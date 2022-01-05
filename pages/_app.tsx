@@ -23,7 +23,7 @@ export default function App ({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Token Gate by CharmVerse</title>
+        <title>Web3 Editor by CharmVerse</title>
         <meta name='description' content={siteDescription} />
         <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       </Head>

@@ -4,10 +4,8 @@ import { useUser } from '@auth0/nextjs-auth0';
 import styled from '@emotion/styled';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import Copyright from '../components/Copyright';
 import PrimaryButton from '../components/PrimaryButton';
 import Link from '@mui/material/Link';
-import EmailIcon from '@mui/icons-material/MailOutline';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { blueColor, greyColor } from '../theme/colors';
@@ -52,7 +50,7 @@ export default function Login () {
           <LogoImage src={'/images/logo_black_lightgrey.png'} />
         </Box>
         <Typography sx={{ fontSize: 32 }}>
-          Token Gate
+          Web3 Editor
         </Typography>
         <Typography sx={{ fontSize: 12, mb: 4 }}>
           Powered by <Link href='https://charmverse.io' target='_blank'>CharmVerse</Link>
