@@ -5,12 +5,12 @@ import BangleEditor from './BangleEditor';
 const Container = styled.div`
   width: 900px;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0 auto 5px;
 `;
 
 const Controls = styled.div`
   margin-top: 80px;
-  margin-bottom:
+  margin-bottom: 4px;
 `;
 
 export function Editor () {
