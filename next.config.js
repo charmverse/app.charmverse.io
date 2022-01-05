@@ -39,4 +39,15 @@ next.isSerializableProps = (page, method, input) => isSerializableProps(page, me
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
-module.exports = withBundleAnalyzer(config);
+
+// fix for esm modules
+const withTM = require('next-transpile-modules')([
+  '@bangle.dev/base-components',
+  '@bangle.dev/core',
+  '@bangle.dev/pm',
+  '@bangle.dev/react',
+  '@bangle.dev/utils',
+  '@bangle.dev/markdown'
+]);
+
+module.exports = withBundleAnalyzer(withTM(config));

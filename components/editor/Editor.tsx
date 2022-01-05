@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import styled from '@emotion/styled';
+import BangleEditor from './BangleEditor';
 
 const Container = styled.div`
   width: 900px;
@@ -9,7 +10,7 @@ const Container = styled.div`
 
 const Controls = styled.div`
   margin-top: 80px;
-  margin-bottom: 4px;
+  margin-bottom:
 `;
 
 export function Editor () {
@@ -26,7 +27,7 @@ export function Editor () {
       <Typography variant='h1'>{page.title}</Typography>
     </Container>
     <Container>
-      Editor!
+      <BangleEditor />
     </Container>
   </>);
 }
