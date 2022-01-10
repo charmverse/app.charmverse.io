@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Theme } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import styled from '@emotion/styled';
+import { css } from '@emotion/react'
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
@@ -42,7 +43,8 @@ const closedMixin = (theme: Theme) => ({
   // },
 });
 
-const DrawerHeader = styled('div')(({ theme }) => ({
+// @ts-ignore necessary for content to be below app bar
+const DrawerHeader = styled.div(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -61,29 +63,30 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-  background: 'transparent',
-  boxShadow: 'none',
-  color: 'inherit',
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
+const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'open' })
+  <{ open: boolean }>(({ theme, open }) => ({
+    background: 'transparent',
+    boxShadow: 'none',
+    color: 'inherit',
+    zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
+      duration: theme.transitions.duration.leavingScreen,
     }),
+    ...(open && {
+      marginLeft: drawerWidth,
+      width: `calc(100% - ${drawerWidth}px)`,
+      transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    })
   })
-}));
+);
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })
+  // @ts-ignore mixins dont work with Typescript
+  <{ open: boolean }>(({ theme, open }) => ({
     width: drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
