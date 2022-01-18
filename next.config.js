@@ -50,6 +50,7 @@ const withTM = require('next-transpile-modules')([
   '@bangle.dev/markdown',
   '@bangle.dev/tooltip',
   '@bangle.dev/react-menu',
+  "@popperjs/core"
 ]);
 
 module.exports = withBundleAnalyzer(withTM(config));
