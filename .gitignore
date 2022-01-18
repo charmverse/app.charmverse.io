@@ -1,0 +1,23 @@
+
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# production
+*.zip
+
+# misc
+.DS_Store
+.env.local
+.env.production
+
+# user data
+*.csv
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
