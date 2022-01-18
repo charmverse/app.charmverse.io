@@ -1,10 +1,3 @@
-import '@bangle.dev/core/style.css';
-import {
-  BangleEditor,
-  SpecRegistry,
-} from '@bangle.dev/core';
-import { useEditorState, BangleEditor as ReactBangleEditor } from '@bangle.dev/react';
-import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
 import {
   blockquote,
   bold,
@@ -21,8 +14,85 @@ import {
   orderedList,
   paragraph,
   strike,
-  underline,
+  underline
 } from '@bangle.dev/base-components';
+import {
+  BangleEditor,
+  SpecRegistry
+} from '@bangle.dev/core';
+import '@bangle.dev/core/style.css';
+import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
+import { EditorView } from '@bangle.dev/pm';
+import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
+import { ActionKind, autocomplete, closeAutocomplete, FromTo, Options } from "prosemirror-autocomplete";
+import { useEffect } from 'react';
+
+const picker = {
+  view: null as EditorView | null,
+  open: false,
+  current: 0,
+  range: null as FromTo | null,
+};
+
+
+
+const NUM_SUGGESTIONS = 3;
+
+function placeSuggestion() {
+  const suggestion = document.querySelector('#suggestion') as HTMLDivElement;
+  suggestion.style.display = picker.open ? 'block' : 'none';
+  const rect = document.getElementsByClassName('autocomplete')[0]?.getBoundingClientRect();
+  if (!rect) return;
+  suggestion.style.top = `${rect.top + rect.height}px`;
+  suggestion.style.left = `${rect.left}px`;
+  [].forEach.call(suggestion.children, (item: HTMLDivElement, i) => {
+    item.classList[i === picker.current ? 'add' : 'remove']('selected');
+  });
+}
+
+
+const options: Options = {
+  reducer: (action) => {
+    picker.view = action.view;
+    switch (action.kind) {
+      case ActionKind.open:
+        picker.current = 0;
+        picker.open = true;
+        picker.range = action.range;
+        placeSuggestion();
+        return true;
+      case ActionKind.close:
+        picker.open = false;
+        placeSuggestion();
+        return true;
+      case ActionKind.up:
+        picker.current -= 1;
+        picker.current += NUM_SUGGESTIONS; // negative modulus doesn't work
+        picker.current %= NUM_SUGGESTIONS;
+        placeSuggestion();
+        return true;
+      case ActionKind.down:
+        picker.current += 1;
+        picker.current %= NUM_SUGGESTIONS;
+        placeSuggestion();
+        return true;
+      case ActionKind.enter: {
+        const tr = action.view.state.tr
+          .deleteRange(action.range.from, action.range.to)
+          .insertText(`You can define this ${action.type ? `${action.type?.name} ` : ''}action!`);
+        action.view.dispatch(tr);
+        return true;
+      }
+      default:
+        return false;
+    }
+  },
+  triggers: [
+    // For demo purposes, make the `#` and `@` easier to create
+    { name: 'emoji', trigger: ':' },
+    { name: 'command', trigger: '/', decorationAttrs: { class: 'command' } },
+  ],
+};
 
 const specRegistry = new SpecRegistry([
   blockquote.spec(),
@@ -45,7 +115,26 @@ const specRegistry = new SpecRegistry([
 const parser = markdownParser(specRegistry);
 const serializer = markdownSerializer(specRegistry);
 
-export default function Editor () {
+export default function Editor() {
+
+  useEffect(() => {
+    const suggestion = document.querySelector('#suggestion') as HTMLDivElement;
+    Array.from(suggestion.children).forEach((item, index) => {
+      item.addEventListener('click', () => {
+        if (!picker.view) return;
+        closeAutocomplete(picker.view);
+        picker.open = false;
+        placeSuggestion();
+        if (!picker.range) return;
+        const tr = picker.view.state.tr
+          .deleteRange(picker.range.from, picker.range.to)
+          .insertText(`Clicked on ${index + 1}`);
+        picker.view.dispatch(tr);
+        picker.view.focus();
+      });
+    })
+  }, [])
+
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -65,14 +154,22 @@ export default function Editor () {
       paragraph.plugins(),
       strike.plugins(),
       underline.plugins(),
+      ...autocomplete(options)
     ],
     initialValue: parser.parse(getMarkdown()),
   });
 
-  return <ReactBangleEditor state={state} />;
+  return <>
+    <ReactBangleEditor state={state} />
+    <div id="suggestion" style={{ display: "none" }}>
+      <div>Suggestion 1</div>
+      <div>Suggestion 2</div>
+      <div>Suggestion 3</div>
+    </div>
+  </>;
 }
 
-export function serializeMarkdown (editor: BangleEditor) {
+export function serializeMarkdown(editor: BangleEditor) {
   return serializer.serialize(editor.view.state.doc);
 }
 
