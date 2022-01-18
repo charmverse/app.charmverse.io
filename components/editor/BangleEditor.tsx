@@ -21,6 +21,7 @@ import {
 } from '@bangle.dev/core';
 import '@bangle.dev/core/style.css';
 import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
+import { NodeSelection } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
 import '@bangle.dev/react-menu/style.css';
@@ -70,6 +71,12 @@ export default function Editor() {
       underline.plugins(),
       floatingMenu.plugins({
         key: menuKey,
+        calculateType: (state, prevType) => {
+          if ((state.selection as NodeSelection)?.node?.type?.name === "image") {
+            return null;
+          }
+          return 'defaultMenu'
+        }
       }),
     ],
     initialValue: parser.parse(getMarkdown()),
