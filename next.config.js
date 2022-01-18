@@ -4,11 +4,11 @@ const config = {
   webpack5: true,
   async redirects() {
     return [
-      // {
-      //   source: '/',
-      //   destination: '/settings',
-      //   permanent: false,
-      // },
+      {
+        source: '/',
+        destination: '/blocks',
+        permanent: false,
+      },
     ]
   },
   webpack(config, { isServer }) {
