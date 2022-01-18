@@ -47,7 +47,9 @@ const withTM = require('next-transpile-modules')([
   '@bangle.dev/pm',
   '@bangle.dev/react',
   '@bangle.dev/utils',
-  '@bangle.dev/markdown'
+  '@bangle.dev/markdown',
+  '@bangle.dev/tooltip',
+  '@bangle.dev/react-menu',
 ]);
 
 module.exports = withBundleAnalyzer(withTM(config));
