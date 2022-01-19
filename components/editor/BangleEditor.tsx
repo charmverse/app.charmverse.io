@@ -71,7 +71,11 @@ export default function Editor() {
       underline.plugins(),
       floatingMenu.plugins({
         key: menuKey,
-        calculateType: (state, prevType) => {
+        calculateType: (state,) => {
+          if (state.selection.empty) {
+            return null;
+          }
+
           if ((state.selection as NodeSelection)?.node?.type?.name === "image") {
             return null;
           }
