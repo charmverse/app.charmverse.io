@@ -1,10 +1,3 @@
-import '@bangle.dev/core/style.css';
-import {
-  BangleEditor,
-  SpecRegistry,
-} from '@bangle.dev/core';
-import { useEditorState, BangleEditor as ReactBangleEditor } from '@bangle.dev/react';
-import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
 import {
   blockquote,
   bold,
@@ -21,8 +14,19 @@ import {
   orderedList,
   paragraph,
   strike,
-  underline,
+  underline
 } from '@bangle.dev/base-components';
+import {
+  BangleEditor, PluginKey, SpecRegistry
+} from '@bangle.dev/core';
+import '@bangle.dev/core/style.css';
+import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
+import { NodeSelection } from '@bangle.dev/pm';
+import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
+import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
+import '@bangle.dev/react-menu/style.css';
+import '@bangle.dev/tooltip/style.css';
+const menuKey = new PluginKey('menuKey');
 
 const specRegistry = new SpecRegistry([
   blockquote.spec(),
@@ -45,7 +49,7 @@ const specRegistry = new SpecRegistry([
 const parser = markdownParser(specRegistry);
 const serializer = markdownSerializer(specRegistry);
 
-export default function Editor () {
+export default function Editor() {
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -65,14 +69,29 @@ export default function Editor () {
       paragraph.plugins(),
       strike.plugins(),
       underline.plugins(),
+      floatingMenu.plugins({
+        key: menuKey,
+        calculateType: (state,) => {
+          if (state.selection.empty) {
+            return null;
+          }
+
+          if ((state.selection as NodeSelection)?.node?.type?.name === "image") {
+            return null;
+          }
+          return 'defaultMenu'
+        }
+      }),
     ],
     initialValue: parser.parse(getMarkdown()),
   });
 
-  return <ReactBangleEditor state={state} />;
+  return <ReactBangleEditor state={state}>
+    <FloatingMenu menuKey={menuKey} />
+  </ReactBangleEditor>
 }
 
-export function serializeMarkdown (editor: BangleEditor) {
+export function serializeMarkdown(editor: BangleEditor) {
   return serializer.serialize(editor.view.state.doc);
 }
 
