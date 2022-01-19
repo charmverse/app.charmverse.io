@@ -17,15 +17,18 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import {
-  BangleEditor,
-  SpecRegistry
+  BangleEditor, PluginKey, SpecRegistry
 } from '@bangle.dev/core';
 import '@bangle.dev/core/style.css';
 import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
-import { EditorView } from '@bangle.dev/pm';
+import { EditorView, NodeSelection } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
+import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
+import '@bangle.dev/react-menu/style.css';
+import '@bangle.dev/tooltip/style.css';
 import { ActionKind, autocomplete, closeAutocomplete, FromTo, Options } from "prosemirror-autocomplete";
 import { useEffect } from 'react';
+const menuKey = new PluginKey('menuKey');
 
 const picker = {
   view: null as EditorView | null,
@@ -33,8 +36,6 @@ const picker = {
   current: 0,
   range: null as FromTo | null,
 };
-
-
 
 const NUM_SUGGESTIONS = 3;
 
@@ -116,24 +117,26 @@ const parser = markdownParser(specRegistry);
 const serializer = markdownSerializer(specRegistry);
 
 export default function Editor() {
+  const suggestion = document.querySelector('#suggestion') as HTMLDivElement;
 
   useEffect(() => {
-    const suggestion = document.querySelector('#suggestion') as HTMLDivElement;
-    Array.from(suggestion.children).forEach((item, index) => {
-      item.addEventListener('click', () => {
-        if (!picker.view) return;
-        closeAutocomplete(picker.view);
-        picker.open = false;
-        placeSuggestion();
-        if (!picker.range) return;
-        const tr = picker.view.state.tr
-          .deleteRange(picker.range.from, picker.range.to)
-          .insertText(`Clicked on ${index + 1}`);
-        picker.view.dispatch(tr);
-        picker.view.focus();
-      });
-    })
-  }, [])
+    if (suggestion) {
+      Array.from(suggestion.children).forEach((item, index) => {
+        item.addEventListener('click', () => {
+          if (!picker.view) return;
+          closeAutocomplete(picker.view);
+          picker.open = false;
+          placeSuggestion();
+          if (!picker.range) return;
+          const tr = picker.view.state.tr
+            .deleteRange(picker.range.from, picker.range.to)
+            .insertText(`Clicked on ${index + 1}`);
+          picker.view.dispatch(tr);
+          picker.view.focus();
+        });
+      })
+    }
+  }, [suggestion])
 
   const state = useEditorState({
     specRegistry,
@@ -154,19 +157,32 @@ export default function Editor() {
       paragraph.plugins(),
       strike.plugins(),
       underline.plugins(),
-      ...autocomplete(options)
+      ...autocomplete(options),
+      floatingMenu.plugins({
+        key: menuKey,
+        calculateType: (state,) => {
+          if (state.selection.empty) {
+            return null;
+          }
+
+          if ((state.selection as NodeSelection)?.node?.type?.name === "image") {
+            return null;
+          }
+          return 'defaultMenu'
+        }
+      }),
     ],
     initialValue: parser.parse(getMarkdown()),
   });
 
-  return <>
-    <ReactBangleEditor state={state} />
+  return <ReactBangleEditor state={state}>
+    <FloatingMenu menuKey={menuKey} />
     <div id="suggestion" style={{ display: "none" }}>
       <div>Suggestion 1</div>
       <div>Suggestion 2</div>
       <div>Suggestion 3</div>
     </div>
-  </>;
+  </ReactBangleEditor>
 }
 
 export function serializeMarkdown(editor: BangleEditor) {
