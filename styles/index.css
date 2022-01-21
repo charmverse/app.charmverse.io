@@ -39,8 +39,13 @@
   background: white;
   border: none;
   font-size: 20px !important;
+  padding: 0px !important;
 }
 
 .bangle-emoji-square:hover {
   cursor: pointer;
+}
+
+.bangle-emoji-square.bangle-is-selected {
+  background: rgb(223, 223, 223);
 }
