@@ -27,7 +27,7 @@ import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
 import '@bangle.dev/react-menu/style.css';
 import '@bangle.dev/tooltip/style.css';
 import { ActionKind, autocomplete, closeAutocomplete, FromTo, Options } from "prosemirror-autocomplete";
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 const menuKey = new PluginKey('menuKey');
 
 const picker = {
@@ -95,15 +95,6 @@ const options: Options = {
   ],
 };
 
-// bold.spec(),
-// italic.spec(),
-// link.spec(),
-// blockquote.spec(),
-// orderedList.spec(),
-// bulletList.spec(),
-// listItem.spec(),
-// paragraph.spec(),
-// heading.spec(),
 const specRegistry = new SpecRegistry([
   blockquote.spec(),
   bold.spec(),
