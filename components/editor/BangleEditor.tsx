@@ -71,6 +71,7 @@ const options: Options = {
         placeSuggestion();
         return true;
       case ActionKind.up:
+        console.log(123);
         picker.current -= 1;
         picker.current += totalDropdownItems; // negative modulus doesn't work
         picker.current %= totalDropdownItems;
@@ -223,10 +224,10 @@ export default function Editor() {
     <FloatingMenu menuKey={menuKey} />
     <EmojiSuggest emojiSuggestKey={emojiSuggestKey} />
     <div id="suggestion" style={{ display: "none" }}>
-      {(dropdownGroups as DropdownGroup[]).map(dropdownGroup => <div className="suggestion-group">
+      {(dropdownGroups as DropdownGroup[]).map(dropdownGroup => <div className="suggestion-group" key={dropdownGroup.group}>
         <div className="suggestion-group-name">{dropdownGroup.group}</div>
         <div className="suggestion-group-items">
-          {dropdownGroup.items.map(item => <div onClick={suggestionItemClickHandler} className="suggestion-group-item">
+          {dropdownGroup.items.map(item => <div key={`${dropdownGroup.group}.${item.label}`} onClick={suggestionItemClickHandler} className="suggestion-group-item">
             <span className="suggestion-group-item-icon">{item.icon}</span>
             <span className="suggestion-group-item-label">{item.label}</span>
           </div>)}
