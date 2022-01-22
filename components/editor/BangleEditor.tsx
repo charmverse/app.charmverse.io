@@ -30,7 +30,6 @@ import '@bangle.dev/react-menu/style.css';
 import '@bangle.dev/tooltip/style.css';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { ActionKind, autocomplete, closeAutocomplete, FromTo, Options } from "prosemirror-autocomplete";
-import { useEffect } from 'react';
 
 const menuKey = new PluginKey('menuKey');
 
@@ -144,28 +143,20 @@ const specRegistry = new SpecRegistry([
 const parser = markdownParser(specRegistry);
 const serializer = markdownSerializer(specRegistry);
 
+function suggestionItemClickHandler() {
+  if (!picker.view) return;
+  closeAutocomplete(picker.view);
+  picker.open = false;
+  placeSuggestion();
+  if (!picker.range) return;
+  const tr = picker.view.state.tr
+    .deleteRange(picker.range.from, picker.range.to)
+    .insertText(`Clicked`);
+  picker.view.dispatch(tr);
+  picker.view.focus();
+}
+
 export default function Editor() {
-  const suggestion = document.querySelector('#suggestion') as HTMLDivElement;
-
-  useEffect(() => {
-    if (suggestion) {
-      Array.from(suggestion.children).forEach((item, index) => {
-        item.addEventListener('click', () => {
-          if (!picker.view) return;
-          closeAutocomplete(picker.view);
-          picker.open = false;
-          placeSuggestion();
-          if (!picker.range) return;
-          const tr = picker.view.state.tr
-            .deleteRange(picker.range.from, picker.range.to)
-            .insertText(`Clicked on ${index + 1}`);
-          picker.view.dispatch(tr);
-          picker.view.focus();
-        });
-      })
-    }
-  }, [suggestion])
-
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -230,9 +221,9 @@ export default function Editor() {
     <FloatingMenu menuKey={menuKey} />
     <EmojiSuggest emojiSuggestKey={emojiSuggestKey} />
     <div id="suggestion" style={{ display: "none" }}>
-      <div>Suggestion 1</div>
-      <div>Suggestion 2</div>
-      <div>Suggestion 3</div>
+      <div onClick={suggestionItemClickHandler}>Suggestion 1</div>
+      <div onClick={suggestionItemClickHandler}>Suggestion 2</div>
+      <div onClick={suggestionItemClickHandler}>Suggestion 3</div>
     </div>
   </ReactBangleEditor>
 }

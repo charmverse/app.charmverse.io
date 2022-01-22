@@ -1,0 +1,19 @@
+[
+  {
+    "group": "Headings",
+    "items": [
+      {
+        "label": "Heading 1",
+        "icon": "H1"
+      },
+      {
+        "label": "Heading 2",
+        "icon": "H2"
+      },
+      {
+        "label": "Heading 3",
+        "icon": "H3"
+      }
+    ]
+  }
+]
