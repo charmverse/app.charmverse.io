@@ -20,14 +20,18 @@ import {
   BangleEditor, PluginKey, SpecRegistry
 } from '@bangle.dev/core';
 import '@bangle.dev/core/style.css';
+import { emoji } from '@bangle.dev/emoji';
 import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
 import { EditorView, NodeSelection } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
+import { EmojiSuggest, emojiSuggest } from '@bangle.dev/react-emoji-suggest';
 import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
 import '@bangle.dev/react-menu/style.css';
 import '@bangle.dev/tooltip/style.css';
+import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { ActionKind, autocomplete, closeAutocomplete, FromTo, Options } from "prosemirror-autocomplete";
 import { useEffect } from 'react';
+
 const menuKey = new PluginKey('menuKey');
 
 const picker = {
@@ -50,7 +54,6 @@ function placeSuggestion() {
     item.classList[i === picker.current ? 'add' : 'remove']('selected');
   });
 }
-
 
 const options: Options = {
   reducer: (action) => {
@@ -89,10 +92,30 @@ const options: Options = {
     }
   },
   triggers: [
-    // For demo purposes, make the `#` and `@` easier to create
-    { name: 'emoji', trigger: ':' },
     { name: 'command', trigger: '/', decorationAttrs: { class: 'command' } },
   ],
+};
+
+const emojiSuggestKey = new PluginKey('emojiSuggestKey');
+
+const emojiData = Object.values(
+  gemojiData.reduce((prev, obj) => {
+    if (!prev[obj.category]) {
+      prev[obj.category] = { name: obj.category, emojis: [] };
+    }
+    prev[obj.category].emojis.push([obj.aliases[0], obj.emoji]);
+
+    return prev;
+  }, {} as Record<string, { name: string, emojis: [string, string][] }>),
+);
+
+const getEmojiByAlias = (emojiAlias: string) => {
+  for (const { emojis } of emojiData) {
+    const match = emojis.find((e) => e[0] === emojiAlias);
+    if (match) {
+      return match;
+    }
+  }
 };
 
 const specRegistry = new SpecRegistry([
@@ -109,6 +132,11 @@ const specRegistry = new SpecRegistry([
   paragraph.spec(),
   strike.spec(),
   underline.spec(),
+  emoji.spec({
+    getEmoji: (emojiAlias) =>
+      (getEmojiByAlias(emojiAlias) || ['question', '❓'])[1],
+  }),
+  emojiSuggest.spec({ markName: 'emojiSuggest' }),
   code.spec(),
   codeBlock.spec(),
   heading.spec(),
@@ -158,6 +186,29 @@ export default function Editor() {
       strike.plugins(),
       underline.plugins(),
       ...autocomplete(options),
+      emoji.plugins(),
+      emojiSuggest.plugins({
+        key: emojiSuggestKey,
+        getEmojiGroups: (queryText) => {
+          if (!queryText) {
+            return emojiData;
+          }
+          return emojiData
+            .map((group) => {
+              return {
+                name: group.name,
+                emojis: group.emojis.filter(([emojiAlias]) =>
+                  emojiAlias.includes(queryText),
+                ),
+              };
+            })
+            .filter((group) => group.emojis.length > 0);
+        },
+        markName: 'emojiSuggest',
+        tooltipRenderOpts: {
+          placement: 'bottom',
+        },
+      }),
       floatingMenu.plugins({
         key: menuKey,
         calculateType: (state,) => {
@@ -177,6 +228,7 @@ export default function Editor() {
 
   return <ReactBangleEditor state={state}>
     <FloatingMenu menuKey={menuKey} />
+    <EmojiSuggest emojiSuggestKey={emojiSuggestKey} />
     <div id="suggestion" style={{ display: "none" }}>
       <div>Suggestion 1</div>
       <div>Suggestion 2</div>
