@@ -122,10 +122,7 @@ const specRegistry = new SpecRegistry([
   blockquote.spec(),
   bold.spec(),
   bulletList.spec(),
-  code.spec(),
-  codeBlock.spec(),
   hardBreak.spec(),
-  heading.spec(),
   horizontalRule.spec(),
   image.spec(),
   italic.spec(),
@@ -140,6 +137,9 @@ const specRegistry = new SpecRegistry([
       (getEmojiByAlias(emojiAlias) || ['question', '❓'])[1],
   }),
   emojiSuggest.spec({ markName: 'emojiSuggest' }),
+  code.spec(),
+  codeBlock.spec(),
+  heading.spec(),
 ]);
 const parser = markdownParser(specRegistry);
 const serializer = markdownSerializer(specRegistry);
