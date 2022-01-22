@@ -30,6 +30,8 @@ import '@bangle.dev/react-menu/style.css';
 import '@bangle.dev/tooltip/style.css';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { ActionKind, autocomplete, closeAutocomplete, FromTo, Options } from "prosemirror-autocomplete";
+import { DropdownGroup } from '../../components/types';
+import dropdownGroups from "../dropdown.json";
 
 const menuKey = new PluginKey('menuKey');
 
@@ -40,7 +42,7 @@ const picker = {
   range: null as FromTo | null,
 };
 
-const NUM_SUGGESTIONS = 3;
+const totalDropdownItems = dropdownGroups.reduce((current, dropdownGroup) => current + dropdownGroup.items.length, 0);
 
 function placeSuggestion() {
   const suggestion = document.querySelector('#suggestion') as HTMLDivElement;
@@ -70,13 +72,13 @@ const options: Options = {
         return true;
       case ActionKind.up:
         picker.current -= 1;
-        picker.current += NUM_SUGGESTIONS; // negative modulus doesn't work
-        picker.current %= NUM_SUGGESTIONS;
+        picker.current += totalDropdownItems; // negative modulus doesn't work
+        picker.current %= totalDropdownItems;
         placeSuggestion();
         return true;
       case ActionKind.down:
         picker.current += 1;
-        picker.current %= NUM_SUGGESTIONS;
+        picker.current %= totalDropdownItems;
         placeSuggestion();
         return true;
       case ActionKind.enter: {
@@ -221,9 +223,15 @@ export default function Editor() {
     <FloatingMenu menuKey={menuKey} />
     <EmojiSuggest emojiSuggestKey={emojiSuggestKey} />
     <div id="suggestion" style={{ display: "none" }}>
-      <div onClick={suggestionItemClickHandler}>Suggestion 1</div>
-      <div onClick={suggestionItemClickHandler}>Suggestion 2</div>
-      <div onClick={suggestionItemClickHandler}>Suggestion 3</div>
+      {(dropdownGroups as DropdownGroup[]).map(dropdownGroup => <div className="suggestion-group">
+        <div className="suggestion-group-name">{dropdownGroup.group}</div>
+        <div className="suggestion-group-items">
+          {dropdownGroup.items.map(item => <div onClick={suggestionItemClickHandler} className="suggestion-group-item">
+            <span className="suggestion-group-item-icon">{item.icon}</span>
+            <span className="suggestion-group-item-label">{item.label}</span>
+          </div>)}
+        </div>
+      </div>)}
     </div>
   </ReactBangleEditor>
 }

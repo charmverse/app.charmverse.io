@@ -18,14 +18,31 @@
   padding: 10px;
   transform: translateY(-1px);
 }
-/* You actually should do the UI with a mouse enter event rather than css hover */
-#suggestion:hover .selected {
-  background-color: white;
+
+.suggestion-group {
+  padding: 5px;
 }
-#suggestion:hover > div:hover,
-#suggestion .selected {
+
+.suggestion-group-name {
+  font-size: 20px;
+}
+
+.suggestion-group-item {
+  padding: 5px;
+}
+
+.suggestion-group-item.selected, .suggestion-group-item:hover {
   background-color: wheat;
   cursor: pointer;
+}
+
+.suggestion-group-items {
+  padding-left: 10px;
+  font-size: 16px;
+}
+
+.suggestion-group-item-icon {
+  padding-right: 10px;
 }
 
 .bangle-emoji-suggest {
