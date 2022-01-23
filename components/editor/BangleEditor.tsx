@@ -49,7 +49,6 @@ function placeSuggestion() {
   const suggestion = document.querySelector('#suggestion') as HTMLDivElement;
   suggestion.style.display = picker.open ? 'block' : 'none';
   const rect = document.getElementsByClassName('autocomplete')[0]?.getBoundingClientRect();
-  console.log({ rect });
 
   if (!rect) return;
   suggestion.style.top = `${rect.top + rect.height}px`;
@@ -75,7 +74,6 @@ const options: Options = {
         placeSuggestion();
         return true;
       case ActionKind.up:
-        console.log(action);
         picker.current -= 1;
         picker.current += totalDropdownItems; // negative modulus doesn't work
         picker.current %= totalDropdownItems;
@@ -103,7 +101,6 @@ const options: Options = {
 };
 
 function suggestionItemClickHandler() {
-  console.log(123);
   if (!picker.view) return;
   closeAutocomplete(picker.view);
   picker.open = false;
