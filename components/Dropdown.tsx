@@ -1,4 +1,4 @@
-import { EditorView } from "@bangle.dev/pm";
+import { EditorView, Schema } from "@bangle.dev/pm";
 import autocomplete, { ActionKind, closeAutocomplete, FromTo, Options } from "prosemirror-autocomplete";
 import dropdownGroups from "./dropdown.json";
 import { DropdownGroup } from "./types";
@@ -53,9 +53,35 @@ const options: Options = {
         placeSuggestion();
         return true;
       case ActionKind.enter: {
+        const selectedDropdownItem = dropdownItems.find(dropdownItem => dropdownItem.classList.contains("selected"));
+        const schema = (action.view.state.schema as Schema);
+        let fragment = schema.nodes.paragraph.create();
+        if (selectedDropdownItem) {
+          const selectedDropdownItemLabel = selectedDropdownItem.querySelector(".suggestion-group-item-label")!.textContent;
+          switch (selectedDropdownItemLabel) {
+            case "Heading 1": {
+              fragment = schema.nodes.heading.create({
+                level: 1
+              })
+              break;
+            }
+            case "Heading 2": {
+              fragment = schema.nodes.heading.create({
+                level: 2
+              })
+              break;
+            }
+            case "Heading 3": {
+              fragment = schema.nodes.heading.create({
+                level: 3
+              })
+              break;
+            }
+          }
+        }
         const tr = action.view.state.tr
           .deleteRange(action.range.from, action.range.to)
-          .insertText(`You can define this ${action.type ? `${action.type?.name} ` : ''}action!`);
+          .insert(action.range.from, fragment);
         action.view.dispatch(tr);
         return true;
       }
@@ -78,7 +104,7 @@ function dropdownItemClickHandler() {
   if (!picker.range) return;
   const tr = picker.view.state.tr
     .deleteRange(picker.range.from, picker.range.to)
-    .insertText(`Clicked`);
+    .insert(picker.range.from, picker.view.state.schema.nodes.paragraph.create("Hello World", null, null));
   picker.view.dispatch(tr);
   picker.view.focus();
 }
