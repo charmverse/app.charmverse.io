@@ -22,24 +22,18 @@ import {
 import '@bangle.dev/core/style.css';
 import { emoji } from '@bangle.dev/emoji';
 import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
-import { EditorView, NodeSelection } from '@bangle.dev/pm';
+import { keymap, NodeSelection } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { EmojiSuggest, emojiSuggest } from '@bangle.dev/react-emoji-suggest';
 import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
 import '@bangle.dev/react-menu/style.css';
 import '@bangle.dev/tooltip/style.css';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
-import { FromTo } from "prosemirror-autocomplete";
-
+import { paletteMarkName, palettePluginKey } from '../@bangle.io/extensions/inline-command-palette/config';
+import { InlineCommandPalette } from "../@bangle.io/extensions/inline-command-palette/InlineCommandPalette";
+import { inlinePalette, queryInlinePaletteActive } from '../@bangle.io/js-lib/inline-palette';
+import { keybindings } from '../@bangle.io/lib/config';
 const menuKey = new PluginKey('menuKey');
-
-const picker = {
-  view: null as EditorView | null,
-  open: false,
-  current: 0,
-  range: null as FromTo | null,
-};
-
 const emojiSuggestKey = new PluginKey('emojiSuggestKey');
 
 const emojiData = Object.values(
@@ -61,6 +55,8 @@ const getEmojiByAlias = (emojiAlias: string) => {
     }
   }
 };
+
+const trigger = '/';
 
 const specRegistry = new SpecRegistry([
   blockquote.spec(),
@@ -84,13 +80,12 @@ const specRegistry = new SpecRegistry([
   code.spec(),
   codeBlock.spec(),
   heading.spec(),
+  inlinePalette.spec({ markName: paletteMarkName, trigger })
 ]);
 const parser = markdownParser(specRegistry);
 const serializer = markdownSerializer(specRegistry);
 
 export default function Editor() {
-  const suggestion = document.querySelector('#suggestion') as HTMLDivElement;
-
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -146,6 +141,33 @@ export default function Editor() {
           return 'defaultMenu'
         }
       }),
+      keymap({
+        [keybindings.toggleInlineCommandPalette.key]: (
+          state,
+          dispatch,
+          view,
+        ): boolean => {
+          const { tr, schema, selection } = state;
+
+          if (queryInlinePaletteActive(palettePluginKey)(state)) {
+            return false;
+          }
+          const marks = selection.$from.marks();
+          const mark = schema.mark(paletteMarkName, { trigger });
+
+          const textBefore = selection.$from.nodeBefore?.text;
+          // Insert a space so we follow the convention of <space> trigger
+          if (textBefore && !textBefore.endsWith(' ')) {
+            tr.replaceSelectionWith(schema.text(' '), false);
+          }
+          tr.replaceSelectionWith(
+            schema.text(trigger, [mark, ...marks]),
+            false,
+          );
+          dispatch?.(tr);
+          return true;
+        },
+      }),
     ],
     initialValue: parser.parse(getMarkdown()),
   });
@@ -153,6 +175,7 @@ export default function Editor() {
   return <ReactBangleEditor state={state}>
     <FloatingMenu menuKey={menuKey} />
     <EmojiSuggest emojiSuggestKey={emojiSuggestKey} />
+    <InlineCommandPalette />
   </ReactBangleEditor>
 }
 
