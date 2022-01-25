@@ -78,7 +78,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
         <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
           <Box display='flex' alignItems='center'>
             <Avatar name='dolemite' />
-            <Box pl={2}>
+            <Box pl={1}>
               <Typography variant='caption' sx={{ display: 'block' }}>
                 <strong>dolemite</strong><br />
                 0x141...fBf4
