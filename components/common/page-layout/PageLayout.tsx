@@ -9,10 +9,10 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import Header from './Header';
+import Header, { toolbarHeight } from './Header';
 import Sidebar from './Sidebar';
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const openedMixin = (theme: Theme) => ({
   marginRight: 0,
@@ -90,11 +90,11 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
-        <Toolbar>
+      <AppBar position='fixed' open={open}>
+        <Toolbar variant='dense' sx={{ height: toolbarHeight, minHeight: toolbarHeight }}>
           <IconButton
-            color="inherit"
-            aria-label="open drawer"
+            color='inherit'
+            aria-label='open drawer'
             onClick={handleDrawerOpen}
             edge="start"
             sx={{
@@ -109,11 +109,11 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer variant="permanent" open={open}>
+      <Drawer variant='permanent' open={open}>
         <Sidebar closeSidebar={handleDrawerClose} />
       </Drawer>
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-        <Box component="main" sx={{ flexGrow: 1 }}>
+        <Box component='main' sx={{ flexGrow: 1 }}>
           <Header />
           {children}
         </Box>

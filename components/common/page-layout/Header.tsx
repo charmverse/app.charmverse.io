@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 
+export const toolbarHeight = 56;
+
 // @ts-ignore necessary for content to be below app bar
 const AppBar = styled.div(({ theme }) => ({
   display: 'flex',
@@ -17,7 +19,7 @@ const AppBar = styled.div(({ theme }) => ({
     opacity: 1
   },
   // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
+  minHeight: toolbarHeight
 }));
 
 

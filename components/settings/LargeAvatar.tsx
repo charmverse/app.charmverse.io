@@ -8,11 +8,12 @@ const StyledAvatar = styled(Avatar)`
   font-weight: 500;
   width: 150px;
   height: 150px;
+  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
 `;
 
-export default function ({ name = '' }: { name: string }) {
+export default function ({ name = '', variant }: { name: string, variant?: 'circular' | 'rounded' | 'square' }) {
   return (
-    <StyledAvatar sx={{ bgcolor: stringToColor(name) }}>
+    <StyledAvatar sx={{ bgcolor: stringToColor(name) }} variant={variant}>
       {name.charAt(0).toUpperCase()}
     </StyledAvatar>
   );

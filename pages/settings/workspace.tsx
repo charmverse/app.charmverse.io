@@ -37,7 +37,7 @@ export default function WorkspaceSettings () {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container direction={'column'} spacing={3}>
         <Grid item>
-          <Avatar name={watchName} />
+          <Avatar name={watchName} variant='rounded' />
         </Grid>
         <Grid item>
           <FieldLabel>Name</FieldLabel>
