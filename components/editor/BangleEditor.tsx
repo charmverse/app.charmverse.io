@@ -22,7 +22,7 @@ import {
 import '@bangle.dev/core/style.css';
 import { emoji } from '@bangle.dev/emoji';
 import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
-import { keymap, NodeSelection } from '@bangle.dev/pm';
+import { EditorView, keymap, NodeSelection } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { EmojiSuggest, emojiSuggest } from '@bangle.dev/react-emoji-suggest';
 import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
@@ -85,10 +85,21 @@ const specRegistry = new SpecRegistry([
 const parser = markdownParser(specRegistry);
 const serializer = markdownSerializer(specRegistry);
 
+const getScrollContainer = (view: EditorView) => {
+  return view.dom.parentElement!;
+};
+
 export default function Editor() {
   const state = useEditorState({
     specRegistry,
     plugins: () => [
+      inlinePalette.plugins({
+        key: palettePluginKey,
+        markName: paletteMarkName,
+        tooltipRenderOpts: {
+          getScrollContainer,
+        },
+      }),
       blockquote.plugins(),
       bold.plugins(),
       bulletList.plugins(),

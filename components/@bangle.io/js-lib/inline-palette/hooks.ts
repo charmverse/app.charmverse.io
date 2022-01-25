@@ -4,8 +4,6 @@ import { suggestTooltip } from '@bangle.dev/tooltip';
 import { useCallback, useEffect } from 'react';
 import { getSuggestTooltipKey } from './inline-palette';
 
-
-
 export function useInlinePaletteQuery(inlinePaletteKey: PluginKey) {
   const view = useEditorViewContext();
   // TODO show is a bad name

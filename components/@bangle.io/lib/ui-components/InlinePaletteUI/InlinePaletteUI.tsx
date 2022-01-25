@@ -3,7 +3,7 @@ import {
   cx,
   isTouchDevice,
   safeScrollIntoViewIfNeeded
-} from '../utils/utility';
+} from '../../utils/utility';
 
 const PADDING_OFFSET = 16;
 const BASE_PADDING = 16;

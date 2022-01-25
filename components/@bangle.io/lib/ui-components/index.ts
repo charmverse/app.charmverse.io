@@ -1,3 +1,3 @@
-export * from "./InlinePaletteUI";
+export * from "./InlinePaletteUI/InlinePaletteUI";
 export * from "./UniversalPalette";
 

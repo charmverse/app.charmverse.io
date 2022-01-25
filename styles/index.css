@@ -19,3 +19,102 @@
 .bangle-emoji-square.bangle-is-selected {
   background: rgb(223, 223, 223);
 }
+
+.bangle-heading-collapsed {
+  background-color: var(--window-bgColor-2);
+  border-radius: 8px;
+}
+
+.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
+  margin-top: 0.45rem;
+}
+
+.bangle-editor .selected-node {
+  animation-duration: 0.75s;
+  animation-name: editorSelectedNode;
+  animation-timing-function: ease-out;
+}
+
+@keyframes editorSelectedNode {
+  from {
+    border-radius: 4px;
+    background-color: var(--editorCore-selectionChange-bgColor);
+  }
+
+  to {
+  }
+}
+
+:root {
+  --textColor-1: red;
+}
+
+.bangle-editor a {
+  color: var(--window-link-color);
+  text-decoration: underline;
+}
+
+.bangle-editor li {
+  margin-bottom: 0.25rem;
+}
+
+.bangle-editor p > code {
+  background-color: var(--base-300);
+  color: var(--textColor-1);
+}
+.bangle-editor pre {
+  background-color: var(--base-300);
+}
+
+.bangle-editor blockquote {
+  background-color: var(--base-300);
+  color: var(--textColor-1);
+}
+
+.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
+  margin-top: 0.45rem;
+}
+
+.bangle-editor .ProseMirror-selectednode {
+  outline: 2px solid var(--window-link-color);
+  border-radius: var(--window-pill-borderRadius);
+}
+
+.bangle-tooltip {
+  z-index: var(--window-tooltip-zIndex);
+}
+
+.inline-palette-wrapper {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--window-bgColor-1);
+  max-width: var(--inlineUniversalPalette-maxWidth);
+  min-width: var(--inlineUniversalPalette-maxWidth);
+}
+
+.inline-palette-items-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-height: var(--inlineUniversalPalette-maxHeight);
+  overflow-y: scroll;
+}
+
+.inline-palette-items-wrapper > .inline-palette-row {
+  padding: 0.4rem 0;
+}
+
+.inline-palette-items-wrapper > .inline-palette-row.disabled {
+  background-color: var(--accent-secondary);
+}
+
+.inline-palette-items-wrapper > .inline-palette-row.active.disabled {
+  background-color: var(--accent-secondary);
+}
+
+.inline-palette-items-wrapper > .inline-palette-row.hover-allowed:hover {
+  background-color: var(--accent-secondary);
+}
+
+.inline-palette-items-wrapper > .inline-palette-row.active {
+  background-color: var(--accent-primary-1) !important;
+}
