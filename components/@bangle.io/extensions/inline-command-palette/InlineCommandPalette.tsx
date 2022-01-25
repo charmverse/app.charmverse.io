@@ -6,7 +6,7 @@ import {
   useInlinePaletteItems,
   useInlinePaletteQuery
 } from '../../js-lib/inline-palette';
-import { InlinePaletteRow, UniversalPalette } from '../../lib/ui-components';
+import { InlinePaletteRow } from '../../lib/ui-components';
 import { palettePluginKey } from './config';
 import {
   PaletteItem, PALETTE_ITEM_HINT_TYPE,
@@ -170,17 +170,6 @@ export function InlineCommandPalette() {
           );
         })} */}
       </div>
-      <UniversalPalette.PaletteInfo>
-        <UniversalPalette.PaletteInfoItem>
-          <kbd className="font-normal">↑↓</kbd> Navigate
-        </UniversalPalette.PaletteInfoItem>
-        <UniversalPalette.PaletteInfoItem>
-          <kbd className="font-normal">Enter</kbd> Execute a command
-        </UniversalPalette.PaletteInfoItem>
-        <UniversalPalette.PaletteInfoItem>
-          <kbd className="font-normal">Esc</kbd> Dismiss
-        </UniversalPalette.PaletteInfoItem>
-      </UniversalPalette.PaletteInfo>
     </div>,
     tooltipContentDOM,
   );
