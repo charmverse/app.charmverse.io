@@ -9,5 +9,6 @@ export const greyColor = '#525252';
 export const whiteColor = '#fff';
 export const lightGreyColor = '#eff1f3';
 export const greyColor2 = '#aaa';
+export const darkGreyColor = '#696773';
 
 export const backgroundBlack = '#010302';

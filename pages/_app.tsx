@@ -4,9 +4,9 @@ import { ThemeProvider } from '@mui/material/styles';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useEffect } from 'react';
-import RouteGuard from '../components/RouteGuard';
+import RouteGuard from '../components/common/RouteGuard';
 import "../styles/index.css";
-import { theme } from '../theme';
+import { theme } from 'theme';
 
 export default function App({ Component, pageProps }: AppProps) {
 
