@@ -1,25 +1,16 @@
 import * as React from 'react';
 import { Theme } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import styled from '@emotion/styled';
-import { css } from '@emotion/react'
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
 import CssBaseline from '@mui/material/CssBaseline';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import Link from 'components/common/Link';
-import NextLink from 'next/link';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import { darkGreyColor, greyColor } from 'theme/colors';
+import Header from './Header';
+import Sidebar from './Sidebar';
 
 const drawerWidth = 240;
 
@@ -45,26 +36,6 @@ const closedMixin = (theme: Theme) => ({
   //   width: `calc(${theme.spacing(9)} + 1px)`,
   // },
 });
-
-// @ts-ignore necessary for content to be below app bar
-const DrawerHeader = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: theme.spacing(0, 2),
-  '& .MuiIconButton-root': {
-    opacity: 0,
-    transition: theme.transitions.create('opacity', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  '&:hover .MuiIconButton-root': {
-    opacity: 1
-  },
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-}));
 
 const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'open' })
   <{ open: boolean }>(({ theme, open }) => ({
@@ -106,7 +77,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 export function PageLayout ({ children }: { children: React.ReactNode }) {
-  const theme = useTheme();
   const [open, setOpen] = React.useState(true);
 
   const handleDrawerOpen = () => {
@@ -140,56 +110,13 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
-          <Typography>Acme</Typography>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <Box>
-          <List>
-            <NextLink href='/settings/account' passHref>
-              <ListItem button component='a' disableRipple sx={{ py: 1, color: greyColor + ' !important' }}>
-                <ListItemText disableTypography>
-                    <Box sx={{ fontSize: 14, fontWeight: 500 }}>Settings</Box>
-                </ListItemText>
-              </ListItem>
-            </NextLink>
-          </List>
-        </Box>
-        <Box mb={3}>
-          <Typography sx={{ color: '#999', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-            FAVORITES
-          </Typography>
-        </Box>
-        <Box>
-          <Typography sx={{ color: '#999', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-            WORKSPACE
-          </Typography>
-          <List>
-            <NextLink href='/blocks' passHref>
-              <ListItem button component='a' sx={{ py: 0 }}>
-                <ListItemText disableTypography>
-                    <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
-                </ListItemText>
-              </ListItem>
-            </NextLink>
-          </List>
-        </Box>
-        {/* <List>
-          {['WORKSPACE', 'PRIVATE'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemText disableTypography>
-                <Typography variant='caption'>{text}</Typography>
-              </ListItemText>
-            </ListItem>
-          ))}
-        </List> */}
+        <Sidebar closeSidebar={handleDrawerClose} />
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <DrawerHeader />
-        {children}
+      <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+        <Box component="main" sx={{ flexGrow: 1 }}>
+          <Header />
+          {children}
+        </Box>
       </Box>
     </Box>
   );

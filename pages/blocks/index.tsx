@@ -9,7 +9,6 @@ export default function BlocksEditorPage () {
 }
 
 BlocksEditorPage.getLayout = (page: ReactElement) => {
-  console.log('get editor layout', page);
   return (
     <PageLayout>
       {page}
