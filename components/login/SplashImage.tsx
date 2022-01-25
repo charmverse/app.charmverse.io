@@ -36,7 +36,9 @@ export default function SplashImage () {
             </Box>
           </Grid>
           <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>
-            <Image src={splashImage} />
+            <Box px={3}>
+              <Image src={splashImage} />
+            </Box>
           </Grid>
         </Grid>
       </Container>
