@@ -6,7 +6,7 @@ import Head from 'next/head';
 import type { NextPage } from 'next';
 import { ReactElement, useEffect } from 'react';
 import RouteGuard from 'components/common/RouteGuard';
-import "styles/index.css";
+import 'styles/index.css';
 import { theme } from 'theme';
 
 type NextPageWithLayout = NextPage & {
