@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 import { Theme as MaterialUITheme } from '@mui/material';
 import { darken } from '@mui/system';
-import { darkBlueColor } from './colors';
+import { blueColor, darkBlueColor } from './colors';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
 declare module '@emotion/react' {
@@ -78,7 +78,7 @@ const theme = createTheme({
       main: '#3b5998',
     },
     primary: {
-      main: '#010101',
+      main: blueColor, //'#010101',
     },
     secondary: {
       main: '#777',

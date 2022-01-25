@@ -2,7 +2,6 @@
 import MuiButton from '@mui/material/Button';
 import styled from '@emotion/styled';
 import { darken } from '@mui/system';
-import { lighten } from '@mui/material/styles';
 import Button, { InputProps, StyledSpinner } from './Button';
 import { blueColor } from 'theme/colors';
 
