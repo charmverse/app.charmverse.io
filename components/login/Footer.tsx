@@ -1,13 +1,15 @@
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
 import styled from '@emotion/styled';
 import Link from '@mui/material/Link';
-import PrimaryButton from 'components/common/PrimaryButton';
+import IconButton from '@mui/material/IconButton';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import DiscordIcon from 'public/images/discord_logo.svg';
+import SvgIcon from '@mui/material/SvgIcon';
 
-import logoImage from 'public/images/charmverse_logo.webp';
-import splashImage from 'public/images/charmverse_land.webp';
 import { darkGreyColor, lightGreyColor } from 'theme/colors';
 
 import { Container } from './SplashImage';
@@ -57,9 +59,22 @@ export default function Footer () {
             <LinkHeader>
               Social
             </LinkHeader>
+            <Box display='flex' alignItems='center'>
+              <IconButton sx={{ mr: 1 }} color='white' href='https://www.linkedin.com/company/charmverse' target='_blank'>
+                <LinkedInIcon />
+              </IconButton>
+              <IconButton sx={{ mr: 1 }} color='white' href='https://twitter.com/charmverse' target='_blank'>
+                <TwitterIcon />
+              </IconButton>
+              <IconButton sx={{ mr: 1 }} color='white' href='https://www.facebook.com/charmverse.io' target='_blank'>
+                <FacebookIcon />
+              </IconButton>
+              <IconButton sx={{ mr: 1 }} color='white' href='https://discord.gg/UEsngsk8E2' target='_blank'>
+                <SvgIcon viewBox='0 -5 70 70'><DiscordIcon style={{ fill: '#fff' }} /></SvgIcon>
+              </IconButton>
+            </Box>
           </Grid>
         </Grid>
-        Links!
       </Container>
     </Background>
   );
