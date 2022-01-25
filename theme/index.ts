@@ -41,8 +41,19 @@ declare module '@mui/material/IconButton' {
 
 // Explore all theme options: https://material-ui.com/customization/default-theme/
 const theme = createTheme({
+  transitions: {
+    duration: {
+      shortest: 150,
+      shorter: 200,
+      short: 250,
+      standard: 300,
+      complex: 375,
+      enteringScreen: 225,
+      leavingScreen: 195,
+    }
+  },
   typography: {
-    fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+    fontFamily: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"',
     h1: {
       fontSize: '2rem',
       fontWeight: 500
@@ -90,6 +101,11 @@ const theme = createTheme({
     MuiButton: {
       defaultProps: {
         disableRipple: true
+      },
+      styleOverrides: {
+        root: {
+          borderRadius: '10px'
+        }
       }
     },
     MuiCardContent: {

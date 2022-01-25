@@ -1,3 +1,12 @@
+/* Make the Next.j wrappers 100% height */
+html,
+body,
+body > div:first-child,
+div#__next,
+div#__next > div {
+  height: 100%;
+}
+
 /* The default ID for the decoration, can override with decorationAttrs = { id: 'something' }  */
 .autocomplete {
   color: blue;
