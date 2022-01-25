@@ -16,13 +16,13 @@ export default function MembersSettings () {
   return (<>
     <Legend>
       Invite Links
-      <Button size='small' variant='outlined' sx={{ float: 'right'}}>Add a link</Button>
+      <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right'}}>Add a link</Button>
     </Legend>
     <Typography color='secondary'>No invite links yet</Typography>
 
     <Legend>
       Token Gates
-      <Button size='small' variant='outlined' sx={{ float: 'right'}}>Add a gate</Button>
+      <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right'}}>Add a gate</Button>
     </Legend>
     <Typography color='secondary'>No token gates yet</Typography>
 
