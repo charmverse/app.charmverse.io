@@ -24,8 +24,8 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
         <ChevronLeftIcon />
       </IconButton>
     </Header>
-    <Divider />
-    <Box>
+    <Divider sx={{ mb: 3 }} />
+    {/* <Box>
       <List>
         <NextLink href='/settings/account' passHref>
           <ListItem button component='a' disableRipple sx={{ py: 1, color: greyColor + ' !important' }}>
@@ -35,26 +35,31 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
           </ListItem>
         </NextLink>
       </List>
-    </Box>
-    <Box mb={3}>
-      <Typography sx={{ color: '#999', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-        FAVORITES
-      </Typography>
-    </Box>
-    <Box>
-      <Typography sx={{ color: '#999', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-        WORKSPACE
-      </Typography>
-      <List>
-        <NextLink href='/blocks' passHref>
-          <ListItem button component='a' sx={{ py: 0 }}>
-            <ListItemText disableTypography>
-                <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
-            </ListItemText>
-          </ListItem>
-        </NextLink>
-      </List>
-    </Box>
+    </Box> */}
+    <Typography sx={{ color: '#999', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+      FAVORITES
+    </Typography>
+    <List>
+      <NextLink href='/blocks' passHref>
+        <ListItem button component='a' sx={{ py: 0 }}>
+          <ListItemText disableTypography>
+              <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
+          </ListItemText>
+        </ListItem>
+      </NextLink>
+    </List>
+    <Typography sx={{ color: '#999', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+      WORKSPACE
+    </Typography>
+    <List>
+      <NextLink href='/blocks' passHref>
+        <ListItem button component='a' sx={{ py: 0 }}>
+          <ListItemText disableTypography>
+              <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
+          </ListItemText>
+        </ListItem>
+      </NextLink>
+    </List>
     {/* <List>
       {['WORKSPACE', 'PRIVATE'].map((text, index) => (
         <ListItem button key={text}>
