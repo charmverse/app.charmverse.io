@@ -9,6 +9,11 @@ const config = {
         destination: '/blocks',
         permanent: false,
       },
+      {
+        source: '/settings',
+        destination: '/settings/account',
+        permanent: true,
+      },
     ]
   },
   webpack(config, { isServer }) {

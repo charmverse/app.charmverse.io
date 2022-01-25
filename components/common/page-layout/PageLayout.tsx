@@ -15,8 +15,11 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import Link from 'components/common/Link';
+import NextLink from 'next/link';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import { darkGreyColor, greyColor } from 'theme/colors';
 
 const drawerWidth = 240;
 
@@ -144,7 +147,37 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <List>
+        <Box>
+          <List>
+            <NextLink href='/settings/account' passHref>
+              <ListItem button component='a' disableRipple sx={{ py: 1, color: greyColor + ' !important' }}>
+                <ListItemText disableTypography>
+                    <Box sx={{ fontSize: 14, fontWeight: 500 }}>Settings</Box>
+                </ListItemText>
+              </ListItem>
+            </NextLink>
+          </List>
+        </Box>
+        <Box mb={3}>
+          <Typography sx={{ color: '#999', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+            FAVORITES
+          </Typography>
+        </Box>
+        <Box>
+          <Typography sx={{ color: '#999', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+            WORKSPACE
+          </Typography>
+          <List>
+            <NextLink href='/blocks' passHref>
+              <ListItem button component='a' sx={{ py: 0 }}>
+                <ListItemText disableTypography>
+                    <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
+                </ListItemText>
+              </ListItem>
+            </NextLink>
+          </List>
+        </Box>
+        {/* <List>
           {['WORKSPACE', 'PRIVATE'].map((text, index) => (
             <ListItem button key={text}>
               <ListItemText disableTypography>
@@ -152,7 +185,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
               </ListItemText>
             </ListItem>
           ))}
-        </List>
+        </List> */}
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
