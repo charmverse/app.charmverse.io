@@ -46,7 +46,9 @@
 }
 
 :root {
-  --textColor-1: red;
+  --window-tooltip-zIndex: 5;
+  --inlineUniversalPalette-height: 350px;
+  --accent-secondary: rgb(241, 241, 241);
 }
 
 .bangle-editor a {
@@ -81,7 +83,7 @@
 }
 
 .bangle-tooltip {
-  z-index: var(--window-tooltip-zIndex);
+  background: white;
 }
 
 .inline-palette-wrapper {
@@ -89,7 +91,9 @@
   flex-direction: column;
   background-color: var(--window-bgColor-1);
   max-width: var(--inlineUniversalPalette-maxWidth);
-  min-width: var(--inlineUniversalPalette-maxWidth);
+  height: var(--inlineUniversalPalette-height);
+  box-shadow: 0 0 rgba(26, 24, 24, 0), 0 0 #0000, 0 0 #0000, 0 0 #0000,
+    0 15px 25px -15px rgba(0, 0, 0, 0.25);
 }
 
 .inline-palette-items-wrapper {
@@ -101,6 +105,7 @@
 
 .inline-palette-items-wrapper > .inline-palette-row {
   padding: 0.4rem 0;
+  cursor: pointer;
 }
 
 .inline-palette-items-wrapper > .inline-palette-row.disabled {
@@ -117,4 +122,18 @@
 
 .inline-palette-items-wrapper > .inline-palette-row.active {
   background-color: var(--accent-primary-1) !important;
+}
+
+.inline-palette-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.inline-palette-item-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.inline-palette-row.disabled{
+  color: rgb(0, 0, 0, 0.4);
 }

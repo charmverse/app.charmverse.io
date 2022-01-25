@@ -3,7 +3,6 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
 import {
-  replaceSuggestionMarkWith,
   useInlinePaletteItems,
   useInlinePaletteQuery
 } from '../../js-lib/inline-palette';
@@ -15,8 +14,8 @@ import {
 } from './palette-item';
 import { useEditorItems } from './use-editor-items';
 
-const staticHints = [
-  PaletteItem.create({
+const staticHints: PaletteItem[] = [
+  /* PaletteItem.create({
     uid: 'useBacklink',
     type: PALETTE_ITEM_HINT_TYPE,
     title: 'Linking a note',
@@ -31,7 +30,7 @@ const staticHints = [
     editorExecuteCommand: () => {
       return replaceSuggestionMarkWith(palettePluginKey, "");
     },
-  }),
+  }), */
 ];
 function getItemsAndHints(
   view: EditorView,
@@ -144,7 +143,7 @@ export function InlineCommandPalette() {
               key={item.uid}
               dataId={item.uid}
               disabled={item._isItemDisabled}
-              title={(item._isItemDisabled ? '🚫 ' : '') + item.title}
+              title={item.title}
               description={item.description}
               rightHoverIcon={item.rightHoverIcon}
               rightIcon={
@@ -155,7 +154,7 @@ export function InlineCommandPalette() {
           );
         })}
 
-        {hintItems.map((item, i) => {
+        {/* {hintItems.map((item, i) => {
           return (
             <InlinePaletteRow
               key={item.uid}
@@ -169,7 +168,7 @@ export function InlineCommandPalette() {
               }
             />
           );
-        })}
+        })} */}
       </div>
       <UniversalPalette.PaletteInfo>
         <UniversalPalette.PaletteInfoItem>

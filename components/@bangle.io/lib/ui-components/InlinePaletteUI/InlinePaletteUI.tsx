@@ -83,9 +83,9 @@ export function InlinePaletteRow({
         }}
       >
         {leftNode}
-        <span className="flex flex-col">
+        <span className="flex flex-col inline-palette-item">
           <span
-            className={cx('text-base font-bold truncate select-none')}
+            className={cx('text-base font-bold truncate select-none inline-palette-item-title')}
             style={{
               color: disabled ? 'var(--textColor-1)' : 'inherit',
             }}
@@ -93,7 +93,7 @@ export function InlinePaletteRow({
             {title}
           </span>
           <span
-            className={cx('text-sm font-normal select-none')}
+            className={cx('text-sm font-normal select-none inline-palette-item-description')}
             style={{
               color: disabled ? 'var(--textColor-1)' : 'inherit',
             }}
