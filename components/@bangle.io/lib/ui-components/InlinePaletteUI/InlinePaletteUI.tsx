@@ -13,9 +13,7 @@ export function InlinePaletteRow({
   title,
   isActive,
   onClick,
-  rightIcon = null,
-  rightHoverIcon = null,
-  leftNode = null,
+  icon = null,
   basePadding = BASE_PADDING,
   depth = 1,
   description = '',
@@ -30,9 +28,7 @@ export function InlinePaletteRow({
   title?: string;
   isActive?: boolean;
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-  rightIcon?: JSX.Element | null;
-  rightHoverIcon?: JSX.Element | null;
-  leftNode?: JSX.Element | null;
+  icon?: JSX.Element | null;
   basePadding?: number;
   depth?: number;
   description?: string;
@@ -82,7 +78,9 @@ export function InlinePaletteRow({
           ...style,
         }}
       >
-        {leftNode}
+        <div className="inline-palette-row-icon">
+          {icon}
+        </div>
         <span className="flex flex-col inline-palette-item">
           <span
             className={cx('text-base font-bold truncate select-none inline-palette-item-title')}
@@ -101,10 +99,6 @@ export function InlinePaletteRow({
             {description}
           </span>
         </span>
-
-        <span className=" flex flex-1"></span>
-        {rightIcon}
-        {isHovered ? rightHoverIcon : null}
       </div>
     </>
   );

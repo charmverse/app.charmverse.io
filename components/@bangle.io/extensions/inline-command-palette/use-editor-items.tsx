@@ -37,6 +37,7 @@ export function useEditorItems() {
         uid: 'paraBelow',
         title: 'Insert paragraph',
         group: 'editor',
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
         description: 'Inserts a new paragraph',
         // TODO current just disabling it, but we need to implement this method for lists
         disabled: (state) => {
@@ -58,6 +59,7 @@ export function useEditorItems() {
         uid: 'paraConvert',
         title: 'Paragraph',
         group: 'editor',
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
         description: 'Convert the current block to paragraph',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
@@ -86,6 +88,7 @@ export function useEditorItems() {
       PaletteItem.create({
         uid: 'bulletListConvert',
         title: 'Bullet List',
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
         group: 'editor',
         keywords: ['unordered', 'lists'],
         description: 'Convert the current block to bullet list',
@@ -104,6 +107,7 @@ export function useEditorItems() {
       PaletteItem.create({
         uid: 'todoListConvert',
         title: 'Todo List',
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
         group: 'editor',
         keywords: ['todo', 'lists', 'checkbox', 'checked'],
         description: 'Convert the current block to todo list',
@@ -122,6 +126,7 @@ export function useEditorItems() {
       PaletteItem.create({
         uid: 'orderedListConvert',
         group: 'editor',
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
         title: 'Ordered List',
         keywords: ['numbered', 'lists'],
         description: 'Convert the current block to ordered list',
@@ -139,6 +144,7 @@ export function useEditorItems() {
 
       PaletteItem.create({
         uid: 'insertSiblingListBelow',
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
         group: 'editor',
         title: 'Insert List below',
         keywords: ['insert', 'lists'],
@@ -162,6 +168,7 @@ export function useEditorItems() {
         const level = i + 1;
         return PaletteItem.create({
           uid: 'headingConvert' + level,
+          icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
           title: 'H' + level,
           group: 'editor',
           description: 'Convert the current block to heading level ' + level,

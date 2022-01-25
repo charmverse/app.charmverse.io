@@ -15,23 +15,8 @@ import {
 import { useEditorItems } from './use-editor-items';
 
 const staticHints: PaletteItem[] = [
-  /* PaletteItem.create({
-    uid: 'useBacklink',
-    type: PALETTE_ITEM_HINT_TYPE,
-    title: 'Linking a note',
-    description: `Type [[ and then name of the note to create a link to it`,
-    keywords: ['backlink', 'link'],
-    group: 'hints',
-    disabled: true,
-    highPriority: false,
-    hidden: false,
-    skipFiltering: true,
-    // TODO clicking this hint to switch to backlink suggest
-    editorExecuteCommand: () => {
-      return replaceSuggestionMarkWith(palettePluginKey, "");
-    },
-  }), */
 ];
+
 function getItemsAndHints(
   view: EditorView,
   query: string,
@@ -145,30 +130,11 @@ export function InlineCommandPalette() {
               disabled={item._isItemDisabled}
               title={item.title}
               description={item.description}
-              rightHoverIcon={item.rightHoverIcon}
-              rightIcon={
-                <kbd className="whitespace-nowrap">{item.keybinding}</kbd>
-              }
+              icon={item.icon}
               {...getItemProps(item, i)}
             />
           );
         })}
-
-        {/* {hintItems.map((item, i) => {
-          return (
-            <InlinePaletteRow
-              key={item.uid}
-              dataId={item.uid}
-              className="palette-row"
-              title={'💡 Tip ' + item.title}
-              description={item.description}
-              rightHoverIcon={item.rightHoverIcon}
-              rightIcon={
-                <kbd className="whitespace-nowrap">{item.keybinding}</kbd>
-              }
-            />
-          );
-        })} */}
       </div>
     </div>,
     tooltipContentDOM,

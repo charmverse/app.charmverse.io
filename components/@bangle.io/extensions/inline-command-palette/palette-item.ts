@@ -23,7 +23,7 @@ interface PaletteItemType {
   highPriority?: boolean;
   skipFiltering?: boolean;
   _isItemDisabled?: boolean
-  rightHoverIcon?: JSX.Element | null | undefined
+  icon?: JSX.Element | null | undefined
 }
 
 export class PaletteItem implements PaletteItemType{
@@ -42,7 +42,7 @@ export class PaletteItem implements PaletteItemType{
   group: string;
   highPriority: boolean;
   skipFiltering: boolean;
-  rightHoverIcon?: JSX.Element | null | undefined
+  icon?: JSX.Element | null | undefined
   keybinding?: string
   constructor(obj: PaletteItemType) {
     const {
@@ -57,6 +57,7 @@ export class PaletteItem implements PaletteItemType{
       group,
       highPriority,
       skipFiltering,
+      icon,
       ...otherKeys
     } = obj;
 
@@ -86,5 +87,6 @@ export class PaletteItem implements PaletteItemType{
     this.highPriority = highPriority ?? false;
     this.skipFiltering = skipFiltering ?? false;
     this._isItemDisabled = false;
+    this.icon = icon;
   }
 }
