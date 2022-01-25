@@ -2,7 +2,7 @@
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import Avatar from './Avatar';
+import Avatar from 'components/common/Avatar';
 
 export interface Member {
   address: string;
