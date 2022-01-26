@@ -145,7 +145,7 @@ export default function Editor() {
       columnResizing,
       floatingMenu.plugins({
         key: menuKey,
-        calculateType: (state,) => {
+        calculateType: (state) => {
           // if inside a table, first check to see if we are resizing or not
           const isInsideTable = state.selection.$anchor.parent.type.name.match(/^(table_cell|table_header)$/);
           if (isInsideTable) {
@@ -195,7 +195,6 @@ export default function Editor() {
           return true;
         },
       }),
-
     ],
     initialValue: parser.parse(getMarkdown()),
   });

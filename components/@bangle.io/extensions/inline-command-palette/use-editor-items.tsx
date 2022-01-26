@@ -2,8 +2,8 @@ import {
   bulletList, orderedList,
   paragraph
 } from '@bangle.dev/base-components';
-import { EditorState, setBlockType, Transaction } from '@bangle.dev/pm';
-import { rafCommandExec } from '@bangle.dev/utils';
+import { EditorState, Fragment, setBlockType, Transaction } from '@bangle.dev/pm';
+import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import { useMemo } from 'react';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
@@ -25,6 +25,22 @@ const setHeadingBlockType = (level: number) => (state: EditorState, dispatch: ((
   const type = state.schema.nodes.heading;
   return setBlockType(type, { level })(state, dispatch);
 };
+
+function createTableCell(state: EditorState, text: string) {
+  return state.schema.nodes.table_cell.create(undefined, Fragment.fromArray([
+    state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
+      state.schema.text(text)
+    ]))
+  ]))
+}
+
+function createTableHeader(state: EditorState, text: string) {
+  return state.schema.nodes.table_header.create(undefined, Fragment.fromArray([
+    state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
+      state.schema.text(text)
+    ]))
+  ]))
+}
 
 export function useEditorItems() {
   const baseItem = useMemo(
@@ -134,8 +150,38 @@ export function useEditorItems() {
         keywords: ['layout', 'table'],
         description: 'Insert a simple table below',
         editorExecuteCommand: () => {
-          return () => {
-            return true
+          return (state, dispatch, view) => {
+            console.log({ state });
+
+            const insertPos = state.selection.$from.after();
+            const nodeToInsert = state.schema.nodes.table.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
+                  createTableHeader(state, "Header 1"),
+                  createTableHeader(state, "Header 2"),
+                  createTableHeader(state, "Header 3"),
+                ])),
+                state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
+                  createTableCell(state, "Cell 1"),
+                  createTableCell(state, "Cell 2"),
+                  createTableCell(state, "Cell 3"),
+                ]))
+              ])
+            );
+
+            const tr = state.tr;
+            const newTr = safeInsert(nodeToInsert!, insertPos)(state.tr);
+
+            if (tr === newTr) {
+              return false;
+            }
+
+            if (dispatch) {
+              dispatch(newTr.scrollIntoView());
+            }
+
+            return true;
           };
         },
       }),
