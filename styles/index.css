@@ -115,16 +115,8 @@
   background-color: var(--accent-secondary);
 }
 
-.inline-palette-items-wrapper > .inline-palette-row.active.disabled {
-  background-color: var(--accent-secondary);
-}
-
 .inline-palette-items-wrapper > .inline-palette-row.hover-allowed:hover {
   background-color: var(--accent-secondary);
-}
-
-.inline-palette-items-wrapper > .inline-palette-row.active {
-  background-color: var(--accent-primary-1) !important;
 }
 
 .inline-palette-item {

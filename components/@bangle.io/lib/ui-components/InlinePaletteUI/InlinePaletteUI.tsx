@@ -68,7 +68,6 @@ export function InlinePaletteRow({
           'flex flex-row items-center inline-palette-row',
           disabled ? 'cursor-not-allowed' : 'cursor-pointer',
           className,
-          isActive && 'active',
           allowHover && 'hover-allowed',
           disabled && 'disabled',
         )}
