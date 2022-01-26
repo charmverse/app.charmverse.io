@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-export function PaletteItemsContainer({ children }) {
+export function PaletteItemsContainer({ children }: { children: ReactNode }) {
   return (
     <div
       className="universal-palette-items-container"

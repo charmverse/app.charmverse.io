@@ -6,7 +6,7 @@ export function useWatchClickOutside(
   onClickInside?: () => void,
 ) {
   useEffect(() => {
-    const handler = (e) => {
+    const handler = (e: any) => {
       if (!ref.current) {
         return;
       }
