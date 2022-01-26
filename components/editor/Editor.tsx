@@ -1,6 +1,7 @@
 import Typography from '@mui/material/Typography';
 import styled from '@emotion/styled';
 import BangleEditor from './BangleEditor';
+import Emoji from 'components/common/Emoji';
 
 const Container = styled.div`
   width: 900px;
@@ -24,6 +25,7 @@ export function Editor () {
       <Controls>
 
       </Controls>
+      <Emoji sx={{ fontSize: 78 }}>📌</Emoji>
       <Typography variant='h1'>{page.title}</Typography>
     </Container>
     <Container>
