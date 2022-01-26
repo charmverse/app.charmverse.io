@@ -28,6 +28,13 @@ const AvatarLink = styled(NextLink)`
   cursor: pointer;
 `;
 
+const WorkspaceContainer = styled.div`
+  float: left;
+  height: 100%;
+  border-right: 1px solid ${({ theme }) => theme.palette.divider};
+  padding: ${({ theme }) => theme.spacing(1)};
+`;
+
 interface SidebarProps {
   closeSidebar: () => void;
 }
@@ -38,7 +45,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
   const { domain } = router.query;
 
   return (<Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
-    <Box p={1} sx={{ float: 'left', borderRight: '1px solid #ddd', height: '100%' }}>
+    <WorkspaceContainer>
       <Grid container spacing={2} flexDirection='column'>
         {workspaces.map(workspace => (
           <Grid item key={workspace.domain}>
@@ -53,7 +60,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
           <IconButton sx={{ borderRadius: '8px' }}><AddIcon /></IconButton>
         </Grid>
       </Grid>
-    </Box>
+    </WorkspaceContainer>
     <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
       <Box sx={{ flexGrow: 1 }}>
         <Header>
