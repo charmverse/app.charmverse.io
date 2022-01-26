@@ -35,7 +35,7 @@ export default function SettingsLayout ({ children }: { children: React.ReactNod
   }, [router.pathname]);
 
   function getCurrentTabValue (pathname: string) {
-    const tabConfig = SETTINGS_TABS.find(tab => pathname.includes(tab.path) || SETTINGS_TABS[0]);
+    const tabConfig = SETTINGS_TABS.find(tab => pathname.includes(tab.path)) || SETTINGS_TABS[0];
     return SETTINGS_TABS.indexOf(tabConfig);
   }
 
