@@ -15,6 +15,7 @@
     "@bangle.dev/react": "^0.28.4-alpha.2",
     "@bangle.dev/react-emoji-suggest": "^0.28.4-alpha.2",
     "@bangle.dev/react-menu": "^0.28.4-alpha.2",
+    "@bangle.dev/table": "^0.28.5",
     "@bangle.dev/tooltip": "^0.28.4-alpha.2",
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.7.1",
