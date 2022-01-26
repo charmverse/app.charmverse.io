@@ -5,6 +5,7 @@ body > div:first-child,
 div#__next,
 div#__next > div {
   height: 100%;
+  font-size: 14px;
 }
 
 /* The default ID for the decoration, can override with decorationAttrs = { id: 'something' }  */
