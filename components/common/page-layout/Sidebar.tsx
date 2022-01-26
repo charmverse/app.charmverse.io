@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
+import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NextLink from 'next/link';
@@ -46,13 +46,18 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
   return (<Box display='flex' sx={{ backgroundColor: lightGreyColor, height: '100%' }}>
     <Box p={1} sx={{ float: 'left', borderRight: '1px solid #ddd', height: '100%' }}>
       <Grid container spacing={2} flexDirection='column'>
-        {workspaces.map(workspace => (<Grid item>
-          <AvatarLink active={pathname.includes(workspace.domain)} href='/' passHref>
-            <MuiLink>
-              <Avatar name={workspace.name} variant='rounded' />
-            </MuiLink>
-          </AvatarLink>
-        </Grid>))}
+        {workspaces.map(workspace => (
+          <Grid item>
+            <AvatarLink active={pathname.includes(workspace.domain)} href='/' passHref>
+              <MuiLink>
+                <Avatar name={workspace.name} variant='rounded' />
+              </MuiLink>
+            </AvatarLink>
+          </Grid>
+        ))}
+        <Grid item>
+          <IconButton><AddIcon /></IconButton>
+        </Grid>
       </Grid>
     </Box>
     <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
