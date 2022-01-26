@@ -21,6 +21,18 @@ Download and install this repo to get started:
 2. Run `npm ci`
 3. Run `npm start` and visit [http://localhost:3000](http://localhost:3000)
 
+### Third Party Dependencies
+
+We stand on the shoulders of giants:
+
+- Typescript
+- React
+- Next.js
+- Ethers.js
+- Prisma.js
+- Bangle.io / bangle.dev
+- Material UI
+
 ### Best Practices
 
 #### Theming
@@ -36,15 +48,3 @@ const Container = styled(Box)`
 // 'sx' property from Material UI:
 <Box sx={{ bgcolor: 'sidebar.background' }} />
 ```
-
-### Third Party Dependencies
-
-We stand on the shoulders of giants:
-
-- Typescript
-- React
-- Next.js
-- Ethers.js
-- Prisma.js
-- Bangle.io / bangle.dev
-- Material UI
