@@ -1,7 +1,5 @@
 import {
-  bulletList,
-  listItem,
-  orderedList,
+  bulletList, orderedList,
   paragraph
 } from '@bangle.dev/base-components';
 import { queryIsHeadingActive, toggleHeading } from '@bangle.dev/base-components/dist/heading';
@@ -22,7 +20,6 @@ const {
   queryIsTodoListActive,
   toggleBulletList
 } = bulletList;
-const { insertEmptySiblingListBelow } = listItem;
 const { toggleOrderedList, queryIsOrderedListActive } = orderedList;
 
 const setHeadingBlockType = (level: number) => (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined) => {

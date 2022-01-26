@@ -122,6 +122,7 @@ export function InlineCommandPalette() {
   const paletteGroupItemsRecord: Record<string, ReactNode[]> = {};
 
   items.forEach((item, i) => {
+    const itemProps = { ...getItemProps(item, i) };
     // If we haven't added the group node, add it to set and render the node
     if (!paletteGroupItemsRecord[item.group]) {
       paletteGroupItemsRecord[item.group] = []
@@ -133,7 +134,7 @@ export function InlineCommandPalette() {
       title={item.title}
       description={item.description}
       icon={item.icon}
-      {...getItemProps(item, i)}
+      {...itemProps}
     />)
   })
 

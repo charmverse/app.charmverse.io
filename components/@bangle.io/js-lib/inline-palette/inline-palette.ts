@@ -1,5 +1,5 @@
 import { BaseRawMarkSpec, PluginKey, SpecRegistry } from '@bangle.dev/core';
-import type { Command, EditorState, EditorView, Schema, Transaction } from '@bangle.dev/pm';
+import type { Command, EditorState, Schema } from '@bangle.dev/pm';
 import {
   createTooltipDOM,
   suggestTooltip,
@@ -63,10 +63,10 @@ function pluginsFactory({
       throw new Error(`markName ${markName} not found`);
     }
 
-    const updateCounter: any = (key = 'UP') => {
-      return (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, view: EditorView) => {
+    const updateCounter: any = (key = 'UP'): Command => {
+      return (state, dispatch, view) => {
         safeRequestAnimationFrame(() => {
-          view.focus();
+          view?.focus();
         });
         if (key === 'UP' ? !getIsTop() : getIsTop()) {
           return decrementSuggestTooltipCounter(suggestTooltipKey)(
@@ -114,7 +114,7 @@ function pluginsFactory({
           return executeItemCommand?.(state, dispatch, view);
         },
         onArrowDown: updateCounter('DOWN'),
-        onArrowUp: updateCounter('UP'),
+        onArrowUp: updateCounter('UP')
       }),
     ];
   };

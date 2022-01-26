@@ -113,6 +113,10 @@
   background-color: var(--accent-secondary);
 }
 
+.inline-palette-group-items .active {
+  background-color: var(--accent-secondary);
+}
+
 .inline-palette-item {
   display: flex;
   flex-direction: column;
@@ -136,4 +140,9 @@
 
 .inline-palette-group {
   margin: 5px 0px;
+}
+
+.bangle-editor {
+  border: none;
+  outline: none;
 }

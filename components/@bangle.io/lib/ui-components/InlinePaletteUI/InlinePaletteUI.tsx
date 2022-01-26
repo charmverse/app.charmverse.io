@@ -70,6 +70,7 @@ export function InlinePaletteRow({
           className,
           allowHover && 'hover-allowed',
           disabled && 'disabled',
+          isActive && 'active',
         )}
         style={{
           paddingLeft: depth * basePadding,
