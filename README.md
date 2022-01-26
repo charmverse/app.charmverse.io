@@ -25,7 +25,17 @@ Download and install this repo to get started:
 
 #### Theming
 
-- To make it easy to maintain light/dark mode, color choices should be defined on Theme.palette in `theme/index.tsx`.
+- To make it easy to maintain light/dark mode, color choices should be defined on Theme.palette in `theme/index.tsx`. This way, we can use colors from the theme in two ways:
+
+```
+// styled component:
+const Container = styled(Box)`
+  color: ${({ theme }) => theme.palette.sidebar.background};
+`;
+
+// 'sx' property from Material UI:
+<Box sx={{ bgcolor: 'sidebar.background' }} />
+```
 
 ### Third Party Dependencies
 
