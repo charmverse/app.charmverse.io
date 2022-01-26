@@ -1,14 +1,25 @@
 import { UserProvider } from '@auth0/nextjs-auth0';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
-import { AppProps } from 'next/app';
+import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { useEffect } from 'react';
+import type { NextPage } from 'next';
+import { ReactElement, useEffect } from 'react';
 import RouteGuard from 'components/common/RouteGuard';
-import "styles/index.css";
+import 'styles/index.css';
 import { theme } from 'theme';
 
-export default function App({ Component, pageProps }: AppProps) {
+type NextPageWithLayout = NextPage & {
+  getLayout: (page: ReactElement) => JSX.Element
+}
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout
+}
+
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
+
+  const getLayout = Component.getLayout ?? ((page) => page);
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -31,7 +42,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <CssBaseline />
         <UserProvider>
           <RouteGuard>
-            <Component {...pageProps} />
+            {getLayout(<Component {...pageProps} />)}
           </RouteGuard>
         </UserProvider>
       </ThemeProvider>
