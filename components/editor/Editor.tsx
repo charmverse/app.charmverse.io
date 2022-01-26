@@ -1,3 +1,5 @@
+
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import styled from '@emotion/styled';
 import BangleEditor from './BangleEditor';
@@ -25,7 +27,9 @@ export function Editor () {
       <Controls>
 
       </Controls>
-      <Emoji sx={{ fontSize: 78 }}>📌</Emoji>
+      <Box py={3}>
+        <Emoji sx={{ fontSize: 78 }}>📌</Emoji>
+      </Box>
       <Typography variant='h1'>{page.title}</Typography>
     </Container>
     <Container>
