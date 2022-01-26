@@ -106,7 +106,8 @@
   padding: 0.4rem 0;
   cursor: pointer;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  gap: 10px;
 }
 
 .inline-palette-items-wrapper > .inline-palette-row.disabled {
@@ -131,17 +132,10 @@
 }
 
 .inline-palette-item-title {
-  font-size: 20px;
   font-weight: bold;
 }
 
 .inline-palette-row.disabled{
   color: rgb(0, 0, 0, 0.4);
   cursor: default;
-}
-
-.inline-palette-row-icon svg {
-  width: 2.5em;
-  height: 2.5em;
-  margin-right: 10px;
 }
