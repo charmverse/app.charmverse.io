@@ -106,7 +106,7 @@ function pluginsFactory({
         markName,
         trigger,
         tooltipRenderOpts: {
-          placement: 'bottom',
+          placement: 'left',
           ...tooltipRenderOpts,
           tooltipDOMSpec,
         },

@@ -4,7 +4,8 @@ import {
   orderedList,
   paragraph
 } from '@bangle.dev/base-components';
-import { EditorState, setBlockType, Transaction } from '@bangle.dev/pm';
+import { queryIsHeadingActive, toggleHeading } from '@bangle.dev/base-components/dist/heading';
+import { chainCommands, EditorState, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 import { useMemo } from 'react';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
@@ -16,10 +17,10 @@ import { PaletteItem } from './palette-item';
 
 const { convertToParagraph } = paragraph;
 const {
-  toggleBulletList,
   toggleTodoList,
   queryIsBulletListActive,
   queryIsTodoListActive,
+  toggleBulletList
 } = bulletList;
 const { insertEmptySiblingListBelow } = listItem;
 const { toggleOrderedList, queryIsOrderedListActive } = orderedList;
@@ -32,28 +33,6 @@ const setHeadingBlockType = (level: number) => (state: EditorState, dispatch: ((
 export function useEditorItems() {
   const baseItem = useMemo(
     () => [
-      /*     PaletteItem.create({
-            uid: 'paraBelow',
-            title: 'Insert paragraph',
-            group: 'editor',
-            icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
-            description: 'Inserts a new paragraph',
-            // TODO current just disabling it, but we need to implement this method for lists
-            disabled: (state) => {
-              return isList()(state);
-            },
-            editorExecuteCommand: () => {
-              return (state, dispatch, view) => {
-                rafCommandExec(view!, chainedInsertParagraphBelow());
-                return replaceSuggestionMarkWith(palettePluginKey, '')(
-                  state,
-                  dispatch,
-                  view,
-                );
-              };
-            },
-          }), */
-
       PaletteItem.create({
         uid: 'paraConvert',
         title: 'Paragraph',
@@ -93,7 +72,10 @@ export function useEditorItems() {
         description: 'Convert the current block to bullet list',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
-            rafCommandExec(view!, toggleBulletList());
+            if (queryIsHeadingActive(1)(state) || queryIsHeadingActive(2)(state) || queryIsHeadingActive(3)(state)) {
+              rafCommandExec(view!, chainCommands(toggleHeading(), toggleBulletList()));
+            }
+            rafCommandExec(view!, chainCommands(toggleBulletList()));
             return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,
@@ -168,7 +150,7 @@ export function useEditorItems() {
         return PaletteItem.create({
           uid: 'headingConvert' + level,
           icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M448 96v320h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H320a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V288H160v128h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V96H32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-32v128h192V96h-32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16z" /></svg>,
-          title: 'H' + level,
+          title: 'Heading ' + level,
           group: 'heading',
           description: 'Convert the current block to heading level ' + level,
           disabled: (state) => {

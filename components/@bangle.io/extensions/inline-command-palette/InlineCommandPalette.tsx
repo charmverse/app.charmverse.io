@@ -1,6 +1,6 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { Fragment, ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
 import {
   useInlinePaletteItems,
@@ -139,7 +139,7 @@ export function InlineCommandPalette() {
 
   return reactDOM.createPortal(
     <div className="inline-palette-wrapper shadow-2xl">
-      {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (<>
+      {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (<Fragment key={group}>
         <div className="inline-palette-group">
           <div className="inline-palette-group-name">
             {group}
@@ -148,7 +148,7 @@ export function InlineCommandPalette() {
             {paletteItems}
           </div>
         </div>
-      </>))}
+      </Fragment>))}
     </div>,
     tooltipContentDOM,
   );
