@@ -126,6 +126,20 @@ export function useEditorItems() {
         },
       }),
 
+      PaletteItem.create({
+        uid: 'insertSimpleTable',
+        group: 'layout',
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM224 416H64v-96h160v96zm0-160H64v-96h160v96zm224 160H288v-96h160v96zm0-160H288v-96h160v96z" /></svg>,
+        title: 'Table',
+        keywords: ['layout', 'table'],
+        description: 'Insert a simple table below',
+        editorExecuteCommand: () => {
+          return () => {
+            return true
+          };
+        },
+      }),
+
       /* PaletteItem.create({
         uid: 'insertSiblingListBelow',
         icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
