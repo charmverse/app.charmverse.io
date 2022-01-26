@@ -5,7 +5,7 @@ import Footer from 'components/login/Footer';
 
 export default function LoginPage () {
   return (
-    <Box display='flex' flexDirection='column'>
+    <Box display='flex' flexDirection='column' sx={{ backgroundColor: '#fafafa' }}>
       <Header />
       <SplashImage />
       <Footer />

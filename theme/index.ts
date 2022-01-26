@@ -65,7 +65,7 @@ const theme = createTheme({
   },
   palette: {
     background: {
-      default: "#fafafa"
+      default: "#ffffff"
     },
     twitter: {
       contrastText: '#ffffff',

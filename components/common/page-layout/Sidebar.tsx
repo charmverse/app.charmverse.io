@@ -17,21 +17,20 @@ import Link from '../Link';
 import MuiLink from '@mui/material/Link';
 import Header from './Header';
 import Avatar from '../Avatar';
+import { lightGreyColor } from 'theme/colors';
 
 const workspaces = [
   { name: 'CharmVerse', domain: 'charmverse' },
   { name: 'MattVerse', domain: 'mattverse' },
-]
+];
 
 const AvatarLink = styled(NextLink)<{ active: boolean }>`
-  border-radius: 8px;
-  border: 2px solid white;
   cursor: pointer;
   &:hover {
     box-shadow: 0 0 0 3px #ccc;
   }
   ${({ active }) => active && 'box-shadow: 0 0 0 3px #ccc;'}
-`
+`;
 
 interface SidebarProps {
   closeSidebar: () => void;
@@ -42,7 +41,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
   const router = useRouter();
   const pathname = router.pathname;
 
-  return (<Box display='flex' sx={{ height: '100%' }}>
+  return (<Box display='flex' sx={{ backgroundColor: lightGreyColor, height: '100%' }}>
     <Box p={1} sx={{ float: 'left', borderRight: '1px solid #ddd', height: '100%' }}>
       <Grid container spacing={2} flexDirection='column'>
         {workspaces.map(workspace => (<Grid item>
@@ -74,7 +73,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
             </NextLink>
           </List>
         </Box> */}
-        <Typography sx={{ color: '#999', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+        <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
           FAVORITES
         </Typography>
         <List>
@@ -86,7 +85,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
             </ListItem>
           </NextLink>
         </List>
-        <Typography sx={{ color: '#999', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+        <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
           WORKSPACE
         </Typography>
         <List>
