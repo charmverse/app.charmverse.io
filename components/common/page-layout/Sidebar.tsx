@@ -17,6 +17,7 @@ import Link from '../Link';
 import MuiLink from '@mui/material/Link';
 import Header from './Header';
 import Avatar from '../Avatar';
+import WorkspaceAvatar from '../WorkspaceAvatar';
 import { lightGreyColor } from 'theme/colors';
 
 const workspaces = [
@@ -24,12 +25,8 @@ const workspaces = [
   { name: 'MattVerse', domain: 'mattverse' },
 ];
 
-const AvatarLink = styled(NextLink)<{ active: boolean }>`
+const AvatarLink = styled(NextLink)`
   cursor: pointer;
-  &:hover {
-    box-shadow: 0 0 0 3px #ccc;
-  }
-  ${({ active }) => active && 'box-shadow: 0 0 0 3px #ccc;'}
 `;
 
 interface SidebarProps {
@@ -39,23 +36,22 @@ interface SidebarProps {
 export default function Sidebar ({ closeSidebar }: SidebarProps) {
 
   const router = useRouter();
-  const pathname = router.pathname;
   const { domain } = router.query;
 
   return (<Box display='flex' sx={{ backgroundColor: lightGreyColor, height: '100%' }}>
     <Box p={1} sx={{ float: 'left', borderRight: '1px solid #ddd', height: '100%' }}>
       <Grid container spacing={2} flexDirection='column'>
         {workspaces.map(workspace => (
-          <Grid item>
-            <AvatarLink active={pathname.includes(workspace.domain)} href={`/${workspace.domain}`} passHref>
+          <Grid item key={workspace.domain}>
+            <AvatarLink href={`/${workspace.domain}`} passHref>
               <MuiLink>
-                <Avatar name={workspace.name} variant='rounded' />
+                <WorkspaceAvatar active={domain === workspace.domain} name={workspace.name} />
               </MuiLink>
             </AvatarLink>
           </Grid>
         ))}
         <Grid item>
-          <IconButton sx={{ borderRadius: '8px !important' }}><AddIcon /></IconButton>
+          <IconButton sx={{ borderRadius: '8px' }}><AddIcon /></IconButton>
         </Grid>
       </Grid>
     </Box>
