@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 import { Theme as MaterialUITheme } from '@mui/material';
 import { darken } from '@mui/system';
-import { darkBlueColor } from './colors';
+import { blueColor, darkBlueColor } from './colors';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
 declare module '@emotion/react' {
@@ -41,8 +41,20 @@ declare module '@mui/material/IconButton' {
 
 // Explore all theme options: https://material-ui.com/customization/default-theme/
 const theme = createTheme({
+  transitions: {
+    duration: {
+      shortest: 150,
+      shorter: 200,
+      short: 250,
+      standard: 300,
+      complex: 375,
+      enteringScreen: 225,
+      leavingScreen: 195,
+    }
+  },
   typography: {
-    fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+    fontFamily: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"',
+    htmlFontSize: 14,
     h1: {
       fontSize: '2rem',
       fontWeight: 500
@@ -54,7 +66,7 @@ const theme = createTheme({
   },
   palette: {
     background: {
-      default: "#fafafa"
+      default: "#ffffff"
     },
     twitter: {
       contrastText: '#ffffff',
@@ -67,7 +79,7 @@ const theme = createTheme({
       main: '#3b5998',
     },
     primary: {
-      main: '#010101',
+      main: blueColor, //'#010101',
     },
     secondary: {
       main: '#777',
@@ -90,6 +102,11 @@ const theme = createTheme({
     MuiButton: {
       defaultProps: {
         disableRipple: true
+      },
+      styleOverrides: {
+        root: {
+          borderRadius: '10px'
+        }
       }
     },
     MuiCardContent: {

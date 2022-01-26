@@ -6,7 +6,7 @@ import {
 } from '../../utils/utility';
 
 const PADDING_OFFSET = 16;
-const BASE_PADDING = 15;
+const BASE_PADDING = 10;
 
 export function InlinePaletteRow({
   dataId,

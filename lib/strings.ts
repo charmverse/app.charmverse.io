@@ -30,3 +30,16 @@ export function getDomain (url: string, includeProtocol?: boolean) {
     return protocol + '//' + host;
   return host;
 }
+
+
+// generate a color based on a string. Copied from https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
+export function stringToColor (name: string, saturation = 50, lightness = 60) {
+
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const h = hash % 360;
+  return `hsl(${h}, ${saturation}%, ${lightness}%)`;
+}

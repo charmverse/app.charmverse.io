@@ -3,7 +3,7 @@ import MuiButton from '@mui/material/Button';
 import styled from '@emotion/styled';
 import { darken } from '@mui/system';
 import Button, { InputProps, StyledSpinner } from './Button';
-import { blueColor } from '../theme/colors';
+import { blueColor } from 'theme/colors';
 
 const StyledButton = styled(Button)`
 
@@ -11,18 +11,18 @@ const StyledButton = styled(Button)`
   border: 0 none;
   color: white;
   font-weight: bold;
-  padding: .5em 2em;
+  padding: 10px 30px;
   white-space: nowrap;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 10px 1px;
 
   span {
     font-size: .85em;
   }
 
   &:hover {
-    background: ${blueColor};
+    background: ${darken(blueColor, .1)};
     color: white;
     border: 0 none;
-    box-shadow: 1px 2px 3px #444;
   }
 `;
 

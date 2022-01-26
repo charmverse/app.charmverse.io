@@ -6,16 +6,21 @@ const config = {
     return [
       {
         source: '/',
-        destination: '/blocks',
+        destination: '/charmverse',
         permanent: false,
+      },
+      {
+        source: '/:domain/settings',
+        destination: '/:domain/settings/account',
+        permanent: true,
       },
     ]
   },
   webpack(config, { isServer }) {
-    // config.module.rules.push({
-    //   test: /\.svg$/,
-    //   use: ['@svgr/webpack']
-    // });
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack']
+    });
     return config;
   }
 }

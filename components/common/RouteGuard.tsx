@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useUser } from '@auth0/nextjs-auth0';
 
-const publicPaths = ['/login', '/signup', '/blocks'];
+const publicPaths = ['/login', '/signup', '/'];
 
 export default function RouteGuard ({ children }: { children: JSX.Element }) {
   const { user, isLoading } = useUser();
