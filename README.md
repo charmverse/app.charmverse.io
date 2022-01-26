@@ -31,8 +31,10 @@ Download and install this repo to get started:
 
 We stand on the shoulders of giants:
 
+- Typescript
 - React
 - Next.js
-- Prism.js
+- Ethers.js
+- Prisma.js
 - Bangle.io / bangle.dev
 - Material UI
