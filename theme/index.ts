@@ -11,6 +11,8 @@ import {
   primaryTextColorDarkMode,
   sidebarBackgroundColor,
   sidebarBackgroundColorDarkMode,
+  settingsHeaderBackgroundColor,
+  settingsHeaderBackgroundColorDarkMode,
 } from './colors';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
@@ -32,7 +34,11 @@ declare module '@mui/material/styles/createPalette' {
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
     // custom elements
+    settingsHeader: {
+      background: string
+    };
     sidebar: {
+      avatarHighlight: string;
       background: string;
     };
   }
@@ -103,14 +109,19 @@ export const createThemeLightSensitive = (mode: PaletteMode) =>
       secondary: {
         main: '#777',
       },
-      sidebar: {
-        background: mode === 'dark' ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor,
-      },
       blue: {
         main: '#00aced'
       },
       white: {
         main: '#eee'
+      },
+      // custom components
+      settingsHeader: {
+        background: mode === 'dark' ? settingsHeaderBackgroundColorDarkMode : settingsHeaderBackgroundColor,
+      },
+      sidebar: {
+        avatarHighlight: mode === 'dark' ? 'rgba(255, 255, 255, .2)' : '#ccc',
+        background: mode === 'dark' ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor,
       }
     },
     components: {

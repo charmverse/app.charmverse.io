@@ -18,7 +18,6 @@ import MuiLink from '@mui/material/Link';
 import Header from './Header';
 import Avatar from '../Avatar';
 import WorkspaceAvatar from '../WorkspaceAvatar';
-import { lightGreyColor } from 'theme/colors';
 
 const workspaces = [
   { name: 'CharmVerse', domain: 'charmverse' },
