@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Header, { toolbarHeight } from './Header';
-import { TitleContext } from './PageTitle';
+import { useTitleState } from './PageTitle';
 import Sidebar from './Sidebar';
 
 const drawerWidth = 300;
@@ -80,7 +80,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export function PageLayout ({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
-  const pageTitleValue: any = React.useState('');
+  const [pageTitle] = useTitleState();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -91,14 +91,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <TitleContext.Provider value={pageTitleValue}>
-      <Head>
-        <title>
-          <TitleContext.Consumer>
-            {(title) => title}
-          </TitleContext.Consumer>
-        </title>
-      </Head>
+    <>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <AppBar position='fixed' open={open}>
@@ -116,9 +109,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
               <MenuIcon />
             </IconButton>
             <Typography noWrap component='div' sx={{ fontWeight: 500 }}>
-              <TitleContext.Consumer>
-                {(title) => title}
-              </TitleContext.Consumer>
+              {pageTitle}
             </Typography>
           </Toolbar>
         </AppBar>
@@ -132,6 +123,6 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
           </Box>
         </Box>
       </Box>
-    </TitleContext.Provider>
+    </>
   );
 }

@@ -13,9 +13,9 @@ import SettingsIcon from '@mui/icons-material/WorkOutline';
 import PersonIcon from '@mui/icons-material/Group';
 
 const SETTINGS_TABS = [
-  { icon: <AccountIcon fontSize='small' />, path: '/account', label: 'My account' },
-  { icon: <SettingsIcon fontSize='small' />, path: '/workspace', label: 'Workspace' },
-  { icon: <PersonIcon fontSize='small' />, path: '/members', label: 'Members' },
+  { icon: <AccountIcon fontSize='small' />, path: 'account', label: 'My account' },
+  { icon: <SettingsIcon fontSize='small' />, path: 'workspace', label: 'Workspace' },
+  { icon: <PersonIcon fontSize='small' />, path: 'members', label: 'Members' },
 ];
 
 const NavigationContainer = styled(Box)`
