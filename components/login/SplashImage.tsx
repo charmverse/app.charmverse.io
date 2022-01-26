@@ -32,7 +32,7 @@ export default function SplashImage () {
               <Typography sx={{ fontSize: 20, mb: 6 }}>
                 Tasks, docs, and more
               </Typography>
-              <PrimaryButton size='large' href='/blocks'>Connect Wallet</PrimaryButton>
+              <PrimaryButton size='large' href={`/workspace/charmverse`}>Connect Wallet</PrimaryButton>
             </Box>
           </Grid>
           <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>

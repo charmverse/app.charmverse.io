@@ -6,12 +6,12 @@ const config = {
     return [
       {
         source: '/',
-        destination: '/blocks',
+        destination: '/workspace/charmverse',
         permanent: false,
       },
       {
-        source: '/settings',
-        destination: '/settings/account',
+        source: '/workspace/:domain/settings',
+        destination: '/workspace/:domain/settings/account',
         permanent: true,
       },
     ]

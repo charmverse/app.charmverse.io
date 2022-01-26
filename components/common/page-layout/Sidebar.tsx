@@ -19,6 +19,8 @@ import Header from './Header';
 import Avatar from '../Avatar';
 import { lightGreyColor } from 'theme/colors';
 
+const workspaceDomain = 'charmverse';
+
 const workspaces = [
   { name: 'CharmVerse', domain: 'charmverse' },
   { name: 'MattVerse', domain: 'mattverse' },
@@ -64,7 +66,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
         <Divider sx={{ mb: 3 }} />
         {/* <Box>
           <List>
-            <NextLink href='/settings/account' passHref>
+            <NextLink href='' passHref>
               <ListItem button component='a' disableRipple sx={{ py: 1, color: greyColor + ' !important' }}>
                 <ListItemText disableTypography>
                     <Box sx={{ fontSize: 14, fontWeight: 500 }}>Settings</Box>
@@ -77,7 +79,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
           FAVORITES
         </Typography>
         <List>
-          <NextLink href='/blocks' passHref>
+          <NextLink href={`/workspace/${workspaceDomain}/`} passHref>
             <ListItem button component='a' sx={{ py: 0 }}>
               <ListItemText disableTypography>
                   <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
@@ -89,7 +91,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
           WORKSPACE
         </Typography>
         <List>
-          <NextLink href='/blocks' passHref>
+          <NextLink href={`/workspace/${workspaceDomain}/`} passHref>
             <ListItem button component='a' sx={{ py: 0 }}>
               <ListItemText disableTypography>
                   <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
@@ -119,7 +121,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
               </Typography>
             </Box>
           </Box>
-          <Link href='/settings/account'>
+          <Link href={`/workspace/${workspaceDomain}/settings/account`}>
             <IconButton>
               <SettingsIcon />
             </IconButton>
