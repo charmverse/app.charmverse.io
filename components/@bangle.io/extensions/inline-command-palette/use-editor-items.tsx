@@ -2,8 +2,7 @@ import {
   bulletList, orderedList,
   paragraph
 } from '@bangle.dev/base-components';
-import { queryIsHeadingActive, toggleHeading } from '@bangle.dev/base-components/dist/heading';
-import { chainCommands, EditorState, setBlockType, Transaction } from '@bangle.dev/pm';
+import { EditorState, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 import { useMemo } from 'react';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
@@ -69,11 +68,11 @@ export function useEditorItems() {
         description: 'Convert the current block to bullet list',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
-            if (queryIsHeadingActive(1)(state) || queryIsHeadingActive(2)(state) || queryIsHeadingActive(3)(state)) {
-              rafCommandExec(view!, chainCommands(toggleHeading(), toggleBulletList()));
-            } else {
-              rafCommandExec(view!, chainCommands(toggleBulletList()));
-            }
+            rafCommandExec(view!, (state, dispatch, view) => {
+              setBlockType(state.schema.nodes.paragraph)(state, dispatch);
+              return toggleBulletList()(view!.state, view!.dispatch, view);
+            });
+
             return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,
@@ -92,11 +91,10 @@ export function useEditorItems() {
         description: 'Convert the current block to todo list',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
-            if (queryIsHeadingActive(1)(state) || queryIsHeadingActive(2)(state) || queryIsHeadingActive(3)(state)) {
-              rafCommandExec(view!, chainCommands(toggleHeading(), toggleTodoList()));
-            } else {
-              rafCommandExec(view!, chainCommands(toggleTodoList()));
-            }
+            rafCommandExec(view!, (state, dispatch, view) => {
+              setBlockType(state.schema.nodes.paragraph)(state, dispatch);
+              return toggleTodoList()(view!.state, view!.dispatch, view);
+            });
             return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,
@@ -115,11 +113,10 @@ export function useEditorItems() {
         description: 'Convert the current block to ordered list',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
-            if (queryIsHeadingActive(1)(state) || queryIsHeadingActive(2)(state) || queryIsHeadingActive(3)(state)) {
-              rafCommandExec(view!, chainCommands(toggleHeading(), toggleOrderedList()));
-            } else {
-              rafCommandExec(view!, chainCommands(toggleOrderedList()));
-            }
+            rafCommandExec(view!, (state, dispatch, view) => {
+              setBlockType(state.schema.nodes.paragraph)(state, dispatch);
+              return toggleOrderedList()(view!.state, view!.dispatch, view);
+            });
             return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,
