@@ -22,80 +22,18 @@ import {
 import '@bangle.dev/core/style.css';
 import { emoji } from '@bangle.dev/emoji';
 import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
-import { EditorView, NodeSelection } from '@bangle.dev/pm';
+import { EditorView, keymap, NodeSelection } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { EmojiSuggest, emojiSuggest } from '@bangle.dev/react-emoji-suggest';
 import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
 import '@bangle.dev/react-menu/style.css';
 import '@bangle.dev/tooltip/style.css';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
-import { ActionKind, autocomplete, closeAutocomplete, FromTo, Options } from "prosemirror-autocomplete";
-import { useEffect } from 'react';
-
+import { paletteMarkName, palettePluginKey } from '../@bangle.io/extensions/inline-command-palette/config';
+import { InlineCommandPalette } from "../@bangle.io/extensions/inline-command-palette/InlineCommandPalette";
+import { inlinePalette, queryInlinePaletteActive } from '../@bangle.io/js-lib/inline-palette';
+import { keybindings } from '../@bangle.io/lib/config';
 const menuKey = new PluginKey('menuKey');
-
-const picker = {
-  view: null as EditorView | null,
-  open: false,
-  current: 0,
-  range: null as FromTo | null,
-};
-
-const NUM_SUGGESTIONS = 3;
-
-function placeSuggestion() {
-  const suggestion = document.querySelector('#suggestion') as HTMLDivElement;
-  suggestion.style.display = picker.open ? 'block' : 'none';
-  const rect = document.getElementsByClassName('autocomplete')[0]?.getBoundingClientRect();
-  if (!rect) return;
-  suggestion.style.top = `${rect.top + rect.height}px`;
-  suggestion.style.left = `${rect.left}px`;
-  [].forEach.call(suggestion.children, (item: HTMLDivElement, i) => {
-    item.classList[i === picker.current ? 'add' : 'remove']('selected');
-  });
-}
-
-const options: Options = {
-  reducer: (action) => {
-    picker.view = action.view;
-    switch (action.kind) {
-      case ActionKind.open:
-        picker.current = 0;
-        picker.open = true;
-        picker.range = action.range;
-        placeSuggestion();
-        return true;
-      case ActionKind.close:
-        picker.open = false;
-        placeSuggestion();
-        return true;
-      case ActionKind.up:
-        picker.current -= 1;
-        picker.current += NUM_SUGGESTIONS; // negative modulus doesn't work
-        picker.current %= NUM_SUGGESTIONS;
-        placeSuggestion();
-        return true;
-      case ActionKind.down:
-        picker.current += 1;
-        picker.current %= NUM_SUGGESTIONS;
-        placeSuggestion();
-        return true;
-      case ActionKind.enter: {
-        const tr = action.view.state.tr
-          .deleteRange(action.range.from, action.range.to)
-          .insertText(`You can define this ${action.type ? `${action.type?.name} ` : ''}action!`);
-        action.view.dispatch(tr);
-        return true;
-      }
-      default:
-        return false;
-    }
-  },
-  triggers: [
-    { name: 'command', trigger: '/', decorationAttrs: { class: 'command' } },
-  ],
-};
-
 const emojiSuggestKey = new PluginKey('emojiSuggestKey');
 
 const emojiData = Object.values(
@@ -117,6 +55,8 @@ const getEmojiByAlias = (emojiAlias: string) => {
     }
   }
 };
+
+const trigger = '/';
 
 const specRegistry = new SpecRegistry([
   blockquote.spec(),
@@ -140,35 +80,26 @@ const specRegistry = new SpecRegistry([
   code.spec(),
   codeBlock.spec(),
   heading.spec(),
+  inlinePalette.spec({ markName: paletteMarkName, trigger })
 ]);
 const parser = markdownParser(specRegistry);
 const serializer = markdownSerializer(specRegistry);
 
+const getScrollContainer = (view: EditorView) => {
+  return view.dom.parentElement!;
+};
+
 export default function Editor() {
-  const suggestion = document.querySelector('#suggestion') as HTMLDivElement;
-
-  useEffect(() => {
-    if (suggestion) {
-      Array.from(suggestion.children).forEach((item, index) => {
-        item.addEventListener('click', () => {
-          if (!picker.view) return;
-          closeAutocomplete(picker.view);
-          picker.open = false;
-          placeSuggestion();
-          if (!picker.range) return;
-          const tr = picker.view.state.tr
-            .deleteRange(picker.range.from, picker.range.to)
-            .insertText(`Clicked on ${index + 1}`);
-          picker.view.dispatch(tr);
-          picker.view.focus();
-        });
-      })
-    }
-  }, [suggestion])
-
   const state = useEditorState({
     specRegistry,
     plugins: () => [
+      inlinePalette.plugins({
+        key: palettePluginKey,
+        markName: paletteMarkName,
+        tooltipRenderOpts: {
+          getScrollContainer,
+        },
+      }),
       blockquote.plugins(),
       bold.plugins(),
       bulletList.plugins(),
@@ -185,7 +116,6 @@ export default function Editor() {
       paragraph.plugins(),
       strike.plugins(),
       underline.plugins(),
-      ...autocomplete(options),
       emoji.plugins(),
       emojiSuggest.plugins({
         key: emojiSuggestKey,
@@ -222,6 +152,33 @@ export default function Editor() {
           return 'defaultMenu'
         }
       }),
+      keymap({
+        [keybindings.toggleInlineCommandPalette.key]: (
+          state,
+          dispatch,
+          view,
+        ): boolean => {
+          const { tr, schema, selection } = state;
+
+          if (queryInlinePaletteActive(palettePluginKey)(state)) {
+            return false;
+          }
+          const marks = selection.$from.marks();
+          const mark = schema.mark(paletteMarkName, { trigger });
+
+          const textBefore = selection.$from.nodeBefore?.text;
+          // Insert a space so we follow the convention of <space> trigger
+          if (textBefore && !textBefore.endsWith(' ')) {
+            tr.replaceSelectionWith(schema.text(' '), false);
+          }
+          tr.replaceSelectionWith(
+            schema.text(trigger, [mark, ...marks]),
+            false,
+          );
+          dispatch?.(tr);
+          return true;
+        },
+      }),
     ],
     initialValue: parser.parse(getMarkdown()),
   });
@@ -229,11 +186,7 @@ export default function Editor() {
   return <ReactBangleEditor state={state}>
     <FloatingMenu menuKey={menuKey} />
     <EmojiSuggest emojiSuggestKey={emojiSuggestKey} />
-    <div id="suggestion" style={{ display: "none" }}>
-      <div>Suggestion 1</div>
-      <div>Suggestion 2</div>
-      <div>Suggestion 3</div>
-    </div>
+    <InlineCommandPalette />
   </ReactBangleEditor>
 }
 
