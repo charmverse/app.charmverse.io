@@ -74,8 +74,9 @@ export function useEditorItems() {
           return (state, dispatch, view) => {
             if (queryIsHeadingActive(1)(state) || queryIsHeadingActive(2)(state) || queryIsHeadingActive(3)(state)) {
               rafCommandExec(view!, chainCommands(toggleHeading(), toggleBulletList()));
+            } else {
+              rafCommandExec(view!, chainCommands(toggleBulletList()));
             }
-            rafCommandExec(view!, chainCommands(toggleBulletList()));
             return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,
@@ -94,7 +95,11 @@ export function useEditorItems() {
         description: 'Convert the current block to todo list',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
-            rafCommandExec(view!, toggleTodoList());
+            if (queryIsHeadingActive(1)(state) || queryIsHeadingActive(2)(state) || queryIsHeadingActive(3)(state)) {
+              rafCommandExec(view!, chainCommands(toggleHeading(), toggleTodoList()));
+            } else {
+              rafCommandExec(view!, chainCommands(toggleTodoList()));
+            }
             return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,
@@ -113,7 +118,11 @@ export function useEditorItems() {
         description: 'Convert the current block to ordered list',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
-            rafCommandExec(view!, toggleOrderedList());
+            if (queryIsHeadingActive(1)(state) || queryIsHeadingActive(2)(state) || queryIsHeadingActive(3)(state)) {
+              rafCommandExec(view!, chainCommands(toggleHeading(), toggleOrderedList()));
+            } else {
+              rafCommandExec(view!, chainCommands(toggleOrderedList()));
+            }
             return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,
