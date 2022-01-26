@@ -144,7 +144,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
           </Box>
           <Link href={`/${domain}/settings/account`}>
             <IconButton>
-              <SettingsIcon />
+              <SettingsIcon color='secondary' />
             </IconButton>
           </Link>
         </Box>
