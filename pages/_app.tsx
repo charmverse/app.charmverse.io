@@ -2,6 +2,7 @@ import { UserProvider } from '@auth0/nextjs-auth0';
 import CssBaseline from '@mui/material/CssBaseline';
 import { PaletteMode } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import type { NextPage } from 'next';
@@ -11,6 +12,7 @@ import 'styles/index.css';
 import { createThemeLightSensitive } from 'theme';
 import { ColorModeContext } from 'context/color-mode';
 import { PageTitleProvider, TitleContext } from 'components/common/page-layout/PageTitle';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => JSX.Element
@@ -33,21 +35,33 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   }, []);
 
   // dark mode: https://mui.com/customization/dark-mode/
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode>('darkMode');
   const [mode, setMode] = useState<PaletteMode>('light');
   const colorMode = useMemo(
     () => ({
       // The dark mode switch would invoke this method
       toggleColorMode: () => {
-        console.log('toggle color mode');
-        setMode((prevMode: PaletteMode) =>
-          prevMode === 'light' ? 'dark' : 'light',
-        );
+        setMode((prevMode: PaletteMode) => {
+          const newMode = prevMode === 'light' ? 'dark' : 'light';
+          setSavedDarkMode(newMode);
+          return newMode;
+        });
       },
     }),
     [],
   );
   // Update the theme only if the mode changes
   const theme = useMemo(() => createThemeLightSensitive(mode), [mode]);
+
+  useEffect(() => {
+    if (savedDarkMode) {
+      setMode(savedDarkMode);
+    }
+    else if (prefersDarkMode) {
+      setMode('dark');
+    }
+  }, [prefersDarkMode, savedDarkMode]);
 
   return (
     <PageTitleProvider>

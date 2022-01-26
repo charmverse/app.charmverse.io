@@ -24,6 +24,15 @@ const workspaces = [
   { name: 'MattVerse', domain: 'mattverse' },
 ];
 
+const favoritePages = [
+  { id: 0, path: '', title: 'First Page' }
+];
+
+const pages = [
+  { id: 1, path: '', title: 'First Page' },
+  { id: 2, path: '', title: 'Second Page' }
+]
+
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
 `;
@@ -64,7 +73,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
     <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
       <Box sx={{ flexGrow: 1 }}>
         <Header>
-          <Typography>Acme</Typography>
+          <Typography><strong>Acme</strong></Typography>
           <IconButton onClick={closeSidebar}>
             <ChevronLeftIcon />
           </IconButton>
@@ -81,29 +90,35 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
             </NextLink>
           </List>
         </Box> */}
-        <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-          FAVORITES
-        </Typography>
-        <List>
-          <NextLink href={`/${domain}/`} passHref>
-            <ListItem button component='a' sx={{ py: 0 }}>
-              <ListItemText disableTypography>
-                  <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
-              </ListItemText>
-            </ListItem>
-          </NextLink>
-        </List>
+        {favoritePages.length > 0 && <>
+          <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+            FAVORITES
+          </Typography>
+          <List>
+            {favoritePages.map(page => (
+              <NextLink href={`/${domain}/${page.path}`} key={page.id} passHref>
+                <ListItem button component='a' disableRipple sx={{ py: 0 }}>
+                  <ListItemText disableTypography>
+                      <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
+                  </ListItemText>
+                </ListItem>
+              </NextLink>
+            ))}
+          </List>
+        </>}
         <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
           WORKSPACE
         </Typography>
         <List>
-          <NextLink href={`/${domain}/`} passHref>
-            <ListItem button component='a' sx={{ py: 0 }}>
-              <ListItemText disableTypography>
-                  <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
-              </ListItemText>
-            </ListItem>
-          </NextLink>
+          {pages.map(page => (
+            <NextLink href={`/${domain}/${page.path}`} key={page.id} passHref>
+              <ListItem button component='a' disableRipple sx={{ py: 0 }}>
+                <ListItemText disableTypography>
+                    <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
+                </ListItemText>
+              </ListItem>
+            </NextLink>
+          ))}
         </List>
         {/* <List>
           {['WORKSPACE', 'PRIVATE'].map((text, index) => (
