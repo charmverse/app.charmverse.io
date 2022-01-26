@@ -20,7 +20,7 @@ import { PluginKey, SpecRegistry } from '@bangle.dev/core';
 import '@bangle.dev/core/style.css';
 import { emoji } from '@bangle.dev/emoji';
 import { markdownParser } from '@bangle.dev/markdown';
-import { columnResizing, EditorView, keymap, NodeSelection } from '@bangle.dev/pm';
+import { columnResizing, EditorView, keymap, Node, NodeSelection, ResolvedPos } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { EmojiSuggest, emojiSuggest } from '@bangle.dev/react-emoji-suggest';
 import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
@@ -146,8 +146,23 @@ export default function Editor() {
       floatingMenu.plugins({
         key: menuKey,
         calculateType: (state,) => {
-          // If we are inside a table cell, or if the selection is empty no need to show, no need to show floating menu
-          if (state.selection.$anchor.parent.type.name.match(/^(table_cell|table_header)$/) || state.selection.empty || (state.selection as NodeSelection)?.node?.type?.name === "image") {
+          // if inside a table, first check to see if we are resizing or not
+          const isInsideTable = state.selection.$anchor.parent.type.name.match(/^(table_cell|table_header)$/);
+          if (isInsideTable) {
+            const { path } = (state.selection.$anchor) as ResolvedPos & { path: Node[] };
+            if (path) {
+              for (let index = path.length - 1; index > 0; index--) {
+                const node = path[index];
+                // We are inside a paragraph, then show floating menu
+                if (node.type && node.type.name === "paragraph") {
+                  return "defaultMenu"
+                }
+              }
+              // We are not inside a paragraph, so dont show floating menu 
+              return null;
+            }
+          }
+          if (state.selection.empty || (state.selection as NodeSelection)?.node?.type?.name === "image") {
             return null;
           }
           return 'defaultMenu'
@@ -180,6 +195,7 @@ export default function Editor() {
           return true;
         },
       }),
+
     ],
     initialValue: parser.parse(getMarkdown()),
   });
