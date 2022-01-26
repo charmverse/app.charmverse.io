@@ -20,27 +20,29 @@ declare module '@emotion/react' {
   export interface Theme extends MaterialUITheme {}
 }
 
+interface CustomColors {
+  settingsHeader: {
+    background: string
+  };
+  sidebar: {
+    avatarHighlight: string;
+    background: string;
+  };
+}
+
 // define custom colors: https://material-ui.com/customization/palette/
 declare module '@mui/material/styles/createPalette' {
-  interface Palette {
+  interface Palette extends CustomColors {
     blue: Palette['primary'];
     facebook: Palette['primary'];
     twitter: Palette['primary'];
     white: PaletteOptions['primary'];
   }
-  interface PaletteOptions {
+  interface PaletteOptions extends CustomColors {
     blue: PaletteOptions['primary'];
     facebook: PaletteOptions['primary'];
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
-    // custom elements
-    settingsHeader: {
-      background: string
-    };
-    sidebar: {
-      avatarHighlight: string;
-      background: string;
-    };
   }
 }
 
