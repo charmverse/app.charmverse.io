@@ -31,7 +31,7 @@ export default function MembersSettings () {
 
     <Legend>Current Members</Legend>
     {members.map((member) => (
-      <MemberRow member={member} />
+      <MemberRow key={member.username} member={member} />
     ))}
   </>);
 }
