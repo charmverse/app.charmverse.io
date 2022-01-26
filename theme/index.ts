@@ -1,7 +1,17 @@
 import { createTheme } from '@mui/material/styles';
-import { Theme as MaterialUITheme } from '@mui/material';
+import { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
 import { darken } from '@mui/system';
-import { blueColor, darkBlueColor } from './colors';
+import {
+  blueColor,
+  darkBlueColor,
+  lightGreyColor,
+  backgroundColor,
+  backgroundColorDarkMode,
+  primaryTextColor,
+  primaryTextColorDarkMode,
+  sidebarBackgroundColor,
+  sidebarBackgroundColorDarkMode,
+} from './colors';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
 declare module '@emotion/react' {
@@ -21,6 +31,10 @@ declare module '@mui/material/styles/createPalette' {
     facebook: PaletteOptions['primary'];
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
+    // custom elements
+    sidebar: {
+      background: string;
+    };
   }
 }
 
@@ -40,98 +54,104 @@ declare module '@mui/material/IconButton' {
 }
 
 // Explore all theme options: https://material-ui.com/customization/default-theme/
-const theme = createTheme({
-  transitions: {
-    duration: {
-      shortest: 150,
-      shorter: 200,
-      short: 250,
-      standard: 300,
-      complex: 375,
-      enteringScreen: 225,
-      leavingScreen: 195,
-    }
-  },
-  typography: {
-    fontFamily: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"',
-    htmlFontSize: 14,
-    h1: {
-      fontSize: '2rem',
-      fontWeight: 500
-    },
-    h2: {
-      fontSize: '1.05rem',
-      fontWeight: 500
-    }
-  },
-  palette: {
-    background: {
-      default: "#ffffff"
-    },
-    twitter: {
-      contrastText: '#ffffff',
-      dark: darken('#00aced', 0.1),
-      main: '#00aced',
-    },
-    facebook: {
-      contrastText: '#ffffff',
-      dark: darken('#3b5998', 0.1),
-      main: '#3b5998',
-    },
-    primary: {
-      main: blueColor, //'#010101',
-    },
-    secondary: {
-      main: '#777',
-    },
-    blue: {
-      main: '#00aced'
-    },
-    white: {
-      main: '#eee'
-    }
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: '20px'
-        }
+export const createThemeLightSensitive = (mode: PaletteMode) =>
+  createTheme({
+    transitions: {
+      duration: {
+        shortest: 150,
+        shorter: 200,
+        short: 250,
+        standard: 300,
+        complex: 375,
+        enteringScreen: 225,
+        leavingScreen: 195,
       }
     },
-    MuiButton: {
-      defaultProps: {
-        disableRipple: true
+    typography: {
+      fontFamily: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"',
+      htmlFontSize: 14,
+      h1: {
+        fontSize: '2rem',
+        fontWeight: 500
       },
-      styleOverrides: {
-        root: {
-          borderRadius: '10px'
-        }
+      h2: {
+        fontSize: '1.05rem',
+        fontWeight: 500
       }
     },
-    MuiCardContent: {
-      styleOverrides: {
-        root: {
-          "&:last-child": {
-            paddingBottom: 16,
-          }
-        }
+    palette: {
+      mode,
+      background: {
+        default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor
+      },
+      text: {
+        primary: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor,
+      },
+      twitter: {
+        contrastText: '#ffffff',
+        dark: darken('#00aced', 0.1),
+        main: '#00aced',
+      },
+      facebook: {
+        contrastText: '#ffffff',
+        dark: darken('#3b5998', 0.1),
+        main: '#3b5998',
+      },
+      primary: {
+        main: blueColor, //'#010101',
+      },
+      secondary: {
+        main: '#777',
+      },
+      sidebar: {
+        background: mode === 'dark' ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor,
+      },
+      blue: {
+        main: '#00aced'
+      },
+      white: {
+        main: '#eee'
       }
     },
-    MuiLink: {
-      styleOverrides: {
-        root: {
-          color: darkBlueColor,
-          '&:hover': {
-            color: darken(darkBlueColor, 0.2),
+    components: {
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: '20px'
           }
         }
       },
-      defaultProps: {
-        underline: 'none'
+      MuiButton: {
+        defaultProps: {
+          disableRipple: true
+        },
+        styleOverrides: {
+          root: {
+            borderRadius: '10px'
+          }
+        }
+      },
+      MuiCardContent: {
+        styleOverrides: {
+          root: {
+            "&:last-child": {
+              paddingBottom: 16,
+            }
+          }
+        }
+      },
+      MuiLink: {
+        styleOverrides: {
+          root: {
+            color: darkBlueColor,
+            '&:hover': {
+              color: darken(darkBlueColor, 0.2),
+            }
+          }
+        },
+        defaultProps: {
+          underline: 'none'
+        }
       }
     }
-  }
-});
-
-export { theme };
+  });

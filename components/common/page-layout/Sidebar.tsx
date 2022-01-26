@@ -38,7 +38,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
   const router = useRouter();
   const { domain } = router.query;
 
-  return (<Box display='flex' sx={{ backgroundColor: lightGreyColor, height: '100%' }}>
+  return (<Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
     <Box p={1} sx={{ float: 'left', borderRight: '1px solid #ddd', height: '100%' }}>
       <Grid container spacing={2} flexDirection='column'>
         {workspaces.map(workspace => (
