@@ -7,6 +7,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import Legend from 'components/settings/Legend';
 import Avatar from 'components/settings/LargeAvatar';
+import { setTitle } from 'components/common/page-layout/PageTitle';
 
 interface FormValues {
   domain: string;
@@ -14,6 +15,8 @@ interface FormValues {
 }
 
 export default function WorkspaceSettings () {
+
+  setTitle('Workspace Options');
 
   const {
     register,
