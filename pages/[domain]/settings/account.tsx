@@ -7,12 +7,15 @@ import { useForm } from 'react-hook-form';
 import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import Avatar from 'components/settings/LargeAvatar';
+import { setTitle } from 'components/common/page-layout/PageTitle';
 
 interface FormValues {
   username: string;
 }
 
 export default function AccountSettings () {
+
+  setTitle('My Account');
 
   const {
     register,

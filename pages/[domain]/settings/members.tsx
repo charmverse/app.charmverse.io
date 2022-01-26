@@ -4,6 +4,7 @@ import Legend from 'components/settings/Legend';
 import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
 import MemberRow, { Member } from 'components/settings/MemberRow';
+import { setTitle } from 'components/common/page-layout/PageTitle';
 
 const members: Member[] = [
   { address: '0x1416d1b5435D12CE393aBbA3f81fe6C5951e4Bf4', username: 'cerberus', role: 'admin' },
@@ -12,6 +13,8 @@ const members: Member[] = [
 ]
 
 export default function MembersSettings () {
+
+  setTitle('Members');
 
   return (<>
     <Legend>

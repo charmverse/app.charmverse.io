@@ -22,7 +22,8 @@ const SETTINGS_TABS = [
 
 const NavigationContainer = styled(Box)`
   background-color: ${lighterGreyColor};
-  padding-top: ${({ theme }) => theme.spacing(6)};
+  padding-top: ${({ theme }) => theme.spacing(4)};
+  border-top: 1px solid #ddd;
 `;
 
 export default function SettingsLayout ({ children }: { children: React.ReactNode }) {

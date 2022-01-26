@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Theme } from '@mui/material';
+import Head from 'next/head';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -10,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Header, { toolbarHeight } from './Header';
+import { TitleContext } from './PageTitle';
 import Sidebar from './Sidebar';
 
 const drawerWidth = 300;
@@ -78,6 +80,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export function PageLayout ({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
+  const pageTitleValue: any = React.useState('');
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -88,36 +91,47 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBar position='fixed' open={open}>
-        <Toolbar variant='dense' sx={{ background: 'white', height: toolbarHeight, minHeight: toolbarHeight }}>
-          <IconButton
-            color='inherit'
-            aria-label='open drawer'
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: '36px',
-              ...(open && { display: 'none' }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography noWrap component='div'>
-            Welcome!
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer variant='permanent' open={open}>
-        <Sidebar closeSidebar={handleDrawerClose} />
-      </Drawer>
-      <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-        <Box component='main' sx={{ flexGrow: 1 }}>
-          <Header />
-          {children}
+    <TitleContext.Provider value={pageTitleValue}>
+      <Head>
+        <title>
+          <TitleContext.Consumer>
+            {(title) => title}
+          </TitleContext.Consumer>
+        </title>
+      </Head>
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <AppBar position='fixed' open={open}>
+          <Toolbar variant='dense' sx={{ background: 'white', height: toolbarHeight, minHeight: toolbarHeight }}>
+            <IconButton
+              color='inherit'
+              aria-label='open drawer'
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{
+                marginRight: '36px',
+                ...(open && { display: 'none' }),
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography noWrap component='div' sx={{ fontWeight: 500 }}>
+              <TitleContext.Consumer>
+                {(title) => title}
+              </TitleContext.Consumer>
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Drawer variant='permanent' open={open}>
+          <Sidebar closeSidebar={handleDrawerClose} />
+        </Drawer>
+        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+          <Box component='main' sx={{ flexGrow: 1 }}>
+            <Header />
+            {children}
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </TitleContext.Provider>
   );
 }
