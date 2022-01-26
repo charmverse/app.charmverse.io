@@ -91,7 +91,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position='fixed' open={open}>
-        <Toolbar variant='dense' sx={{ height: toolbarHeight, minHeight: toolbarHeight }}>
+        <Toolbar variant='dense' sx={{ background: 'white', height: toolbarHeight, minHeight: toolbarHeight }}>
           <IconButton
             color='inherit'
             aria-label='open drawer'
@@ -104,7 +104,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography noWrap component="div">
+          <Typography noWrap component='div'>
             Welcome!
           </Typography>
         </Toolbar>
