@@ -79,7 +79,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
           FAVORITES
         </Typography>
         <List>
-          <NextLink href={`/workspace/${workspaceDomain}/`} passHref>
+          <NextLink href={`/${workspaceDomain}/`} passHref>
             <ListItem button component='a' sx={{ py: 0 }}>
               <ListItemText disableTypography>
                   <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
@@ -91,7 +91,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
           WORKSPACE
         </Typography>
         <List>
-          <NextLink href={`/workspace/${workspaceDomain}/`} passHref>
+          <NextLink href={`/${workspaceDomain}/`} passHref>
             <ListItem button component='a' sx={{ py: 0 }}>
               <ListItemText disableTypography>
                   <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
@@ -121,7 +121,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
               </Typography>
             </Box>
           </Box>
-          <Link href={`/workspace/${workspaceDomain}/settings/account`}>
+          <Link href={`/${workspaceDomain}/settings/account`}>
             <IconButton>
               <SettingsIcon />
             </IconButton>

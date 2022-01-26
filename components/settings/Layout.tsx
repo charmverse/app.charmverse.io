@@ -35,7 +35,7 @@ export default function SettingsLayout ({ children }: { children: React.ReactNod
   }, [router.pathname]);
 
   function getCurrentTabValue (pathname: string) {
-    const tabConfig = SETTINGS_TABS.find(tab => tab.path === pathname) || SETTINGS_TABS[0];
+    const tabConfig = SETTINGS_TABS.find(tab => pathname.includes(tab.path) || SETTINGS_TABS[0]);
     return SETTINGS_TABS.indexOf(tabConfig);
   }
 
@@ -46,7 +46,7 @@ export default function SettingsLayout ({ children }: { children: React.ReactNod
           <Tabs value={tab} indicatorColor='primary'>
             {/* combining next links with MUI tabs - https://stackoverflow.com/questions/65471275/material-ui-tabs-with-nextjs */}
             {SETTINGS_TABS.map(({ icon, path, label }) => (
-              <Link href={`/workspace/${workspaceDomain}/${path}`} passHref key={label}>
+              <Link href={`/${workspaceDomain}/settings/${path}`} passHref key={label}>
                 <Tab icon={icon} iconPosition='start' component='a' disableRipple label={label} sx={{ minHeight: 0}} />
               </Link>
             ))}
