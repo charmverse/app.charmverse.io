@@ -1,6 +1,6 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
 import {
   useInlinePaletteItems,
@@ -119,22 +119,31 @@ export function InlineCommandPalette() {
     isItemDisabled,
   );
 
+  const paletteGroups: Set<string> = new Set();
+  const renderedElements: ReactNode[] = [];
+
+  items.forEach((item, i) => {
+    // If we haven't added the group node, add it to set and render the node
+    if (!paletteGroups.has(item.group)) {
+      renderedElements.push(<div className="inline-palette-items-group">{item.group}</div>)
+      paletteGroups.add(item.group)
+    }
+
+    renderedElements.push(<InlinePaletteRow
+      key={item.uid}
+      dataId={item.uid}
+      disabled={item._isItemDisabled}
+      title={item.title}
+      description={item.description}
+      icon={item.icon}
+      {...getItemProps(item, i)}
+    />)
+  })
+
   return reactDOM.createPortal(
     <div className="inline-palette-wrapper shadow-2xl">
       <div className="inline-palette-items-wrapper">
-        {items.map((item, i) => {
-          return (
-            <InlinePaletteRow
-              key={item.uid}
-              dataId={item.uid}
-              disabled={item._isItemDisabled}
-              title={item.title}
-              description={item.description}
-              icon={item.icon}
-              {...getItemProps(item, i)}
-            />
-          );
-        })}
+        {renderedElements}
       </div>
     </div>,
     tooltipContentDOM,

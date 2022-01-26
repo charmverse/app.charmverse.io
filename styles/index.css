@@ -47,7 +47,7 @@
 
 :root {
   --window-tooltip-zIndex: 5;
-  --inlineUniversalPalette-height: 350px;
+  --inlineUniversalPalette-height: 400px;
   --accent-secondary: rgb(241, 241, 241);
 }
 
@@ -99,11 +99,12 @@
   display: flex;
   flex-direction: column;
   max-height: var(--inlineUniversalPalette-maxHeight);
-  overflow-y: scroll;
+  overflow-y: auto;
+  padding: 10px;
 }
 
 .inline-palette-items-wrapper > .inline-palette-row {
-  padding: 0.4rem 0;
+  padding: 0.5rem 0;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -138,4 +139,11 @@
 .inline-palette-row.disabled{
   color: rgb(0, 0, 0, 0.4);
   cursor: default;
+}
+
+.inline-palette-items-group {
+  font-size: 14px;
+  color: rgb(0, 0, 0, 0.5);
+  text-transform: capitalize;
+  font-weight: bold;
 }
