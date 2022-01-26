@@ -119,17 +119,14 @@ export function InlineCommandPalette() {
     isItemDisabled,
   );
 
-  const paletteGroups: Set<string> = new Set();
-  const renderedElements: ReactNode[] = [];
+  const paletteGroupItemsRecord: Record<string, ReactNode[]> = {};
 
   items.forEach((item, i) => {
     // If we haven't added the group node, add it to set and render the node
-    if (!paletteGroups.has(item.group)) {
-      renderedElements.push(<div className="inline-palette-items-group">{item.group}</div>)
-      paletteGroups.add(item.group)
+    if (!paletteGroupItemsRecord[item.group]) {
+      paletteGroupItemsRecord[item.group] = []
     }
-
-    renderedElements.push(<InlinePaletteRow
+    paletteGroupItemsRecord[item.group].push(<InlinePaletteRow
       key={item.uid}
       dataId={item.uid}
       disabled={item._isItemDisabled}
@@ -142,9 +139,16 @@ export function InlineCommandPalette() {
 
   return reactDOM.createPortal(
     <div className="inline-palette-wrapper shadow-2xl">
-      <div className="inline-palette-items-wrapper">
-        {renderedElements}
-      </div>
+      {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (<>
+        <div className="inline-palette-group">
+          <div className="inline-palette-group-name">
+            {group}
+          </div>
+          <div className="inline-palette-group-items">
+            {paletteItems}
+          </div>
+        </div>
+      </>))}
     </div>,
     tooltipContentDOM,
   );
