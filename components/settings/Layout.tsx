@@ -44,7 +44,7 @@ export default function SettingsLayout ({ children }: { children: React.ReactNod
     <PageLayout>
       <NavigationContainer>
         <Container>
-          <Tabs value={tab} indicatorColor='primary'>
+          <Tabs value={tab} indicatorColor='primary' sx={{ minHeight: 44 }}>
             {/* combining next links with MUI tabs - https://stackoverflow.com/questions/65471275/material-ui-tabs-with-nextjs */}
             {SETTINGS_TABS.map(({ icon, path, label }) => (
               <Link href={`/${workspaceDomain}/settings/${path}`} passHref key={label}>
