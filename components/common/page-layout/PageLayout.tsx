@@ -13,8 +13,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useColorMode } from 'context/color-mode';
+import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import * as React from 'react';
-import { scrollBarThumbBackgroundColor, scrollBarThumbBackgroundColorDarkMode, scrollBarTrackBackgroundColor, scrollBarTrackBackgroundColorDarkMode } from 'theme/colors';
 import Header, { toolbarHeight } from './Header';
 import { useTitleState } from './PageTitle';
 import Sidebar from './Sidebar';
@@ -94,6 +94,7 @@ export function PageLayout({ children }: { children: React.ReactNode }) {
   const [pageTitle] = useTitleState();
   const theme = useTheme();
   const colorMode = useColorMode();
+  const scrollbarStyling = useScrollbarStyling();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -137,16 +138,7 @@ export function PageLayout({ children }: { children: React.ReactNode }) {
         </Drawer>
         <Box sx={{
           flexGrow: 1, overflow: 'auto',
-          "&::-webkit-scrollbar": {
-            width: "10px",
-            border: "1px solid black"
-          },
-          "&::-webkit-scrollbar-track": {
-            backgroundColor: theme.palette.mode === "dark" ? scrollBarTrackBackgroundColorDarkMode : scrollBarTrackBackgroundColor
-          },
-          "&::-webkit-scrollbar-thumb": {
-            backgroundColor: theme.palette.mode === "dark" ? scrollBarThumbBackgroundColorDarkMode : scrollBarThumbBackgroundColor
-          }
+          ...scrollbarStyling,
         }}>
           <Box component='main' sx={{ flexGrow: 1 }}>
             <Header />
