@@ -18,15 +18,30 @@ import MuiLink from '@mui/material/Link';
 import Header from './Header';
 import Avatar from '../Avatar';
 import WorkspaceAvatar from '../WorkspaceAvatar';
-import { lightGreyColor } from 'theme/colors';
 
 const workspaces = [
   { name: 'CharmVerse', domain: 'charmverse' },
   { name: 'MattVerse', domain: 'mattverse' },
 ];
 
+const favoritePages = [
+  { id: 0, path: '', title: 'First Page' }
+];
+
+const pages = [
+  { id: 1, path: '', title: 'First Page' },
+  { id: 2, path: '', title: 'Second Page' }
+]
+
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
+`;
+
+const WorkspaceContainer = styled.div`
+  float: left;
+  height: 100%;
+  border-right: 1px solid ${({ theme }) => theme.palette.divider};
+  padding: ${({ theme }) => theme.spacing(1)};
 `;
 
 interface SidebarProps {
@@ -38,8 +53,8 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
   const router = useRouter();
   const { domain } = router.query;
 
-  return (<Box display='flex' sx={{ backgroundColor: lightGreyColor, height: '100%' }}>
-    <Box p={1} sx={{ float: 'left', borderRight: '1px solid #ddd', height: '100%' }}>
+  return (<Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
+    <WorkspaceContainer>
       <Grid container spacing={2} flexDirection='column'>
         {workspaces.map(workspace => (
           <Grid item key={workspace.domain}>
@@ -54,11 +69,11 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
           <IconButton sx={{ borderRadius: '8px' }}><AddIcon /></IconButton>
         </Grid>
       </Grid>
-    </Box>
+    </WorkspaceContainer>
     <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
       <Box sx={{ flexGrow: 1 }}>
         <Header>
-          <Typography>Acme</Typography>
+          <Typography><strong>Acme</strong></Typography>
           <IconButton onClick={closeSidebar}>
             <ChevronLeftIcon />
           </IconButton>
@@ -75,29 +90,35 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
             </NextLink>
           </List>
         </Box> */}
-        <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-          FAVORITES
-        </Typography>
-        <List>
-          <NextLink href={`/${domain}/`} passHref>
-            <ListItem button component='a' sx={{ py: 0 }}>
-              <ListItemText disableTypography>
-                  <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
-              </ListItemText>
-            </ListItem>
-          </NextLink>
-        </List>
+        {favoritePages.length > 0 && <>
+          <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+            FAVORITES
+          </Typography>
+          <List>
+            {favoritePages.map(page => (
+              <NextLink href={`/${domain}/${page.path}`} key={page.id} passHref>
+                <ListItem button component='a' disableRipple sx={{ py: 0 }}>
+                  <ListItemText disableTypography>
+                      <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
+                  </ListItemText>
+                </ListItem>
+              </NextLink>
+            ))}
+          </List>
+        </>}
         <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
           WORKSPACE
         </Typography>
         <List>
-          <NextLink href={`/${domain}/`} passHref>
-            <ListItem button component='a' sx={{ py: 0 }}>
-              <ListItemText disableTypography>
-                  <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>First Page</Box>
-              </ListItemText>
-            </ListItem>
-          </NextLink>
+          {pages.map(page => (
+            <NextLink href={`/${domain}/${page.path}`} key={page.id} passHref>
+              <ListItem button component='a' disableRipple sx={{ py: 0 }}>
+                <ListItemText disableTypography>
+                    <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
+                </ListItemText>
+              </ListItem>
+            </NextLink>
+          ))}
         </List>
         {/* <List>
           {['WORKSPACE', 'PRIVATE'].map((text, index) => (
@@ -123,7 +144,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
           </Box>
           <Link href={`/${domain}/settings/account`}>
             <IconButton>
-              <SettingsIcon />
+              <SettingsIcon color='secondary' />
             </IconButton>
           </Link>
         </Box>

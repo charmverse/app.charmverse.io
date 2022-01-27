@@ -6,9 +6,10 @@ import BangleEditor from './BangleEditor';
 import Emoji from 'components/common/Emoji';
 
 const Container = styled.div`
-  width: 800px;
+  width: 860px;
   max-width: 100%;
   margin: 0 auto 5px;
+  padding: 0 20px 0 40px;
 `;
 
 const Controls = styled.div`
@@ -25,6 +26,7 @@ const PageTitle = styled(Typography)`
 export function Editor () {
 
   const page = {
+    icon: '📌',
     title: 'Welcome!'
   };
 
@@ -34,11 +36,9 @@ export function Editor () {
 
       </Controls>
       <Box py={3}>
-        <Emoji sx={{ fontSize: 78 }}>📌</Emoji>
+        <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
       </Box>
       <PageTitle>{page.title}</PageTitle>
-    </Container>
-    <Container>
       <BangleEditor />
     </Container>
   </>);

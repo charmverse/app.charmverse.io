@@ -4,7 +4,8 @@ import Avatar from '@mui/material/Avatar';
 import { stringToColor } from 'lib/strings';
 
 const StyledAvatar = styled(Avatar)`
-  font-size: 75px;
+  color: white;
+  font-size: 90px;
   font-weight: 500;
   width: 150px;
   height: 150px;

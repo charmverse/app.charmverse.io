@@ -7,7 +7,6 @@ import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import { PageLayout } from '../common/page-layout';
 import Container from './ContentContainer';
-import { lighterGreyColor } from 'theme/colors';
 import AccountIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/WorkOutline';
 import PersonIcon from '@mui/icons-material/Group';
@@ -19,9 +18,9 @@ const SETTINGS_TABS = [
 ];
 
 const NavigationContainer = styled(Box)`
-  background-color: ${lighterGreyColor};
+  background-color: ${({ theme }) => theme.palette.settingsHeader.background};
   padding-top: ${({ theme }) => theme.spacing(4)};
-  border-top: 1px solid #ddd;
+  border-top: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
 export default function SettingsLayout ({ children }: { children: React.ReactNode }) {
