@@ -1,18 +1,13 @@
-import { createTheme } from '@mui/material/styles';
 import { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 import { darken } from '@mui/system';
 import {
-  blueColor,
-  darkBlueColor,
-  lightGreyColor,
   backgroundColor,
-  backgroundColorDarkMode,
-  primaryTextColor,
-  primaryTextColorDarkMode,
-  sidebarBackgroundColor,
-  sidebarBackgroundColorDarkMode,
-  settingsHeaderBackgroundColor,
-  settingsHeaderBackgroundColorDarkMode,
+  backgroundColorDarkMode, blueColor,
+  darkBlueColor, primaryTextColor,
+  primaryTextColorDarkMode, settingsHeaderBackgroundColor,
+  settingsHeaderBackgroundColorDarkMode, sidebarBackgroundColor,
+  sidebarBackgroundColorDarkMode
 } from './colors';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme

@@ -1,7 +1,10 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import React, { Fragment, ReactNode, useCallback, useEffect, useState } from 'react';
+import styled from '@emotion/styled';
+import { List, ListItem, Typography } from '@mui/material';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
+import { sidebarBackgroundColor, sidebarBackgroundColorDarkMode } from 'theme/colors';
 import {
   useInlinePaletteItems,
   useInlinePaletteQuery
@@ -9,13 +12,9 @@ import {
 import { InlinePaletteRow } from '../../lib/ui-components';
 import { palettePluginKey } from './config';
 import {
-  PaletteItem, PALETTE_ITEM_HINT_TYPE,
-  PALETTE_ITEM_REGULAR_TYPE
+  PaletteItem, PALETTE_ITEM_REGULAR_TYPE
 } from './palette-item';
 import { useEditorItems } from './use-editor-items';
-
-const staticHints: PaletteItem[] = [
-];
 
 function getItemsAndHints(
   view: EditorView,
@@ -39,12 +38,6 @@ function getItemsAndHints(
   items.forEach((item) => {
     item._isItemDisabled = isItemDisabled(item);
   });
-
-  let hintItems = [
-    ...staticHints,
-    ...items.filter((item) => item.type === PALETTE_ITEM_HINT_TYPE),
-  ];
-
   items = items
     .filter(
       (item) =>
@@ -68,8 +61,31 @@ function getItemsAndHints(
       }
       return a.group.localeCompare(b.group);
     });
-  return { items, hintItems };
+  return { items };
 }
+
+const InlinePaletteWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: ${({ theme }) => theme.palette.mode === "dark" ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor};
+  max-height: 350px;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  overflow-y: auto;
+  padding: ${({ theme }) => theme.spacing(1)};
+  border-radius: ${({ theme }) => theme.spacing(0.5)};
+`;
+
+const InlinePaletteGroup = styled.div`
+  margin: ${({ theme }) => theme.spacing(1, 0)};
+  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
+`;
+
+const InlinePaletteGroupName = styled(Typography)`
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #777
+`;
 
 export function InlineCommandPalette() {
   const { query, counter, isVisible, tooltipContentDOM } =
@@ -86,7 +102,7 @@ export function InlineCommandPalette() {
     [view],
   );
 
-  const [{ items, hintItems }, updateItem] = useState(() => {
+  const [{ items }, updateItem] = useState(() => {
     return getItemsAndHints(
       view,
       query,
@@ -123,34 +139,38 @@ export function InlineCommandPalette() {
 
   items.forEach((item, i) => {
     const itemProps = { ...getItemProps(item, i) };
-    // If we haven't added the group node, add it to set and render the node
     if (!paletteGroupItemsRecord[item.group]) {
       paletteGroupItemsRecord[item.group] = []
     }
-    paletteGroupItemsRecord[item.group].push(<InlinePaletteRow
-      key={item.uid}
-      dataId={item.uid}
-      disabled={item._isItemDisabled}
-      title={item.title}
-      description={item.description}
-      icon={item.icon}
-      {...itemProps}
-    />)
+    paletteGroupItemsRecord[item.group].push(<ListItem disabled={item._isItemDisabled} button component="div" sx={{ py: 0, px: 0 }}>
+      <InlinePaletteRow
+        key={item.uid}
+        dataId={item.uid}
+        disabled={item._isItemDisabled}
+        title={item.title}
+        description={item.description}
+        icon={item.icon}
+        {...itemProps}
+      />
+    </ListItem>)
   })
 
   return reactDOM.createPortal(
-    <div className="inline-palette-wrapper shadow-2xl">
-      {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (<Fragment key={group}>
-        <div className="inline-palette-group">
-          <div className="inline-palette-group-name">
+    <InlinePaletteWrapper>
+      {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
+        <InlinePaletteGroup>
+          <InlinePaletteGroupName>
             {group}
-          </div>
-          <div className="inline-palette-group-items">
+          </InlinePaletteGroupName>
+          <List sx={{
+            paddingTop: '5px',
+            paddingBottom: '5px',
+          }}>
             {paletteItems}
-          </div>
-        </div>
-      </Fragment>))}
-    </div>,
+          </List>
+        </InlinePaletteGroup>
+      ))}
+    </InlinePaletteWrapper>,
     tooltipContentDOM,
   );
 }
