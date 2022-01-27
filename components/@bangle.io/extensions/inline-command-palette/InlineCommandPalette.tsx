@@ -70,8 +70,20 @@ const InlinePaletteWrapper = styled.div`
   max-height: 400;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   overflow-y: auto;
-  padding: 10px;
-`
+  padding: ${({ theme }) => theme.spacing(1)};
+`;
+
+const InlinePaletteGroup = styled.div`
+  margin: ${({ theme }) => theme.spacing(1, 0)};
+  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
+`;
+
+const InlinePaletteGroupName = styled.div`
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
+`;
 
 export function InlineCommandPalette() {
   const { query, counter, isVisible, tooltipContentDOM } =
@@ -142,14 +154,15 @@ export function InlineCommandPalette() {
   return reactDOM.createPortal(
     <InlinePaletteWrapper>
       {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
-        <div key={group} className="inline-palette-group">
-          <div className="inline-palette-group-name">
+        <InlinePaletteGroup>
+          <InlinePaletteGroupName>
             {group}
-          </div>
+          </InlinePaletteGroupName>
           <div className="inline-palette-group-items">
             {paletteItems}
           </div>
-        </div>))}
+        </InlinePaletteGroup>
+      ))}
     </InlinePaletteWrapper>,
     tooltipContentDOM,
   );
