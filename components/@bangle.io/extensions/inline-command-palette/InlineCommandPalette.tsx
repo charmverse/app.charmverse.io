@@ -1,6 +1,7 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import React, { Fragment, ReactNode, useCallback, useEffect, useState } from 'react';
+import styled from '@emotion/styled';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
 import {
   useInlinePaletteItems,
@@ -9,13 +10,9 @@ import {
 import { InlinePaletteRow } from '../../lib/ui-components';
 import { palettePluginKey } from './config';
 import {
-  PaletteItem, PALETTE_ITEM_HINT_TYPE,
-  PALETTE_ITEM_REGULAR_TYPE
+  PaletteItem, PALETTE_ITEM_REGULAR_TYPE
 } from './palette-item';
 import { useEditorItems } from './use-editor-items';
-
-const staticHints: PaletteItem[] = [
-];
 
 function getItemsAndHints(
   view: EditorView,
@@ -39,12 +36,6 @@ function getItemsAndHints(
   items.forEach((item) => {
     item._isItemDisabled = isItemDisabled(item);
   });
-
-  let hintItems = [
-    ...staticHints,
-    ...items.filter((item) => item.type === PALETTE_ITEM_HINT_TYPE),
-  ];
-
   items = items
     .filter(
       (item) =>
@@ -68,8 +59,19 @@ function getItemsAndHints(
       }
       return a.group.localeCompare(b.group);
     });
-  return { items, hintItems };
+  return { items };
 }
+
+const InlinePaletteWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: ${({ theme }) => theme.palette.background.default};
+  max-width: 400;
+  max-height: 400;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  overflow-y: auto;
+  padding: 10px;
+`
 
 export function InlineCommandPalette() {
   const { query, counter, isVisible, tooltipContentDOM } =
@@ -86,7 +88,7 @@ export function InlineCommandPalette() {
     [view],
   );
 
-  const [{ items, hintItems }, updateItem] = useState(() => {
+  const [{ items }, updateItem] = useState(() => {
     return getItemsAndHints(
       view,
       query,
@@ -123,7 +125,6 @@ export function InlineCommandPalette() {
 
   items.forEach((item, i) => {
     const itemProps = { ...getItemProps(item, i) };
-    // If we haven't added the group node, add it to set and render the node
     if (!paletteGroupItemsRecord[item.group]) {
       paletteGroupItemsRecord[item.group] = []
     }
@@ -139,18 +140,17 @@ export function InlineCommandPalette() {
   })
 
   return reactDOM.createPortal(
-    <div className="inline-palette-wrapper shadow-2xl">
-      {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (<Fragment key={group}>
-        <div className="inline-palette-group">
+    <InlinePaletteWrapper>
+      {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
+        <div key={group} className="inline-palette-group">
           <div className="inline-palette-group-name">
             {group}
           </div>
           <div className="inline-palette-group-items">
             {paletteItems}
           </div>
-        </div>
-      </Fragment>))}
-    </div>,
+        </div>))}
+    </InlinePaletteWrapper>,
     tooltipContentDOM,
   );
 }
