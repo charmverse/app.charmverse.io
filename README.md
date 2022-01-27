@@ -35,13 +35,13 @@ We stand on the shoulders of giants:
 
 ### Folder Structure
 
-- `/adapters`: utils to interact with external apis and other io layers
+- `/pages`: pages rendered by Next.js
+- `/theme`: colors, typography, etc.
 - `/components`: React components
 - `/context`: React utils
 - `/hooks`: React utils
+- `/adapters`: utils to interact with external apis and other io layers
 - `/lib`: utils that don't fit anywhere else
-- `/pages`: pages rendered by Next.js
-- `/theme`: pages rendered by Next.js
 
 ### Theming
 
