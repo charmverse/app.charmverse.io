@@ -10,7 +10,7 @@ export function CustomFloatingMenu() {
         <ItalicButton />
         <CodeButton />
       </MenuGroup>
-      <MenuGroup>
+      <MenuGroup isLastGroup>
         <ParagraphButton />
         <BlockquoteButton />
         <HeadingButton level={1} />
