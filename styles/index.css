@@ -107,7 +107,7 @@ div#__next > div {
   padding: 10px;
 }
 
-.inline-palette-wrapper .inline-palette-row {
+.inline-palette-row {
   padding: 0.5rem 0;
   cursor: pointer;
   display: flex;
@@ -115,11 +115,11 @@ div#__next > div {
   gap: 10px;
 }
 
-.inline-palette-wrapper .inline-palette-row.disabled {
+.inline-palette-row.disabled {
   background-color: var(--accent-secondary);
 }
 
-.inline-palette-wrapper .inline-palette-row.hover-allowed:hover {
+.inline-palette-row.hover-allowed:hover {
   background-color: var(--accent-secondary);
 }
 

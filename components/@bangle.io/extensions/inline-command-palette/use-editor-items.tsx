@@ -186,28 +186,6 @@ export function useEditorItems() {
         },
       }),
 
-      /* PaletteItem.create({
-        uid: 'insertSiblingListBelow',
-        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
-        group: 'editor',
-        title: 'Insert List below',
-        keywords: ['insert', 'lists'],
-        description: 'Insert a list item',
-        disabled: (state) => {
-          return !isList()(state);
-        },
-        editorExecuteCommand: () => {
-          return (state, dispatch, view) => {
-            rafCommandExec(view!, insertEmptySiblingListBelow());
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view,
-            );
-          };
-        },
-      }), */
-
       ...Array.from({ length: 3 }, (_, i) => {
         const level = i + 1;
         return PaletteItem.create({
