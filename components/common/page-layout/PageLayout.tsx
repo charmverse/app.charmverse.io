@@ -1,23 +1,23 @@
-import * as React from 'react';
-import { Theme } from '@mui/material';
-import Head from 'next/head';
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
-import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
-import CssBaseline from '@mui/material/CssBaseline';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import MenuIcon from '@mui/icons-material/Menu';
+import { Theme } from '@mui/material';
+import MuiAppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import CssBaseline from '@mui/material/CssBaseline';
+import MuiDrawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import { useColorMode } from 'context/color-mode';
+import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
+import * as React from 'react';
 import Header, { toolbarHeight } from './Header';
 import { useTitleState } from './PageTitle';
 import Sidebar from './Sidebar';
-import { useTheme } from '@emotion/react';
-import { useColorMode } from 'context/color-mode';
 
 const drawerWidth = 300;
 
@@ -63,7 +63,7 @@ const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !==
       }),
     })
   })
-);
+  );
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })
   // @ts-ignore mixins dont work with Typescript
@@ -81,7 +81,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
       '& .MuiDrawer-paper': closedMixin(theme),
     }),
   }),
-);
+  );
 
 const StyledToolbar = styled(Toolbar)`
   background-color: ${({ theme }) => theme.palette.background.default};
@@ -89,11 +89,12 @@ const StyledToolbar = styled(Toolbar)`
   min-height: ${toolbarHeight}px;
 `;
 
-export function PageLayout ({ children }: { children: React.ReactNode }) {
+export function PageLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
   const [pageTitle] = useTitleState();
   const theme = useTheme();
   const colorMode = useColorMode();
+  const scrollbarStyling = useScrollbarStyling();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -135,7 +136,10 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
         <Drawer variant='permanent' open={open}>
           <Sidebar closeSidebar={handleDrawerClose} />
         </Drawer>
-        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+        <Box sx={{
+          flexGrow: 1, overflow: 'auto',
+          ...scrollbarStyling,
+        }}>
           <Box component='main' sx={{ flexGrow: 1 }}>
             <Header />
             {children}
