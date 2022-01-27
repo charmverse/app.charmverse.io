@@ -1,4 +1,6 @@
-import { BlockquoteButton, BoldButton, CodeButton, HeadingButton, ItalicButton, Menu, MenuGroup, ParagraphButton } from "@bangle.dev/react-menu";
+import { Menu } from "components/@bangle.dev/react-menu/Menu";
+import { BlockquoteButton, BoldButton, CodeButton, HeadingButton, ItalicButton, ParagraphButton } from "components/@bangle.dev/react-menu/MenuButtons";
+import { MenuGroup } from "components/@bangle.dev/react-menu/MenuGroup";
 
 export function CustomFloatingMenu() {
   return (
