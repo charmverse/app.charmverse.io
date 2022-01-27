@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  cx,
   isTouchDevice,
   safeScrollIntoViewIfNeeded
 } from '../../utils/utility';
@@ -33,9 +32,9 @@ const StyledInlinePaletteRow = styled.div<{ active: boolean, disabled: boolean }
   align-items: center;
   gap: ${({ theme }) => theme.spacing(1.5)};
   width: 100%;
-  ${props => props.active && `background-color: rgb(0, 0, 0, 0.125)`};
+  ${props => props.active && `background-color: rgb(0, 0, 0, 0.125);`};
   font-weight: 500;
-  ${props => props.disabled ? `pointer: none` : `pointer: cursor`}
+  padding: 5px ${BASE_PADDING}px
 `;
 
 export function InlinePaletteRow({
@@ -44,8 +43,6 @@ export function InlinePaletteRow({
   isActive,
   onClick,
   icon = null,
-  basePadding = BASE_PADDING,
-  depth = 1,
   description = '',
   className = '',
   scrollIntoViewIfNeeded = true,
@@ -80,31 +77,11 @@ export function InlinePaletteRow({
       ref={ref}
       active={Boolean(isActive)}
       disabled={Boolean(disabled)}
-      className={cx(
-        'inline-palette-row',
-        disabled ? 'cursor-not-allowed' : 'cursor-pointer',
-        className,
-        allowHover && 'hover-allowed',
-      )}
-      style={{
-        paddingLeft: depth * basePadding,
-        paddingRight: PADDING_OFFSET,
-        paddingTop: 5,
-        paddingBottom: 5,
-        ...style,
-      }}
+      className={className}
+      style={style}
     >
       {icon}
-      <span className="inline-palette-item">
-        <span
-          className={cx('inline-palette-item-title')}
-          style={{
-            color: disabled ? 'var(--textColor-1)' : 'inherit',
-          }}
-        >
-          {title}
-        </span>
-      </span>
+      {title}
     </StyledInlinePaletteRow>
   );
 }

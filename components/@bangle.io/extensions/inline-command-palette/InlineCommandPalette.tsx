@@ -142,7 +142,7 @@ export function InlineCommandPalette() {
     if (!paletteGroupItemsRecord[item.group]) {
       paletteGroupItemsRecord[item.group] = []
     }
-    paletteGroupItemsRecord[item.group].push(<ListItem button component="div" sx={{ py: 0, px: 0 }}>
+    paletteGroupItemsRecord[item.group].push(<ListItem disabled={item._isItemDisabled} button component="div" sx={{ py: 0, px: 0 }}>
       <InlinePaletteRow
         key={item.uid}
         dataId={item.uid}

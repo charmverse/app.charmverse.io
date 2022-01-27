@@ -96,21 +96,6 @@ div#__next > div {
   background: white;
 }
 
-.inline-palette-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.inline-palette-item-title {
-  font-weight: 500;
-}
-
-.inline-palette-row.disabled{
-  color: rgb(0, 0, 0, 0.4);
-  background-color: var(--accent-secondary);
-  cursor: default;
-}
-
 .bangle-editor {
   border: none;
   outline: none;
