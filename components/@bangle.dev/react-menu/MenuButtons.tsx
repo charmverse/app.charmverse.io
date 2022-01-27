@@ -52,13 +52,13 @@ const {
 } = bulletList;
 
 interface ButtonProps {
-  hint?: string;
+  hints?: string[];
   hintPos?: HintPos;
   children?: React.ReactNode;
 }
 
 export function BoldButton({
-  hint = 'Bold\n' + boldKeys.toggleBold,
+  hints = ['Bold', boldKeys.toggleBold],
   hintPos = 'top',
   children = <BoldIcon />,
   ...props
@@ -80,7 +80,7 @@ export function BoldButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isActive={queryIsBoldActive()(view.state)}
       isDisabled={!view.editable || !toggleBold()(view.state)}
     >
@@ -90,7 +90,7 @@ export function BoldButton({
 }
 
 export function BlockquoteButton({
-  hint = 'Wrap in Blockquote\n' + blockquote.defaultKeys.wrapIn,
+  hints = ['Wrap in Blockquote', blockquote.defaultKeys.wrapIn],
   hintPos = 'top',
   children = <BlockquoteIcon />,
   ...props
@@ -114,7 +114,7 @@ export function BlockquoteButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isActive={blockquote.commands.queryIsBlockquoteActive()(view.state)}
       isDisabled={
         !view.editable || !blockquote.commands.wrapInBlockquote()(view.state)
@@ -126,7 +126,7 @@ export function BlockquoteButton({
 }
 
 export function ItalicButton({
-  hint = 'Italic\n' + italicKeys.toggleItalic,
+  hints = ['Italic', italicKeys.toggleItalic],
   hintPos = 'top',
   children = <ItalicIcon />,
   ...props
@@ -148,7 +148,7 @@ export function ItalicButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isActive={queryIsItalicActive()(view.state)}
       isDisabled={!view.editable || !toggleItalic()(view.state)}
     >
@@ -158,7 +158,7 @@ export function ItalicButton({
 }
 
 export function UndoButton({
-  hint = 'Undo\n' + historyKeys.undo,
+  hints = ['Undo', historyKeys.undo],
   hintPos = 'top',
   children = <UndoIcon />,
   ...props
@@ -180,7 +180,7 @@ export function UndoButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isDisabled={!view.editable || !undo()(view.state)}
     >
       {children}
@@ -189,7 +189,7 @@ export function UndoButton({
 }
 
 export function RedoButton({
-  hint = 'Redo\n' + historyKeys.redo,
+  hints = ['Redo', historyKeys.redo],
   hintPos = 'top',
   children = <RedoIcon />,
   ...props
@@ -211,7 +211,7 @@ export function RedoButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isDisabled={!view.editable || !redo()(view.state)}
     >
       {children}
@@ -220,7 +220,7 @@ export function RedoButton({
 }
 
 export function CodeButton({
-  hint = 'Code\n' + codeKeys.toggleCode,
+  hints = ['Code', codeKeys.toggleCode],
   hintPos = 'top',
   children = <CodeIcon />,
   ...props
@@ -242,7 +242,7 @@ export function CodeButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isActive={queryIsCodeActive()(view.state)}
       isDisabled={!view.editable || !toggleCode()(view.state)}
     >
@@ -252,7 +252,7 @@ export function CodeButton({
 }
 
 export function BulletListButton({
-  hint = 'BulletList\n' + bulletListKeys.toggle,
+  hints = ['BulletList', bulletListKeys.toggle],
   hintPos = 'top',
   children = <BulletListIcon />,
   ...props
@@ -274,7 +274,7 @@ export function BulletListButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isDisabled={!view.editable}
       isActive={
         queryIsBulletListActive()(view.state) &&
@@ -287,7 +287,7 @@ export function BulletListButton({
 }
 
 export function OrderedListButton({
-  hint = 'OrderedList\n' + orderedListKeys.toggle,
+  hints = ['Ordered list', orderedListKeys.toggle],
   hintPos = 'top',
   children = <OrderedListIcon />,
   ...props
@@ -309,7 +309,7 @@ export function OrderedListButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isDisabled={!view.editable}
       isActive={queryIsOrderedListActive()(view.state)}
     >
@@ -319,7 +319,7 @@ export function OrderedListButton({
 }
 
 export function TodoListButton({
-  hint = 'TodoList\n' + bulletListKeys.toggleTodo,
+  hints = ['Todo list', bulletListKeys.toggleTodo],
   hintPos = 'top',
   children = <TodoListIcon />,
   ...props
@@ -342,7 +342,7 @@ export function TodoListButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isDisabled={!view.editable}
       isActive={queryIsTodoListActive()(view.state)}
     >
@@ -353,7 +353,7 @@ export function TodoListButton({
 
 export function HeadingButton({
   level,
-  hint = `Heading${level}\n` + headingKeys['toH' + level],
+  hints = [`Heading ${level}`, headingKeys['toH' + level] ?? "1"],
   hintPos = 'top',
   children = <HeadingIcon level={level} />,
   ...props
@@ -376,7 +376,7 @@ export function HeadingButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isActive={queryIsHeadingActive(level)(view.state)}
       isDisabled={!view.editable || !toggleHeading(level)(view.state)}
     >
@@ -386,7 +386,7 @@ export function HeadingButton({
 }
 
 export function ParagraphButton({
-  hint = `Paragraph\n` + paragraphKeys.convertToParagraph,
+  hints = [`Paragraph`, paragraphKeys.convertToParagraph],
   hintPos = 'top',
   children = <ParagraphIcon />,
   ...props
@@ -409,7 +409,7 @@ export function ParagraphButton({
       {...props}
       hintPos={hintPos}
       onMouseDown={onSelect}
-      hint={hint}
+      hints={hints}
       isActive={queryIsTopLevelParagraph()(view.state)}
       isDisabled={!view.editable || !convertToParagraph()(view.state)}
     >
@@ -419,7 +419,7 @@ export function ParagraphButton({
 }
 
 export function FloatingLinkButton({
-  hint = 'Link\n' + floatingMenuKeys.toggleLink,
+  hints = ['Create a link', floatingMenuKeys.toggleLink],
   hintPos = 'top',
   children = <LinkIcon />,
   menuKey,
@@ -451,7 +451,7 @@ export function FloatingLinkButton({
   return (
     <MenuButton
       onMouseDown={onMouseDown}
-      hint={hint}
+      hints={hints}
       hintPos={hintPos}
       isActive={queryIsLinkActive()(view.state)}
       isDisabled={!view.editable || !createLink('')(view.state)}
