@@ -1,18 +1,18 @@
 import { UserProvider } from '@auth0/nextjs-auth0';
-import CssBaseline from '@mui/material/CssBaseline';
 import { PaletteMode } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { PageTitleProvider, TitleContext } from 'components/common/page-layout/PageTitle';
+import RouteGuard from 'components/common/RouteGuard';
+import { ColorModeContext } from 'context/color-mode';
+import { useLocalStorage } from 'hooks/useLocalStorage';
+import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import type { NextPage } from 'next';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
-import RouteGuard from 'components/common/RouteGuard';
 import 'styles/index.css';
 import { createThemeLightSensitive } from 'theme';
-import { ColorModeContext } from 'context/color-mode';
-import { PageTitleProvider, TitleContext } from 'components/common/page-layout/PageTitle';
-import { useLocalStorage } from 'hooks/useLocalStorage';
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => JSX.Element

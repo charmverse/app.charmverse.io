@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { List, ListItem, Typography } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
-import { sidebarBackgroundColor, sidebarBackgroundColorDarkMode } from 'theme/colors';
+import { scrollBarThumbBackgroundColor, scrollBarThumbBackgroundColorDarkMode, scrollBarTrackBackgroundColor, scrollBarTrackBackgroundColorDarkMode, sidebarBackgroundColor, sidebarBackgroundColorDarkMode } from 'theme/colors';
 import {
   useInlinePaletteItems,
   useInlinePaletteQuery
@@ -73,6 +73,16 @@ const InlinePaletteWrapper = styled.div`
   overflow-y: auto;
   padding: ${({ theme }) => theme.spacing(1)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
+  &::-webkit-scrollbar {
+    width: 10px;
+    border: 1px solid black;
+  };
+  &::-webkit-scrollbar-track {
+    background-color: ${({ theme }) => theme.palette.mode === "dark" ? scrollBarTrackBackgroundColorDarkMode : scrollBarTrackBackgroundColor};
+  };
+  &::-webkit-scrollbar-thumb {
+    background-color: ${({ theme }) => theme.palette.mode === "dark" ? scrollBarThumbBackgroundColorDarkMode : scrollBarThumbBackgroundColor};
+  };
 `;
 
 const InlinePaletteGroup = styled.div`
