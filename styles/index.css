@@ -102,13 +102,10 @@ div#__next > div {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
 }
 
 .inline-palette-row.disabled {
-  background-color: var(--accent-secondary);
-}
-
-.inline-palette-row.hover-allowed:hover {
   background-color: var(--accent-secondary);
 }
 

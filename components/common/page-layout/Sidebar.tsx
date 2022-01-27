@@ -1,23 +1,23 @@
 
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import List from '@mui/material/List';
 import styled from '@emotion/styled';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SettingsIcon from '@mui/icons-material/Settings';
-import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import MuiLink from '@mui/material/Link';
+import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import Link from '../Link';
-import MuiLink from '@mui/material/Link';
-import Header from './Header';
+import Typography from '@mui/material/Typography';
+import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 import Avatar from '../Avatar';
+import Link from '../Link';
 import WorkspaceAvatar from '../WorkspaceAvatar';
+import Header from './Header';
 
 const workspaces = [
   { name: 'CharmVerse', domain: 'charmverse' },
@@ -48,7 +48,7 @@ interface SidebarProps {
   closeSidebar: () => void;
 }
 
-export default function Sidebar ({ closeSidebar }: SidebarProps) {
+export default function Sidebar({ closeSidebar }: SidebarProps) {
 
   const router = useRouter();
   const { domain } = router.query;
@@ -99,7 +99,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
               <NextLink href={`/${domain}/${page.path}`} key={page.id} passHref>
                 <ListItem button component='a' disableRipple sx={{ py: 0 }}>
                   <ListItemText disableTypography>
-                      <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
+                    <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
                   </ListItemText>
                 </ListItem>
               </NextLink>
@@ -114,7 +114,7 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
             <NextLink href={`/${domain}/${page.path}`} key={page.id} passHref>
               <ListItem button component='a' disableRipple sx={{ py: 0 }}>
                 <ListItemText disableTypography>
-                    <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
+                  <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
                 </ListItemText>
               </ListItem>
             </NextLink>

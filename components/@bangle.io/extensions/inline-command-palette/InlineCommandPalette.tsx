@@ -1,8 +1,10 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
+import { ListItem } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
+import { sidebarBackgroundColor, sidebarBackgroundColorDarkMode } from 'theme/colors';
 import {
   useInlinePaletteItems,
   useInlinePaletteQuery
@@ -65,12 +67,12 @@ function getItemsAndHints(
 const InlinePaletteWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: ${({ theme }) => theme.palette.background.default};
-  max-width: 400;
-  max-height: 400;
+  background-color: ${({ theme }) => theme.palette.mode === "dark" ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor};
+  max-height: 500px;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   overflow-y: auto;
   padding: ${({ theme }) => theme.spacing(1)};
+  border-radius: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const InlinePaletteGroup = styled.div`
@@ -81,8 +83,9 @@ const InlinePaletteGroup = styled.div`
 const InlinePaletteGroupName = styled.div`
   font-size: 12px;
   text-transform: uppercase;
-  font-weight: bold;
-  margin-bottom: ${({ theme }) => theme.spacing(1)};
+  font-weight: 600;
+  margin-bottom: ${({ theme }) => theme.spacing(0.5)};
+  color: #777
 `;
 
 export function InlineCommandPalette() {
@@ -140,15 +143,17 @@ export function InlineCommandPalette() {
     if (!paletteGroupItemsRecord[item.group]) {
       paletteGroupItemsRecord[item.group] = []
     }
-    paletteGroupItemsRecord[item.group].push(<InlinePaletteRow
-      key={item.uid}
-      dataId={item.uid}
-      disabled={item._isItemDisabled}
-      title={item.title}
-      description={item.description}
-      icon={item.icon}
-      {...itemProps}
-    />)
+    paletteGroupItemsRecord[item.group].push(<ListItem button component="div" sx={{ py: 0, px: 0 }}>
+      <InlinePaletteRow
+        key={item.uid}
+        dataId={item.uid}
+        disabled={item._isItemDisabled}
+        title={item.title}
+        description={item.description}
+        icon={item.icon}
+        {...itemProps}
+      />
+    </ListItem>)
   })
 
   return reactDOM.createPortal(
