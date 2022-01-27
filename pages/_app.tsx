@@ -11,7 +11,7 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
-import 'styles/index.css';
+import 'theme/styles.css';
 import { createThemeLightSensitive } from 'theme';
 
 type NextPageWithLayout = NextPage & {
