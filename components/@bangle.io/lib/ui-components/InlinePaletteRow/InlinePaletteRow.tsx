@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   cx,
@@ -24,6 +25,18 @@ interface InlinePaletteRowProps {
   // on touch devices having :hover forces you to click twice
   allowHover?: boolean;
 }
+
+const StyledInlinePaletteRow = styled.div<{ active: boolean, disabled: boolean }>`
+  padding: 0.5rem 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing(1.5)};
+  width: 100%;
+  ${props => props.active && `background-color: rgb(0, 0, 0, 0.125)`};
+  font-weight: 500;
+  ${props => props.disabled ? `pointer: none` : `pointer: cursor`}
+`;
 
 export function InlinePaletteRow({
   dataId,
@@ -59,19 +72,19 @@ export function InlinePaletteRow({
   }, [allowHover]);
 
   return (
-    <div
+    <StyledInlinePaletteRow
       data-id={dataId}
       onClick={onClick}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
       ref={ref}
+      active={Boolean(isActive)}
+      disabled={Boolean(disabled)}
       className={cx(
         'inline-palette-row',
         disabled ? 'cursor-not-allowed' : 'cursor-pointer',
         className,
         allowHover && 'hover-allowed',
-        disabled && 'disabled',
-        isActive && 'active',
       )}
       style={{
         paddingLeft: depth * basePadding,
@@ -92,6 +105,6 @@ export function InlinePaletteRow({
           {title}
         </span>
       </span>
-    </div>
+    </StyledInlinePaletteRow>
   );
 }

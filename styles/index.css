@@ -96,23 +96,6 @@ div#__next > div {
   background: white;
 }
 
-.inline-palette-row {
-  padding: 0.5rem 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-}
-
-.inline-palette-row.disabled {
-  background-color: var(--accent-secondary);
-}
-
-.inline-palette-group-items .active {
-  background-color: rgb(0, 0, 0, 0.125);
-}
-
 .inline-palette-item {
   display: flex;
   flex-direction: column;
@@ -124,6 +107,7 @@ div#__next > div {
 
 .inline-palette-row.disabled{
   color: rgb(0, 0, 0, 0.4);
+  background-color: var(--accent-secondary);
   cursor: default;
 }
 

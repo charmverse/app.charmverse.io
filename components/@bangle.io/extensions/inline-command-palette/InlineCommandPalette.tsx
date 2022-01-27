@@ -1,7 +1,7 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { ListItem } from '@mui/material';
+import { List, ListItem, Typography } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
 import { sidebarBackgroundColor, sidebarBackgroundColorDarkMode } from 'theme/colors';
@@ -68,7 +68,7 @@ const InlinePaletteWrapper = styled.div`
   display: flex;
   flex-direction: column;
   background-color: ${({ theme }) => theme.palette.mode === "dark" ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor};
-  max-height: 500px;
+  max-height: 350px;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   overflow-y: auto;
   padding: ${({ theme }) => theme.spacing(1)};
@@ -80,11 +80,10 @@ const InlinePaletteGroup = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
-const InlinePaletteGroupName = styled.div`
+const InlinePaletteGroupName = styled(Typography)`
   font-size: 12px;
   text-transform: uppercase;
   font-weight: 600;
-  margin-bottom: ${({ theme }) => theme.spacing(0.5)};
   color: #777
 `;
 
@@ -163,9 +162,12 @@ export function InlineCommandPalette() {
           <InlinePaletteGroupName>
             {group}
           </InlinePaletteGroupName>
-          <div className="inline-palette-group-items">
+          <List sx={{
+            paddingTop: '5px',
+            paddingBottom: '5px',
+          }}>
             {paletteItems}
-          </div>
+          </List>
         </InlinePaletteGroup>
       ))}
     </InlinePaletteWrapper>,
