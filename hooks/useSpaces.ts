@@ -3,5 +3,5 @@ import { Space } from 'models';
 import { spaces } from 'seedData';
 
 export function useSpaces () {
-  return useLocalStorage<Space[]>(`spaces`, spaces);
+  return useLocalStorage<Space[]>(`charm.v1.spaces`, spaces);
 };

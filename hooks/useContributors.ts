@@ -6,5 +6,5 @@ import { useSpace } from './useSpace';
 export function useContributors () {
   const [space] = useSpace();
   const spaceContributors = contributors.filter(c => c.spaceRoles.some(({ spaceId }) => spaceId === space.id));
-  return useLocalStorage<Contributor[]>(`space.${space.id}.contributors`, spaceContributors);
+  return useLocalStorage<Contributor[]>(`'charm.v1.space.${space.id}.contributors`, spaceContributors);
 };
