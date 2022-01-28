@@ -23,6 +23,7 @@ import { useSpace } from 'hooks/useSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { usePages } from 'hooks/usePages';
 import { Contributor } from 'models';
+import { shortenedWeb3Address } from 'lib/strings';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -132,10 +133,10 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
           <Box display='flex' alignItems='center'>
             <Avatar name='Dolemite' />
             <Box pl={1}>
-              <Typography variant='caption' sx={{ display: 'block' }}>
-                <strong>Dolemite</strong><br />
-                0x141...fBf4
-              </Typography>
+              {user && <Typography variant='caption' sx={{ display: 'block' }}>
+                <strong>{user.username}</strong><br />
+                {shortenedWeb3Address(user.address)}
+              </Typography>}
             </Box>
           </Box>
           <Link href={`/${space.domain}/settings/account`}>
