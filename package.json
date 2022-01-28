@@ -6,7 +6,6 @@
     "start:prod": "node_modules/next/dist/bin/next start"
   },
   "dependencies": {
-    "@auth0/nextjs-auth0": "^1.6.2",
     "@bangle.dev/base-components": "^0.28.4-alpha.2",
     "@bangle.dev/core": "^0.28.4-alpha.2",
     "@bangle.dev/emoji": "^0.28.4-alpha.2",
