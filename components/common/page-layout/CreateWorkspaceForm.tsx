@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import Avatar from 'components/settings/LargeAvatar';
+import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Space } from 'models';
@@ -58,6 +59,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
 
   return (<>
     <form onSubmit={handleSubmit(onSubmit)}>
+      <Legend sx={{ marginTop: '0 !important' }}>Create a workspace</Legend>
       <Grid container direction={'column'} spacing={3}>
         <Grid item display='flex' justifyContent='center'>
           <Avatar name={watchName} variant='rounded' />
@@ -82,7 +84,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
         </Grid>
         <Grid item>
           <PrimaryButton disabled={!watchName || !watchDomain} type='submit'>
-            Save
+            Create Workspace
           </PrimaryButton>
         </Grid>
       </Grid>
