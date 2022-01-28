@@ -9,6 +9,7 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
 import 'theme/styles.scss';
 import { createThemeLightSensitive } from 'theme';
@@ -35,7 +36,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
   // dark mode: https://mui.com/customization/dark-mode/
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode>('darkMode');
+  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode>(`darkMode`);
   const [mode, setMode] = useState<PaletteMode>('light');
   const colorMode = useMemo(
     () => ({
@@ -50,6 +51,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     }),
     [],
   );
+
   // Update the theme only if the mode changes
   const theme = useMemo(() => createThemeLightSensitive(mode), [mode]);
 
@@ -61,6 +63,12 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       setMode('dark');
     }
   }, [prefersDarkMode, savedDarkMode]);
+
+  // wait for router to be ready, as we rely on the URL to know what space to load
+  const router = useRouter();
+  if (!router.isReady) {
+    return <></>;
+  }
 
   return (
     <PageTitleProvider>

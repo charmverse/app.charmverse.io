@@ -13,25 +13,15 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
 import Avatar from '../Avatar';
 import Link from '../Link';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import Header from './Header';
-
-const workspaces = [
-  { name: 'CharmVerse', domain: 'charmverse' },
-  { name: 'MattVerse', domain: 'mattverse' },
-];
-
-const favoritePages = [
-  { id: 0, path: '', title: 'First Page' }
-];
-
-const pages = [
-  { id: 1, path: '', title: 'First Page' },
-  { id: 2, path: '', title: 'Second Page' }
-]
+import { isTruthy } from 'lib/types';
+import { useUser } from 'hooks/useUser';
+import { useSpace } from 'hooks/useSpace';
+import { useSpaces } from 'hooks/useSpaces';
+import { usePages } from 'hooks/usePages';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -50,17 +40,21 @@ interface SidebarProps {
 
 export default function Sidebar({ closeSidebar }: SidebarProps) {
 
-  const router = useRouter();
-  const { domain } = router.query;
+  const [user] = useUser();
+  const [space] = useSpace();
+  const [spaces] = useSpaces();
+  const [pages] = usePages();
+
+  const favoritePages = user.favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
 
   return (<Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
     <WorkspaceContainer>
       <Grid container spacing={2} flexDirection='column'>
-        {workspaces.map(workspace => (
+        {spaces.map(workspace => (
           <Grid item key={workspace.domain}>
             <AvatarLink href={`/${workspace.domain}`} passHref>
               <MuiLink>
-                <WorkspaceAvatar active={domain === workspace.domain} name={workspace.name} />
+                <WorkspaceAvatar active={space.domain === workspace.domain} name={workspace.name} />
               </MuiLink>
             </AvatarLink>
           </Grid>
@@ -96,7 +90,7 @@ export default function Sidebar({ closeSidebar }: SidebarProps) {
           </Typography>
           <List>
             {favoritePages.map(page => (
-              <NextLink href={`/${domain}/${page.path}`} key={page.id} passHref>
+              <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
                 <ListItem button component='a' disableRipple sx={{ py: 0 }}>
                   <ListItemText disableTypography>
                     <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
@@ -111,7 +105,7 @@ export default function Sidebar({ closeSidebar }: SidebarProps) {
         </Typography>
         <List>
           {pages.map(page => (
-            <NextLink href={`/${domain}/${page.path}`} key={page.id} passHref>
+            <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
               <ListItem button component='a' disableRipple sx={{ py: 0 }}>
                 <ListItemText disableTypography>
                   <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
@@ -142,7 +136,7 @@ export default function Sidebar({ closeSidebar }: SidebarProps) {
               </Typography>
             </Box>
           </Box>
-          <Link href={`/${domain}/settings/account`}>
+          <Link href={`/${space.domain}/settings/account`}>
             <IconButton>
               <SettingsIcon color='secondary' />
             </IconButton>

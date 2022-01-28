@@ -8,6 +8,7 @@ import FieldLabel from 'components/settings/FieldLabel';
 import Legend from 'components/settings/Legend';
 import Avatar from 'components/settings/LargeAvatar';
 import { setTitle } from 'components/common/page-layout/PageTitle';
+import { useSpace } from 'hooks/useSpace';
 
 interface FormValues {
   domain: string;
@@ -17,6 +18,7 @@ interface FormValues {
 export default function WorkspaceSettings () {
 
   setTitle('Workspace Options');
+  const [space, setSpace] = useSpace();
 
   const {
     register,
@@ -24,9 +26,7 @@ export default function WorkspaceSettings () {
     watch,
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: {
-      name: 'CharmVerse'
-    }
+    defaultValues: space
   });
 
   const watchName = watch('name');
