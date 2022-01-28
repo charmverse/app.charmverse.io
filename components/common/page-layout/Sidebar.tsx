@@ -7,7 +7,6 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import MuiLink from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -101,10 +100,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
         </Grid>
       </Grid>
       <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-        <ModalContainer>
-          <IconButton sx={{ position: 'absolute', top: 10, right: 10 }} onClick={closeSpaceForm}>
-            <CloseIcon color='secondary' />
-          </IconButton>
+        <ModalContainer onClose={closeSpaceForm}>
           <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
         </ModalContainer>
       </Modal>
