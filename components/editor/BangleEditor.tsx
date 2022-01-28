@@ -92,7 +92,7 @@ const getScrollContainer = (view: EditorView) => {
   return view.dom.parentElement!;
 };
 
-export default function Editor ({ markdown }: { markdown: string }) {
+export default function Editor({ markdown }: { markdown: string }) {
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -101,6 +101,7 @@ export default function Editor ({ markdown }: { markdown: string }) {
         markName: paletteMarkName,
         tooltipRenderOpts: {
           getScrollContainer,
+          placement: "top-start"
         },
       }),
       blockquote.plugins(),

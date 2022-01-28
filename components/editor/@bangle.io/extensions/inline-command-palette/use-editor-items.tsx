@@ -2,7 +2,7 @@ import {
   bulletList, orderedList,
   paragraph
 } from '@bangle.dev/base-components';
-import { EditorState, Fragment, setBlockType, Transaction } from '@bangle.dev/pm';
+import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import { useMemo } from 'react';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
@@ -42,14 +42,31 @@ function createTableHeader(state: EditorState, text: string) {
   ]))
 }
 
+function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node) {
+  const insertPos = state.selection.$from.after();
+
+  const tr = state.tr;
+  const newTr = safeInsert(nodeToInsert, insertPos)(state.tr);
+
+  if (tr === newTr) {
+    return false;
+  }
+
+  if (dispatch) {
+    dispatch(newTr.scrollIntoView());
+  }
+
+  return true;
+}
+
 export function useEditorItems() {
   const baseItem = useMemo(
     () => [
       PaletteItem.create({
         uid: 'paraConvert',
-        title: 'Paragraph',
-        group: 'paragraph',
-        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M9 16h2v4h2V6h2v14h2V6h3V4H9c-3.309 0-6 2.691-6 6s2.691 6 6 6zM9 6h2v8H9c-2.206 0-4-1.794-4-4s1.794-4 4-4z" /></svg>,
+        title: 'Simple Text',
+        group: 'text',
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z" /><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z" /></svg>,
         description: 'Convert the current block to paragraph',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
@@ -71,6 +88,44 @@ export function useEditorItems() {
               dispatch,
               view,
             );
+          };
+        },
+      }),
+
+      PaletteItem.create({
+        uid: 'code',
+        title: 'Code',
+        group: 'text',
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 384 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M384 121.941V128H256V0h6.059c6.365 0 12.47 2.529 16.971 7.029l97.941 97.941A24.005 24.005 0 0 1 384 121.941zM248 160c-13.2 0-24-10.8-24-24V0H24C10.745 0 0 10.745 0 24v464c0 13.255 10.745 24 24 24h336c13.255 0 24-10.745 24-24V160H248zM123.206 400.505a5.4 5.4 0 0 1-7.633.246l-64.866-60.812a5.4 5.4 0 0 1 0-7.879l64.866-60.812a5.4 5.4 0 0 1 7.633.246l19.579 20.885a5.4 5.4 0 0 1-.372 7.747L101.65 336l40.763 35.874a5.4 5.4 0 0 1 .372 7.747l-19.579 20.884zm51.295 50.479l-27.453-7.97a5.402 5.402 0 0 1-3.681-6.692l61.44-211.626a5.402 5.402 0 0 1 6.692-3.681l27.452 7.97a5.4 5.4 0 0 1 3.68 6.692l-61.44 211.626a5.397 5.397 0 0 1-6.69 3.681zm160.792-111.045l-64.866 60.812a5.4 5.4 0 0 1-7.633-.246l-19.58-20.885a5.4 5.4 0 0 1 .372-7.747L284.35 336l-40.763-35.874a5.4 5.4 0 0 1-.372-7.747l19.58-20.885a5.4 5.4 0 0 1 7.633-.246l64.866 60.812a5.4 5.4 0 0 1-.001 7.879z" /></svg>,
+        description: 'Insert a code block in the line below',
+        editorExecuteCommand: () => {
+          return (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.codeBlock.create(
+              { language: "Javascript" },
+              Fragment.fromArray([
+                state.schema.text("console.log('Hello World');")
+              ])
+            ))
+          };
+        },
+      }),
+
+      PaletteItem.create({
+        uid: 'callout',
+        title: 'Callout',
+        group: 'text',
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 64C141.1 64 48 139.2 48 232c0 64.9 45.6 121.2 112.3 149.2-5.2 25.8-21 47-33.5 60.5-2.3 2.5.2 6.5 3.6 6.3 11.5-.8 32.9-4.4 51-12.7 21.5-9.9 40.3-30.1 46.3-36.9 9.3 1 18.8 1.6 28.5 1.6 114.9 0 208-75.2 208-168C464 139.2 370.9 64 256 64z" /></svg>,
+        description: 'Insert a callout block in the line below',
+        editorExecuteCommand: () => {
+          return (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.blockquote.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
+                  state.schema.text("Hello World")
+                ]))
+              ])
+            ))
           };
         },
       }),
@@ -150,11 +205,8 @@ export function useEditorItems() {
         keywords: ['layout', 'table'],
         description: 'Insert a simple table below',
         editorExecuteCommand: () => {
-          return (state, dispatch, view) => {
-            console.log({ state });
-
-            const insertPos = state.selection.$from.after();
-            const nodeToInsert = state.schema.nodes.table.create(
+          return (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.table.create(
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
@@ -168,20 +220,7 @@ export function useEditorItems() {
                   createTableCell(state, "Cell 3"),
                 ]))
               ])
-            );
-
-            const tr = state.tr;
-            const newTr = safeInsert(nodeToInsert!, insertPos)(state.tr);
-
-            if (tr === newTr) {
-              return false;
-            }
-
-            if (dispatch) {
-              dispatch(newTr.scrollIntoView());
-            }
-
-            return true;
+            ))
           };
         },
       }),
