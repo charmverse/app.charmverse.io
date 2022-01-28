@@ -21,7 +21,9 @@ import '@bangle.dev/core/style.css';
 import { markdownParser } from '@bangle.dev/markdown';
 import { columnResizing } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
+import '@bangle.dev/react-menu/style.css';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.dev/table";
+import '@bangle.dev/tooltip/style.css';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
@@ -83,7 +85,7 @@ export default function Editor({ markdown }: { markdown: string }) {
 
   return <ReactBangleEditor state={state}>
     <FloatingMenu />
-    <EmojiSuggest />
-    <InlinePalette />
+    {EmojiSuggest}
+    {InlinePalette}
   </ReactBangleEditor>
 }
