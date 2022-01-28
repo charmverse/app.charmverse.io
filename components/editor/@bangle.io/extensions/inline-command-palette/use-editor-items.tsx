@@ -2,7 +2,7 @@ import {
   bulletList, orderedList,
   paragraph
 } from '@bangle.dev/base-components';
-import { EditorState, Fragment, setBlockType, Transaction } from '@bangle.dev/pm';
+import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import { useMemo } from 'react';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
@@ -40,6 +40,23 @@ function createTableHeader(state: EditorState, text: string) {
       state.schema.text(text)
     ]))
   ]))
+}
+
+function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node) {
+  const insertPos = state.selection.$from.after();
+
+  const tr = state.tr;
+  const newTr = safeInsert(nodeToInsert, insertPos)(state.tr);
+
+  if (tr === newTr) {
+    return false;
+  }
+
+  if (dispatch) {
+    dispatch(newTr.scrollIntoView());
+  }
+
+  return true;
 }
 
 export function useEditorItems() {
@@ -83,26 +100,12 @@ export function useEditorItems() {
         description: 'Convert the current block to code block',
         editorExecuteCommand: () => {
           return (state, dispatch) => {
-            const insertPos = state.selection.$from.after();
-            const nodeToInsert = state.schema.nodes.codeBlock.create(
+            return insertNode(state, dispatch, state.schema.nodes.codeBlock.create(
               { language: "Javascript" },
               Fragment.fromArray([
                 state.schema.text("console.log('Hello World');")
               ])
-            );
-
-            const tr = state.tr;
-            const newTr = safeInsert(nodeToInsert!, insertPos)(state.tr);
-
-            if (tr === newTr) {
-              return false;
-            }
-
-            if (dispatch) {
-              dispatch(newTr.scrollIntoView());
-            }
-
-            return true;
+            ))
           };
         },
       }),
@@ -196,8 +199,7 @@ export function useEditorItems() {
         description: 'Insert a simple table below',
         editorExecuteCommand: () => {
           return (state, dispatch) => {
-            const insertPos = state.selection.$from.after();
-            const nodeToInsert = state.schema.nodes.table.create(
+            return insertNode(state, dispatch, state.schema.nodes.table.create(
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
@@ -211,20 +213,7 @@ export function useEditorItems() {
                   createTableCell(state, "Cell 3"),
                 ]))
               ])
-            );
-
-            const tr = state.tr;
-            const newTr = safeInsert(nodeToInsert!, insertPos)(state.tr);
-
-            if (tr === newTr) {
-              return false;
-            }
-
-            if (dispatch) {
-              dispatch(newTr.scrollIntoView());
-            }
-
-            return true;
+            ))
           };
         },
       }),
