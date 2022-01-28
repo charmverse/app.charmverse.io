@@ -143,7 +143,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
               {pageTitle}
             </Typography>
             {/** favorite toggle */}
-            <Tooltip title={isFavorite ? 'Remove favorite' : 'Add to favorites'} arrow placement='bottom'>
+            <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
               <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color="inherit">
                 {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
               </IconButton>
