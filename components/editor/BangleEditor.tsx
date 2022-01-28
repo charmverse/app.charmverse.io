@@ -54,6 +54,8 @@ const specRegistry = new SpecRegistry([
 const parser = markdownParser(specRegistry);
 
 export default function BangleEditor({ markdown }: { markdown: string }) {
+  console.log({ content: parser.parse(markdown).toJSON() });
+
   const state = useEditorState({
     specRegistry,
     plugins: () => [

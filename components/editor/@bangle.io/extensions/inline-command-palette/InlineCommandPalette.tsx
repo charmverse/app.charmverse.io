@@ -173,8 +173,8 @@ export function InlineCommandPalette() {
             {group}
           </InlinePaletteGroupName>
           <List sx={{
-            paddingTop: '5px',
-            paddingBottom: '5px',
+            paddingTop: 0.5,
+            paddingBottom: 0.5,
           }}>
             {paletteItems}
           </List>
