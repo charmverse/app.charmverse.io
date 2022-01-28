@@ -8,7 +8,8 @@ export default styled(Box)`
   transform: translate(-50%, -50%);
   width: 400px;
   background-color: ${({ theme }) => theme.palette.background.paper};
-  border: 2px solid #000;
+  border: 2px solid ${({ theme }) => theme.palette.divider};
+  border-radius: 20px;
   box-shadow: ${({ theme }) => theme.shadows[15]};
   padding: ${({ theme }) => theme.spacing(4)};
 `;

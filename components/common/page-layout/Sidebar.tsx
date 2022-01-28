@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import MuiLink from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -62,6 +63,10 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
     setSpaceFormOpen(true);
   }
 
+  function closeSpaceForm () {
+    setSpaceFormOpen(false);
+  }
+
   function addSpace (space: Space) {
     if (spaces.some(s => s.id === space.id)) {
       throw new Error('Space with that id already exists: ' + space.id);
@@ -95,9 +100,12 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
           <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
         </Grid>
       </Grid>
-      <Modal open={spaceFormOpen} onClose={() => setSpaceFormOpen(false)}>
+      <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
         <ModalContainer>
-          <CreateWorkspaceForm onSubmit={addSpace} onCancel={() => setSpaceFormOpen(false)} />
+          <IconButton sx={{ position: 'absolute', top: 10, right: 10 }} onClick={closeSpaceForm}>
+            <CloseIcon color='secondary' />
+          </IconButton>
+          <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
         </ModalContainer>
       </Modal>
     </WorkspacesContainer>
