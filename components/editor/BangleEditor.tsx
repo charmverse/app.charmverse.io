@@ -18,43 +18,20 @@ import {
 } from '@bangle.dev/base-components';
 import { PluginKey, SpecRegistry } from '@bangle.dev/core';
 import '@bangle.dev/core/style.css';
-import { emoji } from '@bangle.dev/emoji';
 import { markdownParser } from '@bangle.dev/markdown';
 import { columnResizing, EditorView, keymap, Node, NodeSelection, ResolvedPos } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
-import { EmojiSuggest, emojiSuggest } from '@bangle.dev/react-emoji-suggest';
 import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
 import '@bangle.dev/react-menu/style.css';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.dev/table";
 import '@bangle.dev/tooltip/style.css';
 import { CustomFloatingMenu } from 'components/editor/CustomFloatingMenu';
-import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { paletteMarkName, palettePluginKey } from './@bangle.io/extensions/inline-command-palette/config';
 import { InlineCommandPalette } from "./@bangle.io/extensions/inline-command-palette/InlineCommandPalette";
 import { inlinePalette, queryInlinePaletteActive } from './@bangle.io/js-lib/inline-palette';
 import { keybindings } from './@bangle.io/lib/config';
+import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 const menuKey = new PluginKey('menuKey');
-const emojiSuggestKey = new PluginKey('emojiSuggestKey');
-
-const emojiData = Object.values(
-  gemojiData.reduce((prev, obj) => {
-    if (!prev[obj.category]) {
-      prev[obj.category] = { name: obj.category, emojis: [] };
-    }
-    prev[obj.category].emojis.push([obj.aliases[0], obj.emoji]);
-
-    return prev;
-  }, {} as Record<string, { name: string, emojis: [string, string][] }>),
-);
-
-const getEmojiByAlias = (emojiAlias: string) => {
-  for (const { emojis } of emojiData) {
-    const match = emojis.find((e) => e[0] === emojiAlias);
-    if (match) {
-      return match;
-    }
-  }
-};
 
 const trigger = '/';
 
@@ -72,11 +49,7 @@ const specRegistry = new SpecRegistry([
   paragraph.spec(),
   strike.spec(),
   underline.spec(),
-  emoji.spec({
-    getEmoji: (emojiAlias) =>
-      (getEmojiByAlias(emojiAlias) || ['question', '❓'])[1],
-  }),
-  emojiSuggest.spec({ markName: 'emojiSuggest' }),
+  emojiSpecs(),
   code.spec(),
   codeBlock.spec(),
   heading.spec(),
@@ -120,29 +93,7 @@ export default function Editor({ markdown }: { markdown: string }) {
       paragraph.plugins(),
       strike.plugins(),
       underline.plugins(),
-      emoji.plugins(),
-      emojiSuggest.plugins({
-        key: emojiSuggestKey,
-        getEmojiGroups: (queryText) => {
-          if (!queryText) {
-            return emojiData;
-          }
-          return emojiData
-            .map((group) => {
-              return {
-                name: group.name,
-                emojis: group.emojis.filter(([emojiAlias]) =>
-                  emojiAlias.includes(queryText),
-                ),
-              };
-            })
-            .filter((group) => group.emojis.length > 0);
-        },
-        markName: 'emojiSuggest',
-        tooltipRenderOpts: {
-          placement: 'bottom',
-        },
-      }),
+      emojiPlugins(),
       tablePlugins(),
       columnResizing,
       floatingMenu.plugins({
@@ -209,7 +160,7 @@ export default function Editor({ markdown }: { markdown: string }) {
       }
       return null;
     }} />
-    <EmojiSuggest emojiSuggestKey={emojiSuggestKey} />
+    {EmojiSuggest}
     <InlineCommandPalette />
   </ReactBangleEditor>
 }
