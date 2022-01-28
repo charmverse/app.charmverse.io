@@ -1,6 +1,6 @@
 import { EditorView, keymap } from '@bangle.dev/pm';
 import { paletteMarkName, palettePluginKey } from './@bangle.io/extensions/inline-command-palette/config';
-import { InlineCommandPalette as InlinePalette } from "./@bangle.io/extensions/inline-command-palette/InlineCommandPalette";
+import { InlineCommandPalette } from "./@bangle.io/extensions/inline-command-palette/InlineCommandPalette";
 import { inlinePalette, queryInlinePaletteActive } from './@bangle.io/js-lib/inline-palette';
 import { keybindings } from './@bangle.io/lib/config';
 
@@ -54,5 +54,5 @@ export const inlinePalettePlugins = () => {
 }
 
 export default () => {
-  return <InlinePalette />
+  return <InlineCommandPalette />
 }

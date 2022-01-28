@@ -1,15 +1,15 @@
 import { PluginKey } from "@bangle.dev/core";
 import { Node, ResolvedPos } from "@bangle.dev/pm";
-import { FloatingMenu as BangleFloatingMenu, floatingMenu } from "@bangle.dev/react-menu";
+import { FloatingMenu, floatingMenu } from "@bangle.dev/react-menu";
 import { NodeSelection } from "prosemirror-state";
 import { Menu } from "./@bangle.dev/react-menu/Menu";
 import { BlockquoteButton, BoldButton, CodeButton, HeadingButton, ItalicButton, ParagraphButton } from "./@bangle.dev/react-menu/MenuButtons";
 import { MenuGroup } from "./@bangle.dev/react-menu/MenuGroup";
 const menuKey = new PluginKey('menuKey');
 
-export default function FloatingMenu() {
+export default () => {
   return (
-    <BangleFloatingMenu menuKey={menuKey} renderMenuType={({ type }) => {
+    <FloatingMenu menuKey={menuKey} renderMenuType={({ type }) => {
       if (type === 'defaultMenu') {
         return (
           <Menu>
@@ -53,7 +53,7 @@ export const floatingMenuPlugin = () => {
           return null;
         }
       }
-      if (state.selection.empty || (state.selection as NodeSelection)?.node?.type?.name === "image") {
+      if (state.selection.empty || (state.selection as NodeSelection)?.node?.type?.name.match(/(image)/)) {
         return null;
       }
       return 'defaultMenu'
