@@ -23,7 +23,6 @@ import * as React from 'react';
 import Header, { toolbarHeight } from './Header';
 import { useTitleState } from './PageTitle';
 import Sidebar from './Sidebar';
-import { usePages } from 'hooks/usePages';
 
 const drawerWidth = 300;
 
