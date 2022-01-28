@@ -16,15 +16,14 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { SpecRegistry } from '@bangle.dev/core';
-import '@bangle.dev/core/style.css';
+import { NodeView, SpecRegistry } from '@bangle.dev/core';
 import { markdownParser } from '@bangle.dev/markdown';
 import { columnResizing } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
-import '@bangle.dev/react-menu/style.css';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.dev/table";
 import '@bangle.dev/tooltip/style.css';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
+import { BlockQuote } from './BlockQuote';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
@@ -79,11 +78,22 @@ export default function Editor({ markdown }: { markdown: string }) {
       tablePlugins(),
       columnResizing,
       floatingMenuPlugin(),
+      NodeView.createPlugin({
+        name: "blockquote",
+        containerDOM: ["blockquote"],
+        contentDOM: ["span"]
+      })
     ],
     initialValue: parser.parse(markdown),
   });
 
-  return <ReactBangleEditor state={state}>
+  return <ReactBangleEditor state={state} renderNodeViews={({ node, children }) => {
+    if (node.type.name === 'blockquote') {
+      return <BlockQuote>
+        {children}
+      </BlockQuote>;
+    }
+  }} >
     <FloatingMenu />
     {EmojiSuggest}
     {InlinePalette}
