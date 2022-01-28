@@ -2,7 +2,7 @@
 
 This folder was created to customize packages under the [@bangle.dev](https://github.com/bangle-io/bangle.dev) monorepo to meet our use cases. We are aware that all `@bangle.dev` packages are available as npm packages. Below we have provided the reasons for each specific package.
 
-## `react-menu`
+## `react-menu@0.28.4-alpha.2`
 
 1. `MenuGroup` and `Menu` components were copied over to met our design guidelines (using styled components rather than plain css)
 2. `Icon` component was copied over to utilize MUI's own tooltip component rather than the one `react-menu` provides out of the box
