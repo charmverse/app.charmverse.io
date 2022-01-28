@@ -18,11 +18,11 @@ import {
 } from '@bangle.dev/base-components';
 import { SpecRegistry } from '@bangle.dev/core';
 import '@bangle.dev/core/style.css';
-import { markdownParser } from '@bangle.dev/markdown';
-import { columnResizing } from '@bangle.dev/pm';
+import { columnResizing, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.dev/table";
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
+import { PageContent } from 'models';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
@@ -50,9 +50,8 @@ const specRegistry = new SpecRegistry([
   tableHeader,
   tableRow
 ]);
-const parser = markdownParser(specRegistry);
 
-export default function Editor({ markdown }: { markdown: string }) {
+export default function BangleEditor({ content }: { content: PageContent }) {
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -78,7 +77,7 @@ export default function Editor({ markdown }: { markdown: string }) {
       columnResizing,
       floatingMenuPlugin(),
     ],
-    initialValue: parser.parse(markdown),
+    initialValue: Node.fromJSON(specRegistry.schema, content),
   });
 
   return <ReactBangleEditor state={state}>
