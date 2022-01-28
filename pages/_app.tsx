@@ -36,7 +36,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
   // dark mode: https://mui.com/customization/dark-mode/
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode>('charm.darkMode');
+  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode>('darkMode');
   const [mode, setMode] = useState<PaletteMode>('light');
   const colorMode = useMemo(
     () => ({
