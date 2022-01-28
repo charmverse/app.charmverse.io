@@ -16,12 +16,18 @@ const StyledModal = styled(Box)`
   padding: ${({ theme }) => theme.spacing(4)};
 `;
 
+const StyledCloseButton = styled(IconButton)`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+`;
+
 export default function ({ children, onClose }: { children: React.ReactNode, onClose: () => void }) {
   return (
     <StyledModal>
-      <IconButton sx={{ position: 'absolute', top: 10, right: 10 }} onClick={onClose}>
+      <StyledCloseButton onClick={onClose}>
         <CloseIcon color='secondary' />
-      </IconButton>
+      </StyledCloseButton>
       {children}
     </StyledModal>
   );
