@@ -15,9 +15,9 @@ export const contributors: Contributor[] = [
 export const activeUser = contributors[0];
 
 export const pages: Page[] = [
-  { id: '0', icon: '📌', created: new Date(), content: getMarkdown(), isPublic: false, path: 'first-page', spaceId: '0', title: 'First Page' },
-  { id: '1', created: new Date(), content: 'Hello world :)', isPublic: false, path: 'second-page', spaceId: '0', title: 'Second Page' },
-  { id: '0', icon: '📌', created: new Date(), content: getMarkdown(), isPublic: false, path: 'first-page', spaceId: '1', title: 'First Page' }
+  { id: '0', icon: '📌', created: new Date(), content: getMarkdown(), isPublic: false, path: 'first-page', spaceId: '0', title: 'Getting Started' },
+  { id: '1', created: new Date(), content: 'Hello world :)', parentPageId: '0', isPublic: false, path: 'second-page', spaceId: '0', title: 'Nested Page' },
+  { id: '0', icon: '📌', created: new Date(), content: getMarkdown(), isPublic: false, path: 'first-page', spaceId: '1', title: 'Getting Started Again' }
 ];
 
 
