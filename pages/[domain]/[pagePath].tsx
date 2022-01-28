@@ -13,12 +13,12 @@ import { useRouter } from 'next/router';
 
 export default function BlocksEditorPage () {
 
-  const router = useRouter();
-  setTitle('Welcome!');
-  const { pagePath } = router.query;
   const [pages] = usePages();
-  console.log('pages', pagePath);
+  const router = useRouter();
+  const { pagePath } = router.query;
   const pageByPath = pages.find(page => page.path === pagePath) || pages[0];
+
+  setTitle(pageByPath.title);
 
   return (
     <Editor page={pageByPath} />
