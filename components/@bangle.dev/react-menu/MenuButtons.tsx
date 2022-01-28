@@ -90,9 +90,9 @@ export function BoldButton({
 }
 
 export function BlockquoteButton({
-  hints = ['Wrap in Blockquote', blockquote.defaultKeys.wrapIn],
+  hints = ['Blockquote', blockquote.defaultKeys.wrapIn],
   hintPos = 'top',
-  children = <BlockquoteIcon />,
+  children = <BlockquoteIcon fontSize={16} />,
   ...props
 }: ButtonProps) {
   const view = useEditorViewContext();
@@ -388,7 +388,7 @@ export function HeadingButton({
 export function ParagraphButton({
   hints = [`Paragraph`, paragraphKeys.convertToParagraph],
   hintPos = 'top',
-  children = <ParagraphIcon />,
+  children = <ParagraphIcon fontSize={16} />,
   ...props
 }: ButtonProps) {
   const view = useEditorViewContext();
