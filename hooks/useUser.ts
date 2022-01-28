@@ -1,8 +1,8 @@
 import { Contributor } from 'models';
 import { activeUser } from 'seedData';
-import { useLocalStorage, PREFIX } from './useLocalStorage';
+import { useLocalStorage } from './useLocalStorage';
 
 export function useUser () {
-  return useLocalStorage<Contributor>(`${PREFIX}.space.profile`, activeUser);
+  return useLocalStorage<Contributor>(`profile`, activeUser);
 
 };
