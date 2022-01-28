@@ -6,8 +6,8 @@ const publicPaths = ['/login', '/signup', '/'];
 
 export default function RouteGuard ({ children }: { children: JSX.Element }) {
   const user = null;
-  const isLoading = false;//const { user, isLoading } = useUser();
   const router = useRouter();
+  const isLoading = !router.isReady;//const { user, isLoading } = useUser();
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {

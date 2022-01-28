@@ -52,8 +52,6 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     [],
   );
 
-  const router = useRouter();
-  console.log("IS READY", router.isReady);
   // Update the theme only if the mode changes
   const theme = useMemo(() => createThemeLightSensitive(mode), [mode]);
 
@@ -67,6 +65,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   }, [prefersDarkMode, savedDarkMode]);
 
   // wait for router to be ready, as we rely on the URL to know what space to load
+  const router = useRouter();
   if (!router.isReady) {
     return <></>;
   }

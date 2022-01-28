@@ -6,7 +6,7 @@ const config = {
     return [
       {
         source: '/',
-        destination: '/charmverse',
+        destination: '/demo',
         permanent: false,
       },
       {

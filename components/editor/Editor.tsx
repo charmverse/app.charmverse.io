@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import styled from '@emotion/styled';
 import BangleEditor from './BangleEditor';
 import Emoji from 'components/common/Emoji';
+import { Page } from 'models';
 
 const Container = styled.div`
   width: 860px;
@@ -23,12 +24,7 @@ const PageTitle = styled(Typography)`
   font-weight: 700;
 `;
 
-export function Editor () {
-
-  const page = {
-    icon: '📌',
-    title: 'Welcome!'
-  };
+export function Editor ({ page }: { page: Page}) {
 
   return (<>
     <Container>
@@ -39,7 +35,7 @@ export function Editor () {
         <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
       </Box>
       <PageTitle>{page.title}</PageTitle>
-      <BangleEditor />
+      <BangleEditor markdown={page.content} />
     </Container>
   </>);
 }
