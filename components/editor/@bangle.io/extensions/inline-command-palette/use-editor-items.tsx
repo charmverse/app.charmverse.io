@@ -151,7 +151,6 @@ export function useEditorItems() {
         description: 'Insert a simple table below',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
-            console.log({ state });
 
             const insertPos = state.selection.$from.after();
             const nodeToInsert = state.schema.nodes.table.create(

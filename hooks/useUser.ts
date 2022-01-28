@@ -4,5 +4,4 @@ import { useLocalStorage } from './useLocalStorage';
 
 export function useUser () {
   return useLocalStorage<Contributor>(`profile`, activeUser);
-
 };

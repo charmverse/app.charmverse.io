@@ -22,6 +22,7 @@ import { useUser } from 'hooks/useUser';
 import { useSpace } from 'hooks/useSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { usePages } from 'hooks/usePages';
+import { Contributor } from 'models';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -36,16 +37,17 @@ const WorkspaceContainer = styled.div`
 
 interface SidebarProps {
   closeSidebar: () => void;
+  favorites: Contributor['favorites'];
 }
 
-export default function Sidebar({ closeSidebar }: SidebarProps) {
+export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
 
   const [user] = useUser();
   const [space] = useSpace();
   const [spaces] = useSpaces();
   const [pages] = usePages();
 
-  const favoritePages = user.favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
+  const favoritePages = favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
 
   return (<Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
     <WorkspaceContainer>
