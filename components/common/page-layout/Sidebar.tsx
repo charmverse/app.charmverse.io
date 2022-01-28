@@ -24,7 +24,9 @@ import { useUser } from 'hooks/useUser';
 import { useSpace } from 'hooks/useSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { usePages } from 'hooks/usePages';
-import { Contributor, Space } from 'models';
+import { pages as seedPages } from 'seedData';
+import { Contributor, Page, Space } from 'models';
+import { getKey } from 'hooks/useLocalStorage';
 import { shortenedWeb3Address } from 'lib/strings';
 import EmojiCon from '../Emoji';
 import ModalContainer from '../ModalContainer';
@@ -52,9 +54,9 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
   const [user] = useUser();
   const [space] = useSpace();
   const [spaces, setSpaces] = useSpaces();
-  const [pages] = usePages();
+  const [pages, setPages] = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-
+  console.log(pages)
   const favoritePages = favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
 
   function showSpaceForm () {
@@ -62,7 +64,19 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
   }
 
   function addSpace (space: Space) {
+    if (spaces.some(s => s.id === space.id)) {
+      throw new Error('Space with that id already exists: ' + space.id);
+    }
+    if (spaces.some(s => s.domain === space.domain)) {
+      throw new Error('Space with that domain already exists');
+    }
     setSpaces([...spaces, space]);
+
+    // add a first page - note that usePages is for the current space, so we can't use setPages here
+    const firstPage: Page = { ...seedPages[0], id: '' + Math.random(), spaceId: space.id };
+    const key = getKey(`spaces.${space.id}.pages`);
+    localStorage.setItem(key, JSON.stringify([firstPage]));
+
     router.push(`/${space.domain}`);
   }
 

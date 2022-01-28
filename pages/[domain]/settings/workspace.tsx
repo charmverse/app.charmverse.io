@@ -16,7 +16,7 @@ import * as yup from 'yup';
 export const schema = yup.object({
   domain: yup.string().ensure().trim().lowercase()
     .min(3, 'Domain must be at least 3 characters')
-    .matches(/^[0-9a-z]*$/, 'Domain must be only lowercase letters and numbers')
+    .matches(/^[0-9a-z\-]*$/, 'Domain must be only lowercase hyphens, letters, and numbers')
     .required('Domain is required'),
   name: yup.string().ensure().trim()
     .min(3, 'Name must be at least 3 characters')
@@ -73,7 +73,7 @@ export default function WorkspaceSettings () {
         <Grid item>
           <FieldLabel>Domain</FieldLabel>
           <TextField
-            {...register('domain', { required: true })}
+            {...register('domain')}
             fullWidth
             error={!!errors.domain}
             helperText={errors.domain?.message}
