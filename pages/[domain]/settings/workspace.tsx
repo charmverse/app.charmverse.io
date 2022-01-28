@@ -9,6 +9,18 @@ import Legend from 'components/settings/Legend';
 import Avatar from 'components/settings/LargeAvatar';
 import { setTitle } from 'components/common/page-layout/PageTitle';
 import { useSpace } from 'hooks/useSpace';
+import { useRouter } from 'next/router';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+const schema = yup.object({
+  domain: yup.string().ensure().trim().lowercase()
+    .matches(/^[0-9a-z]*$/, 'Domain must be only lowercase letters and numbers')
+    .required('Domain is required'),
+  name: yup.string().ensure().trim()
+    .matches(/^[0-9a-zA-Z\s]*$/, 'Name must be only letters, numbers, and spaces')
+    .required('Name is required'),
+}).required();
 
 interface FormValues {
   domain: string;
@@ -18,6 +30,7 @@ interface FormValues {
 export default function WorkspaceSettings () {
 
   setTitle('Workspace Options');
+  const router = useRouter();
   const [space, setSpace] = useSpace();
 
   const {
@@ -26,13 +39,19 @@ export default function WorkspaceSettings () {
     watch,
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: space
+    defaultValues: space,
+    resolver: yupResolver(schema),
   });
 
   const watchName = watch('name');
 
   function onSubmit (values: FormValues) {
-    alert(values.domain)
+    // reload with new subdomain
+    const newDomain = space.domain !== values.domain;
+    setSpace({ ...space, ...values }, newDomain);
+    if (newDomain) {
+      window.location.href = router.asPath.replace(space.domain, values.domain);
+    }
   }
 
   return (<>
@@ -45,10 +64,10 @@ export default function WorkspaceSettings () {
         <Grid item>
           <FieldLabel>Name</FieldLabel>
           <TextField
-            {...register('name', { required: true })}
+            {...register('name')}
             fullWidth
             error={!!errors.name}
-            helperText={errors.name && 'Name is required'}
+            helperText={errors.name?.message}
           />
         </Grid>
         <Grid item>
@@ -57,7 +76,7 @@ export default function WorkspaceSettings () {
             {...register('domain', { required: true })}
             fullWidth
             error={!!errors.domain}
-            helperText={errors.domain && 'Domain is required'}
+            helperText={errors.domain?.message}
           />
         </Grid>
         <Grid item>

@@ -71,7 +71,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
     <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
       <Box sx={{ flexGrow: 1 }}>
         <Header>
-          <Typography><strong>Acme</strong></Typography>
+          <Typography><strong>{space.name}</strong></Typography>
           <IconButton onClick={closeSidebar}>
             <ChevronLeftIcon />
           </IconButton>
