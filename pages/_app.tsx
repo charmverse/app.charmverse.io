@@ -1,4 +1,3 @@
-import { UserProvider } from '@auth0/nextjs-auth0';
 import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
@@ -11,7 +10,7 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
-import 'styles/index.css';
+import 'theme/styles.scss';
 import { createThemeLightSensitive } from 'theme';
 
 type NextPageWithLayout = NextPage & {
@@ -81,11 +80,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <UserProvider>
-            <RouteGuard>
-              {getLayout(<Component {...pageProps} />)}
-            </RouteGuard>
-          </UserProvider>
+          <RouteGuard>
+            {getLayout(<Component {...pageProps} />)}
+          </RouteGuard>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </PageTitleProvider>

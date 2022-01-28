@@ -33,9 +33,7 @@ We stand on the shoulders of giants:
 - Bangle.io / bangle.dev
 - Material UI
 
-### Best Practices
-
-#### Theming
+### Theming
 
 - To make it easy to maintain light/dark mode, color choices should be defined on Theme.palette in `theme/index.tsx`. This way, we can use colors from the theme in two ways:
 
