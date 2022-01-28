@@ -24,6 +24,7 @@ import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.d
 import '@bangle.dev/tooltip/style.css';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { BlockQuote } from './BlockQuote';
+import { Code } from './Code';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
@@ -82,6 +83,11 @@ export default function Editor({ markdown }: { markdown: string }) {
         name: "blockquote",
         containerDOM: ["blockquote"],
         contentDOM: ["span"]
+      }),
+      NodeView.createPlugin({
+        name: "codeBlock",
+        containerDOM: ["pre"],
+        contentDOM: ["span"]
       })
     ],
     initialValue: parser.parse(markdown),
@@ -92,6 +98,11 @@ export default function Editor({ markdown }: { markdown: string }) {
       return <BlockQuote>
         {children}
       </BlockQuote>;
+    } else if (node.type.name === "codeBlock") {
+      console.log(children)
+      return <Code>
+        {children}
+      </Code>
     }
   }} >
     <FloatingMenu />
