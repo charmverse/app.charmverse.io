@@ -54,9 +54,8 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
   const [user] = useUser();
   const [space] = useSpace();
   const [spaces, setSpaces] = useSpaces();
-  const [pages, setPages] = usePages();
+  const [pages] = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  console.log(pages)
   const favoritePages = favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
 
   function showSpaceForm () {
@@ -73,7 +72,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
     setSpaces([...spaces, space]);
 
     // add a first page - note that usePages is for the current space, so we can't use setPages here
-    const firstPage: Page = { ...seedPages[0], id: '' + Math.random(), spaceId: space.id };
+    const firstPage: Page = { ...seedPages[0], id: Math.random().toString().replace('0.', ''), spaceId: space.id };
     const key = getKey(`spaces.${space.id}.pages`);
     localStorage.setItem(key, JSON.stringify([firstPage]));
 

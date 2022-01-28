@@ -3,12 +3,14 @@ import { ReactElement } from 'react';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
+import Button from 'components/common/Button';
 import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import Legend from 'components/settings/Legend';
 import Avatar from 'components/settings/LargeAvatar';
 import { setTitle } from 'components/common/page-layout/PageTitle';
 import { useSpace } from 'hooks/useSpace';
+import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -30,6 +32,7 @@ export default function WorkspaceSettings () {
   setTitle('Workspace Options');
   const router = useRouter();
   const [space, setSpace] = useSpace();
+  const [spaces] = useSpaces();
 
   const {
     register,
@@ -52,6 +55,13 @@ export default function WorkspaceSettings () {
       window.location.href = router.asPath.replace(space.domain, values.domain);
     }
     reset(values);
+  }
+
+  function deleteWorkspace () {
+    if (confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
+      setSpace(null);
+      window.location.href = `/${spaces[0].domain}`;
+    }
   }
 
   return (<>
@@ -79,10 +89,13 @@ export default function WorkspaceSettings () {
             helperText={errors.domain?.message}
           />
         </Grid>
-        <Grid item>
+        <Grid item display='flex' justifyContent='space-between'>
           <PrimaryButton disabled={!isDirty} type='submit'>
             Save
           </PrimaryButton>
+          <Button disabled={spaces.length === 1} variant='outlined' color='error' onClick={deleteWorkspace}>
+            Delete Workspace
+          </Button>
         </Grid>
       </Grid>
     </form>

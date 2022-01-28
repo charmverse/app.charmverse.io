@@ -14,14 +14,24 @@ export function useSpace () {
     throw new Error('Space not defined for domain: ' + domain);
   }
 
-  function setSpace (space: Space, silent?: boolean) {
-    const newSpaces = spaces.map(s => s.id === space.id ? space : s);
-    if (silent) {
-      const key = getKey('spaces');
-      localStorage.setItem(key, JSON.stringify(newSpaces));
+  function setSpace (_space: Space | null, silent?: boolean) {
+    if (_space) {
+      const newSpaces = spaces.map(s => s.id === _space.id ? _space : s);
+      if (silent) {
+        const key = getKey('spaces');
+        localStorage.setItem(key, JSON.stringify(newSpaces));
+      }
+      else {
+        setSpaces(newSpaces);
+      }
     }
     else {
-      setSpaces(newSpaces);
+      const spaceId = space!.id;
+      console.log('dleete space', spaceId)
+      const key = getKey('spaces');
+      const newSpaces = spaces.filter(s => s.id !== spaceId);
+      localStorage.setItem(key, JSON.stringify(newSpaces));
+      localStorage.removeItem(`spaces.${spaceId}.pages`);
     }
   }
 

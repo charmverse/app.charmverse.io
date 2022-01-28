@@ -40,7 +40,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
   const watchDomain = watch('domain');
 
   function onSubmit (values: FormValues) {
-    const newId = '' + Math.random();
+    const newId = Math.random().toString().replace('0.', '');
     try {
       _onSubmit({ id: newId, ...values })
     } catch (e) {
