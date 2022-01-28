@@ -12,6 +12,8 @@ export const contributors: Contributor[] = [
   { id: '3', address: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2', favorites: [], username: 'mattopoly', spaceRoles: [{ spaceId: spaces[1].id, type: 'contributor', userId: '3' }] }
 ];
 
+export const activeUser = contributors[0];
+
 export const pages: Page[] = [
   { id: '0', created: new Date(), content: 'Testing... 1, 2, 3...', isPublic: false, path: '', spaceId: '0', title: 'First Page' },
   { id: '1', created: new Date(), content: 'Hello world :)', isPublic: false, path: '', spaceId: '0', title: 'Second Page' }

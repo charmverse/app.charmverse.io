@@ -9,6 +9,7 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
 import 'theme/styles.scss';
 import { createThemeLightSensitive } from 'theme';
@@ -50,6 +51,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     }),
     [],
   );
+
+  const router = useRouter();
+  console.log("IS READY", router.isReady);
   // Update the theme only if the mode changes
   const theme = useMemo(() => createThemeLightSensitive(mode), [mode]);
 
@@ -61,6 +65,11 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       setMode('dark');
     }
   }, [prefersDarkMode, savedDarkMode]);
+
+  // wait for router to be ready, as we rely on the URL to know what space to load
+  if (!router.isReady) {
+    return <></>;
+  }
 
   return (
     <PageTitleProvider>
