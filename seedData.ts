@@ -1,8 +1,8 @@
 import { Contributor, Page, Space } from 'models';
 
 export const spaces: Space[] = [
-  { id: '0', name: 'CharmVerse', domain: 'charmverse' },
-  { id: '1', name: 'MattVerse', domain: 'mattverse' },
+  { id: '0', name: 'Our Community', domain: 'demo' },
+  { id: '1', name: 'My Workspace', domain: 'my-workspace' },
 ];
 
 export const contributors: Contributor[] = [
