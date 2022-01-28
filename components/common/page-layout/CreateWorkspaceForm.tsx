@@ -8,57 +8,48 @@ import FieldLabel from 'components/settings/FieldLabel';
 import Legend from 'components/settings/Legend';
 import Avatar from 'components/settings/LargeAvatar';
 import { setTitle } from 'components/common/page-layout/PageTitle';
-import { useSpace } from 'hooks/useSpace';
+import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { Space } from 'models';
 
-export const schema = yup.object({
-  domain: yup.string().ensure().trim().lowercase()
-    .min(3, 'Domain must be at least 3 characters')
-    .matches(/^[0-9a-z]*$/, 'Domain must be only lowercase letters and numbers')
-    .required('Domain is required'),
-  name: yup.string().ensure().trim()
-    .min(3, 'Name must be at least 3 characters')
-    .required('Name is required'),
-});
+import { schema, FormValues } from 'pages/[domain]/settings/workspace';
 
-export type FormValues = yup.InferType<typeof schema>;
+interface Props {
+  onCancel: () => void;
+  onSubmit: (values: Space) => void;
+}
 
-export default function WorkspaceSettings () {
+export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Props) {
 
-  setTitle('Workspace Options');
-  const router = useRouter();
-  const [space, setSpace] = useSpace();
+  const [user] = useUser();
+  const [spaces] = useSpaces();
 
   const {
     register,
     handleSubmit,
-    reset,
     watch,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: space,
+    defaultValues: {
+      name: `${user?.username}'s Workspace`,
+    },
     resolver: yupResolver(schema),
   });
 
   const watchName = watch('name');
+  const watchDomain = watch('domain');
 
   function onSubmit (values: FormValues) {
-    // reload with new subdomain
-    const newDomain = space.domain !== values.domain;
-    setSpace({ ...space, ...values }, newDomain);
-    if (newDomain) {
-      window.location.href = router.asPath.replace(space.domain, values.domain);
-    }
-    reset(values);
+    const newId = '' + (spaces.length + 1);
+    _onSubmit({ id: newId, ...values });
   }
 
   return (<>
-    <Legend>Space Details</Legend>
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container direction={'column'} spacing={3}>
-        <Grid item>
+        <Grid item display='flex' justifyContent='center'>
           <Avatar name={watchName} variant='rounded' />
         </Grid>
         <Grid item>
@@ -80,7 +71,7 @@ export default function WorkspaceSettings () {
           />
         </Grid>
         <Grid item>
-          <PrimaryButton disabled={!isDirty} type='submit'>
+          <PrimaryButton disabled={!watchName || !watchDomain} type='submit'>
             Save
           </PrimaryButton>
         </Grid>
@@ -89,11 +80,3 @@ export default function WorkspaceSettings () {
   </>);
 
 }
-
-WorkspaceSettings.getLayout = (page: ReactElement) => {
-  return (
-    <SettingsLayout>
-      {page}
-    </SettingsLayout>
-  );
-};

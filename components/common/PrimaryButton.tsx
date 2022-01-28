@@ -1,5 +1,3 @@
-
-import MuiButton from '@mui/material/Button';
 import styled from '@emotion/styled';
 import { darken } from '@mui/system';
 import Button, { InputProps, StyledSpinner } from './Button';
@@ -14,6 +12,10 @@ const StyledButton = styled(Button)`
   padding: 10px 30px;
   white-space: nowrap;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 10px 1px;
+
+  &:disabled {
+    box-shadow: none;
+  }
 
   span {
     font-size: .85em;
