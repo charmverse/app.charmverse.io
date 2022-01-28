@@ -63,4 +63,6 @@ export const emojiPlugins = () => {
   ]
 }
 
-export default <BangleEmojiSuggest emojiSuggestKey={emojiSuggestKey} />;
+export default () => {
+  return <BangleEmojiSuggest emojiSuggestKey={emojiSuggestKey} />
+};
