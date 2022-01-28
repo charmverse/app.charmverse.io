@@ -12,6 +12,7 @@ import MuiDrawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
+import { useRouter } from 'next/router';
 import Typography from '@mui/material/Typography';
 import { useColorMode } from 'context/color-mode';
 import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
@@ -100,6 +101,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   const scrollbarStyling = useScrollbarStyling();
   const [pages] = usePages();
   const [user, setUser] = useUser();
+  const router = useRouter();
   const thisPage = pages.find(page => page.title === pageTitle);
   const isFavorite = thisPage && user?.favorites.some(({ pageId }) => pageId === thisPage.id);
 
@@ -122,6 +124,8 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
     });
   }
 
+  const isPage = router.route.includes('pagePath');
+
   return (
     <>
       <Box sx={{ display: 'flex' }}>
@@ -143,11 +147,11 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
               {pageTitle}
             </Typography>
             {/** favorite toggle */}
-            <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
+            {isPage && <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
               <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color="inherit">
                 {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
               </IconButton>
-            </Tooltip>
+            </Tooltip>}
             {/** dark mode toggle */}
             <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
               <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
