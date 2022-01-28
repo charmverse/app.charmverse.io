@@ -1,4 +1,5 @@
 
+export const PATH_BLACKLIST = ['settings'];
 
 export interface Page {
   id: string;
