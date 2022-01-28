@@ -139,6 +139,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) =>
           }
         }
       },
+      MuiIconButton: {
+        defaultProps: {
+          disableRipple: true
+        }
+      },
       MuiCardContent: {
         styleOverrides: {
           root: {

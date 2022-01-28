@@ -22,6 +22,8 @@ import { useUser } from 'hooks/useUser';
 import { useSpace } from 'hooks/useSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { usePages } from 'hooks/usePages';
+import { Contributor } from 'models';
+import { shortenedWeb3Address } from 'lib/strings';
 import EmojiCon from '../Emoji';
 
 const AvatarLink = styled(NextLink)`
@@ -37,16 +39,17 @@ const WorkspaceContainer = styled.div`
 
 interface SidebarProps {
   closeSidebar: () => void;
+  favorites: Contributor['favorites'];
 }
 
-export default function Sidebar({ closeSidebar }: SidebarProps) {
+export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
 
   const [user] = useUser();
   const [space] = useSpace();
   const [spaces] = useSpaces();
   const [pages] = usePages();
 
-  const favoritePages = user.favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
+  const favoritePages = favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
 
   return (<Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
     <WorkspaceContainer>
@@ -135,10 +138,10 @@ export default function Sidebar({ closeSidebar }: SidebarProps) {
           <Box display='flex' alignItems='center'>
             <Avatar name='Dolemite' />
             <Box pl={1}>
-              <Typography variant='caption' sx={{ display: 'block' }}>
-                <strong>Dolemite</strong><br />
-                0x141...fBf4
-              </Typography>
+              {user && <Typography variant='caption' sx={{ display: 'block' }}>
+                <strong>{user.username}</strong><br />
+                {shortenedWeb3Address(user.address)}
+              </Typography>}
             </Box>
           </Box>
           <Link href={`/${space.domain}/settings/account`}>

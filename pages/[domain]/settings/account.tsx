@@ -8,6 +8,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import Avatar from 'components/settings/LargeAvatar';
 import { setTitle } from 'components/common/page-layout/PageTitle';
+import { useUser } from 'hooks/useUser';
 
 interface FormValues {
   username: string;
@@ -16,6 +17,7 @@ interface FormValues {
 export default function AccountSettings () {
 
   setTitle('My Account');
+  const [user, setUser] = useUser();
 
   const {
     register,
@@ -23,15 +25,13 @@ export default function AccountSettings () {
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: {
-      username: 'Dolemite'
-    }
+    defaultValues: user!
   });
 
   const watchUsername = watch('username');
 
   function onSubmit (values: FormValues) {
-    alert(values.username)
+    setUser({ ...user, ...values });
   }
 
   return (<>
