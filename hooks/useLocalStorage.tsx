@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 
+// Add a prefix so if our schema changes, we can invalidate previous content
+export const PREFIX = 'charm.v1';
+
 // localStorage hook inspiration: https://blog.logrocket.com/using-localstorage-react-hooks/
 
 function getStorageValue<T = any> (key: string, defaultValue?: T) {
@@ -14,7 +17,7 @@ function getStorageValue<T = any> (key: string, defaultValue?: T) {
 
 export function useLocalStorage<T = any> (key: string, defaultValue?: T) {
   const [value, setValue] = useState<T>(() => {
-    return getStorageValue(key, defaultValue);
+    return getStorageValue(PREFIX + key, defaultValue);
   });
 
   useEffect(() => {

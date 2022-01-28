@@ -1,4 +1,4 @@
-import { useLocalStorage } from './useLocalStorage';
+import { useLocalStorage, PREFIX } from './useLocalStorage';
 import { Contributor } from 'models';
 import { contributors } from 'seedData';
 import { useSpace } from './useSpace';
@@ -6,5 +6,5 @@ import { useSpace } from './useSpace';
 export function useContributors () {
   const [space] = useSpace();
   const spaceContributors = contributors.filter(c => c.spaceRoles.some(({ spaceId }) => spaceId === space.id));
-  return useLocalStorage<Contributor[]>(`'charm.v1.space.${space.id}.contributors`, spaceContributors);
+  return useLocalStorage<Contributor[]>(`${PREFIX}.space.${space.id}.contributors`, spaceContributors);
 };
