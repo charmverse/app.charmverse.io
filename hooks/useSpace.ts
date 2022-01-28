@@ -27,7 +27,6 @@ export function useSpace () {
     }
     else {
       const spaceId = space!.id;
-      console.log('dleete space', spaceId)
       const key = getKey('spaces');
       const newSpaces = spaces.filter(s => s.id !== spaceId);
       localStorage.setItem(key, JSON.stringify(newSpaces));
