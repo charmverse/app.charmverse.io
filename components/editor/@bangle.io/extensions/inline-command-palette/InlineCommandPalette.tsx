@@ -153,9 +153,8 @@ export function InlineCommandPalette() {
     if (!paletteGroupItemsRecord[item.group]) {
       paletteGroupItemsRecord[item.group] = []
     }
-    paletteGroupItemsRecord[item.group].push(<ListItem disabled={item._isItemDisabled} button component="div" sx={{ py: 0, px: 0 }}>
+    paletteGroupItemsRecord[item.group].push(<ListItem key={item.uid} disabled={item._isItemDisabled} button component="div" sx={{ py: 0, px: 0 }}>
       <InlinePaletteRow
-        key={item.uid}
         dataId={item.uid}
         disabled={item._isItemDisabled}
         title={item.title}
@@ -169,7 +168,7 @@ export function InlineCommandPalette() {
   return reactDOM.createPortal(
     <InlinePaletteWrapper>
       {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
-        <InlinePaletteGroup>
+        <InlinePaletteGroup key={group}>
           <InlinePaletteGroupName>
             {group}
           </InlinePaletteGroupName>

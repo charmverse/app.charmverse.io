@@ -50,9 +50,10 @@ const specRegistry = new SpecRegistry([
   tableHeader,
   tableRow
 ]);
+
 const parser = markdownParser(specRegistry);
 
-export default function Editor({ markdown }: { markdown: string }) {
+export default function BangleEditor({ markdown }: { markdown: string }) {
   const state = useEditorState({
     specRegistry,
     plugins: () => [
