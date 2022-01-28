@@ -20,12 +20,9 @@ const schema = yup.object({
   name: yup.string().ensure().trim()
     .matches(/^[0-9a-zA-Z\s]*$/, 'Name must be only letters, numbers, and spaces')
     .required('Name is required'),
-}).required();
+});
 
-interface FormValues {
-  domain: string;
-  name: string;
-}
+type FormValues = yup.InferType<typeof schema>;
 
 export default function WorkspaceSettings () {
 
@@ -36,8 +33,9 @@ export default function WorkspaceSettings () {
   const {
     register,
     handleSubmit,
+    reset,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<FormValues>({
     defaultValues: space,
     resolver: yupResolver(schema),
@@ -52,6 +50,7 @@ export default function WorkspaceSettings () {
     if (newDomain) {
       window.location.href = router.asPath.replace(space.domain, values.domain);
     }
+    reset(values);
   }
 
   return (<>
@@ -80,7 +79,7 @@ export default function WorkspaceSettings () {
           />
         </Grid>
         <Grid item>
-          <PrimaryButton type='submit'>
+          <PrimaryButton disabled={!isDirty} type='submit'>
             Save
           </PrimaryButton>
         </Grid>

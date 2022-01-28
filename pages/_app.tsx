@@ -6,6 +6,7 @@ import { PageTitleProvider, TitleContext } from 'components/common/page-layout/P
 import RouteGuard from 'components/common/RouteGuard';
 import { ColorModeContext } from 'context/color-mode';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
@@ -72,30 +73,40 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   }
 
   return (
-    <PageTitleProvider>
-      <UserProvider>
-        <TitleContext.Consumer>
-          {([title]) => (
-            <Head>
-              <title>
-                {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-              </title>
-            </Head>
-          )}
-        </TitleContext.Consumer>
-        <Head>
-          <meta name='description' content='The Notion of Web3' />
-          <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-        </Head>
-        <ColorModeContext.Provider value={colorMode}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <RouteGuard>
-              {getLayout(<Component {...pageProps} />)}
-            </RouteGuard>
-          </ThemeProvider>
-        </ColorModeContext.Provider>
-      </UserProvider>
-    </PageTitleProvider>
+    <DataProviders>
+      <TitleContext.Consumer>
+        {([title]) => (
+          <Head>
+            <title>
+              {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+            </title>
+          </Head>
+        )}
+      </TitleContext.Consumer>
+      <Head>
+        <meta name='description' content='The Notion of Web3' />
+        <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+      </Head>
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <RouteGuard>
+            {getLayout(<Component {...pageProps} />)}
+          </RouteGuard>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
+    </DataProviders>
+  );
+}
+
+function DataProviders ({ children }: { children: React.ReactNode }) {
+  return (
+    <SpacesProvider>
+      <PageTitleProvider>
+        <UserProvider>
+          {children}
+        </UserProvider>
+      </PageTitleProvider>
+    </SpacesProvider>
   );
 }
