@@ -47,7 +47,6 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useSpace();
   const [spaces] = useSpaces();
   const [pages] = usePages();
-  console.log(user)
 
   const favoritePages = favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
 
