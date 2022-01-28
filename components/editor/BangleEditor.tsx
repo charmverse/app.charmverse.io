@@ -27,12 +27,12 @@ import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
 import '@bangle.dev/react-menu/style.css';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.dev/table";
 import '@bangle.dev/tooltip/style.css';
-import { CustomFloatingMenu } from 'components/common/CustomFloatingMenu';
+import { CustomFloatingMenu } from 'components/editor/CustomFloatingMenu';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
-import { paletteMarkName, palettePluginKey } from '../@bangle.io/extensions/inline-command-palette/config';
-import { InlineCommandPalette } from "../@bangle.io/extensions/inline-command-palette/InlineCommandPalette";
-import { inlinePalette, queryInlinePaletteActive } from '../@bangle.io/js-lib/inline-palette';
-import { keybindings } from '../@bangle.io/lib/config';
+import { paletteMarkName, palettePluginKey } from './@bangle.io/extensions/inline-command-palette/config';
+import { InlineCommandPalette } from "./@bangle.io/extensions/inline-command-palette/InlineCommandPalette";
+import { inlinePalette, queryInlinePaletteActive } from './@bangle.io/js-lib/inline-palette';
+import { keybindings } from './@bangle.io/lib/config';
 const menuKey = new PluginKey('menuKey');
 const emojiSuggestKey = new PluginKey('emojiSuggestKey');
 
