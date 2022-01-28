@@ -1,5 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import Head from 'next/head';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
@@ -22,6 +23,7 @@ import * as React from 'react';
 import Header, { toolbarHeight } from './Header';
 import { useTitleState } from './PageTitle';
 import Sidebar from './Sidebar';
+import { usePages } from 'hooks/usePages';
 
 const drawerWidth = 300;
 
@@ -128,6 +130,12 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <Head>
+        {thisPage?.icon
+          ? <link rel="icon" href={`data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${thisPage?.icon || ''}</text></svg>`} />
+        : <link rel="icon" type='image/png' href={`/favicon.png`} />
+        }
+      </Head>
       <Box sx={{ display: 'flex' }}>
         <AppBar position='fixed' open={open}>
           <StyledToolbar variant='dense'>

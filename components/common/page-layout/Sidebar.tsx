@@ -24,6 +24,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { usePages } from 'hooks/usePages';
 import { Contributor } from 'models';
 import { shortenedWeb3Address } from 'lib/strings';
+import EmojiCon from '../Emoji';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -96,7 +97,9 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
                 <ListItem button component='a' disableRipple sx={{ py: 0 }}>
                   <ListItemText disableTypography>
-                    <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
+                    <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
+                      <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon> {page.title}
+                    </Box>
                   </ListItemText>
                 </ListItem>
               </NextLink>
@@ -111,7 +114,9 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
             <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
               <ListItem button component='a' disableRipple sx={{ py: 0 }}>
                 <ListItemText disableTypography>
-                  <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>{page.title}</Box>
+                  <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
+                    <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon> {page.title}
+                  </Box>
                 </ListItemText>
               </ListItem>
             </NextLink>
