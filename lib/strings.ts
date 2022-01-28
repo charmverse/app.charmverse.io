@@ -43,3 +43,7 @@ export function stringToColor (name: string, saturation = 50, lightness = 60) {
   const h = hash % 360;
   return `hsl(${h}, ${saturation}%, ${lightness}%)`;
 }
+
+export const shortenedWeb3Address = (address: string) => {
+  return address.substring(0, 6) + '...' + address.substring(address.length - 4);
+};

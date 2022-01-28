@@ -101,7 +101,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   const [pages] = usePages();
   const [user, setUser] = useUser();
   const thisPage = pages.find(page => page.title === pageTitle);
-  const isFavorite = thisPage && user.favorites.some(({ pageId }) => pageId === thisPage.id);
+  const isFavorite = thisPage && user?.favorites.some(({ pageId }) => pageId === thisPage.id);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -112,7 +112,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   };
 
   function toggleFavorite () {
-    if (!thisPage) return;
+    if (!thisPage || !user) return;
     const pageId = thisPage.id;
     setUser({
       ...user,
@@ -157,7 +157,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
           </StyledToolbar>
         </AppBar>
         <Drawer variant='permanent' open={open}>
-          <Sidebar closeSidebar={handleDrawerClose} favorites={user.favorites} />
+          <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
         </Drawer>
         <Box sx={{
           flexGrow: 1, overflow: 'auto',
