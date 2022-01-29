@@ -17,12 +17,13 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import { NodeView, SpecRegistry } from '@bangle.dev/core';
-import { markdownParser } from '@bangle.dev/markdown';
-import { columnResizing } from '@bangle.dev/pm';
+import '@bangle.dev/core/style.css';
+import { columnResizing, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.dev/table";
 import '@bangle.dev/tooltip/style.css';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
+import { PageContent } from 'models';
 import { BlockQuote } from './BlockQuote';
 import { Code } from './Code';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
@@ -52,9 +53,8 @@ const specRegistry = new SpecRegistry([
   tableHeader,
   tableRow
 ]);
-const parser = markdownParser(specRegistry);
 
-export default function Editor({ markdown }: { markdown: string }) {
+export default function BangleEditor({ content }: { content: PageContent }) {
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -90,7 +90,7 @@ export default function Editor({ markdown }: { markdown: string }) {
         contentDOM: ["span"]
       })
     ],
-    initialValue: parser.parse(markdown),
+    initialValue: Node.fromJSON(specRegistry.schema, content),
   });
 
   return <ReactBangleEditor state={state} renderNodeViews={({ node, children }) => {
