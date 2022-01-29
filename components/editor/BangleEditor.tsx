@@ -94,15 +94,17 @@ export default function Editor({ markdown }: { markdown: string }) {
   });
 
   return <ReactBangleEditor state={state} renderNodeViews={({ node, children }) => {
-    if (node.type.name === 'blockquote') {
-      return <BlockQuote>
-        {children}
-      </BlockQuote>;
-    } else if (node.type.name === "codeBlock") {
-      console.log(children)
-      return <Code>
-        {children}
-      </Code>
+    switch (node.type.name) {
+      case "blockquote": {
+        return <BlockQuote>
+          {children}
+        </BlockQuote>
+      }
+      case "codeBlock": {
+        return <Code>
+          {children}
+        </Code>
+      }
     }
   }} >
     <FloatingMenu />
