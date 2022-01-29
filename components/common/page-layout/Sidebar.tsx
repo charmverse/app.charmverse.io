@@ -48,7 +48,6 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
-
   const router = useRouter();
   const [user] = useUser();
   const [space] = useSpace();
