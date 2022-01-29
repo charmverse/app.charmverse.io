@@ -3,8 +3,19 @@ import { PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { GetEmojiGroupsType, selectEmoji } from '@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { getSquareDimensions, resolveCounter } from '@bangle.dev/react-emoji-suggest/utils';
+import styled from '@emotion/styled';
+import Box from '@mui/material/Box';
+import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import React, { useCallback, useMemo } from 'react';
 import reactDOM from 'react-dom';
+
+const StyledEmojiSuggest = styled(Box)`
+  height: 400px;
+  overflow: auto;
+  overflow-x: hidden;
+  width: fit-content;
+  background-color: ${({ theme }) => theme.palette.background.light}
+`;
 
 export function EmojiSuggest({
   emojiSuggestKey,
@@ -27,9 +38,10 @@ export function EmojiSuggest({
     triggerText,
     show: isVisible,
   } = usePluginState(suggestTooltipKey);
+  const scrollbarStyling = useScrollbarStyling();
 
   return reactDOM.createPortal(
-    <div className="bangle-emoji-suggest">
+    <StyledEmojiSuggest className="bangle-emoji-suggest" sx={scrollbarStyling}>
       <div
         style={{
           width: rowWidth,
@@ -52,7 +64,7 @@ export function EmojiSuggest({
           />
         )}
       </div>
-    </div>,
+    </StyledEmojiSuggest>,
     tooltipContentDOM,
   );
 }
@@ -109,7 +121,7 @@ export function EmojiSuggestContainer({
         return (
           <div className="bangle-emoji-suggest-group" key={groupName || i}>
             {groupName && <span>{groupName}</span>}
-            <div>
+            <Box>
               {emojis.slice(0, maxItems).map(([emojiAlias, emoji]) => (
                 <EmojiSquare
                   key={emojiAlias}
@@ -127,13 +139,24 @@ export function EmojiSuggestContainer({
                   }}
                 />
               ))}
-            </div>
+            </Box>
           </div>
         );
       })}
     </div>
   );
 }
+
+const StyledEmojiSquare = styled.button<{ isSelected: boolean }>`
+  border: none;
+  padding: 0px !important;
+  ${props => props.isSelected && `background-color: rgb(0, 0, 0, 0.125);`};
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgb(0, 0, 0, 0.125);
+  }
+`
 
 function EmojiSquare({
   isSelected,
@@ -151,9 +174,9 @@ function EmojiSquare({
   selectedEmojiSquareId: string;
 }) {
   return (
-    <button
-      className={`bangle-emoji-square ${isSelected ? 'bangle-is-selected' : ''
-        }`}
+    <StyledEmojiSquare
+      isSelected={isSelected}
+      className={`bangle-emoji-square`}
       id={isSelected ? selectedEmojiSquareId : undefined}
       onClick={(e) => {
         e.preventDefault();
@@ -162,6 +185,6 @@ function EmojiSquare({
       style={style}
     >
       {emoji}
-    </button>
+    </StyledEmojiSquare>
   );
 }

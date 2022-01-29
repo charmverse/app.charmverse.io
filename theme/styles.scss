@@ -8,24 +8,8 @@ div#__next > div {
   font-size: 14px;
 }
 
-.bangle-emoji-suggest {
-  height: 400px;
-  overflow: auto;
-  width: fit-content;
-}
-
-.bangle-emoji-square {
-  border: none;
-  font-size: 20px !important;
-  padding: 0px !important;
-}
-
-.bangle-emoji-square:hover {
-  cursor: pointer;
-}
-
-.bangle-emoji-square.bangle-is-selected {
-  background: rgb(223, 223, 223);
+body button {
+  background: inherit;
 }
 
 .bangle-heading-collapsed {
