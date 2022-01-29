@@ -1,10 +1,10 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { List, ListItem, Typography } from '@mui/material';
+import { Box, List, ListItem, Typography } from '@mui/material';
+import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
-import { scrollBarThumbBackgroundColor, scrollBarThumbBackgroundColorDarkMode, scrollBarTrackBackgroundColor, scrollBarTrackBackgroundColorDarkMode } from 'theme/colors';
 import {
   useInlinePaletteItems,
   useInlinePaletteQuery
@@ -64,7 +64,7 @@ function getItemsAndHints(
   return { items };
 }
 
-const InlinePaletteWrapper = styled.div`
+const InlinePaletteWrapper = styled(Box)`
   display: flex;
   flex-direction: column;
   background-color: ${({ theme }) => theme.palette.background.light};
@@ -74,16 +74,6 @@ const InlinePaletteWrapper = styled.div`
   width: 100%;
   padding: ${({ theme }) => theme.spacing(1.5)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  &::-webkit-scrollbar {
-    width: 10px;
-    border: 1px solid black;
-  };
-  &::-webkit-scrollbar-track {
-    background-color: ${({ theme }) => theme.palette.mode === "dark" ? scrollBarTrackBackgroundColorDarkMode : scrollBarTrackBackgroundColor};
-  };
-  &::-webkit-scrollbar-thumb {
-    background-color: ${({ theme }) => theme.palette.mode === "dark" ? scrollBarThumbBackgroundColorDarkMode : scrollBarThumbBackgroundColor};
-  };
 `;
 
 const InlinePaletteGroup = styled.div`
@@ -102,7 +92,7 @@ export function InlineCommandPalette() {
   const { query, counter, isVisible, tooltipContentDOM } =
     useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
-
+  const scrollbarStyling = useScrollbarStyling();
   const editorItems = useEditorItems();
   const isItemDisabled = useCallback(
     (item) => {
@@ -166,7 +156,7 @@ export function InlineCommandPalette() {
   })
 
   return reactDOM.createPortal(
-    <InlinePaletteWrapper>
+    <InlinePaletteWrapper sx={scrollbarStyling}>
       {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
         <InlinePaletteGroup key={group}>
           <InlinePaletteGroupName>
