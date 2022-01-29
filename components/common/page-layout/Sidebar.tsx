@@ -12,19 +12,19 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import { usePages } from 'hooks/usePages';
+import { useSpace } from 'hooks/useSpace';
+import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
+import { shortenedWeb3Address } from 'lib/strings';
+import { isTruthy } from 'lib/types';
+import { Contributor } from 'models';
 import NextLink from 'next/link';
 import Avatar from '../Avatar';
+import EmojiCon from '../Emoji';
 import Link from '../Link';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import Header from './Header';
-import { isTruthy } from 'lib/types';
-import { useUser } from 'hooks/useUser';
-import { useSpace } from 'hooks/useSpace';
-import { useSpaces } from 'hooks/useSpaces';
-import { usePages } from 'hooks/usePages';
-import { Contributor } from 'models';
-import { shortenedWeb3Address } from 'lib/strings';
-import EmojiCon from '../Emoji';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;

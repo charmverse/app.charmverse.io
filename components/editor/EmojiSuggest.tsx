@@ -60,6 +60,7 @@ export const emojiPlugins = () => {
       tooltipRenderOpts: {
         placement: 'bottom',
       },
+      squareSide: 35
     })
   ]
 }

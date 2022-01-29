@@ -5,12 +5,14 @@ import { GetEmojiGroupsType, selectEmoji } from '@bangle.dev/react-emoji-suggest
 import { getSquareDimensions, resolveCounter } from '@bangle.dev/react-emoji-suggest/utils';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import { useTheme } from '@mui/system';
+import GroupLabel from 'components/editor/GroupLabel';
 import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import React, { useCallback, useMemo } from 'react';
 import reactDOM from 'react-dom';
 
 const StyledEmojiSuggest = styled(Box)`
-  height: 400px;
+  height: 350px;
   overflow: auto;
   overflow-x: hidden;
   width: fit-content;
@@ -33,18 +35,20 @@ export function EmojiSuggest({
     selectedEmojiSquareId,
     suggestTooltipKey,
   } = usePluginState(emojiSuggestKey);
+  const theme = useTheme();
   const {
     counter,
     triggerText,
     show: isVisible,
   } = usePluginState(suggestTooltipKey);
   const scrollbarStyling = useScrollbarStyling();
+  const width = rowWidth + (parseInt(theme.spacing(1).replace("px", "")) * 2);
 
   return reactDOM.createPortal(
     <StyledEmojiSuggest className="bangle-emoji-suggest" sx={scrollbarStyling}>
       <div
         style={{
-          width: rowWidth,
+          width,
           display: 'flex',
           justifyContent: 'center',
         }}
@@ -52,7 +56,7 @@ export function EmojiSuggest({
         {isVisible && (
           <EmojiSuggestContainer
             view={view}
-            rowWidth={rowWidth}
+            rowWidth={width}
             squareMargin={squareMargin}
             squareSide={squareSide}
             maxItems={maxItems}
@@ -101,6 +105,7 @@ export function EmojiSuggestContainer({
     squareMargin,
     squareSide,
   });
+  const theme = useTheme();
 
   const { item: activeItem } = resolveCounter(counter, emojiGroups);
   const onSelectEmoji = useCallback(
@@ -114,14 +119,18 @@ export function EmojiSuggestContainer({
     <div
       className="bangle-emoji-suggest-container"
       style={{
-        width: containerWidth,
+        width: containerWidth + (parseInt(theme.spacing(1).replace("px", "")) * 2),
       }}
     >
       {emojiGroups.map(({ name: groupName, emojis }, i) => {
         return (
-          <div className="bangle-emoji-suggest-group" key={groupName || i}>
-            {groupName && <span>{groupName}</span>}
-            <Box>
+          <Box p={1} className="bangle-emoji-suggest-group" key={groupName || i}>
+            <GroupLabel sx={{
+              margin: 1
+            }} label={groupName} />
+            <Box sx={{
+              marginBottom: 1.5
+            }}>
               {emojis.slice(0, maxItems).map(([emojiAlias, emoji]) => (
                 <EmojiSquare
                   key={emojiAlias}
@@ -135,12 +144,12 @@ export function EmojiSuggestContainer({
                     width: squareSide,
                     height: squareSide,
                     lineHeight: squareSide + 'px',
-                    fontSize: Math.max(squareSide - 7, 4),
+                    fontSize: Math.max(squareSide - 10, 4),
                   }}
                 />
               ))}
             </Box>
-          </div>
+          </Box>
         );
       })}
     </div>
@@ -151,10 +160,12 @@ const StyledEmojiSquare = styled.button<{ isSelected: boolean }>`
   border: none;
   padding: 0px !important;
   ${props => props.isSelected && `background-color: rgb(0, 0, 0, 0.125);`};
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
   &:hover {
     cursor: pointer;
-    background-color: rgb(0, 0, 0, 0.125);
+    background-color: ${({ theme }) => theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.04);"};
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   }
 `
 
@@ -184,7 +195,12 @@ function EmojiSquare({
       }}
       style={style}
     >
-      {emoji}
+      <span style={{
+        position: "relative",
+        right: -1
+      }}>
+        {emoji}
+      </span>
     </StyledEmojiSquare>
   );
 }
