@@ -239,7 +239,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
   ]
 };
 
-const paletteItems: PaletteItemType[] = [];
+const paletteItems: PaletteItem[] = [];
 
 Object.entries(paletteGroupItemsRecord).forEach(([group, paletteItemsWithoutGroup]) => {
   paletteItemsWithoutGroup.forEach(paletteItem => {
