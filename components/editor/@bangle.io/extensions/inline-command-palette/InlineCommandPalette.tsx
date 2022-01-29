@@ -1,7 +1,8 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, List, ListItem, Typography } from '@mui/material';
+import { Box, List, ListItem } from '@mui/material';
+import GroupLabel from 'components/editor/GroupLabel';
 import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
@@ -81,13 +82,6 @@ const InlinePaletteGroup = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
-const InlinePaletteGroupName = styled(Typography)`
-  font-size: 12px;
-  text-transform: uppercase;
-  font-weight: 600;
-  color: #777
-`;
-
 export function InlineCommandPalette() {
   const { query, counter, isVisible, tooltipContentDOM } =
     useInlinePaletteQuery(palettePluginKey);
@@ -159,9 +153,7 @@ export function InlineCommandPalette() {
     <InlinePaletteWrapper sx={scrollbarStyling}>
       {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
         <InlinePaletteGroup key={group}>
-          <InlinePaletteGroupName>
-            {group}
-          </InlinePaletteGroupName>
+          <GroupLabel label={group} />
           <List sx={{
             paddingTop: 0.5,
             paddingBottom: 0.5,
