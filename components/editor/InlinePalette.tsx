@@ -53,6 +53,4 @@ export const inlinePalettePlugins = () => {
   ]
 }
 
-export default () => {
-  return <InlinePalette />
-}
+export default <InlinePalette />

@@ -18,13 +18,13 @@ export const primaryTextColor = 'rgb(55, 53, 47)';
 export const backgroundColor = '#fff';
 export const sidebarBackgroundColor = lightGreyColor;
 export const settingsHeaderBackgroundColor = lighten(sidebarBackgroundColor, 0.4);
-export const scrollBarTrackBackgroundColor = lighten(sidebarBackgroundColor, 0.5);
-export const scrollBarThumbBackgroundColor = "rgba(0,0,0,.10)";
+export const scrollBarTrackBackgroundColor = darken(sidebarBackgroundColor, 0.1);
+export const scrollBarThumbBackgroundColor = lighten(scrollBarTrackBackgroundColor, 0.5);
 
 // dark mode
 export const primaryTextColorDarkMode = 'rgba(255, 255, 255, 0.9)';
 export const backgroundColorDarkMode = '#2f3437';
 export const sidebarBackgroundColorDarkMode = '#373c3f';
 export const settingsHeaderBackgroundColorDarkMode = darken(sidebarBackgroundColorDarkMode, 0.3);
-export const scrollBarTrackBackgroundColorDarkMode = lighten(sidebarBackgroundColorDarkMode, 0.25);
-export const scrollBarThumbBackgroundColorDarkMode = "rgba(0,0,0,.25)";
+export const scrollBarTrackBackgroundColorDarkMode = darken(sidebarBackgroundColorDarkMode, 0.2);
+export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackgroundColorDarkMode, 0.1);

@@ -16,13 +16,16 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { SpecRegistry } from '@bangle.dev/core';
+import { NodeView, SpecRegistry } from '@bangle.dev/core';
 import '@bangle.dev/core/style.css';
 import { columnResizing, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.dev/table";
+import '@bangle.dev/tooltip/style.css';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
+import { BlockQuote } from './BlockQuote';
+import { Code } from './Code';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
@@ -76,13 +79,36 @@ export default function BangleEditor({ content }: { content: PageContent }) {
       tablePlugins(),
       columnResizing,
       floatingMenuPlugin(),
+      NodeView.createPlugin({
+        name: "blockquote",
+        containerDOM: ["blockquote"],
+        contentDOM: ["span"]
+      }),
+      NodeView.createPlugin({
+        name: "codeBlock",
+        containerDOM: ["pre"],
+        contentDOM: ["span"]
+      })
     ],
     initialValue: Node.fromJSON(specRegistry.schema, content),
   });
 
-  return <ReactBangleEditor state={state}>
+  return <ReactBangleEditor state={state} renderNodeViews={({ node, children }) => {
+    switch (node.type.name) {
+      case "blockquote": {
+        return <BlockQuote>
+          {children}
+        </BlockQuote>
+      }
+      case "codeBlock": {
+        return <Code>
+          {children}
+        </Code>
+      }
+    }
+  }} >
     <FloatingMenu />
-    <EmojiSuggest />
-    <InlinePalette />
+    {EmojiSuggest}
+    {InlinePalette}
   </ReactBangleEditor>
 }
