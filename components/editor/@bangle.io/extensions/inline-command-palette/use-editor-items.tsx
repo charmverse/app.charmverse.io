@@ -4,13 +4,12 @@ import {
 } from '@bangle.dev/base-components';
 import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
-import { useMemo } from 'react';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
   isList
 } from './commands';
 import { palettePluginKey } from './config';
-import { PaletteItem } from './palette-item';
+import { PaletteItem, PaletteItemType } from './palette-item';
 
 const { convertToParagraph } = paragraph;
 const {
@@ -59,199 +58,198 @@ function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => voi
   return true;
 }
 
+const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> = {
+  text: [
+    {
+      uid: 'paraConvert',
+      title: 'Text',
+      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z" /><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z" /></svg>,
+      description: 'Convert the current block to paragraph',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch, view) => {
+            if (queryIsTodoListActive()(state)) {
+              return toggleTodoList()(state, dispatch, view);
+            }
+            if (queryIsBulletListActive()(state)) {
+              return toggleBulletList()(state, dispatch, view);
+            }
+            if (queryIsOrderedListActive()(state)) {
+              return toggleOrderedList()(state, dispatch, view);
+            }
+            return convertToParagraph()(state, dispatch, view);
+          });
+
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    },
+    {
+      uid: 'code',
+      title: 'Code',
+      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 384 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M384 121.941V128H256V0h6.059c6.365 0 12.47 2.529 16.971 7.029l97.941 97.941A24.005 24.005 0 0 1 384 121.941zM248 160c-13.2 0-24-10.8-24-24V0H24C10.745 0 0 10.745 0 24v464c0 13.255 10.745 24 24 24h336c13.255 0 24-10.745 24-24V160H248zM123.206 400.505a5.4 5.4 0 0 1-7.633.246l-64.866-60.812a5.4 5.4 0 0 1 0-7.879l64.866-60.812a5.4 5.4 0 0 1 7.633.246l19.579 20.885a5.4 5.4 0 0 1-.372 7.747L101.65 336l40.763 35.874a5.4 5.4 0 0 1 .372 7.747l-19.579 20.884zm51.295 50.479l-27.453-7.97a5.402 5.402 0 0 1-3.681-6.692l61.44-211.626a5.402 5.402 0 0 1 6.692-3.681l27.452 7.97a5.4 5.4 0 0 1 3.68 6.692l-61.44 211.626a5.397 5.397 0 0 1-6.69 3.681zm160.792-111.045l-64.866 60.812a5.4 5.4 0 0 1-7.633-.246l-19.58-20.885a5.4 5.4 0 0 1 .372-7.747L284.35 336l-40.763-35.874a5.4 5.4 0 0 1-.372-7.747l19.58-20.885a5.4 5.4 0 0 1 7.633-.246l64.866 60.812a5.4 5.4 0 0 1-.001 7.879z" /></svg>,
+      description: 'Insert a code block in the line below',
+      editorExecuteCommand: () => {
+        return (state, dispatch) => {
+          return insertNode(state, dispatch, state.schema.nodes.codeBlock.create(
+            { language: "Javascript" },
+            Fragment.fromArray([
+              state.schema.text("console.log('Hello World');")
+            ])
+          ))
+        };
+      },
+    },
+    {
+      uid: 'callout',
+      title: 'Callout',
+      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 64C141.1 64 48 139.2 48 232c0 64.9 45.6 121.2 112.3 149.2-5.2 25.8-21 47-33.5 60.5-2.3 2.5.2 6.5 3.6 6.3 11.5-.8 32.9-4.4 51-12.7 21.5-9.9 40.3-30.1 46.3-36.9 9.3 1 18.8 1.6 28.5 1.6 114.9 0 208-75.2 208-168C464 139.2 370.9 64 256 64z" /></svg>,
+      description: 'Insert a callout block in the line below',
+      editorExecuteCommand: () => {
+        return (state, dispatch) => {
+          return insertNode(state, dispatch, state.schema.nodes.blockquote.create(
+            undefined,
+            Fragment.fromArray([
+              state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
+                state.schema.text("Hello World")
+              ]))
+            ])
+          ))
+        };
+      },
+    },
+    ...Array.from({ length: 3 }, (_, i) => {
+      const level = i + 1;
+      return {
+        uid: 'headingConvert' + level,
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M448 96v320h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H320a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V288H160v128h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V96H32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-32v128h192V96h-32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16z" /></svg>,
+        title: 'Heading ' + level,
+        description: 'Convert the current block to heading level ' + level,
+        disabled: (state) => {
+          const result = isList()(state);
+          return result;
+        },
+        editorExecuteCommand: () => {
+          return (state, dispatch, view) => {
+            rafCommandExec(view!, setHeadingBlockType(level));
+            return replaceSuggestionMarkWith(palettePluginKey, '')(
+              state,
+              dispatch,
+              view,
+            );
+          };
+        },
+      } as Omit<PaletteItemType, "group">;
+    })
+  ],
+  "list": [
+    {
+      uid: 'bulletListConvert',
+      title: 'Bullet List',
+      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} version="1.1" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M6 1h10v2h-10v-2zM6 7h10v2h-10v-2zM6 13h10v2h-10v-2zM0 2c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2zM0 8c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2zM0 14c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2z" /></svg>,
+      keywords: ['unordered', 'lists'],
+      description: 'Convert the current block to bullet list',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch, view) => {
+            setBlockType(state.schema.nodes.paragraph)(state, dispatch);
+            return toggleBulletList()(view!.state, view!.dispatch, view);
+          });
+
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    },
+    {
+      uid: 'todoListConvert',
+      title: 'Todo List',
+      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><g><path fill="none" d="M0 0h24v24H0z" /><path d="M7 7V3a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-4v3.993c0 .556-.449 1.007-1.007 1.007H3.007A1.006 1.006 0 0 1 2 20.993l.003-12.986C2.003 7.451 2.452 7 3.01 7H7zm2 0h6.993C16.549 7 17 7.449 17 8.007V15h3V4H9v3zm-.497 11l5.656-5.657-1.414-1.414-4.242 4.243L6.38 13.05l-1.414 1.414L8.503 18z" /></g></svg>,
+      keywords: ['todo', 'lists', 'checkbox', 'checked'],
+      description: 'Convert the current block to todo list',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch, view) => {
+            setBlockType(state.schema.nodes.paragraph)(state, dispatch);
+            return toggleTodoList()(view!.state, view!.dispatch, view);
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    },
+    {
+      uid: 'orderedListConvert',
+      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} version="1.1" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M6 13h10v2h-10zM6 7h10v2h-10zM6 1h10v2h-10zM3 0v4h-1v-3h-1v-1zM2 8.219v0.781h2v1h-3v-2.281l2-0.938v-0.781h-2v-1h3v2.281zM4 11v5h-3v-1h2v-1h-2v-1h2v-1h-2v-1z" /></svg>,
+      title: 'Ordered List',
+      keywords: ['numbered', 'lists'],
+      description: 'Convert the current block to ordered list',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch, view) => {
+            setBlockType(state.schema.nodes.paragraph)(state, dispatch);
+            return toggleOrderedList()(view!.state, view!.dispatch, view);
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    }
+  ],
+  "layout": [
+    {
+      uid: 'insertSimpleTable',
+      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM224 416H64v-96h160v96zm0-160H64v-96h160v96zm224 160H288v-96h160v96zm0-160H288v-96h160v96z" /></svg>,
+      title: 'Table',
+      keywords: ['layout', 'table'],
+      description: 'Insert a simple table below',
+      editorExecuteCommand: () => {
+        return (state, dispatch) => {
+          return insertNode(state, dispatch, state.schema.nodes.table.create(
+            undefined,
+            Fragment.fromArray([
+              state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
+                createTableHeader(state, "Header 1"),
+                createTableHeader(state, "Header 2"),
+                createTableHeader(state, "Header 3"),
+              ])),
+              state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
+                createTableCell(state, "Cell 1"),
+                createTableCell(state, "Cell 2"),
+                createTableCell(state, "Cell 3"),
+              ]))
+            ])
+          ))
+        };
+      },
+    }
+  ]
+};
+
+const paletteItems: PaletteItem[] = [];
+
+Object.entries(paletteGroupItemsRecord).forEach(([group, paletteItemsWithoutGroup]) => {
+  paletteItemsWithoutGroup.forEach(paletteItem => {
+    paletteItems.push(PaletteItem.create({
+      ...paletteItem,
+      group
+    }))
+  })
+})
+
 export function useEditorItems() {
-  const baseItem = useMemo(
-    () => [
-      PaletteItem.create({
-        uid: 'paraConvert',
-        title: 'Simple Text',
-        group: 'text',
-        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z" /><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z" /></svg>,
-        description: 'Convert the current block to paragraph',
-        editorExecuteCommand: () => {
-          return (state, dispatch, view) => {
-            rafCommandExec(view!, (state, dispatch, view) => {
-              if (queryIsTodoListActive()(state)) {
-                return toggleTodoList()(state, dispatch, view);
-              }
-              if (queryIsBulletListActive()(state)) {
-                return toggleBulletList()(state, dispatch, view);
-              }
-              if (queryIsOrderedListActive()(state)) {
-                return toggleOrderedList()(state, dispatch, view);
-              }
-              return convertToParagraph()(state, dispatch, view);
-            });
-
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view,
-            );
-          };
-        },
-      }),
-
-      PaletteItem.create({
-        uid: 'code',
-        title: 'Code',
-        group: 'text',
-        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 384 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M384 121.941V128H256V0h6.059c6.365 0 12.47 2.529 16.971 7.029l97.941 97.941A24.005 24.005 0 0 1 384 121.941zM248 160c-13.2 0-24-10.8-24-24V0H24C10.745 0 0 10.745 0 24v464c0 13.255 10.745 24 24 24h336c13.255 0 24-10.745 24-24V160H248zM123.206 400.505a5.4 5.4 0 0 1-7.633.246l-64.866-60.812a5.4 5.4 0 0 1 0-7.879l64.866-60.812a5.4 5.4 0 0 1 7.633.246l19.579 20.885a5.4 5.4 0 0 1-.372 7.747L101.65 336l40.763 35.874a5.4 5.4 0 0 1 .372 7.747l-19.579 20.884zm51.295 50.479l-27.453-7.97a5.402 5.402 0 0 1-3.681-6.692l61.44-211.626a5.402 5.402 0 0 1 6.692-3.681l27.452 7.97a5.4 5.4 0 0 1 3.68 6.692l-61.44 211.626a5.397 5.397 0 0 1-6.69 3.681zm160.792-111.045l-64.866 60.812a5.4 5.4 0 0 1-7.633-.246l-19.58-20.885a5.4 5.4 0 0 1 .372-7.747L284.35 336l-40.763-35.874a5.4 5.4 0 0 1-.372-7.747l19.58-20.885a5.4 5.4 0 0 1 7.633-.246l64.866 60.812a5.4 5.4 0 0 1-.001 7.879z" /></svg>,
-        description: 'Insert a code block in the line below',
-        editorExecuteCommand: () => {
-          return (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.codeBlock.create(
-              { language: "Javascript" },
-              Fragment.fromArray([
-                state.schema.text("console.log('Hello World');")
-              ])
-            ))
-          };
-        },
-      }),
-
-      PaletteItem.create({
-        uid: 'callout',
-        title: 'Callout',
-        group: 'text',
-        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 64C141.1 64 48 139.2 48 232c0 64.9 45.6 121.2 112.3 149.2-5.2 25.8-21 47-33.5 60.5-2.3 2.5.2 6.5 3.6 6.3 11.5-.8 32.9-4.4 51-12.7 21.5-9.9 40.3-30.1 46.3-36.9 9.3 1 18.8 1.6 28.5 1.6 114.9 0 208-75.2 208-168C464 139.2 370.9 64 256 64z" /></svg>,
-        description: 'Insert a callout block in the line below',
-        editorExecuteCommand: () => {
-          return (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.blockquote.create(
-              undefined,
-              Fragment.fromArray([
-                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
-                  state.schema.text("Hello World")
-                ]))
-              ])
-            ))
-          };
-        },
-      }),
-
-      PaletteItem.create({
-        uid: 'bulletListConvert',
-        title: 'Bullet List',
-        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} version="1.1" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M6 1h10v2h-10v-2zM6 7h10v2h-10v-2zM6 13h10v2h-10v-2zM0 2c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2zM0 8c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2zM0 14c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2z" /></svg>,
-        group: 'list',
-        keywords: ['unordered', 'lists'],
-        description: 'Convert the current block to bullet list',
-        editorExecuteCommand: () => {
-          return (state, dispatch, view) => {
-            rafCommandExec(view!, (state, dispatch, view) => {
-              setBlockType(state.schema.nodes.paragraph)(state, dispatch);
-              return toggleBulletList()(view!.state, view!.dispatch, view);
-            });
-
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view,
-            );
-          };
-        },
-      }),
-
-      PaletteItem.create({
-        uid: 'todoListConvert',
-        title: 'Todo List',
-        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><g><path fill="none" d="M0 0h24v24H0z" /><path d="M7 7V3a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-4v3.993c0 .556-.449 1.007-1.007 1.007H3.007A1.006 1.006 0 0 1 2 20.993l.003-12.986C2.003 7.451 2.452 7 3.01 7H7zm2 0h6.993C16.549 7 17 7.449 17 8.007V15h3V4H9v3zm-.497 11l5.656-5.657-1.414-1.414-4.242 4.243L6.38 13.05l-1.414 1.414L8.503 18z" /></g></svg>,
-        group: 'list',
-        keywords: ['todo', 'lists', 'checkbox', 'checked'],
-        description: 'Convert the current block to todo list',
-        editorExecuteCommand: () => {
-          return (state, dispatch, view) => {
-            rafCommandExec(view!, (state, dispatch, view) => {
-              setBlockType(state.schema.nodes.paragraph)(state, dispatch);
-              return toggleTodoList()(view!.state, view!.dispatch, view);
-            });
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view,
-            );
-          };
-        },
-      }),
-
-      PaletteItem.create({
-        uid: 'orderedListConvert',
-        group: 'list',
-        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} version="1.1" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M6 13h10v2h-10zM6 7h10v2h-10zM6 1h10v2h-10zM3 0v4h-1v-3h-1v-1zM2 8.219v0.781h2v1h-3v-2.281l2-0.938v-0.781h-2v-1h3v2.281zM4 11v5h-3v-1h2v-1h-2v-1h2v-1h-2v-1z" /></svg>,
-        title: 'Ordered List',
-        keywords: ['numbered', 'lists'],
-        description: 'Convert the current block to ordered list',
-        editorExecuteCommand: () => {
-          return (state, dispatch, view) => {
-            rafCommandExec(view!, (state, dispatch, view) => {
-              setBlockType(state.schema.nodes.paragraph)(state, dispatch);
-              return toggleOrderedList()(view!.state, view!.dispatch, view);
-            });
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view,
-            );
-          };
-        },
-      }),
-
-      PaletteItem.create({
-        uid: 'insertSimpleTable',
-        group: 'layout',
-        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM224 416H64v-96h160v96zm0-160H64v-96h160v96zm224 160H288v-96h160v96zm0-160H288v-96h160v96z" /></svg>,
-        title: 'Table',
-        keywords: ['layout', 'table'],
-        description: 'Insert a simple table below',
-        editorExecuteCommand: () => {
-          return (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.table.create(
-              undefined,
-              Fragment.fromArray([
-                state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
-                  createTableHeader(state, "Header 1"),
-                  createTableHeader(state, "Header 2"),
-                  createTableHeader(state, "Header 3"),
-                ])),
-                state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
-                  createTableCell(state, "Cell 1"),
-                  createTableCell(state, "Cell 2"),
-                  createTableCell(state, "Cell 3"),
-                ]))
-              ])
-            ))
-          };
-        },
-      }),
-
-      ...Array.from({ length: 3 }, (_, i) => {
-        const level = i + 1;
-        return PaletteItem.create({
-          uid: 'headingConvert' + level,
-          icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M448 96v320h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H320a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V288H160v128h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V96H32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-32v128h192V96h-32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16z" /></svg>,
-          title: 'Heading ' + level,
-          group: 'heading',
-          description: 'Convert the current block to heading level ' + level,
-          disabled: (state) => {
-            const result = isList()(state);
-            return result;
-          },
-          editorExecuteCommand: () => {
-            return (state, dispatch, view) => {
-              rafCommandExec(view!, setHeadingBlockType(level));
-              return replaceSuggestionMarkWith(palettePluginKey, '')(
-                state,
-                dispatch,
-                view,
-              );
-            };
-          },
-        });
-      }),
-    ],
-    [],
-  );
-
-  return baseItem;
+  return paletteItems;
 }

@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -11,6 +10,7 @@ import MuiLink from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import { usePages } from 'hooks/usePages';
 import { useSpace } from 'hooks/useSpace';
@@ -18,19 +18,24 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { shortenedWeb3Address } from 'lib/strings';
 import { isTruthy } from 'lib/types';
-import { Contributor } from 'models';
+import { Contributor, Page, Space } from 'models';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { pages as seedPages } from 'seedData';
 import Avatar from '../Avatar';
 import EmojiCon from '../Emoji';
 import Link from '../Link';
+import ModalContainer from '../ModalContainer';
 import WorkspaceAvatar from '../WorkspaceAvatar';
+import CreateWorkspaceForm from './CreateWorkspaceForm';
 import Header from './Header';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
 `;
 
-const WorkspaceContainer = styled.div`
+const WorkspacesContainer = styled.div`
   float: left;
   height: 100%;
   border-right: 1px solid ${({ theme }) => theme.palette.divider};
@@ -44,15 +49,41 @@ interface SidebarProps {
 
 export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
 
+  const router = useRouter();
   const [user] = useUser();
   const [space] = useSpace();
-  const [spaces] = useSpaces();
+  const [spaces, setSpaces] = useSpaces();
   const [pages] = usePages();
-
+  const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const favoritePages = favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
 
+  function showSpaceForm() {
+    setSpaceFormOpen(true);
+  }
+
+  function closeSpaceForm() {
+    setSpaceFormOpen(false);
+  }
+
+  function addSpace(space: Space) {
+    if (spaces.some(s => s.id === space.id)) {
+      throw new Error('Space with that id already exists: ' + space.id);
+    }
+    if (spaces.some(s => s.domain === space.domain)) {
+      throw new Error('Space with that domain already exists');
+    }
+    setSpaces([...spaces, space]);
+
+    // add a first page - note that usePages is for the current space, so we can't use setPages here
+    const firstPage: Page = { ...seedPages[0], id: Math.random().toString().replace('0.', ''), spaceId: space.id };
+    const key = getKey(`spaces.${space.id}.pages`);
+    localStorage.setItem(key, JSON.stringify([firstPage]));
+
+    router.push(`/${space.domain}`);
+  }
+
   return (<Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
-    <WorkspaceContainer>
+    <WorkspacesContainer>
       <Grid container spacing={2} flexDirection='column'>
         {spaces.map(workspace => (
           <Grid item key={workspace.domain}>
@@ -64,14 +95,19 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
           </Grid>
         ))}
         <Grid item>
-          <IconButton sx={{ borderRadius: '8px' }}><AddIcon /></IconButton>
+          <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
         </Grid>
       </Grid>
-    </WorkspaceContainer>
+      <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
+        <ModalContainer onClose={closeSpaceForm}>
+          <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
+        </ModalContainer>
+      </Modal>
+    </WorkspacesContainer>
     <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
       <Box sx={{ flexGrow: 1 }}>
         <Header>
-          <Typography><strong>Acme</strong></Typography>
+          <Typography><strong>{space.name}</strong></Typography>
           <IconButton onClick={closeSidebar}>
             <ChevronLeftIcon />
           </IconButton>
@@ -135,15 +171,15 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
       <Box>
         <Divider />
         <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
-          <Box display='flex' alignItems='center'>
-            <Avatar name='Dolemite' />
+          {user && <Box display='flex' alignItems='center'>
+            <Avatar name={user.username} />
             <Box pl={1}>
-              {user && <Typography variant='caption' sx={{ display: 'block' }}>
+              <Typography variant='caption' sx={{ display: 'block' }}>
                 <strong>{user.username}</strong><br />
                 {shortenedWeb3Address(user.address)}
-              </Typography>}
+              </Typography>
             </Box>
-          </Box>
+          </Box>}
           <Link href={`/${space.domain}/settings/account`}>
             <IconButton>
               <SettingsIcon color='secondary' />

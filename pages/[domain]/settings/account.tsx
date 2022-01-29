@@ -9,10 +9,16 @@ import FieldLabel from 'components/settings/FieldLabel';
 import Avatar from 'components/settings/LargeAvatar';
 import { setTitle } from 'components/common/page-layout/PageTitle';
 import { useUser } from 'hooks/useUser';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
-interface FormValues {
-  username: string;
-}
+const schema = yup.object({
+  username: yup.string().ensure().trim()
+    .matches(/^[0-9a-zA-Z\s]*$/, 'Name must be only letters, numbers, and spaces')
+    .required('Username is required'),
+});
+
+type FormValues = yup.InferType<typeof schema>;
 
 export default function AccountSettings () {
 
@@ -21,17 +27,20 @@ export default function AccountSettings () {
 
   const {
     register,
+    reset,
     watch,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<FormValues>({
-    defaultValues: user!
+    defaultValues: user!,
+    resolver: yupResolver(schema)
   });
 
   const watchUsername = watch('username');
 
   function onSubmit (values: FormValues) {
     setUser({ ...user, ...values });
+    reset(values);
   }
 
   return (<>
@@ -43,14 +52,14 @@ export default function AccountSettings () {
         <Grid item>
           <FieldLabel>Username</FieldLabel>
           <TextField
-            {...register('username', { required: true })}
+            {...register('username')}
             fullWidth
             error={!!errors.username}
-            helperText={errors.username && 'Username is required'}
+            helperText={errors.username?.message}
           />
         </Grid>
         <Grid item>
-          <PrimaryButton type='submit'>
+          <PrimaryButton disabled={!isDirty} type='submit'>
             Save
           </PrimaryButton>
         </Grid>
