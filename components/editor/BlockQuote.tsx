@@ -1,9 +1,8 @@
 import styled from "@emotion/styled";
 import { ReactNode } from "react";
-import { sidebarBackgroundColor, sidebarBackgroundColorDarkMode } from "theme/colors";
 
 const StyledBlockQuote = styled.div`
-  background-color: ${({ theme }) => theme.palette.mode === "dark" ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor};
+  background-color: ${({ theme }) => theme.palette.background.light};
   font-size: 20px;
   padding: ${({ theme }) => theme.spacing(2)};
   margin-top: ${({ theme }) => theme.spacing(1)};
