@@ -17,7 +17,6 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import { NodeView, SpecRegistry } from '@bangle.dev/core';
-import '@bangle.dev/core/style.css';
 import { columnResizing, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.dev/table";
