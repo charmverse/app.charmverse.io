@@ -10,7 +10,7 @@ type EditorExecuteCommand = (arg: {
   itemIndex: number;
 }) => Command;;
 
-interface PaletteItemType {
+export interface PaletteItemType {
   uid: string;
   title: string;
   type?: string;

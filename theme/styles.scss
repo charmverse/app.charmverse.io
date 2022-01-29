@@ -31,7 +31,6 @@ div#__next > div {
 }
 
 .bangle-heading-collapsed {
-  background-color: var(--window-bgColor-2);
   border-radius: 8px;
 }
 
@@ -62,7 +61,6 @@ div#__next > div {
 }
 
 .bangle-editor a {
-  color: var(--window-link-color);
   text-decoration: underline;
 }
 
@@ -71,11 +69,6 @@ div#__next > div {
 }
 
 .bangle-editor p > code {
-  background-color: var(--base-300);
-  color: var(--textColor-1);
-}
-.bangle-editor pre {
-  background-color: var(--base-300);
 }
 
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
@@ -83,7 +76,6 @@ div#__next > div {
 }
 
 .bangle-editor .ProseMirror-selectednode {
-  outline: 2px solid var(--window-link-color);
   border-radius: var(--window-pill-borderRadius);
 }
 
@@ -373,7 +365,6 @@ img.ProseMirror-separator {
   padding: 0.2em 0.4em;
   margin: 0 0.1em;
   font-size: 85%;
-  background-color: rgba(29, 30, 35, 0.06);
   border-radius: 6px;
 }
 
