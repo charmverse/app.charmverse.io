@@ -35,6 +35,6 @@ export function useLocalStorage<T = any> (_key: string, defaultValue?: T) {
   return [value, setValue] as const;
 }
 
-function getKey (key: string) {
+export function getKey (key: string) {
   return `${PREFIX}.${key}`;
 }
