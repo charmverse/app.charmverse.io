@@ -1,8 +1,8 @@
 import { blockquote } from '@bangle.dev/base-components';
 import { BaseRawNodeSpec, NodeViewProps } from '@bangle.dev/core';
-import { getSuggestTooltipKey } from '@bangle.dev/react-emoji-suggest/emoji-suggest';
 import styled from '@emotion/styled';
 import { ReactNode } from 'react';
+import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { emojiSuggestKey } from './EmojiSuggest';
 
 const StyledBlockQuote = styled.div`
@@ -49,15 +49,14 @@ export function BlockQuote ({ children, node, updateAttrs, view }: NodeViewProps
     <StyledBlockQuote>
       <BlockQuoteEmoji>
         <span
-          role='button'
           tabIndex={0}
-          onClick={() => {
+          role='button'
+          onClick={e => {
+            e.stopPropagation();
             if (view.dispatch!) {
               const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
               view.dispatch(
-                view.state.tr
-                  .setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' })
-                  .setMeta('addToHistory', false)
+                view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_CALLOUT', updateAttrs }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
               );
             }
           }}

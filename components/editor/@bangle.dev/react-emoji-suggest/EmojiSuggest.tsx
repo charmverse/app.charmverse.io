@@ -1,11 +1,13 @@
+import { UpdateAttrsFunction } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { GetEmojiGroupsType, selectEmoji } from '@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { getSquareDimensions, resolveCounter } from '@bangle.dev/react-emoji-suggest/utils';
 import styled from '@emotion/styled';
 import { useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
+import { GetEmojiGroupsType, selectEmoji } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
+import { getEmojiByAlias } from 'components/editor/EmojiSuggest';
 import GroupLabel from 'components/editor/GroupLabel';
 import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import React, { useCallback, useMemo } from 'react';
@@ -35,6 +37,8 @@ export function EmojiSuggest({
     rowWidth,
     selectedEmojiSquareId,
     suggestTooltipKey,
+    insideCallout,
+    updateAttrs
   } = usePluginState(emojiSuggestKey);
   const theme = useTheme();
   const {
@@ -57,6 +61,7 @@ export function EmojiSuggest({
         {isVisible && (
           <EmojiSuggestContainer
             view={view}
+            insideCallout={insideCallout}
             rowWidth={width}
             squareMargin={squareMargin}
             squareSide={squareSide}
@@ -66,6 +71,7 @@ export function EmojiSuggest({
             triggerText={triggerText}
             counter={counter}
             selectedEmojiSquareId={selectedEmojiSquareId}
+            updateAttrs={updateAttrs}
           />
         )}
       </div>
@@ -85,6 +91,8 @@ export function EmojiSuggestContainer({
   counter,
   selectedEmojiSquareId,
   maxItems,
+  insideCallout,
+  updateAttrs
 }: {
   view: EditorView;
   rowWidth: number;
@@ -96,6 +104,8 @@ export function EmojiSuggestContainer({
   counter: number;
   selectedEmojiSquareId: string;
   maxItems: number;
+  insideCallout: boolean,
+  updateAttrs: UpdateAttrsFunction
 }) {
   const emojiGroups = useMemo(
     () => getEmojiGroups(triggerText),
@@ -111,7 +121,18 @@ export function EmojiSuggestContainer({
   const { item: activeItem } = resolveCounter(counter, emojiGroups);
   const onSelectEmoji = useCallback(
     (emojiAlias: string) => {
-      selectEmoji(emojiSuggestKey, emojiAlias)(view.state, view.dispatch, view);
+
+      if (!insideCallout) {
+        selectEmoji(emojiSuggestKey, emojiAlias)(view.state, view.dispatch, view);
+      } else {
+        updateAttrs({
+          emoji: getEmojiByAlias(emojiAlias)?.[1] ?? "👋"
+        })
+      }
+
+      view.dispatch(
+        view.state.tr.setMeta(emojiSuggestKey, { type: "OUTSIDE_CALLOUT" })
+      )
     },
     [view, emojiSuggestKey],
   );
@@ -160,11 +181,12 @@ export function EmojiSuggestContainer({
 
 const StyledEmojiSquare = styled.button<{ isSelected: boolean }>`
   border: none;
+  background: inherit;
   padding: 0px !important;
   ${props => props.isSelected && `background-color: rgb(0, 0, 0, 0.125);`};
   transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-
+  
   &:hover {
     cursor: pointer;
     background-color: ${({ theme }) => theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.04);"};

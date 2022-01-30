@@ -1,6 +1,6 @@
 import { PluginKey } from '@bangle.dev/core';
 import { emoji } from '@bangle.dev/emoji';
-import { emojiSuggest } from '@bangle.dev/react-emoji-suggest';
+import * as emojiSuggest from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { EmojiSuggest } from 'components/editor/@bangle.dev/react-emoji-suggest/EmojiSuggest';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 
@@ -18,7 +18,7 @@ const emojiData = Object.values(
   }, {} as Record<string, { name: string, emojis: [string, string][] }>)
 );
 
-const getEmojiByAlias = (emojiAlias: string) => {
+export const getEmojiByAlias = (emojiAlias: string) => {
   for (const { emojis } of emojiData) {
     const match = emojis.find(e => e[0] === emojiAlias);
     if (match) {
