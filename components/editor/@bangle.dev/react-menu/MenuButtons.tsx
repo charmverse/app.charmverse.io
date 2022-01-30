@@ -8,7 +8,9 @@ import {
   italic,
   link,
   orderedList,
-  paragraph
+  paragraph,
+  strike,
+  underline
 } from '@bangle.dev/base-components';
 import { EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
@@ -31,6 +33,8 @@ const { defaultKeys: historyKeys, undo, redo } = history;
 
 const { defaultKeys: boldKeys, queryIsBoldActive, toggleBold } = bold;
 const { defaultKeys: codeKeys, queryIsCodeActive, toggleCode } = code;
+const { defaultKeys: underlineKeys, queryIsUnderlineActive, toggleUnderline } = underline;
+const { defaultKeys: strikeKeys, queryIsStrikeActive, toggleStrike } = strike;
 const {
   defaultKeys: paragraphKeys,
   queryIsTopLevelParagraph,
@@ -87,6 +91,65 @@ export function BoldButton({
   );
 }
 
+export function StrikeButton({
+  hints = ['Strike', strikeKeys.toggleStrike],
+  hintPos = 'top',
+  children = <span style={{ textDecoration: "line-through", fontSize: 18, marginLeft: 5, marginRight: 5 }}>S</span>,
+  ...props
+}: ButtonProps) {
+  const view = useEditorViewContext();
+  const onSelect = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (toggleStrike()(view.state, view.dispatch, view)) {
+        view.focus();
+      }
+    },
+    [view],
+  );
+  return (
+    <MenuButton
+      {...props}
+      hintPos={hintPos}
+      onMouseDown={onSelect}
+      hints={hints}
+      isActive={queryIsStrikeActive()(view.state)}
+      isDisabled={!view.editable || !toggleStrike()(view.state)}
+    >
+      {children}
+    </MenuButton>
+  );
+}
+
+export function UnderlineButton({
+  hints = ['Underline', underlineKeys.toggleUnderline],
+  hintPos = 'top',
+  children = <span style={{ textDecoration: "underline", fontSize: 18, marginLeft: 5, marginRight: 5 }}>U</span>,
+  ...props
+}: ButtonProps) {
+  const view = useEditorViewContext();
+  const onSelect = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (toggleUnderline()(view.state, view.dispatch, view)) {
+        view.focus();
+      }
+    },
+    [view],
+  );
+  return (
+    <MenuButton
+      {...props}
+      hintPos={hintPos}
+      onMouseDown={onSelect}
+      hints={hints}
+      isActive={queryIsUnderlineActive()(view.state)}
+      isDisabled={!view.editable || !toggleUnderline()(view.state)}
+    >
+      {children}
+    </MenuButton>
+  );
+}
 export function BlockquoteButton({
   hints = ['Callout', blockquote.defaultKeys.wrapIn],
   hintPos = 'top',
