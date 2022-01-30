@@ -24,17 +24,15 @@ const PageTitle = styled(Typography)`
   font-weight: 700;
 `;
 
-export function Editor({ page }: { page: Page }) {
-  return (<>
+export function Editor ({ page }: { page: Page }) {
+  return (
     <Container>
-      <Controls>
-
-      </Controls>
+      <Controls />
       <Box py={3}>
         <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
       </Box>
       <PageTitle>{page.title}</PageTitle>
       <BangleEditor content={page.content} />
     </Container>
-  </>);
+  );
 }

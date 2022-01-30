@@ -11,7 +11,7 @@ const StyledAvatar = styled(Avatar)<{ active: boolean }>`
   ${({ active, theme }) => active && `box-shadow: 0 0 0 3px ${theme.palette.sidebar.avatarHighlight};`}
 `;
 
-export default function ({ active = false, name = '' }: { active?: boolean, name: string }) {
+export default function WorkspaceAvatar ({ active = false, name = '' }: { active?: boolean, name: string }) {
   return (
     <StyledAvatar active={active} name={name} variant='rounded' />
   );

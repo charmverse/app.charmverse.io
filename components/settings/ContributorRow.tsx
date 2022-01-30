@@ -12,7 +12,9 @@ const StyledRow = styled(Box)`
   justify-content: space-between;
 `;
 
-export default function ContributorRow ({ contributor, spaceId }: { contributor: Contributor, spaceId: string }) {
+type Props = { contributor: Contributor, spaceId: string };
+
+export default function ContributorRow ({ contributor, spaceId }: Props) {
   const role = contributor.spaceRoles.find(r => r.spaceId === spaceId);
   return (
     <StyledRow pb={2} mb={2}>
@@ -27,5 +29,5 @@ export default function ContributorRow ({ contributor, spaceId }: { contributor:
         {role?.type}
       </Typography>
     </StyledRow>
-  )
+  );
 }

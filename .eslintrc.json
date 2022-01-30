@@ -1,0 +1,53 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "plugin:react/recommended",
+        "airbnb",
+        "plugin:@next/next/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react",
+        "@typescript-eslint"
+    ],
+    "rules": {
+        "arrow-body-style": "off",
+        "arrow-parens": ["error", "as-needed"],
+        "brace-style": ["error", "stroustrup"],
+        "comma-dangle": ["error", "never"],
+        "import/prefer-default-export": "off",
+        "import/extensions": "off",
+        "import/no-unresolved": "off",
+        "jsx-a11y/anchor-is-valid": "off",
+        "jsx-quotes": ["error", "prefer-single"],
+        "no-alert": "off",
+        "no-bitwise": ["warn"],
+        "no-confusing-arrow": "off",
+        "no-multiple-empty-lines": ["error", { "max": 1 }],
+        "no-nested-ternary": ["warn"],
+        "no-param-reassign": "off",
+        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+        "no-restricted-syntax": "off",
+        "no-unused-vars": "off",
+        "no-use-before-define": ["error", { "functions": false }],
+        "object-curly-newline": "off",
+        "padded-blocks": "off",
+        "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".jsx"] }],
+        "react/jsx-no-bind": "off",
+        "react/jsx-props-no-spreading": "off",
+        "react/require-default-props": "off",
+        "react/react-in-jsx-scope": "off",
+        "space-before-function-paren": ["error", "always"]
+    }
+}

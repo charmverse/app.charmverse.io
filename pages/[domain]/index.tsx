@@ -1,10 +1,9 @@
-import { useEffect } from 'react';
+import { ReactElement, useEffect } from 'react';
 import { PageLayout } from 'components/common/page-layout';
 import { setTitle } from 'components/common/page-layout/PageTitle';
 import { useSpace } from 'hooks/useSpace';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
-import { ReactElement } from 'react';
 
 export default function IndexPage () {
   const [space] = useSpace();
@@ -18,7 +17,7 @@ export default function IndexPage () {
     }
   }, []);
 
-  return <></>;
+  return null;
 }
 
 IndexPage.getLayout = (page: ReactElement) => {
