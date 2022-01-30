@@ -12,7 +12,7 @@ import {
 } from '@bangle.dev/base-components';
 import { EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import { BlockquoteIcon, BoldIcon, BulletListIcon, CodeIcon, HeadingIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
+import { BoldIcon, BulletListIcon, CodeIcon, HeadingIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
 import {
   defaultKeys as floatingMenuKeys, focusFloatingMenuInput, toggleLinkSubMenu
 } from '@bangle.dev/react-menu/dist/floating-menu';
@@ -68,9 +68,7 @@ export function BoldButton({
     (e) => {
       e.preventDefault();
       if (toggleBold()(view.state, view.dispatch, view)) {
-        if (view.dispatch as any) {
-          view.focus();
-        }
+        view.focus();
       }
     },
     [view],
@@ -90,9 +88,9 @@ export function BoldButton({
 }
 
 export function BlockquoteButton({
-  hints = ['Blockquote', blockquote.defaultKeys.wrapIn],
+  hints = ['Callout', blockquote.defaultKeys.wrapIn],
   hintPos = 'top',
-  children = <BlockquoteIcon fontSize={16} />,
+  children = <svg stroke="currentColor" fill="currentColor" fontSize={12} strokeWidth={0} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256 64C141.1 64 48 139.2 48 232c0 64.9 45.6 121.2 112.3 149.2-5.2 25.8-21 47-33.5 60.5-2.3 2.5.2 6.5 3.6 6.3 11.5-.8 32.9-4.4 51-12.7 21.5-9.9 40.3-30.1 46.3-36.9 9.3 1 18.8 1.6 28.5 1.6 114.9 0 208-75.2 208-168C464 139.2 370.9 64 256 64z" /></svg>,
   ...props
 }: ButtonProps) {
   const view = useEditorViewContext();
@@ -102,9 +100,7 @@ export function BlockquoteButton({
       if (
         blockquote.commands.wrapInBlockquote()(view.state, view.dispatch, view)
       ) {
-        if (view.dispatch as any) {
-          view.focus();
-        }
+        view.focus();
       }
     },
     [view],
