@@ -4,7 +4,7 @@ import { TypeBackground } from '@mui/material/styles/createPalette';
 import { darken } from '@mui/system';
 import {
   backgroundColor,
-  backgroundColorDarkMode, backgroundLightColor,
+  backgroundColorDarkMode, backgroundDarkColor, backgroundDarkColorDarkMode, backgroundLightColor,
   backgroundLightColorDarkMode, blueColor,
   darkBlueColor, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
@@ -43,6 +43,7 @@ declare module '@mui/material/styles/createPalette' {
   }
   interface TypeBackground {
     light: string
+    dark: string
   } 
 }
 
@@ -91,7 +92,8 @@ export const createThemeLightSensitive = (mode: PaletteMode) =>
       mode,
       background: {
         default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor,
-        light: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor
+        light: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor,
+        dark: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor,
       },
       text: {
         primary: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor,

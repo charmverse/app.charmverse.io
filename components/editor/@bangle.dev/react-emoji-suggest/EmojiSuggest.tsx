@@ -4,8 +4,8 @@ import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { GetEmojiGroupsType, selectEmoji } from '@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { getSquareDimensions, resolveCounter } from '@bangle.dev/react-emoji-suggest/utils';
 import styled from '@emotion/styled';
+import { useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
-import { useTheme } from '@mui/system';
 import GroupLabel from 'components/editor/GroupLabel';
 import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import React, { useCallback, useMemo } from 'react';
@@ -16,7 +16,8 @@ const StyledEmojiSuggest = styled(Box)`
   overflow: auto;
   overflow-x: hidden;
   width: fit-content;
-  background-color: ${({ theme }) => theme.palette.background.light}
+  background-color: ${({ theme }) => theme.palette.background.light};
+  border-radius: ${({ theme }) => theme.spacing(0.5)}
 `;
 
 export function EmojiSuggest({
@@ -129,7 +130,8 @@ export function EmojiSuggestContainer({
               margin: 1
             }} label={groupName} />
             <Box sx={{
-              marginBottom: 1.5
+              marginBottom: 1.5,
+              borderBottom: `1px solid ${theme.palette.divider}`
             }}>
               {emojis.slice(0, maxItems).map(([emojiAlias, emoji]) => (
                 <EmojiSquare
@@ -161,11 +163,19 @@ const StyledEmojiSquare = styled.button<{ isSelected: boolean }>`
   padding: 0px !important;
   ${props => props.isSelected && `background-color: rgb(0, 0, 0, 0.125);`};
   transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-radius: ${({ theme }) => theme.spacing(0.5)};
 
   &:hover {
     cursor: pointer;
     background-color: ${({ theme }) => theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.04);"};
     transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  }
+
+  /* The emojis are moved slightly to the right and top for some reason */
+  span {
+    position: relative;
+    right: -0.5px;
+    top: 0.5px;
   }
 `
 
@@ -195,10 +205,7 @@ function EmojiSquare({
       }}
       style={style}
     >
-      <span style={{
-        position: "relative",
-        right: -1
-      }}>
+      <span>
         {emoji}
       </span>
     </StyledEmojiSquare>
