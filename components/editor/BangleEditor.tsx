@@ -60,6 +60,8 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
     padding: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
     border-radius: ${({ theme }) => theme.spacing(0.5)};
     background-color: ${({ theme }) => theme.palette.mode === "dark" ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor};
+    font-size: 85%;
+    color: ${({ theme }) => theme.palette.code.color};
   }
 `
 

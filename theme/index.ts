@@ -23,6 +23,9 @@ interface CustomColors {
     avatarHighlight: string;
     background: string;
   };
+  code: {
+    color: string
+  }
 }
 
 // define custom colors: https://material-ui.com/customization/palette/
@@ -119,6 +122,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) =>
       sidebar: {
         avatarHighlight: mode === 'dark' ? 'rgba(255, 255, 255, .2)' : '#ccc',
         background: mode === 'dark' ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor,
+      },
+      code: {
+        color: "#EB5757"
       }
     },
     components: {
