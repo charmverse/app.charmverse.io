@@ -18,6 +18,6 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
       {children}
     </SpacesContext.Provider>
   );
-};
+}
 
 export const useSpaces = () => useContext(SpacesContext);
