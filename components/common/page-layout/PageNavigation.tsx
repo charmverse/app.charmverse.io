@@ -3,14 +3,14 @@ import styled from '@emotion/styled';
 import { useDrop, useDrag, DndProvider } from 'react-dnd';
 import { useRouter } from 'next/router';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import Box from '@mui/material/Box';
+import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
+import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
+import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import Typography from '@mui/material/Typography';
 import TreeView from '@mui/lab/TreeView';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import Link from 'next/link';
-import { greyColor2 } from 'theme/colors';
+import { blackColor, greyColor2 } from 'theme/colors';
 import { Page } from 'models';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import EmojiCon from '../Emoji';
@@ -21,7 +21,11 @@ export type MenuNode = Page & {
   children: MenuNode[];
 }
 
-const DEFAULT_ICON = '📄';
+const DefaultPageIcon = styled(ArticleIcon)`
+  color: ${greyColor2};
+  opacity: 0.5;
+  font-size: 22px;
+`;
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   [`& .${treeItemClasses.content}`]: {
@@ -36,14 +40,16 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     // },
     '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
       backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
-      color: 'var(--tree-view-color)'
+      color: blackColor
     },
     [`& .${treeItemClasses.label}`]: {
       fontWeight: 'inherit',
       color: 'inherit'
     },
-    [`& .${treeItemClasses.iconContainer}:empty`]: {
-      content: '">"'
+    [`& .${treeItemClasses.iconContainer} svg`]: {
+      color: greyColor2,
+      fontSize: 24,
+      marginLeft: 12
     }
   },
   [`& .${treeItemClasses.group}`]: {
@@ -71,7 +77,16 @@ const StyledTreeItemContent = styled.a`
   text-decoration: none;
   display: flex;
   align-items: center;
-  padding: ${({ theme }) => theme.spacing(0.5)} 0;
+  padding: 3px 0;
+`;
+
+const StyledPageIcon = styled(EmojiCon)`
+  display: flex;
+  align-items: center;
+  color: black;
+  font-size: 14px;
+  height: 24px;
+  width: 24px;
 `;
 
 const StyledLink = styled(Typography)`
@@ -81,6 +96,10 @@ const StyledLink = styled(Typography)`
   &:hover {
     color: inherit;
   }
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: calc(80%); // hack to get ellipsis to appear
 `;
 
 // eslint-disable-next-line react/function-component-definition
@@ -102,9 +121,9 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
       label={(
         <Link href={href} passHref>
           <StyledTreeItemContent onClick={onClick}>
-            <EmojiCon sx={{ display: 'inline-block', color: 'black', fontSize: 14, width: 24 }}>
-              {labelIcon || DEFAULT_ICON}
-            </EmojiCon>
+            <StyledPageIcon>
+              {labelIcon || <DefaultPageIcon />}
+            </StyledPageIcon>
             <StyledLink>
               {label}
             </StyledLink>
@@ -286,6 +305,10 @@ export default function PageNavigation ({ pages, setPages, pathPrefix }:
         return stateNode;
       }
     }));
+    // collapse the dropped node
+    setExpanded(state => {
+      return state.filter(id => id !== droppedItem.id);
+    });
   };
   const router = useRouter();
   const expandedNodeIds = new Set<string>();

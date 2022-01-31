@@ -13,8 +13,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import TreeView from '@mui/lab/TreeView';
-import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { isTruthy } from 'lib/types';
@@ -26,6 +24,7 @@ import { useUser } from 'hooks/useUser';
 import { shortenedWeb3Address } from 'lib/strings';
 import { Contributor, Page, Space } from 'models';
 import { pages as seedPages } from 'seedData';
+import { greyColor2 } from 'theme/colors';
 import Header from './Header';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import Link from '../Link';
@@ -137,7 +136,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           </Box> */}
             {favoritePages.length > 0 && (
             <>
-              <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+              <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
                 FAVORITES
               </Typography>
               <List>
@@ -157,7 +156,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               </List>
             </>
             )}
-            <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+            <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
               WORKSPACE
             </Typography>
             <PageNavigation pages={pages} pathPrefix={`/${space.domain}`} setPages={setPages} />
