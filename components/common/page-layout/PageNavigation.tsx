@@ -19,8 +19,8 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
-    borderTopRightRadius: theme.spacing(2),
-    borderBottomRightRadius: theme.spacing(2),
+    // borderTopRightRadius: theme.spacing(2),
+    // borderBottomRightRadius: theme.spacing(2),
     paddingRight: theme.spacing(1),
     fontWeight: theme.typography.fontWeightMedium,
     '&.Mui-expanded': {
@@ -62,11 +62,11 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
   return (
     <StyledTreeItemRoot
       label={(
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
-          <EmojiCon sx={{ display: 'inline-block', width: 20 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, px: 0 }}>
+          <EmojiCon sx={{ display: 'inline-block', fontSize: 14, fontWeight: 500, width: 20 }}>
             {labelIcon || '📄 '}
           </EmojiCon>
-          <Typography variant='body2' sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+          <Typography sx={{ fontSize: 14, fontWeight: 500, flexGrow: 1 }}>
             {label}
           </Typography>
         </Box>
@@ -94,18 +94,6 @@ function mergeRefs (refs: any) {
     });
   };
 }
-
-// function RenderStaticNode ({ item }: { item: ReactNode }) {
-//   return (
-//     <TreeItem key={item.id} nodeId={item.id} label={`Item ${item.id}`}>
-//       {item.children?.length > 0
-//         ? item.children.map((childItem, index) => (
-//             <RenderStaticNode key={childItem.id} item={childItem} />
-//           ))
-//         : null}
-//     </TreeItem>
-//   );
-// };
 
 function RenderDraggableNode ({ item, onDrop }: { item: MenuNode, onDrop: (a: MenuNode, b: MenuNode) => void }) {
   // rgba(22, 52, 71, 0.08)
@@ -277,28 +265,5 @@ export default function PageNavigation ({ pages, setPages }:
         ))}
       </TreeRoot>
     </DndProvider>
-    // <TreeView
-    //   defaultCollapseIcon={<ExpandMoreIcon />}
-    //   defaultExpandIcon={<ChevronRightIcon />}
-    //   sx={{ height: 240, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-    // >
-    //   {pages.map(node => (
-    //     <StyledTreeItem
-    //       key={node.id}
-    //       labelIcon={node.icon}
-    //       nodeId={node.id}
-    //       label={node.title}
-    //     >
-    //       {node.children.map(childNode => (
-    //         <StyledTreeItem
-    //           key={childNode.id}
-    //           nodeId={childNode.id}
-    //           labelIcon={childNode.icon}
-    //           label={childNode.title}
-    //         />
-    //       ))}
-    //     </StyledTreeItem>
-    //   ))}
-    // </TreeView>
   );
 }
