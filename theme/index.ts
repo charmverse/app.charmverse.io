@@ -3,11 +3,11 @@ import { createTheme } from '@mui/material/styles';
 import { darken } from '@mui/system';
 import {
   backgroundColor,
-  backgroundColorDarkMode, blueColor,
+  backgroundColorDarkMode, backgroundDarkColor, backgroundDarkColorDarkMode, backgroundLightColor,
+  backgroundLightColorDarkMode, blueColor,
   darkBlueColor, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
-  settingsHeaderBackgroundColorDarkMode, sidebarBackgroundColor,
-  sidebarBackgroundColorDarkMode
+  settingsHeaderBackgroundColorDarkMode
 } from './colors';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
@@ -38,6 +38,10 @@ declare module '@mui/material/styles/createPalette' {
     facebook: Palette['primary'];
     twitter: Palette['primary'];
     white: PaletteOptions['primary'];
+  }
+  interface TypeBackground {
+    light: string
+    dark: string
   }
 }
 
@@ -84,7 +88,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
   palette: {
     mode,
     background: {
-      default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor
+      default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor,
+      light: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor,
+      dark: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
     },
     text: {
       primary: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor
@@ -117,7 +123,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     },
     sidebar: {
       avatarHighlight: mode === 'dark' ? 'rgba(255, 255, 255, .2)' : '#ccc',
-      background: mode === 'dark' ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor
+      background: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor
     }
   },
   components: {

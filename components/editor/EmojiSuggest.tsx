@@ -1,6 +1,7 @@
 import { PluginKey } from '@bangle.dev/core';
 import { emoji } from '@bangle.dev/emoji';
-import { EmojiSuggest as BangleEmojiSuggest, emojiSuggest } from '@bangle.dev/react-emoji-suggest';
+import { emojiSuggest } from '@bangle.dev/react-emoji-suggest';
+import { EmojiSuggest } from 'components/editor/@bangle.dev/react-emoji-suggest/EmojiSuggest';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 
 const emojiSuggestKey = new PluginKey('emojiSuggestKey');
@@ -16,15 +17,14 @@ const emojiData = Object.values(
   }, {} as Record<string, { name: string, emojis: [string, string][] }>)
 );
 
-const getEmojiByAlias = (emojiAlias: string) => {
+function getEmojiByAlias (emojiAlias: string) {
   for (const { emojis } of emojiData) {
     const match = emojis.find(e => e[0] === emojiAlias);
     if (match) {
       return match;
     }
   }
-  return null;
-};
+}
 
 export const emojiSpecs = () => {
   return [
@@ -56,9 +56,10 @@ export const emojiPlugins = () => {
       markName: 'emojiSuggest',
       tooltipRenderOpts: {
         placement: 'bottom'
-      }
+      },
+      squareSide: 35
     })
   ];
 };
 
-export default <BangleEmojiSuggest emojiSuggestKey={emojiSuggestKey} />;
+export default <EmojiSuggest emojiSuggestKey={emojiSuggestKey} />;

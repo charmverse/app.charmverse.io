@@ -16,14 +16,14 @@ import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { isTruthy } from 'lib/types';
-import { useUser } from 'hooks/useUser';
+import { getKey } from 'hooks/useLocalStorage';
+import { usePages } from 'hooks/usePages';
 import { useSpace } from 'hooks/useSpace';
 import { useSpaces } from 'hooks/useSpaces';
-import { usePages } from 'hooks/usePages';
-import { pages as seedPages } from 'seedData';
-import { Contributor, Page, Space } from 'models';
-import { getKey } from 'hooks/useLocalStorage';
+import { useUser } from 'hooks/useUser';
 import { shortenedWeb3Address } from 'lib/strings';
+import { Contributor, Page, Space } from 'models';
+import { pages as seedPages } from 'seedData';
 import Header from './Header';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import Link from '../Link';
@@ -49,7 +49,6 @@ interface SidebarProps {
 }
 
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
-
   const router = useRouter();
   const [user] = useUser();
   const [space] = useSpace();

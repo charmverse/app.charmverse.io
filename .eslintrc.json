@@ -27,6 +27,7 @@
         "arrow-parens": ["error", "as-needed"],
         "brace-style": ["error", "stroustrup"],
         "comma-dangle": ["error", "never"],
+        "consistent-return": "off",
         "import/prefer-default-export": "off",
         "import/extensions": "off",
         "import/no-unresolved": "off",
