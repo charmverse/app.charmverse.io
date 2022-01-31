@@ -99,9 +99,11 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
         </Grid>
       </Grid>
       <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-        <ModalContainer onClose={closeSpaceForm}>
-          <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
-        </ModalContainer>
+        <div>
+          <ModalContainer onClose={closeSpaceForm}>
+            <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
+          </ModalContainer>
+        </div>
       </Modal>
     </WorkspacesContainer>
     <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
