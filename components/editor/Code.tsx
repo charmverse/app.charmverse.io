@@ -1,5 +1,5 @@
-import styled from "@emotion/styled";
-import { ReactNode } from "react";
+import styled from '@emotion/styled';
+import { ReactNode } from 'react';
 
 const StyledCode = styled.div`
   background-color: ${({ theme }) => theme.palette.background.light};
@@ -9,8 +9,10 @@ const StyledCode = styled.div`
   font-family: Consolas;
 `;
 
-export function Code({ children }: { children: ReactNode }) {
-  return <StyledCode>
-    {children}
-  </StyledCode>
+export function Code ({ children }: { children: ReactNode }) {
+  return (
+    <StyledCode>
+      {children}
+    </StyledCode>
+  );
 }

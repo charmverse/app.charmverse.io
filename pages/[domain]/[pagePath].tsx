@@ -5,7 +5,7 @@ import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import { ReactElement } from 'react';
 
-export default function BlocksEditorPage() {
+export default function BlocksEditorPage () {
   const [pages] = usePages();
   const router = useRouter();
   const { pagePath } = router.query;

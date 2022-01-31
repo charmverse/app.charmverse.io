@@ -15,7 +15,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 const schema = yup.object({
   username: yup.string().ensure().trim()
     .matches(/^[0-9a-zA-Z\s]*$/, 'Name must be only letters, numbers, and spaces')
-    .required('Username is required'),
+    .required('Username is required')
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -30,7 +30,7 @@ export default function AccountSettings () {
     reset,
     watch,
     handleSubmit,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty }
   } = useForm<FormValues>({
     defaultValues: user!,
     resolver: yupResolver(schema)
@@ -43,12 +43,12 @@ export default function AccountSettings () {
     reset(values);
   }
 
-  return (<>
+  return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Box sx={{ py: 3 }}>
         <Avatar name={watchUsername} />
       </Box>
-      <Grid container direction={"column"} spacing={3}>
+      <Grid container direction='column' spacing={3}>
         <Grid item>
           <FieldLabel>Username</FieldLabel>
           <TextField
@@ -65,7 +65,7 @@ export default function AccountSettings () {
         </Grid>
       </Grid>
     </form>
-  </>);
+  );
 
 }
 

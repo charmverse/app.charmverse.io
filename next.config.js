@@ -2,47 +2,49 @@
 const config = {
   poweredByHeader: false,
   webpack5: true,
-  async redirects() {
+  async redirects () {
     return [
       {
         source: '/',
         destination: '/demo',
-        permanent: false,
+        permanent: false
       },
       {
         source: '/:domain/settings',
         destination: '/:domain/settings/account',
-        permanent: true,
-      },
-    ]
+        permanent: true
+      }
+    ];
   },
-  webpack(config, { isServer }) {
-    config.module.rules.push({
+  webpack (_config, { isServer }) {
+    _config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack']
     });
-    return config;
+    return _config;
   }
-}
+};
 
 /**
  * Remove undefined values so Next.js doesn't complain during serialization
  */
-const removeUndefined = (obj) => {
-  let newObj = {};
-  Object.keys(obj).forEach((key) => {
+const removeUndefined = obj => {
+  const newObj = {};
+  Object.keys(obj).forEach(key => {
     if (obj[key] === Object(obj[key])) newObj[key] = removeUndefined(obj[key]);
     else if (obj[key] !== undefined) newObj[key] = obj[key];
   });
   return newObj;
 };
 const next = require('next/dist/lib/is-serializable-props');
+// eslint-disable-next-line prefer-destructuring
 const isSerializableProps = next.isSerializableProps;
-next.isSerializableProps = (page, method, input) => isSerializableProps(page, method, removeUndefined(input));
-
+next.isSerializableProps = function _isSerializableProps (page, method, input) {
+  return isSerializableProps(page, method, removeUndefined(input));
+};
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
+  enabled: process.env.ANALYZE === 'true'
 });
 
 // fix for esm modules
@@ -58,7 +60,7 @@ const withTM = require('next-transpile-modules')([
   '@bangle.dev/emoji',
   '@bangle.dev/react-emoji-suggest',
   '@bangle.dev/table',
-  "@popperjs/core"
+  '@popperjs/core'
 ]);
 
 module.exports = withBundleAnalyzer(withTM(config));

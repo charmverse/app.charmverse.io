@@ -11,7 +11,7 @@ export function useSpace () {
   const { domain } = router.query;
   const space = spaces.find(w => w.domain === domain);
   if (!space) {
-    throw new Error('Space not defined for domain: ' + domain);
+    throw new Error(`Space not defined for domain: ${domain}`);
   }
 
   function setSpace (_space: Space | null, silent?: boolean) {
@@ -35,4 +35,4 @@ export function useSpace () {
   }
 
   return [space, setSpace] as const;
-};
+}

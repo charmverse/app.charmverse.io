@@ -7,9 +7,13 @@ const StyledAvatar = styled(Avatar)`
   font-weight: 500;
 `;
 
-export default function ({ className, name = '', variant }: { className?: string, active?: boolean, name: string, variant?: 'circular' | 'rounded' | 'square' }) {
+export default function InitialAvatar ({ className, name = '', variant }: { className?: string, name: string, variant?: 'circular' | 'rounded' | 'square' }) {
   return (
-    <StyledAvatar className={className} sx={{ backgroundColor: stringToColor(name) }} variant={variant}>
+    <StyledAvatar
+      className={className}
+      sx={{ backgroundColor: stringToColor(name) }}
+      variant={variant}
+    >
       {name.charAt(0).toUpperCase()}
     </StyledAvatar>
   );

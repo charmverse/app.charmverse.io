@@ -15,33 +15,50 @@ export const Container = styled(Box)`
 
 export default function SplashImage () {
   return (
-    <>
-      <Container px={3}>
-        <Grid container>
-          <Grid item xs={12} display={{ xs: 'flex', sm: 'none' }} justifyContent='center' py={3} px={6}>
-            <Box sx={{ maxWidth: 300 }}>
-              <Image src={splashImage} />
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} display='flex' justifyContent='center'>
-            <Box>
-              <Typography sx={{ fontSize: { xs: 30, md: 48 }, fontWeight: 'bold', lineHeight: '1.1em', mt: { xs: 3, md: '140px' }, mb: 3 }}>
-                First Web 3 Native<br />
-                All-in-one Workspace
-              </Typography>
-              <Typography sx={{ fontSize: 20, mb: 6 }}>
-                Tasks, docs, and more
-              </Typography>
-              <PrimaryButton size='large' href={`/charmverse`}>Connect Wallet</PrimaryButton>
-            </Box>
-          </Grid>
-          <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>
-            <Box px={3}>
-              <Image src={splashImage} />
-            </Box>
-          </Grid>
+    <Container px={3}>
+      <Grid container>
+        <Grid
+          item
+          xs={12}
+          display={{ xs: 'flex', sm: 'none' }}
+          justifyContent='center'
+          py={3}
+          px={6}
+        >
+          <Box sx={{ maxWidth: 300 }}>
+            <Image src={splashImage} />
+          </Box>
         </Grid>
-      </Container>
-    </>
+        <Grid item xs={12} sm={6} display='flex' justifyContent='center'>
+          <Box>
+            <Typography
+              sx={{
+                fontSize: { xs: 30, md: 48 },
+                fontWeight: 'bold',
+                lineHeight: '1.1em',
+                mt: { xs: 3, md: '140px' },
+                mb: 3
+              }}
+            >
+              First Web 3 Native
+              {' '}
+              <br />
+              All-in-one Workspace
+            </Typography>
+            <Typography sx={{ fontSize: 20, mb: 6 }}>
+              Tasks, docs, and more
+            </Typography>
+            <PrimaryButton size='large' href='/charmverse'>
+              Connect Wallet
+            </PrimaryButton>
+          </Box>
+        </Grid>
+        <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>
+          <Box px={3}>
+            <Image src={splashImage} />
+          </Box>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }

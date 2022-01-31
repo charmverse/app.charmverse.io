@@ -15,24 +15,26 @@ export default function ContributorSettings () {
 
   setTitle('Contributors');
 
-  return (<>
-    <Legend>
-      Invite Links
-      <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right'}}>Add a link</Button>
-    </Legend>
-    <Typography color='secondary'>No invite links yet</Typography>
+  return (
+    <>
+      <Legend>
+        Invite Links
+        <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right' }}>Add a link</Button>
+      </Legend>
+      <Typography color='secondary'>No invite links yet</Typography>
 
-    <Legend>
-      Token Gates
-      <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right'}}>Add a gate</Button>
-    </Legend>
-    <Typography color='secondary'>No token gates yet</Typography>
+      <Legend>
+        Token Gates
+        <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right' }}>Add a gate</Button>
+      </Legend>
+      <Typography color='secondary'>No token gates yet</Typography>
 
-    <Legend>Current Contributors</Legend>
-    {contributors.map((contributor) => (
-      <ContributorRow key={contributor.username} contributor={contributor} spaceId={space.id} />
-    ))}
-  </>);
+      <Legend>Current Contributors</Legend>
+      {contributors.map(contributor => (
+        <ContributorRow key={contributor.username} contributor={contributor} spaceId={space.id} />
+      ))}
+    </>
+  );
 }
 
 ContributorSettings.getLayout = (page: ReactElement) => {

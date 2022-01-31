@@ -1,11 +1,10 @@
 
 const _fetch = (resource: string, init?: any) => {
-  const api =
-    !resource.startsWith('http') && !resource.startsWith('/api')
-      ? process.env.NEXT_PUBLIC_API
-      : '';
+  const api = !resource.startsWith('http') && !resource.startsWith('/api')
+    ? process.env.NEXT_PUBLIC_API
+    : '';
   return fetch(`${api}${resource}`, init).then(transformResponse);
-}
+};
 
 function transformResponse (response: Response) {
   if (response.status >= 400) {
@@ -22,9 +21,9 @@ function transformResponse (response: Response) {
     return response.json();
   }
   return response.text()
-    .then(response => {
+    .then(_response => {
       // since we expect JSON, dont return the true value for 200 response
-      return response === 'OK' ? null : response;
+      return _response === 'OK' ? null : _response;
     });
 }
 

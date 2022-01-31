@@ -1,5 +1,5 @@
-import styled from "@emotion/styled";
-import { SxProps, Typography } from "@mui/material";
+import styled from '@emotion/styled';
+import { SxProps, Typography } from '@mui/material';
 
 const StyledGroupLabel = styled(Typography)`
   font-size: 12px;
@@ -8,8 +8,10 @@ const StyledGroupLabel = styled(Typography)`
   color: ${({ theme }) => theme.palette.secondary.main}
 `;
 
-export default function GroupLabel({ label, sx }: { label: string, sx?: SxProps }) {
-  return <StyledGroupLabel sx={sx}>
-    {label}
-  </StyledGroupLabel>
+export default function GroupLabel ({ label, sx }: { label: string, sx?: SxProps }) {
+  return (
+    <StyledGroupLabel sx={sx}>
+      {label}
+    </StyledGroupLabel>
+  );
 }

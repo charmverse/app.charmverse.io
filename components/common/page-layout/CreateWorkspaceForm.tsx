@@ -1,4 +1,4 @@
-
+import { ChangeEvent } from 'react';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
@@ -28,13 +28,13 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, touchedFields },
+    formState: { errors, touchedFields }
   } = useForm<FormValues>({
     defaultValues: {
       name: defaultName,
       domain: getDomainFromName(defaultName)
     },
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema)
   });
 
   const watchName = watch('name');
@@ -43,13 +43,14 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
   function onSubmit (values: FormValues) {
     const newId = Math.random().toString().replace('0.', '');
     try {
-      _onSubmit({ id: newId, ...values })
-    } catch (e) {
+      _onSubmit({ id: newId, ...values });
+    }
+    catch (e) {
       console.error(e);
     }
   }
 
-  function onChangeName (event: React.ChangeEvent<HTMLInputElement>) {
+  function onChangeName (event: ChangeEvent<HTMLInputElement>) {
     const name = event.target.value;
     if (!touchedFields.domain) {
       setValue('domain', getDomainFromName(name));
@@ -57,10 +58,10 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
 
   }
 
-  return (<>
+  return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Legend sx={{ marginTop: '0 !important' }}>Create a workspace</Legend>
-      <Grid container direction={'column'} spacing={3}>
+      <Grid container direction='column' spacing={3}>
         <Grid item display='flex' justifyContent='center'>
           <Avatar name={watchName} variant='rounded' />
         </Grid>
@@ -89,7 +90,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
         </Grid>
       </Grid>
     </form>
-  </>);
+  );
 
 }
 
