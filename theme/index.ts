@@ -1,13 +1,14 @@
 import { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
+import { TypeBackground } from '@mui/material/styles/createPalette';
 import { darken } from '@mui/system';
 import {
   backgroundColor,
-  backgroundColorDarkMode, blueColor,
+  backgroundColorDarkMode, backgroundDarkColor, backgroundDarkColorDarkMode, backgroundLightColor,
+  backgroundLightColorDarkMode, blueColor,
   darkBlueColor, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
-  settingsHeaderBackgroundColorDarkMode, sidebarBackgroundColor,
-  sidebarBackgroundColorDarkMode
+  settingsHeaderBackgroundColorDarkMode
 } from './colors';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
@@ -25,8 +26,10 @@ interface CustomColors {
   };
   code: {
     color: string
+    background: string
   }
 }
+
 
 // define custom colors: https://material-ui.com/customization/palette/
 declare module '@mui/material/styles/createPalette' {
@@ -42,6 +45,10 @@ declare module '@mui/material/styles/createPalette' {
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
   }
+  interface TypeBackground {
+    light: string
+    dark: string
+  } 
 }
 
 // Extend color prop on components
@@ -88,7 +95,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) =>
     palette: {
       mode,
       background: {
-        default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor
+        default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor,
+        light: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor,
+        dark: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor,
       },
       text: {
         primary: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor,
@@ -121,10 +130,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) =>
       },
       sidebar: {
         avatarHighlight: mode === 'dark' ? 'rgba(255, 255, 255, .2)' : '#ccc',
-        background: mode === 'dark' ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor,
+        background: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor,
       },
       code: {
-        color: "#EB5757"
+        color: "#EB5757",
+        background: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor,
       }
     },
     components: {

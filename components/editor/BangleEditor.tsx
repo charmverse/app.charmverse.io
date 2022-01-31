@@ -24,14 +24,13 @@ import '@bangle.dev/tooltip/style.css';
 import { styled } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
-import { sidebarBackgroundColor, sidebarBackgroundColorDarkMode } from 'theme/colors';
-import { BlockQuote } from './BlockQuote';
+import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
 const specRegistry = new SpecRegistry([
-  blockquote.spec(),
+  blockQuoteSpec(),
   bold.spec(),
   bulletList.spec(),
   hardBreak.spec(),
@@ -59,7 +58,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   code {
     padding: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
     border-radius: ${({ theme }) => theme.spacing(0.5)};
-    background-color: ${({ theme }) => theme.palette.mode === "dark" ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor};
+    background-color: ${({ theme }) => theme.palette.code.background};
     font-size: 85%;
     color: ${({ theme }) => theme.palette.code.color};
   }
@@ -107,7 +106,7 @@ export default function BangleEditor({ content }: { content: PageContent }) {
   return <StyledReactBangleEditor state={state} renderNodeViews={({ node, children }) => {
     switch (node.type.name) {
       case "blockquote": {
-        return <BlockQuote>
+        return <BlockQuote node={node}>
           {children}
         </BlockQuote>
       }
