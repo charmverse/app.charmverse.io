@@ -1,6 +1,6 @@
 import React, { forwardRef, ReactNode, ComponentProps, useCallback, useMemo, useState, useEffect, Dispatch, SetStateAction, SyntheticEvent } from 'react';
 import styled from '@emotion/styled';
-import { useDrop, useDrag, DragSourceMonitor, DndProvider } from 'react-dnd';
+import { useDrop, useDrag, DndProvider } from 'react-dnd';
 import { useRouter } from 'next/router';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import TreeView from '@mui/lab/TreeView';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import Link from 'next/link';
-import MuiLink from '@mui/material/Link';
+import { greyColor2 } from 'theme/colors';
 import { Page } from 'models';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import EmojiCon from '../Emoji';
@@ -20,6 +20,8 @@ import EmojiCon from '../Emoji';
 export type MenuNode = Page & {
   children: MenuNode[];
 }
+
+const DEFAULT_ICON = '📄';
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   [`& .${treeItemClasses.content}`]: {
@@ -39,14 +41,22 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     [`& .${treeItemClasses.label}`]: {
       fontWeight: 'inherit',
       color: 'inherit'
+    },
+    [`& .${treeItemClasses.iconContainer}:empty`]: {
+      content: '">"'
     }
-    // [`& .${treeItemClasses.iconContainer}`]: {
-    // }
   },
   [`& .${treeItemClasses.group}`]: {
     marginLeft: 0,
     [`& .${treeItemClasses.content}`]: {
       paddingLeft: theme.spacing(3)
+    },
+    // add increasing indentation to children of children
+    [`& .${treeItemClasses.group} .${treeItemClasses.content}`]: {
+      paddingLeft: `calc(${theme.spacing(3)} + 16px)`
+    },
+    [`& .${treeItemClasses.group} .${treeItemClasses.group} .${treeItemClasses.content}`]: {
+      paddingLeft: `calc(${theme.spacing(3)} + 32px)`
     }
   }
 }));
@@ -92,8 +102,8 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
       label={(
         <Link href={href} passHref>
           <StyledTreeItemContent onClick={onClick}>
-            <EmojiCon sx={{ display: 'inline-block', color: 'black', width: 24 }}>
-              {labelIcon || '📄 '}
+            <EmojiCon sx={{ display: 'inline-block', color: 'black', fontSize: 14, width: 24 }}>
+              {labelIcon || DEFAULT_ICON}
             </EmojiCon>
             <StyledLink>
               {label}
@@ -102,6 +112,7 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
         </Link>
       )}
       {...other}
+      TransitionProps={{ timeout: 50 }}
       ref={ref}
     />
   );
@@ -180,7 +191,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix }:
               item={childItem}
             />
           ))
-          : null}
+          : <Typography variant='caption' className='MuiTreeItem-content' sx={{ color: `${greyColor2} !important`, ml: 1 }}>No pages inside</Typography>}
     </StyledTreeItem>
   );
 }
@@ -265,7 +276,7 @@ export default function PageNavigation ({ pages, setPages, pathPrefix }:
   const mappedItems = useMemo(() => mapTree(pages, 'parentId'), [pages]);
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
     setPages(stateNodes => stateNodes.map(stateNode => {
-      if (stateNode.id === droppedItem.id) {
+      if (stateNode.id === droppedItem.id && droppedItem.id !== containerItem.id) {
         return {
           ...stateNode,
           parentId: containerItem.id
@@ -304,6 +315,7 @@ export default function PageNavigation ({ pages, setPages, pathPrefix }:
       <TreeRoot
         setPages={setPages}
         expanded={expanded}
+        // @ts-ignore - we use null instead of undefined to control the element
         selected={selectedNodeId}
         onNodeToggle={onNodeToggle}
         aria-label='items navigator'
