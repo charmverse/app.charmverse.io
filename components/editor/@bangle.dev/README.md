@@ -12,3 +12,5 @@ This folder was created to customize packages under the [@bangle.dev](https://gi
 ## `react-emoji-suggest@0.28.4-alpha.2`
 
 1. `EmojiSuggest` component was copied over to met our design guidelines (using styled components rather than plain css for custom/dynamic theming)
+2. `emoji-suggest`: We needed customize the default behavior in order to trigger emoji-suggest component on clicking the emoji of a callout.
+

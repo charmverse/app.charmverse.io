@@ -1,11 +1,12 @@
 import { blockquote } from '@bangle.dev/base-components';
-import { BaseRawNodeSpec } from '@bangle.dev/core';
-import { Node } from '@bangle.dev/pm';
+import { BaseRawNodeSpec, NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import { ReactNode } from 'react';
+import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
+import { emojiSuggestKey } from './EmojiSuggest';
 
 const StyledBlockQuote = styled.div`
-background-color: ${({ theme }) => theme.palette.background.light};
+  background-color: ${({ theme }) => theme.palette.background.light};
   font-size: 20px;
   padding: ${({ theme }) => theme.spacing(1)};
   margin-top: ${({ theme }) => theme.spacing(1)};
@@ -23,7 +24,7 @@ const BlockQuoteEmoji = styled.div`
   transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
   & span {
-        padding: ${({ theme }) => theme.spacing(0.5)};
+    padding: ${({ theme }) => theme.spacing(0.5)};
     border-radius: ${({ theme }) => theme.spacing(0.5)};
     font-size: 16px;
   }
@@ -36,18 +37,30 @@ const BlockQuoteEmoji = styled.div`
 `;
 
 export function blockQuoteSpec () {
-  const _blockQuoteSpec = blockquote.spec() as BaseRawNodeSpec;
-  _blockQuoteSpec.schema.attrs = {
+  const spec = blockquote.spec() as BaseRawNodeSpec;
+  spec.schema.attrs = {
     emoji: { default: '😃' }
   };
-  return _blockQuoteSpec;
+  return spec;
 }
 
-export function BlockQuote ({ children, node }: { node: Node, children: ReactNode }) {
+export function BlockQuote ({ children, node, updateAttrs, view }: NodeViewProps & { children: ReactNode }) {
   return (
     <StyledBlockQuote>
       <BlockQuoteEmoji>
-        <span>
+        <span
+          tabIndex={0}
+          role='button'
+          onClick={e => {
+            e.stopPropagation();
+            if (view.dispatch!) {
+              const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
+              view.dispatch(
+                view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_CALLOUT', updateAttrs }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
+              );
+            }
+          }}
+        >
           {node.attrs.emoji}
         </span>
       </BlockQuoteEmoji>
