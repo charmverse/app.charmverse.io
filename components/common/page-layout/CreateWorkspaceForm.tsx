@@ -1,16 +1,15 @@
-import { ChangeEvent } from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { useForm } from 'react-hook-form';
 import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import Avatar from 'components/settings/LargeAvatar';
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { Space } from 'models';
-
-import { schema, FormValues } from 'pages/[domain]/settings/workspace';
+import { FormValues, schema } from 'pages/[domain]/settings/workspace';
+import { ChangeEvent } from 'react';
+import { useForm } from 'react-hook-form';
 
 interface Props {
   onCancel: () => void;
@@ -46,6 +45,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
       _onSubmit({ id: newId, ...values });
     }
     catch (e) {
+      // eslint-disable-next-line
       console.error(e);
     }
   }

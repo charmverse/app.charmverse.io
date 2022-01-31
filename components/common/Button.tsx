@@ -1,9 +1,8 @@
-import { ComponentProps, ElementType } from 'react';
+import styled from '@emotion/styled';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import NextLink from 'next/link';
-import Link from '@mui/material/Link';
-import styled from '@emotion/styled';
+import { ComponentProps, ElementType } from 'react';
 
 const StyledButton = styled(Button)`
   white-space: nowrap;
@@ -29,22 +28,22 @@ export type InputProps<C extends ElementType> = ButtonProps
 
 function PimpedButtonWithNextLink<C extends ElementType>
 ({ href, external, children, target, ...props }: InputProps<C>) {
-  return (
-    href
-      ? (external
-        ? <PimpedButton href={href} {...props}>{children}</PimpedButton>
-        : (
-          <NextLink href={href} passHref>
-            {/** use an anchor tag to catch the ref passed down by NextLink.
-             *  see https://github.com/vercel/next.js/issues/7915 */}
-            <a target={target}>
-              <PimpedButton {...props}>{children}</PimpedButton>
-            </a>
-          </NextLink>
-        )
-      )
-      : <PimpedButton {...props}>{children}</PimpedButton>
-  );
+  if (href) {
+    if (external) {
+      return <PimpedButton href={href} {...props}>{children}</PimpedButton>;
+    }
+    return (
+      <NextLink href={href} passHref>
+        {/** use an anchor tag to catch the ref passed down by NextLink.
+       *  see https://github.com/vercel/next.js/issues/7915 */}
+        <a target={target}>
+          <PimpedButton {...props}>{children}</PimpedButton>
+        </a>
+      </NextLink>
+    );
+  }
+
+  return <PimpedButton {...props}>{children}</PimpedButton>;
 }
 
 export function PimpedButton<C extends ElementType> (props: InputProps<C>) {

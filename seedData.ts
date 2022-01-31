@@ -15,8 +15,9 @@ export const contributors: Contributor[] = [
 export const activeUser = contributors[0];
 
 export const pages: Page[] = [
-  { id: '0', icon: '📌', created: new Date(), content: getPageContent(), isPublic: false, path: 'first-page', spaceId: '0', title: 'Getting Started' },
-  { id: '1',
+  { id: '0', icon: '📌', created: new Date(), content: gettingStartedPageContent(), isPublic: false, path: 'first-page', spaceId: '0', title: 'Getting Started' },
+  {
+    id: '1',
     created: new Date(),
     content: {
       type: 'doc',
@@ -36,9 +37,233 @@ export const pages: Page[] = [
     isPublic: false,
     path: 'second-page',
     spaceId: '0',
-    title: 'Nested Page' },
+    title: 'Nested Page'
+  },
   { id: '0', icon: '📌', created: new Date(), content: getPageContent(), isPublic: false, path: 'first-page', spaceId: '1', title: 'Getting Started Again' }
 ];
+
+function gettingStartedPageContent (): PageContent {
+  return {
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: [
+          {
+            type: 'text',
+            text: '👋 Welcome to your workspace!'
+          }
+        ]
+      },
+      {
+        type: 'heading',
+        attrs: {
+          level: 3,
+          collapseContent: null
+        },
+        content: [
+          {
+            type: 'text',
+            text: 'Some basics to get you started'
+          }
+        ]
+      },
+      {
+        type: 'bulletList',
+        attrs: {
+          tight: false
+        },
+        content: [
+          {
+            type: 'listItem',
+            attrs: {
+              todoChecked: false
+            },
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Click anywhere and just start typing'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: 'listItem',
+            attrs: {
+              todoChecked: false
+            },
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Use '
+                  },
+                  {
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'code'
+                      }
+                    ],
+                    text: '/'
+                  },
+                  {
+                    type: 'text',
+                    text: ' to see the different styles and content you can create - bold, italics, tables, task lists, images, videos, etc'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: 'listItem',
+            attrs: {
+              todoChecked: false
+            },
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Use '
+                  },
+                  {
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'code'
+                      }
+                    ],
+                    text: ':'
+                  },
+                  {
+                    type: 'text',
+                    text: ' for inserting emojis. Use '
+                  },
+                  {
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'code'
+                      }
+                    ],
+                    text: '@'
+                  },
+                  {
+                    type: 'text',
+                    text: ' for mentioning people'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: 'listItem',
+            attrs: {
+              todoChecked: false
+            },
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Use '
+                  },
+                  {
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'code'
+                      }
+                    ],
+                    text: '+'
+                  },
+                  {
+                    type: 'text',
+                    text: ' button in the sidebar to add new pages'
+                  }
+                ]
+              }
+            ]
+          }
+
+        ]
+      },
+      {
+        type: 'heading',
+        attrs: {
+          level: 3,
+          collapseContent: null
+        },
+        content: [
+          {
+            type: 'text',
+            text: 'See how it works'
+          }
+        ]
+      },
+      {
+        type: 'blockquote',
+        attrs: {
+          emoji: '👉🏼'
+        },
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                marks: [
+                  {
+                    type: 'bold'
+                  }
+                ],
+                text: 'Questions?'
+              },
+              {
+                type: 'text',
+                text: ' Email us at '
+              },
+              {
+                type: 'text',
+                marks: [
+                  {
+                    type: 'code'
+                  }
+                ],
+                text: 'hello@charmverse.io'
+              },
+              {
+                type: 'text',
+                text: 'or join our community in '
+              },
+              {
+                type: 'text',
+                marks: [
+                  {
+                    type: 'link',
+                    attrs: {
+                      href: 'https://discord.gg/n8VU9pAm'
+                    }
+                  }
+                ],
+                text: 'Discord'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+}
 
 function getPageContent (): PageContent {
   return {

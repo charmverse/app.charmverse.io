@@ -1,58 +1,106 @@
 {
-    "root": true,
-    "env": {
-        "browser": true,
-        "es2021": true,
-        "node": true
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "plugin:react/recommended",
+    "airbnb",
+    "plugin:@next/next/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
     },
-    "extends": [
-        "plugin:react/recommended",
-        "airbnb",
-        "plugin:@next/next/recommended"
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "arrow-body-style": "off",
+    "arrow-parens": [
+      "error",
+      "as-needed"
     ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-    },
-    "plugins": [
-        "react",
-        "@typescript-eslint"
+    "brace-style": [
+      "error",
+      "stroustrup"
     ],
-    "rules": {
-        "arrow-body-style": "off",
-        "arrow-parens": ["error", "as-needed"],
-        "brace-style": ["error", "stroustrup"],
-        "comma-dangle": ["error", "never"],
-        "consistent-return": "off",
-        "import/prefer-default-export": "off",
-        "import/extensions": "off",
-        "import/no-unresolved": "off",
-        "jsx-a11y/anchor-is-valid": "off",
-        "jsx-quotes": ["error", "prefer-single"],
-        "max-len": ["error", { "code": 120, "ignoreComments": true, "ignoreStrings": true, "ignoreTemplateLiterals": true }],
-        "no-alert": "off",
-        "no-bitwise": ["warn"],
-        "no-confusing-arrow": "off",
-        "no-multiple-empty-lines": ["error", { "max": 1 }],
-        "no-nested-ternary": ["warn"],
-        "no-param-reassign": "off",
-        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
-        "no-restricted-syntax": "off",
-        "no-underscore-dangle": "off",
-        "no-unused-vars": "off",
-        "no-use-before-define": ["error", { "functions": false }],
-        "object-curly-newline": "off",
-        "padded-blocks": "off",
-        "prefer-promise-reject-errors": "off",
-        "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".jsx"] }],
-        "react/jsx-no-bind": "off",
-        "react/jsx-props-no-spreading": "off",
-        "react/require-default-props": "off",
-        "react/react-in-jsx-scope": "off",
-        "space-before-function-paren": ["error", "always"]
-    }
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
+    "consistent-return": "off",
+    "import/prefer-default-export": "off",
+    "import/extensions": "off",
+    "import/no-unresolved": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "jsx-quotes": [
+      "error",
+      "prefer-single"
+    ],
+    "max-len": [
+      "error",
+      {
+        "code": 120,
+        "ignoreComments": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "no-alert": "off",
+    "no-confusing-arrow": "off",
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1
+      }
+    ],
+    "no-nested-ternary": [
+      "warn"
+    ],
+    "no-param-reassign": "off",
+    "no-plusplus": [
+      "error",
+      {
+        "allowForLoopAfterthoughts": true
+      }
+    ],
+    "no-restricted-syntax": "off",
+    "no-underscore-dangle": "off",
+    "no-unused-vars": "off",
+    "no-use-before-define": [
+      "error",
+      {
+        "functions": false
+      }
+    ],
+    "object-curly-newline": "off",
+    "padded-blocks": "off",
+    "prefer-promise-reject-errors": "off",
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          ".tsx",
+          ".jsx"
+        ]
+      }
+    ],
+    "react/jsx-no-bind": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/require-default-props": "off",
+    "react/react-in-jsx-scope": "off",
+    "space-before-function-paren": [
+      "error",
+      "always"
+    ],
+    "no-bitwise": "off"
+  }
 }
