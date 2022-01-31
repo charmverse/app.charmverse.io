@@ -21,6 +21,7 @@ import { columnResizing, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.dev/table";
 import '@bangle.dev/tooltip/style.css';
+import { styled } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
@@ -52,6 +53,16 @@ const specRegistry = new SpecRegistry([
   tableHeader,
   tableRow
 ]);
+
+const StyledReactBangleEditor = styled(ReactBangleEditor)`
+  code {
+    padding: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
+    border-radius: ${({ theme }) => theme.spacing(0.5)};
+    background-color: ${({ theme }) => theme.palette.code.background};
+    font-size: 85%;
+    color: ${({ theme }) => theme.palette.code.color};
+  }
+`
 
 export default function BangleEditor({ content }: { content: PageContent }) {
   const state = useEditorState({
@@ -92,7 +103,7 @@ export default function BangleEditor({ content }: { content: PageContent }) {
     initialValue: Node.fromJSON(specRegistry.schema, content),
   });
 
-  return <ReactBangleEditor state={state} renderNodeViews={({ node, children }) => {
+  return <StyledReactBangleEditor state={state} renderNodeViews={({ node, children }) => {
     switch (node.type.name) {
       case "blockquote": {
         return <BlockQuote node={node}>
@@ -109,5 +120,5 @@ export default function BangleEditor({ content }: { content: PageContent }) {
     <FloatingMenu />
     {EmojiSuggest}
     {InlinePalette}
-  </ReactBangleEditor>
+  </StyledReactBangleEditor>
 }
