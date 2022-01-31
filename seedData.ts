@@ -15,7 +15,7 @@ export const contributors: Contributor[] = [
 export const activeUser = contributors[0];
 
 export const pages: Page[] = [
-  { id: '0', icon: '📌', created: new Date(), content: gettingStartedPageContent(), isPublic: false, path: 'first-page', spaceId: '0', title: 'Getting Started' },
+  { id: '0', icon: '📌', created: new Date(), content: gettingStartedPageContent(), isPublic: false, path: 'first-page', spaceId: '0', title: 'Getting Started', parentId: null },
   {
     id: '1',
     created: new Date(),
@@ -33,13 +33,39 @@ export const pages: Page[] = [
         }
       ]
     },
-    parentPageId: '0',
+    parentId: '0',
     isPublic: false,
     path: 'second-page',
     spaceId: '0',
     title: 'Nested Page'
   },
-  { id: '0', icon: '📌', created: new Date(), content: getPageContent(), isPublic: false, path: 'first-page', spaceId: '1', title: 'Getting Started Again' }
+  {
+    id: '2',
+    created: new Date(),
+    content: {
+      type: 'doc',
+      content: []
+    },
+    isPublic: false,
+    parentId: null,
+    path: 'third-page',
+    spaceId: '0',
+    title: 'Another Top-level Page'
+  },
+  {
+    id: '3',
+    created: new Date(),
+    content: {
+      type: 'doc',
+      content: []
+    },
+    isPublic: false,
+    parentId: null,
+    path: 'fourth-page',
+    spaceId: '0',
+    title: 'Fourth page'
+  },
+  { id: '4', icon: '📌', created: new Date(), content: getPageContent(), isPublic: false, path: 'fifth-page', spaceId: '1', title: 'Getting Started Again', parentId: null }
 ];
 
 function gettingStartedPageContent (): PageContent {

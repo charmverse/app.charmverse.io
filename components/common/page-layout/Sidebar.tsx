@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ComponentProps, useState } from 'react';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -24,6 +24,7 @@ import { useUser } from 'hooks/useUser';
 import { shortenedWeb3Address } from 'lib/strings';
 import { Contributor, Page, Space } from 'models';
 import { pages as seedPages } from 'seedData';
+import { greyColor2 } from 'theme/colors';
 import Header from './Header';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import Link from '../Link';
@@ -31,6 +32,8 @@ import Avatar from '../Avatar';
 import EmojiCon from '../Emoji';
 import ModalContainer from '../ModalContainer';
 import CreateWorkspaceForm from './CreateWorkspaceForm';
+
+import PageNavigation, { MenuNode } from './PageNavigation';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -53,11 +56,9 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [user] = useUser();
   const [space] = useSpace();
   const [spaces, setSpaces] = useSpaces();
-  const [pages] = usePages();
+  const [pages, setPages] = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  const favoritePages = favorites
-    .map(fav => pages.find(page => page.id === fav.pageId))
-    .filter(isTruthy);
+  const favoritePageIds = favorites.map(f => f.pageId);
 
   function showSpaceForm () {
     setSpaceFormOpen(true);
@@ -92,10 +93,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             <Grid item key={workspace.domain}>
               <AvatarLink href={`/${workspace.domain}`} passHref>
                 <MuiLink>
-                  <WorkspaceAvatar
-                    active={space.domain === workspace.domain}
-                    name={workspace.name}
-                  />
+                  <WorkspaceAvatar active={space.domain === workspace.domain} name={workspace.name} />
                 </MuiLink>
               </AvatarLink>
             </Grid>
@@ -114,74 +112,49 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       </WorkspacesContainer>
       <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
         <Box sx={{ flexGrow: 1 }}>
-          <Header>
-            <Typography><strong>{space.name}</strong></Typography>
-            <IconButton onClick={closeSidebar}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </Header>
-          <Divider sx={{ mb: 3 }} />
-          {/* <Box>
-          <List>
-            <NextLink href='' passHref>
-              <ListItem button component='a' disableRipple
-                sx={{ py: 1, color: greyColor + ' !important' }}>
-                <ListItemText disableTypography>
-                    <Box sx={{ fontSize: 14, fontWeight: 500 }}>Settings</Box>
-                </ListItemText>
-              </ListItem>
-            </NextLink>
-          </List>
-        </Box> */}
-          {favoritePages.length > 0 && (
-          <>
-            <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-              FAVORITES
-            </Typography>
+          <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
+            <Header>
+              <Typography><strong>{space.name}</strong></Typography>
+              <IconButton onClick={closeSidebar}>
+                <ChevronLeftIcon />
+              </IconButton>
+            </Header>
+            <Divider sx={{ mb: 3 }} />
+            {/* <Box>
             <List>
-              {favoritePages.map(page => (
-                <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
-                  <ListItem button component='a' disableRipple sx={{ py: 0 }}>
-                    <ListItemText disableTypography>
-                      <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
-                        <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon>
-                        {' '}
-                        {page.title}
-                      </Box>
-                    </ListItemText>
-                  </ListItem>
-                </NextLink>
-              ))}
-            </List>
-          </>
-          )}
-          <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-            WORKSPACE
-          </Typography>
-          <List>
-            {pages.map(page => (
-              <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
-                <ListItem button component='a' disableRipple sx={{ py: 0 }}>
+              <NextLink href='' passHref>
+                <ListItem button component='a' disableRipple
+                  sx={{ py: 1, color: greyColor + ' !important' }}>
                   <ListItemText disableTypography>
-                    <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
-                      <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon>
-                      {' '}
-                      {page.title}
-                    </Box>
+                      <Box sx={{ fontSize: 14, fontWeight: 500 }}>Settings</Box>
                   </ListItemText>
                 </ListItem>
               </NextLink>
-            ))}
-          </List>
-          {/* <List>
-          {['WORKSPACE', 'PRIVATE'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemText disableTypography>
-                <Typography variant='caption'>{text}</Typography>
-              </ListItemText>
-            </ListItem>
-          ))}
-        </List> */}
+            </List>
+          </Box> */}
+            {favoritePageIds.length > 0 && (
+              <Box mb={2}>
+                <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+                  FAVORITES
+                </Typography>
+                <PageNavigation
+                  isFavorites={true}
+                  pages={pages}
+                  pathPrefix={`/${space.domain}`}
+                  rootPageIds={favoritePageIds}
+                  setPages={setPages}
+                />
+              </Box>
+            )}
+            <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+              WORKSPACE
+            </Typography>
+            <PageNavigation
+              pages={pages}
+              pathPrefix={`/${space.domain}`}
+              setPages={setPages}
+            />
+          </Box>
         </Box>
         <Box>
           <Divider />

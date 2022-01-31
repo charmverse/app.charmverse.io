@@ -33,7 +33,7 @@ export interface Page {
   icon?: string;
   isPublic: boolean;
   path: string;
-  parentPageId?: string;
+  parentId: string | null;
   spaceId: string;
   updated?: Date;
 }

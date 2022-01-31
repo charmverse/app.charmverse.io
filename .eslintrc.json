@@ -24,10 +24,7 @@
   ],
   "rules": {
     "arrow-body-style": "off",
-    "arrow-parens": [
-      "error",
-      "as-needed"
-    ],
+    "arrow-parens": "off",
     "brace-style": [
       "error",
       "stroustrup"
@@ -56,16 +53,16 @@
     ],
     "no-alert": "off",
     "no-confusing-arrow": "off",
+    "no-else-return": "off",
     "no-multiple-empty-lines": [
       "error",
       {
         "max": 1
       }
     ],
-    "no-nested-ternary": [
-      "warn"
-    ],
+    "no-nested-ternary": "off",
     "no-param-reassign": "off",
+    "no-prototype-builtins": "off",
     "no-plusplus": [
       "error",
       {
@@ -84,6 +81,7 @@
     "object-curly-newline": "off",
     "padded-blocks": "off",
     "prefer-promise-reject-errors": "off",
+    "react/jsx-boolean-value": "off",
     "react/jsx-filename-extension": [
       1,
       {
