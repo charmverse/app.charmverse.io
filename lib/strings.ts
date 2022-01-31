@@ -35,6 +35,7 @@ export function getDomain (url: string, includeProtocol?: boolean) {
 export function stringToColor (name: string, saturation = 50, lightness = 60) {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
+    // eslint-disable-next-line
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
 

@@ -101,6 +101,7 @@
       "error",
       "always"
     ],
-    "no-bitwise": "off"
+    "no-bitwise": "warn",
+    "jsx-a11y/click-events-have-key-events": "off"
   }
 }
