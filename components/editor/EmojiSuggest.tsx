@@ -1,6 +1,7 @@
 import { PluginKey } from '@bangle.dev/core';
 import { emoji } from '@bangle.dev/emoji';
-import { EmojiSuggest as BangleEmojiSuggest, emojiSuggest } from '@bangle.dev/react-emoji-suggest';
+import { emojiSuggest } from '@bangle.dev/react-emoji-suggest';
+import { EmojiSuggest } from 'components/editor/@bangle.dev/react-emoji-suggest/EmojiSuggest';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 
 const emojiSuggestKey = new PluginKey('emojiSuggestKey');
@@ -13,26 +14,25 @@ const emojiData = Object.values(
     prev[obj.category].emojis.push([obj.aliases[0], obj.emoji]);
 
     return prev;
-  }, {} as Record<string, { name: string, emojis: [string, string][] }>),
+  }, {} as Record<string, { name: string, emojis: [string, string][] }>)
 );
 
-const getEmojiByAlias = (emojiAlias: string) => {
+function getEmojiByAlias (emojiAlias: string) {
   for (const { emojis } of emojiData) {
-    const match = emojis.find((e) => e[0] === emojiAlias);
+    const match = emojis.find(e => e[0] === emojiAlias);
     if (match) {
       return match;
     }
   }
-};
+}
 
 export const emojiSpecs = () => {
   return [
     emoji.spec({
-      getEmoji: (emojiAlias) =>
-        (getEmojiByAlias(emojiAlias) || ['question', '❓'])[1],
+      getEmoji: emojiAlias => (getEmojiByAlias(emojiAlias) || ['question', '❓'])[1]
     }),
-    emojiSuggest.spec({ markName: 'emojiSuggest' }),
-  ]
+    emojiSuggest.spec({ markName: 'emojiSuggest' })
+  ];
 };
 
 export const emojiPlugins = () => {
@@ -40,27 +40,26 @@ export const emojiPlugins = () => {
     emoji.plugins(),
     emojiSuggest.plugins({
       key: emojiSuggestKey,
-      getEmojiGroups: (queryText) => {
+      getEmojiGroups: queryText => {
         if (!queryText) {
           return emojiData;
         }
         return emojiData
-          .map((group) => {
+          .map(group => {
             return {
               name: group.name,
-              emojis: group.emojis.filter(([emojiAlias]) =>
-                emojiAlias.includes(queryText),
-              ),
+              emojis: group.emojis.filter(([emojiAlias]) => emojiAlias.includes(queryText))
             };
           })
-          .filter((group) => group.emojis.length > 0);
+          .filter(group => group.emojis.length > 0);
       },
       markName: 'emojiSuggest',
       tooltipRenderOpts: {
-        placement: 'bottom',
+        placement: 'bottom'
       },
+      squareSide: 35
     })
-  ]
-}
+  ];
+};
 
-export default <BangleEmojiSuggest emojiSuggestKey={emojiSuggestKey} />;
+export default <EmojiSuggest emojiSuggestKey={emojiSuggestKey} />;

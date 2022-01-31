@@ -1,10 +1,11 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { List, ListItem, Typography } from '@mui/material';
+import { Box, List, ListItem } from '@mui/material';
+import GroupLabel from 'components/editor/GroupLabel';
+import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
-import { scrollBarThumbBackgroundColor, scrollBarThumbBackgroundColorDarkMode, scrollBarTrackBackgroundColor, scrollBarTrackBackgroundColorDarkMode, sidebarBackgroundColor, sidebarBackgroundColorDarkMode } from 'theme/colors';
 import {
   useInlinePaletteItems,
   useInlinePaletteQuery
@@ -64,26 +65,16 @@ function getItemsAndHints(
   return { items };
 }
 
-const InlinePaletteWrapper = styled.div`
+const InlinePaletteWrapper = styled(Box)`
   display: flex;
   flex-direction: column;
-  background-color: ${({ theme }) => theme.palette.mode === "dark" ? sidebarBackgroundColorDarkMode : sidebarBackgroundColor};
+  background-color: ${({ theme }) => theme.palette.background.light};
   max-height: 350px;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   overflow-y: auto;
   width: 100%;
   padding: ${({ theme }) => theme.spacing(1.5)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  &::-webkit-scrollbar {
-    width: 10px;
-    border: 1px solid black;
-  };
-  &::-webkit-scrollbar-track {
-    background-color: ${({ theme }) => theme.palette.mode === "dark" ? scrollBarTrackBackgroundColorDarkMode : scrollBarTrackBackgroundColor};
-  };
-  &::-webkit-scrollbar-thumb {
-    background-color: ${({ theme }) => theme.palette.mode === "dark" ? scrollBarThumbBackgroundColorDarkMode : scrollBarThumbBackgroundColor};
-  };
 `;
 
 const InlinePaletteGroup = styled.div`
@@ -91,18 +82,11 @@ const InlinePaletteGroup = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
-const InlinePaletteGroupName = styled(Typography)`
-  font-size: 12px;
-  text-transform: uppercase;
-  font-weight: 600;
-  color: #777
-`;
-
 export function InlineCommandPalette() {
   const { query, counter, isVisible, tooltipContentDOM } =
     useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
-
+  const scrollbarStyling = useScrollbarStyling();
   const editorItems = useEditorItems();
   const isItemDisabled = useCallback(
     (item) => {
@@ -166,12 +150,10 @@ export function InlineCommandPalette() {
   })
 
   return reactDOM.createPortal(
-    <InlinePaletteWrapper>
+    <InlinePaletteWrapper sx={scrollbarStyling}>
       {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
         <InlinePaletteGroup key={group}>
-          <InlinePaletteGroupName>
-            {group}
-          </InlinePaletteGroupName>
+          <GroupLabel label={group} />
           <List sx={{
             paddingTop: 0.5,
             paddingBottom: 0.5,

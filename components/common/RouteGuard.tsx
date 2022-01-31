@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-//import { useUser } from '@auth0/nextjs-auth0';
+// import { useUser } from '@auth0/nextjs-auth0';
 
 const publicPaths = ['/login', '/signup', '/'];
 
-export default function RouteGuard ({ children }: { children: JSX.Element }) {
+export default function RouteGuard ({ children }: { children: ReactNode }) {
   const user = null;
   const router = useRouter();
   const isLoading = !router.isReady;
@@ -23,13 +23,14 @@ export default function RouteGuard ({ children }: { children: JSX.Element }) {
     router.events.on('routeChangeStart', hideContent);
 
     // on route change complete - run auth check
-    router.events.on('routeChangeComplete', authCheck)
+    router.events.on('routeChangeComplete', authCheck);
 
     // unsubscribe from events in useEffect return function
+    // eslint-disable-next-line consistent-return
     return () => {
       router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheck);
-    }
+    };
   }, [isLoading]);
 
   function authCheck (url: string) {
@@ -48,7 +49,7 @@ export default function RouteGuard ({ children }: { children: JSX.Element }) {
   }
 
   if (isLoading) {
-    return <></>;
+    return null;
   }
-  return authorized ? children : null;
+  return <span>{authorized ? children : null}</span>;
 }

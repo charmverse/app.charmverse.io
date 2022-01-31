@@ -15,19 +15,19 @@ import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import Avatar from '../Avatar';
-import Link from '../Link';
-import WorkspaceAvatar from '../WorkspaceAvatar';
-import Header from './Header';
 import { isTruthy } from 'lib/types';
-import { useUser } from 'hooks/useUser';
+import { getKey } from 'hooks/useLocalStorage';
+import { usePages } from 'hooks/usePages';
 import { useSpace } from 'hooks/useSpace';
 import { useSpaces } from 'hooks/useSpaces';
-import { usePages } from 'hooks/usePages';
-import { pages as seedPages } from 'seedData';
-import { Contributor, Page, Space } from 'models';
-import { getKey } from 'hooks/useLocalStorage';
+import { useUser } from 'hooks/useUser';
 import { shortenedWeb3Address } from 'lib/strings';
+import { Contributor, Page, Space } from 'models';
+import { pages as seedPages } from 'seedData';
+import Header from './Header';
+import WorkspaceAvatar from '../WorkspaceAvatar';
+import Link from '../Link';
+import Avatar from '../Avatar';
 import EmojiCon from '../Emoji';
 import ModalContainer from '../ModalContainer';
 import CreateWorkspaceForm from './CreateWorkspaceForm';
@@ -48,15 +48,16 @@ interface SidebarProps {
   favorites: Contributor['favorites'];
 }
 
-export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
-
+export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
   const [user] = useUser();
   const [space] = useSpace();
   const [spaces, setSpaces] = useSpaces();
   const [pages] = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  const favoritePages = favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
+  const favoritePages = favorites
+    .map(fav => pages.find(page => page.id === fav.pageId))
+    .filter(isTruthy);
 
   function showSpaceForm () {
     setSpaceFormOpen(true);
@@ -66,58 +67,63 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
     setSpaceFormOpen(false);
   }
 
-  function addSpace (space: Space) {
-    if (spaces.some(s => s.id === space.id)) {
-      throw new Error('Space with that id already exists: ' + space.id);
+  function addSpace (newSpace: Space) {
+    if (spaces.some(s => s.id === newSpace.id)) {
+      throw new Error(`Space with that id already exists: ${newSpace.id}`);
     }
-    if (spaces.some(s => s.domain === space.domain)) {
+    if (spaces.some(s => s.domain === newSpace.domain)) {
       throw new Error('Space with that domain already exists');
     }
-    setSpaces([...spaces, space]);
+    setSpaces([...spaces, newSpace]);
 
     // add a first page - note that usePages is for the current space, so we can't use setPages here
-    const firstPage: Page = { ...seedPages[0], id: Math.random().toString().replace('0.', ''), spaceId: space.id };
-    const key = getKey(`spaces.${space.id}.pages`);
+    const firstPage: Page = { ...seedPages[0], id: Math.random().toString().replace('0.', ''), spaceId: newSpace.id };
+    const key = getKey(`spaces.${newSpace.id}.pages`);
     localStorage.setItem(key, JSON.stringify([firstPage]));
 
-    router.push(`/${space.domain}`);
+    router.push(`/${newSpace.domain}`);
   }
 
-  return (<Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
-    <WorkspacesContainer>
-      <Grid container spacing={2} flexDirection='column'>
-        {spaces.map(workspace => (
-          <Grid item key={workspace.domain}>
-            <AvatarLink href={`/${workspace.domain}`} passHref>
-              <MuiLink>
-                <WorkspaceAvatar active={space.domain === workspace.domain} name={workspace.name} />
-              </MuiLink>
-            </AvatarLink>
+  return (
+    <Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
+      <WorkspacesContainer>
+        <Grid container spacing={2} flexDirection='column'>
+          {spaces.map(workspace => (
+            <Grid item key={workspace.domain}>
+              <AvatarLink href={`/${workspace.domain}`} passHref>
+                <MuiLink>
+                  <WorkspaceAvatar
+                    active={space.domain === workspace.domain}
+                    name={workspace.name}
+                  />
+                </MuiLink>
+              </AvatarLink>
+            </Grid>
+          ))}
+          <Grid item>
+            <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
           </Grid>
-        ))}
-        <Grid item>
-          <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
         </Grid>
-      </Grid>
-      <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-        <ModalContainer onClose={closeSpaceForm}>
-          <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
-        </ModalContainer>
-      </Modal>
-    </WorkspacesContainer>
-    <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
-      <Box sx={{ flexGrow: 1 }}>
-        <Header>
-          <Typography><strong>{space.name}</strong></Typography>
-          <IconButton onClick={closeSidebar}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </Header>
-        <Divider sx={{ mb: 3 }} />
-        {/* <Box>
+        <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
+          <ModalContainer onClose={closeSpaceForm}>
+            <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
+          </ModalContainer>
+        </Modal>
+      </WorkspacesContainer>
+      <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1 }}>
+          <Header>
+            <Typography><strong>{space.name}</strong></Typography>
+            <IconButton onClick={closeSidebar}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </Header>
+          <Divider sx={{ mb: 3 }} />
+          {/* <Box>
           <List>
             <NextLink href='' passHref>
-              <ListItem button component='a' disableRipple sx={{ py: 1, color: greyColor + ' !important' }}>
+              <ListItem button component='a' disableRipple
+                sx={{ py: 1, color: greyColor + ' !important' }}>
                 <ListItemText disableTypography>
                     <Box sx={{ fontSize: 14, fontWeight: 500 }}>Settings</Box>
                 </ListItemText>
@@ -125,41 +131,47 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
             </NextLink>
           </List>
         </Box> */}
-        {favoritePages.length > 0 && <>
+          {favoritePages.length > 0 && (
+          <>
+            <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+              FAVORITES
+            </Typography>
+            <List>
+              {favoritePages.map(page => (
+                <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
+                  <ListItem button component='a' disableRipple sx={{ py: 0 }}>
+                    <ListItemText disableTypography>
+                      <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
+                        <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon>
+                        {' '}
+                        {page.title}
+                      </Box>
+                    </ListItemText>
+                  </ListItem>
+                </NextLink>
+              ))}
+            </List>
+          </>
+          )}
           <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-            FAVORITES
+            WORKSPACE
           </Typography>
           <List>
-            {favoritePages.map(page => (
+            {pages.map(page => (
               <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
                 <ListItem button component='a' disableRipple sx={{ py: 0 }}>
                   <ListItemText disableTypography>
                     <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
-                      <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon> {page.title}
+                      <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon>
+                      {' '}
+                      {page.title}
                     </Box>
                   </ListItemText>
                 </ListItem>
               </NextLink>
             ))}
           </List>
-        </>}
-        <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-          WORKSPACE
-        </Typography>
-        <List>
-          {pages.map(page => (
-            <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
-              <ListItem button component='a' disableRipple sx={{ py: 0 }}>
-                <ListItemText disableTypography>
-                  <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
-                    <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon> {page.title}
-                  </Box>
-                </ListItemText>
-              </ListItem>
-            </NextLink>
-          ))}
-        </List>
-        {/* <List>
+          {/* <List>
           {['WORKSPACE', 'PRIVATE'].map((text, index) => (
             <ListItem button key={text}>
               <ListItemText disableTypography>
@@ -168,26 +180,30 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
             </ListItem>
           ))}
         </List> */}
-      </Box>
-      <Box>
-        <Divider />
-        <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
-          {user && <Box display='flex' alignItems='center'>
-            <Avatar name={user.username} />
-            <Box pl={1}>
-              <Typography variant='caption' sx={{ display: 'block' }}>
-                <strong>{user.username}</strong><br />
-                {shortenedWeb3Address(user.address)}
-              </Typography>
+        </Box>
+        <Box>
+          <Divider />
+          <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
+            {user && (
+            <Box display='flex' alignItems='center'>
+              <Avatar name={user.username} />
+              <Box pl={1}>
+                <Typography variant='caption' sx={{ display: 'block' }}>
+                  <strong>{user.username}</strong>
+                  <br />
+                  {shortenedWeb3Address(user.address)}
+                </Typography>
+              </Box>
             </Box>
-          </Box>}
-          <Link href={`/${space.domain}/settings/account`}>
-            <IconButton>
-              <SettingsIcon color='secondary' />
-            </IconButton>
-          </Link>
+            )}
+            <Link href={`/${space.domain}/settings/account`}>
+              <IconButton>
+                <SettingsIcon color='secondary' />
+              </IconButton>
+            </Link>
+          </Box>
         </Box>
       </Box>
     </Box>
-  </Box>);
+  );
 }

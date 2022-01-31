@@ -12,8 +12,8 @@ const AppBar = styled.div(({ theme }) => ({
     opacity: 0,
     transition: theme.transitions.create('opacity', {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
+      duration: theme.transitions.duration.enteringScreen
+    })
   },
   '&:hover .MuiIconButton-root': {
     opacity: 1
@@ -21,6 +21,5 @@ const AppBar = styled.div(({ theme }) => ({
   // necessary for content to be below app bar
   minHeight: toolbarHeight
 }));
-
 
 export default AppBar;

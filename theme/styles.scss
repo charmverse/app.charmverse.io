@@ -5,29 +5,6 @@ body > div:first-child,
 div#__next,
 div#__next > div {
   height: 100%;
-  font-size: 14px;
-}
-
-.bangle-emoji-suggest {
-  height: 400px;
-  overflow: auto;
-  width: fit-content;
-  background: white;
-}
-
-.bangle-emoji-square {
-  background: white;
-  border: none;
-  font-size: 20px !important;
-  padding: 0px !important;
-}
-
-.bangle-emoji-square:hover {
-  cursor: pointer;
-}
-
-.bangle-emoji-square.bangle-is-selected {
-  background: rgb(223, 223, 223);
 }
 
 .bangle-heading-collapsed {
@@ -57,7 +34,6 @@ div#__next > div {
 :root {
   --window-tooltip-zIndex: 5;
   --inlineUniversalPalette-height: 400px;
-  --accent-secondary: rgb(241, 241, 241);
 }
 
 .bangle-editor a {

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import styled from '@emotion/styled';
 
@@ -14,25 +14,27 @@ export const LoadingCard = styled.div<{ height?: CSSValue, minHeight?: CSSValue 
   display: flex;
   justify-content: center;
   height: 100%;
-  min-height: ${props => (props.hasOwnProperty('minHeight') && props.minHeight) ? `min-height: ${props.minHeight}px;` : 'inherit'};
+  min-height: ${props => ('minHeight' in props && props.minHeight) ? `min-height: ${props.minHeight}px;` : 'inherit'};
   ${props => props.height && `min-height: ${props.height}`};
 `;
 
 interface LoadingProps {
-  component?: JSX.Element;
+  component?: ReactNode;
   height?: CSSValue;
   label?: string;
   minHeight?: CSSValue;
   isLoading: boolean;
   size?: number;
+  children: React.ReactNode;
 }
 
-const LoadingComponent: React.FC<LoadingProps> = ({ height, isLoading, component, label, children, minHeight, size = 40 }) => {
-  if (!isLoading) return component ? component : <>{children}</>;
-  return <LoadingCard height={height} minHeight={minHeight}>
-    <LoadingIcon style={{ height: size, width: size }} />
-    {label ? <span style={{ color: '#aaa', paddingLeft: 8 }}>{label}</span> : null}
-  </LoadingCard>;
-};
-
-export default LoadingComponent;
+export default function LoadingComponent ({
+  height, isLoading, component, label, children, minHeight, size = 40 }: LoadingProps) {
+  if (!isLoading) return component || <span>{children}</span>;
+  return (
+    <LoadingCard height={height} minHeight={minHeight}>
+      <LoadingIcon style={{ height: size, width: size }} />
+      {label ? <span style={{ color: '#aaa', paddingLeft: 8 }}>{label}</span> : null}
+    </LoadingCard>
+  );
+}
