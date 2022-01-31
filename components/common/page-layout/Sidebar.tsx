@@ -16,8 +16,6 @@ import Typography from '@mui/material/Typography';
 import TreeView from '@mui/lab/TreeView';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import NextLink from 'next/link';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useRouter } from 'next/router';
 import { isTruthy } from 'lib/types';
 import { getKey } from 'hooks/useLocalStorage';
@@ -36,9 +34,7 @@ import EmojiCon from '../Emoji';
 import ModalContainer from '../ModalContainer';
 import CreateWorkspaceForm from './CreateWorkspaceForm';
 
-type MenuNode = Page & {
-  children: MenuNode[];
-}
+import PageNavigation, { MenuNode } from './PageNavigation';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -61,7 +57,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [user] = useUser();
   const [space] = useSpace();
   const [spaces, setSpaces] = useSpaces();
-  const [pages] = usePages();
+  const [pages, setPages] = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const favoritePages = favorites
     .map(fav => pages.find(page => page.id === fav.pageId))
@@ -92,31 +88,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     router.push(`/${newSpace.domain}`);
   }
 
-  // find children
-  const noParent = 'NO_PARENT';
-  const grouped = pages.reduce<{ [pid: string | typeof noParent]: MenuNode[] }>((acc, page: any) => {
-    const pid = page.parentPageId || noParent;
-    acc[pid] ||= [];
-    acc[pid].push({
-      children: [],
-      ...page
-    });
-    return acc;
-  }, {});
-  console.log('grouped', grouped);
-  // add children
-  for (const pid in grouped) {
-    if (grouped.hasOwnProperty(pid)) {
-      grouped[pid].forEach(page => {
-        if (grouped[page.id]) {
-          page.children = grouped[page.id];
-        }
-      });
-    }
-  }
-  // top pages don't have a parent
-  const menuNodes = grouped[noParent] || [];
-  console.log('menu nodes', menuNodes);
   return (
     <Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
       <WorkspacesContainer>
@@ -188,24 +159,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
             WORKSPACE
           </Typography>
-          <TreeView
-            defaultCollapseIcon={<ExpandMoreIcon />}
-            defaultExpandIcon={<ChevronRightIcon />}
-            sx={{ height: 240, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-          >
-            {menuNodes.map(node => (
-              <StyledTreeItem
-                key={node.id}
-                labelIcon={node.icon}
-                nodeId={node.id}
-                label={node.title}
-              >
-                {node.children.map(childNode => (
-                  <StyledTreeItem nodeId={childNode.id} labelIcon={childNode.icon} label={childNode.title} />
-                ))}
-              </StyledTreeItem>
-            ))}
-          </TreeView>
+          <PageNavigation pages={pages} setPages={setPages} />
           {/* <List>
             {pages.map(page => (
               <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
@@ -221,15 +175,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               </NextLink>
             ))}
           </List> */}
-          {/* <List>
-          {['WORKSPACE', 'PRIVATE'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemText disableTypography>
-                <Typography variant='caption'>{text}</Typography>
-              </ListItemText>
-            </ListItem>
-          ))}
-        </List> */}
         </Box>
         <Box>
           <Divider />
@@ -255,69 +200,5 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         </Box>
       </Box>
     </Box>
-  );
-}
-
-const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
-  color: theme.palette.text.secondary,
-  [`& .${treeItemClasses.content}`]: {
-    color: theme.palette.text.secondary,
-    borderTopRightRadius: theme.spacing(2),
-    borderBottomRightRadius: theme.spacing(2),
-    paddingRight: theme.spacing(1),
-    fontWeight: theme.typography.fontWeightMedium,
-    '&.Mui-expanded': {
-      fontWeight: theme.typography.fontWeightRegular
-    },
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover
-    },
-    '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
-      backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
-      color: 'var(--tree-view-color)'
-    },
-    [`& .${treeItemClasses.label}`]: {
-      fontWeight: 'inherit',
-      color: 'inherit'
-    }
-  },
-  [`& .${treeItemClasses.group}`]: {
-    marginLeft: 0,
-    [`& .${treeItemClasses.content}`]: {
-      paddingLeft: theme.spacing(2)
-    }
-  }
-}));
-
-type TreeItemProps = ComponentProps<typeof TreeItem> & {
-  labelIcon?: string;
-}
-
-function StyledTreeItem (props: TreeItemProps) {
-  const {
-    color,
-    labelIcon,
-    label,
-    ...other
-  } = props;
-
-  return (
-    <StyledTreeItemRoot
-      label={(
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
-          <EmojiCon sx={{ display: 'inline-block', width: 20 }}>
-            {labelIcon || '📄 '}
-          </EmojiCon>
-          <Typography variant='body2' sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
-            {label}
-          </Typography>
-        </Box>
-      )}
-      // style={{
-      //   '--tree-view-color': color,
-      //   //'--tree-view-bg-color': bgColor,
-      // }}
-      {...other}
-    />
   );
 }
