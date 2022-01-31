@@ -115,32 +115,54 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       </WorkspacesContainer>
       <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
         <Box sx={{ flexGrow: 1 }}>
-          <Header>
-            <Typography><strong>{space.name}</strong></Typography>
-            <IconButton onClick={closeSidebar}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </Header>
-          <Divider sx={{ mb: 3 }} />
-          {/* <Box>
-          <List>
-            <NextLink href='' passHref>
-              <ListItem button component='a' disableRipple
-                sx={{ py: 1, color: greyColor + ' !important' }}>
-                <ListItemText disableTypography>
-                    <Box sx={{ fontSize: 14, fontWeight: 500 }}>Settings</Box>
-                </ListItemText>
-              </ListItem>
-            </NextLink>
-          </List>
-        </Box> */}
-          {favoritePages.length > 0 && (
-          <>
-            <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-              FAVORITES
-            </Typography>
+          <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
+            <Header>
+              <Typography><strong>{space.name}</strong></Typography>
+              <IconButton onClick={closeSidebar}>
+                <ChevronLeftIcon />
+              </IconButton>
+            </Header>
+            <Divider sx={{ mb: 3 }} />
+            {/* <Box>
             <List>
-              {favoritePages.map(page => (
+              <NextLink href='' passHref>
+                <ListItem button component='a' disableRipple
+                  sx={{ py: 1, color: greyColor + ' !important' }}>
+                  <ListItemText disableTypography>
+                      <Box sx={{ fontSize: 14, fontWeight: 500 }}>Settings</Box>
+                  </ListItemText>
+                </ListItem>
+              </NextLink>
+            </List>
+          </Box> */}
+            {favoritePages.length > 0 && (
+            <>
+              <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+                FAVORITES
+              </Typography>
+              <List>
+                {favoritePages.map(page => (
+                  <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
+                    <ListItem button component='a' disableRipple sx={{ py: 0 }}>
+                      <ListItemText disableTypography>
+                        <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
+                          <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon>
+                          {' '}
+                          {page.title}
+                        </Box>
+                      </ListItemText>
+                    </ListItem>
+                  </NextLink>
+                ))}
+              </List>
+            </>
+            )}
+            <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+              WORKSPACE
+            </Typography>
+            <PageNavigation pages={pages} pathPrefix={`/${space.domain}`} setPages={setPages} />
+            {/* <List>
+              {pages.map(page => (
                 <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
                   <ListItem button component='a' disableRipple sx={{ py: 0 }}>
                     <ListItemText disableTypography>
@@ -153,28 +175,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                   </ListItem>
                 </NextLink>
               ))}
-            </List>
-          </>
-          )}
-          <Typography sx={{ color: '#777', fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-            WORKSPACE
-          </Typography>
-          <PageNavigation pages={pages} setPages={setPages} />
-          {/* <List>
-            {pages.map(page => (
-              <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
-                <ListItem button component='a' disableRipple sx={{ py: 0 }}>
-                  <ListItemText disableTypography>
-                    <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
-                      <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon>
-                      {' '}
-                      {page.title}
-                    </Box>
-                  </ListItemText>
-                </ListItem>
-              </NextLink>
-            ))}
-          </List> */}
+            </List> */}
+          </Box>
         </Box>
         <Box>
           <Divider />

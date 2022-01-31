@@ -8,21 +8,22 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TreeView from '@mui/lab/TreeView';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
+import Link from 'next/link';
+import MuiLink from '@mui/material/Link';
 import { Page } from 'models';
 import EmojiCon from '../Emoji';
+
+// based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
 export type MenuNode = Page & {
   children: MenuNode[];
 }
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
-  color: theme.palette.text.secondary,
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
-    // borderTopRightRadius: theme.spacing(2),
-    // borderBottomRightRadius: theme.spacing(2),
-    paddingRight: theme.spacing(1),
-    fontWeight: theme.typography.fontWeightMedium,
+    // paddingRight: theme.spacing(1),
+    // fontWeight: theme.typography.fontWeightMedium,
     '&.Mui-expanded': {
       fontWeight: theme.typography.fontWeightRegular
     },
@@ -37,16 +38,19 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
       fontWeight: 'inherit',
       color: 'inherit'
     }
+    // [`& .${treeItemClasses.iconContainer}`]: {
+    // }
   },
   [`& .${treeItemClasses.group}`]: {
     marginLeft: 0,
     [`& .${treeItemClasses.content}`]: {
-      paddingLeft: theme.spacing(2)
+      paddingLeft: theme.spacing(3)
     }
   }
 }));
 
 type TreeItemProps = ComponentProps<typeof TreeItem> & {
+  href: string;
   labelIcon?: string;
 }
 
@@ -54,6 +58,7 @@ type TreeItemProps = ComponentProps<typeof TreeItem> & {
 const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
   const {
     color,
+    href,
     labelIcon,
     label,
     ...other
@@ -63,12 +68,14 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
     <StyledTreeItemRoot
       label={(
         <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, px: 0 }}>
-          <EmojiCon sx={{ display: 'inline-block', fontSize: 14, fontWeight: 500, width: 20 }}>
+          <EmojiCon sx={{ display: 'inline-block', color: 'black', fontSize: 14, fontWeight: 500, width: 24 }}>
             {labelIcon || '📄 '}
           </EmojiCon>
-          <Typography sx={{ fontSize: 14, fontWeight: 500, flexGrow: 1 }}>
-            {label}
-          </Typography>
+          <Link href={href} passHref>
+            <MuiLink className='tree-label' sx={{ fontSize: 14, fontWeight: 500, flexGrow: 1 }}>
+              {label}
+            </MuiLink>
+          </Link>
         </Box>
       )}
       // style={{
@@ -95,7 +102,8 @@ function mergeRefs (refs: any) {
   };
 }
 
-function RenderDraggableNode ({ item, onDrop }: { item: MenuNode, onDrop: (a: MenuNode, b: MenuNode) => void }) {
+function RenderDraggableNode ({ item, onDrop, pathPrefix }:
+  { item: MenuNode, onDrop: (a: MenuNode, b: MenuNode) => void, pathPrefix: string }) {
   // rgba(22, 52, 71, 0.08)
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
@@ -136,6 +144,7 @@ function RenderDraggableNode ({ item, onDrop }: { item: MenuNode, onDrop: (a: Me
       key={item.id}
       nodeId={item.id}
       label={item.title}
+      href={`${pathPrefix}/${item.path}`}
       labelIcon={item.icon}
       sx={{
         backgroundColor: isActive ? 'rgba(22, 52, 71, 0.08)' : 'unset'
@@ -147,6 +156,7 @@ function RenderDraggableNode ({ item, onDrop }: { item: MenuNode, onDrop: (a: Me
           ? item.children.map((childItem, index) => (
             <RenderDraggableNode
               onDrop={onDrop}
+              pathPrefix={pathPrefix}
               key={childItem.id}
               item={childItem}
             />
@@ -184,8 +194,12 @@ function mapTree (items: Page[], key: 'parentId'): MenuNode[] {
   return roots;
 }
 
-function TreeRoot ({ children, setPages, ...rest }:
-  { children: ReactNode, setPages: Dispatch<SetStateAction<Page[]>> } & ComponentProps<typeof TreeView>) {
+type TreeRootProps = {
+  children: ReactNode,
+  setPages: Dispatch<SetStateAction<Page[]>>
+} & ComponentProps<typeof TreeView>;
+
+function TreeRoot ({ children, setPages, ...rest }: TreeRootProps) {
   const [{ canDrop, isOverCurrent }, drop] = useDrop(() => ({
     accept: 'item',
     drop (item: MenuNode, monitor) {
@@ -215,8 +229,8 @@ function TreeRoot ({ children, setPages, ...rest }:
     <div
       ref={drop}
       style={{
-        height: '100%',
-        backgroundColor: isActive ? 'rgba(22, 52, 71, 0.08)' : 'unset'
+        backgroundColor: isActive ? 'rgba(22, 52, 71, 0.08)' : 'unset',
+        flexGrow: 1
       }}
     >
       <TreeView {...rest}>{children}</TreeView>
@@ -224,8 +238,8 @@ function TreeRoot ({ children, setPages, ...rest }:
   );
 }
 
-export default function PageNavigation ({ pages, setPages }:
-    { pages: Page[], setPages: Dispatch<SetStateAction<Page[]>> }) {
+export default function PageNavigation ({ pages, setPages, pathPrefix }:
+    { pages: Page[], setPages: Dispatch<SetStateAction<Page[]>>, pathPrefix: string }) {
   const nodes = pages.map(page => ({
     id: page.id,
     disabled: false,
@@ -258,10 +272,10 @@ export default function PageNavigation ({ pages, setPages }:
         aria-label='items navigator'
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
-        sx={{ height: '100%', flexGrow: 1, width: '100%', overflowY: 'auto' }}
+        sx={{ flexGrow: 1, width: '100%', overflowY: 'auto' }}
       >
         {mappedItems.map((item, index) => (
-          <RenderDraggableNode key={item.id} item={item} onDrop={onDrop} />
+          <RenderDraggableNode key={item.id} item={item} onDrop={onDrop} pathPrefix={pathPrefix} />
         ))}
       </TreeRoot>
     </DndProvider>

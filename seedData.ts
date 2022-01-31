@@ -63,7 +63,7 @@ export const pages: Page[] = [
     parentId: null,
     path: 'fourth-page',
     spaceId: '0',
-    title: ''
+    title: 'Fourth page'
   },
   { id: '4', icon: '📌', created: new Date(), content: getPageContent(), isPublic: false, path: 'fifth-page', spaceId: '1', title: 'Getting Started Again', parentId: null }
 ];
