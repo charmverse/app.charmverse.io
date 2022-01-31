@@ -18,7 +18,7 @@ const emojiData = Object.values(
   }, {} as Record<string, { name: string, emojis: [string, string][] }>)
 );
 
-const getEmojiByAlias = (emojiAlias: string) => {
+export const getEmojiByAlias = (emojiAlias: string) => {
   for (const { emojis } of emojiData) {
     const match = emojis.find(e => e[0] === emojiAlias);
     if (match) {
