@@ -159,22 +159,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
               WORKSPACE
             </Typography>
-            <PageNavigation pages={pages} pathPrefix={`/${space.domain}`} setPages={setPages} />
-            {/* <List>
-              {pages.map(page => (
-                <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
-                  <ListItem button component='a' disableRipple sx={{ py: 0 }}>
-                    <ListItemText disableTypography>
-                      <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
-                        <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon>
-                        {' '}
-                        {page.title}
-                      </Box>
-                    </ListItemText>
-                  </ListItem>
-                </NextLink>
-              ))}
-            </List> */}
+            <PageNavigation
+              pages={pages}
+              pathPrefix={`/${space.domain}`}
+              setPages={setPages}
+            />
           </Box>
         </Box>
         <Box>
