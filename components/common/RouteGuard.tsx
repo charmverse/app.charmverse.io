@@ -51,5 +51,5 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   if (isLoading) {
     return null;
   }
-  return <>authorized ? children : null</>;
+  return <span>{authorized ? children : null}</span>;
 }

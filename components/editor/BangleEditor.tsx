@@ -21,6 +21,7 @@ import { columnResizing, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
 import '@bangle.dev/tooltip/style.css';
+import { styled } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
@@ -52,6 +53,16 @@ const specRegistry = new SpecRegistry([
   tableHeader,
   tableRow
 ]);
+
+const StyledReactBangleEditor = styled(ReactBangleEditor)`
+  code {
+    padding: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
+    border-radius: ${({ theme }) => theme.spacing(0.5)};
+    background-color: ${({ theme }) => theme.palette.code.background};
+    font-size: 85%;
+    color: ${({ theme }) => theme.palette.code.color};
+  }
+`;
 
 export default function BangleEditor ({ content }: { content: PageContent }) {
   const state = useEditorState({
@@ -93,7 +104,7 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
   });
 
   return (
-    <ReactBangleEditor
+    <StyledReactBangleEditor
       state={state}
       renderNodeViews={({ node, children }) => {
         switch (node.type.name) {
@@ -112,13 +123,13 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
             );
           }
           default:
-            return null;
+            return children;
         }
       }}
     >
       <FloatingMenu />
       {EmojiSuggest}
       {InlinePalette}
-    </ReactBangleEditor>
+    </StyledReactBangleEditor>
   );
 }
