@@ -106,11 +106,12 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
   return (
     <StyledReactBangleEditor
       state={state}
-      renderNodeViews={({ node, children }) => {
-        switch (node.type.name) {
+      renderNodeViews={({ children, ...props }) => {
+        // eslint-disable-next-line
+        switch (props.node.type.name) {
           case 'blockquote': {
             return (
-              <BlockQuote node={node}>
+              <BlockQuote {...props}>
                 {children}
               </BlockQuote>
             );
@@ -122,8 +123,9 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
               </Code>
             );
           }
-          default:
-            return children;
+          default: {
+            return null;
+          }
         }
       }}
     >
