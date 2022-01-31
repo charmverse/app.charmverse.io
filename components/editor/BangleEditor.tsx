@@ -19,17 +19,18 @@ import {
 import { NodeView, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
-import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.dev/table";
+import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
 import '@bangle.dev/tooltip/style.css';
+import { styled } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
-import { BlockQuote } from './BlockQuote';
+import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
 const specRegistry = new SpecRegistry([
-  blockquote.spec(),
+  blockQuoteSpec(),
   bold.spec(),
   bulletList.spec(),
   hardBreak.spec(),
@@ -53,7 +54,17 @@ const specRegistry = new SpecRegistry([
   tableRow
 ]);
 
-export default function BangleEditor({ content }: { content: PageContent }) {
+const StyledReactBangleEditor = styled(ReactBangleEditor)`
+  code {
+    padding: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
+    border-radius: ${({ theme }) => theme.spacing(0.5)};
+    background-color: ${({ theme }) => theme.palette.code.background};
+    font-size: 85%;
+    color: ${({ theme }) => theme.palette.code.color};
+  }
+`;
+
+export default function BangleEditor ({ content }: { content: PageContent }) {
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -79,35 +90,48 @@ export default function BangleEditor({ content }: { content: PageContent }) {
       columnResizing,
       floatingMenuPlugin(),
       NodeView.createPlugin({
-        name: "blockquote",
-        containerDOM: ["blockquote"],
-        contentDOM: ["span"]
+        name: 'blockquote',
+        containerDOM: ['blockquote'],
+        contentDOM: ['span']
       }),
       NodeView.createPlugin({
-        name: "codeBlock",
-        containerDOM: ["pre"],
-        contentDOM: ["span"]
+        name: 'codeBlock',
+        containerDOM: ['pre'],
+        contentDOM: ['span']
       })
     ],
-    initialValue: Node.fromJSON(specRegistry.schema, content),
+    initialValue: Node.fromJSON(specRegistry.schema, content)
   });
 
-  return <ReactBangleEditor state={state} renderNodeViews={({ node, children }) => {
-    switch (node.type.name) {
-      case "blockquote": {
-        return <BlockQuote>
-          {children}
-        </BlockQuote>
-      }
-      case "codeBlock": {
-        return <Code>
-          {children}
-        </Code>
-      }
-    }
-  }} >
-    <FloatingMenu />
-    {EmojiSuggest}
-    {InlinePalette}
-  </ReactBangleEditor>
+  return (
+    <StyledReactBangleEditor
+      state={state}
+      renderNodeViews={({ children, ...props }) => {
+        // eslint-disable-next-line
+        switch (props.node.type.name) {
+          case 'blockquote': {
+            return (
+              <BlockQuote {...props}>
+                {children}
+              </BlockQuote>
+            );
+          }
+          case 'codeBlock': {
+            return (
+              <Code>
+                {children}
+              </Code>
+            );
+          }
+          default: {
+            return null;
+          }
+        }
+      }}
+    >
+      <FloatingMenu />
+      {EmojiSuggest}
+      {InlinePalette}
+    </StyledReactBangleEditor>
+  );
 }

@@ -1,7 +1,8 @@
+import { ElementType } from 'react';
 import styled from '@emotion/styled';
 import { darken } from '@mui/system';
-import Button, { InputProps, StyledSpinner } from './Button';
 import { blueColor } from 'theme/colors';
+import Button, { InputProps, StyledSpinner } from './Button';
 
 const StyledButton = styled(Button)`
 
@@ -22,13 +23,13 @@ const StyledButton = styled(Button)`
   }
 
   &:hover {
-    background: ${darken(blueColor, .1)};
+    background: ${darken(blueColor, 0.1)};
     color: white;
     border: 0 none;
   }
 `;
 
-function PimpedButton<C extends React.ElementType> (props: InputProps<C>)  {
+function PimpedButton<C extends ElementType> (props: InputProps<C>) {
   const { children, loading, loadingMessage, ...rest } = props;
   return (
     <StyledButton disabled={loading} {...rest}>

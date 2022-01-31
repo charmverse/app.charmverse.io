@@ -1,6 +1,29 @@
 
 export const PATH_BLACKLIST = ['settings'];
 
+export interface PagePermission {
+  pageId: string;
+  userId: string;
+  level: 'full_access' | 'editor' | 'view_comment' | 'view';
+}
+
+interface TextContent {
+  text: string
+  type: 'text'
+}
+
+interface PageMark {
+  type: string
+  attrs?: Record<string, any>
+}
+
+export interface PageContent {
+  type: string,
+  content?: (PageContent | TextContent)[],
+  attrs?: Record<string, any>
+  marks?: PageMark[]
+}
+
 export interface Page {
   id: string;
   title: string;
@@ -13,27 +36,4 @@ export interface Page {
   parentPageId?: string;
   spaceId: string;
   updated?: Date;
-}
-
-export interface PagePermission {
-  pageId: string;
-  userId: string;
-  level: 'full_access' | 'editor' | 'view_comment' | 'view';
-}
-
-export interface PageContent {
-  type: string,
-  content?: (PageContent | TextContent)[],
-  attrs?: Record<string, any>
-  marks?: PageMark[]
-}
-
-interface PageMark {
-  type: string
-  attrs?: Record<string, any>
-}
-
-interface TextContent {
-  text: string
-  type: "text"
 }

@@ -12,21 +12,21 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useMemo, useState } from 'react';
+import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
 import 'theme/styles.scss';
 import { createThemeLightSensitive } from 'theme';
 
 type NextPageWithLayout = NextPage & {
-  getLayout: (page: ReactElement) => JSX.Element
+  getLayout: (page: ReactElement) => ReactElement
 }
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout
 }
 
-export default function App({ Component, pageProps }: AppPropsWithLayout) {
+export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
-  const getLayout = Component.getLayout ?? ((page) => page);
+  const getLayout = Component.getLayout ?? (page => page);
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -38,7 +38,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
   // dark mode: https://mui.com/customization/dark-mode/
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode>(`darkMode`);
+  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode>('darkMode');
   const [mode, setMode] = useState<PaletteMode>('light');
   const colorMode = useMemo(
     () => ({
@@ -49,9 +49,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
           setSavedDarkMode(newMode);
           return newMode;
         });
-      },
+      }
     }),
-    [],
+    []
   );
 
   // Update the theme only if the mode changes
@@ -69,7 +69,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   // wait for router to be ready, as we rely on the URL to know what space to load
   const router = useRouter();
   if (!router.isReady) {
-    return <></>;
+    return null;
   }
 
   return (
@@ -99,7 +99,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   );
 }
 
-function DataProviders ({ children }: { children: React.ReactNode }) {
+function DataProviders ({ children }: { children: ReactNode }) {
   return (
     <SpacesProvider>
       <PageTitleProvider>

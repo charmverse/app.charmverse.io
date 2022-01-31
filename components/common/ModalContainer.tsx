@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -22,7 +23,8 @@ const StyledCloseButton = styled(IconButton)`
   right: 10px;
 `;
 
-export default function ({ children, onClose }: { children: React.ReactNode, onClose: () => void }) {
+export default function ModalContainer ({ children, onClose }:
+  { children: ReactNode, onClose: () => void }) {
   return (
     <StyledModal>
       <StyledCloseButton onClick={onClose}>

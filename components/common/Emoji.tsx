@@ -1,3 +1,4 @@
+import { ComponentProps } from 'react';
 import Box from '@mui/material/Box';
 import styled from '@emotion/styled';
 
@@ -8,8 +9,8 @@ const Emoji = styled(Box)`
   white-space: nowrap;
 `;
 
-export default function EmojiCon ({ children, ...props }: React.ComponentProps<typeof Emoji>) {
+export default function EmojiCon ({ children, ...props }: ComponentProps<typeof Emoji>) {
   return (
-    <Emoji role='image' {...props}>{children}</Emoji>
-  )
+    <Emoji {...props}>{children}</Emoji>
+  );
 }

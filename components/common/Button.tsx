@@ -1,8 +1,8 @@
+import styled from '@emotion/styled';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import NextLink from 'next/link';
-import Link from '@mui/material/Link';
-import styled from '@emotion/styled';
+import { ComponentProps, ElementType } from 'react';
 
 const StyledButton = styled(Button)`
   white-space: nowrap;
@@ -15,10 +15,10 @@ export const StyledSpinner = styled(CircularProgress)`
   margin-left: 5px;
 `;
 
-type ButtonProps = React.ComponentProps<typeof Button>;
-export type InputProps<C extends React.ElementType> = ButtonProps
+type ButtonProps = ComponentProps<typeof Button>;
+export type InputProps<C extends ElementType> = ButtonProps
   // Omit 'variant' because it gets overridden sometimes by component
-  & Omit<React.ComponentProps<C>, 'variant'>
+  & Omit<ComponentProps<C>, 'variant'>
   & {
     component?: C;
     external?: boolean;
@@ -26,24 +26,27 @@ export type InputProps<C extends React.ElementType> = ButtonProps
     loadingMessage?: string;
   };
 
+function PimpedButtonWithNextLink<C extends ElementType>
+({ href, external, children, target, ...props }: InputProps<C>) {
+  if (href) {
+    if (external) {
+      return <PimpedButton href={href} {...props}>{children}</PimpedButton>;
+    }
+    return (
+      <NextLink href={href} passHref>
+        {/** use an anchor tag to catch the ref passed down by NextLink.
+       *  see https://github.com/vercel/next.js/issues/7915 */}
+        <a target={target}>
+          <PimpedButton {...props}>{children}</PimpedButton>
+        </a>
+      </NextLink>
+    );
+  }
 
-function PimpedButtonWithNextLink<C extends React.ElementType> ({ href, external, children, target, ...props }: InputProps<C>) {
-  return (
-    href
-      ? (external
-        ? <PimpedButton href={href} {...props}>{children}</PimpedButton>
-        : <NextLink href={href} passHref>
-            {/** use an anchor tag to catch the ref passed down by NextLink. see https://github.com/vercel/next.js/issues/7915 */}
-            <a target={target}>
-              <PimpedButton {...props}>{children}</PimpedButton>
-            </a>
-          </NextLink>
-      )
-      : <PimpedButton {...props}>{children}</PimpedButton>
-  );
-};
+  return <PimpedButton {...props}>{children}</PimpedButton>;
+}
 
-export function PimpedButton<C extends React.ElementType> (props: InputProps<C>)  {
+export function PimpedButton<C extends ElementType> (props: InputProps<C>) {
   const { children, loading, loadingMessage, ...rest } = props;
   return (
     <StyledButton disabled={loading} {...rest}>

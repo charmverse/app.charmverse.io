@@ -12,7 +12,7 @@ const StyledAvatar = styled(Avatar)`
   ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
 `;
 
-export default function ({ name = '', variant }: { name: string, variant?: 'circular' | 'rounded' | 'square' }) {
+export default function LargeAvatar ({ name = '', variant }: { name: string, variant?: 'circular' | 'rounded' | 'square' }) {
   return (
     <StyledAvatar sx={{ bgcolor: stringToColor(name) }} variant={variant}>
       {name.charAt(0).toUpperCase()}

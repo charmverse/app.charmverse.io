@@ -2,13 +2,17 @@ import fetch from './fetch';
 
 type Params = { [key: string]: any };
 
-export function GET<T> (requestURL: string, data: Params = {}, { headers = {} }: { headers?: any } = {}): Promise<T> {
+export function GET<T> (
+  requestURL: string,
+  data: Params = {},
+  { headers = {} }: { headers?: any } = {}
+): Promise<T> {
   const queryStr = Object.keys(data)
     .filter(key => !!data[key])
     .map(key => `${key}=${encodeURIComponent(data[key])}`)
     .join('&');
   return fetch(
-    requestURL + (queryStr ? '?' + queryStr : ''),
+    requestURL + (queryStr ? `?${queryStr}` : ''),
     {
       method: 'GET',
       headers: new Headers({
@@ -20,7 +24,11 @@ export function GET<T> (requestURL: string, data: Params = {}, { headers = {} }:
   );
 }
 
-export function DELETE<T> (requestURL: string, data: Params = {}, { headers = {} }: { headers?: any } = {}): Promise<T> {
+export function DELETE<T> (
+  requestURL: string,
+  data: Params = {},
+  { headers = {} }: { headers?: any } = {}
+): Promise<T> {
   return fetch(
     requestURL,
     {
@@ -36,7 +44,11 @@ export function DELETE<T> (requestURL: string, data: Params = {}, { headers = {}
   );
 }
 
-export function POST<T> (requestURL: string, data: Params = {}, { headers = {}, noHeaders }: { headers?: any, noHeaders?: boolean } = {}): Promise<T> {
+export function POST<T> (
+  requestURL: string,
+  data: Params = {},
+  { headers = {}, noHeaders }: { headers?: any, noHeaders?: boolean } = {}
+): Promise<T> {
   return fetch(
     requestURL,
     {
@@ -52,7 +64,11 @@ export function POST<T> (requestURL: string, data: Params = {}, { headers = {}, 
   );
 }
 
-export function PUT<T> (requestURL: string, data: Params = {}, { headers = {} }: { headers?: any } = {}): Promise<T> {
+export function PUT<T> (
+  requestURL: string,
+  data: Params = {},
+  { headers = {} }: { headers?: any } = {}
+): Promise<T> {
   return fetch(
     requestURL,
     {

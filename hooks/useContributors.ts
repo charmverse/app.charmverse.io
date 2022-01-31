@@ -1,10 +1,12 @@
-import { useLocalStorage } from './useLocalStorage';
 import { Contributor } from 'models';
 import { contributors } from 'seedData';
+import { useLocalStorage } from './useLocalStorage';
 import { useSpace } from './useSpace';
 
 export function useContributors () {
   const [space] = useSpace();
-  const spaceContributors = contributors.filter(c => c.spaceRoles.some(({ spaceId }) => spaceId === space.id));
+  const spaceContributors = contributors.filter(
+    c => c.spaceRoles.some(({ spaceId }) => spaceId === space.id)
+  );
   return useLocalStorage<Contributor[]>(`spaces.${space.id}.contributors`, spaceContributors);
-};
+}
