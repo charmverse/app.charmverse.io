@@ -81,6 +81,7 @@
     "object-curly-newline": "off",
     "padded-blocks": "off",
     "prefer-promise-reject-errors": "off",
+    "react/jsx-boolean-value": "off",
     "react/jsx-filename-extension": [
       1,
       {

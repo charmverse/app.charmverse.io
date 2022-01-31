@@ -215,7 +215,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix }:
   );
 }
 
-function mapTree (items: Page[], key: 'parentId'): MenuNode[] {
+function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuNode[] {
   const tempItems = items.map(item => {
     return {
       ...item,
@@ -233,10 +233,13 @@ function mapTree (items: Page[], key: 'parentId'): MenuNode[] {
     node = tempItems[i];
     const index = node[key] ? map[node[key]!] : -1;
     if (node[key] && tempItems[index]) {
-      // @ts-ignore if you have dangling branches check that map[node.parentId] exists
+      // @ts-ignore
       tempItems[index].children.push(node);
     }
-    else {
+    else if (!rootPageIds) {
+      roots.push(node);
+    }
+    if (rootPageIds?.includes(node.id)) {
       roots.push(node);
     }
   }
@@ -245,10 +248,11 @@ function mapTree (items: Page[], key: 'parentId'): MenuNode[] {
 
 type TreeRootProps = {
   children: ReactNode,
+  isFavorites?: boolean,
   setPages: Dispatch<SetStateAction<Page[]>>
 } & ComponentProps<typeof TreeView>;
 
-function TreeRoot ({ children, setPages, ...rest }: TreeRootProps) {
+function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) {
   const [{ canDrop, isOverCurrent }, drop] = useDrop(() => ({
     accept: 'item',
     drop (item: MenuNode, monitor) {
@@ -279,7 +283,7 @@ function TreeRoot ({ children, setPages, ...rest }: TreeRootProps) {
       ref={drop}
       style={{
         backgroundColor: isActive ? 'rgba(22, 52, 71, 0.08)' : 'unset',
-        flexGrow: 1
+        flexGrow: isFavorites ? 0 : 1
       }}
     >
       <TreeView {...rest}>{children}</TreeView>
@@ -287,12 +291,19 @@ function TreeRoot ({ children, setPages, ...rest }: TreeRootProps) {
   );
 }
 
-export default function PageNavigation ({ pages, setPages, pathPrefix }:
-    { pages: Page[], setPages: Dispatch<SetStateAction<Page[]>>, pathPrefix: string }) {
+type NavProps = {
+  pages: Page[];
+  setPages: Dispatch<SetStateAction<Page[]>>;
+  pathPrefix: string;
+  isFavorites?: boolean;
+  rootPageIds?: string[];
+};
+
+export default function PageNavigation ({ pages, setPages, pathPrefix, isFavorites, rootPageIds }: NavProps) {
 
   const [expanded, setExpanded] = useLocalStorage<string[]>('expanded-pages', []);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const mappedItems = useMemo(() => mapTree(pages, 'parentId'), [pages]);
+  const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
     setPages(stateNodes => stateNodes.map(stateNode => {
       if (stateNode.id === droppedItem.id && droppedItem.id !== containerItem.id) {
@@ -311,13 +322,11 @@ export default function PageNavigation ({ pages, setPages, pathPrefix }:
     });
   };
   const router = useRouter();
-  const expandedNodeIds = new Set<string>();
   useEffect(() => {
     for (const page of pages) {
       if (router.asPath === `${pathPrefix}/${page.path}`) {
         // expand the parent of the active page
-        if (page.parentId) {
-          expandedNodeIds.add(page.parentId);
+        if (!isFavorites && page.parentId) {
           if (!expanded.includes(page.parentId)) {
             setExpanded(expanded.concat(page.parentId));
           }
@@ -333,6 +342,9 @@ export default function PageNavigation ({ pages, setPages, pathPrefix }:
     setExpanded(nodeIds);
   }
 
+  console.log('expanded', expanded);
+  console.log(mappedItems);
+
   return (
     <DndProvider backend={HTML5Backend}>
       <TreeRoot
@@ -344,7 +356,8 @@ export default function PageNavigation ({ pages, setPages, pathPrefix }:
         aria-label='items navigator'
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
-        sx={{ flexGrow: 1, width: '100%', overflowY: 'auto' }}
+        isFavorites={isFavorites}
+        sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
       >
         {mappedItems.map((item, index) => (
           <RenderDraggableNode key={item.id} item={item} onDrop={onDrop} pathPrefix={pathPrefix} />

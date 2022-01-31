@@ -58,9 +58,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [spaces, setSpaces] = useSpaces();
   const [pages, setPages] = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  const favoritePages = favorites
-    .map(fav => pages.find(page => page.id === fav.pageId))
-    .filter(isTruthy);
+  const favoritePageIds = favorites.map(f => f.pageId);
 
   function showSpaceForm () {
     setSpaceFormOpen(true);
@@ -134,27 +132,19 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               </NextLink>
             </List>
           </Box> */}
-            {favoritePages.length > 0 && (
-            <>
-              <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-                FAVORITES
-              </Typography>
-              <List>
-                {favoritePages.map(page => (
-                  <NextLink href={`/${space.domain}/${page.path}`} key={page.id} passHref>
-                    <ListItem button component='a' disableRipple sx={{ py: 0 }}>
-                      <ListItemText disableTypography>
-                        <Box sx={{ fontSize: 14, fontWeight: 500, ml: 2 }}>
-                          <EmojiCon sx={{ display: 'inline-block', width: 20 }}>{page.icon || '📄 '}</EmojiCon>
-                          {' '}
-                          {page.title}
-                        </Box>
-                      </ListItemText>
-                    </ListItem>
-                  </NextLink>
-                ))}
-              </List>
-            </>
+            {favoritePageIds.length > 0 && (
+              <Box mb={2}>
+                <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+                  FAVORITES
+                </Typography>
+                <PageNavigation
+                  isFavorites={true}
+                  pages={pages}
+                  pathPrefix={`/${space.domain}`}
+                  rootPageIds={favoritePageIds}
+                  setPages={setPages}
+                />
+              </Box>
             )}
             <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
               WORKSPACE
