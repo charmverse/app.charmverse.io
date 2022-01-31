@@ -23,13 +23,13 @@ import { table, tableCell, tableHeader, tablePlugins, tableRow } from "@bangle.d
 import '@bangle.dev/tooltip/style.css';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
-import { BlockQuote } from './BlockQuote';
+import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
 const specRegistry = new SpecRegistry([
-  blockquote.spec(),
+  blockQuoteSpec(),
   bold.spec(),
   bulletList.spec(),
   hardBreak.spec(),
@@ -95,7 +95,7 @@ export default function BangleEditor({ content }: { content: PageContent }) {
   return <ReactBangleEditor state={state} renderNodeViews={({ node, children }) => {
     switch (node.type.name) {
       case "blockquote": {
-        return <BlockQuote>
+        return <BlockQuote node={node}>
           {children}
         </BlockQuote>
       }

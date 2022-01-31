@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -13,24 +12,25 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import NextLink from 'next/link';
-import { useRouter } from 'next/router';
-import Avatar from '../Avatar';
-import Link from '../Link';
-import WorkspaceAvatar from '../WorkspaceAvatar';
-import Header from './Header';
-import { isTruthy } from 'lib/types';
-import { useUser } from 'hooks/useUser';
+import { getKey } from 'hooks/useLocalStorage';
+import { usePages } from 'hooks/usePages';
 import { useSpace } from 'hooks/useSpace';
 import { useSpaces } from 'hooks/useSpaces';
-import { usePages } from 'hooks/usePages';
-import { pages as seedPages } from 'seedData';
-import { Contributor, Page, Space } from 'models';
-import { getKey } from 'hooks/useLocalStorage';
+import { useUser } from 'hooks/useUser';
 import { shortenedWeb3Address } from 'lib/strings';
+import { isTruthy } from 'lib/types';
+import { Contributor, Page, Space } from 'models';
+import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { pages as seedPages } from 'seedData';
+import Avatar from '../Avatar';
 import EmojiCon from '../Emoji';
+import Link from '../Link';
 import ModalContainer from '../ModalContainer';
+import WorkspaceAvatar from '../WorkspaceAvatar';
 import CreateWorkspaceForm from './CreateWorkspaceForm';
+import Header from './Header';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -49,7 +49,6 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
-
   const router = useRouter();
   const [user] = useUser();
   const [space] = useSpace();
@@ -58,15 +57,15 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const favoritePages = favorites.map(fav => pages.find(page => page.id === fav.pageId)).filter(isTruthy);
 
-  function showSpaceForm () {
+  function showSpaceForm() {
     setSpaceFormOpen(true);
   }
 
-  function closeSpaceForm () {
+  function closeSpaceForm() {
     setSpaceFormOpen(false);
   }
 
-  function addSpace (space: Space) {
+  function addSpace(space: Space) {
     if (spaces.some(s => s.id === space.id)) {
       throw new Error('Space with that id already exists: ' + space.id);
     }
