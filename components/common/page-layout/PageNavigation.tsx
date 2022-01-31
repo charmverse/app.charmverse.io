@@ -1,6 +1,7 @@
-import React, { forwardRef, ReactNode, ComponentProps, useCallback, useMemo, Dispatch, SetStateAction } from 'react';
+import React, { forwardRef, ReactNode, ComponentProps, useCallback, useMemo, useState, useEffect, Dispatch, SetStateAction, SyntheticEvent } from 'react';
 import styled from '@emotion/styled';
 import { useDrop, useDrag, DragSourceMonitor, DndProvider } from 'react-dnd';
+import { useRouter } from 'next/router';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -11,6 +12,7 @@ import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import Link from 'next/link';
 import MuiLink from '@mui/material/Link';
 import { Page } from 'models';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import EmojiCon from '../Emoji';
 
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
@@ -27,9 +29,9 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     '&.Mui-expanded': {
       fontWeight: theme.typography.fontWeightRegular
     },
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover
-    },
+    // '&:hover': {
+    //   backgroundColor: theme.palette.action.hover
+    // },
     '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
       backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
       color: 'var(--tree-view-color)'
@@ -54,6 +56,23 @@ type TreeItemProps = ComponentProps<typeof TreeItem> & {
   labelIcon?: string;
 }
 
+const StyledTreeItemContent = styled.a`
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: ${({ theme }) => theme.spacing(0.5)} 0;
+`;
+
+const StyledLink = styled(Typography)`
+  color: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  &:hover {
+    color: inherit;
+  }
+`;
+
 // eslint-disable-next-line react/function-component-definition
 const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
   const {
@@ -64,24 +83,24 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
     ...other
   } = props;
 
+  function onClick (event: SyntheticEvent) {
+    event.stopPropagation();
+  }
+
   return (
     <StyledTreeItemRoot
       label={(
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, px: 0 }}>
-          <EmojiCon sx={{ display: 'inline-block', color: 'black', fontSize: 14, fontWeight: 500, width: 24 }}>
-            {labelIcon || '📄 '}
-          </EmojiCon>
-          <Link href={href} passHref>
-            <MuiLink className='tree-label' sx={{ fontSize: 14, fontWeight: 500, flexGrow: 1 }}>
+        <Link href={href} passHref>
+          <StyledTreeItemContent onClick={onClick}>
+            <EmojiCon sx={{ display: 'inline-block', color: 'black', width: 24 }}>
+              {labelIcon || '📄 '}
+            </EmojiCon>
+            <StyledLink>
               {label}
-            </MuiLink>
-          </Link>
-        </Box>
+            </StyledLink>
+          </StyledTreeItemContent>
+        </Link>
       )}
-      // style={{
-      //   '--tree-view-color': color,
-      //   //'--tree-view-bg-color': bgColor,
-      // }}
       {...other}
       ref={ref}
     />
@@ -240,12 +259,10 @@ function TreeRoot ({ children, setPages, ...rest }: TreeRootProps) {
 
 export default function PageNavigation ({ pages, setPages, pathPrefix }:
     { pages: Page[], setPages: Dispatch<SetStateAction<Page[]>>, pathPrefix: string }) {
-  const nodes = pages.map(page => ({
-    id: page.id,
-    disabled: false,
-    parentId: page.parentId || null
-  }));
-  const mappedItems = useMemo(() => mapTree(pages, 'parentId'), [nodes]);
+
+  const [expanded, setExpanded] = useLocalStorage<string[]>('expanded-pages', []);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const mappedItems = useMemo(() => mapTree(pages, 'parentId'), [pages]);
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
     setPages(stateNodes => stateNodes.map(stateNode => {
       if (stateNode.id === droppedItem.id) {
@@ -259,16 +276,36 @@ export default function PageNavigation ({ pages, setPages, pathPrefix }:
       }
     }));
   };
+  const router = useRouter();
+  const expandedNodeIds = new Set<string>();
+  useEffect(() => {
+    for (const page of pages) {
+      if (router.asPath === `${pathPrefix}/${page.path}`) {
+        // expand the parent of the active page
+        if (page.parentId) {
+          expandedNodeIds.add(page.parentId);
+          if (!expanded.includes(page.parentId)) {
+            setExpanded(expanded.concat(page.parentId));
+          }
+        }
+        if (!selectedNodeId) {
+          setSelectedNodeId(page.id);
+        }
+      }
+    }
+  }, []);
+
+  function onNodeToggle (event: SyntheticEvent, nodeIds: string[]) {
+    setExpanded(nodeIds);
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
       <TreeRoot
         setPages={setPages}
-        defaultExpanded={nodes
-          .filter((item) => item.disabled)
-          .map((item) => item.id)}
-        defaultSelected={nodes
-          .filter((item) => item.disabled)
-          .map((item) => item.id)}
+        expanded={expanded}
+        selected={selectedNodeId}
+        onNodeToggle={onNodeToggle}
         aria-label='items navigator'
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
