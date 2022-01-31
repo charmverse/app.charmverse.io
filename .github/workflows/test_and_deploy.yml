@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "17"
       - name: Install npm dependencies
         run: npm ci --no-audit --no-fund
       - name: Lint
@@ -40,7 +40,7 @@ jobs:
       - name: Install Node.js v16
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "17"
 
       - name: Install dependencies
         run: npm ci --no-fund
