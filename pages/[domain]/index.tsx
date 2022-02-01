@@ -1,20 +1,23 @@
 import { ReactElement, useEffect } from 'react';
 import { PageLayout } from 'components/common/page-layout';
-import { setTitle } from 'components/common/page-layout/PageTitle';
-import { useSpace } from 'hooks/useSpace';
+import { useTitleState } from 'components/common/page-layout/PageTitle';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 
 export default function IndexPage () {
-  const [space] = useSpace();
-  const [pages] = usePages();
+  const [space] = useCurrentSpace();
+  const [, setTitleState] = useTitleState();
+  const { pages } = usePages();
   const router = useRouter();
-  setTitle(space.name);
+
+  const spacePages = pages.filter(page => page.spaceId === space.id);
 
   useEffect(() => {
-    if (pages.length) {
+    if (spacePages.length) {
       router.push(`/${space.domain}/${pages[0].path}`);
     }
+    setTitleState(space.name);
   }, []);
 
   return null;

@@ -9,7 +9,7 @@ import FieldLabel from 'components/settings/FieldLabel';
 import Legend from 'components/settings/Legend';
 import Avatar from 'components/settings/LargeAvatar';
 import { setTitle } from 'components/common/page-layout/PageTitle';
-import { useSpace } from 'hooks/useSpace';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -31,7 +31,7 @@ export default function WorkspaceSettings () {
 
   setTitle('Workspace Options');
   const router = useRouter();
-  const [space, setSpace] = useSpace();
+  const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
 
   const {

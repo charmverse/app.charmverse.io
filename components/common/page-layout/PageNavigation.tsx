@@ -438,7 +438,9 @@ export default function PageNavigation ({
 
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${spaceId}.expanded-pages`, []);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
+  const pagesForSpace = pages.filter(p => p.spaceId === spaceId);
+  const mappedItems = useMemo(() => mapTree(pagesForSpace, 'parentId', rootPageIds), [pagesForSpace, rootPageIds]);
+
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
     setPages(stateNodes => stateNodes.map(stateNode => {
       if (stateNode.id === droppedItem.id && droppedItem.id !== containerItem.id) {
@@ -456,9 +458,11 @@ export default function PageNavigation ({
       return state.filter(id => id !== droppedItem.id);
     });
   };
+
   const router = useRouter();
+
   useEffect(() => {
-    for (const page of pages) {
+    for (const page of pagesForSpace) {
       if (router.asPath === `${pathPrefix}/${page.path}`) {
         // expand the parent of the active page
         if (!isFavorites && page.parentId) {

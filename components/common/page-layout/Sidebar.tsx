@@ -15,7 +15,7 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
-import { useSpace } from 'hooks/useSpace';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { shortenedWeb3Address } from 'lib/strings';
@@ -78,9 +78,9 @@ interface SidebarProps {
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
   const [user] = useUser();
-  const [space] = useSpace();
+  const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
-  const [pages, setPages] = usePages();
+  const { pages, setPages } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
 

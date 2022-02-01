@@ -3,7 +3,7 @@ import { Space } from 'models';
 import { useSpaces } from './useSpaces';
 import { getKey } from './useLocalStorage';
 
-export function useSpace () {
+export function useCurrentSpace () {
 
   const router = useRouter();
   const [spaces, setSpaces] = useSpaces();

@@ -7,6 +7,7 @@ import RouteGuard from 'components/common/RouteGuard';
 import { ColorModeContext } from 'context/color-mode';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { SpacesProvider } from 'hooks/useSpaces';
+import { PagesProvider } from 'hooks/usePages';
 import { UserProvider } from 'hooks/useUser';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
@@ -102,11 +103,13 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders ({ children }: { children: ReactNode }) {
   return (
     <SpacesProvider>
-      <PageTitleProvider>
-        <UserProvider>
-          {children}
-        </UserProvider>
-      </PageTitleProvider>
+      <PagesProvider>
+        <PageTitleProvider>
+          <UserProvider>
+            {children}
+          </UserProvider>
+        </PageTitleProvider>
+      </PagesProvider>
     </SpacesProvider>
   );
 }
