@@ -351,9 +351,6 @@ export default function PageNavigation ({ pages, spaceId, setPages, pathPrefix, 
     setExpanded(nodeIds);
   }
 
-  console.log('expanded', expanded);
-  console.log(mappedItems);
-
   return (
     <DndProvider backend={HTML5Backend}>
       <TreeRoot
