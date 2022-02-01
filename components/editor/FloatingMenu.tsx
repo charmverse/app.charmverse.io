@@ -3,7 +3,7 @@ import { Node, ResolvedPos } from '@bangle.dev/pm';
 import { FloatingMenu, floatingMenu } from '@bangle.dev/react-menu';
 import { NodeSelection } from 'prosemirror-state';
 import { Menu } from './@bangle.dev/react-menu/Menu';
-import { BlockquoteButton, BoldButton, CodeButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
+import { BoldButton, CalloutButton, CodeButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 
 const menuKey = new PluginKey('menuKey');
@@ -25,7 +25,7 @@ export default function FloatingMenuComponent () {
               </MenuGroup>
               <MenuGroup isLastGroup>
                 <ParagraphButton />
-                <BlockquoteButton />
+                <CalloutButton />
                 <HeadingButton level={1} />
                 <HeadingButton level={2} />
                 <HeadingButton level={3} />
