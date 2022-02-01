@@ -134,6 +134,12 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     }, 100);
   }
 
+  function deletePage (pageId: string) {
+    const newPages = pages.filter(p => p.id !== pageId);
+    router.push(newPages[0] ? `/${space.domain}/${newPages[0].path}` : `/${space.domain}`);
+    setPages(newPages);
+  }
+
   return (
     <SidebarContainer>
       <WorkspacesContainer>
@@ -215,6 +221,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               pathPrefix={`/${space.domain}`}
               setPages={setPages}
               addPage={addPage}
+              deletePage={deletePage}
             />
           </Box>
         </Box>
