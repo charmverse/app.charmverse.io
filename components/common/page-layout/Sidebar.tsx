@@ -13,7 +13,6 @@ import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { isTruthy } from 'lib/types';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useSpace } from 'hooks/useSpace';
