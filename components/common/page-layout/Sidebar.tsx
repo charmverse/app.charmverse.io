@@ -85,6 +85,30 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     router.push(`/${newSpace.domain}`);
   }
 
+  function addPage (page: Partial<Page>) {
+    const id = Math.random().toString().replace('0.', '');
+    const newPage: Page = {
+      content: {
+        type: 'doc',
+        content: []
+      },
+      created: new Date(),
+      id,
+      isPublic: false,
+      parentId: null,
+      path: `page-${id}`,
+      spaceId: space.id,
+      title: '',
+      ...page
+    };
+    setPages([...pages, newPage]);
+
+    // add delay to simulate a server call
+    setTimeout(() => {
+      router.push(`/${space.domain}/${newPage.path}`);
+    }, 100);
+  }
+
   return (
     <Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
       <WorkspacesContainer>
@@ -144,6 +168,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                   pathPrefix={`/${space.domain}`}
                   rootPageIds={favoritePageIds}
                   setPages={setPages}
+                  addPage={addPage}
                 />
               </Box>
             )}
@@ -155,6 +180,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               spaceId={space.id}
               pathPrefix={`/${space.domain}`}
               setPages={setPages}
+              addPage={addPage}
             />
           </Box>
         </Box>

@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
+import AddIcon from '@mui/icons-material/AddBoxOutlined';
 import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import Typography from '@mui/material/Typography';
 import TreeView from '@mui/lab/TreeView';
@@ -29,6 +30,9 @@ const DefaultPageIcon = styled(ArticleIcon)`
 `;
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
+
+  position: 'relative',
+
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
     // paddingRight: theme.spacing(1),
@@ -74,17 +78,25 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   }
 }));
 
-type TreeItemProps = ComponentProps<typeof TreeItem> & {
-  href: string;
-  labelIcon?: string;
-}
-
 const StyledTreeItemContent = styled.a`
   color: inherit;
   text-decoration: none;
   display: flex;
   align-items: center;
+  overflow: hidden;
   padding: 3px 0;
+  position: relative;
+
+  .page-actions {
+    background: ${({ theme }) => theme.palette.action.hover};
+    display: none;
+    position: absolute;
+    padding-top: 6px;
+    right: 0;
+  }
+  &:hover .page-actions {
+    display: block;
+  }
 `;
 
 const StyledPageIcon = styled(EmojiCon)`
@@ -108,9 +120,16 @@ const StyledLink = styled(Typography)`
   width: calc(80%); // hack to get ellipsis to appear
 `;
 
+type TreeItemProps = ComponentProps<typeof TreeItem> & {
+  href: string;
+  labelIcon?: string;
+  addSubPage?: () => void;
+}
+
 // eslint-disable-next-line react/function-component-definition
 const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
   const {
+    addSubPage,
     color,
     href,
     labelIcon,
@@ -118,7 +137,7 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
     ...other
   } = props;
 
-  function onClick (event: SyntheticEvent) {
+  function stopPropagation (event: SyntheticEvent) {
     event.stopPropagation();
   }
 
@@ -126,13 +145,16 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
     <StyledTreeItemRoot
       label={(
         <Link href={href} passHref>
-          <StyledTreeItemContent onClick={onClick}>
+          <StyledTreeItemContent onClick={stopPropagation}>
             <StyledPageIcon>
               {labelIcon || <DefaultPageIcon />}
             </StyledPageIcon>
             <StyledLink>
               {label}
             </StyledLink>
+            <div className='page-actions'>
+              {addSubPage && <AddIcon color='secondary' fontSize='small' onClick={() => addSubPage()} />}
+            </div>
           </StyledTreeItemContent>
         </Link>
       )}
@@ -157,8 +179,14 @@ function mergeRefs (refs: any) {
   };
 }
 
-function RenderDraggableNode ({ item, onDrop, pathPrefix }:
-  { item: MenuNode, onDrop: (a: MenuNode, b: MenuNode) => void, pathPrefix: string }) {
+type DraggableNodeProps = {
+  item: MenuNode;
+  onDrop: (a: MenuNode, b: MenuNode) => void;
+  pathPrefix: string;
+  addPage?: (p: Partial<Page>) => void;
+}
+
+function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage }: DraggableNodeProps) {
 
   const theme = useTheme();
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
@@ -194,8 +222,16 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix }:
   }, [drag]);
 
   const isActive = canDrop && isOverCurrent;
+
+  function addSubPage () {
+    if (addPage) {
+      addPage({ parentId: item.id });
+    }
+  }
+
   return (
     <StyledTreeItem
+      addSubPage={addSubPage}
       ref={mergeRefs([drag, drop, dragPreview, focusListener])}
       key={item.id}
       nodeId={item.id}
@@ -203,7 +239,8 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix }:
       href={`${pathPrefix}/${item.path}`}
       labelIcon={item.icon}
       sx={{
-        backgroundColor: isActive ? theme.palette.action.focus : 'unset' // 'rgba(22, 52, 71, 0.08)' : 'unset'
+        backgroundColor: isActive ? theme.palette.action.focus : 'unset', // 'rgba(22, 52, 71, 0.08)' : 'unset'
+        position: 'relative'
       }}
     >
       {isDragging
@@ -215,9 +252,14 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix }:
               pathPrefix={pathPrefix}
               key={childItem.id}
               item={childItem}
+              addPage={addPage}
             />
           ))
-          : <Typography variant='caption' className='MuiTreeItem-content' sx={{ color: `${greyColor2} !important`, ml: 1 }}>No pages inside</Typography>}
+          : (
+            <Typography variant='caption' className='MuiTreeItem-content' sx={{ color: `${greyColor2} !important`, ml: 1 }}>
+              No pages inside
+            </Typography>
+          )}
     </StyledTreeItem>
   );
 }
@@ -300,15 +342,24 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
 }
 
 type NavProps = {
-  pages: Page[];
-  setPages: Dispatch<SetStateAction<Page[]>>;
-  pathPrefix: string;
+  addPage?: (p: Partial<Page>) => void;
   isFavorites?: boolean;
-  spaceId: string;
+  pages: Page[];
+  pathPrefix: string;
   rootPageIds?: string[];
+  setPages: Dispatch<SetStateAction<Page[]>>;
+  spaceId: string;
 };
 
-export default function PageNavigation ({ pages, spaceId, setPages, pathPrefix, isFavorites, rootPageIds }: NavProps) {
+export default function PageNavigation ({
+  addPage,
+  isFavorites,
+  pages,
+  pathPrefix,
+  rootPageIds,
+  setPages,
+  spaceId
+}: NavProps) {
 
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${spaceId}.expanded-pages`, []);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -351,9 +402,6 @@ export default function PageNavigation ({ pages, spaceId, setPages, pathPrefix, 
     setExpanded(nodeIds);
   }
 
-  console.log('expanded', expanded);
-  console.log(mappedItems);
-
   return (
     <DndProvider backend={HTML5Backend}>
       <TreeRoot
@@ -369,7 +417,7 @@ export default function PageNavigation ({ pages, spaceId, setPages, pathPrefix, 
         sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
       >
         {mappedItems.map((item, index) => (
-          <RenderDraggableNode key={item.id} item={item} onDrop={onDrop} pathPrefix={pathPrefix} />
+          <RenderDraggableNode key={item.id} item={item} onDrop={onDrop} pathPrefix={pathPrefix} addPage={addPage} />
         ))}
       </TreeRoot>
     </DndProvider>
