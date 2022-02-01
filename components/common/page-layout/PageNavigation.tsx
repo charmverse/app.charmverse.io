@@ -110,13 +110,21 @@ const StyledTreeItemContent = styled.a`
 
   .page-actions {
     background: ${({ theme }) => theme.palette.action.hover};
+<<<<<<< HEAD
     opacity: 0;
+=======
+    display: none;
+>>>>>>> main
     position: absolute;
     top: 0px;
     right: 0px;
   }
   &:hover .page-actions {
+<<<<<<< HEAD
     opacity: 1;
+=======
+    display: block;
+>>>>>>> main
   }
 `;
 
