@@ -7,14 +7,20 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import AddIcon from '@mui/icons-material/Add';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import TreeView from '@mui/lab/TreeView';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import Tooltip from '@mui/material/Tooltip';
 import Link from 'next/link';
-import { blackColor, greyColor2 } from 'theme/colors';
+import { greyColor2 } from 'theme/colors';
 import { Page } from 'models';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import EmojiCon from '../Emoji';
@@ -104,13 +110,13 @@ const StyledTreeItemContent = styled.a`
 
   .page-actions {
     background: ${({ theme }) => theme.palette.action.hover};
-    display: none;
+    opacity: 0;
     position: absolute;
     top: 0px;
     right: 0px;
   }
   &:hover .page-actions {
-    display: block;
+    opacity: 1;
   }
 `;
 
@@ -139,12 +145,14 @@ type TreeItemProps = ComponentProps<typeof TreeItem> & {
   href: string;
   labelIcon?: string;
   addSubPage?: () => void;
+  deletePage?: () => void;
 }
 
 // eslint-disable-next-line react/function-component-definition
 const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
   const {
     addSubPage,
+    deletePage,
     color,
     href,
     labelIcon,
@@ -152,37 +160,71 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
     ...other
   } = props;
 
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
   function stopPropagation (event: SyntheticEvent) {
     event.stopPropagation();
   }
 
+  function showMenu (event: React.MouseEvent<HTMLElement>) {
+    setAnchorEl(event.currentTarget);
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function hideMenu (event: React.MouseEvent<HTMLElement>) {
+    setAnchorEl(null);
+  }
+
   return (
-    <StyledTreeItemRoot
-      label={(
-        <Link href={href} passHref>
-          <StyledTreeItemContent onClick={stopPropagation}>
-            <StyledPageIcon>
-              {labelIcon || <DefaultPageIcon />}
-            </StyledPageIcon>
-            <StyledLink>
-              {label}
-            </StyledLink>
-            <div className='page-actions'>
-              {addSubPage && (
-                <Tooltip disableInteractive title='Add a page inside' leaveDelay={0}>
-                  <StyledIconButton onClick={() => addSubPage()}>
-                    <AddIcon color='secondary' />
-                  </StyledIconButton>
-                </Tooltip>
-              )}
-            </div>
-          </StyledTreeItemContent>
-        </Link>
-      )}
-      {...other}
-      TransitionProps={{ timeout: 50 }}
-      ref={ref}
-    />
+    <>
+      <StyledTreeItemRoot
+        label={(
+          <Link href={href} passHref>
+            <StyledTreeItemContent onClick={stopPropagation}>
+              <StyledPageIcon>
+                {labelIcon || <DefaultPageIcon />}
+              </StyledPageIcon>
+              <StyledLink>
+                {label}
+              </StyledLink>
+              <div className='page-actions'>
+                <IconButton size='small' onClick={showMenu}>
+                  <MoreHorizIcon color='secondary' fontSize='small' />
+                </IconButton>
+                {addSubPage && (
+                  <Tooltip disableInteractive title='Add a page inside' leaveDelay={0}>
+                    <StyledIconButton onClick={() => addSubPage()} sx={{ marginLeft: '3px' }}>
+                      <AddIcon color='secondary' />
+                    </StyledIconButton>
+                  </Tooltip>
+                )}
+              </div>
+            </StyledTreeItemContent>
+          </Link>
+        )}
+        {...other}
+        TransitionProps={{ timeout: 50 }}
+        ref={ref}
+      />
+
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={hideMenu}
+        onClick={hideMenu}
+        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left'
+        }}
+      >
+        <MenuItem sx={{ padding: '3px 12px' }} onClick={deletePage}>
+          <ListItemIcon><DeleteIcon fontSize='small' /></ListItemIcon>
+          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
+        </MenuItem>
+      </Menu>
+    </>
   );
 });
 
@@ -205,9 +247,10 @@ type DraggableNodeProps = {
   onDrop: (a: MenuNode, b: MenuNode) => void;
   pathPrefix: string;
   addPage?: (p: Partial<Page>) => void;
+  deletePage?: (id: string) => void;
 }
 
-function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage }: DraggableNodeProps) {
+function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }: DraggableNodeProps) {
 
   const theme = useTheme();
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
@@ -250,9 +293,16 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage }: DraggableNo
     }
   }
 
+  function deleteThisPage () {
+    if (deletePage) {
+      deletePage(item.id);
+    }
+  }
+
   return (
     <StyledTreeItem
       addSubPage={addSubPage}
+      deletePage={deleteThisPage}
       ref={mergeRefs([drag, drop, dragPreview, focusListener])}
       key={item.id}
       nodeId={item.id}
@@ -274,6 +324,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage }: DraggableNo
               key={childItem.id}
               item={childItem}
               addPage={addPage}
+              deletePage={deletePage}
             />
           ))
           : (
@@ -365,6 +416,7 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
 
 type NavProps = {
   addPage?: (p: Partial<Page>) => void;
+  deletePage?: (id: string) => void;
   isFavorites?: boolean;
   pages: Page[];
   pathPrefix: string;
@@ -375,6 +427,7 @@ type NavProps = {
 
 export default function PageNavigation ({
   addPage,
+  deletePage,
   isFavorites,
   pages,
   pathPrefix,
@@ -439,7 +492,14 @@ export default function PageNavigation ({
         sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
       >
         {mappedItems.map((item, index) => (
-          <RenderDraggableNode key={item.id} item={item} onDrop={onDrop} pathPrefix={pathPrefix} addPage={addPage} />
+          <RenderDraggableNode
+            key={item.id}
+            item={item}
+            onDrop={onDrop}
+            pathPrefix={pathPrefix}
+            addPage={addPage}
+            deletePage={deletePage}
+          />
         ))}
       </TreeRoot>
     </DndProvider>
