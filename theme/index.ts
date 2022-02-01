@@ -118,7 +118,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
       main: blueColor // '#010101',
     },
     secondary: {
-      main: mode === 'dark' ? '#999' : '#777'
+      main: mode === 'dark' ? '#999' : '#888'
     },
     blue: {
       main: '#00aced'

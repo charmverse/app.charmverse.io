@@ -7,10 +7,8 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import MuiLink from '@mui/material/Link';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
@@ -33,7 +31,7 @@ import EmojiCon from '../Emoji';
 import ModalContainer from '../ModalContainer';
 import CreateWorkspaceForm from './CreateWorkspaceForm';
 
-import PageNavigation, { MenuNode } from './PageNavigation';
+import PageNavigation, { StyledIconButton } from './PageNavigation';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -44,6 +42,33 @@ const WorkspacesContainer = styled.div`
   height: 100%;
   border-right: 1px solid ${({ theme }) => theme.palette.divider};
   padding: ${({ theme }) => theme.spacing(1)};
+`;
+
+const WorkspaceLabel = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  .add-a-page {
+    display: flex;
+    position: absolute;
+    right: 8px;
+    top: 0px;
+  }
+`;
+
+const SidebarContainer = styled.div`
+  display: flex;
+  background-color: ${({ theme }) => theme.palette.sidebar.background};
+  height: 100%;
+
+  .add-a-page {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+  &:hover .add-a-page {
+    opacity: 1;
+  }
 `;
 
 interface SidebarProps {
@@ -101,7 +126,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       title: '',
       ...page
     };
-    setPages([...pages, newPage]);
+    setPages([newPage, ...pages]);
 
     // add delay to simulate a server call
     setTimeout(() => {
@@ -110,7 +135,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   }
 
   return (
-    <Box display='flex' sx={{ bgcolor: 'sidebar.background', height: '100%' }}>
+    <SidebarContainer>
       <WorkspacesContainer>
         <Grid container spacing={2} flexDirection='column'>
           {spaces.map(workspace => (
@@ -158,7 +183,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           </Box> */}
             {favoritePageIds.length > 0 && (
               <Box mb={2}>
-                <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
+                <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
                   FAVORITES
                 </Typography>
                 <PageNavigation
@@ -172,9 +197,18 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 />
               </Box>
             )}
-            <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2 }}>
-              WORKSPACE
-            </Typography>
+            <WorkspaceLabel>
+              <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
+                WORKSPACE
+              </Typography>
+              <div className='add-a-page'>
+                <Tooltip disableInteractive title='Add a page' leaveDelay={0} placement='right' arrow>
+                  <StyledIconButton onClick={() => addPage({})}>
+                    <AddIcon color='secondary' />
+                  </StyledIconButton>
+                </Tooltip>
+              </div>
+            </WorkspaceLabel>
             <PageNavigation
               pages={pages}
               spaceId={space.id}
@@ -207,6 +241,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           </Box>
         </Box>
       </Box>
-    </Box>
+    </SidebarContainer>
   );
 }

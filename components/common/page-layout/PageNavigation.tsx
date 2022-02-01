@@ -6,11 +6,13 @@ import { useRouter } from 'next/router';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
-import AddIcon from '@mui/icons-material/AddBoxOutlined';
+import AddIcon from '@mui/icons-material/Add';
 import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import TreeView from '@mui/lab/TreeView';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
+import Tooltip from '@mui/material/Tooltip';
 import Link from 'next/link';
 import { blackColor, greyColor2 } from 'theme/colors';
 import { Page } from 'models';
@@ -78,6 +80,19 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   }
 }));
 
+export const StyledIconButton = styled(IconButton)`
+  border-radius: 3px;
+  border: 1px solid ${({ theme }) => theme.palette.divider};
+  height: 16px;
+  width: 16px;
+  svg {
+    font-size: 16px;
+  }
+  &:hover {
+    background-color: ${({ theme }) => theme.palette.action.hover};
+  }
+`;
+
 const StyledTreeItemContent = styled.a`
   color: inherit;
   text-decoration: none;
@@ -91,8 +106,8 @@ const StyledTreeItemContent = styled.a`
     background: ${({ theme }) => theme.palette.action.hover};
     display: none;
     position: absolute;
-    padding-top: 6px;
-    right: 0;
+    top: 0px;
+    right: 0px;
   }
   &:hover .page-actions {
     display: block;
@@ -153,7 +168,13 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
               {label}
             </StyledLink>
             <div className='page-actions'>
-              {addSubPage && <AddIcon color='secondary' fontSize='small' onClick={() => addSubPage()} />}
+              {addSubPage && (
+                <Tooltip disableInteractive title='Add a page inside' leaveDelay={0}>
+                  <StyledIconButton onClick={() => addSubPage()}>
+                    <AddIcon color='secondary' />
+                  </StyledIconButton>
+                </Tooltip>
+              )}
             </div>
           </StyledTreeItemContent>
         </Link>
@@ -333,7 +354,8 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
       ref={drop}
       style={{
         backgroundColor: isActive ? theme.palette.action.focus : 'unset',
-        flexGrow: isFavorites ? 0 : 1
+        flexGrow: isFavorites ? 0 : 1,
+        maxWidth: 240
       }}
     >
       <TreeView {...rest}>{children}</TreeView>
