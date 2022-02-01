@@ -136,7 +136,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   function deletePage (pageId: string) {
     const newPages = pages.filter(p => p.id !== pageId);
-    router.push(newPages[0] ? `/${space.domain}/${newPages[0].path}` : `/${space.domain}`);
     setPages(newPages);
   }
 
