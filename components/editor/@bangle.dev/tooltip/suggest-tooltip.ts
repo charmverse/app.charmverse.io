@@ -14,12 +14,8 @@ import { tooltipPlacement, TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import {
-  createObject, filter,
-  isChromeWithSelectionBug, safeInsert
+  createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert
 } from '@bangle.dev/utils';
-import {
-  findFirstMarkPosition
-} from "components/editor/@bangle.dev/utils/pm-helpers";
 import { emojiSuggestKey } from "components/editor/EmojiSuggest";
 
 export const spec = specFactory;
