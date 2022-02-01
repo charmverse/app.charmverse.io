@@ -15,8 +15,12 @@ import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placeme
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import {
   createObject, filter,
-  findFirstMarkPosition, isChromeWithSelectionBug, safeInsert
+  isChromeWithSelectionBug, safeInsert
 } from '@bangle.dev/utils';
+import {
+  findFirstMarkPosition
+} from "components/editor/@bangle.dev/utils/pm-helpers";
+import { emojiSuggestKey } from "components/editor/EmojiSuggest";
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -68,14 +72,7 @@ function specFactory({
       attrs: {
         trigger: { default: trigger },
       },
-    },
-    markdown: {
-      toMarkdown: {
-        open: '',
-        close: '',
-        mixable: true,
-      },
-    },
+    }
   };
 }
 
@@ -184,14 +181,27 @@ function pluginsFactory({
         renderOpts: {
           ...tooltipRenderOpts,
           getReferenceElement: referenceElement((state: EditorState) => {
-            const markType = schema.marks[markName];
-            const { selection } = state;
-            return findFirstMarkPosition(
-              markType,
-              state.doc,
-              selection.from - 1,
-              selection.to,
-            );
+            const emojiSuggestState = emojiSuggestKey.getState(state);
+            // We are inside a callout, so dont search for mark,
+            // Instead use the getPos key of the emoji suggest plugin state
+            // to get the position of the callout node
+            const {getPos} = emojiSuggestState
+            if (getPos) {
+              const position = getPos();
+              return {
+                end: position,
+                start: position
+              };
+            } else {
+              const markType = schema.marks[markName];
+              const { selection } = state;
+              return findFirstMarkPosition(
+                markType,
+                state.doc,
+                selection.from - 1,
+                selection.to,
+              );
+            }
           }),
         },
       }),

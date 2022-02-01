@@ -44,7 +44,7 @@ export function blockQuoteSpec () {
   return spec;
 }
 
-export function BlockQuote ({ children, node, updateAttrs, view }: NodeViewProps & { children: ReactNode }) {
+export function BlockQuote ({ children, node, updateAttrs, view, getPos }: NodeViewProps & { children: ReactNode }) {
   return (
     <StyledBlockQuote>
       <BlockQuoteEmoji>
@@ -57,7 +57,7 @@ export function BlockQuote ({ children, node, updateAttrs, view }: NodeViewProps
               const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
               view.dispatch(
                 // Chain transactions together
-                view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_CALLOUT', updateAttrs }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
+                view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_CALLOUT', updateAttrs, getPos }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
               );
             }
           }}

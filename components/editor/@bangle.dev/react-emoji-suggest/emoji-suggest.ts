@@ -167,7 +167,9 @@ function pluginsFactory({
               selectedEmojiSquareId,
               rowWidth,
               suggestTooltipKey,
-              insideCallout: false
+              insideCallout: false,
+              getPos: null,
+              updateAttrs: null,
             };
           },
           apply(tr, pluginState) {
@@ -179,7 +181,8 @@ function pluginsFactory({
               return {
                 ...pluginState,
                 insideCallout: true,
-                updateAttrs: meta.updateAttrs
+                updateAttrs: meta.updateAttrs,
+                getPos: meta.getPos
               }
             }
 
@@ -187,7 +190,8 @@ function pluginsFactory({
               return {
                 ...pluginState,
                 insideCallout: false,
-                updateAttrs: null
+                updateAttrs: null,
+                getPos: null
               }
             }
           },
