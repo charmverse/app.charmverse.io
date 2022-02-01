@@ -2,13 +2,13 @@ import { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
 import { Command, EditorState, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { EmojiGroupType } from '@bangle.dev/react-emoji-suggest/types';
 import { getSquareDimensions, resolveCounter, resolveRowJump } from '@bangle.dev/react-emoji-suggest/utils';
-import type { SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
-import { createTooltipDOM, suggestTooltip } from '@bangle.dev/tooltip';
+import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import {
   bangleWarn,
   rafCommandExec,
   uuid
 } from '@bangle.dev/utils';
+import * as suggestTooltip from "components/editor/@bangle.dev/tooltip/suggest-tooltip";
 
 const {
   decrementSuggestTooltipCounter,

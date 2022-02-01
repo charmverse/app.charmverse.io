@@ -56,6 +56,7 @@ export function BlockQuote ({ children, node, updateAttrs, view }: NodeViewProps
             if (view.dispatch!) {
               const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
               view.dispatch(
+                // Chain transactions together
                 view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_CALLOUT', updateAttrs }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
               );
             }
