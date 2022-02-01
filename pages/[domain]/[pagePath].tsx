@@ -1,19 +1,28 @@
+import { ReactElement, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { PageLayout } from 'components/common/page-layout';
-import { setTitle } from 'components/common/page-layout/PageTitle';
+import { useTitleState } from 'components/common/page-layout/PageTitle';
 import { Editor } from 'components/editor';
 import { usePages } from 'hooks/usePages';
-import { useRouter } from 'next/router';
-import { ReactElement } from 'react';
+import { Page } from 'models';
 
 export default function BlocksEditorPage () {
-  const [pages] = usePages();
+  const [pages, setPages] = usePages();
   const router = useRouter();
   const { pagePath } = router.query;
   const pageByPath = pages.find(page => page.path === pagePath) || pages[0];
-  setTitle(pageByPath.title);
+  const [, setTitleState] = useTitleState();
+
+  function setPage (page: Page) {
+    setPages(pages.map(p => p.id === page.id ? page : p));
+  }
+
+  useEffect(() => {
+    setTitleState(pageByPath.title);
+  }, [pageByPath]);
 
   return (
-    <Editor page={pageByPath} />
+    <Editor page={pageByPath} setPage={setPage} />
   );
 }
 
