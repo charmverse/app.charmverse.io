@@ -46,7 +46,7 @@ export default function SettingsLayout ({ children }: { children: ReactNode }) {
             {/* combining next links with MUI tabs - https://stackoverflow.com/questions/65471275/material-ui-tabs-with-nextjs */}
             {SETTINGS_TABS.map(({ icon, path, label }) => (
               <Link href={`/${domain}/settings/${path}`} passHref key={label}>
-                <Tab icon={icon} iconPosition='start' component='a' disableRipple label={label} sx={{ minHeight: 0 }} />
+                <Tab icon={icon} iconPosition='start' component='a' disableRipple label={label} sx={{ fontSize: 14, minHeight: 0 }} />
               </Link>
             ))}
           </Tabs>

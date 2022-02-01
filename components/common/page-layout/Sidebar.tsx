@@ -13,7 +13,6 @@ import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { isTruthy } from 'lib/types';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useSpace } from 'hooks/useSpace';
@@ -134,6 +133,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     }, 100);
   }
 
+  function deletePage (pageId: string) {
+    const newPages = pages.filter(p => p.id !== pageId);
+    setPages(newPages);
+  }
+
   return (
     <SidebarContainer>
       <WorkspacesContainer>
@@ -215,6 +219,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               pathPrefix={`/${space.domain}`}
               setPages={setPages}
               addPage={addPage}
+              deletePage={deletePage}
             />
           </Box>
         </Box>
