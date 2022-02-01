@@ -31,7 +31,7 @@ const BlockQuoteEmoji = styled.div`
 
   & span:hover {
     cursor: pointer;
-    background-color: ${({ theme }) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04);'};
+    background-color: ${({ theme }) => theme.palette.emoji.hoverBackground};
     transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   }
 `;

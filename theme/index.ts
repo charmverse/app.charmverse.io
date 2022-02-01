@@ -26,6 +26,9 @@ interface CustomColors {
   code: {
     color: string
     background: string
+  },
+  emoji: {
+    hoverBackground: string
   }
 }
 
@@ -137,6 +140,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     code: {
       color: '#EB5757',
       background: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
+    },
+    emoji: {
+      hoverBackground: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04);'
     }
   },
   components: {
