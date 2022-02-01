@@ -84,7 +84,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [pages, setPages] = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
-  console.log('pages', pages.map(p => p.title));
+
   function showSpaceForm () {
     setSpaceFormOpen(true);
   }
