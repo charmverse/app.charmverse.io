@@ -140,6 +140,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 <PageNavigation
                   isFavorites={true}
                   pages={pages}
+                  spaceId={space.id}
                   pathPrefix={`/${space.domain}`}
                   rootPageIds={favoritePageIds}
                   setPages={setPages}
@@ -151,6 +152,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             </Typography>
             <PageNavigation
               pages={pages}
+              spaceId={space.id}
               pathPrefix={`/${space.domain}`}
               setPages={setPages}
             />

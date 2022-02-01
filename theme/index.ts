@@ -91,6 +91,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
   },
   palette: {
     mode,
+    action: {
+      focus: mode === 'dark' ? 'rgb(29, 92, 132)' : 'rgb(29, 92, 132, 0.1)', // darken(backgroundLightColor, 0.1)
+      hover: mode === 'dark' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(22, 52, 71, 0.12)',
+      selected: mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(22, 52, 71, 0.06)'
+    },
     background: {
       default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor,
       light: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor,

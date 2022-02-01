@@ -1,4 +1,5 @@
 import React, { forwardRef, ReactNode, ComponentProps, useCallback, useMemo, useState, useEffect, Dispatch, SetStateAction, SyntheticEvent } from 'react';
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useDrop, useDrag, DndProvider } from 'react-dnd';
 import { useRouter } from 'next/router';
@@ -32,15 +33,21 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     color: theme.palette.text.secondary,
     // paddingRight: theme.spacing(1),
     // fontWeight: theme.typography.fontWeightMedium,
+    '.MuiTypography-root': {
+      fontWeight: 500
+    },
     '&.Mui-expanded': {
       fontWeight: theme.typography.fontWeightRegular
     },
-    // '&:hover': {
-    //   backgroundColor: theme.palette.action.hover
-    // },
+    '&.Mui-selected:hover': {
+      backgroundColor: theme.palette.action.hover
+    },
     '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
-      backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
-      color: blackColor
+      backgroundColor: theme.palette.action.selected,
+      color: theme.palette.text.primary,
+      '.MuiTypography-root': {
+        fontWeight: 700
+      }
     },
     [`& .${treeItemClasses.label}`]: {
       fontWeight: 'inherit',
@@ -92,7 +99,6 @@ const StyledPageIcon = styled(EmojiCon)`
 const StyledLink = styled(Typography)`
   color: inherit;
   font-size: 14px;
-  font-weight: 500;
   &:hover {
     color: inherit;
   }
@@ -153,7 +159,8 @@ function mergeRefs (refs: any) {
 
 function RenderDraggableNode ({ item, onDrop, pathPrefix }:
   { item: MenuNode, onDrop: (a: MenuNode, b: MenuNode) => void, pathPrefix: string }) {
-  // rgba(22, 52, 71, 0.08)
+
+  const theme = useTheme();
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
     item,
@@ -196,7 +203,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix }:
       href={`${pathPrefix}/${item.path}`}
       labelIcon={item.icon}
       sx={{
-        backgroundColor: isActive ? 'rgba(22, 52, 71, 0.08)' : 'unset'
+        backgroundColor: isActive ? theme.palette.action.focus : 'unset' // 'rgba(22, 52, 71, 0.08)' : 'unset'
       }}
     >
       {isDragging
@@ -277,12 +284,13 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
       canDrop: monitor.canDrop()
     })
   }));
+  const theme = useTheme();
   const isActive = canDrop && isOverCurrent;
   return (
     <div
       ref={drop}
       style={{
-        backgroundColor: isActive ? 'rgba(22, 52, 71, 0.08)' : 'unset',
+        backgroundColor: isActive ? theme.palette.action.focus : 'unset',
         flexGrow: isFavorites ? 0 : 1
       }}
     >
@@ -296,12 +304,13 @@ type NavProps = {
   setPages: Dispatch<SetStateAction<Page[]>>;
   pathPrefix: string;
   isFavorites?: boolean;
+  spaceId: string;
   rootPageIds?: string[];
 };
 
-export default function PageNavigation ({ pages, setPages, pathPrefix, isFavorites, rootPageIds }: NavProps) {
+export default function PageNavigation ({ pages, spaceId, setPages, pathPrefix, isFavorites, rootPageIds }: NavProps) {
 
-  const [expanded, setExpanded] = useLocalStorage<string[]>('expanded-pages', []);
+  const [expanded, setExpanded] = useLocalStorage<string[]>(`${spaceId}.expanded-pages`, []);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
