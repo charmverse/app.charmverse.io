@@ -20,7 +20,9 @@ const Controls = styled.div`
 `;
 
 const PageTitle = styled.input`
+  background: transparent;
   border: 0 none;
+  color: ${({ theme }) => theme.palette.text.primary};
   cursor: text;
   font-size: 40px;
   font-weight: 700;
