@@ -108,7 +108,7 @@ div#__next > div {
 }
 
 .ProseMirror {
-  padding: 5px 15px;
+  padding: 5px 0;
 }
 
 .ProseMirror table {
@@ -136,7 +136,7 @@ div#__next > div {
  * Prosemirror
  * copied from https://github.com/ProseMirror/prosemirror-view/blob/master/style/prosemirror.css
  */
- .ProseMirror {
+.ProseMirror {
   position: relative;
 }
 
@@ -146,7 +146,7 @@ div#__next > div {
   white-space: break-spaces;
   -webkit-font-variant-ligatures: none;
   font-variant-ligatures: none;
-  font-feature-settings: 'liga' 0; /* the above doesn't seem to work in Edge */
+  font-feature-settings: "liga" 0; /* the above doesn't seem to work in Edge */
 }
 
 .ProseMirror-hideselection *::selection {
@@ -290,7 +290,7 @@ img.ProseMirror-separator {
 }
 
 .bangle-editor li.ProseMirror-selectednode:after {
-  content: '';
+  content: "";
   position: absolute;
   left: -32px;
   right: -2px;
@@ -328,15 +328,15 @@ img.ProseMirror-separator {
   font-size: 1rem;
   line-height: 1.625;
   font-size: 1.125rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 .bangle-editor > p {
   margin-top: 0.75rem;
 }
 
 .bangle-editor p > code {
-  font-family: Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+  font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   padding: 0.2em 0.4em;
   margin: 0 0.1em;
@@ -378,7 +378,7 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror-gapcursor:after {
-  content: '';
+  content: "";
   display: block;
   position: absolute;
   top: -2px;
