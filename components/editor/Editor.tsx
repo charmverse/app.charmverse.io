@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
-import { ListItem, useTheme } from '@mui/material';
+import { ListItem } from '@mui/material';
 import Box from '@mui/material/Box';
 import Emoji from 'components/common/Emoji';
 import { Page } from 'models';
-import { ChangeEvent } from 'react';
+import React, { ChangeEvent, ReactNode } from 'react';
 import BangleEditor from './BangleEditor';
 
 const Container = styled.div`
@@ -13,6 +13,24 @@ const Container = styled.div`
   margin: 0 auto 5px;
   padding: 0 20px 0 40px;
 `;
+
+const StyledListItem = styled(ListItem)`
+  border-radius: ${({ theme }) => theme.spacing(0.5)};
+  opacity: 0.5;
+  display: flex;
+  gap: 1;
+  padding: ${({ theme }) => theme.spacing(0.75)};
+  width: fit-content;
+` as React.FC<{disableRipple: boolean, button: boolean, children: ReactNode}>;
+
+function PageListItem (props: {children: ReactNode}) {
+  const { children } = props;
+  return (
+    <StyledListItem disableRipple button>
+      {children}
+    </StyledListItem>
+  );
+}
 
 const Controls = styled.div`
   margin-top: 80px;
@@ -34,27 +52,14 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
     setPage({ ...page, title: event.target.value });
   }
 
-  const theme = useTheme();
-
   return (
     <Container>
       <Controls>
         {!page.icon && (
-        <ListItem
-          button
-          disableRipple
-          sx={{
-            borderRadius: theme.spacing(0.5),
-            opacity: 0.5,
-            display: 'flex',
-            gap: 1,
-            padding: `${theme.spacing(0.75)}`,
-            width: 'fit-content'
-          }}
-        >
-          <EmojiEmotionsIcon fontSize='small' />
+        <PageListItem>
+          <EmojiEmotionsIcon fontSize='small' sx={{ marginRight: 1 }} />
           Add Icon
-        </ListItem>
+        </PageListItem>
         )}
       </Controls>
       <Box py={3}>
