@@ -46,3 +46,23 @@ export function stringToColor (name: string, saturation = 50, lightness = 60) {
 export const shortenedWeb3Address = (address: string) => {
   return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
 };
+
+// copied from react-router to support focalboard
+
+function invariant (cond: any, message: string): asserts cond {
+  if (!cond) throw new Error(message);
+}
+
+/**
+ * Returns a path with params interpolated.
+ *
+ * @see https://reactrouter.com/docs/en/v6/api#generatepath
+ */
+export function generatePath (path: string, params: any = {}): string {
+  return path
+    .replace(/:(\w+)/g, (_, key) => {
+      invariant(params[key] != null, `Missing ":${key}" param`);
+      return params[key]!;
+    })
+    .replace(/\/*\*$/, _ => params['*'] == null ? '' : params['*'].replace(/^\/*/, '/'));
+}
