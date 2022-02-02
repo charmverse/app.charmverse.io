@@ -114,9 +114,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         type: 'doc',
         content: [{
           type: 'paragraph',
-          content: [
-
-          ]
+          content: []
         }]
       },
       created: new Date(),

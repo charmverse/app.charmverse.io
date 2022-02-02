@@ -1,28 +1,27 @@
-import React, { forwardRef, ReactNode, ComponentProps, useCallback, useMemo, useState, useEffect, Dispatch, SetStateAction, SyntheticEvent } from 'react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { useDrop, useDrag, DndProvider } from 'react-dnd';
-import { useRouter } from 'next/router';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
-import AddIcon from '@mui/icons-material/Add';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
+import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import TreeView from '@mui/lab/TreeView';
-import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import Tooltip from '@mui/material/Tooltip';
-import Link from 'next/link';
-import { greyColor2 } from 'theme/colors';
-import { Page } from 'models';
+import Typography from '@mui/material/Typography';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { Page } from 'models';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { greyColor2 } from 'theme/colors';
 import EmojiCon from '../Emoji';
 
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
@@ -129,12 +128,13 @@ const StyledPageIcon = styled(EmojiCon)`
   width: 24px;
 `;
 
-const StyledLink = styled(Typography)`
+const StyledLink = styled(Typography)<{isEmpty: boolean}>`
   color: inherit;
   font-size: 14px;
   &:hover {
     color: inherit;
   }
+  ${(props) => props.isEmpty && 'opacity: 0.5;'}
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -185,8 +185,8 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
               <StyledPageIcon>
                 {labelIcon || <DefaultPageIcon />}
               </StyledPageIcon>
-              <StyledLink>
-                {label}
+              <StyledLink isEmpty={(label as string).length === 0}>
+                {(label as string)?.length !== 0 ? label : 'Untitled'}
               </StyledLink>
               <div className='page-actions'>
                 <IconButton size='small' onClick={showMenu}>
