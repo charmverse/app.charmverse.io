@@ -118,14 +118,21 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       description: 'Insert a callout block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
-          return insertNode(state, dispatch, state.schema.nodes.blockquote.create(
-            undefined,
-            Fragment.fromArray([
-              state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
-                state.schema.text("Hello World")
-              ]))
-            ])
-          ))
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.blockquote.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
+                  state.schema.text("Hello World")
+                ]))
+              ])
+            ))
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
         };
       },
     },
