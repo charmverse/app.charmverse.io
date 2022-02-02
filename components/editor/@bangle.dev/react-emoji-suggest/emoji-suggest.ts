@@ -9,6 +9,7 @@ import {
   uuid
 } from '@bangle.dev/utils';
 import * as suggestTooltip from "components/editor/@bangle.dev/tooltip/suggest-tooltip";
+import { emojiSuggestKey, getEmojiByAlias } from 'components/editor/EmojiSuggest';
 
 const {
   decrementSuggestTooltipCounter,
@@ -215,7 +216,7 @@ function pluginsFactory({
         onEnter: (state, dispatch, view) => {
           const emojiGroups = getEmojiGroups(queryTriggerText(key)(state));
           const matchedEmojis = emojiGroups.flatMap((r) => r.emojis);
-
+          const {insideCallout, updateAttrs} = emojiSuggestKey.getState(state);
           if (matchedEmojis.length === 0) {
             return removeSuggestMark(key)(state, dispatch, view);
           }
@@ -230,7 +231,20 @@ function pluginsFactory({
           const emojiAlias = activeItem[0];
           view &&
             rafCommandExec(view, resetSuggestTooltipCounter(suggestTooltipKey));
-          return selectEmoji(key, emojiAlias)(state, dispatch, view);
+          
+          if (!insideCallout) {
+            return selectEmoji(key, emojiAlias)(state, dispatch, view);
+          } else {
+            updateAttrs({
+              emoji: getEmojiByAlias(emojiAlias)?.[1] ?? "👋"
+            })
+            if (view) {
+              view.dispatch(
+                view.state.tr.setMeta(emojiSuggestKey, { type: "OUTSIDE_CALLOUT" })
+              )
+            }
+            return true;
+          }
         },
 
         onArrowDown: updateCounter('DOWN'),
