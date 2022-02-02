@@ -7,7 +7,7 @@ import { usePages } from 'hooks/usePages';
 import { Page } from 'models';
 
 export default function BlocksEditorPage () {
-  const [pages, setPages] = usePages();
+  const { pages, setPages, setCurrentPage } = usePages();
   const router = useRouter();
   const { pagePath } = router.query;
   const pageByPath = pages.find(page => page.path === pagePath) || pages[0];
@@ -19,6 +19,7 @@ export default function BlocksEditorPage () {
 
   useEffect(() => {
     setTitleState(pageByPath.title);
+    setCurrentPage(pageByPath);
   }, [pageByPath]);
 
   return (

@@ -6,11 +6,11 @@ import Typography from '@mui/material/Typography';
 import ContributorRow from 'components/settings/ContributorRow';
 import { setTitle } from 'components/common/page-layout/PageTitle';
 import { useContributors } from 'hooks/useContributors';
-import { useSpace } from 'hooks/useSpace';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 export default function ContributorSettings () {
 
-  const [space] = useSpace();
+  const [space] = useCurrentSpace();
   const [contributors] = useContributors();
 
   setTitle('Contributors');

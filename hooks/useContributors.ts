@@ -1,10 +1,10 @@
 import { Contributor } from 'models';
 import { contributors } from 'seedData';
 import { useLocalStorage } from './useLocalStorage';
-import { useSpace } from './useSpace';
+import { useCurrentSpace } from './useCurrentSpace';
 
 export function useContributors () {
-  const [space] = useSpace();
+  const [space] = useCurrentSpace();
   const spaceContributors = contributors.filter(
     c => c.spaceRoles.some(({ spaceId }) => spaceId === space.id)
   );

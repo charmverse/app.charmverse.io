@@ -100,11 +100,10 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   const theme = useTheme();
   const colorMode = useColorMode();
   const scrollbarStyling = useScrollbarStyling();
-  const [pages] = usePages();
+  const { currentPage } = usePages();
   const [user, setUser] = useUser();
   const router = useRouter();
-  const thisPage = pages.find(page => page.title === pageTitle);
-  const isFavorite = thisPage && user?.favorites.some(({ pageId }) => pageId === thisPage.id);
+  const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -115,13 +114,13 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   };
 
   function toggleFavorite () {
-    if (!thisPage || !user) return;
-    const pageId = thisPage.id;
+    if (!currentPage || !user) return;
+    const pageId = currentPage.id;
     setUser({
       ...user,
       favorites: isFavorite
         ? user.favorites.filter(page => page.pageId !== pageId)
-        : [...user.favorites, { pageId: thisPage.id, userId: '' }]
+        : [...user.favorites, { pageId: currentPage.id, userId: '' }]
     });
   }
 
@@ -130,8 +129,8 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Head>
-        {thisPage?.icon
-          ? <link rel='icon' href={`data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${thisPage?.icon || ''}</text></svg>`} />
+        {currentPage?.icon
+          ? <link rel='icon' type='image/svg+xml' href={`data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${currentPage?.icon || ''}</text></svg>`} />
           : <link rel='icon' type='image/png' href='/favicon.png' />}
       </Head>
       <Box sx={{ display: 'flex' }}>
