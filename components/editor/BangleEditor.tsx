@@ -7,7 +7,6 @@ import {
   hardBreak,
   heading,
   horizontalRule,
-  image,
   italic,
   link,
   listItem,
@@ -22,6 +21,7 @@ import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/r
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
 import '@bangle.dev/tooltip/style.css';
 import { styled } from '@mui/material';
+import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
@@ -35,7 +35,7 @@ const specRegistry = new SpecRegistry([
   bulletList.spec(),
   hardBreak.spec(),
   horizontalRule.spec(),
-  image.spec(),
+  imageSpec(),
   italic.spec(),
   link.spec(),
   listItem.spec(),
@@ -76,7 +76,7 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
       hardBreak.plugins(),
       heading.plugins(),
       horizontalRule.plugins(),
-      image.plugins(),
+      imagePlugins(),
       italic.plugins(),
       link.plugins(),
       listItem.plugins(),
