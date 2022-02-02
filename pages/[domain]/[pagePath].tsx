@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { PageLayout } from 'components/common/page-layout';
 import { useTitleState } from 'components/common/page-layout/PageTitle';
 import { Editor } from 'components/editor';
+import { DatabaseEditor } from 'components/databases';
 import { usePages } from 'hooks/usePages';
 import { Page } from 'models';
 
@@ -23,7 +24,9 @@ export default function BlocksEditorPage () {
   }, [pageByPath]);
 
   return (
-    <Editor page={pageByPath} setPage={setPage} />
+    (pageByPath?.type === 'database')
+      ? <DatabaseEditor page={pageByPath} setPage={setPage} />
+      : <Editor page={pageByPath} setPage={setPage} />
   );
 }
 

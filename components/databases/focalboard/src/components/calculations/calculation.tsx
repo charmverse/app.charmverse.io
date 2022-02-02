@@ -12,7 +12,6 @@ import ChevronUp from '../../widgets/icons/chevronUp'
 import {CommonCalculationOptionProps, Options, optionDisplayNameString} from './options'
 
 import Calculations from './calculations'
-import './calculation.scss'
 
 type Props = {
     style: CSSProperties

@@ -14,8 +14,24 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
-import 'theme/styles.scss';
 import { createThemeLightSensitive } from 'theme';
+
+// fullcalendar css
+import '@fullcalendar/common/main.css';
+import '@fullcalendar/daygrid/main.css';
+
+// init focalboard
+import '@mattermost/compass-icons/css/compass-icons.css';
+import 'components/databases/focalboard/src/components/blockIconSelector.scss';
+import 'components/databases/focalboard/src/components/calculations/calculation.scss';
+import 'components/databases/focalboard/src/components/calendar/fullcalendar.scss';
+import 'components/databases/focalboard/src/styles/variables.scss';
+import 'components/databases/focalboard/src/styles/main.scss';
+import 'components/databases/focalboard/src/styles/labels.scss';
+import 'components/databases/focalboard/src/styles/_markdown.scss';
+import { ReduxProvider, store } from 'components/databases/focalboard/src/main';
+
+import 'theme/styles.scss';
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement
@@ -74,29 +90,31 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   }
 
   return (
-    <DataProviders>
-      <TitleContext.Consumer>
-        {([title]) => (
-          <Head>
-            <title>
-              {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-            </title>
-          </Head>
-        )}
-      </TitleContext.Consumer>
-      <Head>
-        <meta name='description' content='The Notion of Web3' />
-        <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-      </Head>
-      <ColorModeContext.Provider value={colorMode}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <RouteGuard>
-            {getLayout(<Component {...pageProps} />)}
-          </RouteGuard>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
-    </DataProviders>
+    <ReduxProvider store={store}>
+      <DataProviders>
+        <TitleContext.Consumer>
+          {([title]) => (
+            <Head>
+              <title>
+                {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+              </title>
+            </Head>
+          )}
+        </TitleContext.Consumer>
+        <Head>
+          <meta name='description' content='The Notion of Web3' />
+          <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+        </Head>
+        <ColorModeContext.Provider value={colorMode}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <RouteGuard>
+              {getLayout(<Component {...pageProps} />)}
+            </RouteGuard>
+          </ThemeProvider>
+        </ColorModeContext.Provider>
+      </DataProviders>
+    </ReduxProvider>
   );
 }
 

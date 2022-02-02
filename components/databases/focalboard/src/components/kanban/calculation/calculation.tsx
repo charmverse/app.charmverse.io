@@ -5,7 +5,6 @@ import {useIntl} from 'react-intl'
 
 import {Card} from '../../../blocks/card'
 import Button from '../../../widgets/buttons/button'
-import './calculation.scss'
 import {IPropertyTemplate} from '../../../blocks/board'
 
 import Calculations from '../../calculations/calculations'

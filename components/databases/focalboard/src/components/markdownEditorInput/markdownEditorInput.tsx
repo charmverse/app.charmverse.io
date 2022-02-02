@@ -23,7 +23,7 @@ import './markdownEditorInput.scss'
 
 import Entry from './entryComponent/entryComponent'
 
-const imageURLForUser = (window as any).Components?.imageURLForUser
+const imageURLForUser = (typeof window !== 'undefined') ? (window as any).Components?.imageURLForUser : undefined
 
 type Props = {
     onChange?: (text: string) => void

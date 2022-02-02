@@ -4,7 +4,7 @@ import React, {ReactElement} from 'react'
 import {EntryComponentProps} from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry'
 import './entryComponent.scss'
 
-const BotBadge = (window as any).Components?.BotBadge
+const BotBadge = (typeof window !== 'undefined') ? (window as any).Components?.BotBadge : undefined
 
 const Entry = (props: EntryComponentProps): ReactElement => {
     const {

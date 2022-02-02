@@ -35,5 +35,6 @@ export interface Page {
   path: string;
   parentId: string | null;
   spaceId: string;
+  type: 'page' | 'database';
   updated?: Date;
 }

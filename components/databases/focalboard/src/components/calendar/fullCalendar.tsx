@@ -20,7 +20,6 @@ import PropertyValueElement from '../propertyValueElement'
 import {Constants} from '../../constants'
 import CardBadges from '../cardBadges'
 
-import './fullcalendar.scss'
 
 const oneDay = 60 * 60 * 24 * 1000
 

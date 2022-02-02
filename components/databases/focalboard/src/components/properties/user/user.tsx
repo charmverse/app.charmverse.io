@@ -12,7 +12,7 @@ import {useAppSelector} from '../../../store/hooks'
 import './user.scss'
 import {getSelectBaseStyle} from '../../../theme'
 
-const imageURLForUser = (window as any).Components?.imageURLForUser
+const imageURLForUser = (typeof window !== 'undefined') ? (window as any).Components?.imageURLForUser : undefined
 
 type Props = {
     value: string,

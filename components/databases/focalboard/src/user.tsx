@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-interface IUser {
+export interface IUser {
     id: string,
     username: string,
     email: string,
@@ -12,10 +12,8 @@ interface IUser {
     is_bot: boolean,
 }
 
-interface UserWorkspace {
+export interface UserWorkspace {
     id: string
     title: string
     boardCount: number
 }
-
-export {IUser, UserWorkspace}

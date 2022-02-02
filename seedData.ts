@@ -14,11 +14,35 @@ export const contributors: Contributor[] = [
 
 export const activeUser = contributors[0];
 
-export const pages: Page[] = [
-  { id: '0', icon: '📌', created: new Date(), content: gettingStartedPageContent(), isPublic: false, path: 'first-page', spaceId: '0', title: 'Getting Started', parentId: null },
-  {
-    id: '1',
+function MockPage (partial: Partial<Page>): Page {
+  const id = Math.random().toString(36).substring(2);
+  return {
     created: new Date(),
+    id,
+    type: 'page',
+    title: '',
+    content: {
+      type: 'doc',
+      content: []
+    } as PageContent,
+    isPublic: false,
+    parentId: null,
+    path: id,
+    spaceId: '',
+    ...partial
+  };
+}
+
+export const pages: Page[] = [
+  MockPage({
+    id: '0',
+    icon: '📌',
+    content: gettingStartedPageContent(),
+    path: 'getting-started',
+    spaceId: '0',
+    title: 'Getting Started'
+  }),
+  MockPage({
     content: {
       type: 'doc',
       content: [
@@ -34,38 +58,27 @@ export const pages: Page[] = [
       ]
     },
     parentId: '0',
-    isPublic: false,
-    path: 'second-page',
+    path: 'nested-page',
     spaceId: '0',
     title: 'Nested Page'
-  },
-  {
-    id: '2',
-    created: new Date(),
-    content: {
-      type: 'doc',
-      content: []
-    },
-    isPublic: false,
-    parentId: null,
+  }),
+  MockPage({
     path: 'third-page',
     spaceId: '0',
     title: 'Another Top-level Page'
-  },
-  {
-    id: '3',
-    created: new Date(),
-    content: {
-      type: 'doc',
-      content: []
-    },
-    isPublic: false,
-    parentId: null,
-    path: 'fourth-page',
+  }),
+  MockPage({
+    path: 'database-page',
     spaceId: '0',
-    title: 'Fourth page'
-  },
-  { id: '4', icon: '📌', created: new Date(), content: getPageContent(), isPublic: false, path: 'fifth-page', spaceId: '1', title: 'Getting Started Again', parentId: null }
+    title: 'Database page'
+  }),
+  MockPage({
+    icon: '📌',
+    content: getPageContent(),
+    path: 'fifth-page',
+    spaceId: '1',
+    title: 'Getting Started Again'
+  })
 ];
 
 function gettingStartedPageContent (): PageContent {
