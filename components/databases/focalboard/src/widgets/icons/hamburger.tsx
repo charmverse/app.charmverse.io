@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import './hamburger.scss'
+import './hamburger.module.scss'
 
 export default function HamburgerIcon(): JSX.Element {
     return (

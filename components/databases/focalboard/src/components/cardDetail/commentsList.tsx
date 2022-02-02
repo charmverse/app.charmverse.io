@@ -15,7 +15,7 @@ import {IUser} from '../../user'
 import {getMe} from '../../store/users'
 
 import Comment from './comment'
-import './commentsList.scss'
+import './commentsList.module.scss'
 
 type Props = {
     comments: readonly CommentBlock[]

@@ -5,7 +5,7 @@ import React from 'react'
 
 import CompassIcon from './compassIcon'
 
-import './add.scss'
+import './add.module.scss'
 
 export default function AddIcon(): JSX.Element {
     return (

@@ -5,7 +5,7 @@ import React from 'react'
 
 import CompassIcon from './compassIcon'
 
-import './settings.scss'
+import './settings.module.scss'
 
 export default function SettingsIcon(): JSX.Element {
     return (

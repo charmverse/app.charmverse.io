@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import './logoWithName.scss'
+import './logoWithName.module.scss'
 
 export default function LogoWithNameIcon(): JSX.Element {
     return (

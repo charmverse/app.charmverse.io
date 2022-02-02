@@ -6,4 +6,4 @@ This folder was created to customize packages under the [focalboard](https://git
 2. Removed telemetry code for tracking events
 3. Minor changes to make Typescript types compatible with Next.js tsconfig
 4. Minor changes for SSR (checking for window, etc)
-5. Moved CSS imports to \_app.tsx
+5. Moved 3rd party global CSS imports to \_app.tsx and converted local CSS to modules

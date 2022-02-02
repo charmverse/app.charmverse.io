@@ -29,7 +29,7 @@ import CardDetail from './cardDetail/cardDetail'
 import Dialog from './dialog'
 import {sendFlashMessage} from './flashMessages'
 
-import './cardDialog.scss'
+import './cardDialog.module.scss'
 
 type Props = {
     board: Board

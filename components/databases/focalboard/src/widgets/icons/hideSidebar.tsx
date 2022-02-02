@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import './hideSidebar.scss'
+import './hideSidebar.module.scss'
 
 export default function HideSidebarIcon(): JSX.Element {
     return (

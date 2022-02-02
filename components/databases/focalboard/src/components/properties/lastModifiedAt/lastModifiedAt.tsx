@@ -10,7 +10,7 @@ import {Block} from '../../../blocks/block'
 import {ContentBlock} from '../../../blocks/contentBlock'
 import {CommentBlock} from '../../../blocks/commentBlock'
 import {Utils} from '../../../utils'
-import './lastModifiedAt.scss'
+import './lastModifiedAt.module.scss'
 
 type Props = {
     card: Card,

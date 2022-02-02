@@ -6,7 +6,7 @@ import React from 'react'
 import {useIntl} from 'react-intl'
 
 import {Utils} from '../../../utils'
-import './createdAt.scss'
+import './createdAt.module.scss'
 
 type Props = {
     createAt: number

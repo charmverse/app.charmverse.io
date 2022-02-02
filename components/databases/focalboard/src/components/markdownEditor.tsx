@@ -3,7 +3,7 @@
 import React, {useState} from 'react'
 
 import {Utils} from '../utils'
-import './markdownEditor.scss'
+import './markdownEditor.module.scss'
 
 import MarkdownEditorInput from './markdownEditorInput/markdownEditorInput'
 

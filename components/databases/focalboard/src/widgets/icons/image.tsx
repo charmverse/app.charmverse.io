@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import './image.scss'
+import './image.module.scss'
 
 export default function ImageIcon(): JSX.Element {
     return (

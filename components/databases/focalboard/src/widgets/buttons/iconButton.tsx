@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React from 'react'
 
-import './iconButton.scss'
+import './iconButton.module.scss'
 
 type Props = {
     onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void

@@ -20,7 +20,7 @@ import CenterPanel from './centerPanel'
 import EmptyCenterPanel from './emptyCenterPanel'
 
 import Sidebar from './sidebar/sidebar'
-import './workspace.scss'
+import './workspace.module.scss'
 
 type Props = {
     readonly: boolean

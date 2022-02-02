@@ -5,7 +5,7 @@ import React, {ReactNode} from 'react'
 
 import Editable from '../../../widgets/editable'
 
-import './link.scss'
+import './link.module.scss'
 import {Utils} from '../../../utils'
 import LinkIcon from '../../../widgets/icons/Link'
 

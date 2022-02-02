@@ -8,7 +8,7 @@ import IconButton from '../widgets/buttons/iconButton'
 import CloseIcon from '../widgets/icons/close'
 import OptionsIcon from '../widgets/icons/options'
 import MenuWrapper from '../widgets/menuWrapper'
-import './dialog.scss'
+import './dialog.module.scss'
 
 type Props = {
     children: React.ReactNode

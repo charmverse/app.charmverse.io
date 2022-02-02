@@ -12,7 +12,7 @@ import {useCardDetailContext} from '../cardDetail/cardDetailContext'
 
 import {contentRegistry} from './contentRegistry'
 
-import './checkboxElement.scss'
+import './checkboxElement.module.scss'
 
 type Props = {
     block: ContentBlock

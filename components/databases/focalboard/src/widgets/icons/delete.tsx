@@ -5,7 +5,7 @@ import React from 'react'
 
 import CompassIcon from './compassIcon'
 
-import './delete.scss'
+import './delete.module.scss'
 
 export default function DeleteIcon(): JSX.Element {
     return (

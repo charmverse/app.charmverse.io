@@ -6,7 +6,7 @@ import {DividerBlock, createDividerBlock} from '../../blocks/dividerBlock'
 import DividerIcon from '../../widgets/icons/divider'
 
 import {contentRegistry} from './contentRegistry'
-import './dividerElement.scss'
+import './dividerElement.module.scss'
 
 const DividerElement = React.memo((): JSX.Element => <div className='DividerElement'/>)
 

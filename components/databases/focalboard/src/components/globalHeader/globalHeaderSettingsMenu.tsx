@@ -14,7 +14,7 @@ import SettingsIcon from '../../widgets/icons/settings'
 
 import {Constants} from '../../constants'
 
-import './globalHeaderSettingsMenu.scss'
+import './globalHeaderSettingsMenu.module.scss'
 
 const GlobalHeaderSettingsMenu = React.memo(() => {
     const intl = useIntl()

@@ -9,7 +9,7 @@ import {IUser} from '../../../user'
 import {getWorkspaceUsersList, getWorkspaceUsers} from '../../../store/users'
 import {useAppSelector} from '../../../store/hooks'
 
-import './user.scss'
+import './user.module.scss'
 import {getSelectBaseStyle} from '../../../theme'
 
 const imageURLForUser = (typeof window !== 'undefined') ? (window as any).Components?.imageURLForUser : undefined

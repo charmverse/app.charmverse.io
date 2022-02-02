@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React from 'react'
 
-import './labelOption.scss'
+import './labelOption.module.scss'
 
 type LabelOptionProps = {
     icon?: string

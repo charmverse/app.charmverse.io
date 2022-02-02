@@ -22,9 +22,6 @@ import '@fullcalendar/daygrid/main.css';
 
 // init focalboard
 import '@mattermost/compass-icons/css/compass-icons.css';
-import 'components/databases/focalboard/src/components/blockIconSelector.scss';
-import 'components/databases/focalboard/src/components/calculations/calculation.scss';
-import 'components/databases/focalboard/src/components/calendar/fullcalendar.scss';
 import 'components/databases/focalboard/src/styles/variables.scss';
 import 'components/databases/focalboard/src/styles/main.scss';
 import 'components/databases/focalboard/src/styles/labels.scss';

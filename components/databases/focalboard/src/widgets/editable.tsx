@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React, {forwardRef, useImperativeHandle, useLayoutEffect, useRef} from 'react'
 
-import './editable.scss'
+import './editable.module.scss'
 
 export type EditableProps = {
     onChange: (value: string) => void

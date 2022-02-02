@@ -16,7 +16,7 @@ import Button from '../widgets/buttons/button'
 import Switch from '../widgets/switch'
 
 import Modal from './modal'
-import './shareBoardComponent.scss'
+import './shareBoardComponent.module.scss'
 
 type Props = {
     boardId: string

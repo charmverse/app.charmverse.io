@@ -16,7 +16,7 @@ import MenuWrapper from '../../widgets/menuWrapper'
 
 import FilterValue from './filterValue'
 
-import './filterEntry.scss'
+import './filterEntry.module.scss'
 
 type Props = {
     board: Board

@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React, {ReactElement} from 'react'
 import {EntryComponentProps} from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry'
-import './entryComponent.scss'
+import './entryComponent.module.scss'
 
 const BotBadge = (typeof window !== 'undefined') ? (window as any).Components?.BotBadge : undefined
 

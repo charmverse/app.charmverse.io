@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import './table.scss'
+import './table.module.scss'
 
 export default function TableIcon(): JSX.Element {
     return (

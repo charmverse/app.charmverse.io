@@ -14,7 +14,7 @@ import {Utils} from '../../utils'
 import {useAppDispatch} from '../../store/hooks'
 import {updateView} from '../../store/views'
 
-import './table.scss'
+import './table.module.scss'
 
 import TableHeaders from './tableHeaders'
 import TableRows from './tableRows'

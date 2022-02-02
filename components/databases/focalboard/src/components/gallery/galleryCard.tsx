@@ -25,7 +25,7 @@ import ContentElement from '../content/contentElement'
 import ImageElement from '../content/imageElement'
 import {sendFlashMessage} from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
-import './galleryCard.scss'
+import './galleryCard.module.scss'
 import CardBadges from '../cardBadges'
 
 type Props = {

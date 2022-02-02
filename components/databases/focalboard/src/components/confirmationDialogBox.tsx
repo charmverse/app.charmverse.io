@@ -7,7 +7,7 @@ import {FormattedMessage} from 'react-intl'
 import Button from '../widgets/buttons/button'
 
 import Dialog from './dialog'
-import './confirmationDialogBox.scss'
+import './confirmationDialogBox.module.scss'
 
 type ConfirmationDialogBoxProps = {
     heading: string

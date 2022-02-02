@@ -23,7 +23,7 @@ import KanbanColumn from './kanbanColumn'
 import KanbanColumnHeader from './kanbanColumnHeader'
 import KanbanHiddenColumnItem from './kanbanHiddenColumnItem'
 
-import './kanban.scss'
+import './kanban.module.scss'
 
 type Props = {
     board: Board

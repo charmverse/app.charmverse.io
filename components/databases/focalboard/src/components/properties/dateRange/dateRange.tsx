@@ -16,7 +16,7 @@ import Modal from '../../../components/modal'
 import ModalWrapper from '../../../components/modalWrapper'
 
 import 'react-day-picker/lib/style.css'
-import './dateRange.scss'
+import './dateRange.module.scss'
 import {Utils} from '../../../utils'
 
 type Props = {

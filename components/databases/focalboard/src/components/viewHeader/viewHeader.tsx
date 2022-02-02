@@ -25,7 +25,7 @@ import ViewHeaderActionsMenu from './viewHeaderActionsMenu'
 import ViewHeaderSearch from './viewHeaderSearch'
 import FilterComponent from './filterComponent'
 
-import './viewHeader.scss'
+import './viewHeader.module.scss'
 
 type Props = {
     board: Board

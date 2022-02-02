@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React from 'react'
 
-import './button.scss'
+import './button.module.scss'
 import {Utils} from '../../utils'
 
 type Props = {

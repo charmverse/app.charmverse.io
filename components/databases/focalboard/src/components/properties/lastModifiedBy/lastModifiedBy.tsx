@@ -11,7 +11,7 @@ import {Board} from '../../../blocks/board'
 import {Block} from '../../../blocks/block'
 import {getWorkspaceUsers} from '../../../store/users'
 import {useAppSelector} from '../../../store/hooks'
-import './lastModifiedBy.scss'
+import './lastModifiedBy.module.scss'
 
 type Props = {
     card: Card,

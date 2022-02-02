@@ -3,7 +3,7 @@
 import React, {useState, useEffect} from 'react'
 import {createNanoEvents} from 'nanoevents'
 
-import './flashMessages.scss'
+import './flashMessages.module.scss'
 
 export type FlashMessage = {
     content: React.ReactNode

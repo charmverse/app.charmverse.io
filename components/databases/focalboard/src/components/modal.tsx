@@ -4,7 +4,7 @@ import React, {useRef, useEffect} from 'react'
 
 import IconButton from '../widgets/buttons/iconButton'
 import CloseIcon from '../widgets/icons/close'
-import './modal.scss'
+import './modal.module.scss'
 
 type Props = {
     onClose: () => void

@@ -15,7 +15,7 @@ import {getUser} from '../../store/users'
 import {useAppSelector} from '../../store/hooks'
 import Tooltip from '../../widgets/tooltip'
 
-import './comment.scss'
+import './comment.module.scss'
 
 type Props = {
     comment: Block

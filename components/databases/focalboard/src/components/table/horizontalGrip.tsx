@@ -3,7 +3,7 @@
 import React from 'react'
 import {useDrag} from 'react-dnd'
 
-import './horizontalGrip.scss'
+import './horizontalGrip.module.scss'
 
 type Props = {
     templateId: string

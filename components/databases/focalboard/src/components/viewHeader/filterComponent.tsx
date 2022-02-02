@@ -15,7 +15,7 @@ import Modal from '../modal'
 
 import FilterEntry from './filterEntry'
 
-import './filterComponent.scss'
+import './filterComponent.module.scss'
 
 type Props = {
     board: Board

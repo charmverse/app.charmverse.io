@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import './logo.scss'
+import './logo.module.scss'
 import CompassIcon from './compassIcon'
 
 export default function LogoIcon(): JSX.Element {

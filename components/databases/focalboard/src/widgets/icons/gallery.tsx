@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import './gallery.scss'
+import './gallery.module.scss'
 
 export default function GalleryIcon(): JSX.Element {
     return (

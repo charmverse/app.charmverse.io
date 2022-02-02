@@ -13,7 +13,7 @@ import {useAppSelector, useAppDispatch} from '../../store/hooks'
 
 import Modal from '../modal'
 
-import './registrationLink.scss'
+import './registrationLink.module.scss'
 
 type Props = {
     onClose: () => void

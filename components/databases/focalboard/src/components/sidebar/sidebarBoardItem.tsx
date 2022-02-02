@@ -22,7 +22,7 @@ import MenuWrapper from '../../widgets/menuWrapper'
 
 import DeleteBoardDialog from './deleteBoardDialog'
 
-import './sidebarBoardItem.scss'
+import './sidebarBoardItem.module.scss'
 
 type Props = {
     views: BoardView[]

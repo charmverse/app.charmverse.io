@@ -23,7 +23,7 @@ import {Position} from '../components/cardDetail/cardDetailContents'
 import ContentElement from './content/contentElement'
 import AddContentMenuItem from './addContentMenuItem'
 import {contentRegistry} from './content/contentRegistry'
-import './contentBlock.scss'
+import './contentBlock.module.scss'
 
 type Props = {
     block: ContentBlockType

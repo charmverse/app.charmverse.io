@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React, {useState} from 'react'
 
-import './workspaceSwitcher.scss'
+import './workspaceSwitcher.module.scss'
 import { useRouter } from 'next/router';
 
 import {IWorkspace} from '../../blocks/workspace'

@@ -15,7 +15,7 @@ import {Utils} from '../../utils'
 
 import HorizontalGrip from './horizontalGrip'
 
-import './table.scss'
+import './table.module.scss'
 import TableHeaderMenu from './tableHeaderMenu'
 
 type Props = {

@@ -21,7 +21,7 @@ import {IAppWindow} from '../../types'
 
 import RegistrationLink from './registrationLink'
 
-import './sidebarUserMenu.scss'
+import './sidebarUserMenu.module.scss'
 
 declare let window: IAppWindow
 

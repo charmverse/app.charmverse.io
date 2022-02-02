@@ -15,7 +15,7 @@ import {Constants} from '../../constants'
 
 import GlobalHeaderSettingsMenu from './globalHeaderSettingsMenu'
 
-import './globalHeader.scss'
+import './globalHeader.module.scss'
 
 const HeaderItems = () => {
     const language = useAppSelector<string>(getLanguage)

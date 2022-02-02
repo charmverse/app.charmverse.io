@@ -5,7 +5,7 @@ import {useIntl} from 'react-intl'
 
 import {MenuOptionProps} from './menuItem'
 
-import './colorOption.scss'
+import './colorOption.module.scss'
 
 type ColorOptionProps = MenuOptionProps & {
     icon?: React.ReactNode

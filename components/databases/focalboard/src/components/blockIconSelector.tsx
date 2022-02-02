@@ -12,6 +12,7 @@ import DeleteIcon from '../widgets/icons/delete'
 import EmojiIcon from '../widgets/icons/emoji'
 import Menu from '../widgets/menu'
 import MenuWrapper from '../widgets/menuWrapper'
+import './blockIconSelector.module.scss'
 
 type Props = {
     block: Board|Card

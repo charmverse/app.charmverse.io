@@ -17,7 +17,7 @@ import {getCurrentWorkspace} from '../../store/workspace'
 import {useAppSelector} from '../../store/hooks'
 import {Utils} from '../../utils'
 
-import './sidebar.scss'
+import './sidebar.module.scss'
 
 import WorkspaceSwitcher from '../workspaceSwitcher/workspaceSwitcher'
 

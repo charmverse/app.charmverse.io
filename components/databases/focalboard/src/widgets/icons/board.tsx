@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import './board.scss'
+import './board.module.scss'
 
 export default function BoardIcon(): JSX.Element {
     return (

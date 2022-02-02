@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import './topBar.scss'
+import './topBar.module.scss'
 import {FormattedMessage} from 'react-intl'
 
 import HelpIcon from '../widgets/icons/help'

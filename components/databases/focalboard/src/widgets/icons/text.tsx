@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import './text.scss'
+import './text.module.scss'
 
 export default function TextIcon(): JSX.Element {
     return (
