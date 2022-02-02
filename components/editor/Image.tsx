@@ -29,6 +29,12 @@ const Controls = styled.div`
   }
 `;
 
+const ImageCaption = styled.div`
+  font-size: 16px;
+  color: ${({ theme }) => theme.palette.text.primary};
+  opacity: 0.5;
+`;
+
 export function Image ({ node }: NodeViewProps) {
   const [align, setAlign] = useState('center');
   const theme = useTheme();
@@ -39,18 +45,27 @@ export function Image ({ node }: NodeViewProps) {
         <Controls>
           {[
             [
-              'start', <AlignHorizontalLeftIcon fontSize='small' />
+              'start', <AlignHorizontalLeftIcon sx={{
+                fontSize: 16
+              }}
+              />
             ], [
-              'center', <AlignHorizontalCenterIcon fontSize='small' />
+              'center', <AlignHorizontalCenterIcon sx={{
+                fontSize: 16
+              }}
+              />
             ], [
-              'end', <AlignHorizontalRightIcon fontSize='small' />
+              'end', <AlignHorizontalRightIcon
+                sx={{
+                  fontSize: 16
+                }}
+              />
             ]
           ].map(([alignLabel, alignIcon]) => (
             <ListItem
               key={alignLabel as string}
               sx={{
                 padding: theme.spacing(1),
-                borderRadius: theme.spacing(0.5),
                 backgroundColor: align === alignLabel ? theme.palette.background.dark : 'inherit'
               }}
               button
@@ -65,6 +80,7 @@ export function Image ({ node }: NodeViewProps) {
         </Controls>
         { /* eslint-disable-next-line */}
         <img width={500} contentEditable={false} draggable src={node.attrs.src} alt={node.attrs.alt} />
+        <ImageCaption>{node.attrs.caption ?? 'Write a caption...'}</ImageCaption>
       </div>
     </StyledImage>
   );
