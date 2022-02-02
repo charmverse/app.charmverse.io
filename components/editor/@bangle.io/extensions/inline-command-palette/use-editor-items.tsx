@@ -231,22 +231,29 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       keywords: ['layout', 'table'],
       description: 'Insert a simple table below',
       editorExecuteCommand: () => {
-        return (state, dispatch) => {
-          return insertNode(state, dispatch, state.schema.nodes.table.create(
-            undefined,
-            Fragment.fromArray([
-              state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
-                createTableHeader(state, "Header 1"),
-                createTableHeader(state, "Header 2"),
-                createTableHeader(state, "Header 3"),
-              ])),
-              state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
-                createTableCell(state, "Cell 1"),
-                createTableCell(state, "Cell 2"),
-                createTableCell(state, "Cell 3"),
-              ]))
-            ])
-          ))
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch, view) => {
+            return insertNode(state, dispatch, state.schema.nodes.table.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
+                  createTableHeader(state, "Header 1"),
+                  createTableHeader(state, "Header 2"),
+                  createTableHeader(state, "Header 3"),
+                ])),
+                state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
+                  createTableCell(state, "Cell 1"),
+                  createTableCell(state, "Cell 2"),
+                  createTableCell(state, "Cell 3"),
+                ]))
+              ])
+            ))
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
         };
       },
     }
