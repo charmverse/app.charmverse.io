@@ -16,6 +16,17 @@ const Controls = styled.div`
   position: absolute;
   background: ${({ theme }) => theme.palette.background.light};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
+
+  display: flex;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 250ms ease-in-out;
+
+  &:hover{
+    opacity: 1;
+    transition: opacity 250ms ease-in-out;
+  }
 `;
 
 export function Image ({ node }: NodeViewProps) {
@@ -24,7 +35,7 @@ export function Image ({ node }: NodeViewProps) {
 
   return (
     <StyledImage align={align}>
-      <div className='content'>
+      <div className='content' style={{ position: 'relative' }}>
         <Controls>
           {[
             [
@@ -54,7 +65,6 @@ export function Image ({ node }: NodeViewProps) {
         </Controls>
         { /* eslint-disable-next-line */}
         <img width={500} contentEditable={false} draggable src={node.attrs.src} alt={node.attrs.alt} />
-
       </div>
     </StyledImage>
   );
