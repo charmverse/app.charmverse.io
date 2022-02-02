@@ -4,3 +4,4 @@ This folder was created to customize packages under the [focalboard](https://git
 
 1. Replaced `react-router-dom` with `next/router`
 2. Removed telemetry code for tracking events
+3. Made Typescript types compatible with Next.js settings
