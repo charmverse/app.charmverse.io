@@ -46,7 +46,8 @@ const BoardPage = (props: Props): JSX.Element => {
     const activeView = useAppSelector(getCurrentView)
     const boardViews = useAppSelector(getCurrentBoardViews)
     const dispatch = useAppDispatch()
-
+    console.log('board', board)
+    console.log('activeView', activeView)
     const router = useRouter()
     const [websocketClosed, setWebsocketClosed] = useState(false)
     const queryString = new URLSearchParams(router.query as { [key: string]: string })
@@ -98,9 +99,9 @@ const BoardPage = (props: Props): JSX.Element => {
         // we can pick workspace ID from board if it's not available anywhere,
         const workspaceIDToUse = workspaceId || board.workspaceId
 
-        const newPath = Utils.buildOriginalPath(workspaceIDToUse, router.query.boardId as string, router.query.viewId as string, router.query.cardId as string)
+        const newPath = Utils.buildOriginalPath(workspaceIDToUse, router.query.pageId as string, router.query.viewId as string, router.query.cardId as string)
         router.replace(`/workspace/${newPath}`)
-    }, [workspaceId, router.query.boardId, router.query.viewId, router.query.cardId])
+    }, [workspaceId, router.query.pageId, router.query.viewId, router.query.cardId])
 
     useEffect(() => {
         // Backward compatibility: This can be removed in the future, this is for
@@ -109,7 +110,7 @@ const BoardPage = (props: Props): JSX.Element => {
         const params = {...router.query}
         let needsRedirect = false
         if (queryBoardId) {
-            params.boardId = queryBoardId
+            params.pageId = queryBoardId
             needsRedirect = true
         }
         const queryViewId = queryString.get('v')
@@ -129,17 +130,17 @@ const BoardPage = (props: Props): JSX.Element => {
         }
 
         // Backward compatibility end
-        const boardId = router.query.boardId as string
+        const pageId = router.query.pageId as string
         const viewId = router.query.viewId === '0' ? '' : router.query.viewId as string
 
-        if (!boardId) {
+        if (!pageId) {
             // Load last viewed boardView
             const lastBoardId = UserSettings.lastBoardId || undefined
             const lastViewId = UserSettings.lastViewId || undefined
             if (lastBoardId) {
-                let newPath = generatePath(router.pathname, {...router.query, boardId: lastBoardId})
+                let newPath = generatePath(router.pathname, {...router.query, pageId: lastBoardId})
                 if (lastViewId) {
-                    newPath = generatePath(router.pathname, {...router.query, boardId: lastBoardId, viewId: lastViewId})
+                    newPath = generatePath(router.pathname, {...router.query, pageId: lastBoardId, viewId: lastViewId})
                 }
                 router.replace(newPath)
                 return
@@ -147,23 +148,24 @@ const BoardPage = (props: Props): JSX.Element => {
             return
         }
 
-        Utils.log(`attachToBoard: ${boardId}`)
+        Utils.log(`attachToBoard: ${pageId}`)
 
-        // Ensure boardViews is for our boardId before redirecting
-        const isCorrectBoardView = boardViews.length > 0 && boardViews[0].parentId === boardId
+        // Ensure boardViews is for our pageId before redirecting
+        const isCorrectBoardView = boardViews.length > 0 && boardViews[0].parentId === pageId
         if (!viewId && isCorrectBoardView) {
-            const newPath = generatePath(router.pathname, {...router.query, boardId, viewId: boardViews[0].id})
+            const newPath = generatePath(router.pathname, {...router.query, pageId, viewId: boardViews[0].id})
+            console.log(newPath)
             router.replace(newPath)
             return
         }
 
-        UserSettings.lastBoardId = boardId || ''
+        UserSettings.lastBoardId = pageId || ''
         UserSettings.lastViewId = viewId || ''
         UserSettings.lastWorkspaceId = workspaceId
 
-        dispatch(setCurrentBoard(boardId || ''))
+        dispatch(setCurrentBoard(pageId || ''))
         dispatch(setCurrentView(viewId || ''))
-    }, [router.query.boardId, router.query.viewId, boardViews])
+    }, [router.query.pageId, router.query.viewId, boardViews])
 
     useEffect(() => {
         Utils.setFavicon(board?.fields.icon)
@@ -199,7 +201,7 @@ const BoardPage = (props: Props): JSX.Element => {
             token = token || queryString.get('r') || ''
         }
 
-        dispatch(loadAction(router.query.boardId))
+        dispatch(loadAction(router.query.pageId))
 
         let subscribedToWorkspace = false
         if (wsClient.state === 'open') {
@@ -245,7 +247,7 @@ const BoardPage = (props: Props): JSX.Element => {
         }
 
         wsClient.addOnChange(incrementalUpdate)
-        wsClient.addOnReconnect(() => dispatch(loadAction(router.query.boardId)))
+        wsClient.addOnReconnect(() => dispatch(loadAction(router.query.pageId)))
         wsClient.addOnStateChange(updateWebsocketState)
         wsClient.setOnFollowBlock((_: WSClient, subscription: Subscription): void => {
             if (subscription.subscriberId === me?.id && subscription.workspaceId === router.query.workspaceId) {
@@ -265,10 +267,10 @@ const BoardPage = (props: Props): JSX.Element => {
                 wsClient.unsubscribeToWorkspace(router.query.workspaceId as string || '0')
             }
             wsClient.removeOnChange(incrementalUpdate)
-            wsClient.removeOnReconnect(() => dispatch(loadAction(router.query.boardId)))
+            wsClient.removeOnReconnect(() => dispatch(loadAction(router.query.pageId)))
             wsClient.removeOnStateChange(updateWebsocketState)
         }
-    }, [router.query.workspaceId, props.readonly, router.query.boardId])
+    }, [router.query.workspaceId, props.readonly, router.query.pageId])
 
     useHotkeys('ctrl+z,cmd+z', () => {
         Utils.log('Undo')

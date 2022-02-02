@@ -16,6 +16,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
 import { createThemeLightSensitive } from 'theme';
+import { isMobile } from 'lib/browser';
 
 // fullcalendar css
 import '@fullcalendar/common/main.css';
@@ -138,10 +139,18 @@ import 'components/databases/focalboard/src/widgets/propertyMenu.scss';
 import 'components/databases/focalboard/src/widgets/switch.scss';
 import 'components/databases/focalboard/src/widgets/tooltip.scss';
 import 'components/databases/focalboard/src/widgets/valueSelector.scss';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TouchBackend } from 'react-dnd-touch-backend';
 import { ReduxProvider, store } from 'components/databases/focalboard/src/main';
 import { getLanguage, fetchLanguage } from 'components/databases/focalboard/src/store/language';
 import { useAppSelector, useAppDispatch } from 'components/databases/focalboard/src/store/hooks';
 import { getMessages } from 'components/databases/focalboard/src/i18n';
+import {
+  darkTheme,
+  lightTheme,
+  setTheme
+} from 'components/databases/focalboard/src/theme';
 
 import 'theme/styles.scss';
 
@@ -176,6 +185,8 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
         setMode((prevMode: PaletteMode) => {
           const newMode = prevMode === 'light' ? 'dark' : 'light';
           setSavedDarkMode(newMode);
+          // set focalboard theme
+          setTheme(newMode === 'dark' ? darkTheme : lightTheme);
           return newMode;
         });
       }
@@ -246,7 +257,9 @@ function FocalBoardProviders ({ children }: { children: ReactNode }) {
       locale={language.split(/[_]/)[0]}
       messages={getMessages(language)}
     >
-      {children}
+      <DndProvider backend={isMobile() ? TouchBackend : HTML5Backend}>
+        {children}
+      </DndProvider>
     </IntlProvider>
   );
 }

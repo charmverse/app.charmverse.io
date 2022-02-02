@@ -54,7 +54,7 @@ function CenterContent(props: Props) {
             wsClient.removeOnConfigChange(onConfigChangeHandler)
         }
     }, [])
-
+    console.log('BOARD AND VIEW', board, activeView)
     if (board && activeView) {
         let property = groupByProperty
         if ((!property || property.type !== 'select') && activeView.fields.viewType === 'board') {

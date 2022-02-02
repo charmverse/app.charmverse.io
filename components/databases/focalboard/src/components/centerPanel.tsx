@@ -23,7 +23,6 @@ import {updateView} from '../store/views'
 
 import CardDialog from './cardDialog'
 import RootPortal from './rootPortal'
-import TopBar from './topBar'
 import ViewHeader from './viewHeader/viewHeader'
 import ViewTitle from './viewTitle'
 import Kanban from './kanban/kanban'
@@ -141,7 +140,6 @@ class CenterPanel extends React.Component<Props, State> {
                     </RootPortal>}
 
                 <div className='top-head'>
-                    <TopBar/>
                     <ViewTitle
                         key={board.id + board.title}
                         board={board}

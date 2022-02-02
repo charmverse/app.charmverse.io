@@ -1,1 +1,1 @@
-export * from './DatabaseEditor';
+export * from './BoardPage';

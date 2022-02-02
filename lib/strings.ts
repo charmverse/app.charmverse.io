@@ -60,7 +60,7 @@ function invariant (cond: any, message: string): asserts cond {
  */
 export function generatePath (path: string, params: any = {}): string {
   return path
-    .replace(/:(\w+)/g, (_, key) => {
+    .replace(/\[(\w+)\]/g, (_, key) => {
       invariant(params[key] != null, `Missing ":${key}" param`);
       return params[key]!;
     })

@@ -15,6 +15,9 @@ type BoardsState = {
     templates: {[key: string]: Board}
 }
 
+// TODO: use real Id
+export const CURRENT_BID = 'b3fs1cyw717nfjfswcyk9hd1jph'
+
 const boardsSlice = createSlice({
     name: 'boards',
     initialState: {boards: {}, templates: {}} as BoardsState,
@@ -93,6 +96,7 @@ export const getCurrentBoard = createSelector(
     getBoards,
     getTemplates,
     (boardId, boards, templates) => {
+        return boards[CURRENT_BID]
         return boards[boardId] || templates[boardId]
     },
 )

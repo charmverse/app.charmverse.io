@@ -57,7 +57,7 @@ class OctoClient {
     }
 
     async login(username: string, password: string): Promise<boolean> {
-        const path = '/api/v1/login'
+        const path = '/api/focalboard/login'
         const body = JSON.stringify({username, password, type: 'normal'})
         const response = await fetch(this.getBaseURL() + path, {
             method: 'POST',
@@ -77,7 +77,7 @@ class OctoClient {
     }
 
     async logout(): Promise<boolean> {
-        const path = '/api/v1/logout'
+        const path = '/api/focalboard/logout'
         const response = await fetch(this.getBaseURL() + path, {
             method: 'POST',
             headers: this.headers(),
@@ -91,7 +91,7 @@ class OctoClient {
     }
 
     async getClientConfig(): Promise<ClientConfig | null> {
-        const path = '/api/v1/clientConfig'
+        const path = '/api/focalboard/clientConfig'
         const response = await fetch(this.getBaseURL() + path, {
             method: 'GET',
             headers: this.headers(),
@@ -105,7 +105,7 @@ class OctoClient {
     }
 
     async register(email: string, username: string, password: string, token?: string): Promise<{code: number, json: {error?: string}}> {
-        const path = '/api/v1/register'
+        const path = '/api/focalboard/register'
         const body = JSON.stringify({email, username, password, token})
         const response = await fetch(this.getBaseURL() + path, {
             method: 'POST',
@@ -117,7 +117,7 @@ class OctoClient {
     }
 
     async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<{code: number, json: {error?: string}}> {
-        const path = `/api/v1/users/${encodeURIComponent(userId)}/changepassword`
+        const path = `/api/focalboard/users/${encodeURIComponent(userId)}/changepassword`
         const body = JSON.stringify({oldPassword, newPassword})
         const response = await fetch(this.getBaseURL() + path, {
             method: 'POST',
@@ -148,11 +148,11 @@ class OctoClient {
             workspaceIdToUse = this.workspaceId === '0' ? UserSettings.lastWorkspaceId || this.workspaceId : this.workspaceId
         }
 
-        return `/api/v1/workspaces/${workspaceIdToUse}`
+        return `/api/focalboard/workspaces/${workspaceIdToUse}`
     }
 
     async getMe(): Promise<IUser | undefined> {
-        const path = '/api/v1/users/me'
+        const path = '/api/focalboard/users/me'
         const response = await fetch(this.getBaseURL() + path, {headers: this.headers()})
         if (response.status !== 200) {
             return undefined
@@ -162,7 +162,7 @@ class OctoClient {
     }
 
     async getUser(userId: string): Promise<IUser | undefined> {
-        const path = `/api/v1/users/${encodeURIComponent(userId)}`
+        const path = `/api/focalboard/users/${encodeURIComponent(userId)}`
         const response = await fetch(this.getBaseURL() + path, {headers: this.headers()})
         if (response.status !== 200) {
             return undefined
@@ -300,7 +300,7 @@ class OctoClient {
             subscriberId: userId,
         }
 
-        return fetch(this.getBaseURL() + `/api/v1/workspaces/${this.workspaceId}/subscriptions`, {
+        return fetch(this.getBaseURL() + `/api/focalboard/workspaces/${this.workspaceId}/subscriptions`, {
             method: 'POST',
             headers: this.headers(),
             body: JSON.stringify(body),
@@ -308,7 +308,7 @@ class OctoClient {
     }
 
     async unfollowBlock(blockId: string, blockType: string, userId: string): Promise<Response> {
-        return fetch(this.getBaseURL() + `/api/v1/workspaces/${this.workspaceId}/subscriptions/${blockId}/${userId}`, {
+        return fetch(this.getBaseURL() + `/api/focalboard/workspaces/${this.workspaceId}/subscriptions/${blockId}/${userId}`, {
             method: 'DELETE',
             headers: this.headers(),
         })
@@ -449,7 +449,7 @@ class OctoClient {
     }
 
     async getUserWorkspaces(): Promise<UserWorkspace[]> {
-        const path = '/api/v1/workspaces'
+        const path = '/api/focalboard/workspaces'
         const response = await fetch(this.getBaseURL() + path, {headers: this.headers()})
         if (response.status !== 200) {
             return []
@@ -464,7 +464,7 @@ class OctoClient {
     }
 
     async getUserBlockSubscriptions(userId: string): Promise<Array<Subscription>> {
-        const path = `/api/v1/workspaces/${this.workspaceId}/subscriptions/${userId}`
+        const path = `/api/focalboard/workspaces/${this.workspaceId}/subscriptions/${userId}`
         const response = await fetch(this.getBaseURL() + path, {headers: this.headers()})
         if (response.status !== 200) {
             return []
