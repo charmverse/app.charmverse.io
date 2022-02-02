@@ -21,13 +21,12 @@ const StyledMenuButton = styled.div<{ active: boolean }>`
   flex-direction: row;
   align-items: center;
   padding: ${({ theme }) => theme.spacing(0.5)};
-
   ${props => props.active && `background-color: rgb(0, 0, 0, 0.125);`};
 
   & svg {
     display: block;
-    height: 1.5em;
-    width: 1.5em;
+    height: 1.25em;
+    width: 1.25em;
     fill: currentcolor;
   }
 `
@@ -53,7 +52,7 @@ export const MenuButton = ({
         }} key={hint}>{hint}</div>)
       }
     </div>} arrow placement='bottom'>
-      <ListItem disabled={isDisabled} button component="div" sx={{ py: 0, px: 0 }}>
+      <ListItem disabled={isDisabled} button component="div" sx={{ py: 0, px: 0, mx: 0.25, my: 0, borderRadius: 0.5 }}>
         <StyledMenuButton
           aria-label={hints.join("\n")}
           active={isActive}

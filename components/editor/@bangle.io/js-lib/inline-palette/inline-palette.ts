@@ -1,11 +1,10 @@
 import { BaseRawMarkSpec, PluginKey, SpecRegistry } from '@bangle.dev/core';
 import type { Command, EditorState, Schema } from '@bangle.dev/pm';
-import {
-  createTooltipDOM,
-  suggestTooltip,
-  SuggestTooltipRenderOpts
-} from '@bangle.dev/tooltip';
+import { createTooltipDOM, suggestTooltip } from '@bangle.dev/tooltip';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
+import {
+  SuggestTooltipRenderOpts
+} from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
 import { safeRequestAnimationFrame } from '../../lib/utils';
 
 const {

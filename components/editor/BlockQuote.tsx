@@ -31,7 +31,7 @@ const BlockQuoteEmoji = styled.div`
 
   & span:hover {
     cursor: pointer;
-    background-color: ${({ theme }) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04);'};
+    background-color: ${({ theme }) => theme.palette.emoji.hoverBackground};
     transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   }
 `;
@@ -44,7 +44,7 @@ export function blockQuoteSpec () {
   return spec;
 }
 
-export function BlockQuote ({ children, node, updateAttrs, view }: NodeViewProps & { children: ReactNode }) {
+export function BlockQuote ({ children, node, updateAttrs, view, getPos }: NodeViewProps & { children: ReactNode }) {
   return (
     <StyledBlockQuote>
       <BlockQuoteEmoji>
@@ -56,7 +56,8 @@ export function BlockQuote ({ children, node, updateAttrs, view }: NodeViewProps
             if (view.dispatch!) {
               const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
               view.dispatch(
-                view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_CALLOUT', updateAttrs }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
+                // Chain transactions together
+                view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_CALLOUT', updateAttrs, getPos }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
               );
             }
           }}

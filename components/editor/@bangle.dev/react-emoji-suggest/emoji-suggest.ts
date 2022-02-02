@@ -2,13 +2,13 @@ import { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
 import { Command, EditorState, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { EmojiGroupType } from '@bangle.dev/react-emoji-suggest/types';
 import { getSquareDimensions, resolveCounter, resolveRowJump } from '@bangle.dev/react-emoji-suggest/utils';
-import type { SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
-import { createTooltipDOM, suggestTooltip } from '@bangle.dev/tooltip';
+import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import {
   bangleWarn,
   rafCommandExec,
   uuid
 } from '@bangle.dev/utils';
+import * as suggestTooltip from "components/editor/@bangle.dev/tooltip/suggest-tooltip";
 
 const {
   decrementSuggestTooltipCounter,
@@ -167,7 +167,9 @@ function pluginsFactory({
               selectedEmojiSquareId,
               rowWidth,
               suggestTooltipKey,
-              insideCallout: false
+              insideCallout: false,
+              getPos: null,
+              updateAttrs: null,
             };
           },
           apply(tr, pluginState) {
@@ -179,7 +181,8 @@ function pluginsFactory({
               return {
                 ...pluginState,
                 insideCallout: true,
-                updateAttrs: meta.updateAttrs
+                updateAttrs: meta.updateAttrs,
+                getPos: meta.getPos
               }
             }
 
@@ -187,7 +190,8 @@ function pluginsFactory({
               return {
                 ...pluginState,
                 insideCallout: false,
-                updateAttrs: null
+                updateAttrs: null,
+                getPos: null
               }
             }
           },
