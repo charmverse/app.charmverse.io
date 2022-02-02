@@ -128,13 +128,13 @@ const StyledPageIcon = styled(EmojiCon)`
   width: 24px;
 `;
 
-const StyledLink = styled(Typography)<{isEmpty: boolean}>`
+const StyledLink = styled(Typography)<{isempty: number}>`
   color: inherit;
   font-size: 14px;
   &:hover {
     color: inherit;
   }
-  ${(props) => props.isEmpty && 'opacity: 0.5;'}
+  ${(props) => props.isempty && 'opacity: 0.5;'}
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -176,6 +176,8 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
     setAnchorEl(null);
   }
 
+  const isempty = !label;
+
   return (
     <>
       <StyledTreeItemRoot
@@ -185,8 +187,8 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
               <StyledPageIcon>
                 {labelIcon || <DefaultPageIcon />}
               </StyledPageIcon>
-              <StyledLink isEmpty={(label as string).length === 0}>
-                {(label as string)?.length !== 0 ? label : 'Untitled'}
+              <StyledLink isempty={isempty ? 1 : 0}>
+                {isempty ? 'Untitled' : label}
               </StyledLink>
               <div className='page-actions'>
                 <IconButton size='small' onClick={showMenu}>
