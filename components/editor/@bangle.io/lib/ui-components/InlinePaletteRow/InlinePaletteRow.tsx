@@ -5,7 +5,6 @@ import {
   safeScrollIntoViewIfNeeded
 } from '../../utils/utility';
 
-const PADDING_OFFSET = 16;
 const BASE_PADDING = 10;
 
 interface InlinePaletteRowProps {
@@ -34,6 +33,7 @@ const StyledInlinePaletteRow = styled.div<{ active: boolean, disabled: boolean }
   width: 100%;
   ${props => props.active && `background-color: rgb(0, 0, 0, 0.125);`};
   font-weight: 500;
+  font-size: 14px;
   padding: 5px ${BASE_PADDING}px
 `;
 
@@ -43,7 +43,6 @@ export function InlinePaletteRow({
   isActive,
   onClick,
   icon = null,
-  description = '',
   className = '',
   scrollIntoViewIfNeeded = true,
   style = {},
