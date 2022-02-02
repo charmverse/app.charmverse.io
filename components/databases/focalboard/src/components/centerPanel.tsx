@@ -20,7 +20,6 @@ import {UserSettings} from '../userSettings'
 import {addCard, addTemplate} from '../store/cards'
 import {updateView} from '../store/views'
 
-import './centerPanel.module.scss'
 
 import CardDialog from './cardDialog'
 import RootPortal from './rootPortal'

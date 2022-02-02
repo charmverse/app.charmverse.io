@@ -8,7 +8,6 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {UserWorkspace} from '../../user'
 import {useAppSelector} from '../../store/hooks'
 
-import './workspaceOptions.module.scss'
 import Search from '../../widgets/icons/search'
 import {getUserWorkspaceList} from '../../store/workspace'
 

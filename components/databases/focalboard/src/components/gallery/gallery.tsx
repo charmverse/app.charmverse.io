@@ -10,7 +10,6 @@ import {BoardView} from '../../blocks/boardView'
 import mutator from '../../mutator'
 import {Utils} from '../../utils'
 
-import './gallery.module.scss'
 import GalleryCard from './galleryCard'
 
 type Props = {

@@ -5,7 +5,6 @@ import React from 'react'
 import DropdownIcon from '../icons/dropdown'
 import MenuWrapper from '../menuWrapper'
 
-import './buttonWithMenu.module.scss'
 
 type Props = {
     onClick?: (e: React.MouseEvent<HTMLDivElement>) => void

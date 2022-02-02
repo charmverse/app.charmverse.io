@@ -7,7 +7,6 @@ import {Card} from '../../blocks/card'
 import {Board} from '../../blocks/board'
 import {BoardView} from '../../blocks/boardView'
 
-import './table.module.scss'
 
 import TableRow from './tableRow'
 

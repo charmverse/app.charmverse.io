@@ -4,7 +4,6 @@ import React, {useState} from 'react'
 
 import {Constants} from '../../../constants'
 
-import './calculationRow.module.scss'
 import {Board, createBoard, IPropertyTemplate} from '../../../blocks/board'
 
 import mutator from '../../../mutator'

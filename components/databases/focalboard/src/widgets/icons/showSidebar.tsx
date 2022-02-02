@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './showSidebar.module.scss'
 
 export default function ShowSidebarIcon(): JSX.Element {
     return (

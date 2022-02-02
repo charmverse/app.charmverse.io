@@ -23,7 +23,6 @@ import {sendFlashMessage} from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
 
 import ConfirmationDialogBox, {ConfirmationDialogBoxProps} from '../confirmationDialogBox'
-import './kanbanCard.module.scss'
 import CardBadges from '../cardBadges'
 
 type Props = {

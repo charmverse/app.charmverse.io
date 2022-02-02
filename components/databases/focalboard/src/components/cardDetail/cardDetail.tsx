@@ -24,7 +24,6 @@ import CardDetailContentsMenu from './cardDetailContentsMenu'
 import CardDetailProperties from './cardDetailProperties'
 import useImagePaste from './imagePaste'
 
-import './cardDetail.module.scss'
 
 type Props = {
     board: Board

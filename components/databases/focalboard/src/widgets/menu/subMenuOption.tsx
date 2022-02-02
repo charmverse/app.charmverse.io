@@ -6,7 +6,6 @@ import SubmenuTriangleIcon from '../icons/submenuTriangle'
 
 import Menu from '.'
 
-import './subMenuOption.module.scss'
 
 type SubMenuOptionProps = {
     id: string,

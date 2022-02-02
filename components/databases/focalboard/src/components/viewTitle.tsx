@@ -14,7 +14,6 @@ import ShowIcon from '../widgets/icons/show'
 
 import BlockIconSelector from './blockIconSelector'
 import {MarkdownEditor} from './markdownEditor'
-import './viewTitle.module.scss'
 
 type Props = {
     board: Board

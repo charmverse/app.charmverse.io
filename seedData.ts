@@ -70,7 +70,8 @@ export const pages: Page[] = [
   MockPage({
     path: 'database-page',
     spaceId: '0',
-    title: 'Database page'
+    title: 'Database page',
+    type: 'database'
   }),
   MockPage({
     icon: '📌',

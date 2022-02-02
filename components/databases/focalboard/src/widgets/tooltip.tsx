@@ -2,7 +2,6 @@
 // See LICENSE.txt for license information.
 import React from 'react'
 
-import './tooltip.module.scss'
 
 type Props = {
     title: string

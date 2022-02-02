@@ -9,7 +9,6 @@ import ColorOption from './colorOption'
 import SubMenuOption from './subMenuOption'
 import LabelOption from './labelOption'
 
-import './menu.module.scss'
 
 type Props = {
     children: React.ReactNode

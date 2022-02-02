@@ -5,7 +5,6 @@ import React from 'react'
 
 import CompassIcon from './compassIcon'
 
-import './link.module.scss'
 
 export default function LinkIcon(): JSX.Element {
     return (

@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './logoWithNameWhite.module.scss'
 
 export default function LogoWithNameWhiteIcon(): JSX.Element {
     return (

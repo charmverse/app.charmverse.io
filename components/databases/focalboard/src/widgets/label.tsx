@@ -4,7 +4,6 @@ import React from 'react'
 
 import {Constants} from '../constants'
 
-import './label.module.scss'
 
 type Props = {
     color?: string

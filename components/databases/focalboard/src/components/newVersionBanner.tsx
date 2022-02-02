@@ -5,7 +5,6 @@ import {FormattedMessage} from 'react-intl'
 
 import wsClient from '../wsclient'
 
-import './newVersionBanner.module.scss'
 
 const NewVersionBanner = () => {
     const [appVersionChanged, setAppVersionChanged] = useState(false)

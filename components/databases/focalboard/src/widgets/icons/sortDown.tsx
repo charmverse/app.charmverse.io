@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './sortDown.module.scss'
 
 export default function SortDownIcon(): JSX.Element {
     return (

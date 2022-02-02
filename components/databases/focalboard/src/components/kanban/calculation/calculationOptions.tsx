@@ -9,7 +9,6 @@ import {
 } from '../../calculations/options'
 import {IPropertyTemplate, PropertyType} from '../../../blocks/board'
 
-import './calculationOption.module.scss'
 import {Option, OptionProps} from './kanbanOption'
 
 type Props = CommonCalculationOptionProps & {

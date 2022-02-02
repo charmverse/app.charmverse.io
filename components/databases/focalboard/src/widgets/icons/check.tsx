@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './check.module.scss'
 
 export default function CheckIcon(): JSX.Element {
     return (

@@ -9,7 +9,6 @@ import Button from '../../widgets/buttons/button'
 import Dialog from '../dialog'
 import RootPortal from '../rootPortal'
 
-import './deleteBoardDialog.module.scss'
 
 type Props = {
     boardTitle: string;

@@ -8,7 +8,6 @@ import MomentLocaleUtils from 'react-day-picker/moment'
 import {Utils} from '../utils'
 
 import 'react-day-picker/lib/style.css'
-import './editableDayPicker.module.scss'
 
 type Props = {
     className: string

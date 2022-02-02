@@ -19,7 +19,6 @@ import {useAppSelector} from '../../store/hooks'
 import {getWorkspaceUsersList} from '../../store/users'
 import {IUser} from '../../user'
 import createLiveMarkdownPlugin from '../live-markdown-plugin/liveMarkdownPlugin'
-import './markdownEditorInput.module.scss'
 
 import Entry from './entryComponent/entryComponent'
 

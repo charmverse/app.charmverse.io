@@ -13,7 +13,6 @@ import {Utils} from '../../utils'
 
 import {OctoUtils} from '../../octoUtils'
 
-import './table.module.scss'
 
 import TableHeader from './tableHeader'
 

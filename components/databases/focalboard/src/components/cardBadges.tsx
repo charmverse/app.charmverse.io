@@ -14,8 +14,6 @@ import MessageIcon from '../widgets/icons/message'
 import CheckIcon from '../widgets/icons/check'
 import {Utils} from '../utils'
 
-import './cardBadges.module.scss'
-
 type Props = {
     card: Card
     className?: string

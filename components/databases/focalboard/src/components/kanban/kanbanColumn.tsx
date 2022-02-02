@@ -4,7 +4,6 @@ import React from 'react'
 import {useDrop} from 'react-dnd'
 
 import {Card} from '../../blocks/card'
-import './kanbanColumn.module.scss'
 
 type Props = {
     onDrop: (card: Card) => void

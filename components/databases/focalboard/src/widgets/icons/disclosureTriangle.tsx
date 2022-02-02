@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './disclosureTriangle.module.scss'
 
 export default function DisclosureTriangle(): JSX.Element {
     return (

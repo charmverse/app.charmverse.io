@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './submenuTriangle.module.scss'
 
 export default function SubmenuTriangleIcon(): JSX.Element {
     return (

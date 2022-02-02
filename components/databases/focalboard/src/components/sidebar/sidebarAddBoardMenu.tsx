@@ -19,7 +19,6 @@ import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
 
 import BoardTemplateMenuItem from './boardTemplateMenuItem'
-import './sidebarAddBoardMenu.module.scss'
 
 type Props = {
     activeBoardId?: string

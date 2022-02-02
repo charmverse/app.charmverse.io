@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './focalboard_logo.module.scss'
 
 export default function FocalboardLogoIcon(): JSX.Element {
     return (

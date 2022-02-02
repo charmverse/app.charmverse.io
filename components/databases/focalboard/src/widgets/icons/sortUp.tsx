@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './sortUp.module.scss'
 
 export default function SortUpIcon(): JSX.Element {
     return (

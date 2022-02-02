@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './card.module.scss'
 
 export default function CardIcon(): JSX.Element {
     return (

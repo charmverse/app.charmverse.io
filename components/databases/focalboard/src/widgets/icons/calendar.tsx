@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './calendar.module.scss'
 
 export default function CalendarIcon(): JSX.Element {
     return (

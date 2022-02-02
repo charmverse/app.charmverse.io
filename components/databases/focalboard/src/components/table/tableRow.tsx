@@ -18,7 +18,6 @@ import {getCardContents} from '../../store/contents'
 import {getCardComments} from '../../store/comments'
 
 import PropertyValueElement from '../propertyValueElement'
-import './tableRow.module.scss'
 
 type Props = {
     board: Board

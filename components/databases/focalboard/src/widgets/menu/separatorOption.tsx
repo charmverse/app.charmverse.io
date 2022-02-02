@@ -2,7 +2,6 @@
 // See LICENSE.txt for license information.
 import React, {FC} from 'react'
 
-import './separatorOption.module.scss'
 
 const SeparatorOption: FC = (): JSX.Element => (
     <div className='MenuOption MenuSeparator menu-separator'/>

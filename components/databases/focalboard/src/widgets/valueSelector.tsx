@@ -20,7 +20,6 @@ import DeleteIcon from './icons/delete'
 import CloseIcon from './icons/close'
 import Label from './label'
 
-import './valueSelector.module.scss'
 
 type Props = {
     options: IPropertyOption[]

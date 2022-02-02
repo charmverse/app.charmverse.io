@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './emoji.module.scss'
 
 export default function EmojiIcon(): JSX.Element {
     return (

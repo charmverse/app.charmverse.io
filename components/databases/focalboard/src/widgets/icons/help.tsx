@@ -4,7 +4,6 @@ import React from 'react'
 
 import CompassIcon from './compassIcon'
 
-import './help.module.scss'
 
 export default function HelpIcon(): JSX.Element {
     return (

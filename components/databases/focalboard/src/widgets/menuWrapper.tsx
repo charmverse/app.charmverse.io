@@ -3,7 +3,6 @@
 
 import React, {useRef, useState, useEffect} from 'react'
 
-import './menuWrapper.module.scss'
 
 type Props = {
     children?: React.ReactNode;

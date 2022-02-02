@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './edit.module.scss'
 
 export default function EditIcon(): JSX.Element {
     return (

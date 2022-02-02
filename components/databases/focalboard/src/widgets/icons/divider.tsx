@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './divider.module.scss'
 
 export default function DividerIcon(): JSX.Element {
     return (

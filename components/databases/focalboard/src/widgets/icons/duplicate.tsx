@@ -5,7 +5,6 @@ import React from 'react'
 
 import CompassIcon from './compassIcon'
 
-import './duplicate.module.scss'
 
 export default function DuplicateIcon(): JSX.Element {
     return (

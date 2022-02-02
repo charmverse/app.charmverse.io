@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './grip.module.scss'
 
 export default function GripIcon(): JSX.Element {
     return (

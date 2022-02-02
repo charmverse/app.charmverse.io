@@ -2,7 +2,6 @@
 // See LICENSE.txt for license information.
 import React from 'react'
 
-import './switch.module.scss'
 
 type Props = {
     onChanged: (isOn: boolean) => void

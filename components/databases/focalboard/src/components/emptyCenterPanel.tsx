@@ -18,7 +18,6 @@ import octoClient from '../octoClient'
 import {addBoardTemplateClicked, addBoardClicked} from './sidebar/sidebarAddBoardMenu'
 import {addBoardFromTemplate, BoardTemplateButtonMenu} from './sidebar/boardTemplateMenuItem'
 
-import './emptyCenterPanel.module.scss'
 
 type ButtonProps = {
     buttonIcon: string | React.ReactNode,

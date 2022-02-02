@@ -5,7 +5,6 @@ import React from 'react'
 
 import CompassIcon from './compassIcon'
 
-import './dropdown.module.scss'
 
 export default function DropdownIcon(): JSX.Element {
     return (

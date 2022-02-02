@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './hide.module.scss'
 
 export default function HideIcon(): JSX.Element {
     return (

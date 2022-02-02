@@ -20,7 +20,6 @@ import {useAppDispatch} from '../../store/hooks'
 import {storeLanguage} from '../../store/language'
 import {UserSettings} from '../../userSettings'
 
-import './sidebarSettingsMenu.module.scss'
 import CheckIcon from '../../widgets/icons/check'
 import {Constants} from '../../constants'
 

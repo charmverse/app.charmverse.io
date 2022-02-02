@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './show.module.scss'
 
 export default function ShowIcon(): JSX.Element {
     return (

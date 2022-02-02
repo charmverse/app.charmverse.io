@@ -3,7 +3,6 @@
 
 import React from 'react'
 
-import './dot.module.scss'
 
 export default function DotIcon(): JSX.Element {
     return (
