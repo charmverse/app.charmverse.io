@@ -236,17 +236,16 @@ function referenceElement(
         // if the suggestMark text spanned two lines, we want to show the tooltip based on the end pos
         // so that it doesn't hide the text
         const end = view.coordsAtPos(markPos.end > -1 ? markPos.end : startPos);
-
-        let { left, right } = start;
-        let { top, bottom } = end;
-
+        
+        let { left, right, top, bottom } = end;
+        right = left;
         return {
           width: right - left,
           height: bottom - top,
-          top: top,
-          right: left,
-          bottom: bottom,
-          left: left,
+          top,
+          right,
+          bottom,
+          left,
           x: left,
           y: top,
           toJSON: () => {}
