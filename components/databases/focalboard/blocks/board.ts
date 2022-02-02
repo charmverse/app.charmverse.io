@@ -78,4 +78,5 @@ type BoardGroup = {
     cards: Card[]
 }
 
-export {Board, PropertyType, IPropertyOption, IPropertyTemplate, BoardGroup, createBoard}
+export {createBoard}
+export type {Board, PropertyType, IPropertyOption, IPropertyTemplate, BoardGroup}

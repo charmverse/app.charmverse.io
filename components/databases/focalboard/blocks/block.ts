@@ -107,5 +107,5 @@ function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): BlockPatch[]
     ]
 }
 
-export type {ContentBlockTypes, BlockTypes}
-export {blockTypes, contentBlockTypes, Block, BlockPatch, createBlock, createPatchesFromBlocks}
+export type {ContentBlockTypes, BlockTypes, Block, BlockPatch}
+export {blockTypes, contentBlockTypes, createBlock, createPatchesFromBlocks}

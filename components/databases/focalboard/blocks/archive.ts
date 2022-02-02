@@ -78,4 +78,6 @@ class ArchiveUtils {
     }
 }
 
-export {ArchiveHeader, ArchiveLine, BlockArchiveLine, ArchiveUtils}
+export type {ArchiveHeader, ArchiveLine, BlockArchiveLine}
+
+export {ArchiveUtils}

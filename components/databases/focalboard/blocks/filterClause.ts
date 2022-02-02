@@ -26,4 +26,5 @@ function areEqual(a: FilterClause, b: FilterClause): boolean {
     )
 }
 
-export {FilterClause, FilterCondition, createFilterClause, areEqual}
+export {createFilterClause, areEqual}
+export type {FilterClause, FilterCondition}

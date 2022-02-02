@@ -96,7 +96,5 @@ const Option = (props: {data: OptionProps}): JSX.Element => {
     )
 }
 
-export {
-    Option,
-    OptionProps,
-}
+export {Option}
+export type {OptionProps}

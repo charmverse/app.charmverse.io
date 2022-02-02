@@ -3,7 +3,7 @@
 import {ContentBlock} from './contentBlock'
 import {Block, createBlock} from './block'
 
-type TextBlock = ContentBlock & {
+export type TextBlock = ContentBlock & {
     type: 'text'
 }
 
@@ -14,4 +14,4 @@ function createTextBlock(block?: Block): TextBlock {
     }
 }
 
-export {TextBlock, createTextBlock}
+export {createTextBlock}

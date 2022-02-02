@@ -63,4 +63,5 @@ function sortBoardViewsAlphabetically(views: BoardView[]): BoardView[] {
     }).sort((v1, v2) => v1.title.localeCompare(v2.title)).map((v) => v.view)
 }
 
-export {BoardView, IViewType, ISortOption, sortBoardViewsAlphabetically, createBoardView, KanbanCalculationFields}
+export {sortBoardViewsAlphabetically, createBoardView}
+export type {BoardView, IViewType, ISortOption, KanbanCalculationFields}

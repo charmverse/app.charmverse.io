@@ -22,4 +22,5 @@ function createImageBlock(block?: Block): ImageBlock {
     }
 }
 
-export {ImageBlock, createImageBlock}
+export {createImageBlock}
+export type {ImageBlock}

@@ -11,4 +11,5 @@ type ContentBlock = Block
 
 const createContentBlock = createBlock
 
-export {ContentBlock, IContentBlockWithCords, createContentBlock}
+export {createContentBlock}
+export type {ContentBlock, IContentBlockWithCords}

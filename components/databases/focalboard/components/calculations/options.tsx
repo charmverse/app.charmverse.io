@@ -209,8 +209,9 @@ const CalculationOptions = (props: BaseCalculationOptionProps): JSX.Element => {
     )
 }
 
-export {
-    CalculationOptions,
+export {CalculationOptions}
+
+export type {
     Option,
     CommonCalculationOptionProps,
 }

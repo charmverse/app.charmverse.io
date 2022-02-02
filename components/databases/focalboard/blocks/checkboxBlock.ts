@@ -14,4 +14,5 @@ function createCheckboxBlock(block?: Block): CheckboxBlock {
     }
 }
 
-export {CheckboxBlock, createCheckboxBlock}
+export {createCheckboxBlock}
+export type {CheckboxBlock}
