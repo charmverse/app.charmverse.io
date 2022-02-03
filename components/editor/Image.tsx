@@ -5,7 +5,8 @@ import AlignHorizontalCenterIcon from '@mui/icons-material/AlignHorizontalCenter
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import AlignHorizontalRightIcon from '@mui/icons-material/AlignHorizontalRight';
 import ImageIcon from '@mui/icons-material/Image';
-import { Box, ListItem, Typography } from '@mui/material';
+import { Box, Button, ListItem, TextField, Typography } from '@mui/material';
+import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { HTMLAttributes, useState } from 'react';
 
@@ -70,15 +71,44 @@ function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
   );
 }
 
-export function Image ({ node, view }: NodeViewProps) {
+export function Image ({ node, updateAttrs }: NodeViewProps) {
   const [align, setAlign] = useState('center');
   const theme = useTheme();
+  const [embedLink, setEmbedLink] = useState('');
 
   if (!node.attrs.src) {
     return (
       <PopperPopup popupContent={(
         <Box>
-          Hello World
+          <MultiTabs tabs={[
+            [
+              'Upload',
+              <div>
+                <Button variant='contained'>Choose an image</Button>
+              </div>
+            ],
+            [
+              'Link',
+              <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2
+              }}
+              >
+                <TextField placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
+                <Button onClick={() => {
+                  updateAttrs({
+                    src: embedLink
+                  });
+                  setEmbedLink('');
+                }}
+                >
+                  Embed Image
+                </Button>
+              </Box>
+            ]
+          ]}
+          />
         </Box>
       )}
       >
