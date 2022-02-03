@@ -6,7 +6,8 @@ import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import AlignHorizontalRightIcon from '@mui/icons-material/AlignHorizontalRight';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
-import { useState } from 'react';
+import PopperPopup from 'components/common/PopperPopup';
+import { HTMLAttributes, useState } from 'react';
 
 const StyledImage = styled.div<{ align?: string }>`
   display: flex;
@@ -44,7 +45,7 @@ const StyledEmptyImageContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyImageContainer () {
+function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
   const theme = useTheme();
 
   return (
@@ -57,6 +58,7 @@ function EmptyImageContainer () {
         display: 'flex',
         borderRadius: theme.spacing(0.5)
       }}
+      {...props}
     >
       <StyledEmptyImageContainer>
         <ImageIcon fontSize='small' />
@@ -73,7 +75,16 @@ export function Image ({ node, view }: NodeViewProps) {
   const theme = useTheme();
 
   if (!node.attrs.src) {
-    return <EmptyImageContainer />;
+    return (
+      <PopperPopup popupContent={(
+        <Box>
+          Hello World
+        </Box>
+      )}
+      >
+        <EmptyImageContainer />
+      </PopperPopup>
+    );
   }
   return (
     <StyledImage align={align}>
