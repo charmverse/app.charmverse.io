@@ -25,10 +25,10 @@ const StyledListItem = styled(ListItem)`
   width: fit-content;
 ` as React.FC<{disableRipple: boolean, button: boolean, children: ReactNode}>;
 
-function PageControlItem (props: {children: ReactNode}) {
-  const { children } = props;
+function PageControlItem (props: {children: ReactNode} & React.HTMLAttributes<HTMLDivElement>) {
+  const { children, ...rest } = props;
   return (
-    <StyledListItem disableRipple button>
+    <StyledListItem {...rest} disableRipple button>
       {children}
     </StyledListItem>
   );
@@ -85,11 +85,11 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
       )}
       <Controls>
         {!page.icon && (
-        <PageControlItem>
+        <PageControlItem onClick={() => {
+          setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
+        }}
+        >
           <EmojiEmotionsIcon
-            onClick={() => {
-              setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
-            }}
             fontSize='small'
             sx={{ marginRight: 1 }}
           />
@@ -97,14 +97,14 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
         </PageControlItem>
         )}
         {!page.headerImage && (
-        <PageControlItem>
+        <PageControlItem onClick={() => {
+          // Charmverse logo
+          setPage({ ...page, headerImage: 'https://static.wixstatic.com/media/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.png/v1/fill/w_304,h_58,al_c,q_85,usm_0.66_1.00_0.01/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.webp' });
+        }}
+        >
           <ImageIcon
             fontSize='small'
             sx={{ marginRight: 1 }}
-            onClick={() => {
-              // Charmverse logo
-              setPage({ ...page, headerImage: 'https://static.wixstatic.com/media/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.png/v1/fill/w_304,h_58,al_c,q_85,usm_0.66_1.00_0.01/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.webp' });
-            }}
           />
           Add cover
         </PageControlItem>
