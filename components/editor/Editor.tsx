@@ -35,7 +35,6 @@ function PageControlItem (props: {children: ReactNode}) {
 }
 
 const Controls = styled.div`
-  margin-top: 80px;
   margin-bottom: 4px;
   display: flex;
   gap: ${({ theme }) => theme.spacing(0.5)};
@@ -51,6 +50,17 @@ const PageTitle = styled.input`
   outline: none;
 `;
 
+const PageBanner = styled(Box)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    object-fit: cover;
+  }
+`;
+
 function randomIntFromInterval (min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -62,6 +72,17 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
 
   return (
     <Container>
+      {page.headerImage && (
+        <PageBanner>
+          {/* eslint-disable-next-line */}
+          <img src={page.headerImage} alt='Page Banner' />
+        </PageBanner>
+      )}
+      {page.icon && (
+        <Box py={3}>
+          <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+        </Box>
+      )}
       <Controls>
         {!page.icon && (
         <PageControlItem>
@@ -77,14 +98,19 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
         )}
         {!page.headerImage && (
         <PageControlItem>
-          <ImageIcon fontSize='small' sx={{ marginRight: 1 }} />
+          <ImageIcon
+            fontSize='small'
+            sx={{ marginRight: 1 }}
+            onClick={() => {
+              // Charmverse logo
+              setPage({ ...page, headerImage: 'https://static.wixstatic.com/media/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.png/v1/fill/w_304,h_58,al_c,q_85,usm_0.66_1.00_0.01/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.webp' });
+            }}
+          />
           Add cover
         </PageControlItem>
         )}
       </Controls>
-      <Box py={3}>
-        <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-      </Box>
+
       <PageTitle
         placeholder='Untitled'
         autoFocus
