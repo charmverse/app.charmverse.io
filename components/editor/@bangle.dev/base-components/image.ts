@@ -20,6 +20,12 @@ const name = 'image';
 
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
 
+export interface ImageNodeSchemaAttrs {
+  caption: null | string
+  src: null | string
+  alt: null | string
+}
+
 function specFactory(): RawSpecs {
   return {
     type: 'node',
@@ -27,13 +33,13 @@ function specFactory(): RawSpecs {
     schema: {
       inline: true,
       attrs: {
+        caption: {
+          default: null
+        },
         src: {},
         alt: {
           default: null,
-        },
-        title: {
-          default: null,
-        },
+        }
       },
       group: 'inline',
       draggable: true,
@@ -42,7 +48,6 @@ function specFactory(): RawSpecs {
           tag: 'img[src]',
           getAttrs: (dom: any) => ({
             src: dom.getAttribute('src'),
-            title: dom.getAttribute('title'),
             alt: dom.getAttribute('alt'),
           }),
         },
@@ -74,13 +79,9 @@ function pluginsFactory({
       new InputRule(
         /!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/,
         (state, match, start, end) => {
-          let [, alt, src, title] = match;
+          let [, alt, src] = match;
           if (!src) {
             return null;
-          }
-
-          if (!title) {
-            title = alt;
           }
           return state.tr.replaceWith(
             start,
@@ -88,7 +89,6 @@ function pluginsFactory({
             type.create({
               src,
               alt,
-              title,
             }),
           );
         },

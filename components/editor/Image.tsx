@@ -80,7 +80,9 @@ export function Image ({ node }: NodeViewProps) {
         </Controls>
         { /* eslint-disable-next-line */}
         <img width={500} contentEditable={false} draggable src={node.attrs.src} alt={node.attrs.alt} />
-        <ImageCaption>{node.attrs.caption ?? 'Write a caption...'}</ImageCaption>
+        <ImageCaption>
+          {node.attrs.caption ?? 'Write a caption...'}
+        </ImageCaption>
       </div>
     </StyledImage>
   );

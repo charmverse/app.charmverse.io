@@ -102,7 +102,7 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
       }),
       NodeView.createPlugin({
         name: 'image',
-        containerDOM: ['span']
+        containerDOM: ['div']
       })
     ],
     initialValue: Node.fromJSON(specRegistry.schema, content)
