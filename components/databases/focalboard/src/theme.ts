@@ -123,7 +123,7 @@ export function setTheme(theme: Theme | null): Theme {
     }
 
     setActiveThemeName(consolidatedTheme, theme)
-    console.log(theme)
+
     if (!Utils.isFocalboardPlugin()) {
         document.documentElement.style.setProperty('--center-channel-bg-rgb', consolidatedTheme.mainBg)
         document.documentElement.style.setProperty('--center-channel-color-rgb', consolidatedTheme.mainFg)

@@ -5,7 +5,7 @@ const PREFIX = 'charm.v1';
 
 // localStorage hook inspiration: https://blog.logrocket.com/using-localstorage-react-hooks/
 
-function getStorageValue<T = any> (key: string, defaultValue?: T) {
+export function getStorageValue<T = any> (key: string, defaultValue?: T) {
 
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem(key);

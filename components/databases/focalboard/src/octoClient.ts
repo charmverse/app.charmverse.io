@@ -9,6 +9,7 @@ import {Utils} from './utils'
 import {ClientConfig} from './config/clientConfig'
 import {UserSettings} from './userSettings'
 import {Subscription} from './wsclient'
+import { getDatabaseBlocks } from 'hooks/useDatabaseBlocks'
 
 //
 // OctoClient is the client interface to the server APIs
@@ -245,6 +246,14 @@ class OctoClient {
             return []
         }
         const blocks = (await this.getJson(response, [])) as Block[]
+        try {
+            const blocks2 = getDatabaseBlocks();
+            console.log('get blocks', blocks2);
+            return this.fixBlocks(blocks2)
+        }
+        catch (e) {
+            console.log('error', e);
+        }
         return this.fixBlocks(blocks)
     }
 

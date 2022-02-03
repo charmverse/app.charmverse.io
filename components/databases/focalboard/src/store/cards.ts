@@ -113,7 +113,6 @@ export const getCurrentBoardCards = createSelector(
     (state) => state.boards.current,
     getCards,
     (boardId, cards) => {
-        console.log("ALL CARDS", cards)
         return Object.values(cards).filter((c) => c.parentId === CURRENT_BID) as Card[]
     },
 )

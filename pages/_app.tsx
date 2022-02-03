@@ -9,6 +9,7 @@ import { ColorModeContext } from 'context/color-mode';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { PagesProvider } from 'hooks/usePages';
+import { DatabaseBlocksProvider } from 'hooks/useDatabaseBlocks';
 import { UserProvider } from 'hooks/useUser';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
@@ -268,11 +269,13 @@ function DataProviders ({ children }: { children: ReactNode }) {
   return (
     <SpacesProvider>
       <PagesProvider>
-        <PageTitleProvider>
-          <UserProvider>
-            {children}
-          </UserProvider>
-        </PageTitleProvider>
+        <DatabaseBlocksProvider>
+          <PageTitleProvider>
+            <UserProvider>
+              {children}
+            </UserProvider>
+          </PageTitleProvider>
+        </DatabaseBlocksProvider>
       </PagesProvider>
     </SpacesProvider>
   );
