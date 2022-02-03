@@ -48,7 +48,7 @@ const CardDialog = (props: Props): JSX.Element => {
     const comments = useAppSelector(getCardComments(props.cardId))
     const intl = useIntl()
     const me = useAppSelector<IUser|null>(getMe)
-
+    console.log('card dialog',props.cardId, card);
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
     const makeTemplateClicked = async () => {
         if (!card) {

@@ -25,6 +25,7 @@ class Mutator {
             Utils.assertFailure('UndoManager does not support nested groups')
             return undefined
         }
+        console.log('beginUndoGroup!');
         this.undoGroupId = Utils.createGuid(IDType.None)
         return this.undoGroupId
     }

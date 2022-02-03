@@ -6,7 +6,10 @@ const blocks = JSON.parse(`[{"id":"2bb7dc3d-c36a-4e00-8e0f-a6d31ac053c7","schema
 export default async function handler (req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'POST') {
-    res.json(req.body);
+    res.json([{
+      ...req.body[0],
+      workspaceId: req.query.workspaceId
+    }]);
   }
   if (req.method === 'GET') {
     res.json(blocks);

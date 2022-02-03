@@ -70,7 +70,7 @@ export const darkThemeName = 'dark-theme'
 export const darkTheme = {
     ...defaultTheme,
 
-    mainBg: '55, 53, 47',
+    mainBg: '0, 0, 0, 0',// '55, 53, 47',
     mainFg: '220, 220, 220',
     buttonBg: '80, 170, 221',
     buttonFg: '255, 255, 255',
@@ -123,7 +123,7 @@ export function setTheme(theme: Theme | null): Theme {
     }
 
     setActiveThemeName(consolidatedTheme, theme)
-
+    console.log(theme)
     if (!Utils.isFocalboardPlugin()) {
         document.documentElement.style.setProperty('--center-channel-bg-rgb', consolidatedTheme.mainBg)
         document.documentElement.style.setProperty('--center-channel-color-rgb', consolidatedTheme.mainFg)

@@ -59,9 +59,11 @@ function invariant (cond: any, message: string): asserts cond {
  * @see https://reactrouter.com/docs/en/v6/api#generatepath
  */
 export function generatePath (path: string, params: any = {}): string {
+  const remainingParamsKeys = { ...params };
   return path
     .replace(/\[(\w+)\]/g, (_, key) => {
       invariant(params[key] != null, `Missing ":${key}" param`);
+      delete remainingParamsKeys[key];
       return params[key]!;
     })
     .replace(/\/*\*$/, _ => params['*'] == null ? '' : params['*'].replace(/^\/*/, '/'));

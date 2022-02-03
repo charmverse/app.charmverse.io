@@ -46,15 +46,12 @@ export function DatabaseEditor ({ readonly }: Props) {
   }, [router.query.workspaceId, readonly, router.query.pageId]);
 
   const showCard = useCallback((cardId?: string) => {
-    const params = { ...router.query, cardId };
-    let newPath = generatePath(router.pathname, params);
+    let newPath = generatePath(router.pathname, router.query);
     if (readonly) {
       newPath += `?r=${Utils.getReadToken()}`;
     }
-    router.push(newPath);
+    router.push({ pathname: newPath, query: { cardId } }, undefined, { shallow: true });
   }, [router.query]);
-
-  console.log('BOARD AND VIEW', board, activeView);
 
   if (board && activeView) {
     let property = groupByProperty;
