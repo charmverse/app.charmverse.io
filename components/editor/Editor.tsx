@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+import ImageIcon from '@mui/icons-material/Image';
 import { ListItem } from '@mui/material';
 import Box from '@mui/material/Box';
 import Emoji from 'components/common/Emoji';
+import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { Page } from 'models';
 import React, { ChangeEvent, ReactNode } from 'react';
 import BangleEditor from './BangleEditor';
@@ -23,7 +25,7 @@ const StyledListItem = styled(ListItem)`
   width: fit-content;
 ` as React.FC<{disableRipple: boolean, button: boolean, children: ReactNode}>;
 
-function PageListItem (props: {children: ReactNode}) {
+function PageControlItem (props: {children: ReactNode}) {
   const { children } = props;
   return (
     <StyledListItem disableRipple button>
@@ -35,6 +37,8 @@ function PageListItem (props: {children: ReactNode}) {
 const Controls = styled.div`
   margin-top: 80px;
   margin-bottom: 4px;
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const PageTitle = styled.input`
@@ -47,6 +51,10 @@ const PageTitle = styled.input`
   outline: none;
 `;
 
+function randomIntFromInterval (min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => void }) {
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {
     setPage({ ...page, title: event.target.value });
@@ -56,10 +64,22 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
     <Container>
       <Controls>
         {!page.icon && (
-        <PageListItem>
-          <EmojiEmotionsIcon fontSize='small' sx={{ marginRight: 1 }} />
-          Add Icon
-        </PageListItem>
+        <PageControlItem>
+          <EmojiEmotionsIcon
+            onClick={() => {
+              setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
+            }}
+            fontSize='small'
+            sx={{ marginRight: 1 }}
+          />
+          Add icon
+        </PageControlItem>
+        )}
+        {!page.headerImage && (
+        <PageControlItem>
+          <ImageIcon fontSize='small' sx={{ marginRight: 1 }} />
+          Add cover
+        </PageControlItem>
         )}
       </Controls>
       <Box py={3}>
