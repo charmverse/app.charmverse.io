@@ -54,6 +54,7 @@ const PageBanner = styled(Box)`
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 150px;
 
   img {
     width: 100%;
@@ -72,12 +73,10 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
 
   return (
     <Container>
-      {page.headerImage && (
-        <PageBanner>
-          {/* eslint-disable-next-line */}
-          <img src={page.headerImage} alt='Page Banner' />
-        </PageBanner>
-      )}
+      <PageBanner>
+        {/* eslint-disable-next-line */}
+        {page.headerImage && <img src={page.headerImage} alt='Page Banner' />}
+      </PageBanner>
       {page.icon && (
         <Box py={3}>
           <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
