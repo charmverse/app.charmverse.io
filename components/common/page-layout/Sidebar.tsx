@@ -1,4 +1,3 @@
-import { ComponentProps, useState } from 'react';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -7,29 +6,28 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
 import MuiLink from '@mui/material/Link';
 import Modal from '@mui/material/Modal';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { shortenedWeb3Address } from 'lib/strings';
 import { Contributor, Page, Space } from 'models';
+import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { pages as seedPages } from 'seedData';
 import { greyColor2 } from 'theme/colors';
-import Header from './Header';
-import WorkspaceAvatar from '../WorkspaceAvatar';
-import Link from '../Link';
 import Avatar from '../Avatar';
-import EmojiCon from '../Emoji';
+import Link from '../Link';
 import ModalContainer from '../ModalContainer';
+import WorkspaceAvatar from '../WorkspaceAvatar';
 import CreateWorkspaceForm from './CreateWorkspaceForm';
-
+import Header from './Header';
 import PageNavigation, { StyledIconButton } from './PageNavigation';
 
 const AvatarLink = styled(NextLink)`
@@ -114,7 +112,10 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     const newPage: Page = {
       content: {
         type: 'doc',
-        content: []
+        content: [{
+          type: 'paragraph',
+          content: []
+        }]
       },
       created: new Date(),
       id,

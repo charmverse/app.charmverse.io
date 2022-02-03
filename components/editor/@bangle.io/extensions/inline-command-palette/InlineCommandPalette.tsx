@@ -72,7 +72,6 @@ const InlinePaletteWrapper = styled(Box)`
   max-height: 350px;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   overflow-y: auto;
-  width: 100%;
   padding: ${({ theme }) => theme.spacing(1.5)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
 `;
@@ -150,7 +149,7 @@ export function InlineCommandPalette() {
   })
 
   return reactDOM.createPortal(
-    <InlinePaletteWrapper sx={scrollbarStyling}>
+    <InlinePaletteWrapper sx={{...scrollbarStyling, width: 200}}>
       {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
         <InlinePaletteGroup key={group}>
           <GroupLabel label={group} />
