@@ -71,7 +71,14 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.image.create())
+            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.image.create({
+                  src: null
+                })
+              ])
+            ))
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,

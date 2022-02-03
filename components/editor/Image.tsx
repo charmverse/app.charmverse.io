@@ -4,7 +4,8 @@ import styled from '@emotion/styled';
 import AlignHorizontalCenterIcon from '@mui/icons-material/AlignHorizontalCenter';
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import AlignHorizontalRightIcon from '@mui/icons-material/AlignHorizontalRight';
-import { ListItem } from '@mui/material';
+import ImageIcon from '@mui/icons-material/Image';
+import { Box, ListItem, Typography } from '@mui/material';
 import { useState } from 'react';
 
 const StyledImage = styled.div<{ align?: string }>`
@@ -35,10 +36,45 @@ const ImageCaption = styled.div`
   opacity: 0.5;
 `;
 
-export function Image ({ node }: NodeViewProps) {
+const StyledEmptyImageContainer = styled(Box)`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(1.5)};
+  width: 100%;
+  align-items: center;
+  opacity: 0.5;
+`;
+
+function EmptyImageContainer () {
+  const theme = useTheme();
+
+  return (
+    <ListItem
+      button
+      disableRipple
+      sx={{
+        backgroundColor: theme.palette.background.light,
+        p: 2,
+        display: 'flex',
+        borderRadius: theme.spacing(0.5)
+      }}
+    >
+      <StyledEmptyImageContainer>
+        <ImageIcon fontSize='small' />
+        <Typography>
+          Add an image
+        </Typography>
+      </StyledEmptyImageContainer>
+    </ListItem>
+  );
+}
+
+export function Image ({ node, view }: NodeViewProps) {
   const [align, setAlign] = useState('center');
   const theme = useTheme();
 
+  if (!node.attrs.src) {
+    return <EmptyImageContainer />;
+  }
   return (
     <StyledImage align={align}>
       <div className='content' style={{ position: 'relative' }}>
@@ -79,7 +115,7 @@ export function Image ({ node }: NodeViewProps) {
           ))}
         </Controls>
         { /* eslint-disable-next-line */}
-        <img width={500} contentEditable={false} draggable src={node.attrs.src} alt={node.attrs.alt} />
+        {<img width={500} contentEditable={false} draggable src={node.attrs.src} alt={node.attrs.alt} />}
         <ImageCaption>
           {node.attrs.caption ?? 'Write a caption...'}
         </ImageCaption>

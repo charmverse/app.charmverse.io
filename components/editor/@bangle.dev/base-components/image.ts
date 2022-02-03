@@ -36,7 +36,9 @@ function specFactory(): RawSpecs {
         caption: {
           default: null
         },
-        src: {},
+        src: {
+          default: null
+        },
         alt: {
           default: null,
         }
