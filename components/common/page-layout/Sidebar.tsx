@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import styled from '@emotion/styled';
@@ -11,28 +12,27 @@ import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { shortenedWeb3Address } from 'lib/strings';
 import { Contributor, Page, Space } from 'models';
+import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 import { pages as seedPages } from 'seedData';
 import { greyColor2 } from 'theme/colors';
 import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
 import mutator from 'components/databases/focalboard/src//mutator';
 import { useAppSelector } from 'components/databases/focalboard/src/store/hooks';
 import { getSortedBoards } from 'components/databases/focalboard/src/store/boards';
-import Header from './Header';
-import WorkspaceAvatar from '../WorkspaceAvatar';
-import Link from '../Link';
 import Avatar from '../Avatar';
+import Link from '../Link';
 import ModalContainer from '../ModalContainer';
+import WorkspaceAvatar from '../WorkspaceAvatar';
 import CreateWorkspaceForm from './CreateWorkspaceForm';
-
+import Header from './Header';
 import PageNavigation from './PageNavigation';
 import NewPageMenu from '../NewPageMenu';
 
@@ -120,7 +120,10 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     const newPage: Page = {
       content: {
         type: 'doc',
-        content: []
+        content: [{
+          type: 'paragraph',
+          content: []
+        }]
       },
       created: new Date(),
       id,

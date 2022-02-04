@@ -30,7 +30,7 @@ import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
 const specRegistry = new SpecRegistry([
-  blockQuoteSpec(),
+  paragraph.spec(),
   bold.spec(),
   bulletList.spec(),
   hardBreak.spec(),
@@ -40,7 +40,6 @@ const specRegistry = new SpecRegistry([
   link.spec(),
   listItem.spec(),
   orderedList.spec(),
-  paragraph.spec(),
   strike.spec(),
   underline.spec(),
   emojiSpecs(),
@@ -51,7 +50,8 @@ const specRegistry = new SpecRegistry([
   table,
   tableCell,
   tableHeader,
-  tableRow
+  tableRow,
+  blockQuoteSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
@@ -69,7 +69,6 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
     specRegistry,
     plugins: () => [
       inlinePalettePlugins(),
-      blockquote.plugins(),
       bold.plugins(),
       bulletList.plugins(),
       code.plugins(),
@@ -89,6 +88,7 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
       tablePlugins(),
       columnResizing,
       floatingMenuPlugin(),
+      blockquote.plugins(),
       NodeView.createPlugin({
         name: 'blockquote',
         containerDOM: ['blockquote'],

@@ -215,7 +215,6 @@ function pluginsFactory({
         onEnter: (state, dispatch, view) => {
           const emojiGroups = getEmojiGroups(queryTriggerText(key)(state));
           const matchedEmojis = emojiGroups.flatMap((r) => r.emojis);
-
           if (matchedEmojis.length === 0) {
             return removeSuggestMark(key)(state, dispatch, view);
           }
