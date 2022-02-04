@@ -20,7 +20,7 @@ type Props = {
 }
 
 export const FlashMessages = React.memo((props: Props) => {
-    const [message, setMessage] = useState<FlashMessage|null>(null)
+    const [message, setMessage] = useState<FlashMessage|null>()
     const [fadeOut, setFadeOut] = useState(false)
     const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout>|null>(null)
 

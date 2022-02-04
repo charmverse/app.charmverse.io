@@ -146,6 +146,7 @@ import { TouchBackend } from 'react-dnd-touch-backend';
 import { ReduxProvider, store } from 'components/databases/focalboard/src/main';
 import { getLanguage, fetchLanguage } from 'components/databases/focalboard/src/store/language';
 import { useAppSelector, useAppDispatch } from 'components/databases/focalboard/src/store/hooks';
+import { FlashMessages } from 'components/databases/focalboard/src/components/flashMessages';
 import { getMessages } from 'components/databases/focalboard/src/i18n';
 import {
   darkTheme,
@@ -264,6 +265,7 @@ function FocalBoardProviders ({ children }: { children: ReactNode }) {
       messages={getMessages(language)}
     >
       <DndProvider backend={isMobile() ? TouchBackend : HTML5Backend}>
+        <FlashMessages milliseconds={2000} />
         {children}
       </DndProvider>
     </IntlProvider>

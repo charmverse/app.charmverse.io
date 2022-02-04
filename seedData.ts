@@ -71,7 +71,8 @@ export const pages: Page[] = [
     path: 'database-page',
     spaceId: '0',
     title: 'Database page',
-    type: 'database'
+    type: 'database',
+    databaseId: 'b3fs1cyw717nfjfswcyk9hd1jph'
   }),
   MockPage({
     icon: '📌',

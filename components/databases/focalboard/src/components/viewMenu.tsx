@@ -36,7 +36,7 @@ const ViewMenu = React.memo((props: Props) => {
         if (props.readonly) {
             newPath += `?r=${Utils.getReadToken()}`
         }
-        router.push(newPath)
+        router.push({ pathname: newPath, query: { viewId: viewId || '' } }, undefined, { shallow: true });
     }, [router.query, history])
 
     const handleDuplicateView = useCallback(() => {

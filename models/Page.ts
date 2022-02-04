@@ -28,6 +28,7 @@ export interface Page {
   id: string;
   title: string;
   content: PageContent;
+  databaseId?: string; // required for type: 'database'
   created: Date;
   headerImage?: string;
   icon?: string;

@@ -25,7 +25,7 @@ export default function BlocksEditorPage () {
 
   return (
     (pageByPath?.type === 'database')
-      ? <DatabaseEditor /> // page={pageByPath} setPage={setPage} />
+      ? <DatabaseEditor page={pageByPath} />
       : <Editor page={pageByPath} setPage={setPage} />
   );
 }

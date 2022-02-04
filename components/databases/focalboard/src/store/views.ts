@@ -68,7 +68,7 @@ export const getSortedViews = createSelector(
 
 export function getView(viewId: string): (state: RootState) => BoardView|null {
     return (state: RootState): BoardView|null => {
-        return state.views.views['1cd434b0-75a6-473d-823e-958ac98af66d'] || null
+        return state.views.views[viewId] || null
     }
 }
 
@@ -84,7 +84,7 @@ export const getCurrentView = createSelector(
     getViews,
     (state) => state.views.current,
     (views, viewId) => {
-        return views['1cd434b0-75a6-473d-823e-958ac98af66d']
+        return views[viewId]
     },
 )
 

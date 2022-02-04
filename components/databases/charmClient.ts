@@ -82,8 +82,9 @@ class CharmClient {
   async deleteBlock (blockId: string, updater: BlockUpdater): Promise<void> {
     Utils.log(`deleteBlock: ${blockId}`);
     const blocks = getStorageValue('database-blocks', [...seedData.blocks]);
-    const updated = setStorageValue('database-blocks', blocks.filter(block => block.id !== blockId));
-    updater(updated);
+    setStorageValue('database-blocks', blocks.filter(block => block.id !== blockId));
+    const blocksToDelete = blocks.map(block => block.id === blockId ? { ...block, deleteAt: Date.now() } : block);
+    updater(blocksToDelete);
   }
 
   async insertBlock (block: Block, updater: BlockUpdater): Promise<Block[]> {
@@ -97,8 +98,11 @@ class CharmClient {
     });
     const blocks = getStorageValue('database-blocks', [...seedData.blocks]);
     const currentSpace = this.getCurrentWorkspace();
-    newBlocks.forEach(block => {
-      block.workspaceId = currentSpace.id;
+    newBlocks = newBlocks.map(block => {
+      return {
+        ...block,
+        workspaceId: currentSpace.id
+      };
     });
     const updated = setStorageValue('database-blocks', [...blocks, ...newBlocks]);
     updater(updated);

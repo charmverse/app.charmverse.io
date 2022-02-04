@@ -1,9 +1,13 @@
 import { useCallback, useEffect } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { generatePath } from 'lib/strings';
 import { useRouter } from 'next/router';
-import { getView, getCurrentBoardViews, getCurrentViewGroupBy, getCurrentViewDisplayBy } from './focalboard/src/store/views';
+import { Page } from 'models';
+import { sendFlashMessage } from './focalboard/src/components/flashMessages';
+import mutator from './focalboard/src/mutator';
+import { getView, setCurrent as setCurrentView, getCurrentBoardViews, getCurrentViewGroupBy, getCurrentViewDisplayBy } from './focalboard/src/store/views';
 import { useAppSelector, useAppDispatch } from './focalboard/src/store/hooks';
-import { getCurrentBoard } from './focalboard/src/store/boards';
+import { updateBoards, getCurrentBoard, setCurrent as setCurrentBoard } from './focalboard/src/store/boards';
 import { getCurrentViewCardsSortedFilteredAndGrouped } from './focalboard/src/store/cards';
 import { getClientConfig } from './focalboard/src/store/clientConfig';
 import { Utils } from './focalboard/src/utils';
@@ -17,21 +21,29 @@ import { initialLoad, initialReadOnlyLoad } from './focalboard/src/store/initial
  */
 
 interface Props {
-  // page: Page;
+  page: Page;
   readonly?: boolean;
   // setPage: (p: Page) => void;
 }
 
-export function DatabaseEditor ({ readonly }: Props) {
+export function DatabaseEditor ({ page, readonly }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
   const activeView = useAppSelector(getView(router.query.viewId as string));
-  const views = useAppSelector(getCurrentBoardViews);
+  const boardViews = useAppSelector(getCurrentBoardViews);
   const groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const viewId = router.query.viewId as string;
+
+    dispatch(setCurrentBoard(page.databaseId!));
+    dispatch(setCurrentView(viewId || ''));
+
+  }, [page.databaseId, router.query.viewId, boardViews]);
 
   useEffect(() => {
     let loadAction: any = initialLoad; /* eslint-disable-line @typescript-eslint/no-explicit-any */
@@ -40,10 +52,49 @@ export function DatabaseEditor ({ readonly }: Props) {
       loadAction = initialReadOnlyLoad;
       token = token || router.query.r as string || '';
     }
+    dispatch(loadAction(page.databaseId));
+    const viewId = router.query.viewId as string;
 
-    dispatch(loadAction(router.query.pageId));
+    dispatch(setCurrentBoard(page.databaseId!));
+    dispatch(setCurrentView(viewId || ''));
 
   }, [router.query.workspaceId, readonly, router.query.pageId]);
+
+  useHotkeys('ctrl+z,cmd+z', () => {
+    Utils.log('Undo');
+    if (mutator.canUndo) {
+      const description = mutator.undoDescription;
+      mutator.undo().then(() => {
+        if (description) {
+          sendFlashMessage({ content: `Undo ${description}`, severity: 'low' });
+        }
+        else {
+          sendFlashMessage({ content: 'Undo', severity: 'low' });
+        }
+      });
+    }
+    else {
+      sendFlashMessage({ content: 'Nothing to Undo', severity: 'low' });
+    }
+  });
+
+  useHotkeys('shift+ctrl+z,shift+cmd+z', () => {
+    Utils.log('Redo');
+    if (mutator.canRedo) {
+      const description = mutator.redoDescription;
+      mutator.redo().then(() => {
+        if (description) {
+          sendFlashMessage({ content: `Redo ${description}`, severity: 'low' });
+        }
+        else {
+          sendFlashMessage({ content: 'Redu', severity: 'low' });
+        }
+      });
+    }
+    else {
+      sendFlashMessage({ content: 'Nothing to Redo', severity: 'low' });
+    }
+  });
 
   const showCard = useCallback((cardId?: string) => {
     let newPath = generatePath(router.pathname, router.query);
@@ -76,7 +127,7 @@ export function DatabaseEditor ({ readonly }: Props) {
           activeView={activeView}
           groupByProperty={property}
           dateDisplayProperty={displayProperty}
-          views={views}
+          views={boardViews}
           showShared={clientConfig?.enablePublicSharedBoards || false}
         />
       </div>

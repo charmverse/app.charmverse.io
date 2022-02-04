@@ -12,7 +12,7 @@ import {Constants} from '../constants'
 import {CardFilter} from '../cardFilter'
 
 import {initialLoad, initialReadOnlyLoad} from './initialLoad'
-import {getCurrentBoard, CURRENT_BID } from './boards'
+import {getCurrentBoard } from './boards'
 import {getWorkspaceUsers} from './users'
 import {getCurrentView} from './views'
 import {getSearchText} from './searchText'
@@ -112,7 +112,7 @@ export const getCurrentBoardCards = createSelector(
     (state) => state.boards.current,
     getCards,
     (boardId, cards) => {
-        return Object.values(cards).filter((c) => c.parentId === CURRENT_BID) as Card[]
+        return Object.values(cards).filter((c) => c.parentId === boardId) as Card[]
     },
 )
 
