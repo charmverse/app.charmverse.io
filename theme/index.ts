@@ -90,6 +90,10 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     h2: {
       fontSize: '1.05rem',
       fontWeight: 500
+    },
+    subtitle1: {
+      fontSize: '0.85rem',
+      fontWeight: 400
     }
   },
   palette: {
@@ -146,6 +150,13 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     }
   },
   components: {
+    MuiTypography: {
+      styleOverrides: {
+        root: {
+          whiteSpace: 'nowrap'
+        }
+      }
+    },
     MuiCard: {
       styleOverrides: {
         root: {

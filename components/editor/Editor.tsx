@@ -1,7 +1,8 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
-import { ListItem } from '@mui/material';
+import { ListItem, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Emoji from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
@@ -57,10 +58,22 @@ const PageBanner = styled(Box)`
   align-items: center;
   justify-content: center;
   height: 200px;
+  position: relative;
 
   img {
     width: 100%;
     object-fit: cover;
+  }
+
+  .page-cover-controls {
+    visibility: hidden;
+    position: absolute;
+    bottom: 0px;
+    right: 25px
+  }
+
+  &:hover .page-cover-controls {
+    visibility: inherit;
   }
 `;
 
@@ -73,11 +86,48 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
     setPage({ ...page, title: event.target.value });
   }
 
+  const theme = useTheme();
+
   return (
     <Box>
       <PageBanner>
         {/* eslint-disable-next-line */}
         {page.headerImage && <img src={page.headerImage} alt='Page Banner' />}
+        <Box
+          sx={{
+            background: theme.palette.background.dark,
+            borderRadius: theme.spacing(0.5),
+            display: 'flex'
+          }}
+          className='page-cover-controls'
+        >
+          <ListItem
+            button
+            disableRipple
+            sx={{
+              borderTopLeftRadius: theme.spacing(0.5),
+              borderBottomLeftRadius: theme.spacing(0.5),
+              padding: theme.spacing(0.5, 1.5)
+            }}
+          >
+            <Typography variant='subtitle1'>
+              Change Cover
+            </Typography>
+          </ListItem>
+          <ListItem
+            button
+            disableRipple
+            sx={{
+              borderTopRightRadius: theme.spacing(0.5),
+              borderBottomRightRadius: theme.spacing(0.5),
+              padding: theme.spacing(0.5, 1.5)
+            }}
+          >
+            <Typography variant='subtitle1'>
+              Remove
+            </Typography>
+          </ListItem>
+        </Box>
       </PageBanner>
       <Container>
         {page.icon && (
