@@ -111,6 +111,7 @@ class CenterPanel extends React.Component<Props, State> {
     render(): JSX.Element {
         const {groupByProperty, activeView, board, views, cards} = this.props
         const {visible: visibleGroups, hidden: hiddenGroups} = this.getVisibleAndHiddenGroups(cards, activeView.fields.visibleOptionIds, activeView.fields.hiddenOptionIds, groupByProperty)
+
         return (
             <div
                 className='BoardComponent'

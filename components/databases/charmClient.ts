@@ -61,7 +61,7 @@ class CharmClient {
     Utils.log(`patchBlock: ${blockId} block`);
     const blocks = getStorageValue('database-blocks', [...seedData.blocks]);
     const block = blocks.find(b => b.id === blockId);
-    const { updatedFields = {}, ...updates } = blockPatch;
+    const { deletedFields = [], updatedFields = {}, ...updates } = blockPatch;
     Object.assign(block, updates, { fields: { ...block.fields, ...updatedFields } });
     setStorageValue('database-blocks', blocks);
     updater([block]);
@@ -70,10 +70,11 @@ class CharmClient {
   async patchBlocks (_blocks: Block[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void> {
     Utils.log(`patchBlocks: ${_blocks.length} blocks`);
     const blocks = getStorageValue('database-blocks', [...seedData.blocks]);
-    _blocks.forEach((block, i) => {
+    _blocks.forEach((updated, i) => {
+      const block = blocks.find(b => b.id === updated.id);
       const blockPatch = blockPatches[i]!;
-      const { updatedFields = {}, ...updates } = blockPatch;
-      Object.assign(block, updates, { fields: { ...block.fields, ...updatedFields } });
+      const { deletedFields = [], updatedFields = {}, ...updates } = blockPatch;
+      Object.assign(block, updates, { fields: { ...updated.fields, ...updatedFields } });
     });
     setStorageValue('database-blocks', blocks);
     updater(blocks);
