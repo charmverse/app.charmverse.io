@@ -32,7 +32,7 @@ const ViewMenu = React.memo((props: Props) => {
     const router = useRouter()
 
     const showView = useCallback((viewId) => {
-        let newPath = generatePath(router.pathname, {...router.query, viewId: viewId || ''})
+        let newPath = generatePath(router.pathname, router.query)
         if (props.readonly) {
             newPath += `?r=${Utils.getReadToken()}`
         }

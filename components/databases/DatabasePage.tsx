@@ -38,9 +38,21 @@ export function DatabaseEditor ({ page, readonly }: Props) {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    const boardId = page.databaseId!;
     const viewId = router.query.viewId as string;
 
-    dispatch(setCurrentBoard(page.databaseId!));
+    // Ensure boardViews is for our boardId before redirecting
+    const isCorrectBoardView = boardViews.length > 0 && boardViews[0].parentId === boardId;
+    if (!viewId && isCorrectBoardView) {
+      const newPath = generatePath(router.pathname, { ...router.query, boardId });
+      router.replace({
+        pathname: newPath,
+        query: { ...router.query, viewId: boardViews[0].id }
+      });
+      return;
+    }
+
+    dispatch(setCurrentBoard(boardId));
     dispatch(setCurrentView(viewId || ''));
 
   }, [page.databaseId, router.query.viewId, boardViews]);
@@ -53,10 +65,6 @@ export function DatabaseEditor ({ page, readonly }: Props) {
       token = token || router.query.r as string || '';
     }
     dispatch(loadAction(page.databaseId));
-    const viewId = router.query.viewId as string;
-
-    dispatch(setCurrentBoard(page.databaseId!));
-    dispatch(setCurrentView(viewId || ''));
 
   }, [router.query.workspaceId, readonly, router.query.pageId]);
 
@@ -101,7 +109,7 @@ export function DatabaseEditor ({ page, readonly }: Props) {
     if (readonly) {
       newPath += `?r=${Utils.getReadToken()}`;
     }
-    router.push({ pathname: newPath, query: { cardId } }, undefined, { shallow: true });
+    router.push({ pathname: newPath, query: { cardId, viewId: router.query.viewId } }, undefined, { shallow: true });
   }, [router.query]);
 
   if (board && activeView) {
