@@ -14,8 +14,10 @@ export default function BlocksEditorPage () {
   const pageByPath = pages.find(page => page.path === pageId || page.id === pageId) || pages[0];
   const [, setTitleState] = useTitleState();
 
-  function setPage (page: Page) {
-    setPages(pages.map(p => p.id === page.id ? page : p));
+  function setPage (page: Partial<Page>) {
+    console.log('setPage called', page);
+    const newPage = { ...pageByPath, ...page };
+    setPages(pages.map(p => p.id === newPage.id ? newPage : p));
   }
 
   useEffect(() => {
@@ -25,7 +27,7 @@ export default function BlocksEditorPage () {
 
   return (
     (pageByPath?.type === 'database')
-      ? <DatabaseEditor page={pageByPath} />
+      ? <DatabaseEditor page={pageByPath} setPage={setPage} />
       : <Editor page={pageByPath} setPage={setPage} />
   );
 }

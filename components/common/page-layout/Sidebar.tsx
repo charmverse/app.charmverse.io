@@ -1,4 +1,5 @@
-import { ComponentProps, useState } from 'react';
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -7,7 +8,6 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
 import MuiLink from '@mui/material/Link';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
@@ -22,15 +22,19 @@ import { shortenedWeb3Address } from 'lib/strings';
 import { Contributor, Page, Space } from 'models';
 import { pages as seedPages } from 'seedData';
 import { greyColor2 } from 'theme/colors';
+import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
+import mutator from 'components/databases/focalboard/src//mutator';
+import { useAppSelector } from 'components/databases/focalboard/src/store/hooks';
+import { getSortedBoards } from 'components/databases/focalboard/src/store/boards';
 import Header from './Header';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import Link from '../Link';
 import Avatar from '../Avatar';
-import EmojiCon from '../Emoji';
 import ModalContainer from '../ModalContainer';
 import CreateWorkspaceForm from './CreateWorkspaceForm';
 
-import PageNavigation, { StyledIconButton } from './PageNavigation';
+import PageNavigation from './PageNavigation';
+import NewPageMenu from '../NewPageMenu';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -80,9 +84,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [user] = useUser();
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
+  const boards = useAppSelector(getSortedBoards);
   const { pages, setPages } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
+  const intl = useIntl();
 
   function showSpaceForm () {
     setSpaceFormOpen(true);
@@ -109,7 +115,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     router.push(`/${newSpace.domain}`);
   }
 
-  function addPage (page: Partial<Page>) {
+  async function addPage (page: Partial<Page>) {
     const id = Math.random().toString().replace('0.', '');
     const newPage: Page = {
       content: {
@@ -126,6 +132,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       type: 'page',
       ...page
     };
+    if (newPage.type === 'database') {
+      await addBoardClicked(boardId => {
+        newPage.databaseId = boardId;
+      }, intl);
+    }
     setPages([newPage, ...pages]);
 
     // add delay to simulate a server call
@@ -135,8 +146,24 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   }
 
   function deletePage (pageId: string) {
+    const page = pages.find(p => p.id === pageId);
     const newPages = pages.filter(p => p.id !== pageId);
     setPages(newPages);
+    if (page?.databaseId) {
+      const board = boards.find(b => b.id === page.databaseId);
+      if (board) {
+        mutator.deleteBlock(
+          board,
+          intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
+          async () => {
+            // success
+          },
+          async () => {
+            // error
+          }
+        );
+      }
+    }
   }
 
   return (
@@ -207,11 +234,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 WORKSPACE
               </Typography>
               <div className='add-a-page'>
-                <Tooltip disableInteractive title='Add a page' leaveDelay={0} placement='right' arrow>
-                  <StyledIconButton onClick={() => addPage({})}>
-                    <AddIcon color='secondary' />
-                  </StyledIconButton>
-                </Tooltip>
+                <NewPageMenu tooltip='Add a page' addPage={addPage} />
               </div>
             </WorkspaceLabel>
             <PageNavigation

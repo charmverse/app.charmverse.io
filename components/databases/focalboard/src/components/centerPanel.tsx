@@ -33,6 +33,8 @@ import CalendarFullView from './calendar/fullCalendar'
 
 import Gallery from './gallery/gallery'
 
+import { Page } from 'models';
+
 type Props = {
     clientConfig?: ClientConfig
     board: Board
@@ -44,6 +46,7 @@ type Props = {
     intl: IntlShape
     readonly: boolean
     addCard: (card: Card) => void
+    setPage: (p: Partial<Page>) => void
     updateView: (view: BoardView) => void
     addTemplate: (template: Card) => void
     shownCardId?: string
@@ -144,6 +147,7 @@ class CenterPanel extends React.Component<Props, State> {
                         key={board.id + board.title}
                         board={board}
                         readonly={this.props.readonly}
+                        setPage={this.props.setPage}
                     />
                     <ViewHeader
                         board={this.props.board}

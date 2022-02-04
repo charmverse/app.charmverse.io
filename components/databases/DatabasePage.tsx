@@ -23,10 +23,10 @@ import { initialLoad, initialReadOnlyLoad } from './focalboard/src/store/initial
 interface Props {
   page: Page;
   readonly?: boolean;
-  // setPage: (p: Page) => void;
+  setPage: (p: Partial<Page>) => void;
 }
 
-export function DatabaseEditor ({ page, readonly }: Props) {
+export function DatabaseEditor ({ page, setPage, readonly }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
@@ -129,6 +129,7 @@ export function DatabaseEditor ({ page, readonly }: Props) {
           clientConfig={clientConfig}
           readonly={!!readonly}
           board={board}
+          setPage={setPage}
           cards={cards}
           shownCardId={router.query.cardId as string}
           showCard={showCard}
@@ -146,33 +147,3 @@ export function DatabaseEditor ({ page, readonly }: Props) {
     <EmptyCenterPanel />
   );
 }
-
-// const Workspace = React.memo((props: Props) => {
-//     const board = useAppSelector(getCurrentBoard)
-//     const view = useAppSelector(getCurrentView)
-
-//     return (
-//         <div className='Workspace'>
-//             {!props.readonly &&
-//                 <Sidebar
-//                     activeBoardId={board?.id}
-//                     activeViewId={view?.id}
-//                 />
-//             }
-//             <div className='mainFrame'>
-//                 {(board?.fields.isTemplate) &&
-//                 <div className='banner'>
-//                     <FormattedMessage
-//                         id='Workspace.editing-board-template';
-//                         defaultMessage="You're editing a board template."
-//                     />
-//                 </div>}
-//                 <CenterContent
-//                     readonly={props.readonly}
-//                 />
-//             </div>
-//         </div>
-//     )
-// })
-
-// export default Workspace

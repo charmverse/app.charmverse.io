@@ -14,18 +14,26 @@ import ShowIcon from '../widgets/icons/show'
 
 import BlockIconSelector from './blockIconSelector'
 import {MarkdownEditor} from './markdownEditor'
+import {Page} from 'models'
 
 type Props = {
     board: Board
     readonly: boolean
+    setPage: (page: Partial<Page>) => void
 }
 
 const ViewTitle = React.memo((props: Props) => {
     const {board} = props
 
     const [title, setTitle] = useState(board.title)
-    const onEditTitleSave = useCallback(() => mutator.changeTitle(board.id, board.title, title), [board.id, board.title, title])
-    const onEditTitleCancel = useCallback(() => setTitle(board.title), [board.title])
+    const onEditTitleSave = useCallback(() => {
+        mutator.changeTitle(board.id, board.title, title)
+        props.setPage({ title })
+    }, [board.id, board.title, title])
+    const onEditTitleCancel = useCallback(() => {
+        setTitle(board.title)
+        props.setPage({ title: board.title })
+    }, [board.title])
     const onDescriptionBlur = useCallback((text) => mutator.changeDescription(board.id, board.fields.description, text), [board.id, board.fields.description])
     const onAddRandomIcon = useCallback(() => {
         const newIcon = BlockIcons.shared.randomIcon()
