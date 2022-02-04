@@ -23,7 +23,7 @@ function TabPanel (props: TabPanelProps) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
+          <Typography component='div'>{children}</Typography>
         </Box>
       )}
     </div>
@@ -45,12 +45,13 @@ export default function MultiTabs (props: MultiTabsProps) {
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label='multi tabs'>
-          {tabs.map(([tabLabel]) => <Tab label={tabLabel} />)}
+          {tabs.map(([tabLabel]) => <Tab key={tabLabel} label={tabLabel} />)}
         </Tabs>
       </Box>
       {
         tabs.map(([_, tabComponent], tabIndex) => (
-          <TabPanel value={value} index={tabIndex}>
+          /* eslint-disable-next-line */
+          <TabPanel value={value} index={tabIndex} key={tabIndex}>
             {tabComponent}
           </TabPanel>
         ))
