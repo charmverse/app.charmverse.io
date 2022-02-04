@@ -248,7 +248,6 @@ class OctoClient {
         const blocks = (await this.getJson(response, [])) as Block[]
         try {
             const blocks2 = getDatabaseBlocks();
-            console.log('get blocks', blocks2);
             return this.fixBlocks(blocks2)
         }
         catch (e) {

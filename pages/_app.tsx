@@ -154,6 +154,7 @@ import {
 } from 'components/databases/focalboard/src/theme';
 
 import 'theme/styles.scss';
+import 'theme/styles.focalboard.scss';
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement
@@ -177,7 +178,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   // dark mode: https://mui.com/customization/dark-mode/
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode>('darkMode');
+  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>('darkMode', null);
   const [mode, setMode] = useState<PaletteMode>('light');
   const colorMode = useMemo(
     () => ({
@@ -235,6 +236,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
               <CssBaseline />
               <RouteGuard>
                 {getLayout(<Component {...pageProps} />)}
+                <div id='focalboard-root-portal' className='focalboard-body' />
               </RouteGuard>
             </ThemeProvider>
           </ColorModeContext.Provider>

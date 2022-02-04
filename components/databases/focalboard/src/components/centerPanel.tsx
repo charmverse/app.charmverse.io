@@ -267,14 +267,12 @@ class CenterPanel extends React.Component<Props, State> {
         if (!card.fields.icon && UserSettings.prefillRandomIcons) {
             card.fields.icon = BlockIcons.shared.randomIcon()
         }
-        console.log('perform undo group', card);
+
         mutator.performAsUndoGroup(async () => {
-            console.log('insert block');
             const newCard = await mutator.insertBlock(
                 card,
                 'add card',
                 async (block: Block) => {
-                    console.log('show block', block, show);
                     if (show) {
                         this.props.addCard(createCard(block))
                         this.props.updateView({...activeView, fields: {...activeView.fields, cardOrder: [...activeView.fields.cardOrder, block.id]}})
@@ -290,7 +288,6 @@ class CenterPanel extends React.Component<Props, State> {
                 },
             )
             await mutator.changeViewCardOrder(activeView, [...activeView.fields.cardOrder, newCard.id], 'add-card')
-            console.log("done", newCard);
         })
     }
 

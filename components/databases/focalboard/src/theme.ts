@@ -70,7 +70,7 @@ export const darkThemeName = 'dark-theme'
 export const darkTheme = {
     ...defaultTheme,
 
-    mainBg: '0, 0, 0, 0',// '55, 53, 47',
+    mainBg: '47, 52, 55',
     mainFg: '220, 220, 220',
     buttonBg: '80, 170, 221',
     buttonFg: '255, 255, 255',

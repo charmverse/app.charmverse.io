@@ -65,7 +65,7 @@ export function DatabaseEditor ({ readonly }: Props) {
     }
 
     return (
-      <div className='focalboard-body'>
+      <div className='focalboard-body' style={{ flexGrow: 1 }}>
         <CenterPanel
           clientConfig={clientConfig}
           readonly={!!readonly}

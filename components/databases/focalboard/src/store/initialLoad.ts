@@ -4,27 +4,21 @@
 import {createAsyncThunk, createSelector} from '@reduxjs/toolkit'
 
 import {default as client} from '../octoClient'
-import {UserWorkspace} from '../user'
-import {Utils} from '../utils'
+import charmClient from '../../../charmClient'
 
 import {Subscription} from '../wsclient'
 
 import {RootState} from './index'
 
-const fetchUserWorkspaces = async ():Promise<UserWorkspace[]> => {
-    // Concept of workspaces is only applicable when running as a plugin.
-    // There is always only one, single workspace in personal server edition.
-    return Utils.isFocalboardPlugin() ? client.getUserWorkspaces() : []
-}
-
 export const initialLoad = createAsyncThunk(
     'initialLoad',
     async () => {
+
         const [workspace, workspaceUsers, blocks, userWorkspaces] = await Promise.all([
-            client.getWorkspace(),
-            client.getWorkspaceUsers(),
-            client.getAllBlocks(),
-            fetchUserWorkspaces(),
+            charmClient.getWorkspace(),
+            charmClient.getWorkspaceUsers(),
+            charmClient.getAllBlocks(),
+            charmClient.getUserWorkspaces(),
         ])
 
         // if no workspace, either bad id, or user doesn't have access

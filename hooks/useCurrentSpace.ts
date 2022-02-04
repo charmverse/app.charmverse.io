@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
-import { Space } from 'models';
+import { Page, Space } from 'models';
 import { useSpaces } from './useSpaces';
-import { getKey } from './useLocalStorage';
+import { getStorageValue, setStorageValue } from './useLocalStorage';
 
 export function useCurrentSpace () {
 
@@ -18,19 +18,20 @@ export function useCurrentSpace () {
     if (_space) {
       const newSpaces = spaces.map(s => s.id === _space.id ? _space : s);
       if (silent) {
-        const key = getKey('spaces');
-        localStorage.setItem(key, JSON.stringify(newSpaces));
+        setStorageValue('spaces', newSpaces);
       }
       else {
         setSpaces(newSpaces);
       }
     }
     else {
+      // delete the current space
       const spaceId = space!.id;
-      const key = getKey('spaces');
       const newSpaces = spaces.filter(s => s.id !== spaceId);
-      localStorage.setItem(key, JSON.stringify(newSpaces));
-      localStorage.removeItem(`spaces.${spaceId}.pages`);
+      setStorageValue('spaces', newSpaces);
+      // delete pages
+      const pages = getStorageValue<Page[]>('pages', []);
+      setStorageValue('pages', pages.filter(p => p.spaceId !== spaceId));
     }
   }
 
