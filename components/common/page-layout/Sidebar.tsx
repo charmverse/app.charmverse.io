@@ -123,6 +123,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       path: `page-${id}`,
       spaceId: space.id,
       title: '',
+      type: 'page',
       ...page
     };
     setPages([newPage, ...pages]);

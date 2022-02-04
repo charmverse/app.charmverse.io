@@ -86,7 +86,6 @@ import 'components/databases/focalboard/src/components/viewTitle.scss';
 import 'components/databases/focalboard/src/components/workspace.scss';
 import 'components/databases/focalboard/src/components/workspaceSwitcher/workspaceOptions.scss';
 import 'components/databases/focalboard/src/components/workspaceSwitcher/workspaceSwitcher.scss';
-import 'components/databases/focalboard/src/pages/boardPage.scss';
 import 'components/databases/focalboard/src/widgets/buttons/button.scss';
 import 'components/databases/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/databases/focalboard/src/widgets/buttons/iconButton.scss';
