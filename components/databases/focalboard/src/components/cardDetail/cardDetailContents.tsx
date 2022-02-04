@@ -35,7 +35,6 @@ function addTextBlock(card: Card, intl: IntlShape, text: string): void {
         const insertedBlock = await mutator.insertBlock(block, description)
         const contentOrder = card.fields.contentOrder.slice()
         contentOrder.push(insertedBlock.id)
-        console.log('new block after mutator.insertBlock', insertedBlock)
         await mutator.changeCardContentOrder(card.id, card.fields.contentOrder, contentOrder, description)
     })
 }
@@ -182,7 +181,6 @@ const CardDetailContents = React.memo((props: Props) => {
                         text=''
                         placeholderText='Add a description...'
                         onBlur={(text) => {
-                            console.log('on blur', text)
                             if (text) {
                                 addTextBlock(card, intl, text)
                             }

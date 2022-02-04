@@ -21,8 +21,9 @@ export function getStorageValue<T = any> (key: string, defaultValue: T): T {
   return defaultValue;
 }
 
-export function setStorageValue<T = any> (key: string, value?: T) {
+export function setStorageValue<T = any> (key: string, value: T): T {
   localStorage.setItem(getKey(key), JSON.stringify(value));
+  return value;
 }
 
 export function useLocalStorage<T = any> (key: string, defaultValue: T) {

@@ -2,11 +2,14 @@
 import * as seedData from 'seedData';
 import { getStorageValue, setStorageValue } from 'hooks/useLocalStorage';
 import { Space } from 'models';
-import { Block, BlockPatch } from './focalboard/src/blocks/block';
 import { IUser, UserWorkspace } from './focalboard/src/user';
 import { IWorkspace } from './focalboard/src/blocks/workspace';
 import { OctoUtils } from './focalboard/src/octoUtils';
 import { Utils } from './focalboard/src/utils';
+// import store from './focalboard/src/store';
+import { Block, BlockPatch } from './focalboard/src/blocks/block';
+
+type BlockUpdater = (blocks: Block[]) => void;
 
 //
 // CharmClient is the client interface to the server APIs
@@ -54,18 +57,17 @@ class CharmClient {
     return [];
   }
 
-  async patchBlock (blockId: string, blockPatch: BlockPatch): Promise<void> {
+  async patchBlock (blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void> {
     Utils.log(`patchBlock: ${blockId} block`);
-    console.log(new Error().stack);
     const blocks = getStorageValue('database-blocks', [...seedData.blocks]);
     const block = blocks.find(b => b.id === blockId);
     const { updatedFields = {}, ...updates } = blockPatch;
-    console.log('update block', block, blockPatch);
     Object.assign(block, updates, { fields: { ...block.fields, ...updatedFields } });
     setStorageValue('database-blocks', blocks);
+    updater([block]);
   }
 
-  async patchBlocks (_blocks: Block[], blockPatches: BlockPatch[]): Promise<void> {
+  async patchBlocks (_blocks: Block[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void> {
     Utils.log(`patchBlocks: ${_blocks.length} blocks`);
     const blocks = getStorageValue('database-blocks', [...seedData.blocks]);
     _blocks.forEach((block, i) => {
@@ -74,19 +76,21 @@ class CharmClient {
       Object.assign(block, updates, { fields: { ...block.fields, ...updatedFields } });
     });
     setStorageValue('database-blocks', blocks);
+    updater(blocks);
   }
 
-  async deleteBlock (blockId: string): Promise<void> {
+  async deleteBlock (blockId: string, updater: BlockUpdater): Promise<void> {
     Utils.log(`deleteBlock: ${blockId}`);
     const blocks = getStorageValue('database-blocks', [...seedData.blocks]);
-    setStorageValue('database-blocks', blocks.filter(block => block.id !== blockId));
+    const updated = setStorageValue('database-blocks', blocks.filter(block => block.id !== blockId));
+    updater(updated);
   }
 
-  async insertBlock (block: Block): Promise<Block[]> {
-    return this.insertBlocks([block]);
+  async insertBlock (block: Block, updater: BlockUpdater): Promise<Block[]> {
+    return this.insertBlocks([block], updater);
   }
 
-  async insertBlocks (newBlocks: Block[]): Promise<Block[]> {
+  async insertBlocks (newBlocks: Block[], updater: BlockUpdater): Promise<Block[]> {
     Utils.log(`insertBlocks: ${newBlocks.length} blocks(s)`);
     newBlocks.forEach((block) => {
       Utils.log(`\t ${block.type}, ${block.id}, ${block.title?.substr(0, 50) || ''}`);
@@ -96,7 +100,8 @@ class CharmClient {
     newBlocks.forEach(block => {
       block.workspaceId = currentSpace.id;
     });
-    setStorageValue('database-blocks', [...blocks, ...newBlocks]);
+    const updated = setStorageValue('database-blocks', [...blocks, ...newBlocks]);
+    updater(updated);
     return [...newBlocks];
   }
 

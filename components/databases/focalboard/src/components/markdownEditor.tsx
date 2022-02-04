@@ -46,6 +46,7 @@ const MarkdownEditor = (props: Props): JSX.Element => {
     const editorOnBlur = (newText: string) => {
         setIsEditing(false)
         onBlur && onBlur(newText)
+        console.log('editorOnBlur', onBlur?.toString())
     }
 
     const editorElement = (

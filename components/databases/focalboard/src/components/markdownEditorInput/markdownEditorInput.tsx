@@ -127,6 +127,7 @@ const MarkdownEditorInput = (props: Props): ReactElement => {
     const onEditorStateBlur = useCallback(() => {
         const text = editorState.getCurrentContent().getPlainText()
         onBlur && onBlur(text)
+        console.log('editor state blur', text, onBlur)
     }, [editorState, onBlur])
 
     const onEditorStateChange = useCallback((newEditorState: EditorState) => {

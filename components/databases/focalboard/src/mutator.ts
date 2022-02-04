@@ -12,6 +12,7 @@ import {OctoUtils} from './octoUtils'
 import undoManager from './undomanager'
 import {Utils, IDType} from './utils'
 import {UserSettings} from './userSettings'
+import { publishIncrementalUpdate } from '../../publisher';
 
 //
 // The Mutator is used to make all changes to server state
@@ -26,7 +27,6 @@ class Mutator {
             Utils.assertFailure('UndoManager does not support nested groups')
             return undefined
         }
-        console.log('beginUndoGroup!');
         this.undoGroupId = Utils.createGuid(IDType.None)
         return this.undoGroupId
     }
@@ -55,10 +55,10 @@ class Mutator {
         const [updatePatch, undoPatch] = createPatchesFromBlocks(newBlock, oldBlock)
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(newBlock.id, updatePatch)
+                await charmClient.patchBlock(newBlock.id, updatePatch, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(oldBlock.id, undoPatch)
+                await charmClient.patchBlock(oldBlock.id, undoPatch, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -81,10 +81,10 @@ class Mutator {
 
         return undoManager.perform(
             async () => {
-                await charmClient.patchBlocks(newBlocks, updatePatches)
+                await charmClient.patchBlocks(newBlocks, updatePatches, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlocks(newBlocks, undoPatches)
+                await charmClient.patchBlocks(newBlocks, undoPatches, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -95,14 +95,14 @@ class Mutator {
     async insertBlock(block: Block, description = 'add', afterRedo?: (block: Block) => Promise<void>, beforeUndo?: (block: Block) => Promise<void>): Promise<Block> {
         return undoManager.perform(
             async () => {
-                const jsonres = await charmClient.insertBlock(block)
+                const jsonres = await charmClient.insertBlock(block, publishIncrementalUpdate)
                 const newBlock = jsonres[0] as Block
                 await afterRedo?.(newBlock)
                 return newBlock
             },
             async (newBlock: Block) => {
                 await beforeUndo?.(newBlock)
-                await charmClient.deleteBlock(newBlock.id)
+                await charmClient.deleteBlock(newBlock.id, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -113,7 +113,7 @@ class Mutator {
     async insertBlocks(blocks: Block[], description = 'add', afterRedo?: (blocks: Block[]) => Promise<void>, beforeUndo?: () => Promise<void>) {
         return undoManager.perform(
             async () => {
-                const newBlocks = await charmClient.insertBlocks(blocks)
+                const newBlocks = await charmClient.insertBlocks(blocks, publishIncrementalUpdate)
                 await afterRedo?.(newBlocks)
                 return newBlocks
             },
@@ -121,7 +121,7 @@ class Mutator {
                 await beforeUndo?.()
                 const awaits = []
                 for (const block of newBlocks) {
-                    awaits.push(charmClient.deleteBlock(block.id))
+                    awaits.push(charmClient.deleteBlock(block.id, publishIncrementalUpdate))
                 }
                 await Promise.all(awaits)
             },
@@ -136,10 +136,10 @@ class Mutator {
         await undoManager.perform(
             async () => {
                 await beforeRedo?.()
-                await charmClient.deleteBlock(block.id)
+                await charmClient.deleteBlock(block.id, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.insertBlock(block)
+                await charmClient.insertBlock(block, publishIncrementalUpdate)
                 await afterUndo?.()
             },
             actualDescription,
@@ -150,10 +150,10 @@ class Mutator {
     async changeTitle(blockId: string, oldTitle: string, newTitle: string, description = 'change title') {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(blockId, {title: newTitle})
+                await charmClient.patchBlock(blockId, {title: newTitle}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(blockId, {title: oldTitle})
+                await charmClient.patchBlock(blockId, {title: oldTitle}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -163,10 +163,10 @@ class Mutator {
     async setDefaultTemplate(blockId: string, oldTemplateId: string, templateId: string, description = 'set default template') {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(blockId, {updatedFields: {defaultTemplateId: templateId}})
+                await charmClient.patchBlock(blockId, {updatedFields: {defaultTemplateId: templateId}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(blockId, {updatedFields: {defaultTemplateId: oldTemplateId}})
+                await charmClient.patchBlock(blockId, {updatedFields: {defaultTemplateId: oldTemplateId}}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -176,10 +176,10 @@ class Mutator {
     async clearDefaultTemplate(blockId: string, oldTemplateId: string, description = 'set default template') {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(blockId, {updatedFields: {defaultTemplateId: ''}})
+                await charmClient.patchBlock(blockId, {updatedFields: {defaultTemplateId: ''}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(blockId, {updatedFields: {defaultTemplateId: oldTemplateId}})
+                await charmClient.patchBlock(blockId, {updatedFields: {defaultTemplateId: oldTemplateId}}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -189,10 +189,10 @@ class Mutator {
     async changeIcon(blockId: string, oldIcon: string|undefined, icon: string, description = 'change icon') {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(blockId, {updatedFields: {icon}})
+                await charmClient.patchBlock(blockId, {updatedFields: {icon}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(blockId, {updatedFields: {icon: oldIcon}})
+                await charmClient.patchBlock(blockId, {updatedFields: {icon: oldIcon}}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -202,10 +202,10 @@ class Mutator {
     async changeDescription(blockId: string, oldBlockDescription: string|undefined, blockDescription: string, description = 'change description') {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(blockId, {updatedFields: {description: blockDescription}})
+                await charmClient.patchBlock(blockId, {updatedFields: {description: blockDescription}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(blockId, {updatedFields: {description: oldBlockDescription}})
+                await charmClient.patchBlock(blockId, {updatedFields: {description: oldBlockDescription}}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -220,10 +220,10 @@ class Mutator {
 
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(boardId, {updatedFields: {showDescription}})
+                await charmClient.patchBlock(boardId, {updatedFields: {showDescription}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(boardId, {updatedFields: {showDescription: oldShowDescription}})
+                await charmClient.patchBlock(boardId, {updatedFields: {showDescription: oldShowDescription}}, publishIncrementalUpdate)
             },
             actionDescription,
             this.undoGroupId,
@@ -233,10 +233,10 @@ class Mutator {
     async changeCardContentOrder(cardId: string, oldContentOrder: Array<string | string[]>, contentOrder: Array<string | string[]>, description = 'reorder'): Promise<void> {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(cardId, {updatedFields: {contentOrder}})
+                await charmClient.patchBlock(cardId, {updatedFields: {contentOrder}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(cardId, {updatedFields: {contentOrder: oldContentOrder}})
+                await charmClient.patchBlock(cardId, {updatedFields: {contentOrder: oldContentOrder}}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -513,10 +513,10 @@ class Mutator {
     async changeViewSortOptions(viewId: string, oldSortOptions: ISortOption[], sortOptions: ISortOption[]): Promise<void> {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {sortOptions}})
+                await charmClient.patchBlock(viewId, {updatedFields: {sortOptions}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {sortOptions: oldSortOptions}})
+                await charmClient.patchBlock(viewId, {updatedFields: {sortOptions: oldSortOptions}}, publishIncrementalUpdate)
             },
             'sort',
             this.undoGroupId,
@@ -526,10 +526,10 @@ class Mutator {
     async q(viewId: string, oldFilter: FilterGroup, filter: FilterGroup): Promise<void> {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {filter}})
+                await charmClient.patchBlock(viewId, {updatedFields: {filter}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {filter: oldFilter}})
+                await charmClient.patchBlock(viewId, {updatedFields: {filter: oldFilter}}, publishIncrementalUpdate)
             },
             'filter',
             this.undoGroupId,
@@ -539,10 +539,10 @@ class Mutator {
     async changeViewGroupById(viewId: string, oldGroupById: string|undefined, groupById: string): Promise<void> {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {groupById}})
+                await charmClient.patchBlock(viewId, {updatedFields: {groupById}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {groupById: oldGroupById}})
+                await charmClient.patchBlock(viewId, {updatedFields: {groupById: oldGroupById}}, publishIncrementalUpdate)
             },
             'group by',
             this.undoGroupId,
@@ -552,10 +552,10 @@ class Mutator {
     async changeViewDateDisplayPropertyId(viewId: string, oldDateDisplayPropertyId: string|undefined, dateDisplayPropertyId: string): Promise<void> {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {dateDisplayPropertyId}})
+                await charmClient.patchBlock(viewId, {updatedFields: {dateDisplayPropertyId}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {dateDisplayPropertyId: oldDateDisplayPropertyId}})
+                await charmClient.patchBlock(viewId, {updatedFields: {dateDisplayPropertyId: oldDateDisplayPropertyId}}, publishIncrementalUpdate)
             },
             'display by',
             this.undoDisplayId,
@@ -573,10 +573,10 @@ class Mutator {
 
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(view.id, {updatedFields: {visiblePropertyIds: newOrder}})
+                await charmClient.patchBlock(view.id, {updatedFields: {visiblePropertyIds: newOrder}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(view.id, {updatedFields: {visiblePropertyIds: oldVisiblePropertyIds}})
+                await charmClient.patchBlock(view.id, {updatedFields: {visiblePropertyIds: oldVisiblePropertyIds}}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -586,10 +586,10 @@ class Mutator {
     async changeViewVisibleProperties(viewId: string, oldVisiblePropertyIds: string[], visiblePropertyIds: string[], description = 'show / hide property'): Promise<void> {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {visiblePropertyIds}})
+                await charmClient.patchBlock(viewId, {updatedFields: {visiblePropertyIds}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {visiblePropertyIds: oldVisiblePropertyIds}})
+                await charmClient.patchBlock(viewId, {updatedFields: {visiblePropertyIds: oldVisiblePropertyIds}}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -599,10 +599,10 @@ class Mutator {
     async changeViewVisibleOptionIds(viewId: string, oldVisibleOptionIds: string[], visibleOptionIds: string[], description = 'reorder'): Promise<void> {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {visibleOptionIds}})
+                await charmClient.patchBlock(viewId, {updatedFields: {visibleOptionIds}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {visibleOptionIds: oldVisibleOptionIds}})
+                await charmClient.patchBlock(viewId, {updatedFields: {visibleOptionIds: oldVisibleOptionIds}}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -612,10 +612,10 @@ class Mutator {
     async changeViewHiddenOptionIds(viewId: string, oldHiddenOptionIds: string[], hiddenOptionIds: string[], description = 'reorder'): Promise<void> {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {hiddenOptionIds}})
+                await charmClient.patchBlock(viewId, {updatedFields: {hiddenOptionIds}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {hiddenOptionIds: oldHiddenOptionIds}})
+                await charmClient.patchBlock(viewId, {updatedFields: {hiddenOptionIds: oldHiddenOptionIds}}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,
@@ -625,10 +625,10 @@ class Mutator {
     async changeViewKanbanCalculations(viewId: string, oldCalculations: Record<string, KanbanCalculationFields>, calculations: Record<string, KanbanCalculationFields>, description = 'updated kanban calculations'): Promise<void> {
         await undoManager.perform(
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {kanbanCalculations: calculations}})
+                await charmClient.patchBlock(viewId, {updatedFields: {kanbanCalculations: calculations}}, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.patchBlock(viewId, {updatedFields: {kanbanCalculations: oldCalculations}})
+                await charmClient.patchBlock(viewId, {updatedFields: {kanbanCalculations: oldCalculations}}, publishIncrementalUpdate)
             },
             description,
             this.undoGroupId,

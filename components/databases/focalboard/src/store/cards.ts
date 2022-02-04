@@ -104,7 +104,6 @@ export const getSortedTemplates = createSelector(
 
 export function getCard(cardId: string): (state: RootState) => Card|undefined {
     return (state: RootState): Card|undefined => {
-        console.log('cards', state.cards.cards)
         return state.cards.cards[cardId] || state.cards.templates[cardId]
     }
 }
@@ -302,7 +301,6 @@ export const getCurrentViewCardsSortedFilteredAndGrouped = createSelector(
     getSearchText,
     getWorkspaceUsers,
     (cards, board, view, searchText, users) => {
-        console.log('getCurrentViewCardsSortedFilteredAndGrouped', cards);
         if (!view || !board || !users || !cards) {
             return []
         }
