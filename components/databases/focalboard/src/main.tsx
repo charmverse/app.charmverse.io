@@ -15,6 +15,8 @@ import store from './store'
 emojiMartStore.setHandlers({getter: UserSettings.getEmojiMartSetting, setter: UserSettings.setEmojiMartSetting})
 importNativeAppSettings()
 
-initThemes()
+if (typeof window !== 'undefined') {
+  initThemes()
+}
 
 export { ReduxProvider, store }
