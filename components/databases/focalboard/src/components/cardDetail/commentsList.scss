@@ -1,0 +1,34 @@
+.CommentsList {
+    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    .comment-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 100%;
+    }
+
+    .CommentsList__new {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 8px 0 24px;
+        min-height: 64px;
+    }
+
+    .newcomment {
+        flex-grow: 1;
+        margin: 0 0 0 8px;
+
+        + button {
+            margin-left: 8px;
+        }
+    }
+}
+
+.CommentsList__divider {
+    margin-top: 8px;
+}

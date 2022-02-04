@@ -23,15 +23,13 @@ Download and install this repo to get started:
 
 ### Third Party Dependencies
 
-We stand on the shoulders of giants:
+CharmVerse is a Node.js app built using:
 
-- Typescript
-- React
-- Next.js
 - Ethers.js
-- Prisma.js
-- Bangle.io / bangle.dev
 - Material UI
+- Next.js
+- React
+- Typescript
 
 ### Theming
 

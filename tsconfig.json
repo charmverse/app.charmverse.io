@@ -7,7 +7,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "strict": true,
-    "target": "es5",
+    "target": "es2019",
     "lib": [
       "dom",
       "dom.iterable",
@@ -20,12 +20,17 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
     "jsx": "preserve",
     "jsxImportSource": "@emotion/react",
     "allowJs": true,
-    "incremental": true
+    "incremental": true,
+    "isolatedModules": true
   },
-  "exclude": [ "node_modules" ],
-  "include": [ "**/*.ts", "**/*.tsx" ],
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }
