@@ -93,7 +93,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     },
     subtitle1: {
       fontSize: '0.85rem',
-      fontWeight: 400
+      fontWeight: 600
     }
   },
   palette: {

@@ -91,43 +91,57 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
   return (
     <Box>
       <PageBanner>
-        {/* eslint-disable-next-line */}
-        {page.headerImage && <img src={page.headerImage} alt='Page Banner' />}
-        <Box
-          sx={{
-            background: theme.palette.background.dark,
-            borderRadius: theme.spacing(0.5),
-            display: 'flex'
-          }}
-          className='page-cover-controls'
-        >
-          <ListItem
-            button
-            disableRipple
+        {page.headerImage
+        && (
+        <>
+          {/* eslint-disable-next-line */}
+          <img src={page.headerImage} alt='Page Banner' />
+          <Box
             sx={{
-              borderTopLeftRadius: theme.spacing(0.5),
-              borderBottomLeftRadius: theme.spacing(0.5),
-              padding: theme.spacing(0.5, 1.5)
+              background: theme.palette.background.light,
+              borderRadius: theme.spacing(0.5),
+              display: 'flex',
+              gap: theme.spacing(0.25),
+              boxShadow: theme.shadows[2]
             }}
+            className='page-cover-controls'
           >
-            <Typography variant='subtitle1'>
-              Change Cover
-            </Typography>
-          </ListItem>
-          <ListItem
-            button
-            disableRipple
-            sx={{
-              borderTopRightRadius: theme.spacing(0.5),
-              borderBottomRightRadius: theme.spacing(0.5),
-              padding: theme.spacing(0.5, 1.5)
-            }}
-          >
-            <Typography variant='subtitle1'>
-              Remove
-            </Typography>
-          </ListItem>
-        </Box>
+            <ListItem
+              button
+              disableRipple
+              sx={{
+                background: theme.palette.background.dark,
+                borderTopLeftRadius: theme.spacing(0.5),
+                borderBottomLeftRadius: theme.spacing(0.5),
+                padding: theme.spacing(0.5, 1.5)
+              }}
+            >
+              <Typography variant='subtitle1'>
+                Change Cover
+              </Typography>
+            </ListItem>
+            <ListItem
+              button
+              disableRipple
+              sx={{
+                background: theme.palette.background.dark,
+                borderTopRightRadius: theme.spacing(0.5),
+                borderBottomRightRadius: theme.spacing(0.5),
+                padding: theme.spacing(0.5, 1.5)
+              }}
+            >
+              <Typography
+                variant='subtitle1'
+                onClick={() => {
+                  setPage({ ...page, headerImage: undefined });
+                }}
+              >
+                Remove
+              </Typography>
+            </ListItem>
+          </Box>
+        </>
+        )}
       </PageBanner>
       <Container>
         {page.icon && (
