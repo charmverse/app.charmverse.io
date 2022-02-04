@@ -80,7 +80,6 @@ const CardDetail = (props: Props): JSX.Element|null => {
     if (!card) {
         return null
     }
-    console.log('props.contents', props.contents)
 
     return (
         <>

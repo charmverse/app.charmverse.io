@@ -153,7 +153,6 @@ const BoardPage = (props: Props): JSX.Element => {
         const isCorrectBoardView = boardViews.length > 0 && boardViews[0].parentId === pageId
         if (!viewId && isCorrectBoardView) {
             const newPath = generatePath(router.pathname, {...router.query, pageId, viewId: boardViews[0].id})
-            console.log(newPath)
             router.replace(newPath)
             return
         }

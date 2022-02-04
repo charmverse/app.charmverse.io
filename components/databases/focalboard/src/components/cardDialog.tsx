@@ -45,7 +45,6 @@ const CardDialog = (props: Props): JSX.Element => {
     const {board, activeView, cards, views} = props
     const card = useAppSelector(getCard(props.cardId))
     const contents = useAppSelector(getCardContents(props.cardId))
-    console.log('dialog contents', contents);
     const comments = useAppSelector(getCardComments(props.cardId))
     const intl = useIntl()
     const me = useAppSelector<IUser|null>(getMe)

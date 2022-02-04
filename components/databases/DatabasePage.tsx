@@ -1,20 +1,10 @@
 import { useCallback, useEffect } from 'react';
-import { batch } from 'react-redux';
 import { generatePath } from 'lib/strings';
 import { useRouter } from 'next/router';
-import { getView, getCurrentBoardViews, getCurrentViewGroupBy, updateViews, getCurrentViewDisplayBy } from './focalboard/src/store/views';
+import { getView, getCurrentBoardViews, getCurrentViewGroupBy, getCurrentViewDisplayBy } from './focalboard/src/store/views';
 import { useAppSelector, useAppDispatch } from './focalboard/src/store/hooks';
-import wsClient, { WSClient } from './focalboard/src/wsclient';
 import { getCurrentBoard } from './focalboard/src/store/boards';
-import { updateCards, getCurrentViewCardsSortedFilteredAndGrouped } from './focalboard/src/store/cards';
-import { updateContents } from './focalboard/src/store/contents';
-import { updateComments } from './focalboard/src/store/comments';
-import { Block } from './focalboard/src/blocks/block';
-import { ContentBlock } from './focalboard/src/blocks/contentBlock';
-import { CommentBlock } from './focalboard/src/blocks/commentBlock';
-import { Board } from './focalboard/src/blocks/board';
-import { Card } from './focalboard/src/blocks/card';
-import { BoardView } from './focalboard/src/blocks/boardView';
+import { getCurrentViewCardsSortedFilteredAndGrouped } from './focalboard/src/store/cards';
 import { getClientConfig } from './focalboard/src/store/clientConfig';
 import { Utils } from './focalboard/src/utils';
 import CenterPanel from './focalboard/src/components/centerPanel';
@@ -43,8 +33,6 @@ export function DatabaseEditor ({ readonly }: Props) {
   const clientConfig = useAppSelector(getClientConfig);
   const dispatch = useAppDispatch();
 
-  const spaceId = router.query.workspaceId;
-
   useEffect(() => {
     let loadAction: any = initialLoad; /* eslint-disable-line @typescript-eslint/no-explicit-any */
     let token = localStorage.getItem('focalboardSessionId') || '';
@@ -54,26 +42,6 @@ export function DatabaseEditor ({ readonly }: Props) {
     }
 
     dispatch(loadAction(router.query.pageId));
-
-    // const incrementalUpdate = (_: WSClient, blocks: Block[]) => {
-    //   // only takes into account the blocks that belong to the workspace
-    //   const workspaceBlocks = blocks.filter((b: Block) => b.workspaceId === '0' || b.workspaceId === spaceId);
-    //   console.log('incrementalUpdate', workspaceBlocks);
-
-    //   batch(() => {
-    //     dispatch(updateBoards(workspaceBlocks.filter((b: Block) => b.type === 'board' || b.deleteAt !== 0) as Board[]));
-    //     dispatch(updateViews(workspaceBlocks.filter((b: Block) => b.type === 'view' || b.deleteAt !== 0) as BoardView[]));
-    //     dispatch(updateCards(workspaceBlocks.filter((b: Block) => b.type === 'card' || b.deleteAt !== 0) as Card[]));
-    //     dispatch(updateComments(workspaceBlocks.filter((b: Block) => b.type === 'comment' || b.deleteAt !== 0) as CommentBlock[]));
-    //     dispatch(updateContents(workspaceBlocks.filter((b: Block) => b.type !== 'card' && b.type !== 'view' && b.type !== 'board' && b.type !== 'comment') as ContentBlock[]));
-    //   });
-    // };
-
-    // wsClient.addOnChange(incrementalUpdate);
-
-    // return () => {
-    //   wsClient.removeOnChange(incrementalUpdate);
-    // };
 
   }, [router.query.workspaceId, readonly, router.query.pageId]);
 

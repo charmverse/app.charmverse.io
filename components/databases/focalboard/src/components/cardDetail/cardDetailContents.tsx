@@ -28,7 +28,6 @@ function addTextBlock(card: Card, intl: IntlShape, text: string): void {
     block.parentId = card.id
     block.rootId = card.rootId
     block.title = text
-    console.log('add text block', text);
 
     mutator.performAsUndoGroup(async () => {
         const description = intl.formatMessage({id: 'CardDetail.addCardText', defaultMessage: 'add card text'})
