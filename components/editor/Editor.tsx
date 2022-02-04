@@ -14,6 +14,8 @@ const Container = styled.div`
   max-width: 100%;
   margin: 0 auto 5px;
   padding: 0 20px 0 40px;
+  position: relative;
+  top: -100px;
 `;
 
 const StyledListItem = styled(ListItem)`
@@ -54,7 +56,7 @@ const PageBanner = styled(Box)`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 150px;
+  height: 200px;
 
   img {
     width: 100%;
@@ -72,51 +74,52 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
   }
 
   return (
-    <Container>
+    <Box>
       <PageBanner>
         {/* eslint-disable-next-line */}
         {page.headerImage && <img src={page.headerImage} alt='Page Banner' />}
       </PageBanner>
-      {page.icon && (
-        <Box py={3}>
-          <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-        </Box>
-      )}
-      <Controls>
-        {!page.icon && (
-        <PageControlItem onClick={() => {
-          setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
-        }}
-        >
-          <EmojiEmotionsIcon
-            fontSize='small'
-            sx={{ marginRight: 1 }}
-          />
-          Add icon
-        </PageControlItem>
+      <Container>
+        {page.icon && (
+          <Box py={3}>
+            <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+          </Box>
         )}
-        {!page.headerImage && (
-        <PageControlItem onClick={() => {
-          // Charmverse logo
-          setPage({ ...page, headerImage: 'https://static.wixstatic.com/media/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.png/v1/fill/w_304,h_58,al_c,q_85,usm_0.66_1.00_0.01/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.webp' });
-        }}
-        >
-          <ImageIcon
-            fontSize='small'
-            sx={{ marginRight: 1 }}
-          />
-          Add cover
-        </PageControlItem>
-        )}
-      </Controls>
-
-      <PageTitle
-        placeholder='Untitled'
-        autoFocus
-        value={page.title}
-        onChange={updateTitle}
-      />
-      <BangleEditor content={page.content} />
-    </Container>
+        <Controls>
+          {!page.icon && (
+          <PageControlItem onClick={() => {
+            setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
+          }}
+          >
+            <EmojiEmotionsIcon
+              fontSize='small'
+              sx={{ marginRight: 1 }}
+            />
+            Add icon
+          </PageControlItem>
+          )}
+          {!page.headerImage && (
+          <PageControlItem onClick={() => {
+            // Charmverse logo
+            setPage({ ...page, headerImage: 'https://static.wixstatic.com/media/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.png/v1/fill/w_304,h_58,al_c,q_85,usm_0.66_1.00_0.01/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.webp' });
+          }}
+          >
+            <ImageIcon
+              fontSize='small'
+              sx={{ marginRight: 1 }}
+            />
+            Add cover
+          </PageControlItem>
+          )}
+        </Controls>
+        <PageTitle
+          placeholder='Untitled'
+          autoFocus
+          value={page.title}
+          onChange={updateTitle}
+        />
+        <BangleEditor content={page.content} />
+      </Container>
+    </Box>
   );
 }
