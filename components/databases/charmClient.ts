@@ -72,8 +72,7 @@ class CharmClient {
     const blocks = getStorageValue('database-blocks', [...seedData.blocks]);
     _blocks.forEach((updated, i) => {
       const block = blocks.find(b => b.id === updated.id);
-      const blockPatch = blockPatches[i]!;
-      const { deletedFields = [], updatedFields = {}, ...updates } = blockPatch;
+      const { deletedFields = [], updatedFields = {}, ...updates } = blockPatches[i];
       Object.assign(block, updates, { fields: { ...updated.fields, ...updatedFields } });
     });
     setStorageValue('database-blocks', blocks);
