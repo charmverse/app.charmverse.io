@@ -46,8 +46,7 @@ const BoardPage = (props: Props): JSX.Element => {
     const activeView = useAppSelector(getCurrentView)
     const boardViews = useAppSelector(getCurrentBoardViews)
     const dispatch = useAppDispatch()
-    console.log('board', board)
-    console.log('activeView', activeView)
+
     const router = useRouter()
     const [websocketClosed, setWebsocketClosed] = useState(false)
     const queryString = new URLSearchParams(router.query as { [key: string]: string })

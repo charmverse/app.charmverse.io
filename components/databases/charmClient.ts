@@ -56,10 +56,12 @@ class CharmClient {
 
   async patchBlock (blockId: string, blockPatch: BlockPatch): Promise<void> {
     Utils.log(`patchBlock: ${blockId} block`);
+    console.log(new Error().stack);
     const blocks = getStorageValue('database-blocks', [...seedData.blocks]);
     const block = blocks.find(b => b.id === blockId);
     const { updatedFields = {}, ...updates } = blockPatch;
-    Object.assign(block, updates, updatedFields);
+    console.log('update block', block, blockPatch);
+    Object.assign(block, updates, { fields: { ...block.fields, ...updatedFields } });
     setStorageValue('database-blocks', blocks);
   }
 
@@ -69,7 +71,7 @@ class CharmClient {
     _blocks.forEach((block, i) => {
       const blockPatch = blockPatches[i]!;
       const { updatedFields = {}, ...updates } = blockPatch;
-      Object.assign(block, updates, updatedFields);
+      Object.assign(block, updates, { fields: { ...block.fields, ...updatedFields } });
     });
     setStorageValue('database-blocks', blocks);
   }
@@ -86,13 +88,16 @@ class CharmClient {
 
   async insertBlocks (newBlocks: Block[]): Promise<Block[]> {
     Utils.log(`insertBlocks: ${newBlocks.length} blocks(s)`);
+    newBlocks.forEach((block) => {
+      Utils.log(`\t ${block.type}, ${block.id}, ${block.title?.substr(0, 50) || ''}`);
+    });
     const blocks = getStorageValue('database-blocks', [...seedData.blocks]);
     const currentSpace = this.getCurrentWorkspace();
     newBlocks.forEach(block => {
       block.workspaceId = currentSpace.id;
     });
     setStorageValue('database-blocks', [...blocks, ...newBlocks]);
-    return newBlocks;
+    return [...newBlocks];
   }
 
   async getUserWorkspaces (): Promise<UserWorkspace[]> {

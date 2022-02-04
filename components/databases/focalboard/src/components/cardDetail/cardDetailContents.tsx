@@ -28,12 +28,14 @@ function addTextBlock(card: Card, intl: IntlShape, text: string): void {
     block.parentId = card.id
     block.rootId = card.rootId
     block.title = text
+    console.log('add text block', text);
 
     mutator.performAsUndoGroup(async () => {
         const description = intl.formatMessage({id: 'CardDetail.addCardText', defaultMessage: 'add card text'})
         const insertedBlock = await mutator.insertBlock(block, description)
         const contentOrder = card.fields.contentOrder.slice()
         contentOrder.push(insertedBlock.id)
+        console.log('new block after mutator.insertBlock', insertedBlock)
         await mutator.changeCardContentOrder(card.id, card.fields.contentOrder, contentOrder, description)
     })
 }
@@ -150,6 +152,7 @@ const ContentBlockWithDragAndDrop = (props: ContentBlockWithDragAndDropProps) =>
 const CardDetailContents = React.memo((props: Props) => {
     const intl = useIntl()
     const {contents, card, id} = props
+
     if (contents.length) {
         return (
             <div className='octo-content'>
@@ -179,6 +182,7 @@ const CardDetailContents = React.memo((props: Props) => {
                         text=''
                         placeholderText='Add a description...'
                         onBlur={(text) => {
+                            console.log('on blur', text)
                             if (text) {
                                 addTextBlock(card, intl, text)
                             }

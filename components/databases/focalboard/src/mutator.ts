@@ -523,7 +523,7 @@ class Mutator {
         )
     }
 
-    async changeViewFilter(viewId: string, oldFilter: FilterGroup, filter: FilterGroup): Promise<void> {
+    async q(viewId: string, oldFilter: FilterGroup, filter: FilterGroup): Promise<void> {
         await undoManager.perform(
             async () => {
                 await charmClient.patchBlock(viewId, {updatedFields: {filter}})

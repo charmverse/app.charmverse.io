@@ -15,6 +15,7 @@ const contentsSlice = createSlice({
     initialState: {contents: {}} as {contents: {[key: string]: ContentBlock}},
     reducers: {
         updateContents: (state, action: PayloadAction<ContentBlock[]>) => {
+            console.log('update contents!', action);
             for (const content of action.payload) {
                 if (content.deleteAt === 0) {
                     state.contents[content.id] = content
@@ -62,6 +63,7 @@ export function getCardContents(cardId: string): (state: RootState) => Array<Con
         (contents, cards, templates): Array<ContentBlock|ContentBlock[]> => {
             const card = {...cards, ...templates}[cardId]
             const result: Array<ContentBlock|ContentBlock[]> = []
+            console.log('card?.fields?.contentOrder', contents, card?.fields?.contentOrder)
             if (card?.fields?.contentOrder) {
                 for (const contentId of card.fields.contentOrder) {
                     if (typeof contentId === 'string' && contents[contentId]) {

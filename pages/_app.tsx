@@ -197,7 +197,9 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   );
 
   // Update the theme only if the mode changes
-  const theme = useMemo(() => createThemeLightSensitive(mode), [mode]);
+  const theme = useMemo(() => {
+    return createThemeLightSensitive(mode);
+  }, [mode]);
 
   useEffect(() => {
     if (savedDarkMode) {
@@ -236,12 +238,13 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
               <CssBaseline />
               <RouteGuard>
                 {getLayout(<Component {...pageProps} />)}
-                <div id='focalboard-root-portal' className='focalboard-body' />
               </RouteGuard>
             </ThemeProvider>
           </ColorModeContext.Provider>
         </DataProviders>
       </FocalBoardProviders>
+      {/** include the root portal for focalboard's popup */}
+      <div id='focalboard-root-portal' className='focalboard-body' />
     </ReduxProvider>
   );
 }
