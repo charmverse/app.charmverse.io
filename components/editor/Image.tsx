@@ -84,7 +84,26 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
             [
               'Upload',
               <div>
-                <Button variant='contained'>Choose an image</Button>
+                <Button component='label' variant='contained'>
+                  Choose an image
+                  <input
+                    type='file'
+                    hidden
+                    onChange={(e) => {
+                      const firstFile = e.target.files?.[0];
+                      if (firstFile) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const { result } = reader;
+                          updateAttrs({
+                            src: result
+                          });
+                        };
+                        reader.readAsDataURL(firstFile);
+                      }
+                    }}
+                  />
+                </Button>
               </div>
             ],
             [
