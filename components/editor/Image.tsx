@@ -9,7 +9,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import { Box, Button, ListItem, TextField, Typography } from '@mui/material';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
-import { HTMLAttributes, useState } from 'react';
+import { HTMLAttributes, useRef, useState } from 'react';
 
 const StyledImageContainer = styled.div<{ align?: string }>`
   display: flex;
@@ -75,7 +75,7 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
   const [align, setAlign] = useState('center');
   const theme = useTheme();
   const [embedLink, setEmbedLink] = useState('');
-
+  const imageCaptionRef = useRef<HTMLDivElement>(null);
   if (!node.attrs.src) {
     return (
       <PopperPopup popupContent={(
@@ -136,7 +136,12 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
     );
   }
   return (
-    <StyledImageContainer align={align}>
+    <StyledImageContainer
+      align={align}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
       <div className='content' style={{ position: 'relative' }}>
         { /* eslint-disable-next-line */}
         <img width={500} contentEditable={false} draggable src={node.attrs.src} alt={node.attrs.alt} />
@@ -194,9 +199,6 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
             />
           </ListItem>
         </Controls>
-        <ImageCaption>
-          {node.attrs.caption ?? 'Write a caption...'}
-        </ImageCaption>
       </div>
     </StyledImageContainer>
   );
