@@ -12,7 +12,7 @@ interface PopperPopupProps {
 export default function PopperPopup (props: PopperPopupProps) {
   const { popupContent, children } = props;
   return (
-    <PopupState variant='popper' popupId='demo-popup-popper'>
+    <PopupState variant='popper'>
       {(popupState) => (
         <div>
           <div {...bindToggle(popupState)}>
