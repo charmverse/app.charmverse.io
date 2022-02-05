@@ -9,6 +9,7 @@ import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { Page } from 'models';
 import React, { ChangeEvent, ReactNode } from 'react';
 import BangleEditor from './BangleEditor';
+import ImageSelector from './ImageSelector';
 
 const Container = styled.div`
   width: 860px;
@@ -63,6 +64,7 @@ const PageBanner = styled(Box)`
   img {
     width: 100%;
     object-fit: cover;
+    height: 100%;
   }
 
   .page-cover-controls {
@@ -106,20 +108,25 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
             }}
             className='page-cover-controls'
           >
-            <ListItem
-              button
-              disableRipple
-              sx={{
-                background: theme.palette.background.dark,
-                borderTopLeftRadius: theme.spacing(0.5),
-                borderBottomLeftRadius: theme.spacing(0.5),
-                padding: theme.spacing(0.5, 1.5)
-              }}
+            <ImageSelector onImageSelect={(imageSrc) => {
+              setPage({ ...page, headerImage: imageSrc });
+            }}
             >
-              <Typography variant='subtitle1'>
-                Change Cover
-              </Typography>
-            </ListItem>
+              <ListItem
+                button
+                disableRipple
+                sx={{
+                  background: theme.palette.background.dark,
+                  borderTopLeftRadius: theme.spacing(0.5),
+                  borderBottomLeftRadius: theme.spacing(0.5),
+                  padding: theme.spacing(0.5, 1.5)
+                }}
+              >
+                <Typography variant='subtitle1'>
+                  Change Cover
+                </Typography>
+              </ListItem>
+            </ImageSelector>
             <ListItem
               button
               disableRipple
