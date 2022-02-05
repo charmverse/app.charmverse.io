@@ -4,32 +4,32 @@ import styled from '@emotion/styled';
 import AlignHorizontalCenterIcon from '@mui/icons-material/AlignHorizontalCenter';
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import AlignHorizontalRightIcon from '@mui/icons-material/AlignHorizontalRight';
+import DeleteIcon from '@mui/icons-material/Delete';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, Button, ListItem, TextField, Typography } from '@mui/material';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { HTMLAttributes, useState } from 'react';
 
-const StyledImage = styled.div<{ align?: string }>`
+const StyledImageContainer = styled.div<{ align?: string }>`
   display: flex;
   justify-content: ${props => props.align};
+  &:hover .controls {
+    opacity: 1;
+    transition: opacity 250ms ease-in-out;
+  }
 `;
 
 const Controls = styled.div`
   position: absolute;
   background: ${({ theme }) => theme.palette.background.light};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-
+  padding: ${({ theme }) => theme.spacing(0.5)};
   display: flex;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 0;
+  top: 0;
   opacity: 0;
   transition: opacity 250ms ease-in-out;
-
-  &:hover{
-    opacity: 1;
-    transition: opacity 250ms ease-in-out;
-  }
 `;
 
 const ImageCaption = styled.div`
@@ -136,24 +136,26 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
     );
   }
   return (
-    <StyledImage align={align}>
+    <StyledImageContainer align={align}>
       <div className='content' style={{ position: 'relative' }}>
-        <Controls>
+        { /* eslint-disable-next-line */}
+        <img width={500} contentEditable={false} draggable src={node.attrs.src} alt={node.attrs.alt} />
+        <Controls className='controls'>
           {[
             [
               'start', <AlignHorizontalLeftIcon sx={{
-                fontSize: 16
+                fontSize: 14
               }}
               />
             ], [
               'center', <AlignHorizontalCenterIcon sx={{
-                fontSize: 16
+                fontSize: 14
               }}
               />
             ], [
               'end', <AlignHorizontalRightIcon
                 sx={{
-                  fontSize: 16
+                  fontSize: 14
                 }}
               />
             ]
@@ -173,13 +175,29 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
               {alignIcon}
             </ListItem>
           ))}
+          <ListItem
+            button
+            disableRipple
+            onClick={() => {
+              updateAttrs({
+                src: null
+              });
+            }}
+            sx={{
+              padding: theme.spacing(1),
+              backgroundColor: 'inherit'
+            }}
+          >
+            <DeleteIcon sx={{
+              fontSize: 14
+            }}
+            />
+          </ListItem>
         </Controls>
-        { /* eslint-disable-next-line */}
-        {<img width={500} contentEditable={false} draggable src={node.attrs.src} alt={node.attrs.alt} />}
         <ImageCaption>
           {node.attrs.caption ?? 'Write a caption...'}
         </ImageCaption>
       </div>
-    </StyledImage>
+    </StyledImageContainer>
   );
 }
