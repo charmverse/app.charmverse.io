@@ -1,13 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {createSlice, PayloadAction, createSelector} from '@reduxjs/toolkit'
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { Board } from '../blocks/board'
+import { RootState } from './index'
+import { initialLoad, initialReadOnlyLoad } from './initialLoad'
 
-import {Board} from '../blocks/board'
 
-import {initialLoad, initialReadOnlyLoad} from './initialLoad'
 
-import {RootState} from './index'
 
 type BoardsState = {
     current: string
@@ -89,10 +89,12 @@ export function getBoard(boardId: string): (state: RootState) => Board|null {
 }
 
 export const getCurrentBoard = createSelector(
-    (state) => state.boards.current,
+    (state: RootState) => state.boards.current,
     getBoards,
     getTemplates,
-    (boardId, boards, templates) => {
+    (boardId: string, boards: {[key: string]: Board}, templates: {
+      [key: string]: Board;
+    }) => {
         return boards[boardId] || templates[boardId]
     },
 )
