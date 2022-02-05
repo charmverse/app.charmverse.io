@@ -1,23 +1,23 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {createSlice, PayloadAction, createSelector} from '@reduxjs/toolkit'
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { Board } from '../blocks/board'
+import { BoardView } from '../blocks/boardView'
+import { Card } from '../blocks/card'
+import { CardFilter } from '../cardFilter'
+import { Constants } from '../constants'
+import { IUser } from '../user'
+import { Utils } from '../utils'
+import { getCurrentBoard } from './boards'
+import { RootState } from './index'
+import { initialLoad, initialReadOnlyLoad } from './initialLoad'
+import { getSearchText } from './searchText'
+import { getWorkspaceUsers } from './users'
+import { getCurrentView } from './views'
 
-import {Card} from '../blocks/card'
-import {IUser} from '../user'
-import {Board} from '../blocks/board'
-import {BoardView} from '../blocks/boardView'
-import {Utils} from '../utils'
-import {Constants} from '../constants'
-import {CardFilter} from '../cardFilter'
 
-import {initialLoad, initialReadOnlyLoad} from './initialLoad'
-import {getCurrentBoard } from './boards'
-import {getWorkspaceUsers} from './users'
-import {getCurrentView} from './views'
-import {getSearchText} from './searchText'
 
-import {RootState} from './index'
 
 type CardsState = {
     current: string
@@ -109,17 +109,19 @@ export function getCard(cardId: string): (state: RootState) => Card|undefined {
 }
 
 export const getCurrentBoardCards = createSelector(
-    (state) => state.boards.current,
+    (state: RootState) => state.boards.current,
     getCards,
-    (boardId, cards) => {
+    (boardId: string, cards: {[key: string]: Card}) => {
         return Object.values(cards).filter((c) => c.parentId === boardId) as Card[]
     },
 )
 
 export const getCurrentBoardTemplates = createSelector(
-    (state) => state.boards.current,
+    (state: RootState) => state.boards.current,
     getTemplates,
-    (boardId, templates) => {
+    (boardId: string, templates: {
+        [key: string]: Card;
+    }) => {
         return Object.values(templates).filter((c) => c.parentId === boardId) as Card[]
     },
 )

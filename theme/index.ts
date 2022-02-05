@@ -166,11 +166,19 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     },
     MuiButton: {
       defaultProps: {
-        disableRipple: true
+        disableRipple: true,
+        variant: 'contained'
       },
       styleOverrides: {
         root: {
           borderRadius: '10px'
+        }
+      }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundColor: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
         }
       }
     },

@@ -1,19 +1,19 @@
+import { generatePath } from 'lib/strings';
+import { Page } from 'models';
+import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { generatePath } from 'lib/strings';
-import { useRouter } from 'next/router';
-import { Page } from 'models';
-import { sendFlashMessage } from './focalboard/src/components/flashMessages';
-import mutator from './focalboard/src/mutator';
-import { getView, setCurrent as setCurrentView, getCurrentBoardViews, getCurrentViewGroupBy, getCurrentViewDisplayBy } from './focalboard/src/store/views';
-import { useAppSelector, useAppDispatch } from './focalboard/src/store/hooks';
-import { updateBoards, getCurrentBoard, setCurrent as setCurrentBoard } from './focalboard/src/store/boards';
-import { getCurrentViewCardsSortedFilteredAndGrouped } from './focalboard/src/store/cards';
-import { getClientConfig } from './focalboard/src/store/clientConfig';
-import { Utils } from './focalboard/src/utils';
 import CenterPanel from './focalboard/src/components/centerPanel';
 import EmptyCenterPanel from './focalboard/src/components/emptyCenterPanel';
+import { sendFlashMessage } from './focalboard/src/components/flashMessages';
+import mutator from './focalboard/src/mutator';
+import { getCurrentBoard, setCurrent as setCurrentBoard } from './focalboard/src/store/boards';
+import { getCurrentViewCardsSortedFilteredAndGrouped } from './focalboard/src/store/cards';
+import { getClientConfig } from './focalboard/src/store/clientConfig';
+import { useAppDispatch, useAppSelector } from './focalboard/src/store/hooks';
 import { initialLoad, initialReadOnlyLoad } from './focalboard/src/store/initialLoad';
+import { getCurrentBoardViews, getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, setCurrent as setCurrentView } from './focalboard/src/store/views';
+import { Utils } from './focalboard/src/utils';
 
 /**
  *
@@ -115,12 +115,12 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
   if (board && activeView) {
     let property = groupByProperty;
     if ((!property || property.type !== 'select') && activeView.fields.viewType === 'board') {
-      property = board?.fields.cardProperties.find((o) => o.type === 'select');
+      property = board?.fields.cardProperties.find((o: any) => o.type === 'select');
     }
 
     let displayProperty = dateDisplayProperty;
     if (!displayProperty && activeView.fields.viewType === 'calendar') {
-      displayProperty = board.fields.cardProperties.find((o) => o.type === 'date');
+      displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
     }
 
     return (

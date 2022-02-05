@@ -4,6 +4,7 @@ import {
 } from '@bangle.dev/base-components';
 import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
+import ImageIcon from '@mui/icons-material/Image';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
   isList
@@ -59,9 +60,39 @@ function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => voi
 }
 
 const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> = {
+  media: [
+    {
+      uid: 'image',
+      title: 'Image',
+      icon: <ImageIcon
+        sx={{ fontSize: 16 }}
+      />,
+      description: 'Insert a image block in the line below',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.image.create({
+                  src: null
+                })
+              ])
+            ))
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    },
+  ],
   text: [
     {
       uid: 'paraConvert',
+      keywords: ['paragraph', 'text'],
       title: 'Text',
       icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z" /><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z" /></svg>,
       description: 'Convert the current block to paragraph',

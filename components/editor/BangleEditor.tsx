@@ -7,7 +7,6 @@ import {
   hardBreak,
   heading,
   horizontalRule,
-  image,
   italic,
   link,
   listItem,
@@ -22,20 +21,22 @@ import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/r
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
 import '@bangle.dev/tooltip/style.css';
 import { styled } from '@mui/material';
+import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
+import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
 const specRegistry = new SpecRegistry([
+  imageSpec(),
   paragraph.spec(),
   bold.spec(),
   bulletList.spec(),
   hardBreak.spec(),
   horizontalRule.spec(),
-  image.spec(),
   italic.spec(),
   link.spec(),
   listItem.spec(),
@@ -68,6 +69,7 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
   const state = useEditorState({
     specRegistry,
     plugins: () => [
+      imagePlugins(),
       inlinePalettePlugins(),
       bold.plugins(),
       bulletList.plugins(),
@@ -76,7 +78,6 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
       hardBreak.plugins(),
       heading.plugins(),
       horizontalRule.plugins(),
-      image.plugins(),
       italic.plugins(),
       link.plugins(),
       listItem.plugins(),
@@ -98,6 +99,10 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
         name: 'codeBlock',
         containerDOM: ['pre'],
         contentDOM: ['span']
+      }),
+      NodeView.createPlugin({
+        name: 'image',
+        containerDOM: ['div']
       })
     ],
     initialValue: Node.fromJSON(specRegistry.schema, content)
@@ -121,6 +126,13 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
               <Code>
                 {children}
               </Code>
+            );
+          }
+          case 'image': {
+            return (
+              <Image {...props}>
+                {children}
+              </Image>
             );
           }
           default: {

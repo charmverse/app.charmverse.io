@@ -1,14 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {createSlice, PayloadAction, createSelector} from '@reduxjs/toolkit'
-
-import {BoardView, createBoardView} from '../blocks/boardView'
-
-import {initialLoad, initialReadOnlyLoad} from './initialLoad'
-import {getCurrentBoard} from './boards'
-
-import {RootState} from './index'
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { BoardView, createBoardView } from '../blocks/boardView'
+import { getCurrentBoard } from './boards'
+import { RootState } from './index'
+import { initialLoad, initialReadOnlyLoad } from './initialLoad'
 
 type ViewsState = {
     current: string
@@ -73,16 +70,18 @@ export function getView(viewId: string): (state: RootState) => BoardView|null {
 }
 
 export const getCurrentBoardViews = createSelector(
-    (state) => state.boards.current,
+    (state: RootState) => state.boards.current,
     getViews,
-    (boardId, views) => {
+    (boardId: string, views: {
+      [key: string]: BoardView;
+    }) => {
         return Object.values(views).filter((v) => v.parentId === boardId).sort((a, b) => a.title.localeCompare(b.title)).map((v) => createBoardView(v))
     },
 )
 
 export const getCurrentView = createSelector(
     getViews,
-    (state) => state.views.current,
+    (state: RootState) => state.views.current,
     (views, viewId) => {
         return views[viewId]
     },

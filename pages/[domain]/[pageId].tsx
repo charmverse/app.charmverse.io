@@ -1,11 +1,11 @@
-import { ReactElement, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import { PageLayout } from 'components/common/page-layout';
 import { useTitleState } from 'components/common/page-layout/PageTitle';
-import { Editor } from 'components/editor';
 import { DatabaseEditor } from 'components/databases';
+import { Editor } from 'components/editor';
 import { usePages } from 'hooks/usePages';
 import { Page } from 'models';
+import { useRouter } from 'next/router';
+import { ReactElement, useEffect } from 'react';
 
 export default function BlocksEditorPage () {
   const { pages, setPages, setCurrentPage } = usePages();
