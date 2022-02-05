@@ -10,6 +10,23 @@ import { Page } from 'models';
 import React, { ChangeEvent, ReactNode } from 'react';
 import BangleEditor from './BangleEditor';
 import ImageSelector from './ImageSelector';
+import { ImageSelectorGallery } from './ImageSelectorGallery';
+
+const PageCoverGalleryImageGroups = {
+  'Color & Gradient': [
+    'patterns/notion/gradients_2.png',
+    'patterns/notion/gradients_3.png',
+    'patterns/notion/gradients_4.png',
+    'patterns/notion/gradients_5.png',
+    'patterns/notion/gradients_8.png',
+    'patterns/notion/gradients_10.jpg',
+    'patterns/notion/gradients_11.jpg',
+    'patterns/notion/solid_beige.png',
+    'patterns/notion/solid_blue.png',
+    'patterns/notion/solid_red.png',
+    'patterns/notion/solid_yellow.png'
+  ]
+};
 
 const Container = styled.div`
   width: 860px;
@@ -108,9 +125,19 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
             }}
             className='page-cover-controls'
           >
-            <ImageSelector onImageSelect={(imageSrc) => {
-              setPage({ ...page, headerImage: imageSrc });
-            }}
+            <ImageSelector
+              tabs={[[
+                'Gallery',
+                <ImageSelectorGallery
+                  onImageClick={(imageSrc) => {
+                    setPage({ ...page, headerImage: `/images/${imageSrc}` });
+                  }}
+                  items={PageCoverGalleryImageGroups}
+                />
+              ]]}
+              onImageSelect={(imageSrc) => {
+                setPage({ ...page, headerImage: imageSrc });
+              }}
             >
               <ListItem
                 button

@@ -7,11 +7,12 @@ import { ReactNode, useState } from 'react';
 interface ImageSelectorProps {
   onImageSelect: (imageSrc: string) => void
   children: ReactNode
+  tabs?: [string, ReactNode][]
 }
 
 export default function ImageSelector (props: ImageSelectorProps) {
   const [embedLink, setEmbedLink] = useState('');
-  const { children, onImageSelect } = props;
+  const { tabs = [], children, onImageSelect } = props;
 
   return (
     <PopperPopup popupContent={(
@@ -57,7 +58,8 @@ export default function ImageSelector (props: ImageSelectorProps) {
                 Embed Image
               </Button>
             </Box>
-          ]
+          ],
+          ...tabs
         ]}
         />
       </Box>
