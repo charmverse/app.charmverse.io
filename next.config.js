@@ -60,7 +60,12 @@ const withTM = require('next-transpile-modules')([
   '@bangle.dev/emoji',
   '@bangle.dev/react-emoji-suggest',
   '@bangle.dev/table',
-  '@popperjs/core'
+  '@popperjs/core',
+  '@fullcalendar/common',
+  '@fullcalendar/core',
+  '@fullcalendar/daygrid',
+  '@fullcalendar/interaction',
+  '@fullcalendar/react'
 ]);
 
 module.exports = withBundleAnalyzer(withTM(config));

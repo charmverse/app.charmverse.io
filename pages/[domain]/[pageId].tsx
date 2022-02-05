@@ -3,18 +3,21 @@ import { useRouter } from 'next/router';
 import { PageLayout } from 'components/common/page-layout';
 import { useTitleState } from 'components/common/page-layout/PageTitle';
 import { Editor } from 'components/editor';
+import { DatabaseEditor } from 'components/databases';
 import { usePages } from 'hooks/usePages';
 import { Page } from 'models';
 
 export default function BlocksEditorPage () {
   const { pages, setPages, setCurrentPage } = usePages();
   const router = useRouter();
-  const { pagePath } = router.query;
-  const pageByPath = pages.find(page => page.path === pagePath) || pages[0];
+  const { pageId } = router.query;
+  const pageByPath = pages.find(page => page.path === pageId || page.id === pageId) || pages[0];
   const [, setTitleState] = useTitleState();
 
-  function setPage (page: Page) {
-    setPages(pages.map(p => p.id === page.id ? page : p));
+  function setPage (page: Partial<Page>) {
+    console.log('setPage called', page);
+    const newPage = { ...pageByPath, ...page };
+    setPages(pages.map(p => p.id === newPage.id ? newPage : p));
   }
 
   useEffect(() => {
@@ -23,7 +26,9 @@ export default function BlocksEditorPage () {
   }, [pageByPath]);
 
   return (
-    <Editor page={pageByPath} setPage={setPage} />
+    (pageByPath?.type === 'database')
+      ? <DatabaseEditor page={pageByPath} setPage={setPage} />
+      : <Editor page={pageByPath} setPage={setPage} />
   );
 }
 

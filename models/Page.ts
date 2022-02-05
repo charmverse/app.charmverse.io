@@ -28,6 +28,7 @@ export interface Page {
   id: string;
   title: string;
   content: PageContent;
+  databaseId?: string; // required for type: 'database'
   created: Date;
   headerImage?: string;
   icon?: string;
@@ -35,5 +36,6 @@ export interface Page {
   path: string;
   parentId: string | null;
   spaceId: string;
+  type: 'page' | 'database';
   updated?: Date;
 }

@@ -1,0 +1,45 @@
+.Modal {
+    position: absolute;
+    top: 25px;
+    left: -240px;
+    z-index: 10;
+    background-color: rgb(var(--center-channel-bg-rgb));
+    padding: 10px;
+    border-radius: 3px;
+    box-shadow: var(--elevation-4);
+
+    @media screen and (max-width: 430px) {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        min-width: 0;
+    }
+
+    @media not screen and (max-width: 430px) {
+        &.top {
+            top: auto;
+            bottom: 25px;
+            left: 25px;
+        }
+
+        &.bottom-right {
+            left: 0;
+        }
+    }
+
+    .hideOnWidescreen {
+        /* Hide controls (e.g. close button) on larger screens */
+        @media not screen and (max-width: 430px) {
+            display: none !important;
+        }
+    }
+
+    > .toolbar {
+        display: flex;
+        flex-direction: row;
+        height: 30px;
+        margin-bottom: 10px;
+    }
+}

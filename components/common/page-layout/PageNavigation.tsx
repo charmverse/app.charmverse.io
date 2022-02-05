@@ -1,27 +1,25 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
-import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Tooltip from '@mui/material/Tooltip';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import TreeView from '@mui/lab/TreeView';
+import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
-import { useLocalStorage } from 'hooks/useLocalStorage';
-import { Page } from 'models';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { greyColor2 } from 'theme/colors';
+import { Page } from 'models';
+import { useLocalStorage } from 'hooks/useLocalStorage';
+import NewPageMenu, { StyledArticleIcon, StyledDatabaseIcon } from '../NewPageMenu';
 import EmojiCon from '../Emoji';
 
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
@@ -29,12 +27,6 @@ import EmojiCon from '../Emoji';
 export type MenuNode = Page & {
   children: MenuNode[];
 }
-
-const DefaultPageIcon = styled(ArticleIcon)`
-  color: ${greyColor2};
-  opacity: 0.5;
-  font-size: 22px;
-`;
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 
@@ -143,8 +135,9 @@ const StyledLink = styled(Typography)<{isempty: number}>`
 
 type TreeItemProps = ComponentProps<typeof TreeItem> & {
   href: string;
+  pageType: 'database' | 'page';
   labelIcon?: string;
-  addSubPage?: () => void;
+  addSubPage?: (page: Partial<Page>) => void;
   deletePage?: () => void;
 }
 
@@ -157,6 +150,7 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
     href,
     labelIcon,
     label,
+    pageType,
     ...other
   } = props;
 
@@ -185,7 +179,7 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
           <Link href={href} passHref>
             <StyledTreeItemContent onClick={stopPropagation}>
               <StyledPageIcon>
-                {labelIcon || <DefaultPageIcon />}
+                {labelIcon || (pageType === 'database' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
               </StyledPageIcon>
               <StyledLink isempty={isempty ? 1 : 0}>
                 {isempty ? 'Untitled' : label}
@@ -195,11 +189,7 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
                   <MoreHorizIcon color='secondary' fontSize='small' />
                 </IconButton>
                 {addSubPage && (
-                  <Tooltip disableInteractive title='Add a page inside' leaveDelay={0}>
-                    <StyledIconButton onClick={() => addSubPage()} sx={{ marginLeft: '3px' }}>
-                      <AddIcon color='secondary' />
-                    </StyledIconButton>
-                  </Tooltip>
+                  <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} sx={{ marginLeft: '3px' }} />
                 )}
               </div>
             </StyledTreeItemContent>
@@ -289,9 +279,9 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
 
   const isActive = canDrop && isOverCurrent;
 
-  function addSubPage () {
+  function addSubPage (page: Partial<Page>) {
     if (addPage) {
-      addPage({ parentId: item.id });
+      addPage({ ...page, parentId: item.id });
     }
   }
 
@@ -311,6 +301,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
       label={item.title}
       href={`${pathPrefix}/${item.path}`}
       labelIcon={item.icon}
+      pageType={item.type}
       sx={{
         backgroundColor: isActive ? theme.palette.action.focus : 'unset', // 'rgba(22, 52, 71, 0.08)' : 'unset'
         position: 'relative'

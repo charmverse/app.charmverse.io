@@ -14,11 +14,35 @@ export const contributors: Contributor[] = [
 
 export const activeUser = contributors[0];
 
-export const pages: Page[] = [
-  { id: '0', icon: '📌', created: new Date(), content: gettingStartedPageContent(), isPublic: false, path: 'first-page', spaceId: '0', title: 'Getting Started', parentId: null },
-  {
-    id: '1',
+function MockPage (partial: Partial<Page>): Page {
+  const id = Math.random().toString(36).substring(2);
+  return {
     created: new Date(),
+    id,
+    type: 'page',
+    title: '',
+    content: {
+      type: 'doc',
+      content: []
+    } as PageContent,
+    isPublic: false,
+    parentId: null,
+    path: id,
+    spaceId: '',
+    ...partial
+  };
+}
+
+export const pages: Page[] = [
+  MockPage({
+    id: '0',
+    icon: '📌',
+    content: gettingStartedPageContent(),
+    path: 'getting-started',
+    spaceId: '0',
+    title: 'Getting Started'
+  }),
+  MockPage({
     content: {
       type: 'doc',
       content: [
@@ -34,38 +58,29 @@ export const pages: Page[] = [
       ]
     },
     parentId: '0',
-    isPublic: false,
-    path: 'second-page',
+    path: 'nested-page',
     spaceId: '0',
     title: 'Nested Page'
-  },
-  {
-    id: '2',
-    created: new Date(),
-    content: {
-      type: 'doc',
-      content: []
-    },
-    isPublic: false,
-    parentId: null,
+  }),
+  MockPage({
     path: 'third-page',
     spaceId: '0',
     title: 'Another Top-level Page'
-  },
-  {
-    id: '3',
-    created: new Date(),
-    content: {
-      type: 'doc',
-      content: []
-    },
-    isPublic: false,
-    parentId: null,
-    path: 'fourth-page',
+  }),
+  MockPage({
+    path: 'database-page',
     spaceId: '0',
-    title: 'Fourth page'
-  },
-  { id: '4', icon: '📌', created: new Date(), content: getPageContent(), isPublic: false, path: 'fifth-page', spaceId: '1', title: 'Getting Started Again', parentId: null }
+    title: 'Database page',
+    type: 'database',
+    databaseId: 'b3fs1cyw717nfjfswcyk9hd1jph'
+  }),
+  MockPage({
+    icon: '📌',
+    content: getPageContent(),
+    path: 'fifth-page',
+    spaceId: '1',
+    title: 'Getting Started Again'
+  })
 ];
 
 function gettingStartedPageContent (): PageContent {
@@ -1075,3 +1090,5 @@ function getPageContent (): PageContent {
     ]
   };
 }
+
+export const blocks = JSON.parse('[{"id":"vk5d6td6tzpdfibtabuzjgwk88r","schema":1,"workspaceId":"0","parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"view","fields":{"viewType":"board","sortOptions":[],"visiblePropertyIds":[],"visibleOptionIds":[],"hiddenOptionIds":[],"collapsedOptionIds":[],"filter":{"operation":"and","filters":[]},"cardOrder":["ctf1jbxhgmi85bg67pdzusyebhw","cjoke918aqbrzu8a78onszkpipw","7s14ecncef7apnhpc7jpmmac1sh","cyuidkfsy43rzubzfohx8demtcw","71ffp1rss8b9z1mej8t8gomdxeo"],"columnWidths":{},"columnCalculations":{},"kanbanCalculations":{},"defaultTemplateId":""},"title":"Board View","createAt":1643733258753,"updateAt":1643733303218,"deleteAt":0},{"id":"cyuidkfsy43rzubzfohx8demtcw","schema":1,"workspaceId":"0","parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"🌳","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"dabadd9b-adf1-4d9f-8702-805ac6cef602"},"contentOrder":[],"isTemplate":false},"title":"Gardening","createAt":1643733258755,"updateAt":1643736454792,"deleteAt":0},{"id":"c53orcju38jggmcadh7ja74yp1a","schema":1,"workspaceId":"0","parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"34eb9c25-d5bf-49d9-859e-f74f4e0030e7"},"contentOrder":[],"isTemplate":true},"title":"New Task","createAt":1643733258757,"updateAt":1643733258757,"deleteAt":0},{"id":"ctf1jbxhgmi85bg67pdzusyebhw","schema":1,"workspaceId":"0","parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"🐱","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"d37a61f4-f332-4db9-8b2d-5e0a91aa20ed"},"contentOrder":[],"isTemplate":false},"title":"Feed Fluffy","createAt":1643733258758,"updateAt":1643733262451,"deleteAt":0},{"id":"b3fs1cyw717nfjfswcyk9hd1jph","schema":1,"workspaceId":"0","parentId":"","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"board","fields":{"showDescription":false,"description":"","icon":"😄","isTemplate":false,"columnCalculations":[],"cardProperties":[{"id":"d777ba3b-8728-40d1-87a6-59406bbbbfb0","name":"Status","type":"select","options":[{"color":"propColorPink","id":"34eb9c25-d5bf-49d9-859e-f74f4e0030e7","value":"To Do!!"},{"color":"propColorYellow","id":"d37a61f4-f332-4db9-8b2d-5e0a91aa20ed","value":"Doing"},{"color":"propColorGreen","id":"dabadd9b-adf1-4d9f-8702-805ac6cef602","value":"Done 🙌"}]}]},"title":"Personal Tasks","createAt":1643733258760,"updateAt":1643736587752,"deleteAt":0},{"id":"cjoke918aqbrzu8a78onszkpipw","schema":1,"workspaceId":"0","parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"👣","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"34eb9c25-d5bf-49d9-859e-f74f4e0030e7"},"contentOrder":[],"isTemplate":false},"title":"Go for a walk","createAt":1643733258761,"updateAt":1643733258761,"deleteAt":0}]');
