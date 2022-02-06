@@ -9,7 +9,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import { Box, Button, ListItem, TextField, Typography } from '@mui/material';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
-import { HTMLAttributes, useRef, useState } from 'react';
+import { HTMLAttributes, useState } from 'react';
 
 const StyledImageContainer = styled.div<{ align?: string }>`
   display: flex;
@@ -71,11 +71,22 @@ function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
   );
 }
 
+const StyledImage = styled.img`
+  object-fit: contain;
+  width: 100%;
+  user-select: none;
+  &:hover {
+    cursor: initial;
+  }
+`;
+
 export function Image ({ node, updateAttrs }: NodeViewProps) {
   const [align, setAlign] = useState('center');
   const theme = useTheme();
   const [embedLink, setEmbedLink] = useState('');
-  const imageCaptionRef = useRef<HTMLDivElement>(null);
+  const [imageWidth, setImageWidth] = useState(500);
+  const [_, setClientX] = useState<null | number>(null);
+
   if (!node.attrs.src) {
     return (
       <PopperPopup popupContent={(
@@ -144,7 +155,30 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
     >
       <div className='content' style={{ position: 'relative' }}>
         { /* eslint-disable-next-line */}
-        <img width={500} contentEditable={false} draggable src={node.attrs.src} alt={node.attrs.alt} />
+        <Box 
+          draggable
+          onDrag={(e) => {
+            setClientX((clientX) => {
+              setImageWidth(imageWidth + (e.clientX - (clientX ?? e.clientX)));
+              return e.clientX;
+            });
+          }}
+          sx={{
+            position: 'relative',
+            cursor: 'col-resize',
+            padding: theme.spacing(0, 0.5),
+            width: imageWidth,
+            '&:hover': {
+              background: 'rgba(0,0,0, 0.25)'
+            }
+          }}
+        >
+          <StyledImage
+            draggable={false}
+            src={node.attrs.src}
+            alt={node.attrs.alt}
+          />
+        </Box>
         <Controls className='controls'>
           {[
             [
