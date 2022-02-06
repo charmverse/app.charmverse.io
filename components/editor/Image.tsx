@@ -32,12 +32,6 @@ const Controls = styled.div`
   transition: opacity 250ms ease-in-out;
 `;
 
-const ImageCaption = styled.div`
-  font-size: 16px;
-  color: ${({ theme }) => theme.palette.text.primary};
-  opacity: 0.5;
-`;
-
 const StyledEmptyImageContainer = styled(Box)`
   display: flex;
   gap: ${({ theme }) => theme.spacing(1.5)};
@@ -167,12 +161,22 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
             position: 'relative',
             cursor: 'col-resize',
             padding: theme.spacing(0, 0.5),
-            width: imageWidth,
-            '&:hover': {
-              background: 'rgba(0,0,0, 0.25)'
-            }
+            width: imageWidth
           }}
         >
+          <Box sx={{
+            '&:hover': {
+              borderLeft: '7.5px solid rgba(0,0,0, 0.25)',
+              borderRight: '7.5px solid rgba(0,0,0, 0.25)'
+            },
+            position: 'absolute',
+            // precise width and height measurement to keep the resize handler same dimension as that of image
+            width: 'calc(100% + 5px)',
+            height: 'calc(100% - 8.25px)',
+            left: '50%',
+            transform: 'translateX(-50%)'
+          }}
+          />
           <StyledImage
             draggable={false}
             src={node.attrs.src}
