@@ -8,7 +8,7 @@ import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { Page } from 'models';
 import React, { ChangeEvent, ReactNode } from 'react';
 import BangleEditor from './BangleEditor';
-import PageBanner from './Page/PageBanner';
+import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 
 const Container = styled(Box)`
   width: 860px;
@@ -65,7 +65,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
     <Box>
       <PageBanner page={page} setPage={setPage} />
       <Container sx={{
-        top: page.icon ? '-100px' : 0
+        top: !page.headerImage ? -100 : page.icon ? '-100px' : 10
       }}
       >
         {page.icon && (
@@ -89,7 +89,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
           {!page.headerImage && (
           <PageControlItem onClick={() => {
             // Charmverse logo
-            setPage({ ...page, headerImage: 'https://static.wixstatic.com/media/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.png/v1/fill/w_304,h_58,al_c,q_85,usm_0.66_1.00_0.01/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.webp' });
+            setPage({ ...page, headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
           }}
           >
             <ImageIcon

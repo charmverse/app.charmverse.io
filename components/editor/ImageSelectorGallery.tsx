@@ -37,7 +37,7 @@ export function ImageSelectorGallery (props: ImageSelectorGalleryProps) {
             {images.map(image => (
               <div key={image} role='button' tabIndex={0} onClick={() => onImageClick(image)}>
                 {/* eslint-disable-next-line */}
-                <img src={`/images/${image}`} width={75} height={50} alt={groupName} />
+                <img src={image} width={75} height={50} alt={groupName} />
               </div>
             ))}
           </GalleryGroupImages>

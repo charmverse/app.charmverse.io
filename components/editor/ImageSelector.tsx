@@ -18,6 +18,7 @@ export default function ImageSelector (props: ImageSelectorProps) {
     <PopperPopup popupContent={(
       <Box>
         <MultiTabs tabs={[
+          ...tabs,
           [
             'Upload',
             <div>
@@ -58,8 +59,7 @@ export default function ImageSelector (props: ImageSelectorProps) {
                 Embed Image
               </Button>
             </Box>
-          ],
-          ...tabs
+          ]
         ]}
         />
       </Box>

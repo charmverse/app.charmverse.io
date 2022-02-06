@@ -31,19 +31,19 @@ const StyledPageBanner = styled(Box)`
   }
 `;
 
-const PageCoverGalleryImageGroups = {
+export const PageCoverGalleryImageGroups = {
   'Color & Gradient': [
-    'patterns/notion/gradients_2.png',
-    'patterns/notion/gradients_3.png',
-    'patterns/notion/gradients_4.png',
-    'patterns/notion/gradients_5.png',
-    'patterns/notion/gradients_8.png',
-    'patterns/notion/gradients_10.jpg',
-    'patterns/notion/gradients_11.jpg',
-    'patterns/notion/solid_beige.png',
-    'patterns/notion/solid_blue.png',
-    'patterns/notion/solid_red.png',
-    'patterns/notion/solid_yellow.png'
+    '/images/patterns/notion/gradients_2.png',
+    '/images/patterns/notion/gradients_3.png',
+    '/images/patterns/notion/gradients_4.png',
+    '/images/patterns/notion/gradients_5.png',
+    '/images/patterns/notion/gradients_8.png',
+    '/images/patterns/notion/gradients_10.jpg',
+    '/images/patterns/notion/gradients_11.jpg',
+    '/images/patterns/notion/solid_beige.png',
+    '/images/patterns/notion/solid_blue.png',
+    '/images/patterns/notion/solid_red.png',
+    '/images/patterns/notion/solid_yellow.png'
   ]
 };
 
@@ -72,7 +72,7 @@ export default function PageBanner ({ page, setPage }: { page: Page, setPage: (p
             'Gallery',
             <ImageSelectorGallery
               onImageClick={(imageSrc) => {
-                setPage({ ...page, headerImage: `/images/${imageSrc}` });
+                setPage({ ...page, headerImage: imageSrc });
               }}
               items={PageCoverGalleryImageGroups}
             />
