@@ -16,12 +16,20 @@ export default function ImageSelector (props: ImageSelectorProps) {
 
   return (
     <PopperPopup popupContent={(
-      <Box>
+      <Box sx={{
+        width: 750
+      }}
+      >
         <MultiTabs tabs={[
           ...tabs,
           [
             'Upload',
-            <div>
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              width: '100%'
+            }}
+            >
               <Button component='label' variant='contained'>
                 Choose an image
                 <input
@@ -40,7 +48,7 @@ export default function ImageSelector (props: ImageSelectorProps) {
                   }}
                 />
               </Button>
-            </div>
+            </Box>
           ],
           [
             'Link',

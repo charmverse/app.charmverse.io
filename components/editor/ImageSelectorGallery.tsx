@@ -21,9 +21,21 @@ const GalleryGroupName = styled.div`
 
 const GalleryGroupImages = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(5, 1fr);
   grid-gap: ${({ theme }) => theme.spacing(1)};
   cursor: pointer;
+`;
+
+const GalleryGroupImage = styled.div`
+  width: 100%;
+  height: 75px;
+
+  img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: ${({ theme }) => theme.spacing(0.5)};
+  }
 `;
 
 export function ImageSelectorGallery (props: ImageSelectorGalleryProps) {
@@ -35,10 +47,10 @@ export function ImageSelectorGallery (props: ImageSelectorGalleryProps) {
           <GalleryGroupName>{groupName}</GalleryGroupName>
           <GalleryGroupImages>
             {images.map(image => (
-              <div key={image} role='button' tabIndex={0} onClick={() => onImageClick(image)}>
+              <GalleryGroupImage key={image} role='button' tabIndex={0} onClick={() => onImageClick(image)}>
                 {/* eslint-disable-next-line */}
-                <img src={image} width={75} height={50} alt={groupName} />
-              </div>
+                <img src={image} alt={groupName} />
+              </GalleryGroupImage>
             ))}
           </GalleryGroupImages>
         </GalleryGroup>
