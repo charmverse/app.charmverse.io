@@ -36,6 +36,10 @@ const GalleryGroupImage = styled.div`
     height: 100%;
     border-radius: ${({ theme }) => theme.spacing(0.5)};
   }
+
+  img:hover {
+    opacity: 0.75;
+  }
 `;
 
 export function ImageSelectorGallery (props: ImageSelectorGalleryProps) {

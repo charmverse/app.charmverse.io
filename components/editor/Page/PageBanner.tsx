@@ -22,8 +22,8 @@ const StyledPageBanner = styled(Box)`
   .page-cover-controls {
     visibility: hidden;
     position: absolute;
-    bottom: 0px;
-    right: 25px
+    bottom: 10px;
+    right: 200px
   }
 
   &:hover .page-cover-controls {

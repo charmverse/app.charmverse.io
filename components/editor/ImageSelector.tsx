@@ -55,14 +55,19 @@ export default function ImageSelector (props: ImageSelectorProps) {
             <Box sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 2
+              gap: 2,
+              alignItems: 'center'
             }}
             >
-              <TextField placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
-              <Button onClick={() => {
-                onImageSelect(embedLink);
-                setEmbedLink('');
-              }}
+              <TextField fullWidth placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
+              <Button
+                sx={{
+                  width: 250
+                }}
+                onClick={() => {
+                  onImageSelect(embedLink);
+                  setEmbedLink('');
+                }}
               >
                 Embed Image
               </Button>
