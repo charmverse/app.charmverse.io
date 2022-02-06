@@ -10,13 +10,12 @@ import React, { ChangeEvent, ReactNode } from 'react';
 import BangleEditor from './BangleEditor';
 import PageBanner from './Page/PageBanner';
 
-const Container = styled.div`
+const Container = styled(Box)`
   width: 860px;
   max-width: 100%;
   margin: 0 auto 5px;
   padding: 0 20px 0 40px;
   position: relative;
-  top: -100px;
 `;
 
 const StyledListItem = styled(ListItem)`
@@ -65,7 +64,10 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
   return (
     <Box>
       <PageBanner page={page} setPage={setPage} />
-      <Container>
+      <Container sx={{
+        top: page.icon ? '-100px' : 0
+      }}
+      >
         {page.icon && (
           <Box py={3}>
             <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
