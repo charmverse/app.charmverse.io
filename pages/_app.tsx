@@ -84,8 +84,6 @@ import 'components/databases/focalboard/src/components/viewHeader/filterComponen
 import 'components/databases/focalboard/src/components/viewHeader/filterEntry.scss';
 import 'components/databases/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/databases/focalboard/src/components/viewTitle.scss';
-// import 'components/databases/focalboard/src/components/workspaceSwitcher/workspaceOptions.scss';
-// import 'components/databases/focalboard/src/components/workspaceSwitcher/workspaceSwitcher.scss';
 // import 'components/databases/focalboard/src/widgets/buttons/button.scss';
 import 'components/databases/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/databases/focalboard/src/widgets/buttons/iconButton.scss';
