@@ -99,13 +99,24 @@ function EmojiContainer (
       onClick={() => {
         if (view.dispatch!) {
           const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
-          view.dispatch(
-          // Chain transactions together
-            view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_PAGE_ICON',
-              onClick: (emoji: string) => updatePageIcon(emoji),
-              ref: ref.current,
-              getPos: () => 0 }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
-          );
+          const suggestTooltipState = suggestTooltipKey.getState(view.state);
+
+          // If the emoji suggest already has a ref attached its already visible, we need to hide it
+
+          if (suggestTooltipState.show) {
+            view.dispatch(
+              view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
+            );
+          }
+          else {
+            view.dispatch(
+            // Chain transactions together
+              view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_PAGE_ICON',
+                onClick: (emoji: string) => updatePageIcon(emoji),
+                ref: ref.current,
+                getPos: () => 0 }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
+            );
+          }
         }
       }}
     >

@@ -145,10 +145,6 @@ function pluginsFactory({
               };
             }
             if (meta.type === 'HIDE_TOOLTIP') {
-              // Do not change object reference if show was and is false
-              if (pluginState.show === false) {
-                return pluginState;
-              }
               return {
                 ...pluginState,
                 triggerText: '',

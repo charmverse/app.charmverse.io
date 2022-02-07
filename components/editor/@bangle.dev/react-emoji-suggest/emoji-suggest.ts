@@ -201,6 +201,15 @@ function pluginsFactory({
               }
             }
 
+            if (meta.type === "OUTSIDE_PAGE_ICON") {
+              return {
+                ...pluginState,
+                insideCallout: false,
+                ref: null,
+                show: false
+              }
+            }
+
             if (meta.type === "OUTSIDE_CALLOUT") {
               return {
                 ...pluginState,
