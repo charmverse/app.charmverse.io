@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import CenterPanel from './focalboard/src/components/centerPanel';
-import EmptyCenterPanel from './focalboard/src/components/emptyCenterPanel';
 import { sendFlashMessage } from './focalboard/src/components/flashMessages';
 import mutator from './focalboard/src/mutator';
 import { getCurrentBoard, setCurrent as setCurrentBoard } from './focalboard/src/store/boards';
@@ -143,7 +142,5 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
     );
   }
 
-  return (
-    <EmptyCenterPanel />
-  );
+  return null;
 }
