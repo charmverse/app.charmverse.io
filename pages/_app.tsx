@@ -3,7 +3,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { IntlProvider } from 'react-intl';
-import { PageTitleProvider, TitleContext } from 'components/common/page-layout/PageTitle';
+import { PageTitleProvider, TitleContext } from 'hooks/usePageTitle';
 import RouteGuard from 'components/common/RouteGuard';
 import { ColorModeContext } from 'context/color-mode';
 import { useLocalStorage } from 'hooks/useLocalStorage';
