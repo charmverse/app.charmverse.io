@@ -115,6 +115,7 @@ describe('components/centerPanel', () => {
             <ReduxProvider store={store}>
                 <CenterPanel
                     cards={[card1]}
+                    setPage={() => {}}
                     views={[activeView]}
                     board={board}
                     activeView={activeView}
@@ -134,6 +135,7 @@ describe('components/centerPanel', () => {
             <ReduxProvider store={store}>
                 <CenterPanel
                     cards={[card1]}
+                    setPage={() => {}}
                     views={[activeView]}
                     board={board}
                     activeView={activeView}
@@ -153,6 +155,7 @@ describe('components/centerPanel', () => {
             <ReduxProvider store={store}>
                 <CenterPanel
                     cards={[card1]}
+                    setPage={() => {}}
                     views={[activeView]}
                     board={board}
                     activeView={activeView}
@@ -173,6 +176,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
@@ -204,6 +208,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
@@ -227,6 +232,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
@@ -254,6 +260,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
@@ -288,6 +295,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
@@ -314,6 +322,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
@@ -341,6 +350,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
@@ -366,6 +376,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
@@ -388,6 +399,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
@@ -413,6 +425,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
@@ -439,6 +452,7 @@ describe('components/centerPanel', () => {
                 <ReduxProvider store={store}>
                     <CenterPanel
                         cards={[card1, card2]}
+                        setPage={() => {}}
                         views={[activeView]}
                         board={board}
                         activeView={activeView}
