@@ -19,12 +19,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-      - name: Install npm dependencies
-        run: npm ci --no-audit --no-fund
-      - name: Lint
-        run: npm run lint:prod
-      - name: Build Next.js App
-        run: npm run build
       - name: Cache npm dependencies # copied from https://github.com/vercel/next.js/blob/canary/errors/no-cache.md
         uses: actions/cache@v2
         with:
@@ -36,6 +30,12 @@ jobs:
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+      - name: Install npm dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Lint
+        run: npm run lint:prod
+      - name: Build Next.js App
+        run: npm run build
     # - name: Run Tests
     #   shell: 'script -q -e -c "bash {0}"' # add support for colors in output. see: https://github.com/actions/runner/issues/241
     #   run: npm test
