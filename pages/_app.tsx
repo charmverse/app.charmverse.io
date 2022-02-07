@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
-import { PageTitleProvider, TitleContext } from 'components/common/page-layout/PageTitle';
+import { PageTitleProvider, TitleContext } from 'hooks/usePageTitle';
 import RouteGuard from 'components/common/RouteGuard';
 import FocalBoardPortal from 'components/databases/FocalBoardPortal';
 import { ColorModeContext } from 'context/color-mode';
