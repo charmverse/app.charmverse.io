@@ -1,5 +1,3 @@
-@import "typography";
-
 html {
   height: 100%;
 }
@@ -11,7 +9,6 @@ html {
   overflow: hidden;
 
   width: 100%;
-  height: 100%;
   color: rgb(var(--center-channel-color-rgb));
   background: rgb(var(--center-channel-bg-rgb));
   padding: 0;
@@ -27,7 +24,6 @@ html {
 
   padding: 0;
   margin: 0;
-  font-family: "Open Sans", sans-serif;
   /* -webkit-font-smoothing: auto; */
   font-size: 14px;
   line-height: 24px;
@@ -49,6 +45,7 @@ html {
   textarea {
     background: rgb(var(--center-channel-bg-rgb));
     color: rgb(var(--center-channel-color-rgb));
+    font-family: inherit;
 
     user-select: text;
   }
