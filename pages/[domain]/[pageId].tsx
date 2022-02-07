@@ -15,7 +15,6 @@ export default function BlocksEditorPage () {
   const [, setTitleState] = usePageTitle();
 
   function setPage (page: Partial<Page>) {
-    console.log('setPage called', page);
     const newPage = { ...pageByPath, ...page };
     setPages(pages.map(p => p.id === newPage.id ? newPage : p));
   }
