@@ -57,7 +57,7 @@ export const defaultTheme = {
     propGray: '#EDEDED',
     propBrown: '#F7DDC3',
     propOrange: '#ffd3c1',
-    propYellow: '#EAD637', //'#f7f0b6',
+    propYellow: '#f7f0b6',
     propGreen: '#c7eac3',
     propBlue: '#B1D1F6',
     propPurple: '#e6d0ff',
