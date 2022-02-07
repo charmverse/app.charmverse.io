@@ -1,22 +1,21 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
-import { ListItem, Typography } from '@mui/material';
+import { ListItem } from '@mui/material';
 import Box from '@mui/material/Box';
 import Emoji from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { Page } from 'models';
 import React, { ChangeEvent, ReactNode } from 'react';
 import BangleEditor from './BangleEditor';
+import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 
-const Container = styled.div`
+const Container = styled(Box)`
   width: 860px;
   max-width: 100%;
   margin: 0 auto 5px;
   padding: 0 20px 0 40px;
   position: relative;
-  top: -100px;
 `;
 
 const StyledListItem = styled(ListItem)`
@@ -53,30 +52,6 @@ const PageTitle = styled.input`
   outline: none;
 `;
 
-const PageBanner = styled(Box)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  position: relative;
-
-  img {
-    width: 100%;
-    object-fit: cover;
-  }
-
-  .page-cover-controls {
-    visibility: hidden;
-    position: absolute;
-    bottom: 0px;
-    right: 25px
-  }
-
-  &:hover .page-cover-controls {
-    visibility: inherit;
-  }
-`;
-
 function randomIntFromInterval (min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -86,64 +61,13 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
     setPage({ ...page, title: event.target.value });
   }
 
-  const theme = useTheme();
-
   return (
     <Box>
-      <PageBanner>
-        {page.headerImage
-        && (
-        <>
-          {/* eslint-disable-next-line */}
-          <img src={page.headerImage} alt='Page Banner' />
-          <Box
-            sx={{
-              background: theme.palette.background.light,
-              borderRadius: theme.spacing(0.5),
-              display: 'flex',
-              gap: theme.spacing(0.25),
-              boxShadow: theme.shadows[2]
-            }}
-            className='page-cover-controls'
-          >
-            <ListItem
-              button
-              disableRipple
-              sx={{
-                background: theme.palette.background.dark,
-                borderTopLeftRadius: theme.spacing(0.5),
-                borderBottomLeftRadius: theme.spacing(0.5),
-                padding: theme.spacing(0.5, 1.5)
-              }}
-            >
-              <Typography variant='subtitle1'>
-                Change Cover
-              </Typography>
-            </ListItem>
-            <ListItem
-              button
-              disableRipple
-              sx={{
-                background: theme.palette.background.dark,
-                borderTopRightRadius: theme.spacing(0.5),
-                borderBottomRightRadius: theme.spacing(0.5),
-                padding: theme.spacing(0.5, 1.5)
-              }}
-            >
-              <Typography
-                variant='subtitle1'
-                onClick={() => {
-                  setPage({ ...page, headerImage: undefined });
-                }}
-              >
-                Remove
-              </Typography>
-            </ListItem>
-          </Box>
-        </>
-        )}
-      </PageBanner>
-      <Container>
+      <PageBanner page={page} setPage={setPage} />
+      <Container sx={{
+        top: !page.headerImage ? -100 : page.icon ? '-100px' : 10
+      }}
+      >
         {page.icon && (
           <Box py={3}>
             <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
@@ -165,7 +89,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
           {!page.headerImage && (
           <PageControlItem onClick={() => {
             // Charmverse logo
-            setPage({ ...page, headerImage: 'https://static.wixstatic.com/media/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.png/v1/fill/w_304,h_58,al_c,q_85,usm_0.66_1.00_0.01/1d6dff_76c31fc4660149aa95a5f619ea6a50a3~mv2.webp' });
+            setPage({ ...page, headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
           }}
           >
             <ImageIcon

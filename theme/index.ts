@@ -196,6 +196,14 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
         }
       }
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        input: {
+          padding: '10px 10px',
+          fontSize: 16
+        }
+      }
+    },
     MuiLink: {
       styleOverrides: {
         root: {

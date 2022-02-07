@@ -6,10 +6,9 @@ import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import AlignHorizontalRightIcon from '@mui/icons-material/AlignHorizontalRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ImageIcon from '@mui/icons-material/Image';
-import { Box, Button, ListItem, TextField, Typography } from '@mui/material';
-import MultiTabs from 'components/common/MultiTabs';
-import PopperPopup from 'components/common/PopperPopup';
-import { HTMLAttributes, useRef, useState } from 'react';
+import { Box, ListItem, Typography } from '@mui/material';
+import { HTMLAttributes, useState } from 'react';
+import ImageSelector from './ImageSelector';
 
 const StyledImageContainer = styled.div<{ align?: string }>`
   display: flex;
@@ -30,12 +29,6 @@ const Controls = styled.div`
   top: 0;
   opacity: 0;
   transition: opacity 250ms ease-in-out;
-`;
-
-const ImageCaption = styled.div`
-  font-size: 16px;
-  color: ${({ theme }) => theme.palette.text.primary};
-  opacity: 0.5;
 `;
 
 const StyledEmptyImageContainer = styled(Box)`
@@ -74,65 +67,16 @@ function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
 export function Image ({ node, updateAttrs }: NodeViewProps) {
   const [align, setAlign] = useState('center');
   const theme = useTheme();
-  const [embedLink, setEmbedLink] = useState('');
-  const imageCaptionRef = useRef<HTMLDivElement>(null);
   if (!node.attrs.src) {
     return (
-      <PopperPopup popupContent={(
-        <Box>
-          <MultiTabs tabs={[
-            [
-              'Upload',
-              <div>
-                <Button component='label' variant='contained'>
-                  Choose an image
-                  <input
-                    type='file'
-                    hidden
-                    onChange={(e) => {
-                      const firstFile = e.target.files?.[0];
-                      if (firstFile) {
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                          const { result } = reader;
-                          updateAttrs({
-                            src: result
-                          });
-                        };
-                        reader.readAsDataURL(firstFile);
-                      }
-                    }}
-                  />
-                </Button>
-              </div>
-            ],
-            [
-              'Link',
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2
-              }}
-              >
-                <TextField placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
-                <Button onClick={() => {
-                  updateAttrs({
-                    src: embedLink
-                  });
-                  setEmbedLink('');
-                }}
-                >
-                  Embed Image
-                </Button>
-              </Box>
-            ]
-          ]}
-          />
-        </Box>
-      )}
+      <ImageSelector onImageSelect={(imageSrc) => {
+        updateAttrs({
+          src: imageSrc
+        });
+      }}
       >
         <EmptyImageContainer />
-      </PopperPopup>
+      </ImageSelector>
     );
   }
   return (
