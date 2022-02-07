@@ -52,6 +52,13 @@ const PageTitle = styled.input`
   outline: none;
 `;
 
+const EmojiContainer = styled(Box)`
+  width: fit-content;
+  display: flex;
+  position: relative;
+  left: 220px;
+`;
+
 function randomIntFromInterval (min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -64,15 +71,19 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
   return (
     <Box>
       <PageBanner page={page} setPage={setPage} />
+      {page.icon && (
+        <EmojiContainer sx={{
+          // If there are not page header image, move the icon a bit upward
+          top: !page.headerImage ? -100 : -50
+        }}
+        >
+          <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+        </EmojiContainer>
+      )}
       <Container sx={{
-        top: !page.headerImage ? -100 : page.icon ? '-100px' : 10
+        top: !page.headerImage ? -100 : page.icon ? '-50px' : 10
       }}
       >
-        {page.icon && (
-          <Box py={3}>
-            <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-          </Box>
-        )}
         <Controls>
           {!page.icon && (
           <PageControlItem onClick={() => {
