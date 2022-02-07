@@ -17,7 +17,7 @@ import {
 } from '@bangle.dev/base-components';
 import { NodeView, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, Node } from '@bangle.dev/pm';
-import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
+import { BangleEditor as ReactBangleEditor, EditorViewContext, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
 import '@bangle.dev/tooltip/style.css';
 import styled from '@emotion/styled';
@@ -26,10 +26,11 @@ import Emoji from 'components/common/Emoji';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { Page, PageContent } from 'models';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, ReactNode, useContext, useRef } from 'react';
+import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
-import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
+import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
 import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
@@ -80,17 +81,48 @@ const PageTitle = styled.input`
   outline: none;
 `;
 
-const EmojiContainer = styled(Box)`
-  width: fit-content;
-  display: flex;
-  position: relative;
-`;
+function EmojiContainer (
+  { updatePageIcon, top, children }: {updatePageIcon: (icon: string) => void, children: ReactNode, top: number}
+) {
+  const view = useContext(EditorViewContext);
+  const ref = useRef<HTMLDivElement>(null);
+
+  return (
+    <Box
+      sx={{
+        width: 'fit-content',
+        display: 'flex',
+        position: 'relative',
+        top
+      }}
+      ref={ref}
+      onClick={() => {
+        if (view.dispatch!) {
+          const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
+          view.dispatch(
+          // Chain transactions together
+            view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_PAGE_ICON',
+              onClick: (emoji: string) => updatePageIcon(emoji),
+              ref: ref.current,
+              getPos: () => 0 }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
+          );
+        }
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
 
 export default function BangleEditor (
   { content, page, setPage }: { content: PageContent, page: Page, setPage: (p: Page) => void }
 ) {
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {
     setPage({ ...page, title: event.target.value });
+  }
+
+  function updatePageIcon (icon: string) {
+    setPage({ ...page, icon });
   }
 
   const state = useEditorState({
@@ -191,11 +223,7 @@ export default function BangleEditor (
       }}
     >
       {page.icon && (
-        <EmojiContainer sx={{
-          // If there are not page header image, move the icon a bit upward
-          top: pageIconTop
-        }}
-        >
+        <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
           <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
         </EmojiContainer>
       )}

@@ -228,11 +228,15 @@ function referenceElement(
   return (view) => {
     return {
       getBoundingClientRect: () => {
+        const emojiSuggestState = emojiSuggestKey.getState(view.state);
+        // Ref will be present if we are triggering the emoji suggest by clicking on page icon
+        if (emojiSuggestState.ref) {
+          return (emojiSuggestState.ref as HTMLDivElement).getBoundingClientRect()
+        }
         let state = view.state;
         const markPos = getActiveMarkPos(state);
         // add by + so that we get the position right after trigger
         const startPos = markPos.start > -1 ? markPos.start + 1 : 0;
-        const start = view.coordsAtPos(startPos);
         // if the suggestMark text spanned two lines, we want to show the tooltip based on the end pos
         // so that it doesn't hide the text
         const end = view.coordsAtPos(markPos.end > -1 ? markPos.end : startPos);

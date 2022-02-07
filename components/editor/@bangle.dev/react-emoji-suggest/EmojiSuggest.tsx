@@ -38,7 +38,9 @@ export function EmojiSuggest({
     selectedEmojiSquareId,
     suggestTooltipKey,
     insideCallout,
-    updateAttrs
+    updateAttrs,
+    onClick,
+    ref
   } = usePluginState(emojiSuggestKey);
   const theme = useTheme();
   const {
@@ -72,6 +74,9 @@ export function EmojiSuggest({
             counter={counter}
             selectedEmojiSquareId={selectedEmojiSquareId}
             updateAttrs={updateAttrs}
+            onClick={onClick}
+            // if ref exists then we clicked on page icon
+            insidePageIcon={Boolean(ref)}
           />
         )}
       </div>
@@ -92,7 +97,9 @@ export function EmojiSuggestContainer({
   selectedEmojiSquareId,
   maxItems,
   insideCallout,
-  updateAttrs
+  updateAttrs,
+  insidePageIcon,
+  onClick
 }: {
   view: EditorView;
   rowWidth: number;
@@ -105,7 +112,9 @@ export function EmojiSuggestContainer({
   selectedEmojiSquareId: string;
   maxItems: number;
   insideCallout: boolean,
-  updateAttrs: UpdateAttrsFunction
+  updateAttrs: UpdateAttrsFunction,
+  onClick: (icon: string) => void,
+  insidePageIcon: boolean
 }) {
   const emojiGroups = useMemo(
     () => getEmojiGroups(triggerText),
@@ -121,13 +130,14 @@ export function EmojiSuggestContainer({
   const { item: activeItem } = resolveCounter(counter, emojiGroups);
   const onSelectEmoji = useCallback(
     (emojiAlias: string) => {
-
-      if (!insideCallout) {
-        selectEmoji(emojiSuggestKey, emojiAlias)(view.state, view.dispatch, view);
-      } else {
+      if (insidePageIcon) {
+        onClick(getEmojiByAlias(emojiAlias)?.[1] ?? "👋")
+      } else if (insideCallout) {
         updateAttrs({
           emoji: getEmojiByAlias(emojiAlias)?.[1] ?? "👋"
         })
+      } else {
+        selectEmoji(emojiSuggestKey, emojiAlias)(view.state, view.dispatch, view);
       }
 
       view.dispatch(
