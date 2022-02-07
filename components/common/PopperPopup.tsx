@@ -1,7 +1,6 @@
-import Fade from '@mui/material/Fade';
+import { Popover } from '@mui/material';
 import Paper from '@mui/material/Paper';
-import Popper from '@mui/material/Popper';
-import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
+import PopupState, { bindPopover, bindToggle } from 'material-ui-popup-state';
 import * as React from 'react';
 
 interface PopperPopupProps {
@@ -12,21 +11,27 @@ interface PopperPopupProps {
 export default function PopperPopup (props: PopperPopupProps) {
   const { popupContent, children } = props;
   return (
-    <PopupState variant='popper' popupId='demo-popup-popper'>
+    <PopupState variant='popper'>
       {(popupState) => (
         <div>
           <div {...bindToggle(popupState)}>
             {children}
           </div>
-          <Popper {...bindPopper(popupState)} transition>
-            {({ TransitionProps }) => (
-              <Fade {...TransitionProps} timeout={350}>
-                <Paper>
-                  {popupContent}
-                </Paper>
-              </Fade>
-            )}
-          </Popper>
+          <Popover
+            {...bindPopover(popupState)}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center'
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center'
+            }}
+          >
+            <Paper>
+              {popupContent}
+            </Paper>
+          </Popover>
         </div>
       )}
     </PopupState>

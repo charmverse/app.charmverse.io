@@ -45,7 +45,15 @@ export default function MultiTabs (props: MultiTabsProps) {
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label='multi tabs'>
-          {tabs.map(([tabLabel]) => <Tab key={tabLabel} label={tabLabel} />)}
+          {tabs.map(([tabLabel]) => (
+            <Tab
+              sx={{
+                textTransform: 'initial'
+              }}
+              key={tabLabel}
+              label={tabLabel}
+            />
+          ))}
         </Tabs>
       </Box>
       {
