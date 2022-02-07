@@ -1,12 +1,11 @@
 import styled from '@emotion/styled';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
-import { ListItem } from '@mui/material';
+import { ListItem, ListItemProps } from '@mui/material';
 import Box from '@mui/material/Box';
-import Emoji from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { Page } from 'models';
-import React, { ChangeEvent, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import BangleEditor from './BangleEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 
@@ -27,7 +26,7 @@ const StyledListItem = styled(ListItem)`
   width: fit-content;
 ` as React.FC<{disableRipple: boolean, button: boolean, children: ReactNode}>;
 
-function PageControlItem (props: {children: ReactNode} & React.HTMLAttributes<HTMLDivElement>) {
+function PageControlItem (props: {children: ReactNode} & ListItemProps) {
   const { children, ...rest } = props;
   return (
     <StyledListItem {...rest} disableRipple button>
@@ -36,27 +35,10 @@ function PageControlItem (props: {children: ReactNode} & React.HTMLAttributes<HT
   );
 }
 
-const Controls = styled.div`
+const Controls = styled(Box)`
   margin-bottom: 4px;
   display: flex;
   gap: ${({ theme }) => theme.spacing(0.5)};
-`;
-
-const PageTitle = styled.input`
-  background: transparent;
-  border: 0 none;
-  color: ${({ theme }) => theme.palette.text.primary};
-  cursor: text;
-  font-size: 40px;
-  font-weight: 700;
-  outline: none;
-`;
-
-const EmojiContainer = styled(Box)`
-  width: fit-content;
-  display: flex;
-  position: relative;
-  left: 220px;
 `;
 
 function randomIntFromInterval (min: number, max: number) {
@@ -64,27 +46,30 @@ function randomIntFromInterval (min: number, max: number) {
 }
 
 export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => void }) {
-  function updateTitle (event: ChangeEvent<HTMLInputElement>) {
-    setPage({ ...page, title: event.target.value });
+
+  let pageControlTop = 0;
+
+  if (page.icon && !page.headerImage) {
+    pageControlTop = 50;
+  }
+
+  if (!page.icon && page.headerImage) {
+    pageControlTop = 10;
+  }
+
+  if (page.icon && page.headerImage) {
+    pageControlTop = 50;
   }
 
   return (
     <Box>
       <PageBanner page={page} setPage={setPage} />
-      {page.icon && (
-        <EmojiContainer sx={{
-          // If there are not page header image, move the icon a bit upward
-          top: !page.headerImage ? -100 : -50
+      <Container>
+        <Controls sx={{
+          position: 'relative',
+          top: pageControlTop
         }}
         >
-          <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-        </EmojiContainer>
-      )}
-      <Container sx={{
-        top: !page.headerImage ? -100 : page.icon ? '-50px' : 10
-      }}
-      >
-        <Controls>
           {!page.icon && (
           <PageControlItem onClick={() => {
             setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
@@ -98,10 +83,11 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
           </PageControlItem>
           )}
           {!page.headerImage && (
-          <PageControlItem onClick={() => {
-            // Charmverse logo
-            setPage({ ...page, headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
-          }}
+          <PageControlItem
+            onClick={() => {
+              // Charmverse logo
+              setPage({ ...page, headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
+            }}
           >
             <ImageIcon
               fontSize='small'
@@ -111,13 +97,8 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
           </PageControlItem>
           )}
         </Controls>
-        <PageTitle
-          placeholder='Untitled'
-          autoFocus
-          value={page.title}
-          onChange={updateTitle}
-        />
-        <BangleEditor content={page.content} />
+
+        <BangleEditor content={page.content} page={page} setPage={setPage} />
       </Container>
     </Box>
   );
