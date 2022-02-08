@@ -96,9 +96,13 @@ interface ImageResizeHandleProps {
   setClientX: React.Dispatch<React.SetStateAction<number>>
   clientX: number,
   position: 'right' | 'left'
+  isDragging: boolean
+  setIsDragging: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function ImageResizeHandle ({ position, imageWidth, setClientX, setImageWidth, clientX }: ImageResizeHandleProps) {
+function ImageResizeHandle (
+  { isDragging, setIsDragging, position, imageWidth, setClientX, setImageWidth, clientX }: ImageResizeHandleProps
+) {
   const sx: Partial<{left: number, right: number}> = {};
 
   if (position === 'left') {
@@ -116,7 +120,15 @@ function ImageResizeHandle ({ position, imageWidth, setClientX, setImageWidth, c
         className='image-resize-handler'
       />
       <StyledImageResizeHandle
+        onDragEnd={() => {
+          if (isDragging) {
+            setIsDragging(false);
+          }
+        }}
         onDrag={(e) => {
+          if (!isDragging) {
+            setIsDragging(true);
+          }
           // Make sure the image is not below 250px, and above 750px
           if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
             let difference = clientX - e.clientX;
@@ -166,6 +178,7 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
   const theme = useTheme();
   const [imageWidth, setImageWidth] = useState(500);
   const [clientX, setClientX] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   if (!node.attrs.src) {
     return (
@@ -184,7 +197,9 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
     clientX,
     imageWidth,
     setClientX,
-    setImageWidth
+    setImageWidth,
+    isDragging,
+    setIsDragging
   };
 
   return (
@@ -202,7 +217,7 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
             cursor: 'col-resize',
             width: imageWidth,
             '&:hover .image-resize-handler': {
-              opacity: 1,
+              opacity: isDragging ? 0 : 1,
               transition: 'opacity 250ms ease-in-out'
             }
           }}
