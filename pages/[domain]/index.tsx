@@ -1,13 +1,13 @@
 import { ReactElement, useEffect } from 'react';
 import { PageLayout } from 'components/common/page-layout';
-import { useTitleState } from 'components/common/page-layout/PageTitle';
+import { usePageTitle } from 'hooks/usePageTitle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 
 export default function IndexPage () {
   const [space] = useCurrentSpace();
-  const [, setTitleState] = useTitleState();
+  const [, setTitleState] = usePageTitle();
   const { pages } = usePages();
   const router = useRouter();
 

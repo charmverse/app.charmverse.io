@@ -2,7 +2,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from 'react
 
 export const TitleContext = createContext(['', (title: string) => {}] as const);
 
-export const useTitleState = () => useContext(TitleContext);
+export const usePageTitle = () => useContext(TitleContext);
 
 export function PageTitleProvider ({ children }: { children: ReactNode }) {
 
@@ -17,7 +17,7 @@ export function PageTitleProvider ({ children }: { children: ReactNode }) {
 
 export const setTitle = (title: string) => {
 
-  const [_, setTitleValue] = useTitleState();
+  const [_, setTitleValue] = usePageTitle();
   useEffect(() => {
     setTitleValue(title);
   }, []);

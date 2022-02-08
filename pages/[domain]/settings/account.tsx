@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import Avatar from 'components/settings/LargeAvatar';
-import { setTitle } from 'components/common/page-layout/PageTitle';
+import { setTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';

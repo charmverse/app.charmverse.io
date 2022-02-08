@@ -7,7 +7,8 @@ import {
   backgroundLightColorDarkMode, blueColor,
   darkBlueColor, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
-  settingsHeaderBackgroundColorDarkMode
+  settingsHeaderBackgroundColorDarkMode,
+  yellowColor
 } from './colors';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme

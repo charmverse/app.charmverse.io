@@ -57,6 +57,7 @@ describe('components/viewTitle', () => {
                     <ViewTitle
                         board={board}
                         readonly={false}
+                        setPage={() => {}}
                     />
                 </ReduxProvider>,
             ))
@@ -73,6 +74,7 @@ describe('components/viewTitle', () => {
                     <ViewTitle
                         board={board}
                         readonly={true}
+                        setPage={() => {}}
                     />
                 </ReduxProvider>,
             ))
@@ -90,6 +92,7 @@ describe('components/viewTitle', () => {
                     <ViewTitle
                         board={board}
                         readonly={false}
+                        setPage={() => {}}
                     />
                 </ReduxProvider>,
             ))
@@ -110,6 +113,7 @@ describe('components/viewTitle', () => {
                     <ViewTitle
                         board={board}
                         readonly={false}
+                        setPage={() => {}}
                     />
                 </ReduxProvider>,
             ))
@@ -130,6 +134,7 @@ describe('components/viewTitle', () => {
                     <ViewTitle
                         board={board}
                         readonly={false}
+                        setPage={() => {}}
                     />
                 </ReduxProvider>,
             ))
@@ -148,6 +153,7 @@ describe('components/viewTitle', () => {
                     <ViewTitle
                         board={board}
                         readonly={false}
+                        setPage={() => {}}
                     />
                 </ReduxProvider>,
             ))

@@ -1,27 +1,14 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Head from 'next/head';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import NotFavoritedIcon from '@mui/icons-material/StarBorder';
-import FavoritedIcon from '@mui/icons-material/Star';
-import MenuIcon from '@mui/icons-material/Menu';
 import { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
-import { useRouter } from 'next/router';
-import Typography from '@mui/material/Typography';
-import { useColorMode } from 'context/color-mode';
 import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import * as React from 'react';
-import Header, { toolbarHeight } from './Header';
-import { useTitleState } from './PageTitle';
+import Header, { headerHeight } from './Header';
 import Sidebar from './Sidebar';
 
 const drawerWidth = 300;
@@ -43,10 +30,7 @@ const closedMixin = (theme: Theme) => ({
   }),
   overflowX: 'hidden',
   marginRight: 60,
-  width: 0// `calc(${theme.spacing(7)} + 1px)`,
-  // [theme.breakpoints.up('sm')]: {
-  //   width: `calc(${theme.spacing(9)} + 1px)`,
-  // },
+  width: 0
 });
 
 const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'open' })
@@ -88,22 +72,15 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' })
     })
   }));
 
-const StyledToolbar = styled(Toolbar)`
-  background-color: ${({ theme }) => theme.palette.background.default};
-  height: ${toolbarHeight}px;
-  min-height: ${toolbarHeight}px;
+const HeaderSpacer = styled.div`
+  min-height: ${headerHeight}px;
 `;
 
 export function PageLayout ({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
-  const [pageTitle] = useTitleState();
-  const theme = useTheme();
-  const colorMode = useColorMode();
   const scrollbarStyling = useScrollbarStyling();
+  const [user] = useUser();
   const { currentPage } = usePages();
-  const [user, setUser] = useUser();
-  const router = useRouter();
-  const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -112,19 +89,6 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  function toggleFavorite () {
-    if (!currentPage || !user) return;
-    const pageId = currentPage.id;
-    setUser({
-      ...user,
-      favorites: isFavorite
-        ? user.favorites.filter(page => page.pageId !== pageId)
-        : [...user.favorites, { pageId: currentPage.id, userId: '' }]
-    });
-  }
-
-  const isPage = router.route.includes('pagePath');
 
   return (
     <>
@@ -135,37 +99,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
       </Head>
       <Box sx={{ display: 'flex', height: '100%' }}>
         <AppBar position='fixed' open={open}>
-          <StyledToolbar variant='dense'>
-            <IconButton
-              color='inherit'
-              aria-label='open drawer'
-              onClick={handleDrawerOpen}
-              edge='start'
-              sx={{
-                marginRight: '36px',
-                ...(open && { display: 'none' })
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography noWrap component='div' sx={{ flexGrow: 1, fontWeight: 500 }}>
-              {pageTitle}
-            </Typography>
-            {/** favorite toggle */}
-            {isPage && (
-            <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
-              <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
-                {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
-              </IconButton>
-            </Tooltip>
-            )}
-            {/** dark mode toggle */}
-            <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
-              <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-                {theme.palette.mode === 'dark' ? <Brightness7Icon color='secondary' /> : <Brightness4Icon color='secondary' />}
-              </IconButton>
-            </Tooltip>
-          </StyledToolbar>
+          <Header open={open} openSidebar={handleDrawerOpen} />
         </AppBar>
         <Drawer variant='permanent' open={open}>
           <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
@@ -177,7 +111,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
         }}
         >
           <Box component='main' sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Header />
+            <HeaderSpacer />
             {children}
           </Box>
         </Box>
