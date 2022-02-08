@@ -92,7 +92,7 @@ function EmojiContainer (
       sx={{
         width: 'fit-content',
         display: 'flex',
-        position: 'relative',
+        position: 'absolute',
         top
       }}
       ref={ref}
@@ -184,7 +184,7 @@ export default function BangleEditor (
   if (page.icon && !page.headerImage) {
     pageTitleTop = 100;
     bangleEditorTop = 125;
-    pageIconTop = -150;
+    pageIconTop = -75;
   }
 
   if (!page.icon && page.headerImage) {
@@ -194,7 +194,7 @@ export default function BangleEditor (
   if (page.icon && page.headerImage) {
     pageTitleTop = 50;
     bangleEditorTop = 125;
-    pageIconTop = -100;
+    pageIconTop = -60;
   }
 
   return (
