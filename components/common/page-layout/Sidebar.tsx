@@ -59,6 +59,20 @@ const WorkspaceLabel = styled.div`
   }
 `;
 
+const BountyLabel = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  cursor: pointer;
+  .add-a-page {
+    display: flex;
+    position: absolute;
+    right: 8px;
+    top: 0px;
+  }
+`;
+
 const SidebarContainer = styled.div`
   display: flex;
   background-color: ${({ theme }) => theme.palette.sidebar.background};
@@ -252,21 +266,28 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             />
           </Box>
         </Box>
-        {/* //xtungvo TODO: Put a bounty item here  */}
+        <Link href={`/${space.domain}/bounty`}>
+          <BountyLabel>
+            <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
+              {/* //xtungvo TODO: styling this later */}
+              $ Bounties
+            </Typography>
+          </BountyLabel>
+        </Link>
         <Box>
           <Divider />
           <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
             {user && (
-            <Box display='flex' alignItems='center'>
-              <Avatar name={user.username} />
-              <Box pl={1}>
-                <Typography variant='caption' sx={{ display: 'block' }}>
-                  <strong>{user.username}</strong>
-                  <br />
-                  {shortenHex(user.addresses[0])}
-                </Typography>
+              <Box display='flex' alignItems='center'>
+                <Avatar name={user.username} />
+                <Box pl={1}>
+                  <Typography variant='caption' sx={{ display: 'block' }}>
+                    <strong>{user.username}</strong>
+                    <br />
+                    {shortenHex(user.addresses[0])}
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
             )}
             <Link href={`/${space.domain}/settings/account`}>
               <IconButton>
