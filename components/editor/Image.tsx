@@ -120,7 +120,26 @@ function ImageResizeHandle ({ position, imageWidth, setClientX, setImageWidth, c
           // Make sure the image is not below 250px, and above 750px
           if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
             if (clientX !== e.clientX) {
-              let newImageWidth = imageWidth + (e.clientX - clientX);
+              let newImageWidth = imageWidth;
+              const difference = clientX - e.clientX;
+              if (position === 'right') {
+                // Increasing image size
+                if (difference < 0) {
+                  newImageWidth -= difference;
+                }
+                else {
+                  newImageWidth -= difference;
+                }
+              }
+              else if (position === 'left') {
+                // Increasing
+                if (difference > 0) {
+                  newImageWidth += difference;
+                }
+                else {
+                  newImageWidth += difference;
+                }
+              }
               if (newImageWidth < MIN_IMAGE_WIDTH) {
                 newImageWidth = MIN_IMAGE_WIDTH;
               }
