@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 import styled from '@emotion/styled';
+import { useWeb3React } from '@web3-react/core';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 
@@ -18,6 +19,7 @@ export const Container = styled(Box)`
 export default function SplashImage () {
 
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+  const { account } = useWeb3React();
 
   return (
     <Container px={3}>
@@ -41,7 +43,7 @@ export default function SplashImage () {
                 fontSize: { xs: 30, md: 48 },
                 fontWeight: 'bold',
                 lineHeight: '1.1em',
-                mt: { xs: 3, md: '140px' },
+                mt: { xs: 3, md: '100px' },
                 mb: 3
               }}
             >
@@ -53,9 +55,15 @@ export default function SplashImage () {
             <Typography sx={{ fontSize: 20, mb: 6 }}>
               Tasks, docs, and more
             </Typography>
-            <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
-              Connect Wallet
-            </PrimaryButton>
+            {account ? (
+              <PrimaryButton size='large' href='/'>
+                Go to Workspace
+              </PrimaryButton>
+            ) : (
+              <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
+                Connect Wallet
+              </PrimaryButton>
+            )}
           </Box>
         </Grid>
         <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>
