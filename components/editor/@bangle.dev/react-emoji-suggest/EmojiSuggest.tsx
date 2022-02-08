@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ListItem, Typography, useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
-import { GetEmojiGroupsType, selectEmoji } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
+import { GetEmojiGroupsType, getSuggestTooltipKey, selectEmoji } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { getEmojiByAlias } from 'components/editor/EmojiSuggest';
 import GroupLabel from 'components/editor/GroupLabel';
 import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
@@ -112,7 +112,7 @@ export function EmojiSuggestContainer({
   maxItems: number;
   insideCallout: boolean,
   updateAttrs: UpdateAttrsFunction,
-  onClick: (icon: string) => void,
+  onClick: (icon: string | null) => void,
   insidePageIcon: boolean
 }) {
   const emojiGroups = useMemo(
@@ -151,10 +151,21 @@ export function EmojiSuggestContainer({
     <div
       className="bangle-emoji-suggest-container"
       style={{
-        width: containerWidth + (parseInt(theme.spacing(1).replace("px", "")) * 2),
+        width: containerWidth + (parseInt(theme.spacing(2).replace("px", "")) * 2),
       }}
     >
-      {insidePageIcon && !insideCallout && <Box sx={{
+      {insidePageIcon && !insideCallout && <Box onClick={() => {
+        // Set the page icon to be null
+        onClick(null)
+        // Hide the emoji suggest
+        if (view.dispatch!) {
+          const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
+          view.dispatch(
+            // Chain transactions together
+            view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
+          );
+        }
+      }} sx={{
         width: "fit-content",
       }}>
         <ListItem button disableRipple sx={{
