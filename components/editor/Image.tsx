@@ -10,6 +10,9 @@ import { Box, ListItem, Typography } from '@mui/material';
 import { HTMLAttributes, useState } from 'react';
 import ImageSelector from './ImageSelector';
 
+const MAX_IMAGE_WIDTH = 750; const
+  MIN_IMAGE_WIDTH = 250;
+
 const StyledImageContainer = styled.div<{ align?: string }>`
   display: flex;
   justify-content: ${props => props.align};
@@ -71,6 +74,20 @@ const StyledImage = styled.img`
   &:hover {
     cursor: initial;
   }
+  border-radius: ${({ theme }) => theme.spacing(1)};
+`;
+
+const ImageResizeHandle = styled(Box)`
+  width: 7.5px;
+  height: 75px;
+  border-radius: ${({ theme }) => theme.spacing(2)};
+  border: 2px solid ${({ theme }) => theme.palette.primary.main};
+  background-color: ${({ theme }) => theme.palette.background.dark};
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 250ms ease-in-out;
 `;
 
 export function Image ({ node, updateAttrs }: NodeViewProps) {
@@ -101,47 +118,66 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
       <div className='content' style={{ position: 'relative' }}>
         { /* eslint-disable-next-line */}
         <Box 
-          draggable
-          onDrag={(e) => {
-            // Make sure the image is not below 250px, and above 750px
-            if (imageWidth >= 250 && imageWidth <= 750) {
-              setClientX((clientX) => {
-                let newImageWidth = imageWidth + (e.clientX - (clientX ?? e.clientX));
-                if (newImageWidth < 250) {
-                  newImageWidth = 250;
-                }
-                else if (newImageWidth > 750) {
-                  newImageWidth = 750;
-                }
-                setImageWidth(newImageWidth);
-                return e.clientX;
-              });
-            }
-          }}
           sx={{
             position: 'relative',
             cursor: 'col-resize',
-            padding: theme.spacing(0, 0.5),
-            width: imageWidth
+            width: imageWidth,
+            '&:hover .image-resize-handler': {
+              opacity: 1,
+              transition: 'opacity 250ms ease-in-out'
+            }
           }}
         >
-          <Box sx={{
-            '&:hover': {
-              borderLeft: '7.5px solid rgba(0,0,0, 0.5)',
-              borderRight: '7.5px solid rgba(0,0,0, 0.5)'
-            },
-            position: 'absolute',
-            // precise width and height measurement to keep the resize handler same dimension as that of image
-            width: 'calc(100% + 5px)',
-            height: 'calc(100% - 8.25px)',
-            left: '50%',
-            transform: 'translateX(-50%)'
-          }}
+          <ImageResizeHandle
+            className='image-resize-handler'
+            onDrag={(e) => {
+              // Make sure the image is not below 250px, and above 750px
+              if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
+                setClientX((clientX) => {
+                  let newImageWidth = imageWidth + (e.clientX - (clientX ?? e.clientX));
+                  if (newImageWidth < MIN_IMAGE_WIDTH) {
+                    newImageWidth = MIN_IMAGE_WIDTH;
+                  }
+                  else if (newImageWidth > MAX_IMAGE_WIDTH) {
+                    newImageWidth = MAX_IMAGE_WIDTH;
+                  }
+                  setImageWidth(newImageWidth);
+                  return e.clientX;
+                });
+              }
+            }}
+            draggable
+            sx={{
+              left: 15
+            }}
           />
           <StyledImage
             draggable={false}
             src={node.attrs.src}
             alt={node.attrs.alt}
+          />
+          <ImageResizeHandle
+            className='image-resize-handler'
+            onDrag={(e) => {
+              // Make sure the image is not below 250px, and above 750px
+              if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
+                setClientX((clientX) => {
+                  let newImageWidth = imageWidth + (e.clientX - (clientX ?? e.clientX));
+                  if (newImageWidth < MIN_IMAGE_WIDTH) {
+                    newImageWidth = MIN_IMAGE_WIDTH;
+                  }
+                  else if (newImageWidth > MAX_IMAGE_WIDTH) {
+                    newImageWidth = MAX_IMAGE_WIDTH;
+                  }
+                  setImageWidth(newImageWidth);
+                  return e.clientX;
+                });
+              }
+            }}
+            draggable
+            sx={{
+              right: 15
+            }}
           />
         </Box>
         <Controls className='controls'>
