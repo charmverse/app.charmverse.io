@@ -74,6 +74,7 @@ const StyledImage = styled.img`
   &:hover {
     cursor: initial;
   }
+  box-shadow: ${({ theme }) => theme.shadows[3]};
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
@@ -81,7 +82,6 @@ const ImageResizeHandle = styled(Box)`
   width: 7.5px;
   height: 75px;
   border-radius: ${({ theme }) => theme.spacing(2)};
-  border: 2px solid ${({ theme }) => theme.palette.primary.main};
   background-color: ${({ theme }) => theme.palette.background.dark};
   position: absolute;
   top: 50%;
@@ -94,7 +94,7 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
   const [align, setAlign] = useState('center');
   const theme = useTheme();
   const [imageWidth, setImageWidth] = useState(500);
-  const [_, setClientX] = useState<null | number>(null);
+  const [clientX, setClientX] = useState<number>(0);
 
   if (!node.attrs.src) {
     return (
@@ -129,12 +129,17 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
           }}
         >
           <ImageResizeHandle
+            sx={{
+              left: 15
+            }}
             className='image-resize-handler'
+          />
+          <ImageResizeHandle
             onDrag={(e) => {
               // Make sure the image is not below 250px, and above 750px
               if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
-                setClientX((clientX) => {
-                  let newImageWidth = imageWidth + (e.clientX - (clientX ?? e.clientX));
+                if (clientX !== e.clientX) {
+                  let newImageWidth = imageWidth + (e.clientX - clientX);
                   if (newImageWidth < MIN_IMAGE_WIDTH) {
                     newImageWidth = MIN_IMAGE_WIDTH;
                   }
@@ -142,8 +147,9 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
                     newImageWidth = MAX_IMAGE_WIDTH;
                   }
                   setImageWidth(newImageWidth);
-                  return e.clientX;
-                });
+
+                  setClientX(e.clientX);
+                }
               }
             }}
             draggable
@@ -156,13 +162,21 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
             src={node.attrs.src}
             alt={node.attrs.alt}
           />
+          {/** Adding ImageResizeHandle to hide image ghost while dragging  */}
+          <ImageResizeHandle
+            sx={{
+              right: 15
+            }}
+            className='image-resize-handler'
+          />
           <ImageResizeHandle
             className='image-resize-handler'
             onDrag={(e) => {
               // Make sure the image is not below 250px, and above 750px
               if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
-                setClientX((clientX) => {
-                  let newImageWidth = imageWidth + (e.clientX - (clientX ?? e.clientX));
+                // If we are not dragging, no need to update the state
+                if (clientX !== e.clientX) {
+                  let newImageWidth = imageWidth + (e.clientX - clientX);
                   if (newImageWidth < MIN_IMAGE_WIDTH) {
                     newImageWidth = MIN_IMAGE_WIDTH;
                   }
@@ -170,8 +184,9 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
                     newImageWidth = MAX_IMAGE_WIDTH;
                   }
                   setImageWidth(newImageWidth);
-                  return e.clientX;
-                });
+
+                  setClientX(e.clientX);
+                }
               }
             }}
             draggable
