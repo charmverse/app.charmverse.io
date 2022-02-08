@@ -119,9 +119,11 @@ function ImageResizeHandle ({ position, imageWidth, setClientX, setImageWidth, c
         onDrag={(e) => {
           // Make sure the image is not below 250px, and above 750px
           if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
+            let difference = clientX - e.clientX;
+            // Making sure the difference isn't too abrupt clipping the difference to a limit
+            difference = difference < -5 ? -5 : difference > 5 ? 5 : difference;
             if (clientX !== e.clientX) {
               let newImageWidth = imageWidth;
-              const difference = clientX - e.clientX;
               if (position === 'right') {
                 // Increasing image size
                 if (difference < 0) {
