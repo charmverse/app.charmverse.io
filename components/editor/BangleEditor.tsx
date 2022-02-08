@@ -26,6 +26,7 @@ import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu
 import { PageContent } from 'models';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
+import { cryptoPriceSpec, CryptoPrice } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
@@ -52,7 +53,8 @@ const specRegistry = new SpecRegistry([
   tableCell,
   tableHeader,
   tableRow,
-  blockQuoteSpec()
+  blockQuoteSpec(),
+  cryptoPriceSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
@@ -114,6 +116,11 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
       renderNodeViews={({ children, ...props }) => {
         // eslint-disable-next-line
         switch (props.node.type.name) {
+          case 'cryptoPrice': {
+            return (
+              <CryptoPrice />
+            );
+          }
           case 'blockquote': {
             return (
               <BlockQuote {...props}>
