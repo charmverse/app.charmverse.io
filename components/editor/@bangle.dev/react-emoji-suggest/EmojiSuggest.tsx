@@ -4,6 +4,7 @@ import { PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { getSquareDimensions, resolveCounter } from '@bangle.dev/react-emoji-suggest/utils';
 import styled from '@emotion/styled';
+import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ListItem, Typography, useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -126,6 +127,7 @@ export function EmojiSuggestContainer({
   });
   const theme = useTheme();
   const scrollbarStyling = useScrollbarStyling();
+  const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
 
   const { item: activeItem } = resolveCounter(counter, emojiGroups);
   const onSelectEmoji = useCallback(
@@ -139,7 +141,13 @@ export function EmojiSuggestContainer({
       } else {
         selectEmoji(emojiSuggestKey, emojiAlias)(view.state, view.dispatch, view);
       }
+      // Hide the tooltip on clicking an emoji if we are setting emoji for page icon
 
+      if (view.dispatch! && insidePageIcon && !insideCallout) {
+        view.dispatch(
+          view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
+        );
+      }
       view.dispatch(
         view.state.tr.setMeta(emojiSuggestKey, { type: "OUTSIDE_CALLOUT" })
       )
@@ -154,23 +162,24 @@ export function EmojiSuggestContainer({
         width: containerWidth + (parseInt(theme.spacing(2).replace("px", "")) * 2),
       }}
     >
-      {insidePageIcon && !insideCallout && <Box onClick={() => {
-        // Set the page icon to be null
-        onClick(null)
-        // Hide the emoji suggest
-        if (view.dispatch!) {
-          const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
-          view.dispatch(
-            // Chain transactions together
-            view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
-          );
-        }
-      }} sx={{
+      <Box sx={{
         width: "fit-content",
+        display: "flex",
+        justifyContent: "space-between"
       }}>
-        <ListItem button disableRipple sx={{
+        {insidePageIcon && !insideCallout && <ListItem onClick={() => {
+          // Set the page icon to be null
+          onClick(null)
+          // Hide the emoji suggest
+          if (view.dispatch!) {
+            view.dispatch(
+              // Chain transactions together
+              view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
+            );
+          }
+        }} button disableRipple sx={{
           padding: theme.spacing(0.5),
-          marginTop: theme.spacing(1),
+          margin: theme.spacing(1, 0, 0, 1),
           borderRadius: theme.spacing(0.5)
         }}>
           <DeleteIcon sx={{
@@ -180,13 +189,38 @@ export function EmojiSuggestContainer({
           <Typography sx={{
             fontSize: 14,
             opacity: 0.75,
-            fontWeight: 700
+            fontWeight: 700,
           }}>
             Remove
           </Typography>
+        </ListItem>}
+        <ListItem onClick={() => {
+          // Hide the emoji suggest
+          if (view.dispatch!) {
+            view.dispatch(
+              // Chain transactions together
+              view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
+            );
+          }
+        }} button disableRipple sx={{
+          padding: theme.spacing(0.5),
+          margin: theme.spacing(1, 0, 0, 1),
+          borderRadius: theme.spacing(0.5)
+        }}>
+          <CancelIcon sx={{
+            fontSize: 18,
+            marginRight: theme.spacing(0.5)
+          }}/>
+          <Typography sx={{
+            fontSize: 14,
+            opacity: 0.75,
+            fontWeight: 700,
+          }}>
+            Close
+          </Typography>
         </ListItem>
-      </Box>}
-      <Box sx={{...scrollbarStyling, height: 320, overflowX: "hidden"}}>
+      </Box>
+      <Box sx={{...scrollbarStyling, height: insidePageIcon && !insideCallout ? 320 : 400, overflowX: "hidden"}}>
         {emojiGroups.map(({ name: groupName, emojis }, i) => {
           return (
             <Box p={1} className="bangle-emoji-suggest-group" key={groupName || i}>
