@@ -10,7 +10,6 @@ const StyledPageBanner = styled(Box)`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 200px;
   position: relative;
 
   img {
@@ -51,7 +50,10 @@ export default function PageBanner ({ page, setPage }: { page: Page, setPage: (p
   const theme = useTheme();
 
   return (
-    <StyledPageBanner>
+    <StyledPageBanner sx={{
+      height: page.headerImage ? 200 : 100
+    }}
+    >
       {page.headerImage
     && (
     <>

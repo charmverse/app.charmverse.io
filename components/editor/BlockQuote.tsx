@@ -55,10 +55,20 @@ export function BlockQuote ({ children, node, updateAttrs, view, getPos }: NodeV
             e.stopPropagation();
             if (view.dispatch!) {
               const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
-              view.dispatch(
-                // Chain transactions together
-                view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_CALLOUT', updateAttrs, getPos }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
-              );
+              const emojiSuggestState = emojiSuggestKey.getState(view.state);
+              // If we are already inside a callout we need to hide the emoji palette
+              if (emojiSuggestState.insideCallout) {
+                view.dispatch(
+                  // Chain transactions together
+                  view.state.tr.setMeta(emojiSuggestKey, { type: 'OUTSIDE_CALLOUT', updateAttrs, getPos }).setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
+                );
+              }
+              else {
+                view.dispatch(
+                  // Chain transactions together
+                  view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_CALLOUT', updateAttrs, getPos }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
+                );
+              }
             }
           }}
         >
