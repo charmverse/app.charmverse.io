@@ -76,7 +76,6 @@ const StyledImage = styled.img`
 export function Image ({ node, updateAttrs }: NodeViewProps) {
   const [align, setAlign] = useState('center');
   const theme = useTheme();
-  const [embedLink, setEmbedLink] = useState('');
   const [imageWidth, setImageWidth] = useState(500);
   const [_, setClientX] = useState<null | number>(null);
 
@@ -104,10 +103,20 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
         <Box 
           draggable
           onDrag={(e) => {
-            setClientX((clientX) => {
-              setImageWidth(imageWidth + (e.clientX - (clientX ?? e.clientX)));
-              return e.clientX;
-            });
+            // Make sure the image is not below 250px, and above 750px
+            if (imageWidth >= 250 && imageWidth <= 750) {
+              setClientX((clientX) => {
+                let newImageWidth = imageWidth + (e.clientX - (clientX ?? e.clientX));
+                if (newImageWidth < 250) {
+                  newImageWidth = 250;
+                }
+                else if (newImageWidth > 750) {
+                  newImageWidth = 750;
+                }
+                setImageWidth(newImageWidth);
+                return e.clientX;
+              });
+            }
           }}
           sx={{
             position: 'relative',
@@ -118,8 +127,8 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
         >
           <Box sx={{
             '&:hover': {
-              borderLeft: '7.5px solid rgba(0,0,0, 0.25)',
-              borderRight: '7.5px solid rgba(0,0,0, 0.25)'
+              borderLeft: '7.5px solid rgba(0,0,0, 0.5)',
+              borderRight: '7.5px solid rgba(0,0,0, 0.5)'
             },
             position: 'absolute',
             // precise width and height measurement to keep the resize handler same dimension as that of image
