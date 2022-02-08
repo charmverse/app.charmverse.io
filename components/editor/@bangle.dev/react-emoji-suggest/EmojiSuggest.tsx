@@ -4,7 +4,8 @@ import { PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { getSquareDimensions, resolveCounter } from '@bangle.dev/react-emoji-suggest/utils';
 import styled from '@emotion/styled';
-import { useTheme } from '@mui/material';
+import DeleteIcon from "@mui/icons-material/Delete";
+import { ListItem, Typography, useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
 import { GetEmojiGroupsType, selectEmoji } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { getEmojiByAlias } from 'components/editor/EmojiSuggest';
@@ -15,8 +16,7 @@ import reactDOM from 'react-dom';
 
 const StyledEmojiSuggest = styled(Box)`
   height: 350px;
-  overflow: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   width: fit-content;
   background-color: ${({ theme }) => theme.palette.background.light};
   border-radius: ${({ theme }) => theme.spacing(0.5)}
@@ -48,11 +48,10 @@ export function EmojiSuggest({
     triggerText,
     show: isVisible,
   } = usePluginState(suggestTooltipKey);
-  const scrollbarStyling = useScrollbarStyling();
   const width = rowWidth + (parseInt(theme.spacing(1).replace("px", "")) * 2);
 
   return reactDOM.createPortal(
-    <StyledEmojiSuggest className="bangle-emoji-suggest" sx={scrollbarStyling}>
+    <StyledEmojiSuggest className="bangle-emoji-suggest">
       <div
         style={{
           width,
@@ -126,6 +125,7 @@ export function EmojiSuggestContainer({
     squareSide,
   });
   const theme = useTheme();
+  const scrollbarStyling = useScrollbarStyling();
 
   const { item: activeItem } = resolveCounter(counter, emojiGroups);
   const onSelectEmoji = useCallback(
@@ -154,37 +154,60 @@ export function EmojiSuggestContainer({
         width: containerWidth + (parseInt(theme.spacing(1).replace("px", "")) * 2),
       }}
     >
-      {emojiGroups.map(({ name: groupName, emojis }, i) => {
-        return (
-          <Box p={1} className="bangle-emoji-suggest-group" key={groupName || i}>
-            <GroupLabel sx={{
-              margin: 1
-            }} label={groupName} />
-            <Box sx={{
-              marginBottom: 1.5,
-              borderBottom: `1px solid ${theme.palette.divider}`
-            }}>
-              {emojis.slice(0, maxItems).map(([emojiAlias, emoji]) => (
-                <EmojiSquare
-                  key={emojiAlias}
-                  isSelected={activeItem?.[0] === emojiAlias}
-                  emoji={emoji}
-                  emojiAlias={emojiAlias}
-                  onSelectEmoji={onSelectEmoji}
-                  selectedEmojiSquareId={selectedEmojiSquareId}
-                  style={{
-                    margin: squareMargin,
-                    width: squareSide,
-                    height: squareSide,
-                    lineHeight: squareSide + 'px',
-                    fontSize: Math.max(squareSide - 10, 4),
-                  }}
-                />
-              ))}
+      {insidePageIcon && !insideCallout && <Box sx={{
+        width: "fit-content",
+      }}>
+        <ListItem button disableRipple sx={{
+          padding: theme.spacing(0.5),
+          marginTop: theme.spacing(1),
+          borderRadius: theme.spacing(0.5)
+        }}>
+          <DeleteIcon sx={{
+            fontSize: 18,
+            marginRight: theme.spacing(0.5)
+          }}/>
+          <Typography sx={{
+            fontSize: 14,
+            opacity: 0.75,
+            fontWeight: 700
+          }}>
+            Remove
+          </Typography>
+        </ListItem>
+      </Box>}
+      <Box sx={{...scrollbarStyling, height: 320, overflowX: "hidden"}}>
+        {emojiGroups.map(({ name: groupName, emojis }, i) => {
+          return (
+            <Box p={1} className="bangle-emoji-suggest-group" key={groupName || i}>
+              <GroupLabel sx={{
+                margin: 1
+              }} label={groupName} />
+              <Box sx={{
+                marginBottom: 1.5,
+                borderBottom: `1px solid ${theme.palette.divider}`
+              }}>
+                {emojis.slice(0, maxItems).map(([emojiAlias, emoji]) => (
+                  <EmojiSquare
+                    key={emojiAlias}
+                    isSelected={activeItem?.[0] === emojiAlias}
+                    emoji={emoji}
+                    emojiAlias={emojiAlias}
+                    onSelectEmoji={onSelectEmoji}
+                    selectedEmojiSquareId={selectedEmojiSquareId}
+                    style={{
+                      margin: squareMargin,
+                      width: squareSide,
+                      height: squareSide,
+                      lineHeight: squareSide + 'px',
+                      fontSize: Math.max(squareSide - 10, 4),
+                    }}
+                  />
+                ))}
+              </Box>
             </Box>
-          </Box>
-        );
-      })}
+          );
+        })}
+      </Box>
     </div>
   );
 }
