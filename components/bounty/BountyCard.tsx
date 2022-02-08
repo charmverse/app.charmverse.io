@@ -1,8 +1,8 @@
 import Box from '@mui/material/Box';
-import styled from '@emotion/styled';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
 
 interface BountyCardProps {
   // TODO: define the key later
@@ -14,7 +14,12 @@ interface BountyCardProps {
   type: string;
 }
 
-export default function BountyCard ({ id, title, status, type }: BountyCardProps) {
+export default function BountyCard ({
+  id,
+  title,
+  status,
+  type
+}: BountyCardProps) {
   return (
     <Box
       key={id}
@@ -23,7 +28,6 @@ export default function BountyCard ({ id, title, status, type }: BountyCardProps
         height: 228,
         borderRadius: 10,
         border: '1px solid'
-        // backgroundColor: 'red'
       }}
     >
       {title}
@@ -31,9 +35,7 @@ export default function BountyCard ({ id, title, status, type }: BountyCardProps
         <Chip label={status} />
         <Chip label={type} />
       </Stack>
-      <Button>
-        APPLY
-      </Button>
+      <Button>APPLY</Button>
     </Box>
   );
 }

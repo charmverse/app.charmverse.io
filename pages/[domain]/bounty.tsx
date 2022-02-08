@@ -2,6 +2,7 @@ import { PageLayout } from 'components/common/page-layout';
 import BountyCard from 'components/bounty/BountyCard';
 import FloatButton from 'components/bounty/FloatButton';
 import Grid from '@mui/material/Grid';
+import Modal from '@mui/material/Modal';
 
 import { ReactElement } from 'react';
 

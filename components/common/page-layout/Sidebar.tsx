@@ -65,12 +65,7 @@ const BountyLabel = styled.div`
   justify-content: space-between;
   position: relative;
   cursor: pointer;
-  .add-a-page {
-    display: flex;
-    position: absolute;
-    right: 8px;
-    top: 0px;
-  }
+  margin-top: 8px;
 `;
 
 const SidebarContainer = styled.div`
@@ -224,56 +219,58 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       </WorkspacesContainer>
       <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
         <Box sx={{ flexGrow: 1 }}>
-          <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
-            <SidebarHeader>
-              <Typography><strong>{space.name}</strong></Typography>
-              <IconButton onClick={closeSidebar}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </SidebarHeader>
-            <Divider sx={{ mb: 3 }} />
-            {favoritePageIds.length > 0 && (
-              <Box mb={2}>
+          <Box sx={{ flexGrow: 1 }}>
+            <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
+              <SidebarHeader>
+                <Typography><strong>{space.name}</strong></Typography>
+                <IconButton onClick={closeSidebar}>
+                  <ChevronLeftIcon />
+                </IconButton>
+              </SidebarHeader>
+              <Divider sx={{ mb: 3 }} />
+              {favoritePageIds.length > 0 && (
+                <Box mb={2}>
+                  <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
+                    FAVORITES
+                  </Typography>
+                  <PageNavigation
+                    isFavorites={true}
+                    pages={pages}
+                    spaceId={space.id}
+                    pathPrefix={`/${space.domain}`}
+                    rootPageIds={favoritePageIds}
+                    setPages={setPages}
+                    addPage={addPage}
+                  />
+                </Box>
+              )}
+              <WorkspaceLabel>
                 <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
-                  FAVORITES
+                  WORKSPACE
                 </Typography>
-                <PageNavigation
-                  isFavorites={true}
-                  pages={pages}
-                  spaceId={space.id}
-                  pathPrefix={`/${space.domain}`}
-                  rootPageIds={favoritePageIds}
-                  setPages={setPages}
-                  addPage={addPage}
-                />
-              </Box>
-            )}
-            <WorkspaceLabel>
-              <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
-                WORKSPACE
-              </Typography>
-              <div className='add-a-page'>
-                <NewPageMenu tooltip='Add a page' addPage={addPage} />
-              </div>
-            </WorkspaceLabel>
-            <PageNavigation
-              pages={pages}
-              spaceId={space.id}
-              pathPrefix={`/${space.domain}`}
-              setPages={setPages}
-              addPage={addPage}
-              deletePage={deletePage}
-            />
+                <div className='add-a-page'>
+                  <NewPageMenu tooltip='Add a page' addPage={addPage} />
+                </div>
+              </WorkspaceLabel>
+              <PageNavigation
+                pages={pages}
+                spaceId={space.id}
+                pathPrefix={`/${space.domain}`}
+                setPages={setPages}
+                addPage={addPage}
+                deletePage={deletePage}
+              />
+            </Box>
           </Box>
+          <Link href={`/${space.domain}/bounty`}>
+            <BountyLabel>
+              <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
+                {/* //xtungvo TODO: styling this later */}
+                $ BOUNTIES
+              </Typography>
+            </BountyLabel>
+          </Link>
         </Box>
-        <Link href={`/${space.domain}/bounty`}>
-          <BountyLabel>
-            <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
-              {/* //xtungvo TODO: styling this later */}
-              $ Bounties
-            </Typography>
-          </BountyLabel>
-        </Link>
         <Box>
           <Divider />
           <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
