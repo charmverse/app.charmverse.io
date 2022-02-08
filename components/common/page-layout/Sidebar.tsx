@@ -252,6 +252,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             />
           </Box>
         </Box>
+        {/* //xtungvo TODO: Put a bounty item here  */}
         <Box>
           <Divider />
           <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
