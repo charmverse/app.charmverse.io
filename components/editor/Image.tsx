@@ -7,7 +7,7 @@ import AlignHorizontalRightIcon from '@mui/icons-material/AlignHorizontalRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
-import { HTMLAttributes, useState } from 'react';
+import React, { HTMLAttributes, useState } from 'react';
 import ImageSelector from './ImageSelector';
 
 const MAX_IMAGE_WIDTH = 750; const
@@ -78,7 +78,7 @@ const StyledImage = styled.img`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-const ImageResizeHandle = styled(Box)`
+const StyledImageResizeHandle = styled(Box)`
   width: 7.5px;
   height: 75px;
   border-radius: ${({ theme }) => theme.spacing(2)};
@@ -89,6 +89,56 @@ const ImageResizeHandle = styled(Box)`
   opacity: 0;
   transition: opacity 250ms ease-in-out;
 `;
+
+interface ImageResizeHandleProps {
+  imageWidth: number
+  setImageWidth: React.Dispatch<React.SetStateAction<number>>
+  setClientX: React.Dispatch<React.SetStateAction<number>>
+  clientX: number,
+  position: 'right' | 'left'
+}
+
+function ImageResizeHandle ({ position, imageWidth, setClientX, setImageWidth, clientX }: ImageResizeHandleProps) {
+  const sx: Partial<{left: number, right: number}> = {};
+
+  if (position === 'left') {
+    sx.left = 15;
+  }
+  else {
+    sx.right = 15;
+  }
+
+  return (
+    <>
+      {/** Adding StyledImageResizeHandle twice to hide image ghost while dragging  */}
+      <StyledImageResizeHandle
+        sx={sx}
+        className='image-resize-handler'
+      />
+      <StyledImageResizeHandle
+        onDrag={(e) => {
+          // Make sure the image is not below 250px, and above 750px
+          if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
+            if (clientX !== e.clientX) {
+              let newImageWidth = imageWidth + (e.clientX - clientX);
+              if (newImageWidth < MIN_IMAGE_WIDTH) {
+                newImageWidth = MIN_IMAGE_WIDTH;
+              }
+              else if (newImageWidth > MAX_IMAGE_WIDTH) {
+                newImageWidth = MAX_IMAGE_WIDTH;
+              }
+              setImageWidth(newImageWidth);
+
+              setClientX(e.clientX);
+            }
+          }
+        }}
+        draggable
+        sx={sx}
+      />
+    </>
+  );
+}
 
 export function Image ({ node, updateAttrs }: NodeViewProps) {
   const [align, setAlign] = useState('center');
@@ -108,6 +158,14 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
       </ImageSelector>
     );
   }
+
+  const imageResizeHandleProps: Omit<ImageResizeHandleProps, 'position'> = {
+    clientX,
+    imageWidth,
+    setClientX,
+    setImageWidth
+  };
+
   return (
     <StyledImageContainer
       align={align}
@@ -128,72 +186,13 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
             }
           }}
         >
-          <ImageResizeHandle
-            sx={{
-              left: 15
-            }}
-            className='image-resize-handler'
-          />
-          <ImageResizeHandle
-            onDrag={(e) => {
-              // Make sure the image is not below 250px, and above 750px
-              if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
-                if (clientX !== e.clientX) {
-                  let newImageWidth = imageWidth + (e.clientX - clientX);
-                  if (newImageWidth < MIN_IMAGE_WIDTH) {
-                    newImageWidth = MIN_IMAGE_WIDTH;
-                  }
-                  else if (newImageWidth > MAX_IMAGE_WIDTH) {
-                    newImageWidth = MAX_IMAGE_WIDTH;
-                  }
-                  setImageWidth(newImageWidth);
-
-                  setClientX(e.clientX);
-                }
-              }
-            }}
-            draggable
-            sx={{
-              left: 15
-            }}
-          />
+          <ImageResizeHandle {...imageResizeHandleProps} position='left' />
           <StyledImage
             draggable={false}
             src={node.attrs.src}
             alt={node.attrs.alt}
           />
-          {/** Adding ImageResizeHandle to hide image ghost while dragging  */}
-          <ImageResizeHandle
-            sx={{
-              right: 15
-            }}
-            className='image-resize-handler'
-          />
-          <ImageResizeHandle
-            className='image-resize-handler'
-            onDrag={(e) => {
-              // Make sure the image is not below 250px, and above 750px
-              if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
-                // If we are not dragging, no need to update the state
-                if (clientX !== e.clientX) {
-                  let newImageWidth = imageWidth + (e.clientX - clientX);
-                  if (newImageWidth < MIN_IMAGE_WIDTH) {
-                    newImageWidth = MIN_IMAGE_WIDTH;
-                  }
-                  else if (newImageWidth > MAX_IMAGE_WIDTH) {
-                    newImageWidth = MAX_IMAGE_WIDTH;
-                  }
-                  setImageWidth(newImageWidth);
-
-                  setClientX(e.clientX);
-                }
-              }
-            }}
-            draggable
-            sx={{
-              right: 15
-            }}
-          />
+          <ImageResizeHandle {...imageResizeHandleProps} position='right' />
         </Box>
         <Controls className='controls'>
           {[
