@@ -151,13 +151,13 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     }
   },
   components: {
-    MuiTypography: {
-      styleOverrides: {
-        root: {
-          whiteSpace: 'nowrap'
-        }
-      }
-    },
+    // MuiTypography: {
+    //   styleOverrides: {
+    //     root: {
+    //       whiteSpace: 'nowrap'
+    //     }
+    //   }
+    // },
     MuiCard: {
       styleOverrides: {
         root: {

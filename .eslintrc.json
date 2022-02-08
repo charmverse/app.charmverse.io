@@ -93,13 +93,17 @@
     ],
     "react/jsx-no-bind": "off",
     "react/jsx-props-no-spreading": "off",
+    "react/no-unescaped-entities": "off",
     "react/require-default-props": "off",
     "react/react-in-jsx-scope": "off",
+    "react/self-closing-comp": "off",
     "space-before-function-paren": [
       "error",
       "always"
     ],
     "no-bitwise": "warn",
-    "jsx-a11y/click-events-have-key-events": "off"
+    "jsx-a11y/click-events-have-key-events": "off",
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "error"
   }
 }

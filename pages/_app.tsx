@@ -1,9 +1,13 @@
+import { IntlProvider } from 'react-intl';
+import { Provider as ReduxProvider } from 'react-redux';
 import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { IntlProvider } from 'react-intl';
-import { Provider as ReduxProvider } from 'react-redux';
+import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
+import { Web3ReactProvider } from '@web3-react/core';
+import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { PageTitleProvider, TitleContext } from 'hooks/usePageTitle';
 import RouteGuard from 'components/common/RouteGuard';
 import FocalBoardPortal from 'components/databases/FocalBoardPortal';
@@ -155,6 +159,8 @@ import 'theme/styles.scss';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/focalboard/styles.scss';
 
+const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
+
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement
 }
@@ -237,9 +243,13 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
           <ColorModeContext.Provider value={colorMode}>
             <ThemeProvider theme={theme}>
               <CssBaseline />
-              <RouteGuard>
-                {getLayout(<Component {...pageProps} />)}
-              </RouteGuard>
+              <Web3ReactProvider getLibrary={getLibrary}>
+                <Web3ConnectionManager>
+                  <RouteGuard>
+                    {getLayout(<Component {...pageProps} />)}
+                  </RouteGuard>
+                </Web3ConnectionManager>
+              </Web3ReactProvider>
             </ThemeProvider>
           </ColorModeContext.Provider>
         </DataProviders>

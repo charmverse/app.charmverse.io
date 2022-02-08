@@ -7,6 +7,6 @@ const StyledRoot = styled.div`
 
 export default function RootPortal () {
   return (
-    <StyledRoot id='focalboard-root-portal' className='focalboard-body' />
+    <StyledRoot id='focalboard-root-portal' className='focalboard-body'></StyledRoot>
   );
 }

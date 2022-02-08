@@ -1,9 +1,11 @@
+import { useContext } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 
 import splashImage from 'public/images/charmverse_world.png';
 
@@ -14,6 +16,9 @@ export const Container = styled(Box)`
 `;
 
 export default function SplashImage () {
+
+  const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+
   return (
     <Container px={3}>
       <Grid container>
@@ -48,7 +53,7 @@ export default function SplashImage () {
             <Typography sx={{ fontSize: 20, mb: 6 }}>
               Tasks, docs, and more
             </Typography>
-            <PrimaryButton size='large' href='/charmverse'>
+            <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
               Connect Wallet
             </PrimaryButton>
           </Box>
