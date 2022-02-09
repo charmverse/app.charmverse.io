@@ -1,6 +1,22 @@
-export type CryptoCurrency = 'BTC' | 'ETH' | 'XRP' | 'LTC' | 'BCH' | 'ETC';
+export const CryptoCurrencyList = {
+  BTC: 'Bitcoin',
+  ETH: 'Ether',
+  XRP: 'Ripple',
+  LTC: 'Litecoin',
+  BCH: 'Bitcoin Cash',
+  ETC: 'Ethererum Classic'
+};
 
-export type FiatCurrency = 'USD' | 'GBP' | 'EUR' | 'JPY' | 'ZAR';
+export type CryptoCurrency = keyof typeof CryptoCurrencyList;
+
+export const FiatCurrencyList = {
+  USD: 'US Dollar',
+  GBP: 'British Pound Sterling',
+  EUR: 'Euro',
+  JPY: 'Japanese Yen'
+};
+
+export type FiatCurrency = keyof typeof FiatCurrencyList;
 
 export type Currency = CryptoCurrency | FiatCurrency;
 
