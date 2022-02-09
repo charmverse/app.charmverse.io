@@ -1,11 +1,9 @@
-import { useContext, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useContext } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 import styled from '@emotion/styled';
-import { useWeb3React } from '@web3-react/core';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 
@@ -17,16 +15,9 @@ export const Container = styled(Box)`
   margin: 0 auto;
 `;
 
-export default function LoginPageContent () {
+export default function LoginPageContent ({ account }: { account: string | null | undefined }) {
 
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
-  const { account } = useWeb3React();
-  const router = useRouter();
-  useEffect(() => {
-    if (account && typeof router.query.returnUrl === 'string') {
-      router.push(router.query.returnUrl);
-    }
-  }, [account]);
 
   return (
     <Container px={3}>

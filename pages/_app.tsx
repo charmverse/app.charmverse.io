@@ -222,7 +222,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   if (!router.isReady) {
     return null;
   }
-
   return (
     <ReduxProvider store={store}>
       <FocalBoardProviders>

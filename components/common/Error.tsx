@@ -40,7 +40,7 @@ function Error<ErrorType> ({
 
   return (
     <Collapse in={delayedShow}>
-      <Alert severity='error' sx={{ mb: 6 }}>
+      <Alert severity='error' sx={{ mb: 3 }}>
         <Box>
           <AlertTitle>{state.title}</AlertTitle>
           {state.description}

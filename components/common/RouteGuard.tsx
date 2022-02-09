@@ -1,6 +1,7 @@
-import React, { ReactNode, useState, useEffect } from 'react';
+import { ReactNode, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useWeb3React } from '@web3-react/core';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 
 const publicPaths = ['/login'];
 
@@ -8,8 +9,9 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
 
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
+  const { triedEager } = useContext(Web3Connection);
   const { account, active } = useWeb3React();
-  const isLoading = !router.isReady || !active;
+  const isLoading = !router.isReady || (!triedEager && !account && active);
 
   useEffect(() => {
     // wait to listen to events until user is loaded
@@ -32,7 +34,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheck);
     };
-  }, [isLoading]);
+  }, [account, isLoading]);
 
   function authCheck (url: string) {
     // redirect to login page if accessing a private page and not logged in

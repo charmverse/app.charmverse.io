@@ -8,10 +8,12 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import Link from 'components/common/Link';
+import { Error } from 'components/common/Error';
 import { injected, walletConnect, walletLink } from 'connectors';
 import { ArrowSquareOut } from 'phosphor-react';
 import { useEffect, useRef } from 'react';
 import { Modal, DialogTitle } from 'components/common/Modal';
+import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import ConnectorButton from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
 
@@ -39,18 +41,25 @@ function WalletSelectorModal ({
     onboarding.current = new MetaMaskOnboarding();
   }
 
-  const handleConnect = (provider: any) => {
-    setActivatingConnector(provider);
-    activate(provider, undefined, true).catch((err) => {
+  const handleConnect = (_connector: AbstractConnector) => {
+    setActivatingConnector(_connector);
+    activate(_connector, undefined, true).catch((err) => {
       setActivatingConnector(undefined);
+      // We need to reset walletconnect if users have closed the modal
+      resetWalletConnector(_connector);
       setError(err);
+      if (connector) {
+        // revert to previous connector
+        return activate(connector, undefined, true);
+      }
     });
   };
   const handleOnboarding = () => onboarding.current?.startOnboarding();
 
-  // useEffect(() => {
-  //   if (active) closeModal();
-  // }, [active, closeModal]);
+  // close the modal after signing in
+  useEffect(() => {
+    if (active) closeModal();
+  }, [active]);
 
   useEffect(() => {
     if (error instanceof UnsupportedChainIdError) {
@@ -62,7 +71,7 @@ function WalletSelectorModal ({
   return (
     <Modal open={isModalOpen} onClose={closeModal}>
       <DialogTitle onClose={closeModal}>Connect to a wallet</DialogTitle>
-      {/* <Error error={error} processError={processConnectionError} /> */}
+      <Error error={error} processError={processConnectionError} />
       <Grid container spacing={2}>
         <Grid item xs>
           <ConnectorButton
@@ -122,6 +131,12 @@ function WalletSelectorModal ({
       </Grid>
     </Modal>
   );
+}
+
+function resetWalletConnector (connector: AbstractConnector) {
+  if (connector && connector instanceof WalletConnectConnector) {
+    connector.walletConnectProvider = undefined;
+  }
 }
 
 export default WalletSelectorModal;

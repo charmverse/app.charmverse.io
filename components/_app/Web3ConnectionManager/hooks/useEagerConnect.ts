@@ -10,8 +10,12 @@ const useEagerConnect = (): boolean => {
   useEffect(() => {
     injected
       .isAuthorized()
-      .then((isAuthorized) => isAuthorized && activate(injected, undefined, true).then(Boolean))
-      .catch(() => setTried(true))
+      .then((isAuthorized) => {
+        return isAuthorized ? activate(injected, undefined, true) : Promise.resolve();
+      })
+      .catch((e) => {
+        return setTried(true);
+      })
       .finally(() => setTried(true));
   }, [activate]);
 
