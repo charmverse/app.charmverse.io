@@ -171,6 +171,8 @@ function pluginsFactory({
               insideCallout: false,
               getPos: null,
               updateAttrs: null,
+              ref: null,
+              onClick: () => {}
             };
           },
           apply(tr, pluginState) {
@@ -183,7 +185,28 @@ function pluginsFactory({
                 ...pluginState,
                 insideCallout: true,
                 updateAttrs: meta.updateAttrs,
-                getPos: meta.getPos
+                getPos: meta.getPos,
+                ref: null,
+              }
+            }
+
+            if (meta.type === "INSIDE_PAGE_ICON") {
+              return {
+                ...pluginState,
+                insideCallout: false,
+                updateAttrs: () => {},
+                getPos: () => {},
+                ref: meta.ref,
+                onClick: meta.onClick,
+              }
+            }
+
+            if (meta.type === "OUTSIDE_PAGE_ICON") {
+              return {
+                ...pluginState,
+                insideCallout: false,
+                ref: null,
+                show: false
               }
             }
 
@@ -192,7 +215,8 @@ function pluginsFactory({
                 ...pluginState,
                 insideCallout: false,
                 updateAttrs: null,
-                getPos: null
+                getPos: null,
+                ref: null,
               }
             }
           },

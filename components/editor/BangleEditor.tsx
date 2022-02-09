@@ -17,16 +17,20 @@ import {
 } from '@bangle.dev/base-components';
 import { NodeView, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, Node } from '@bangle.dev/pm';
-import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
+import { BangleEditor as ReactBangleEditor, EditorViewContext, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
 import '@bangle.dev/tooltip/style.css';
-import { styled } from '@mui/material';
+import styled from '@emotion/styled';
+import { Box } from '@mui/material';
+import Emoji from 'components/common/Emoji';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
-import { PageContent } from 'models';
+import { Page, PageContent } from 'models';
+import { ChangeEvent, ReactNode, useContext, useRef } from 'react';
+import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
-import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
+import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
 import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
@@ -56,6 +60,8 @@ const specRegistry = new SpecRegistry([
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
+  position: relative;
+
   code {
     padding: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
     border-radius: ${({ theme }) => theme.spacing(0.5)};
@@ -65,7 +71,71 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 `;
 
-export default function BangleEditor ({ content }: { content: PageContent }) {
+const PageTitle = styled.input`
+  background: transparent;
+  border: 0 none;
+  color: ${({ theme }) => theme.palette.text.primary};
+  cursor: text;
+  font-size: 40px;
+  font-weight: 700;
+  outline: none;
+`;
+
+function EmojiContainer (
+  { updatePageIcon, top, children }: {updatePageIcon: (icon: string) => void, children: ReactNode, top: number}
+) {
+  const view = useContext(EditorViewContext);
+  const ref = useRef<HTMLDivElement>(null);
+
+  return (
+    <Box
+      sx={{
+        width: 'fit-content',
+        display: 'flex',
+        position: 'absolute',
+        top
+      }}
+      ref={ref}
+      onClick={() => {
+        if (view.dispatch!) {
+          const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
+          const suggestTooltipState = suggestTooltipKey.getState(view.state);
+
+          // If the emoji suggest already has a ref attached its already visible, we need to hide it
+
+          if (suggestTooltipState.show) {
+            view.dispatch(
+              view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
+            );
+          }
+          else {
+            view.dispatch(
+            // Chain transactions together
+              view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_PAGE_ICON',
+                onClick: (emoji: string) => updatePageIcon(emoji),
+                ref: ref.current,
+                getPos: () => 0 }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
+            );
+          }
+        }
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
+
+export default function BangleEditor (
+  { content, page, setPage }: { content: PageContent, page: Page, setPage: (p: Page) => void }
+) {
+  function updateTitle (event: ChangeEvent<HTMLInputElement>) {
+    setPage({ ...page, title: event.target.value });
+  }
+
+  function updatePageIcon (icon: string) {
+    setPage({ ...page, icon });
+  }
+
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -108,8 +178,30 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
     initialValue: Node.fromJSON(specRegistry.schema, content)
   });
 
+  let pageTitleTop = 50; let bangleEditorTop = 75; let
+    pageIconTop = 50;
+
+  if (page.icon && !page.headerImage) {
+    pageTitleTop = 100;
+    bangleEditorTop = 125;
+    pageIconTop = -75;
+  }
+
+  if (!page.icon && page.headerImage) {
+    pageTitleTop = 50;
+  }
+
+  if (page.icon && page.headerImage) {
+    pageTitleTop = 50;
+    bangleEditorTop = 125;
+    pageIconTop = -60;
+  }
+
   return (
     <StyledReactBangleEditor
+      style={{
+        top: bangleEditorTop
+      }}
       state={state}
       renderNodeViews={({ children, ...props }) => {
         // eslint-disable-next-line
@@ -141,6 +233,23 @@ export default function BangleEditor ({ content }: { content: PageContent }) {
         }
       }}
     >
+      {page.icon && (
+        <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
+          <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+        </EmojiContainer>
+      )}
+      <Box sx={{
+        position: 'absolute',
+        top: pageTitleTop
+      }}
+      >
+        <PageTitle
+          placeholder='Untitled'
+          autoFocus
+          value={page.title}
+          onChange={updateTitle}
+        />
+      </Box>
       <FloatingMenu />
       {EmojiSuggest}
       {InlinePalette}
