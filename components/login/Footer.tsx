@@ -14,11 +14,11 @@ import { Container } from './LoginPageContent';
 
 const Background = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.dark};
-  color: ${({ theme }) => theme.palette.secondary.dark};
   flex-grow: 1;
 `;
 
 const LinkHeader = styled(Typography)`
+  color: ${({ theme }) => theme.palette.secondary.dark};
   text-transform: uppercase;
   font-size: 1.3em;
   font-weight: bold;
@@ -28,16 +28,19 @@ const LinkHeader = styled(Typography)`
 `;
 
 const StyledLink = styled(Link)`
-  color: inherit;
+  color: ${({ theme }) => theme.palette.secondary.main};
   display: block;
   &:hover {
-    color: inherit;
+    color: ${({ theme }) => theme.palette.secondary.dark};
   }
 `;
 
 const StyledIconButton = styled(IconButton)`
-  color: inherit;
+  color: ${({ theme }) => theme.palette.secondary.main};
   margin-right: ${({ theme }) => theme.spacing(1)};
+  &:hover {
+    color: ${({ theme }) => theme.palette.secondary.dark};
+  }
 ` as typeof IconButton;
 
 export default function Footer () {
@@ -57,7 +60,7 @@ export default function Footer () {
               About
             </LinkHeader>
             <StyledLink href='mailto:hello@charmverse.io'>hello@charmverse.io</StyledLink>
-            <Typography>New York, NY</Typography>
+            <Typography color='secondary'>New York, NY</Typography>
           </Grid>
           <Grid item xs={12} sm={4}>
             <LinkHeader>
