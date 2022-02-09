@@ -6,6 +6,7 @@ import Image from 'next/image';
 import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+import { blackColor } from 'theme/colors';
 
 import splashImage from 'public/images/charmverse_world.png';
 
@@ -38,6 +39,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
           <Box>
             <Typography
               sx={{
+                color: blackColor,
                 fontSize: { xs: 30, md: 48 },
                 fontWeight: 'bold',
                 lineHeight: '1.1em',
@@ -50,7 +52,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
               <br />
               All-in-one Workspace
             </Typography>
-            <Typography sx={{ fontSize: 20, mb: 6 }}>
+            <Typography sx={{ color: blackColor, fontSize: 20, mb: 6 }}>
               Tasks, docs, and more
             </Typography>
             {account ? (
