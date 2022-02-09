@@ -93,7 +93,7 @@ export default function PageBanner ({ page, setPage }: { page: Page, setPage: (p
               padding: theme.spacing(0.5, 1.5)
             }}
           >
-            <Typography variant='subtitle1'>
+            <Typography variant='subtitle1' whiteSpace='nowrap'>
               Change Cover
             </Typography>
           </ListItem>
