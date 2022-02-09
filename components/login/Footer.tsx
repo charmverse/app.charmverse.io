@@ -12,7 +12,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 
 import { darkGreyColor, lightGreyColor } from 'theme/colors';
 
-import { Container } from './SplashImage';
+import { Container } from './LoginPageContent';
 
 const Background = styled(Box)`
   background-color: ${darkGreyColor};
