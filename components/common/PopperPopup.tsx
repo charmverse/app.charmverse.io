@@ -5,7 +5,7 @@ import * as React from 'react';
 
 interface PopperPopupProps {
   popupContent: React.ReactNode
-  children: React.ReactNode
+  children?: React.ReactNode | null
 }
 
 export default function PopperPopup (props: PopperPopupProps) {
@@ -14,9 +14,11 @@ export default function PopperPopup (props: PopperPopupProps) {
     <PopupState variant='popper'>
       {(popupState) => (
         <div>
+          {children && (
           <div {...bindToggle(popupState)}>
             {children}
           </div>
+          )}
           <Popover
             {...bindPopover(popupState)}
             anchorOrigin={{

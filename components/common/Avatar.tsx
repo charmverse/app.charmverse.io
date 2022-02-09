@@ -7,14 +7,15 @@ const StyledAvatar = styled(Avatar)`
   font-weight: 500;
 `;
 
-export default function InitialAvatar ({ className, name = '', variant }: { className?: string, name: string, variant?: 'circular' | 'rounded' | 'square' }) {
+export default function InitialAvatar ({ className, name, variant }: { className?: string, name?: string | null, variant?: 'circular' | 'rounded' | 'square' }) {
+  const nameStr = name || '';
   return (
     <StyledAvatar
       className={className}
-      sx={{ backgroundColor: stringToColor(name) }}
+      sx={{ backgroundColor: stringToColor(nameStr) }}
       variant={variant}
     >
-      {name.charAt(0).toUpperCase()}
+      {nameStr.charAt(0).toUpperCase()}
     </StyledAvatar>
   );
 }

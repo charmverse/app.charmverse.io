@@ -8,7 +8,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import Legend from 'components/settings/Legend';
 import Avatar from 'components/settings/LargeAvatar';
-import { setTitle } from 'components/common/page-layout/PageTitle';
+import { setTitle } from 'hooks/usePageTitle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';

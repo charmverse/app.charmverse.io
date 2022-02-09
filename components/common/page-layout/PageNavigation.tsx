@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { greyColor2 } from 'theme/colors';
 import { Page } from 'models';
@@ -475,30 +475,28 @@ export default function PageNavigation ({
   }
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <TreeRoot
-        setPages={setPages}
-        expanded={expanded}
-        // @ts-ignore - we use null instead of undefined to control the element
-        selected={selectedNodeId}
-        onNodeToggle={onNodeToggle}
-        aria-label='items navigator'
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
-        isFavorites={isFavorites}
-        sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
-      >
-        {mappedItems.map((item, index) => (
-          <RenderDraggableNode
-            key={item.id}
-            item={item}
-            onDrop={onDrop}
-            pathPrefix={pathPrefix}
-            addPage={addPage}
-            deletePage={deletePage}
-          />
-        ))}
-      </TreeRoot>
-    </DndProvider>
+    <TreeRoot
+      setPages={setPages}
+      expanded={expanded}
+      // @ts-ignore - we use null instead of undefined to control the element
+      selected={selectedNodeId}
+      onNodeToggle={onNodeToggle}
+      aria-label='items navigator'
+      defaultCollapseIcon={<ExpandMoreIcon />}
+      defaultExpandIcon={<ChevronRightIcon />}
+      isFavorites={isFavorites}
+      sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
+    >
+      {mappedItems.map((item, index) => (
+        <RenderDraggableNode
+          key={item.id}
+          item={item}
+          onDrop={onDrop}
+          pathPrefix={pathPrefix}
+          addPage={addPage}
+          deletePage={deletePage}
+        />
+      ))}
+    </TreeRoot>
   );
 }

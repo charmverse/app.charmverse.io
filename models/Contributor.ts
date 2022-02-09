@@ -12,8 +12,14 @@ export interface SpaceRole {
 
 export interface Contributor {
   id: string;
-  address: string;
+  addresses: string[];
+  discordId?: string;
   username: string;
-  favorites: FavoritePage[];
   spaceRoles: SpaceRole[];
+}
+
+export interface ContributorUser extends Contributor {
+  favorites: FavoritePage[];
+  isLoading: boolean;
+  linkedAddressesCount: number; // from guild.xyz
 }

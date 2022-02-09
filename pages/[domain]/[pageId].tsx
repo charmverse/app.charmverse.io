@@ -1,5 +1,5 @@
 import { PageLayout } from 'components/common/page-layout';
-import { useTitleState } from 'components/common/page-layout/PageTitle';
+import { usePageTitle } from 'hooks/usePageTitle';
 import { DatabaseEditor } from 'components/databases';
 import { Editor } from 'components/editor';
 import { usePages } from 'hooks/usePages';
@@ -12,10 +12,9 @@ export default function BlocksEditorPage () {
   const router = useRouter();
   const { pageId } = router.query;
   const pageByPath = pages.find(page => page.path === pageId || page.id === pageId) || pages[0];
-  const [, setTitleState] = useTitleState();
+  const [, setTitleState] = usePageTitle();
 
   function setPage (page: Partial<Page>) {
-    console.log('setPage called', page);
     const newPage = { ...pageByPath, ...page };
     setPages(pages.map(p => p.id === newPage.id ? newPage : p));
   }

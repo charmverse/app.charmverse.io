@@ -4,7 +4,7 @@ import Legend from 'components/settings/Legend';
 import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
 import ContributorRow from 'components/settings/ContributorRow';
-import { setTitle } from 'components/common/page-layout/PageTitle';
+import { setTitle } from 'hooks/usePageTitle';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 

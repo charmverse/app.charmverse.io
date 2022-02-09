@@ -10,7 +10,6 @@ const StyledPageBanner = styled(Box)`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 200px;
   position: relative;
 
   img {
@@ -51,7 +50,10 @@ export default function PageBanner ({ page, setPage }: { page: Page, setPage: (p
   const theme = useTheme();
 
   return (
-    <StyledPageBanner>
+    <StyledPageBanner sx={{
+      height: page.headerImage ? 200 : 100
+    }}
+    >
       {page.headerImage
     && (
     <>
@@ -91,7 +93,7 @@ export default function PageBanner ({ page, setPage }: { page: Page, setPage: (p
               padding: theme.spacing(0.5, 1.5)
             }}
           >
-            <Typography variant='subtitle1'>
+            <Typography variant='subtitle1' whiteSpace='nowrap'>
               Change Cover
             </Typography>
           </ListItem>

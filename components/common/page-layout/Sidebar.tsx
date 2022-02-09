@@ -10,15 +10,14 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
-import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { shortenedWeb3Address } from 'lib/strings';
-import { Contributor, Page, Space } from 'models';
+import { shortenHex } from 'lib/strings';
+import { ContributorUser, Page, Space } from 'models';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { pages as seedPages } from 'seedData';
@@ -29,10 +28,10 @@ import { useAppSelector } from 'components/databases/focalboard/src/store/hooks'
 import { getSortedBoards } from 'components/databases/focalboard/src/store/boards';
 import Avatar from '../Avatar';
 import Link from '../Link';
-import ModalContainer from '../ModalContainer';
+import { Modal } from '../Modal';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import CreateWorkspaceForm from './CreateWorkspaceForm';
-import Header from './Header';
+import { headerHeight } from './Header';
 import PageNavigation from './PageNavigation';
 import NewPageMenu from '../NewPageMenu';
 
@@ -74,9 +73,28 @@ const SidebarContainer = styled.div`
   }
 `;
 
+const SidebarHeader = styled.div(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: theme.spacing(0, 2),
+  '& .MuiIconButton-root': {
+    opacity: 0,
+    transition: theme.transitions.create('opacity', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen
+    })
+  },
+  '&:hover .MuiIconButton-root': {
+    opacity: 1
+  },
+  // necessary for content to be below app bar
+  minHeight: headerHeight
+}));
+
 interface SidebarProps {
   closeSidebar: () => void;
-  favorites: Contributor['favorites'];
+  favorites: ContributorUser['favorites'];
 }
 
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
@@ -187,35 +205,19 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           </Grid>
         </Grid>
         <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-          <div>
-            <ModalContainer onClose={closeSpaceForm}>
-              <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
-            </ModalContainer>
-          </div>
+          <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
         </Modal>
       </WorkspacesContainer>
       <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
         <Box sx={{ flexGrow: 1 }}>
           <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
-            <Header>
+            <SidebarHeader>
               <Typography><strong>{space.name}</strong></Typography>
               <IconButton onClick={closeSidebar}>
                 <ChevronLeftIcon />
               </IconButton>
-            </Header>
+            </SidebarHeader>
             <Divider sx={{ mb: 3 }} />
-            {/* <Box>
-            <List>
-              <NextLink href='' passHref>
-                <ListItem button component='a' disableRipple
-                  sx={{ py: 1, color: greyColor + ' !important' }}>
-                  <ListItemText disableTypography>
-                      <Box sx={{ fontSize: 14, fontWeight: 500 }}>Settings</Box>
-                  </ListItemText>
-                </ListItem>
-              </NextLink>
-            </List>
-          </Box> */}
             {favoritePageIds.length > 0 && (
               <Box mb={2}>
                 <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
@@ -260,7 +262,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 <Typography variant='caption' sx={{ display: 'block' }}>
                   <strong>{user.username}</strong>
                   <br />
-                  {shortenedWeb3Address(user.address)}
+                  {shortenHex(user.addresses[0])}
                 </Typography>
               </Box>
             </Box>

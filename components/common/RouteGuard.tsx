@@ -1,14 +1,17 @@
-import React, { ReactNode, useState, useEffect } from 'react';
+import { ReactNode, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
-// import { useUser } from '@auth0/nextjs-auth0';
+import { useWeb3React } from '@web3-react/core';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 
-const publicPaths = ['/login', '/signup', '/'];
+const publicPaths = ['/login', '/'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
-  const user = null;
+
   const router = useRouter();
-  const isLoading = !router.isReady;
   const [authorized, setAuthorized] = useState(false);
+  const { triedEager } = useContext(Web3Connection);
+  const { account, active } = useWeb3React();
+  const isLoading = !router.isReady || (!triedEager && !account && active);
 
   useEffect(() => {
     // wait to listen to events until user is loaded
@@ -31,12 +34,12 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheck);
     };
-  }, [isLoading]);
+  }, [account, isLoading]);
 
   function authCheck (url: string) {
     // redirect to login page if accessing a private page and not logged in
     const path = url.split('?')[0];
-    if (!user && !publicPaths.some(basePath => path.startsWith(basePath))) {
+    if (!account && !publicPaths.some(basePath => path.startsWith(basePath))) {
       setAuthorized(false);
       router.push({
         pathname: '/login',

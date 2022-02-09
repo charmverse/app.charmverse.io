@@ -1,10 +1,16 @@
+import { IntlProvider } from 'react-intl';
+import { Provider as ReduxProvider } from 'react-redux';
 import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { IntlProvider } from 'react-intl';
-import { PageTitleProvider, TitleContext } from 'components/common/page-layout/PageTitle';
+import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
+import { Web3ReactProvider } from '@web3-react/core';
+import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
+import { PageTitleProvider, TitleContext } from 'hooks/usePageTitle';
 import RouteGuard from 'components/common/RouteGuard';
+import FocalBoardPortal from 'components/databases/FocalBoardPortal';
 import { ColorModeContext } from 'context/color-mode';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { SpacesProvider } from 'hooks/useSpaces';
@@ -26,7 +32,7 @@ import '@fullcalendar/daygrid/main.css';
 // init focalboard
 import '@mattermost/compass-icons/css/compass-icons.css';
 import 'components/databases/focalboard/src/styles/variables.scss';
-import 'components/databases/focalboard/src/styles/main.scss';
+// import 'components/databases/focalboard/src/styles/main.scss';
 import 'components/databases/focalboard/src/styles/labels.scss';
 import 'components/databases/focalboard/src/styles/_markdown.scss';
 import 'components/databases/focalboard/src/components/blockIconSelector.scss';
@@ -43,7 +49,6 @@ import 'components/databases/focalboard/src/components/content/checkboxElement.s
 import 'components/databases/focalboard/src/components/content/dividerElement.scss';
 import 'components/databases/focalboard/src/components/contentBlock.scss';
 import 'components/databases/focalboard/src/components/dialog.scss';
-import 'components/databases/focalboard/src/components/emptyCenterPanel.scss';
 import 'components/databases/focalboard/src/components/flashMessages.scss';
 import 'components/databases/focalboard/src/components/gallery/gallery.scss';
 import 'components/databases/focalboard/src/components/gallery/galleryCard.scss';
@@ -67,13 +72,13 @@ import 'components/databases/focalboard/src/components/properties/lastModifiedBy
 import 'components/databases/focalboard/src/components/properties/link/link.scss';
 import 'components/databases/focalboard/src/components/properties/user/user.scss';
 import 'components/databases/focalboard/src/components/shareBoardComponent.scss';
-import 'components/databases/focalboard/src/components/sidebar/deleteBoardDialog.scss';
-import 'components/databases/focalboard/src/components/sidebar/registrationLink.scss';
-import 'components/databases/focalboard/src/components/sidebar/sidebar.scss';
-import 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu.scss';
-import 'components/databases/focalboard/src/components/sidebar/sidebarBoardItem.scss';
-import 'components/databases/focalboard/src/components/sidebar/sidebarSettingsMenu.scss';
-import 'components/databases/focalboard/src/components/sidebar/sidebarUserMenu.scss';
+// import 'components/databases/focalboard/src/components/sidebar/deleteBoardDialog.scss';
+// import 'components/databases/focalboard/src/components/sidebar/registrationLink.scss';
+// import 'components/databases/focalboard/src/components/sidebar/sidebar.scss';
+// import 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu.scss';
+// import 'components/databases/focalboard/src/components/sidebar/sidebarBoardItem.scss';
+// import 'components/databases/focalboard/src/components/sidebar/sidebarSettingsMenu.scss';
+// import 'components/databases/focalboard/src/components/sidebar/sidebarUserMenu.scss';
 import 'components/databases/focalboard/src/components/table/calculation/calculationRow.scss';
 import 'components/databases/focalboard/src/components/table/horizontalGrip.scss';
 import 'components/databases/focalboard/src/components/table/table.scss';
@@ -83,9 +88,7 @@ import 'components/databases/focalboard/src/components/viewHeader/filterComponen
 import 'components/databases/focalboard/src/components/viewHeader/filterEntry.scss';
 import 'components/databases/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/databases/focalboard/src/components/viewTitle.scss';
-import 'components/databases/focalboard/src/components/workspaceSwitcher/workspaceOptions.scss';
-import 'components/databases/focalboard/src/components/workspaceSwitcher/workspaceSwitcher.scss';
-import 'components/databases/focalboard/src/widgets/buttons/button.scss';
+// import 'components/databases/focalboard/src/widgets/buttons/button.scss';
 import 'components/databases/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/databases/focalboard/src/widgets/buttons/iconButton.scss';
 import 'components/databases/focalboard/src/widgets/editable.scss';
@@ -141,19 +144,22 @@ import 'components/databases/focalboard/src/widgets/valueSelector.scss';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
-import { ReduxProvider, store } from 'components/databases/focalboard/src/main';
+import store from 'components/databases/focalboard/src/store';
 import { getLanguage, fetchLanguage } from 'components/databases/focalboard/src/store/language';
 import { useAppSelector, useAppDispatch } from 'components/databases/focalboard/src/store/hooks';
 import { FlashMessages } from 'components/databases/focalboard/src/components/flashMessages';
 import { getMessages } from 'components/databases/focalboard/src/i18n';
+import { setTheme } from 'components/databases/focalboard/src/theme';
 import {
   darkTheme,
-  lightTheme,
-  setTheme
-} from 'components/databases/focalboard/src/theme';
+  lightTheme
+} from 'theme/focalboard/theme';
 
 import 'theme/styles.scss';
-import 'theme/styles.focalboard.scss';
+import 'theme/@bangle.dev/styles.scss';
+import 'theme/focalboard/styles.scss';
+
+const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement
@@ -186,8 +192,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
         setMode((prevMode: PaletteMode) => {
           const newMode = prevMode === 'light' ? 'dark' : 'light';
           setSavedDarkMode(newMode);
-          // set focalboard theme
-          setTheme(newMode === 'dark' ? darkTheme : lightTheme);
           return newMode;
         });
       }
@@ -197,6 +201,10 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   // Update the theme only if the mode changes
   const theme = useMemo(() => {
+    // set focalboard theme - dont run for SSR
+    if (typeof window !== 'undefined') {
+      setTheme(mode === 'dark' ? darkTheme : lightTheme);
+    }
     return createThemeLightSensitive(mode);
   }, [mode]);
 
@@ -214,7 +222,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   if (!router.isReady) {
     return null;
   }
-
   return (
     <ReduxProvider store={store}>
       <FocalBoardProviders>
@@ -235,15 +242,19 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
           <ColorModeContext.Provider value={colorMode}>
             <ThemeProvider theme={theme}>
               <CssBaseline />
-              <RouteGuard>
-                {getLayout(<Component {...pageProps} />)}
-              </RouteGuard>
+              <Web3ReactProvider getLibrary={getLibrary}>
+                <Web3ConnectionManager>
+                  <RouteGuard>
+                    {getLayout(<Component {...pageProps} />)}
+                  </RouteGuard>
+                </Web3ConnectionManager>
+              </Web3ReactProvider>
             </ThemeProvider>
           </ColorModeContext.Provider>
         </DataProviders>
       </FocalBoardProviders>
       {/** include the root portal for focalboard's popup */}
-      <div id='focalboard-root-portal' className='focalboard-body' />
+      <FocalBoardPortal />
     </ReduxProvider>
   );
 }

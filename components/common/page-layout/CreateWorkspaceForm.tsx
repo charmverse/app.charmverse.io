@@ -4,11 +4,12 @@ import TextField from '@mui/material/TextField';
 import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import Avatar from 'components/settings/LargeAvatar';
-import Legend from 'components/settings/Legend';
+import Divider from '@mui/material/Divider';
 import { useUser } from 'hooks/useUser';
 import { Space } from 'models';
 import { FormValues, schema } from 'pages/[domain]/settings/workspace';
 import { ChangeEvent } from 'react';
+import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
 
 interface Props {
@@ -60,7 +61,9 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Legend sx={{ marginTop: '0 !important' }}>Create a workspace</Legend>
+      <DialogTitle onClose={onCancel}>Create a workspace</DialogTitle>
+      <Divider />
+      <br />
       <Grid container direction='column' spacing={3}>
         <Grid item display='flex' justifyContent='center'>
           <Avatar name={watchName} variant='rounded' />
