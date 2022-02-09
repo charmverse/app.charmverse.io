@@ -1,8 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import Editor from '@draft-js-plugins/editor'
-import createEmojiPlugin from '@draft-js-plugins/emoji'
-import '@draft-js-plugins/emoji/lib/plugin.css'
 import createMentionPlugin, {
     defaultSuggestionsFilter,
     MentionData,
@@ -74,22 +72,18 @@ const MarkdownEditorInput = (props: Props): ReactElement => {
     const [isEmojiPopoverOpen, setIsEmojiPopoverOpen] = useState(false)
     const [suggestions, setSuggestions] = useState(mentions)
 
-    const {MentionSuggestions, plugins, EmojiSuggestions} = useMemo(() => {
+    const {MentionSuggestions, plugins} = useMemo(() => {
         const mentionPlugin = createMentionPlugin({mentionPrefix: '@'})
-        const emojiPlugin = createEmojiPlugin()
         const markdownPlugin = createLiveMarkdownPlugin()
 
-        // eslint-disable-next-line no-shadow
-        const {EmojiSuggestions} = emojiPlugin
         // eslint-disable-next-line no-shadow
         const {MentionSuggestions} = mentionPlugin
         // eslint-disable-next-line no-shadow
         const plugins = [
             mentionPlugin,
-            emojiPlugin,
             markdownPlugin,
         ]
-        return {plugins, MentionSuggestions, EmojiSuggestions}
+        return {plugins, MentionSuggestions}
     }, [])
 
     useEffect(() => {
@@ -177,10 +171,6 @@ const MarkdownEditorInput = (props: Props): ReactElement => {
                 suggestions={suggestions}
                 onSearchChange={onSearchChange}
                 entryComponent={Entry}
-            />
-            <EmojiSuggestions
-                onOpen={onEmojiPopoverOpen}
-                onClose={onEmojiPopoverClose}
             />
         </div>
     )
