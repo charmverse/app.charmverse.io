@@ -16,7 +16,7 @@ function timestampDifferenceInSeconds (first: number | Date, second: number | Da
   return Math.floor(convertToUnixSeconds(first) - convertToUnixSeconds(second));
 }
 
-export function RelativeTime ({ timestamp }: {timestamp: number}) {
+export function RelativeTime ({ timestamp }: {timestamp: number | Date}) {
 
   const [, refreshLabel] = useState('');
 
@@ -36,19 +36,19 @@ export function RelativeTime ({ timestamp }: {timestamp: number}) {
       break;
 
     case (differenceInSeconds < 60):
-      label = `${differenceInSeconds} seconds ago`;
+      label = `${differenceInSeconds} secs. ago`;
       // Refresh every second
       timeoutToSet = 1000;
       break;
 
     case (differenceInMinutes === 1):
-      label = '1 minute ago';
+      label = '1 min. ago';
       // Only refresh once a minute
       timeoutToSet = 60000;
       break;
 
     default:
-      label = `${differenceInMinutes} minutes ago`;
+      label = `${differenceInMinutes} mins. ago`;
       timeoutToSet = 60000;
   }
 
