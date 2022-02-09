@@ -7,10 +7,12 @@ import { useForm } from 'react-hook-form';
 import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import Avatar from 'components/settings/LargeAvatar';
+import Legend from 'components/settings/Legend';
 import { setTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import WalletConnection from 'components/settings/WalletConnection';
 
 const schema = yup.object({
   username: yup.string().ensure().trim()
@@ -59,9 +61,15 @@ export default function AccountSettings () {
           />
         </Grid>
         <Grid item>
+        </Grid>
+        <Grid item>
           <PrimaryButton disabled={!isDirty} type='submit'>
             Save
           </PrimaryButton>
+        </Grid>
+        <Grid item>
+          <Legend>Web3 Connection</Legend>
+          <WalletConnection />
         </Grid>
       </Grid>
     </form>

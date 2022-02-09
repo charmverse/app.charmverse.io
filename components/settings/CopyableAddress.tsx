@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Tooltip from '@mui/material/Tooltip';
 import { shortenHex } from 'lib/strings';
-import Button from './Button';
+import Button from '../common/Button';
 
 type Props = {
   address: string
-  decimals?: number
+  decimals?: number,
+  sx?: any
 }
 
 export default function CopyableAddress ({ address, decimals = 3, ...rest }: Props) {

@@ -1,4 +1,5 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -16,10 +17,16 @@ export const Container = styled(Box)`
   margin: 0 auto;
 `;
 
-export default function SplashImage () {
+export default function LoginPageContent () {
 
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
+  const router = useRouter();
+  useEffect(() => {
+    if (account && typeof router.query.returnUrl === 'string') {
+      router.push(router.query.returnUrl);
+    }
+  }, [account]);
 
   return (
     <Container px={3}>

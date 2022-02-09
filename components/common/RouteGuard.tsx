@@ -7,10 +7,11 @@ const publicPaths = ['/login'];
 export default function RouteGuard ({ children }: { children: ReactNode }) {
 
   const router = useRouter();
-  const isLoading = !router.isReady;
   const [authorized, setAuthorized] = useState(false);
-  const { account, error } = useWeb3React();
-  console.log('account', account, error);
+  const web3react = useWeb3React();
+  const { account, connector, error } = web3react;
+  const isLoading = !router.isReady || !connector;
+
   useEffect(() => {
     // wait to listen to events until user is loaded
     if (isLoading) {
