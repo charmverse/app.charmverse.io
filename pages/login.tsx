@@ -12,7 +12,7 @@ export default function LoginPage () {
   const router = useRouter();
   useEffect(() => {
     if (account && typeof router.query.returnUrl === 'string') {
-      router.replace('/login');
+      router.replace('/login', undefined, { shallow: true });
       router.push(router.query.returnUrl);
     }
   }, [account]);
