@@ -78,7 +78,7 @@ const StyledImage = styled.img`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-const StyledImageResizeHandle = styled(Box)`
+const StyledImageResizeHandle = styled(Box)<{pos: 'right' | 'left'}>`
   width: 7.5px;
   height: 75px;
   border-radius: ${({ theme }) => theme.spacing(2)};
@@ -88,6 +88,7 @@ const StyledImageResizeHandle = styled(Box)`
   transform: translateY(-50%);
   opacity: 0;
   transition: opacity 250ms ease-in-out;
+  ${({ pos }) => pos === 'left' ? 'left: 15px' : 'right: 15px'};
 `;
 
 interface ImageResizeHandleProps {
@@ -103,23 +104,16 @@ interface ImageResizeHandleProps {
 function ImageResizeHandle (
   { isDragging, setIsDragging, position, imageWidth, setClientX, setImageWidth, clientX }: ImageResizeHandleProps
 ) {
-  const sx: Partial<{left: number, right: number}> = {};
-
-  if (position === 'left') {
-    sx.left = 15;
-  }
-  else {
-    sx.right = 15;
-  }
-
   return (
     <>
       {/** Adding StyledImageResizeHandle twice to hide image ghost while dragging  */}
       <StyledImageResizeHandle
-        sx={sx}
+        pos={position}
+        /** custom class required to show resize handler when hovering over the image */
         className='image-resize-handler'
       />
       <StyledImageResizeHandle
+        pos={position}
         onDragEnd={() => {
           if (isDragging) {
             setIsDragging(false);
@@ -134,26 +128,31 @@ function ImageResizeHandle (
             let difference = clientX - e.clientX;
             // Making sure the difference isn't too abrupt clipping the difference to a limit
             difference = difference < -5 ? -5 : difference > 5 ? 5 : difference;
+            // Avoid updating state when the clientX value are the same
+            // This happens when the user is dragging but staying still
             if (clientX !== e.clientX) {
               let newImageWidth = imageWidth;
               if (position === 'right') {
-                // Increasing image size
+                // left to right movement. Increasing image size
                 if (difference < 0) {
                   newImageWidth -= difference;
                 }
+                // Right to left movement. Decreasing image size
                 else {
                   newImageWidth -= difference;
                 }
               }
               else if (position === 'left') {
-                // Increasing
+                // right to left movement. Increasing image size
                 if (difference > 0) {
                   newImageWidth += difference;
                 }
+                // Left to right movement. Decreasing image size
                 else {
                   newImageWidth += difference;
                 }
               }
+              // Making sure that the image width is within a certain range
               if (newImageWidth < MIN_IMAGE_WIDTH) {
                 newImageWidth = MIN_IMAGE_WIDTH;
               }
@@ -167,7 +166,6 @@ function ImageResizeHandle (
           }
         }}
         draggable
-        sx={sx}
       />
     </>
   );
@@ -176,10 +174,14 @@ function ImageResizeHandle (
 export function Image ({ node, updateAttrs }: NodeViewProps) {
   const [align, setAlign] = useState('center');
   const theme = useTheme();
+  // State to keep track of the current image width
   const [imageWidth, setImageWidth] = useState(500);
+  // State to keep track of the current dragged mouse position
   const [clientX, setClientX] = useState<number>(0);
+  // Is dragging is used to hide the resize handles while dragging
   const [isDragging, setIsDragging] = useState(false);
 
+  // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
       <ImageSelector onImageSelect={(imageSrc) => {
