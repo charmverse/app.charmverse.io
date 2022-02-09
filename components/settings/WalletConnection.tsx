@@ -36,7 +36,7 @@ export default function WalletConnection () {
         <CopyableAddress
           address={account}
           decimals={5}
-          sx={{ fontSize: 24, background: 'transparent !important', color: 'inherit', px: 0 }}
+          sx={{ fontSize: 20, background: 'transparent !important', color: 'inherit', px: 0 }}
         />
       ) : <div></div>}
       <Box

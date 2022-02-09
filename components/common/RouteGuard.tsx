@@ -8,9 +8,8 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
 
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
-  const web3react = useWeb3React();
-  const { account, connector, error } = web3react;
-  const isLoading = !router.isReady || !connector;
+  const { account, active } = useWeb3React();
+  const isLoading = !router.isReady || !active;
 
   useEffect(() => {
     // wait to listen to events until user is loaded

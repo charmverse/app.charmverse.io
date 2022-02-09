@@ -48,9 +48,9 @@ function WalletSelectorModal ({
   };
   const handleOnboarding = () => onboarding.current?.startOnboarding();
 
-  useEffect(() => {
-    if (active) closeModal();
-  }, [active, closeModal]);
+  // useEffect(() => {
+  //   if (active) closeModal();
+  // }, [active, closeModal]);
 
   useEffect(() => {
     if (error instanceof UnsupportedChainIdError) {
@@ -67,17 +67,17 @@ function WalletSelectorModal ({
         <Grid item xs>
           <ConnectorButton
             name={
-                typeof window !== 'undefined'
+              typeof window !== 'undefined'
                 && MetaMaskOnboarding.isMetaMaskInstalled()
-                  ? 'MetaMask'
-                  : 'Install MetaMask'
-              }
+                ? 'MetaMask'
+                : 'Install MetaMask'
+            }
             onClick={
-                typeof window !== 'undefined'
+              typeof window !== 'undefined'
                 && MetaMaskOnboarding.isMetaMaskInstalled()
-                  ? () => handleConnect(injected)
-                  : handleOnboarding
-              }
+                ? () => handleConnect(injected)
+                : handleOnboarding
+            }
             iconUrl='metamask.png'
             disabled={connector === injected || !!activatingConnector}
             isActive={connector === injected}

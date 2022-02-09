@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import Image from 'next/image';
 import Button from 'components/common/Button';
+import { greyColor2 } from 'theme/colors';
 
 const ImageIcon = styled.img`
   width: 1.5rem;
@@ -41,7 +42,11 @@ function ConnectorButton ({
       loadingMessage={`${name} - connecting...`}
       fullWidth
       size='large'
-      sx={{ px: 4, py: 1.5 }}
+      sx={{
+        color: disabled ? `${greyColor2} !important` : 'inherit',
+        px: 4,
+        py: 1.5
+      }}
     >
       <ButtonContent>
         {`${name} ${isActive ? ' - connected' : ''}`}
