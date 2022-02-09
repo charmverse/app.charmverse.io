@@ -31,7 +31,7 @@ export function RelativeTime ({ timestamp }: {timestamp: number}) {
 
   switch (true) {
     case (differenceInSeconds < 5):
-      label = 'Just now';
+      label = 'just now';
       timeoutToSet = 1000;
       break;
 
