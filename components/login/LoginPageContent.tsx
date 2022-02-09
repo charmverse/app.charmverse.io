@@ -16,6 +16,10 @@ export const Container = styled(Box)`
   margin: 0 auto;
 `;
 
+const ImageWrapper = styled(Box)`
+  ${({ theme }) => theme.palette.mode === 'dark' && 'filter: invert(100%);'}
+`;
+
 export default function LoginPageContent ({ account }: { account: string | null | undefined }) {
 
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
@@ -31,15 +35,14 @@ export default function LoginPageContent ({ account }: { account: string | null 
           py={3}
           px={6}
         >
-          <Box sx={{ maxWidth: 300 }}>
+          <ImageWrapper sx={{ maxWidth: 300 }}>
             <Image src={splashImage} />
-          </Box>
+          </ImageWrapper>
         </Grid>
         <Grid item xs={12} sm={6} display='flex' justifyContent='center'>
-          <Box>
+          <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
             <Typography
               sx={{
-                color: blackColor,
                 fontSize: { xs: 30, md: 48 },
                 fontWeight: 'bold',
                 lineHeight: '1.1em',
@@ -52,7 +55,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
               <br />
               All-in-one Workspace
             </Typography>
-            <Typography sx={{ color: blackColor, fontSize: 20, mb: 6 }}>
+            <Typography sx={{ fontSize: 20, mb: 6 }}>
               Tasks, docs, and more
             </Typography>
             {account ? (
@@ -67,9 +70,9 @@ export default function LoginPageContent ({ account }: { account: string | null 
           </Box>
         </Grid>
         <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>
-          <Box px={3}>
+          <ImageWrapper px={3}>
             <Image src={splashImage} />
-          </Box>
+          </ImageWrapper>
         </Grid>
       </Grid>
     </Container>

@@ -10,13 +10,12 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
 
-import { darkGreyColor, lightGreyColor } from 'theme/colors';
-
 import { Container } from './LoginPageContent';
 
 const Background = styled(Box)`
-  background-color: ${darkGreyColor};
-  color: ${lightGreyColor};
+  background-color: ${({ theme }) => theme.palette.background.dark};
+  color: ${({ theme }) => theme.palette.secondary.dark};
+  flex-grow: 1;
 `;
 
 const LinkHeader = styled(Typography)`
@@ -24,7 +23,7 @@ const LinkHeader = styled(Typography)`
   font-size: 1.3em;
   font-weight: bold;
   margin: 1em 0;
-  border-top: 4px solid #999;
+  border-top: 4px solid ${({ theme }) => theme.palette.divider};
   padding-top: .5em;
 `;
 
@@ -35,6 +34,11 @@ const StyledLink = styled(Link)`
     color: inherit;
   }
 `;
+
+const StyledIconButton = styled(IconButton)`
+  color: inherit;
+  margin-right: ${({ theme }) => theme.spacing(1)};
+` as typeof IconButton;
 
 export default function Footer () {
   return (
@@ -60,18 +64,18 @@ export default function Footer () {
               Social
             </LinkHeader>
             <Box display='flex' alignItems='center'>
-              <IconButton sx={{ mr: 1 }} color='white' href='https://www.linkedin.com/company/charmverse' target='_blank'>
+              <StyledIconButton href='https://www.linkedin.com/company/charmverse' target='_blank'>
                 <LinkedInIcon />
-              </IconButton>
-              <IconButton sx={{ mr: 1 }} color='white' href='https://twitter.com/charmverse' target='_blank'>
+              </StyledIconButton>
+              <StyledIconButton href='https://twitter.com/charmverse' target='_blank'>
                 <TwitterIcon />
-              </IconButton>
-              <IconButton sx={{ mr: 1 }} color='white' href='https://www.facebook.com/charmverse.io' target='_blank'>
+              </StyledIconButton>
+              <StyledIconButton href='https://www.facebook.com/charmverse.io' target='_blank'>
                 <FacebookIcon />
-              </IconButton>
-              <IconButton sx={{ mr: 1 }} color='white' href='https://discord.gg/UEsngsk8E2' target='_blank'>
-                <SvgIcon viewBox='0 -5 70 70'><DiscordIcon style={{ fill: '#fff' }} /></SvgIcon>
-              </IconButton>
+              </StyledIconButton>
+              <StyledIconButton href='https://discord.gg/UEsngsk8E2' target='_blank'>
+                <SvgIcon viewBox='0 -5 70 70'><DiscordIcon /></SvgIcon>
+              </StyledIconButton>
             </Box>
           </Grid>
         </Grid>
