@@ -74,7 +74,6 @@ const StyledImage = styled.img`
   &:hover {
     cursor: initial;
   }
-  box-shadow: ${({ theme }) => theme.shadows[3]};
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
@@ -213,7 +212,7 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
     >
       <div className='content' style={{ position: 'relative' }}>
         { /* eslint-disable-next-line */}
-        <Box 
+        <Box
           sx={{
             position: 'relative',
             cursor: 'col-resize',

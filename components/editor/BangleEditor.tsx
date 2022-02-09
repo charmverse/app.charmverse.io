@@ -175,7 +175,11 @@ export default function BangleEditor (
         containerDOM: ['div']
       })
     ],
-    initialValue: Node.fromJSON(specRegistry.schema, content)
+    initialValue: Node.fromJSON(specRegistry.schema, content),
+    // hide the black bar when dragging items - we dont even support dragging most components
+    dropCursorOpts: {
+      color: 'transparent'
+    }
   });
 
   let pageTitleTop = 50; let bangleEditorTop = 75; let
