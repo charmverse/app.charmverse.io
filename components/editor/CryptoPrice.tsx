@@ -64,14 +64,9 @@ export function CryptoPrice ({ preset } : {preset?: Partial<ICurrencyPair> }) {
       });
   }
 
-  function currencySelected (selected: string, eventFromList: OptionListName): void {
-
-    if (eventFromList === 'base') {
-      setBaseCurrency(selected as any);
-    }
-    else if (eventFromList === 'quote') {
-      setQuoteCurrency(selected as any);
-    }
+  function changeQuoteCurrency (newQuote: FiatCurrency): void {
+    setSelectionList(null);
+    setQuoteCurrency(newQuote);
   }
 
   return (
@@ -85,18 +80,14 @@ export function CryptoPrice ({ preset } : {preset?: Partial<ICurrencyPair> }) {
           {quoteCurrency}
           {' '}
           <ArrowDropDown onClick={() => setSelectionList('base')} />
-          <Autorenew onClick={refreshPrice} sx={{ float: 'right' }} />
+          <Autorenew onClick={() => refreshPrice()} sx={{ float: 'right' }} />
         </Typography>
 
-        {/*
-            Section for display list of cryptos
-
-            REINSERT BELOW IF NEEDED
-            <InputSearch name={selectionList} options={listOptions} callback={currencySelected} />
-          */}
         {
           selectionList === 'base' && (
-            <InputSearchCurrency />
+            <div style={{ marginTop: '4px' }}>
+              <InputSearchCurrency callback={changeQuoteCurrency} />
+            </div>
           )
         }
 
@@ -121,7 +112,9 @@ export function CryptoPrice ({ preset } : {preset?: Partial<ICurrencyPair> }) {
           <p style={{ margin: 'auto', minWidth: '250px', textAlign: 'center', fontSize: '14px', paddingBottom: '3px' }}>
             Updated:
             {' '}
-            <RelativeTime timestamp={lastQuote.receivedOn > 0 ? lastQuote.receivedOn : Date.now()} />
+            <RelativeTime timestamp={(
+              lastQuote?.receivedOn && lastQuote?.receivedOn > 0) ? lastQuote.receivedOn : Date.now()}
+            />
           </p>
         )
       }
