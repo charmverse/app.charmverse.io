@@ -1,7 +1,7 @@
-import { Currency, IPairQuote } from '../models/Currency';
+import { CryptoCurrency, FiatCurrency, IPairQuote } from '../models/Currency';
 import fetch from '../adapters/http/fetch';
 
-export function getPricing (base: Currency, quote: Currency): Promise<IPairQuote> {
+export function getPricing (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
   return new Promise((resolve, reject) => {
     fetch(`https://min-api.cryptocompare.com/data/price?fsym=${base}&tsyms=${quote}`)
       .then(data => {
@@ -13,6 +13,8 @@ export function getPricing (base: Currency, quote: Currency): Promise<IPairQuote
         };
 
         resolve(pairQuote);
+      }).catch(error => {
+        reject(error);
       });
   });
 
