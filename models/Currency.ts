@@ -4,9 +4,13 @@ export type FiatCurrency = 'USD' | 'GBP' | 'EUR' | 'JPY' | 'ZAR';
 
 export type Currency = CryptoCurrency | FiatCurrency;
 
-export interface IPairQuote {
+export interface ICurrencyPair {
   base: CryptoCurrency;
   quote: FiatCurrency;
+}
+
+export interface IPairQuote extends ICurrencyPair {
   amount: number;
+  receivedOn?: number | Date;
   source?: string;
 }
