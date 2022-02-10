@@ -50,7 +50,7 @@ export default function BountyCard ({
       <StyledTitled>
         {content}
       </StyledTitled>
-      <Stack direction='row' spacing={1} mt={2}>
+      <Stack direction='row' spacing={2} mt={2}>
         <Chip label={status} color='primary' />
         <Chip label={type} color='secondary' />
       </Stack>

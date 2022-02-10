@@ -65,7 +65,7 @@ const BountyLabel = styled.div`
   justify-content: space-between;
   position: relative;
   cursor: pointer;
-  margin-top: 8px;
+  margin-top: 48px;
 `;
 
 const SidebarContainer = styled.div`
