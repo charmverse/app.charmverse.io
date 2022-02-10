@@ -5,6 +5,7 @@ import {
 import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import ImageIcon from '@mui/icons-material/Image';
+import InsertChartIcon from '@mui/icons-material/InsertChart';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
   isList
@@ -45,8 +46,11 @@ function createTableHeader(state: EditorState, text: string) {
 function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node) {
   const insertPos = state.selection.$from.after();
 
+
   const tr = state.tr;
   const newTr = safeInsert(nodeToInsert, insertPos)(state.tr);
+
+
 
   if (tr === newTr) {
     return false;
@@ -60,6 +64,29 @@ function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => voi
 }
 
 const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> = {
+  crypto: [
+    {
+      uid: 'price',
+      title: 'Crypto price',
+      icon: <InsertChartIcon sx={{fontSize: 16}}
+      />,
+      description: 'Display a crypto price',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          // Execute the animation
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.cryptoPrice.create())
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+
+        };
+      },
+    }
+  ],
   media: [
     {
       uid: 'image',
@@ -88,6 +115,39 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
         };
       },
     },
+    {
+      uid: 'insertSimpleTable',
+      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM224 416H64v-96h160v96zm0-160H64v-96h160v96zm224 160H288v-96h160v96zm0-160H288v-96h160v96z" /></svg>,
+      title: 'Table',
+      keywords: ['table'],
+      description: 'Insert a simple table below',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch, view) => {
+            return insertNode(state, dispatch, state.schema.nodes.table.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
+                  createTableHeader(state, "Header 1"),
+                  createTableHeader(state, "Header 2"),
+                  createTableHeader(state, "Header 3"),
+                ])),
+                state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
+                  createTableCell(state, "Cell 1"),
+                  createTableCell(state, "Cell 2"),
+                  createTableCell(state, "Cell 3"),
+                ]))
+              ])
+            ))
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    }
   ],
   text: [
     {
@@ -244,41 +304,6 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
           rafCommandExec(view!, (state, dispatch, view) => {
             setBlockType(state.schema.nodes.paragraph)(state, dispatch);
             return toggleOrderedList()(view!.state, view!.dispatch, view);
-          });
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view,
-          );
-        };
-      },
-    }
-  ],
-  "layout": [
-    {
-      uid: 'insertSimpleTable',
-      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM224 416H64v-96h160v96zm0-160H64v-96h160v96zm224 160H288v-96h160v96zm0-160H288v-96h160v96z" /></svg>,
-      title: 'Table',
-      keywords: ['layout', 'table'],
-      description: 'Insert a simple table below',
-      editorExecuteCommand: () => {
-        return (state, dispatch, view) => {
-          rafCommandExec(view!, (state, dispatch, view) => {
-            return insertNode(state, dispatch, state.schema.nodes.table.create(
-              undefined,
-              Fragment.fromArray([
-                state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
-                  createTableHeader(state, "Header 1"),
-                  createTableHeader(state, "Header 2"),
-                  createTableHeader(state, "Header 3"),
-                ])),
-                state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
-                  createTableCell(state, "Cell 1"),
-                  createTableCell(state, "Cell 2"),
-                  createTableCell(state, "Cell 3"),
-                ]))
-              ])
-            ))
           });
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,

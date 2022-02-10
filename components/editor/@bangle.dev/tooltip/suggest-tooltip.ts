@@ -41,7 +41,7 @@ export const defaultKeys = {
 function specFactory({
   markName,
   trigger,
-  markColor = '#005893',
+  markColor,
 }: {
   markName: string;
   trigger: string;
@@ -61,7 +61,7 @@ function specFactory({
           {
             'data-bangle-name': markName,
             'data-suggest-trigger': mark.attrs.trigger,
-            'style': `color: ${markColor}`,
+            'style': markColor ? `color: ${markColor}` : '',
           },
         ];
       },
@@ -236,7 +236,7 @@ function referenceElement(
         // if the suggestMark text spanned two lines, we want to show the tooltip based on the end pos
         // so that it doesn't hide the text
         const end = view.coordsAtPos(markPos.end > -1 ? markPos.end : startPos);
-        
+
         let { left, right, top, bottom } = end;
         right = left;
         return {
