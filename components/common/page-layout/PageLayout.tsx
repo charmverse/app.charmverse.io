@@ -4,7 +4,6 @@ import { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
-import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import * as React from 'react';
@@ -78,7 +77,6 @@ const HeaderSpacer = styled.div`
 
 export function PageLayout ({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
-  const scrollbarStyling = useScrollbarStyling();
   const [user] = useUser();
   const { currentPage } = usePages();
 
@@ -106,8 +104,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
         </Drawer>
         <Box sx={{
           flexGrow: 1,
-          overflow: 'auto',
-          ...scrollbarStyling
+          overflow: 'auto'
         }}
         >
           <Box component='main' sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
