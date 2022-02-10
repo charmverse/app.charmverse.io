@@ -22,7 +22,7 @@ function BountyContainer (): ReactElement {
       {bounties.map((bounty: any) => (
         <Grid item key={bounty.id}>
           {/* // xtungvo TODO: update to handle action for editing bounty */}
-          <BountyCard {...bounty} />
+          <BountyCard bounty={bounty} />
         </Grid>
       ))}
     </Grid>
@@ -86,7 +86,7 @@ export default function BountyPage () {
           fontSize: '30px',
           color: '#6A6A6A',
           fontWeight: 'bold',
-          marginLeft: '8px'
+          marginLeft: '16px'
         }}
       >
         Bounty Panel

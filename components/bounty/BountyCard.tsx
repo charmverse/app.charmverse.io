@@ -4,6 +4,8 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import styled from '@emotion/styled';
 
+import type { IBountyCard } from 'types/bounty';
+
 // xtungvo TODO: apply theme changes
 const StyledTitled = styled.div`
   display: -webkit-box;
@@ -18,22 +20,19 @@ const StyledTitled = styled.div`
   flex-grow: 1;
 `;
 
-interface BountyCardProps {
-  // TODO: define the key later
-  id: number;
-  title: string;
-  // TODO: update this to enum with later requirement
-  status: string;
-  // TODO: update this to enum with later requirement
-  type: string;
+const statusMap = {
+  // xtungvo TODO: apply i18n
+  pending: 'Not Started',
+  done: 'Done',
+  inprogress: 'In Progress'
+};
+
+interface IBountyCardProps {
+  bounty: IBountyCard;
 }
 
-export default function BountyCard ({
-  id,
-  title,
-  status,
-  type
-}: BountyCardProps) {
+export default function BountyCard ({ bounty }: IBountyCardProps) {
+  const { id, title, content, type, status } = bounty;
   return (
     <Box
       key={id}
@@ -47,14 +46,18 @@ export default function BountyCard ({
         flexDirection: 'column'
       }}
     >
-      <StyledTitled>
-        {title}
-      </StyledTitled>
+      <StyledTitled>{title}</StyledTitled>
       <Stack direction='row' spacing={2} mt={2}>
-        <Chip label={status} color='primary' />
-        <Chip label={type} color='secondary' />
+        <Chip label={statusMap[status]} color='primary' />
+        <Chip label={type.toUpperCase()} color='secondary' />
       </Stack>
-      <Button variant='outlined' sx={{ marginTop: '16px', width: '120px', alignSelf: 'flex-end' }} onClick={() => { }}>APPLY</Button>
+      <Button
+        variant='outlined'
+        sx={{ marginTop: '16px', width: '120px', alignSelf: 'flex-end' }}
+        onClick={() => {}}
+      >
+        APPLY
+      </Button>
     </Box>
   );
 }
