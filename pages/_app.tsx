@@ -241,7 +241,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
           </Head>
           <ColorModeContext.Provider value={colorMode}>
             <ThemeProvider theme={theme}>
-              <CssBaseline />
+              <CssBaseline enableColorScheme={true} />
               <Web3ReactProvider getLibrary={getLibrary}>
                 <Web3ConnectionManager>
                   <RouteGuard>

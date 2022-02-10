@@ -11,7 +11,6 @@ import Box from '@mui/material/Box';
 import { GetEmojiGroupsType, getSuggestTooltipKey, selectEmoji } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { getEmojiByAlias } from 'components/editor/EmojiSuggest';
 import GroupLabel from 'components/editor/GroupLabel';
-import { useScrollbarStyling } from 'hooks/useScrollbarStyling';
 import React, { useCallback, useMemo } from 'react';
 import reactDOM from 'react-dom';
 
@@ -126,7 +125,6 @@ export function EmojiSuggestContainer({
     squareSide,
   });
   const theme = useTheme();
-  const scrollbarStyling = useScrollbarStyling();
   const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
 
   const { item: activeItem } = resolveCounter(counter, emojiGroups);
@@ -220,7 +218,7 @@ export function EmojiSuggestContainer({
           </Typography>
         </ListItem>
       </Box>
-      <Box sx={{...scrollbarStyling, height: insidePageIcon && !insideCallout ? 320 : 400, overflowX: "hidden"}}>
+      <Box sx={{height: insidePageIcon && !insideCallout ? 320 : 400, overflowX: "hidden"}}>
         {emojiGroups.map(({ name: groupName, emojis }, i) => {
           return (
             <Box p={1} className="bangle-emoji-suggest-group" key={groupName || i}>
