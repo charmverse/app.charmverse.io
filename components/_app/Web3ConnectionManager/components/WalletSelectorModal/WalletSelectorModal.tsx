@@ -124,7 +124,7 @@ function WalletSelectorModal ({
               target='_blank'
             >
               Learn more
-              <IconButton size='small' sx={{ color: 'inherit' }}><ArrowSquareOut /></IconButton>
+              <IconButton size='small' sx={{ color: 'inherit' }}><ArrowSquareOut fontSize='small' /></IconButton>
             </Link>
           </Typography>
         </Grid>
