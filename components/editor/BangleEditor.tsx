@@ -30,12 +30,13 @@ import { ChangeEvent, ReactNode, useContext, useRef } from 'react';
 import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
-import { cryptoPriceSpec, CryptoPrice } from './CryptoPrice';
+import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
 import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
 const specRegistry = new SpecRegistry([
+  cryptoPriceSpec(),
   imageSpec(),
   paragraph.spec(),
   bold.spec(),
@@ -57,8 +58,7 @@ const specRegistry = new SpecRegistry([
   tableCell,
   tableHeader,
   tableRow,
-  blockQuoteSpec(),
-  cryptoPriceSpec()
+  blockQuoteSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
@@ -165,15 +165,19 @@ export default function BangleEditor (
       NodeView.createPlugin({
         name: 'blockquote',
         containerDOM: ['blockquote'],
-        contentDOM: ['span']
+        contentDOM: ['div']
       }),
       NodeView.createPlugin({
         name: 'codeBlock',
         containerDOM: ['pre'],
-        contentDOM: ['span']
+        contentDOM: ['div']
       }),
       NodeView.createPlugin({
         name: 'image',
+        containerDOM: ['div']
+      }),
+      NodeView.createPlugin({
+        name: 'cryptoPrice',
         containerDOM: ['div']
       })
     ],

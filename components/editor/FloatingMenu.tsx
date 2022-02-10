@@ -43,6 +43,11 @@ export const floatingMenuPlugin = () => {
   return floatingMenu.plugins({
     key: menuKey,
     calculateType: state => {
+      if (state.selection.empty
+        || (state.selection as NodeSelection)?.node?.type?.name.match(/(image)|(cryptoPrice)/)) {
+        return null;
+      }
+
       // if inside a table, first check to see if we are resizing or not
       const isInsideTable = state.selection.$anchor.parent.type.name.match(/^(table_cell|table_header)$/);
       if (isInsideTable) {
@@ -59,9 +64,7 @@ export const floatingMenuPlugin = () => {
           return null;
         }
       }
-      if (state.selection.empty || (state.selection as NodeSelection)?.node?.type?.name.match(/(image)/)) {
-        return null;
-      }
+
       return 'defaultMenu';
     }
   });

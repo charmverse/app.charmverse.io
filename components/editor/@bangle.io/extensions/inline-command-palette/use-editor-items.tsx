@@ -75,7 +75,6 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
         return (state, dispatch, view) => {
           // Execute the animation
           rafCommandExec(view!, (state, dispatch) => {
-
             return insertNode(state, dispatch, state.schema.nodes.cryptoPrice.create())
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(

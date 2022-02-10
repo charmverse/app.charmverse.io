@@ -1,11 +1,11 @@
 import { BaseRawNodeSpec } from '@bangle.dev/core';
-import { Button, Card, CardActions, CardContent, CardHeader, CircularProgress, Typography, Box } from '@mui/material';
-import { Autorenew, ArrowDropDown } from '@mui/icons-material';
-import { useEffect, useState, Suspense } from 'react';
-import LoadingComponent from '../common/LoadingComponent';
+import { DOMOutputSpec } from '@bangle.dev/pm';
+import { ArrowDropDown, Autorenew } from '@mui/icons-material';
+import { Card, CardContent, CircularProgress, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { InputSearchCurrency } from '../../components/common/form/InputSearchCurrency';
 import { getPricing } from '../../hooks/usePricing';
-import { CryptoCurrency, FiatCurrency, ICurrencyPair, IPairQuote, CryptoCurrencyList, FiatCurrencyList, Currency } from '../../models/Currency';
+import { CryptoCurrency, FiatCurrency, ICurrencyPair, IPairQuote } from '../../models/Currency';
 import { formatMoney } from '../../utilities/formatting';
 import { RelativeTime } from '../common/RelativeTime';
 
@@ -22,7 +22,13 @@ export function cryptoPriceSpec () {
   const spec: BaseRawNodeSpec = {
     name: 'cryptoPrice',
     type: 'node',
-    schema: {}
+    schema: {
+      group: 'block',
+      parseDOM: [{ tag: 'div.cryptoPrice' }],
+      toDOM: (): DOMOutputSpec => {
+        return ['div.cryptoPrice', 0];
+      }
+    }
   };
   return spec;
 }
@@ -70,7 +76,7 @@ export function CryptoPrice ({ preset } : {preset?: Partial<ICurrencyPair> }) {
   }
 
   return (
-    <Card raised={true} sx={{ display: 'inline-block', mx: '10px' }}>
+    <Card className='cryptoPrice' component='div' raised={true} sx={{ display: 'inline-block', mx: '10px' }}>
       <CardContent>
         <Typography variant='h2'>
           {baseCurrency}
