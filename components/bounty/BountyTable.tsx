@@ -5,11 +5,12 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-
 import Paper from '@mui/material/Paper';
 
+import type { ISuggestingBounty } from 'types/bounty';
+
 interface Props {
-  items: Array<any>
+  items: Array<ISuggestingBounty>
 }
 
 export default function BountyTable (props: Props) {
@@ -36,7 +37,7 @@ export default function BountyTable (props: Props) {
                 {row.title}
               </TableCell>
               {/* // xtungvo TODO: content render here */}
-              <TableCell>{JSON.stringify(row.content)}</TableCell>
+              <TableCell>{row.preview}</TableCell>
               <TableCell>{row.author}</TableCell>
               <TableCell>{row.createdAt.toString()}</TableCell>
             </TableRow>

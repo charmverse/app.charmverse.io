@@ -1,4 +1,4 @@
-import React, { ReactElement, useReducer, useState, useCallback, useMemo, useContext } from 'react';
+import React, { ReactElement, useReducer, useMemo, useContext } from 'react';
 
 const initialSuggestionState = { suggestedBounties: [] };
 
@@ -11,6 +11,7 @@ function suggestionReducer (state: any, action: any) {
     default: throw new Error();
   }
 }
+
 const SuggestionContext = React.createContext<any | null>(null);
 
 export function SuggestionProvider (props: { children: React.ReactNode }): ReactElement {
@@ -19,7 +20,7 @@ export function SuggestionProvider (props: { children: React.ReactNode }): React
     suggestedBounties: state.suggestedBounties,
     addBounty: (bounty: any) => {
       const buildAction = () => (
-        { type: 'ADD_SUGGESTED_BOUNTY', item: { id: Math.random(), ...bounty } }
+        { type: 'ADD_SUGGESTED_BOUNTY', item: bounty }
       );
       dispatch(buildAction());
     }
