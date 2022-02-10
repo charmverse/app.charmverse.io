@@ -79,14 +79,14 @@ export function CryptoPrice ({ preset } : {preset?: Partial<ICurrencyPair> }) {
           {' '}
           {quoteCurrency}
           {' '}
-          <ArrowDropDown onClick={() => setSelectionList('base')} />
+          <ArrowDropDown onClick={() => setSelectionList('quote')} />
           <Autorenew onClick={() => refreshPrice()} sx={{ float: 'right' }} />
         </Typography>
 
         {
-          selectionList === 'base' && (
+          selectionList === 'quote' && (
             <div style={{ marginTop: '4px' }}>
-              <InputSearchCurrency callback={changeQuoteCurrency} />
+              <InputSearchCurrency onChange={changeQuoteCurrency} />
             </div>
           )
         }

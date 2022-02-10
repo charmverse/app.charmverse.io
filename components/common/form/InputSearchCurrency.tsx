@@ -4,20 +4,18 @@ import { FiatCurrencyList, FiatCurrency } from '../../../models/Currency';
 
 const currencyOptions = Object.keys(FiatCurrencyList);
 
-export function InputSearchCurrency ({ callback }: {callback: (value: FiatCurrency) => any}) {
+export function InputSearchCurrency ({ onChange }: {onChange: (value: FiatCurrency) => any}) {
 
   function emitValue (value: string) {
-    if (currencyOptions.indexOf(value) >= 0) {
-      callback(value as FiatCurrency);
+    if (value !== null && currencyOptions.indexOf(value) >= 0) {
+      onChange(value as FiatCurrency);
     }
   }
 
   return (
     <Autocomplete
       onChange={(event, value) => {
-        if (value !== null) {
-          emitValue(value as any);
-        }
+        emitValue(value as any);
       }}
       id='currency'
       sx={{ minWidth: 150 }}
