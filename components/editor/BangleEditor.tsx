@@ -33,6 +33,7 @@ import { Code } from './Code';
 import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
 import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
+import PageTitle from './Page/PageTitle';
 
 const specRegistry = new SpecRegistry([
   imageSpec(),
@@ -71,18 +72,8 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 `;
 
-const PageTitle = styled.input`
-  background: transparent;
-  border: 0 none;
-  color: ${({ theme }) => theme.palette.text.primary};
-  cursor: text;
-  font-size: 40px;
-  font-weight: 700;
-  outline: none;
-`;
-
 function EmojiContainer (
-  { updatePageIcon, top, children }: {updatePageIcon: (icon: string) => void, children: ReactNode, top: number}
+  { updatePageIcon, top, children }: { updatePageIcon: (icon: string) => void, children: ReactNode, top: number }
 ) {
   const view = useContext(EditorViewContext);
   const ref = useRef<HTMLDivElement>(null);
@@ -110,11 +101,13 @@ function EmojiContainer (
           }
           else {
             view.dispatch(
-            // Chain transactions together
-              view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_PAGE_ICON',
+              // Chain transactions together
+              view.state.tr.setMeta(emojiSuggestKey, {
+                type: 'INSIDE_PAGE_ICON',
                 onClick: (emoji: string) => updatePageIcon(emoji),
                 ref: ref.current,
-                getPos: () => 0 }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
+                getPos: () => 0
+              }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
             );
           }
         }
@@ -248,8 +241,6 @@ export default function BangleEditor (
       }}
       >
         <PageTitle
-          placeholder='Untitled'
-          autoFocus
           value={page.title}
           onChange={updateTitle}
         />
