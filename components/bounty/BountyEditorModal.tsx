@@ -40,6 +40,11 @@ export default function BountyEditorModal (props: Props) {
     ]
   });
 
+  const handleSubmit = () => {
+    // xtungvo TODO: define the schema
+    onSubmit({ id: uuidv4(), title, createdAt: new Date(), author: user?.username || '0x000000', content: updatingContent, preview: updatingPreview });
+  };
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Create Bounty</DialogTitle>
@@ -63,11 +68,7 @@ export default function BountyEditorModal (props: Props) {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={() => {
-          // xtungvo TODO: define the schema
-          onSubmit({ id: uuidv4(), title, createdAt: new Date(), author: user?.username || '0x000000', content: updatingContent, preview: updatingPreview });
-        }}
-        >
+        <Button onClick={handleSubmit}>
           Submit
         </Button>
       </DialogActions>

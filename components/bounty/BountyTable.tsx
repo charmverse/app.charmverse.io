@@ -39,7 +39,7 @@ export default function BountyTable (props: Props) {
               {/* // xtungvo TODO: content render here */}
               <TableCell>{row.preview}</TableCell>
               <TableCell>{row.author}</TableCell>
-              <TableCell>{row.createdAt.toString()}</TableCell>
+              <TableCell>{row.createdAt.toLocaleString()}</TableCell>
             </TableRow>
           ))}
         </TableBody>
