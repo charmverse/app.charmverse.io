@@ -4,7 +4,7 @@ import React, {useState, useRef, useEffect, useMemo} from 'react'
 import { useRouter } from 'next/router';
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useHotkeys} from 'react-hotkeys-hook'
-import {debounce} from 'lodash'
+import debounce from 'lodash/debounce'
 
 import Button from '../../widgets/buttons/button'
 import Editable from '../../widgets/editable'

@@ -10,7 +10,7 @@ import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import Link from 'components/common/Link';
 import { Error } from 'components/common/Error';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { ArrowSquareOut } from 'phosphor-react';
+import ArrowSquareOut from '@mui/icons-material/Launch';
 import { useEffect, useRef } from 'react';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
@@ -124,7 +124,7 @@ function WalletSelectorModal ({
               target='_blank'
             >
               Learn more
-              <IconButton size='small' sx={{ color: 'inherit' }}><ArrowSquareOut /></IconButton>
+              <IconButton size='small' sx={{ color: 'inherit' }}><ArrowSquareOut fontSize='small' /></IconButton>
             </Link>
           </Typography>
         </Grid>

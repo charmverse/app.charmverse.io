@@ -33,7 +33,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const theme = useTheme();
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
-  const isPage = router.route.includes('pagePath');
+  const isPage = router.route.includes('pageId');
 
   function toggleFavorite () {
     if (!currentPage || !user) return;
