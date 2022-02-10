@@ -118,7 +118,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
       {
         baseCurrency !== null && (
         <CardContent>
-          <Typography variant='h2'>
+          <Typography variant='h5'>
             {baseCurrency}
             {' '}
             <ArrowDropDown onClick={() => setSelectionList('base')} />
