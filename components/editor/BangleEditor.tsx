@@ -26,6 +26,7 @@ import Emoji from 'components/common/Emoji';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { Page, PageContent } from 'models';
+import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { ChangeEvent, ReactNode, useContext, useRef } from 'react';
 import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
@@ -213,8 +214,25 @@ export default function BangleEditor (
         // eslint-disable-next-line
         switch (props.node.type.name) {
           case 'cryptoPrice': {
+            /* eslint-disable-next-line */
+            const attrs = props.attrs as {base: null | CryptoCurrency, quote: null | FiatCurrency};
             return (
-              <CryptoPrice />
+              <CryptoPrice
+                preset={{
+                  base: attrs.base,
+                  quote: attrs.quote
+                }}
+                onBaseCurrencyChange={(newBaseCurrency) => {
+                  props.updateAttrs({
+                    base: newBaseCurrency
+                  });
+                }}
+                onQuoteCurrencyChange={(newQuoteCurrency) => {
+                  props.updateAttrs({
+                    quote: newQuoteCurrency
+                  });
+                }}
+              />
             );
           }
           case 'blockquote': {

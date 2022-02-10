@@ -5,7 +5,7 @@ import { Card, CardContent, CircularProgress, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { InputSearchCurrency } from '../../components/common/form/InputSearchCurrency';
 import { getPricing } from '../../hooks/usePricing';
-import { CryptoCurrency, FiatCurrency, ICurrencyPair, IPairQuote } from '../../models/Currency';
+import { CryptoCurrency, FiatCurrency, IPairQuote } from '../../models/Currency';
 import { formatMoney } from '../../utilities/formatting';
 import { RelativeTime } from '../common/RelativeTime';
 
@@ -23,6 +23,14 @@ export function cryptoPriceSpec () {
     name: 'cryptoPrice',
     type: 'node',
     schema: {
+      attrs: {
+        base: {
+          default: null
+        },
+        quote: {
+          default: null
+        }
+      },
       group: 'block',
       parseDOM: [{ tag: 'div.cryptoPrice' }],
       toDOM: (): DOMOutputSpec => {
@@ -33,7 +41,14 @@ export function cryptoPriceSpec () {
   return spec;
 }
 
-export function CryptoPrice ({ preset } : {preset?: Partial<ICurrencyPair> }) {
+export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChange }: {
+  preset?: Partial<{
+    base: CryptoCurrency | null;
+    quote: FiatCurrency | null;
+  }>,
+  onQuoteCurrencyChange: ((currency: FiatCurrency) => void),
+  onBaseCurrencyChange: ((currency: CryptoCurrency) => void)
+}) {
 
   const [loading, setLoadingState] = useState(true);
   const [baseCurrency, setBaseCurrency] = useState(preset?.base ?? 'BTC' as CryptoCurrency);
@@ -73,6 +88,7 @@ export function CryptoPrice ({ preset } : {preset?: Partial<ICurrencyPair> }) {
   function changeQuoteCurrency (newQuote: FiatCurrency): void {
     setSelectionList(null);
     setQuoteCurrency(newQuote);
+    onQuoteCurrencyChange(newQuote);
   }
 
   return (
@@ -98,18 +114,18 @@ export function CryptoPrice ({ preset } : {preset?: Partial<ICurrencyPair> }) {
         }
 
         {(loading === true && error === null) && (
-        <div>
-          <CircularProgress />
-          <h2 style={{ textAlign: 'center' }}>Loading price..</h2>
-        </div>
+          <div>
+            <CircularProgress />
+            <h2 style={{ textAlign: 'center' }}>Loading price..</h2>
+          </div>
         )}
 
         {(loading === false && lastQuote.amount > 0 && error === null) && (
-        <h2 style={{ textAlign: 'center' }}>{formatMoney(lastQuote.amount, quoteCurrency)}</h2>
+          <h2 style={{ textAlign: 'center' }}>{formatMoney(lastQuote.amount, quoteCurrency)}</h2>
         )}
 
         {error !== null && (
-        <h2 style={{ textAlign: 'center' }}>No price found</h2>
+          <h2 style={{ textAlign: 'center' }}>No price found</h2>
         )}
 
       </CardContent>
