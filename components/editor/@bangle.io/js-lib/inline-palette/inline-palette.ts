@@ -1,10 +1,8 @@
 import { BaseRawMarkSpec, PluginKey, SpecRegistry } from '@bangle.dev/core';
 import type { Command, EditorState, Schema } from '@bangle.dev/pm';
-import { createTooltipDOM, suggestTooltip } from '@bangle.dev/tooltip';
+import { createTooltipDOM } from '@bangle.dev/tooltip';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
-import {
-  SuggestTooltipRenderOpts
-} from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
+import * as suggestTooltip from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
 import { safeRequestAnimationFrame } from '../../lib/utils';
 
 const {
@@ -42,7 +40,7 @@ function pluginsFactory({
 }: {
   key: PluginKey;
   markName: string;
-  tooltipRenderOpts: SuggestTooltipRenderOpts;
+  tooltipRenderOpts: suggestTooltip.SuggestTooltipRenderOpts;
 }) {
   return ({ schema, specRegistry }: {schema: Schema, specRegistry: SpecRegistry}) => {
     const { trigger } = specRegistry.options[markName];
