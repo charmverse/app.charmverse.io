@@ -38,9 +38,7 @@ import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './Inlin
 import PageTitle from './Page/PageTitle';
 
 const specRegistry = new SpecRegistry([
-  cryptoPriceSpec(),
-  imageSpec(),
-  paragraph.spec(),
+  paragraph.spec(), // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   bold.spec(),
   bulletList.spec(),
   hardBreak.spec(),
@@ -60,7 +58,9 @@ const specRegistry = new SpecRegistry([
   tableCell,
   tableHeader,
   tableRow,
-  blockQuoteSpec()
+  blockQuoteSpec(),
+  cryptoPriceSpec(),
+  imageSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
