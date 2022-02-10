@@ -2,6 +2,8 @@ import { Button, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
+import Snackbar from 'components/common/Snackbar';
+import useSnackbar from 'hooks/useSnackbar';
 import { ReactNode, useState } from 'react';
 
 interface ImageSelectorProps {
@@ -11,9 +13,10 @@ interface ImageSelectorProps {
 }
 
 export default function ImageSelector (props: ImageSelectorProps) {
+  const { message, handleClose, isOpen, showMessage } = useSnackbar();
+
   const [embedLink, setEmbedLink] = useState('');
   const { tabs = [], children, onImageSelect } = props;
-
   return (
     <PopperPopup popupContent={(
       <Box sx={{
@@ -35,15 +38,23 @@ export default function ImageSelector (props: ImageSelectorProps) {
                 <input
                   type='file'
                   hidden
+                  accept='image/*'
                   onChange={(e) => {
                     const firstFile = e.target.files?.[0];
                     if (firstFile) {
-                      const reader = new FileReader();
-                      reader.onload = () => {
-                        const { result } = reader;
-                        onImageSelect(result as string);
-                      };
-                      reader.readAsDataURL(firstFile);
+                      // file size in mb
+                      const fileSize = firstFile.size / 1024 / 1024;
+                      if (fileSize > 1) {
+                        showMessage(`File size ${fileSize.toFixed(2)} Mb too large. Limit 1 Mb`);
+                      }
+                      else {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const { result } = reader;
+                          onImageSelect(result as string);
+                        };
+                        reader.readAsDataURL(firstFile);
+                      }
                     }
                   }}
                 />
@@ -79,6 +90,7 @@ export default function ImageSelector (props: ImageSelectorProps) {
   )}
     >
       {children}
+      <Snackbar severity='error' handleClose={handleClose} isOpen={isOpen} message={message ?? ''} />
     </PopperPopup>
   );
 }
