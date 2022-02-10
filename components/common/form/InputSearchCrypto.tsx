@@ -4,6 +4,10 @@ import { CryptoCurrencyList, CryptoCurrency } from '../../../models/Currency';
 
 const currencyOptions = Object.keys(CryptoCurrencyList);
 
+const cryptoList = ['BTC', 'ETH'] as const;
+
+type Crypto = typeof cryptoList[number]
+
 /**
  * https://www.cryptofonts.com/icons.php
  */
@@ -29,7 +33,6 @@ export function InputSearchCrypto ({ onChange }: {onChange: (value: CryptoCurren
       onChange={(event, value) => {
         emitValue(value as any);
       }}
-      id='currency'
       sx={{ minWidth: 150 }}
       options={currencyOptions}
       autoHighlight
