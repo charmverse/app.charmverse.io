@@ -1,5 +1,6 @@
 import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
+import { TextSelection } from 'prosemirror-state';
 import { ChangeEvent, useContext } from 'react';
 
 const StyledPageTitle = styled.input`
@@ -27,6 +28,11 @@ export default function PageTitle ({ value, onChange }: PageTitleProps) {
       autoFocus
       onKeyDown={(e) => {
         if (e.code === 'Enter') {
+          // prevent inserting a new line into the editor
+          e.preventDefault();
+          const { tr } = view.state;
+          // set cursor at beginning of first line
+          view.dispatch(tr.setSelection(TextSelection.atStart(tr.doc)));
           view.focus();
         }
       }}
