@@ -81,6 +81,7 @@
     "object-curly-newline": "off",
     "padded-blocks": "off",
     "prefer-promise-reject-errors": "off",
+    "react/destructuring-assignment": "off",
     "react/jsx-boolean-value": "off",
     "react/jsx-filename-extension": [
       1,
@@ -94,9 +95,11 @@
     "react/jsx-no-bind": "off",
     "react/jsx-props-no-spreading": "off",
     "react/no-unescaped-entities": "off",
+    "react/prop-types": "off",
     "react/require-default-props": "off",
     "react/react-in-jsx-scope": "off",
     "react/self-closing-comp": "off",
+    "react/state-in-constructor": "off",
     "space-before-function-paren": [
       "error",
       "always"
@@ -104,7 +107,6 @@
     "no-bitwise": "warn",
     "jsx-a11y/click-events-have-key-events": "off",
     "no-shadow": "off",
-    "@typescript-eslint/no-shadow": "error",
-    "react/prop-types": "off"
+    "@typescript-eslint/no-shadow": "error"
   }
 }

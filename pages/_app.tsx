@@ -129,6 +129,7 @@ import 'components/databases/focalboard/src/widgets/tooltip.scss';
 import 'components/databases/focalboard/src/widgets/valueSelector.scss';
 import FocalBoardPortal from 'components/databases/FocalBoardPortal';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
+import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { ColorModeContext } from 'context/color-mode';
 import { DatabaseBlocksProvider } from 'hooks/useDatabaseBlocks';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -242,7 +243,9 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
               <Web3ReactProvider getLibrary={getLibrary}>
                 <Web3ConnectionManager>
                   <RouteGuard>
-                    {getLayout(<Component {...pageProps} />)}
+                    <ErrorBoundary>
+                      {getLayout(<Component {...pageProps} />)}
+                    </ErrorBoundary>
                   </RouteGuard>
                 </Web3ConnectionManager>
               </Web3ReactProvider>
