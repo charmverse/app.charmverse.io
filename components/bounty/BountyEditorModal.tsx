@@ -4,40 +4,21 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import { useUser } from 'hooks/useUser';
 
-import { Box, Button, DialogContentText, TextField, Typography } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 
 import { useEditorState, BangleEditor } from '@bangle.dev/react';
 import { Plugin } from '@bangle.dev/core';
-import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
-import {
-  bold,
-  listItem,
-  bulletList,
-  orderedList
-} from '@bangle.dev/base-components';
 import { useState } from 'react';
 
 interface Props {
   open: boolean
-  item: any
   onClose: () => void
+  // xtungvo TODO: set the correct type
   onSubmit: (item: any) => void
 }
 
-const style = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4
-};
-
 export default function BountyEditorModal (props: Props) {
-  const { open, item, onClose, onSubmit } = props;
+  const { open, onClose, onSubmit } = props;
   const [updatingContent, setUpdatingContent] = useState({});
   const [user] = useUser();
   const editorState = useEditorState({
@@ -59,10 +40,7 @@ export default function BountyEditorModal (props: Props) {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Create Bounty</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          To subscribe to this website, please enter your email address here. We
-          will send updates occasionally.
-        </DialogContentText>
+        {/* // xtungvo TODO: update title editor */}
         <TextField
           autoFocus
           margin='dense'
@@ -71,6 +49,8 @@ export default function BountyEditorModal (props: Props) {
           fullWidth
           variant='standard'
         />
+
+        {/* // xtungvo TODO: update to use our custome editor */}
         <BangleEditor
           state={editorState}
         />
@@ -79,6 +59,7 @@ export default function BountyEditorModal (props: Props) {
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={() => {
+          // xtungvo TODO: define the schema
           onSubmit({ title: 'new one', createdAt: new Date(), author: user?.username || '0x000000', content: updatingContent });
         }}
         >

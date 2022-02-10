@@ -14,6 +14,7 @@ interface Props {
 
 export default function BountyTable (props: Props) {
   const { items } = props;
+  // xtungvo TODO: update styling
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label='simple table'>
@@ -34,6 +35,7 @@ export default function BountyTable (props: Props) {
               <TableCell component='th' scope='row'>
                 {row.title}
               </TableCell>
+              {/* // xtungvo TODO: content render here */}
               <TableCell>{JSON.stringify(row.content)}</TableCell>
               <TableCell>{row.author}</TableCell>
               <TableCell>{row.createdAt.toString()}</TableCell>

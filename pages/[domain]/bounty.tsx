@@ -10,6 +10,7 @@ import { ReactElement, useReducer, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
 
+// xtungvo TODO: refactor code to separate file
 const initialSuggestionState = { suggestedBounties: [] };
 const initialBountyState = {
   bounties: [{ content: { type: 'doc', content: [{ type: 'paragraph', content: [] }] }, author: 'Author', createdAt: '2/10/2022', description: 'description placeholder', title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', status: 'Not Started', type: 'Content', id: 1 },
@@ -47,11 +48,14 @@ function bountyReducer (state: any, action: any) {
 }
 
 export default function BountyPage () {
+  // reducers
   const [suggestionState, dispatchSuggestion] = useReducer(suggestionReducer, initialSuggestionState);
   const [bountyState, dispatchBounty] = useReducer(bountyReducer, initialBountyState);
   const { suggestedBounties } = suggestionState;
   const { bounties } = bountyState;
+
   const [bountyDialogOpen, setBountyDialogOpen] = useState(false);
+
   const submitSuggestion = (suggestingBounty: any) => {
     const buildAction = () => (
       { type: 'ADD_SUGGESTED_BOUNTY', item: { id: Math.random(), ...suggestingBounty } }
@@ -63,6 +67,7 @@ export default function BountyPage () {
       <Grid container direction='row' spacing={3} sx={{ padding: '16px' }}>
         {bounties.map((card) => (
           <Grid item key={card.id}>
+            {/* // xtungvo TODO: update to handle action for editing card */}
             <BountyCard {...card} />
           </Grid>
         ))}
@@ -77,8 +82,8 @@ export default function BountyPage () {
         </Button>
       </Box>
       <BountyTable items={suggestedBounties} />
+      {/* // xtungvo TODO: update component name to match with the responding modal for creating/editing bounty */}
       <BountyEditorModal
-        item={bounties[0]}
         open={bountyDialogOpen}
         onClose={() => {
           setBountyDialogOpen(false);
