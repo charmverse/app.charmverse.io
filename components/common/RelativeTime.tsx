@@ -43,13 +43,13 @@ export function RelativeTime ({ timestamp }: {timestamp: number | Date}) {
   switch (true) {
     case (differenceInSeconds < 5):
       label = 'just now';
-      timeoutToSet = 1000;
+      timeoutToSet = 5000;
       break;
 
     case (differenceInSeconds < 60):
-      label = `${differenceInSeconds} secs. ago`;
+      label = 'under 1 min. ago';
       // Refresh every second
-      timeoutToSet = 1000;
+      timeoutToSet = 60000;
       break;
 
     case (differenceInMinutes === 1):
