@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 
-const publicPaths = ['/login', '/'];
+const publicPaths = ['/login'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
 
