@@ -71,7 +71,6 @@ export default function BountyPage () {
         <Typography>Suggestions</Typography>
         <Button onClick={() => {
           setBountyDialogOpen(true);
-
         }}
         >
           Suggest (+)

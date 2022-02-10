@@ -2,6 +2,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+import { useUser } from 'hooks/useUser';
 
 import { Box, Button, DialogContentText, TextField, Typography } from '@mui/material';
 
@@ -38,6 +39,7 @@ const style = {
 export default function BountyEditorModal (props: Props) {
   const { open, item, onClose, onSubmit } = props;
   const [updatingContent, setUpdatingContent] = useState({});
+  const [user] = useUser();
   const editorState = useEditorState({
     initialValue: 'Hello world!',
     plugins: () => [
@@ -77,7 +79,7 @@ export default function BountyEditorModal (props: Props) {
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={() => {
-          onSubmit({ title: 'new one', createdAt: new Date(), author: '0x000000', content: updatingContent });
+          onSubmit({ title: 'new one', createdAt: new Date(), author: user?.username || '0x000000', content: updatingContent });
         }}
         >
           Submit
