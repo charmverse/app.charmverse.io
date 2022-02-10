@@ -16,7 +16,7 @@ const Content = styled.div`
 
 const StyledBolt = styled(Bolt)`
   position: relative;
-  left: -20px;
+  left: -15px;
 `;
 
 const Text = styled(Typography)`
