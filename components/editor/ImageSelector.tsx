@@ -1,8 +1,9 @@
-import { Button, SnackbarProps, TextField } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import Snackbar from 'components/common/Snackbar';
+import useSnackbar from 'hooks/useSnackbar';
 import { ReactNode, useState } from 'react';
 
 interface ImageSelectorProps {
@@ -12,20 +13,7 @@ interface ImageSelectorProps {
 }
 
 export default function ImageSelector (props: ImageSelectorProps) {
-  const [open, setOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<null | string>(null);
-
-  const handleClick = () => {
-    setOpen(true);
-  };
-
-  const handleClose: SnackbarProps['onClose'] = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setOpen(false);
-  };
+  const { message, handleClose, isOpen, showMessage } = useSnackbar();
 
   const [embedLink, setEmbedLink] = useState('');
   const { tabs = [], children, onImageSelect } = props;
@@ -57,8 +45,7 @@ export default function ImageSelector (props: ImageSelectorProps) {
                       // file size in mb
                       const fileSize = firstFile.size / 1024 / 1024;
                       if (fileSize > 1) {
-                        handleClick();
-                        setErrorMessage(`File size ${fileSize.toFixed(2)} Mb too large. Limit 1 Mb`);
+                        showMessage(`File size ${fileSize.toFixed(2)} Mb too large. Limit 1 Mb`);
                       }
                       else {
                         const reader = new FileReader();
@@ -103,7 +90,7 @@ export default function ImageSelector (props: ImageSelectorProps) {
   )}
     >
       {children}
-      <Snackbar severity='error' handleClose={handleClose} isOpen={open} message={errorMessage ?? ''} />
+      <Snackbar severity='error' handleClose={handleClose} isOpen={isOpen} message={message ?? ''} />
     </PopperPopup>
   );
 }
