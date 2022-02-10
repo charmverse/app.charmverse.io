@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function convertToUnixSeconds (timestamp: number | Date): number {
 
@@ -29,6 +29,17 @@ export function RelativeTime ({ timestamp }: {timestamp: number | Date}) {
   let label = '';
   let timeoutToSet = 0;
 
+  let timeout: any;
+
+  useEffect(() => {
+    return () => {
+      if (timeout) {
+        // Prevent no-op bug that happens when the timeout fires after component unmounting
+        clearTimeout(timeout);
+      }
+    };
+  });
+
   switch (true) {
     case (differenceInSeconds < 5):
       label = 'just now';
@@ -53,7 +64,8 @@ export function RelativeTime ({ timestamp }: {timestamp: number | Date}) {
   }
 
   // Refresh this every second
-  setTimeout(() => {
+  // eslint-disable-next-line prefer-const
+  timeout = setTimeout(() => {
     // TODO - Improve this quick hack for forcing re-renders
     refreshLabel(Math.random().toString());
   }, timeoutToSet);
