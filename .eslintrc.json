@@ -104,6 +104,7 @@
     "no-bitwise": "warn",
     "jsx-a11y/click-events-have-key-events": "off",
     "no-shadow": "off",
-    "@typescript-eslint/no-shadow": "error"
+    "@typescript-eslint/no-shadow": "error",
+    "react/prop-types": "off"
   }
 }

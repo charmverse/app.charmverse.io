@@ -5,6 +5,7 @@ import {
 import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import ImageIcon from '@mui/icons-material/Image';
+import InsertChartIcon from '@mui/icons-material/InsertChart';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
   isList
@@ -45,8 +46,11 @@ function createTableHeader(state: EditorState, text: string) {
 function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node) {
   const insertPos = state.selection.$from.after();
 
+
   const tr = state.tr;
   const newTr = safeInsert(nodeToInsert, insertPos)(state.tr);
+
+
 
   if (tr === newTr) {
     return false;
@@ -60,6 +64,29 @@ function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => voi
 }
 
 const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> = {
+  crypto: [
+    {
+      uid: 'price',
+      title: 'Crypto price',
+      icon: <InsertChartIcon sx={{fontSize: 16}}
+      />,
+      description: 'Display a crypto price',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          // Execute the animation
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.cryptoPrice.create())
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+
+        };
+      },
+    }
+  ],
   media: [
     {
       uid: 'image',

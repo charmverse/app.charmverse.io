@@ -54,6 +54,10 @@ export const floatingMenuPlugin = () => {
   return floatingMenu.plugins({
     key: menuKey,
     calculateType: state => {
+      if (state.selection.empty
+        || (state.selection as NodeSelection)?.node?.type?.name.match(/(image)|(cryptoPrice)/)) {
+        return null;
+      }
       // If were are inside a link
       if (hasComponentInSchema(state, 'link')) {
         if (
@@ -80,9 +84,7 @@ export const floatingMenuPlugin = () => {
           return null;
         }
       }
-      if (state.selection.empty || (state.selection as NodeSelection)?.node?.type?.name.match(/(image)/)) {
-        return null;
-      }
+
       return 'defaultMenu';
     }
   });

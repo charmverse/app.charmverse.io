@@ -26,16 +26,19 @@ import Emoji from 'components/common/Emoji';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { Page, PageContent } from 'models';
+import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { ChangeEvent, ReactNode, useContext, useRef } from 'react';
 import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
+import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
 import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import PageTitle from './Page/PageTitle';
 
 const specRegistry = new SpecRegistry([
+  cryptoPriceSpec(),
   imageSpec(),
   paragraph.spec(),
   bold.spec(),
@@ -156,15 +159,19 @@ export default function BangleEditor (
       NodeView.createPlugin({
         name: 'blockquote',
         containerDOM: ['blockquote'],
-        contentDOM: ['span']
+        contentDOM: ['div']
       }),
       NodeView.createPlugin({
         name: 'codeBlock',
         containerDOM: ['pre'],
-        contentDOM: ['span']
+        contentDOM: ['div']
       }),
       NodeView.createPlugin({
         name: 'image',
+        containerDOM: ['div']
+      }),
+      NodeView.createPlugin({
+        name: 'cryptoPrice',
         containerDOM: ['div']
       })
     ],
@@ -203,6 +210,28 @@ export default function BangleEditor (
       renderNodeViews={({ children, ...props }) => {
         // eslint-disable-next-line
         switch (props.node.type.name) {
+          case 'cryptoPrice': {
+            /* eslint-disable-next-line */
+            const attrs = props.attrs as {base: null | CryptoCurrency, quote: null | FiatCurrency};
+            return (
+              <CryptoPrice
+                preset={{
+                  base: attrs.base,
+                  quote: attrs.quote
+                }}
+                onBaseCurrencyChange={(newBaseCurrency) => {
+                  props.updateAttrs({
+                    base: newBaseCurrency
+                  });
+                }}
+                onQuoteCurrencyChange={(newQuoteCurrency) => {
+                  props.updateAttrs({
+                    quote: newQuoteCurrency
+                  });
+                }}
+              />
+            );
+          }
           case 'blockquote': {
             return (
               <BlockQuote {...props}>
