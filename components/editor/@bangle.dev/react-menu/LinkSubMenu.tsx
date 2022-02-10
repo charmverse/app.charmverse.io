@@ -2,6 +2,7 @@ import { link } from '@bangle.dev/base-components';
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
+import DeleteIcon from "@mui/icons-material/Delete";
 import LinkIcon from '@mui/icons-material/Link';
 import SaveIcon from '@mui/icons-material/Save';
 import { Box } from '@mui/material';
@@ -107,6 +108,13 @@ function LinkMenu({
       >
         <LinkIcon sx={{
           fontSize: 14
+        }}/>
+      </MenuButton>
+      <MenuButton hints={["Remove link"]}>
+        <DeleteIcon sx={{
+          fontSize: 14
+        }} onClick={() => {
+          link.updateLink()(view.state, view.dispatch);
         }}/>
       </MenuButton>
     </Box>
