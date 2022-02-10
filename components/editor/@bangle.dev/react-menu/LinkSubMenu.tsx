@@ -2,6 +2,7 @@ import { link } from '@bangle.dev/base-components';
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import DeleteIcon from "@mui/icons-material/Delete";
 import LinkIcon from '@mui/icons-material/Link';
 import SaveIcon from '@mui/icons-material/Save';
@@ -9,13 +10,14 @@ import { Box } from '@mui/material';
 import React, { useRef, useState } from 'react';
 import { MenuButton } from './Icon';
 
-export function LinkSubMenu({ getIsTop = () => true }) {
+export function LinkSubMenu({ showMessage, getIsTop = () => true }: {showMessage: (msg: string) => void, getIsTop?: () => boolean}) {
   const view = useEditorViewContext();
   const result = link.queryLinkAttrs()(view.state);
   const originalHref = (result && result.href) || '';
 
   return (
     <LinkMenu
+      showMessage={showMessage}
       // (hackish) Using the key to unmount then mount
       // the linkmenu so that it discards any preexisting state
       // in its `href` and starts fresh
@@ -41,7 +43,9 @@ function LinkMenu({
   getIsTop,
   view,
   originalHref = '',
+  showMessage
 }: {
+  showMessage: (msg: string) => void,
   getIsTop: () => boolean;
   view: EditorView;
   originalHref?: string;
@@ -52,7 +56,6 @@ function LinkMenu({
     link.updateLink(href)(view.state, view.dispatch);
     view.focus();
   };
-
   return (
     <Box sx={{
       display: "flex"
@@ -109,6 +112,14 @@ function LinkMenu({
         <LinkIcon sx={{
           fontSize: 14
         }}/>
+      </MenuButton>
+      <MenuButton hints={["Copy link"]}>
+        <AssignmentIcon sx={{
+          fontSize: 14
+        }} onClick={() => {
+          navigator.clipboard.writeText(href);
+          showMessage(`Link copied to clipboard`);
+        }} />
       </MenuButton>
       <MenuButton hints={["Remove link"]}>
         <DeleteIcon sx={{
