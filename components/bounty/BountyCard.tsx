@@ -21,7 +21,7 @@ const StyledTitled = styled.div`
 interface BountyCardProps {
   // TODO: define the key later
   id: number;
-  content: string;
+  title: string;
   // TODO: update this to enum with later requirement
   status: string;
   // TODO: update this to enum with later requirement
@@ -30,7 +30,7 @@ interface BountyCardProps {
 
 export default function BountyCard ({
   id,
-  content,
+  title,
   status,
   type
 }: BountyCardProps) {
@@ -48,7 +48,7 @@ export default function BountyCard ({
       }}
     >
       <StyledTitled>
-        {content}
+        {title}
       </StyledTitled>
       <Stack direction='row' spacing={2} mt={2}>
         <Chip label={status} color='primary' />
