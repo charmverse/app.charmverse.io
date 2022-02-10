@@ -4,6 +4,7 @@ import { ArrowDropDown, Autorenew } from '@mui/icons-material';
 import { Card, CardContent, CircularProgress, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { InputSearchCurrency } from '../../components/common/form/InputSearchCurrency';
+import { InputSearchCrypto } from '../../components/common/form/InputSearchCrypto';
 import { getPricing } from '../../hooks/usePricing';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from '../../models/Currency';
 import { formatMoney } from '../../utilities/formatting';
@@ -46,12 +47,12 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
     base: CryptoCurrency | null;
     quote: FiatCurrency | null;
   }>,
-  onQuoteCurrencyChange: ((currency: FiatCurrency) => void),
-  onBaseCurrencyChange: ((currency: CryptoCurrency) => void)
+  onQuoteCurrencyChange?: ((currency: FiatCurrency) => void),
+  onBaseCurrencyChange?: ((currency: CryptoCurrency) => void)
 }) {
 
   const [loading, setLoadingState] = useState(true);
-  const [baseCurrency, setBaseCurrency] = useState(preset?.base ?? 'BTC' as CryptoCurrency);
+  const [baseCurrency, setBaseCurrency] = useState(preset?.base ?? null as any as CryptoCurrency);
   const [quoteCurrency, setQuoteCurrency] = useState(preset?.quote ?? 'USD' as FiatCurrency);
   const [lastQuote, setPrice] = useState({
     amount: 0,
@@ -85,53 +86,88 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
       });
   }
 
+  function changeBaseCurrency (newBase: CryptoCurrency): void {
+    setSelectionList(null);
+    setBaseCurrency(newBase);
+
+    if (onBaseCurrencyChange) {
+      onBaseCurrencyChange(newBase);
+    }
+  }
+
   function changeQuoteCurrency (newQuote: FiatCurrency): void {
     setSelectionList(null);
     setQuoteCurrency(newQuote);
-    onQuoteCurrencyChange(newQuote);
+
+    if (onQuoteCurrencyChange) {
+      onQuoteCurrencyChange(newQuote);
+    }
   }
 
   return (
-    <Card className='cryptoPrice' component='div' raised={true} sx={{ display: 'inline-block', mx: '10px' }}>
-      <CardContent>
-        <Typography variant='h2'>
-          {baseCurrency}
-          {' '}
-          /
-          {' '}
-          {quoteCurrency}
-          {' '}
-          <ArrowDropDown onClick={() => setSelectionList('quote')} />
-          <Autorenew onClick={() => refreshPrice()} sx={{ float: 'right' }} />
-        </Typography>
+    <Card className='cryptoPrice' component='div' raised={true} sx={{ display: 'inline-block', mx: '10px', minWidth: '250px' }}>
 
-        {
+      {
+        (baseCurrency === null) && (
+          <div style={{ marginTop: '4px', padding: '5px' }}>
+            <InputSearchCrypto onChange={changeBaseCurrency} />
+          </div>
+        )
+      }
+
+      {
+        baseCurrency !== null && (
+        <CardContent>
+          <Typography variant='h2'>
+            {baseCurrency}
+            {' '}
+            <ArrowDropDown onClick={() => setSelectionList('base')} />
+            /
+            {' '}
+            {quoteCurrency}
+            {' '}
+            <ArrowDropDown onClick={() => setSelectionList('quote')} />
+            <Autorenew onClick={() => refreshPrice()} sx={{ float: 'right' }} />
+          </Typography>
+
+          {
+          (selectionList === 'base') && (
+            <div style={{ marginTop: '4px', padding: '5px' }}>
+              <InputSearchCrypto onChange={changeBaseCurrency} />
+            </div>
+          )
+        }
+
+          {
           selectionList === 'quote' && (
-            <div style={{ marginTop: '4px' }}>
+            <div style={{ marginTop: '4px', padding: '5px' }}>
               <InputSearchCurrency onChange={changeQuoteCurrency} />
             </div>
           )
         }
 
-        {(loading === true && error === null) && (
+          {(loading === true && error === null) && (
           <div>
             <CircularProgress />
             <h2 style={{ textAlign: 'center' }}>Loading price..</h2>
           </div>
-        )}
+          )}
 
-        {(loading === false && lastQuote.amount > 0 && error === null) && (
+          {(loading === false && lastQuote.amount > 0 && error === null) && (
           <h2 style={{ textAlign: 'center' }}>{formatMoney(lastQuote.amount, quoteCurrency)}</h2>
-        )}
+          )}
 
-        {error !== null && (
+          {error !== null && (
           <h2 style={{ textAlign: 'center' }}>No price found</h2>
-        )}
+          )}
 
-      </CardContent>
+        </CardContent>
+        )
+      }
+
       {
-        loading === false && (
-          <p style={{ margin: 'auto', minWidth: '250px', textAlign: 'center', fontSize: '14px', paddingBottom: '3px' }}>
+        (loading === false && baseCurrency !== null) && (
+          <p style={{ margin: 'auto', textAlign: 'center', fontSize: '14px', paddingBottom: '3px' }}>
             Updated:
             {' '}
             <RelativeTime timestamp={(
