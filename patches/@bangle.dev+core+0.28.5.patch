@@ -1,0 +1,22 @@
+diff --git a/node_modules/@bangle.dev/core/dist/node-view.js b/node_modules/@bangle.dev/core/dist/node-view.js
+index 86e0353..f6740c7 100644
+--- a/node_modules/@bangle.dev/core/dist/node-view.js
++++ b/node_modules/@bangle.dev/core/dist/node-view.js
+@@ -98,6 +98,8 @@ class BaseNodeView {
+         return this._node.attrs;
+     }
+     getNodeViewProps() {
++        // when toggling a list-item, this._getPos() is undefined once updateAttrs() is called, resulting in an exception. I wasn't able to figure out why.
++        const pos = this._getPos();
+         return {
+             node: this._node,
+             view: this._view,
+@@ -106,7 +108,7 @@ class BaseNodeView {
+             selected: this._selected,
+             attrs: this._node.attrs,
+             updateAttrs: (attrs) => {
+-                this._view.dispatch(updateAttrs(this._getPos(), this._node, attrs, this._view.state.tr));
++                this._view.dispatch(updateAttrs(pos, this._node, attrs, this._view.state.tr));
+             },
+         };
+     }
