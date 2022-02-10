@@ -29,7 +29,7 @@ export default function ErrorPage () {
     <Container>
       <Content>
         <StyledBolt />
-        <Text sx={{ mt: 5 }}>
+        <Text sx={{ mt: 3 }}>
           Sorry! there was an error
         </Text>
       </Content>
