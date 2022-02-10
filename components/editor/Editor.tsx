@@ -24,9 +24,9 @@ const StyledListItem = styled(ListItem)`
   gap: 1;
   padding: ${({ theme }) => theme.spacing(0.75)};
   width: fit-content;
-` as React.FC<{disableRipple: boolean, button: boolean, children: ReactNode}>;
+` as React.FC<{ disableRipple: boolean, button: boolean, children: ReactNode }>;
 
-function PageControlItem (props: {children: ReactNode} & ListItemProps) {
+function PageControlItem (props: { children: ReactNode } & ListItemProps) {
   const { children, ...rest } = props;
   return (
     <StyledListItem {...rest} disableRipple button>
@@ -60,6 +60,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
   if (page.icon && page.headerImage) {
     pageControlTop = 50;
   }
+  console.log('objeczzzzzzzzzt', page.content);
 
   return (
     <Box>
@@ -71,30 +72,30 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
         }}
         >
           {!page.icon && (
-          <PageControlItem onClick={() => {
-            setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
-          }}
-          >
-            <EmojiEmotionsIcon
-              fontSize='small'
-              sx={{ marginRight: 1 }}
-            />
-            Add icon
-          </PageControlItem>
+            <PageControlItem onClick={() => {
+              setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
+            }}
+            >
+              <EmojiEmotionsIcon
+                fontSize='small'
+                sx={{ marginRight: 1 }}
+              />
+              Add icon
+            </PageControlItem>
           )}
           {!page.headerImage && (
-          <PageControlItem
-            onClick={() => {
-              // Charmverse logo
-              setPage({ ...page, headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
-            }}
-          >
-            <ImageIcon
-              fontSize='small'
-              sx={{ marginRight: 1 }}
-            />
-            Add cover
-          </PageControlItem>
+            <PageControlItem
+              onClick={() => {
+                // Charmverse logo
+                setPage({ ...page, headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
+              }}
+            >
+              <ImageIcon
+                fontSize='small'
+                sx={{ marginRight: 1 }}
+              />
+              Add cover
+            </PageControlItem>
           )}
         </Controls>
 
