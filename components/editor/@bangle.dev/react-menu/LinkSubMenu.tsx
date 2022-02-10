@@ -56,6 +56,9 @@ function LinkMenu({
     link.updateLink(href)(view.state, view.dispatch);
     view.focus();
   };
+
+  const isSavedDisabled = href === originalHref || (!/^(ipfs|http(s?)):\/\//i.test(href));
+
   return (
     <Box sx={{
       display: "flex"
@@ -92,12 +95,12 @@ function LinkMenu({
           e.preventDefault();
         }}
       />
-      <MenuButton disableButton={href === originalHref} hints={["Save"]}>
-        <SaveIcon color={href !== originalHref ? "inherit" : "disabled"} sx={{
+      <MenuButton disableButton={isSavedDisabled} hints={["Save"]}>
+        <SaveIcon color={!isSavedDisabled ? "inherit" : "disabled"} sx={{
           fontSize: 14
         }} onClick={() => {
           // Only update attribute if the value has changed
-          if (href !== originalHref) {
+          if (!isSavedDisabled) {
             link.updateLink(href)(view.state, view.dispatch);
           }
         }}/>
