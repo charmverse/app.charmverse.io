@@ -2,9 +2,8 @@ import { link } from '@bangle.dev/base-components';
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import CancelIcon from '@mui/icons-material/Cancel';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LinkIcon from '@mui/icons-material/Link';
+import SaveIcon from '@mui/icons-material/Save';
 import { Box } from '@mui/material';
 import React, { useRef, useState } from 'react';
 import { MenuButton } from './Icon';
@@ -27,7 +26,7 @@ export function LinkSubMenu({ getIsTop = () => true }) {
   );
 }
 
-const StyledLink = styled.input`
+const StyledInput = styled.input`
   background: ${({theme}) => theme.palette.background.default};
   outline: none;
   border: none;
@@ -57,7 +56,7 @@ function LinkMenu({
     <Box sx={{
       display: "flex"
     }}>
-      <StyledLink
+      <StyledInput
         value={href}
         ref={inputRef}
         onKeyDown={(e) => {
@@ -89,6 +88,16 @@ function LinkMenu({
           e.preventDefault();
         }}
       />
+      <MenuButton disableButton={href === originalHref} hints={["Save"]}>
+        <SaveIcon color={href !== originalHref ? "inherit" : "disabled"} sx={{
+          fontSize: 14
+        }} onClick={() => {
+          // Only update attribute if the value has changed
+          if (href !== originalHref) {
+            link.updateLink(href)(view.state, view.dispatch);
+          }
+        }}/>
+      </MenuButton>
       <MenuButton
         hints={["Visit"]}
         onMouseDown={(e) => {
@@ -100,33 +109,6 @@ function LinkMenu({
           fontSize: 14
         }}/>
       </MenuButton>
-      {href === originalHref ? (
-        <MenuButton
-          hints={["Clear"]}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            link.updateLink()(view.state, view.dispatch);
-            view.focus();
-          }}
-        >
-          <CancelIcon sx={{
-            fontSize: 14
-          }}/>
-        </MenuButton>
-      ) : (
-        <MenuButton
-          hints={["Save"]}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleSubmit();
-            view.focus();
-          }}
-        >
-          <CheckCircleIcon sx={{
-            fontSize: 14
-          }}/>
-        </MenuButton>
-      )}
     </Box>
   );
 }
