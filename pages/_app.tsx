@@ -1,40 +1,16 @@
-import { IntlProvider } from 'react-intl';
-import { Provider as ReduxProvider } from 'react-redux';
+import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
+// fullcalendar css
+import '@fullcalendar/common/main.css';
+import '@fullcalendar/daygrid/main.css';
+// init focalboard
+import '@mattermost/compass-icons/css/compass-icons.css';
 import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
-import { Web3Provider } from '@ethersproject/providers';
 import { Web3ReactProvider } from '@web3-react/core';
-import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
-import { PageTitleProvider, TitleContext } from 'hooks/usePageTitle';
 import RouteGuard from 'components/common/RouteGuard';
-import FocalBoardPortal from 'components/databases/FocalBoardPortal';
-import { ColorModeContext } from 'context/color-mode';
-import { useLocalStorage } from 'hooks/useLocalStorage';
-import { SpacesProvider } from 'hooks/useSpaces';
-import { PagesProvider } from 'hooks/usePages';
-import { DatabaseBlocksProvider } from 'hooks/useDatabaseBlocks';
-import { UserProvider } from 'hooks/useUser';
-import type { NextPage } from 'next';
-import type { AppProps } from 'next/app';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
-import { createThemeLightSensitive } from 'theme';
-import { isMobile } from 'lib/browser';
-
-// fullcalendar css
-import '@fullcalendar/common/main.css';
-import '@fullcalendar/daygrid/main.css';
-
-// init focalboard
-import '@mattermost/compass-icons/css/compass-icons.css';
-import 'components/databases/focalboard/src/styles/variables.scss';
-// import 'components/databases/focalboard/src/styles/main.scss';
-import 'components/databases/focalboard/src/styles/labels.scss';
-import 'components/databases/focalboard/src/styles/_markdown.scss';
 import 'components/databases/focalboard/src/components/blockIconSelector.scss';
 import 'components/databases/focalboard/src/components/calculations/calculation.scss';
 import 'components/databases/focalboard/src/components/calendar/fullcalendar.scss';
@@ -49,6 +25,7 @@ import 'components/databases/focalboard/src/components/content/checkboxElement.s
 import 'components/databases/focalboard/src/components/content/dividerElement.scss';
 import 'components/databases/focalboard/src/components/contentBlock.scss';
 import 'components/databases/focalboard/src/components/dialog.scss';
+import { FlashMessages } from 'components/databases/focalboard/src/components/flashMessages';
 import 'components/databases/focalboard/src/components/flashMessages.scss';
 import 'components/databases/focalboard/src/components/gallery/gallery.scss';
 import 'components/databases/focalboard/src/components/gallery/galleryCard.scss';
@@ -88,6 +65,15 @@ import 'components/databases/focalboard/src/components/viewHeader/filterComponen
 import 'components/databases/focalboard/src/components/viewHeader/filterEntry.scss';
 import 'components/databases/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/databases/focalboard/src/components/viewTitle.scss';
+import { getMessages } from 'components/databases/focalboard/src/i18n';
+import store from 'components/databases/focalboard/src/store';
+import { useAppDispatch, useAppSelector } from 'components/databases/focalboard/src/store/hooks';
+import { fetchLanguage, getLanguage } from 'components/databases/focalboard/src/store/language';
+// import 'components/databases/focalboard/src/styles/main.scss';
+import 'components/databases/focalboard/src/styles/labels.scss';
+import 'components/databases/focalboard/src/styles/variables.scss';
+import 'components/databases/focalboard/src/styles/_markdown.scss';
+import { setTheme } from 'components/databases/focalboard/src/theme';
 // import 'components/databases/focalboard/src/widgets/buttons/button.scss';
 import 'components/databases/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/databases/focalboard/src/widgets/buttons/iconButton.scss';
@@ -141,23 +127,35 @@ import 'components/databases/focalboard/src/widgets/propertyMenu.scss';
 import 'components/databases/focalboard/src/widgets/switch.scss';
 import 'components/databases/focalboard/src/widgets/tooltip.scss';
 import 'components/databases/focalboard/src/widgets/valueSelector.scss';
+import FocalBoardPortal from 'components/databases/FocalBoardPortal';
+import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
+import { ColorModeContext } from 'context/color-mode';
+import { DatabaseBlocksProvider } from 'hooks/useDatabaseBlocks';
+import { useLocalStorage } from 'hooks/useLocalStorage';
+import { PagesProvider } from 'hooks/usePages';
+import { PageTitleProvider, TitleContext } from 'hooks/usePageTitle';
+import { SpacesProvider } from 'hooks/useSpaces';
+import { UserProvider } from 'hooks/useUser';
+import { isMobile } from 'lib/browser';
+import type { NextPage } from 'next';
+import type { AppProps } from 'next/app';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { SnackbarProvider } from 'notistack';
+import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
-import store from 'components/databases/focalboard/src/store';
-import { getLanguage, fetchLanguage } from 'components/databases/focalboard/src/store/language';
-import { useAppSelector, useAppDispatch } from 'components/databases/focalboard/src/store/hooks';
-import { FlashMessages } from 'components/databases/focalboard/src/components/flashMessages';
-import { getMessages } from 'components/databases/focalboard/src/i18n';
-import { setTheme } from 'components/databases/focalboard/src/theme';
+import { IntlProvider } from 'react-intl';
+import { Provider as ReduxProvider } from 'react-redux';
+import { createThemeLightSensitive } from 'theme';
+import 'theme/@bangle.dev/styles.scss';
+import 'theme/focalboard/styles.scss';
 import {
   darkTheme,
   lightTheme
 } from 'theme/focalboard/theme';
-
 import 'theme/styles.scss';
-import 'theme/@bangle.dev/styles.scss';
-import 'theme/focalboard/styles.scss';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -288,7 +286,15 @@ function DataProviders ({ children }: { children: ReactNode }) {
         <DatabaseBlocksProvider>
           <PageTitleProvider>
             <UserProvider>
-              {children}
+              <SnackbarProvider
+                maxSnack={4}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'center'
+                }}
+              >
+                {children}
+              </SnackbarProvider>
             </UserProvider>
           </PageTitleProvider>
         </DatabaseBlocksProvider>

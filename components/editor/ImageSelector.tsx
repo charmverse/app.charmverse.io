@@ -2,6 +2,7 @@ import { Button, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
+import { useSnackbar } from 'notistack';
 import { ReactNode, useState } from 'react';
 
 interface ImageSelectorProps {
@@ -13,7 +14,7 @@ interface ImageSelectorProps {
 export default function ImageSelector (props: ImageSelectorProps) {
   const [embedLink, setEmbedLink] = useState('');
   const { tabs = [], children, onImageSelect } = props;
-
+  const { enqueueSnackbar } = useSnackbar();
   return (
     <PopperPopup popupContent={(
       <Box sx={{
@@ -35,15 +36,25 @@ export default function ImageSelector (props: ImageSelectorProps) {
                 <input
                   type='file'
                   hidden
+                  accept='image/*'
                   onChange={(e) => {
                     const firstFile = e.target.files?.[0];
                     if (firstFile) {
-                      const reader = new FileReader();
-                      reader.onload = () => {
-                        const { result } = reader;
-                        onImageSelect(result as string);
-                      };
-                      reader.readAsDataURL(firstFile);
+                      // file size in mb
+                      const fileSize = firstFile.size / 1024 / 1024;
+                      if (fileSize > 1) {
+                        enqueueSnackbar(`File size ${fileSize.toFixed(2)} Mb too large. Limit 1 Mb`, {
+                          variant: 'error'
+                        });
+                      }
+                      else {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const { result } = reader;
+                          onImageSelect(result as string);
+                        };
+                        reader.readAsDataURL(firstFile);
+                      }
                     }
                   }}
                 />
