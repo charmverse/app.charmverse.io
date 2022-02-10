@@ -22,7 +22,7 @@ export default function ContributorRow ({ contributor, spaceId }: Props) {
         <Avatar name={contributor.username} />
         <Box pl={2}>
           <Typography variant='body1'><strong>{contributor.username}</strong></Typography>
-          <Typography color='secondary' variant='body2'>{contributor.addrsses[0]}</Typography>
+          <Typography color='secondary' variant='body2'>{contributor.addresses[0]}</Typography>
         </Box>
       </Box>
       <Typography color='secondary' variant='body2' sx={{ px: 3 }}>
