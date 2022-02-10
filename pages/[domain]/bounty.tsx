@@ -6,7 +6,7 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { findIndex } from 'lodash';
 
-import { ReactElement, useReducer, useState } from 'react';
+import React, { ReactElement, useReducer, useState, useCallback, useMemo, useContext } from 'react';
 import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
 
@@ -47,31 +47,72 @@ function bountyReducer (state: any, action: any) {
   }
 }
 
-export default function BountyPage () {
-  // reducers
-  const [suggestionState, dispatchSuggestion] = useReducer(suggestionReducer, initialSuggestionState);
-  const [bountyState, dispatchBounty] = useReducer(bountyReducer, initialBountyState);
-  const { suggestedBounties } = suggestionState;
-  const { bounties } = bountyState;
+const BountyContext = React.createContext<any | null>(null);
+const SuggestionContext = React.createContext<any | null>(null);
 
+interface BountyProviderProps {
+  children: React.ReactNode
+}
+function BountyProvider (props: BountyProviderProps): ReactElement {
+
+  const [state, dispatch] = useReducer(bountyReducer, initialBountyState);
+  const contextValue = useMemo(() => ({
+    bounties: state.bounties,
+    addBounty: (bounty: any) => {
+      const buildAction = () => (
+        { type: 'UPDATE_BOUNTY', itemId: bounty.id, item: bounty }
+      );
+      dispatch(buildAction());
+    }
+
+  }), [state, dispatch]);
+  const { children } = props;
+
+  return (
+    <BountyContext.Provider value={contextValue}>
+      {children}
+    </BountyContext.Provider>
+  );
+}
+
+function SuggestionProvider (props: { children: React.ReactNode }): ReactElement {
+  const [state, dispatch] = useReducer(suggestionReducer, initialSuggestionState);
+  const contextValue = useMemo(() => ({
+    suggestedBounties: state.suggestedBounties,
+    addBounty: (bounty: any) => {
+      console.log('objeczzzzzzt', bounty);
+      const buildAction = () => (
+        { type: 'ADD_SUGGESTED_BOUNTY', item: { id: Math.random(), ...bounty } }
+      );
+      dispatch(buildAction());
+    }
+
+  }), [state, dispatch]);
+  const { children } = props;
+  return (
+    <SuggestionContext.Provider value={contextValue}>
+      {children}
+    </SuggestionContext.Provider>
+  );
+}
+function BountyContainer (): ReactElement {
+  const { bounties } = useContext(BountyContext);
+  return (
+    <Grid container direction='row' spacing={3} sx={{ padding: '16px' }}>
+      {bounties.map((bounty: any) => (
+        <Grid item key={bounty.id}>
+          {/* // xtungvo TODO: update to handle action for editing bounty */}
+          <BountyCard {...bounty} />
+        </Grid>
+      ))}
+    </Grid>
+  );
+}
+function SuggestionContainer (): ReactElement {
+  const { suggestedBounties, addBounty } = useContext(SuggestionContext);
   const [bountyDialogOpen, setBountyDialogOpen] = useState(false);
-
-  const submitSuggestion = (suggestingBounty: any) => {
-    const buildAction = () => (
-      { type: 'ADD_SUGGESTED_BOUNTY', item: { id: Math.random(), ...suggestingBounty } }
-    );
-    dispatchSuggestion(buildAction());
-  };
   return (
     <>
-      <Grid container direction='row' spacing={3} sx={{ padding: '16px' }}>
-        {bounties.map((card) => (
-          <Grid item key={card.id}>
-            {/* // xtungvo TODO: update to handle action for editing card */}
-            <BountyCard {...card} />
-          </Grid>
-        ))}
-      </Grid>
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         <Typography>Suggestions</Typography>
         <Button onClick={() => {
@@ -82,15 +123,29 @@ export default function BountyPage () {
         </Button>
       </Box>
       <BountyTable items={suggestedBounties} />
-      {/* // xtungvo TODO: update component name to match with the responding modal for creating/editing bounty */}
       <BountyEditorModal
         open={bountyDialogOpen}
         onClose={() => {
           setBountyDialogOpen(false);
         }}
-        onSubmit={submitSuggestion}
+        onSubmit={(bounty) => {
+          addBounty(bounty); setBountyDialogOpen(false);
+        }}
       />
     </>
+  );
+}
+export default function BountyPage () {
+  return (
+    <>
+      <BountyProvider>
+        <BountyContainer />
+      </BountyProvider>
+      <SuggestionProvider>
+        <SuggestionContainer />
+      </SuggestionProvider>
+    </>
+
   );
 }
 

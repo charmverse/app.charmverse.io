@@ -85,6 +85,7 @@
     "react-select": "4.3",
     "reselect": "^4.0.0",
     "swr": "^1.2.1",
+    "uuid": "^8.3.2",
     "yup": "^0.32.11"
   },
   "devDependencies": {
