@@ -141,7 +141,6 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { SnackbarProvider } from 'notistack';
 import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -286,15 +285,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
         <DatabaseBlocksProvider>
           <PageTitleProvider>
             <UserProvider>
-              <SnackbarProvider
-                maxSnack={4}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'center'
-                }}
-              >
-                {children}
-              </SnackbarProvider>
+              {children}
             </UserProvider>
           </PageTitleProvider>
         </DatabaseBlocksProvider>
