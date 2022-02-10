@@ -1,15 +1,26 @@
-import BangleEditor from 'components/editor/BangleEditor';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+
 import { Box, Button, DialogContentText, TextField, Typography } from '@mui/material';
+
+import { useEditorState, BangleEditor } from '@bangle.dev/react';
+import { Plugin } from '@bangle.dev/core';
+import { floatingMenu, FloatingMenu } from '@bangle.dev/react-menu';
+import {
+  bold,
+  listItem,
+  bulletList,
+  orderedList
+} from '@bangle.dev/base-components';
+import { useState } from 'react';
 
 interface Props {
   open: boolean
   item: any
   onClose: () => void
-  submit: (item: any) => void
+  onSubmit: (item: any) => void
 }
 
 const style = {
@@ -25,8 +36,23 @@ const style = {
 };
 
 export default function BountyEditorModal (props: Props) {
-  const { open, item, onClose, submit } = props;
-  console.log('objeczzzzzzzt', item.content);
+  const { open, item, onClose, onSubmit } = props;
+  const [updatingContent, setUpdatingContent] = useState({});
+  const editorState = useEditorState({
+    initialValue: 'Hello world!',
+    plugins: () => [
+      new Plugin({
+        view: () => ({
+          update: (view, prevState) => {
+            if (!view.state.doc.eq(prevState.doc)) {
+              setUpdatingContent(view.state.doc.toJSON());
+            }
+          }
+        })
+      })
+    ]
+  });
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Create Bounty</DialogTitle>
@@ -43,11 +69,19 @@ export default function BountyEditorModal (props: Props) {
           fullWidth
           variant='standard'
         />
-        <BangleEditor content={item.content} />
+        <BangleEditor
+          state={editorState}
+        />
+
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={() => { }}>Submit</Button>
+        <Button onClick={() => {
+          onSubmit({ title: 'new one', createdAt: new Date(), author: '0x000000', content: updatingContent });
+        }}
+        >
+          Submit
+        </Button>
       </DialogActions>
     </Dialog>
   );

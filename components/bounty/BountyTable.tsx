@@ -34,7 +34,7 @@ export default function BountyTable (props: Props) {
               <TableCell component='th' scope='row'>
                 {row.title}
               </TableCell>
-              <TableCell>{row.description}</TableCell>
+              <TableCell>{JSON.stringify(row.content)}</TableCell>
               <TableCell>{row.author}</TableCell>
               <TableCell>{row.createdAt.toString()}</TableCell>
             </TableRow>

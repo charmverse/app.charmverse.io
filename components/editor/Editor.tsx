@@ -60,7 +60,6 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
   if (page.icon && page.headerImage) {
     pageControlTop = 50;
   }
-  console.log('objeczzzzzzzzzt', page.content);
 
   return (
     <Box>

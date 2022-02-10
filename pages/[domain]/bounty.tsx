@@ -54,7 +54,7 @@ export default function BountyPage () {
   const [bountyDialogOpen, setBountyDialogOpen] = useState(false);
   const submitSuggestion = (suggestingBounty: any) => {
     const buildAction = () => (
-      { type: 'ADD_SUGGESTED_BOUNTY', item: { id: Math.random(), suggestingBounty } }
+      { type: 'ADD_SUGGESTED_BOUNTY', item: { id: Math.random(), ...suggestingBounty } }
     );
     dispatchSuggestion(buildAction());
   };
@@ -84,7 +84,7 @@ export default function BountyPage () {
         onClose={() => {
           setBountyDialogOpen(false);
         }}
-        submit={submitSuggestion}
+        onSubmit={submitSuggestion}
       />
     </>
   );
