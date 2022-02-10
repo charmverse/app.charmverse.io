@@ -11,6 +11,7 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import { useWeb3React } from '@web3-react/core';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
@@ -105,6 +106,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const boards = useAppSelector(getSortedBoards);
   const { pages, setPages } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
+  const { account } = useWeb3React();
   const favoritePageIds = favorites.map(f => f.pageId);
   const intl = useIntl();
 
@@ -262,7 +264,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 <Typography variant='caption' sx={{ display: 'block' }}>
                   <strong>{user.username}</strong>
                   <br />
-                  {shortenHex(user.addresses[0])}
+                  {account && shortenHex(account)}
                 </Typography>
               </Box>
             </Box>
