@@ -3,7 +3,7 @@ import React, { ReactElement, useReducer, useMemo, useContext } from 'react';
 import { findIndex } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
-import type { IBountyCard } from 'models/Bounty';
+import type { IBountyAction } from 'models/Bounty';
 
 const BountyContext = React.createContext<any | null>(null);
 
@@ -14,18 +14,6 @@ interface BountyProviderProps {
 const initialBountyState = {
   bounties: []
 };
-
-interface ICreatingBounty {
-  title: string;
-  discription: string;
-  type: 'content' | 'social';
-  reward: Object;
-}
-interface IBountyAction {
-  type: string;
-  item?: ICreatingBounty;
-  itemId?: string;
-}
 
 function bountyReducer (state: any, action: IBountyAction) {
   switch (action.type) {

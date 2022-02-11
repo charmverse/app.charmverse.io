@@ -8,8 +8,10 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Chip from '@mui/material/Chip';
-import { Typography, Box, Stack } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
+import { useEditorState, BangleEditor } from '@bangle.dev/react';
+import { Plugin } from '@bangle.dev/core';
 import _ from 'lodash';
 
 import * as yup from 'yup';
@@ -35,28 +37,28 @@ const tokens: readonly IToken[] = [
   }
 ];
 
-const InputWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-`;
-
 interface Props {
   open: boolean;
-  creating: boolean;
+  type: 'create' | 'edit';
   onClose: () => void;
   onSubmit: (item: any) => void;
 }
+
 export const rewardSchema = yup.object({
   reviewer: yup.string().ensure().trim(),
   assignee: yup.string().ensure().trim(),
   token: yup.string().ensure().trim(),
   amount: yup.number()
 });
+export const descSchema = yup.object({
+  type: yup.string(),
+  content: yup.array()
+});
 
 export const schema = yup.object({
   title: yup.string().ensure().trim().lowercase()
     .required('Title is required'),
-  description: yup.string().ensure().trim(),
+  description: descSchema,
   type: yup.string().ensure().trim(),
   status: yup.string().ensure().trim(),
   reward: rewardSchema
@@ -65,8 +67,7 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 export default function BountyModal (props: Props) {
-  const { open, onClose, onSubmit, creating } = props;
-
+  const { open, onClose, onSubmit, type } = props;
   const {
     register,
     handleSubmit,
@@ -76,7 +77,10 @@ export default function BountyModal (props: Props) {
   } = useForm<FormValues>({
     defaultValues: {
       title: 'New bounty',
-      description: 'Description',
+      description: {
+        type: 'doc',
+        content: []
+      },
       type: 'social',
       status: 'pending',
       reward: {
@@ -86,6 +90,21 @@ export default function BountyModal (props: Props) {
     },
     resolver: yupResolver(schema)
   });
+  const editorState = useEditorState({
+    initialValue: 'Hello world!',
+    plugins: () => [
+      new Plugin({
+        view: () => ({
+          update: (view, prevState) => {
+            if (!view.state.doc.eq(prevState.doc)) {
+              setValue('description', view.state.doc.toJSON());
+            }
+          }
+        })
+      })
+    ]
+  });
+
   const handleTypeSelect = (e: SelectChangeEvent) => {
     setValue('type', e.target.value as string);
   };
@@ -132,6 +151,9 @@ export default function BountyModal (props: Props) {
             </Grid>
           </Grid>
           <Grid item>
+            <BangleEditor state={editorState} />
+          </Grid>
+          <Grid item>
             <Typography variant='h5'>Reward</Typography>
             <Divider />
             <Box>
@@ -150,7 +172,6 @@ export default function BountyModal (props: Props) {
                 </Grid>
               </Grid>
               <Grid container direction='row' alignItems='center' mt={1}>
-
                 <Grid item xs={6}>
                   <Typography>Assignee</Typography>
                 </Grid>
@@ -166,7 +187,6 @@ export default function BountyModal (props: Props) {
                 </Grid>
               </Grid>
               <Grid container direction='row' alignItems='center' mt={1}>
-
                 <Grid item xs={6}>
                   <Typography>Token</Typography>
                 </Grid>
@@ -219,7 +239,6 @@ export default function BountyModal (props: Props) {
                 </Grid>
               </Grid>
               <Grid container direction='row' alignItems='center' mt={1}>
-
                 <Grid item xs={6}>
                   <Typography>Amount</Typography>
                 </Grid>

@@ -17,3 +17,23 @@ export interface IBountyCard {
   type: 'content' | 'social';
   createdAt: Date;
 }
+
+export interface IBountyReward {
+  reviewer: string;
+  assignee: string;
+  token: string;
+  amount: number;
+}
+
+export interface ICreatingBounty {
+  title: string;
+  discription: Object;
+  type: 'content' | 'social';
+  reward: IBountyReward;
+}
+
+export interface IBountyAction {
+  type: string;
+  item?: ICreatingBounty;
+  itemId?: string;
+}
