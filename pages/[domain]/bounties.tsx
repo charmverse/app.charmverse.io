@@ -2,7 +2,7 @@ import { PageLayout } from 'components/common/page-layout';
 import BountyCard from 'components/bounties/BountyCard';
 import BountyTable from 'components/bounties/BountyTable';
 import BountyEditorModal from 'components/bounties/BountyEditorModal';
-import AddBountyModal from 'components/bounties/AddBountyModal';
+import BountyModal from 'components/bounties/BountyModal';
 import { BountyProvider, useBounty } from 'components/bounties/hooks/useBounty';
 import {
   SuggestionProvider,
@@ -48,7 +48,7 @@ function BountyContainer (): ReactElement {
           </Grid>
         ))}
       </Grid>
-      <AddBountyModal
+      <BountyModal
         open={bountyDialogOpen}
         onClose={() => setBountyDialogOpen(false)}
         onSubmit={(data) => {
