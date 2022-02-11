@@ -2,9 +2,9 @@ import { link } from '@bangle.dev/base-components';
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from "@mui/icons-material/Delete";
-import LinkIcon from '@mui/icons-material/Link';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import SaveIcon from '@mui/icons-material/Save';
 import { Box } from '@mui/material';
 import React, { useRef, useState } from 'react';
@@ -106,19 +106,19 @@ function LinkMenu({
         }}/>
       </MenuButton>
       <MenuButton
-        hints={["Visit"]}
+        hints={["Go to link"]}
         onMouseDown={(e) => {
           e.preventDefault();
           window.open(href, '_blank');
         }}
       >
-        <LinkIcon sx={{
+        <OpenInNewIcon sx={{
           fontSize: 14
         }}/>
       </MenuButton>
       <MenuButton hints={["Copy link"]}>
-        <AssignmentIcon sx={{
-          fontSize: 14
+        <ContentCopyIcon sx={{
+          fontSize: 12
         }} onClick={() => {
           navigator.clipboard.writeText(href);
           showMessage(`Link copied to clipboard`);
