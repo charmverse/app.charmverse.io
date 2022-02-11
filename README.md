@@ -36,7 +36,7 @@ CharmVerse is a React app built using:
 
 ### Database
 
-Our connection to PostgreSQL is managed by a Prisma client. 
+Our connection to PostgreSQL is managed by a Prisma client. Below are the most common commands:
 
 ```
 # Update your local database
@@ -47,6 +47,9 @@ npx prisma studio
 
 # Generate just the Typescript types from updated schema.prisma (you can import the interfaces from "@prisma/client")
 npx prisma generate
+
+# Format the schema file
+npx prisma format
 
 # Generate a new migration
 npx prisma migrate dev --name blocks_title_required
