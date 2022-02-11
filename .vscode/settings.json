@@ -11,4 +11,10 @@
       "source.fixAll.eslint": true
     }
   },
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  },
 }
