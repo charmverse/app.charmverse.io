@@ -6,7 +6,7 @@ import { useCurrentSpace } from './useCurrentSpace';
 export function useContributors () {
   const [space] = useCurrentSpace();
   const spaceContributors = contributors.filter(
-    c => c.spaceRoles.some(({ spaceId }) => spaceId === space.id)
+    c => c.spacePermissions.some(({ spaceId }) => spaceId === space.id)
   );
   return useLocalStorage<Contributor[]>(`spaces.${space.id}.contributors`, spaceContributors);
 }

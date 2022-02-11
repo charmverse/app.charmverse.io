@@ -15,7 +15,7 @@ const StyledRow = styled(Box)`
 type Props = { contributor: Contributor, spaceId: string };
 
 export default function ContributorRow ({ contributor, spaceId }: Props) {
-  const role = contributor.spaceRoles.find(r => r.spaceId === spaceId);
+  const role = contributor.spacePermissions.find(r => r.spaceId === spaceId);
   return (
     <StyledRow pb={2} mb={2}>
       <Box display='flex' alignItems='center'>

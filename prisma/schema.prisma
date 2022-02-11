@@ -12,6 +12,11 @@ datasource db {
 
 model Space {
   id          String            @id @default(uuid()) @db.Uuid
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  createdBy String
+  updatedAt DateTime
+  updatedBy String
   name        String
   domain      String            @unique
   permissions SpacePermission[]
@@ -24,7 +29,7 @@ model Page {
   deletedAt   DateTime?
   createdAt   DateTime         @default(now())
   createdBy   String
-  updatedAt   DateTime?
+  updatedAt   DateTime
   updatedBy   String
   title       String
   content     Json?
@@ -33,8 +38,10 @@ model Page {
   isPublic    Boolean
   path        String
   parentId    String?
-  spaceId     String
-  space       Space            @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  spaceId     String?
+  space       Space?           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
   type        String // 'page' | 'database';
   boardId     String?
   permissions PagePermission[]
@@ -46,7 +53,7 @@ model Block {
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   createdBy String
-  updatedAt DateTime?
+  updatedAt DateTime
   updatedBy String
   spaceId   String
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
@@ -68,6 +75,7 @@ model User {
   spacePermissions SpacePermission[]
   favorites        FavoritePage[]
   pagePermissions  PagePermission[]
+  pages             Page[]
 }
 
 model FavoritePage {

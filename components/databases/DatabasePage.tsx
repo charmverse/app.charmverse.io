@@ -37,7 +37,7 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const boardId = page.databaseId!;
+    const boardId = page.boardId!;
     const viewId = router.query.viewId as string;
 
     // Ensure boardViews is for our boardId before redirecting
@@ -54,7 +54,7 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
     dispatch(setCurrentBoard(boardId));
     dispatch(setCurrentView(viewId || ''));
 
-  }, [page.databaseId, router.query.viewId, boardViews]);
+  }, [page.boardId, router.query.viewId, boardViews]);
 
   useEffect(() => {
     let loadAction: any = initialLoad; /* eslint-disable-line @typescript-eslint/no-explicit-any */
@@ -63,7 +63,7 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
       loadAction = initialReadOnlyLoad;
       token = token || router.query.r as string || '';
     }
-    dispatch(loadAction(page.databaseId));
+    dispatch(loadAction(page.boardId));
 
   }, [router.query.workspaceId, readonly, router.query.pageId]);
 

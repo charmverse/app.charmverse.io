@@ -145,7 +145,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           content: []
         }]
       },
-      created: new Date(),
+      createdAt: new Date(),
       id,
       isPublic: false,
       parentId: null,
@@ -157,7 +157,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     };
     if (newPage.type === 'database') {
       await addBoardClicked(boardId => {
-        newPage.databaseId = boardId;
+        newPage.boardId = boardId;
       }, intl);
     }
     setPages([newPage, ...pages]);
@@ -172,8 +172,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     const page = pages.find(p => p.id === pageId);
     const newPages = pages.filter(p => p.id !== pageId);
     setPages(newPages);
-    if (page?.databaseId) {
-      const board = boards.find(b => b.id === page.databaseId);
+    if (page?.boardId) {
+      const board = boards.find(b => b.id === page.boardId);
       if (board) {
         mutator.deleteBlock(
           board,
