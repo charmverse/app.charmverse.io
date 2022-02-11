@@ -23,13 +23,36 @@ Download and install this repo to get started:
 
 ### Third Party Dependencies
 
-CharmVerse is a Node.js app built using:
+CharmVerse is a React app built using:
 
 - Ethers.js
 - Material UI
 - Next.js
 - React
 - Typescript
+- Prisma
+- @bangle.dev / Prosemirror
+- focalboard
+
+### Database
+
+Our connection to PostgreSQL is managed by a Prisma client. 
+
+```
+# Update your local database
+npx prisma migrate dev
+
+# View the contents of the database
+npx prisma studio
+
+# Generate just the Typescript types from updated schema.prisma (you can import the interfaces from "@prisma/client")
+npx prisma generate
+
+# Generate a new migration
+npx prisma migrate dev --name blocks_title_required
+```
+
+For more information about how migrations work: https://www.prisma.io/docs/concepts/components/prisma-migrate.
 
 ### Theming
 
