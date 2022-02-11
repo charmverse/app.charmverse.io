@@ -5,7 +5,12 @@ import TextField from '@mui/material/TextField';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import PrimaryButton from 'components/common/PrimaryButton';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Chip from '@mui/material/Chip';
+
 import * as yup from 'yup';
+import { Box } from '@mui/material';
 
 interface Props {
   open: boolean;
@@ -51,8 +56,14 @@ export default function AddBountyModal (props: Props) {
     },
     resolver: yupResolver(schema)
   });
+  const handleTypeSelect = (e: SelectChangeEvent) => {
+    setValue('type', e.target.value as string);
+  };
+
+  const watchType = watch('type');
+
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={true} onClose={onClose}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle onClose={onClose}>Adding new bounty</DialogTitle>
         <Divider />
@@ -67,20 +78,30 @@ export default function AddBountyModal (props: Props) {
             />
           </Grid>
           <Grid item>
-            <TextField
-              {...register('type')}
-              fullWidth
-              error={!!errors.type}
-              helperText={errors.type?.message}
-            />
+            <Select
+              labelId='select-type'
+              id='select-type'
+              value={watchType}
+              label='type'
+              onChange={handleTypeSelect}
+            >
+              <MenuItem value='social'>
+                <Chip label='SOCIAL' color='primary' />
+              </MenuItem>
+              <MenuItem value='content'>
+                <Chip label='CONTENT' color='secondary' />
+              </MenuItem>
+            </Select>
           </Grid>
           <Grid item>
-            <TextField
-              {...register('reward.reviewer')}
-              fullWidth
-              error={!!errors.reward?.reviewer}
-              helperText={errors.reward?.reviewer?.message}
-            />
+            <Box>
+              <TextField
+                {...register('reward.reviewer')}
+                fullWidth
+                error={!!errors.reward?.reviewer}
+                helperText={errors.reward?.reviewer?.message}
+              />
+            </Box>
           </Grid>
           <Grid item>
             <PrimaryButton type='submit'>Add Bounty</PrimaryButton>
