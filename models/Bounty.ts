@@ -7,16 +7,8 @@ export interface ISuggestingBounty {
   preview: string;
 }
 
-export interface IBountyCard {
-  title: string;
-  author: string;
-  status: 'pending' | 'inprogress' | 'done';
-  id: string;
-  //
-  content: Object;
-  type: 'content' | 'social';
-  createdAt: Date;
-}
+type TBountyCardStatus = 'pending' | 'inprogress' | 'done';
+type TBountyCardType = 'content' | 'social';
 
 export interface IBountyReward {
   reviewer: string;
@@ -26,11 +18,19 @@ export interface IBountyReward {
 }
 
 export interface ICreatingBounty {
+  author: string;
   title: string;
   discription: Object;
-  type: 'content' | 'social';
+  status: TBountyCardStatus;
+  type: TBountyCardType;
   reward: IBountyReward;
 }
+
+export type TBountyCard = ICreatingBounty & {
+  author: string;
+  id: string;
+  createdAt: Date;
+};
 
 export interface IBountyAction {
   type: string;

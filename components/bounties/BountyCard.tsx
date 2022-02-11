@@ -6,7 +6,7 @@ import CardActions from '@mui/material/CardActions';
 
 import styled from '@emotion/styled';
 
-import type { IBountyCard } from 'models/Bounty';
+import type { TBountyCard } from 'models/Bounty';
 
 // xtungvo TODO: apply theme changes
 const StyledTitled = styled.div`
@@ -30,11 +30,11 @@ const statusMap = {
 };
 
 interface IBountyCardProps {
-  bounty: IBountyCard;
+  bounty: TBountyCard;
 }
 
 export default function BountyCard ({ bounty }: IBountyCardProps) {
-  const { id, title, content, type, status } = bounty;
+  const { id, title, type, status } = bounty;
   return (
     <Card
       key={id}

@@ -1,26 +1,28 @@
-import { Modal, DialogTitle } from 'components/common/Modal';
+import _ from 'lodash';
+import { Modal } from 'components/common/Modal';
+import { Plugin } from '@bangle.dev/core';
+import { Typography, Box } from '@mui/material';
+import { useEditorState, BangleEditor } from '@bangle.dev/react';
+import { useForm } from 'react-hook-form';
+import { useUser } from 'hooks/useUser';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+import Autocomplete from '@mui/material/Autocomplete';
+import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useForm } from 'react-hook-form';
+import MenuItem from '@mui/material/MenuItem';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import Chip from '@mui/material/Chip';
-import { Typography, Box } from '@mui/material';
-import Autocomplete from '@mui/material/Autocomplete';
-import { useEditorState, BangleEditor } from '@bangle.dev/react';
-import { Plugin } from '@bangle.dev/core';
-import _ from 'lodash';
-
-import * as yup from 'yup';
-import styled from '@emotion/styled';
+import TextField from '@mui/material/TextField';
 
 interface IToken {
   symbol: string;
   img: string;
 }
+
+// xtungvo TODO: update this list
 const tokens: readonly IToken[] = [
   {
     symbol: 'CHARM',
@@ -44,6 +46,7 @@ interface Props {
   onSubmit: (item: any) => void;
 }
 
+// xtungvo TODO: update this bunchs of schema
 export const rewardSchema = yup.object({
   reviewer: yup.string().ensure().trim(),
   assignee: yup.string().ensure().trim(),
@@ -56,6 +59,7 @@ export const descSchema = yup.object({
 });
 
 export const schema = yup.object({
+  author: yup.string(),
   title: yup.string().ensure().trim().lowercase()
     .required('Title is required'),
   description: descSchema,
@@ -68,6 +72,7 @@ export type FormValues = yup.InferType<typeof schema>;
 
 export default function BountyModal (props: Props) {
   const { open, onClose, onSubmit, type } = props;
+  const [user] = useUser();
   const {
     register,
     handleSubmit,
@@ -76,6 +81,7 @@ export default function BountyModal (props: Props) {
     formState: { errors }
   } = useForm<FormValues>({
     defaultValues: {
+      author: user?.username || '',
       title: 'New bounty',
       description: {
         type: 'doc',
@@ -85,7 +91,7 @@ export default function BountyModal (props: Props) {
       status: 'pending',
       reward: {
         token: 'CHARM',
-        reviewer: 'me'
+        reviewer: user?.username || ''
       }
     },
     resolver: yupResolver(schema)
@@ -113,7 +119,7 @@ export default function BountyModal (props: Props) {
   const watchToken = watch('reward.token');
 
   return (
-    <Modal open={true} onClose={onClose}>
+    <Modal open={open} onClose={onClose}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
