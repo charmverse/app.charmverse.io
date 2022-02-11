@@ -18,7 +18,6 @@ const initialBountyState = {
 function bountyReducer (state: any, action: IBountyAction) {
   switch (action.type) {
     case 'ADD_BOUNTY': {
-      console.log('objeczzzzzzt', action.item);
       const updatingBounties = [...state.bounties, { id: uuidv4(), ...action.item }];
       return {
         bounties: updatingBounties
@@ -48,7 +47,7 @@ export function BountyProvider (props: BountyProviderProps): ReactElement {
         dispatch({ type: 'ADD_BOUNTY', item: bounty });
       },
       updateBounty: (bounty: any) => {
-        dispatch({ type: 'UPDATE_BOUNTY', itemId: uuidv4(), item: bounty });
+        dispatch({ type: 'UPDATE_BOUNTY', itemId: bounty.id, item: bounty });
       }
     }),
     [state, dispatch]

@@ -15,6 +15,7 @@ import Button from '@mui/material/Button';
 import { ReactElement, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
+import { TBountyCard } from 'models/Bounty';
 
 function BountyContainer (): ReactElement {
   const { bounties, addBounty } = useBounty();
@@ -49,10 +50,14 @@ function BountyContainer (): ReactElement {
         ))}
       </Grid>
       <BountyModal
+        key={new Date().getDate()}
         open={bountyDialogOpen}
         onClose={() => setBountyDialogOpen(false)}
         modalType='create'
-        onSubmit={addBounty}
+        onSubmit={(creatingBounty: TBountyCard) => {
+          addBounty(creatingBounty);
+          setBountyDialogOpen(false);
+        }}
       />
     </Box>
   );

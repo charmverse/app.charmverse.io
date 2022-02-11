@@ -18,16 +18,6 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import type { TBountyCard } from 'models/Bounty';
 import { useState } from 'react';
-import {
-  bold,
-  italic,
-  link,
-  bulletList,
-  heading,
-  listItem,
-  orderedList,
-  paragraph
-} from '@bangle.dev/base-components';
 
 interface IToken {
   symbol: string;
@@ -107,6 +97,7 @@ export default function BountyModal (props: Props) {
           type: 'social',
           status: 'pending',
           reward: {
+            token: 'CHARM',
             reviewer: user?.username || ''
           }
         }
@@ -117,29 +108,12 @@ export default function BountyModal (props: Props) {
   const editorState = useEditorState({
     // xtungvo TODO: somehow the bangle.dev not updating the new state
     initialValue: modalType === 'create' ? 'Edit bounty description...' : bounty?.description,
-    specs: [
-      bold.spec(),
-      italic.spec(),
-      link.spec(),
-      orderedList.spec(),
-      bulletList.spec(),
-      listItem.spec(),
-      paragraph.spec(),
-      heading.spec()
-    ],
     plugins: () => [
-      bold.plugins(),
-      italic.plugins(),
-      link.plugins(),
-      orderedList.plugins(),
-      bulletList.plugins(),
-      listItem.plugins(),
-      paragraph.plugins(),
-      heading.plugins(),
       new Plugin({
         view: () => ({
           update: (view, prevState) => {
             if (!view.state.doc.eq(prevState.doc)) {
+              // xtungvo TODO: fix this typing error
               setValue('description', view.state.doc.toJSON());
             }
           }
@@ -295,6 +269,7 @@ export default function BountyModal (props: Props) {
                       </Box>
                     )}
                     renderInput={(params) => {
+                      // xtungvo TODO: fix this typing error
                       const inputValue = params.inputProps.value;
                       const tokenImg = _.find(tokens, { symbol: inputValue })?.img;
                       return (
