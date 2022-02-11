@@ -10,7 +10,7 @@ import { useEditorState, BangleEditor } from '@bangle.dev/react';
 import { Plugin } from '@bangle.dev/core';
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import type { ISuggestingBounty } from 'types/bounty';
+import type { ISuggestingBounty } from 'models/Bounty';
 
 interface Props {
   open: boolean;

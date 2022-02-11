@@ -7,7 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import type { ISuggestingBounty } from 'types/bounty';
+import type { ISuggestingBounty } from 'models/Bounty';
 
 interface Props {
   items: Array<ISuggestingBounty>;

@@ -2,6 +2,9 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+
 import styled from '@emotion/styled';
 
 import type { IBountyCard } from 'models/Bounty';
@@ -34,7 +37,7 @@ interface IBountyCardProps {
 export default function BountyCard ({ bounty }: IBountyCardProps) {
   const { id, title, content, type, status } = bounty;
   return (
-    <Box
+    <Card
       key={id}
       sx={{
         width: 290,
@@ -51,13 +54,15 @@ export default function BountyCard ({ bounty }: IBountyCardProps) {
         <Chip label={statusMap[status]} color='primary' />
         <Chip label={type.toUpperCase()} color='secondary' />
       </Stack>
-      <Button
-        variant='outlined'
-        sx={{ marginTop: '16px', width: '120px', alignSelf: 'flex-end' }}
-        onClick={() => {}}
-      >
-        APPLY
-      </Button>
-    </Box>
+      <CardActions>
+        <Button
+          variant='outlined'
+          sx={{ marginTop: '16px', width: '120px', marginLeft: 'auto' }}
+          onClick={() => {}}
+        >
+          APPLY
+        </Button>
+      </CardActions>
+    </Card>
   );
 }

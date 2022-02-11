@@ -18,14 +18,17 @@ import { Typography } from '@mui/material';
 function BountyContainer (): ReactElement {
   const { bounties } = useBounty();
   return (
-    <Grid container direction='row' spacing={3} sx={{ padding: '16px' }}>
-      {bounties.map((bounty: any) => (
-        <Grid item key={bounty.id}>
-          {/* // xtungvo TODO: update to handle action for editing bounty */}
-          <BountyCard bounty={bounty} />
-        </Grid>
-      ))}
-    </Grid>
+    <Box sx={{ padding: '8px 16px' }}>
+      <Typography variant='h1'>Bounty Panel</Typography>
+      <Grid container direction='row' spacing={3} sx={{ marginTop: '8px' }}>
+        {bounties.map((bounty: any) => (
+          <Grid item key={bounty.id}>
+            {/* // xtungvo TODO: update to handle action for editing bounty */}
+            <BountyCard bounty={bounty} />
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 }
 
@@ -47,15 +50,7 @@ function SuggestionContainer (): ReactElement {
         }}
       >
         {/* // xtungvo TODO: update correct variant style */}
-        <Typography
-          sx={{
-            fontSize: '30px',
-            color: '#6A6A6A',
-            fontWeight: 'bold'
-          }}
-        >
-          Suggestions
-        </Typography>
+        <Typography variant='h1'>Suggestions</Typography>
         <Button
           onClick={() => {
             setBountyDialogOpen(true);
@@ -81,16 +76,6 @@ function SuggestionContainer (): ReactElement {
 export default function BountyPage () {
   return (
     <>
-      <Typography
-        sx={{
-          fontSize: '30px',
-          color: '#6A6A6A',
-          fontWeight: 'bold',
-          marginLeft: '16px'
-        }}
-      >
-        Bounty Panel
-      </Typography>
       <BountyProvider>
         <BountyContainer />
       </BountyProvider>

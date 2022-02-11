@@ -1,6 +1,5 @@
 import React, { ReactElement, useReducer, useMemo, useContext } from 'react';
 import type { ISuggestingBounty } from 'models/Bounty';
-import { getStorageValue, setStorageValue } from 'hooks/useLocalStorage';
 
 function suggestionReducer (state: any, action: any) {
   switch (action.type) {

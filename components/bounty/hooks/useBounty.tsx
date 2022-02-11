@@ -3,7 +3,7 @@ import React, { ReactElement, useReducer, useMemo, useContext } from 'react';
 import { findIndex } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
-import type { IBountyCard } from 'types/bounty';
+import type { IBountyCard } from 'models/Bounty';
 
 const BountyContext = React.createContext<any | null>(null);
 
@@ -64,8 +64,7 @@ export function BountyProvider (props: BountyProviderProps): ReactElement {
     () => ({
       bounties: state.bounties,
       addBounty: (bounty: any) => {
-        const buildAction = () => ({ type: 'UPDATE_BOUNTY', itemId: bounty.id, item: bounty });
-        dispatch(buildAction());
+        dispatch({ type: 'UPDATE_BOUNTY', itemId: bounty.id, item: bounty });
       }
     }),
     [state, dispatch]
