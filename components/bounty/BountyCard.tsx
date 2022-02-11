@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import styled from '@emotion/styled';
 
-import type { IBountyCard } from 'types/bounty';
+import type { IBountyCard } from 'models/Bounty';
 
 // xtungvo TODO: apply theme changes
 const StyledTitled = styled.div`

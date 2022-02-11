@@ -1,7 +1,6 @@
 import React, { ReactElement, useReducer, useMemo, useContext } from 'react';
-import type { ISuggestingBounty } from 'types/bounty';
-
-const initialSuggestionState = { suggestedBounties: [] };
+import type { ISuggestingBounty } from 'models/Bounty';
+import { getStorageValue, setStorageValue } from 'hooks/useLocalStorage';
 
 function suggestionReducer (state: any, action: any) {
   switch (action.type) {
@@ -17,6 +16,7 @@ function suggestionReducer (state: any, action: any) {
 const SuggestionContext = React.createContext<any | null>(null);
 
 export function SuggestionProvider (props: { children: React.ReactNode }): ReactElement {
+  const initialSuggestionState = { suggestedBounties: [] };
   const [state, dispatch] = useReducer(suggestionReducer, initialSuggestionState);
   const contextValue = useMemo(
     () => ({

@@ -13,9 +13,9 @@ import { v4 as uuidv4 } from 'uuid';
 import type { ISuggestingBounty } from 'types/bounty';
 
 interface Props {
-  open: boolean
-  onClose: () => void
-  onSubmit: (item: ISuggestingBounty) => void
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (item: ISuggestingBounty) => void;
 }
 
 export default function BountyEditorModal (props: Props) {
@@ -42,7 +42,14 @@ export default function BountyEditorModal (props: Props) {
 
   const handleSubmit = () => {
     // xtungvo TODO: define the schema
-    onSubmit({ id: uuidv4(), title, createdAt: new Date(), author: user?.username || '0x000000', content: updatingContent, preview: updatingPreview });
+    onSubmit({
+      id: uuidv4(),
+      title,
+      createdAt: new Date(),
+      author: user?.username || '0x000000',
+      content: updatingContent,
+      preview: updatingPreview
+    });
   };
 
   return (
@@ -61,18 +68,12 @@ export default function BountyEditorModal (props: Props) {
         />
 
         {/* // xtungvo TODO: update to use our custome editor */}
-        <BangleEditor
-          state={editorState}
-        />
-
+        <BangleEditor state={editorState} />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit}>
-          Submit
-        </Button>
+        <Button onClick={handleSubmit}>Submit</Button>
       </DialogActions>
     </Dialog>
   );
-
 }

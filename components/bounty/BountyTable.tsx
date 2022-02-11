@@ -10,7 +10,7 @@ import Paper from '@mui/material/Paper';
 import type { ISuggestingBounty } from 'types/bounty';
 
 interface Props {
-  items: Array<ISuggestingBounty>
+  items: Array<ISuggestingBounty>;
 }
 
 export default function BountyTable (props: Props) {
@@ -29,10 +29,7 @@ export default function BountyTable (props: Props) {
         </TableHead>
         <TableBody>
           {items.map((row) => (
-            <TableRow
-              key={row.id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
+            <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell component='th' scope='row'>
                 {row.title}
               </TableCell>
