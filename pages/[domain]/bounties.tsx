@@ -18,7 +18,7 @@ import { Typography } from '@mui/material';
 function BountyContainer (): ReactElement {
   const { bounties } = useBounty();
   return (
-    <Box sx={{ padding: '8px 16px' }}>
+    <Box>
       <Typography variant='h1'>Bounty Panel</Typography>
       <Grid container direction='row' spacing={3} sx={{ marginTop: '8px' }}>
         {bounties.map((bounty: any) => (
@@ -42,7 +42,6 @@ function SuggestionContainer (): ReactElement {
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
-          padding: '8px 16px',
           borderBottom: '1px solid',
           borderColor: 'divider',
           margin: '8px 0',
@@ -75,14 +74,14 @@ function SuggestionContainer (): ReactElement {
 }
 export default function BountyPage () {
   return (
-    <>
+    <Box p={3}>
       <BountyProvider>
         <BountyContainer />
       </BountyProvider>
       <SuggestionProvider>
         <SuggestionContainer />
       </SuggestionProvider>
-    </>
+    </Box>
   );
 }
 
