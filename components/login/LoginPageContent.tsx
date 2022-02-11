@@ -67,7 +67,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
               All-in-one Workspace
             </Typography>
             <Typography sx={{ fontSize: 20, mb: 6 }}>
-              Tasks, docs, and more
+              Tasks, docs, bounties, and more
             </Typography>
             {account ? (
               <PrimaryButton size='large' href='/'>
