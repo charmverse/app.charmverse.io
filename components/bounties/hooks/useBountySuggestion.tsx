@@ -1,5 +1,5 @@
 import React, { ReactElement, useReducer, useMemo, useContext } from 'react';
-import type { ISuggestingBounty } from 'models/Bounty';
+import type { TBountyCard } from 'models/Bounty';
 
 function suggestionReducer (state: any, action: any) {
   switch (action.type) {
@@ -13,11 +13,11 @@ function suggestionReducer (state: any, action: any) {
 }
 
 const SuggestionContext = React.createContext<{
-  suggestedBounties: ISuggestingBounty[];
-  addBounty:(bounty: ISuggestingBounty) => void;
+  suggestedBounties: TBountyCard[];
+  addBounty:(bounty: TBountyCard) => void;
     }>({
       suggestedBounties: [],
-      addBounty: (bounty: ISuggestingBounty) => undefined
+      addBounty: (bounty: TBountyCard) => undefined
     });
 
 export function SuggestionProvider (props: { children: React.ReactNode }): ReactElement {
@@ -26,8 +26,8 @@ export function SuggestionProvider (props: { children: React.ReactNode }): React
   const contextValue = useMemo(
     () => ({
       suggestedBounties: state.suggestedBounties,
-      addBounty: (bounty: ISuggestingBounty) => {
-        dispatch({ type: 'ADD_SUGGESTED_BOUNTY', item: bounty });
+      addBounty: (bounty: TBountyCard) => {
+        dispatch({ type: 'ADD_SUGGESTED_BOUNTY', item: { ...bounty, createdAt: new Date() } });
       }
     }),
     [state, dispatch]

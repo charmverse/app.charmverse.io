@@ -6,10 +6,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
-import type { ISuggestingBounty } from 'models/Bounty';
+import type { TBountyCard } from 'models/Bounty';
 
 interface Props {
-  items: Array<ISuggestingBounty>;
+  items: Array<TBountyCard>;
 }
 
 export default function BountyTable (props: Props) {
@@ -32,7 +32,7 @@ export default function BountyTable (props: Props) {
               {row.title}
             </TableCell>
             {/* // xtungvo TODO: content render here */}
-            <TableCell>{row.preview}</TableCell>
+            <TableCell>{JSON.stringify(row.description)}</TableCell>
             <TableCell>{row.author}</TableCell>
             <TableCell>{row.createdAt.toLocaleString()}</TableCell>
           </TableRow>

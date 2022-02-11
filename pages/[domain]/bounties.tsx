@@ -1,7 +1,6 @@
 import { PageLayout } from 'components/common/page-layout';
 import BountyCard from 'components/bounties/BountyCard';
 import BountyTable from 'components/bounties/BountyTable';
-import BountyEditorModal from 'components/bounties/BountyEditorModal';
 import BountyModal from 'components/bounties/BountyModal';
 import { BountyProvider, useBounty } from 'components/bounties/hooks/useBounty';
 import {
@@ -90,13 +89,13 @@ function SuggestionContainer (): ReactElement {
         </Button>
       </Box>
       <BountyTable items={suggestedBounties} />
-      <BountyEditorModal
+      <BountyModal
+        key={new Date().getDate()}
         open={bountyDialogOpen}
-        onClose={() => {
-          setBountyDialogOpen(false);
-        }}
-        onSubmit={(bounty) => {
-          addBounty(bounty);
+        onClose={() => setBountyDialogOpen(false)}
+        modalType='suggest'
+        onSubmit={(creatingBounty: TBountyCard) => {
+          addBounty(creatingBounty);
           setBountyDialogOpen(false);
         }}
       />

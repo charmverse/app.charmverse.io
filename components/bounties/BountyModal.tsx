@@ -43,10 +43,10 @@ const tokens: readonly IToken[] = [
 
 interface Props {
   open: boolean;
-  modalType?: 'create' | 'edit';
+  modalType?: 'create' | 'edit' | 'suggest';
   bounty?: TBountyCard;
   onClose: () => void;
-  onSubmit: (item: TBountyCard) => void;
+  onSubmit: (bounty: TBountyCard) => void;
 }
 
 // xtungvo TODO: update this bunchs of schema
@@ -61,8 +61,9 @@ export const descSchema = yup.object({
   content: yup.array()
 });
 
+// xtungvo TODO: fix typing here
 export const schema = yup.object({
-  author: yup.string(),
+  author: yup.string().required(),
   title: yup.string().ensure().trim().lowercase()
     .required('Title is required'),
   description: descSchema,
@@ -86,7 +87,7 @@ export default function BountyModal (props: Props) {
     formState: { errors }
   } = useForm<FormValues>({
     defaultValues:
-      modalType === 'create'
+      modalType !== 'edit'
         ? {
           author: user?.username || '',
           title: 'New bounty',
@@ -132,7 +133,7 @@ export default function BountyModal (props: Props) {
 
   const watchType = watch('type');
   const watchStatus = watch('status');
-  const defaultValue = modalType === 'create' ? tokens[0] : _.find(tokens, { symbol: bounty?.reward?.token });
+  const defaultValue = modalType !== 'edit' ? tokens[0] : _.find(tokens, { symbol: bounty?.reward?.token });
 
   if (modalType === 'edit' && !bounty) {
     return <span />;
@@ -151,33 +152,36 @@ export default function BountyModal (props: Props) {
               variant='standard'
             />
           </Grid>
-          <Grid item>
-            <Grid container direction='row' alignItems='center'>
-              <Grid item xs={6}>
-                <Typography>Status</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Select
-                  labelId='select-type'
-                  id='select-type'
-                  value={watchStatus}
-                  variant='standard'
-                  label='type'
-                  onChange={handleStatusSelect}
-                >
-                  <MenuItem value='pending'>
-                    <Chip label='Not Started' color='primary' />
-                  </MenuItem>
-                  <MenuItem value='inprogress'>
-                    <Chip label='In Progress' color='secondary' />
-                  </MenuItem>
-                  <MenuItem value='done'>
-                    <Chip label='Done' color='secondary' />
-                  </MenuItem>
-                </Select>
+          {modalType !== 'suggest' && (
+            <Grid item>
+              <Grid container direction='row' alignItems='center'>
+                <Grid item xs={6}>
+                  <Typography>Status</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Select
+                    labelId='select-type'
+                    id='select-type'
+                    value={watchStatus}
+                    variant='standard'
+                    label='type'
+                    onChange={handleStatusSelect}
+                  >
+                    <MenuItem value='pending'>
+                      <Chip label='Not Started' color='primary' />
+                    </MenuItem>
+                    <MenuItem value='inprogress'>
+                      <Chip label='In Progress' color='secondary' />
+                    </MenuItem>
+                    <MenuItem value='done'>
+                      <Chip label='Done' color='secondary' />
+                    </MenuItem>
+                  </Select>
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
+          )}
+
           <Grid item>
             <Grid container direction='row' alignItems='center'>
               <Grid item xs={6}>
@@ -321,7 +325,7 @@ export default function BountyModal (props: Props) {
           </Grid>
           <Grid item>
             <PrimaryButton type='submit'>
-              {modalType === 'create' ? 'Add Bounty' : 'Update Bounty'}
+              {modalType !== 'edit' ? 'Add Bounty' : 'Update Bounty'}
             </PrimaryButton>
           </Grid>
         </Grid>
