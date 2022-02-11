@@ -1,12 +1,12 @@
 import { PageLayout } from 'components/common/page-layout';
-import BountyCard from 'components/bounty/BountyCard';
-import BountyTable from 'components/bounty/BountyTable';
-import BountyEditorModal from 'components/bounty/BountyEditorModal';
-import { BountyProvider, useBounty } from 'components/bounty/hooks/useBounty';
+import BountyCard from 'components/bounties/BountyCard';
+import BountyTable from 'components/bounties/BountyTable';
+import BountyEditorModal from 'components/bounties/BountyEditorModal';
+import { BountyProvider, useBounty } from 'components/bounties/hooks/useBounty';
 import {
   SuggestionProvider,
   useBountySuggestion
-} from 'components/bounty/hooks/useBountySuggestion';
+} from 'components/bounties/hooks/useBountySuggestion';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
