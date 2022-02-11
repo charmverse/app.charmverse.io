@@ -11,42 +11,34 @@ interface BountyProviderProps {
   children: React.ReactNode;
 }
 
-const buildMockData = (
-  id: string,
-  title: string,
-  author: string,
-  status: 'pending' | 'inprogress' | 'done',
-  type: 'content' | 'social',
-  content: Object,
-  createdAt: Date
-): IBountyCard => ({
-  title,
-  author,
-  status,
-  type,
-  id,
-  content,
-  createdAt
-});
-
 const initialBountyState = {
-  bounties: [1, 2, 3, 4, 5].map((index) => buildMockData(
-    uuidv4(),
-    `Card title ${index}`,
-    'Author',
-    index % 2 === 0 ? 'pending' : 'inprogress',
-    index % 3 === 0 ? 'content' : 'social',
-    { type: 'doc', content: [{ type: 'paragraph', content: [] }] },
-    new Date('2/10/2022')
-  ))
+  bounties: []
 };
 
-function bountyReducer (state: any, action: any) {
+interface ICreatingBounty {
+  title: string;
+  discription: string;
+  type: 'content' | 'social';
+  reward: Object;
+}
+interface IBountyAction {
+  type: string;
+  item?: ICreatingBounty;
+  itemId?: string;
+}
+
+function bountyReducer (state: any, action: IBountyAction) {
   switch (action.type) {
+    case 'ADD_BOUNTY': {
+      const updatingBounties = [...state.bounties, action.item];
+      return {
+        bounties: updatingBounties
+      };
+    }
     case 'UPDATE_BOUNTY': {
       // xtungvo TODO: improve not to use robust approach later
       const updatingBounties = [...state.bounties];
-      const index = findIndex(state.bounties, { id: action.iemId });
+      const index = findIndex(state.bounties, { id: action.itemId });
       updatingBounties.splice(index, 1, action.item);
 
       return {
@@ -64,7 +56,10 @@ export function BountyProvider (props: BountyProviderProps): ReactElement {
     () => ({
       bounties: state.bounties,
       addBounty: (bounty: any) => {
-        dispatch({ type: 'UPDATE_BOUNTY', itemId: bounty.id, item: bounty });
+        dispatch({ type: 'ADD_BOUNTY', item: bounty });
+      },
+      updateBounty: (bounty: any) => {
+        dispatch({ type: 'UPDATE_BOUNTY', itemId: uuidv4(), item: bounty });
       }
     }),
     [state, dispatch]

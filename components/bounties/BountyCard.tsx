@@ -19,7 +19,7 @@ const StyledTitled = styled.div`
   font-weight: bold;
   font-size: 20px;
   line-height: 23px;
-  color: #696773;
+  color: ${({ theme }) => theme.palette.secondary.main};
   flex-grow: 1;
 `;
 
