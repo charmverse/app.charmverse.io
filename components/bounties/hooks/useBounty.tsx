@@ -3,9 +3,18 @@ import React, { ReactElement, useReducer, useMemo, useContext } from 'react';
 import { findIndex } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
-import type { IBountyAction } from 'models/Bounty';
+import type { IBountyAction, TBountyCard } from 'models/Bounty';
 
-const BountyContext = React.createContext<any | null>(null);
+interface IBountyContext {
+  bounties: TBountyCard[];
+  addBounty: (bounty: TBountyCard) => void;
+  updateBounty: (bounty: TBountyCard) => void;
+}
+const BountyContext = React.createContext<IBountyContext>({
+  bounties: [],
+  addBounty: (bounty) => undefined,
+  updateBounty: (bounty) => undefined
+});
 
 interface BountyProviderProps {
   children: React.ReactNode;
@@ -43,10 +52,10 @@ export function BountyProvider (props: BountyProviderProps): ReactElement {
   const contextValue = useMemo(
     () => ({
       bounties: state.bounties,
-      addBounty: (bounty: any) => {
+      addBounty: (bounty: TBountyCard) => {
         dispatch({ type: 'ADD_BOUNTY', item: bounty });
       },
-      updateBounty: (bounty: any) => {
+      updateBounty: (bounty: TBountyCard) => {
         dispatch({ type: 'UPDATE_BOUNTY', itemId: bounty.id, item: bounty });
       }
     }),

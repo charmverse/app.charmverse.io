@@ -46,7 +46,7 @@ interface Props {
   modalType?: 'create' | 'edit';
   bounty?: TBountyCard;
   onClose: () => void;
-  onSubmit: (item: any) => void;
+  onSubmit: (item: TBountyCard) => void;
 }
 
 // xtungvo TODO: update this bunchs of schema
@@ -170,6 +170,9 @@ export default function BountyModal (props: Props) {
                   </MenuItem>
                   <MenuItem value='inprogress'>
                     <Chip label='In Progress' color='secondary' />
+                  </MenuItem>
+                  <MenuItem value='done'>
+                    <Chip label='Done' color='secondary' />
                   </MenuItem>
                 </Select>
               </Grid>

@@ -12,7 +12,13 @@ function suggestionReducer (state: any, action: any) {
   }
 }
 
-const SuggestionContext = React.createContext<any | null>(null);
+const SuggestionContext = React.createContext<{
+  suggestedBounties: ISuggestingBounty[];
+  addBounty:(bounty: ISuggestingBounty) => void;
+    }>({
+      suggestedBounties: [],
+      addBounty: (bounty: ISuggestingBounty) => undefined
+    });
 
 export function SuggestionProvider (props: { children: React.ReactNode }): ReactElement {
   const initialSuggestionState = { suggestedBounties: [] };

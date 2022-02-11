@@ -9,6 +9,7 @@ import styled from '@emotion/styled';
 
 import type { TBountyCard } from 'models/Bounty';
 import { useState } from 'react';
+import { Typography } from '@mui/material';
 
 // xtungvo TODO: apply theme changes
 const StyledTitled = styled.div`
@@ -63,7 +64,7 @@ export default function BountyCard ({ bounty }: IBountyCardProps) {
           setBountyDialogOpen(true);
         }}
       >
-        <StyledTitled>{title}</StyledTitled>
+        <Typography variant='h5'>{title}</Typography>
         <Stack direction='row' spacing={2} mt={2}>
           <Chip label={statusMap[status]} color='primary' />
           <Chip label={type.toUpperCase()} color='secondary' />
@@ -71,12 +72,12 @@ export default function BountyCard ({ bounty }: IBountyCardProps) {
         <CardActions>
           <Button
             variant='outlined'
-            sx={{ marginTop: '16px', width: '120px', marginLeft: 'auto' }}
+            sx={{ marginTop: '16px', width: '150px', marginLeft: 'auto' }}
             onClick={() => {
               setBountyDialogOpen(true);
             }}
           >
-            APPLY
+            View Details
           </Button>
         </CardActions>
       </Card>
