@@ -12,6 +12,7 @@ export interface MenuButtonProps {
   hintPos?: HintPos;
   hintBreakWhiteSpace?: boolean;
   onMouseDown?: React.MouseEventHandler;
+  disableButton?: boolean
 }
 
 const StyledMenuButton = styled.div<{ active: boolean }>`
@@ -38,6 +39,7 @@ export const MenuButton = ({
   isDisabled,
   hints,
   onMouseDown,
+  disableButton = false
 }: MenuButtonProps) => {
   return (
     <Tooltip title={<div style={{
@@ -52,7 +54,7 @@ export const MenuButton = ({
         }} key={hint}>{hint}</div>)
       }
     </div>} arrow placement='bottom'>
-      <ListItem disabled={isDisabled} button component="div" sx={{ py: 0, px: 0, mx: 0.25, my: 0, borderRadius: 0.5 }}>
+      <ListItem disabled={isDisabled} button={!disableButton as any} component="div" sx={{ py: 0, px: 0, mx: 0.25, my: 0, borderRadius: 0.5 }}>
         <StyledMenuButton
           aria-label={hints.join("\n")}
           active={isActive}
