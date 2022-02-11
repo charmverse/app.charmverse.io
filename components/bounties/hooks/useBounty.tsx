@@ -18,7 +18,8 @@ const initialBountyState = {
 function bountyReducer (state: any, action: IBountyAction) {
   switch (action.type) {
     case 'ADD_BOUNTY': {
-      const updatingBounties = [...state.bounties, action.item];
+      console.log('objeczzzzzzt', action.item);
+      const updatingBounties = [...state.bounties, { id: uuidv4(), ...action.item }];
       return {
         bounties: updatingBounties
       };

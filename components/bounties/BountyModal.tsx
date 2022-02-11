@@ -16,6 +16,18 @@ import MenuItem from '@mui/material/MenuItem';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
+import type { TBountyCard } from 'models/Bounty';
+import { useState } from 'react';
+import {
+  bold,
+  italic,
+  link,
+  bulletList,
+  heading,
+  listItem,
+  orderedList,
+  paragraph
+} from '@bangle.dev/base-components';
 
 interface IToken {
   symbol: string;
@@ -41,7 +53,8 @@ const tokens: readonly IToken[] = [
 
 interface Props {
   open: boolean;
-  type: 'create' | 'edit';
+  modalType?: 'create' | 'edit';
+  bounty?: TBountyCard;
   onClose: () => void;
   onSubmit: (item: any) => void;
 }
@@ -71,8 +84,10 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 export default function BountyModal (props: Props) {
-  const { open, onClose, onSubmit, type } = props;
+  const { open, onClose, onSubmit, modalType, bounty } = props;
+  const [tokenInput, setTokenInput] = useState('');
   const [user] = useUser();
+
   const {
     register,
     handleSubmit,
@@ -80,25 +95,47 @@ export default function BountyModal (props: Props) {
     watch,
     formState: { errors }
   } = useForm<FormValues>({
-    defaultValues: {
-      author: user?.username || '',
-      title: 'New bounty',
-      description: {
-        type: 'doc',
-        content: []
-      },
-      type: 'social',
-      status: 'pending',
-      reward: {
-        token: 'CHARM',
-        reviewer: user?.username || ''
-      }
-    },
+    defaultValues:
+      modalType === 'create'
+        ? {
+          author: user?.username || '',
+          title: 'New bounty',
+          description: {
+            type: 'doc',
+            content: []
+          },
+          type: 'social',
+          status: 'pending',
+          reward: {
+            reviewer: user?.username || ''
+          }
+        }
+        : bounty,
     resolver: yupResolver(schema)
   });
+
   const editorState = useEditorState({
-    initialValue: 'Hello world!',
+    // xtungvo TODO: somehow the bangle.dev not updating the new state
+    initialValue: modalType === 'create' ? 'Edit bounty description...' : bounty?.description,
+    specs: [
+      bold.spec(),
+      italic.spec(),
+      link.spec(),
+      orderedList.spec(),
+      bulletList.spec(),
+      listItem.spec(),
+      paragraph.spec(),
+      heading.spec()
+    ],
     plugins: () => [
+      bold.plugins(),
+      italic.plugins(),
+      link.plugins(),
+      orderedList.plugins(),
+      bulletList.plugins(),
+      listItem.plugins(),
+      paragraph.plugins(),
+      heading.plugins(),
       new Plugin({
         view: () => ({
           update: (view, prevState) => {
@@ -115,8 +152,17 @@ export default function BountyModal (props: Props) {
     setValue('type', e.target.value as string);
   };
 
+  const handleStatusSelect = (e: SelectChangeEvent) => {
+    setValue('status', e.target.value as string);
+  };
+
   const watchType = watch('type');
-  const watchToken = watch('reward.token');
+  const watchStatus = watch('status');
+  const defaultValue = modalType === 'create' ? tokens[0] : _.find(tokens, { symbol: bounty?.reward?.token });
+
+  if (modalType === 'edit' && !bounty) {
+    return <span />;
+  }
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -134,9 +180,32 @@ export default function BountyModal (props: Props) {
           <Grid item>
             <Grid container direction='row' alignItems='center'>
               <Grid item xs={6}>
+                <Typography>Status</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Select
+                  labelId='select-type'
+                  id='select-type'
+                  value={watchStatus}
+                  variant='standard'
+                  label='type'
+                  onChange={handleStatusSelect}
+                >
+                  <MenuItem value='pending'>
+                    <Chip label='Not Started' color='primary' />
+                  </MenuItem>
+                  <MenuItem value='inprogress'>
+                    <Chip label='In Progress' color='secondary' />
+                  </MenuItem>
+                </Select>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item>
+            <Grid container direction='row' alignItems='center'>
+              <Grid item xs={6}>
                 <Typography>Type</Typography>
               </Grid>
-
               <Grid item xs={6}>
                 <Select
                   labelId='select-type'
@@ -156,9 +225,12 @@ export default function BountyModal (props: Props) {
               </Grid>
             </Grid>
           </Grid>
+
           <Grid item>
             <BangleEditor state={editorState} />
           </Grid>
+
+          {/* // xtungvo TODO: Move to separated component */}
           <Grid item>
             <Typography variant='h5'>Reward</Typography>
             <Divider />
@@ -173,7 +245,6 @@ export default function BountyModal (props: Props) {
                     fullWidth
                     variant='standard'
                     error={!!errors.reward?.reviewer}
-                    helperText={errors.reward?.reviewer?.message}
                   />
                 </Grid>
               </Grid>
@@ -188,10 +259,11 @@ export default function BountyModal (props: Props) {
                     fullWidth
                     variant='standard'
                     error={!!errors.reward?.assignee}
-                    helperText={errors.reward?.assignee?.message}
                   />
                 </Grid>
               </Grid>
+
+              {/* Render Token Select */}
               <Grid container direction='row' alignItems='center' mt={1}>
                 <Grid item xs={6}>
                   <Typography>Token</Typography>
@@ -201,10 +273,16 @@ export default function BountyModal (props: Props) {
                     id='token-select'
                     options={tokens}
                     autoHighlight
-                    onInputChange={(event, newInputValue) => {
-                      setValue('reward.token', newInputValue);
+                    onChange={(event: any, newValue: IToken | null) => {
+                      if (newValue?.symbol) {
+                        setValue('reward.token', newValue?.symbol);
+                      }
                     }}
-                    inputValue={watchToken}
+                    onInputChange={(event, newInputValue) => {
+                      setTokenInput(newInputValue);
+                    }}
+                    inputValue={tokenInput}
+                    defaultValue={defaultValue}
                     getOptionLabel={(option) => option.symbol}
                     renderOption={(renderProps, option) => (
                       <Box
@@ -244,6 +322,7 @@ export default function BountyModal (props: Props) {
                   />
                 </Grid>
               </Grid>
+              {/* Render token amount */}
               <Grid container direction='row' alignItems='center' mt={1}>
                 <Grid item xs={6}>
                   <Typography>Amount</Typography>
@@ -253,8 +332,8 @@ export default function BountyModal (props: Props) {
                     {...register('reward.amount')}
                     fullWidth
                     variant='standard'
-                    error={!!errors.reward?.assignee}
-                    helperText={errors.reward?.assignee?.message}
+                    type='number'
+                    error={!!errors.reward?.amount}
                   />
                 </Grid>
               </Grid>
@@ -263,7 +342,9 @@ export default function BountyModal (props: Props) {
             </Box>
           </Grid>
           <Grid item>
-            <PrimaryButton type='submit'>Add Bounty</PrimaryButton>
+            <PrimaryButton type='submit'>
+              {modalType === 'create' ? 'Add Bounty' : 'Update Bounty'}
+            </PrimaryButton>
           </Grid>
         </Grid>
       </form>

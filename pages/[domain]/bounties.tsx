@@ -51,10 +51,8 @@ function BountyContainer (): ReactElement {
       <BountyModal
         open={bountyDialogOpen}
         onClose={() => setBountyDialogOpen(false)}
-        onSubmit={(data) => {
-          addBounty(data);
-          console.log('zzzzzz', data);
-        }}
+        modalType='create'
+        onSubmit={addBounty}
       />
     </Box>
   );

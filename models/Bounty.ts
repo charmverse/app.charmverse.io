@@ -20,7 +20,7 @@ export interface IBountyReward {
 export interface ICreatingBounty {
   author: string;
   title: string;
-  discription: Object;
+  description: Object;
   status: TBountyCardStatus;
   type: TBountyCardType;
   reward: IBountyReward;
