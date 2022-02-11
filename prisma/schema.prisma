@@ -12,11 +12,11 @@ datasource db {
 
 model Space {
   id          String            @id @default(uuid()) @db.Uuid
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  createdBy String
-  updatedAt DateTime
-  updatedBy String
+  deletedAt   DateTime?
+  createdAt   DateTime          @default(now())
+  createdBy   String
+  updatedAt   DateTime
+  updatedBy   String
   name        String
   domain      String            @unique
   permissions SpacePermission[]
@@ -75,7 +75,7 @@ model User {
   spacePermissions SpacePermission[]
   favorites        FavoritePage[]
   pagePermissions  PagePermission[]
-  pages             Page[]
+  pages            Page[]
 }
 
 model FavoritePage {

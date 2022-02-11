@@ -138,6 +138,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   async function addPage (page: Partial<Page>) {
     const id = Math.random().toString().replace('0.', '');
     const newPage: Page = {
+      boardId: null,
       content: {
         type: 'doc',
         content: [{
@@ -146,6 +147,13 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         }]
       },
       createdAt: new Date(),
+      createdBy: user!.id,
+      headerImage: null,
+      icon: null,
+      updatedAt: new Date(),
+      userId: null,
+      updatedBy: user!.id,
+      deletedAt: null,
       id,
       isPublic: false,
       parentId: null,
