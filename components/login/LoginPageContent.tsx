@@ -39,7 +39,18 @@ export default function LoginPageContent ({ account }: { account: string | null 
             <Image src={splashImage} />
           </ImageWrapper>
         </Grid>
-        <Grid item xs={12} sm={6} display='flex' justifyContent='center'>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          sx={{
+            display: 'flex',
+            justifyContent: {
+              xs: 'center',
+              sm: 'flex-start'
+            }
+          }}
+        >
           <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
             <Typography
               sx={{
@@ -56,7 +67,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
               All-in-one Workspace
             </Typography>
             <Typography sx={{ fontSize: 20, mb: 6 }}>
-              Tasks, docs, and more
+              Tasks, docs, bounties, and more
             </Typography>
             {account ? (
               <PrimaryButton size='large' href='/'>

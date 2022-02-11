@@ -26,17 +26,19 @@ import Emoji from 'components/common/Emoji';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { Page, PageContent } from 'models';
+import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { ChangeEvent, ReactNode, useContext, useRef } from 'react';
 import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
+import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
 import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
+import PageTitle from './Page/PageTitle';
 
 const specRegistry = new SpecRegistry([
-  imageSpec(),
-  paragraph.spec(),
+  paragraph.spec(), // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   bold.spec(),
   bulletList.spec(),
   hardBreak.spec(),
@@ -56,7 +58,9 @@ const specRegistry = new SpecRegistry([
   tableCell,
   tableHeader,
   tableRow,
-  blockQuoteSpec()
+  blockQuoteSpec(),
+  cryptoPriceSpec(),
+  imageSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
@@ -71,18 +75,8 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 `;
 
-const PageTitle = styled.input`
-  background: transparent;
-  border: 0 none;
-  color: ${({ theme }) => theme.palette.text.primary};
-  cursor: text;
-  font-size: 40px;
-  font-weight: 700;
-  outline: none;
-`;
-
 function EmojiContainer (
-  { updatePageIcon, top, children }: {updatePageIcon: (icon: string) => void, children: ReactNode, top: number}
+  { updatePageIcon, top, children }: { updatePageIcon: (icon: string) => void, children: ReactNode, top: number }
 ) {
   const view = useContext(EditorViewContext);
   const ref = useRef<HTMLDivElement>(null);
@@ -110,11 +104,13 @@ function EmojiContainer (
           }
           else {
             view.dispatch(
-            // Chain transactions together
-              view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_PAGE_ICON',
+              // Chain transactions together
+              view.state.tr.setMeta(emojiSuggestKey, {
+                type: 'INSIDE_PAGE_ICON',
                 onClick: (emoji: string) => updatePageIcon(emoji),
                 ref: ref.current,
-                getPos: () => 0 }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
+                getPos: () => 0
+              }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
             );
           }
         }
@@ -163,15 +159,19 @@ export default function BangleEditor (
       NodeView.createPlugin({
         name: 'blockquote',
         containerDOM: ['blockquote'],
-        contentDOM: ['span']
+        contentDOM: ['div']
       }),
       NodeView.createPlugin({
         name: 'codeBlock',
         containerDOM: ['pre'],
-        contentDOM: ['span']
+        contentDOM: ['div']
       }),
       NodeView.createPlugin({
         name: 'image',
+        containerDOM: ['div']
+      }),
+      NodeView.createPlugin({
+        name: 'cryptoPrice',
         containerDOM: ['div']
       })
     ],
@@ -210,6 +210,28 @@ export default function BangleEditor (
       renderNodeViews={({ children, ...props }) => {
         // eslint-disable-next-line
         switch (props.node.type.name) {
+          case 'cryptoPrice': {
+            /* eslint-disable-next-line */
+            const attrs = props.attrs as {base: null | CryptoCurrency, quote: null | FiatCurrency};
+            return (
+              <CryptoPrice
+                preset={{
+                  base: attrs.base,
+                  quote: attrs.quote
+                }}
+                onBaseCurrencyChange={(newBaseCurrency) => {
+                  props.updateAttrs({
+                    base: newBaseCurrency
+                  });
+                }}
+                onQuoteCurrencyChange={(newQuoteCurrency) => {
+                  props.updateAttrs({
+                    quote: newQuoteCurrency
+                  });
+                }}
+              />
+            );
+          }
           case 'blockquote': {
             return (
               <BlockQuote {...props}>
@@ -248,8 +270,6 @@ export default function BangleEditor (
       }}
       >
         <PageTitle
-          placeholder='Untitled'
-          autoFocus
           value={page.title}
           onChange={updateTitle}
         />

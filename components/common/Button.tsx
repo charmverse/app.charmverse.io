@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import NextLink from 'next/link';
+import MuiLink from '@mui/material/Link';
 import { ComponentProps, ElementType } from 'react';
 
 const StyledButton = styled(Button)`
@@ -36,9 +37,9 @@ function PimpedButtonWithNextLink<C extends ElementType>
       <NextLink href={href} passHref>
         {/** use an anchor tag to catch the ref passed down by NextLink.
        *  see https://github.com/vercel/next.js/issues/7915 */}
-        <a target={target}>
+        <MuiLink target={target}>
           <PimpedButton {...props}>{children}</PimpedButton>
-        </a>
+        </MuiLink>
       </NextLink>
     );
   }

@@ -15,10 +15,10 @@ import {
 import { EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
+import { HintPos } from '@bangle.dev/react-menu/dist/types';
 import {
   defaultKeys as floatingMenuKeys, focusFloatingMenuInput, toggleLinkSubMenu
-} from '@bangle.dev/react-menu/dist/floating-menu';
-import { HintPos } from '@bangle.dev/react-menu/dist/types';
+} from '@bangle.dev/react-menu/floating-menu';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import React, { useCallback } from 'react';
 import { MenuButton } from './Icon';
