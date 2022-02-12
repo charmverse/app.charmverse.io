@@ -27,7 +27,6 @@ export default function BountyCard ({ bounty }: BountyCardProps) {
   const [bountyDialogOpen, setBountyDialogOpen] = useState(false);
   const { updateBounty } = useBounty();
   const { id, title, status } = bounty;
-  console.log('bounty', bounty);
 
   const handleUpdateBounty = (updatingBounty: Bounty) => {
     updateBounty(updatingBounty);

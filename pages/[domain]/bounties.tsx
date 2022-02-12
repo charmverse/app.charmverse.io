@@ -26,8 +26,8 @@ function BountyContainer (): ReactElement {
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
-          margin: '8px 0',
-          alignItems: 'center'
+          alignItems: 'center',
+          mb: 2
         }}
       >
         <Typography variant='h1'>Bounties</Typography>
@@ -40,15 +40,21 @@ function BountyContainer (): ReactElement {
           Add a Bounty
         </Button>
       </Box>
-      <Grid container direction='row' spacing={3} sx={{ marginTop: '8px' }}>
+      <Grid container direction='row' spacing={3}>
         {bounties.map((bounty: any) => (
           <Grid item key={bounty.id}>
             <BountyCard bounty={bounty} />
           </Grid>
         ))}
+        {bounties.length === 0 && (
+          <Grid item xs>
+            <Box display='flex' justifyContent='center' py={4}>
+              <Typography color='secondary'>No bounties to display</Typography>
+            </Box>
+          </Grid>
+        )}
       </Grid>
       <BountyModal
-        key={new Date().getDate()}
         open={bountyDialogOpen}
         onClose={() => setBountyDialogOpen(false)}
         modalType='create'
@@ -71,10 +77,10 @@ function SuggestionContainer (): ReactElement {
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
-          borderBottom: '1px solid',
+          borderTop: '1px solid',
           borderColor: 'divider',
-          py: 2,
-          my: 2,
+          py: 3,
+          my: 3,
           alignItems: 'center'
         }}
       >
@@ -88,7 +94,7 @@ function SuggestionContainer (): ReactElement {
           Suggest a bounty
         </Button>
       </Box>
-      <BountyTable items={suggestedBounties} />
+      {suggestedBounties.length > 0 && <BountyTable items={suggestedBounties} />}
       <BountyModal
         key={new Date().getDate()}
         open={bountyDialogOpen}
