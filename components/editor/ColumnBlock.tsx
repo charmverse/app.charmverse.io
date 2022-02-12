@@ -1,7 +1,10 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import {
-  DOMOutputSpec
+  DOMOutputSpec, Node
 } from '@bangle.dev/pm';
+import styled from '@emotion/styled';
+import { Box } from '@mui/material';
+import { ReactNode } from 'react';
 
 export const spec = specFactory;
 
@@ -21,4 +24,18 @@ function specFactory (): RawSpecs {
       }
     }
   };
+}
+
+const StyledColumnBlock = styled(Box)`
+  width: 500px;
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(5)};
+`;
+
+export default function ColumnLayout ({ children, node }: {node: Node, children: ReactNode}) {
+  return (
+    <StyledColumnBlock>
+      {children}
+    </StyledColumnBlock>
+  );
 }

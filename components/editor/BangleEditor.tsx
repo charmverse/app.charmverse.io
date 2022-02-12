@@ -32,7 +32,7 @@ import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-su
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
 import { spec as columnBlockSpec } from './ColumnBlock';
-import { spec as columnLayoutSpec } from './ColumnLayout';
+import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
 import { Image } from './Image';
@@ -171,6 +171,16 @@ export default function BangleEditor (
         contentDOM: ['div']
       }),
       NodeView.createPlugin({
+        name: 'columnLayout',
+        containerDOM: ['pre'],
+        contentDOM: ['div']
+      }),
+      NodeView.createPlugin({
+        name: 'columnBlock',
+        containerDOM: ['pre'],
+        contentDOM: ['div']
+      }),
+      NodeView.createPlugin({
         name: 'image',
         containerDOM: ['div']
       }),
@@ -214,6 +224,16 @@ export default function BangleEditor (
       renderNodeViews={({ children, ...props }) => {
         // eslint-disable-next-line
         switch (props.node.type.name) {
+          case 'columnLayout': {
+            return <ColumnLayout node={props.node}>{children}</ColumnLayout>;
+          }
+          case 'columnBlock': {
+            return (
+              <div>
+                columnBlock
+              </div>
+            );
+          }
           case 'cryptoPrice': {
             /* eslint-disable-next-line */
             const attrs = props.attrs as {base: null | CryptoCurrency, quote: null | FiatCurrency};
