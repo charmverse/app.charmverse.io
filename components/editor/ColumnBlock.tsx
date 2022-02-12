@@ -21,11 +21,6 @@ function specFactory (): RawSpecs {
       parseDOM: [{ tag: 'div' }],
       toDOM: (): DOMOutputSpec => {
         return ['div', 0];
-      },
-      attrs: {
-        width: {
-          default: 266.666667
-        }
       }
     }
   };
@@ -34,8 +29,12 @@ function specFactory (): RawSpecs {
 const StyledColumnBlock = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.default};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  height: 250px;
   width: 256px;
+  padding: ${({ theme }) => theme.spacing(1, 2)};
+
+  & .bangle-nv-content p {
+    overflow-wrap: anywhere;
+  }
 `;
 
 export default function ColumnBlock ({ children, node }: {node: Node, children: ReactNode}) {

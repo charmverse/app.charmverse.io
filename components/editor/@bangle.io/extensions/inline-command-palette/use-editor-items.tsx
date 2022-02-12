@@ -162,9 +162,15 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
             return insertNode(state, dispatch, state.schema.nodes.columnLayout.create(
               undefined,
               Fragment.fromArray([
-                state.schema.nodes.columnBlock.create(),
-                state.schema.nodes.columnBlock.create(),
-                state.schema.nodes.columnBlock.create(),
+                state.schema.nodes.columnBlock.create(undefined, Fragment.fromArray([
+                  state.schema.nodes.paragraph.create()
+                ])),
+                state.schema.nodes.columnBlock.create(undefined, Fragment.fromArray([
+                  state.schema.nodes.paragraph.create()
+                ])),
+                state.schema.nodes.columnBlock.create(undefined, Fragment.fromArray([
+                  state.schema.nodes.paragraph.create()
+                ])),
               ])
             ))
           })

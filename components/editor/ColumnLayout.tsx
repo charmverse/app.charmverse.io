@@ -30,8 +30,8 @@ const StyledColumnLayout = styled(Box)`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   padding: ${({ theme }) => theme.spacing(1)};
 
-  & .bangle-nv-child-container .bangle-nv-content {
-    display: flex;
+  & > .bangle-nv-child-container > .bangle-nv-content {
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: ${({ theme }) => theme.spacing(1)};
   }
