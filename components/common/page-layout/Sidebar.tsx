@@ -60,6 +60,15 @@ const WorkspaceLabel = styled.div`
   }
 `;
 
+const BountyLabel = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  cursor: pointer;
+  margin-top: 48px;
+`;
+
 const SidebarContainer = styled.div`
   display: flex;
   background-color: ${({ theme }) => theme.palette.sidebar.background};
@@ -212,62 +221,71 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       </WorkspacesContainer>
       <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
         <Box sx={{ flexGrow: 1 }}>
-          <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
-            <SidebarHeader>
-              <Typography><strong>{space.name}</strong></Typography>
-              <IconButton onClick={closeSidebar}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </SidebarHeader>
-            <Divider sx={{ mb: 3 }} />
-            {favoritePageIds.length > 0 && (
-              <Box mb={2}>
+          <Box sx={{ flexGrow: 1 }}>
+            <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
+              <SidebarHeader>
+                <Typography><strong>{space.name}</strong></Typography>
+                <IconButton onClick={closeSidebar}>
+                  <ChevronLeftIcon />
+                </IconButton>
+              </SidebarHeader>
+              <Divider sx={{ mb: 3 }} />
+              {favoritePageIds.length > 0 && (
+                <Box mb={2}>
+                  <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
+                    FAVORITES
+                  </Typography>
+                  <PageNavigation
+                    isFavorites={true}
+                    pages={pages}
+                    spaceId={space.id}
+                    pathPrefix={`/${space.domain}`}
+                    rootPageIds={favoritePageIds}
+                    setPages={setPages}
+                    addPage={addPage}
+                  />
+                </Box>
+              )}
+              <WorkspaceLabel>
                 <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
-                  FAVORITES
+                  WORKSPACE
                 </Typography>
-                <PageNavigation
-                  isFavorites={true}
-                  pages={pages}
-                  spaceId={space.id}
-                  pathPrefix={`/${space.domain}`}
-                  rootPageIds={favoritePageIds}
-                  setPages={setPages}
-                  addPage={addPage}
-                />
-              </Box>
-            )}
-            <WorkspaceLabel>
-              <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
-                WORKSPACE
-              </Typography>
-              <div className='add-a-page'>
-                <NewPageMenu tooltip='Add a page' addPage={addPage} />
-              </div>
-            </WorkspaceLabel>
-            <PageNavigation
-              pages={pages}
-              spaceId={space.id}
-              pathPrefix={`/${space.domain}`}
-              setPages={setPages}
-              addPage={addPage}
-              deletePage={deletePage}
-            />
+                <div className='add-a-page'>
+                  <NewPageMenu tooltip='Add a page' addPage={addPage} />
+                </div>
+              </WorkspaceLabel>
+              <PageNavigation
+                pages={pages}
+                spaceId={space.id}
+                pathPrefix={`/${space.domain}`}
+                setPages={setPages}
+                addPage={addPage}
+                deletePage={deletePage}
+              />
+            </Box>
           </Box>
+          <Link href={`/${space.domain}/bounties`}>
+            <BountyLabel>
+              <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
+                BOUNTIES
+              </Typography>
+            </BountyLabel>
+          </Link>
         </Box>
         <Box>
           <Divider />
           <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
             {user && (
-            <Box display='flex' alignItems='center'>
-              <Avatar name={user.username} />
-              <Box pl={1}>
-                <Typography variant='caption' sx={{ display: 'block' }}>
-                  <strong>{user.username}</strong>
-                  <br />
-                  {account && shortenHex(account)}
-                </Typography>
+              <Box display='flex' alignItems='center'>
+                <Avatar name={user.username} />
+                <Box pl={1}>
+                  <Typography variant='caption' sx={{ display: 'block' }}>
+                    <strong>{user.username}</strong>
+                    <br />
+                    {account && shortenHex(account)}
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
             )}
             <Link href={`/${space.domain}/settings/account`}>
               <IconButton>
