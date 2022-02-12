@@ -31,7 +31,7 @@ import { ChangeEvent, ReactNode, useContext, useRef } from 'react';
 import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
-import { spec as columnBlockSpec } from './ColumnBlock';
+import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
@@ -172,12 +172,12 @@ export default function BangleEditor (
       }),
       NodeView.createPlugin({
         name: 'columnLayout',
-        containerDOM: ['pre'],
+        containerDOM: ['div'],
         contentDOM: ['div']
       }),
       NodeView.createPlugin({
         name: 'columnBlock',
-        containerDOM: ['pre'],
+        containerDOM: ['div'],
         contentDOM: ['div']
       }),
       NodeView.createPlugin({
@@ -228,14 +228,9 @@ export default function BangleEditor (
             return <ColumnLayout node={props.node}>{children}</ColumnLayout>;
           }
           case 'columnBlock': {
-            return (
-              <div>
-                columnBlock
-              </div>
-            );
+            return <ColumnBlock node={props.node}>{children}</ColumnBlock>;
           }
           case 'cryptoPrice': {
-            /* eslint-disable-next-line */
             const attrs = props.attrs as {base: null | CryptoCurrency, quote: null | FiatCurrency};
             return (
               <CryptoPrice

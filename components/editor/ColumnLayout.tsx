@@ -25,9 +25,16 @@ function specFactory (): RawSpecs {
 }
 
 const StyledColumnLayout = styled(Box)`
-  width: 500px;
-  display: flex;
-  gap: ${({ theme }) => theme.spacing(5)};
+  min-height: 100px;
+  background-color: ${({ theme }) => theme.palette.background.light};
+  border-radius: ${({ theme }) => theme.spacing(0.5)};
+  padding: ${({ theme }) => theme.spacing(1)};
+
+  & .bangle-nv-child-container .bangle-nv-content {
+    display: flex;
+    grid-template-columns: repeat(3, 1fr);
+    gap: ${({ theme }) => theme.spacing(1)};
+  }
 `;
 
 export default function ColumnLayout ({ children, node }: {node: Node, children: ReactNode}) {

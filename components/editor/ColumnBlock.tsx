@@ -21,18 +21,24 @@ function specFactory (): RawSpecs {
       parseDOM: [{ tag: 'div' }],
       toDOM: (): DOMOutputSpec => {
         return ['div', 0];
+      },
+      attrs: {
+        width: {
+          default: 266.666667
+        }
       }
     }
   };
 }
 
 const StyledColumnBlock = styled(Box)`
-  width: 500px;
-  display: flex;
-  gap: ${({ theme }) => theme.spacing(5)};
+  background-color: ${({ theme }) => theme.palette.background.default};
+  border-radius: ${({ theme }) => theme.spacing(0.5)};
+  height: 250px;
+  width: 256px;
 `;
 
-export default function ColumnLayout ({ children, node }: {node: Node, children: ReactNode}) {
+export default function ColumnBlock ({ children, node }: {node: Node, children: ReactNode}) {
   return (
     <StyledColumnBlock>
       {children}
