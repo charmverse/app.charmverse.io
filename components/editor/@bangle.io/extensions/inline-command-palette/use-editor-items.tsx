@@ -6,6 +6,7 @@ import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import ImageIcon from '@mui/icons-material/Image';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
   isList
@@ -147,7 +148,34 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
           );
         };
       },
-    }
+    },
+    {
+      uid: 'column',
+      title: 'Column',
+      icon: <ViewColumnIcon
+        sx={{ fontSize: 16 }}
+      />,
+      description: '3 Column Layout',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.columnLayout.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.columnBlock.create(),
+                state.schema.nodes.columnBlock.create(),
+                state.schema.nodes.columnBlock.create(),
+              ])
+            ))
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    },
   ],
   text: [
     {

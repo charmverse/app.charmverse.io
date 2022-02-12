@@ -31,6 +31,8 @@ import { ChangeEvent, ReactNode, useContext, useRef } from 'react';
 import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
+import { spec as columnBlockSpec } from './ColumnBlock';
+import { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
 import { Image } from './Image';
@@ -60,7 +62,9 @@ const specRegistry = new SpecRegistry([
   tableRow,
   blockQuoteSpec(),
   cryptoPriceSpec(),
-  imageSpec()
+  imageSpec(),
+  columnLayoutSpec(),
+  columnBlockSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
