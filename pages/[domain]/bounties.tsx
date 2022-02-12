@@ -9,12 +9,12 @@ import {
 } from 'components/bounties/hooks/useBountySuggestion';
 
 import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
+import Button from 'components/common/Button';
 
 import { ReactElement, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
-import { TBountyCard } from 'models/Bounty';
+import { Bounty } from 'models/Bounty';
 
 function BountyContainer (): ReactElement {
   const { bounties, addBounty } = useBounty();
@@ -31,13 +31,14 @@ function BountyContainer (): ReactElement {
         }}
       >
         {/* // xtungvo TODO: update correct variant style */}
-        <Typography variant='h1'>Bounty Panel</Typography>
+        <Typography variant='h1'>Bounties</Typography>
         <Button
+          variant='outlined'
           onClick={() => {
             setBountyDialogOpen(true);
           }}
         >
-          New Bounty (+)
+          Add a Bounty
         </Button>
       </Box>
       <Grid container direction='row' spacing={3} sx={{ marginTop: '8px' }}>
@@ -53,7 +54,7 @@ function BountyContainer (): ReactElement {
         open={bountyDialogOpen}
         onClose={() => setBountyDialogOpen(false)}
         modalType='create'
-        onSubmit={(creatingBounty: TBountyCard) => {
+        onSubmit={(creatingBounty: Bounty) => {
           addBounty(creatingBounty);
           setBountyDialogOpen(false);
         }}
@@ -74,18 +75,19 @@ function SuggestionContainer (): ReactElement {
           justifyContent: 'space-between',
           borderBottom: '1px solid',
           borderColor: 'divider',
-          margin: '8px 0',
+          py: 2,
+          my: 2,
           alignItems: 'center'
         }}
       >
-        {/* // xtungvo TODO: update correct variant style */}
-        <Typography variant='h1'>Suggestions</Typography>
+        <Typography variant='h2'>Suggested Bounties</Typography>
         <Button
+          variant='outlined'
           onClick={() => {
             setBountyDialogOpen(true);
           }}
         >
-          Suggest (+)
+          Suggest a bounty
         </Button>
       </Box>
       <BountyTable items={suggestedBounties} />
@@ -94,7 +96,7 @@ function SuggestionContainer (): ReactElement {
         open={bountyDialogOpen}
         onClose={() => setBountyDialogOpen(false)}
         modalType='suggest'
-        onSubmit={(creatingBounty: TBountyCard) => {
+        onSubmit={(creatingBounty: Bounty) => {
           addBounty(creatingBounty);
           setBountyDialogOpen(false);
         }}

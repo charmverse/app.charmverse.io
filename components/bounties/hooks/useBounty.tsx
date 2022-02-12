@@ -1,14 +1,19 @@
 import React, { ReactElement, useReducer, useMemo, useContext } from 'react';
 
 import { findIndex } from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 
-import type { IBountyAction, TBountyCard } from 'models/Bounty';
+import type { Bounty } from 'models/Bounty';
+
+export interface BountyAction {
+  type: string;
+  item?: Bounty;
+  itemId?: string;
+}
 
 interface IBountyContext {
-  bounties: TBountyCard[];
-  addBounty: (bounty: TBountyCard) => void;
-  updateBounty: (bounty: TBountyCard) => void;
+  bounties: Bounty[];
+  addBounty: (bounty: Bounty) => void;
+  updateBounty: (bounty: Bounty) => void;
 }
 const BountyContext = React.createContext<IBountyContext>({
   bounties: [],
@@ -24,15 +29,11 @@ const initialBountyState = {
   bounties: []
 };
 
-function bountyReducer (state: any, action: IBountyAction) {
+function bountyReducer (state: any, action: BountyAction) {
   switch (action.type) {
     case 'ADD_BOUNTY': {
-      const updatingBounties = [
-        ...state.bounties,
-        { ...action.item, id: uuidv4(), createdAt: new Date() }
-      ];
       return {
-        bounties: updatingBounties
+        bounties: [...state.bounties, action.item]
       };
     }
     case 'UPDATE_BOUNTY': {
@@ -55,10 +56,10 @@ export function BountyProvider (props: BountyProviderProps): ReactElement {
   const contextValue = useMemo(
     () => ({
       bounties: state.bounties,
-      addBounty: (bounty: TBountyCard) => {
+      addBounty: (bounty: Bounty) => {
         dispatch({ type: 'ADD_BOUNTY', item: bounty });
       },
-      updateBounty: (bounty: TBountyCard) => {
+      updateBounty: (bounty: Bounty) => {
         dispatch({ type: 'UPDATE_BOUNTY', itemId: bounty.id, item: bounty });
       }
     }),

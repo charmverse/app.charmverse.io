@@ -1,14 +1,15 @@
-import _ from 'lodash';
-import { Modal } from 'components/common/Modal';
+import { v4 as uuid } from 'uuid';
+import { useState } from 'react';
+import { DialogTitle, Modal } from 'components/common/Modal';
 import { Plugin } from '@bangle.dev/core';
 import { Typography, Box } from '@mui/material';
 import { useEditorState, BangleEditor } from '@bangle.dev/react';
+import FieldLabel from 'components/settings/FieldLabel';
+import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { useUser } from 'hooks/useUser';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-
-import Autocomplete from '@mui/material/Autocomplete';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -16,46 +17,42 @@ import MenuItem from '@mui/material/MenuItem';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import type { TBountyCard } from 'models/Bounty';
-import { useState } from 'react';
+import { Bounty, BOUNTY_STATUSES, BountyStatus } from 'models/Bounty';
+import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
+import { CryptoCurrency, CryptoCurrencyList, CryptoLogoPaths } from 'models/Currency';
 
 interface IToken {
   symbol: string;
   img: string;
 }
 
-// xtungvo TODO: update this list
-const tokens: readonly IToken[] = [
-  {
-    symbol: 'CHARM',
-    img: 'https://media-exp1.licdn.com/dms/image/C560BAQFfixfL2L4FHQ/company-logo_200_200/0/1640872171070?e=2159024400&v=beta&t=VmnRYP4llSkrQUizgSjkB_Jd7wcSYL1sbDpvXnBD2Yo'
-  },
-  {
-    symbol: 'ETH',
-    img: 'https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/1024/Ethereum-ETH-icon.png'
-  },
+const CRYPTO_CURRENCY_LIST = Object.keys(CryptoCurrencyList) as CryptoCurrency[];
 
-  {
-    symbol: 'USDT',
-    img: 'https://w7.pngwing.com/pngs/803/844/png-transparent-usdt-crypto-cryptocurrency-cryptocurrencies-cash-money-bank-payment-icon-thumbnail.png'
-  }
-];
+// xtungvo TODO: update this list
+// const tokens: readonly IToken[] = [
+//   {
+//     symbol: 'ETH',
+//     img: 'https://media-exp1.licdn.com/dms/image/C560BAQFfixfL2L4FHQ/company-logo_200_200/0/1640872171070?e=2159024400&v=beta&t=VmnRYP4llSkrQUizgSjkB_Jd7wcSYL1sbDpvXnBD2Yo'
+//   },
+//   {
+//     symbol: 'ETH',
+//     img: 'https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/1024/Ethereum-ETH-icon.png'
+//   },
+
+//   {
+//     symbol: 'USDT',
+//     img: 'https://w7.pngwing.com/pngs/803/844/png-transparent-usdt-crypto-cryptocurrency-cryptocurrencies-cash-money-bank-payment-icon-thumbnail.png'
+//   }
+// ];
 
 interface Props {
   open: boolean;
   modalType?: 'create' | 'edit' | 'suggest';
-  bounty?: TBountyCard;
+  bounty?: Bounty;
   onClose: () => void;
-  onSubmit: (bounty: TBountyCard) => void;
+  onSubmit: (bounty: Bounty) => void;
 }
 
-// xtungvo TODO: update this bunchs of schema
-export const rewardSchema = yup.object({
-  reviewer: yup.string().ensure().trim(),
-  assignee: yup.string().ensure().trim(),
-  token: yup.string().ensure().trim(),
-  amount: yup.number()
-});
 export const descSchema = yup.object({
   type: yup.string(),
   content: yup.array()
@@ -67,16 +64,18 @@ export const schema = yup.object({
   title: yup.string().ensure().trim().lowercase()
     .required('Title is required'),
   description: descSchema,
-  type: yup.string().ensure().trim(),
-  status: yup.string().ensure().trim(),
-  reward: rewardSchema
+  type: yup.string().required().trim(),
+  status: yup.mixed<BountyStatus>().oneOf([...BOUNTY_STATUSES]).required(),
+  reviewer: yup.string().ensure().trim(),
+  assignee: yup.string().ensure().trim(),
+  rewardToken: yup.mixed<CryptoCurrency>().oneOf(CRYPTO_CURRENCY_LIST).required(),
+  rewardAmount: yup.number().required()
 });
 
 export type FormValues = yup.InferType<typeof schema>;
 
 export default function BountyModal (props: Props) {
-  const { open, onClose, onSubmit, modalType, bounty } = props;
-  const [tokenInput, setTokenInput] = useState('');
+  const { open, onClose, onSubmit: _onSubmit, modalType, bounty } = props;
   const [user] = useUser();
 
   const {
@@ -90,17 +89,15 @@ export default function BountyModal (props: Props) {
       modalType !== 'edit'
         ? {
           author: user?.username || '',
-          title: 'New bounty',
+          title: 'New Bounty',
           description: {
             type: 'doc',
             content: []
           },
           type: 'social',
           status: 'pending',
-          reward: {
-            token: 'CHARM',
-            reviewer: user?.username || ''
-          }
+          rewardToken: 'ETH',
+          reviewer: user?.username || ''
         }
         : bounty,
     resolver: yupResolver(schema)
@@ -114,8 +111,7 @@ export default function BountyModal (props: Props) {
         view: () => ({
           update: (view, prevState) => {
             if (!view.state.doc.eq(prevState.doc)) {
-              // xtungvo TODO: fix this typing error
-              setValue('description', view.state.doc.toJSON());
+              setValue('description', view.state.doc.toJSON() as FormValues['description']);
             }
           }
         })
@@ -123,24 +119,31 @@ export default function BountyModal (props: Props) {
     ]
   });
 
-  const handleTypeSelect = (e: SelectChangeEvent) => {
-    setValue('type', e.target.value as string);
-  };
-
   const handleStatusSelect = (e: SelectChangeEvent) => {
-    setValue('status', e.target.value as string);
+    setValue('status', e.target.value as BountyStatus);
   };
 
-  const watchType = watch('type');
   const watchStatus = watch('status');
-  const defaultValue = modalType !== 'edit' ? tokens[0] : _.find(tokens, { symbol: bounty?.reward?.token });
+
+  function setToken (token: CryptoCurrency) {
+    setValue('rewardToken', token);
+  }
 
   if (modalType === 'edit' && !bounty) {
     return <span />;
   }
 
+  function onSubmit (values: FormValues) {
+    _onSubmit({
+      id: uuid(),
+      createdAt: new Date(),
+      ...values
+    });
+  }
+
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal size='large' open={open} onClose={onClose}>
+      <DialogTitle onClose={onClose}>{modalType !== 'edit' ? 'Create a Bounty' : 'Edit Bounty'}</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
@@ -148,8 +151,9 @@ export default function BountyModal (props: Props) {
               {...register('title')}
               fullWidth
               error={!!errors.title}
+              placeholder='Bounty title'
               helperText={errors.title?.message}
-              variant='standard'
+              variant='outlined'
             />
           </Grid>
           {modalType !== 'suggest' && (
@@ -170,7 +174,7 @@ export default function BountyModal (props: Props) {
                     <MenuItem value='pending'>
                       <Chip label='Not Started' color='primary' />
                     </MenuItem>
-                    <MenuItem value='inprogress'>
+                    <MenuItem value='in-progress'>
                       <Chip label='In Progress' color='secondary' />
                     </MenuItem>
                     <MenuItem value='done'>
@@ -183,37 +187,12 @@ export default function BountyModal (props: Props) {
           )}
 
           <Grid item>
-            <Grid container direction='row' alignItems='center'>
-              <Grid item xs={6}>
-                <Typography>Type</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Select
-                  labelId='select-type'
-                  id='select-type'
-                  value={watchType}
-                  variant='standard'
-                  label='type'
-                  onChange={handleTypeSelect}
-                >
-                  <MenuItem value='social'>
-                    <Chip label='SOCIAL' color='primary' />
-                  </MenuItem>
-                  <MenuItem value='content'>
-                    <Chip label='CONTENT' color='secondary' />
-                  </MenuItem>
-                </Select>
-              </Grid>
-            </Grid>
-          </Grid>
-
-          <Grid item>
             <BangleEditor state={editorState} />
           </Grid>
 
           {/* // xtungvo TODO: Move to separated component */}
           <Grid item>
-            <Typography variant='h5'>Reward</Typography>
+            <FieldLabel>Reward</FieldLabel>
             <Divider />
             <Box>
               <Grid container direction='row' alignItems='center' mt={1}>
@@ -222,10 +201,10 @@ export default function BountyModal (props: Props) {
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
-                    {...register('reward.reviewer')}
+                    {...register('reviewer')}
                     fullWidth
-                    variant='standard'
-                    error={!!errors.reward?.reviewer}
+                    variant='outlined'
+                    error={!!errors?.reviewer}
                   />
                 </Grid>
               </Grid>
@@ -236,10 +215,10 @@ export default function BountyModal (props: Props) {
 
                 <Grid item xs={6}>
                   <TextField
-                    {...register('reward.assignee')}
+                    {...register('assignee')}
                     fullWidth
-                    variant='standard'
-                    error={!!errors.reward?.assignee}
+                    variant='outlined'
+                    error={!!errors?.assignee}
                   />
                 </Grid>
               </Grid>
@@ -250,58 +229,7 @@ export default function BountyModal (props: Props) {
                   <Typography>Token</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Autocomplete
-                    id='token-select'
-                    options={tokens}
-                    autoHighlight
-                    onChange={(event: any, newValue: IToken | null) => {
-                      if (newValue?.symbol) {
-                        setValue('reward.token', newValue?.symbol);
-                      }
-                    }}
-                    onInputChange={(event, newInputValue) => {
-                      setTokenInput(newInputValue);
-                    }}
-                    inputValue={tokenInput}
-                    defaultValue={defaultValue}
-                    getOptionLabel={(option) => option.symbol}
-                    renderOption={(renderProps, option) => (
-                      <Box
-                        component='li'
-                        sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
-                        {...renderProps}
-                      >
-                        <img loading='lazy' width='20' src={option.img} alt='' />
-                        {option.symbol}
-                      </Box>
-                    )}
-                    renderInput={(params) => {
-                      // xtungvo TODO: fix this typing error
-                      const inputValue = params.inputProps.value;
-                      const tokenImg = _.find(tokens, { symbol: inputValue })?.img;
-                      return (
-                        <Grid
-                          container
-                          direction='row'
-                          sx={{ alignItems: 'center', position: 'relative' }}
-                        >
-                          {tokenImg && (
-                            <div style={{ position: 'absolute', left: '-30px', top: '8px' }}>
-                              <img loading='lazy' width='20' src={tokenImg} alt='' />
-                            </div>
-                          )}
-                          <TextField
-                            {...params}
-                            variant='standard'
-                            inputProps={{
-                              ...params.inputProps,
-                              autoComplete: 'new-password' // disable autocomplete and autofill
-                            }}
-                          />
-                        </Grid>
-                      );
-                    }}
-                  />
+                  <InputSearchCrypto defaultValue={bounty?.rewardToken} onChange={setToken} />
                 </Grid>
               </Grid>
               {/* Render token amount */}
@@ -311,11 +239,11 @@ export default function BountyModal (props: Props) {
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
-                    {...register('reward.amount')}
+                    {...register('rewardAmount')}
                     fullWidth
-                    variant='standard'
+                    variant='outlined'
                     type='number'
-                    error={!!errors.reward?.amount}
+                    error={!!errors?.rewardAmount}
                   />
                 </Grid>
               </Grid>
@@ -324,9 +252,11 @@ export default function BountyModal (props: Props) {
             </Box>
           </Grid>
           <Grid item>
-            <PrimaryButton type='submit'>
-              {modalType !== 'edit' ? 'Add Bounty' : 'Update Bounty'}
-            </PrimaryButton>
+            <Box display='flex' justifyContent='flex-end'>
+              <PrimaryButton type='submit'>
+                {modalType !== 'edit' ? 'Create' : 'Update'}
+              </PrimaryButton>
+            </Box>
           </Grid>
         </Grid>
       </form>

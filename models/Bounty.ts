@@ -1,30 +1,17 @@
-type TBountyCardStatus = 'pending' | 'inprogress' | 'done';
-type TBountyCardType = 'content' | 'social';
+import { CryptoCurrency } from './Currency';
 
-export interface IBountyReward {
+export const BOUNTY_STATUSES = ['pending', 'in-progress', 'done'] as const;
+export type BountyStatus = typeof BOUNTY_STATUSES[number];
+
+export interface Bounty {
+  id: string;
+  author: string;
+  createdAt: Date;
+  description: object;
   reviewer: string;
   assignee: string;
-  token: string;
-  amount: number;
-}
-
-export interface ICreatingBounty {
-  author: string;
+  rewardAmount: number;
+  rewardToken: CryptoCurrency;
+  status: BountyStatus;
   title: string;
-  description: Object;
-  status: TBountyCardStatus;
-  type: TBountyCardType;
-  reward: IBountyReward;
-}
-
-export type TBountyCard = ICreatingBounty & {
-  author: string;
-  id: string;
-  createdAt: Date;
-};
-
-export interface IBountyAction {
-  type: string;
-  item?: ICreatingBounty;
-  itemId?: string;
 }
