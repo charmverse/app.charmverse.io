@@ -28,13 +28,21 @@ interface IToken {
 
 const CRYPTO_CURRENCY_LIST = Object.keys(CryptoCurrencyList) as CryptoCurrency[];
 
+type ModalType = 'create' | 'edit' | 'suggest';
+
 interface Props {
   open: boolean;
-  modalType?: 'create' | 'edit' | 'suggest';
+  modalType: ModalType;
   bounty?: Bounty;
   onClose: () => void;
   onSubmit: (bounty: Bounty) => void;
 }
+
+const modalTitles: Record<ModalType, string> = {
+  suggest: 'Suggest a Bounty',
+  create: 'Create a Bounty',
+  edit: 'Edit a Bounty'
+};
 
 export const descSchema = yup.object({
   type: yup.string(),
@@ -125,7 +133,7 @@ export default function BountyModal (props: Props) {
 
   return (
     <Modal size='large' open={open} onClose={onClose}>
-      <DialogTitle onClose={onClose}>{modalType !== 'edit' ? 'Create a Bounty' : 'Edit Bounty'}</DialogTitle>
+      <DialogTitle onClose={onClose}>{modalTitles[modalType]}</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3}>
           <Grid item>

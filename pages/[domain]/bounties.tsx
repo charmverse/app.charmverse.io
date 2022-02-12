@@ -37,7 +37,7 @@ function BountyContainer (): ReactElement {
             setBountyDialogOpen(true);
           }}
         >
-          Add a Bounty
+          Create Bounty
         </Button>
       </Box>
       <Grid container direction='row' spacing={3}>
@@ -91,7 +91,7 @@ function SuggestionContainer (): ReactElement {
             setBountyDialogOpen(true);
           }}
         >
-          Suggest a bounty
+          Suggest bounty
         </Button>
       </Box>
       {suggestedBounties.length > 0 && <BountyTable items={suggestedBounties} />}
