@@ -22,6 +22,7 @@ export function InputSearchCrypto ({ onChange, defaultValue }:
       sx={{ minWidth: 150 }}
       options={currencyOptions}
       autoHighlight
+      size='small'
       renderOption={(props, option) => (
         <Box component='li' sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
           <Image

@@ -3,6 +3,7 @@ import BountyCard from 'components/bounties/BountyCard';
 import BountyTable from 'components/bounties/BountyTable';
 import BountyModal from 'components/bounties/BountyModal';
 import { BountyProvider, useBounty } from 'components/bounties/hooks/useBounty';
+import { setTitle } from 'hooks/usePageTitle';
 import {
   SuggestionProvider,
   useBountySuggestion
@@ -30,7 +31,9 @@ function BountyContainer (): ReactElement {
           mb: 2
         }}
       >
-        <Typography variant='h1'>Bounties</Typography>
+        <Typography variant='h1'>
+          Bounties
+        </Typography>
         <Button
           variant='outlined'
           onClick={() => {
@@ -109,6 +112,9 @@ function SuggestionContainer (): ReactElement {
   );
 }
 export default function BountyPage () {
+
+  setTitle('Bounties');
+
   return (
     <Box p={3}>
       <BountyProvider>
