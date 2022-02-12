@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SettingsIcon from '@mui/icons-material/Settings';
+import BountyIcon from '@mui/icons-material/RequestPage';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -33,7 +34,7 @@ import { Modal } from '../Modal';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import CreateWorkspaceForm from './CreateWorkspaceForm';
 import { headerHeight } from './Header';
-import PageNavigation from './PageNavigation';
+import PageNavigation, { PageLink, StyledTreeItem } from './PageNavigation';
 import NewPageMenu from '../NewPageMenu';
 
 const AvatarLink = styled(NextLink)`
@@ -81,6 +82,16 @@ const SidebarContainer = styled.div`
   &:hover .add-a-page {
     opacity: 1;
   }
+`;
+
+const SectionName = styled(Typography)`
+  color: ${greyColor2};
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+  padding-left: ${({ theme }) => theme.spacing(2)};
+  padding-right: ${({ theme }) => theme.spacing(2)};
+  margin-bottom: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const SidebarHeader = styled.div(({ theme }) => ({
@@ -232,9 +243,9 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               <Divider sx={{ mb: 3 }} />
               {favoritePageIds.length > 0 && (
                 <Box mb={2}>
-                  <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
+                  <SectionName>
                     FAVORITES
-                  </Typography>
+                  </SectionName>
                   <PageNavigation
                     isFavorites={true}
                     pages={pages}
@@ -247,9 +258,9 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 </Box>
               )}
               <WorkspaceLabel>
-                <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
+                <SectionName>
                   WORKSPACE
-                </Typography>
+                </SectionName>
                 <div className='add-a-page'>
                   <NewPageMenu tooltip='Add a page' addPage={addPage} />
                 </div>
@@ -264,13 +275,17 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               />
             </Box>
           </Box>
-          <Link href={`/${space.domain}/bounties`}>
-            <BountyLabel>
-              <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
-                BOUNTIES
-              </Typography>
-            </BountyLabel>
-          </Link>
+          <StyledTreeItem
+            sx={{ mt: 3 }}
+            nodeId='bounties'
+            icon={<BountyIcon fontSize='small' />}
+            label={
+              <PageLink href={`/${space.domain}/bounties`} label='Bounties' />
+            }
+            ContentProps={{
+              className: router.pathname.includes('bounties') ? 'Mui-selected' : ''
+            }}
+          />
         </Box>
         <Box>
           <Divider />
