@@ -29,7 +29,6 @@ function specFactory (): RawSpecs {
 const StyledColumnBlock = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.default};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  width: 256px;
   padding: ${({ theme }) => theme.spacing(1, 2)};
 
   & .bangle-nv-content p {

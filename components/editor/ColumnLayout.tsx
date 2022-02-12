@@ -24,22 +24,28 @@ function specFactory (): RawSpecs {
   };
 }
 
-const StyledColumnLayout = styled(Box)`
-  min-height: 100px;
+const StyledColumnLayout = styled(Box)<{colCount: number}>`
+  min-height: 60px;
   background-color: ${({ theme }) => theme.palette.background.light};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   padding: ${({ theme }) => theme.spacing(1)};
+  margin: ${({ theme }) => theme.spacing(2, 0)};
 
+  & > .bangle-nv-child-container {
+    height: 100%;
+  }
+  
   & > .bangle-nv-child-container > .bangle-nv-content {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(${({ colCount }) => colCount}, 1fr);
     gap: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
 export default function ColumnLayout ({ children, node }: {node: Node, children: ReactNode}) {
+  const totalChildren = (node.content as any)?.content?.length ?? 3;
   return (
-    <StyledColumnLayout>
+    <StyledColumnLayout colCount={totalChildren}>
       {children}
     </StyledColumnLayout>
   );

@@ -64,12 +64,46 @@ function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => voi
   return true;
 }
 
+function createColumnPaletteItem(colCount: number): Omit<PaletteItemType, "group"> {
+  return {
+    uid: `column ${colCount}`,
+    title: `${colCount} Columns`,
+    icon: <ViewColumnIcon
+      sx={{ fontSize: 16 }}
+    />,
+    description: `${colCount} Column Layout`,
+    editorExecuteCommand: () => {
+      return (state, dispatch, view) => {
+        rafCommandExec(view!, (state, dispatch) => {
+          const columnBlocks: Node[] = [];
+          for (let index = 0; index < colCount; index++) {
+            columnBlocks.push(
+              state.schema.nodes.columnBlock.create(undefined, Fragment.fromArray([
+                state.schema.nodes.paragraph.create()
+              ]))
+            )
+          }
+          return insertNode(state, dispatch, state.schema.nodes.columnLayout.create(
+            undefined,
+            Fragment.fromArray(columnBlocks)
+          ))
+        })
+        return replaceSuggestionMarkWith(palettePluginKey, '')(
+          state,
+          dispatch,
+          view,
+        );
+      };
+    },
+  }
+}
+
 const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> = {
   crypto: [
     {
       uid: 'price',
       title: 'Crypto price',
-      icon: <InsertChartIcon sx={{fontSize: 16}}
+      icon: <InsertChartIcon sx={{ fontSize: 16 }}
       />,
       description: 'Display a crypto price',
       editorExecuteCommand: () => {
@@ -149,39 +183,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
         };
       },
     },
-    {
-      uid: 'column',
-      title: 'Column',
-      icon: <ViewColumnIcon
-        sx={{ fontSize: 16 }}
-      />,
-      description: '3 Column Layout',
-      editorExecuteCommand: () => {
-        return (state, dispatch, view) => {
-          rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.columnLayout.create(
-              undefined,
-              Fragment.fromArray([
-                state.schema.nodes.columnBlock.create(undefined, Fragment.fromArray([
-                  state.schema.nodes.paragraph.create()
-                ])),
-                state.schema.nodes.columnBlock.create(undefined, Fragment.fromArray([
-                  state.schema.nodes.paragraph.create()
-                ])),
-                state.schema.nodes.columnBlock.create(undefined, Fragment.fromArray([
-                  state.schema.nodes.paragraph.create()
-                ])),
-              ])
-            ))
-          })
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view,
-          );
-        };
-      },
-    },
+    createColumnPaletteItem(2),
+    createColumnPaletteItem(3),
   ],
   text: [
     {
