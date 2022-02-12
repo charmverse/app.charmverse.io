@@ -83,6 +83,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
   },
   typography: {
     fontFamily: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"',
+    fontSize: 12,
     htmlFontSize: 14,
     h1: {
       fontSize: '2rem',

@@ -37,7 +37,6 @@ function bountyReducer (state: any, action: BountyAction) {
       };
     }
     case 'UPDATE_BOUNTY': {
-      // xtungvo TODO: improve not to use robust approach later
       const updatingBounties = [...state.bounties];
       const index = findIndex(state.bounties, { id: action.itemId });
       updatingBounties.splice(index, 1, action.item);

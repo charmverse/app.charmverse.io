@@ -30,7 +30,6 @@ function BountyContainer (): ReactElement {
           alignItems: 'center'
         }}
       >
-        {/* // xtungvo TODO: update correct variant style */}
         <Typography variant='h1'>Bounties</Typography>
         <Button
           variant='outlined'
@@ -44,7 +43,6 @@ function BountyContainer (): ReactElement {
       <Grid container direction='row' spacing={3} sx={{ marginTop: '8px' }}>
         {bounties.map((bounty: any) => (
           <Grid item key={bounty.id}>
-            {/* // xtungvo TODO: update to handle action for editing bounty */}
             <BountyCard bounty={bounty} />
           </Grid>
         ))}

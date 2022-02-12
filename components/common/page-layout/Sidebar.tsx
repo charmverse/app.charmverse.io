@@ -267,8 +267,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           <Link href={`/${space.domain}/bounties`}>
             <BountyLabel>
               <Typography sx={{ color: greyColor2, fontSize: 12, letterSpacing: '0.03em', fontWeight: 600, px: 2, mb: 0.5 }}>
-                {/* //xtungvo TODO: styling this later */}
-                $ BOUNTIES
+                BOUNTIES
               </Typography>
             </BountyLabel>
           </Link>

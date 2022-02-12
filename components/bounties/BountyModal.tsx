@@ -28,23 +28,6 @@ interface IToken {
 
 const CRYPTO_CURRENCY_LIST = Object.keys(CryptoCurrencyList) as CryptoCurrency[];
 
-// xtungvo TODO: update this list
-// const tokens: readonly IToken[] = [
-//   {
-//     symbol: 'ETH',
-//     img: 'https://media-exp1.licdn.com/dms/image/C560BAQFfixfL2L4FHQ/company-logo_200_200/0/1640872171070?e=2159024400&v=beta&t=VmnRYP4llSkrQUizgSjkB_Jd7wcSYL1sbDpvXnBD2Yo'
-//   },
-//   {
-//     symbol: 'ETH',
-//     img: 'https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/1024/Ethereum-ETH-icon.png'
-//   },
-
-//   {
-//     symbol: 'USDT',
-//     img: 'https://w7.pngwing.com/pngs/803/844/png-transparent-usdt-crypto-cryptocurrency-cryptocurrencies-cash-money-bank-payment-icon-thumbnail.png'
-//   }
-// ];
-
 interface Props {
   open: boolean;
   modalType?: 'create' | 'edit' | 'suggest';
@@ -58,7 +41,6 @@ export const descSchema = yup.object({
   content: yup.array()
 });
 
-// xtungvo TODO: fix typing here
 export const schema = yup.object({
   author: yup.string().required(),
   title: yup.string().ensure().trim().lowercase()
@@ -104,7 +86,7 @@ export default function BountyModal (props: Props) {
   });
 
   const editorState = useEditorState({
-    // xtungvo TODO: somehow the bangle.dev not updating the new state
+    // TODO: somehow the bangle.dev not updating the new state
     initialValue: modalType === 'create' ? 'Edit bounty description...' : bounty?.description,
     plugins: () => [
       new Plugin({
@@ -190,7 +172,6 @@ export default function BountyModal (props: Props) {
             <BangleEditor state={editorState} />
           </Grid>
 
-          {/* // xtungvo TODO: Move to separated component */}
           <Grid item>
             <FieldLabel>Reward</FieldLabel>
             <Divider />
