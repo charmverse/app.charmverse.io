@@ -4,7 +4,7 @@ import {
 } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 export const spec = specFactory;
 
@@ -26,20 +26,44 @@ function specFactory (): RawSpecs {
   };
 }
 
-const StyledColumnBlock = styled(Box)`
+const StyledResizeHandle = styled(Box)<{pos: 'right' | 'left'}>`
+  width: 7.5px;
+  height: calc(100% - 15px);
+  max-height: 75px;
+  border-radius: ${({ theme }) => theme.spacing(2)};
+  background-color: ${({ theme }) => theme.palette.background.dark};
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 250ms ease-in-out;
+  ${({ pos }) => pos === 'left' ? 'left: 15px' : 'right: 15px'};
+  cursor: col-resize;
+`;
+
+const StyledColumnBlock = styled(Box)<{opacity: number}>`
   background-color: ${({ theme }) => theme.palette.background.default};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   padding: ${({ theme }) => theme.spacing(1, 2)};
-
+  position: relative;
+  
   & .bangle-nv-content p {
     overflow-wrap: anywhere;
+  }
+
+  &:hover .image-resize-handler {
+    opacity: ${({ opacity }) => opacity};
+    transition: opacity 250ms ease-in-out
   }
 `;
 
 export default function ColumnBlock ({ children, node }: {node: Node, children: ReactNode}) {
+  const [isDragging, setIsDragging] = useState(false);
+
   return (
-    <StyledColumnBlock>
+    <StyledColumnBlock opacity={isDragging ? 0 : 1}>
       {children}
+      <StyledResizeHandle pos='right' className='image-resize-handler' />
     </StyledColumnBlock>
   );
 }
