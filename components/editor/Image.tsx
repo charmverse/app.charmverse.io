@@ -9,6 +9,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
 import React, { HTMLAttributes, useState } from 'react';
 import ImageSelector from './ImageSelector';
+import { StyledResizeHandle } from './ResizeHandle';
 
 const MAX_IMAGE_WIDTH = 750; const
   MIN_IMAGE_WIDTH = 250;
@@ -77,19 +78,6 @@ const StyledImage = styled.img`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-const StyledImageResizeHandle = styled(Box)<{pos: 'right' | 'left'}>`
-  width: 7.5px;
-  height: 75px;
-  border-radius: ${({ theme }) => theme.spacing(2)};
-  background-color: ${({ theme }) => theme.palette.background.dark};
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0;
-  transition: opacity 250ms ease-in-out;
-  ${({ pos }) => pos === 'left' ? 'left: 15px' : 'right: 15px'};
-`;
-
 interface ImageResizeHandleProps {
   imageWidth: number
   setImageWidth: React.Dispatch<React.SetStateAction<number>>
@@ -105,13 +93,13 @@ function ImageResizeHandle (
 ) {
   return (
     <>
-      {/** Adding StyledImageResizeHandle twice to hide image ghost while dragging  */}
-      <StyledImageResizeHandle
+      {/** Adding StyledResizeHandle twice to hide image ghost while dragging  */}
+      <StyledResizeHandle
         pos={position}
         /** custom class required to show resize handler when hovering over the image */
         className='image-resize-handler'
       />
-      <StyledImageResizeHandle
+      <StyledResizeHandle
         pos={position}
         onDragEnd={() => {
           if (isDragging) {
