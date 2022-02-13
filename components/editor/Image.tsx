@@ -7,6 +7,7 @@ import AlignHorizontalRightIcon from '@mui/icons-material/AlignHorizontalRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
+import useResize from 'hooks/useResize';
 import React, { HTMLAttributes, useState } from 'react';
 import ImageSelector from './ImageSelector';
 import { StyledResizeHandle } from './ResizeHandle';
@@ -79,8 +80,8 @@ const StyledImage = styled.img`
 `;
 
 interface ImageResizeHandleProps {
-  imageWidth: number
-  setImageWidth: React.Dispatch<React.SetStateAction<number>>
+  width: number
+  setWidth: React.Dispatch<React.SetStateAction<number>>
   setClientX: React.Dispatch<React.SetStateAction<number>>
   clientX: number,
   position: 'right' | 'left'
@@ -89,7 +90,7 @@ interface ImageResizeHandleProps {
 }
 
 function ImageResizeHandle (
-  { isDragging, setIsDragging, position, imageWidth, setClientX, setImageWidth, clientX }: ImageResizeHandleProps
+  { isDragging, setIsDragging, position, width, setClientX, setWidth, clientX }: ImageResizeHandleProps
 ) {
   return (
     <>
@@ -111,14 +112,14 @@ function ImageResizeHandle (
             setIsDragging(true);
           }
           // Make sure the image is not below 250px, and above 750px
-          if (imageWidth >= MIN_IMAGE_WIDTH && imageWidth <= MAX_IMAGE_WIDTH) {
+          if (width >= MIN_IMAGE_WIDTH && width <= MAX_IMAGE_WIDTH) {
             let difference = clientX - e.clientX;
             // Making sure the difference isn't too abrupt clipping the difference to a limit
             difference = difference < -5 ? -5 : difference > 5 ? 5 : difference;
             // Avoid updating state when the clientX value are the same
             // This happens when the user is dragging but staying still
             if (clientX !== e.clientX) {
-              let newImageWidth = imageWidth;
+              let newImageWidth = width;
               if (position === 'right') {
                 // left to right movement. Increasing image size
                 if (difference < 0) {
@@ -146,7 +147,7 @@ function ImageResizeHandle (
               else if (newImageWidth > MAX_IMAGE_WIDTH) {
                 newImageWidth = MAX_IMAGE_WIDTH;
               }
-              setImageWidth(newImageWidth);
+              setWidth(newImageWidth);
 
               setClientX(e.clientX);
             }
@@ -161,12 +162,8 @@ function ImageResizeHandle (
 export function Image ({ node, updateAttrs }: NodeViewProps) {
   const [align, setAlign] = useState('center');
   const theme = useTheme();
-  // State to keep track of the current image width
-  const [imageWidth, setImageWidth] = useState(500);
-  // State to keep track of the current dragged mouse position
-  const [clientX, setClientX] = useState<number>(0);
-  // Is dragging is used to hide the resize handles while dragging
-  const [isDragging, setIsDragging] = useState(false);
+
+  const resizeState = useResize({ initialWidth: 500 });
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
@@ -182,15 +179,6 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
     );
   }
 
-  const imageResizeHandleProps: Omit<ImageResizeHandleProps, 'position'> = {
-    clientX,
-    imageWidth,
-    setClientX,
-    setImageWidth,
-    isDragging,
-    setIsDragging
-  };
-
   return (
     <StyledImageContainer
       align={align}
@@ -204,20 +192,20 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
           sx={{
             position: 'relative',
             cursor: 'col-resize',
-            width: imageWidth,
+            width: resizeState.width,
             '&:hover .image-resize-handler': {
-              opacity: isDragging ? 0 : 1,
+              opacity: resizeState.isDragging ? 0 : 1,
               transition: 'opacity 250ms ease-in-out'
             }
           }}
         >
-          <ImageResizeHandle {...imageResizeHandleProps} position='left' />
+          <ImageResizeHandle {...resizeState} position='left' />
           <StyledImage
             draggable={false}
             src={node.attrs.src}
             alt={node.attrs.alt}
           />
-          <ImageResizeHandle {...imageResizeHandleProps} position='right' />
+          <ImageResizeHandle {...resizeState} position='right' />
         </Box>
         <Controls className='controls'>
           {[
