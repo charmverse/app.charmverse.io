@@ -6,6 +6,7 @@ import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { HTMLAttributes } from 'react';
+import VideoSelector from './VideoSelector';
 
 const name = 'video';
 
@@ -72,7 +73,16 @@ function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
 export default function Video ({ node, updateAttrs }: NodeViewProps) {
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
-    return <EmptyImageContainer />;
+    return (
+      <VideoSelector onVideoSelect={(videoLink) => {
+        updateAttrs({
+          src: videoLink
+        });
+      }}
+      >
+        <EmptyImageContainer />
+      </VideoSelector>
+    );
   }
   return null;
 }

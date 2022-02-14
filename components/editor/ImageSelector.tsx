@@ -14,7 +14,6 @@ interface ImageSelectorProps {
 
 export default function ImageSelector (props: ImageSelectorProps) {
   const { message, handleClose, isOpen, showMessage } = useSnackbar();
-
   const [embedLink, setEmbedLink] = useState('');
   const { tabs = [], children, onImageSelect } = props;
   return (
