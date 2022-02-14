@@ -1,11 +1,11 @@
-import type { FavoritePage, SpacePermission, User } from '@prisma/client';
+import type { FavoritePage, SpaceRole, User } from '@prisma/client';
 
-export { FavoritePage, SpacePermission, User };
+export { FavoritePage, SpaceRole, User };
 
-export type SpacePermissionType = 'admin' | 'contributor';
+export type Role = 'admin' | 'contributor';
 
 export interface PopulatedUser extends User {
-  spacePermissions: (Pick<SpacePermission, 'userId' | 'spaceId'> & { type: SpacePermissionType })[];
+  spaceRoles: (Pick<SpaceRole, 'userId' | 'spaceId'> & { role: Role })[];
 }
 
 export interface LoggedInUser extends User {

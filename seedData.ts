@@ -21,16 +21,16 @@ function MockSpace (partial: Partial<Space>): Space {
 }
 
 export const users: PopulatedUser[] = [
-  { id: '0', addresses: ['0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw'], spacePermissions: [{ spaceId: spaces[0].id, type: 'admin' as const, userId: '0' }, { spaceId: spaces[1].id, type: 'admin' as const, userId: '0' }] },
-  { id: '1', addresses: ['0x1416d1b5435D12CE393aBbA3f81fe6C5951e4Bf4'], spacePermissions: [{ spaceId: spaces[0].id, type: 'admin' as const, userId: '1' }] },
-  { id: '2', addresses: ['0x626a827c90AA620CFD78A8ecda494Edb9a4225D5'], spacePermissions: [{ spaceId: spaces[0].id, type: 'contributor' as const, userId: '2' }, { spaceId: spaces[1].id, type: 'admin' as const, userId: '2' }] },
-  { id: '3', addresses: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'], spacePermissions: [{ spaceId: spaces[1].id, type: 'contributor' as const, userId: '3' }] }
+  { id: '0', addresses: ['0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw'], spaceRoles: [{ spaceId: spaces[0].id, role: 'admin' as const, userId: '0' }, { spaceId: spaces[1].id, role: 'admin' as const, userId: '0' }] },
+  { id: '1', addresses: ['0x1416d1b5435D12CE393aBbA3f81fe6C5951e4Bf4'], spaceRoles: [{ spaceId: spaces[0].id, role: 'admin' as const, userId: '1' }] },
+  { id: '2', addresses: ['0x626a827c90AA620CFD78A8ecda494Edb9a4225D5'], spaceRoles: [{ spaceId: spaces[0].id, role: 'contributor' as const, userId: '2' }, { spaceId: spaces[1].id, role: 'admin' as const, userId: '2' }] },
+  { id: '3', addresses: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'], spaceRoles: [{ spaceId: spaces[1].id, role: 'contributor' as const, userId: '3' }] }
 ].map(user => MockUser(user));
 
 function MockUser (partial: Partial<PopulatedUser>): PopulatedUser {
   return {
     addresses: [],
-    spacePermissions: [],
+    spaceRoles: [],
     discordId: null,
     id: `${Math.random()}`,
     createdAt: new Date(),
@@ -65,11 +65,11 @@ function MockPage (partial: Partial<Page>): Page {
       type: 'doc',
       content: []
     }, // as PageContent,
+    contentString: '',
     isPublic: false,
     parentId: null,
     path: id,
     spaceId: null,
-    userId: null,
     ...partial
   };
 }
