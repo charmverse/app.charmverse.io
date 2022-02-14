@@ -5,7 +5,9 @@ import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
-const ModalContainer = styled.div<{ size?: 'large' }>`
+type ModalSize = 'large' | 'fluid' | 'small';
+
+const ModalContainer = styled.div<{ size?: ModalSize }>`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -32,7 +34,7 @@ const CloseButton = styled(IconButton)`
   padding: 0;
 `;
 
-type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose'> & { size?: 'large', children: any, onClose: () => void };
+type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose'> & { size?: ModalSize, children: any, onClose: () => void };
 
 export function Modal ({ children, size, ...props }: ModalProps) {
   return (

@@ -4,11 +4,11 @@ export { FavoritePage, SpacePermission, User };
 
 export type SpacePermissionType = 'admin' | 'contributor';
 
-export interface Contributor extends User {
+export interface PopulatedUser extends User {
   spacePermissions: (Pick<SpacePermission, 'userId' | 'spaceId'> & { type: SpacePermissionType })[];
 }
 
-export interface ContributorUser extends Contributor {
+export interface LoggedInUser extends User {
   favorites: FavoritePage[];
   isLoading: boolean;
   linkedAddressesCount: number; // from guild.xyz

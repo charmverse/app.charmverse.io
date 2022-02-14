@@ -1,5 +1,5 @@
-import { Contributor, ContributorUser, PageContent } from 'models';
 import { Page, Space, User } from '@prisma/client';
+import { LoggedInUser, PopulatedUser, PageContent } from 'models';
 
 export const spaces: Space[] = [
   { id: '0', name: 'Our Community', domain: 'demo' },
@@ -20,35 +20,34 @@ function MockSpace (partial: Partial<Space>): Space {
   };
 }
 
-export const contributors: Contributor[] = [
-  { id: '0', addresses: ['0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw'], username: 'dolemite', spacePermissions: [{ spaceId: spaces[0].id, type: 'admin', userId: '0' }, { spaceId: spaces[1].id, type: 'admin', userId: '0' }] },
-  { id: '1', addresses: ['0x1416d1b5435D12CE393aBbA3f81fe6C5951e4Bf4'], username: 'cerberus', spacePermissions: [{ spaceId: spaces[0].id, type: 'admin', userId: '1' }] },
-  { id: '2', addresses: ['0x626a827c90AA620CFD78A8ecda494Edb9a4225D5'], username: 'devorein', spacePermissions: [{ spaceId: spaces[0].id, type: 'contributor', userId: '2' }, { spaceId: spaces[1].id, type: 'admin', userId: '2' }] },
-  { id: '3', addresses: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'], username: 'mattopoly', spacePermissions: [{ spaceId: spaces[1].id, type: 'contributor', userId: '3' }] }
+export const users: PopulatedUser[] = [
+  { id: '0', addresses: ['0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw'], spacePermissions: [{ spaceId: spaces[0].id, type: 'admin' as const, userId: '0' }, { spaceId: spaces[1].id, type: 'admin' as const, userId: '0' }] },
+  { id: '1', addresses: ['0x1416d1b5435D12CE393aBbA3f81fe6C5951e4Bf4'], spacePermissions: [{ spaceId: spaces[0].id, type: 'admin' as const, userId: '1' }] },
+  { id: '2', addresses: ['0x626a827c90AA620CFD78A8ecda494Edb9a4225D5'], spacePermissions: [{ spaceId: spaces[0].id, type: 'contributor' as const, userId: '2' }, { spaceId: spaces[1].id, type: 'admin' as const, userId: '2' }] },
+  { id: '3', addresses: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'], spacePermissions: [{ spaceId: spaces[1].id, type: 'contributor' as const, userId: '3' }] }
 ].map(user => MockUser(user));
 
-function MockUser (partial: Partial<User>): Contributor {
+function MockUser (partial: Partial<PopulatedUser>): PopulatedUser {
   return {
     addresses: [],
     spacePermissions: [],
     discordId: null,
     id: `${Math.random()}`,
-    username: '',
     createdAt: new Date(),
     updatedAt: new Date(),
     ...partial
   };
 }
 
-export const activeUser: ContributorUser = {
-  ...contributors[0],
+export const activeUser: LoggedInUser = {
+  ...users[0],
   isLoading: false,
   linkedAddressesCount: 1,
   favorites: []
 };
 
 function MockPage (partial: Partial<Page>): Page {
-  const author = partial.createdBy || contributors[0].addresses[0];
+  const author = partial.createdBy || users[0].addresses[0];
   const id = Math.random().toString(36).substring(2);
   return {
     createdAt: new Date(),

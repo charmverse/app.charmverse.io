@@ -7,6 +7,7 @@ import ContributorRow from 'components/settings/ContributorRow';
 import { setTitle } from 'hooks/usePageTitle';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import getDisplayName from 'lib/users/getDisplayName';
 
 export default function ContributorSettings () {
 
@@ -31,7 +32,7 @@ export default function ContributorSettings () {
 
       <Legend>Current Contributors</Legend>
       {contributors.map(contributor => (
-        <ContributorRow key={contributor.username} contributor={contributor} spaceId={space.id} />
+        <ContributorRow key={getDisplayName(contributor)} contributor={contributor} spaceId={space.id} />
       ))}
     </>
   );

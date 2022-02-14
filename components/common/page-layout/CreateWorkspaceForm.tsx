@@ -11,6 +11,7 @@ import { FormValues, schema } from 'pages/[domain]/settings/workspace';
 import { ChangeEvent } from 'react';
 import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
+import getDisplayName from 'lib/users/getDisplayName';
 
 interface Props {
   onCancel: () => void;
@@ -21,7 +22,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
 
   const [user] = useUser();
 
-  const defaultName = `${user!.username}'s Workspace`;
+  const defaultName = `${getDisplayName(user!)}'s Workspace`;
 
   const {
     register,

@@ -71,7 +71,6 @@ model User {
   updatedAt        DateTime?
   addresses        String[]
   discordId        String?
-  username         String
   spacePermissions SpacePermission[]
   favorites        FavoritePage[]
   pagePermissions  PagePermission[]
