@@ -86,8 +86,8 @@ const CommentsList = React.memo((props: Props) => {
                 <Comment
                     key={comment.id}
                     comment={comment}
-                    userImageUrl={Utils.getProfilePicture(comment.modifiedBy)}
-                    userId={comment.modifiedBy}
+                    userImageUrl={Utils.getProfilePicture(comment.updatedBy)}
+                    userId={comment.updatedBy}
                     readonly={props.readonly}
                 />
             ))}

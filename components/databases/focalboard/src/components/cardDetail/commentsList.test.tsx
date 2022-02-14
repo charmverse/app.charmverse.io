@@ -33,15 +33,15 @@ describe('components/cardDetail/CommentsList', () => {
     const comment1: CommentBlock = {
         id: 'comment_id_1',
         title: 'Comment 1',
-        createAt: createdAt,
-        modifiedBy: 'user_id_1',
+        createdAt: createdAt,
+        updatedBy: 'user_id_1',
     } as CommentBlock
 
     const comment2: CommentBlock = {
         id: 'comment_id_2',
         title: 'Comment 2',
-        createAt: createdAt,
-        modifiedBy: 'user_id_2',
+        createdAt: createdAt,
+        updatedBy: 'user_id_2',
     } as CommentBlock
 
     test('comments show up', async () => {

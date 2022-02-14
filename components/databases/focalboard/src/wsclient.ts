@@ -35,7 +35,7 @@ export interface Subscription {
     blockType: string
     subscriberType: string
     notifiedAt?: number
-    createAt?: number
+    createdAt?: number
     deleteAt?: number
 }
 

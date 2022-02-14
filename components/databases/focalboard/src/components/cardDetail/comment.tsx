@@ -28,7 +28,7 @@ const Comment: FC<Props> = (props: Props) => {
     const intl = useIntl()
     const html = Utils.htmlFromMarkdown(comment.title)
     const user = useAppSelector(getUser(userId))
-    const date = new Date(comment.createAt)
+    const date = new Date(comment.createdAt)
 
     return (
         <div

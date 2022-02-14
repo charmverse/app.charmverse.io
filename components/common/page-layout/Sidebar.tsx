@@ -167,12 +167,12 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           content: []
         }]
       },
+      contentText: '',
       createdAt: new Date(),
       createdBy: user!.id,
       headerImage: null,
       icon: null,
       updatedAt: new Date(),
-      userId: null,
       updatedBy: user!.id,
       deletedAt: null,
       id,

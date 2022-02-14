@@ -188,10 +188,10 @@ describe('components/table/Table extended', () => {
         })
 
         const card1 = TestBlockFactory.createCard(board)
-        card1.createAt = Date.parse('15 Jun 2021 16:22:00')
+        card1.createdAt = Date.parse('15 Jun 2021 16:22:00')
 
         const card2 = TestBlockFactory.createCard(board)
-        card2.createAt = Date.parse('15 Jun 2021 16:22:00')
+        card2.createdAt = Date.parse('15 Jun 2021 16:22:00')
 
         const view = TestBlockFactory.createBoardView(board)
         view.fields.viewType = 'table'
@@ -245,20 +245,20 @@ describe('components/table/Table extended', () => {
         })
 
         const card1 = TestBlockFactory.createCard(board)
-        card1.updateAt = Date.parse('20 Jun 2021 12:22:00')
+        card1.updatedAt = Date.parse('20 Jun 2021 12:22:00')
 
         const card2 = TestBlockFactory.createCard(board)
-        card2.updateAt = Date.parse('20 Jun 2021 12:22:00')
+        card2.updatedAt = Date.parse('20 Jun 2021 12:22:00')
 
         const card2Comment = TestBlockFactory.createCard(board)
         card2Comment.parentId = card2.id
         card2Comment.type = 'comment'
-        card2Comment.updateAt = Date.parse('21 Jun 2021 15:23:00')
+        card2Comment.updatedAt = Date.parse('21 Jun 2021 15:23:00')
 
         const card2Text = TestBlockFactory.createCard(board)
         card2Text.parentId = card2.id
         card2Text.type = 'text'
-        card2Text.updateAt = Date.parse('22 Jun 2021 11:23:00')
+        card2Text.updatedAt = Date.parse('22 Jun 2021 11:23:00')
 
         card2.fields.contentOrder = [card2Text.id]
 
@@ -373,40 +373,40 @@ describe('components/table/Table extended', () => {
     test('should match snapshot with UpdatedBy', async () => {
         const board = TestBlockFactory.createBoard()
 
-        const modifiedById = Utils.createGuid(IDType.User)
+        const updatedById = Utils.createGuid(IDType.User)
         board.fields.cardProperties.push({
-            id: modifiedById,
+            id: updatedById,
             name: 'Last Modified By',
             type: 'updatedBy',
             options: [],
         })
 
         const card1 = TestBlockFactory.createCard(board)
-        card1.modifiedBy = 'user-id-1'
-        card1.updateAt = Date.parse('15 Jun 2021 16:22:00')
+        card1.updatedBy = 'user-id-1'
+        card1.updatedAt = Date.parse('15 Jun 2021 16:22:00')
 
         const card1Text = TestBlockFactory.createCard(board)
         card1Text.parentId = card1.id
         card1Text.type = 'text'
-        card1Text.modifiedBy = 'user-id-4'
-        card1Text.updateAt = Date.parse('16 Jun 2021 16:22:00')
+        card1Text.updatedBy = 'user-id-4'
+        card1Text.updatedAt = Date.parse('16 Jun 2021 16:22:00')
 
         card1.fields.contentOrder = [card1Text.id]
 
         const card2 = TestBlockFactory.createCard(board)
-        card2.modifiedBy = 'user-id-2'
-        card2.updateAt = Date.parse('15 Jun 2021 16:22:00')
+        card2.updatedBy = 'user-id-2'
+        card2.updatedAt = Date.parse('15 Jun 2021 16:22:00')
 
         const card2Comment = TestBlockFactory.createCard(board)
         card2Comment.parentId = card2.id
         card2Comment.type = 'comment'
-        card2Comment.modifiedBy = 'user-id-3'
-        card2.updateAt = Date.parse('16 Jun 2021 16:22:00')
+        card2Comment.updatedBy = 'user-id-3'
+        card2.updatedAt = Date.parse('16 Jun 2021 16:22:00')
 
         const view = TestBlockFactory.createBoardView(board)
         view.fields.viewType = 'table'
         view.fields.groupById = undefined
-        view.fields.visiblePropertyIds = ['property1', 'property2', modifiedById]
+        view.fields.visiblePropertyIds = ['property1', 'property2', updatedById]
 
         const callback = jest.fn()
         const addCard = jest.fn()

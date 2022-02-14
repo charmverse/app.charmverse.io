@@ -143,7 +143,7 @@ function titleOrCreatedOrder(cardA: Card, cardB: Card) {
     }
 
     // If both cards are untitled, use the create date
-    return cardA.createAt - cardB.createAt
+    return cardA.createdAt - cardB.createdAt
 }
 
 function manualOrder(activeView: BoardView, cardA: Card, cardB: Card) {
@@ -199,8 +199,8 @@ function sortCards(cards: Card[], board: Board, activeView: BoardView, usersById
                     aValue = usersById[a.createdBy]?.username || ''
                     bValue = usersById[b.createdBy]?.username || ''
                 } else if (template.type === 'updatedBy') {
-                    aValue = usersById[a.modifiedBy]?.username || ''
-                    bValue = usersById[b.modifiedBy]?.username || ''
+                    aValue = usersById[a.updatedBy]?.username || ''
+                    bValue = usersById[b.updatedBy]?.username || ''
                 } else if (template.type === 'date') {
                     aValue = (aValue === '') ? '' : JSON.parse(aValue as string).from
                     bValue = (bValue === '') ? '' : JSON.parse(bValue as string).from
@@ -221,9 +221,9 @@ function sortCards(cards: Card[], board: Board, activeView: BoardView, usersById
 
                     result = Number(aValue) - Number(bValue)
                 } else if (template.type === 'createdTime') {
-                    result = a.createAt - b.createAt
+                    result = a.createdAt - b.createdAt
                 } else if (template.type === 'updatedTime') {
-                    result = a.updateAt - b.updateAt
+                    result = a.updatedAt - b.updatedAt
                 } else {
                     // Text-based sort
 

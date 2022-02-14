@@ -65,7 +65,7 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
     }
     dispatch(loadAction(page.boardId));
 
-  }, [router.query.workspaceId, readonly, router.query.pageId]);
+  }, [router.query.spaceId, readonly, router.query.pageId]);
 
   useHotkeys('ctrl+z,cmd+z', () => {
     Utils.log('Undo');

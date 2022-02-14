@@ -23,13 +23,13 @@ function getCardProperty(card: Card, property: IPropertyTemplate): string | stri
         return card.createdBy
     }
     case ('createdTime'): {
-        return fixTimestampToMinutesAccuracy(card.createAt)
+        return fixTimestampToMinutesAccuracy(card.createdAt)
     }
     case ('updatedBy'): {
-        return card.modifiedBy
+        return card.updatedBy
     }
     case ('updatedTime'): {
-        return fixTimestampToMinutesAccuracy(card.updateAt)
+        return fixTimestampToMinutesAccuracy(card.updatedAt)
     }
     default: {
         return card.fields.properties[property.id]

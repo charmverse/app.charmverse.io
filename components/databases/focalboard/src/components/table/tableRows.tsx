@@ -45,7 +45,7 @@ const TableRows = (props: Props): JSX.Element => {
             {cards.map((card) => {
                 const tableRow = (
                     <TableRow
-                        key={card.id + card.updateAt}
+                        key={card.id + card.updatedAt}
                         board={board}
                         activeView={activeView}
                         card={card}

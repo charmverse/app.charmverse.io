@@ -14,6 +14,7 @@ model Space {
   id          String      @id @default(uuid()) @db.Uuid
   deletedAt   DateTime?
   createdAt   DateTime    @default(now())
+  author      User        @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   createdBy   String
   updatedAt   DateTime
   updatedBy   String
@@ -25,46 +26,46 @@ model Space {
 }
 
 model Page {
-  id            String           @id @default(uuid()) @db.Uuid
-  deletedAt     DateTime?
-  createdAt     DateTime         @default(now())
-  createdBy     String           @db.Uuid
-  createdByUser User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  updatedAt     DateTime
-  updatedBy     String           @db.Uuid
-  title         String
-  content       Json?
-  contentString String
-  headerImage   String?
-  icon          String?
-  isPublic      Boolean
-  path          String
-  parentId      String?
-  spaceId       String?
-  space         Space?           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  type          String
-  boardId       String?
-  permissions   PagePermission[]
-  favorites     FavoritePage[]
+  id          String           @id @default(uuid()) @db.Uuid
+  deletedAt   DateTime?
+  createdAt   DateTime         @default(now())
+  createdBy   String           @db.Uuid
+  author      User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  updatedAt   DateTime
+  updatedBy   String           @db.Uuid
+  title       String
+  content     Json?
+  contentText String
+  headerImage String?
+  icon        String?
+  isPublic    Boolean
+  path        String
+  parentId    String?
+  spaceId     String?
+  space       Space?           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  type        String
+  boardId     String?
+  permissions PagePermission[]
+  favorites   FavoritePage[]
 }
 
+// focalboard blocks
 model Block {
-  id            String    @id @db.Uuid
-  deletedAt     DateTime?
-  createdAt     DateTime  @default(now())
-  createdBy     String    @db.Uuid
-  createdByUser User      @relation("createdBy", fields: [createdBy], references: [id], onDelete: Cascade)
-  updatedAt     DateTime
-  updatedBy     String    @db.Uuid
-  updatedByUser User      @relation("updatedBy", fields: [updatedBy], references: [id])
-  spaceId       String
-  space         Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  parentId      String
-  rootId        String
-  schema        Int
-  type          String
-  title         String
-  fields        Json
+  id        String    @id @db.Uuid
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  createdBy String    @db.Uuid
+  User      User      @relation(fields: [createdBy], references: [id])
+  updatedAt DateTime
+  updatedBy String    @db.Uuid
+  spaceId   String
+  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  parentId  String
+  rootId    String
+  schema    Int
+  type      String
+  title     String
+  fields    Json
 }
 
 model User {
@@ -77,8 +78,8 @@ model User {
   favorites       FavoritePage[]
   pagePermissions PagePermission[]
   pages           Page[]
-  createdBlocks   Block[]          @relation("createdBy")
-  updatedBlocks   Block[]          @relation("updatedBy")
+  blocks          Block[]
+  Space           Space[]
 }
 
 model FavoritePage {
