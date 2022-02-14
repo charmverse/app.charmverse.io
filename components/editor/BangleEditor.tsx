@@ -228,7 +228,6 @@ export default function BangleEditor (
       }}
       state={state}
       renderNodeViews={({ children, ...props }) => {
-        // eslint-disable-next-line
         switch (props.node.type.name) {
           case 'columnLayout': {
             return <ColumnLayout node={props.node}>{children}</ColumnLayout>;

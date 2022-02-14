@@ -35,6 +35,7 @@ export default function VideoSelector (props: VideoSelectorProps) {
             >
               <TextField fullWidth placeholder='Paste the video link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
               <Button
+                disabled={!embedLink}
                 sx={{
                   width: 250
                 }}

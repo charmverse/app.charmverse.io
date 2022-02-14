@@ -71,6 +71,7 @@ export default function ImageSelector (props: ImageSelectorProps) {
             >
               <TextField fullWidth placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
               <Button
+                disabled={!embedLink}
                 sx={{
                   width: 250
                 }}

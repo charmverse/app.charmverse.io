@@ -6,6 +6,8 @@ import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { HTMLAttributes } from 'react';
+import BlockAligner from './BlockAligner';
+import Resizer from './Resizer';
 import VideoSelector from './VideoSelector';
 
 const name = 'video';
@@ -15,23 +17,23 @@ export function videoSpec (): RawSpecs {
     type: 'node',
     name,
     schema: {
-      inline: true,
       attrs: {
         src: {
           default: null
         }
       },
+      group: 'block',
       draggable: true,
       parseDOM: [
         {
-          tag: 'video[src]',
+          tag: 'iframe[src]',
           getAttrs: (dom: any) => ({
             src: dom.getAttribute('src')
           })
         }
       ],
       toDOM: (node: Node) => {
-        return ['video', node.attrs];
+        return ['iframe', node.attrs];
       }
     }
   };
@@ -45,7 +47,7 @@ const StyledEmptyVideoContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
+function EmptyVideoContainer (props: HTMLAttributes<HTMLDivElement>) {
   const theme = useTheme();
 
   return (
@@ -70,6 +72,17 @@ function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
   );
 }
 
+const StyledVideo = styled.iframe`
+  object-fit: contain;
+  width: 100%;
+  min-height: 250px;
+  user-select: none;
+  &:hover {
+    cursor: initial;
+  }
+  border-radius: ${({ theme }) => theme.spacing(1)};
+`;
+
 export default function Video ({ node, updateAttrs }: NodeViewProps) {
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
@@ -80,9 +93,28 @@ export default function Video ({ node, updateAttrs }: NodeViewProps) {
         });
       }}
       >
-        <EmptyImageContainer />
+        <EmptyVideoContainer />
       </VideoSelector>
     );
   }
-  return null;
+
+  return (
+    <BlockAligner onDelete={() => {
+      updateAttrs({
+        src: null
+      });
+    }}
+    >
+      <Resizer maxWidth={750} minWidth={250}>
+        <StyledVideo
+          draggable={false}
+          src={node.attrs.src}
+          title='YouTube video player'
+          frameBorder='0'
+          allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+          allowFullScreen
+        />
+      </Resizer>
+    </BlockAligner>
+  );
 }
