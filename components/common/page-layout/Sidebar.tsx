@@ -19,7 +19,7 @@ import { usePages } from 'hooks/usePages';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { shortenHex } from 'lib/strings';
-import { ContributorUser, Page, Space } from 'models';
+import { LoggedInUser, Page, Space } from 'models';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { pages as seedPages } from 'seedData';
@@ -28,6 +28,7 @@ import { addBoardClicked } from 'components/databases/focalboard/src/components/
 import mutator from 'components/databases/focalboard/src//mutator';
 import { useAppSelector } from 'components/databases/focalboard/src/store/hooks';
 import { getSortedBoards } from 'components/databases/focalboard/src/store/boards';
+import getDisplayName from 'lib/users/getDisplayName';
 import Avatar from '../Avatar';
 import Link from '../Link';
 import { Modal } from '../Modal';
@@ -115,7 +116,7 @@ const SidebarHeader = styled.div(({ theme }) => ({
 
 interface SidebarProps {
   closeSidebar: () => void;
-  favorites: ContributorUser['favorites'];
+  favorites: LoggedInUser['favorites'];
 }
 
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
@@ -292,12 +293,10 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
             {user && (
               <Box display='flex' alignItems='center'>
-                <Avatar name={user.username} />
+                <Avatar name={getDisplayName(user)} />
                 <Box pl={1}>
-                  <Typography variant='caption' sx={{ display: 'block' }}>
-                    <strong>{user.username}</strong>
-                    <br />
-                    {account && shortenHex(account)}
+                  <Typography>
+                    <strong>{getDisplayName(user)}</strong>
                   </Typography>
                 </Box>
               </Box>

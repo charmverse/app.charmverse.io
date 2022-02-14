@@ -19,7 +19,8 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import { Bounty, BOUNTY_STATUSES, BountyStatus } from 'models/Bounty';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { CryptoCurrency, CryptoCurrencyList, CryptoLogoPaths } from 'models/Currency';
+import { CryptoCurrency, CryptoCurrencyList } from 'models/Currency';
+import getDisplayName from 'lib/users/getDisplayName';
 
 interface IToken {
   symbol: string;
@@ -78,7 +79,7 @@ export default function BountyModal (props: Props) {
     defaultValues:
       modalType !== 'edit'
         ? {
-          author: user?.username || '',
+          author: user ? getDisplayName(user) : '',
           title: 'New Bounty',
           description: {
             type: 'doc',
@@ -87,7 +88,7 @@ export default function BountyModal (props: Props) {
           type: 'social',
           status: 'pending',
           rewardToken: 'ETH',
-          reviewer: user?.username || ''
+          reviewer: user ? getDisplayName(user) : ''
         }
         : bounty,
     resolver: yupResolver(schema)
