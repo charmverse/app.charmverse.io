@@ -10,15 +10,14 @@ export interface SpaceRole {
   userId: string;
 }
 
-export interface Contributor {
+export interface User {
   id: string;
   addresses: string[];
   discordId?: string;
-  username: string;
   spaceRoles: SpaceRole[];
 }
 
-export interface ContributorUser extends Contributor {
+export interface LoggedInUser extends User {
   favorites: FavoritePage[];
   isLoading: boolean;
   linkedAddressesCount: number; // from guild.xyz

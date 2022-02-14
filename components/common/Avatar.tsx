@@ -8,7 +8,7 @@ const StyledAvatar = styled(Avatar)`
 `;
 
 export default function InitialAvatar ({ className, name, variant }: { className?: string, name?: string | null, variant?: 'circular' | 'rounded' | 'square' }) {
-  const nameStr = name || '';
+  const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
   return (
     <StyledAvatar
       className={className}

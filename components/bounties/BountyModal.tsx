@@ -78,7 +78,7 @@ export default function BountyModal (props: Props) {
     defaultValues:
       modalType !== 'edit'
         ? {
-          author: user?.username || '',
+          author: user?.id,
           title: 'New Bounty',
           description: {
             type: 'doc',
@@ -87,7 +87,7 @@ export default function BountyModal (props: Props) {
           type: 'social',
           status: 'pending',
           rewardToken: 'ETH',
-          reviewer: user?.username || ''
+          reviewer: user?.id
         }
         : bounty,
     resolver: yupResolver(schema)
