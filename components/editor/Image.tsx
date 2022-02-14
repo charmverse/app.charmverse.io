@@ -80,8 +80,8 @@ const StyledImage = styled.img`
 `;
 
 export function Image ({ node, updateAttrs }: NodeViewProps) {
-  const [align, setAlign] = useState('center');
   const theme = useTheme();
+  const [align, setAlign] = useState('center');
 
   const resizeState = useResize({ initialWidth: 500 });
 
@@ -102,9 +102,6 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
   return (
     <StyledImageContainer
       align={align}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
     >
       <div className='content' style={{ position: 'relative' }}>
         { /* eslint-disable-next-line */}
