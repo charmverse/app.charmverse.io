@@ -110,7 +110,6 @@ function pluginsFactory({
                   acceptFileType,
                   true,
                 );
-                console.log({files})
 
                 // TODO should we handle all drops but just show error?
                 // returning false here would just default to native behaviour

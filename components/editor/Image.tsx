@@ -56,7 +56,6 @@ const StyledImage = styled.img`
 `;
 
 export function Image ({ node, updateAttrs }: NodeViewProps) {
-  const theme = useTheme();
   const resizeState = useResize({ initialWidth: 500 });
 
   // If there are no source for the node, return the image select component

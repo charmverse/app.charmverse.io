@@ -38,6 +38,7 @@ import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './Emoji
 import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import PageTitle from './Page/PageTitle';
+import Video, { videoSpec } from './Video';
 
 const specRegistry = new SpecRegistry([
   paragraph.spec(), // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
@@ -54,6 +55,7 @@ const specRegistry = new SpecRegistry([
   emojiSpecs(),
   code.spec(),
   codeBlock.spec(),
+  videoSpec(),
   heading.spec(),
   inlinePaletteSpecs(),
   table,
@@ -187,6 +189,10 @@ export default function BangleEditor (
       NodeView.createPlugin({
         name: 'cryptoPrice',
         containerDOM: ['div']
+      }),
+      NodeView.createPlugin({
+        name: 'video',
+        containerDOM: ['div']
       })
     ],
     initialValue: Node.fromJSON(specRegistry.schema, content),
@@ -270,6 +276,13 @@ export default function BangleEditor (
               <Image {...props}>
                 {children}
               </Image>
+            );
+          }
+          case 'video': {
+            return (
+              <Video {...props}>
+                {children}
+              </Video>
             );
           }
           default: {

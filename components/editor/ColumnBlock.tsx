@@ -18,7 +18,7 @@ function specFactory (): RawSpecs {
     schema: {
       content: 'block*',
       group: 'block',
-      draggable: false,
+      draggable: true,
       parseDOM: [{ tag: 'div' }],
       toDOM: (): DOMOutputSpec => {
         return ['div', 0];

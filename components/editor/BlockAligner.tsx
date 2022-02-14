@@ -43,7 +43,6 @@ export default function BlockAligner (props: BlockAlignerProps) {
       align={align}
     >
       <div className='content' style={{ position: 'relative' }}>
-        { /* eslint-disable-next-line */}
         {children}
         <Controls className='controls'>
           {[
