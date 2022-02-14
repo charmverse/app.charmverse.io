@@ -9,13 +9,19 @@ import AccountIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/WorkOutline';
 import PersonIcon from '@mui/icons-material/Group';
 import { PageLayout } from '../common/page-layout';
-import Container from './ContentContainer';
 
 const SETTINGS_TABS = [
   { icon: <AccountIcon fontSize='small' />, path: 'account', label: 'My account' },
   { icon: <SettingsIcon fontSize='small' />, path: 'workspace', label: 'Workspace' },
   { icon: <PersonIcon fontSize='small' />, path: 'contributors', label: 'Contributors' }
 ];
+
+const Container = styled.div`
+  width: 800px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 ${({ theme }) => theme.spacing(3)};
+`;
 
 const NavigationContainer = styled(Box)`
   background-color: ${({ theme }) => theme.palette.settingsHeader.background};
