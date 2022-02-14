@@ -331,8 +331,8 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
       nodeId={item.id}
       label={item.title}
       href={`${pathPrefix}/${item.path}`}
-      labelIcon={item.icon}
-      pageType={item.type}
+      labelIcon={item.icon || undefined}
+      pageType={item.type as 'page'}
       sx={{
         backgroundColor: isActive ? theme.palette.action.focus : 'unset', // 'rgba(22, 52, 71, 0.08)' : 'unset'
         position: 'relative'

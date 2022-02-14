@@ -25,14 +25,14 @@ const LastModifiedBy = (props: Props): JSX.Element => {
     let latestBlock: Block = props.card
     if (props.board) {
         const allBlocks: Block[] = [props.card, ...props.contents.flat(), ...props.comments]
-        const sortedBlocks = allBlocks.sort((a, b) => b.updateAt - a.updateAt)
+        const sortedBlocks = allBlocks.sort((a, b) => b.updatedAt - a.updatedAt)
 
         latestBlock = sortedBlocks.length > 0 ? sortedBlocks[0] : latestBlock
     }
 
     return (
         <div className='LastModifiedBy octo-propertyvalue readonly'>
-            {(workspaceUsersById && workspaceUsersById[latestBlock.modifiedBy]?.username) || latestBlock.modifiedBy}
+            {(workspaceUsersById && workspaceUsersById[latestBlock.updatedBy]?.username) || latestBlock.updatedBy}
         </div>
     )
 }

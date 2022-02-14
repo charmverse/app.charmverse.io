@@ -159,6 +159,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   async function addPage (page: Partial<Page>) {
     const id = Math.random().toString().replace('0.', '');
     const newPage: Page = {
+      boardId: null,
       content: {
         type: 'doc',
         content: [{
@@ -166,7 +167,14 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           content: []
         }]
       },
-      created: new Date(),
+      contentText: '',
+      createdAt: new Date(),
+      createdBy: user!.id,
+      headerImage: null,
+      icon: null,
+      updatedAt: new Date(),
+      updatedBy: user!.id,
+      deletedAt: null,
       id,
       isPublic: false,
       parentId: null,
@@ -178,7 +186,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     };
     if (newPage.type === 'database') {
       await addBoardClicked(boardId => {
-        newPage.databaseId = boardId;
+        newPage.boardId = boardId;
       }, intl);
     }
     setPages([newPage, ...pages]);
@@ -193,8 +201,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     const page = pages.find(p => p.id === pageId);
     const newPages = pages.filter(p => p.id !== pageId);
     setPages(newPages);
-    if (page?.databaseId) {
-      const board = boards.find(b => b.id === page.databaseId);
+    if (page?.boardId) {
+      const board = boards.find(b => b.id === page.boardId);
       if (board) {
         mutator.deleteBlock(
           board,

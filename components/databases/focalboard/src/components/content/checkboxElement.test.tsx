@@ -22,17 +22,17 @@ const board = TestBlockFactory.createBoard()
 const card = TestBlockFactory.createCard(board)
 const checkboxBlock: ContentBlock = {
     id: 'test-id',
-    workspaceId: '',
+    spaceId: '',
     parentId: card.id,
     rootId: card.rootId,
-    modifiedBy: 'test-user-id',
+    updatedBy: 'test-user-id',
     schema: 1,
     type: 'checkbox',
     title: 'test-title',
     fields: {value: false},
     createdBy: 'test-user-id',
-    createAt: 0,
-    updateAt: 0,
+    createdAt: 0,
+    updatedAt: 0,
     deleteAt: 0,
 }
 

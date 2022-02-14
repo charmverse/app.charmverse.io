@@ -43,11 +43,11 @@ class OctoUtils {
             break
         }
         case 'createdTime': {
-            displayValue = Utils.displayDateTime(new Date(block.createAt), intl)
+            displayValue = Utils.displayDateTime(new Date(block.createdAt), intl)
             break
         }
         case 'updatedTime': {
-            displayValue = Utils.displayDateTime(new Date(block.updateAt), intl)
+            displayValue = Utils.displayDateTime(new Date(block.updatedAt), intl)
             break
         }
         case 'date': {
@@ -115,8 +115,8 @@ class OctoUtils {
         const newBlocks = blocks.map((block) => {
             const newBlock = this.hydrateBlock(block)
             newBlock.id = Utils.createGuid(Utils.blockTypeToIDType(newBlock.type))
-            newBlock.createAt = now
-            newBlock.updateAt = now
+            newBlock.createdAt = now
+            newBlock.updatedAt = now
             idMap[block.id] = newBlock.id
             return newBlock
         })

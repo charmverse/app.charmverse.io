@@ -45,13 +45,13 @@ describe('components/cardDetail/CardDetail', () => {
     comment1.type = 'comment'
     comment1.title = 'Comment 1'
     comment1.parentId = card.id
-    comment1.createAt = createdAt
+    comment1.createdAt = createdAt
 
     const comment2 = TestBlockFactory.createComment(card)
     comment2.type = 'comment'
     comment2.title = 'Comment 2'
     comment2.parentId = card.id
-    comment2.createAt = createdAt
+    comment2.createdAt = createdAt
 
     test('should show comments', async () => {
         const mockStore = configureStore([])

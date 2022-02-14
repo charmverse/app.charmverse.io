@@ -1,16 +1,44 @@
-import { User, LoggedInUser, Page, PageContent, Space } from 'models';
+import { Page, Space, User } from '@prisma/client';
+import { LoggedInUser, PopulatedUser, PageContent } from 'models';
+import { v4 as uuid } from 'uuid';
 
 export const spaces: Space[] = [
   { id: '0', name: 'Our Community', domain: 'demo' },
   { id: '1', name: 'My Workspace', domain: 'my-workspace' }
-];
+].map(space => MockSpace(space));
 
-export const users: User[] = [
-  { id: '0', addresses: ['0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw'], spaceRoles: [{ spaceId: spaces[0].id, type: 'admin', userId: '0' }, { spaceId: spaces[1].id, type: 'admin', userId: '0' }] },
-  { id: '1', addresses: ['0x1416d1b5435D12CE393aBbA3f81fe6C5951e4Bf4'], spaceRoles: [{ spaceId: spaces[0].id, type: 'admin', userId: '1' }] },
-  { id: '2', addresses: ['0x626a827c90AA620CFD78A8ecda494Edb9a4225D5'], spaceRoles: [{ spaceId: spaces[0].id, type: 'contributor', userId: '2' }, { spaceId: spaces[1].id, type: 'admin', userId: '2' }] },
-  { id: '3', addresses: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'], spaceRoles: [{ spaceId: spaces[1].id, type: 'contributor', userId: '3' }] }
-];
+function MockSpace (partial: Partial<Space>): Space {
+  return {
+    id: uuid(),
+    domain: '',
+    name: '',
+    createdAt: new Date(),
+    createdBy: '0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw',
+    deletedAt: null,
+    updatedAt: new Date(),
+    updatedBy: '0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw',
+    ...partial
+  };
+}
+
+export const users: PopulatedUser[] = [
+  { addresses: ['0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw'], spaceRoles: [{ spaceId: spaces[0].id, role: 'admin' as const, userId: '0' }, { spaceId: spaces[1].id, role: 'admin' as const, userId: '0' }] },
+  { addresses: ['0x1416d1b5435D12CE393aBbA3f81fe6C5951e4Bf4'], spaceRoles: [{ spaceId: spaces[0].id, role: 'admin' as const, userId: '1' }] },
+  { addresses: ['0x626a827c90AA620CFD78A8ecda494Edb9a4225D5'], spaceRoles: [{ spaceId: spaces[0].id, role: 'contributor' as const, userId: '2' }, { spaceId: spaces[1].id, role: 'admin' as const, userId: '2' }] },
+  { addresses: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'], spaceRoles: [{ spaceId: spaces[1].id, role: 'contributor' as const, userId: '3' }] }
+].map(user => MockUser(user));
+
+function MockUser (partial: Partial<PopulatedUser>): PopulatedUser {
+  return {
+    id: uuid(),
+    addresses: [],
+    spaceRoles: [],
+    discordId: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...partial
+  };
+}
 
 export const activeUser: LoggedInUser = {
   ...users[0],
@@ -20,20 +48,29 @@ export const activeUser: LoggedInUser = {
 };
 
 function MockPage (partial: Partial<Page>): Page {
-  const id = Math.random().toString(36).substring(2);
+  const author = partial.createdBy || users[0].addresses[0];
+  const id = uuid();
   return {
-    created: new Date(),
     id,
+    createdAt: new Date(),
+    createdBy: author,
+    deletedAt: null,
+    updatedAt: new Date(),
+    updatedBy: author,
+    headerImage: null,
+    icon: null,
+    boardId: null,
     type: 'page',
     title: '',
     content: {
       type: 'doc',
       content: []
-    } as PageContent,
+    }, // as PageContent,
+    contentText: '',
     isPublic: false,
     parentId: null,
     path: id,
-    spaceId: '',
+    spaceId: null,
     ...partial
   };
 }
@@ -44,7 +81,7 @@ export const pages: Page[] = [
     icon: '📌',
     content: gettingStartedPageContent(),
     path: 'getting-started',
-    spaceId: '0',
+    spaceId: spaces[0].id,
     title: 'Getting Started'
   }),
   MockPage({
@@ -64,20 +101,20 @@ export const pages: Page[] = [
     },
     parentId: '0',
     path: 'nested-page',
-    spaceId: '0',
+    spaceId: spaces[0].id,
     title: 'Nested Page'
   }),
   MockPage({
     path: 'third-page',
-    spaceId: '0',
+    spaceId: spaces[0].id,
     title: 'Another Top-level Page'
   }),
   MockPage({
     path: 'database-page',
-    spaceId: '0',
-    title: 'Database page',
-    type: 'database',
-    databaseId: 'b3fs1cyw717nfjfswcyk9hd1jph'
+    spaceId: spaces[0].id,
+    title: 'Board page',
+    type: 'board',
+    boardId: 'b3fs1cyw717nfjfswcyk9hd1jph'
   }),
   MockPage({
     icon: '📌',
@@ -1096,4 +1133,8 @@ function getPageContent (): PageContent {
   };
 }
 
-export const blocks = JSON.parse('[{"id":"vk5d6td6tzpdfibtabuzjgwk88r","schema":1,"workspaceId":"0","parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"view","fields":{"viewType":"board","sortOptions":[],"visiblePropertyIds":[],"visibleOptionIds":[],"hiddenOptionIds":[],"collapsedOptionIds":[],"filter":{"operation":"and","filters":[]},"cardOrder":["ctf1jbxhgmi85bg67pdzusyebhw","cjoke918aqbrzu8a78onszkpipw","7s14ecncef7apnhpc7jpmmac1sh","cyuidkfsy43rzubzfohx8demtcw","71ffp1rss8b9z1mej8t8gomdxeo"],"columnWidths":{},"columnCalculations":{},"kanbanCalculations":{},"defaultTemplateId":""},"title":"Board View","createAt":1643733258753,"updateAt":1643733303218,"deleteAt":0},{"id":"cyuidkfsy43rzubzfohx8demtcw","schema":1,"workspaceId":"0","parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"🌳","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"dabadd9b-adf1-4d9f-8702-805ac6cef602"},"contentOrder":[],"isTemplate":false},"title":"Gardening","createAt":1643733258755,"updateAt":1643736454792,"deleteAt":0},{"id":"c53orcju38jggmcadh7ja74yp1a","schema":1,"workspaceId":"0","parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"34eb9c25-d5bf-49d9-859e-f74f4e0030e7"},"contentOrder":[],"isTemplate":true},"title":"New Task","createAt":1643733258757,"updateAt":1643733258757,"deleteAt":0},{"id":"ctf1jbxhgmi85bg67pdzusyebhw","schema":1,"workspaceId":"0","parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"🐱","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"d37a61f4-f332-4db9-8b2d-5e0a91aa20ed"},"contentOrder":[],"isTemplate":false},"title":"Feed Fluffy","createAt":1643733258758,"updateAt":1643733262451,"deleteAt":0},{"id":"b3fs1cyw717nfjfswcyk9hd1jph","schema":1,"workspaceId":"0","parentId":"","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"board","fields":{"showDescription":false,"description":"","icon":"😄","isTemplate":false,"columnCalculations":[],"cardProperties":[{"id":"d777ba3b-8728-40d1-87a6-59406bbbbfb0","name":"Status","type":"select","options":[{"color":"propColorPink","id":"34eb9c25-d5bf-49d9-859e-f74f4e0030e7","value":"To Do!!"},{"color":"propColorYellow","id":"d37a61f4-f332-4db9-8b2d-5e0a91aa20ed","value":"Doing"},{"color":"propColorGreen","id":"dabadd9b-adf1-4d9f-8702-805ac6cef602","value":"Done 🙌"}]}]},"title":"Personal Tasks","createAt":1643733258760,"updateAt":1643736587752,"deleteAt":0},{"id":"cjoke918aqbrzu8a78onszkpipw","schema":1,"workspaceId":"0","parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","modifiedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"👣","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"34eb9c25-d5bf-49d9-859e-f74f4e0030e7"},"contentOrder":[],"isTemplate":false},"title":"Go for a walk","createAt":1643733258761,"updateAt":1643733258761,"deleteAt":0}]');
+export const blocks = JSON.parse('[{"id":"vk5d6td6tzpdfibtabuzjgwk88r","schema":1,"parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","updatedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"view","fields":{"viewType":"board","sortOptions":[],"visiblePropertyIds":[],"visibleOptionIds":[],"hiddenOptionIds":[],"collapsedOptionIds":[],"filter":{"operation":"and","filters":[]},"cardOrder":["ctf1jbxhgmi85bg67pdzusyebhw","cjoke918aqbrzu8a78onszkpipw","7s14ecncef7apnhpc7jpmmac1sh","cyuidkfsy43rzubzfohx8demtcw","71ffp1rss8b9z1mej8t8gomdxeo"],"columnWidths":{},"columnCalculations":{},"kanbanCalculations":{},"defaultTemplateId":""},"title":"Board View","createAt":1643733258753,"updateAt":1643733303218,"deleteAt":0},{"id":"cyuidkfsy43rzubzfohx8demtcw","schema":1,"parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","updatedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"🌳","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"dabadd9b-adf1-4d9f-8702-805ac6cef602"},"contentOrder":[],"isTemplate":false},"title":"Gardening","createAt":1643733258755,"updateAt":1643736454792,"deleteAt":0},{"id":"c53orcju38jggmcadh7ja74yp1a","schema":1,"parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","updatedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"34eb9c25-d5bf-49d9-859e-f74f4e0030e7"},"contentOrder":[],"isTemplate":true},"title":"New Task","createAt":1643733258757,"updateAt":1643733258757,"deleteAt":0},{"id":"ctf1jbxhgmi85bg67pdzusyebhw","schema":1,"parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","updatedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"🐱","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"d37a61f4-f332-4db9-8b2d-5e0a91aa20ed"},"contentOrder":[],"isTemplate":false},"title":"Feed Fluffy","createAt":1643733258758,"updateAt":1643733262451,"deleteAt":0},{"id":"b3fs1cyw717nfjfswcyk9hd1jph","schema":1,"parentId":"","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","updatedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"board","fields":{"showDescription":false,"description":"","icon":"😄","isTemplate":false,"columnCalculations":[],"cardProperties":[{"id":"d777ba3b-8728-40d1-87a6-59406bbbbfb0","name":"Status","type":"select","options":[{"color":"propColorPink","id":"34eb9c25-d5bf-49d9-859e-f74f4e0030e7","value":"To Do!!"},{"color":"propColorYellow","id":"d37a61f4-f332-4db9-8b2d-5e0a91aa20ed","value":"Doing"},{"color":"propColorGreen","id":"dabadd9b-adf1-4d9f-8702-805ac6cef602","value":"Done 🙌"}]}]},"title":"Personal Tasks","createAt":1643733258760,"updateAt":1643736587752,"deleteAt":0},{"id":"cjoke918aqbrzu8a78onszkpipw","schema":1,"parentId":"b3fs1cyw717nfjfswcyk9hd1jph","rootId":"b3fs1cyw717nfjfswcyk9hd1jph","createdBy":"uoounhrzr1irztg5igxmseh9n8o","updatedBy":"uoounhrzr1irztg5igxmseh9n8o","type":"card","fields":{"icon":"👣","properties":{"d777ba3b-8728-40d1-87a6-59406bbbbfb0":"34eb9c25-d5bf-49d9-859e-f74f4e0030e7"},"contentOrder":[],"isTemplate":false},"title":"Go for a walk","createAt":1643733258761,"updateAt":1643733258761,"deleteAt":0}]')
+  .map((b: object) => ({
+    ...b,
+    spaceId: spaces[0].id
+  }));

@@ -28,7 +28,7 @@ describe('components/calendar/toolbar', () => {
     const card = TestBlockFactory.createCard(board)
     const fifth = Date.UTC(2021, 9, 5, 12)
     const twentieth = Date.UTC(2021, 9, 20, 12)
-    card.createAt = fifth
+    card.createdAt = fifth
     const rObject = {from: twentieth}
 
     test('return calendar, no date property', () => {

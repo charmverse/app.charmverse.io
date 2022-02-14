@@ -212,7 +212,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
         )
     } else if (propertyTemplate.type === 'createdTime') {
         return (
-            <CreatedAt createAt={card.createAt}/>
+            <CreatedAt createdAt={card.createdAt}/>
         )
     } else if (propertyTemplate.type === 'updatedTime') {
         return (

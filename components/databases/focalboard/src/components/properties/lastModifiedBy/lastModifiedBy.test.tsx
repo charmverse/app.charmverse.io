@@ -20,11 +20,11 @@ describe('components/properties/lastModifiedBy', () => {
     test('should match snapshot', () => {
         const card = createCard()
         card.id = 'card-id-1'
-        card.modifiedBy = 'user-id-1'
+        card.updatedBy = 'user-id-1'
 
         const board = createBoard()
         const comment = createCommentBlock()
-        comment.modifiedBy = 'user-id-1'
+        comment.updatedBy = 'user-id-1'
         comment.parentId = 'card-id-1'
 
         const mockStore = configureStore([])

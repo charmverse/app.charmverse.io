@@ -11,7 +11,7 @@ type ContentBlockTypes = typeof contentBlockTypes[number]
 type BlockTypes = typeof blockTypes[number]
 
 interface BlockPatch {
-    workspaceId?: string
+    spaceId?: string
     parentId?: string
     rootId?: string
     schema?: number
@@ -25,11 +25,11 @@ interface BlockPatch {
 
 interface Block {
     id: string
-    workspaceId: string
+    spaceId: string
     parentId: string
     rootId: string
     createdBy: string
-    modifiedBy: string
+    updatedBy: string
 
     schema: number
     type: BlockTypes
@@ -37,8 +37,8 @@ interface Block {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fields: Record<string, any>
 
-    createAt: number
-    updateAt: number
+    createdAt: number
+    updatedAt: number
     deleteAt: number
 }
 
@@ -47,16 +47,16 @@ function createBlock(block?: Block): Block {
     return {
         id: block?.id || Utils.createGuid(Utils.blockTypeToIDType(block?.type)),
         schema: 1,
-        workspaceId: block?.workspaceId || '',
+        spaceId: block?.spaceId || '',
         parentId: block?.parentId || '',
         rootId: block?.rootId || '',
         createdBy: block?.createdBy || '',
-        modifiedBy: block?.modifiedBy || '',
+        updatedBy: block?.updatedBy || '',
         type: block?.type || 'unknown',
         fields: block?.fields ? {...block?.fields} : {},
         title: block?.title || '',
-        createAt: block?.createAt || now,
-        updateAt: block?.updateAt || now,
+        createdAt: block?.createdAt || now,
+        updatedAt: block?.updatedAt || now,
         deleteAt: block?.deleteAt || 0,
     }
 }

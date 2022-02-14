@@ -44,7 +44,15 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
   function onSubmit (values: FormValues) {
     const newId = Math.random().toString().replace('0.', '');
     try {
-      _onSubmit({ id: newId, ...values });
+      _onSubmit({
+        createdAt: new Date(),
+        createdBy: user!.id,
+        updatedAt: new Date(),
+        updatedBy: user!.id,
+        deletedAt: null,
+        id: newId,
+        ...values
+      });
     }
     catch (e) {
       // eslint-disable-next-line

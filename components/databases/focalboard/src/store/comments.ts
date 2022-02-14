@@ -50,6 +50,6 @@ export function getCardComments(cardId: string): (state: RootState) => CommentBl
     return (state: RootState): CommentBlock[] => {
         return Object.values(state.comments.comments).
             filter((c) => c.parentId === cardId).
-            sort((a, b) => a.createAt - b.createAt)
+            sort((a, b) => a.createdAt - b.createdAt)
     }
 }

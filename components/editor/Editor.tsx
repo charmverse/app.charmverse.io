@@ -4,7 +4,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import { ListItem, ListItemProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
-import { Page } from 'models';
+import { PageContent, Page } from 'models';
 import React, { ReactNode } from 'react';
 import BangleEditor from './BangleEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
@@ -98,7 +98,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
           )}
         </Controls>
 
-        <BangleEditor content={page.content} page={page} setPage={setPage} />
+        <BangleEditor content={page.content as PageContent} page={page} setPage={setPage} />
       </Container>
     </Box>
   );

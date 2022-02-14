@@ -1,20 +1,11 @@
+import type { FavoritePage, SpaceRole, User } from '@prisma/client';
 
-export interface FavoritePage {
-  pageId: string;
-  userId: string;
-}
+export { FavoritePage, SpaceRole, User };
 
-export interface SpaceRole {
-  type: 'admin' | 'contributor';
-  spaceId: string;
-  userId: string;
-}
+export type Role = 'admin' | 'contributor';
 
-export interface User {
-  id: string;
-  addresses: string[];
-  discordId?: string;
-  spaceRoles: SpaceRole[];
+export interface PopulatedUser extends User {
+  spaceRoles: (Pick<SpaceRole, 'userId' | 'spaceId'> & { role: Role })[];
 }
 
 export interface LoggedInUser extends User {

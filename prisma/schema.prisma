@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Space {
+  id          String      @id @default(uuid()) @db.Uuid
+  deletedAt   DateTime?
+  createdAt   DateTime    @default(now())
+  author      User        @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  createdBy   String
+  updatedAt   DateTime
+  updatedBy   String
+  name        String
+  domain      String      @unique
+  permissions SpaceRole[]
+  pages       Page[]
+  blocks      Block[]
+}
+
+model Page {
+  id          String           @id @default(uuid()) @db.Uuid
+  deletedAt   DateTime?
+  createdAt   DateTime         @default(now())
+  createdBy   String           @db.Uuid
+  author      User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  updatedAt   DateTime
+  updatedBy   String           @db.Uuid
+  title       String
+  content     Json?
+  contentText String
+  headerImage String?
+  icon        String?
+  isPublic    Boolean
+  path        String
+  parentId    String?
+  spaceId     String?
+  space       Space?           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  type        String
+  boardId     String?
+  permissions PagePermission[]
+  favorites   FavoritePage[]
+}
+
+// focalboard blocks
+model Block {
+  id        String    @id @db.Uuid
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  createdBy String    @db.Uuid
+  User      User      @relation(fields: [createdBy], references: [id])
+  updatedAt DateTime
+  updatedBy String    @db.Uuid
+  spaceId   String
+  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  parentId  String
+  rootId    String
+  schema    Int
+  type      String
+  title     String
+  fields    Json
+}
+
+model User {
+  id              String           @id @default(uuid()) @db.Uuid
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime?
+  addresses       String[]
+  discordId       String?
+  spaceRoles      SpaceRole[]
+  favorites       FavoritePage[]
+  pagePermissions PagePermission[]
+  pages           Page[]
+  blocks          Block[]
+  Space           Space[]
+}
+
+model FavoritePage {
+  pageId String @db.Uuid
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, userId])
+}
+
+model PagePermission {
+  level  String
+  pageId String @db.Uuid
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, userId])
+}
+
+model SpaceRole {
+  role    String
+  spaceId String @db.Uuid
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId  String @db.Uuid
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([spaceId, userId])
+}

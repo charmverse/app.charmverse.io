@@ -24,17 +24,17 @@ const mockedUtils = mocked(Utils, true)
 mockedUtils.createGuid.mockReturnValue('test-id')
 const defaultBlock: TextBlock = {
     id: 'test-id',
-    workspaceId: 'test-id',
+    spaceId: 'test-id',
     parentId: 'test-id',
     rootId: 'test-id',
-    modifiedBy: 'test-user-id',
+    updatedBy: 'test-user-id',
     schema: 0,
     type: 'text',
     title: '',
     fields: {},
     createdBy: 'test-user-id',
-    createAt: 0,
-    updateAt: 0,
+    createdAt: 0,
+    updatedAt: 0,
     deleteAt: 0,
 }
 describe('components/content/TextElement', () => {
