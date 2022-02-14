@@ -30,6 +30,7 @@
     "node_modules"
   ],
   "include": [
+    "*.ts",
     "**/*.ts",
     "**/*.tsx"
   ]
