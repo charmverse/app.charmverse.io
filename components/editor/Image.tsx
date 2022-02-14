@@ -3,11 +3,10 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
-import useResize from 'hooks/useResize';
 import React, { HTMLAttributes } from 'react';
 import BlockAligner from './BlockAligner';
 import ImageSelector from './ImageSelector';
-import { ResizeHandle } from './ResizeHandle';
+import Resizer from './Resizer';
 
 const MAX_IMAGE_WIDTH = 750; const
   MIN_IMAGE_WIDTH = 250;
@@ -56,8 +55,6 @@ const StyledImage = styled.img`
 `;
 
 export function Image ({ node, updateAttrs }: NodeViewProps) {
-  const resizeState = useResize({ initialWidth: 500 });
-
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -79,25 +76,13 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
       });
     }}
     >
-      <Box
-        sx={{
-          position: 'relative',
-          cursor: 'col-resize',
-          width: resizeState.width,
-          '&:hover .resize-handler': {
-            opacity: resizeState.isDragging ? 0 : 1,
-            transition: 'opacity 250ms ease-in-out'
-          }
-        }}
-      >
-        <ResizeHandle maxWidth={MAX_IMAGE_WIDTH} minWidth={MIN_IMAGE_WIDTH} {...resizeState} position='left' />
+      <Resizer maxWidth={MAX_IMAGE_WIDTH} minWidth={MIN_IMAGE_WIDTH}>
         <StyledImage
           draggable={false}
           src={node.attrs.src}
           alt={node.attrs.alt}
         />
-        <ResizeHandle maxWidth={MAX_IMAGE_WIDTH} minWidth={MIN_IMAGE_WIDTH} {...resizeState} position='right' />
-      </Box>
+      </Resizer>
     </BlockAligner>
   );
 }
