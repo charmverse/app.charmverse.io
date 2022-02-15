@@ -41,6 +41,9 @@ export default function Resizer (props: ResizerProps) {
         '&:hover .react-resizable-handle': {
           opacity: 1,
           transition: 'opacity 250ms ease-in-out'
+        },
+        '& .react-resizable': {
+          display: 'flex'
         }
       }}
     >
