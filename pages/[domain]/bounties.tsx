@@ -17,6 +17,8 @@ import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
 import { Bounty } from 'models/Bounty';
 
+import { BountyList } from 'components/bounties_v2/BountyList';
+
 function BountyContainer (): ReactElement {
   const { bounties, addBounty } = useBounty();
   const [bountyDialogOpen, setBountyDialogOpen] = useState(false);
@@ -43,7 +45,11 @@ function BountyContainer (): ReactElement {
           Create Bounty
         </Button>
       </Box>
-      <Grid container direction='row' spacing={3}>
+
+      {
+        /**
+         * Reintegrate this later
+
         {bounties.map((bounty: any) => (
           <Grid item key={bounty.id}>
             <BountyCard bounty={bounty} />
@@ -66,10 +72,19 @@ function BountyContainer (): ReactElement {
           setBountyDialogOpen(false);
         }}
       />
+
+      <Grid container direction='row' spacing={3}>
+
+         */
+      }
+
+      <BountyList />
+
     </Box>
   );
 }
 
+// UNUSED - For now we only work with Bounties added by the admin
 function SuggestionContainer (): ReactElement {
   const { suggestedBounties, addBounty } = useBountySuggestion();
   const [bountyDialogOpen, setBountyDialogOpen] = useState(false);
@@ -117,12 +132,21 @@ export default function BountyPage () {
 
   return (
     <Box p={3}>
-      <BountyProvider>
+
+      <h1>List of bounties</h1>
+
+      <BountyList />
+      {
+        /*
+        <BountyProvider>
         <BountyContainer />
       </BountyProvider>
-      <SuggestionProvider>
+
+              <SuggestionProvider>
         <SuggestionContainer />
       </SuggestionProvider>
+         */
+      }
     </Box>
   );
 }
