@@ -133,8 +133,6 @@ export default function BountyPage () {
   return (
     <Box p={3}>
 
-      <h1>List of bounties</h1>
-
       <BountyList />
       {
         /*
@@ -149,8 +147,5 @@ export default function BountyPage () {
       }
     </Box>
   );
-}
 
-BountyPage.getLayout = (page: ReactElement) => {
-  return <PageLayout>{page}</PageLayout>;
-};
+}
