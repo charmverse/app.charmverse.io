@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Bounty as IBounty } from 'models/Bounty';
 import Loader from 'components/common/Loader';
 import { Bounty } from 'components/bounties_v2/Bounty';
-import { Typography, Button } from '@mui/material';
+import { Typography, Button, Grid } from '@mui/material';
 import BountyService from './BountyService';
 import { BountyEditor } from './BountyEditor';
 
@@ -27,25 +27,39 @@ export function BountyList () {
   }
   else {
     return (
-      <>
+      <Grid container>
 
-        {
+        <Grid container alignItems='center'>
+          <Grid item xs={8}>
+            <h1>Bounty list</h1>
+          </Grid>
+
+          <Grid item xs={4}>
+            <Button
+              variant='outlined'
+              onClick={() => {
+                setDisplayBountyDialog(true);
+              }}
+              sx={{ margin: 'auto' }}
+            >
+              Create Bounty
+            </Button>
+          </Grid>
+
+        </Grid>
+
+        <Grid container>
+
+          {
         bountyList.length === 0 && <Typography paragraph={true}>No bounties were found</Typography>
       }
 
-        { bountyList.length > 0
+          { bountyList.length > 0
         && bountyList.map(availableBounty => {
           return <Bounty key={availableBounty.id} bounty={availableBounty} />;
         })}
 
-        <Button
-          variant='outlined'
-          onClick={() => {
-            setDisplayBountyDialog(true);
-          }}
-        >
-          Create Bounty
-        </Button>
+        </Grid>
 
         {
           /**
@@ -53,7 +67,7 @@ export function BountyList () {
            */
           displayBountyDialog === true && <BountyEditor onSubmit={bountyCreated} />
         }
-      </>
+      </Grid>
     );
   }
 }
