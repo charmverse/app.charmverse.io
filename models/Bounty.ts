@@ -5,7 +5,8 @@ export const BOUNTY_LABELS = {
   open: 'Open',
   assigned: 'Assigned',
   review: 'Review',
-  complete: 'Complete'
+  complete: 'Complete',
+  paid: 'Paid'
 };
 
 export type BountyStatus = keyof typeof BOUNTY_LABELS;
