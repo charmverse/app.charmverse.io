@@ -7,7 +7,10 @@ import {
   backgroundLightColorDarkMode, blueColor,
   darkBlueColor, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
-  settingsHeaderBackgroundColorDarkMode
+  settingsHeaderBackgroundColorDarkMode,
+  lightModeColors,
+  darkModeColors,
+  BrandColors
 } from './colors';
 import { darkTheme as darkThemeFocalBoard, lightTheme as lightThemeFocalBoard } from './focalboard/theme';
 
@@ -18,7 +21,7 @@ declare module '@emotion/react' {
 
 type FocalBoardColors = typeof darkThemeFocalBoard;
 
-interface CustomColors extends FocalBoardColors {
+interface CustomColors extends FocalBoardColors, Record<BrandColors, any> {
   settingsHeader: {
     background: string
   };
@@ -47,7 +50,7 @@ declare module '@mui/material/styles/createPalette' {
     blue: Palette['primary'];
     facebook: Palette['primary'];
     twitter: Palette['primary'];
-    white: PaletteOptions['primary'];
+    white: Palette['primary'];
   }
   interface TypeBackground {
     light: string
@@ -131,11 +134,35 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     secondary: {
       main: mode === 'dark' ? '#999' : '#888'
     },
-    blue: {
-      main: '#00aced'
-    },
     white: {
       main: '#eee'
+    },
+    blue: {
+      main: mode === 'dark' ? darkModeColors.blue : lightModeColors.blue
+    },
+    red: {
+      main: mode === 'dark' ? darkModeColors.red : lightModeColors.red
+    },
+    gray: {
+      main: mode === 'dark' ? darkModeColors.gray : lightModeColors.gray
+    },
+    brown: {
+      main: mode === 'dark' ? darkModeColors.brown : lightModeColors.brown
+    },
+    orange: {
+      main: mode === 'dark' ? darkModeColors.orange : lightModeColors.orange
+    },
+    yellow: {
+      main: mode === 'dark' ? darkModeColors.yellow : lightModeColors.yellow
+    },
+    green: {
+      main: mode === 'dark' ? darkModeColors.green : lightModeColors.green
+    },
+    purple: {
+      main: mode === 'dark' ? darkModeColors.purple : lightModeColors.purple
+    },
+    pink: {
+      main: mode === 'dark' ? darkModeColors.pink : lightModeColors.pink
     },
     // custom components
     settingsHeader: {
