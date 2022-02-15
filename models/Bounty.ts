@@ -1,7 +1,7 @@
 import { PageContent } from '.';
 import { CryptoCurrency } from './Currency';
 
-const BOUNTY_LABELS = {
+export const BOUNTY_LABELS = {
   open: 'Open',
   assigned: 'Assigned',
   review: 'Review',

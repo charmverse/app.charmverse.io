@@ -1,10 +1,17 @@
-import { Bounty as IBounty } from 'models/Bounty';
-import { Card, CardHeader, CardContent, Chip, Typography } from '@mui/material';
+import { Bounty as IBounty, BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
+import { Card, CardHeader, CardContent, Chip, Typography, Grid } from '@mui/material';
 import { useState } from 'react';
 
 export interface IBountyInput {
   bounty: IBounty
 }
+
+const BountyStatusColours: Record<BountyStatus, string> = {
+  open: 'blue',
+  assigned: 'red',
+  review: 'purple',
+  complete: 'green'
+};
 
 export function Bounty ({ bounty }: IBountyInput) {
 
@@ -13,9 +20,10 @@ export function Bounty ({ bounty }: IBountyInput) {
   return (
     <Card
       sx={{
-        display: 'flex',
+        display: 'inline-block',
         flexDirection: 'column',
         width: 290,
+        m: '5px',
         minHeight: 200,
         cursor: 'pointer'
       }}
@@ -26,14 +34,18 @@ export function Bounty ({ bounty }: IBountyInput) {
     >
       <CardHeader subheader={bounty.title} />
       <CardContent sx={{ flexGrow: 1, display: 'flex', alignItems: 'flex-end' }}>
+        <Grid container>
+          <Grid item xs={12}>
+            <Typography paragraph={true}>
+              {bounty.description.substring(0, 120)}
+              ..
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Chip variant='outlined' label={BountyLabels[bounty.status]} />
+          </Grid>
+        </Grid>
 
-        <Typography paragraph={true}>{bounty.description}</Typography>
-        {
-          /**
-           * TODO Readd the status
-           <Chip variant='outlined' label='Bounty status' color='primary' />
-           */
-        }
       </CardContent>
     </Card>
   );
