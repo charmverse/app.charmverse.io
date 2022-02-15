@@ -15,7 +15,7 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { NodeView, SpecRegistry } from '@bangle.dev/core';
+import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, EditorViewContext, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
@@ -136,7 +136,8 @@ export default function BangleEditor (
         content: []
       }
     ]
-  }, page, setPage }: { content?: PageContent, page?: Page, setPage?: (p: Page) => void }
+  }, page, setPage, onPageContentChange }:
+  { content?: PageContent, page?: Page, setPage?: (p: Page) => void, onPageContentChange: (doc: PageContent) => any }
 ) {
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {
     if (page && setPage) {
@@ -153,6 +154,14 @@ export default function BangleEditor (
   const state = useEditorState({
     specRegistry,
     plugins: () => [
+      new Plugin({
+        props: {
+          handleTextInput (view) {
+            onPageContentChange(view.state.doc.toJSON() as PageContent);
+            return false;
+          }
+        }
+      }),
       imagePlugins(),
       inlinePalettePlugins(),
       bold.plugins(),
