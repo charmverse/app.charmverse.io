@@ -56,6 +56,28 @@ const StyledImage = styled.img`
   box-shadow: ${({ theme }) => theme.shadows[3]}
 `;
 
+export const StyledResizeHandle = styled(Box)`
+  width: 7.5px;
+  height: calc(100% - 15px);
+  max-height: 75px;
+  border-radius: ${({ theme }) => theme.spacing(2)};
+  background-color: ${({ theme }) => theme.palette.background.dark};
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity 250ms ease-in-out;
+  cursor: col-resize;
+
+  &.react-resizable-handle-w {
+    left: 15px;
+  }
+
+  &.react-resizable-handle-e {
+    right: 15px;
+  }
+`;
+
 export function Image ({ node, updateAttrs }: NodeViewProps) {
   const [dimensions, setDimensions] = useState({ width: 200, height: 200 });
 
@@ -80,22 +102,32 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
       });
     }}
     >
-      <ResizableBox
-        resizeHandles={['w', 'e']}
-        lockAspectRatio
-        {...dimensions}
-        onResize={(_, { size }) => {
-          setDimensions(size);
-        }}
-        minConstraints={[MIN_IMAGE_WIDTH, MIN_IMAGE_WIDTH]}
-        maxConstraints={[MAX_IMAGE_WIDTH, MAX_IMAGE_WIDTH]}
+      <Box sx={{
+        '&:hover .react-resizable-handle': {
+          opacity: 1,
+          transition: 'opacity 250ms ease-in-out'
+        }
+      }}
       >
-        <StyledImage
-          draggable={false}
-          src={node.attrs.src}
-          alt={node.attrs.alt}
-        />
-      </ResizableBox>
+        <ResizableBox
+          resizeHandles={['w', 'e']}
+          lockAspectRatio
+          {...dimensions}
+          onResize={(_, { size }) => {
+            setDimensions(size);
+          }}
+          minConstraints={[MIN_IMAGE_WIDTH, MIN_IMAGE_WIDTH]}
+          maxConstraints={[MAX_IMAGE_WIDTH, MAX_IMAGE_WIDTH]}
+          /* eslint-disable-next-line */
+          handle={(handleAxis: string, ref: React.Ref<unknown>) => <StyledResizeHandle ref={ref} className={`react-resizable-handle react-resizable-handle-${handleAxis}`} />}
+        >
+          <StyledImage
+            draggable={false}
+            src={node.attrs.src}
+            alt={node.attrs.alt}
+          />
+        </ResizableBox>
+      </Box>
     </BlockAligner>
   );
 }
