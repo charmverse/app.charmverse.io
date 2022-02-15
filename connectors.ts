@@ -168,7 +168,7 @@ const RPC = {
     iconUrls: ['/networkLogos/ethereum.svg']
   },
   RINKEBY: {
-    chainId: 61,
+    chainId: 4,
     chainName: 'Rinkeby',
     nativeCurrency: {
       name: 'Ether',

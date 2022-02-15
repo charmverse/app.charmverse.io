@@ -3,12 +3,13 @@ import Button from '@mui/material/Button';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
+import { RPC } from 'connectors';
 import ERC20ABI from '../../abis/ERC20ABI.json';
 
 interface Props {
   receiver: string;
   amount: string;
-  token: string;
+  tokenSymbol: string;
   tokenContractAddress?: string;
   tokenDecimals?: number;
   onSuccess?: (txId: string) => void;
@@ -19,21 +20,24 @@ interface Props {
 export default function BountyPaymentButton ({
   receiver,
   amount,
-  token = 'Ether',
+  tokenSymbol = 'ETH',
   tokenContractAddress = '',
   tokenDecimals = 16,
   onSuccess = (tx: string) => {},
   onError = () => {},
   children
 }: Props) {
-  const { account, library } = useWeb3React();
+  const { account, library, chainId } = useWeb3React();
 
   const makePayment = async () => {
+
+    const currentChain = Object.values(RPC).find((blockchain: any) => blockchain.chainId === chainId);
 
     const signer = await library.getSigner(account);
 
     try {
-      if (token === 'Ether') {
+      // if it's native currency
+      if (tokenSymbol.toLowerCase() === currentChain?.nativeCurrency.symbol.toLowerCase()) {
         const tx = await signer.sendTransaction({
           to: receiver,
           value: ethers.utils.parseEther(amount)
