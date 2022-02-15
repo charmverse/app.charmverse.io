@@ -41,6 +41,7 @@ export default function BlockAligner (props: BlockAlignerProps) {
   return (
     <StyledBlockAligner
       align={align}
+      draggable={false}
     >
       <div className='content' style={{ position: 'relative' }}>
         {children}

@@ -105,9 +105,8 @@ export default function Video ({ node, updateAttrs }: NodeViewProps) {
       });
     }}
     >
-      <Resizer maxWidth={750} minWidth={250}>
+      <Resizer initialSize={350} maxSize={750} minSize={250}>
         <StyledVideo
-          draggable={false}
           src={node.attrs.src}
           title='YouTube video player'
           frameBorder='0'
