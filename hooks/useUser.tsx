@@ -1,4 +1,5 @@
-import { ReactNode, createContext, useContext, useMemo } from 'react';
+import { useWeb3React } from '@web3-react/core';
+import { ReactNode, createContext, useContext, useEffect, useMemo } from 'react';
 import { LoggedInUser } from 'models';
 import { activeUser } from 'seedData';
 import { useLocalStorage } from './useLocalStorage';
@@ -9,6 +10,13 @@ export const UserContext = createContext<Readonly<IContext>>([null, () => undefi
 
 export function UserProvider ({ children }: { children: ReactNode }) {
 
+  const { account } = useWeb3React();
+  useEffect(() => {
+    if (account) {
+      console.log('Query user');
+
+    }
+  }, [account]);
   const [user, setUser] = useLocalStorage<LoggedInUser>('profile', activeUser);
   // @ts-ignore - backwards compatibility
   user.addresses = user.addresses || [user.address];
