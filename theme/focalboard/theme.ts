@@ -5,28 +5,35 @@ import {
   lightTheme as originalLightTheme
 } from 'components/databases/focalboard/src/theme';
 
+import { darkModeColors, lightModeColors, BrandColorScheme } from 'theme/colors';
+
+/**
+ * Automatically generate property names that are in sync with our brand colours
+ */
+function renameColorsForFocalboard (colorScheme: BrandColorScheme): Record<string, string> {
+  return Object.entries(colorScheme).reduce((computedColorScheme, color) => {
+
+    const propName = color[0];
+    const capitalisedPropName = `prop${propName.slice(0, 1).toUpperCase()}${propName.slice(1)}`;
+
+    // eslint-disable-next-line prefer-destructuring
+    computedColorScheme[capitalisedPropName] = color[1];
+
+    return computedColorScheme;
+  }, <any>{});
+}
+
+const darkFocalboardBrandColors = renameColorsForFocalboard(darkModeColors);
+
 export const darkTheme: Theme = {
   ...originalDarkTheme,
-  propGray: '#7A6677',
-  propBrown: '#79632A',
-  propOrange: '#CC4B00',
-  propYellow: '#B89F00',
-  propGreen: '#007A5C',
-  propBlue: '#007C8F',
-  propPurple: '#5F396A',
-  propPink: '#D11046',
-  propRed: '#970C0C'
+  ...darkFocalboardBrandColors
 };
+
+const lightFocalboardBrandColors = renameColorsForFocalboard(lightModeColors);
 
 export const lightTheme: Theme = {
   ...originalLightTheme,
-  propGray: '#C4D0D4',
-  propBrown: '#E6C39E',
-  propOrange: '#FFAC47',
-  propYellow: '#FDFD9B',
-  propGreen: '#A8F0DD',
-  propBlue: '#ADF4FF',
-  propPurple: '#B7AFD4',
-  propPink: '#EB82ED',
-  propRed: '#E37898'
+  ...lightFocalboardBrandColors
+
 };
