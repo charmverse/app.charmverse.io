@@ -1,20 +1,20 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState, useCallback} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
-
-import {BlockIcons} from '../blockIcons'
-import {Board} from '../blocks/board'
+import BangleEditor from 'components/editor/BangleEditor'
+import { Page } from 'models'
+import React, { useCallback, useState } from 'react'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { BlockIcons } from '../blockIcons'
+import { Board } from '../blocks/board'
 import mutator from '../mutator'
 import Button from '../widgets/buttons/button'
 import Editable from '../widgets/editable'
 import EmojiIcon from '../widgets/icons/emoji'
 import HideIcon from '../widgets/icons/hide'
 import ShowIcon from '../widgets/icons/show'
-
 import BlockIconSelector from './blockIconSelector'
-import {MarkdownEditor} from './markdownEditor'
-import {Page} from 'models'
+
+
 
 type Props = {
     board: Board
@@ -99,12 +99,7 @@ const ViewTitle = React.memo((props: Props) => {
 
             {board.fields.showDescription &&
                 <div className='description'>
-                    <MarkdownEditor
-                        text={board.fields.description}
-                        placeholderText='Add a description...'
-                        onBlur={onDescriptionBlur}
-                        readonly={props.readonly}
-                    />
+                    <BangleEditor />
                 </div>
             }
         </div>
