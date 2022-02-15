@@ -31,6 +31,7 @@ export class LocalStorageBountyService implements IBountyService {
   async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
     bounty.id = v4();
     bounty.createdAt = new Date();
+    bounty.status = 'open';
 
     const bountyList = await this.listBounties();
 
