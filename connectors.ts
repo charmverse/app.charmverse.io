@@ -13,6 +13,7 @@ enum Chains {
   CELO = 42220,
   HARMONY = 1666600000,
   GOERLI = 5,
+  RINKEBY = 4
 }
 
 const RPC = {
@@ -165,6 +166,21 @@ const RPC = {
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
     iconUrls: ['/networkLogos/ethereum.svg']
+  },
+  RINKEBY: {
+    chainId: 4,
+    chainName: 'Rinkeby',
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
+      logoURI:
+        'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+    },
+    blockExplorerUrls: ['https://rinkeby-explorer.arbitrum.io/#/'],
+    iconUrls: ['/networkLogos/ethereum.svg'],
+    rpcUrls: ['https://rinkeby-light.eth.linkpool.io/']
   }
 } as const;
 
@@ -180,7 +196,8 @@ const supportedChains = [
   'CELO',
   'HARMONY',
   'BSC',
-  'GOERLI'
+  'GOERLI',
+  'RINKEBY'
 ] as const;
 
 const supportedChainIds = supportedChains.map((_) => Chains[_]);
