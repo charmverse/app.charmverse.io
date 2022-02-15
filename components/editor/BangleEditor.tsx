@@ -40,6 +40,11 @@ import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './Inlin
 import PageTitle from './Page/PageTitle';
 import Video, { videoSpec } from './Video';
 
+export interface IBangleEditorOutput {
+  doc: PageContent,
+  rawText: string
+}
+
 const specRegistry = new SpecRegistry([
   paragraph.spec(), // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   bold.spec(),
@@ -136,8 +141,11 @@ export default function BangleEditor (
         content: []
       }
     ]
-  }, page, setPage, onPageContentChange }:
-  { content?: PageContent, page?: Page, setPage?: (p: Page) => void, onPageContentChange: (doc: PageContent) => any }
+  }, page, setPage, onPageContentChange = () => {} }:
+  {
+    content?: PageContent,
+    page?: Page, setPage?: (p: Page) => void,
+    onPageContentChange?: (output: IBangleEditorOutput) => any }
 ) {
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {
     if (page && setPage) {
@@ -157,7 +165,11 @@ export default function BangleEditor (
       new Plugin({
         props: {
           handleTextInput (view) {
-            onPageContentChange(view.state.doc.toJSON() as PageContent);
+
+            const pageAsJson = view.state.doc.toJSON() as PageContent;
+            const rawText = view.state.doc.textContent ?? '';
+
+            onPageContentChange({ doc: pageAsJson, rawText });
             return false;
           }
         }

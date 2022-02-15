@@ -35,7 +35,7 @@ export function BountyList () {
 
         { bountyList.length > 0
         && bountyList.map(availableBounty => {
-          return <Bounty bounty={availableBounty} />;
+          return <Bounty key={availableBounty.id} bounty={availableBounty} />;
         })}
 
         <Button

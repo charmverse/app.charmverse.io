@@ -1,3 +1,4 @@
+import { PageContent } from '.';
 import { CryptoCurrency } from './Currency';
 
 const BOUNTY_LABELS = {
@@ -15,7 +16,8 @@ export interface Bounty {
   id: string;
   author: string;
   createdAt: Date;
-  description: object;
+  description: string;
+  descriptionNodes: PageContent;
   reviewer: string;
   assignee: string;
   rewardAmount: number;

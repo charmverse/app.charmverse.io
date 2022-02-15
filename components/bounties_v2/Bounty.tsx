@@ -1,5 +1,5 @@
 import { Bounty as IBounty } from 'models/Bounty';
-import { Card, CardHeader, CardContent, Chip } from '@mui/material';
+import { Card, CardHeader, CardContent, Chip, Typography } from '@mui/material';
 import { useState } from 'react';
 
 export interface IBountyInput {
@@ -26,7 +26,14 @@ export function Bounty ({ bounty }: IBountyInput) {
     >
       <CardHeader subheader={bounty.title} />
       <CardContent sx={{ flexGrow: 1, display: 'flex', alignItems: 'flex-end' }}>
-        <Chip variant='outlined' label='Bounty status' color='primary' />
+
+        <Typography paragraph={true}>{bounty.description}</Typography>
+        {
+          /**
+           * TODO Readd the status
+           <Chip variant='outlined' label='Bounty status' color='primary' />
+           */
+        }
       </CardContent>
     </Card>
   );

@@ -6,20 +6,37 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import MenuItem from '@mui/material/MenuItem';
-import Chip from '@mui/material/Chip';
-import Select from '@mui/material/Select';
 import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
+import { PageContent } from 'models';
+
+import BangleEditor, { IBangleEditorOutput } from 'components/editor/BangleEditor';
+import { Bounty as IBounty } from 'models/Bounty';
 
 import BountyService from './BountyService';
 
 interface IBountyEditorInput {
-  onSubmit: () => any
+  onSubmit: () => any,
+  bounty?: IBounty
 }
 
-export function BountyEditor ({ onSubmit }: IBountyEditorInput) {
+export function BountyEditor ({ onSubmit, bounty }: IBountyEditorInput) {
+
+  const bountyDescription: PageContent = {
+    type: 'doc'
+  };
+
+  let bangleContent: IBangleEditorOutput = {
+    doc: {
+      type: 'doc'
+    },
+    rawText: ''
+  };
+
+  function refreshBangleContent (content: IBangleEditorOutput) {
+    bangleContent = content;
+  }
 
   const {
     register,
@@ -29,15 +46,18 @@ export function BountyEditor ({ onSubmit }: IBountyEditorInput) {
     formState: { errors }
   } = useForm();
 
-  function createBounty () {
-    console.log('Bounty data');
+  async function createBounty (bountyToCreate: Partial<IBounty>) {
+    bountyToCreate.description = bangleContent.rawText;
+    bountyToCreate.descriptionNodes = bangleContent.doc;
+    const created = await BountyService.createBounty(bountyToCreate);
+    onSubmit();
   }
 
   return (
     <div>
       <h1>Bounty Editor</h1>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(values => createBounty(values))}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <TextField
@@ -51,33 +71,7 @@ export function BountyEditor ({ onSubmit }: IBountyEditorInput) {
           </Grid>
 
           <Grid item>
-            <Grid container direction='row' alignItems='center'>
-              <Grid item xs={6}>
-                <Typography>Status</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Select
-                  labelId='select-type'
-                  id='select-type'
-                  variant='standard'
-                  label='type'
-                >
-                  <MenuItem value='pending'>
-                    <Chip label='Not Started' color='primary' />
-                  </MenuItem>
-                  <MenuItem value='in-progress'>
-                    <Chip label='In Progress' color='secondary' />
-                  </MenuItem>
-                  <MenuItem value='done'>
-                    <Chip label='Done' color='secondary' />
-                  </MenuItem>
-                </Select>
-              </Grid>
-            </Grid>
-          </Grid>
-
-          <Grid item>
-            EDITOR SECTION
+            <BangleEditor onPageContentChange={refreshBangleContent} />
           </Grid>
 
           <Grid item>
@@ -118,7 +112,7 @@ export function BountyEditor ({ onSubmit }: IBountyEditorInput) {
                   <Typography>Token</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <InputSearchCrypto defaultValue='ETH' onChange={() => {}} />
+                  <InputSearchCrypto {...register('rewardToken')} defaultValue='ETH' onChange={() => {}} />
                 </Grid>
               </Grid>
               {/* Render token amount */}
