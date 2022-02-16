@@ -1,35 +1,28 @@
 import { useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
-import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
-import Header from 'components/login/Header';
+import Header from 'components/common/base-layout/Header';
+import PageWrapper from 'components/common/base-layout/PageWrapper';
 import LoginPageContent from 'components/login/LoginPageContent';
 import Footer from 'components/login/Footer';
-
-const LoginWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: ${({ theme }) => theme.palette.background.light};
-`;
 
 export default function LoginPage () {
 
   const { account } = useWeb3React();
   const router = useRouter();
+  console.log('login page');
   useEffect(() => {
+    console.log('account', account, router.query.returnUrl);
     if (account && typeof router.query.returnUrl === 'string') {
-      router.replace('/login', undefined, { shallow: true });
       router.push(router.query.returnUrl);
     }
   }, [account]);
 
   return (
-    <LoginWrapper>
+    <PageWrapper>
       <Header />
       <LoginPageContent account={account} />
       <Footer />
-    </LoginWrapper>
+    </PageWrapper>
   );
 }

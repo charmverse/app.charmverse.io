@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -6,16 +7,27 @@ import FieldLabel from 'components/settings/FieldLabel';
 import Avatar from 'components/settings/LargeAvatar';
 import Divider from '@mui/material/Divider';
 import { useUser } from 'hooks/useUser';
-import { Space } from 'models';
-import { FormValues, schema } from 'pages/[domain]/settings/workspace';
+import { Prisma, Space } from '@prisma/client';
 import { ChangeEvent } from 'react';
 import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
 import getDisplayName from 'lib/users/getDisplayName';
 
+export const schema = yup.object({
+  domain: yup.string().ensure().trim().lowercase()
+    .min(3, 'Domain must be at least 3 characters')
+    .matches(/^[0-9a-z-]*$/, 'Domain must be only lowercase hyphens, letters, and numbers')
+    .required('Domain is required'),
+  name: yup.string().ensure().trim()
+    .min(3, 'Name must be at least 3 characters')
+    .required('Name is required')
+});
+
+export type FormValues = yup.InferType<typeof schema>;
+
 interface Props {
-  onCancel: () => void;
-  onSubmit: (values: Space) => void;
+  onCancel?: () => void;
+  onSubmit: (values: Prisma.SpaceCreateInput) => void;
 }
 
 export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Props) {
@@ -42,15 +54,26 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
   const watchDomain = watch('domain');
 
   function onSubmit (values: FormValues) {
-    const newId = Math.random().toString().replace('0.', '');
     try {
       _onSubmit({
+        author: {
+          connect: {
+            id: user!.id
+          }
+        },
         createdAt: new Date(),
-        createdBy: user!.id,
         updatedAt: new Date(),
         updatedBy: user!.id,
-        deletedAt: null,
-        id: newId,
+        // permissions: {
+        //   create: [{
+        //     role: 'owner',
+        //     user: {
+        //       connect: {
+        //         id: user!.id
+        //       }
+        //     }
+        //   }]
+        // },
         ...values
       });
     }

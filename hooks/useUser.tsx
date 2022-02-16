@@ -1,27 +1,37 @@
 import { useWeb3React } from '@web3-react/core';
-import { ReactNode, createContext, useContext, useEffect, useMemo } from 'react';
-import { LoggedInUser } from 'models';
-import { activeUser } from 'seedData';
-import { useLocalStorage } from './useLocalStorage';
+import { ReactNode, createContext, useContext, useEffect, useState, useMemo } from 'react';
+import { User } from '@prisma/client';
+import { useRouter } from 'next/router';
+import charmClient from 'charmClient';
 
-type IContext = [user: LoggedInUser | null, setUser: (user: LoggedInUser | any) => void];
+type IContext = [user: User | null, setUser: (user: User | any) => void, isLoaded: boolean];
 
-export const UserContext = createContext<Readonly<IContext>>([null, () => undefined]);
+export const UserContext = createContext<Readonly<IContext>>([null, () => undefined, false]);
 
 export function UserProvider ({ children }: { children: ReactNode }) {
 
   const { account } = useWeb3React();
-  useEffect(() => {
-    if (account) {
-      console.log('Query user');
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoaded, setIsLoaded] = useState(true);
 
+  useEffect(() => {
+    if (account && !user) {
+      setIsLoaded(false);
+      charmClient.getUser()
+        .then(_user => {
+          setUser(_user);
+          setIsLoaded(true);
+          router.push('/');
+        })
+        .catch(err => {
+          // probably needs to log in
+          setIsLoaded(true);
+        });
     }
   }, [account]);
-  const [user, setUser] = useLocalStorage<LoggedInUser>('profile', activeUser);
-  // @ts-ignore - backwards compatibility
-  user.addresses = user.addresses || [user.address];
-  user.linkedAddressesCount = user.addresses.length;
-  const value = useMemo(() => [user, setUser] as const, [user]);
+  console.log('USER!!!', user);
+  const value = useMemo(() => [user, setUser, isLoaded] as const, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>

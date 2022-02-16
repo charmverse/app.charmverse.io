@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import styled from '@emotion/styled';
+import { Prisma } from '@prisma/client';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -14,7 +15,7 @@ import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { useWeb3React } from '@web3-react/core';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getKey } from 'hooks/useLocalStorage';
+import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -33,7 +34,7 @@ import Avatar from '../Avatar';
 import Link from '../Link';
 import { Modal } from '../Modal';
 import WorkspaceAvatar from '../WorkspaceAvatar';
-import CreateWorkspaceForm from './CreateWorkspaceForm';
+import CreateWorkspaceForm from '../CreateWorkspaceForm';
 import { headerHeight } from './Header';
 import PageNavigation, { PageLink, StyledTreeItem } from './PageNavigation';
 import NewPageMenu from '../NewPageMenu';
@@ -127,7 +128,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const boards = useAppSelector(getSortedBoards);
   const { pages, setPages } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  const { account } = useWeb3React();
   const favoritePageIds = favorites.map(f => f.pageId);
   const intl = useIntl();
 
@@ -139,20 +139,9 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     setSpaceFormOpen(false);
   }
 
-  function addSpace (newSpace: Space) {
-    if (spaces.some(s => s.id === newSpace.id)) {
-      throw new Error(`Space with that id already exists: ${newSpace.id}`);
-    }
-    if (spaces.some(s => s.domain === newSpace.domain)) {
-      throw new Error('Space with that domain already exists');
-    }
+  async function addSpace (spaceOpts: Prisma.SpaceCreateInput) {
+    const newSpace = await charmClient.createSpace(spaceOpts);
     setSpaces([...spaces, newSpace]);
-
-    // add a first page - note that usePages is for the current space, so we can't use setPages here
-    const firstPage: Page = { ...seedPages[0], id: Math.random().toString().replace('0.', ''), spaceId: newSpace.id };
-    const key = getKey(`spaces.${newSpace.id}.pages`);
-    localStorage.setItem(key, JSON.stringify([firstPage]));
-
     router.push(`/${newSpace.domain}`);
   }
 

@@ -125,7 +125,7 @@ export const pages: Page[] = [
   })
 ];
 
-function gettingStartedPageContent (): PageContent {
+export function gettingStartedPageContent (): PageContent {
   return {
     type: 'doc',
     content: [

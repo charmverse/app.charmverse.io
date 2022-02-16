@@ -10,22 +10,10 @@ import Legend from 'components/settings/Legend';
 import Avatar from 'components/settings/LargeAvatar';
 import { setTitle } from 'hooks/usePageTitle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { FormValues, schema } from 'components/common/CreateWorkspaceForm';
 import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-
-export const schema = yup.object({
-  domain: yup.string().ensure().trim().lowercase()
-    .min(3, 'Domain must be at least 3 characters')
-    .matches(/^[0-9a-z-]*$/, 'Domain must be only lowercase hyphens, letters, and numbers')
-    .required('Domain is required'),
-  name: yup.string().ensure().trim()
-    .min(3, 'Name must be at least 3 characters')
-    .required('Name is required')
-});
-
-export type FormValues = yup.InferType<typeof schema>;
 
 export default function WorkspaceSettings () {
 

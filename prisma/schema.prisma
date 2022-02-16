@@ -38,7 +38,7 @@ model Page {
   contentText String
   headerImage String?
   icon        String?
-  isPublic    Boolean
+  isPublic    Boolean          @default(false)
   path        String
   parentId    String?          @db.Uuid
   spaceId     String?          @db.Uuid
@@ -79,7 +79,7 @@ model User {
   pagePermissions PagePermission[]
   pages           Page[]
   blocks          Block[]
-  Space           Space[]
+  spaces          Space[]
 }
 
 model FavoritePage {

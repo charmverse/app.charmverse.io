@@ -6,7 +6,6 @@ import Image from 'next/image';
 import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import { blackColor } from 'theme/colors';
 
 import splashImage from 'public/images/charmverse_world.png';
 

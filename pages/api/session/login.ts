@@ -3,7 +3,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { User } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, withSessionRoute } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 
 export interface LoginResponse extends User {}
 
@@ -24,6 +25,9 @@ async function authenticate (req: NextApiRequest, res: NextApiResponse<LoginResp
   if (!user) {
     return res.status(401).send({ error: 'No user has been associated with this wallet address' });
   }
+
+  req.session.user = user;
+  await req.session.save();
 
   return res.status(200).json(user);
 }

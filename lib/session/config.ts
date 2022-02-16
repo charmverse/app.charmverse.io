@@ -1,3 +1,11 @@
+import { User } from '@prisma/client';
+
+declare module 'iron-session' {
+  interface IronSessionData {
+    user: User;
+  }
+}
+
 export const ironOptions = {
   cookieName: 'charm.sessionId',
   password: process.env.AUTH_SECRET as string,
