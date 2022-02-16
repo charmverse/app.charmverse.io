@@ -1,13 +1,14 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import { ReactNode } from 'react';
-import { ResizableBox } from 'react-resizable';
+import { ResizableBox, ResizableProps } from 'react-resizable';
 
 interface ResizerProps {
   maxSize: number
   initialSize: number
   minSize: number
   children: ReactNode
+  onResize?: ResizableProps['onResize']
 }
 
 export const StyledResizeHandle = styled(Box)`
@@ -33,7 +34,7 @@ export const StyledResizeHandle = styled(Box)`
 `;
 
 export default function Resizer (props: ResizerProps) {
-  const { initialSize, minSize, maxSize, children } = props;
+  const { onResize, initialSize, minSize, maxSize, children } = props;
 
   return (
     <Box
@@ -48,6 +49,7 @@ export default function Resizer (props: ResizerProps) {
       }}
     >
       <ResizableBox
+        onResize={onResize}
         width={initialSize}
         height={initialSize}
         resizeHandles={['w', 'e']}

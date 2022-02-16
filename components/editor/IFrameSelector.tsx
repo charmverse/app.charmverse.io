@@ -6,16 +6,16 @@ import Snackbar from 'components/common/Snackbar';
 import useSnackbar from 'hooks/useSnackbar';
 import { ReactNode, useState } from 'react';
 
-interface VideoSelectorProps {
-  onVideoSelect: (videoSrc: string) => void
+interface IFrameSelectorProps {
+  onIFrameSelect: (videoSrc: string) => void
   children: ReactNode
   tabs?: [string, ReactNode][]
 }
 
-export default function VideoSelector (props: VideoSelectorProps) {
+export default function IFrameSelector (props: IFrameSelectorProps) {
   const { message, handleClose, isOpen } = useSnackbar();
   const [embedLink, setEmbedLink] = useState('');
-  const { tabs = [], children, onVideoSelect } = props;
+  const { tabs = [], children, onIFrameSelect } = props;
   return (
     <PopperPopup popupContent={(
       <Box sx={{
@@ -40,7 +40,7 @@ export default function VideoSelector (props: VideoSelectorProps) {
                   width: 250
                 }}
                 onClick={() => {
-                  onVideoSelect(embedLink);
+                  onIFrameSelect(embedLink);
                   setEmbedLink('');
                 }}
               >
