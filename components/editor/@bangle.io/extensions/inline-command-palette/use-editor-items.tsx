@@ -47,12 +47,9 @@ function createTableHeader(state: EditorState, text: string) {
 
 function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node) {
   const insertPos = state.selection.$from.after();
-
-
+  
   const tr = state.tr;
   const newTr = safeInsert(nodeToInsert, insertPos)(state.tr);
-
-
 
   if (tr === newTr) {
     return false;
@@ -152,19 +149,19 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       },
     },
     {
-      uid: 'video',
-      title: 'Video',
+      uid: 'iframe',
+      title: 'Iframe',
       icon: <VideoLibraryIcon
         sx={{ fontSize: 16 }}
       />,
-      description: 'Insert a video block in the line below',
+      description: 'Insert a iframe block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (state, dispatch) => {
             return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
               undefined,
               Fragment.fromArray([
-                state.schema.nodes.video.create({
+                state.schema.nodes.iframe.create({
                   src: null
                 })
               ])
