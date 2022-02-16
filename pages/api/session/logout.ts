@@ -5,8 +5,6 @@ import { User } from '@prisma/client';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
-export interface LoginResponse extends User {}
-
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(logout);

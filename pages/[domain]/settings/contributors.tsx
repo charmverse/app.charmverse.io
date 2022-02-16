@@ -31,7 +31,7 @@ export default function ContributorSettings () {
       <Typography color='secondary'>No token gates yet</Typography>
 
       <Legend>Current Contributors</Legend>
-      {contributors.map(contributor => (
+      {space && contributors.map(contributor => (
         <ContributorRow key={getDisplayName(contributor)} contributor={contributor} spaceId={space.id} />
       ))}
     </>

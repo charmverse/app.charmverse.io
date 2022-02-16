@@ -5,10 +5,7 @@ import { FavoritePage, User } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-
-export interface LoginResponse extends User {
-  favorites: FavoritePage[];
-}
+import { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -17,7 +14,7 @@ handler
   .use(requireUser)
   .get(getProfile);
 
-async function createProfile (req: NextApiRequest, res: NextApiResponse<LoginResponse | { error: any }>) {
+async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
   const { address } = req.body;
   const user = await prisma.user.findFirst({
@@ -37,7 +34,6 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoginRes
     res.status(200).json(user);
   }
   else {
-    console.log('Create new user', { address });
     const newUser = await prisma.user.create({
       data: {
         addresses: [address]
@@ -52,7 +48,7 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoginRes
   }
 }
 
-async function getProfile (req: NextApiRequest, res: NextApiResponse<LoginResponse | { error: any }>) {
+async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
   const profile = await prisma.user.findUnique({
     where: {

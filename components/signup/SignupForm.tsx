@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -33,9 +32,8 @@ export default function SignupPageContent () {
     const newUser = await charmClient.createUser({ address: account! });
     setUser(newUser);
     setTimeout(() => {
-      console.log('send to create ws');
       router.push('/createWorkspace');
-    }, 1000);
+    }, 100);
   }
 
   return (

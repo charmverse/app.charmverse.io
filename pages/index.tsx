@@ -5,6 +5,7 @@ export const getServerSideProps = withSessionSsr(
   async ({ req }) => {
     const { user } = req.session;
     if (!user) {
+      console.log('Send user to login');
       return {
         redirect: {
           destination: '/login',
@@ -26,6 +27,7 @@ export const getServerSideProps = withSessionSsr(
       };
     }
     else {
+      console.log('Send user to create workspace');
       return {
         redirect: {
           destination: '/createWorkspace',

@@ -34,7 +34,7 @@ import Avatar from '../Avatar';
 import Link from '../Link';
 import { Modal } from '../Modal';
 import WorkspaceAvatar from '../WorkspaceAvatar';
-import CreateWorkspaceForm from '../CreateWorkspaceForm';
+import CreateWorkspaceForm from '../CreateSpaceForm';
 import { headerHeight } from './Header';
 import PageNavigation, { PageLink, StyledTreeItem } from './PageNavigation';
 import NewPageMenu from '../NewPageMenu';
@@ -145,7 +145,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     router.push(`/${newSpace.domain}`);
   }
 
-  async function addPage (page: Partial<Page>) {
+  async function addPage (_space: Space, page: Partial<Page>) {
     const id = Math.random().toString().replace('0.', '');
     const newPage: Page = {
       boardId: null,
@@ -168,7 +168,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       isPublic: false,
       parentId: null,
       path: `page-${id}`,
-      spaceId: space.id,
+      spaceId: _space.id,
       title: '',
       type: 'page',
       ...page
@@ -182,7 +182,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
     // add delay to simulate a server call
     setTimeout(() => {
-      router.push(`/${space.domain}/${newPage.path}`);
+      router.push(`/${_space.domain}/${newPage.path}`);
     }, 100);
   }
 
@@ -215,7 +215,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             <Grid item key={workspace.domain}>
               <AvatarLink href={`/${workspace.domain}`} passHref>
                 <MuiLink>
-                  <WorkspaceAvatar active={space.domain === workspace.domain} name={workspace.name} />
+                  <WorkspaceAvatar active={space?.domain === workspace.domain} name={workspace.name} />
                 </MuiLink>
               </AvatarLink>
             </Grid>
@@ -228,84 +228,84 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
         </Modal>
       </WorkspacesContainer>
-      <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
-        <Box sx={{ flexGrow: 1 }}>
+      {space && (
+        <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
           <Box sx={{ flexGrow: 1 }}>
-            <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
-              <SidebarHeader>
-                <Typography><strong>{space.name}</strong></Typography>
-                <IconButton onClick={closeSidebar}>
-                  <ChevronLeftIcon />
-                </IconButton>
-              </SidebarHeader>
-              <Divider sx={{ mb: 3 }} />
-              {favoritePageIds.length > 0 && (
-                <Box mb={2}>
+            <Box sx={{ flexGrow: 1 }}>
+              <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
+                <SidebarHeader>
+                  <Typography><strong>{space.name}</strong></Typography>
+                  <IconButton onClick={closeSidebar}>
+                    <ChevronLeftIcon />
+                  </IconButton>
+                </SidebarHeader>
+                <Divider sx={{ mb: 3 }} />
+                {favoritePageIds.length > 0 && (
+                  <Box mb={2}>
+                    <SectionName>
+                      FAVORITES
+                    </SectionName>
+                    <PageNavigation
+                      isFavorites={true}
+                      pages={pages}
+                      space={space}
+                      rootPageIds={favoritePageIds}
+                      setPages={setPages}
+                      addPage={addPage}
+                    />
+                  </Box>
+                )}
+                <WorkspaceLabel>
                   <SectionName>
-                    FAVORITES
+                    WORKSPACE
                   </SectionName>
-                  <PageNavigation
-                    isFavorites={true}
-                    pages={pages}
-                    spaceId={space.id}
-                    pathPrefix={`/${space.domain}`}
-                    rootPageIds={favoritePageIds}
-                    setPages={setPages}
-                    addPage={addPage}
-                  />
+                  <div className='add-a-page'>
+                    <NewPageMenu tooltip='Add a page' addPage={page => addPage(space, page)} />
+                  </div>
+                </WorkspaceLabel>
+                <PageNavigation
+                  pages={pages}
+                  space={space}
+                  setPages={setPages}
+                  addPage={addPage}
+                  deletePage={deletePage}
+                />
+              </Box>
+            </Box>
+            <StyledTreeItem
+              sx={{ mt: 3 }}
+              nodeId='bounties'
+              icon={<BountyIcon fontSize='small' />}
+              label={
+                <PageLink href={`/${space.domain}/bounties`} label='Bounties' />
+              }
+              ContentProps={{
+                className: router.pathname.includes('bounties') ? 'Mui-selected' : ''
+              }}
+            />
+          </Box>
+          <Box>
+            <Divider />
+            <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
+              {user && (
+                <Box display='flex' alignItems='center'>
+                  <Avatar name={getDisplayName(user)} />
+                  <Box pl={1}>
+                    <Typography>
+                      <strong>{getDisplayName(user)}</strong>
+                    </Typography>
+                  </Box>
                 </Box>
               )}
-              <WorkspaceLabel>
-                <SectionName>
-                  WORKSPACE
-                </SectionName>
-                <div className='add-a-page'>
-                  <NewPageMenu tooltip='Add a page' addPage={addPage} />
-                </div>
-              </WorkspaceLabel>
-              <PageNavigation
-                pages={pages}
-                spaceId={space.id}
-                pathPrefix={`/${space.domain}`}
-                setPages={setPages}
-                addPage={addPage}
-                deletePage={deletePage}
-              />
+              <Link href={`/${space.domain}/settings/account`}>
+                <IconButton>
+                  <SettingsIcon color='secondary' />
+                </IconButton>
+              </Link>
             </Box>
           </Box>
-          <StyledTreeItem
-            sx={{ mt: 3 }}
-            nodeId='bounties'
-            icon={<BountyIcon fontSize='small' />}
-            label={
-              <PageLink href={`/${space.domain}/bounties`} label='Bounties' />
-            }
-            ContentProps={{
-              className: router.pathname.includes('bounties') ? 'Mui-selected' : ''
-            }}
-          />
         </Box>
-        <Box>
-          <Divider />
-          <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
-            {user && (
-              <Box display='flex' alignItems='center'>
-                <Avatar name={getDisplayName(user)} />
-                <Box pl={1}>
-                  <Typography>
-                    <strong>{getDisplayName(user)}</strong>
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-            <Link href={`/${space.domain}/settings/account`}>
-              <IconButton>
-                <SettingsIcon color='secondary' />
-              </IconButton>
-            </Link>
-          </Box>
-        </Box>
-      </Box>
+      )}
     </SidebarContainer>
   );
 }

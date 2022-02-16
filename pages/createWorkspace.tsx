@@ -3,25 +3,29 @@ import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Header from 'components/common/base-layout/Header';
 import PageWrapper from 'components/common/base-layout/PageWrapper';
-import CreateWorkspaceForm from 'components/common/CreateWorkspaceForm';
+import CreateSpaceForm from 'components/common/CreateSpaceForm';
 import charmClient from 'charmClient';
+import { useSpaces } from 'hooks/useSpaces';
 
-export default function CreateWorkspace () {
+export default function CreateSpace () {
 
+  const [spaces, setSpaces] = useSpaces();
   const router = useRouter();
 
   async function addSpace (newSpace: Prisma.SpaceCreateInput) {
     const space = await charmClient.createSpace(newSpace);
-    setTimeout(() => {
-      router.push(`/${space.domain}`);
-    }, 100);
+
+    setSpaces([...spaces, space]);
+    // setTimeout(() => {
+    router.push(`/${space.domain}`);
+    // }, 100);
   }
 
   return (
     <PageWrapper>
       <Header />
       <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto' }}>
-        <CreateWorkspaceForm onSubmit={addSpace} />
+        <CreateSpaceForm onSubmit={addSpace} />
       </Box>
     </PageWrapper>
   );

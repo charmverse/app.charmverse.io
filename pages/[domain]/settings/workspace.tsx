@@ -10,7 +10,7 @@ import Legend from 'components/settings/Legend';
 import Avatar from 'components/settings/LargeAvatar';
 import { setTitle } from 'hooks/usePageTitle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { FormValues, schema } from 'components/common/CreateWorkspaceForm';
+import { FormValues, schema } from 'components/common/CreateSpaceForm';
 import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -36,6 +36,7 @@ export default function WorkspaceSettings () {
   const watchName = watch('name');
 
   function onSubmit (values: FormValues) {
+    if (!space) return;
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
     setSpace({ ...space, ...values }, newDomain);

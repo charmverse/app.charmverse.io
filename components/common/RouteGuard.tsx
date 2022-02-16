@@ -6,15 +6,28 @@ import { useUser } from 'hooks/useUser';
 
 const publicPaths = ['/login'];
 
+/**
+ * Page loading:
+ * 1. React loads
+ * 2a. Request user from session
+ * 2b. Request connected wallet from browser extension
+ *
+ */
+
 export default function RouteGuard ({ children }: { children: ReactNode }) {
 
   const router = useRouter();
-  const [authorized, setAuthorized] = useState(false);
+  const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
   const { account, active } = useWeb3React();
   const [user, _, isUserLoaded] = useUser();
-  const isLoading = !isUserLoaded || !router.isReady || (!triedEager && !account && active);
-  console.log('isLoading', isUserLoaded, isLoading, user, (!triedEager && !account && active));
+  const isUserLoading = !!(account && !isUserLoaded);
+  const isWalletLoading = (!triedEager && !account);
+  const isReactLoading = !router.isReady;
+  const isLoading = isUserLoading || isWalletLoading || isReactLoading;
+
+  // console.log('isLoading', isLoading, { isReactLoading, isWalletLoading, isUserLoading });
+
   useEffect(() => {
     // wait to listen to events until user is loaded
     if (isLoading) {
@@ -37,7 +50,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheck);
     };
-  }, [account, isLoading, isUserLoaded]);
+  }, [account, isLoading, isUserLoaded, user]);
 
   function authCheck (url: string) {
     // redirect to login page if accessing a private page and not logged in

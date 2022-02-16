@@ -2,8 +2,8 @@
 
 import { Space, Prisma, Page, User } from '@prisma/client';
 import * as http from 'adapters/http';
-import type { LoginResponse } from 'pages/api/session/login';
 import { gettingStartedPageContent } from 'seedData';
+import { Contributor, LoggedInUser } from 'models';
 
 //
 // CharmClient is the client interface to the server APIs
@@ -11,7 +11,7 @@ import { gettingStartedPageContent } from 'seedData';
 class CharmClient {
 
   async login (address: string) {
-    const user = await http.POST<LoginResponse>('/api/session/login', {
+    const user = await http.POST<LoggedInUser>('/api/session/login', {
       address
     });
     return user;
@@ -22,11 +22,11 @@ class CharmClient {
   }
 
   getUser () {
-    return http.GET<User>('/api/session/profile');
+    return http.GET<LoggedInUser>('/api/session/profile');
   }
 
   createUser ({ address }: { address: string }) {
-    return http.POST<LoginResponse>('/api/session/profile', {
+    return http.POST<LoggedInUser>('/api/session/profile', {
       address
     });
   }
@@ -52,6 +52,10 @@ class CharmClient {
 
   getSpaces () {
     return http.GET<Space[]>('/api/spaces');
+  }
+
+  getContributors (spaceId: string) {
+    return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
   }
 
   createPage (pageOpts: Prisma.PageCreateInput) {

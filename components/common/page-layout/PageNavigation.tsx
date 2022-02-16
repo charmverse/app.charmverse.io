@@ -1,5 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import { Space } from '@prisma/client';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -438,14 +439,13 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
 }
 
 type NavProps = {
-  addPage?: (p: Partial<Page>) => void;
+  addPage?: (s: Space, p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
   pages: Page[];
-  pathPrefix: string;
+  space: Space;
   rootPageIds?: string[];
   setPages: Dispatch<SetStateAction<Page[]>>;
-  spaceId: string;
 };
 
 export default function PageNavigation ({
@@ -453,15 +453,14 @@ export default function PageNavigation ({
   deletePage,
   isFavorites,
   pages,
-  pathPrefix,
+  space,
   rootPageIds,
-  setPages,
-  spaceId
+  setPages
 }: NavProps) {
 
-  const [expanded, setExpanded] = useLocalStorage<string[]>(`${spaceId}.expanded-pages`, []);
+  const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const pagesForSpace = pages.filter(p => p.spaceId === spaceId);
+  const pagesForSpace = pages.filter(p => p.spaceId === space.id);
   const mappedItems = useMemo(() => mapTree(pagesForSpace, 'parentId', rootPageIds), [pagesForSpace, rootPageIds]);
 
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
@@ -486,7 +485,7 @@ export default function PageNavigation ({
 
   useEffect(() => {
     for (const page of pagesForSpace) {
-      if (router.asPath === `${pathPrefix}/${page.path}`) {
+      if (router.asPath === `/${space.domain}/${page.path}`) {
         // expand the parent of the active page
         if (!isFavorites && page.parentId) {
           if (!expanded.includes(page.parentId)) {
@@ -522,8 +521,8 @@ export default function PageNavigation ({
           key={item.id}
           item={item}
           onDrop={onDrop}
-          pathPrefix={pathPrefix}
-          addPage={addPage}
+          pathPrefix={`/${space.domain}`}
+          addPage={page => addPage && addPage(space, page)}
           deletePage={deletePage}
         />
       ))}

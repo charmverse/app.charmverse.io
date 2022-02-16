@@ -1,6 +1,10 @@
-import { Page, Space, User } from '@prisma/client';
-import { LoggedInUser, PopulatedUser, PageContent } from 'models';
+import { Page, Space, User, SpaceRole } from '@prisma/client';
+import { LoggedInUser, PageContent } from 'models';
 import { v4 as uuid } from 'uuid';
+
+type PopulatedUser = User & {
+  spaceRoles: SpaceRole[];
+}
 
 export const spaces: Space[] = [
   { id: '0', name: 'Our Community', domain: 'demo' },
@@ -42,8 +46,6 @@ function MockUser (partial: Partial<PopulatedUser>): PopulatedUser {
 
 export const activeUser: LoggedInUser = {
   ...users[0],
-  isLoading: false,
-  linkedAddressesCount: 1,
   favorites: []
 };
 

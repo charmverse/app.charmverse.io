@@ -7,7 +7,7 @@ declare global {
 
 export const prisma = global.prisma
   || new PrismaClient({
-    log: ['query']
+    //    log: ['query']
   });
 
 // remember this instance of prisma in development to avoid too many clients

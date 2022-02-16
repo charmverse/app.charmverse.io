@@ -11,14 +11,15 @@ export default function IndexPage () {
   const { pages } = usePages();
   const router = useRouter();
 
-  const spacePages = pages.filter(page => page.spaceId === space.id);
-
   useEffect(() => {
-    if (spacePages.length) {
-      router.push(`/${space.domain}/${pages[0].path}`);
+    if (space) {
+      const spacePages = pages.filter(page => page.spaceId === space.id);
+      if (spacePages.length) {
+        router.push(`/${space.domain}/${spacePages[0].path}`);
+      }
+      setTitleState(space.name);
     }
-    setTitleState(space.name);
-  }, []);
+  }, [space]);
 
   return null;
 }

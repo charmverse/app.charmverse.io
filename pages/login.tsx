@@ -10,9 +10,8 @@ export default function LoginPage () {
 
   const { account } = useWeb3React();
   const router = useRouter();
-  console.log('login page');
+
   useEffect(() => {
-    console.log('account', account, router.query.returnUrl);
     if (account && typeof router.query.returnUrl === 'string') {
       router.push(router.query.returnUrl);
     }

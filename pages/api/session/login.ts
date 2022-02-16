@@ -5,20 +5,22 @@ import { User } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-
-export interface LoginResponse extends User {}
+import { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.post(authenticate);
 
-async function authenticate (req: NextApiRequest, res: NextApiResponse<LoginResponse | { error: any }>) {
+async function authenticate (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
   const { address } = req.body;
   const user = await prisma.user.findFirst({
     where: {
       addresses: {
         has: address
       }
+    },
+    include: {
+      favorites: true
     }
   });
 
