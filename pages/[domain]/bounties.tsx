@@ -149,3 +149,11 @@ export default function BountyPage () {
   );
 
 }
+
+BountyPage.getLayout = (page: ReactElement) => {
+  return (
+    <PageLayout>
+      {page}
+    </PageLayout>
+  );
+};
