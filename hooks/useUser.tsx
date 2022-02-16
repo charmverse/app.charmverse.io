@@ -21,7 +21,6 @@ export function UserProvider ({ children }: { children: ReactNode }) {
         .then(_user => {
           setUser(_user);
           setIsLoaded(true);
-          router.push('/');
         })
         .catch(err => {
           // probably needs to log in
