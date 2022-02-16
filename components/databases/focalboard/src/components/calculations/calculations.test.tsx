@@ -24,9 +24,9 @@ describe('components/calculations/calculation logic', () => {
     card1.fields.properties.property_person = 'user_id_1'
     card1.fields.properties.property_checkbox = 'true'
     card1.createdBy = 'user_id_1'
-    card1.createAt = 1625553000000
-    card1.modifiedBy = 'user_id_1'
-    card1.updateAt = 1625553000000
+    card1.createdAt = 1625553000000
+    card1.updatedBy = 'user_id_1'
+    card1.updatedAt = 1625553000000
 
     const card2 = TestBlockFactory.createCard(board)
     card2.fields.properties.property_text = 'foo bar'
@@ -39,17 +39,17 @@ describe('components/calculations/calculation logic', () => {
     card2.fields.properties.property_date = '1625639400000'
     card2.fields.properties.property_person = 'user_id_2'
     card2.fields.properties.property_checkbox = 'false'
-    card2.createAt = 1625639400000
+    card2.createdAt = 1625639400000
     card2.createdBy = 'user_id_2'
-    card2.updateAt = 1625639400000
-    card2.modifiedBy = 'user_id_2'
+    card2.updatedAt = 1625639400000
+    card2.updatedBy = 'user_id_2'
 
     // card with all properties unset
     const card3 = TestBlockFactory.createCard(board)
-    card3.createAt = 1625639400000
+    card3.createdAt = 1625639400000
     card3.createdBy = 'user_id_2'
-    card3.updateAt = 1625639400000
-    card3.modifiedBy = 'user_id_2'
+    card3.updatedAt = 1625639400000
+    card3.updatedBy = 'user_id_2'
 
     // clone of card 1. All properties exactly same as that of card 1
     const card4 = TestBlockFactory.createCard(board)
@@ -63,10 +63,10 @@ describe('components/calculations/calculation logic', () => {
     card4.fields.properties.property_date = '1625553000000'
     card4.fields.properties.property_person = 'user_id_1'
     card4.fields.properties.property_checkbox = 'true'
-    card4.createAt = 1625553000000
+    card4.createdAt = 1625553000000
     card4.createdBy = 'user_id_1'
-    card4.updateAt = 1625553000000
-    card4.modifiedBy = 'user_id_1'
+    card4.updatedAt = 1625553000000
+    card4.updatedBy = 'user_id_1'
 
     // card with all empty values
     const card5 = TestBlockFactory.createCard(board)
@@ -83,17 +83,17 @@ describe('components/calculations/calculation logic', () => {
 
     // clone of card 3 but created / updated 1 second later
     const card6 = TestBlockFactory.createCard(board)
-    card6.createAt = 1625639401000
+    card6.createdAt = 1625639401000
     card6.createdBy = 'user_id_2'
-    card6.updateAt = 1625639401000
-    card6.modifiedBy = 'user_id_2'
+    card6.updatedAt = 1625639401000
+    card6.updatedBy = 'user_id_2'
 
     // clone of card 3 but created / updated 1 minute later
     const card7 = TestBlockFactory.createCard(board)
-    card7.createAt = 1625639460000
+    card7.createdAt = 1625639460000
     card7.createdBy = 'user_id_2'
-    card7.updateAt = 1625639460000
-    card7.modifiedBy = 'user_id_2'
+    card7.updatedAt = 1625639460000
+    card7.updatedBy = 'user_id_2'
 
     const cards = [card1, card2, card3, card4]
 

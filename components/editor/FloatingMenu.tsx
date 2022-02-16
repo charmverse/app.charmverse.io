@@ -3,6 +3,8 @@ import { PluginKey } from '@bangle.dev/core';
 import { Node, ResolvedPos } from '@bangle.dev/pm';
 import { FloatingMenu, floatingMenu } from '@bangle.dev/react-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
+import Snackbar from 'components/common/Snackbar';
+import useSnackbar from 'hooks/useSnackbar';
 import { NodeSelection } from 'prosemirror-state';
 import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
@@ -12,41 +14,46 @@ import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 const menuKey = new PluginKey('menuKey');
 
 export default function FloatingMenuComponent () {
+  const { message, handleClose, isOpen, showMessage } = useSnackbar();
+
   return (
-    <FloatingMenu
-      menuKey={menuKey}
-      renderMenuType={({ type }) => {
-        if (type === 'defaultMenu') {
-          return (
-            <Menu>
-              <MenuGroup>
-                <BoldButton />
-                <ItalicButton />
-                <CodeButton />
-                <StrikeButton />
-                <UnderlineButton />
-                <FloatingLinkButton menuKey={menuKey} />
-              </MenuGroup>
-              <MenuGroup isLastGroup>
-                <ParagraphButton />
-                <CalloutButton />
-                <HeadingButton level={1} />
-                <HeadingButton level={2} />
-                <HeadingButton level={3} />
-              </MenuGroup>
-            </Menu>
-          );
-        }
-        if (type === 'linkSubMenu') {
-          return (
-            <Menu>
-              <LinkSubMenu />
-            </Menu>
-          );
-        }
-        return null;
-      }}
-    />
+    <>
+      <FloatingMenu
+        menuKey={menuKey}
+        renderMenuType={({ type }) => {
+          if (type === 'defaultMenu') {
+            return (
+              <Menu>
+                <MenuGroup>
+                  <BoldButton />
+                  <ItalicButton />
+                  <CodeButton />
+                  <StrikeButton />
+                  <UnderlineButton />
+                  <FloatingLinkButton menuKey={menuKey} />
+                </MenuGroup>
+                <MenuGroup isLastGroup>
+                  <ParagraphButton />
+                  <CalloutButton />
+                  <HeadingButton level={1} />
+                  <HeadingButton level={2} />
+                  <HeadingButton level={3} />
+                </MenuGroup>
+              </Menu>
+            );
+          }
+          if (type === 'linkSubMenu') {
+            return (
+              <Menu>
+                <LinkSubMenu showMessage={showMessage} />
+              </Menu>
+            );
+          }
+          return null;
+        }}
+      />
+      <Snackbar severity='info' handleClose={handleClose} isOpen={isOpen} message={message ?? ''} />
+    </>
   );
 }
 
@@ -55,7 +62,7 @@ export const floatingMenuPlugin = () => {
     key: menuKey,
     calculateType: state => {
       if (state.selection.empty
-        || (state.selection as NodeSelection)?.node?.type?.name.match(/(image)|(cryptoPrice)/)) {
+        || (state.selection as NodeSelection)?.node?.type?.name.match(/(image)|(cryptoPrice)|(iframe)/)) {
         return null;
       }
       // If were are inside a link

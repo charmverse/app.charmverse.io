@@ -2,20 +2,22 @@ import { link } from '@bangle.dev/base-components';
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import CancelIcon from '@mui/icons-material/Cancel';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import LinkIcon from '@mui/icons-material/Link';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteIcon from "@mui/icons-material/Delete";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import SaveIcon from '@mui/icons-material/Save';
 import { Box } from '@mui/material';
 import React, { useRef, useState } from 'react';
 import { MenuButton } from './Icon';
 
-export function LinkSubMenu({ getIsTop = () => true }) {
+export function LinkSubMenu({ showMessage, getIsTop = () => true }: {showMessage: (msg: string) => void, getIsTop?: () => boolean}) {
   const view = useEditorViewContext();
   const result = link.queryLinkAttrs()(view.state);
   const originalHref = (result && result.href) || '';
 
   return (
     <LinkMenu
+      showMessage={showMessage}
       // (hackish) Using the key to unmount then mount
       // the linkmenu so that it discards any preexisting state
       // in its `href` and starts fresh
@@ -27,7 +29,7 @@ export function LinkSubMenu({ getIsTop = () => true }) {
   );
 }
 
-const StyledLink = styled.input`
+const StyledInput = styled.input`
   background: ${({theme}) => theme.palette.background.default};
   outline: none;
   border: none;
@@ -41,7 +43,9 @@ function LinkMenu({
   getIsTop,
   view,
   originalHref = '',
+  showMessage
 }: {
+  showMessage: (msg: string) => void,
   getIsTop: () => boolean;
   view: EditorView;
   originalHref?: string;
@@ -53,11 +57,13 @@ function LinkMenu({
     view.focus();
   };
 
+  const isSavedDisabled = href === originalHref || (!/^(ipfs|http(s?)):\/\//i.test(href));
+
   return (
     <Box sx={{
       display: "flex"
     }}>
-      <StyledLink
+      <StyledInput
         value={href}
         ref={inputRef}
         onKeyDown={(e) => {
@@ -89,44 +95,42 @@ function LinkMenu({
           e.preventDefault();
         }}
       />
+      <MenuButton disableButton={isSavedDisabled} hints={["Save"]}>
+        <SaveIcon color={!isSavedDisabled ? "inherit" : "disabled"} sx={{
+          fontSize: 14
+        }} onClick={() => {
+          // Only update attribute if the value has changed
+          if (!isSavedDisabled) {
+            link.updateLink(href)(view.state, view.dispatch);
+          }
+        }}/>
+      </MenuButton>
       <MenuButton
-        hints={["Visit"]}
+        hints={["Go to link"]}
         onMouseDown={(e) => {
           e.preventDefault();
           window.open(href, '_blank');
         }}
       >
-        <LinkIcon sx={{
+        <OpenInNewIcon sx={{
           fontSize: 14
         }}/>
       </MenuButton>
-      {href === originalHref ? (
-        <MenuButton
-          hints={["Clear"]}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            link.updateLink()(view.state, view.dispatch);
-            view.focus();
-          }}
-        >
-          <CancelIcon sx={{
-            fontSize: 14
-          }}/>
-        </MenuButton>
-      ) : (
-        <MenuButton
-          hints={["Save"]}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleSubmit();
-            view.focus();
-          }}
-        >
-          <CheckCircleIcon sx={{
-            fontSize: 14
-          }}/>
-        </MenuButton>
-      )}
+      <MenuButton hints={["Copy link"]}>
+        <ContentCopyIcon sx={{
+          fontSize: 12
+        }} onClick={() => {
+          navigator.clipboard.writeText(href);
+          showMessage(`Link copied to clipboard`);
+        }} />
+      </MenuButton>
+      <MenuButton hints={["Remove link"]}>
+        <DeleteIcon sx={{
+          fontSize: 14
+        }} onClick={() => {
+          link.updateLink()(view.state, view.dispatch);
+        }}/>
+      </MenuButton>
     </Box>
   );
 }

@@ -28,7 +28,7 @@ export type MenuNode = Page & {
   children: MenuNode[];
 }
 
-const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
+export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
 
   position: 'relative',
 
@@ -56,10 +56,15 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
       fontWeight: 'inherit',
       color: 'inherit'
     },
+    [`& .${treeItemClasses.iconContainer}`]: {
+      width: '28px'
+    },
     [`& .${treeItemClasses.iconContainer} svg`]: {
       color: greyColor2,
-      fontSize: 24,
       marginLeft: 12
+    },
+    [`& .${treeItemClasses.iconContainer} svg.MuiSvgIcon-fontSizeLarge`]: {
+      fontSize: 24
     }
   },
   [`& .${treeItemClasses.group}`]: {
@@ -90,13 +95,13 @@ export const StyledIconButton = styled(IconButton)`
   }
 `;
 
-const StyledTreeItemContent = styled.a`
+const PageAnchor = styled.a`
   color: inherit;
   text-decoration: none;
   display: flex;
   align-items: center;
   overflow: hidden;
-  padding: 3px 0;
+  padding: 2px 0;
   position: relative;
 
   .page-actions {
@@ -111,18 +116,18 @@ const StyledTreeItemContent = styled.a`
   }
 `;
 
-const StyledPageIcon = styled(EmojiCon)`
-  display: flex;
-  align-items: center;
-  color: black;
-  font-size: 14px;
+const PageIcon = styled(EmojiCon)`
   height: 24px;
   width: 24px;
+  margin-right: 4px;
 `;
 
-const StyledLink = styled(Typography)<{isempty: number}>`
+export const PageTitle = styled(Typography)<{isempty: number}>`
   color: inherit;
+  display: flex;
+  align-items: center;
   font-size: 14px;
+  height: 24px;
   &:hover {
     color: inherit;
   }
@@ -141,8 +146,40 @@ type TreeItemProps = ComponentProps<typeof TreeItem> & {
   deletePage?: () => void;
 }
 
+interface PageLinkProps {
+  children?: ReactNode;
+  href: string;
+  label?: string;
+  labelIcon?: React.ReactNode;
+}
+
+export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
+
+  const isempty = !label;
+
+  function stopPropagation (event: SyntheticEvent) {
+    event.stopPropagation();
+  }
+
+  return (
+    <Link href={href} passHref>
+      <PageAnchor onClick={stopPropagation}>
+        {labelIcon && (
+          <PageIcon>
+            {labelIcon}
+          </PageIcon>
+        )}
+        <PageTitle isempty={isempty ? 1 : 0}>
+          {isempty ? 'Untitled' : label}
+        </PageTitle>
+        {children}
+      </PageAnchor>
+    </Link>
+  );
+}
+
 // eslint-disable-next-line react/function-component-definition
-const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
+const PageTreeItem = forwardRef((props: any, ref) => {
   const {
     addSubPage,
     deletePage,
@@ -170,30 +207,24 @@ const StyledTreeItem = forwardRef((props: TreeItemProps, ref) => {
     setAnchorEl(null);
   }
 
-  const isempty = !label;
-
   return (
     <>
-      <StyledTreeItemRoot
+      <StyledTreeItem
         label={(
-          <Link href={href} passHref>
-            <StyledTreeItemContent onClick={stopPropagation}>
-              <StyledPageIcon>
-                {labelIcon || (pageType === 'database' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
-              </StyledPageIcon>
-              <StyledLink isempty={isempty ? 1 : 0}>
-                {isempty ? 'Untitled' : label}
-              </StyledLink>
-              <div className='page-actions'>
-                <IconButton size='small' onClick={showMenu}>
-                  <MoreHorizIcon color='secondary' fontSize='small' />
-                </IconButton>
-                {addSubPage && (
-                  <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} sx={{ marginLeft: '3px' }} />
-                )}
-              </div>
-            </StyledTreeItemContent>
-          </Link>
+          <PageLink
+            href={href}
+            label={label}
+            labelIcon={labelIcon || (pageType === 'database' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
+          >
+            <div className='page-actions'>
+              <IconButton size='small' onClick={showMenu}>
+                <MoreHorizIcon color='secondary' fontSize='small' />
+              </IconButton>
+              {addSubPage && (
+                <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} sx={{ marginLeft: '3px' }} />
+              )}
+            </div>
+          </PageLink>
         )}
         {...other}
         TransitionProps={{ timeout: 50 }}
@@ -292,7 +323,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
   }
 
   return (
-    <StyledTreeItem
+    <PageTreeItem
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
       ref={mergeRefs([drag, drop, dragPreview, focusListener])}
@@ -300,8 +331,8 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
       nodeId={item.id}
       label={item.title}
       href={`${pathPrefix}/${item.path}`}
-      labelIcon={item.icon}
-      pageType={item.type}
+      labelIcon={item.icon || undefined}
+      pageType={item.type as 'page'}
       sx={{
         backgroundColor: isActive ? theme.palette.action.focus : 'unset', // 'rgba(22, 52, 71, 0.08)' : 'unset'
         position: 'relative'
@@ -321,11 +352,11 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
             />
           ))
           : (
-            <Typography variant='caption' className='MuiTreeItem-content' sx={{ color: `${greyColor2} !important`, ml: 1 }}>
+            <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
               No pages inside
             </Typography>
           )}
-    </StyledTreeItem>
+    </PageTreeItem>
   );
 }
 
@@ -398,8 +429,7 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
       ref={drop}
       style={{
         backgroundColor: isActive ? theme.palette.action.focus : 'unset',
-        flexGrow: isFavorites ? 0 : 1,
-        maxWidth: 240
+        flexGrow: isFavorites ? 0 : 1
       }}
     >
       <TreeView {...rest}>{children}</TreeView>
@@ -482,8 +512,8 @@ export default function PageNavigation ({
       selected={selectedNodeId}
       onNodeToggle={onNodeToggle}
       aria-label='items navigator'
-      defaultCollapseIcon={<ExpandMoreIcon />}
-      defaultExpandIcon={<ChevronRightIcon />}
+      defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
+      defaultExpandIcon={<ChevronRightIcon fontSize='large' />}
       isFavorites={isFavorites}
       sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
     >

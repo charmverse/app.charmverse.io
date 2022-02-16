@@ -101,7 +101,7 @@ class CharmClient {
     newBlocks = newBlocks.map(block => {
       return {
         ...block,
-        workspaceId: currentSpace.id
+        spaceId: currentSpace.id
       };
     });
     const updated = setStorageValue('database-blocks', [...blocks, ...newBlocks]);

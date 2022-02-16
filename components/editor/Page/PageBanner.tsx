@@ -111,7 +111,7 @@ export default function PageBanner ({ page, setPage }: { page: Page, setPage: (p
           <Typography
             variant='subtitle1'
             onClick={() => {
-              setPage({ ...page, headerImage: undefined });
+              setPage({ ...page, headerImage: null });
             }}
           >
             Remove

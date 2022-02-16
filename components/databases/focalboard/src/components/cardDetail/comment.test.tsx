@@ -23,8 +23,8 @@ const board = TestBlockFactory.createBoard()
 const card = TestBlockFactory.createCard(board)
 const comment = TestBlockFactory.createComment(card)
 const dateFixed = Date.parse('01 Oct 2020')
-comment.createAt = dateFixed
-comment.updateAt = dateFixed
+comment.createdAt = dateFixed
+comment.updatedAt = dateFixed
 comment.title = 'Test comment'
 
 const userImageUrl = 'data:image/svg+xml'
@@ -57,7 +57,7 @@ describe('components/cardDetail/comment', () => {
             <ReduxProvider store={store}>
                 <Comment
                     comment={comment}
-                    userId={comment.modifiedBy}
+                    userId={comment.updatedBy}
                     userImageUrl={userImageUrl}
                     readonly={false}
                 />
@@ -73,7 +73,7 @@ describe('components/cardDetail/comment', () => {
             <ReduxProvider store={store}>
                 <Comment
                     comment={comment}
-                    userId={comment.modifiedBy}
+                    userId={comment.updatedBy}
                     userImageUrl={userImageUrl}
                     readonly={true}
                 />
@@ -87,7 +87,7 @@ describe('components/cardDetail/comment', () => {
             <ReduxProvider store={store}>
                 <Comment
                     comment={comment}
-                    userId={comment.modifiedBy}
+                    userId={comment.updatedBy}
                     userImageUrl={userImageUrl}
                     readonly={false}
                 />

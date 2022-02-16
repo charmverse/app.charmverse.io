@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useContext, useMemo, Dispatch, SetStateAction } from 'react';
-import { Page } from 'models';
+import { Page } from '@prisma/client';
 import { pages as pagesSeed } from 'seedData';
 import { useLocalStorage } from './useLocalStorage';
 

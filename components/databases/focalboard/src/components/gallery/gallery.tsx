@@ -59,7 +59,7 @@ const Gallery = (props: Props): JSX.Element => {
             {cards.filter((c) => c.parentId === board.id).map((card) => {
                 return (
                     <GalleryCard
-                        key={card.id + card.updateAt}
+                        key={card.id + card.updatedAt}
                         card={card}
                         board={board}
                         onClick={props.onCardClicked}

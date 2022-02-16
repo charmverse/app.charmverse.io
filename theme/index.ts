@@ -7,16 +7,18 @@ import {
   backgroundLightColorDarkMode, blueColor,
   darkBlueColor, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
-  settingsHeaderBackgroundColorDarkMode,
-  yellowColor
+  settingsHeaderBackgroundColorDarkMode
 } from './colors';
+import { darkTheme as darkThemeFocalBoard, lightTheme as lightThemeFocalBoard } from './focalboard/theme';
 
 // Re-declare the emotion theme to have the properties of the MaterialUiTheme - https://emotion.sh/docs/typescript#define-a-theme
 declare module '@emotion/react' {
   export interface Theme extends MaterialUITheme {}
 }
 
-interface CustomColors {
+type FocalBoardColors = typeof darkThemeFocalBoard;
+
+interface CustomColors extends FocalBoardColors {
   settingsHeader: {
     background: string
   };
@@ -83,6 +85,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
   },
   typography: {
     fontFamily: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"',
+    fontSize: 12,
     htmlFontSize: 14,
     h1: {
       fontSize: '2rem',
@@ -148,7 +151,8 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     },
     emoji: {
       hoverBackground: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04);'
-    }
+    },
+    ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
   },
   components: {
     // MuiTypography: {

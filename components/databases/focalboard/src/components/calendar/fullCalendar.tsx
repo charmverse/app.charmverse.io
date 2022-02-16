@@ -83,11 +83,11 @@ const CalendarFullView = (props: Props): JSX.Element|null => {
 
     const myEventsList = useMemo(() => (
         cards.flatMap((card): EventInput[] => {
-            let dateFrom = new Date(card.createAt || 0)
-            let dateTo = new Date(card.createAt || 0)
+            let dateFrom = new Date(card.createdAt || 0)
+            let dateTo = new Date(card.createdAt || 0)
             if (dateDisplayProperty && dateDisplayProperty?.type === 'updatedTime') {
-                dateFrom = new Date(card.updateAt || 0)
-                dateTo = new Date(card.updateAt || 0)
+                dateFrom = new Date(card.updatedAt || 0)
+                dateTo = new Date(card.updatedAt || 0)
             } else if (dateDisplayProperty && dateDisplayProperty?.type !== 'createdTime') {
                 const dateProperty = createDatePropertyFromString(card.fields.properties[dateDisplayProperty.id || ''] as string)
                 if (!dateProperty.from) {

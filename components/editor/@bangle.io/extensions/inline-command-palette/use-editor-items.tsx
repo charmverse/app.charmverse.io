@@ -6,6 +6,7 @@ import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import ImageIcon from '@mui/icons-material/Image';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
@@ -46,12 +47,9 @@ function createTableHeader(state: EditorState, text: string) {
 
 function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node) {
   const insertPos = state.selection.$from.after();
-
-
+  
   const tr = state.tr;
   const newTr = safeInsert(nodeToInsert, insertPos)(state.tr);
-
-
 
   if (tr === newTr) {
     return false;
@@ -137,6 +135,33 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.image.create({
+                  src: null
+                })
+              ])
+            ))
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    },
+    {
+      uid: 'iframe',
+      title: 'Iframe',
+      icon: <VideoLibraryIcon
+        sx={{ fontSize: 16 }}
+      />,
+      description: 'Insert a iframe block in the line below',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.iframe.create({
                   src: null
                 })
               ])

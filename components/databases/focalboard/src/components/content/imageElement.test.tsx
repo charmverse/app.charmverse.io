@@ -23,10 +23,10 @@ mockedOcto.getFileAsDataUrl.mockResolvedValue('test.jpg')
 describe('components/content/ImageElement', () => {
     const defaultBlock: ImageBlock = {
         id: 'test-id',
-        workspaceId: '',
+        spaceId: '',
         parentId: '',
         rootId: '1',
-        modifiedBy: 'test-user-id',
+        updatedBy: 'test-user-id',
         schema: 0,
         type: 'image',
         title: 'test-title',
@@ -34,8 +34,8 @@ describe('components/content/ImageElement', () => {
             fileId: 'test.jpg',
         },
         createdBy: 'test-user-id',
-        createAt: 0,
-        updateAt: 0,
+        createdAt: 0,
+        updatedAt: 0,
         deleteAt: 0,
     }
 

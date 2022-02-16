@@ -23,14 +23,14 @@ const LastModifiedAt = (props: Props): JSX.Element => {
     let latestBlock: Block = props.card
     if (props.card) {
         const allBlocks = [props.card, ...props.contents.flat(), ...props.comments]
-        const sortedBlocks = allBlocks.sort((a, b) => b.updateAt - a.updateAt)
+        const sortedBlocks = allBlocks.sort((a, b) => b.updatedAt - a.updatedAt)
 
         latestBlock = sortedBlocks.length > 0 ? sortedBlocks[0] : latestBlock
     }
 
     return (
         <div className='LastModifiedAt octo-propertyvalue readonly'>
-            {Utils.displayDateTime(new Date(latestBlock.updateAt), intl)}
+            {Utils.displayDateTime(new Date(latestBlock.updatedAt), intl)}
         </div>
     )
 }
