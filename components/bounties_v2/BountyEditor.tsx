@@ -106,7 +106,7 @@ export function BountyEditor ({ onSubmit, bounty }: IBountyEditorInput) {
                 </Grid>
               </Grid>
 
-              {/* Render Token Select */}
+              {/* Render Token Select
               <Grid container direction='row' alignItems='center' mt={1}>
                 <Grid item xs={6}>
                   <Typography>Token</Typography>
@@ -115,6 +115,8 @@ export function BountyEditor ({ onSubmit, bounty }: IBountyEditorInput) {
                   <InputSearchCrypto {...register('rewardToken')} defaultValue='ETH' onChange={() => {}} />
                 </Grid>
               </Grid>
+              */}
+
               {/* Render token amount */}
               <Grid container direction='row' alignItems='center' mt={1}>
                 <Grid item xs={6}>
