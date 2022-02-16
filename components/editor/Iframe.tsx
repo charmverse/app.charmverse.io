@@ -5,8 +5,7 @@ import styled from '@emotion/styled';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { HTMLAttributes, useState } from 'react';
-import { ResizableProps } from 'react-resizable';
+import { HTMLAttributes } from 'react';
 import BlockAligner from './BlockAligner';
 import IFrameSelector from './IFrameSelector';
 import Resizer from './Resizer';
@@ -57,23 +56,20 @@ export function iframeSpec (): RawSpecs {
     name,
     schema: {
       attrs: {
-        height: {
-          default: '180px'
-        },
         src: {
           default: ''
         }
       },
       group: 'block',
       inline: false,
+      draggable: false,
       isolating: true, // dont allow backspace to delete
       parseDOM: [
         {
           tag: 'iframe',
           getAttrs: (dom: any) => {
             return {
-              src: dom.getAttribute('src'),
-              height: dom.style.height
+              src: dom.getAttribute('src')
             };
           }
         }
@@ -130,16 +126,6 @@ const StyledIFrame = styled(Box)`
 `;
 
 export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
-  const [height, setHeight] = useState(node.attrs.height || '200px');
-
-  const onResize: ResizableProps['onResize'] = (_: any, { size }: any) => {
-    setHeight(size.height);
-    updateAttrs({ ...node.attrs, height: `${size.height}px` });
-  };
-
-  const heightNumber = typeof height === 'number' ? height : parseInt(height.replace('px', ''), 10);
-  const heightString = `${heightNumber}px`;
-
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -161,8 +147,8 @@ export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
       });
     }}
     >
-      <Resizer onResize={onResize} initialSize={350} maxSize={750} minSize={250}>
-        <StyledIFrame><iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: heightString, border: '0 solid transparent', width: '100%' }} /></StyledIFrame>
+      <Resizer initialSize={250} maxSize={750} minSize={250}>
+        <StyledIFrame><iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} /></StyledIFrame>
       </Resizer>
     </BlockAligner>
   );
