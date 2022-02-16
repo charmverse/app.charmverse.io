@@ -38,20 +38,23 @@ export function Bounty ({ bounty }: IBountyInput) {
       variant='outlined'
     >
       <CardHeader subheader={bounty.title} />
-      <CardContent sx={{ flexGrow: 1, display: 'flex', alignItems: 'flex-end' }}>
-        <Grid container>
-          <Grid item xs={12}>
+      <CardContent sx={{ flexGrow: 1, display: 'flex', height: '80%' }}>
+        <Grid container direction='row' justifyContent='space-between'>
+          <Grid item xs={12} sx={{ height: '73%' }}>
+
             <Typography paragraph={true}>
               {bounty.description.substring(0, 120)}
               ..
             </Typography>
+
           </Grid>
           <Grid item xs={12}>
             <Chip variant='outlined' label={bountyLabel} />
           </Grid>
-        </Grid>
 
+        </Grid>
       </CardContent>
+
     </Card>
   );
 }
