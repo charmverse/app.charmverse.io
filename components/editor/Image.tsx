@@ -1,9 +1,10 @@
-import { NodeViewProps } from '@bangle.dev/core';
+import { NodeViewProps, Plugin } from '@bangle.dev/core';
+import { EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
-import React, { HTMLAttributes } from 'react';
+import { HTMLAttributes } from 'react';
 import BlockAligner from './BlockAligner';
 import ImageSelector from './ImageSelector';
 import Resizer from './Resizer';
@@ -18,6 +19,40 @@ const StyledEmptyImageContainer = styled(Box)`
   align-items: center;
   opacity: 0.5;
 `;
+
+export const pasteImagePlugin = new Plugin({
+  props: {
+    handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
+      // @ts-ignore
+      const contentRow = slice.content.content?.[0].content.content?.[0];
+
+      if ((contentRow?.text as string)?.startsWith('http')) {
+        const embedUrl = contentRow.text.split('.');
+        if (embedUrl[embedUrl.length - 1].match(/(jpeg|jpg|png|webp)/)) {
+          insertImageNode(view.state, view.dispatch, view, { src: contentRow.text });
+          return true;
+        }
+        return false;
+      }
+      return false;
+    }
+  }
+});
+
+interface DispatchFn {
+  (tr: Transaction): void;
+}
+
+function insertImageNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any }) {
+  const type = state.schema.nodes.image;
+  const newTr = type.create(attrs);
+  const { tr } = view.state;
+  const cursorPosition = state.selection.$head.pos;
+  tr.insert(cursorPosition, newTr);
+  if (dispatch) {
+    dispatch(state.tr.replaceSelectionWith(newTr));
+  }
+}
 
 function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
   const theme = useTheme();
