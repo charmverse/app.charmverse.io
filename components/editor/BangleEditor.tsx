@@ -131,7 +131,7 @@ export default function BangleEditor (
       }
     ]
   }, page, setPage, onPageContentChange }:
-  { content?: PageContent, page?: Page, setPage?: (p: Page) => void, onPageContentChange: (doc: PageContent) => any }
+  { content?: PageContent, page?: Page, setPage?: (p: Page) => void, onPageContentChange?: (doc: PageContent) => any }
 ) {
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {
     if (page && setPage) {
@@ -151,7 +151,9 @@ export default function BangleEditor (
       new Plugin({
         props: {
           handleTextInput (view) {
-            onPageContentChange(view.state.doc.toJSON() as PageContent);
+            if (onPageContentChange) {
+              onPageContentChange(view.state.doc.toJSON() as PageContent);
+            }
             return false;
           }
         }
