@@ -62,7 +62,7 @@ export const floatingMenuPlugin = () => {
     key: menuKey,
     calculateType: state => {
       if (state.selection.empty
-        || (state.selection as NodeSelection)?.node?.type?.name.match(/(image)|(cryptoPrice)/)) {
+        || (state.selection as NodeSelection)?.node?.type?.name.match(/(image)|(cryptoPrice)|(iframe)/)) {
         return null;
       }
       // If were are inside a link

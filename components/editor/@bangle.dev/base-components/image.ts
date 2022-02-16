@@ -44,7 +44,7 @@ function specFactory(): RawSpecs {
         }
       },
       group: 'inline',
-      draggable: true,
+      draggable: false,
       parseDOM: [
         {
           tag: 'img[src]',
@@ -110,7 +110,6 @@ function pluginsFactory({
                   acceptFileType,
                   true,
                 );
-                console.log({files})
 
                 // TODO should we handle all drops but just show error?
                 // returning false here would just default to native behaviour
@@ -139,7 +138,7 @@ function pluginsFactory({
                 return true;
               },
             },
-            
+
             handlePaste: (view, rawEvent) => {
               const event = rawEvent;
               if (!event.clipboardData) {

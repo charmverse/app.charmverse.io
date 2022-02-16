@@ -31,9 +31,12 @@ import { ChangeEvent, ReactNode, useContext, useRef } from 'react';
 import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
+import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
+import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
-import { Image } from './Image';
+import IFrame, { iframePlugin, iframeSpec } from './Iframe';
+import { Image, pasteImagePlugin } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import PageTitle from './Page/PageTitle';
 
@@ -52,6 +55,7 @@ const specRegistry = new SpecRegistry([
   emojiSpecs(),
   code.spec(),
   codeBlock.spec(),
+  iframeSpec(),
   heading.spec(),
   inlinePaletteSpecs(),
   table,
@@ -60,7 +64,9 @@ const specRegistry = new SpecRegistry([
   tableRow,
   blockQuoteSpec(),
   cryptoPriceSpec(),
-  imageSpec()
+  imageSpec(),
+  columnLayoutSpec(),
+  columnBlockSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
@@ -190,13 +196,29 @@ export default function BangleEditor (
         contentDOM: ['div']
       }),
       NodeView.createPlugin({
+        name: 'columnLayout',
+        containerDOM: ['div'],
+        contentDOM: ['div']
+      }),
+      NodeView.createPlugin({
+        name: 'columnBlock',
+        containerDOM: ['div'],
+        contentDOM: ['div']
+      }),
+      NodeView.createPlugin({
         name: 'image',
         containerDOM: ['div']
       }),
       NodeView.createPlugin({
         name: 'cryptoPrice',
         containerDOM: ['div']
-      })
+      }),
+      NodeView.createPlugin({
+        name: 'iframe',
+        containerDOM: ['div', { class: 'iframe-container' }]
+      }),
+      iframePlugin,
+      pasteImagePlugin
     ],
     initialValue: Node.fromJSON(specRegistry.schema, content),
     // hide the black bar when dragging items - we dont even support dragging most components
@@ -235,10 +257,14 @@ export default function BangleEditor (
       }}
       state={state}
       renderNodeViews={({ children, ...props }) => {
-        // eslint-disable-next-line
         switch (props.node.type.name) {
+          case 'columnLayout': {
+            return <ColumnLayout node={props.node}>{children}</ColumnLayout>;
+          }
+          case 'columnBlock': {
+            return <ColumnBlock node={props.node}>{children}</ColumnBlock>;
+          }
           case 'cryptoPrice': {
-            /* eslint-disable-next-line */
             const attrs = props.attrs as {base: null | CryptoCurrency, quote: null | FiatCurrency};
             return (
               <CryptoPrice
@@ -278,6 +304,13 @@ export default function BangleEditor (
               <Image {...props}>
                 {children}
               </Image>
+            );
+          }
+          case 'iframe': {
+            return (
+              <IFrame {...props}>
+                {children}
+              </IFrame>
             );
           }
           default: {
