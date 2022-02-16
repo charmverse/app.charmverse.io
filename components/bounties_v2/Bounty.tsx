@@ -1,21 +1,26 @@
 import { Bounty as IBounty, BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
 import { Card, CardHeader, CardContent, Chip, Typography, Grid } from '@mui/material';
 import { useState } from 'react';
+import { BrandColors } from 'theme/colors';
 
 export interface IBountyInput {
   bounty: IBounty
 }
 
-const BountyStatusColours: Record<BountyStatus, string> = {
-  open: 'blue',
-  assigned: 'red',
-  review: 'purple',
-  complete: 'green'
+const BountyStatusColours: Record<BountyStatus, BrandColors> = {
+  open: 'gray',
+  assigned: 'blue',
+  review: 'red',
+  complete: 'purple',
+  paid: 'green'
 };
 
 export function Bounty ({ bounty }: IBountyInput) {
 
   const [editBounty, toggleBountyDialog] = useState(false);
+
+  const bountyColor = BountyStatusColours[bounty.status];
+  const bountyLabel = BountyLabels[bounty.status];
 
   return (
     <Card
@@ -42,7 +47,7 @@ export function Bounty ({ bounty }: IBountyInput) {
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Chip variant='outlined' label={BountyLabels[bounty.status]} />
+            <Chip variant='outlined' label={bountyLabel} />
           </Grid>
         </Grid>
 
