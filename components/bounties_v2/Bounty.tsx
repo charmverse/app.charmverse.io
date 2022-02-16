@@ -43,13 +43,13 @@ export function Bounty ({ bounty }: IBountyInput) {
           <Grid item xs={12} sx={{ height: '73%' }}>
 
             <Typography paragraph={true}>
-              {bounty.description.substring(0, 120)}
+              {bounty.description.trim().substring(0, 120)}
               ..
             </Typography>
 
           </Grid>
           <Grid item xs={12}>
-            <Chip variant='outlined' label={bountyLabel} />
+            <Chip variant='filled' label={bountyLabel} color={bountyColor as any} />
           </Grid>
 
         </Grid>
