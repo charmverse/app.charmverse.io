@@ -24,6 +24,7 @@ export const iframePlugin = new Plugin({
       // @ts-ignore
       const contentRow = slice.content.content?.[0].content.content;
       const isIframeEmbed = contentRow?.[0]?.text.startsWith('<iframe ');
+
       if (isIframeEmbed) {
         const urlContent = contentRow.find((row: any) => row.marks[0]?.type.name === 'link');
         if (urlContent) {

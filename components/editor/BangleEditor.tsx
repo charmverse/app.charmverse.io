@@ -36,7 +36,7 @@ import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
 import IFrame, { iframePlugin, iframeSpec } from './Iframe';
-import { Image } from './Image';
+import { Image, pasteImagePlugin } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import PageTitle from './Page/PageTitle';
 
@@ -194,7 +194,8 @@ export default function BangleEditor (
         name: 'iframe',
         containerDOM: ['div', { class: 'iframe-container' }]
       }),
-      iframePlugin
+      iframePlugin,
+      pasteImagePlugin
     ],
     initialValue: Node.fromJSON(specRegistry.schema, content),
     // hide the black bar when dragging items - we dont even support dragging most components
