@@ -75,7 +75,7 @@ export function BountyList () {
               onClick={() => {
                 setDisplayBountyDialog(true);
               }}
-              sx={{ margin: 'auto' }}
+              sx={{ margin: 'auto', float: 'right' }}
             >
               Create Bounty
             </Button>
