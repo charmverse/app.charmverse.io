@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Space, Prisma, Page, User } from '@prisma/client';
+import { Space, Prisma, Page } from '@prisma/client';
 import * as http from 'adapters/http';
 import { gettingStartedPageContent } from 'seedData';
 import { Contributor, LoggedInUser } from 'models';
@@ -52,6 +52,10 @@ class CharmClient {
 
   getSpaces () {
     return http.GET<Space[]>('/api/spaces');
+  }
+
+  getPages (spaceId: string) {
+    return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
   }
 
   getContributors (spaceId: string) {

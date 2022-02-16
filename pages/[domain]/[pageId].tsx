@@ -20,15 +20,21 @@ export default function BlocksEditorPage () {
   }
 
   useEffect(() => {
-    setTitleState(pageByPath.title);
-    setCurrentPage(pageByPath);
+    if (pageByPath) {
+      setTitleState(pageByPath.title);
+      setCurrentPage(pageByPath);
+    }
   }, [pageByPath]);
 
-  return (
-    (pageByPath?.type === 'database')
-      ? <DatabaseEditor page={pageByPath} setPage={setPage} />
-      : <Editor page={pageByPath} setPage={setPage} />
-  );
+  if (!pageByPath) {
+    return null;
+  }
+  else if (pageByPath.type === 'database') {
+    return <DatabaseEditor page={pageByPath} setPage={setPage} />;
+  }
+  else {
+    return <Editor page={pageByPath} setPage={setPage} />;
+  }
 }
 
 BlocksEditorPage.getLayout = (page: ReactElement) => {

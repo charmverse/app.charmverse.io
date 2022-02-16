@@ -1,7 +1,8 @@
-import { ReactNode, createContext, useContext, useMemo, Dispatch, SetStateAction } from 'react';
+import { ReactNode, createContext, useContext, useMemo, useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { Page } from '@prisma/client';
 import { pages as pagesSeed } from 'seedData';
-import { useLocalStorage } from './useLocalStorage';
+import charmClient from 'charmClient';
+import { useCurrentSpace } from './useCurrentSpace';
 
 type IContext = {
   currentPage: Page | null,
@@ -19,8 +20,18 @@ export const PagesContext = createContext<Readonly<IContext>>({
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
 
-  const [pages, setPages] = useLocalStorage<Page[]>('pages', pagesSeed);
-  const [currentPage, setCurrentPage] = useLocalStorage<Page | null>('currentPage', null);
+  const [space] = useCurrentSpace();
+  const [pages, setPages] = useState<Page[]>([]);
+  useEffect(() => {
+    if (space) {
+      setPages([]);
+      charmClient.getPages(space.id)
+        .then(_pages => {
+          setPages(_pages);
+        });
+    }
+  }, [space]);
+  const [currentPage, setCurrentPage] = useState<Page | null>(null);
 
   const value = useMemo(() => ({ currentPage, pages, setCurrentPage, setPages }), [currentPage, pages]);
 

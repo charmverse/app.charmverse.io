@@ -63,15 +63,6 @@ const WorkspaceLabel = styled.div`
   }
 `;
 
-const BountyLabel = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  cursor: pointer;
-  margin-top: 48px;
-`;
-
 const SidebarContainer = styled.div`
   display: flex;
   background-color: ${({ theme }) => theme.palette.sidebar.background};
@@ -229,7 +220,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         </Modal>
       </WorkspacesContainer>
       {space && (
-        <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
+        <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
           <Box sx={{ flexGrow: 1 }}>
             <Box sx={{ flexGrow: 1 }}>
               <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
