@@ -13,7 +13,7 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { useWeb3React } from '@web3-react/core';
+import Tooltip from '@mui/material/Tooltip';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
@@ -205,7 +205,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             <Grid item key={workspace.domain}>
               <AvatarLink href={`/${workspace.domain}`} passHref>
                 <MuiLink>
-                  <WorkspaceAvatar active={space?.domain === workspace.domain} name={workspace.name} />
+                  <Tooltip title={workspace.name} placement='right' arrow>
+                    <span>
+                      <WorkspaceAvatar active={space?.domain === workspace.domain} name={workspace.name} />
+                    </span>
+                  </Tooltip>
                 </MuiLink>
               </AvatarLink>
             </Grid>
