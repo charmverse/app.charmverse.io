@@ -8,6 +8,7 @@ import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
+import { shortenHex } from 'lib/strings';
 
 import gatesImage from 'public/images/artwork/gates.png';
 import rocketImage from 'public/images/artwork/rocket.png';
@@ -16,10 +17,6 @@ export const Content = styled(Box)`
   max-width: 100%;
   width: 1170px;
   margin: 0 auto;
-`;
-
-const AdventureContainer = styled.div`
-  text-align: center;
 `;
 
 export default function SignupPageContent () {
@@ -31,15 +28,15 @@ export default function SignupPageContent () {
   async function createAccount () {
     const newUser = await charmClient.createUser({ address: account! });
     setUser(newUser);
-    setTimeout(() => {
-      router.push('/createWorkspace');
-    }, 100);
+    router.push('/createWorkspace');
   }
+
+  const welcomeMessage = `Welcome, ${account ? shortenHex(account) : ''}!`;
 
   return (
     <Content px={3}>
       <Typography gutterBottom variant='h1' align='center'>
-        Welcome, stranger!
+        {welcomeMessage}
       </Typography>
       <Typography gutterBottom variant='h2' align='center'>
         Choose your adventure:

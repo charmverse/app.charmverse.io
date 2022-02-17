@@ -16,9 +16,7 @@ export default function CreateSpace () {
     const space = await charmClient.createSpace(newSpace);
 
     setSpaces([...spaces, space]);
-    // setTimeout(() => {
     router.push(`/${space.domain}`);
-    // }, 100);
   }
 
   return (
