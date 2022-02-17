@@ -25,4 +25,5 @@ export interface Bounty {
   rewardToken: CryptoCurrency;
   status: BountyStatus;
   title: string;
+  linkedTaskId: string;
 }
