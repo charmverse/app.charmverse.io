@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import BangleEditor from 'components/editor/BangleEditor'
+import CharmEditor from 'components/editor/CharmEditor'
 import React from 'react'
 import { IntlShape } from 'react-intl'
 import { Card } from '../../blocks/card'
@@ -151,7 +151,7 @@ const CardDetailContents = React.memo((props: Props) => {
     return (
         <div className='octo-content CardDetailContents'>
             <div className='octo-block'>
-                <BangleEditor />
+                <CharmEditor />
             </div>
         </div>
     )
