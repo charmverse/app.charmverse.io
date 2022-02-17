@@ -154,17 +154,35 @@ export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
 
   return (
     <Box style={{
-      margin: theme.spacing(3)
+      margin: theme.spacing(3, 0),
+      display: 'flex',
+      flexDirection: 'column'
     }}
     >
+      <Box sx={{
+        margin: theme.spacing(1, 0)
+      }}
+      >
+        <a
+          href={node.attrs.src}
+          rel='noopener noreferrer nofollow'
+          target='_blank'
+        >
+          {node.attrs.src}
+        </a>
+
+      </Box>
       <BlockAligner onDelete={() => {
         updateAttrs({
           src: null
         });
       }}
       >
-        <Resizer initialSize={250} maxSize={750} minSize={250}>
-          <StyledIFrame><iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} /></StyledIFrame>
+        <Resizer initialSize={1.77 * 250} maxSize={750} minSize={1.77 * 250} aspectRatio={1.77}>
+          <StyledIFrame>
+
+            <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+          </StyledIFrame>
         </Resizer>
       </BlockAligner>
     </Box>

@@ -9,6 +9,7 @@ interface ResizerProps {
   minSize: number
   children: ReactNode
   onResize?: ResizableProps['onResize']
+  aspectRatio?: number
 }
 
 export const StyledResizeHandle = styled(Box)`
@@ -34,7 +35,7 @@ export const StyledResizeHandle = styled(Box)`
 `;
 
 export default function Resizer (props: ResizerProps) {
-  const { onResize, initialSize, minSize, maxSize, children } = props;
+  const { onResize, initialSize, minSize, maxSize, children, aspectRatio = 1 } = props;
 
   return (
     <Box
@@ -50,7 +51,7 @@ export default function Resizer (props: ResizerProps) {
     >
       <ResizableBox
         onResize={onResize}
-        width={initialSize}
+        width={aspectRatio * initialSize}
         height={initialSize}
         resizeHandles={['w', 'e']}
         lockAspectRatio
