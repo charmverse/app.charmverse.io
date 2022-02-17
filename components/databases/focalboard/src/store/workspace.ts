@@ -3,7 +3,7 @@
 
 import {createSlice, createAsyncThunk, PayloadAction, createSelector} from '@reduxjs/toolkit'
 
-import {default as client} from '../octoClient'
+import {default as client} from 'charmClient'
 import {IWorkspace} from '../blocks/workspace'
 
 import {UserWorkspace} from '../user'

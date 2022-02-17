@@ -164,7 +164,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       type: 'page',
       ...page
     });
-    if (newPage.type === 'database') {
+    if (newPage.type === 'board') {
       await addBoardClicked(boardId => {
         newPage.boardId = boardId;
       }, intl);

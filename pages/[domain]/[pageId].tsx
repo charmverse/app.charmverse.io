@@ -32,7 +32,7 @@ export default function BlocksEditorPage () {
   if (!pageByPath) {
     return null;
   }
-  else if (pageByPath.type === 'database') {
+  else if (pageByPath.type === 'board') {
     return <DatabaseEditor page={pageByPath} setPage={setPage} />;
   }
   else {

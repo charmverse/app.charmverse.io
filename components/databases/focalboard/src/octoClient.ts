@@ -9,7 +9,6 @@ import {Utils} from './utils'
 import {ClientConfig} from './config/clientConfig'
 import {UserSettings} from './userSettings'
 import {Subscription} from './wsclient'
-import { getDatabaseBlocks } from 'hooks/useDatabaseBlocks'
 
 //
 // OctoClient is the client interface to the server APIs
@@ -36,13 +35,6 @@ class OctoClient {
         return baseURL
     }
 
-    get token(): string {
-        return localStorage.getItem('focalboardSessionId') || ''
-    }
-    set token(value: string) {
-        localStorage.setItem('focalboardSessionId', value)
-    }
-
     constructor(serverUrl?: string, public workspaceId = '0') {
         this.serverUrl = serverUrl
     }
@@ -55,40 +47,6 @@ class OctoClient {
         } catch {
             return defaultValue
         }
-    }
-
-    async login(username: string, password: string): Promise<boolean> {
-        const path = '/api/focalboard/login'
-        const body = JSON.stringify({username, password, type: 'normal'})
-        const response = await fetch(this.getBaseURL() + path, {
-            method: 'POST',
-            headers: this.headers(),
-            body,
-        })
-        if (response.status !== 200) {
-            return false
-        }
-
-        const responseJson = (await this.getJson(response, {})) as {token?: string}
-        if (responseJson.token) {
-            localStorage.setItem('focalboardSessionId', responseJson.token)
-            return true
-        }
-        return false
-    }
-
-    async logout(): Promise<boolean> {
-        const path = '/api/focalboard/logout'
-        const response = await fetch(this.getBaseURL() + path, {
-            method: 'POST',
-            headers: this.headers(),
-        })
-        localStorage.removeItem('focalboardSessionId')
-
-        if (response.status !== 200) {
-            return false
-        }
-        return true
     }
 
     async getClientConfig(): Promise<ClientConfig | null> {
@@ -133,7 +91,6 @@ class OctoClient {
         return {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            Authorization: this.token ? 'Bearer ' + this.token : '',
             'X-Requested-With': 'XMLHttpRequest',
         }
     }
@@ -211,51 +168,6 @@ class OctoClient {
         })
     }
 
-    async getBlocksWithParent(parentId: string, type?: string): Promise<Block[]> {
-        let path: string
-        if (type) {
-            path = this.workspacePath() + `/blocks?parent_id=${encodeURIComponent(parentId)}&type=${encodeURIComponent(type)}`
-        } else {
-            path = this.workspacePath() + `/blocks?parent_id=${encodeURIComponent(parentId)}`
-        }
-        return this.getBlocksWithPath(path)
-    }
-
-    async getBlocksWithType(type: string): Promise<Block[]> {
-        const path = this.workspacePath() + `/blocks?type=${encodeURIComponent(type)}`
-        return this.getBlocksWithPath(path)
-    }
-
-    async getBlocksWithBlockID(blockID: string, workspaceID?: string, optionalReadToken?: string): Promise<Block[]> {
-        let path = this.workspacePath(workspaceID) + `/blocks?block_id=${blockID}`
-        const readToken = optionalReadToken || Utils.getReadToken()
-        if (readToken) {
-            path += `&read_token=${readToken}`
-        }
-        return this.getBlocksWithPath(path)
-    }
-
-    async getAllBlocks(): Promise<Block[]> {
-        const path = this.workspacePath() + '/blocks?all=true'
-        return this.getBlocksWithPath(path)
-    }
-
-    private async getBlocksWithPath(path: string): Promise<Block[]> {
-        const response = await fetch(this.getBaseURL() + path, {headers: this.headers()})
-        if (response.status !== 200) {
-            return []
-        }
-        const blocks = (await this.getJson(response, [])) as Block[]
-        try {
-            const blocks2 = getDatabaseBlocks();
-            return this.fixBlocks(blocks2)
-        }
-        catch (e) {
-            console.log('error', e);
-        }
-        return this.fixBlocks(blocks)
-    }
-
     fixBlocks(blocks: Block[]): Block[] {
         if (!blocks) {
             return []
@@ -265,38 +177,6 @@ class OctoClient {
         const fixedBlocks = OctoUtils.hydrateBlocks(blocks)
 
         return fixedBlocks
-    }
-
-    async patchBlock(blockId: string, blockPatch: BlockPatch): Promise<Response> {
-        Utils.log(`patchBlock: ${blockId} block`)
-        const body = JSON.stringify(blockPatch)
-        return fetch(this.getBaseURL() + this.workspacePath() + '/blocks/' + blockId, {
-            method: 'PATCH',
-            headers: this.headers(),
-            body,
-        })
-    }
-
-    async patchBlocks(blocks: Block[], blockPatches: BlockPatch[]): Promise<Response> {
-        Utils.log(`patchBlocks: ${blocks.length} blocks`)
-        const blockIds = blocks.map((block) => block.id)
-        const body = JSON.stringify({block_ids: blockIds, block_patches: blockPatches})
-
-        const path = this.getBaseURL() + this.workspacePath() + '/blocks'
-        const response = fetch(path, {
-            method: 'PATCH',
-            headers: this.headers(),
-            body,
-        })
-        return response
-    }
-
-    async deleteBlock(blockId: string): Promise<Response> {
-        Utils.log(`deleteBlock: ${blockId}`)
-        return fetch(this.getBaseURL() + this.workspacePath() + `/blocks/${encodeURIComponent(blockId)}`, {
-            method: 'DELETE',
-            headers: this.headers(),
-        })
     }
 
     async followBlock(blockId: string, blockType: string, userId: string): Promise<Response> {
@@ -319,23 +199,6 @@ class OctoClient {
         return fetch(this.getBaseURL() + `/api/focalboard/workspaces/${this.workspaceId}/subscriptions/${blockId}/${userId}`, {
             method: 'DELETE',
             headers: this.headers(),
-        })
-    }
-
-    async insertBlock(block: Block): Promise<Response> {
-        return this.insertBlocks([block])
-    }
-
-    async insertBlocks(blocks: Block[]): Promise<Response> {
-        Utils.log(`insertBlocks: ${blocks.length} blocks(s)`)
-        blocks.forEach((block) => {
-            Utils.log(`\t ${block.type}, ${block.id}, ${block.title?.substr(0, 50) || ''}`)
-        })
-        const body = JSON.stringify(blocks)
-        return fetch(this.getBaseURL() + this.workspacePath() + '/blocks', {
-            method: 'POST',
-            headers: this.headers(),
-            body,
         })
     }
 
@@ -370,16 +233,6 @@ class OctoClient {
     }
 
     // Workspace
-
-    async getWorkspace(): Promise<IWorkspace | undefined> {
-        const path = this.workspacePath()
-        const response = await fetch(this.getBaseURL() + path, {headers: this.headers()})
-        if (response.status !== 200) {
-            return undefined
-        }
-        const workspace = (await this.getJson(response, undefined)) as IWorkspace
-        return workspace
-    }
 
     async regenerateWorkspaceSignupToken(): Promise<boolean> {
         const path = this.workspacePath() + '/regenerate_signup_token'
@@ -447,28 +300,9 @@ class OctoClient {
         return URL.createObjectURL(blob)
     }
 
-    async getWorkspaceUsers(): Promise<IUser[]> {
-        const path = this.workspacePath() + '/users'
-        const response = await fetch(this.getBaseURL() + path, {headers: this.headers()})
-        if (response.status !== 200) {
-            return []
-        }
-        return (await this.getJson(response, [])) as IUser[]
-    }
-
-    async getUserWorkspaces(): Promise<UserWorkspace[]> {
-        const path = '/api/focalboard/workspaces'
-        const response = await fetch(this.getBaseURL() + path, {headers: this.headers()})
-        if (response.status !== 200) {
-            return []
-        }
-
-        return (await this.getJson(response, [])) as UserWorkspace[]
-    }
-
     async getGlobalTemplates(): Promise<Block[]> {
-        const path = this.workspacePath('0') + '/blocks?type=board'
-        return this.getBlocksWithPath(path)
+        // const path = this.workspacePath('0') + '/blocks?type=board'
+        return [];
     }
 
     async getUserBlockSubscriptions(userId: string): Promise<Array<Subscription>> {

@@ -206,7 +206,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
           <PageLink
             href={href}
             label={label}
-            labelIcon={labelIcon || (pageType === 'database' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
+            labelIcon={labelIcon || (pageType === 'board' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
           >
             <div className='page-actions'>
               <IconButton size='small' onClick={showMenu}>

@@ -89,7 +89,7 @@ export default function WorkspaceSettings () {
             <PrimaryButton disabled={!isDirty} type='submit'>
               Save
             </PrimaryButton>
-            <Button disabled={spaces.length === 1} variant='outlined' color='error' onClick={deleteWorkspace}>
+            <Button variant='outlined' color='error' onClick={deleteWorkspace}>
               Delete Workspace
             </Button>
           </Grid>

@@ -29,19 +29,3 @@ export interface PageContent {
   attrs?: Record<string, any>
   marks?: PageMark[]
 }
-
-// export interface Page {
-//   id: string;
-//   title: string;
-//   content: PageContent;
-//   databaseId?: string; // required for type: 'database'
-//   created: Date;
-//   headerImage?: string;
-//   icon?: string;
-//   isPublic: boolean;
-//   path: string;
-//   parentId: string | null;
-//   spaceId: string;
-//   type: 'page' | 'board';
-//   updated?: Date;
-// }

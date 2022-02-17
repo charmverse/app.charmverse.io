@@ -10,13 +10,13 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).delete(deleteBlock);
 
-async function deleteBlock (req: NextApiRequest, res: NextApiResponse) {
-  await prisma.block.delete({
+async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block>) {
+  const deleted = await prisma.block.delete({
     where: {
       id: req.query.id as string
     }
   });
-  return res.status(200).json({ ok: true });
+  return res.status(200).json(deleted);
 }
 
 export default withSessionRoute(handler);
