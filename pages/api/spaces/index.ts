@@ -12,7 +12,15 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(getSpaces).post(createSpace);
 
 async function getSpaces (req: NextApiRequest, res: NextApiResponse<Space[]>) {
-  const spaces = await prisma.space.findMany({ where: { createdBy: req.session.user.id } });
+  const spaceRoles = await prisma.spaceRole.findMany({
+    where: {
+      userId: req.session.user.id
+    },
+    include: {
+      space: true
+    }
+  });
+  const spaces = spaceRoles.map(sr => sr.space);
   return res.status(200).json(spaces);
 }
 

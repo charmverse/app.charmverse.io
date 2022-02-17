@@ -34,11 +34,12 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
+  defaultValues?: { name: string, domain: string };
   onCancel?: () => void;
   onSubmit: (values: Prisma.SpaceCreateInput) => void;
 }
 
-export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Props) {
+export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel }: Props) {
 
   const [user] = useUser();
 
@@ -51,10 +52,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
     watch,
     formState: { errors, touchedFields }
   } = useForm<FormValues>({
-    defaultValues: {
-      name: defaultName,
-      domain: getDomainFromName(defaultName)
-    },
+    defaultValues,
     resolver: yupResolver(schema)
   });
 
@@ -74,7 +72,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
         updatedBy: user!.id,
         permissions: {
           create: [{
-            role: 'owner',
+            role: 'admin',
             user: {
               connect: {
                 id: user!.id
@@ -114,6 +112,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
             {...register('name', {
               onChange: onChangeName
             })}
+            autoFocus
             fullWidth
             error={!!errors.name}
             helperText={errors.name?.message}
@@ -139,6 +138,6 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
 
 }
 
-function getDomainFromName (name: string) {
+export function getDomainFromName (name: string) {
   return name.replace(/[\p{P}\p{S}]/gu, '').replace(/\s/g, '-').toLowerCase();
 }
