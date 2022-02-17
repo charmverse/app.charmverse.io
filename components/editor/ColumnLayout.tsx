@@ -18,7 +18,7 @@ function specFactory (): RawSpecs {
       draggable: false,
       parseDOM: [{ tag: 'div' }],
       toDOM: (): DOMOutputSpec => {
-        return ['div', 0];
+        return ['div', { class: 'column-layout' }];
       }
     }
   };
