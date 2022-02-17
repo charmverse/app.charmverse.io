@@ -28,7 +28,7 @@ export const pasteImagePlugin = new Plugin({
 
       if ((contentRow?.text as string)?.startsWith('http')) {
         const embedUrl = contentRow.text.split('.');
-        if (embedUrl[embedUrl.length - 1].match(/(jpeg|jpg|png|webp)/)) {
+        if (embedUrl[embedUrl.length - 1].match(/(jpeg|jpg|png|webp|gif)/)) {
           insertImageNode(view.state, view.dispatch, view, { src: contentRow.text });
           return true;
         }
@@ -92,6 +92,8 @@ const StyledImage = styled.img`
 `;
 
 export function Image ({ node, updateAttrs }: NodeViewProps) {
+  const theme = useTheme();
+
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -107,19 +109,38 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
   }
 
   return (
-    <BlockAligner onDelete={() => {
-      updateAttrs({
-        src: null
-      });
+    <Box style={{
+      margin: theme.spacing(3, 0),
+      display: 'flex',
+      flexDirection: 'column'
     }}
     >
-      <Resizer initialSize={MIN_IMAGE_SIZE} maxSize={MAX_IMAGE_SIZE} minSize={MIN_IMAGE_SIZE}>
-        <StyledImage
-          draggable={false}
-          src={node.attrs.src}
-          alt={node.attrs.alt}
-        />
-      </Resizer>
-    </BlockAligner>
+      <Box sx={{
+        margin: theme.spacing(1, 0)
+      }}
+      >
+        <a
+          href={node.attrs.src}
+          rel='noopener noreferrer nofollow'
+          target='_blank'
+        >
+          {node.attrs.src}
+        </a>
+      </Box>
+      <BlockAligner onDelete={() => {
+        updateAttrs({
+          src: null
+        });
+      }}
+      >
+        <Resizer initialSize={MIN_IMAGE_SIZE} maxSize={MAX_IMAGE_SIZE} minSize={MIN_IMAGE_SIZE}>
+          <StyledImage
+            draggable={false}
+            src={node.attrs.src}
+            alt={node.attrs.alt}
+          />
+        </Resizer>
+      </BlockAligner>
+    </Box>
   );
 }
