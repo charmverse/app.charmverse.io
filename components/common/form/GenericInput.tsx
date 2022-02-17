@@ -18,13 +18,13 @@ type FieldType = NativeHtmlInputType | CustomInputType;
 export interface IInputField<T = any> {
   fieldType: FieldType;
   modelKey: keyof T;
+  value?: any;
   placeholder?: string;
   required?: boolean;
   label?: string;
 }
 
 export interface IGenericInputConfiguration<T = any> {
-  key: string
   fieldConfig: IInputField,
   register: UseFormRegister<T>
 }
@@ -38,7 +38,9 @@ export function GenericInput<T = any> ({ register, fieldConfig }: IGenericInputC
     case 'text':
       return (
         <TextField
-          {...register(fieldConfig.modelKey as Path<T>)}
+          {...register(fieldConfig.modelKey as Path<T>, {
+            value: fieldConfig.value ?? ''
+          })}
           fullWidth
           placeholder={fieldConfig.placeholder}
           variant='outlined'
@@ -58,29 +60,6 @@ export function GenericInput<T = any> ({ register, fieldConfig }: IGenericInputC
         />
       );
 
-      /*
-    case 'charmEditor':
-      return (
-        <Controller
-          control={control}
-          name={fieldConfig.modelKey as string}
-          // eslint-disable-next-line react/no-unstable-nested-components
-          render={({ field: { onChange } }) => (
-            <>
-              <InputLabel>{fieldConfig.label ?? 'Charmverse editor'}</InputLabel>
-              <Typography paragraph={true}></Typography>
-              <BangleEditor
-                onPageContentChange={(data) => {
-                  ref(data);
-                  inputRef.current = data;
-                }}
-              />
-            </>
-          )}
-        />
-      );
-    */
-
     case 'collaborators':
       return (
         <>
@@ -96,7 +75,9 @@ export function GenericInput<T = any> ({ register, fieldConfig }: IGenericInputC
             {fieldConfig.label ?? 'Amount'}
           </InputLabel>
           <TextField
-            {...register(fieldConfig.modelKey as Path<T>)}
+            {...register(fieldConfig.modelKey as Path<T>, {
+              valueAsNumber: true
+            })}
             fullWidth
             inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
           />

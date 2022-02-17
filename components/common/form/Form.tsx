@@ -16,9 +16,10 @@ import { PageContent } from 'models';
 
 import BangleEditor from 'components/editor/BangleEditor';
 import { useRef } from 'react';
+import { v4 } from 'uuid';
 import { GenericInput, IInputField } from './GenericInput';
 
-type FormMode = 'create' | 'update';
+export type FormMode = 'create' | 'update';
 
 export interface ICompositeFormInput<T = any> {
   onSubmit: (values: T) => any
@@ -41,29 +42,27 @@ export function CompositeForm ({ onSubmit, fields, mode, submitLabel }: IComposi
     formState: { errors }
   } = useForm();
 
-  const formValue = watch();
-
-  function submitForm (values) {
-    console.log('Values', values);
-  }
+  // const formValue = watch();
 
   return (
 
     <>
+      {/* TODO - Delete later. Keep this for now
       <p>
         Renders
         {' '}
         {renders.current}
       </p>
+ */}
 
       <Grid container direction='row' rowSpacing={2}>
-        <form onSubmit={handleSubmit(submitForm)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
 
           {
         fields.map(field => {
           return (
-            <Grid item sx={{ marginTop: '10px' }}>
-              <GenericInput key={field.modelKey as string} register={register} fieldConfig={field} />
+            <Grid key={field.modelKey as string + v4()} item sx={{ marginTop: '10px' }}>
+              <GenericInput register={register} fieldConfig={field} />
             </Grid>
           );
         })
@@ -72,62 +71,6 @@ export function CompositeForm ({ onSubmit, fields, mode, submitLabel }: IComposi
           <PrimaryButton type='submit'>
             {submitLabel ?? (mode === 'update' ? 'Update' : 'Create')}
           </PrimaryButton>
-
-          {/*
-      <Grid container direction='column' spacing={3}>
-        <Grid item>
-          <TextField
-            {...register('title')}
-            fullWidth
-            error={!!errors.title}
-            placeholder='Bounty title'
-            helperText={errors.title?.message}
-            variant='outlined'
-          />
-        </Grid>
-
-        <Grid item>
-          <Grid container direction='row' alignItems='center'>
-            <Grid item xs={6}>
-              <Typography>Status</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Select
-                labelId='select-type'
-                id='select-type'
-                variant='standard'
-                label='type'
-              >
-                <MenuItem value='pending'>
-                  <Chip label='Not Started' color='primary' />
-                </MenuItem>
-                <MenuItem value='in-progress'>
-                  <Chip label='In Progress' color='secondary' />
-                </MenuItem>
-                <MenuItem value='done'>
-                  <Chip label='Done' color='secondary' />
-                </MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item>
-          <BangleEditor />
-        </Grid>
-
-        <Grid item>
-          <Box display='flex' justifyContent='flex-end'>
-            <PrimaryButton type='submit'>
-              Set bounty
-            </PrimaryButton>
-          </Box>
-
-        </Grid>
-      </Grid>
-
-      */
-    }
 
         </form>
       </Grid>
