@@ -23,11 +23,11 @@ class CharmClient {
   }
 
   getUser () {
-    return http.GET<LoggedInUser>('/api/session/profile');
+    return http.GET<LoggedInUser>('/api/profile');
   }
 
   createUser ({ address }: { address: string }) {
-    return http.POST<LoggedInUser>('/api/session/profile', {
+    return http.POST<LoggedInUser>('/api/profile', {
       address
     });
   }
@@ -81,6 +81,14 @@ class CharmClient {
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
     return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
+  }
+
+  favoritePage (pageId: string) {
+    return http.POST('/api/profile/favorites', { pageId });
+  }
+
+  unfavoritePage (pageId: string) {
+    return http.DELETE('/api/profile/favorites', { pageId });
   }
 
   getContributors (spaceId: string) {

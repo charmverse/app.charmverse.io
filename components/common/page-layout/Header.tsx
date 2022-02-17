@@ -14,6 +14,7 @@ import { useColorMode } from 'context/color-mode';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
+import charmClient from 'charmClient';
 
 export const headerHeight = 56;
 
@@ -35,15 +36,13 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
   const isPage = router.route.includes('pageId');
 
-  function toggleFavorite () {
+  async function toggleFavorite () {
     if (!currentPage || !user) return;
     const pageId = currentPage.id;
-    setUser({
-      ...user,
-      favorites: isFavorite
-        ? user.favorites.filter(page => page.pageId !== pageId)
-        : [...user.favorites, { pageId: currentPage.id, userId: '' }]
-    });
+    const newUser = isFavorite
+      ? await charmClient.unfavoritePage(pageId)
+      : await charmClient.favoritePage(pageId);
+    setUser(newUser);
   }
 
   return (
