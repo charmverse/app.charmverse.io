@@ -56,19 +56,24 @@ export function CompositeForm ({ onSubmit, fields, mode, submitLabel }: IComposi
         {renders.current}
       </p>
 
-      <form onSubmit={handleSubmit(submitForm)}>
+      <Grid container direction='row' rowSpacing={2}>
+        <form onSubmit={handleSubmit(submitForm)}>
 
-        {
+          {
         fields.map(field => {
-          return <GenericInput key={field.modelKey as string} register={register} fieldConfig={field} />;
+          return (
+            <Grid item sx={{ marginTop: '10px' }}>
+              <GenericInput key={field.modelKey as string} register={register} fieldConfig={field} />
+            </Grid>
+          );
         })
       }
 
-        <PrimaryButton type='submit'>
-          {submitLabel ?? (mode === 'update' ? 'Update' : 'Create')}
-        </PrimaryButton>
+          <PrimaryButton type='submit'>
+            {submitLabel ?? (mode === 'update' ? 'Update' : 'Create')}
+          </PrimaryButton>
 
-        {/*
+          {/*
       <Grid container direction='column' spacing={3}>
         <Grid item>
           <TextField
@@ -124,7 +129,8 @@ export function CompositeForm ({ onSubmit, fields, mode, submitLabel }: IComposi
       */
     }
 
-      </form>
+        </form>
+      </Grid>
     </>
   );
 
