@@ -29,8 +29,14 @@ const AdventureCard = styled(Card)`
   height: 100%;
   padding: ${({ theme }) => theme.spacing(6)};
   &:hover {
-    box-shadow: ${({ theme }) => theme.shadows[15]};
+    box-shadow: ${({ theme }) => theme.shadows[12]};
   }
+`;
+
+const ImageContainer = styled.div`
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
 `;
 
 export default function SignupPageContent () {
@@ -49,16 +55,20 @@ export default function SignupPageContent () {
 
   return (
     <Content px={3}>
-      <Typography gutterBottom variant='h1' align='center'>
-        {welcomeMessage}
-      </Typography>
-      <Typography gutterBottom variant='h2' align='center'>
-        Choose your adventure:
-      </Typography>
-      <Grid container sx={{ mt: 10 }} columnSpacing={6}>
+      <Box my={10}>
+        <Typography gutterBottom variant='h1' align='center'>
+          {welcomeMessage}
+        </Typography>
+        <Typography variant='h2' align='center'>
+          Choose your adventure:
+        </Typography>
+      </Box>
+      <Grid container spacing={6}>
         <Grid item xs>
           <AdventureCard onClick={createAccount}>
-            <Image mb={3} src={rocketImage} />
+            <ImageContainer>
+              <Image src={rocketImage} />
+            </ImageContainer>
             <PrimaryButton size='large'>
               Create a new workspace
             </PrimaryButton>
@@ -66,7 +76,9 @@ export default function SignupPageContent () {
         </Grid>
         <Grid item xs>
           <AdventureCard>
-            <Image mb={3} src={gatesImage} />
+            <ImageContainer>
+              <Image mb={3} src={gatesImage} />
+            </ImageContainer>
             <PrimaryButton size='large'>
               Join an existing workspace
             </PrimaryButton>
