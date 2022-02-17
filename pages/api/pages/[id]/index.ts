@@ -23,7 +23,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<Page>) {
 
 async function deletePage (req: NextApiRequest, res: NextApiResponse) {
 
-  await prisma.space.delete({
+  await prisma.page.delete({
     where: {
       id: req.query.id as string
     }

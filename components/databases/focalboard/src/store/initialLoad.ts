@@ -4,7 +4,7 @@
 import {createAsyncThunk, createSelector} from '@reduxjs/toolkit'
 
 import {default as client} from '../octoClient'
-import charmClient from '../../../charmFocalBoardClient'
+import charmClient from 'charmClient'
 
 import {Subscription} from '../wsclient'
 

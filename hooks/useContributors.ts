@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Contributor } from 'models';
-import { users } from 'seedData';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from './useCurrentSpace';
 

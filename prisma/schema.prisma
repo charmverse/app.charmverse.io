@@ -55,7 +55,7 @@ model Block {
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   createdBy String    @db.Uuid
-  User      User      @relation(fields: [createdBy], references: [id])
+  user      User      @relation(fields: [createdBy], references: [id])
   updatedAt DateTime
   updatedBy String    @db.Uuid
   spaceId   String    @db.Uuid

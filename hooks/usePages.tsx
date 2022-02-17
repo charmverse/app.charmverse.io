@@ -1,6 +1,5 @@
 import { ReactNode, createContext, useContext, useMemo, useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { Page } from '@prisma/client';
-import { pages as pagesSeed } from 'seedData';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from './useCurrentSpace';
 

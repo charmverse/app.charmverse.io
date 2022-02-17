@@ -23,7 +23,6 @@ import { shortenHex } from 'lib/strings';
 import { LoggedInUser, Page, Space } from 'models';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { pages as seedPages } from 'seedData';
 import { greyColor2 } from 'theme/colors';
 import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
 import mutator from 'components/databases/focalboard/src//mutator';
@@ -176,9 +175,12 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     router.push(`/${_space.domain}/${newPage.path}`);
   }
 
-  function deletePage (pageId: string) {
+  async function deletePage (pageId: string) {
     const page = pages.find(p => p.id === pageId);
     const newPages = pages.filter(p => p.id !== pageId);
+    if (page) {
+      await charmClient.deletePage(page.id);
+    }
     setPages(newPages);
     if (page?.boardId) {
       const board = boards.find(b => b.id === page.boardId);

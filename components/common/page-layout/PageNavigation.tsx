@@ -138,14 +138,6 @@ export const PageTitle = styled(Typography)<{isempty: number}>`
   width: calc(80%); // hack to get ellipsis to appear
 `;
 
-type TreeItemProps = ComponentProps<typeof TreeItem> & {
-  href: string;
-  pageType: 'database' | 'page';
-  labelIcon?: string;
-  addSubPage?: (page: Partial<Page>) => void;
-  deletePage?: () => void;
-}
-
 interface PageLinkProps {
   children?: ReactNode;
   href: string;

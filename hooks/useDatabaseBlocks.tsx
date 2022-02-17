@@ -1,5 +1,4 @@
 import { ReactNode, createContext, useContext, useMemo, Dispatch, SetStateAction } from 'react';
-import { Page } from 'models';
 import { blocks as blocksSeed } from 'seedData';
 import { Block } from 'components/databases/focalboard/src/blocks/block';
 import { useLocalStorage, getStorageValue } from './useLocalStorage';
