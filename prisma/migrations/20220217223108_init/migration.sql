@@ -1,3 +1,12 @@
+-- CreateEnum
+CREATE TYPE "PageType" AS ENUM ('board', 'page');
+
+-- CreateEnum
+CREATE TYPE "PermissionLevel" AS ENUM ('full_access', 'editor', 'view_comment', 'view');
+
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('admin', 'contributor');
+
 -- CreateTable
 CREATE TABLE "Space" (
     "id" UUID NOT NULL,
@@ -18,18 +27,18 @@ CREATE TABLE "Page" (
     "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" UUID NOT NULL,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedBy" UUID NOT NULL,
     "title" TEXT NOT NULL,
     "content" JSONB,
     "contentText" TEXT NOT NULL,
     "headerImage" TEXT,
     "icon" TEXT,
-    "isPublic" BOOLEAN NOT NULL,
+    "isPublic" BOOLEAN NOT NULL DEFAULT false,
     "path" TEXT NOT NULL,
     "parentId" UUID,
     "spaceId" UUID,
-    "type" TEXT NOT NULL,
+    "type" "PageType" NOT NULL,
     "boardId" UUID,
 
     CONSTRAINT "Page_pkey" PRIMARY KEY ("id")
@@ -41,7 +50,7 @@ CREATE TABLE "Block" (
     "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" UUID NOT NULL,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedBy" UUID NOT NULL,
     "spaceId" UUID NOT NULL,
     "parentId" TEXT NOT NULL,
@@ -58,9 +67,8 @@ CREATE TABLE "Block" (
 CREATE TABLE "User" (
     "id" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3),
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "addresses" TEXT[],
-    "discordId" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -73,23 +81,20 @@ CREATE TABLE "FavoritePage" (
 
 -- CreateTable
 CREATE TABLE "PagePermission" (
-    "level" TEXT NOT NULL,
+    "level" "PermissionLevel" NOT NULL,
     "pageId" UUID NOT NULL,
     "userId" UUID NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "SpaceRole" (
-    "role" TEXT NOT NULL,
+    "role" "Role" NOT NULL DEFAULT E'contributor',
     "spaceId" UUID NOT NULL,
     "userId" UUID NOT NULL
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Space_domain_key" ON "Space"("domain");
-
--- CreateIndex
-CREATE UNIQUE INDEX "User_discordId_key" ON "User"("discordId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "FavoritePage_pageId_userId_key" ON "FavoritePage"("pageId", "userId");
@@ -104,16 +109,16 @@ CREATE UNIQUE INDEX "SpaceRole_spaceId_userId_key" ON "SpaceRole"("spaceId", "us
 ALTER TABLE "Space" ADD CONSTRAINT "Space_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Page" ADD CONSTRAINT "Page_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Page" ADD CONSTRAINT "Page_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Block" ADD CONSTRAINT "Block_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Page" ADD CONSTRAINT "Page_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Block" ADD CONSTRAINT "Block_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Block" ADD CONSTRAINT "Block_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FavoritePage" ADD CONSTRAINT "FavoritePage_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "Page"("id") ON DELETE CASCADE ON UPDATE CASCADE;

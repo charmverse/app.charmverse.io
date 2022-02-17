@@ -90,7 +90,6 @@ model User {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @default(now())
   addresses       String[]
-  discordId       String?          @unique
   spaceRoles      SpaceRole[]
   favorites       FavoritePage[]
   pagePermissions PagePermission[]
