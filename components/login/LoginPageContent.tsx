@@ -2,21 +2,17 @@ import { useContext } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Image from 'next/image';
+import Image from 'components/common/Image';
 import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 
-import splashImage from 'public/images/charmverse_world.png';
+import splashImage from 'public/images/artwork/world.png';
 
 export const Container = styled(Box)`
   max-width: 100%;
   width: 1170px;
   margin: 0 auto;
-`;
-
-const ImageWrapper = styled(Box)`
-  ${({ theme }) => theme.palette.mode === 'dark' && 'filter: invert(100%);'}
 `;
 
 export default function LoginPageContent ({ account }: { account: string | null | undefined }) {
@@ -34,9 +30,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
           py={3}
           px={6}
         >
-          <ImageWrapper sx={{ maxWidth: 300 }}>
-            <Image src={splashImage} />
-          </ImageWrapper>
+          <Image sx={{ maxWidth: 300 }} src={splashImage} />
         </Grid>
         <Grid
           item
@@ -80,9 +74,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
           </Box>
         </Grid>
         <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>
-          <ImageWrapper px={3}>
-            <Image src={splashImage} />
-          </ImageWrapper>
+          <Image px={3} src={splashImage} />
         </Grid>
       </Grid>
     </Container>

@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import Image from 'next/image';
+import Image from 'components/common/Image';
+import Typography from '@mui/material/Typography';
 import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useWeb3React } from '@web3-react/core';
@@ -8,18 +9,17 @@ import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 
-import splashImage from 'public/images/charmverse_world.png';
+import gatesImage from 'public/images/artwork/gates.png';
+import rocketImage from 'public/images/artwork/rocket.png';
 
-export const Container = styled(Box)`
+export const Content = styled(Box)`
   max-width: 100%;
   width: 1170px;
   margin: 0 auto;
-  height: 400px;
-  align-items: center;
 `;
 
-const ImageWrapper = styled(Box)`
-  ${({ theme }) => theme.palette.mode === 'dark' && 'filter: invert(100%);'}
+const AdventureContainer = styled.div`
+  text-align: center;
 `;
 
 export default function SignupPageContent () {
@@ -37,23 +37,27 @@ export default function SignupPageContent () {
   }
 
   return (
-    <Container px={3}>
-      <Grid container spacing={10}>
-        <Grid item xs container alignItems='center'>
-          <Box display='flex' justifyContent='center'>
-            <PrimaryButton size='large' onClick={createAccount}>
-              Create a new workspace
-            </PrimaryButton>
-          </Box>
+    <Content px={3}>
+      <Typography gutterBottom variant='h1' align='center'>
+        Welcome, stranger!
+      </Typography>
+      <Typography gutterBottom variant='h2' align='center'>
+        Choose your adventure:
+      </Typography>
+      <Grid container sx={{ mt: 3 }}>
+        <Grid item xs container alignItems='center' justifyContent='flex-end' flexDirection='column'>
+          <Image mb={3} src={rocketImage} />
+          <PrimaryButton size='large' onClick={createAccount}>
+            Create a new workspace
+          </PrimaryButton>
         </Grid>
-        <Grid item xs alignItems='center'>
-          <Box display='flex' justifyContent='center'>
-            <PrimaryButton size='large'>
-              Join an existing workspace
-            </PrimaryButton>
-          </Box>
+        <Grid item xs container alignItems='center' justifyContent='flex-end' flexDirection='column'>
+          <Image mb={3} src={gatesImage} />
+          <PrimaryButton size='large'>
+            Join an existing workspace
+          </PrimaryButton>
         </Grid>
       </Grid>
-    </Container>
+    </Content>
   );
 }
