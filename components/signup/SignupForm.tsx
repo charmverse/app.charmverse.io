@@ -36,7 +36,8 @@ const AdventureCard = styled(Card)`
 const ImageContainer = styled.div`
   flex-grow: 1;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  margin-bottom: ${({ theme }) => theme.spacing(3)};
 `;
 
 export default function SignupPageContent () {
@@ -55,7 +56,7 @@ export default function SignupPageContent () {
 
   return (
     <Content px={3}>
-      <Box my={10}>
+      <Box my={6}>
         <Typography gutterBottom variant='h1' align='center'>
           {welcomeMessage}
         </Typography>
@@ -77,7 +78,7 @@ export default function SignupPageContent () {
         <Grid item xs>
           <AdventureCard>
             <ImageContainer>
-              <Image mb={3} src={gatesImage} />
+              <Image src={gatesImage} />
             </ImageContainer>
             <PrimaryButton size='large'>
               Join an existing workspace
