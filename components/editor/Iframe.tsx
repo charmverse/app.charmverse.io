@@ -24,14 +24,24 @@ export const iframePlugin = new Plugin({
       // @ts-ignore
       const contentRow = slice.content.content?.[0].content.content;
       const isIframeEmbed = contentRow?.[0]?.text.startsWith('<iframe ');
+      const isYoutubeLink = contentRow?.[0]
+        ?.text.match(/(?:https:\/\/www.youtube.com\/watch\?v=(.*)|https:\/\/youtu.be\/(.*))/);
+      let embedUrl: null | string = null;
 
-      if (isIframeEmbed) {
+      if (isYoutubeLink) {
+        /* eslint-disable-next-line */
+        embedUrl = `https://www.youtube.com/embed/${isYoutubeLink[1] ?? isYoutubeLink[2]}`;
+      }
+      else if (isIframeEmbed) {
         const urlContent = contentRow.find((row: any) => row.marks[0]?.type.name === 'link');
         if (urlContent) {
-          const embedUrl = urlContent.marks[0].attrs.href;
-          insertIframeNode(view.state, view.dispatch, view, { src: embedUrl });
-          return true;
+          embedUrl = urlContent.marks[0].attrs.href;
         }
+      }
+
+      if (embedUrl) {
+        insertIframeNode(view.state, view.dispatch, view, { src: embedUrl });
+        return true;
       }
       return false;
     }
@@ -127,6 +137,7 @@ const StyledIFrame = styled(Box)`
 `;
 
 export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
+  const theme = useTheme();
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -142,15 +153,20 @@ export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
   }
 
   return (
-    <BlockAligner onDelete={() => {
-      updateAttrs({
-        src: null
-      });
+    <Box style={{
+      margin: theme.spacing(3)
     }}
     >
-      <Resizer initialSize={250} maxSize={750} minSize={250}>
-        <StyledIFrame><iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} /></StyledIFrame>
-      </Resizer>
-    </BlockAligner>
+      <BlockAligner onDelete={() => {
+        updateAttrs({
+          src: null
+        });
+      }}
+      >
+        <Resizer initialSize={250} maxSize={750} minSize={250}>
+          <StyledIFrame><iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} /></StyledIFrame>
+        </Resizer>
+      </BlockAligner>
+    </Box>
   );
 }
