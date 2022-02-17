@@ -10,142 +10,82 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { PageContent } from 'models';
+import { CompositeForm } from 'components/common/form/Form';
 
 import BangleEditor, { IBangleEditorOutput } from 'components/editor/BangleEditor';
 import { Bounty as IBounty } from 'models/Bounty';
 
 import BountyService from './BountyService';
+import { IInputField } from '../common/form/GenericInput';
 
 interface IBountyEditorInput {
   onSubmit: () => any,
+  mode: 'create' | 'update'
   bounty?: IBounty
 }
 
-export function BountyEditor ({ onSubmit, bounty }: IBountyEditorInput) {
-
-  const bountyDescription: PageContent = {
-    type: 'doc'
-  };
-
-  let bangleContent: IBangleEditorOutput = {
-    doc: {
-      type: 'doc'
+function bountyEditorFields (): IInputField<IBounty> [] {
+  return [
+    {
+      fieldType: 'text',
+      modelKey: 'title',
+      label: 'Bounty title'
     },
-    rawText: ''
-  };
+    {
+      fieldType: 'task',
+      modelKey: 'linkedTaskId',
+      label: 'Linked task'
+    },
+    /*
+    {
+      fieldType: 'charmEditor',
+      modelKey: 'descriptionNodes'
+    },
 
-  function refreshBangleContent (content: IBangleEditorOutput) {
-    bangleContent = content;
-  }
+    {
+      fieldType: 'collaborators',
+      modelKey: 'reviewer'
+    },
+    {
+      fieldType: 'collaborators',
+      modelKey: 'assignee'
+    },
+    */
+    {
+      fieldType: 'number',
+      modelKey: 'rewardAmount'
+    },
+    {
+      fieldType: 'crypto',
+      modelKey: 'rewardToken'
+    }
+  ];
+}
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors }
-  } = useForm();
+export function BountyEditor ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
 
   async function createBounty (bountyToCreate: Partial<IBounty>) {
-    bountyToCreate.description = bangleContent.rawText;
-    bountyToCreate.descriptionNodes = bangleContent.doc;
+
     const created = await BountyService.createBounty(bountyToCreate);
     onSubmit();
+  }
+
+  async function updateBounty (bountyToCreate: Partial<IBounty>) {
+
+    const created = await BountyService.createBounty(bountyToCreate);
+    onSubmit();
+  }
+
+  function submitted (value: IBounty): void {
+
+    console.log('Submitted values', value);
   }
 
   return (
     <div>
       <h1>Bounty Editor</h1>
 
-      <form onSubmit={handleSubmit(values => createBounty(values))}>
-        <Grid container direction='column' spacing={3}>
-          <Grid item>
-            <TextField
-              {...register('title')}
-              fullWidth
-              error={!!errors.title}
-              placeholder='Bounty title'
-              helperText={errors.title?.message}
-              variant='outlined'
-            />
-          </Grid>
-
-          <Grid item>
-            <BangleEditor onPageContentChange={refreshBangleContent} />
-          </Grid>
-
-          <Grid item>
-            <FieldLabel>Reward</FieldLabel>
-            <Divider />
-            <Box>
-              <Grid container direction='row' alignItems='center' mt={1}>
-                <Grid item xs={6}>
-                  <Typography>Reviewer</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    {...register('reviewer')}
-                    fullWidth
-                    variant='outlined'
-                    error={!!errors?.reviewer}
-                  />
-                </Grid>
-              </Grid>
-              <Grid container direction='row' alignItems='center' mt={1}>
-                <Grid item xs={6}>
-                  <Typography>Assignee</Typography>
-                </Grid>
-
-                <Grid item xs={6}>
-                  <TextField
-                    {...register('assignee')}
-                    fullWidth
-                    variant='outlined'
-                    error={!!errors?.assignee}
-                  />
-                </Grid>
-              </Grid>
-
-              {/* Render Token Select
-              <Grid container direction='row' alignItems='center' mt={1}>
-                <Grid item xs={6}>
-                  <Typography>Token</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <InputSearchCrypto {...register('rewardToken')} defaultValue='ETH' onChange={() => {}} />
-                </Grid>
-              </Grid>
-              */}
-
-              {/* Render token amount */}
-              <Grid container direction='row' alignItems='center' mt={1}>
-                <Grid item xs={6}>
-                  <Typography>Amount</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    {...register('rewardAmount')}
-                    fullWidth
-                    variant='outlined'
-                    type='number'
-                    error={!!errors?.rewardAmount}
-                  />
-                </Grid>
-              </Grid>
-              <br />
-              <Divider />
-            </Box>
-          </Grid>
-          <Grid item>
-            <Box display='flex' justifyContent='flex-end'>
-              <PrimaryButton type='submit'>
-                Set bounty
-              </PrimaryButton>
-            </Box>
-          </Grid>
-        </Grid>
-
-      </form>
+      <CompositeForm onSubmit={submitted} fields={bountyEditorFields()} />
     </div>
   );
 }
