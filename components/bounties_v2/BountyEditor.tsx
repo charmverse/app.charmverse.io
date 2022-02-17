@@ -36,6 +36,11 @@ function bountyEditorFields (): IInputField<IBounty> [] {
       modelKey: 'linkedTaskId',
       label: 'Linked task'
     },
+    {
+      fieldType: 'textMultiline',
+      modelKey: 'description',
+      label: 'Extended bounty description'
+    },
     /*
     {
       fieldType: 'charmEditor',
