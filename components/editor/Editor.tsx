@@ -3,11 +3,13 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
 import { ListItem, ListItemProps } from '@mui/material';
 import Box from '@mui/material/Box';
+import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { Page, PageContent } from 'models';
-import React, { ReactNode } from 'react';
+import React, { ChangeEvent, ReactNode } from 'react';
 import CharmEditor from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
+import PageTitle from './Page/PageTitle';
 
 const Container = styled(Box)`
   width: 860px;
@@ -61,6 +63,35 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
     pageControlTop = 50;
   }
 
+  let pageTitleTop = 50; let bangleEditorTop = 75; let
+    pageIconTop = 50;
+
+  if (page) {
+    if (page.icon && !page.headerImage) {
+      pageTitleTop = 100;
+      bangleEditorTop = 125;
+      pageIconTop = -75;
+    }
+
+    if (!page.icon && page.headerImage) {
+      pageTitleTop = 50;
+    }
+
+    if (page.icon && page.headerImage) {
+      pageTitleTop = 50;
+      bangleEditorTop = 125;
+      pageIconTop = -60;
+    }
+  }
+
+  function updateTitle (event: ChangeEvent<HTMLInputElement>) {
+    setPage({ ...page, title: event.target.value });
+  }
+
+  function updatePageIcon (icon: string) {
+    setPage({ ...page, icon });
+  }
+
   return (
     <Box>
       <PageBanner page={page} setPage={setPage} />
@@ -98,7 +129,30 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
           )}
         </Controls>
 
-        <CharmEditor content={page.content as PageContent} page={page} setPage={setPage} />
+        <CharmEditor
+          style={{
+            top: bangleEditorTop
+          }}
+          content={page.content as PageContent}
+        >
+          {page?.icon && (
+          <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
+            <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+          </EmojiContainer>
+          )}
+          {page && (
+            <Box sx={{
+              position: 'absolute',
+              top: pageTitleTop
+            }}
+            >
+              <PageTitle
+                value={page.title}
+                onChange={updateTitle}
+              />
+            </Box>
+          )}
+        </CharmEditor>
       </Container>
     </Box>
   );
