@@ -35,10 +35,10 @@ import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
-import { Image } from './Image';
+import IFrame, { iframePlugin, iframeSpec } from './Iframe';
+import { Image, pasteImagePlugin } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import PageTitle from './Page/PageTitle';
-import Video, { videoSpec } from './Video';
 
 export interface IBangleEditorOutput {
   doc: PageContent,
@@ -60,7 +60,7 @@ const specRegistry = new SpecRegistry([
   emojiSpecs(),
   code.spec(),
   codeBlock.spec(),
-  videoSpec(),
+  iframeSpec(),
   heading.spec(),
   inlinePaletteSpecs(),
   table,
@@ -224,9 +224,11 @@ export default function BangleEditor (
         containerDOM: ['div']
       }),
       NodeView.createPlugin({
-        name: 'video',
-        containerDOM: ['div']
-      })
+        name: 'iframe',
+        containerDOM: ['div', { class: 'iframe-container' }]
+      }),
+      iframePlugin,
+      pasteImagePlugin
     ],
     initialValue: Node.fromJSON(specRegistry.schema, content),
     // hide the black bar when dragging items - we dont even support dragging most components
@@ -314,11 +316,11 @@ export default function BangleEditor (
               </Image>
             );
           }
-          case 'video': {
+          case 'iframe': {
             return (
-              <Video {...props}>
+              <IFrame {...props}>
                 {children}
-              </Video>
+              </IFrame>
             );
           }
           default: {

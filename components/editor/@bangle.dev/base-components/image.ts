@@ -44,7 +44,7 @@ function specFactory(): RawSpecs {
         }
       },
       group: 'inline',
-      draggable: true,
+      draggable: false,
       parseDOM: [
         {
           tag: 'img[src]',
@@ -138,7 +138,7 @@ function pluginsFactory({
                 return true;
               },
             },
-            
+
             handlePaste: (view, rawEvent) => {
               const event = rawEvent;
               if (!event.clipboardData) {
