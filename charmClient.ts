@@ -200,8 +200,8 @@ class CharmClient {
     });
     deletedFields.forEach(field => delete fbBlockInput.fields[field]);
     const blockInput = this.fbBlockToBlock(fbBlockInput);
-    const updatedBlock = await http.PUT<Block>('/api/blocks', [blockInput]);
-    const fbBlock = this.blockToFBBlock(updatedBlock);
+    const updatedBlocks = await http.PUT<Block[]>('/api/blocks', [blockInput]);
+    const fbBlock = this.blockToFBBlock(updatedBlocks[0]);
     updater([fbBlock]);
   }
 
