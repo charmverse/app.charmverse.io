@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import BangleEditor from 'components/editor/BangleEditor'
+import CharmEditor from 'components/editor/CharmEditor'
 import { Page } from 'models'
 import React, { useCallback, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -99,7 +99,7 @@ const ViewTitle = React.memo((props: Props) => {
 
             {board.fields.showDescription &&
                 <div className='description'>
-                    <BangleEditor />
+                    <CharmEditor />
                 </div>
             }
         </div>

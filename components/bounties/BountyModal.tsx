@@ -1,26 +1,25 @@
-import { v4 as uuid } from 'uuid';
-import { useState } from 'react';
-import { DialogTitle, Modal } from 'components/common/Modal';
 import { Plugin } from '@bangle.dev/core';
-import { Typography, Box } from '@mui/material';
-import { useEditorState, BangleEditor } from '@bangle.dev/react';
-import FieldLabel from 'components/settings/FieldLabel';
-import Image from 'next/image';
-import { useForm } from 'react-hook-form';
-import { useUser } from 'hooks/useUser';
+import { useEditorState } from '@bangle.dev/react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { Box, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
-import PrimaryButton from 'components/common/PrimaryButton';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import { Bounty, BOUNTY_STATUSES, BountyStatus } from 'models/Bounty';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { CryptoCurrency, CryptoCurrencyList } from 'models/Currency';
+import { DialogTitle, Modal } from 'components/common/Modal';
+import PrimaryButton from 'components/common/PrimaryButton';
+import CharmEditor from 'components/editor/CharmEditor';
+import FieldLabel from 'components/settings/FieldLabel';
+import { useUser } from 'hooks/useUser';
 import getDisplayName from 'lib/users/getDisplayName';
+import { Bounty, BountyStatus, BOUNTY_STATUSES } from 'models/Bounty';
+import { CryptoCurrency, CryptoCurrencyList } from 'models/Currency';
+import { useForm } from 'react-hook-form';
+import { v4 as uuid } from 'uuid';
+import * as yup from 'yup';
 
 interface IToken {
   symbol: string;
@@ -178,7 +177,7 @@ export default function BountyModal (props: Props) {
           )}
 
           <Grid item>
-            <BangleEditor state={editorState} />
+            <CharmEditor />
           </Grid>
 
           <Grid item>

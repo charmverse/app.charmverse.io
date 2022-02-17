@@ -127,7 +127,7 @@ function EmojiContainer (
   );
 }
 
-export default function BangleEditor (
+export default function CharmEditor (
   { content = {
     type: 'doc',
     content: [
