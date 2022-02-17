@@ -1,8 +1,6 @@
 import { ReactNode, createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { Space } from 'models';
-import { spaces as spacesSeed } from 'seedData';
 import charmClient from 'charmClient';
-import { useLocalStorage } from './useLocalStorage';
 
 type IContext = [spaces: Space[], setSpaces: (user: Space[]) => void];
 

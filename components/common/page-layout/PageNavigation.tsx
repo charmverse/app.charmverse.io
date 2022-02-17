@@ -16,7 +16,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { greyColor2 } from 'theme/colors';
 import { Page } from 'models';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -443,6 +442,7 @@ type NavProps = {
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
   pages: Page[];
+  currentPage: Page | null;
   space: Space;
   rootPageIds?: string[];
   setPages: Dispatch<SetStateAction<Page[]>>;
@@ -453,15 +453,14 @@ export default function PageNavigation ({
   deletePage,
   isFavorites,
   pages,
+  currentPage,
   space,
   rootPageIds,
   setPages
 }: NavProps) {
 
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const pagesForSpace = pages.filter(p => p.spaceId === space.id);
-  const mappedItems = useMemo(() => mapTree(pagesForSpace, 'parentId', rootPageIds), [pagesForSpace, rootPageIds]);
+  const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
 
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
     setPages(stateNodes => stateNodes.map(stateNode => {
@@ -484,20 +483,17 @@ export default function PageNavigation ({
   const router = useRouter();
 
   useEffect(() => {
-    for (const page of pagesForSpace) {
-      if (router.asPath === `/${space.domain}/${page.path}`) {
+    for (const page of pages) {
+      if (currentPage?.id === page.id) {
         // expand the parent of the active page
         if (!isFavorites && page.parentId) {
           if (!expanded.includes(page.parentId)) {
             setExpanded(expanded.concat(page.parentId));
           }
         }
-        if (!selectedNodeId) {
-          setSelectedNodeId(page.id);
-        }
       }
     }
-  }, []);
+  }, [currentPage]);
 
   function onNodeToggle (event: SyntheticEvent, nodeIds: string[]) {
     setExpanded(nodeIds);
@@ -508,7 +504,7 @@ export default function PageNavigation ({
       setPages={setPages}
       expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
-      selected={selectedNodeId}
+      selected={currentPage?.id || null}
       onNodeToggle={onNodeToggle}
       aria-label='items navigator'
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}

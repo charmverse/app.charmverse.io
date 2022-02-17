@@ -12,18 +12,18 @@ import { ChangeEvent } from 'react';
 import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
 import getDisplayName from 'lib/users/getDisplayName';
-import debounce from 'lib/debounce';
 import { DOMAIN_BLACKLIST } from 'models/Space';
 import charmClient from 'charmClient';
 
 export const schema = yup.object({
+  id: yup.string(),
   domain: yup.string().ensure().trim().lowercase()
     .min(3, 'Domain must be at least 3 characters')
     .matches(/^[0-9a-z-]*$/, 'Domain must be only lowercase hyphens, letters, and numbers')
     .notOneOf(DOMAIN_BLACKLIST, 'Domain is not allowed')
     .required('Domain is required')
-    .test('domain-exists', 'Domain already exists', async (domain) => {
-      const { ok } = await charmClient.checkDomain(domain);
+    .test('domain-exists', 'Domain already exists', async function checkDomain (domain) {
+      const { ok } = await charmClient.checkDomain({ domain, spaceId: this.parent.id });
       return !ok;
     }),
   name: yup.string().ensure().trim()

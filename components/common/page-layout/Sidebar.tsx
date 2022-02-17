@@ -117,7 +117,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
-  const { pages, setPages } = usePages();
+  const { pages, currentPage, setPages } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
   const intl = useIntl();
@@ -238,6 +238,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                     </SectionName>
                     <PageNavigation
                       isFavorites={true}
+                      currentPage={currentPage}
                       pages={pages}
                       space={space}
                       rootPageIds={favoritePageIds}
@@ -255,6 +256,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                   </div>
                 </WorkspaceLabel>
                 <PageNavigation
+                  currentPage={currentPage}
                   pages={pages}
                   space={space}
                   setPages={setPages}

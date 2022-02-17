@@ -15,10 +15,11 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(checkDomain);
 
 async function checkDomain (req: NextApiRequest, res: NextApiResponse<Response>) {
+  const spaceId = req.query.spaceId as string | undefined;
   const space = await prisma.space.findFirst({
-    where: { domain: req.query.domain as string }
+    where: { domain: req.query.domain as string, id: spaceId }
   });
-  if (space) {
+  if (space && space.id !== spaceId) {
     return res.status(200).json({ ok: true });
   }
   else {

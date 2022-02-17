@@ -14,6 +14,7 @@ import { FormValues, schema } from 'components/common/CreateSpaceForm';
 import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
+import charmClient from 'charmClient';
 
 export default function WorkspaceSettings () {
 
@@ -35,21 +36,26 @@ export default function WorkspaceSettings () {
 
   const watchName = watch('name');
 
-  function onSubmit (values: FormValues) {
+  async function onSubmit (values: FormValues) {
     if (!space) return;
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
-    setSpace({ ...space, ...values }, newDomain);
+    const updatedSpace = await charmClient.updateSpace({ ...space, ...values });
     if (newDomain) {
       window.location.href = router.asPath.replace(space.domain, values.domain);
     }
-    reset(values);
+    else {
+      setSpace(updatedSpace);
+    }
+    reset(updatedSpace);
   }
 
-  function deleteWorkspace () {
-    if (window.confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
-      setSpace(null);
-      window.location.href = `/${spaces[0].domain}`;
+  async function deleteWorkspace () {
+    if (space && window.confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
+      await charmClient.deleteSpace(space!.id);
+      const nextSpace = spaces.filter(s => s.id !== space.id)[0];
+      console.log(nextSpace);
+      window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
     }
   }
 

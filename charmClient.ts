@@ -51,24 +51,36 @@ class CharmClient {
     return space;
   }
 
-  checkDomain (domain: string) {
-    return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', { domain });
+  deleteSpace (spaceId: string) {
+    return http.DELETE(`/api/spaces/${spaceId}`);
+  }
+
+  updateSpace (spaceOpts: Prisma.SpaceUpdateInput) {
+    return http.PUT<Space>(`/api/spaces/${spaceOpts.id}`, spaceOpts);
   }
 
   getSpaces () {
     return http.GET<Space[]>('/api/spaces');
   }
 
+  checkDomain (params: { spaceId?: string, domain: string }) {
+    return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
+  }
+
   getPages (spaceId: string) {
     return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
   }
 
-  getContributors (spaceId: string) {
-    return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
-  }
-
   createPage (pageOpts: Prisma.PageCreateInput) {
     return http.POST<Page>('/api/pages', pageOpts);
+  }
+
+  updatePage (pageOpts: Prisma.PageUpdateInput) {
+    return http.PUT<Page>('/api/pages', pageOpts);
+  }
+
+  getContributors (spaceId: string) {
+    return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
   }
 
 }

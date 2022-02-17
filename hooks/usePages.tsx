@@ -22,6 +22,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const [space] = useCurrentSpace();
   const [pages, setPages] = useState<Page[]>([]);
+  const [currentPage, setCurrentPage] = useState<Page | null>(null);
   useEffect(() => {
     if (space) {
       setPages([]);
@@ -31,7 +32,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
         });
     }
   }, [space]);
-  const [currentPage, setCurrentPage] = useState<Page | null>(null);
 
   const value = useMemo(() => ({ currentPage, pages, setCurrentPage, setPages }), [currentPage, pages]);
 
