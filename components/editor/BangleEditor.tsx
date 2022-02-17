@@ -15,7 +15,7 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { NodeView, SpecRegistry } from '@bangle.dev/core';
+import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, EditorViewContext, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
@@ -128,19 +128,42 @@ function EmojiContainer (
 }
 
 export default function BangleEditor (
-  { content, page, setPage }: { content: PageContent, page: Page, setPage: (p: Page) => void }
+  { content = {
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: []
+      }
+    ]
+  }, page, setPage, onPageContentChange }:
+  { content?: PageContent, page?: Page, setPage?: (p: Page) => void, onPageContentChange?: (doc: PageContent) => any }
 ) {
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {
-    setPage({ ...page, title: event.target.value });
+    if (page && setPage) {
+      setPage({ ...page, title: event.target.value });
+    }
   }
 
   function updatePageIcon (icon: string) {
-    setPage({ ...page, icon });
+    if (page && setPage) {
+      setPage({ ...page, icon });
+    }
   }
 
   const state = useEditorState({
     specRegistry,
     plugins: () => [
+      new Plugin({
+        props: {
+          handleTextInput (view) {
+            if (onPageContentChange) {
+              onPageContentChange(view.state.doc.toJSON() as PageContent);
+            }
+            return false;
+          }
+        }
+      }),
       imagePlugins(),
       inlinePalettePlugins(),
       bold.plugins(),
@@ -207,26 +230,30 @@ export default function BangleEditor (
   let pageTitleTop = 50; let bangleEditorTop = 75; let
     pageIconTop = 50;
 
-  if (page.icon && !page.headerImage) {
-    pageTitleTop = 100;
-    bangleEditorTop = 125;
-    pageIconTop = -75;
-  }
+  if (page) {
+    if (page.icon && !page.headerImage) {
+      pageTitleTop = 100;
+      bangleEditorTop = 125;
+      pageIconTop = -75;
+    }
 
-  if (!page.icon && page.headerImage) {
-    pageTitleTop = 50;
-  }
+    if (!page.icon && page.headerImage) {
+      pageTitleTop = 50;
+    }
 
-  if (page.icon && page.headerImage) {
-    pageTitleTop = 50;
-    bangleEditorTop = 125;
-    pageIconTop = -60;
+    if (page.icon && page.headerImage) {
+      pageTitleTop = 50;
+      bangleEditorTop = 125;
+      pageIconTop = -60;
+    }
   }
 
   return (
     <StyledReactBangleEditor
       style={{
-        top: bangleEditorTop
+        top: page ? bangleEditorTop : 0,
+        width: '100%',
+        height: '100%'
       }}
       state={state}
       renderNodeViews={({ children, ...props }) => {
@@ -292,11 +319,12 @@ export default function BangleEditor (
         }
       }}
     >
-      {page.icon && (
+      {page?.icon && (
         <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
           <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
         </EmojiContainer>
       )}
+      {page && (
       <Box sx={{
         position: 'absolute',
         top: pageTitleTop
@@ -307,6 +335,7 @@ export default function BangleEditor (
           onChange={updateTitle}
         />
       </Box>
+      )}
       <FloatingMenu />
       {EmojiSuggest}
       {InlinePalette}
