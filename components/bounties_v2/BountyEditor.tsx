@@ -80,13 +80,10 @@ export function BountyEditor ({ onSubmit, bounty, mode = 'create' }: IBountyEdit
       const createdBounty = await BountyService.createBounty(value as any);
       onSubmit(createdBounty as any);
     }
-    console.log('Submitted values', value);
   }
 
   return (
     <div>
-      <h1>Bounty Editor</h1>
-
       <CompositeForm onSubmit={submitted} fields={bountyEditorFields(bounty)} />
     </div>
   );
