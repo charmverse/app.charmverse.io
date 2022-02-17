@@ -4,6 +4,7 @@ import { Space, Prisma, Page } from '@prisma/client';
 import * as http from 'adapters/http';
 import { gettingStartedPageContent } from 'seedData';
 import { Contributor, LoggedInUser } from 'models';
+import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 
 //
 // CharmClient is the client interface to the server APIs
@@ -48,6 +49,10 @@ class CharmClient {
     };
     const space = await http.POST<Space>('/api/spaces', spaceOpts);
     return space;
+  }
+
+  checkDomain (domain: string) {
+    return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', { domain });
   }
 
   getSpaces () {
