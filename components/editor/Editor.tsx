@@ -135,12 +135,13 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
           }}
           content={page.content as PageContent}
         >
-          {page?.icon && (
-          <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
-            <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-          </EmojiContainer>
-          )}
-          {page && (
+          <>
+            {page?.icon && (
+            <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
+              <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+            </EmojiContainer>
+            )}
+            {page && (
             <Box sx={{
               position: 'absolute',
               top: pageTitleTop
@@ -151,7 +152,8 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
                 onChange={updateTitle}
               />
             </Box>
-          )}
+            )}
+          </>
         </CharmEditor>
       </Container>
     </Box>
