@@ -138,32 +138,33 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   async function addPage (_space: Space, page: Partial<Page>) {
     const id = Math.random().toString().replace('0.', '');
-    const newPage: Page = {
-      boardId: null,
+    const newPage = await charmClient.createPage({
       content: {
         type: 'doc',
         content: [{
           type: 'paragraph',
           content: []
         }]
-      },
+      } as any,
       contentText: '',
       createdAt: new Date(),
-      createdBy: user!.id,
-      headerImage: null,
-      icon: null,
+      author: {
+        connect: {
+          id: user!.id
+        }
+      },
       updatedAt: new Date(),
       updatedBy: user!.id,
-      deletedAt: null,
-      id,
-      isPublic: false,
-      parentId: null,
       path: `page-${id}`,
-      spaceId: _space.id,
+      space: {
+        connect: {
+          id: _space.id
+        }
+      },
       title: '',
       type: 'page',
       ...page
-    };
+    });
     if (newPage.type === 'database') {
       await addBoardClicked(boardId => {
         newPage.boardId = boardId;
@@ -172,9 +173,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     setPages([newPage, ...pages]);
 
     // add delay to simulate a server call
-    setTimeout(() => {
-      router.push(`/${_space.domain}/${newPage.path}`);
-    }, 100);
+    router.push(`/${_space.domain}/${newPage.path}`);
   }
 
   function deletePage (pageId: string) {
