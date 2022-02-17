@@ -75,8 +75,12 @@ class CharmClient {
     return http.POST<Page>('/api/pages', pageOpts);
   }
 
+  deletePage (pageId: string) {
+    return http.DELETE(`/api/pages/${pageId}`);
+  }
+
   updatePage (pageOpts: Prisma.PageUpdateInput) {
-    return http.PUT<Page>('/api/pages', pageOpts);
+    return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
   getContributors (spaceId: string) {

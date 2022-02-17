@@ -13,7 +13,7 @@ handler.use(requireUser).get(getPages);
 async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
   const pages = await prisma.page.findMany({
     where: {
-      spaceId: req.query.spaceId as string
+      spaceId: req.query.id as string
     }
   });
   return res.status(200).json(pages);
