@@ -19,22 +19,28 @@ import BountyService from './BountyService';
 import { IInputField } from '../common/form/GenericInput';
 
 interface IBountyEditorInput {
-  onSubmit: () => any,
-  mode: 'create' | 'update'
+  onSubmit: (bounty: IBounty) => any,
+  mode?: 'create' | 'update'
   bounty?: IBounty
 }
 
-function bountyEditorFields (): IInputField<IBounty> [] {
+/**
+ * For now, we are only passing prefill data to the text input field
+ * @param bounty
+ * @returns
+ */
+function bountyEditorFields (bounty?: IBounty): IInputField<IBounty> [] {
   return [
     {
       fieldType: 'text',
       modelKey: 'title',
-      label: 'Bounty title'
+      label: 'Bounty title',
+      value: bounty?.title
     },
     {
-      fieldType: 'task',
+      fieldType: 'text',
       modelKey: 'linkedTaskId',
-      label: 'Linked task'
+      label: 'Linked task ID'
     },
     {
       fieldType: 'textMultiline',
@@ -69,20 +75,11 @@ function bountyEditorFields (): IInputField<IBounty> [] {
 
 export function BountyEditor ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
 
-  async function createBounty (bountyToCreate: Partial<IBounty>) {
-
-    const created = await BountyService.createBounty(bountyToCreate);
-    onSubmit();
-  }
-
-  async function updateBounty (bountyToCreate: Partial<IBounty>) {
-
-    const created = await BountyService.createBounty(bountyToCreate);
-    onSubmit();
-  }
-
-  function submitted (value: IBounty): void {
-
+  async function submitted (value: IBounty) {
+    if (mode === 'create') {
+      const createdBounty = await BountyService.createBounty(value as any);
+      onSubmit(createdBounty as any);
+    }
     console.log('Submitted values', value);
   }
 
@@ -90,7 +87,7 @@ export function BountyEditor ({ onSubmit, bounty, mode = 'create' }: IBountyEdit
     <div>
       <h1>Bounty Editor</h1>
 
-      <CompositeForm onSubmit={submitted} fields={bountyEditorFields()} />
+      <CompositeForm onSubmit={submitted} fields={bountyEditorFields(bounty)} />
     </div>
   );
 }

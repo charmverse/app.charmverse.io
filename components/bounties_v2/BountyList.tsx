@@ -3,6 +3,7 @@ import { Bounty as IBounty, BountyStatus } from 'models/Bounty';
 import Loader from 'components/common/Loader';
 import { Bounty } from 'components/bounties_v2/Bounty';
 import { Typography, Button, Grid } from '@mui/material';
+import BountyModal from 'components/bounties_v2/BountyModal';
 import BountyService from './BountyService';
 import { BountyEditor } from './BountyEditor';
 
@@ -51,6 +52,7 @@ export function BountyList () {
   function bountyCreated () {
     // Empty the bounty list so we can reload bounties
     refresh.current = true;
+    setDisplayBountyDialog(false);
     refreshBounties();
   }
 
@@ -65,6 +67,25 @@ export function BountyList () {
       <Grid container>
 
         <Grid container alignItems='center'>
+
+          {
+            /**
+             * Remove later to its own popup modal
+             */
+            displayBountyDialog === true && (
+              <>
+                <BountyModal onSubmit={bountyCreated} open={displayBountyDialog} onClose={bountyCreated} />
+
+                {/*
+                <Grid item xs={12}>
+                  <BountyEditor bounty={{ title: 'Prefilled bounty' } as any} mode='create' onSubmit={bountyCreated} />
+                </Grid>
+                */}
+
+              </>
+            )
+          }
+
           <Grid item xs={8}>
             <h1>Bounty list</h1>
           </Grid>
@@ -96,12 +117,6 @@ export function BountyList () {
 
         </Grid>
 
-        {
-          /**
-           * Remove later to its own popup modal
-           */
-          displayBountyDialog === true && <BountyEditor onSubmit={bountyCreated} />
-        }
       </Grid>
     );
   }
