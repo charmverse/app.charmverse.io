@@ -37,7 +37,6 @@ function MockUser (partial: Partial<PopulatedUser>): PopulatedUser {
     id: uuid(),
     addresses: [],
     spaceRoles: [],
-    discordId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...partial
