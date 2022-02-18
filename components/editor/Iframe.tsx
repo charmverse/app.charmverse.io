@@ -69,6 +69,10 @@ export function iframeSpec (): RawSpecs {
       attrs: {
         src: {
           default: ''
+        },
+        // Type of iframe, it could either be video or embed
+        type: {
+          default: 'embed'
         }
       },
       group: 'block',
@@ -100,9 +104,9 @@ const StyledEmptyIFrameContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement>) {
+function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement> & {type: 'video' | 'embed'}) {
   const theme = useTheme();
-
+  const { type, ...rest } = props;
   return (
     <ListItem
       button
@@ -113,12 +117,12 @@ function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement>) {
         display: 'flex',
         borderRadius: theme.spacing(0.5)
       }}
-      {...props}
+      {...rest}
     >
       <StyledEmptyIFrameContainer>
-        <VideoLibraryIcon fontSize='small' />
+        {type === 'embed' ? <svg viewBox='0 0 30 30' className='compass' height='1em' width='1em' style={{ display: 'block', fill: 'currentColor', flexShrink: 0, backfaceVisibility: 'hidden' }}><path d='M18,4.361V3c0-1.657-1.343-3-3-3s-3,1.343-3,3v1.361C6.27,5.718,2,10.854,2,17c0,7.18,5.82,13,13,13s13-5.82,13-13 C28,10.854,23.73,5.718,18,4.361z M14,3c0-0.552,0.448-1,1-1s1,0.448,1,1v1.051C15.669,4.025,15.338,4,15,4s-0.669,0.025-1,0.051V3z M16,27.949V26h-2v1.949C8.724,27.474,4.526,23.276,4.051,18H6v-2H4.051C4.526,10.724,8.724,6.526,14,6.051V8h2V6.051 c5.276,0.476,9.474,4.673,9.949,9.949H24v2h1.949C25.474,23.276,21.276,27.474,16,27.949z M8,24l10-4l4-10l-10,4L8,24z M18.41,13.59 l-1.949,4.871L11.59,20.41l1.949-4.871L18.41,13.59z' /></svg> : <VideoLibraryIcon fontSize='small' /> }
         <Typography>
-          Embed an iframe
+          {type === 'video' ? 'Insert a video' : 'Insert an embed'}
         </Typography>
       </StyledEmptyIFrameContainer>
     </ListItem>
@@ -141,13 +145,15 @@ export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
-      <IFrameSelector onIFrameSelect={(videoLink) => {
-        updateAttrs({
-          src: videoLink
-        });
-      }}
+      <IFrameSelector
+        type={node.attrs.type}
+        onIFrameSelect={(videoLink) => {
+          updateAttrs({
+            src: videoLink
+          });
+        }}
       >
-        <EmptyIFrameContainer />
+        <EmptyIFrameContainer type={node.attrs.type} />
       </IFrameSelector>
     );
   }

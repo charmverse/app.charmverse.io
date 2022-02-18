@@ -10,12 +10,13 @@ interface IFrameSelectorProps {
   onIFrameSelect: (videoSrc: string) => void
   children: ReactNode
   tabs?: [string, ReactNode][]
+  type: 'embed' | 'video'
 }
 
 export default function IFrameSelector (props: IFrameSelectorProps) {
   const { message, handleClose, isOpen } = useSnackbar();
   const [embedLink, setEmbedLink] = useState('');
-  const { tabs = [], children, onIFrameSelect } = props;
+  const { type, tabs = [], children, onIFrameSelect } = props;
   return (
     <PopperPopup popupContent={(
       <Box sx={{
@@ -33,7 +34,7 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
               alignItems: 'center'
             }}
             >
-              <TextField fullWidth placeholder='Paste the video link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
+              <TextField fullWidth placeholder={`Paste the ${type} link...`} value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
               <Button
                 disabled={!embedLink}
                 sx={{

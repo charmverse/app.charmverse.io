@@ -162,7 +162,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.iframe.create({
-                  src: null
+                  src: null,
+                  type: "video"
                 })
               ])
             ))
@@ -187,7 +188,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.iframe.create({
-                  src: null
+                  src: null,
+                  type: "embed"
                 })
               ])
             ))
