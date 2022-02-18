@@ -1,5 +1,6 @@
-import { Button, TextField } from '@mui/material';
+import { Button } from '@mui/material';
 import { Box } from '@mui/system';
+import { AutoFocusedTextField } from 'components/common/AutoFocusedTextField';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import Snackbar from 'components/common/Snackbar';
@@ -69,7 +70,7 @@ export default function ImageSelector (props: ImageSelectorProps) {
               alignItems: 'center'
             }}
             >
-              <TextField fullWidth placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
+              <AutoFocusedTextField placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
               <Button
                 disabled={!embedLink}
                 sx={{

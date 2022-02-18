@@ -1,5 +1,6 @@
-import { Button, TextField } from '@mui/material';
+import { Button } from '@mui/material';
 import { Box } from '@mui/system';
+import { AutoFocusedTextField } from 'components/common/AutoFocusedTextField';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import Snackbar from 'components/common/Snackbar';
@@ -17,6 +18,7 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
   const { message, handleClose, isOpen } = useSnackbar();
   const [embedLink, setEmbedLink] = useState('');
   const { type, tabs = [], children, onIFrameSelect } = props;
+
   return (
     <PopperPopup popupContent={(
       <Box sx={{
@@ -34,7 +36,7 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
               alignItems: 'center'
             }}
             >
-              <TextField fullWidth placeholder={`Paste the ${type} link...`} value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
+              <AutoFocusedTextField placeholder={`Paste the ${type} link...`} value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
               <Button
                 disabled={!embedLink}
                 sx={{
