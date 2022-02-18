@@ -32,8 +32,8 @@ import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
-import IFrame, { iframePlugin, iframeSpec } from './Iframe';
-import { Image, pasteImagePlugin } from './Image';
+import IFrame, { iframeSpec } from './Iframe';
+import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
 const specRegistry = new SpecRegistry([
@@ -160,9 +160,10 @@ export default function CharmEditor (
       NodeView.createPlugin({
         name: 'iframe',
         containerDOM: ['div', { class: 'iframe-container' }]
-      }),
-      iframePlugin,
-      pasteImagePlugin
+      })
+      // TODO: Pasting iframe or image link shouldn't create those blocks. Maybe in the future we might allow this behavior and adjust it to that of Notion's
+      // iframePlugin,
+      // pasteImagePlugin
     ],
     initialValue: Node.fromJSON(specRegistry.schema, content),
     // hide the black bar when dragging items - we dont even support dragging most components
