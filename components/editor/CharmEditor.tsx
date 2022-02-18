@@ -36,7 +36,7 @@ import IFrame, { iframePlugin, iframeSpec } from './Iframe';
 import { Image, pasteImagePlugin } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
-export interface IBangleEditorOutput {
+export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
 }
@@ -96,7 +96,7 @@ export type UpdatePageContent = (doc: PageContent) => void;
 
 export default function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style }:
-  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent,
+  { content?: PageContent, children?: ReactNode, onPageContentChange?: (content: ICharmEditorOutput) => any,
     style?: CSSProperties }
 ) {
 
@@ -111,7 +111,7 @@ export default function CharmEditor (
             const rawText = view.state.doc.textContent ?? '';
 
             if (onPageContentChange && pageAsJson) {
-              onPageContentChange(pageAsJson);
+              onPageContentChange({ doc: pageAsJson, rawText });
             }
             return false;
           }
