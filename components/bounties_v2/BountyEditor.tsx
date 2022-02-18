@@ -1,22 +1,7 @@
-import BountyModal from 'components/bounties/BountyModal';
-import { useForm } from 'react-hook-form';
-
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import PrimaryButton from 'components/common/PrimaryButton';
-import FieldLabel from 'components/settings/FieldLabel';
-import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { PageContent } from 'models';
 import { CompositeForm } from 'components/common/form/Form';
-
-import BangleEditor, { IBangleEditorOutput } from 'components/editor/BangleEditor';
 import { Bounty as IBounty } from 'models/Bounty';
-
-import BountyService from './BountyService';
 import { IInputField } from '../common/form/GenericInput';
+import BountyService from './BountyService';
 
 interface IBountyEditorInput {
   onSubmit: (bounty: IBounty) => any,

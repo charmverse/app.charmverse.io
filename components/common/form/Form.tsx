@@ -1,21 +1,7 @@
-import BountyModal from 'components/bounties/BountyModal';
-import { useForm } from 'react-hook-form';
-
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import MenuItem from '@mui/material/MenuItem';
-import Chip from '@mui/material/Chip';
-import Select from '@mui/material/Select';
 import PrimaryButton from 'components/common/PrimaryButton';
-import FieldLabel from 'components/settings/FieldLabel';
-import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { PageContent } from 'models';
-
-import BangleEditor from 'components/editor/BangleEditor';
 import { useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import { v4 } from 'uuid';
 import { GenericInput, IInputField } from './GenericInput';
 
