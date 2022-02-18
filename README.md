@@ -21,24 +21,28 @@ There are several ways you can contribute:
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/charmverse
 ```
 
+[Tip] We use Prisma to talk to the database, see some [examples and documentation](https://www.prisma.io/docs/concepts/components/prisma-client/crud).
+
 2. Download and install this repo to get started:
 
-1. Clone this repo
-2. Run `npm ci`
-3. Run `npm start` and visit [http://localhost:3000](http://localhost:3000)
-4. Run `npx prisma migrate dev` to create tables (you may have to create a "charmverse" database first).
+```
+git clone git@github.com:charmverse/app.charmverse.io.git
+npm ci
+npx prisma migrate dev
+npm start
+```
 
 ### Third Party Dependencies
 
-CharmVerse is a React app built using:
+CharmVerse is built with:
 
-- Ethers.js
-- Material UI
+- Typescript
 - Next.js
 - React
-- Typescript
+- Material UI
+- ethers.js
 - Prisma
-- @bangle.dev / Prosemirror
+- @bangle.dev / ProseMirror
 - focalboard
 
 ### Database
