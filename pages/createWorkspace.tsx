@@ -1,6 +1,7 @@
 import { Prisma, Space } from '@prisma/client';
 import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
 import Header from 'components/common/base-layout/Header';
 import PageWrapper from 'components/common/base-layout/PageWrapper';
 import CreateSpaceForm, { getDomainFromName } from 'components/common/CreateSpaceForm';
@@ -31,7 +32,9 @@ export default function CreateSpace () {
     <PageWrapper>
       <Header />
       <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto' }}>
-        <CreateSpaceForm defaultValues={defaultValues} onSubmit={addSpace} />
+        <Card sx={{ p: 4 }}>
+          <CreateSpaceForm defaultValues={defaultValues} onSubmit={addSpace} submitText='Get Started' />
+        </Card>
       </Box>
     </PageWrapper>
   );

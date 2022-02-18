@@ -37,13 +37,12 @@ interface Props {
   defaultValues?: { name: string, domain: string };
   onCancel?: () => void;
   onSubmit: (values: Prisma.SpaceCreateInput) => void;
+  submitText?: string;
 }
 
-export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel }: Props) {
+export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText }: Props) {
 
   const [user] = useUser();
-
-  const defaultName = `${getDisplayName(user!)}'s Workspace`;
 
   const {
     register,
@@ -129,7 +128,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         </Grid>
         <Grid item>
           <PrimaryButton disabled={!watchName || !watchDomain} type='submit'>
-            Create Workspace
+            {submitText || 'Create Workspace'}
           </PrimaryButton>
         </Grid>
       </Grid>
