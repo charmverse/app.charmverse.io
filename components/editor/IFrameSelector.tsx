@@ -1,6 +1,5 @@
-import { Button } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import { Box } from '@mui/system';
-import { AutoFocusedTextField } from 'components/common/AutoFocusedTextField';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import Snackbar from 'components/common/Snackbar';
@@ -36,7 +35,7 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
               alignItems: 'center'
             }}
             >
-              <AutoFocusedTextField placeholder={`Paste the ${type} link...`} value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
+              <TextField autoFocus placeholder={`Paste the ${type} link...`} value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
               <Button
                 disabled={!embedLink}
                 sx={{
