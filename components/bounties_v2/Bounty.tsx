@@ -1,4 +1,5 @@
-import { Bounty as IBounty, BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
+import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
+import { Bounty as IBounty } from '@prisma/client';
 import { Card, CardHeader, CardContent, Chip, Typography, Grid } from '@mui/material';
 import { useState } from 'react';
 import { BrandColors } from 'theme/colors';
@@ -25,8 +26,6 @@ export function Bounty ({ bounty }: IBountyInput) {
   return (
     <Card
       sx={{
-        display: 'inline-block',
-        flexDirection: 'column',
         width: 290,
         m: '5px',
         minHeight: 200,
@@ -38,9 +37,9 @@ export function Bounty ({ bounty }: IBountyInput) {
       variant='outlined'
     >
       <CardHeader subheader={bounty.title} />
-      <CardContent sx={{ flexGrow: 1, display: 'flex', height: '80%' }}>
-        <Grid container direction='row' justifyContent='space-between'>
-          <Grid item xs={12} sx={{ height: '73%' }}>
+      <CardContent sx={{ flexGrow: 1, display: 'block' }}>
+        <Grid container direction='column' justifyContent='space-between'>
+          <Grid item xs={12} sx={{ minHeight: '90px' }}>
 
             <Typography paragraph={true}>
               {bounty.description.trim().substring(0, 120)}
