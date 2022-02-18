@@ -12,6 +12,25 @@ import Resizer from './Resizer';
 
 const name = 'iframe';
 
+function extractEmbedLink (url: string) {
+  const isYoutubeLink = url.match(/(?:https:\/\/www.youtube.com\/watch\?v=(.*)|https:\/\/youtu.be\/(.*))/);
+  const isIframeEmbed = url.startsWith('<iframe ');
+  let embedUrl: null | string = null;
+
+  if (isYoutubeLink) {
+    /* eslint-disable-next-line */
+    embedUrl = `https://www.youtube.com/embed/${isYoutubeLink[1] ?? isYoutubeLink[2]}`;
+  }
+  else if (isIframeEmbed) {
+    const indexOfSrc = url.indexOf('src');
+    const indexOfFirstQuote = url.indexOf('"', indexOfSrc);
+    const indexOfLastQuote = url.indexOf('"', indexOfFirstQuote + 1);
+    embedUrl = url.slice(indexOfFirstQuote + 1, indexOfLastQuote);
+  }
+
+  return embedUrl;
+}
+
 interface DispatchFn {
   (tr: Transaction): void;
 }
@@ -23,22 +42,7 @@ export const iframePlugin = new Plugin({
     handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
       // @ts-ignore
       const contentRow = slice.content.content?.[0].content.content;
-      const isIframeEmbed = contentRow?.[0]?.text.startsWith('<iframe ');
-      const isYoutubeLink = contentRow?.[0]
-        ?.text.match(/(?:https:\/\/www.youtube.com\/watch\?v=(.*)|https:\/\/youtu.be\/(.*))/);
-      let embedUrl: null | string = null;
-
-      if (isYoutubeLink) {
-        /* eslint-disable-next-line */
-        embedUrl = `https://www.youtube.com/embed/${isYoutubeLink[1] ?? isYoutubeLink[2]}`;
-      }
-      else if (isIframeEmbed) {
-        const urlContent = contentRow.find((row: any) => row.marks[0]?.type.name === 'link');
-        if (urlContent) {
-          embedUrl = urlContent.marks[0].attrs.href;
-        }
-      }
-
+      const embedUrl = extractEmbedLink(contentRow?.[0]?.text);
       if (embedUrl) {
         insertIframeNode(view.state, view.dispatch, view, { src: embedUrl });
         return true;
@@ -149,7 +153,7 @@ export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
         type={node.attrs.type}
         onIFrameSelect={(videoLink) => {
           updateAttrs({
-            src: videoLink
+            src: extractEmbedLink(videoLink)
           });
         }}
       >
@@ -165,19 +169,6 @@ export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
       flexDirection: 'column'
     }}
     >
-      <Box sx={{
-        margin: theme.spacing(1, 0)
-      }}
-      >
-        <a
-          href={node.attrs.src}
-          rel='noopener noreferrer nofollow'
-          target='_blank'
-        >
-          {node.attrs.src}
-        </a>
-
-      </Box>
       <BlockAligner onDelete={() => {
         updateAttrs({
           src: null
