@@ -1,5 +1,6 @@
 import Grid from '@mui/material/Grid';
 import PrimaryButton from 'components/common/PrimaryButton';
+import Button from '@mui/material/Button';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { v4 } from 'uuid';
@@ -25,10 +26,11 @@ export function CompositeForm ({ onSubmit, fields, mode, submitLabel }: IComposi
     handleSubmit,
     setValue,
     watch,
-    formState: { errors }
+    formState: { errors, isValid }
   } = useForm();
 
   // const formValue = watch();
+  console.log('Valid', isValid);
 
   return (
 
@@ -42,21 +44,21 @@ export function CompositeForm ({ onSubmit, fields, mode, submitLabel }: IComposi
  */}
 
       <Grid container direction='row' rowSpacing={2}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto' }}>
 
           {
         fields.map(field => {
           return (
-            <Grid key={field.modelKey as string + v4()} item sx={{ marginTop: '10px' }}>
+            <Grid key={field.modelKey as string + v4()} item sx={{ marginTop: '10px', marginBottom: '10px' }}>
               <GenericInput register={register} fieldConfig={field} />
             </Grid>
           );
         })
       }
 
-          <PrimaryButton type='submit'>
+          <Button disabled={!isValid}>
             {submitLabel ?? (mode === 'update' ? 'Update' : 'Create')}
-          </PrimaryButton>
+          </Button>
 
         </form>
       </Grid>
