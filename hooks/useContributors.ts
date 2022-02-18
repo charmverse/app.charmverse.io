@@ -1,12 +1,19 @@
-import { PopulatedUser } from 'models';
-import { users } from 'seedData';
-import { useLocalStorage } from './useLocalStorage';
+import { useEffect, useState } from 'react';
+import { Contributor } from 'models';
+import charmClient from 'charmClient';
 import { useCurrentSpace } from './useCurrentSpace';
 
 export function useContributors () {
   const [space] = useCurrentSpace();
-  const spaceContributors = users.filter(
-    c => c.spaceRoles.some(({ spaceId }) => spaceId === space.id)
-  );
-  return useLocalStorage<PopulatedUser[]>(`spaces.${space.id}.contributors`, spaceContributors);
+  const [contributors, setContributors] = useState<Contributor[]>([]);
+  useEffect(() => {
+    if (space) {
+      setContributors([]);
+      charmClient.getContributors(space.id)
+        .then(_contributors => {
+          setContributors(_contributors);
+        });
+    }
+  }, [space]);
+  return [contributors, setContributors] as const;
 }

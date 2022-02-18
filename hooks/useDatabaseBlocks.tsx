@@ -1,8 +1,6 @@
-import { ReactNode, createContext, useContext, useMemo, Dispatch, SetStateAction } from 'react';
-import { Page } from 'models';
-import { blocks as blocksSeed } from 'seedData';
+import { ReactNode, createContext, useContext, useEffect, useState, useMemo, Dispatch, SetStateAction } from 'react';
 import { Block } from 'components/databases/focalboard/src/blocks/block';
-import { useLocalStorage, getStorageValue } from './useLocalStorage';
+import charmClient from 'charmClient';
 
 type IContext = {
   blocks: Block[],
@@ -14,14 +12,17 @@ export const DatabaseBlocksContext = createContext<Readonly<IContext>>({
   setBlocks: () => undefined
 });
 
-// temporary method until we use a real API
-export function getDatabaseBlocks (): Block[] {
-  return getStorageValue('database-blocks', blocksSeed);
-}
-
 export function DatabaseBlocksProvider ({ children }: { children: ReactNode }) {
 
-  const [blocks, setBlocks] = useLocalStorage<Block[]>('database-blocks', blocksSeed);
+  const [blocks, setBlocks] = useState<Block[]>([]);
+
+  useEffect(() => {
+    charmClient.getAllBlocks()
+      .then(_blocks => {
+        setBlocks(_blocks);
+      })
+      .catch(err => {});
+  }, []);
 
   const value = useMemo(() => ({ blocks, setBlocks }), [blocks]);
 

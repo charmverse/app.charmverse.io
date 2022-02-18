@@ -17,6 +17,7 @@ tsconfig.tsbuildinfo
 
 # user data
 *.csv
+.vscode/vscode-chrome-debug-userdatadir/
 
 # debug
 npm-debug.log*

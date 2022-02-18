@@ -31,6 +31,7 @@
   ],
   "include": [
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "pages/api/pages/[id]"
   ]
 }

@@ -3,6 +3,7 @@
 import {marked} from 'marked'
 import {IntlShape} from 'react-intl'
 import moment from 'moment'
+import { v4 as uuid } from 'uuid'
 
 import {Block} from './blocks/block'
 import {createBoard} from './blocks/board'
@@ -36,7 +37,7 @@ enum IDType {
 class Utils {
     static createGuid(idType: IDType): string {
         const data = Utils.randomArray(16)
-        return idType + Utils.base32encode(data, false)
+        return uuid(); //idType + Utils.base32encode(data, false)
     }
 
     static blockTypeToIDType(blockType: string | undefined): IDType {

@@ -1,34 +1,21 @@
-import { v4 as uuid } from 'uuid';
-import { useState } from 'react';
-import { DialogTitle, Modal } from 'components/common/Modal';
-import { Plugin } from '@bangle.dev/core';
-import { Typography, Box } from '@mui/material';
-import { Editor } from 'components/editor';
-import FieldLabel from 'components/settings/FieldLabel';
-import Image from 'next/image';
-import { useForm } from 'react-hook-form';
-import { useUser } from 'hooks/useUser';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { Box, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
-import PrimaryButton from 'components/common/PrimaryButton';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import { Bounty, BOUNTY_STATUSES, BountyStatus } from 'models/Bounty';
-import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { CryptoCurrency, CryptoCurrencyList } from 'models/Currency';
-import getDisplayName from 'lib/users/getDisplayName';
-import { usePages } from 'hooks/usePages';
-import BlocksEditor from 'pages/[domain]/[pageId]';
+import { DialogTitle, Modal } from 'components/common/Modal';
+import CharmEditor from 'components/editor/CharmEditor';
+import FieldLabel from 'components/settings/FieldLabel';
+import { useUser } from 'hooks/useUser';
 
 interface IToken {
   symbol: string;
   img: string;
 }
 
+/*
 const CRYPTO_CURRENCY_LIST = Object.keys(CryptoCurrencyList) as CryptoCurrency[];
 
 type ModalType = 'create' | 'edit' | 'suggest';
@@ -74,7 +61,85 @@ export default function BountyModal (props: Props) {
   return (
     <Modal size='large' open={open} onClose={onClose}>
       <DialogTitle onClose={onClose}>{modalTitles[modalType]}</DialogTitle>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Grid container direction='column' spacing={3}>
+          <Grid item>
+            <TextField
+              {...register('title')}
+              fullWidth
+              error={!!errors.title}
+              placeholder='Bounty title'
+              helperText={errors.title?.message}
+              variant='outlined'
+            />
+          </Grid>
+          {modalType !== 'suggest' && (
+            <Grid item>
+              <Grid container direction='row' alignItems='center'>
+                <Grid item xs={6}>
+                  <Typography>Status</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Select
+                    labelId='select-type'
+                    id='select-type'
+                    value={watchStatus}
+                    variant='standard'
+                    label='type'
+                    onChange={handleStatusSelect}
+                  >
+                    <MenuItem value='pending'>
+                      <Chip label='Not Started' color='primary' />
+                    </MenuItem>
+                    <MenuItem value='in-progress'>
+                      <Chip label='In Progress' color='secondary' />
+                    </MenuItem>
+                    <MenuItem value='done'>
+                      <Chip label='Done' color='secondary' />
+                    </MenuItem>
+                  </Select>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
+
+          <Grid item>
+            <CharmEditor />
+          </Grid>
+
+          <Grid item>
+            <FieldLabel>Reward</FieldLabel>
+            <Divider />
+            <Box>
+              <Grid container direction='row' alignItems='center' mt={1}>
+                <Grid item xs={6}>
+                  <Typography>Reviewer</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    {...register('reviewer')}
+                    fullWidth
+                    variant='outlined'
+                    error={!!errors?.reviewer}
+                  />
+                </Grid>
+              </Grid>
+              <Grid container direction='row' alignItems='center' mt={1}>
+                <Grid item xs={6}>
+                  <Typography>Assignee</Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <TextField
+                    {...register('assignee')}
+                    fullWidth
+                    variant='outlined'
+                    error={!!errors?.assignee}
+                  />
+                </Grid>
+              </Grid>
 
     </Modal>
   );
 }
+*/

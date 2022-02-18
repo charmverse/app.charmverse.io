@@ -5,11 +5,6 @@ const config = {
   async redirects () {
     return [
       {
-        source: '/',
-        destination: '/demo',
-        permanent: false
-      },
-      {
         source: '/:domain/settings',
         destination: '/:domain/settings/account',
         permanent: true
