@@ -1,7 +1,7 @@
-import { Bounty as IBounty } from 'models/Bounty';
+import { Bounty as IBounty } from '@prisma/client';
 
 export interface IBountyService {
-  listBounties(): Promise<IBounty []>
+  listBounties(workspaceId?: string): Promise<IBounty []>
 
   readBounty(bountyId: string): Promise<IBounty>
 
