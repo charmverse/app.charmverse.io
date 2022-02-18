@@ -104,18 +104,18 @@ export default function CharmEditor (
     specRegistry,
     plugins: () => [
       new Plugin({
-        props: {
-          handleTextInput (view) {
-
-            const pageAsJson = view.state.doc.toJSON() as PageContent;
-            const rawText = view.state.doc.textContent ?? '';
-
-            if (onPageContentChange && pageAsJson) {
-              onPageContentChange({ doc: pageAsJson, rawText });
+        view: () => ({
+          update: (view, prevState) => {
+            if (!view.state.doc.eq(prevState.doc)) {
+              if (onPageContentChange) {
+                onPageContentChange({
+                  doc: view.state.doc.toJSON() as PageContent,
+                  rawText: view.state.doc.textContent as string
+                });
+              }
             }
-            return false;
           }
-        }
+        })
       }),
       imagePlugins(),
       inlinePalettePlugins(),
