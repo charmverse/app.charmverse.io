@@ -13,6 +13,9 @@ export type BountyStatus = keyof typeof BOUNTY_LABELS;
 
 export const BOUNTY_STATUSES = Object.keys(BOUNTY_LABELS) as BountyStatus [];
 
+/**
+ * TODO - Confirm if taskId should be on the bounty, or if bountyId should be on the task. Multiple entities will likely refer to the bounty
+ */
 export interface Bounty {
   id: string;
   author: string;
