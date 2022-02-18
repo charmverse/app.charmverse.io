@@ -68,7 +68,7 @@ export function BountyList () {
     return (
       <Grid container>
 
-        <Grid container alignItems='center'>
+        <Grid item container xs alignItems='center'>
 
           {
             /**
