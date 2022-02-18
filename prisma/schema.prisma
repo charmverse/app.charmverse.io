@@ -3,7 +3,7 @@
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["linux-musl", "darwin"]
+  binaryTargets = ["linux-musl", "darwin", "native"]
 }
 
 datasource db {
@@ -126,4 +126,30 @@ model SpaceRole {
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([spaceId, userId])
+}
+
+enum BountyStatus {
+  open
+  assigned
+  review
+  complete
+  paid
+}
+
+
+model Bounty {
+  id                String      @id @default(uuid()) @db.Uuid
+  author            String      @db.Uuid
+  workspaceId       String      @db.Uuid
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @default(now())
+  description       String
+  descriptionNodes  Json
+  reviewer          String      @db.Uuid
+  assignee          String      @db.Uuid
+  rewardAmount      Float
+  rewardToken       String
+  status            BountyStatus
+  title             String
+  linkedTaskId      String      @db.Uuid
 }

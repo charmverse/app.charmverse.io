@@ -7,7 +7,7 @@ import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { Page, PageContent } from 'models';
 import React, { ChangeEvent, ReactNode, useContext } from 'react';
-import CharmEditor, { UpdatePageContent } from './CharmEditor';
+import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
 import { EditingContext } from './Editing';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
@@ -94,14 +94,14 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
     setPage({ ...page, icon });
   }
 
-  function updatePageContent (content: Parameters<UpdatePageContent>[0]) {
+  function updatePageContent (content: ICharmEditorOutput) {
     if (!isEditing) {
       setIsEditing(true);
       setTimeout(() => {
         setIsEditing(false);
       }, 1500);
     }
-    setPage({ ...page, content });
+    setPage({ ...page, content: content.doc });
   }
 
   return (

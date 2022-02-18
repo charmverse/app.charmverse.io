@@ -7,7 +7,10 @@ import {
   backgroundLightColorDarkMode, blueColor,
   darkBlueColor, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
-  settingsHeaderBackgroundColorDarkMode
+  settingsHeaderBackgroundColorDarkMode,
+  lightModeColors,
+  darkModeColors,
+  BrandColors
 } from './colors';
 import { darkTheme as darkThemeFocalBoard, lightTheme as lightThemeFocalBoard } from './focalboard/theme';
 
@@ -18,7 +21,7 @@ declare module '@emotion/react' {
 
 type FocalBoardColors = typeof darkThemeFocalBoard;
 
-interface CustomColors extends FocalBoardColors {
+interface CustomColors extends FocalBoardColors, Record<BrandColors, any> {
   settingsHeader: {
     background: string
   };
@@ -47,7 +50,7 @@ declare module '@mui/material/styles/createPalette' {
     blue: Palette['primary'];
     facebook: Palette['primary'];
     twitter: Palette['primary'];
-    white: PaletteOptions['primary'];
+    white: Palette['primary'];
   }
   interface TypeBackground {
     light: string
@@ -57,7 +60,7 @@ declare module '@mui/material/styles/createPalette' {
 
 // Extend color prop on components
 declare module '@mui/material/Chip' {
-  export interface ChipPropsColorOverrides {
+  export interface ChipPropsColorOverrides extends Record<BrandColors, true> {
     facebook: true;
     twitter: true;
   }
@@ -136,11 +139,44 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     secondary: {
       main: mode === 'dark' ? '#999' : '#888'
     },
-    blue: {
-      main: '#00aced'
-    },
     white: {
       main: '#eee'
+    },
+    blue: {
+      main: mode === 'dark' ? darkModeColors.blue : lightModeColors.blue,
+      contrastText: '#ffffff' // Contrast text needs to be defined in the palette, otherwise consumers like Chip will throw an error, as contrast text is undefined
+    },
+    red: {
+      main: mode === 'dark' ? darkModeColors.red : lightModeColors.red,
+      contrastText: '#ffffff'
+    },
+    gray: {
+      main: mode === 'dark' ? darkModeColors.gray : lightModeColors.gray,
+      contrastText: '#ffffff'
+    },
+    brown: {
+      main: mode === 'dark' ? darkModeColors.brown : lightModeColors.brown,
+      contrastText: '#ffffff'
+    },
+    orange: {
+      main: mode === 'dark' ? darkModeColors.orange : lightModeColors.orange,
+      contrastText: '#ffffff'
+    },
+    yellow: {
+      main: mode === 'dark' ? darkModeColors.yellow : lightModeColors.yellow,
+      contrastText: '#ffffff'
+    },
+    green: {
+      main: mode === 'dark' ? darkModeColors.green : lightModeColors.green,
+      contrastText: '#ffffff'
+    },
+    purple: {
+      main: mode === 'dark' ? darkModeColors.purple : lightModeColors.purple,
+      contrastText: '#ffffff'
+    },
+    pink: {
+      main: mode === 'dark' ? darkModeColors.pink : lightModeColors.pink,
+      contrastText: '#ffffff'
     },
     // custom components
     settingsHeader: {

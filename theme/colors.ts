@@ -30,3 +30,31 @@ export const backgroundDarkColorDarkMode = darken(backgroundColorDarkMode, 0.3);
 export const settingsHeaderBackgroundColorDarkMode = darken(backgroundLightColorDarkMode, 0.3);
 export const scrollBarTrackBackgroundColorDarkMode = darken(backgroundLightColorDarkMode, 0.2);
 export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackgroundColorDarkMode, 0.1);
+
+export type BrandColors = 'gray' | 'brown' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'red'
+
+export type BrandColorScheme = Record<BrandColors, string>
+
+export const darkModeColors: BrandColorScheme = {
+  gray: '#7A6677',
+  brown: '#79632A',
+  orange: '#CC4B00',
+  yellow: '#B89F00',
+  green: '#007A5C',
+  blue: '#007C8F',
+  purple: '#5F396A',
+  pink: '#D11046',
+  red: '#970C0C'
+};
+
+export const lightModeColors: BrandColorScheme = {
+  gray: '#C4D0D4',
+  brown: '#E6C39E',
+  orange: '#FFAC47',
+  yellow: '#FDFD9B',
+  green: '#A8F0DD',
+  blue: '#ADF4FF',
+  purple: '#B7AFD4',
+  pink: '#EB82ED',
+  red: '#E37898'
+};

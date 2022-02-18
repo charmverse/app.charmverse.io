@@ -36,6 +36,11 @@ import IFrame, { iframeSpec } from './Iframe';
 import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 
+export interface ICharmEditorOutput {
+  doc: PageContent,
+  rawText: string
+}
+
 const specRegistry = new SpecRegistry([
   paragraph.spec(), // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   bold.spec(),
@@ -87,7 +92,7 @@ const defaultContent: PageContent = {
   ]
 };
 
-export type UpdatePageContent = (doc: PageContent) => void;
+export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 export default function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style }:
@@ -103,7 +108,10 @@ export default function CharmEditor (
           update: (view, prevState) => {
             if (!view.state.doc.eq(prevState.doc)) {
               if (onPageContentChange) {
-                onPageContentChange(view.state.doc.toJSON() as PageContent);
+                onPageContentChange({
+                  doc: view.state.doc.toJSON() as PageContent,
+                  rawText: view.state.doc.textContent as string
+                });
               }
             }
           }
