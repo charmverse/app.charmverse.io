@@ -4,12 +4,10 @@ export { FavoritePage, SpaceRole, User };
 
 export type Role = 'admin' | 'contributor';
 
-export interface PopulatedUser extends User {
-  spaceRoles: (Pick<SpaceRole, 'userId' | 'spaceId'> & { role: Role })[];
+export interface Contributor extends User {
+  role: Role;
 }
 
 export interface LoggedInUser extends User {
   favorites: FavoritePage[];
-  isLoading: boolean;
-  linkedAddressesCount: number; // from guild.xyz
 }

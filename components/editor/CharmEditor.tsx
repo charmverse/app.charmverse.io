@@ -87,9 +87,11 @@ const defaultContent: PageContent = {
   ]
 };
 
+export type UpdatePageContent = (doc: PageContent) => void;
+
 export default function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style }:
-  { content?: PageContent, children?: ReactNode, onPageContentChange?: (doc: PageContent) => any,
+  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent,
     style?: CSSProperties }
 ) {
 

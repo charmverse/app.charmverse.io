@@ -72,7 +72,7 @@ export default function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
           <ListItemIcon><StyledArticleIcon fontSize='small' /></ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Page</Typography>
         </MenuItem>
-        <MenuItem onClick={() => createPage({ type: 'database' })}>
+        <MenuItem onClick={() => createPage({ type: 'board' })}>
           <ListItemIcon><StyledDatabaseIcon fontSize='small' /></ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Board</Typography>
         </MenuItem>

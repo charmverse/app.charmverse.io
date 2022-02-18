@@ -222,41 +222,41 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
     return null;
   }
   return (
-    <ReduxProvider store={store}>
-      <FocalBoardProviders>
-        <DataProviders>
-          <TitleContext.Consumer>
-            {([title]) => (
-              <Head>
-                <title>
-                  {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-                </title>
-              </Head>
-            )}
-          </TitleContext.Consumer>
-          <Head>
-            <meta name='description' content='The Notion of Web3' />
-            <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-          </Head>
-          <ColorModeContext.Provider value={colorMode}>
-            <ThemeProvider theme={theme}>
-              <CssBaseline enableColorScheme={true} />
-              <Web3ReactProvider getLibrary={getLibrary}>
-                <Web3ConnectionManager>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <Web3ReactProvider getLibrary={getLibrary}>
+          <Web3ConnectionManager>
+            <ReduxProvider store={store}>
+              <FocalBoardProviders>
+                <DataProviders>
+                  <TitleContext.Consumer>
+                    {([title]) => (
+                      <Head>
+                        <title>
+                          {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+                        </title>
+                      </Head>
+                    )}
+                  </TitleContext.Consumer>
+                  <Head>
+                    <meta name='description' content='The Notion of Web3' />
+                    <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+                  </Head>
+                  <CssBaseline enableColorScheme={true} />
                   <RouteGuard>
                     <ErrorBoundary>
                       {getLayout(<Component {...pageProps} />)}
                     </ErrorBoundary>
                   </RouteGuard>
-                </Web3ConnectionManager>
-              </Web3ReactProvider>
-            </ThemeProvider>
-          </ColorModeContext.Provider>
-        </DataProviders>
-      </FocalBoardProviders>
-      {/** include the root portal for focalboard's popup */}
-      <FocalBoardPortal />
-    </ReduxProvider>
+                </DataProviders>
+              </FocalBoardProviders>
+              {/** include the root portal for focalboard's popup */}
+              <FocalBoardPortal />
+            </ReduxProvider>
+          </Web3ConnectionManager>
+        </Web3ReactProvider>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 

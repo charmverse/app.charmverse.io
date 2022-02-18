@@ -1,10 +1,5 @@
 
-const _fetch = (resource: string, init?: any) => {
-  const api = !resource.startsWith('http') && !resource.startsWith('/api')
-    ? process.env.NEXT_PUBLIC_API
-    : '';
-  return fetch(`${api}${resource}`, init).then(transformResponse);
-};
+type RequestInit = Parameters<typeof fetch>[1];
 
 function transformResponse (response: Response) {
   if (response.status >= 400) {
@@ -27,4 +22,6 @@ function transformResponse (response: Response) {
     });
 }
 
-export default _fetch;
+export default function fetchWrapper (resource: string, init?: RequestInit) {
+  return fetch(resource, init).then(transformResponse);
+}
