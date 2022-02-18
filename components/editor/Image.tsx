@@ -133,7 +133,7 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
         });
       }}
       >
-        <Resizer initialSize={MIN_IMAGE_SIZE} maxSize={MAX_IMAGE_SIZE} minSize={MIN_IMAGE_SIZE}>
+        <Resizer maxSize={MAX_IMAGE_SIZE} minSize={MIN_IMAGE_SIZE}>
           <StyledImage
             draggable={false}
             src={node.attrs.src}

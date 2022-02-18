@@ -4,12 +4,12 @@ import { ReactNode } from 'react';
 import { ResizableBox, ResizableProps } from 'react-resizable';
 
 interface ResizerProps {
-  maxSize: number
-  initialSize: number
-  minSize: number
+  maxSize?: number
+  minSize?: number
   children: ReactNode
   onResize?: ResizableProps['onResize']
-  aspectRatio?: number
+  minConstraints?: ResizableProps['minConstraints']
+  maxConstraints?: ResizableProps['maxConstraints']
 }
 
 export const StyledResizeHandle = styled(Box)`
@@ -35,7 +35,7 @@ export const StyledResizeHandle = styled(Box)`
 `;
 
 export default function Resizer (props: ResizerProps) {
-  const { onResize, initialSize, minSize, maxSize, children, aspectRatio = 1 } = props;
+  const { onResize, minConstraints, maxConstraints, minSize = 250, maxSize = 750, children } = props;
 
   return (
     <Box
@@ -51,12 +51,12 @@ export default function Resizer (props: ResizerProps) {
     >
       <ResizableBox
         onResize={onResize}
-        width={aspectRatio * initialSize}
-        height={initialSize}
+        width={maxConstraints?.[0] ?? maxSize}
+        height={maxConstraints?.[1] ?? maxSize}
         resizeHandles={['w', 'e']}
         lockAspectRatio
-        minConstraints={[minSize, minSize]}
-        maxConstraints={[maxSize, maxSize]}
+        minConstraints={minConstraints ?? [minSize, minSize]}
+        maxConstraints={maxConstraints ?? [maxSize, maxSize]}
         /* eslint-disable-next-line */
         handle={(handleAxis: string, ref: React.Ref<unknown>) => <StyledResizeHandle ref={ref} className={`react-resizable-handle react-resizable-handle-${handleAxis}`} />}
       >

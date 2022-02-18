@@ -176,7 +176,7 @@ export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
         });
       }}
       >
-        <Resizer initialSize={1.77 * 250} maxSize={750} minSize={1.77 * 250} aspectRatio={1.77}>
+        <Resizer minConstraints={[1.77 * 250, 250]} maxConstraints={[1.77 * 550, 600]}>
           <StyledIFrame>
             <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
           </StyledIFrame>
