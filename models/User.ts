@@ -10,4 +10,5 @@ export interface Contributor extends User {
 
 export interface LoggedInUser extends User {
   favorites: FavoritePage[];
+  ensName?: string;
 }

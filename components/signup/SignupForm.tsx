@@ -10,6 +10,7 @@ import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 import { shortenHex } from 'lib/strings';
+import useENSName from 'hooks/useENSName';
 
 import gatesImage from 'public/images/artwork/gates.png';
 import rocketImage from 'public/images/artwork/rocket.png';
@@ -43,6 +44,7 @@ const ImageContainer = styled.div`
 export default function SignupPageContent () {
 
   const { account } = useWeb3React();
+  const ensName = useENSName(account);
   const [, setUser] = useUser();
   const router = useRouter();
 
@@ -52,7 +54,7 @@ export default function SignupPageContent () {
     router.push('/createWorkspace');
   }
 
-  const welcomeMessage = `Welcome, ${account ? shortenHex(account) : ''}!`;
+  const welcomeMessage = `Welcome, ${account ? ensName || shortenHex(account) : ''}!`;
 
   return (
     <Content px={3}>
