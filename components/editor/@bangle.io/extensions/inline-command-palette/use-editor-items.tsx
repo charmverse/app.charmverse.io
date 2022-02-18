@@ -6,6 +6,7 @@ import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import ImageIcon from '@mui/icons-material/Image';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
+import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
@@ -149,12 +150,12 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       },
     },
     {
-      uid: 'iframe',
-      title: 'Iframe',
+      uid: 'video',
+      title: 'Video',
       icon: <VideoLibraryIcon
         sx={{ fontSize: 16 }}
       />,
-      description: 'Insert a iframe block in the line below',
+      description: 'Insert a video block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (state, dispatch) => {
@@ -162,7 +163,34 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.iframe.create({
-                  src: null
+                  src: null,
+                  type: "video"
+                })
+              ])
+            ))
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    },
+    {
+      uid: 'embed',
+      title: 'Embed',
+      icon: <PreviewIcon sx={{fontSize: 16}}/>,
+      description: 'Insert an embed block in the line below',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.iframe.create({
+                  src: null,
+                  type: "embed"
                 })
               ])
             ))

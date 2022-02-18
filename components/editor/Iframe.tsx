@@ -2,6 +2,7 @@ import { NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
 import { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -11,6 +12,25 @@ import IFrameSelector from './IFrameSelector';
 import Resizer from './Resizer';
 
 const name = 'iframe';
+
+function extractEmbedLink (url: string) {
+  const isYoutubeLink = url.match(/(?:https:\/\/www.youtube.com\/watch\?v=(.*)|https:\/\/youtu.be\/(.*))/);
+  const isIframeEmbed = url.startsWith('<iframe ');
+  let embedUrl = url;
+
+  if (isYoutubeLink) {
+    /* eslint-disable-next-line */
+    embedUrl = `https://www.youtube.com/embed/${isYoutubeLink[1] ?? isYoutubeLink[2]}`;
+  }
+  else if (isIframeEmbed) {
+    const indexOfSrc = url.indexOf('src');
+    const indexOfFirstQuote = url.indexOf('"', indexOfSrc);
+    const indexOfLastQuote = url.indexOf('"', indexOfFirstQuote + 1);
+    embedUrl = url.slice(indexOfFirstQuote + 1, indexOfLastQuote);
+  }
+
+  return embedUrl;
+}
 
 interface DispatchFn {
   (tr: Transaction): void;
@@ -23,15 +43,10 @@ export const iframePlugin = new Plugin({
     handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
       // @ts-ignore
       const contentRow = slice.content.content?.[0].content.content;
-      const isIframeEmbed = contentRow?.[0]?.text.startsWith('<iframe ');
-
-      if (isIframeEmbed) {
-        const urlContent = contentRow.find((row: any) => row.marks[0]?.type.name === 'link');
-        if (urlContent) {
-          const embedUrl = urlContent.marks[0].attrs.href;
-          insertIframeNode(view.state, view.dispatch, view, { src: embedUrl });
-          return true;
-        }
+      const embedUrl = extractEmbedLink(contentRow?.[0]?.text);
+      if (embedUrl) {
+        insertIframeNode(view.state, view.dispatch, view, { src: embedUrl });
+        return true;
       }
       return false;
     }
@@ -59,6 +74,10 @@ export function iframeSpec (): RawSpecs {
       attrs: {
         src: {
           default: ''
+        },
+        // Type of iframe, it could either be video or embed
+        type: {
+          default: 'embed'
         }
       },
       group: 'block',
@@ -90,9 +109,9 @@ const StyledEmptyIFrameContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement>) {
+function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement> & {type: 'video' | 'embed'}) {
   const theme = useTheme();
-
+  const { type, ...rest } = props;
   return (
     <ListItem
       button
@@ -103,12 +122,12 @@ function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement>) {
         display: 'flex',
         borderRadius: theme.spacing(0.5)
       }}
-      {...props}
+      {...rest}
     >
       <StyledEmptyIFrameContainer>
-        <VideoLibraryIcon fontSize='small' />
+        {type === 'embed' ? <PreviewIcon fontSize='small' /> : <VideoLibraryIcon fontSize='small' /> }
         <Typography>
-          Embed an iframe
+          {type === 'video' ? 'Insert a video' : 'Insert an embed'}
         </Typography>
       </StyledEmptyIFrameContainer>
     </ListItem>
@@ -127,30 +146,42 @@ const StyledIFrame = styled(Box)`
 `;
 
 export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
+  const theme = useTheme();
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
-      <IFrameSelector onIFrameSelect={(videoLink) => {
-        updateAttrs({
-          src: videoLink
-        });
-      }}
+      <IFrameSelector
+        type={node.attrs.type}
+        onIFrameSelect={(videoLink) => {
+          updateAttrs({
+            src: extractEmbedLink(videoLink)
+          });
+        }}
       >
-        <EmptyIFrameContainer />
+        <EmptyIFrameContainer type={node.attrs.type} />
       </IFrameSelector>
     );
   }
 
   return (
-    <BlockAligner onDelete={() => {
-      updateAttrs({
-        src: null
-      });
+    <Box style={{
+      margin: theme.spacing(3, 0),
+      display: 'flex',
+      flexDirection: 'column'
     }}
     >
-      <Resizer initialSize={250} maxSize={750} minSize={250}>
-        <StyledIFrame><iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} /></StyledIFrame>
-      </Resizer>
-    </BlockAligner>
+      <BlockAligner onDelete={() => {
+        updateAttrs({
+          src: null
+        });
+      }}
+      >
+        <Resizer minConstraints={[1.77 * 250, 250]} maxConstraints={[1.77 * 550, 600]}>
+          <StyledIFrame>
+            <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+          </StyledIFrame>
+        </Resizer>
+      </BlockAligner>
+    </Box>
   );
 }
