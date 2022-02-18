@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import styled from '@emotion/styled';
 import { Prisma } from '@prisma/client';
@@ -19,7 +19,7 @@ import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { shortenHex } from 'lib/strings';
+import useENSName from 'hooks/useENSName';
 import { LoggedInUser, Page, Space } from 'models';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
