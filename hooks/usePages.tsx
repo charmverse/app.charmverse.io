@@ -39,15 +39,15 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const value = useMemo(() => ({
     currentPage,
+    isEditing,
+    setIsEditing,
     pages,
     setCurrentPage,
-    setPages }), [currentPage, pages]);
+    setPages
+  }), [currentPage, isEditing, pages]);
 
   return (
-    <PagesContext.Provider value={{ ...value,
-      isEditing,
-      setIsEditing }}
-    >
+    <PagesContext.Provider value={value}>
       {children}
     </PagesContext.Provider>
   );
