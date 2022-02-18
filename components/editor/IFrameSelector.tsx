@@ -45,7 +45,7 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
                   setEmbedLink('');
                 }}
               >
-                Embed Link
+                {type === 'embed' ? 'Embed link' : 'Insert Video'}
               </Button>
             </Box>
           ]
