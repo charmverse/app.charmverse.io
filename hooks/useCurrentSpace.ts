@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
-import { Page, Space } from 'models';
+import { Space } from 'models';
 import { useSpaces } from './useSpaces';
-import { getStorageValue, setStorageValue } from './useLocalStorage';
 
 export function useCurrentSpace () {
 
@@ -10,29 +9,10 @@ export function useCurrentSpace () {
 
   const { domain } = router.query;
   const space = spaces.find(w => w.domain === domain);
-  if (!space) {
-    throw new Error(`Space not defined for domain: ${domain}`);
-  }
 
-  function setSpace (_space: Space | null, silent?: boolean) {
-    if (_space) {
-      const newSpaces = spaces.map(s => s.id === _space.id ? _space : s);
-      if (silent) {
-        setStorageValue('spaces', newSpaces);
-      }
-      else {
-        setSpaces(newSpaces);
-      }
-    }
-    else {
-      // delete the current space
-      const spaceId = space!.id;
-      const newSpaces = spaces.filter(s => s.id !== spaceId);
-      setStorageValue('spaces', newSpaces);
-      // delete pages
-      const pages = getStorageValue<Page[]>('pages', []);
-      setStorageValue('pages', pages.filter(p => p.spaceId !== spaceId));
-    }
+  function setSpace (_space: Space) {
+    const newSpaces = spaces.map(s => s.id === _space.id ? _space : s);
+    setSpaces(newSpaces);
   }
 
   return [space, setSpace] as const;

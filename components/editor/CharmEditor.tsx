@@ -77,17 +77,21 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 `;
 
+const defaultContent: PageContent = {
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      content: []
+    }
+  ]
+};
+
+export type UpdatePageContent = (doc: PageContent) => void;
+
 export default function CharmEditor (
-  { content = {
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph',
-        content: []
-      }
-    ]
-  }, children, onPageContentChange, style }:
-  { content?: PageContent, children?: ReactNode, onPageContentChange?: (doc: PageContent) => any,
+  { content = defaultContent, children, onPageContentChange, style }:
+  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent,
     style?: CSSProperties }
 ) {
 

@@ -7,7 +7,7 @@ import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { Page, PageContent } from 'models';
 import React, { ChangeEvent, ReactNode } from 'react';
-import CharmEditor from './CharmEditor';
+import CharmEditor, { UpdatePageContent } from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
 
@@ -92,6 +92,10 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
     setPage({ ...page, icon });
   }
 
+  function updatePageContent (content: Parameters<UpdatePageContent>[0]) {
+    setPage({ ...page, content });
+  }
+
   return (
     <Box>
       <PageBanner page={page} setPage={setPage} />
@@ -134,13 +138,15 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
             top: bangleEditorTop
           }}
           content={page.content as PageContent}
+          onPageContentChange={updatePageContent}
         >
-          {page?.icon && (
-          <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
-            <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-          </EmojiContainer>
-          )}
-          {page && (
+          <>
+            {page?.icon && (
+            <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
+              <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+            </EmojiContainer>
+            )}
+            {page && (
             <Box sx={{
               position: 'absolute',
               top: pageTitleTop
@@ -151,7 +157,8 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
                 onChange={updateTitle}
               />
             </Box>
-          )}
+            )}
+          </>
         </CharmEditor>
       </Container>
     </Box>

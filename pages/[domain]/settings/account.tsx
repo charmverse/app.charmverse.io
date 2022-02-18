@@ -15,9 +15,9 @@ export default function AccountSettings () {
   const [user, setUser] = useUser();
 
   return (
-    <Grid container direction='column' spacing={3}>
+    <Grid container direction='column'>
       <Grid item>
-        <Box sx={{ py: 3 }}>
+        <Box sx={{ pt: 6 }}>
           <Avatar name={user ? getDisplayName(user) : ''} />
         </Box>
       </Grid>
