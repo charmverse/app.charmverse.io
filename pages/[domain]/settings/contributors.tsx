@@ -18,17 +18,17 @@ export default function ContributorSettings () {
 
   return (
     <>
-      <Legend>
+      {/* <Legend>
         Invite Links
         <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right' }}>Add a link</Button>
       </Legend>
-      <Typography color='secondary'>No invite links yet</Typography>
-
+      <Typography color='secondary'>No invite links yet</Typography> */}
+      {/*
       <Legend>
         Token Gates
         <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right' }}>Add a gate</Button>
       </Legend>
-      <Typography color='secondary'>No token gates yet</Typography>
+      <Typography color='secondary'>No token gates yet</Typography> */}
 
       <Legend>Current Contributors</Legend>
       {space && contributors.map(contributor => (
