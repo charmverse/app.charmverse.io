@@ -1,6 +1,7 @@
 {
   "scripts": {
     "build": "next build",
+    "build:prod": "prisma generate && npm run build",
     "build:analyze": "ANALYZE=true next build",
     "lint": "eslint -c .eslintrc.json . --ext .ts --ext .tsx",
     "lint:prod": "npm run lint -- --quiet",
