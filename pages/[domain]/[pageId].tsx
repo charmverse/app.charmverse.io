@@ -1,15 +1,16 @@
+import { Prisma } from '@prisma/client';
+import charmClient from 'charmClient';
 import { PageLayout } from 'components/common/page-layout';
-import { usePageTitle } from 'hooks/usePageTitle';
 import { DatabaseEditor } from 'components/databases';
 import { Editor } from 'components/editor';
 import { usePages } from 'hooks/usePages';
+import { usePageTitle } from 'hooks/usePageTitle';
 import { Page } from 'models';
-import { Prisma } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect } from 'react';
-import charmClient from 'charmClient';
 
 export default function BlocksEditorPage () {
+
   const { pages, setPages, setCurrentPage } = usePages();
   const router = useRouter();
   const { pageId } = router.query;

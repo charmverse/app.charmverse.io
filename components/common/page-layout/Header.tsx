@@ -1,20 +1,21 @@
-import styled from '@emotion/styled';
 import { useTheme } from '@emotion/react';
-import Toolbar from '@mui/material/Toolbar';
+import styled from '@emotion/styled';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import NotFavoritedIcon from '@mui/icons-material/StarBorder';
-import FavoritedIcon from '@mui/icons-material/Star';
 import MenuIcon from '@mui/icons-material/Menu';
+import FavoritedIcon from '@mui/icons-material/Star';
+import NotFavoritedIcon from '@mui/icons-material/StarBorder';
+import { Box, CircularProgress } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/router';
-import { useColorMode } from 'context/color-mode';
-import { usePageTitle } from 'hooks/usePageTitle';
-import { usePages } from 'hooks/usePages';
-import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
+import { useColorMode } from 'context/color-mode';
+import { usePages } from 'hooks/usePages';
+import { usePageTitle } from 'hooks/usePageTitle';
+import { useUser } from 'hooks/useUser';
+import { useRouter } from 'next/router';
 
 export const headerHeight = 56;
 
@@ -25,11 +26,10 @@ const StyledToolbar = styled(Toolbar)`
 `;
 
 export default function Header ({ open, openSidebar }: { open: boolean, openSidebar: () => void }) {
-
   const router = useRouter();
   const colorMode = useColorMode();
   const [pageTitle] = usePageTitle();
-  const { currentPage } = usePages();
+  const { currentPage, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
 
@@ -59,23 +59,55 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
       >
         <MenuIcon />
       </IconButton>
-      <Typography noWrap component='div' sx={{ flexGrow: 1, fontWeight: 500 }}>
-        {pageTitle}
-      </Typography>
-      {/** favorite toggle */}
-      {isPage && (
-      <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
-        <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
-          {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
-        </IconButton>
-      </Tooltip>
-      )}
-      {/** dark mode toggle */}
-      <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
-        <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-          {theme.palette.mode === 'dark' ? <Brightness7Icon color='secondary' /> : <Brightness4Icon color='secondary' />}
-        </IconButton>
-      </Tooltip>
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 1,
+        width: '100%'
+      }}
+      >
+        <Box sx={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2
+        }}
+        >
+          <Typography noWrap component='div' sx={{ fontWeight: 500 }}>
+            {pageTitle}
+          </Typography>
+          {isEditing && (
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}
+            >
+              <CircularProgress size={12} />
+              <Typography variant='subtitle2'>
+                Saving
+              </Typography>
+            </Box>
+          )}
+        </Box>
+        {/** favorite toggle */}
+        <Box>
+          {isPage && (
+          <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
+            <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
+              {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
+            </IconButton>
+          </Tooltip>
+          )}
+          {/** dark mode toggle */}
+          <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
+            <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+              {theme.palette.mode === 'dark' ? <Brightness7Icon color='secondary' /> : <Brightness4Icon color='secondary' />}
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Box>
     </StyledToolbar>
   );
 }

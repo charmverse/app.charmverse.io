@@ -101,6 +101,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     subtitle1: {
       fontSize: '0.85rem',
       fontWeight: 600
+    },
+    subtitle2: {
+      opacity: 0.65,
+      fontSize: '0.8rem',
+      fontWeight: 400
     }
   },
   palette: {
