@@ -1,13 +1,10 @@
 
-import { useRef } from 'react';
-import { Controller, Path, useForm, UseFormRegister } from 'react-hook-form';
-import TextField from '@mui/material/TextField';
-import BangleEditor from 'components/editor/BangleEditor';
-import { Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
-import { InputSearchCrypto } from './InputSearchCrypto';
-import { InputSearchCurrency } from './InputSearchCurrency';
+import TextField from '@mui/material/TextField';
+import Input from '@mui/material/Input';
+import { Path, UseFormRegister } from 'react-hook-form';
 import { InputSearchCollaborator } from './InputSearchCollaborator';
+import { InputSearchCrypto } from './InputSearchCrypto';
 
 type NativeHtmlInputType = 'text' |'textMultiline' | 'number'
 
@@ -74,12 +71,13 @@ export function GenericInput<T = any> ({ register, fieldConfig }: IGenericInputC
           <InputLabel>
             {fieldConfig.label ?? 'Amount'}
           </InputLabel>
-          <TextField
+          <Input
             {...register(fieldConfig.modelKey as Path<T>, {
               valueAsNumber: true
             })}
             fullWidth
-            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+            type='number'
+            inputProps={{ step: 0.000000001 }}
           />
         </>
       );
