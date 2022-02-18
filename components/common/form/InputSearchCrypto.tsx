@@ -1,11 +1,22 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
 import Image from 'next/image';
 import { CryptoCurrencyList, CryptoCurrency, CryptoLogoPaths } from 'models/Currency';
+import { UseFormRegister } from 'react-hook-form';
 
 const currencyOptions = Object.keys(CryptoCurrencyList);
 
-export function InputSearchCrypto ({ onChange, defaultValue }:
-    { onChange: (value: CryptoCurrency) => any, defaultValue?: CryptoCurrency }) {
+export interface IInputSearchCryptoProps {
+  onChange: (value: CryptoCurrency) => any,
+  defaultValue?: CryptoCurrency,
+  register?: UseFormRegister<any>
+  modelKey?: string
+}
+
+export function InputSearchCrypto ({
+  onChange,
+  defaultValue,
+  register = () => [] as any,
+  modelKey = '-' }: IInputSearchCryptoProps) {
 
   function emitValue (value: string) {
     if (value !== null && currencyOptions.indexOf(value) >= 0) {
@@ -39,6 +50,7 @@ export function InputSearchCrypto ({ onChange, defaultValue }:
       )}
       renderInput={(params) => (
         <TextField
+          {...register(modelKey)}
           {...params}
           label='Choose a crypto'
           inputProps={{

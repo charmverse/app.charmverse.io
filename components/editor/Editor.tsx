@@ -92,8 +92,8 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
     setPage({ ...page, icon });
   }
 
-  function updatePageContent (content: Parameters<UpdatePageContent>[0]) {
-    setPage({ ...page, content });
+  function updatePageContent ({ doc, rawText }: Parameters<UpdatePageContent>[0]) {
+    setPage({ ...page, content: doc, contentText: rawText });
   }
 
   return (

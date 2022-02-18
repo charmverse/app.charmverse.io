@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, Prisma, Page, User } from '@prisma/client';
+import { Block, Space, Prisma, Page, User, Bounty } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -10,6 +10,7 @@ import { Block as FBBlock, BlockPatch } from 'components/databases/focalboard/sr
 import { IUser, UserWorkspace } from 'components/databases/focalboard/src/user';
 import { IWorkspace } from 'components/databases/focalboard/src/blocks/workspace';
 import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
+import { v4 } from 'uuid';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -219,6 +220,16 @@ class CharmClient {
     updater(fbBlocks);
   }
 
+  listBounties (workspaceId?: string): Promise<Bounty []> {
+    return http.GET<Bounty[]>('/api/bounties');
+  }
+
+  async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
+
+    const data = await http.POST<Bounty[]>('/api/bounties');
+
+    return data[0];
+  }
 }
 
 const charmClient = new CharmClient();
