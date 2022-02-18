@@ -1,8 +1,5 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import AlignHorizontalCenterIcon from '@mui/icons-material/AlignHorizontalCenter';
-import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
-import AlignHorizontalRightIcon from '@mui/icons-material/AlignHorizontalRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ListItem } from '@mui/material';
 import { ReactNode, useState } from 'react';
@@ -46,40 +43,6 @@ export default function BlockAligner (props: BlockAlignerProps) {
       <div className='content' style={{ position: 'relative' }}>
         {children}
         <Controls className='controls'>
-          {[
-            [
-              'start', <AlignHorizontalLeftIcon sx={{
-                fontSize: 14
-              }}
-              />
-            ], [
-              'center', <AlignHorizontalCenterIcon sx={{
-                fontSize: 14
-              }}
-              />
-            ], [
-              'end', <AlignHorizontalRightIcon
-                sx={{
-                  fontSize: 14
-                }}
-              />
-            ]
-          ].map(([alignLabel, alignIcon]) => (
-            <ListItem
-              key={alignLabel as string}
-              sx={{
-                padding: theme.spacing(1),
-                backgroundColor: align === alignLabel ? theme.palette.background.dark : 'inherit'
-              }}
-              button
-              disableRipple
-              onClick={() => {
-                setAlign(alignLabel as string);
-              }}
-            >
-              {alignIcon}
-            </ListItem>
-          ))}
           <ListItem
             button
             disableRipple

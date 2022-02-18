@@ -88,7 +88,6 @@ const StyledImage = styled.img`
     cursor: initial;
   }
   border-radius: ${({ theme }) => theme.spacing(1)};
-  box-shadow: ${({ theme }) => theme.shadows[3]}
 `;
 
 export function Image ({ node, updateAttrs }: NodeViewProps) {
@@ -115,18 +114,6 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
       flexDirection: 'column'
     }}
     >
-      <Box sx={{
-        margin: theme.spacing(1, 0)
-      }}
-      >
-        <a
-          href={node.attrs.src}
-          rel='noopener noreferrer nofollow'
-          target='_blank'
-        >
-          {node.attrs.src}
-        </a>
-      </Box>
       <BlockAligner onDelete={() => {
         updateAttrs({
           src: null
