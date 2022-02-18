@@ -18,6 +18,7 @@ export function BountyList () {
       const foundBounties = await BountyService.listBounties();
 
       // Tenporary measure to seed new bounties so we can experiment with different colour statuses
+      /*
       while (foundBounties.length >= 2 && foundBounties.length < 15) {
 
         const position = Math.random() > 0.5 ? 0 : 1;
@@ -36,6 +37,7 @@ export function BountyList () {
 
         foundBounties.push(copiedBounty);
       }
+      */
 
       setBountyList(foundBounties);
 
