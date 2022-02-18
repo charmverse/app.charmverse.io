@@ -1,11 +1,12 @@
 import styled from '@emotion/styled';
-import Head from 'next/head';
 import { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
+import { Editing } from 'components/editor/Editing';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
+import Head from 'next/head';
 import * as React from 'react';
 import Header, { headerHeight } from './Header';
 import Sidebar from './Sidebar';
@@ -89,7 +90,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <>
+    <Editing>
       <Head>
         {currentPage?.icon
           ? <link rel='icon' type='image/svg+xml' href={`data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${currentPage?.icon || ''}</text></svg>`} />
@@ -113,6 +114,6 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
           </Box>
         </Box>
       </Box>
-    </>
+    </Editing>
   );
 }

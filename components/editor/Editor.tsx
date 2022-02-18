@@ -6,8 +6,9 @@ import Box from '@mui/material/Box';
 import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { Page, PageContent } from 'models';
-import React, { ChangeEvent, ReactNode } from 'react';
+import React, { ChangeEvent, ReactNode, useContext } from 'react';
 import CharmEditor, { UpdatePageContent } from './CharmEditor';
+import { EditingContext } from './Editing';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
 
@@ -48,6 +49,7 @@ function randomIntFromInterval (min: number, max: number) {
 }
 
 export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => void }) {
+  const { isEditing, setIsEditing } = useContext(EditingContext);
 
   let pageControlTop = 0;
 
@@ -93,7 +95,12 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
   }
 
   function updatePageContent (content: Parameters<UpdatePageContent>[0]) {
-    console.log('Content updated');
+    if (!isEditing) {
+      setIsEditing(true);
+      setTimeout(() => {
+        setIsEditing(false);
+      }, 1500);
+    }
     setPage({ ...page, content });
   }
 

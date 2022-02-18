@@ -99,14 +99,15 @@ export default function CharmEditor (
     specRegistry,
     plugins: () => [
       new Plugin({
-        filterTransaction: (tr, _state) => {
-          if (tr.docChanged) {
-            if (onPageContentChange) {
-              onPageContentChange(_state.doc.toJSON() as PageContent);
+        view: () => ({
+          update: (view, prevState) => {
+            if (!view.state.doc.eq(prevState.doc)) {
+              if (onPageContentChange) {
+                onPageContentChange(view.state.doc.toJSON() as PageContent);
+              }
             }
           }
-          return true;
-        }
+        })
       }),
       imagePlugins(),
       inlinePalettePlugins(),
