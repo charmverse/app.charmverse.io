@@ -16,7 +16,7 @@ import rocketImage from 'public/images/artwork/rocket.png';
 
 export const Content = styled(Box)`
   max-width: 100%;
-  width: 1170px;
+  width: 1000px;
   margin: 0 auto;
 `;
 
@@ -56,8 +56,8 @@ export default function SignupPageContent () {
 
   return (
     <Content px={3}>
-      <Box my={6}>
-        <Typography gutterBottom variant='h1' align='center'>
+      <Box mb={6}>
+        <Typography gutterBottom variant='h1' sx={{ fontSize: '2.5rem' }} align='center'>
           {welcomeMessage}
         </Typography>
         <Typography variant='h2' align='center'>
