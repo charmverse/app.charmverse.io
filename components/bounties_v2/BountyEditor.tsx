@@ -20,7 +20,8 @@ function bountyEditorFields (bounty?: IBounty): IInputField<IBounty> [] {
       fieldType: 'text',
       modelKey: 'title',
       label: 'Bounty title',
-      value: bounty?.title
+      value: bounty?.title,
+      required: true
     },
     {
       fieldType: 'text',

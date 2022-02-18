@@ -38,6 +38,7 @@ export function GenericInput<T = any> ({ register, fieldConfig }: IGenericInputC
           {...register(fieldConfig.modelKey as Path<T>, {
             value: fieldConfig.value ?? ''
           })}
+          required={fieldConfig.required === true}
           fullWidth
           placeholder={fieldConfig.placeholder}
           variant='outlined'
