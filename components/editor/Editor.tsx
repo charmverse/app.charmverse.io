@@ -93,6 +93,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
   }
 
   function updatePageContent (content: Parameters<UpdatePageContent>[0]) {
+    console.log('Content updated');
     setPage({ ...page, content });
   }
 

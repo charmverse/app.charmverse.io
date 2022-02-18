@@ -99,13 +99,13 @@ export default function CharmEditor (
     specRegistry,
     plugins: () => [
       new Plugin({
-        props: {
-          handleTextInput (view) {
+        filterTransaction: (tr, _state) => {
+          if (tr.docChanged) {
             if (onPageContentChange) {
-              onPageContentChange(view.state.doc.toJSON() as PageContent);
+              onPageContentChange(_state.doc.toJSON() as PageContent);
             }
-            return false;
           }
+          return true;
         }
       }),
       imagePlugins(),
