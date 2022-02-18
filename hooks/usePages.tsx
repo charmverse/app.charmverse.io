@@ -1,24 +1,29 @@
-import { ReactNode, createContext, useContext, useMemo, useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
+import * as React from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { useCurrentSpace } from './useCurrentSpace';
 
 type IContext = {
   currentPage: Page | null,
   pages: Page[],
   setCurrentPage: Dispatch<SetStateAction<Page | null>>,
-  setPages: Dispatch<SetStateAction<Page[]>>
+  setPages: Dispatch<SetStateAction<Page[]>>,
+  isEditing: boolean
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 export const PagesContext = createContext<Readonly<IContext>>({
   currentPage: null,
   pages: [],
   setCurrentPage: () => undefined,
-  setPages: () => undefined
+  setPages: () => undefined,
+  isEditing: true,
+  setIsEditing: () => { }
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
-
+  const [isEditing, setIsEditing] = useState(false);
   const [space] = useCurrentSpace();
   const [pages, setPages] = useState<Page[]>([]);
   const [currentPage, setCurrentPage] = useState<Page | null>(null);
@@ -32,10 +37,17 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
   }, [space]);
 
-  const value = useMemo(() => ({ currentPage, pages, setCurrentPage, setPages }), [currentPage, pages]);
+  const value = useMemo(() => ({
+    currentPage,
+    pages,
+    setCurrentPage,
+    setPages }), [currentPage, pages]);
 
   return (
-    <PagesContext.Provider value={value}>
+    <PagesContext.Provider value={{ ...value,
+      isEditing,
+      setIsEditing }}
+    >
       {children}
     </PagesContext.Provider>
   );

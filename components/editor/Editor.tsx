@@ -5,10 +5,10 @@ import { ListItem, ListItemProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
+import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
-import React, { ChangeEvent, ReactNode, useContext } from 'react';
+import React, { ChangeEvent, ReactNode } from 'react';
 import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
-import { EditingContext } from './Editing';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
 
@@ -49,7 +49,7 @@ function randomIntFromInterval (min: number, max: number) {
 }
 
 export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => void }) {
-  const { isEditing, setIsEditing } = useContext(EditingContext);
+  const { isEditing, setIsEditing } = usePages();
 
   let pageControlTop = 0;
 

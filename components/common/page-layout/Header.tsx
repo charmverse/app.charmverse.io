@@ -11,13 +11,11 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
-import { EditingContext } from 'components/editor/Editing';
 import { useColorMode } from 'context/color-mode';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
-import { useContext } from 'react';
 
 export const headerHeight = 56;
 
@@ -28,11 +26,10 @@ const StyledToolbar = styled(Toolbar)`
 `;
 
 export default function Header ({ open, openSidebar }: { open: boolean, openSidebar: () => void }) {
-  const { isEditing } = useContext(EditingContext);
   const router = useRouter();
   const colorMode = useColorMode();
   const [pageTitle] = usePageTitle();
-  const { currentPage } = usePages();
+  const { currentPage, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
 
