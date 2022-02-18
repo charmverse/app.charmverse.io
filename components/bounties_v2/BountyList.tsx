@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Bounty as IBounty, BountyStatus } from 'models/Bounty';
+import { Bounty as IBounty } from '@prisma/client';
 import Loader from 'components/common/Loader';
 import { Bounty } from 'components/bounties_v2/Bounty';
 import { Typography, Button, Grid } from '@mui/material';
@@ -113,7 +113,7 @@ export function BountyList () {
       }
 
           { bountyList.length > 0
-        && bountyList.map(availableBounty => {
+        && bountyList?.map(availableBounty => {
           return <Bounty key={availableBounty.id + Math.random().toString()} bounty={availableBounty} />;
         })}
 
