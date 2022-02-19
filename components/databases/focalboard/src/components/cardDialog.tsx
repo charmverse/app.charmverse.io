@@ -1,33 +1,33 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
-
-import {Board} from '../blocks/board'
-import {BoardView} from '../blocks/boardView'
-import {Card} from '../blocks/card'
+import React, { useState } from 'react'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { Board } from '../blocks/board'
+import { BoardView } from '../blocks/boardView'
+import { Card } from '../blocks/card'
+import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../components/confirmationDialogBox'
 import mutator from '../mutator'
-import {getCard} from '../store/cards'
-import {getCardComments} from '../store/comments'
-import {getCardContents} from '../store/contents'
-import {useAppSelector} from '../store/hooks'
-import {Utils} from '../utils'
+import { getCard } from '../store/cards'
+import { getCardComments } from '../store/comments'
+import { getCardContents } from '../store/contents'
+import { useAppSelector } from '../store/hooks'
+import { getUserBlockSubscriptionList } from '../store/initialLoad'
+import { getMe } from '../store/users'
+import { IUser } from '../user'
+import { Utils } from '../utils'
+import Button from '../widgets/buttons/button'
 import DeleteIcon from '../widgets/icons/delete'
 import LinkIcon from '../widgets/icons/Link'
 import Menu from '../widgets/menu'
-
-import ConfirmationDialogBox, {ConfirmationDialogBoxProps} from '../components/confirmationDialogBox'
-
-import Button from '../widgets/buttons/button'
-
-import {getUserBlockSubscriptionList} from '../store/initialLoad'
-
-import {IUser} from '../user'
-import {getMe} from '../store/users'
-
 import CardDetail from './cardDetail/cardDetail'
 import Dialog from './dialog'
-import {sendFlashMessage} from './flashMessages'
+import { sendFlashMessage } from './flashMessages'
+
+
+
+
+
+
 
 
 type Props = {
@@ -124,13 +124,13 @@ const CardDialog = (props: Props): JSX.Element => {
                     sendFlashMessage({content: intl.formatMessage({id: 'CardDialog.copiedLink', defaultMessage: 'Copied!'}), severity: 'high'})
                 }}
             />
-            {(card && !card.fields.isTemplate) &&
+            {/* {(card && !card.fields.isTemplate) &&
                 <Menu.Text
                     id='makeTemplate'
                     name='New template from card'
                     onClick={makeTemplateClicked}
                 />
-            }
+            } */}
         </Menu>
     )
 
@@ -165,7 +165,7 @@ const CardDialog = (props: Props): JSX.Element => {
             <Dialog
                 onClose={props.onClose}
                 toolsMenu={!props.readonly && menu}
-                toolbar={toolbar}
+                // toolbar={toolbar}
             >
                 {card && card.fields.isTemplate &&
                     <div className='banner'>

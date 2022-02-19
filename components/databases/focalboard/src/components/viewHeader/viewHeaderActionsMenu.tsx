@@ -1,24 +1,23 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState} from 'react'
-import {useIntl, IntlShape} from 'react-intl'
-
-import {CsvExporter} from '../../csvExporter'
-import {Archiver} from '../../archiver'
-import {IUser} from '../../user'
-import {Board} from '../../blocks/board'
-import {BoardView} from '../../blocks/boardView'
-import {Card} from '../../blocks/card'
+import React, { useState } from 'react'
+import { IntlShape, useIntl } from 'react-intl'
+import { Board } from '../../blocks/board'
+import { BoardView } from '../../blocks/boardView'
+import { Card } from '../../blocks/card'
+import { CsvExporter } from '../../csvExporter'
+import { useAppSelector } from '../../store/hooks'
+import { getMe } from '../../store/users'
+import { IUser } from '../../user'
 import IconButton from '../../widgets/buttons/iconButton'
 import OptionsIcon from '../../widgets/icons/options'
 import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
-import {getMe} from '../../store/users'
-import {useAppSelector} from '../../store/hooks'
-
+import { sendFlashMessage } from '../flashMessages'
 import ModalWrapper from '../modalWrapper'
 import ShareBoardComponent from '../shareBoardComponent'
-import {sendFlashMessage} from '../flashMessages'
+
+
 
 type Props = {
     board: Board
@@ -115,11 +114,6 @@ const ViewHeaderActionsMenu = React.memo((props: Props) => {
                         id='exportCsv'
                         name={intl.formatMessage({id: 'ViewHeader.export-csv', defaultMessage: 'Export to CSV'})}
                         onClick={() => onExportCsvTrigger(board, activeView, cards, intl)}
-                    />
-                    <Menu.Text
-                        id='exportBoardArchive'
-                        name={intl.formatMessage({id: 'ViewHeader.export-board-archive', defaultMessage: 'Export board archive'})}
-                        onClick={() => Archiver.exportBoardArchive(board)}
                     />
                     {showShareBoard &&
                         <Menu.Text
