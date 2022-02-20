@@ -225,6 +225,13 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
         }
       }
     },
+    MuiAutocomplete: {
+      styleOverrides: {
+        popper: {
+          zIndex: 3000
+        }
+      }
+    },
     MuiPopover: {
       styleOverrides: {
         root: {
