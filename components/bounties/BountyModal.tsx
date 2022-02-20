@@ -1,32 +1,21 @@
-import { v4 as uuid } from 'uuid';
-import { useState } from 'react';
-import { DialogTitle, Modal } from 'components/common/Modal';
-import { Plugin } from '@bangle.dev/core';
-import { Typography, Box } from '@mui/material';
-import { useEditorState, BangleEditor } from '@bangle.dev/react';
-import FieldLabel from 'components/settings/FieldLabel';
-import Image from 'next/image';
-import { useForm } from 'react-hook-form';
-import { useUser } from 'hooks/useUser';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { Box, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
-import PrimaryButton from 'components/common/PrimaryButton';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import { Bounty, BOUNTY_STATUSES, BountyStatus } from 'models/Bounty';
-import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { CryptoCurrency, CryptoCurrencyList } from 'models/Currency';
-import getDisplayName from 'lib/users/getDisplayName';
+import { DialogTitle, Modal } from 'components/common/Modal';
+import CharmEditor from 'components/editor/CharmEditor';
+import FieldLabel from 'components/settings/FieldLabel';
+import { useUser } from 'hooks/useUser';
 
 interface IToken {
   symbol: string;
   img: string;
 }
 
+/*
 const CRYPTO_CURRENCY_LIST = Object.keys(CryptoCurrencyList) as CryptoCurrency[];
 
 type ModalType = 'create' | 'edit' | 'suggest';
@@ -68,69 +57,6 @@ export type FormValues = yup.InferType<typeof schema>;
 export default function BountyModal (props: Props) {
   const { open, onClose, onSubmit: _onSubmit, modalType, bounty } = props;
   const [user] = useUser();
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors }
-  } = useForm<FormValues>({
-    defaultValues:
-      modalType !== 'edit'
-        ? {
-          author: user ? getDisplayName(user) : '',
-          title: 'New Bounty',
-          description: {
-            type: 'doc',
-            content: []
-          },
-          type: 'social',
-          status: 'pending',
-          rewardToken: 'ETH',
-          reviewer: user ? getDisplayName(user) : ''
-        }
-        : bounty,
-    resolver: yupResolver(schema)
-  });
-
-  const editorState = useEditorState({
-    // TODO: somehow the bangle.dev not updating the new state
-    initialValue: modalType === 'create' ? 'Edit bounty description...' : bounty?.description,
-    plugins: () => [
-      new Plugin({
-        view: () => ({
-          update: (view, prevState) => {
-            if (!view.state.doc.eq(prevState.doc)) {
-              setValue('description', view.state.doc.toJSON() as FormValues['description']);
-            }
-          }
-        })
-      })
-    ]
-  });
-
-  const handleStatusSelect = (e: SelectChangeEvent) => {
-    setValue('status', e.target.value as BountyStatus);
-  };
-
-  const watchStatus = watch('status');
-
-  function setToken (token: CryptoCurrency) {
-    setValue('rewardToken', token);
-  }
-
-  if (modalType === 'edit' && !bounty) {
-    return <span />;
-  }
-
-  function onSubmit (values: FormValues) {
-    _onSubmit({
-      id: uuid(),
-      createdAt: new Date(),
-      ...values
-    });
-  }
 
   return (
     <Modal size='large' open={open} onClose={onClose}>
@@ -178,7 +104,7 @@ export default function BountyModal (props: Props) {
           )}
 
           <Grid item>
-            <BangleEditor state={editorState} />
+            <CharmEditor />
           </Grid>
 
           <Grid item>
@@ -213,43 +139,7 @@ export default function BountyModal (props: Props) {
                 </Grid>
               </Grid>
 
-              {/* Render Token Select */}
-              <Grid container direction='row' alignItems='center' mt={1}>
-                <Grid item xs={6}>
-                  <Typography>Token</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <InputSearchCrypto defaultValue={bounty?.rewardToken} onChange={setToken} />
-                </Grid>
-              </Grid>
-              {/* Render token amount */}
-              <Grid container direction='row' alignItems='center' mt={1}>
-                <Grid item xs={6}>
-                  <Typography>Amount</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    {...register('rewardAmount')}
-                    fullWidth
-                    variant='outlined'
-                    type='number'
-                    error={!!errors?.rewardAmount}
-                  />
-                </Grid>
-              </Grid>
-              <br />
-              <Divider />
-            </Box>
-          </Grid>
-          <Grid item>
-            <Box display='flex' justifyContent='flex-end'>
-              <PrimaryButton type='submit'>
-                {modalType !== 'edit' ? 'Create' : 'Update'}
-              </PrimaryButton>
-            </Box>
-          </Grid>
-        </Grid>
-      </form>
     </Modal>
   );
 }
+*/

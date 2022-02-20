@@ -10,22 +10,11 @@ import Legend from 'components/settings/Legend';
 import Avatar from 'components/settings/LargeAvatar';
 import { setTitle } from 'hooks/usePageTitle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { FormValues, schema } from 'components/common/CreateSpaceForm';
 import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-
-export const schema = yup.object({
-  domain: yup.string().ensure().trim().lowercase()
-    .min(3, 'Domain must be at least 3 characters')
-    .matches(/^[0-9a-z-]*$/, 'Domain must be only lowercase hyphens, letters, and numbers')
-    .required('Domain is required'),
-  name: yup.string().ensure().trim()
-    .min(3, 'Name must be at least 3 characters')
-    .required('Name is required')
-});
-
-export type FormValues = yup.InferType<typeof schema>;
+import charmClient from 'charmClient';
 
 export default function WorkspaceSettings () {
 
@@ -47,20 +36,26 @@ export default function WorkspaceSettings () {
 
   const watchName = watch('name');
 
-  function onSubmit (values: FormValues) {
+  async function onSubmit (values: FormValues) {
+    if (!space) return;
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
-    setSpace({ ...space, ...values }, newDomain);
+    const updatedSpace = await charmClient.updateSpace({ ...space, ...values });
     if (newDomain) {
       window.location.href = router.asPath.replace(space.domain, values.domain);
     }
-    reset(values);
+    else {
+      setSpace(updatedSpace);
+    }
+    reset(updatedSpace);
   }
 
-  function deleteWorkspace () {
-    if (window.confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
-      setSpace(null);
-      window.location.href = `/${spaces[0].domain}`;
+  async function deleteWorkspace () {
+    if (space && window.confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
+      await charmClient.deleteSpace(space!.id);
+      const nextSpace = spaces.filter(s => s.id !== space.id)[0];
+      console.log(nextSpace);
+      window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
     }
   }
 
@@ -94,7 +89,7 @@ export default function WorkspaceSettings () {
             <PrimaryButton disabled={!isDirty} type='submit'>
               Save
             </PrimaryButton>
-            <Button disabled={spaces.length === 1} variant='outlined' color='error' onClick={deleteWorkspace}>
+            <Button variant='outlined' color='error' onClick={deleteWorkspace}>
               Delete Workspace
             </Button>
           </Grid>

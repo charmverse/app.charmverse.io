@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -6,23 +7,42 @@ import FieldLabel from 'components/settings/FieldLabel';
 import Avatar from 'components/settings/LargeAvatar';
 import Divider from '@mui/material/Divider';
 import { useUser } from 'hooks/useUser';
-import { Space } from 'models';
-import { FormValues, schema } from 'pages/[domain]/settings/workspace';
+import { Prisma, Space } from '@prisma/client';
 import { ChangeEvent } from 'react';
 import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
 import getDisplayName from 'lib/users/getDisplayName';
+import { DOMAIN_BLACKLIST } from 'models/Space';
+import charmClient from 'charmClient';
+
+export const schema = yup.object({
+  id: yup.string(),
+  domain: yup.string().ensure().trim().lowercase()
+    .min(3, 'Domain must be at least 3 characters')
+    .matches(/^[0-9a-z-]*$/, 'Domain must be only lowercase hyphens, letters, and numbers')
+    .notOneOf(DOMAIN_BLACKLIST, 'Domain is not allowed')
+    .required('Domain is required')
+    .test('domain-exists', 'Domain already exists', async function checkDomain (domain) {
+      const { ok } = await charmClient.checkDomain({ domain, spaceId: this.parent.id });
+      return !ok;
+    }),
+  name: yup.string().ensure().trim()
+    .min(3, 'Name must be at least 3 characters')
+    .required('Name is required')
+});
+
+export type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
-  onCancel: () => void;
-  onSubmit: (values: Space) => void;
+  defaultValues?: { name: string, domain: string };
+  onCancel?: () => void;
+  onSubmit: (values: Prisma.SpaceCreateInput) => void;
+  submitText?: string;
 }
 
-export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Props) {
+export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText }: Props) {
 
   const [user] = useUser();
-
-  const defaultName = `${getDisplayName(user!)}'s Workspace`;
 
   const {
     register,
@@ -31,10 +51,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
     watch,
     formState: { errors, touchedFields }
   } = useForm<FormValues>({
-    defaultValues: {
-      name: defaultName,
-      domain: getDomainFromName(defaultName)
-    },
+    defaultValues,
     resolver: yupResolver(schema)
   });
 
@@ -42,15 +59,26 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
   const watchDomain = watch('domain');
 
   function onSubmit (values: FormValues) {
-    const newId = Math.random().toString().replace('0.', '');
     try {
       _onSubmit({
+        author: {
+          connect: {
+            id: user!.id
+          }
+        },
         createdAt: new Date(),
-        createdBy: user!.id,
         updatedAt: new Date(),
         updatedBy: user!.id,
-        deletedAt: null,
-        id: newId,
+        permissions: {
+          create: [{
+            role: 'admin',
+            user: {
+              connect: {
+                id: user!.id
+              }
+            }
+          }]
+        },
         ...values
       });
     }
@@ -80,7 +108,10 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
         <Grid item>
           <FieldLabel>Name</FieldLabel>
           <TextField
-            {...register('name', { onChange: onChangeName })}
+            {...register('name', {
+              onChange: onChangeName
+            })}
+            autoFocus
             fullWidth
             error={!!errors.name}
             helperText={errors.name?.message}
@@ -97,7 +128,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
         </Grid>
         <Grid item>
           <PrimaryButton disabled={!watchName || !watchDomain} type='submit'>
-            Create Workspace
+            {submitText || 'Create Workspace'}
           </PrimaryButton>
         </Grid>
       </Grid>
@@ -106,6 +137,6 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onCancel }: Pr
 
 }
 
-function getDomainFromName (name: string) {
+export function getDomainFromName (name: string) {
   return name.replace(/[\p{P}\p{S}]/gu, '').replace(/\s/g, '-').toLowerCase();
 }

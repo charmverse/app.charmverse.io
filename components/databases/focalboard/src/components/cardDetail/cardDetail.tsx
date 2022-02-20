@@ -1,28 +1,27 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {FormattedMessage} from 'react-intl'
-
-import {BlockIcons} from '../../blockIcons'
-import {Card} from '../../blocks/card'
-import {BoardView} from '../../blocks/boardView'
-import {Board} from '../../blocks/board'
-import {CommentBlock} from '../../blocks/commentBlock'
-import {ContentBlock} from '../../blocks/contentBlock'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { FormattedMessage } from 'react-intl'
+import { BlockIcons } from '../../blockIcons'
+import { Board } from '../../blocks/board'
+import { BoardView } from '../../blocks/boardView'
+import { Card } from '../../blocks/card'
+import { CommentBlock } from '../../blocks/commentBlock'
+import { ContentBlock } from '../../blocks/contentBlock'
 import mutator from '../../mutator'
 import Button from '../../widgets/buttons/button'
-import {Focusable} from '../../widgets/editable'
+import { Focusable } from '../../widgets/editable'
 import EditableArea from '../../widgets/editableArea'
 import EmojiIcon from '../../widgets/icons/emoji'
-
 import BlockIconSelector from '../blockIconSelector'
-
-import CommentsList from './commentsList'
-import {CardDetailProvider} from './cardDetailContext'
 import CardDetailContents from './cardDetailContents'
-import CardDetailContentsMenu from './cardDetailContentsMenu'
+import { CardDetailProvider } from './cardDetailContext'
 import CardDetailProperties from './cardDetailProperties'
+import CommentsList from './commentsList'
 import useImagePaste from './imagePaste'
+
+
+
 
 
 type Props = {
@@ -148,7 +147,6 @@ const CardDetail = (props: Props): JSX.Element|null => {
                         contents={props.contents}
                         readonly={props.readonly}
                     />
-                    {!props.readonly && <CardDetailContentsMenu/>}
                 </CardDetailProvider>
             </div>
         </>

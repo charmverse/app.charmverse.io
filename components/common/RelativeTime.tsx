@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 function convertToUnixSeconds (timestamp: number | Date): number {
-
   if (timestamp instanceof Date) {
     timestamp = timestamp.valueOf();
   }
@@ -12,12 +11,14 @@ function convertToUnixSeconds (timestamp: number | Date): number {
   return timestamp;
 }
 
-function timestampDifferenceInSeconds (first: number | Date, second: number | Date): number {
+function timestampDifferenceInSeconds (
+  first: number | Date,
+  second: number | Date
+): number {
   return Math.floor(convertToUnixSeconds(first) - convertToUnixSeconds(second));
 }
 
-export function RelativeTime ({ timestamp }: {timestamp: number | Date}) {
-
+export function RelativeTime ({ timestamp }: { timestamp: number | Date }) {
   const [, refreshLabel] = useState('');
 
   const now = Date.now();
@@ -27,9 +28,12 @@ export function RelativeTime ({ timestamp }: {timestamp: number | Date}) {
   const differenceInMinutes = Math.floor(differenceInSeconds / 60);
 
   let label = '';
-  let timeoutToSet = 0;
 
-  let timeout: any;
+  // Set default timeout to 60 seconds
+  let timeoutToSet = 60000;
+
+  // eslint-disable-next-line no-undef
+  let timeout: NodeJS.Timeout;
 
   useEffect(() => {
     return () => {
@@ -41,26 +45,33 @@ export function RelativeTime ({ timestamp }: {timestamp: number | Date}) {
   });
 
   switch (true) {
-    case (differenceInSeconds < 5):
+    case differenceInSeconds < 5: {
       label = 'just now';
       timeoutToSet = 5000;
       break;
+    }
 
-    case (differenceInSeconds < 60):
+    case differenceInSeconds < 60: {
       label = 'under 1 min. ago';
-      // Refresh every second
-      timeoutToSet = 60000;
       break;
+    }
 
-    case (differenceInMinutes === 1):
+    case differenceInMinutes === 1: {
       label = '1 min. ago';
-      // Only refresh once a minute
-      timeoutToSet = 60000;
       break;
+    }
 
-    default:
+    case differenceInMinutes >= 60: {
+      const hours = Math.floor(differenceInMinutes / 60);
+      const timeLabel = hours === 1 ? 'hour' : 'hours';
+      label = `${hours} ${timeLabel} ago`;
+      break;
+    }
+
+    default: {
       label = `${differenceInMinutes} mins. ago`;
-      timeoutToSet = 60000;
+      break;
+    }
   }
 
   // Refresh this every second
@@ -70,5 +81,5 @@ export function RelativeTime ({ timestamp }: {timestamp: number | Date}) {
     refreshLabel(Math.random().toString());
   }, timeoutToSet);
 
-  return (<span>{label}</span>);
+  return <span>{label}</span>;
 }

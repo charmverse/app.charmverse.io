@@ -28,7 +28,7 @@ export const pasteImagePlugin = new Plugin({
 
       if ((contentRow?.text as string)?.startsWith('http')) {
         const embedUrl = contentRow.text.split('.');
-        if (embedUrl[embedUrl.length - 1].match(/(jpeg|jpg|png|webp)/)) {
+        if (embedUrl[embedUrl.length - 1].match(/(jpeg|jpg|png|webp|gif)/)) {
           insertImageNode(view.state, view.dispatch, view, { src: contentRow.text });
           return true;
         }
@@ -88,10 +88,11 @@ const StyledImage = styled.img`
     cursor: initial;
   }
   border-radius: ${({ theme }) => theme.spacing(1)};
-  box-shadow: ${({ theme }) => theme.shadows[3]}
 `;
 
 export function Image ({ node, updateAttrs }: NodeViewProps) {
+  const theme = useTheme();
+
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -107,19 +108,26 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
   }
 
   return (
-    <BlockAligner onDelete={() => {
-      updateAttrs({
-        src: null
-      });
+    <Box style={{
+      margin: theme.spacing(3, 0),
+      display: 'flex',
+      flexDirection: 'column'
     }}
     >
-      <Resizer initialSize={MIN_IMAGE_SIZE} maxSize={MAX_IMAGE_SIZE} minSize={MIN_IMAGE_SIZE}>
-        <StyledImage
-          draggable={false}
-          src={node.attrs.src}
-          alt={node.attrs.alt}
-        />
-      </Resizer>
-    </BlockAligner>
+      <BlockAligner onDelete={() => {
+        updateAttrs({
+          src: null
+        });
+      }}
+      >
+        <Resizer maxSize={MAX_IMAGE_SIZE} minSize={MIN_IMAGE_SIZE}>
+          <StyledImage
+            draggable={false}
+            src={node.attrs.src}
+            alt={node.attrs.alt}
+          />
+        </Resizer>
+      </BlockAligner>
+    </Box>
   );
 }

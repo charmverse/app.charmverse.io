@@ -1,7 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import styled from '@emotion/styled';
+import { Prisma } from '@prisma/client';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -12,17 +13,16 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { useWeb3React } from '@web3-react/core';
+import Tooltip from '@mui/material/Tooltip';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getKey } from 'hooks/useLocalStorage';
+import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { shortenHex } from 'lib/strings';
+import useENSName from 'hooks/useENSName';
 import { LoggedInUser, Page, Space } from 'models';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { pages as seedPages } from 'seedData';
 import { greyColor2 } from 'theme/colors';
 import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
 import mutator from 'components/databases/focalboard/src//mutator';
@@ -33,7 +33,7 @@ import Avatar from '../Avatar';
 import Link from '../Link';
 import { Modal } from '../Modal';
 import WorkspaceAvatar from '../WorkspaceAvatar';
-import CreateWorkspaceForm from './CreateWorkspaceForm';
+import CreateWorkspaceForm from '../CreateSpaceForm';
 import { headerHeight } from './Header';
 import PageNavigation, { PageLink, StyledTreeItem } from './PageNavigation';
 import NewPageMenu from '../NewPageMenu';
@@ -60,15 +60,6 @@ const WorkspaceLabel = styled.div`
     right: 8px;
     top: 0px;
   }
-`;
-
-const BountyLabel = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  cursor: pointer;
-  margin-top: 48px;
 `;
 
 const SidebarContainer = styled.div`
@@ -125,9 +116,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
-  const { pages, setPages } = usePages();
+  const { pages, currentPage, setPages } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  const { account } = useWeb3React();
   const favoritePageIds = favorites.map(f => f.pageId);
   const intl = useIntl();
 
@@ -139,52 +129,42 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     setSpaceFormOpen(false);
   }
 
-  function addSpace (newSpace: Space) {
-    if (spaces.some(s => s.id === newSpace.id)) {
-      throw new Error(`Space with that id already exists: ${newSpace.id}`);
-    }
-    if (spaces.some(s => s.domain === newSpace.domain)) {
-      throw new Error('Space with that domain already exists');
-    }
+  async function addSpace (spaceOpts: Prisma.SpaceCreateInput) {
+    const newSpace = await charmClient.createSpace(spaceOpts);
     setSpaces([...spaces, newSpace]);
-
-    // add a first page - note that usePages is for the current space, so we can't use setPages here
-    const firstPage: Page = { ...seedPages[0], id: Math.random().toString().replace('0.', ''), spaceId: newSpace.id };
-    const key = getKey(`spaces.${newSpace.id}.pages`);
-    localStorage.setItem(key, JSON.stringify([firstPage]));
-
     router.push(`/${newSpace.domain}`);
   }
 
-  async function addPage (page: Partial<Page>) {
+  async function addPage (_space: Space, page: Partial<Page>) {
     const id = Math.random().toString().replace('0.', '');
-    const newPage: Page = {
-      boardId: null,
+    const newPage = await charmClient.createPage({
       content: {
         type: 'doc',
         content: [{
           type: 'paragraph',
           content: []
         }]
-      },
+      } as any,
       contentText: '',
       createdAt: new Date(),
-      createdBy: user!.id,
-      headerImage: null,
-      icon: null,
+      author: {
+        connect: {
+          id: user!.id
+        }
+      },
       updatedAt: new Date(),
       updatedBy: user!.id,
-      deletedAt: null,
-      id,
-      isPublic: false,
-      parentId: null,
       path: `page-${id}`,
-      spaceId: space.id,
+      space: {
+        connect: {
+          id: _space.id
+        }
+      },
       title: '',
       type: 'page',
       ...page
-    };
-    if (newPage.type === 'database') {
+    });
+    if (newPage.type === 'board') {
       await addBoardClicked(boardId => {
         newPage.boardId = boardId;
       }, intl);
@@ -192,14 +172,15 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     setPages([newPage, ...pages]);
 
     // add delay to simulate a server call
-    setTimeout(() => {
-      router.push(`/${space.domain}/${newPage.path}`);
-    }, 100);
+    router.push(`/${_space.domain}/${newPage.path}`);
   }
 
-  function deletePage (pageId: string) {
+  async function deletePage (pageId: string) {
     const page = pages.find(p => p.id === pageId);
     const newPages = pages.filter(p => p.id !== pageId);
+    if (page) {
+      await charmClient.deletePage(page.id);
+    }
     setPages(newPages);
     if (page?.boardId) {
       const board = boards.find(b => b.id === page.boardId);
@@ -226,7 +207,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             <Grid item key={workspace.domain}>
               <AvatarLink href={`/${workspace.domain}`} passHref>
                 <MuiLink>
-                  <WorkspaceAvatar active={space.domain === workspace.domain} name={workspace.name} />
+                  <Tooltip title={workspace.name} placement='right' arrow>
+                    <span>
+                      <WorkspaceAvatar active={space?.domain === workspace.domain} name={workspace.name} />
+                    </span>
+                  </Tooltip>
                 </MuiLink>
               </AvatarLink>
             </Grid>
@@ -239,84 +224,86 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
         </Modal>
       </WorkspacesContainer>
-      <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1 }}>
-        <Box sx={{ flexGrow: 1 }}>
+      {space && (
+        <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
           <Box sx={{ flexGrow: 1 }}>
-            <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
-              <SidebarHeader>
-                <Typography><strong>{space.name}</strong></Typography>
-                <IconButton onClick={closeSidebar}>
-                  <ChevronLeftIcon />
-                </IconButton>
-              </SidebarHeader>
-              <Divider sx={{ mb: 3 }} />
-              {favoritePageIds.length > 0 && (
-                <Box mb={2}>
+            <Box sx={{ flexGrow: 1 }}>
+              <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
+                <SidebarHeader>
+                  <Typography><strong>{space.name}</strong></Typography>
+                  <IconButton onClick={closeSidebar}>
+                    <ChevronLeftIcon />
+                  </IconButton>
+                </SidebarHeader>
+                <Divider sx={{ mb: 3 }} />
+                {favoritePageIds.length > 0 && (
+                  <Box mb={2}>
+                    <SectionName>
+                      FAVORITES
+                    </SectionName>
+                    <PageNavigation
+                      isFavorites={true}
+                      currentPage={currentPage}
+                      pages={pages}
+                      space={space}
+                      rootPageIds={favoritePageIds}
+                      setPages={setPages}
+                      addPage={addPage}
+                    />
+                  </Box>
+                )}
+                <WorkspaceLabel>
                   <SectionName>
-                    FAVORITES
+                    WORKSPACE
                   </SectionName>
-                  <PageNavigation
-                    isFavorites={true}
-                    pages={pages}
-                    spaceId={space.id}
-                    pathPrefix={`/${space.domain}`}
-                    rootPageIds={favoritePageIds}
-                    setPages={setPages}
-                    addPage={addPage}
-                  />
+                  <div className='add-a-page'>
+                    <NewPageMenu tooltip='Add a page' addPage={page => addPage(space, page)} />
+                  </div>
+                </WorkspaceLabel>
+                <PageNavigation
+                  currentPage={currentPage}
+                  pages={pages}
+                  space={space}
+                  setPages={setPages}
+                  addPage={addPage}
+                  deletePage={deletePage}
+                />
+              </Box>
+            </Box>
+            <StyledTreeItem
+              sx={{ mt: 3 }}
+              nodeId='bounties'
+              icon={<BountyIcon fontSize='small' />}
+              label={
+                <PageLink href={`/${space.domain}/bounties`} label='Bounties' />
+              }
+              ContentProps={{
+                className: router.pathname.includes('bounties') ? 'Mui-selected' : ''
+              }}
+            />
+          </Box>
+          <Box>
+            <Divider />
+            <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
+              {user && (
+                <Box display='flex' alignItems='center'>
+                  <Avatar name={getDisplayName(user)} />
+                  <Box pl={1}>
+                    <Typography>
+                      <strong>{getDisplayName(user)}</strong>
+                    </Typography>
+                  </Box>
                 </Box>
               )}
-              <WorkspaceLabel>
-                <SectionName>
-                  WORKSPACE
-                </SectionName>
-                <div className='add-a-page'>
-                  <NewPageMenu tooltip='Add a page' addPage={addPage} />
-                </div>
-              </WorkspaceLabel>
-              <PageNavigation
-                pages={pages}
-                spaceId={space.id}
-                pathPrefix={`/${space.domain}`}
-                setPages={setPages}
-                addPage={addPage}
-                deletePage={deletePage}
-              />
+              <Link href={`/${space.domain}/settings/account`}>
+                <IconButton>
+                  <SettingsIcon color='secondary' />
+                </IconButton>
+              </Link>
             </Box>
           </Box>
-          <StyledTreeItem
-            sx={{ mt: 3 }}
-            nodeId='bounties'
-            icon={<BountyIcon fontSize='small' />}
-            label={
-              <PageLink href={`/${space.domain}/bounties`} label='Bounties' />
-            }
-            ContentProps={{
-              className: router.pathname.includes('bounties') ? 'Mui-selected' : ''
-            }}
-          />
         </Box>
-        <Box>
-          <Divider />
-          <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
-            {user && (
-              <Box display='flex' alignItems='center'>
-                <Avatar name={getDisplayName(user)} />
-                <Box pl={1}>
-                  <Typography>
-                    <strong>{getDisplayName(user)}</strong>
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-            <Link href={`/${space.domain}/settings/account`}>
-              <IconButton>
-                <SettingsIcon color='secondary' />
-              </IconButton>
-            </Link>
-          </Box>
-        </Box>
-      </Box>
+      )}
     </SidebarContainer>
   );
 }

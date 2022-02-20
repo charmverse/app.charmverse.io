@@ -69,7 +69,7 @@ export default function ImageSelector (props: ImageSelectorProps) {
               alignItems: 'center'
             }}
             >
-              <TextField fullWidth placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
+              <TextField autoFocus placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
               <Button
                 disabled={!embedLink}
                 sx={{

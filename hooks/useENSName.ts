@@ -4,17 +4,17 @@ import useSWR from 'swr';
 
 const fetchENSName = (_: any, library: Web3Provider, address: string) => library.lookupAddress(address);
 
-const useENSName = (address: string): string => {
+const useENSName = (account: string | null | undefined): string | null | undefined => {
   const { library, chainId } = useWeb3React<Web3Provider>();
 
-  const shouldFetch = library && address;
+  const shouldFetch = Boolean(library && account);
 
   const { data } = useSWR(
-    shouldFetch ? ['ENS', library, address, chainId] : null,
+    shouldFetch ? ['ENS', library, account, chainId] : null,
     fetchENSName
   );
 
-  return data as string;
+  return data;
 };
 
 export default useENSName;

@@ -1,18 +1,18 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+import CharmEditor from 'components/editor/CharmEditor'
 import React from 'react'
-import {useIntl, IntlShape} from 'react-intl'
-
-import {IContentBlockWithCords, ContentBlock as ContentBlockType} from '../../blocks/contentBlock'
-import {Card} from '../../blocks/card'
-import {createTextBlock} from '../../blocks/textBlock'
+import { IntlShape } from 'react-intl'
+import { Card } from '../../blocks/card'
+import { ContentBlock as ContentBlockType, IContentBlockWithCords } from '../../blocks/contentBlock'
+import { createTextBlock } from '../../blocks/textBlock'
+import { useSortableWithGrip } from '../../hooks/sortable'
 import mutator from '../../mutator'
-import {useSortableWithGrip} from '../../hooks/sortable'
-
 import ContentBlock from '../contentBlock'
-import {MarkdownEditor} from '../markdownEditor'
+import { dragAndDropRearrange } from './cardDetailContentsUtility'
 
-import {dragAndDropRearrange} from './cardDetailContentsUtility'
+
+
 
 export type Position = 'left' | 'right' | 'above' | 'below' | 'aboveRow' | 'belowRow'
 
@@ -148,44 +148,10 @@ const ContentBlockWithDragAndDrop = (props: ContentBlockWithDragAndDropProps) =>
 }
 
 const CardDetailContents = React.memo((props: Props) => {
-    const intl = useIntl()
-    const {contents, card, id} = props
-
-    if (contents.length) {
-        return (
-            <div className='octo-content'>
-                {contents.map((block, x) =>
-                    (
-                        <ContentBlockWithDragAndDrop
-                            key={x}
-                            block={block}
-                            x={x}
-                            card={card}
-                            contents={contents}
-                            intl={intl}
-                            readonly={props.readonly}
-                        />
-                    ),
-                )}
-            </div>
-        )
-    }
     return (
         <div className='octo-content CardDetailContents'>
             <div className='octo-block'>
-                <div className='octo-block-margin'/>
-                {!props.readonly &&
-                    <MarkdownEditor
-                        id={id}
-                        text=''
-                        placeholderText='Add a description...'
-                        onBlur={(text) => {
-                            if (text) {
-                                addTextBlock(card, intl, text)
-                            }
-                        }}
-                    />
-                }
+                <CharmEditor />
             </div>
         </div>
     )

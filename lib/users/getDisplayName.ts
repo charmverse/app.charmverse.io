@@ -1,6 +1,8 @@
-import { User } from 'models/User';
+import { LoggedInUser, User } from 'models/User';
 import { shortenHex } from 'lib/strings';
 
-export default function getDisplayName (user: User) {
-  return shortenHex(user.addresses[0]);
+export function getDisplayName (user: User | LoggedInUser) {
+  return (<LoggedInUser> user).ensName || shortenHex(user.addresses[0]);
 }
+
+export default getDisplayName;

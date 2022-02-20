@@ -1,19 +1,41 @@
-import { ReactNode, createContext, useContext, useMemo } from 'react';
+import { useWeb3React } from '@web3-react/core';
+import { ReactNode, createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { LoggedInUser } from 'models';
-import { activeUser } from 'seedData';
-import { useLocalStorage } from './useLocalStorage';
+import charmClient from 'charmClient';
+import useENSName from 'hooks/useENSName';
 
-type IContext = [user: LoggedInUser | null, setUser: (user: LoggedInUser | any) => void];
+type IContext = [user: LoggedInUser | null, setUser: (user: LoggedInUser | any) => void, isLoaded: boolean];
 
-export const UserContext = createContext<Readonly<IContext>>([null, () => undefined]);
+export const UserContext = createContext<Readonly<IContext>>([null, () => undefined, false]);
 
 export function UserProvider ({ children }: { children: ReactNode }) {
 
-  const [user, setUser] = useLocalStorage<LoggedInUser>('profile', activeUser);
-  // @ts-ignore - backwards compatibility
-  user.addresses = user.addresses || [user.address];
-  user.linkedAddressesCount = user.addresses.length;
-  const value = useMemo(() => [user, setUser] as const, [user]);
+  const { account } = useWeb3React();
+  const [user, setUser] = useState<LoggedInUser | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const ensName = useENSName(account);
+
+  useEffect(() => {
+    if (account && !user) {
+      charmClient.getUser()
+        .then(_user => {
+          setUser(_user);
+          setIsLoaded(true);
+        })
+        .catch(err => {
+          // probably needs to log in
+          setIsLoaded(true);
+        });
+    }
+  }, [account]);
+
+  useEffect(() => {
+    if (user && ensName && !user.ensName) {
+      setUser({ ...user, ensName });
+    }
+  }, [user, ensName]);
+
+  const value = useMemo(() => [user, setUser, isLoaded] as const, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>

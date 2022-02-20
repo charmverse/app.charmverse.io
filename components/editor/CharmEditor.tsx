@@ -15,30 +15,31 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { NodeView, SpecRegistry } from '@bangle.dev/core';
+import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, Node } from '@bangle.dev/pm';
-import { BangleEditor as ReactBangleEditor, EditorViewContext, useEditorState } from '@bangle.dev/react';
+import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
 import '@bangle.dev/tooltip/style.css';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
-import Emoji from 'components/common/Emoji';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
-import { Page, PageContent } from 'models';
+import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { ChangeEvent, ReactNode, useContext, useRef } from 'react';
-import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
+import { CSSProperties, ReactNode } from 'react';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
-import EmojiSuggest, { emojiPlugins, emojiSpecs, emojiSuggestKey } from './EmojiSuggest';
-import IFrame, { iframePlugin, iframeSpec } from './Iframe';
-import { Image, pasteImagePlugin } from './Image';
+import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
+import IFrame, { iframeSpec } from './Iframe';
+import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
-import PageTitle from './Page/PageTitle';
+
+export interface ICharmEditorOutput {
+  doc: PageContent,
+  rawText: string
+}
 
 const specRegistry = new SpecRegistry([
   paragraph.spec(), // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
@@ -81,66 +82,41 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 `;
 
-function EmojiContainer (
-  { updatePageIcon, top, children }: { updatePageIcon: (icon: string) => void, children: ReactNode, top: number }
+const defaultContent: PageContent = {
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      content: []
+    }
+  ]
+};
+
+export type UpdatePageContent = (content: ICharmEditorOutput) => any;
+
+export default function CharmEditor (
+  { content = defaultContent, children, onPageContentChange, style }:
+  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent,
+    style?: CSSProperties }
 ) {
-  const view = useContext(EditorViewContext);
-  const ref = useRef<HTMLDivElement>(null);
-
-  return (
-    <Box
-      sx={{
-        width: 'fit-content',
-        display: 'flex',
-        position: 'absolute',
-        top
-      }}
-      ref={ref}
-      onClick={() => {
-        if (view.dispatch!) {
-          const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
-          const suggestTooltipState = suggestTooltipKey.getState(view.state);
-
-          // If the emoji suggest already has a ref attached its already visible, we need to hide it
-
-          if (suggestTooltipState.show) {
-            view.dispatch(
-              view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
-            );
-          }
-          else {
-            view.dispatch(
-              // Chain transactions together
-              view.state.tr.setMeta(emojiSuggestKey, {
-                type: 'INSIDE_PAGE_ICON',
-                onClick: (emoji: string) => updatePageIcon(emoji),
-                ref: ref.current,
-                getPos: () => 0
-              }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
-            );
-          }
-        }
-      }}
-    >
-      {children}
-    </Box>
-  );
-}
-
-export default function BangleEditor (
-  { content, page, setPage }: { content: PageContent, page: Page, setPage: (p: Page) => void }
-) {
-  function updateTitle (event: ChangeEvent<HTMLInputElement>) {
-    setPage({ ...page, title: event.target.value });
-  }
-
-  function updatePageIcon (icon: string) {
-    setPage({ ...page, icon });
-  }
 
   const state = useEditorState({
     specRegistry,
     plugins: () => [
+      new Plugin({
+        view: () => ({
+          update: (view, prevState) => {
+            if (!view.state.doc.eq(prevState.doc)) {
+              if (onPageContentChange) {
+                onPageContentChange({
+                  doc: view.state.doc.toJSON() as PageContent,
+                  rawText: view.state.doc.textContent as string
+                });
+              }
+            }
+          }
+        })
+      }),
       imagePlugins(),
       inlinePalettePlugins(),
       bold.plugins(),
@@ -193,9 +169,10 @@ export default function BangleEditor (
       NodeView.createPlugin({
         name: 'iframe',
         containerDOM: ['div', { class: 'iframe-container' }]
-      }),
-      iframePlugin,
-      pasteImagePlugin
+      })
+      // TODO: Pasting iframe or image link shouldn't create those blocks. Maybe in the future we might allow this behavior and adjust it to that of Notion's
+      // iframePlugin,
+      // pasteImagePlugin
     ],
     initialValue: Node.fromJSON(specRegistry.schema, content),
     // hide the black bar when dragging items - we dont even support dragging most components
@@ -204,38 +181,21 @@ export default function BangleEditor (
     }
   });
 
-  let pageTitleTop = 50; let bangleEditorTop = 75; let
-    pageIconTop = 50;
-
-  if (page.icon && !page.headerImage) {
-    pageTitleTop = 100;
-    bangleEditorTop = 125;
-    pageIconTop = -75;
-  }
-
-  if (!page.icon && page.headerImage) {
-    pageTitleTop = 50;
-  }
-
-  if (page.icon && page.headerImage) {
-    pageTitleTop = 50;
-    bangleEditorTop = 125;
-    pageIconTop = -60;
-  }
-
   return (
     <StyledReactBangleEditor
       style={{
-        top: bangleEditorTop
+        ...(style ?? {}),
+        width: '100%',
+        height: '100%'
       }}
       state={state}
-      renderNodeViews={({ children, ...props }) => {
+      renderNodeViews={({ children: NodeViewChildren, ...props }) => {
         switch (props.node.type.name) {
           case 'columnLayout': {
-            return <ColumnLayout node={props.node}>{children}</ColumnLayout>;
+            return <ColumnLayout node={props.node}>{NodeViewChildren}</ColumnLayout>;
           }
           case 'columnBlock': {
-            return <ColumnBlock node={props.node}>{children}</ColumnBlock>;
+            return <ColumnBlock node={props.node}>{NodeViewChildren}</ColumnBlock>;
           }
           case 'cryptoPrice': {
             const attrs = props.attrs as {base: null | CryptoCurrency, quote: null | FiatCurrency};
@@ -261,28 +221,28 @@ export default function BangleEditor (
           case 'blockquote': {
             return (
               <BlockQuote {...props}>
-                {children}
+                {NodeViewChildren}
               </BlockQuote>
             );
           }
           case 'codeBlock': {
             return (
               <Code>
-                {children}
+                {NodeViewChildren}
               </Code>
             );
           }
           case 'image': {
             return (
               <Image {...props}>
-                {children}
+                {NodeViewChildren}
               </Image>
             );
           }
           case 'iframe': {
             return (
               <IFrame {...props}>
-                {children}
+                {NodeViewChildren}
               </IFrame>
             );
           }
@@ -292,24 +252,10 @@ export default function BangleEditor (
         }
       }}
     >
-      {page.icon && (
-        <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
-          <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-        </EmojiContainer>
-      )}
-      <Box sx={{
-        position: 'absolute',
-        top: pageTitleTop
-      }}
-      >
-        <PageTitle
-          value={page.title}
-          onChange={updateTitle}
-        />
-      </Box>
       <FloatingMenu />
       {EmojiSuggest}
       {InlinePalette}
+      {children}
     </StyledReactBangleEditor>
   );
 }

@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["linux-musl", "darwin", "native"]
 }
 
 datasource db {
@@ -10,14 +11,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PageType {
+  board
+  page
+}
+
+enum PermissionLevel {
+  full_access
+  editor
+  view_comment
+  view
+}
+
+enum Role {
+  admin
+  contributor
+}
+
 model Space {
   id          String      @id @default(uuid()) @db.Uuid
   deletedAt   DateTime?
   createdAt   DateTime    @default(now())
-  author      User        @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  createdBy   String
+  author      User        @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy   String      @db.Uuid
   updatedAt   DateTime
-  updatedBy   String
+  updatedBy   String      @db.Uuid
   name        String
   domain      String      @unique
   permissions SpaceRole[]
@@ -30,21 +48,21 @@ model Page {
   deletedAt   DateTime?
   createdAt   DateTime         @default(now())
   createdBy   String           @db.Uuid
-  author      User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  updatedAt   DateTime
+  author      User             @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  updatedAt   DateTime         @default(now())
   updatedBy   String           @db.Uuid
   title       String
   content     Json?
   contentText String
   headerImage String?
   icon        String?
-  isPublic    Boolean
+  isPublic    Boolean          @default(false)
   path        String
-  parentId    String?
-  spaceId     String?
-  space       Space?           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  type        String
-  boardId     String?
+  parentId    String?          @db.Uuid
+  spaceId     String?          @db.Uuid
+  space       Space?           @relation(fields: [spaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  type        PageType
+  boardId     String?          @db.Uuid
   permissions PagePermission[]
   favorites   FavoritePage[]
 }
@@ -55,13 +73,13 @@ model Block {
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   createdBy String    @db.Uuid
-  User      User      @relation(fields: [createdBy], references: [id])
-  updatedAt DateTime
+  user      User      @relation(fields: [createdBy], references: [id])
+  updatedAt DateTime  @default(now())
   updatedBy String    @db.Uuid
-  spaceId   String
+  spaceId   String    @db.Uuid
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   parentId  String
-  rootId    String
+  rootId    String    @db.Uuid
   schema    Int
   type      String
   title     String
@@ -71,42 +89,67 @@ model Block {
 model User {
   id              String           @id @default(uuid()) @db.Uuid
   createdAt       DateTime         @default(now())
-  updatedAt       DateTime?
+  updatedAt       DateTime         @default(now())
   addresses       String[]
-  discordId       String?
   spaceRoles      SpaceRole[]
   favorites       FavoritePage[]
   pagePermissions PagePermission[]
   pages           Page[]
   blocks          Block[]
-  Space           Space[]
+  spaces          Space[]
 }
 
 model FavoritePage {
   pageId String @db.Uuid
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([pageId, userId])
 }
 
 model PagePermission {
-  level  String
-  pageId String @db.Uuid
-  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  userId String @db.Uuid
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level  PermissionLevel
+  pageId String          @db.Uuid
+  page   Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  userId String          @db.Uuid
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([pageId, userId])
 }
 
 model SpaceRole {
-  role    String
+  role    Role   @default(contributor)
   spaceId String @db.Uuid
   space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   userId  String @db.Uuid
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([spaceId, userId])
+}
+
+enum BountyStatus {
+  open
+  assigned
+  review
+  complete
+  paid
+}
+
+
+model Bounty {
+  id                String      @id @default(uuid()) @db.Uuid
+  author            String      @db.Uuid
+  workspaceId       String      @db.Uuid
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @default(now())
+  description       String
+  descriptionNodes  Json
+  reviewer          String      @db.Uuid
+  assignee          String      @db.Uuid
+  rewardAmount      Float
+  rewardToken       String
+  status            BountyStatus
+  title             String
+  linkedTaskId      String      @db.Uuid
 }

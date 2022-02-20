@@ -1,5 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import { Space } from '@prisma/client';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -15,7 +16,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { greyColor2 } from 'theme/colors';
 import { Page } from 'models';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -138,14 +138,6 @@ export const PageTitle = styled(Typography)<{isempty: number}>`
   width: calc(80%); // hack to get ellipsis to appear
 `;
 
-type TreeItemProps = ComponentProps<typeof TreeItem> & {
-  href: string;
-  pageType: 'database' | 'page';
-  labelIcon?: string;
-  addSubPage?: (page: Partial<Page>) => void;
-  deletePage?: () => void;
-}
-
 interface PageLinkProps {
   children?: ReactNode;
   href: string;
@@ -214,7 +206,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
           <PageLink
             href={href}
             label={label}
-            labelIcon={labelIcon || (pageType === 'database' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
+            labelIcon={labelIcon || (pageType === 'board' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
           >
             <div className='page-actions'>
               <IconButton size='small' onClick={showMenu}>
@@ -438,14 +430,14 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
 }
 
 type NavProps = {
-  addPage?: (p: Partial<Page>) => void;
+  addPage?: (s: Space, p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
   pages: Page[];
-  pathPrefix: string;
+  currentPage: Page | null;
+  space: Space;
   rootPageIds?: string[];
   setPages: Dispatch<SetStateAction<Page[]>>;
-  spaceId: string;
 };
 
 export default function PageNavigation ({
@@ -453,16 +445,14 @@ export default function PageNavigation ({
   deletePage,
   isFavorites,
   pages,
-  pathPrefix,
+  currentPage,
+  space,
   rootPageIds,
-  setPages,
-  spaceId
+  setPages
 }: NavProps) {
 
-  const [expanded, setExpanded] = useLocalStorage<string[]>(`${spaceId}.expanded-pages`, []);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const pagesForSpace = pages.filter(p => p.spaceId === spaceId);
-  const mappedItems = useMemo(() => mapTree(pagesForSpace, 'parentId', rootPageIds), [pagesForSpace, rootPageIds]);
+  const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
+  const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
 
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
     setPages(stateNodes => stateNodes.map(stateNode => {
@@ -485,20 +475,17 @@ export default function PageNavigation ({
   const router = useRouter();
 
   useEffect(() => {
-    for (const page of pagesForSpace) {
-      if (router.asPath === `${pathPrefix}/${page.path}`) {
+    for (const page of pages) {
+      if (currentPage?.id === page.id) {
         // expand the parent of the active page
         if (!isFavorites && page.parentId) {
           if (!expanded.includes(page.parentId)) {
             setExpanded(expanded.concat(page.parentId));
           }
         }
-        if (!selectedNodeId) {
-          setSelectedNodeId(page.id);
-        }
       }
     }
-  }, []);
+  }, [currentPage]);
 
   function onNodeToggle (event: SyntheticEvent, nodeIds: string[]) {
     setExpanded(nodeIds);
@@ -509,7 +496,7 @@ export default function PageNavigation ({
       setPages={setPages}
       expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
-      selected={selectedNodeId}
+      selected={currentPage?.id || null}
       onNodeToggle={onNodeToggle}
       aria-label='items navigator'
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
@@ -522,8 +509,8 @@ export default function PageNavigation ({
           key={item.id}
           item={item}
           onDrop={onDrop}
-          pathPrefix={pathPrefix}
-          addPage={addPage}
+          pathPrefix={`/${space.domain}`}
+          addPage={page => addPage && addPage(space, page)}
           deletePage={deletePage}
         />
       ))}
