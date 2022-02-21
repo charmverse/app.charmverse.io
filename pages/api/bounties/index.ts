@@ -12,8 +12,16 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(getBounties).post(createBounty);
 
 async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
-  const bounties = await prisma.bounty.findMany({
-  });
+
+  const { workspaceId } = req.query;
+
+  const bountyListQuery: Prisma.BountyFindManyArgs = workspaceId ? {
+    where: {
+      workspaceId
+    }
+  } : {} as any;
+
+  const bounties = await prisma.bounty.findMany(bountyListQuery);
   return res.status(200).json(bounties);
 }
 

@@ -4,18 +4,20 @@ import Loader from 'components/common/Loader';
 import { Bounty } from 'components/bounties_v2/Bounty';
 import { Typography, Button, Grid } from '@mui/material';
 import BountyModal from 'components/bounties_v2/BountyModal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import BountyService from './BountyService';
 import { BountyEditor } from './BountyEditor';
 
 export function BountyList () {
 
+  const [space] = useCurrentSpace();
   const [bountyList, setBountyList] = useState([] as IBounty []);
   const refresh = useRef(true);
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
 
   async function refreshBounties () {
     try {
-      const foundBounties = await BountyService.listBounties();
+      const foundBounties = await BountyService.listBounties(space?.id);
 
       // Tenporary measure to seed new bounties so we can experiment with different colour statuses
       /*
