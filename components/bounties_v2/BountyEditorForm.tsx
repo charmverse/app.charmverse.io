@@ -12,6 +12,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
 import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
+import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { IInputField } from '../common/form/GenericInput';
 import BountyService from './BountyService';
 
@@ -26,7 +27,8 @@ export const schema = yup.object({
   rewardAmount: yup.number().required(),
   rewardToken: yup.string().required(),
   descriptionNodes: yup.mixed(),
-  description: yup.string()
+  description: yup.string(),
+  reviewer: yup.string()
 });
 
 type FormValues = yup.InferType<typeof schema>
@@ -66,6 +68,10 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     setValue('description', content.rawText);
   }
 
+  function setReviewer (walletAddress: string) {
+    setValue('reviewer', walletAddress);
+  }
+
   return (
     <div>
       <form onSubmit={handleSubmit(formValue => submitted(formValue as IBounty))} style={{ margin: 'auto' }}>
@@ -91,24 +97,35 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
           <Grid item>
             <InputLabel>
-              Reward amount
+              Reviewer
             </InputLabel>
-            <Input
-              {...register('rewardAmount', {
-                valueAsNumber: true
-              })}
-              fullWidth
-              type='number'
-              inputProps={{ step: 0.000000001 }}
-            />
+            <InputSearchContributor onChange={setReviewer} />
+          </Grid>
+
+          <Grid container item>
+            <Grid item xs={6}>
+
+              <InputLabel>
+                Reward amount
+              </InputLabel>
+              <Input
+                {...register('rewardAmount', {
+                  valueAsNumber: true
+                })}
+                type='number'
+                inputProps={{ step: 0.000000001 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <InputLabel>
+                Reward token
+              </InputLabel>
+              <InputSearchCrypto label='' register={register} modelKey='rewardToken' />
+            </Grid>
           </Grid>
 
           <Grid item>
-            <InputSearchCrypto register={register} modelKey='rewardToken' />
-          </Grid>
-
-          <Grid item>
-            <Button type='submit'></Button>
+            <Button type='submit'>Create bounty</Button>
           </Grid>
 
         </Grid>

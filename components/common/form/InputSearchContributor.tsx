@@ -12,18 +12,18 @@ export function InputSearchContributor ({ onChange = () => {} }: IInputSearchCon
 
   const [contributors] = useContributors();
 
-  function emitValue (walletAddress: string) {
+  function emitValue (userId: string) {
 
-    if (walletAddress === null) {
+    if (userId === null) {
       return;
     }
 
     const matchingContributor = contributors.find(contributor => {
-      return contributor.addresses.indexOf(walletAddress) > -1;
+      return contributor.id === userId;
     });
 
     if (matchingContributor) {
-      onChange(walletAddress);
+      onChange(userId);
     }
   }
 
