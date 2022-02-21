@@ -1,5 +1,4 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { InviteLink, Space } from '@prisma/client';
 import getBaseLayout from 'components/common/base-layout/getLayout';
 import { getInviteLink } from 'lib/invites';
 import InvitationPageContent from 'components/invites';

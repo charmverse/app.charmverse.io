@@ -12,8 +12,19 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .post(createInviteLink)
   .get(getInviteLinks);
 
+async function createInviteLink (req: NextApiRequest, res: NextApiResponse) {
+
+  const invite = await prisma.inviteLink.create({
+    data: req.body,
+    include: {
+      author: true
+    }
+  });
+  return res.status(200).json(invite);
+}
 async function getInviteLinks (req: NextApiRequest, res: NextApiResponse<InviteLinkPopulated[] | { error: string }>) {
 
   const spaceId = req.query.spaceId as string;

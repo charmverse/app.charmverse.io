@@ -1,7 +1,7 @@
 import SettingsLayout from 'components/settings/Layout';
 import { ReactElement, useEffect, useState } from 'react';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { Modal } from 'components/common/Modal';
+import { DialogTitle, Modal } from 'components/common/Modal';
 import useSWR from 'swr';
 import Legend from 'components/settings/Legend';
 import Button from 'components/common/Button';
@@ -77,7 +77,7 @@ function InviteLinks ({ spaceId }: { spaceId: string }) {
         <div key={link.id}>{link.code}</div>
       ))}
       <Modal open={isOpen} onClose={close}>
-        <InviteForm onSubmit={createLink} />
+        <InviteForm onSubmit={createLink} onClose={close} />
       </Modal>
     </>
   );
