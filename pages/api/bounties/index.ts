@@ -29,8 +29,6 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
 
 async function createBounty (req: NextApiRequest, res: NextApiResponse<Bounty>) {
   const data = req.body as Prisma.BountyCreateInput;
-  // add a first page to the space
-
   const bounty = await prisma.bounty.create({ data });
   return res.status(200).json(bounty);
 }
