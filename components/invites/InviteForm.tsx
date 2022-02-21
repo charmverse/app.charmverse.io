@@ -41,6 +41,7 @@ const maxAgeOptions: { value: FormValues['maxAgeMinutes'], label: string }[] = [
 ];
 
 const maxUsesOptions: { value: FormValues['maxUses'], label: string }[] = [
+  { value: -1, label: 'No limit' },
   { value: 1, label: '1 use' },
   { value: 5, label: '5 uses' },
   { value: 10, label: '10 uses' },
@@ -51,6 +52,9 @@ const maxUsesOptions: { value: FormValues['maxUses'], label: string }[] = [
 
 export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: Props) {
 
+  const defaultMaxAge = maxAgeOptions[maxAgeOptions.length - 2].value; // the longest duration thats not infinite
+  const defaultMaxUses = maxUsesOptions[0].value; // no limit
+
   const {
     register,
     handleSubmit,
@@ -58,8 +62,8 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: Pro
     formState: { errors }
   } = useForm<FormValues & { apiError?: string }>({
     defaultValues: {
-      maxAgeMinutes: maxAgeOptions[0].value,
-      maxUses: maxUsesOptions[0].value
+      maxAgeMinutes: defaultMaxAge,
+      maxUses: defaultMaxUses
     },
     resolver: yupResolver(schema)
   });
@@ -88,7 +92,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: Pro
           <Select
             {...register('maxAgeMinutes')}
             fullWidth
-            defaultValue={maxAgeOptions[0].value}
+            defaultValue={defaultMaxAge}
           >
             {maxAgeOptions.map(({ value, label }) => (
               <MenuItem key={value} value={value}>
@@ -102,7 +106,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: Pro
           <Select
             {...register('maxUses')}
             fullWidth
-            defaultValue={maxUsesOptions[0].value}
+            defaultValue={defaultMaxUses}
           >
             {maxUsesOptions.map(({ value, label }) => (
               <MenuItem key={value} value={value}>

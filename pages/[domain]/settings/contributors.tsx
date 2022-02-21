@@ -12,6 +12,7 @@ import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import getDisplayName from 'lib/users/getDisplayName';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
+import InvitesTable from 'components/invites/InvitesTable';
 import InviteForm, { FormValues as InviteLinkFormValues } from 'components/invites/InviteForm';
 import charmClient from 'charmClient';
 
@@ -67,6 +68,14 @@ function InviteLinks ({ spaceId }: { spaceId: string }) {
     close();
   }
 
+  async function deleteLink (link: InviteLinkPopulated) {
+    if (window.confirm('Are you sure?')) {
+      await charmClient.deleteInviteLink(link.id);
+      // update the list of links
+      await mutate();
+    }
+  }
+
   return (
     <>
       <Legend>
@@ -74,9 +83,7 @@ function InviteLinks ({ spaceId }: { spaceId: string }) {
         <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right' }} onClick={open}>Add a link</Button>
       </Legend>
       {data?.length === 0 && <Typography color='secondary'>No invite links yet</Typography>}
-      {data?.map(link => (
-        <div key={link.id}>{link.code}</div>
-      ))}
+      {data && data?.length > 0 && <InvitesTable invites={data} onDelete={deleteLink} />}
       <Modal open={isOpen} onClose={close}>
         <InviteForm onSubmit={createLink} onClose={close} />
       </Modal>
