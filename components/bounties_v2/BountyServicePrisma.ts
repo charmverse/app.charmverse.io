@@ -10,8 +10,8 @@ export class PrismaBountyService implements IBountyService {
 
   private storageLocation = 'Bounties';
 
-  listBounties (workspaceId?: string): Promise<Bounty []> {
-    return charmClient.listBounties(workspaceId);
+  listBounties (spaceId: string): Promise<Bounty []> {
+    return charmClient.listBounties(spaceId);
   }
 
   async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
@@ -19,18 +19,9 @@ export class PrismaBountyService implements IBountyService {
   }
 
   async readBounty (bountyId: string): Promise<Bounty> {
-    const existingBounties = await this.listBounties();
 
-    const requestedBounty = existingBounties.find(bounty => {
-      return bounty.id === bountyId;
-    });
+    throw new Error('Bounty not found');
 
-    if (requestedBounty !== undefined) {
-      return requestedBounty;
-    }
-    else {
-      throw new Error('Bounty not found');
-    }
   }
 
   updateBounty (bountyId: string, newValues: Partial<Bounty>): Promise<Bounty> {
