@@ -1,5 +1,5 @@
 import { CompositeForm } from 'components/common/form/Form';
-import { Bounty as IBounty } from '@prisma/client';
+import { Bounty, Bounty as IBounty } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { SchemaOf, ObjectSchema, AnySchema } from 'yup';
@@ -53,13 +53,10 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
   async function submitted (value: IBounty) {
     if (mode === 'create') {
-      delete (value as any).linkedTaskId;
       value.spaceId = space!.id;
       value.createdBy = user!.id;
-      value.assignee = user!.id;
-      value.reviewer = user!.id;
-      const createdBounty = await BountyService.createBounty(value as any);
-      onSubmit(createdBounty as any);
+      const createdBounty = await BountyService.createBounty(value);
+      onSubmit(createdBounty);
     }
   }
 
