@@ -28,8 +28,17 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
 }
 
 async function createBounty (req: NextApiRequest, res: NextApiResponse<Bounty>) {
-  const data = req.body as Prisma.BountyCreateInput;
-  const bounty = await prisma.bounty.create({ data });
+  const data = req.body as Bounty;
+  const bountyToCreate = { ...data } as any;
+
+  if (data.createdBy) {
+    (bountyToCreate as Prisma.BountyCreateInput).author = { connect: { id: data.createdBy } };
+
+    // Remove createdBy passed from client to ensure Prisma doesn't throw an error
+    delete bountyToCreate.createdBy;
+  }
+
+  const bounty = await prisma.bounty.create({ data: bountyToCreate });
   return res.status(200).json(bounty);
 }
 

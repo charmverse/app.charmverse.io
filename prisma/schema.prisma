@@ -146,8 +146,8 @@ model Bounty {
   updatedAt        DateTime     @default(now())
   description      String?
   descriptionNodes Json?
-  reviewer         String       @db.Uuid
-  assignee         String       @db.Uuid
+  reviewer         String?       @db.Uuid
+  assignee         String?       @db.Uuid
   rewardAmount     Float
   rewardToken      String
   status           BountyStatus @default(open)
