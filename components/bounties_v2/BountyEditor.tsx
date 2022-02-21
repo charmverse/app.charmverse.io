@@ -69,14 +69,10 @@ export function BountyEditor ({ onSubmit, bounty, mode = 'create' }: IBountyEdit
   const [user] = useUser();
 
   async function submitted (value: IBounty) {
-    console.log('Submit captured', value);
-    console.log('Space', space);
     if (mode === 'create') {
       delete (value as any).linkedTaskId;
-      value.workspaceId = space!.id;
+      value.spaceId = space!.id;
       value.createdBy = user!.id;
-      value.assignee = user!.id;
-      value.reviewer = user!.id;
       const createdBounty = await BountyService.createBounty(value as any);
       onSubmit(createdBounty as any);
     }
