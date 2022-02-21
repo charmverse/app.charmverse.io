@@ -17,7 +17,7 @@ function specFactory (): RawSpecs {
     schema: {
       content: 'block*',
       group: 'block',
-      draggable: true,
+      draggable: false,
       parseDOM: [{ tag: 'div' }],
       toDOM: (): DOMOutputSpec => {
         return ['div', 0];
@@ -27,11 +27,16 @@ function specFactory (): RawSpecs {
 }
 
 const StyledColumnBlock = styled(Box)`
-  background-color: ${({ theme }) => theme.palette.background.default};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   padding: ${({ theme }) => theme.spacing(1, 2)};
   position: relative;
+  transition: background-color 250ms ease-in-out;
   
+  &:hover {
+    transition: background-color 250ms ease-in-out;
+    background-color: ${({ theme }) => theme.palette.background.light};
+  }
+
   & .bangle-nv-content p {
     overflow-wrap: anywhere;
   }
