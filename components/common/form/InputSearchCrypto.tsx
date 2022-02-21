@@ -6,14 +6,14 @@ import { UseFormRegister } from 'react-hook-form';
 const currencyOptions = Object.keys(CryptoCurrencyList);
 
 export interface IInputSearchCryptoProps {
-  onChange: (value: CryptoCurrency) => any,
+  onChange?: (value: CryptoCurrency) => any,
   defaultValue?: CryptoCurrency,
   register?: UseFormRegister<any>
   modelKey?: string
 }
 
 export function InputSearchCrypto ({
-  onChange,
+  onChange = () => {},
   defaultValue,
   register = () => [] as any,
   modelKey = '-' }: IInputSearchCryptoProps) {
