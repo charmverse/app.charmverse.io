@@ -220,8 +220,8 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (workspaceId?: string): Promise<Bounty []> {
-    const requestQuery = workspaceId ? `?workspaceId=${workspaceId}` : '';
+  listBounties (spaceId?: string): Promise<Bounty []> {
+    const requestQuery = spaceId ? `?spaceId=${spaceId}` : '';
     return http.GET<Bounty[]>(`/api/bounties${requestQuery}`);
   }
 

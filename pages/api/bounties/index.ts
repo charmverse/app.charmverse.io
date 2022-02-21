@@ -13,11 +13,11 @@ handler.use(requireUser).get(getBounties).post(createBounty);
 
 async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
 
-  const { workspaceId } = req.query;
+  const { spaceId } = req.query;
 
-  const bountyListQuery: Prisma.BountyFindManyArgs = workspaceId ? {
+  const bountyListQuery: Prisma.BountyFindManyArgs = spaceId ? {
     where: {
-      workspaceId
+      spaceId
     }
   } : {} as any;
 
