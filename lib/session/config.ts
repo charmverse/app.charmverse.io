@@ -1,8 +1,7 @@
-import { SpaceInvitationLink, User } from '@prisma/client';
+import { User } from '@prisma/client';
 
 declare module 'iron-session' {
   interface IronSessionData {
-    invitation?: SpaceInvitationLink;
     user: User;
   }
 }
