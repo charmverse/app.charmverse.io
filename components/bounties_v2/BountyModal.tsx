@@ -3,6 +3,7 @@ import { DialogTitle, Modal } from 'components/common/Modal';
 import { useUser } from 'hooks/useUser';
 import { Bounty } from '@prisma/client';
 import { BountyEditor } from './BountyEditor';
+import { BountyEditorForm } from './BountyEditorForm';
 
 interface Props {
   open: boolean;
@@ -28,7 +29,7 @@ export default function BountyModal (props: Props) {
   return (
     <Modal size='large' open={open} onClose={onClose}>
       <DialogTitle onClose={onClose}>{modalTitles[modalType]}</DialogTitle>
-      <BountyEditor onSubmit={onSubmit} bounty={bounty} />
+      <BountyEditorForm onSubmit={onSubmit} bounty={bounty} />
     </Modal>
   );
 }
