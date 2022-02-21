@@ -22,12 +22,8 @@ export default function BountyModal (props: Props) {
   const { open, onClose, onSubmit, modalType = 'create', bounty } = props;
   const [user] = useUser();
 
-  function modalSubmission (data: any) {
-    console.log('Modal', data);
-  }
-
   return (
-    <Modal size='large' open={open} onClose={onClose}>
+    <Modal size='large' open={open} onClose={onClose} sx={{ margin: 'auto', maxHeight: '80vh' }}>
       <DialogTitle onClose={onClose}>{modalTitles[modalType]}</DialogTitle>
       <BountyEditorForm onSubmit={onSubmit} bounty={bounty} />
     </Modal>
