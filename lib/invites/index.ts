@@ -1,44 +1,49 @@
-import { GetServerSidePropsContext } from 'next';
+import { v4 as uuid } from 'uuid';
 import { prisma } from 'db';
 import { InviteLink, Space } from '@prisma/client';
 
-export interface InviteProps {
-  invitation: InviteLink & {
-    space: Space;
-  };
-}
+export type InviteLinkPopulated = InviteLink & { space: Space };
 
-export async function getServerSideProps (context: GetServerSidePropsContext) {
+export async function getInviteLink (code: string): Promise<{ invite?: InviteLinkPopulated, expired?: boolean }> {
 
-  const inviteCode = context.query.inviteCode as string;
-  const invitation = await prisma.inviteLink.findUnique({
+  const invite = await prisma.inviteLink.findUnique({
     where: {
-      code: inviteCode
+      code
     },
     include: {
       space: true
     }
   });
-
-  if (!invitation) {
-    return {
-      props: {
-        error: 'Invitation not found'
-      }
-    };
+  if (!invite) {
+    return {};
   }
-
-  return {
-    props: {
-      invitation
-    }
-  };
+  if (invite.maxUses > 0 && invite.useCount >= invite.maxUses) {
+    return { invite, expired: true };
+  }
+  else if (invite.maxAgeMinutes > 0) {
+    const timePassed = Date.now() - invite.createdAt.getTime();
+    const expired = timePassed > invite.maxAgeMinutes * 60 * 1000;
+    return { invite, expired };
+  }
+  else {
+    return { invite, expired: false };
+  }
 }
 
-export async function createInviteLink ({ spaceId, userId }: { spaceId: string, userId: string }) {
+interface InviteLinkInput {
+  spaceId: string;
+  userId: string;
+  maxAgeMinutes?: number;
+  maxUses?: number;
+}
+
+export async function createInviteLink ({ maxAgeMinutes, maxUses, spaceId, userId }: InviteLinkInput) {
   const link = await prisma.inviteLink.create({
     data: {
+      code: uuid().substring(0, 6),
       createdBy: userId,
+      maxAgeMinutes,
+      maxUses,
       spaceId
     }
   });

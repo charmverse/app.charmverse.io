@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, Prisma, Page, User, Bounty } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -10,7 +10,7 @@ import { Block as FBBlock, BlockPatch } from 'components/databases/focalboard/sr
 import { IUser, UserWorkspace } from 'components/databases/focalboard/src/user';
 import { IWorkspace } from 'components/databases/focalboard/src/blocks/workspace';
 import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
-import { v4 } from 'uuid';
+import { InviteLinkPopulated } from 'pages/api/invites/index';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -87,6 +87,18 @@ class CharmClient {
 
   unfavoritePage (pageId: string) {
     return http.DELETE('/api/profile/favorites', { pageId });
+  }
+
+  createInviteLink (link: Partial<InviteLink>) {
+    return http.POST<InviteLinkPopulated[]>('/api/invites', link);
+  }
+
+  deleteInviteLink (linkId: string) {
+    return http.DELETE<InviteLinkPopulated[]>(`/api/invites/${linkId}`);
+  }
+
+  getInviteLinks (spaceId: string) {
+    return http.GET<InviteLinkPopulated[]>('/api/invites', { spaceId });
   }
 
   // FocalBoard
