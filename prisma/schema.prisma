@@ -97,6 +97,7 @@ model User {
   pages           Page[]
   blocks          Block[]
   spaces          Space[]
+  Bounty          Bounty[]
 }
 
 model FavoritePage {
@@ -136,20 +137,20 @@ enum BountyStatus {
   paid
 }
 
-
 model Bounty {
-  id                String      @id @default(uuid()) @db.Uuid
-  author            String      @db.Uuid
-  workspaceId       String      @db.Uuid
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @default(now())
-  description       String
-  descriptionNodes  Json
-  reviewer          String      @db.Uuid
-  assignee          String      @db.Uuid
-  rewardAmount      Float
-  rewardToken       String
-  status            BountyStatus
-  title             String
-  linkedTaskId      String      @db.Uuid
+  id               String       @id @default(uuid()) @db.Uuid
+  createdBy        String       @db.Uuid
+  author           User         @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  workspaceId      String       @db.Uuid
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @default(now())
+  description      String?
+  descriptionNodes Json?
+  reviewer         String       @db.Uuid
+  assignee         String       @db.Uuid
+  rewardAmount     Float
+  rewardToken      String
+  status           BountyStatus @default(open)
+  title            String
+  linkedTaskId     String?      @db.Uuid
 }

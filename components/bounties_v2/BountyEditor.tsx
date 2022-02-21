@@ -1,5 +1,7 @@
 import { CompositeForm } from 'components/common/form/Form';
-import { Bounty as IBounty } from 'models/Bounty';
+import { Bounty as IBounty } from '@prisma/client';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useUser } from 'hooks/useUser';
 import { IInputField } from '../common/form/GenericInput';
 import BountyService from './BountyService';
 
@@ -23,11 +25,13 @@ function bountyEditorFields (bounty?: IBounty): IInputField<IBounty> [] {
       value: bounty?.title,
       required: true
     },
+    /*
     {
       fieldType: 'text',
       modelKey: 'linkedTaskId',
       label: 'Linked task ID'
     },
+    */
     {
       fieldType: 'textMultiline',
       modelKey: 'description',
@@ -61,8 +65,18 @@ function bountyEditorFields (bounty?: IBounty): IInputField<IBounty> [] {
 
 export function BountyEditor ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
 
+  const [space] = useCurrentSpace();
+  const [user] = useUser();
+
   async function submitted (value: IBounty) {
+    console.log('Submit captured', value);
+    console.log('Space', space);
     if (mode === 'create') {
+      delete (value as any).linkedTaskId;
+      value.workspaceId = space!.id;
+      value.createdBy = user!.id;
+      value.assignee = user!.id;
+      value.reviewer = user!.id;
       const createdBounty = await BountyService.createBounty(value as any);
       onSubmit(createdBounty as any);
     }
