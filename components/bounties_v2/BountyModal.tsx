@@ -1,7 +1,7 @@
 import { FormMode } from 'components/common/form/Form';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import { useUser } from 'hooks/useUser';
-import { Bounty } from 'models/Bounty';
+import { Bounty } from '@prisma/client';
 import { BountyEditor } from './BountyEditor';
 
 interface Props {
