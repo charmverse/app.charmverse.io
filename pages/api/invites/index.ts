@@ -5,6 +5,7 @@ import { InviteLink, User } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { createInviteLink } from 'lib/invites';
 
 export type InviteLinkPopulated = InviteLink & { author: User };
 
@@ -12,16 +13,16 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .post(createInviteLink)
+  .post(createInviteLinkEndpoint)
   .get(getInviteLinks);
 
-async function createInviteLink (req: NextApiRequest, res: NextApiResponse) {
+async function createInviteLinkEndpoint (req: NextApiRequest, res: NextApiResponse) {
 
-  const invite = await prisma.inviteLink.create({
-    data: req.body,
-    include: {
-      author: true
-    }
+  const invite = await createInviteLink({
+    createdBy: req.session.user.id,
+    maxAgeMinutes: req.body.maxAgeMinutes,
+    maxUses: req.body.maxUses,
+    spaceId: req.body.spaceId as string
   });
   return res.status(200).json(invite);
 }

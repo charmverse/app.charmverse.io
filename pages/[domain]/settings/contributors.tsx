@@ -64,6 +64,7 @@ function InviteLinks ({ spaceId }: { spaceId: string }) {
     });
     // update the list of links
     await mutate();
+    close();
   }
 
   return (

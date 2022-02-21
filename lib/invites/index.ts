@@ -32,16 +32,16 @@ export async function getInviteLink (code: string): Promise<{ invite?: InviteLin
 
 interface InviteLinkInput {
   spaceId: string;
-  userId: string;
+  createdBy: string;
   maxAgeMinutes?: number;
   maxUses?: number;
 }
 
-export async function createInviteLink ({ maxAgeMinutes, maxUses, spaceId, userId }: InviteLinkInput) {
+export async function createInviteLink ({ maxAgeMinutes, maxUses, spaceId, createdBy }: InviteLinkInput) {
   const link = await prisma.inviteLink.create({
     data: {
       code: uuid().substring(0, 6),
-      createdBy: userId,
+      createdBy,
       maxAgeMinutes,
       maxUses,
       spaceId
