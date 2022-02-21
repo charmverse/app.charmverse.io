@@ -42,7 +42,7 @@ export function Bounty ({ bounty }: IBountyInput) {
           <Grid item xs={12} sx={{ minHeight: '90px' }}>
 
             <Typography paragraph={true}>
-              {bounty.description.trim().substring(0, 120)}
+              {bounty.description?.trim().substring(0, 120)}
               ..
             </Typography>
 
