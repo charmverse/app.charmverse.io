@@ -11,8 +11,11 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(getBounties).post(createBounty);
 
 async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
-
   const { spaceId } = req.query;
+
+  if (spaceId === undefined) {
+    return res.status(406).send({ error: 'Please provide a valid spaceId' } as any);
+  }
 
   const bountyListQuery: Prisma.BountyFindManyArgs = spaceId ? {
     where: {
