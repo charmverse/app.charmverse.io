@@ -101,7 +101,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
         setIsEditing(false);
       }, 1500);
     }
-    setPage({ ...page, content: content.doc });
+    setPage({ ...page, content: content.doc, contentText: content.rawText });
   }
 
   return (
