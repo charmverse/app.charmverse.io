@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Box, Button as MuiButton, Typography } from '@mui/material'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { BlockIcons } from '../../blockIcons'
 import { Board } from '../../blocks/board'
@@ -19,7 +20,6 @@ import { CardDetailProvider } from './cardDetailContext'
 import CardDetailProperties from './cardDetailProperties'
 import CommentsList from './commentsList'
 import useImagePaste from './imagePaste'
-
 
 
 
@@ -116,16 +116,40 @@ const CardDetail = (props: Props): JSX.Element|null => {
 
                 {/* Property list */}
 
-                <CardDetailProperties
-                    board={props.board}
-                    card={props.card}
-                    contents={props.contents}
-                    comments={props.comments}
-                    cards={props.cards}
-                    activeView={props.activeView}
-                    views={props.views}
-                    readonly={props.readonly}
-                />
+                <Box sx={{
+                  display: "flex",
+                  gap: 1,
+                  justifyContent: "space-between",
+                  width: "100%"
+                }}>
+                  <CardDetailProperties
+                      board={props.board}
+                      card={props.card}
+                      contents={props.contents}
+                      comments={props.comments}
+                      cards={props.cards}
+                      activeView={props.activeView}
+                      views={props.views}
+                      readonly={props.readonly}
+                  />
+                  <Box sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 1
+                  }}>
+                    <Typography variant="h5" sx={{
+                      textTransform: "uppercase",
+                      fontWeight: "bold",
+                      textAlign: "center"
+                    }}>
+                      No bounties assigned
+                    </Typography>
+                    <MuiButton>
+                      Assign a bounty
+                    </MuiButton>
+                  </Box>
+                </Box>
 
                 {/* Comments */}
 
