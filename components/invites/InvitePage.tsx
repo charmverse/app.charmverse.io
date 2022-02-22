@@ -1,19 +1,73 @@
+import { useContext } from 'react';
+import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import { useWeb3React } from '@web3-react/core';
+import WorkspaceAvatar from 'components/settings/LargeAvatar';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { InviteLinkPopulated } from 'lib/invites';
+import PrimaryButton from 'components/common/PrimaryButton';
+import { useUser } from 'hooks/useUser';
+import charmClient from 'charmClient';
+
+const CenteredBox = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  max-width: 100%;
+`;
 
 export default function InvitationPage ({ error, invite }: { error?: string, invite?: InviteLinkPopulated }) {
 
+  const router = useRouter();
+  const [user] = useUser();
+  const { account } = useWeb3React();
+  const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+
+  async function joinSpace () {
+    if (!user) {
+      await charmClient.createUser({ address: account! });
+    }
+    await charmClient.acceptInvite({ address: account!, id: invite!.id });
+    router.push(`/${invite!.space.domain}`);
+  }
+
   if (error) {
     return (
-      <Box>
-        <Typography color='danger'>{error}</Typography>
-      </Box>
+      <CenteredBox>
+        <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+          <Typography color='danger'>{error}</Typography>
+        </Card>
+      </CenteredBox>
     );
   }
   return (
-    <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto' }}>
-      <Typography>Welcome!</Typography>
-    </Box>
+    <CenteredBox>
+      <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+        {/* <ImageContainer>
+          <Image width={200} height='auto' src={lockImage} />
+        </ImageContainer> */}
+        <Box mb={3}>
+          <WorkspaceAvatar name={invite!.space.name} variant='rounded' />
+        </Box>
+        <Box display='flex' flexDirection='column' alignItems='center' mb={3}>
+          <Typography gutterBottom>You've been invited to join</Typography>
+          <Typography variant='h5'>{invite!.space.name}</Typography>
+        </Box>
+        {account ? (
+          <PrimaryButton fullWidth size='large' onClick={joinSpace}>
+            Accept Invite
+          </PrimaryButton>
+        ) : (
+          <PrimaryButton fullWidth size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
+            Connect Wallet
+          </PrimaryButton>
+        )}
+      </Card>
+    </CenteredBox>
   );
 }

@@ -1,7 +1,6 @@
 
 import styled from '@emotion/styled';
 import Avatar from 'components/common/Avatar';
-import { stringToColor } from 'lib/strings';
 
 const StyledAvatar = styled(Avatar)`
   font-size: 90px;

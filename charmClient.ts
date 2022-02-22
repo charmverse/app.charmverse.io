@@ -101,6 +101,10 @@ class CharmClient {
     return http.GET<InviteLinkPopulated[]>('/api/invites', { spaceId });
   }
 
+  acceptInvite ({ id }: { id: string }) {
+    return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
+  }
+
   // FocalBoard
 
   // TODO: we shouldnt have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
