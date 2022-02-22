@@ -22,7 +22,7 @@ export default function AccountSettings () {
         </Box>
       </Grid>
       <Grid item>
-        <Legend>Web3 Connection</Legend>
+        <Legend>Web 3 Identity</Legend>
         <WalletConnection />
       </Grid>
     </Grid>
