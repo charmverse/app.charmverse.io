@@ -1,11 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import CharmEditor from 'components/editor/CharmEditor'
+import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor'
+import { PageContent } from 'models'
 import React from 'react'
 import { IntlShape } from 'react-intl'
+import Box from '@mui/material/Box'
 import { Card } from '../../blocks/card'
 import { ContentBlock as ContentBlockType, IContentBlockWithCords } from '../../blocks/contentBlock'
+import { CharmTextBlock, createCharmTextBlock } from '../../blocks/charmBlock'
 import { createTextBlock } from '../../blocks/textBlock'
+import { Block } from '../../blocks/block'
 import { useSortableWithGrip } from '../../hooks/sortable'
 import mutator from '../../mutator'
 import ContentBlock from '../contentBlock'
@@ -36,6 +40,12 @@ function addTextBlock(card: Card, intl: IntlShape, text: string): void {
         contentOrder.push(insertedBlock.id)
         await mutator.changeCardContentOrder(card.id, card.fields.contentOrder, contentOrder, description)
     })
+}
+
+function updateCharmTextBlock(block: CharmTextBlock, content: PageContent) {
+    const newBlock = createCharmTextBlock(block)
+    newBlock.fields.content = content
+    return mutator.updateBlock(newBlock, block, 'Updated description')
 }
 
 function moveBlock(card: Card, srcBlock: IContentBlockWithCords, dstBlock: IContentBlockWithCords, intl: IntlShape, moveTo: Position): void {
@@ -148,10 +158,23 @@ const ContentBlockWithDragAndDrop = (props: ContentBlockWithDragAndDropProps) =>
 }
 
 const CardDetailContents = React.memo((props: Props) => {
+
+    const charmTextBlock = props.contents.filter((c): c is CharmTextBlock => (c as Block).type === 'charm_text')[0];
+    const content = charmTextBlock?.fields.content;
+
+    async function updatePageContent (content: ICharmEditorOutput) {
+        if (charmTextBlock) {
+            await updateCharmTextBlock(charmTextBlock, content.doc)
+        }
+        else {
+            console.error('Warning! No charm text block exists for card');
+        }
+    }
     return (
         <div className='octo-content CardDetailContents'>
-            <div className='octo-block'>
-                <CharmEditor />
+            <div className='octo-block' style={{ position: 'relative', zIndex: 1 }}>
+                <CharmEditor editorTop={-70} content={content} onPageContentChange={updatePageContent} />
+                <Box mb={6} />
             </div>
         </div>
     )
