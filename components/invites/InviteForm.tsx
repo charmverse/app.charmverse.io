@@ -23,7 +23,7 @@ export const schema = yup.object({
 
 export type FormValues = yup.InferType<typeof schema>;
 
-interface Props {
+interface FormProps {
   defaultValues?: { name: string, domain: string };
   onClose?: () => void;
   onSubmit: (values: FormValues) => void;
@@ -50,7 +50,7 @@ const maxUsesOptions: { value: FormValues['maxUses'], label: string }[] = [
   { value: 100, label: '100 uses' }
 ];
 
-export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: Props) {
+export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: FormProps) {
 
   const defaultMaxAge = maxAgeOptions[maxAgeOptions.length - 2].value; // the longest duration thats not infinite
   const defaultMaxUses = maxUsesOptions[0].value; // no limit

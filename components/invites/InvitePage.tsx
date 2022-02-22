@@ -38,7 +38,13 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
     return (
       <CenteredBox>
         <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-          <Typography color='danger'>{error}</Typography>
+          <Box display='flex' flexDirection='column' alignItems='center' mb={3}>
+            <Typography variant='h5' gutterBottom><strong>Invite Invalid</strong></Typography>
+            <Typography align='center' color='danger'>This invite may be expired, or you might not have permission to join.</Typography>
+          </Box>
+          <PrimaryButton fullWidth size='large' href='/'>
+            Continue to CharmVerse
+          </PrimaryButton>
         </Card>
       </CenteredBox>
     );
@@ -46,9 +52,6 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
   return (
     <CenteredBox>
       <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        {/* <ImageContainer>
-          <Image width={200} height='auto' src={lockImage} />
-        </ImageContainer> */}
         <Box mb={3}>
           <WorkspaceAvatar name={invite!.space.name} variant='rounded' />
         </Box>
