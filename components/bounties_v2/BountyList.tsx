@@ -17,7 +17,7 @@ export function BountyList () {
 
   async function refreshBounties () {
     try {
-      const foundBounties = await BountyService.listBounties(space?.id);
+      const foundBounties = await BountyService.listBounties(space!.id);
 
       // Tenporary measure to seed new bounties so we can experiment with different colour statuses
       /*
