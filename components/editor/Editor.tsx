@@ -145,6 +145,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
           style={{
             top: bangleEditorTop
           }}
+          editorTop={bangleEditorTop}
           content={page.content as PageContent}
           onPageContentChange={updatePageContent}
         >
