@@ -48,10 +48,11 @@ export function EmojiSuggest({
     triggerText,
     show: isVisible,
   } = usePluginState(suggestTooltipKey);
-  const width = rowWidth + (parseInt(theme.spacing(1).replace("px", "")) * 2);
+
+  const width = rowWidth + (parseInt(theme.spacing(2).replace("px", "")) * 2);
 
   return reactDOM.createPortal(
-    <StyledEmojiSuggest className="bangle-emoji-suggest">
+    <StyledEmojiSuggest className="bangle-emoji-suggest" id='inline-palette-wrapper'>
       <div
         style={{
           width,
@@ -63,7 +64,7 @@ export function EmojiSuggest({
           <EmojiSuggestContainer
             view={view}
             insideCallout={insideCallout}
-            rowWidth={width}
+            rowWidth={rowWidth}
             squareMargin={squareMargin}
             squareSide={squareSide}
             maxItems={maxItems}
@@ -262,7 +263,7 @@ const StyledEmojiSquare = styled.button<{ isSelected: boolean }>`
   ${props => props.isSelected && `background-color: rgb(0, 0, 0, 0.125);`};
   transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  
+
   &:hover {
     cursor: pointer;
     background-color: ${({ theme }) => theme.palette.emoji.hoverBackground};

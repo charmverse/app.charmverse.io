@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   isTouchDevice,
   safeScrollIntoViewIfNeeded
-} from '../../utils/utility';
+} from 'components/editor/utility';
 
 const BASE_PADDING = 10;
 

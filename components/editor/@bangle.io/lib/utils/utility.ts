@@ -38,68 +38,6 @@ export function isTouchDevice() {
   return hasTouchScreen;
 }
 
-export const safeScrollIntoViewIfNeeded = (
-  element: HTMLElement,
-  centerIfNeeded?: boolean,
-) => {
-  if (typeof window !== 'undefined') {
-    return 'scrollIntoViewIfNeeded' in document.body
-      ? (element as any).scrollIntoViewIfNeeded(centerIfNeeded)
-      : scrollIntoViewIfNeededPolyfill(element, centerIfNeeded);
-  }
-  return () => {};
-};
-
-function scrollIntoViewIfNeededPolyfill(
-  element: HTMLElement,
-  centerIfNeeded?: boolean,
-) {
-  centerIfNeeded = arguments.length === 0 ? true : !!centerIfNeeded;
-
-  const parent = (element.closest('#inline-palette-wrapper') || element.parentNode)! as HTMLElement;
-  const elementCoords = element.getBoundingClientRect();
-  const parentCoords = parent.getBoundingClientRect();
-  const elementOffsetTop = elementCoords.top - parentCoords.top;
-  const elementOffsetBottom = elementCoords.bottom - parentCoords.top;
-  const parentComputedStyle = window.getComputedStyle(parent, null),
-    parentBorderTopWidth = parseInt(
-      parentComputedStyle.getPropertyValue('border-top-width'),
-    ),
-    parentBorderLeftWidth = parseInt(
-      parentComputedStyle.getPropertyValue('border-left-width'),
-    ),
-    overTop = elementOffsetTop < 0,//element.offsetTop - parent.offsetTop < parent.scrollTop,
-    overBottom = elementOffsetBottom > parentCoords.height,
-    overLeft = element.offsetLeft - parent.offsetLeft < parent.scrollLeft,
-    overRight =
-      element.offsetLeft -
-        parent.offsetLeft +
-        element.clientWidth -
-        parentBorderLeftWidth >
-      parent.scrollLeft + parent.clientWidth,
-    alignWithTop = overTop && !overBottom;
-  if ((overTop || overBottom) && centerIfNeeded) {
-    parent.scrollTop =
-      element.offsetTop -
-      parent.offsetTop -
-      parent.clientHeight / 2 -
-      parentBorderTopWidth +
-      element.clientHeight / 2;
-  }
-
-  if ((overLeft || overRight) && centerIfNeeded) {
-    parent.scrollLeft =
-      element.offsetLeft -
-      parent.offsetLeft -
-      parent.clientWidth / 2 -
-      parentBorderLeftWidth +
-      element.clientWidth / 2;
-  }
-  if ((overTop || overBottom || overLeft || overRight) && !centerIfNeeded) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-}
-
 export function makeSafeForCSS(name: string) {
   return name.replace(/[^a-z0-9]/g, function (s: string) {
     let c = s.charCodeAt(0);
