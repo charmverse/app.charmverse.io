@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Bounty" ALTER COLUMN "reviewer" DROP NOT NULL,
-ALTER COLUMN "assignee" DROP NOT NULL;
