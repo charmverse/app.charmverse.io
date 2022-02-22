@@ -15,7 +15,7 @@ interface ResizerProps {
 
 export const StyledResizeHandle = styled(Box)`
   width: 7.5px;
-  height: calc(100% - 15px);
+  height: calc(100% - 25px);
   max-height: 75px;
   border-radius: ${({ theme }) => theme.spacing(2)};
   background-color: ${({ theme }) => theme.palette.background.dark};

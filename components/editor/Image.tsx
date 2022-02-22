@@ -10,7 +10,7 @@ import ImageSelector from './ImageSelector';
 import Resizer from './Resizer';
 
 const MAX_IMAGE_SIZE = 750; const
-  MIN_IMAGE_SIZE = 250;
+  MIN_IMAGE_SIZE = 100;
 
 const StyledEmptyImageContainer = styled(Box)`
   display: flex;
@@ -114,11 +114,13 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
       flexDirection: 'column'
     }}
     >
-      <BlockAligner onDelete={() => {
-        updateAttrs({
-          src: null
-        });
-      }}
+      <BlockAligner
+        onDelete={() => {
+          updateAttrs({
+            src: null
+          });
+        }}
+        imageSize={size}
       >
         <Resizer
           size={size}
