@@ -1,6 +1,5 @@
 import { useContext } from 'react';
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
@@ -23,7 +22,6 @@ const CenteredBox = styled.div`
 
 export default function InvitationPage ({ error, invite }: { error?: string, invite?: InviteLinkPopulated }) {
 
-  const router = useRouter();
   const [user] = useUser();
   const { account } = useWeb3React();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
@@ -32,8 +30,8 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
     if (!user) {
       await charmClient.createUser({ address: account! });
     }
-    await charmClient.acceptInvite({ address: account!, id: invite!.id });
-    router.push(`/${invite!.space.domain}`);
+    await charmClient.acceptInvite({ id: invite!.id });
+    window.location.href = `/${invite!.space.domain}`;
   }
 
   if (error) {
