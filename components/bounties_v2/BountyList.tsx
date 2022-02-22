@@ -19,28 +19,6 @@ export function BountyList () {
     try {
       const foundBounties = await BountyService.listBounties(space!.id);
 
-      // Tenporary measure to seed new bounties so we can experiment with different colour statuses
-      /*
-      while (foundBounties.length >= 2 && foundBounties.length < 15) {
-
-        const position = Math.random() > 0.5 ? 0 : 1;
-
-        const copiedBounty = { ...foundBounties[position] };
-
-        const random = Math.random();
-
-        const randomStatus: BountyStatus = random < 0.2 ? 'open'
-          : random < 0.4 ? 'assigned'
-            : random < 0.6 ? 'review'
-              : random < 0.8 ? 'complete'
-                : 'paid';
-
-        copiedBounty.status = randomStatus;
-
-        foundBounties.push(copiedBounty);
-      }
-      */
-
       setBountyList(foundBounties);
 
     }
