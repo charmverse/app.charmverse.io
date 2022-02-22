@@ -27,7 +27,6 @@ export default function BountyTable (props: Props) {
             <TableCell component='th' scope='row'>
               {row.title}
             </TableCell>
-            <TableCell>{row.author}</TableCell>
             <TableCell>{row.createdAt.toLocaleString()}</TableCell>
           </TableRow>
         ))}
