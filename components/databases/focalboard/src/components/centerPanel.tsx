@@ -13,6 +13,7 @@ import {BlockIcons} from '../blockIcons'
 import {Card, createCard} from '../blocks/card'
 import {Board, IPropertyTemplate, IPropertyOption, BoardGroup} from '../blocks/board'
 import {BoardView} from '../blocks/boardView'
+import { createCharmTextBlock } from '../blocks/charmBlock'
 import {CardFilter} from '../cardFilter'
 import mutator from '../mutator'
 import {Utils} from '../utils'
@@ -272,11 +273,18 @@ class CenterPanel extends React.Component<Props, State> {
             card.fields.icon = BlockIcons.shared.randomIcon()
         }
 
+        const charmTextBlock = createCharmTextBlock()
+        charmTextBlock.parentId = card.id
+        charmTextBlock.rootId = card.rootId
+        card.fields.contentOrder = [charmTextBlock.id];
+
         mutator.performAsUndoGroup(async () => {
             const newCard = await mutator.insertBlock(
                 card,
                 'add card',
                 async (block: Block) => {
+                    await mutator.insertBlock(charmTextBlock, 'add card description')
+                    console.log(charmTextBlock)
                     if (show) {
                         this.props.addCard(createCard(block))
                         this.props.updateView({...activeView, fields: {...activeView.fields, cardOrder: [...activeView.fields.cardOrder, block.id]}})
