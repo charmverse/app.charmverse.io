@@ -55,16 +55,7 @@ export function BountyList () {
              * Remove later to its own popup modal
              */
             displayBountyDialog === true && (
-              <>
-                <BountyModal onSubmit={bountyCreated} open={displayBountyDialog} onClose={bountyCreated} />
-
-                {/*
-                <Grid item xs={12}>
-                  <BountyEditor bounty={{ title: 'Prefilled bounty' } as any} mode='create' onSubmit={bountyCreated} />
-                </Grid>
-                */}
-
-              </>
+            <BountyModal onSubmit={bountyCreated} open={displayBountyDialog} onClose={bountyCreated} />
             )
           }
 
@@ -89,8 +80,8 @@ export function BountyList () {
         <Grid container>
 
           {
-        bountyList.length === 0 && <Typography paragraph={true}>No bounties were found</Typography>
-      }
+            bountyList.length === 0 && <Typography paragraph={true}>No bounties were found</Typography>
+          }
 
           { bountyList.length > 0
         && bountyList?.map(availableBounty => {
