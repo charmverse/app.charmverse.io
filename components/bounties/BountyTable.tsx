@@ -5,7 +5,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
-import type { Bounty } from 'models/Bounty';
+import { Bounty } from '@prisma/client';
 
 interface Props {
   items: Bounty[];
@@ -27,7 +27,6 @@ export default function BountyTable (props: Props) {
             <TableCell component='th' scope='row'>
               {row.title}
             </TableCell>
-            <TableCell>{row.author}</TableCell>
             <TableCell>{row.createdAt.toLocaleString()}</TableCell>
           </TableRow>
         ))}

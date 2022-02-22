@@ -236,15 +236,15 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (workspaceId?: string): Promise<Bounty []> {
-    return http.GET<Bounty[]>('/api/bounties');
+  listBounties (spaceId: string): Promise<Bounty []> {
+    return http.GET<Bounty[]>('/api/bounties', { spaceId });
   }
 
   async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
 
-    const data = await http.POST<Bounty[]>('/api/bounties');
+    const data = await http.POST<Bounty>('/api/bounties', bounty);
 
-    return data[0];
+    return data;
   }
 }
 

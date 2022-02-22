@@ -56,7 +56,7 @@ export function CompositeForm ({ onSubmit, fields, mode, submitLabel }: IComposi
         })
       }
 
-          <Button disabled={!isValid}>
+          <Button type='submit' disabled={!isValid}>
             {submitLabel ?? (mode === 'update' ? 'Update' : 'Create')}
           </Button>
 

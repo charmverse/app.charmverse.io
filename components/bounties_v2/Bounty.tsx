@@ -1,8 +1,11 @@
 import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
 import { Bounty as IBounty } from '@prisma/client';
+import Button from '@mui/material/Button';
+import BountyModal from 'components/bounties_v2/BountyModal';
 import { Card, CardHeader, CardContent, Chip, Typography, Grid } from '@mui/material';
 import { useState } from 'react';
 import { BrandColors } from 'theme/colors';
+import { fancyTrim } from 'lib/strings';
 
 export interface IBountyInput {
   bounty: IBounty
@@ -18,10 +21,14 @@ const BountyStatusColours: Record<BountyStatus, BrandColors> = {
 
 export function Bounty ({ bounty }: IBountyInput) {
 
-  const [editBounty, toggleBountyDialog] = useState(false);
+  const [editBounty, setDisplayBountyDialog] = useState(false);
 
   const bountyColor = BountyStatusColours[bounty.status];
   const bountyLabel = BountyLabels[bounty.status];
+
+  function closeDialog () {
+    setDisplayBountyDialog(false);
+  }
 
   return (
     <Card
@@ -31,19 +38,17 @@ export function Bounty ({ bounty }: IBountyInput) {
         minHeight: 200,
         cursor: 'pointer'
       }}
-      onClick={() => {
-        toggleBountyDialog(true);
-      }}
       variant='outlined'
     >
       <CardHeader subheader={bounty.title} />
+
       <CardContent sx={{ flexGrow: 1, display: 'block' }}>
+
         <Grid container direction='column' justifyContent='space-between'>
           <Grid item xs={12} sx={{ minHeight: '90px' }}>
 
             <Typography paragraph={true}>
-              {bounty.description.trim().substring(0, 120)}
-              ..
+              {fancyTrim(bounty.description, 120)}
             </Typography>
 
           </Grid>

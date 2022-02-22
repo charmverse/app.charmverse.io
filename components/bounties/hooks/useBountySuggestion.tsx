@@ -1,5 +1,5 @@
 import React, { ReactElement, useReducer, useMemo, useContext } from 'react';
-import type { Bounty } from 'models/Bounty';
+import { Bounty } from '@prisma/client';
 
 function suggestionReducer (state: any, action: any) {
   switch (action.type) {
