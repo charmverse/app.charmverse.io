@@ -10,6 +10,7 @@ import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
+import Alert from '@mui/material/Alert';
 import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
@@ -40,8 +41,10 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, touchedFields }
+    trigger,
+    formState: { errors, touchedFields, isValid, isValidating }
   } = useForm<FormValues>({
+    mode: 'onBlur',
     defaultValues: bounty as any,
     resolver: yupResolver(schema)
   });
@@ -49,7 +52,10 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
   const [space] = useCurrentSpace();
   const [user] = useUser();
 
-  const formValues = watch();
+  const formValues = watch((value) => {
+    console.log('Watching changes');
+    console.log('Is valid', isValid, errors);
+  });
 
   async function submitted (value: IBounty) {
     if (mode === 'create') {
@@ -83,6 +89,15 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               type='text'
               fullWidth
             />
+
+            {
+              errors?.title && (
+              <Alert severity='error'>
+                {errors.title.message}
+              </Alert>
+              )
+            }
+
           </Grid>
 
           <Grid item>
@@ -112,6 +127,15 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
                 type='number'
                 inputProps={{ step: 0.000000001 }}
               />
+
+              {
+              errors?.rewardAmount && (
+              <Alert severity='error'>
+                {errors.rewardAmount.message}
+              </Alert>
+              )
+            }
+
             </Grid>
             <Grid item xs={6}>
               <InputLabel>
@@ -119,10 +143,11 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               </InputLabel>
               <InputSearchCrypto label='' register={register} modelKey='rewardToken' />
             </Grid>
+
           </Grid>
 
           <Grid item>
-            <Button type='submit'>Create bounty</Button>
+            <Button disabled={!isValid} type='submit'>Create bounty</Button>
           </Grid>
 
         </Grid>
