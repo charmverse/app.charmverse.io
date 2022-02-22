@@ -4,13 +4,10 @@ import { darken } from '@mui/system';
 import {
   backgroundColor,
   backgroundColorDarkMode, backgroundDarkColor, backgroundDarkColorDarkMode, backgroundLightColor,
-  backgroundLightColorDarkMode, blueColor,
-  darkBlueColor, primaryTextColor,
+  backgroundLightColorDarkMode, blueColor, BrandColors,
+  darkBlueColor, darkModeColors, lightModeColors, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
-  settingsHeaderBackgroundColorDarkMode,
-  lightModeColors,
-  darkModeColors,
-  BrandColors
+  settingsHeaderBackgroundColorDarkMode
 } from './colors';
 import { darkTheme as darkThemeFocalBoard, lightTheme as lightThemeFocalBoard } from './focalboard/theme';
 
@@ -225,6 +222,20 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
       styleOverrides: {
         root: {
           backgroundColor: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
+        }
+      }
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        popper: {
+          zIndex: 3000
+        }
+      }
+    },
+    MuiPopover: {
+      styleOverrides: {
+        root: {
+          zIndex: 3000
         }
       }
     },
