@@ -3,6 +3,7 @@ import { Bounty as IBounty } from '@prisma/client';
 import { Card, CardHeader, CardContent, Chip, Typography, Grid } from '@mui/material';
 import { useState } from 'react';
 import { BrandColors } from 'theme/colors';
+import { fancyTrim } from 'lib/strings';
 
 export interface IBountyInput {
   bounty: IBounty
@@ -42,8 +43,7 @@ export function Bounty ({ bounty }: IBountyInput) {
           <Grid item xs={12} sx={{ minHeight: '90px' }}>
 
             <Typography paragraph={true}>
-              {bounty.description?.trim().substring(0, 120)}
-              ..
+              {fancyTrim(bounty.description, 120)}
             </Typography>
 
           </Grid>
