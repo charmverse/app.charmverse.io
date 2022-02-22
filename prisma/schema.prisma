@@ -98,7 +98,7 @@ model User {
   pages           Page[]
   blocks          Block[]
   spaces          Space[]
-  InviteLink      InviteLink[]
+  inviteLinks     InviteLink[]
 }
 
 model FavoritePage {
