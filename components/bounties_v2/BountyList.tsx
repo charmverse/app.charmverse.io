@@ -5,8 +5,7 @@ import { Bounty } from 'components/bounties_v2/Bounty';
 import { Typography, Button, Grid } from '@mui/material';
 import BountyModal from 'components/bounties_v2/BountyModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import BountyService from './BountyService';
-import { BountyEditor } from './BountyEditor';
+import charmClient from 'charmClient';
 
 export function BountyList () {
 
@@ -17,7 +16,7 @@ export function BountyList () {
 
   async function refreshBounties () {
     try {
-      const foundBounties = await BountyService.listBounties(space!.id);
+      const foundBounties = await charmClient.listBounties(space!.id);
 
       setBountyList(foundBounties);
 

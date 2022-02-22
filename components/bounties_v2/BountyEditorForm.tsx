@@ -15,8 +15,8 @@ import Alert from '@mui/material/Alert';
 import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
+import charmClient from 'charmClient';
 import { IInputField } from '../common/form/GenericInput';
-import BountyService from './BountyService';
 
 export type FormMode = 'create' | 'update';
 
@@ -59,7 +59,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     if (mode === 'create') {
       value.spaceId = space!.id;
       value.createdBy = user!.id;
-      const createdBounty = await BountyService.createBounty(value);
+      const createdBounty = await charmClient.createBounty(value);
       onSubmit(createdBounty);
     }
   }
