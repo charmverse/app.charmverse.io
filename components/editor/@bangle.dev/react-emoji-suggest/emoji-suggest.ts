@@ -137,7 +137,6 @@ function pluginsFactory({
           rowCount,
           namedEmojiGroups,
         );
-        console.log('row count', { rowWidth, squareMargin, squareSide, rowCount });
 
         if (newCounter == null) {
           return false;
