@@ -10,6 +10,7 @@ import {
 } from '@bangle.dev/utils';
 import * as suggestTooltip from "components/editor/@bangle.dev/tooltip/suggest-tooltip";
 import { emojiSuggestKey, getEmojiByAlias } from 'components/editor/EmojiSuggest';
+import { safeScrollIntoViewIfNeeded } from 'components/editor/utility';
 
 const {
   decrementSuggestTooltipCounter,
@@ -101,11 +102,7 @@ function pluginsFactory({
         requestAnimationFrame(() => {
           const selectedEmoji = document.getElementById(selectedEmojiSquareId);
           if (selectedEmoji) {
-            if ('scrollIntoViewIfNeeded' in document.body) {
-              (selectedEmoji as any).scrollIntoViewIfNeeded(false);
-            } else if (selectedEmoji.scrollIntoView) {
-              selectedEmoji.scrollIntoView(false);
-            }
+            safeScrollIntoViewIfNeeded(selectedEmoji);
           }
           view?.focus();
         });
@@ -255,7 +252,7 @@ function pluginsFactory({
           const emojiAlias = activeItem[0];
           view &&
             rafCommandExec(view, resetSuggestTooltipCounter(suggestTooltipKey));
-          
+
           if (!insideCallout) {
             return selectEmoji(key, emojiAlias)(state, dispatch, view);
           } else {
