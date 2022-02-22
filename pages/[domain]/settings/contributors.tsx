@@ -21,14 +21,6 @@ export default function ContributorSettings () {
   const [space] = useCurrentSpace();
   const [contributors] = useContributors();
 
-  // useEffect(() => {
-  //   if (space) {
-  //     charmClient.getInviteLinks(space.id).then(links => {
-  //       setInviteLinks(links);
-  //     });
-  //   }
-  // }, [space]);
-
   setTitle('Contributors');
 
   return (
@@ -43,7 +35,7 @@ export default function ContributorSettings () {
 
       <Legend>Current Contributors</Legend>
       {space && contributors.map(contributor => (
-        <ContributorRow key={getDisplayName(contributor)} contributor={contributor} spaceId={space.id} />
+        <ContributorRow key={getDisplayName(contributor)} contributor={contributor} />
       ))}
     </>
   );
