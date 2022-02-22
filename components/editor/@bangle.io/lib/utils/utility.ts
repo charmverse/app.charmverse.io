@@ -56,21 +56,20 @@ function scrollIntoViewIfNeededPolyfill(
 ) {
   centerIfNeeded = arguments.length === 0 ? true : !!centerIfNeeded;
 
-  const parent = element.parentNode! as HTMLElement,
-    parentComputedStyle = window.getComputedStyle(parent, null),
+  const parent = (element.closest('#inline-palette-wrapper') || element.parentNode)! as HTMLElement;
+  const elementCoords = element.getBoundingClientRect();
+  const parentCoords = parent.getBoundingClientRect();
+  const elementOffsetTop = elementCoords.top - parentCoords.top;
+  const elementOffsetBottom = elementCoords.bottom - parentCoords.top;
+  const parentComputedStyle = window.getComputedStyle(parent, null),
     parentBorderTopWidth = parseInt(
       parentComputedStyle.getPropertyValue('border-top-width'),
     ),
     parentBorderLeftWidth = parseInt(
       parentComputedStyle.getPropertyValue('border-left-width'),
     ),
-    overTop = element.offsetTop - parent.offsetTop < parent.scrollTop,
-    overBottom =
-      element.offsetTop -
-        parent.offsetTop +
-        element.clientHeight -
-        parentBorderTopWidth >
-      parent.scrollTop + parent.clientHeight,
+    overTop = elementOffsetTop < 0,//element.offsetTop - parent.offsetTop < parent.scrollTop,
+    overBottom = elementOffsetBottom > parentCoords.height,
     overLeft = element.offsetLeft - parent.offsetLeft < parent.scrollLeft,
     overRight =
       element.offsetLeft -
@@ -79,7 +78,6 @@ function scrollIntoViewIfNeededPolyfill(
         parentBorderLeftWidth >
       parent.scrollLeft + parent.clientWidth,
     alignWithTop = overTop && !overBottom;
-
   if ((overTop || overBottom) && centerIfNeeded) {
     parent.scrollTop =
       element.offsetTop -
@@ -97,9 +95,8 @@ function scrollIntoViewIfNeededPolyfill(
       parentBorderLeftWidth +
       element.clientWidth / 2;
   }
-
   if ((overTop || overBottom || overLeft || overRight) && !centerIfNeeded) {
-    element.scrollIntoView(alignWithTop);
+    element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 }
 
