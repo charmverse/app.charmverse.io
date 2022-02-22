@@ -16,11 +16,12 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
-import { columnResizing, Node } from '@bangle.dev/pm';
-import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
+import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
+import { BangleEditor as ReactBangleEditor, useEditorState, useEditorViewContext } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
 import '@bangle.dev/tooltip/style.css';
 import styled from '@emotion/styled';
+import { Box } from '@mui/material';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
@@ -42,7 +43,22 @@ export interface ICharmEditorOutput {
 }
 
 const specRegistry = new SpecRegistry([
-  paragraph.spec(), // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
+  // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
+  {
+    type: 'node',
+    name: 'paragraph',
+    schema: {
+      content: 'inline*',
+      group: 'block',
+      draggable: false,
+      parseDOM: [
+        {
+          tag: 'p'
+        }
+      ],
+      toDOM: (): DOMOutputSpecArray => ['p', 0]
+    }
+  },
   bold.spec(),
   bulletList.spec(),
   hardBreak.spec(),
@@ -94,12 +110,30 @@ const defaultContent: PageContent = {
 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
-export default function CharmEditor (
-  { content = defaultContent, children, onPageContentChange, style }:
-  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent,
-    style?: CSSProperties }
-) {
+function PlaceHolder ({ top }: {top?: number}) {
+  const view = useEditorViewContext();
+  const docTextContent = view.state.doc.textContent as string;
 
+  // Only show placeholder if the editor content is empty
+  return docTextContent.length === 0 ? (
+    <Box sx={{
+      // This weird calculation is required to place the placeholder on the same position as the editor
+      top: top ? top - 31 : 30,
+      position: 'relative',
+      color: 'rgba(255, 255, 255, 0.4)',
+      zIndex: -20
+    }}
+    >
+      Type '/' for commands
+    </Box>
+  ) : null;
+}
+
+export default function CharmEditor (
+  { editorTop, content = defaultContent, children, onPageContentChange, style }:
+  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent,
+    style?: CSSProperties, editorTop?: number }
+) {
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -181,6 +215,8 @@ export default function CharmEditor (
     }
   });
 
+  const docTextContent = state.pmState.doc.textContent as string;
+
   return (
     <StyledReactBangleEditor
       style={{
@@ -256,6 +292,7 @@ export default function CharmEditor (
       {EmojiSuggest}
       {InlinePalette}
       {children}
+      <PlaceHolder top={style?.top as number ?? 20} />
     </StyledReactBangleEditor>
   );
 }
