@@ -4,13 +4,13 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, useState } from 'react';
 import BlockAligner from './BlockAligner';
 import ImageSelector from './ImageSelector';
 import Resizer from './Resizer';
 
 const MAX_IMAGE_SIZE = 750; const
-  MIN_IMAGE_SIZE = 250;
+  MIN_IMAGE_SIZE = 100;
 
 const StyledEmptyImageContainer = styled(Box)`
   display: flex;
@@ -92,7 +92,7 @@ const StyledImage = styled.img`
 
 export function Image ({ node, updateAttrs }: NodeViewProps) {
   const theme = useTheme();
-
+  const [size, setSize] = useState(MIN_IMAGE_SIZE);
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -114,13 +114,22 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
       flexDirection: 'column'
     }}
     >
-      <BlockAligner onDelete={() => {
-        updateAttrs({
-          src: null
-        });
-      }}
+      <BlockAligner
+        onDelete={() => {
+          updateAttrs({
+            src: null
+          });
+        }}
+        size={size}
       >
-        <Resizer maxSize={MAX_IMAGE_SIZE} minSize={MIN_IMAGE_SIZE}>
+        <Resizer
+          size={size}
+          onResize={(_, data) => {
+            setSize(data.size.width);
+          }}
+          maxSize={MAX_IMAGE_SIZE}
+          minSize={MIN_IMAGE_SIZE}
+        >
           <StyledImage
             draggable={false}
             src={node.attrs.src}

@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { ResizableBox, ResizableProps } from 'react-resizable';
 
 interface ResizerProps {
+  size?: number
   maxSize?: number
   minSize?: number
   children: ReactNode
@@ -14,7 +15,7 @@ interface ResizerProps {
 
 export const StyledResizeHandle = styled(Box)`
   width: 7.5px;
-  height: calc(100% - 15px);
+  height: calc(100% - 25px);
   max-height: 75px;
   border-radius: ${({ theme }) => theme.spacing(2)};
   background-color: ${({ theme }) => theme.palette.background.dark};
@@ -35,7 +36,7 @@ export const StyledResizeHandle = styled(Box)`
 `;
 
 export default function Resizer (props: ResizerProps) {
-  const { onResize, minConstraints, maxConstraints, minSize = 250, maxSize = 750, children } = props;
+  const { size = 250, onResize, minConstraints, maxConstraints, minSize = 250, maxSize = 750, children } = props;
 
   return (
     <Box
@@ -51,8 +52,8 @@ export default function Resizer (props: ResizerProps) {
     >
       <ResizableBox
         onResize={onResize}
-        width={maxConstraints?.[0] ?? maxSize}
-        height={maxConstraints?.[1] ?? maxSize}
+        width={maxConstraints?.[0] ?? size ?? maxSize}
+        height={maxConstraints?.[1] ?? size ?? maxSize}
         resizeHandles={['w', 'e']}
         lockAspectRatio
         minConstraints={minConstraints ?? [minSize, minSize]}
