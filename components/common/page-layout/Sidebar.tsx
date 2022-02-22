@@ -270,7 +270,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 />
               </Box>
             </Box>
-            <StyledTreeItem
+            {/* <StyledTreeItem
               sx={{ mt: 3 }}
               nodeId='bounties'
               icon={<BountyIcon fontSize='small' />}
@@ -280,7 +280,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               ContentProps={{
                 className: router.pathname.includes('bounties') ? 'Mui-selected' : ''
               }}
-            />
+            /> */}
           </Box>
           <Box>
             <Divider />
