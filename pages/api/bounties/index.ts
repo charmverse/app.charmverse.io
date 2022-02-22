@@ -38,6 +38,11 @@ async function createBounty (req: NextApiRequest, res: NextApiResponse<Bounty>) 
     delete bountyToCreate.createdBy;
   }
 
+  if (data.spaceId) {
+    (bountyToCreate as Prisma.BountyCreateInput).space = { connect: { id: data.spaceId } };
+    delete bountyToCreate.spaceId;
+  }
+
   const bounty = await prisma.bounty.create({ data: bountyToCreate });
   return res.status(200).json(bounty);
 }
