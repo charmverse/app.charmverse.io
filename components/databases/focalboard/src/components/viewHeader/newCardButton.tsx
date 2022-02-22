@@ -2,18 +2,16 @@
 // See LICENSE.txt for license information.
 
 import React from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
-
-import {Card} from '../../blocks/card'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { Card } from '../../blocks/card'
+import { getCurrentBoardTemplates } from '../../store/cards'
+import { useAppSelector } from '../../store/hooks'
+import { getCurrentView } from '../../store/views'
 import ButtonWithMenu from '../../widgets/buttons/buttonWithMenu'
-import AddIcon from '../../widgets/icons/add'
 import Menu from '../../widgets/menu'
-import {useAppSelector} from '../../store/hooks'
-import {getCurrentBoardTemplates} from '../../store/cards'
-import {getCurrentView} from '../../store/views'
-
-import NewCardButtonTemplateItem from './newCardButtonTemplateItem'
 import EmptyCardButton from './emptyCardButton'
+
+
 
 type Props = {
     addCard: () => void
@@ -56,26 +54,26 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
 
                     <Menu.Separator/>
                 </>}
-
-                {cardTemplates.map((cardTemplate) => (
+                {/** TODO: Add support for templates*/}
+                {/* {cardTemplates.map((cardTemplate) => (
                     <NewCardButtonTemplateItem
                         key={cardTemplate.id}
                         cardTemplate={cardTemplate}
                         addCardFromTemplate={props.addCardFromTemplate}
                         editCardTemplate={props.editCardTemplate}
                     />
-                ))}
+                ))} */}
 
                 <EmptyCardButton
                     addCard={props.addCard}
                 />
 
-                <Menu.Text
+                {/* <Menu.Text
                     icon={<AddIcon/>}
                     id='add-template'
                     name={intl.formatMessage({id: 'ViewHeader.add-template', defaultMessage: 'New template'})}
                     onClick={() => props.addCardTemplate()}
-                />
+                /> */}
             </Menu>
         </ButtonWithMenu>
     )
