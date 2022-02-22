@@ -115,7 +115,6 @@ function PlaceHolder ({ top }: {top?: number}) {
   const docTextContent = view.state.doc.textContent as string;
   const theme = useTheme();
   const color = useMemo(() => alpha(theme.palette.text.secondary, 0.35), [theme]);
-  console.log('placeholder', docTextContent);
   // Only show placeholder if the editor content is empty
   return docTextContent.length === 0 ? (
     <Box sx={{

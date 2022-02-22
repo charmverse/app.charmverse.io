@@ -65,8 +65,9 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
     pageControlTop = 50;
   }
 
-  let pageTitleTop = 50; let bangleEditorTop = 75; let
-    pageIconTop = 50;
+  let pageTitleTop = 50;
+  let bangleEditorTop = 75;
+  let pageIconTop = 50;
 
   if (page) {
     if (page.icon && !page.headerImage) {
@@ -151,9 +152,9 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
         >
           <>
             {page?.icon && (
-            <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
-              <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-            </EmojiContainer>
+              <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
+                <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+              </EmojiContainer>
             )}
             {page && (
             <Box sx={{

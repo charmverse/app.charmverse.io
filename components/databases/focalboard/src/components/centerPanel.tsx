@@ -284,7 +284,6 @@ class CenterPanel extends React.Component<Props, State> {
                 'add card',
                 async (block: Block) => {
                     await mutator.insertBlock(charmTextBlock, 'add card description')
-                    console.log(charmTextBlock)
                     if (show) {
                         this.props.addCard(createCard(block))
                         this.props.updateView({...activeView, fields: {...activeView.fields, cardOrder: [...activeView.fields.cardOrder, block.id]}})

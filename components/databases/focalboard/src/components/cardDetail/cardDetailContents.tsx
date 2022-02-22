@@ -4,6 +4,7 @@ import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor'
 import { PageContent } from 'models'
 import React from 'react'
 import { IntlShape } from 'react-intl'
+import Box from '@mui/material/Box'
 import { Card } from '../../blocks/card'
 import { ContentBlock as ContentBlockType, IContentBlockWithCords } from '../../blocks/contentBlock'
 import { CharmTextBlock, createCharmTextBlock } from '../../blocks/charmBlock'
@@ -44,7 +45,6 @@ function addTextBlock(card: Card, intl: IntlShape, text: string): void {
 function updateCharmTextBlock(block: CharmTextBlock, content: PageContent) {
     const newBlock = createCharmTextBlock(block)
     newBlock.fields.content = content
-    console.log('update charm text block', newBlock)
     return mutator.updateBlock(newBlock, block, 'Updated description')
 }
 
@@ -173,7 +173,8 @@ const CardDetailContents = React.memo((props: Props) => {
     return (
         <div className='octo-content CardDetailContents'>
             <div className='octo-block'>
-                <CharmEditor content={content} onPageContentChange={updatePageContent} />
+                <CharmEditor editorTop={-70} content={content} onPageContentChange={updatePageContent} />
+                <Box mb={6} />
             </div>
         </div>
     )
