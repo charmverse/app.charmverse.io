@@ -17,18 +17,18 @@ function ButtonWithMenu(props: Props): JSX.Element {
     return (
         <div
             onClick={props.onClick}
-            className='ButtonWithMenu'
+            className='Button filled'
             title={props.title}
         >
             <div className='button-text'>
                 {props.text}
             </div>
-            <MenuWrapper stopPropagationOnToggle={true}>
+            {/* <MenuWrapper stopPropagationOnToggle={true}>
                 <div className='button-dropdown'>
                     <DropdownIcon/>
                 </div>
                 {props.children}
-            </MenuWrapper>
+            </MenuWrapper> */}
         </div>
     )
 }

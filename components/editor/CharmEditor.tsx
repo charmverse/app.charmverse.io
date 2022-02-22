@@ -134,7 +134,7 @@ export default function CharmEditor (
       strike.plugins(),
       underline.plugins(),
       emojiPlugins(),
-      tablePlugins(),
+      // tablePlugins(),
       columnResizing,
       floatingMenuPlugin(),
       blockquote.plugins(),
