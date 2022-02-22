@@ -6,24 +6,29 @@ import { FiatCurrencyList, FiatCurrency } from '../../../models/Currency';
 
 export interface IInputSearchContributorProps {
   onChange?: (id: string) => any
+  defaultValue?: string
 }
 
-export function InputSearchContributor ({ onChange = () => {} }: IInputSearchContributorProps) {
+export function InputSearchContributor ({ onChange = () => {}, defaultValue }: IInputSearchContributorProps) {
 
   const [contributors] = useContributors();
 
-  function emitValue (userId: string) {
+  const preselectedContributor = defaultValue ? contributors.find(contributor => {
+    return contributor.id === defaultValue;
+  }) : null;
 
-    if (userId === null) {
+  function emitValue (selectedUser: Contributor) {
+
+    if (selectedUser === null) {
       return;
     }
 
     const matchingContributor = contributors.find(contributor => {
-      return contributor.id === userId;
+      return contributor.id === selectedUser.id;
     });
 
     if (matchingContributor) {
-      onChange(userId);
+      onChange(matchingContributor.id);
     }
   }
 
@@ -33,6 +38,7 @@ export function InputSearchContributor ({ onChange = () => {} }: IInputSearchCon
 
   return (
     <Autocomplete
+      defaultValue={preselectedContributor}
       onChange={(event, value) => {
         emitValue(value as any);
       }}

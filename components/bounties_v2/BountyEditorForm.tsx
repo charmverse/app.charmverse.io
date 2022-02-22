@@ -1,6 +1,7 @@
 import { CompositeForm } from 'components/common/form/Form';
 import { Bounty, Bounty as IBounty } from '@prisma/client';
 import { useForm } from 'react-hook-form';
+import { CryptoCurrency } from 'models/Currency';
 import * as yup from 'yup';
 import { SchemaOf, ObjectSchema, AnySchema } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -17,9 +18,11 @@ import { InputSearchContributor } from 'components/common/form/InputSearchContri
 import { IInputField } from '../common/form/GenericInput';
 import BountyService from './BountyService';
 
+export type FormMode = 'create' | 'update';
+
 interface IBountyEditorInput {
   onSubmit: (bounty: IBounty) => any,
-  mode?: 'create' | 'update'
+  mode?: FormMode
   bounty?: IBounty
 }
 
@@ -51,11 +54,6 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
   const [space] = useCurrentSpace();
   const [user] = useUser();
-
-  const formValues = watch((value) => {
-    console.log('Watching changes');
-    console.log('Is valid', isValid, errors);
-  });
 
   async function submitted (value: IBounty) {
     if (mode === 'create') {
@@ -102,16 +100,19 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
           <Grid item>
             <InputLabel>
-              Extended description
+              Description
             </InputLabel>
-            <CharmEditor onPageContentChange={pageContent => setRichContent(pageContent)} />
+            <CharmEditor
+              content={bounty?.descriptionNodes as any}
+              onPageContentChange={pageContent => setRichContent(pageContent)}
+            />
           </Grid>
 
           <Grid item>
             <InputLabel>
               Reviewer
             </InputLabel>
-            <InputSearchContributor onChange={setReviewer} />
+            <InputSearchContributor defaultValue={bounty?.reviewer!} onChange={setReviewer} />
           </Grid>
 
           <Grid container item>
@@ -141,7 +142,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Reward token
               </InputLabel>
-              <InputSearchCrypto label='' register={register} modelKey='rewardToken' />
+              <InputSearchCrypto defaultValue={bounty?.rewardToken as CryptoCurrency} label='' register={register} modelKey='rewardToken' />
             </Grid>
 
           </Grid>
