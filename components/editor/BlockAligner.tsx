@@ -7,7 +7,7 @@ import { ReactNode } from 'react';
 interface BlockAlignerProps {
   children: ReactNode
   onDelete: () => void
-  imageSize: number
+  size?: number
 }
 
 const StyledBlockAligner = styled.div`
@@ -32,7 +32,7 @@ const Controls = styled.div`
 `;
 
 export default function BlockAligner (props: BlockAlignerProps) {
-  const { imageSize, children, onDelete } = props;
+  const { size = 250, children, onDelete } = props;
   const theme = useTheme();
 
   return (
@@ -49,12 +49,12 @@ export default function BlockAligner (props: BlockAlignerProps) {
               onDelete();
             }}
             sx={{
-              padding: imageSize < 150 ? theme.spacing(0.5) : theme.spacing(1),
+              padding: size < 150 ? theme.spacing(0.5) : theme.spacing(1),
               backgroundColor: 'inherit'
             }}
           >
             <DeleteIcon sx={{
-              fontSize: imageSize < 150 ? 12 : 14
+              fontSize: size < 150 ? 12 : 14
             }}
             />
           </ListItem>

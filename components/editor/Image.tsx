@@ -120,7 +120,7 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
             src: null
           });
         }}
-        imageSize={size}
+        size={size}
       >
         <Resizer
           size={size}
