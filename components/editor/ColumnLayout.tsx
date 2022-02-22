@@ -29,7 +29,6 @@ const StyledColumnLayout = styled(Box)<{colCount: number}>`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   padding: ${({ theme }) => theme.spacing(1)};
   margin: ${({ theme }) => theme.spacing(2, 0)};
-  box-shadow: ${({ theme }) => theme.shadows[1]};
 
   & > .bangle-nv-child-container {
     height: 100%;
