@@ -21,12 +21,12 @@ import { BangleEditor as ReactBangleEditor, useEditorState, useEditorViewContext
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
 import '@bangle.dev/tooltip/style.css';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { alpha, Box, useTheme } from '@mui/material';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { CSSProperties, ReactNode } from 'react';
+import { CSSProperties, ReactNode, useMemo } from 'react';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
@@ -113,6 +113,8 @@ export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 function PlaceHolder ({ top }: {top?: number}) {
   const view = useEditorViewContext();
   const docTextContent = view.state.doc.textContent as string;
+  const theme = useTheme();
+  const color = useMemo(() => alpha(theme.palette.text.secondary, 0.35), [theme]);
 
   // Only show placeholder if the editor content is empty
   return docTextContent.length === 0 ? (
@@ -120,7 +122,8 @@ function PlaceHolder ({ top }: {top?: number}) {
       // This weird calculation is required to place the placeholder on the same position as the editor
       top: top ? top - 31 : 30,
       position: 'relative',
-      color: 'rgba(255, 255, 255, 0.4)',
+      color,
+      // Place it beneath the actual editor
       zIndex: -20
     }}
     >
