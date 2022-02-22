@@ -1,9 +1,8 @@
-import { Prisma, Space } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import Header from 'components/common/base-layout/Header';
-import PageWrapper from 'components/common/base-layout/PageWrapper';
+import getBaseLayout from 'components/common/base-layout/getLayout';
 import CreateSpaceForm, { getDomainFromName } from 'components/common/CreateSpaceForm';
 import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
@@ -29,13 +28,12 @@ export default function CreateSpace () {
   };
 
   return (
-    <PageWrapper>
-      <Header />
-      <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto' }}>
-        <Card sx={{ p: 4 }}>
-          <CreateSpaceForm defaultValues={defaultValues} onSubmit={addSpace} submitText='Get Started' />
-        </Card>
-      </Box>
-    </PageWrapper>
+    <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto' }}>
+      <Card sx={{ p: 4 }}>
+        <CreateSpaceForm defaultValues={defaultValues} onSubmit={addSpace} submitText='Get Started' />
+      </Card>
+    </Box>
   );
 }
+
+CreateSpace.getLayout = getBaseLayout;

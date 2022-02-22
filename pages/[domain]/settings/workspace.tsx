@@ -54,7 +54,6 @@ export default function WorkspaceSettings () {
     if (space && window.confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
       await charmClient.deleteSpace(space!.id);
       const nextSpace = spaces.filter(s => s.id !== space.id)[0];
-      console.log(nextSpace);
       window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
     }
   }
