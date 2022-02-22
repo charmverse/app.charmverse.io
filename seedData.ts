@@ -229,20 +229,7 @@ export function gettingStartedPageContent (): PageContent {
                   },
                   {
                     type: 'text',
-                    text: ' for inserting emojis. Use '
-                  },
-                  {
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'code'
-                      }
-                    ],
-                    text: '@'
-                  },
-                  {
-                    type: 'text',
-                    text: ' for mentioning people'
+                    text: ' for inserting emojis.'
                   }
                 ]
               }
