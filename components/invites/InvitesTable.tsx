@@ -58,7 +58,12 @@ export default function InvitesTable (props: Props) {
               <Typography><strong>{getDisplayName(row.author)}</strong></Typography>
             </TableCell>
             <TableCell><Typography>{row.code}</Typography></TableCell>
-            <TableCell><Typography>{row.useCount}</Typography></TableCell>
+            <TableCell>
+              <Typography>
+                {row.useCount}
+                {row.maxUses > 0 ? ` / ${row.maxUses}` : ''}
+              </Typography>
+            </TableCell>
             <TableCell>{getExpires(row)}</TableCell>
             <TableCell className='row-actions' align='right'>
               <Tooltip
