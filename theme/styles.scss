@@ -5,3 +5,7 @@ body > div:first-child,
 div#__next {
   height: 100%;
 }
+
+div[role="presentation"] {
+  z-index: 2500;
+}
