@@ -229,20 +229,7 @@ export function gettingStartedPageContent (): PageContent {
                   },
                   {
                     type: 'text',
-                    text: ' for inserting emojis. Use '
-                  },
-                  {
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'code'
-                      }
-                    ],
-                    text: '@'
-                  },
-                  {
-                    type: 'text',
-                    text: ' for mentioning people'
+                    text: ' for inserting emojis.'
                   }
                 ]
               }
@@ -335,7 +322,7 @@ export function gettingStartedPageContent (): PageContent {
                   {
                     type: 'link',
                     attrs: {
-                      href: 'https://discord.gg/n8VU9pAm'
+                      href: 'https://discord.gg/VvhEafEWcg'
                     }
                   }
                 ],

@@ -1,7 +1,12 @@
+import { BountyStatus as BountyStatusEnum } from '@prisma/client';
 import { PageContent } from '.';
 import { CryptoCurrency } from './Currency';
 
-export const BOUNTY_LABELS = {
+export type BountyStatus = keyof typeof BountyStatusEnum;
+
+export const BOUNTY_STATUSES = Object.keys(BountyStatusEnum) as BountyStatus [];
+
+export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   open: 'Open',
   assigned: 'Assigned',
   review: 'Review',
@@ -9,24 +14,3 @@ export const BOUNTY_LABELS = {
   paid: 'Paid'
 };
 
-export type BountyStatus = keyof typeof BOUNTY_LABELS;
-
-export const BOUNTY_STATUSES = Object.keys(BOUNTY_LABELS) as BountyStatus [];
-
-/**
- * TODO - Confirm if taskId should be on the bounty, or if bountyId should be on the task. Multiple entities will likely refer to the bounty
- */
-export interface Bounty {
-  id: string;
-  author: string;
-  createdAt: Date;
-  description: string;
-  descriptionNodes: PageContent;
-  reviewer: string;
-  assignee: string;
-  rewardAmount: number;
-  rewardToken: CryptoCurrency;
-  status: BountyStatus;
-  title: string;
-  linkedTaskId: string;
-}

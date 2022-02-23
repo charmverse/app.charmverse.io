@@ -5,7 +5,7 @@ import difference from 'lodash/difference'
 
 import {Utils} from '../utils'
 
-const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const
+const contentBlockTypes = ['text', 'image', 'divider', 'checkbox', 'charm_text'] as const
 const blockTypes = [...contentBlockTypes, 'board', 'view', 'card', 'comment', 'unknown'] as const
 type ContentBlockTypes = typeof contentBlockTypes[number]
 type BlockTypes = typeof blockTypes[number]

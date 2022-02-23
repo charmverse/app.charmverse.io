@@ -65,7 +65,7 @@ function pluginsFactory({
         safeRequestAnimationFrame(() => {
           view?.focus();
         });
-        if (key === 'UP' ? !getIsTop() : getIsTop()) {
+        if (key === 'UP') {
           return decrementSuggestTooltipCounter(suggestTooltipKey)(
             state,
             dispatch,

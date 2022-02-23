@@ -23,7 +23,7 @@ export const scrollBarTrackBackgroundColor = darken(backgroundLightColor, 0.1);
 export const scrollBarThumbBackgroundColor = lighten(scrollBarTrackBackgroundColor, 0.5);
 
 // dark mode
-export const primaryTextColorDarkMode = 'rgba(255, 255, 255, 0.9)';
+export const primaryTextColorDarkMode = '#ededed';
 export const backgroundColorDarkMode = '#2f3437';
 export const backgroundLightColorDarkMode = '#373c3f';
 export const backgroundDarkColorDarkMode = darken(backgroundColorDarkMode, 0.3);

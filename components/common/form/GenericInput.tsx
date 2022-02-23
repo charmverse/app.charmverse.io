@@ -3,7 +3,7 @@ import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import Input from '@mui/material/Input';
 import { Path, UseFormRegister } from 'react-hook-form';
-import { InputSearchCollaborator } from './InputSearchCollaborator';
+import { InputSearchContributor } from './InputSearchContributor';
 import { InputSearchCrypto } from './InputSearchCrypto';
 
 type NativeHtmlInputType = 'text' |'textMultiline' | 'number'
@@ -62,7 +62,7 @@ export function GenericInput<T = any> ({ register, fieldConfig }: IGenericInputC
       return (
         <>
           <InputLabel>{fieldConfig.label ?? 'Collaborators'}</InputLabel>
-          <InputSearchCollaborator />
+          <InputSearchContributor />
         </>
       );
 

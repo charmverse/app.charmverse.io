@@ -8,7 +8,7 @@ import CardActions from '@mui/material/CardActions';
 import { useBounty } from 'components/bounties/hooks/useBounty';
 import styled from '@emotion/styled';
 
-import type { Bounty } from 'models/Bounty';
+import { Bounty } from '@prisma/client';
 import { useState } from 'react';
 import { Typography } from '@mui/material';
 

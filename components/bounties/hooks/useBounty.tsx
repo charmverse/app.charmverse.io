@@ -2,7 +2,7 @@ import React, { ReactElement, useReducer, useMemo, useContext } from 'react';
 
 import { findIndex } from 'lodash';
 
-import type { Bounty } from 'models/Bounty';
+import { Bounty } from '@prisma/client';
 
 export interface BountyAction {
   type: string;

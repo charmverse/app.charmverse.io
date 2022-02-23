@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { ReactNode, useEffect, useRef } from 'react';
-import { safeScrollIntoViewIfNeeded } from '../../utils';
+import { safeScrollIntoViewIfNeeded } from 'components/editor/utility';
 
 
 export interface ItemType {

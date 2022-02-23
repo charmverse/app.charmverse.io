@@ -6,17 +6,19 @@ import { UseFormRegister } from 'react-hook-form';
 const currencyOptions = Object.keys(CryptoCurrencyList);
 
 export interface IInputSearchCryptoProps {
-  onChange: (value: CryptoCurrency) => any,
+  onChange?: (value: CryptoCurrency) => any,
   defaultValue?: CryptoCurrency,
   register?: UseFormRegister<any>
-  modelKey?: string
+  modelKey?: string,
+  label?: string
 }
 
 export function InputSearchCrypto ({
-  onChange,
+  onChange = () => {},
   defaultValue,
   register = () => [] as any,
-  modelKey = '-' }: IInputSearchCryptoProps) {
+  modelKey = '-',
+  label = 'Choose a crypto' }: IInputSearchCryptoProps) {
 
   function emitValue (value: string) {
     if (value !== null && currencyOptions.indexOf(value) >= 0) {
@@ -52,7 +54,7 @@ export function InputSearchCrypto ({
         <TextField
           {...register(modelKey)}
           {...params}
-          label='Choose a crypto'
+          label={label}
           inputProps={{
             ...params.inputProps
           }}

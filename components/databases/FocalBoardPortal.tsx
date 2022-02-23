@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 
 const StyledRoot = styled.div`
   position: relative;
-  z-index: 10000;
+  z-index: 2500;
 `;
 
 export default function RootPortal () {

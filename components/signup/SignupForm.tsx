@@ -62,12 +62,12 @@ export default function SignupPageContent () {
         <Typography gutterBottom variant='h1' sx={{ fontSize: '2.5rem' }} align='center'>
           {welcomeMessage}
         </Typography>
-        <Typography variant='h2' align='center'>
+        {/* <Typography variant='h2' align='center'>
           Choose your adventure:
-        </Typography>
+        </Typography> */}
       </Box>
       <Grid container spacing={6}>
-        <Grid item xs>
+        <Grid item xs sm={6} sx={{ margin: 'auto' }}>
           <AdventureCard onClick={createAccount}>
             <ImageContainer>
               <Image src={rocketImage} />
@@ -77,7 +77,7 @@ export default function SignupPageContent () {
             </PrimaryButton>
           </AdventureCard>
         </Grid>
-        <Grid item xs>
+        {/* <Grid item xs>
           <AdventureCard>
             <ImageContainer>
               <Image src={gatesImage} />
@@ -86,7 +86,7 @@ export default function SignupPageContent () {
               Join an existing workspace
             </PrimaryButton>
           </AdventureCard>
-        </Grid>
+        </Grid> */}
       </Grid>
     </Content>
   );

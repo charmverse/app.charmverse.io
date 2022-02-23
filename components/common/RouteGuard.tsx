@@ -4,7 +4,10 @@ import { useWeb3React } from '@web3-react/core';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useUser } from 'hooks/useUser';
 
-const publicPaths = ['/login'];
+// Pages to connect your wallet
+const walletConnectPages = ['/login', '/invite'];
+// Pages to create a user account
+const signupPages = ['/signup', '/invite'];
 
 /**
  * Page loading:
@@ -56,7 +59,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     // redirect to login page if accessing a private page and not logged in
     const path = url.split('?')[0];
     // redirect to connect wallet
-    if (!account && !publicPaths.some(basePath => path.startsWith(basePath))) {
+    if (!account && !walletConnectPages.some(basePath => path.startsWith(basePath))) {
       setAuthorized(false);
       console.log('[RouteGuard]: redirect to login');
       router.push({
@@ -65,7 +68,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       });
     }
     // redirect to create a user
-    else if (account && !user && path !== '/signup') {
+    else if (account && !user && !signupPages.some(basePath => path.startsWith(basePath))) {
       setAuthorized(false);
       console.log('[RouteGuard]: redirect to signup', account, path);
       router.push({

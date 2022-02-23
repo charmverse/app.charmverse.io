@@ -2,16 +2,17 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ListItem } from '@mui/material';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 
 interface BlockAlignerProps {
   children: ReactNode
   onDelete: () => void
+  size?: number
 }
 
-const StyledBlockAligner = styled.div<{ align?: string }>`
+const StyledBlockAligner = styled.div`
   display: flex;
-  justify-content: ${props => props.align};
+  justify-content:center;
   &:hover .controls {
     opacity: 1;
     transition: opacity 250ms ease-in-out;
@@ -31,13 +32,11 @@ const Controls = styled.div`
 `;
 
 export default function BlockAligner (props: BlockAlignerProps) {
-  const { children, onDelete } = props;
-  const [align, setAlign] = useState('center');
+  const { size = 250, children, onDelete } = props;
   const theme = useTheme();
 
   return (
     <StyledBlockAligner
-      align={align}
       draggable={false}
     >
       <div className='content' style={{ position: 'relative' }}>
@@ -50,12 +49,12 @@ export default function BlockAligner (props: BlockAlignerProps) {
               onDelete();
             }}
             sx={{
-              padding: theme.spacing(1),
+              padding: size < 150 ? theme.spacing(0.5) : theme.spacing(1),
               backgroundColor: 'inherit'
             }}
           >
             <DeleteIcon sx={{
-              fontSize: 14
+              fontSize: size < 150 ? 12 : 14
             }}
             />
           </ListItem>

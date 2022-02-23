@@ -76,7 +76,7 @@ export default function Footer () {
               <StyledIconButton href='https://www.facebook.com/charmverse.io' target='_blank'>
                 <FacebookIcon />
               </StyledIconButton>
-              <StyledIconButton href='https://discord.gg/UEsngsk8E2' target='_blank'>
+              <StyledIconButton href='https://discord.gg/VvhEafEWcg' target='_blank'>
                 <SvgIcon viewBox='0 -5 70 70'><DiscordIcon /></SvgIcon>
               </StyledIconButton>
             </Box>

@@ -16,7 +16,7 @@ const SETTINGS_TABS = [
   { icon: <PersonIcon fontSize='small' />, path: 'contributors', label: 'Contributors' }
 ];
 
-const Container = styled.div`
+const Container = styled(Box)`
   width: 800px;
   max-width: 100%;
   margin: 0 auto;
@@ -61,6 +61,7 @@ export default function SettingsLayout ({ children }: { children: ReactNode }) {
       <Container>
         {children}
       </Container>
+      <Box pb={8} />
     </PageLayout>
   );
 }

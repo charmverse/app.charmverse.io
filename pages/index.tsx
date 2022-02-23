@@ -21,7 +21,7 @@ export const getServerSideProps = withSessionSsr(
     if (spaces.length) {
       return {
         redirect: {
-          destination: spaces[0].domain,
+          destination: `/${spaces[0].domain}`,
           permanent: false
         }
       };

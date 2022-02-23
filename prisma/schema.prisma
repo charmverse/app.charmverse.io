@@ -29,18 +29,20 @@ enum Role {
 }
 
 model Space {
-  id          String      @id @default(uuid()) @db.Uuid
+  id          String       @id @default(uuid()) @db.Uuid
   deletedAt   DateTime?
-  createdAt   DateTime    @default(now())
-  author      User        @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdBy   String      @db.Uuid
+  createdAt   DateTime     @default(now())
+  author      User         @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy   String       @db.Uuid
   updatedAt   DateTime
-  updatedBy   String      @db.Uuid
+  updatedBy   String       @db.Uuid
   name        String
-  domain      String      @unique
+  domain      String       @unique
   permissions SpaceRole[]
   pages       Page[]
   blocks      Block[]
+  inviteLinks InviteLink[]
+  bounties    Bounty []
 }
 
 model Page {
@@ -97,6 +99,8 @@ model User {
   pages           Page[]
   blocks          Block[]
   spaces          Space[]
+  inviteLinks     InviteLink[]
+  bounties        Bounty []
 }
 
 model FavoritePage {
@@ -128,6 +132,19 @@ model SpaceRole {
   @@unique([spaceId, userId])
 }
 
+model InviteLink {
+  id            String   @id @default(uuid()) @db.Uuid
+  code          String   @unique
+  createdAt     DateTime @default(now())
+  author        User     @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy     String   @db.Uuid
+  spaceId       String   @db.Uuid
+  space         Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  maxAgeMinutes Int      @default(60)
+  maxUses       Int      @default(-1)
+  useCount      Int      @default(0)
+}
+
 enum BountyStatus {
   open
   assigned
@@ -136,20 +153,21 @@ enum BountyStatus {
   paid
 }
 
-
 model Bounty {
-  id                String      @id @default(uuid()) @db.Uuid
-  author            String      @db.Uuid
-  workspaceId       String      @db.Uuid
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @default(now())
-  description       String
-  descriptionNodes  Json
-  reviewer          String      @db.Uuid
-  assignee          String      @db.Uuid
-  rewardAmount      Float
-  rewardToken       String
-  status            BountyStatus
-  title             String
-  linkedTaskId      String      @db.Uuid
+  id               String       @id @default(uuid())
+  author           User         @relation(fields: [createdBy], references: [id])
+  createdBy        String       @db.Uuid()
+  space            Space        @relation(fields: [spaceId], references: [id])
+  spaceId          String       @db.Uuid
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @default(now())
+  description      String
+  descriptionNodes Json
+  reviewer         String?      @db.Uuid
+  assignee         String?      @db.Uuid
+  rewardAmount     Float
+  rewardToken      String
+  status           BountyStatus @default(open)
+  title            String
+  linkedTaskId     String?      @db.Uuid
 }
