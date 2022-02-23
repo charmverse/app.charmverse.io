@@ -142,13 +142,11 @@ export default function CharmEditor (
       new Plugin({
         view: () => ({
           update: (view, prevState) => {
-            if (!view.state.doc.eq(prevState.doc)) {
-              if (onPageContentChange) {
-                onPageContentChange({
-                  doc: view.state.doc.toJSON() as PageContent,
-                  rawText: view.state.doc.textContent as string
-                });
-              }
+            if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
+              onPageContentChange({
+                doc: view.state.doc.toJSON() as PageContent,
+                rawText: view.state.doc.textContent as string
+              });
             }
           }
         })
