@@ -6,6 +6,7 @@ import { grey } from '@mui/material/colors';
 import Container from '@mui/material/Container';
 import { Bounty } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import millify from 'millify';
 import { BOUNTY_LABELS } from 'models/Bounty';
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency';
 import Image from 'next/image';
@@ -55,7 +56,7 @@ export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
           mr={0.5}
           variant='h6'
         >
-          {bounty.rewardAmount}
+          {millify(bounty.rewardAmount)}
         </Typography>
         <Box
           component='span'

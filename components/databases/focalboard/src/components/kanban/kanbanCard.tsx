@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 import { Box } from '@mui/material'
 import { useBounties } from 'hooks/useBounties'
+import millify from "millify"
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
 import Image from 'next/image'
 import React, { useState } from 'react'
@@ -26,7 +27,6 @@ import CardBadges from '../cardBadges'
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../confirmationDialogBox'
 import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
-
 
 
 type Props = {
@@ -184,7 +184,7 @@ const KanbanCard = React.memo((props: Props) => {
                         gap: 0.25
                       }}>
                         <Box component="span">
-                          {linkedBounty.rewardAmount}
+                          {millify(linkedBounty.rewardAmount)}
                         </Box>
                         {/* <Box component="span" sx={{
                           fontWeight: 400,
