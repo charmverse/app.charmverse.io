@@ -11,7 +11,7 @@ export interface IBountyInput {
   bounty: IBounty
 }
 
-const BountyStatusColours: Record<BountyStatus, BrandColors> = {
+export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
   open: 'gray',
   assigned: 'blue',
   review: 'red',
