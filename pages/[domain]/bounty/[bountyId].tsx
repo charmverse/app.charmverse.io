@@ -62,7 +62,7 @@ export default function BountyDetails () {
       <BountyModal onSubmit={loadBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
 
       <Modal open={showProposalDialog} onClose={toggleProposalDialog}>
-        <ProposalEditorForm bountyId={bounty.id} onSubmit={() => {}}></ProposalEditorForm>
+        <ProposalEditorForm bountyId={bounty.id} onSubmit={toggleProposalDialog}></ProposalEditorForm>
       </Modal>
 
       <Grid container direction='column' justifyContent='space-between'>
