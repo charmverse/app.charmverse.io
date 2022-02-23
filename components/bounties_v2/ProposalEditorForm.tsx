@@ -27,7 +27,7 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-export function ProposalForm ({ onSubmit, bountyId, proposal, mode = 'create' }: IProposalFormProps) {
+export function ProposalEditorForm ({ onSubmit, bountyId, proposal, mode = 'create' }: IProposalFormProps) {
 
   const {
     register,

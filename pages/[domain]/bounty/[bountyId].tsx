@@ -15,7 +15,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useState } from 'react';
 import { BountyApplicantList } from 'components/bounties_v2/BountyApplicantList';
-import { ProposalForm } from 'components/bounties_v2/ProposalForm';
+import { ProposalEditorForm } from 'components/bounties_v2/ProposalEditorForm';
 import { Modal } from 'components/common/Modal';
 
 export default function BountyDetails () {
@@ -62,7 +62,7 @@ export default function BountyDetails () {
       <BountyModal onSubmit={loadBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
 
       <Modal open={showProposalDialog} onClose={toggleProposalDialog}>
-        <ProposalForm bountyId={bounty.id} onSubmit={() => {}}></ProposalForm>
+        <ProposalEditorForm bountyId={bounty.id} onSubmit={() => {}}></ProposalEditorForm>
       </Modal>
 
       <Grid container direction='column' justifyContent='space-between'>
