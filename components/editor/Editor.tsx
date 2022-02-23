@@ -111,35 +111,47 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
       <Container>
         <Controls sx={{
           position: 'relative',
-          top: pageControlTop
+          top: pageControlTop,
+          '&:hover .page-controls': {
+            opacity: 1
+          }
         }}
         >
-          {!page.icon && (
-            <PageControlItem onClick={() => {
-              setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
+          <Box
+            className='page-controls'
+            sx={{
+              opacity: 0,
+              display: 'flex',
+              gap: 1
             }}
-            >
-              <EmojiEmotionsIcon
-                fontSize='small'
-                sx={{ marginRight: 1 }}
-              />
-              Add icon
-            </PageControlItem>
-          )}
-          {!page.headerImage && (
-            <PageControlItem
-              onClick={() => {
-                // Charmverse logo
-                setPage({ ...page, headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
+          >
+            {!page.icon && (
+              <PageControlItem onClick={() => {
+                setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
               }}
-            >
-              <ImageIcon
-                fontSize='small'
-                sx={{ marginRight: 1 }}
-              />
-              Add cover
-            </PageControlItem>
-          )}
+              >
+                <EmojiEmotionsIcon
+                  fontSize='small'
+                  sx={{ marginRight: 1 }}
+                />
+                Add icon
+              </PageControlItem>
+            )}
+            {!page.headerImage && (
+              <PageControlItem
+                onClick={() => {
+                  // Charmverse logo
+                  setPage({ ...page, headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
+                }}
+              >
+                <ImageIcon
+                  fontSize='small'
+                  sx={{ marginRight: 1 }}
+                />
+                Add cover
+              </PageControlItem>
+            )}
+          </Box>
         </Controls>
 
         <CharmEditor
