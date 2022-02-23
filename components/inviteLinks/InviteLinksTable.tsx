@@ -92,6 +92,7 @@ export default function InvitesTable (props: Props) {
               </Tooltip>
               <Tooltip arrow placement='top' title='Delete'>
                 <ButtonChip
+                  className='row-actions'
                   icon={<DeleteIcon />}
                   clickable
                   color='secondary'

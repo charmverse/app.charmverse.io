@@ -12,7 +12,7 @@ import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import getDisplayName from 'lib/users/getDisplayName';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
-import InvitesTable from 'components/inviteLinks/InvitesTable';
+import InvitesTable from 'components/inviteLinks/InviteLinksTable';
 import InviteForm, { FormValues as InviteLinkFormValues } from 'components/inviteLinks/InviteLinkForm';
 import charmClient from 'charmClient';
 
