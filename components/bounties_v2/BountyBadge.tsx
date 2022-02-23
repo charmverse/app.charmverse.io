@@ -24,11 +24,6 @@ export interface IBountyBadgeProps {
 export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
 
   const [space] = useCurrentSpace();
-
-  const ContainerDiv = styled.div({ backgroundColor: 'green', borderRadius: '10px', display: 'block' });
-  const RewardDiv = styled.div({ backgroundColor: 'Background', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' });
-  const StatusDiv = styled.div({ backgroundColor: BountyStatusColours[bounty.status], textAlign: 'center' });
-
   const radius = '10px';
 
   const bountyLink = `/${space!.domain}/bounty/${bounty.id}`;
