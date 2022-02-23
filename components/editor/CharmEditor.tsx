@@ -19,7 +19,6 @@ import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState, useEditorViewContext } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
-import '@bangle.dev/tooltip/style.css';
 import styled from '@emotion/styled';
 import { alpha, Box, useTheme } from '@mui/material';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
@@ -132,9 +131,9 @@ function PlaceHolder ({ top }: {top?: number}) {
 }
 
 export default function CharmEditor (
-  { editorTop, content = defaultContent, children, onPageContentChange, style }:
+  { content = defaultContent, children, onPageContentChange, style }:
   { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent,
-    style?: CSSProperties, editorTop?: number }
+    style?: CSSProperties }
 ) {
   const state = useEditorState({
     specRegistry,
@@ -214,8 +213,6 @@ export default function CharmEditor (
       color: 'transparent'
     }
   });
-
-  const docTextContent = state.pmState.doc.textContent as string;
 
   return (
     <StyledReactBangleEditor
