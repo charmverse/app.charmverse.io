@@ -261,9 +261,9 @@ class CharmClient {
     return data;
   }
 
-  async listProposals (bountyId: string): Promise<Proposal> {
+  async listProposals (bountyId: string): Promise<Proposal []> {
 
-    const data = await http.POST<Proposal>('/api/proposals', { bountyId });
+    const data = await http.GET<Proposal []>('/api/proposals', { bountyId });
 
     return data;
   }
