@@ -16,6 +16,7 @@ export function BountyIntegration (props: BountyIntegrationProps) {
   const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === linkedTaskId);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <Box sx={{
       display: 'flex',

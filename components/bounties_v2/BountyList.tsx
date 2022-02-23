@@ -6,12 +6,11 @@ import { useContext, useState } from 'react';
 import { BountyCard } from './BountyCard';
 
 export function BountyList () {
-  const { setBounties, bounties } = useContext(BountiesContext);
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
+  const { bounties } = useContext(BountiesContext);
 
   function bountyCreated (newBounty: IBounty) {
     setDisplayBountyDialog(false);
-    setBounties([...bounties, newBounty]);
   }
   return (
     <Grid container>

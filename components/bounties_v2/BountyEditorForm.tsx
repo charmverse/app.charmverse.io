@@ -9,9 +9,11 @@ import charmClient from 'charmClient';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor';
+import { BountiesContext } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { CryptoCurrency } from 'models/Currency';
+import { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -35,6 +37,7 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
+  const { setBounties, bounties } = useContext(BountiesContext);
 
   const {
     register,
@@ -57,6 +60,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
       // TODO: Should we allow empty description?
       value.description = value.description ?? '';
       const createdBounty = await charmClient.createBounty(value);
+      setBounties([...bounties, createdBounty]);
       onSubmit(createdBounty);
     }
   }
