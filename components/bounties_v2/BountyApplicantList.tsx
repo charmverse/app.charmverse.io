@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Application } from '@prisma/client';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -33,7 +34,7 @@ const rows = [
 
 export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
   const [user] = useUser();
-  const [proposals, setApplications] = useState([] as Application []);
+  const [applications, setApplications] = useState([] as Application []);
   const loading = useRef(true);
 
   useEffect(() => {
@@ -44,9 +45,9 @@ export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
 
   async function refreshApplications () {
     loading.current = true;
-    const proposalList = await charmClient.listApplications(bountyId);
+    const applicationList = await charmClient.listApplications(bountyId);
     loading.current = false;
-    setApplications(proposalList);
+    setApplications(applicationList);
   }
 
   if (loading.current === true) {
@@ -58,34 +59,42 @@ export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
     );
   }
 
+  const applicationsMade = applications.length;
+
+  // Set min height large enough
+  const minHeight = applicationsMade === 0 ? undefined : Math.min(300, (100 * applicationsMade));
+
   return (
-    <Box component='div' sx={{ maxHeight: '50vh', overflowY: 'auto' }}>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-          <TableHead>
-            <TableRow>
-              <TableCell>Applicant ID</TableCell>
-              <TableCell>Message</TableCell>
-              <TableCell>Date</TableCell>
-              {
+    <Box component='div' sx={{ minHeight: `${minHeight}px`, marginBottom: '15px', maxHeight: '50vh', overflowY: 'auto' }}>
+
+      <Table stickyHeader={true} sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
+        <TableHead>
+          <TableRow>
+            <TableCell>
+              <AutorenewIcon onClick={refreshApplications} />
+              Applicant ID
+            </TableCell>
+            <TableCell>Message</TableCell>
+            <TableCell>Date</TableCell>
+            {
                 viewerCanAssignBounty === true && (
                   <TableCell>Assign</TableCell>
                 )
               }
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {proposals.map((proposal) => (
-              <TableRow
-                key={proposal.id}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell size='small'>
-                  {proposal.applicantId}
-                </TableCell>
-                <TableCell>{proposal.message}</TableCell>
-                <TableCell>{proposal.createdAt}</TableCell>
-                {
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {applications.map((application) => (
+            <TableRow
+              key={application.id}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell size='small'>
+                {application.applicantId}
+              </TableCell>
+              <TableCell>{application.message}</TableCell>
+              <TableCell>{application.createdAt}</TableCell>
+              {
                 viewerCanAssignBounty === true && (
                   <TableCell>
                     <Button>Assign</Button>
@@ -93,11 +102,11 @@ export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
                   </TableCell>
                 )
                 }
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
     </Box>
   );
 }
