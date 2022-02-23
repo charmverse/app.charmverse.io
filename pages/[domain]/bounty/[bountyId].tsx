@@ -1,14 +1,17 @@
-import { PageLayout } from 'components/common/page-layout';
-import { setTitle } from 'hooks/usePageTitle';
-import { ReactElement, useEffect, useState } from 'react';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Table from '@mui/material/Table';
 import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/router';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { BountyBadge } from 'components/bounties_v2/BountyBadge';
-
-import charmClient from 'charmClient';
 import { Bounty } from '@prisma/client';
+import charmClient from 'charmClient';
+import { BountyBadge } from 'components/bounties_v2/BountyBadge';
+import { PageLayout } from 'components/common/page-layout';
+import CharmEditor from 'components/editor/CharmEditor';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useRouter } from 'next/router';
+import { ReactElement, useEffect, useState } from 'react';
+import { BountyApplicantList } from 'components/bounties_v2/BountyApplicantList';
 
 export default function BountyDetails () {
 
@@ -37,15 +40,48 @@ export default function BountyDetails () {
   }
 
   return (
-    <Grid container direction='column' justifyContent='space-between'>
-      <Grid item xs={8}>
-        <Typography variant='h1'>{bounty.title}</Typography>
-      </Grid>
-      <Grid item xs={4}>
-        <BountyBadge bounty={bounty} hideLink={true} />
+    <>
+      <Grid container direction='column' justifyContent='space-between'>
+        <Grid item xs={8}>
+          <Typography variant='h1'>{bounty.title}</Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <BountyBadge bounty={bounty} hideLink={true} />
+        </Grid>
+        <Grid item xs={12}>
+        </Grid>
       </Grid>
 
-    </Grid>
+      <Box sx={{ my: '10px' }}>
+        <Typography variant='h5'>Information</Typography>
+        <CharmEditor content={bounty.descriptionNodes as any}></CharmEditor>
+      </Box>
+
+      <Grid container direction='column' display='block' justifyContent='space-between'>
+        <Grid item xs={6}>
+          <Typography variant='h5'>Reviewer</Typography>
+
+          <Box sx={{ display: 'flex' }}>
+            <Avatar></Avatar>
+            {bounty.reviewer}
+          </Box>
+
+        </Grid>
+
+        <Grid item xs={6}>
+          <Typography variant='h5'>Assignee</Typography>
+          {
+            /*
+            <Typography variant='h5'>Assignee</Typography>
+          Content */
+          }
+          No assignee yet
+
+        </Grid>
+      </Grid>
+
+      <BountyApplicantList bountyId='' />
+    </>
   );
 }
 
