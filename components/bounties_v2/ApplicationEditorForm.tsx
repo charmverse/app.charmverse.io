@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import { Proposal } from '@prisma/client';
+import { Application } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
@@ -13,11 +13,11 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { FormMode } from './BountyEditorForm';
 
-interface IProposalFormProps {
-  onSubmit: (bounty: Proposal) => any,
+interface IApplicationFormProps {
+  onSubmit: (bounty: Application) => any,
   bountyId: string
   mode?: FormMode
-  proposal?: Proposal
+  proposal?: Application
 }
 
 export const schema = yup.object({
@@ -27,7 +27,7 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-export function ProposalEditorForm ({ onSubmit, bountyId, proposal, mode = 'create' }: IProposalFormProps) {
+export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'create' }: IApplicationFormProps) {
 
   const {
     register,
@@ -45,18 +45,22 @@ export function ProposalEditorForm ({ onSubmit, bountyId, proposal, mode = 'crea
   const [space] = useCurrentSpace();
   const [user] = useUser();
 
-  async function submitted (proposalToSave: Proposal) {
+  const applicationExample = 'Explain why you are the right person or team to resolve this bounty';
+
+  const walletAddress = user?.addresses[0];
+
+  async function submitted (proposalToSave: Application) {
     if (mode === 'create') {
       proposalToSave.applicantId = user!.id;
       proposalToSave.bountyId = bountyId;
-      const createdProposal = await charmClient.createProposal(proposalToSave);
-      onSubmit(createdProposal);
+      const createdApplication = await charmClient.createApplication(proposalToSave);
+      onSubmit(createdApplication);
     }
   }
 
   return (
     <div>
-      <form onSubmit={handleSubmit(formValue => submitted(formValue as Proposal))} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
         <Grid container direction='column' spacing={3}>
 
           <Grid item>
@@ -65,11 +69,11 @@ export function ProposalEditorForm ({ onSubmit, bountyId, proposal, mode = 'crea
             </InputLabel>
             <TextField
               {...register('message')}
+              placeholder={applicationExample}
               multiline
               type='text'
               fullWidth
             />
-
             {
               errors?.message && (
               <Alert severity='error'>
@@ -82,10 +86,11 @@ export function ProposalEditorForm ({ onSubmit, bountyId, proposal, mode = 'crea
 
           <Grid item>
             <InputLabel>
-              Your wallet address
+              Address to get paid for this bounty
             </InputLabel>
             <Input
               {...register('walletAddress')}
+              defaultValue={walletAddress}
               type='text'
               fullWidth
             />

@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Proposal } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -254,16 +254,16 @@ class CharmClient {
     return data;
   }
 
-  async createProposal (proposal: Proposal): Promise<Proposal> {
+  async createApplication (proposal: Application): Promise<Application> {
 
-    const data = await http.POST<Proposal>('/api/proposals', proposal);
+    const data = await http.POST<Application>('/api/applications', proposal);
 
     return data;
   }
 
-  async listProposals (bountyId: string): Promise<Proposal []> {
+  async listApplications (bountyId: string): Promise<Application []> {
 
-    const data = await http.GET<Proposal []>('/api/proposals', { bountyId });
+    const data = await http.GET<Application []>('/api/applications', { bountyId });
 
     return data;
   }

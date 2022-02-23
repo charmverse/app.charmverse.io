@@ -1,5 +1,5 @@
 
-import { Proposal, Prisma } from '@prisma/client';
+import { Application, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -8,46 +8,46 @@ import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getProposals).post(createProposal);
+handler.use(requireUser).get(getApplications).post(createApplication);
 
-async function getProposals (req: NextApiRequest, res: NextApiResponse<Proposal[]>) {
+async function getApplications (req: NextApiRequest, res: NextApiResponse<Application[]>) {
   const { bountyId } = req.query;
 
   if (bountyId === undefined) {
     return res.status(406).send({ error: 'Please provide a valid bounty ID' } as any);
   }
 
-  const ProposalListQuery: Prisma.ProposalFindManyArgs = {
+  const ApplicationListQuery: Prisma.ApplicationFindManyArgs = {
     where: {
       bountyId: bountyId as string
     }
   };
 
-  const bounties = await prisma.proposal.findMany(ProposalListQuery);
+  const bounties = await prisma.application.findMany(ApplicationListQuery);
   return res.status(200).json(bounties);
 }
 
-async function createProposal (req: NextApiRequest, res: NextApiResponse<Proposal>) {
-  const data = req.body as Proposal;
-  const ProposalToCreate = { ...data } as any;
+async function createApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
+  const data = req.body as Application;
+  const ApplicationToCreate = { ...data } as any;
 
   if (data.applicantId) {
-    (ProposalToCreate as Prisma.ProposalCreateInput).applicant = { connect: { id: data.applicantId } };
-    delete ProposalToCreate.applicantId;
+    (ApplicationToCreate as Prisma.ApplicationCreateInput).applicant = { connect: { id: data.applicantId } };
+    delete ApplicationToCreate.applicantId;
   }
   else {
     return res.status(406).json({ error: 'Please provide an applicant' } as any);
   }
 
   if (data.bountyId) {
-    (ProposalToCreate as Prisma.ProposalCreateInput).bounty = { connect: { id: data.bountyId } };
-    delete ProposalToCreate.bountyId;
+    (ApplicationToCreate as Prisma.ApplicationCreateInput).bounty = { connect: { id: data.bountyId } };
+    delete ApplicationToCreate.bountyId;
   }
   else {
     return res.status(406).json({ error: 'The proposal should be linked to a bounty' } as any);
   }
 
-  const proposal = await prisma.proposal.create({ data: ProposalToCreate });
+  const proposal = await prisma.application.create({ data: ApplicationToCreate });
   return res.status(200).json(proposal);
 }
 

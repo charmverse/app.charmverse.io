@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Proposal } from '@prisma/client';
+import { Application } from '@prisma/client';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -33,20 +33,20 @@ const rows = [
 
 export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
   const [user] = useUser();
-  const [proposals, setProposals] = useState([] as Proposal []);
+  const [proposals, setApplications] = useState([] as Application []);
   const loading = useRef(true);
 
   useEffect(() => {
-    refreshProposals();
+    refreshApplications();
   }, []);
 
   const viewerCanAssignBounty: boolean = true;
 
-  async function refreshProposals () {
+  async function refreshApplications () {
     loading.current = true;
-    const proposalList = await charmClient.listProposals(bountyId);
+    const proposalList = await charmClient.listApplications(bountyId);
     loading.current = false;
-    setProposals(proposalList);
+    setApplications(proposalList);
   }
 
   if (loading.current === true) {

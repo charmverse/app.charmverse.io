@@ -101,7 +101,7 @@ model User {
   spaces             Space[]
   inviteLinks        InviteLink[]
   bounties           Bounty []
-  Proposals          Proposal []
+  Applications          Application []
 }
 
 model FavoritePage {
@@ -171,10 +171,10 @@ model Bounty {
   status           BountyStatus @default(open)
   title            String
   linkedTaskId     String?      @db.Uuid
-  applications     Proposal []
+  applications     Application []
 }
 
-model Proposal {
+model Application {
   id               String       @id @default(uuid()) @db.Uuid
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @default(now())

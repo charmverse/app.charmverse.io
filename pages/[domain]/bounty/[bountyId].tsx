@@ -15,7 +15,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useState } from 'react';
 import { BountyApplicantList } from 'components/bounties_v2/BountyApplicantList';
-import { ProposalEditorForm } from 'components/bounties_v2/ProposalEditorForm';
+import { ApplicationEditorForm } from 'components/bounties_v2/ApplicationEditorForm';
 import { Modal } from 'components/common/Modal';
 
 export default function BountyDetails () {
@@ -23,7 +23,7 @@ export default function BountyDetails () {
   const [space] = useCurrentSpace();
   const [bounty, setBounty] = useState(null as any as Bounty);
   const [showBountyEditDialog, setShowBountyEditDialog] = useState(false);
-  const [showProposalDialog, setShowProposalDialog] = useState(false);
+  const [showApplicationDialog, setShowApplicationDialog] = useState(false);
   const router = useRouter();
 
   async function loadBounty () {
@@ -36,8 +36,8 @@ export default function BountyDetails () {
     setShowBountyEditDialog(!showBountyEditDialog);
   }
 
-  function toggleProposalDialog () {
-    setShowProposalDialog(!showProposalDialog);
+  function toggleApplicationDialog () {
+    setShowApplicationDialog(!showApplicationDialog);
   }
 
   useEffect(() => {
@@ -61,8 +61,8 @@ export default function BountyDetails () {
 
       <BountyModal onSubmit={loadBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
 
-      <Modal open={showProposalDialog} onClose={toggleProposalDialog}>
-        <ProposalEditorForm bountyId={bounty.id} onSubmit={toggleProposalDialog}></ProposalEditorForm>
+      <Modal open={showApplicationDialog} onClose={toggleApplicationDialog}>
+        <ApplicationEditorForm bountyId={bounty.id} onSubmit={toggleApplicationDialog}></ApplicationEditorForm>
       </Modal>
 
       <Grid container direction='column' justifyContent='space-between'>
@@ -110,7 +110,7 @@ export default function BountyDetails () {
             bounty.assignee == undefined && (
               <Box>
                 <p>Open to proposals</p>
-                <Button onClick={toggleProposalDialog}>Apply now</Button>
+                <Button onClick={toggleApplicationDialog}>Apply now</Button>
               </Box>
             )
           }
