@@ -19,7 +19,10 @@ export default function BlocksEditorPage () {
   async function setPage (updates: Partial<Page>) {
     setPages(pages.map(p => p.id === currentPage!.id ? { ...p, ...updates } : p));
     setCurrentPage(_page => ({ ..._page, ...updates }) as Page);
-    // await charmClient.updatePage({ id: currentPage!.id, ...updates } as Prisma.PageUpdateInput);
+    if (updates.title) {
+      setTitleState(updates.title);
+    }
+    await charmClient.updatePage({ id: currentPage!.id, ...updates } as Prisma.PageUpdateInput);
   }
 
   useEffect(() => {
