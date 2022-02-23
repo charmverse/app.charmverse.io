@@ -18,12 +18,12 @@ export default function BlocksEditorPage () {
 
   const setPage = useCallback(async (updates: Partial<Page>) => {
     // const page = pages.find(p => p.path === pageId || p.id === pageId) || pages[0];
-    const updatedPage = { ...currentPage, ...updates } as Page;
+    const updatedPage = { ...updates } as Page;
     console.log('setPage', currentPage, updates);
     // const updatedPage = await charmClient.updatePage(updates as Prisma.PageUpdateInput);
-    setPages(pages.map(p => p.id === updatedPage.id ? updatedPage : p));
-    setCurrentPage(updatedPage);
-  }, [currentPage, pages]);
+    // setPages(_pages => _pages.map(p => p.id === updatedPage.id ? { ...p, ...updates } : p));
+    setCurrentPage(_page => ({ ..._page, ...updates }) as Page);
+  }, [currentPage, pages, setPages, setCurrentPage]);
   console.log('Render [pageId].tsx, currentPage:', currentPage);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function BlocksEditorPage () {
       console.log('set current page by path', pageByPath);
       setCurrentPage(pageByPath);
     }
-  }, [pageId, pages.length > 0]);
+  }, [pageId, setCurrentPage, pages.length > 0]);
 
   if (!currentPage) {
     return null;

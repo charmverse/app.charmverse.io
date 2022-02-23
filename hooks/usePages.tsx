@@ -44,7 +44,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     pages,
     setCurrentPage,
     setPages
-  }), [currentPage, isEditing, pages]);
+  }), [currentPage, isEditing, pages, setPages, setCurrentPage, setIsEditing]);
 
   return (
     <PagesContext.Provider value={value}>

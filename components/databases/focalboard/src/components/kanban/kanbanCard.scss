@@ -57,6 +57,9 @@
         font-weight: 600;
         line-height: 20px;
         margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        width: 90%;
 
         .octo-icon {
             font-size: 16px;

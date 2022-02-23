@@ -1,17 +1,14 @@
-import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
+import { Card, CardContent, CardHeader, Chip, Grid, Typography } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
-import Button from '@mui/material/Button';
-import BountyModal from 'components/bounties_v2/BountyModal';
-import { Card, CardHeader, CardContent, Chip, Typography, Grid } from '@mui/material';
-import { useState } from 'react';
-import { BrandColors } from 'theme/colors';
 import { fancyTrim } from 'lib/strings';
+import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
+import { BrandColors } from 'theme/colors';
 
 export interface IBountyInput {
   bounty: IBounty
 }
 
-const BountyStatusColours: Record<BountyStatus, BrandColors> = {
+export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
   open: 'gray',
   assigned: 'blue',
   review: 'red',
@@ -19,17 +16,9 @@ const BountyStatusColours: Record<BountyStatus, BrandColors> = {
   paid: 'green'
 };
 
-export function Bounty ({ bounty }: IBountyInput) {
-
-  const [editBounty, setDisplayBountyDialog] = useState(false);
-
+export function BountyCard ({ bounty }: IBountyInput) {
   const bountyColor = BountyStatusColours[bounty.status];
   const bountyLabel = BountyLabels[bounty.status];
-
-  function closeDialog () {
-    setDisplayBountyDialog(false);
-  }
-
   return (
     <Card
       sx={{

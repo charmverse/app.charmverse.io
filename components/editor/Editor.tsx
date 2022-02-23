@@ -1,3 +1,4 @@
+import React, { useCallback, ChangeEvent, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
@@ -7,7 +8,6 @@ import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
-import React, { ChangeEvent, ReactNode } from 'react';
 import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
@@ -96,7 +96,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
     setPage({ icon });
   }
 
-  function updatePageContent (content: ICharmEditorOutput) {
+  function updatePageContent ({ doc, rawText }: ICharmEditorOutput) {
     if (!isEditing) {
       setIsEditing(true);
       setTimeout(() => {
@@ -104,7 +104,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
       }, 1500);
     }
     console.log('updatePageContent', page.title);
-    setPage({ });
+    setPage({ content: doc, contentText: rawText });
   }
 
   console.log('Render editor', page.title, page.contentText);
@@ -115,35 +115,47 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
       <Container>
         <Controls sx={{
           position: 'relative',
-          top: pageControlTop
+          top: pageControlTop,
+          '&:hover .page-controls': {
+            opacity: 1
+          }
         }}
         >
-          {!page.icon && (
-            <PageControlItem onClick={() => {
-              setPage({ icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
+          <Box
+            className='page-controls'
+            sx={{
+              opacity: 0,
+              display: 'flex',
+              gap: 1
             }}
-            >
-              <EmojiEmotionsIcon
-                fontSize='small'
-                sx={{ marginRight: 1 }}
-              />
-              Add icon
-            </PageControlItem>
-          )}
-          {!page.headerImage && (
-            <PageControlItem
-              onClick={() => {
-                // Charmverse logo
-                setPage({ headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
+          >
+            {!page.icon && (
+              <PageControlItem onClick={() => {
+                setPage({ icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
               }}
-            >
-              <ImageIcon
-                fontSize='small'
-                sx={{ marginRight: 1 }}
-              />
-              Add cover
-            </PageControlItem>
-          )}
+              >
+                <EmojiEmotionsIcon
+                  fontSize='small'
+                  sx={{ marginRight: 1 }}
+                />
+                Add icon
+              </PageControlItem>
+            )}
+            {!page.headerImage && (
+              <PageControlItem
+                onClick={() => {
+                  // Charmverse logo
+                  setPage({ headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
+                }}
+              >
+                <ImageIcon
+                  fontSize='small'
+                  sx={{ marginRight: 1 }}
+                />
+                Add cover
+              </PageControlItem>
+            )}
+          </Box>
         </Controls>
 
         <CharmEditor
@@ -160,7 +172,6 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
                 <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
               </EmojiContainer>
             )}
-            {page && (
             <Box sx={{
               position: 'absolute',
               top: pageTitleTop
@@ -171,7 +182,6 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
                 onChange={updateTitle}
               />
             </Box>
-            )}
           </>
         </CharmEditor>
       </Container>

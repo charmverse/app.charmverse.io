@@ -1,12 +1,11 @@
 import { Bounty } from '@prisma/client';
 import { DialogTitle, Modal } from 'components/common/Modal';
-import { useUser } from 'hooks/useUser';
 import { BountyEditorForm, FormMode } from './BountyEditorForm';
 
 interface Props {
   open: boolean;
   mode?: FormMode;
-  bounty?: Bounty;
+  bounty?: Partial<Bounty>;
   onClose: () => void;
   onSubmit: (bounty: Bounty) => void;
 }
@@ -18,7 +17,6 @@ const modalTitles: Record<FormMode, string> = {
 
 export default function BountyModal (props: Props) {
   const { open, onClose, onSubmit, mode = 'create', bounty } = props;
-  const [user] = useUser();
 
   return (
     <Modal size='large' open={open} onClose={onClose} sx={{ margin: 'auto', maxHeight: '80vh' }}>

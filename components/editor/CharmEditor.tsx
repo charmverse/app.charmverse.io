@@ -15,6 +15,7 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
+import { useCallback, CSSProperties, ReactNode, useMemo } from 'react';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState, useEditorViewContext } from '@bangle.dev/react';
@@ -26,7 +27,6 @@ import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@b
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { CSSProperties, ReactNode, useMemo } from 'react';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
@@ -136,6 +136,11 @@ export default function CharmEditor (
   { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent,
     style?: CSSProperties, editorTop?: number }
 ) {
+  console.log('Render charm editor');
+
+  const updateContent = useCallback((pageContent: ICharmEditorOutput) => {
+    onPageContentChange(pageContent);
+  }, [onPageContentChange]);
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -144,7 +149,7 @@ export default function CharmEditor (
           update: (view, prevState) => {
             if (!view.state.doc.eq(prevState.doc)) {
               if (onPageContentChange) {
-                onPageContentChange({
+                updateContent({
                   doc: view.state.doc.toJSON() as PageContent,
                   rawText: view.state.doc.textContent as string
                 });

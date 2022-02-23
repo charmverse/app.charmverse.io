@@ -131,6 +131,7 @@ import 'components/databases/focalboard/src/widgets/valueSelector.scss';
 import FocalBoardPortal from 'components/databases/FocalBoardPortal';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { ColorModeContext } from 'context/color-mode';
+import { BountiesProvider } from 'hooks/useBounties';
 import { DatabaseBlocksProvider } from 'hooks/useDatabaseBlocks';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PagesProvider } from 'hooks/usePages';
@@ -286,13 +287,15 @@ function DataProviders ({ children }: { children: ReactNode }) {
   return (
     <SpacesProvider>
       <PagesProvider>
-        <DatabaseBlocksProvider>
-          <PageTitleProvider>
-            <UserProvider>
-              {children}
-            </UserProvider>
-          </PageTitleProvider>
-        </DatabaseBlocksProvider>
+        <BountiesProvider>
+          <DatabaseBlocksProvider>
+            <PageTitleProvider>
+              <UserProvider>
+                {children}
+              </UserProvider>
+            </PageTitleProvider>
+          </DatabaseBlocksProvider>
+        </BountiesProvider>
       </PagesProvider>
     </SpacesProvider>
   );

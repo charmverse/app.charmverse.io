@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 import { GetEmojiGroupsType, getSuggestTooltipKey, selectEmoji } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { getEmojiByAlias } from 'components/editor/EmojiSuggest';
 import GroupLabel from 'components/editor/GroupLabel';
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import reactDOM from 'react-dom';
 
 const StyledEmojiSuggest = styled(Box)`
@@ -158,7 +158,7 @@ export function EmojiSuggestContainer({
     <div
       className="bangle-emoji-suggest-container"
       style={{
-        width: containerWidth + (parseInt(theme.spacing(2).replace("px", "")) * 2),
+        width: "100%"
       }}
     >
       <Box sx={{

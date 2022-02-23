@@ -246,6 +246,13 @@ class CharmClient {
 
     return data;
   }
+
+  async getBounty (bountyId: string): Promise<Bounty> {
+
+    const data = await http.GET<Bounty>(`/api/bounties/${bountyId}`);
+
+    return data;
+  }
 }
 
 const charmClient = new CharmClient();
