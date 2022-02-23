@@ -1,7 +1,7 @@
 import SettingsLayout from 'components/settings/Layout';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement } from 'react';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { DialogTitle, Modal } from 'components/common/Modal';
+import { Modal } from 'components/common/Modal';
 import useSWR from 'swr';
 import Legend from 'components/settings/Legend';
 import Button from 'components/common/Button';
@@ -12,8 +12,8 @@ import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import getDisplayName from 'lib/users/getDisplayName';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
-import InvitesTable from 'components/invites/InvitesTable';
-import InviteForm, { FormValues as InviteLinkFormValues } from 'components/invites/InviteForm';
+import InvitesTable from 'components/inviteLinks/InvitesTable';
+import InviteForm, { FormValues as InviteLinkFormValues } from 'components/inviteLinks/InviteLinkForm';
 import charmClient from 'charmClient';
 
 export default function ContributorSettings () {

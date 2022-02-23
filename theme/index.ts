@@ -218,6 +218,12 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
         }
       }
     },
+    MuiChip: {
+      defaultProps: {
+        // @ts-ignore mui library type is wrong
+        disableRipple: true
+      }
+    },
     MuiPaper: {
       styleOverrides: {
         root: {
