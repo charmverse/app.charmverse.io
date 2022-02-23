@@ -1,9 +1,7 @@
-import { useTheme } from '@emotion/react';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { grey } from '@mui/material/colors';
-import Container from '@mui/material/Container';
 import { Bounty } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import millify from 'millify';
@@ -23,14 +21,13 @@ export interface IBountyBadgeProps {
 }
 
 export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
-  const theme = useTheme();
   const [space] = useCurrentSpace();
 
   const bountyLink = `/${space!.domain}/bounty/${bounty.id}`;
 
   return (
-    <Box sx={{ maxWidth: '400px', background: 'background', borderRadius: theme.spacing(1) }}>
-      <Container sx={{ display: 'flex', alignItems: 'center', padding: theme.spacing(1) }}>
+    <Box sx={{ maxWidth: '400px', background: 'background' }} borderRadius={1}>
+      <Box sx={{ display: 'flex', alignItems: 'center' }} p={1}>
         <Box
           mr={0.75}
           component='span'
@@ -82,9 +79,8 @@ export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
             </Link>
           )
         }
-
-      </Container>
-      <Container sx={{ padding: theme.spacing(1), background: BountyStatusColours[bounty.status], textAlign: 'center', fontWeight: 'bold' }}>
+      </Box>
+      <Box p={1} sx={{ background: BountyStatusColours[bounty.status], textAlign: 'center', fontWeight: 'bold' }}>
         <Typography
           component='span'
           sx={{
@@ -97,7 +93,7 @@ export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
         >
           {BOUNTY_LABELS[bounty.status]}
         </Typography>
-      </Container>
+      </Box>
     </Box>
   );
 }
