@@ -1,29 +1,26 @@
-import { CompositeForm } from 'components/common/form/Form';
-import { Bounty, Bounty as IBounty } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { CryptoCurrency } from 'models/Currency';
-import * as yup from 'yup';
-import { SchemaOf, ObjectSchema, AnySchema } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
+import { Bounty, Bounty as IBounty } from '@prisma/client';
+import charmClient from 'charmClient';
+import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
+import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
+import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import Input from '@mui/material/Input';
-import Button from '@mui/material/Button';
-import InputLabel from '@mui/material/InputLabel';
-import Grid from '@mui/material/Grid';
-import Alert from '@mui/material/Alert';
-import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor';
-import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
-import charmClient from 'charmClient';
-import { IInputField } from '../common/form/GenericInput';
+import { CryptoCurrency } from 'models/Currency';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 export type FormMode = 'create' | 'update';
 
 interface IBountyEditorInput {
-  onSubmit: (bounty: IBounty) => any,
+  onSubmit: (bounty: Bounty) => any,
   mode?: FormMode
-  bounty?: IBounty
+  bounty?: Partial<Bounty>
 }
 
 export const schema = yup.object({
@@ -38,14 +35,12 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
-
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
-    trigger,
-    formState: { errors, touchedFields, isValid, isValidating }
+    getValues,
+    formState: { errors, isValid, isSubmitting }
   } = useForm<FormValues>({
     mode: 'onBlur',
     defaultValues: bounty as any,
@@ -148,7 +143,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
           </Grid>
 
           <Grid item>
-            <Button disabled={!isValid} type='submit'>Create bounty</Button>
+            <Button disabled={!isValid || isSubmitting} type='submit'>Create bounty</Button>
           </Grid>
 
         </Grid>

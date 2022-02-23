@@ -1,11 +1,11 @@
-import { useState, useRef } from 'react';
+import { Button, Grid, Typography } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
-import Loader from 'components/common/Loader';
-import { Bounty } from 'components/bounties_v2/Bounty';
-import { Typography, Button, Grid } from '@mui/material';
-import BountyModal from 'components/bounties_v2/BountyModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import charmClient from 'charmClient';
+import { Bounty } from 'components/bounties_v2/Bounty';
+import BountyModal from 'components/bounties_v2/BountyModal';
+import Loader from 'components/common/Loader';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useRef, useState } from 'react';
 
 export function BountyList () {
 
@@ -38,7 +38,7 @@ export function BountyList () {
   }
 
   if (refresh.current === true) {
-
+    // TODO: No need to refresh bounties we can add the newly created bounty to the list
     refreshBounties();
 
     return <Loader message='Searching for bounties' />;

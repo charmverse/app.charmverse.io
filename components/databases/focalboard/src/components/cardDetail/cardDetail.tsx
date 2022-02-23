@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import { Box, Button as MuiButton, Typography } from '@mui/material'
+import BountyModal from 'components/bounties_v2/BountyModal'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { BlockIcons } from '../../blockIcons'
@@ -36,6 +37,7 @@ type Props = {
 }
 
 const CardDetail = (props: Props): JSX.Element|null => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const {card, comments} = props
     const [title, setTitle] = useState(card.title)
     const [serverTitle, setServerTitle] = useState(card.title)
@@ -145,9 +147,19 @@ const CardDetail = (props: Props): JSX.Element|null => {
                     }}>
                       No bounties assigned
                     </Typography>
-                    <MuiButton>
+                    <MuiButton onClick={() => {
+                      setIsModalOpen(true)
+                    }}>
                       Assign a bounty
                     </MuiButton>
+                    {isModalOpen && <BountyModal open={isModalOpen} bounty={{
+                      title,
+                      linkedTaskId: card.id
+                    }} onClose={() => {
+                      setIsModalOpen(false)
+                    }} onSubmit={() => {
+                      setIsModalOpen(false)
+                    }}/>}
                   </Box>
                 </Box>
 
