@@ -1,16 +1,19 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState} from 'react'
-import {useIntl} from 'react-intl'
-
-import {Board, IPropertyTemplate} from '../../blocks/board'
-import {Card} from '../../blocks/card'
-import {useSortable} from '../../hooks/sortable'
+import { Box } from '@mui/material'
+import { useBounties } from 'hooks/useBounties'
+import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
+import Image from 'next/image'
+import React, { useState } from 'react'
+import { useIntl } from 'react-intl'
+import { Board, IPropertyTemplate } from '../../blocks/board'
+import { Card } from '../../blocks/card'
+import { useSortable } from '../../hooks/sortable'
 import mutator from '../../mutator'
-import {getCardComments} from '../../store/comments'
-import {getCardContents} from '../../store/contents'
-import {useAppSelector} from '../../store/hooks'
-import {Utils} from '../../utils'
+import { getCardComments } from '../../store/comments'
+import { getCardContents } from '../../store/contents'
+import { useAppSelector } from '../../store/hooks'
+import { Utils } from '../../utils'
 import IconButton from '../../widgets/buttons/iconButton'
 import DeleteIcon from '../../widgets/icons/delete'
 import DuplicateIcon from '../../widgets/icons/duplicate'
@@ -19,11 +22,12 @@ import OptionsIcon from '../../widgets/icons/options'
 import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
 import Tooltip from '../../widgets/tooltip'
-import {sendFlashMessage} from '../flashMessages'
+import CardBadges from '../cardBadges'
+import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../confirmationDialogBox'
+import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
 
-import ConfirmationDialogBox, {ConfirmationDialogBoxProps} from '../confirmationDialogBox'
-import CardBadges from '../cardBadges'
+
 
 type Props = {
     card: Card
@@ -47,6 +51,9 @@ const KanbanCard = React.memo((props: Props) => {
     if (props.isManualSort && isOver) {
         className += ' dragover'
     }
+
+    const {bounties} = useBounties()
+    const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === card.id);
 
     const contents = useAppSelector(getCardContents(card.id))
     const comments = useAppSelector(getCardComments(card.id))
@@ -141,13 +148,54 @@ const KanbanCard = React.memo((props: Props) => {
                 }
 
                 <div className='octo-icontitle'>
-                    { card.fields.icon ? <div className='octo-icon'>{card.fields.icon}</div> : undefined }
-                    <div
-                        key='__title'
-                        className='octo-titletext'
-                    >
-                        {card.title || intl.formatMessage({id: 'KanbanCard.untitled', defaultMessage: 'Untitled'})}
-                    </div>
+                    <Box sx={{
+                      display: "flex",
+                    }}>
+                      { card.fields.icon ? <div className='octo-icon'>{card.fields.icon}</div> : undefined }
+                      <div
+                          key='__title'
+                          className='octo-titletext'
+                      >
+                          {card.title || intl.formatMessage({id: 'KanbanCard.untitled', defaultMessage: 'Untitled'})}
+                      </div>
+                    </Box>
+                    {linkedBounty && <Box sx={{
+                      display: "flex",
+                      gap: 0.25
+                    }}>
+                      <Box
+                        mr={0.25}
+                        component='span'
+                        sx={{
+                          width: 15,
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <Image
+                          loading='lazy'
+                          width={15}
+                          height={15}
+                          src={CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
+                        />
+                      </Box>
+                      <Box sx={{
+                        display: "flex",
+                        gap: 0.25
+                      }}>
+                        <Box component="span">
+                          {linkedBounty.rewardAmount}
+                        </Box>
+                        {/* <Box component="span" sx={{
+                          fontWeight: 400,
+                          fontSize: 10,
+                          position: 'relative',
+                          top: 2.5,
+                        }}>
+                          {linkedBounty.rewardToken}
+                        </Box> */}
+                      </Box>
+                    </Box>}
                 </div>
                 {visiblePropertyTemplates.map((template) => (
                     <Tooltip
