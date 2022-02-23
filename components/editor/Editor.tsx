@@ -48,7 +48,7 @@ function randomIntFromInterval (min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => void }) {
+export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Page>) => void }) {
   const { isEditing, setIsEditing } = usePages();
 
   let pageControlTop = 0;
@@ -88,11 +88,12 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
   }
 
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {
-    setPage({ ...page, title: event.target.value });
+    console.log('updateTitle', page.contentText);
+    setPage({ title: event.target.value });
   }
 
   function updatePageIcon (icon: string) {
-    setPage({ ...page, icon });
+    setPage({ icon });
   }
 
   function updatePageContent (content: ICharmEditorOutput) {
@@ -102,8 +103,11 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
         setIsEditing(false);
       }, 1500);
     }
-    setPage({ ...page, content: content.doc, contentText: content.rawText });
+    console.log('updatePageContent', page.title);
+    setPage({ });
   }
+
+  console.log('Render editor', page.title, page.contentText);
 
   return (
     <Box>
@@ -116,7 +120,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
         >
           {!page.icon && (
             <PageControlItem onClick={() => {
-              setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
+              setPage({ icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
             }}
             >
               <EmojiEmotionsIcon
@@ -130,7 +134,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
             <PageControlItem
               onClick={() => {
                 // Charmverse logo
-                setPage({ ...page, headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
+                setPage({ headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
               }}
             >
               <ImageIcon
