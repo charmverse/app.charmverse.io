@@ -1,12 +1,12 @@
-import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
+import { Card, CardHeader, CardContent, Chip, Typography, Grid, CardActionArea } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
 import Button from '@mui/material/Button';
 import BountyModal from 'components/bounties_v2/BountyModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { Card, CardHeader, CardContent, Chip, Typography, Grid, CardActionArea } from '@mui/material';
 import { useState } from 'react';
 import { BrandColors } from 'theme/colors';
 import { fancyTrim } from 'lib/strings';
+import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
 
 export interface IBountyInput {
   bounty: IBounty
@@ -20,7 +20,7 @@ export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
   paid: 'green'
 };
 
-export function Bounty ({ bounty }: IBountyInput) {
+export function BountyCard ({ bounty }: IBountyInput) {
 
   const [editBounty, setDisplayBountyDialog] = useState(false);
   const [space] = useCurrentSpace();

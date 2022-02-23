@@ -81,7 +81,6 @@ function scrollIntoViewIfNeededPolyfill (
       - parentBorderLeftWidth
       + element.clientWidth / 2;
   }
-  console.log('parent', parent, parentCoords, elementOffsetBottom, overTop, overBottom);
   if ((overTop || overBottom || overLeft || overRight) && !centerIfNeeded) {
     element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }

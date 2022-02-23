@@ -1,95 +1,64 @@
-import { useState, useRef } from 'react';
+import { Button, Grid, Typography } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
-import Loader from 'components/common/Loader';
-import { Bounty } from 'components/bounties_v2/Bounty';
-import { Typography, Button, Grid } from '@mui/material';
 import BountyModal from 'components/bounties_v2/BountyModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import charmClient from 'charmClient';
+import { BountiesContext } from 'hooks/useBounties';
+import { useContext, useState } from 'react';
+import { BountyCard } from './BountyCard';
 
 export function BountyList () {
-
-  const [space] = useCurrentSpace();
-  const [bountyList, setBountyList] = useState([] as IBounty []);
-  const refresh = useRef(true);
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
+  const { bounties } = useContext(BountiesContext);
 
-  async function refreshBounties () {
-    try {
-      const foundBounties = await charmClient.listBounties(space!.id);
-
-      setBountyList(foundBounties);
-
-    }
-    catch (error) {
-      // Handle error later
-    }
-
-    refresh.current = false;
-
-    // Test to generate a bunch of statuses
-  }
-
-  function bountyCreated () {
-    // Empty the bounty list so we can reload bounties
-    refresh.current = true;
+  function bountyCreated (newBounty: IBounty) {
     setDisplayBountyDialog(false);
-    refreshBounties();
   }
+  return (
+    <Grid container>
 
-  if (refresh.current === true) {
+      <Grid item container xs alignItems='center'>
 
-    refreshBounties();
-
-    return <Loader message='Searching for bounties' />;
-  }
-  else {
-    return (
-      <Grid container>
-
-        <Grid item container xs alignItems='center'>
-
-          {
-            /**
-             * Remove later to its own popup modal
-             */
-            displayBountyDialog === true && (
-            <BountyModal onSubmit={bountyCreated} open={displayBountyDialog} onClose={bountyCreated} />
-            )
-          }
-
-          <Grid item xs={8}>
-            <h1>Bounty list</h1>
-          </Grid>
-
-          <Grid item xs={4}>
-            <Button
-              variant='outlined'
-              onClick={() => {
-                setDisplayBountyDialog(true);
+        {
+          /**
+           * Remove later to its own popup modal
+           */
+          displayBountyDialog === true && (
+            <BountyModal
+              onSubmit={bountyCreated}
+              open={displayBountyDialog}
+              onClose={() => {
+                setDisplayBountyDialog(false);
               }}
-              sx={{ margin: 'auto', float: 'right' }}
-            >
-              Create Bounty
-            </Button>
-          </Grid>
+            />
+          )
+        }
 
+        <Grid item xs={8}>
+          <h1>Bounty list</h1>
         </Grid>
 
-        <Grid container>
-
-          {
-            bountyList.length === 0 && <Typography paragraph={true}>No bounties were found</Typography>
-          }
-
-          { bountyList.length > 0
-        && bountyList?.map(availableBounty => {
-          return <Bounty key={availableBounty.id + Math.random().toString()} bounty={availableBounty} />;
-        })}
-
+        <Grid item xs={4}>
+          <Button
+            variant='outlined'
+            onClick={() => {
+              setDisplayBountyDialog(true);
+            }}
+            sx={{ margin: 'auto', float: 'right' }}
+          >
+            Create Bounty
+          </Button>
         </Grid>
 
       </Grid>
-    );
-  }
+
+      <Grid container>
+        {
+          bounties.length === 0
+            ? <Typography paragraph={true}>No bounties were found</Typography>
+            : bounties?.map(bounty => {
+              return <BountyCard key={bounty.id} bounty={bounty} />;
+            })
+        }
+      </Grid>
+    </Grid>
+  );
 }
