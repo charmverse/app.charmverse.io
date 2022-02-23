@@ -26,7 +26,7 @@ export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
 
   return (
     <Box sx={{ maxWidth: '400px', background: 'background', borderRadius: radius }}>
-      <Container sx={{ display: 'block', verticalAlign: 'middle' }}>
+      <Container sx={{ display: 'flex', alignItems: 'center', verticalAlign: 'middle' }}>
 
         <Image
           loading='lazy'
