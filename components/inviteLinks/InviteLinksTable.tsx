@@ -14,6 +14,7 @@ import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import { getDisplayName } from 'lib/users';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
+import ButtonChip from 'components/common/ButtonChip';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 
 const StyledRow = styled(TableRow)`
@@ -24,18 +25,6 @@ const StyledRow = styled(TableRow)`
   &:hover .row-actions {
     opacity: 1;
   }
-`;
-
-const ButtonChip = styled(Chip)`
-  box-sizing: content-box;
-  .MuiSvgIcon-root {
-    margin: 0;
-    width: 24px;
-  }
-  .MuiChip-label {
-    display: none;
-  }
-
 `;
 
 interface Props {
