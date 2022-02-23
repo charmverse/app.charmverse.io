@@ -2,7 +2,8 @@ import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
 import { Bounty as IBounty } from '@prisma/client';
 import Button from '@mui/material/Button';
 import BountyModal from 'components/bounties_v2/BountyModal';
-import { Card, CardHeader, CardContent, Chip, Typography, Grid } from '@mui/material';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { Card, CardHeader, CardContent, Chip, Typography, Grid, CardActionArea } from '@mui/material';
 import { useState } from 'react';
 import { BrandColors } from 'theme/colors';
 import { fancyTrim } from 'lib/strings';
@@ -22,6 +23,7 @@ export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
 export function Bounty ({ bounty }: IBountyInput) {
 
   const [editBounty, setDisplayBountyDialog] = useState(false);
+  const [space] = useCurrentSpace();
 
   const bountyColor = BountyStatusColours[bounty.status];
   const bountyLabel = BountyLabels[bounty.status];
@@ -29,6 +31,8 @@ export function Bounty ({ bounty }: IBountyInput) {
   function closeDialog () {
     setDisplayBountyDialog(false);
   }
+
+  const bountyUrl = `/${space!.domain}/bounty/${bounty.id}`;
 
   return (
     <Card
@@ -40,8 +44,9 @@ export function Bounty ({ bounty }: IBountyInput) {
       }}
       variant='outlined'
     >
-      <CardHeader subheader={bounty.title} />
-
+      <CardActionArea href={bountyUrl}>
+        <CardHeader subheader={bounty.title} />
+      </CardActionArea>
       <CardContent sx={{ flexGrow: 1, display: 'block' }}>
 
         <Grid container direction='column' justifyContent='space-between'>
