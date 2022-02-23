@@ -35,11 +35,11 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
+
   const {
     register,
     handleSubmit,
     setValue,
-    getValues,
     formState: { errors, isValid, isSubmitting }
   } = useForm<FormValues>({
     mode: 'onBlur',
@@ -54,6 +54,8 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     if (mode === 'create') {
       value.spaceId = space!.id;
       value.createdBy = user!.id;
+      // TODO: Should we allow empty description?
+      value.description = value.description ?? '';
       const createdBounty = await charmClient.createBounty(value);
       onSubmit(createdBounty);
     }

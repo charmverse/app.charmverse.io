@@ -7,7 +7,7 @@ import { BOUNTY_LABELS } from 'models/Bounty';
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency';
 import Image from 'next/image';
 import Link from 'next/link';
-import { BountyStatusColours } from './Bounty';
+import { BountyStatusColours } from './BountyCard';
 
 /**
  * @hideLink used in the Bounty page so we don't show a link when we are already on the page
