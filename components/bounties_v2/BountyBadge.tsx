@@ -25,7 +25,7 @@ export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
   const bountyLink = `/${space!.domain}/bounty/${bounty.id}`;
 
   return (
-    <Box sx={{ maxWidth: '400px', background: 'background', borderRadius: radius }}>
+    <Box sx={{ maxWidth: '250px', background: 'background', borderRadius: radius }}>
       <Container sx={{ display: 'flex', alignItems: 'center', verticalAlign: 'middle' }}>
 
         <Image
