@@ -157,6 +157,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
         </Controls>
 
         <CharmEditor
+          key={page.id}
           style={{
             top: bangleEditorTop
           }}

@@ -7,7 +7,7 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
-import { ReactElement, useCallback, useEffect } from 'react';
+import { ReactElement, useEffect } from 'react';
 
 export default function BlocksEditorPage () {
 
