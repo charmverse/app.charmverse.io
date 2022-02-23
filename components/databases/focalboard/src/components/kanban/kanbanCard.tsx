@@ -1,8 +1,10 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import { Box } from '@mui/material'
+import { BountyStatusColours } from 'components/bounties_v2/BountyCard'
 import { useBounties } from 'hooks/useBounties'
 import millify from "millify"
+import { BOUNTY_LABELS } from 'models'
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
 import Image from 'next/image'
 import React, { useState } from 'react'
@@ -159,43 +161,6 @@ const KanbanCard = React.memo((props: Props) => {
                           {card.title || intl.formatMessage({id: 'KanbanCard.untitled', defaultMessage: 'Untitled'})}
                       </div>
                     </Box>
-                    {linkedBounty && <Box sx={{
-                      display: "flex",
-                      gap: 0.25
-                    }}>
-                      <Box
-                        mr={0.25}
-                        component='span'
-                        sx={{
-                          width: 15,
-                          display: 'flex',
-                          alignItems: 'center'
-                        }}
-                      >
-                        <Image
-                          loading='lazy'
-                          width={15}
-                          height={15}
-                          src={CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
-                        />
-                      </Box>
-                      <Box sx={{
-                        display: "flex",
-                        gap: 0.25
-                      }}>
-                        <Box component="span">
-                          {millify(linkedBounty.rewardAmount)}
-                        </Box>
-                        {/* <Box component="span" sx={{
-                          fontWeight: 400,
-                          fontSize: 10,
-                          position: 'relative',
-                          top: 2.5,
-                        }}>
-                          {linkedBounty.rewardToken}
-                        </Box> */}
-                      </Box>
-                    </Box>}
                 </div>
                 {visiblePropertyTemplates.map((template) => (
                     <Tooltip
@@ -213,6 +178,58 @@ const KanbanCard = React.memo((props: Props) => {
                         />
                     </Tooltip>
                 ))}
+                {linkedBounty && <Box sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%"
+                  }}>
+                  <Box sx={{
+                    display: "flex",
+                    gap: 0.25,
+                  }}>
+                    <Box
+                      mr={0.25}
+                      component='span'
+                      sx={{
+                        width: 15,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <Image
+                        loading='lazy'
+                        width={15}
+                        height={15}
+                        src={CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
+                      />
+                    </Box>
+                    <Box sx={{
+                      display: "flex",
+                      gap: 0.25
+                    }}>
+                      <Box component="span">
+                        {millify(linkedBounty.rewardAmount)}
+                      </Box>
+                      {/* <Box component="span" sx={{
+                        fontWeight: 400,
+                        fontSize: 10,
+                        position: 'relative',
+                        top: 2.5,
+                      }}>
+                        {linkedBounty.rewardToken}
+                      </Box> */}
+                    </Box>
+                  </Box>
+                  <Box style={{
+                    color: BountyStatusColours[linkedBounty.status],
+                  }} sx={{
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    fontSize: 12
+                  }}>
+                    {BOUNTY_LABELS[linkedBounty.status]}
+                  </Box>
+                </Box>}
                 {props.visibleBadges && <CardBadges card={card}/>}
             </div>
 
