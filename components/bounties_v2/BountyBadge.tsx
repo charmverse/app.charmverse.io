@@ -12,6 +12,7 @@ import { BountyStatusColours } from './BountyCard';
 /**
  * @hideLink used in the Bounty page so we don't show a link when we are already on the page
  */
+
 export interface IBountyBadgeProps {
   bounty: Bounty
   hideLink?: boolean
@@ -27,18 +28,18 @@ export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
   return (
     <Box sx={{ maxWidth: '400px', background: 'background', borderRadius: radius }}>
       <Container sx={{ display: 'flex', alignItems: 'center', verticalAlign: 'middle' }}>
-
         <Image
           loading='lazy'
           width='30px'
           height='30px'
           src={CryptoLogoPaths[bounty.rewardToken as CryptoCurrency]}
         />
-        {' '}
-        {' '}
-        {bounty.rewardAmount}
-        {' '}
-        {bounty.rewardToken}
+        <Box component='span' px={1}>
+          {bounty.rewardAmount}
+        </Box>
+        <Box component='span' px={1}>
+          {bounty.rewardToken}
+        </Box>
         {
           hideLink === false && (
             <Link href={bountyLink} passHref={true}>
