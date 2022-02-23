@@ -48,7 +48,7 @@ function randomIntFromInterval (min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => void }) {
+export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Page>) => void }) {
   const { isEditing, setIsEditing } = usePages();
 
   let pageControlTop = 0;
@@ -88,11 +88,21 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
   }
 
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {
-    setPage({ ...page, title: event.target.value });
+    setPage({ title: event.target.value });
+  }
+
+  function addPageHeader () {
+    const headerImage = PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)];
+    setPage({ headerImage });
+  }
+
+  function addPageIcon () {
+    const icon = gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji;
+    setPage({ icon });
   }
 
   function updatePageIcon (icon: string) {
-    setPage({ ...page, icon });
+    setPage({ icon });
   }
 
   function updatePageContent (content: ICharmEditorOutput) {
@@ -102,7 +112,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
         setIsEditing(false);
       }, 1500);
     }
-    setPage({ ...page, content: content.doc, contentText: content.rawText });
+    setPage({ content: content.doc, contentText: content.rawText });
   }
 
   return (
@@ -126,10 +136,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
             }}
           >
             {!page.icon && (
-              <PageControlItem onClick={() => {
-                setPage({ ...page, icon: gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji });
-              }}
-              >
+              <PageControlItem onClick={addPageIcon}>
                 <EmojiEmotionsIcon
                   fontSize='small'
                   sx={{ marginRight: 1 }}
@@ -138,12 +145,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Page) => v
               </PageControlItem>
             )}
             {!page.headerImage && (
-              <PageControlItem
-                onClick={() => {
-                  // Charmverse logo
-                  setPage({ ...page, headerImage: PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)] });
-                }}
-              >
+              <PageControlItem onClick={addPageHeader}>
                 <ImageIcon
                   fontSize='small'
                   sx={{ marginRight: 1 }}
