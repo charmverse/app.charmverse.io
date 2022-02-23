@@ -46,7 +46,9 @@ export default function Resizer (props: ResizerProps) {
           transition: 'opacity 250ms ease-in-out'
         },
         '& .react-resizable': {
-          display: 'flex'
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
         }
       }}
     >
