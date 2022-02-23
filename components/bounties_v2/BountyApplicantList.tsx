@@ -1,13 +1,19 @@
+import { useState, useRef, useEffect } from 'react';
+import { Proposal } from '@prisma/client';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import { v4 } from 'uuid';
+import { useUser } from 'hooks/useUser';
+import charmClient from 'charmClient';
 
 export interface IBountyApplicantListProps {
   bountyId: string
@@ -26,8 +32,31 @@ const rows = [
 ];
 
 export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
+  const [user] = useUser();
+  const [proposals, setProposals] = useState([] as Proposal []);
+  const loading = useRef(true);
 
-  const viewerIsBountyCreator: boolean = true;
+  useEffect(() => {
+    refreshProposals();
+  }, []);
+
+  const viewerCanAssignBounty: boolean = true;
+
+  async function refreshProposals () {
+    loading.current = true;
+    const proposalList = await charmClient.listProposals(bountyId);
+    loading.current = false;
+    setProposals(proposalList);
+  }
+
+  if (loading.current === true) {
+    return (
+      <>
+        <Typography>Loading proposals</Typography>
+        <CircularProgress></CircularProgress>
+      </>
+    );
+  }
 
   return (
     <Box component='div' sx={{ maxHeight: '50vh', overflowY: 'auto' }}>
@@ -36,29 +65,29 @@ export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
           <TableHead>
             <TableRow>
               <TableCell>Applicant ID</TableCell>
-              <TableCell align='right'>Message</TableCell>
-              <TableCell align='right'>Date</TableCell>
+              <TableCell>Message</TableCell>
+              <TableCell>Date</TableCell>
               {
-                viewerIsBountyCreator === true && (
-                  <TableCell align='right'>Assign</TableCell>
+                viewerCanAssignBounty === true && (
+                  <TableCell>Assign</TableCell>
                 )
               }
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {proposals.map((proposal) => (
               <TableRow
-                key={row.id}
+                key={proposal.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
-                <TableCell component='th' scope='row'>
-                  {row.id}
+                <TableCell size='small'>
+                  {proposal.applicantId}
                 </TableCell>
-                <TableCell align='right'>{row.message}</TableCell>
-                <TableCell align='right'>{row.date}</TableCell>
+                <TableCell>{proposal.message}</TableCell>
+                <TableCell>{proposal.createdAt}</TableCell>
                 {
-                viewerIsBountyCreator === true && (
-                  <TableCell align='right'>
+                viewerCanAssignBounty === true && (
+                  <TableCell>
                     <Button>Assign</Button>
                     {' '}
                   </TableCell>
