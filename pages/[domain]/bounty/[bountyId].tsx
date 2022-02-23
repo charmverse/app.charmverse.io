@@ -15,12 +15,15 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useState } from 'react';
 import { BountyApplicantList } from 'components/bounties_v2/BountyApplicantList';
+import { ProposalForm } from 'components/bounties_v2/ProposalForm';
+import { Modal } from 'components/common/Modal';
 
 export default function BountyDetails () {
 
   const [space] = useCurrentSpace();
   const [bounty, setBounty] = useState(null as any as Bounty);
   const [showBountyEditDialog, setShowBountyEditDialog] = useState(false);
+  const [showProposalDialog, setShowProposalDialog] = useState(false);
   const router = useRouter();
 
   async function loadBounty () {
@@ -29,8 +32,12 @@ export default function BountyDetails () {
     setBounty(foundBounty);
   }
 
-  function toggleDialog () {
+  function toggleBountyEditDialog () {
     setShowBountyEditDialog(!showBountyEditDialog);
+  }
+
+  function toggleProposalDialog () {
+    setShowProposalDialog(!showProposalDialog);
   }
 
   useEffect(() => {
@@ -52,7 +59,11 @@ export default function BountyDetails () {
   return (
     <>
 
-      <BountyModal onSubmit={loadBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleDialog} />
+      <BountyModal onSubmit={loadBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
+
+      <Modal open={showProposalDialog} onClose={toggleProposalDialog}>
+        <ProposalForm bountyId={bounty.id} onSubmit={() => {}}></ProposalForm>
+      </Modal>
 
       <Grid container direction='column' justifyContent='space-between'>
         <Grid item xs={8}>
@@ -62,7 +73,7 @@ export default function BountyDetails () {
             </Box>
             {
               viewerCanModifyBounty === true && (
-                <EditIcon fontSize='small' onClick={toggleDialog} />
+                <EditIcon fontSize='small' onClick={toggleBountyEditDialog} />
 
               )
             }
@@ -98,8 +109,8 @@ export default function BountyDetails () {
             // eslint-disable-next-line eqeqeq
             bounty.assignee == undefined && (
               <Box>
-                <p>Open to applications</p>
-                <Button>Apply now</Button>
+                <p>Open to proposals</p>
+                <Button onClick={toggleProposalDialog}>Apply now</Button>
               </Box>
             )
           }
