@@ -158,7 +158,7 @@ export function EmojiSuggestContainer({
     <div
       className="bangle-emoji-suggest-container"
       style={{
-        width: containerWidth + (parseInt(theme.spacing(2).replace("px", "")) * 2),
+        width: containerWidth + (parseInt(theme.spacing(2).replace("px", "")) * 2) + 10,
       }}
     >
       <Box sx={{
