@@ -1,16 +1,12 @@
-import { Bounty } from '@prisma/client';
-import styled from '@emotion/styled';
-import Chip from '@mui/material/Chip';
-import Grid from '@mui/material/Grid';
+import LaunchIcon from '@mui/icons-material/Launch';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import LaunchIcon from '@mui/icons-material/Launch';
+import { Bounty } from '@prisma/client';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { BOUNTY_LABELS } from 'models/Bounty';
+import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-
-import { BOUNTY_LABELS } from 'models/Bounty';
-import { CryptoLogoPaths, CryptoCurrency } from 'models/Currency';
 import { BountyStatusColours } from './Bounty';
 
 /**
