@@ -218,6 +218,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
         }
       }
     },
+    MuiListItemButton: {
+      defaultProps: {
+        disableRipple: true
+      }
+    },
     MuiPaper: {
       styleOverrides: {
         root: {

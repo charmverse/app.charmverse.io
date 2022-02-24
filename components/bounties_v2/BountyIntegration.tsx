@@ -1,4 +1,4 @@
-import { Button, Typography } from '@mui/material';
+import { Button } from '@mui/material';
 import { Box } from '@mui/system';
 import { useBounties } from 'hooks/useBounties';
 import { useState } from 'react';
@@ -19,24 +19,11 @@ export function BountyIntegration (props: BountyIntegrationProps) {
 
   return (
     <Box sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 1
+      whiteSpace: 'nowrap'
     }}
     >
       {linkedBounty ? <BountyBadge bounty={linkedBounty} /> : (
         <>
-          <Typography
-            variant='h5'
-            sx={{
-              textTransform: 'uppercase',
-              fontWeight: 'bold',
-              textAlign: 'center'
-            }}
-          >
-            No bounties assigned
-          </Typography>
           <Button onClick={() => {
             setIsModalOpen(true);
           }}
@@ -60,7 +47,6 @@ export function BountyIntegration (props: BountyIntegrationProps) {
           )}
         </>
       )}
-
     </Box>
   );
 }
