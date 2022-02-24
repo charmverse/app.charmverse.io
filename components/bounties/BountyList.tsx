@@ -1,6 +1,6 @@
 import { Button, Grid, Typography } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
-import BountyModal from 'components/bounties_v2/BountyModal';
+import BountyModal from 'components/bounties/BountyModal';
 import { BountiesContext } from 'hooks/useBounties';
 import { useContext, useState } from 'react';
 import { BountyCard } from './BountyCard';

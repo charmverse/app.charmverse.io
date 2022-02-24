@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import { Box } from '@mui/material'
-import { BountyIntegration } from 'components/bounties_v2/BountyIntegration'
+import { BountyIntegration } from 'components/bounties/BountyIntegration'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { BlockIcons } from '../../blockIcons'

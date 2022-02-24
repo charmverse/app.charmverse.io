@@ -15,6 +15,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
+import { BountyStatusColours } from 'components/bounties/BountyCard';
 
 export interface IBountyApplicantListProps {
   bounty: Bounty,
@@ -130,7 +131,7 @@ export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IB
                 }
                 {
                   bounty.assignee === application.applicantId && (
-                    <Chip label='Assigned' color='green' />
+                    <Chip label='Assigned' color={BountyStatusColours.assigned} />
                   )
                 }
               </TableCell>
