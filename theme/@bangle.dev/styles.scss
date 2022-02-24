@@ -1,3 +1,4 @@
+
 .bangle-heading-collapsed {
   border-radius: 8px;
 }
@@ -25,6 +26,10 @@
 :root {
   --window-tooltip-zIndex: 5;
   --inlineUniversalPalette-height: 400px;
+}
+
+.bangle-tooltip {
+  z-index: 3000;
 }
 
 .bangle-editor a {

@@ -1,7 +1,7 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getBaseLayout from 'components/common/base-layout/getLayout';
 import { getInviteLink } from 'lib/invites';
-import InvitationPageContent from 'components/invites';
+import InvitationPageContent from 'components/inviteLinks';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 

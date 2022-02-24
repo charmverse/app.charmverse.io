@@ -7,13 +7,15 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import IconButton from '@mui/material/IconButton';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Close';
-import CopyIcon from '@mui/icons-material/ContentCopy';
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
+import LinkIcon from '@mui/icons-material/Link';
 import { getDisplayName } from 'lib/users';
 import Tooltip from '@mui/material/Tooltip';
+import Chip from '@mui/material/Chip';
+import ButtonChip from 'components/common/ButtonChip';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 
 const StyledRow = styled(TableRow)`
@@ -65,27 +67,29 @@ export default function InvitesTable (props: Props) {
               </Typography>
             </TableCell>
             <TableCell>{getExpires(row)}</TableCell>
-            <TableCell className='row-actions' align='right'>
+            <TableCell align='right'>
               <Tooltip
                 arrow
                 placement='top'
-                title={copied[row.id] ? 'Copied' : 'Click to copy link'}
+                title={copied[row.id] ? 'Copied!' : 'Click to copy link'}
                 disableInteractive
               >
-                <span>
+                <Box component='span' pr={1}>
                   <CopyToClipboard text={getInviteLink(row.code)} onCopy={() => onCopy(row.id)}>
-                    <IconButton>
-                      <CopyIcon />
-                    </IconButton>
+                    <Chip sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label={copied[row.id] ? 'Copied!' : 'Share'} />
                   </CopyToClipboard>
-                </span>
+                </Box>
               </Tooltip>
               <Tooltip arrow placement='top' title='Delete'>
-                <span>
-                  <IconButton onClick={() => props.onDelete(row)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </span>
+                <ButtonChip
+                  className='row-actions'
+                  icon={<DeleteIcon />}
+                  clickable
+                  color='secondary'
+                  size='small'
+                  variant='outlined'
+                  onClick={() => props.onDelete(row)}
+                />
               </Tooltip>
             </TableCell>
           </StyledRow>

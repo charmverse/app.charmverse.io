@@ -9,6 +9,7 @@ import { ImageSelectorGallery } from '../ImageSelectorGallery';
 const StyledPageBanner = styled(Box)`
   display: flex;
   align-items: center;
+  height: 200px;
   justify-content: center;
   position: relative;
 
@@ -46,19 +47,13 @@ export const PageCoverGalleryImageGroups = {
   ]
 };
 
-export default function PageBanner ({ page, setPage }: { page: Page, setPage: (p: Page) => void }) {
+export default function PageBanner ({ image, setImage }: { image: string, setImage: (_: string | null) => void }) {
   const theme = useTheme();
 
   return (
-    <StyledPageBanner sx={{
-      height: page.headerImage ? 200 : 100
-    }}
-    >
-      {page.headerImage
-    && (
-    <>
+    <StyledPageBanner>
       {/* eslint-disable-next-line */}
-      <img src={page.headerImage} alt='Page Banner' />
+      <img src={image} alt='Page Banner' />
       <Box
         sx={{
           background: theme.palette.background.light,
@@ -74,13 +69,13 @@ export default function PageBanner ({ page, setPage }: { page: Page, setPage: (p
             'Gallery',
             <ImageSelectorGallery
               onImageClick={(imageSrc) => {
-                setPage({ ...page, headerImage: imageSrc });
+                setImage(imageSrc);
               }}
               items={PageCoverGalleryImageGroups}
             />
           ]]}
           onImageSelect={(imageSrc) => {
-            setPage({ ...page, headerImage: imageSrc });
+            setImage(imageSrc);
           }}
         >
           <ListItem
@@ -111,15 +106,13 @@ export default function PageBanner ({ page, setPage }: { page: Page, setPage: (p
           <Typography
             variant='subtitle1'
             onClick={() => {
-              setPage({ ...page, headerImage: null });
+              setImage(null);
             }}
           >
             Remove
           </Typography>
         </ListItem>
       </Box>
-    </>
-    )}
     </StyledPageBanner>
   );
 }

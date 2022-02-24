@@ -151,6 +151,7 @@ import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import { createThemeLightSensitive } from 'theme';
+import '@bangle.dev/tooltip/style.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/focalboard/styles.scss';
 import {
