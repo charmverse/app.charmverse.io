@@ -101,7 +101,7 @@ model User {
   spaces             Space[]
   inviteLinks        InviteLink[]
   bounties           Bounty []
-  Applications          Application []
+  applications       Application []
 }
 
 model FavoritePage {
