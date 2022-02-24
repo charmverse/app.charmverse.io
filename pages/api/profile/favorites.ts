@@ -43,7 +43,8 @@ async function addFavoritePage (req: NextApiRequest, res: NextApiResponse<Logged
       }
     },
     include: {
-      favorites: true
+      favorites: true,
+      spaceRoles: true
     }
   });
   return res.status(200).json(user);
@@ -67,7 +68,8 @@ async function unFavoritePage (req: NextApiRequest, res: NextApiResponse<LoggedI
       }
     },
     include: {
-      favorites: true
+      favorites: true,
+      spaceRoles: true
     }
   });
   return res.status(200).json(user);
