@@ -4,7 +4,6 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {Provider as ReduxProvider} from 'react-redux'
-import moment from 'moment'
 
 import {mocked} from 'ts-jest/utils'
 
@@ -41,15 +40,15 @@ describe('components/cardDetail/comment', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
-        moment.now = () => {
-            return dateFixed + (24 * 60 * 60 * 1000)
-        }
+        // moment.now = () => {
+        //     return dateFixed + (24 * 60 * 60 * 1000)
+        // }
     })
 
     afterEach(() => {
-        moment.now = () => {
-            return Number(new Date())
-        }
+        // moment.now = () => {
+        //     return Number(new Date())
+        // }
     })
 
     test('return comment', () => {
