@@ -42,9 +42,10 @@ export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IB
 
   useEffect(() => {
     if (user && space) {
-      const adminRoleFound = user.spaceRoles.findIndex(spaceRole => {
+
+      const adminRoleFound = user.spaceRoles.some(spaceRole => {
         return spaceRole.spaceId === space.id && spaceRole.role === 'admin';
-      }) > -1;
+      });
 
       setIsAdmin(adminRoleFound);
 
