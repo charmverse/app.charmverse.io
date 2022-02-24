@@ -23,8 +23,8 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
     }
   };
 
-  const bounties = await prisma.application.findMany(ApplicationListQuery);
-  return res.status(200).json(bounties);
+  const applications = await prisma.application.findMany(ApplicationListQuery);
+  return res.status(200).json(applications);
 }
 
 async function createApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
