@@ -1,10 +1,13 @@
 export const CryptoCurrencyList = {
-  BTC: 'Bitcoin',
   ETH: 'Ether',
-  XRP: 'Ripple',
-  LTC: 'Litecoin',
-  BCH: 'Bitcoin Cash',
-  ETC: 'Ethererum Classic'
+  AETH: 'Ether (Arbitrum)',
+  BNB: 'Binance Coin',
+  MATIC: 'Polygon',
+  AVAX: 'Avalanche',
+  XDAI: 'xDAI',
+  FTM: 'Fantom',
+  CELO: 'Celo',
+  ONE: 'Harmony'
 };
 
 export type CryptoCurrency = keyof typeof CryptoCurrencyList;
@@ -14,11 +17,14 @@ export type CryptoCurrency = keyof typeof CryptoCurrencyList;
  */
 export const CryptoLogoPaths: Record<CryptoCurrency, string> = {
   ETH: '/cryptoLogos/ethereum-eth-logo.svg',
-  BTC: '/cryptoLogos/bitcoin-btc-logo.svg',
-  BCH: '/cryptoLogos/bitcoin-cash-bch-logo.svg',
-  ETC: '/cryptoLogos/ethereum-classic-etc-logo.svg',
-  LTC: '/cryptoLogos/litecoin-ltc-logo.svg',
-  XRP: '/cryptoLogos/ripple-xrp-logo.svg'
+  AETH: '/cryptoLogos/ethereum-eth-logo.svg',
+  BNB: '/cryptoLogos/binance-coin-bnb-logo.svg',
+  MATIC: '/cryptoLogos/polygon-matic-logo.svg',
+  AVAX: '/cryptoLogos/avalanche-avax-logo.svg',
+  XDAI: '/cryptoLogos/gnosis-xdai-logo.svg',
+  FTM: '/cryptoLogos/fantom-ftm-logo.svg',
+  CELO: '/cryptoLogos/celo-celo-logo.svg',
+  ONE: '/cryptoLogos/harmony-one-logo.svg'
 };
 
 export const FiatCurrencyList = {
