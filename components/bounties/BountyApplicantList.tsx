@@ -75,7 +75,7 @@ export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IB
   }
 
   async function assignBounty (assignee: string) {
-    const updatedBounty = charmClient.assignBounty(bounty.id, assignee);
+    await charmClient.assignBounty(bounty.id, assignee);
     bountyReassigned();
   }
 
