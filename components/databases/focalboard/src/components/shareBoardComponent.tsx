@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React, {useState, useEffect} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import { generatePath } from 'lib/strings'
+import { generatePath } from 'lib/utilities/strings'
 import { useRouter } from 'next/router'
 
 import {ISharing} from '../blocks/sharing'

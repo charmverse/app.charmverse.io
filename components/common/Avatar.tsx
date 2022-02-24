@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import Avatar from '@mui/material/Avatar';
-import { stringToColor } from 'lib/strings';
+import { stringToColor } from 'lib/utilities/strings';
 
 const StyledAvatar = styled(Avatar)`
   color: white;
