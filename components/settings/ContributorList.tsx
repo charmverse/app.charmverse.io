@@ -10,10 +10,9 @@ export default function ContributorList () {
   const [contributors, setContributors] = useContributors();
   const [space] = useCurrentSpace();
   const [user] = useUser();
-  const isAdmin = user?.spaceRoles.some(role => role.spaceId === space?.id);
+  const isAdmin = user?.spaceRoles.some(role => role.role === 'admin' && role.spaceId === space?.id);
 
   async function updateContributor (action: RoleAction, contributor: Contributor) {
-    console.log('updateContributor', contributor);
     switch (action) {
 
       case 'makeAdmin':
@@ -38,14 +37,13 @@ export default function ContributorList () {
         throw new Error('Unknown action');
     }
   }
-
   return (
     <>
       {contributors.map(contributor => (
         <ContributorListItem
           isAdmin={isAdmin}
           key={contributor.id}
-          isSpaceOwner={space?.createdBy === user?.id}
+          isSpaceOwner={space?.createdBy === contributor.id}
           contributor={contributor}
           onChange={updateContributor}
         />

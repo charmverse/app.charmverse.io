@@ -1,7 +1,7 @@
 
 import styled from '@emotion/styled';
-import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import Button from 'components/common/Button';
 import CheckIcon from '@mui/icons-material/Check';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -14,7 +14,6 @@ import Avatar from 'components/common/Avatar';
 import { Contributor } from 'models';
 import getDisplayName from 'lib/users/getDisplayName';
 import useENSName from 'hooks/useENSName';
-import { useUser } from 'hooks/useUser';
 
 const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
@@ -81,56 +80,67 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
           {ensName && <Typography variant='body2'>{getDisplayName(contributor)}</Typography>}
         </Box>
       </Box>
-      <Button
-        color='secondary'
-        size='small'
-        variant='outlined'
-        {...bindTrigger(popupState)}
-        endIcon={<KeyboardArrowDownIcon fontSize='small' />}
-      >
-        {contributor.role}
-      </Button>
-      {/* <Typography color='secondary' variant='body2' sx={{ px: 3 }} {...bindTrigger(popupState)}>
-        {contributor.role}
-      </Typography> */}
-      <Menu
-        {...bindMenu(popupState)}
-        PaperProps={{
-          sx: { width: 300 }
-        }}
-      >
-        {actions.map((action) => (
-          <MenuItem
-            key={action}
-            // selected={index === selectedIndex}
-            onClick={(event) => handleMenuItemClick(action)}
-          >
-            {action === 'makeAdmin' && (
-              <StyledListItemText
-                primary='Admin'
-                secondary='Can access all settings and invite new members to the workspace'
-              />
-            )}
-            {action === 'makeContributor' && (
-              <StyledListItemText
-                primary='Contributor'
-                secondary='Cannot change workspace settings or invite new members to the workspace'
-              />
-            )}
-            {action === 'removeFromSpace' && (
-              <StyledListItemText
-                primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
-                primary='Remove from team'
-              />
-            )}
-            {action === activeRoleAction && (
-              <ListItemIcon>
-                <CheckIcon fontSize='small' />
-              </ListItemIcon>
-            )}
-          </MenuItem>
-        ))}
-      </Menu>
+      <Box sx={{ width: 150 }}>
+        {actions.length > 0 ? (
+          <>
+            <Button
+              color='secondary'
+              size='small'
+              variant='outlined'
+              {...bindTrigger(popupState)}
+              endIcon={<KeyboardArrowDownIcon fontSize='small' />}
+            >
+              {contributor.role}
+            </Button>
+            {/* <Typography color='secondary' variant='body2' sx={{ px: 3 }} {...bindTrigger(popupState)}>
+            {contributor.role}
+          </Typography> */}
+            <Menu
+              {...bindMenu(popupState)}
+              PaperProps={{
+                sx: { width: 300 }
+              }}
+            >
+              {actions.map((action) => (
+                <MenuItem
+                  key={action}
+                // selected={index === selectedIndex}
+                  onClick={(event) => handleMenuItemClick(action)}
+                >
+                  {action === 'makeAdmin' && (
+                  <StyledListItemText
+                    primary='Admin'
+                    secondary='Can access all settings and invite new members to the workspace'
+                  />
+                  )}
+                  {action === 'makeContributor' && (
+                  <StyledListItemText
+                    primary='Contributor'
+                    secondary='Cannot change workspace settings or invite new members to the workspace'
+                  />
+                  )}
+                  {action === 'removeFromSpace' && (
+                  <StyledListItemText
+                    primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
+                    primary='Remove from team'
+                  />
+                  )}
+                  {action === activeRoleAction && (
+                  <ListItemIcon>
+                    <CheckIcon fontSize='small' />
+                  </ListItemIcon>
+                  )}
+                </MenuItem>
+              ))}
+            </Menu>
+          </>
+        )
+          : (
+            <Typography color='secondary'>
+              {contributor.role}
+            </Typography>
+          )}
+      </Box>
     </StyledRow>
   );
 }
