@@ -14,6 +14,7 @@ const Emoji = styled(Box)`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   width: 80px;
   height: 80px;
+  overflow: hidden;
 
   display: flex;
   align-items: center;
