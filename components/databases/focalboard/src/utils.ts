@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import {marked} from 'marked'
 import {IntlShape} from 'react-intl'
-import moment from 'moment'
+import { DateTime } from 'luxon'
 import { v4 as uuid } from 'uuid'
 
 import {Block} from './blocks/block'
@@ -291,7 +291,7 @@ class Utils {
     }
 
     static relativeDisplayDateTime(date: Date, intl: IntlShape): string {
-        return moment(date).locale(intl.locale.toLowerCase()).fromNow()
+        return DateTime.fromJSDate(date).setLocale(intl.locale.toLowerCase()).toRelativeCalendar() || ''
     }
 
     static sleep(miliseconds: number): Promise<void> {

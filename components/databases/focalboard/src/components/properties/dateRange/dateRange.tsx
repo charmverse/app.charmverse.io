@@ -6,7 +6,7 @@ import {DateUtils} from 'react-day-picker'
 import MomentLocaleUtils from 'react-day-picker/moment'
 import DayPicker from 'react-day-picker/DayPicker'
 
-import moment from 'moment'
+import { DateTime } from 'luxon'
 
 import Editable from '../../../widgets/editable'
 import SwitchOption from '../../../widgets/menu/switchOption'
@@ -49,7 +49,7 @@ export function createDatePropertyFromString(initialValue: string) : DatePropert
     return dateProperty
 }
 
-const loadedLocales: Record<string, moment.Locale> = {}
+const loadedLocales: Record<string, any> = {}
 
 function DateRange(props: Props): JSX.Element {
     const {className, value, showEmptyPlaceholder, onChange} = props
@@ -81,10 +81,6 @@ function DateRange(props: Props): JSX.Element {
     const isRange = dateTo !== undefined
 
     const locale = intl.locale.toLowerCase()
-    if (locale && locale !== 'en' && !loadedLocales[locale]) {
-        // eslint-disable-next-line global-require
-        loadedLocales[locale] = require(`moment/locale/${locale}`)
-    }
 
     const handleDayClick = (day: Date) => {
         const range : DateProperty = {}
@@ -177,7 +173,7 @@ function DateRange(props: Props): JSX.Element {
                             <div className={'inputContainer'}>
                                 <Editable
                                     value={fromInput}
-                                    placeholderText={moment.localeData(locale).longDateFormat('L')}
+                                    placeholderText={DateTime.local().setLocale(locale).toFormat('DD/MM/YYYY')}
                                     onFocus={() => {
                                         if (dateFrom) {
                                             return setFromInput(Utils.inputDate(dateFrom, intl))
@@ -186,7 +182,7 @@ function DateRange(props: Props): JSX.Element {
                                     }}
                                     onChange={setFromInput}
                                     onSave={() => {
-                                        const newDate = MomentLocaleUtils.parseDate(fromInput, 'L', intl.locale)
+                                        const newDate = DateTime.fromFormat(fromInput, 'DD/MM/YYYY', { locale: intl.locale }).toJSDate()
                                         if (newDate && DateUtils.isDate(newDate)) {
                                             newDate.setHours(12)
                                             const range : DateProperty = {
@@ -205,7 +201,7 @@ function DateRange(props: Props): JSX.Element {
                                 {dateTo &&
                                     <Editable
                                         value={toInput}
-                                        placeholderText={moment.localeData(locale).longDateFormat('L')}
+                                        placeholderText={DateTime.local().setLocale(locale).toFormat('DD/MM/YYYY')}
                                         onFocus={() => {
                                             if (dateTo) {
                                                 return setToInput(Utils.inputDate(dateTo, intl))
@@ -214,7 +210,7 @@ function DateRange(props: Props): JSX.Element {
                                         }}
                                         onChange={setToInput}
                                         onSave={() => {
-                                            const newDate = MomentLocaleUtils.parseDate(toInput, 'L', intl.locale)
+                                            const newDate = DateTime.fromFormat(fromInput, 'DD/MM/YYYY', { locale: intl.locale }).toJSDate()
                                             if (newDate && DateUtils.isDate(newDate)) {
                                                 newDate.setHours(12)
                                                 const range : DateProperty = {

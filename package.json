@@ -69,7 +69,6 @@
     "marked": "^4.0.12",
     "material-ui-popup-state": "^2.0.0",
     "millify": "^4.0.0",
-    "moment": "^2.29.1",
     "nanoevents": "^6.0.2",
     "next": "^12.0.10",
     "next-connect": "^0.11.1",
