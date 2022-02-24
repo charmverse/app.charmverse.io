@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardContent, Chip, Typography, Grid, CardActionArea } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
 import Button from '@mui/material/Button';
-import BountyModal from 'components/bounties_v2/BountyModal';
+import BountyModal from 'components/bounties/BountyModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useState } from 'react';
 import { BrandColors } from 'theme/colors';
