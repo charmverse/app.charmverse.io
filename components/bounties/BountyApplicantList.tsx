@@ -26,14 +26,6 @@ function createData (id: string, message: string, date: string) {
   return { id, message, date };
 }
 
-const rows = [
-  createData(v4(), 'I can do this', new Date().toISOString()),
-  createData(v4(), 'I can do this', new Date().toISOString()),
-  createData(v4(), 'I can do this', new Date().toISOString()),
-  createData(v4(), 'I can do this', new Date().toISOString()),
-  createData(v4(), 'I can do this', new Date().toISOString())
-];
-
 export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IBountyApplicantListProps) {
   const [user] = useUser();
   const [space] = useCurrentSpace();
@@ -100,7 +92,7 @@ export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IB
           <TableRow>
             <TableCell>
               <AutorenewIcon onClick={refreshApplications} />
-              Applicant ID
+              Applicant
             </TableCell>
             <TableCell>Message</TableCell>
             <TableCell>Date</TableCell>
