@@ -64,45 +64,9 @@ const EditorHeader = styled.div`
 export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Page>) => void }) {
   const { isEditing, setIsEditing } = usePages();
 
-  let pageControlTop = 0;
-
-  if (page.icon && !page.headerImage) {
-    pageControlTop = 50;
-  }
-
-  if (!page.icon && page.headerImage) {
-    pageControlTop = 10;
-  }
-
-  if (page.icon && page.headerImage) {
-    pageControlTop = 50;
-  }
-
-  let pageTitleTop = 50;
-  let bangleEditorTop = 75;
-  let pageIconTop = 50;
-
   let pageTop = 100;
   if (page.icon) {
     pageTop = 130;
-  }
-
-  if (page) {
-    if (page.icon && !page.headerImage) {
-      pageTitleTop = 100;
-      bangleEditorTop = 125;
-      pageIconTop = -75;
-    }
-
-    if (!page.icon && page.headerImage) {
-      pageTitleTop = 50;
-    }
-
-    if (page.icon && page.headerImage) {
-      pageTitleTop = 50;
-      bangleEditorTop = 125;
-      pageIconTop = -60;
-    }
   }
 
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {
@@ -137,7 +101,6 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
     <Box>
       <PageBanner page={page} setPage={setPage} />
       <Container top={pageTop}>
-
         <CharmEditor
           key={page.id}
           content={page.content as PageContent}
