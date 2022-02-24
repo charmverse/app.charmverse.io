@@ -17,15 +17,14 @@ import {
 } from '@bangle.dev/base-components';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
-import { BangleEditor as ReactBangleEditor, useEditorState, useEditorViewContext } from '@bangle.dev/react';
+import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
 import styled from '@emotion/styled';
-import { alpha, Box, useTheme } from '@mui/material';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { CSSProperties, ReactNode, useMemo } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
@@ -35,6 +34,7 @@ import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import IFrame, { iframeSpec } from './Iframe';
 import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
+import Placeholder from './Placeholder';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -108,27 +108,6 @@ const defaultContent: PageContent = {
 };
 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
-
-function PlaceHolder ({ top }: {top?: number}) {
-  const view = useEditorViewContext();
-  const docTextContent = view.state.doc.textContent as string;
-  const theme = useTheme();
-  const color = useMemo(() => alpha(theme.palette.text.secondary, 0.35), [theme]);
-  // Only show placeholder if the editor content is empty
-  return docTextContent.length === 0 ? (
-    <Box sx={{
-      // This weird calculation is required to place the placeholder on the same position as the editor
-      top: top ? top - 31 : 30,
-      position: 'relative',
-      color,
-      // Place it beneath the actual editor
-      zIndex: -20
-    }}
-    >
-      Type '/' for commands
-    </Box>
-  ) : null;
-}
 
 export default function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style }:
@@ -289,7 +268,7 @@ export default function CharmEditor (
       {EmojiSuggest}
       {InlinePalette}
       {children}
-      <PlaceHolder top={style?.top as number ?? 20} />
+      <Placeholder />
     </StyledReactBangleEditor>
   );
 }

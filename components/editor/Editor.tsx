@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
-import { ListItem, ListItemProps } from '@mui/material';
+import { ListItemButton, ListItemProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
@@ -12,34 +12,25 @@ import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
 
-const Container = styled(Box)`
+const Container = styled(Box)<{ top: number }>`
   width: 860px;
   max-width: 100%;
   margin: 0 auto 5px;
   padding: 0 20px 0 40px;
   position: relative;
+  top: ${({ top }) => top}px;
 `;
 
-const StyledListItem = styled(ListItem)`
+const PageControlItem = styled(ListItemButton)`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   opacity: 0.5;
   display: flex;
-  gap: 1;
   padding: ${({ theme }) => theme.spacing(0.75)};
   width: fit-content;
-` as React.FC<{ disableRipple: boolean, button: boolean, children: ReactNode }>;
-
-function PageControlItem (props: { children: ReactNode } & ListItemProps) {
-  const { children, ...rest } = props;
-  return (
-    <StyledListItem {...rest} disableRipple button>
-      {children}
-    </StyledListItem>
-  );
-}
+`;
 
 const Controls = styled(Box)`
-  margin-bottom: 4px;
+  position: relative;
   display: flex;
   gap: ${({ theme }) => theme.spacing(0.5)};
 `;
@@ -47,6 +38,28 @@ const Controls = styled(Box)`
 function randomIntFromInterval (min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
+
+const EditorHeader = styled.div`
+  position: absolute;
+  top: 0;
+  height: 0;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: visible;
+
+  .page-controls {
+    height: 36px;
+    opacity: 0;
+    display: flex;
+    gap: 1;
+  }
+
+  &:hover .page-controls {
+    opacity: 1
+  }
+`;
 
 export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Page>) => void }) {
   const { isEditing, setIsEditing } = usePages();
@@ -68,6 +81,11 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
   let pageTitleTop = 50;
   let bangleEditorTop = 75;
   let pageIconTop = 50;
+
+  let pageTop = 100;
+  if (page.icon) {
+    pageTop = 130;
+  }
 
   if (page) {
     if (page.icon && !page.headerImage) {
@@ -118,71 +136,48 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
   return (
     <Box>
       <PageBanner page={page} setPage={setPage} />
-      <Container>
-        <Controls sx={{
-          position: 'relative',
-          top: pageControlTop,
-          '&:hover .page-controls': {
-            opacity: 1
-          }
-        }}
-        >
-          <Box
-            className='page-controls'
-            sx={{
-              opacity: 0,
-              display: 'flex',
-              gap: 1
-            }}
-          >
-            {!page.icon && (
-              <PageControlItem onClick={addPageIcon}>
-                <EmojiEmotionsIcon
-                  fontSize='small'
-                  sx={{ marginRight: 1 }}
-                />
-                Add icon
-              </PageControlItem>
-            )}
-            {!page.headerImage && (
-              <PageControlItem onClick={addPageHeader}>
-                <ImageIcon
-                  fontSize='small'
-                  sx={{ marginRight: 1 }}
-                />
-                Add cover
-              </PageControlItem>
-            )}
-          </Box>
-        </Controls>
+      <Container top={pageTop}>
 
         <CharmEditor
           key={page.id}
-          style={{
-            top: bangleEditorTop
-          }}
           content={page.content as PageContent}
           onPageContentChange={updatePageContent}
         >
-          <>
+          <EditorHeader>
             {page?.icon && (
-              <EmojiContainer top={pageIconTop} updatePageIcon={updatePageIcon}>
-                <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-              </EmojiContainer>
+            <EmojiContainer updatePageIcon={updatePageIcon}>
+              <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+            </EmojiContainer>
             )}
-            {page && (
-            <Box sx={{
-              position: 'absolute',
-              top: pageTitleTop
-            }}
-            >
-              <PageTitle
-                value={page.title}
-                onChange={updateTitle}
-              />
-            </Box>
-            )}
-          </>
+            <Controls>
+              <Box
+                className='page-controls'
+              >
+                {!page.icon && (
+                <PageControlItem onClick={addPageIcon}>
+                  <EmojiEmotionsIcon
+                    fontSize='small'
+                    sx={{ marginRight: 1 }}
+                  />
+                  Add icon
+                </PageControlItem>
+                )}
+                {!page.headerImage && (
+                <PageControlItem onClick={addPageHeader}>
+                  <ImageIcon
+                    fontSize='small'
+                    sx={{ marginRight: 1 }}
+                  />
+                  Add cover
+                </PageControlItem>
+                )}
+              </Box>
+            </Controls>
+            <PageTitle
+              value={page.title}
+              onChange={updateTitle}
+            />
+          </EditorHeader>
         </CharmEditor>
       </Container>
     </Box>

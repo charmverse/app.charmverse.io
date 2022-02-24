@@ -11,10 +11,9 @@ const Emoji = styled(Box)`
   white-space: nowrap;
   user-select: none;
   cursor: pointer;
-  padding: ${({ theme }) => theme.spacing(1)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
 
   display: flex;
   align-items: center;
@@ -32,7 +31,7 @@ export default function EmojiCon ({ children, ...props }: ComponentProps<typeof 
 }
 
 export function EmojiContainer (
-  { updatePageIcon, top, children }: { updatePageIcon: (icon: string) => void, children: ReactNode, top: number }
+  { updatePageIcon, children }: { updatePageIcon: (icon: string) => void, children: ReactNode }
 ) {
   const view = useContext(EditorViewContext);
   const ref = useRef<HTMLDivElement>(null);
@@ -41,9 +40,7 @@ export function EmojiContainer (
     <Box
       sx={{
         width: 'fit-content',
-        display: 'flex',
-        position: 'absolute',
-        top
+        display: 'flex'
       }}
       ref={ref}
       onClick={() => {
