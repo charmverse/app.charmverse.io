@@ -14,7 +14,7 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
   const { bountyId } = req.query;
 
   if (bountyId === undefined) {
-    return res.status(406).send({ error: 'Please provide a valid bounty ID' } as any);
+    return res.status(400).send({ error: 'Please provide a valid bounty ID' } as any);
   }
 
   const ApplicationListQuery: Prisma.ApplicationFindManyArgs = {
@@ -36,7 +36,7 @@ async function createApplication (req: NextApiRequest, res: NextApiResponse<Appl
     delete ApplicationToCreate.createdBy;
   }
   else {
-    return res.status(406).json({ error: 'Please provide an applicant' } as any);
+    return res.status(400).json({ error: 'Please provide an applicant' } as any);
   }
 
   if (data.bountyId) {
@@ -44,7 +44,7 @@ async function createApplication (req: NextApiRequest, res: NextApiResponse<Appl
     delete ApplicationToCreate.bountyId;
   }
   else {
-    return res.status(406).json({ error: 'The proposal should be linked to a bounty' } as any);
+    return res.status(400).json({ error: 'The proposal should be linked to a bounty' } as any);
   }
 
   const proposal = await prisma.application.create({ data: ApplicationToCreate });

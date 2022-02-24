@@ -13,7 +13,7 @@ handler.use(requireUser)
   .use((req: NextApiRequest, res: NextApiResponse, next: Function) => {
     const bountyId = req.query.id;
     if (!bountyId) {
-      return res.status(406).send({ error: 'Please provide a valid bountyId' });
+      return res.status(400).send({ error: 'Please provide a valid bountyId' });
     }
     next();
   })
