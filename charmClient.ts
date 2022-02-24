@@ -1,8 +1,8 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, BountyStatus } from '@prisma/client';
 import * as http from 'adapters/http';
-import { Contributor, LoggedInUser } from 'models';
+import { Contributor, LoggedInUser, BountyWithApplications } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { getDisplayName } from 'lib/users';
@@ -247,9 +247,42 @@ class CharmClient {
     return data;
   }
 
-  async getBounty (bountyId: string): Promise<Bounty> {
+  async getBounty (bountyId: string): Promise<BountyWithApplications> {
 
-    const data = await http.GET<Bounty>(`/api/bounties/${bountyId}`);
+    const data = await http.GET<BountyWithApplications>(`/api/bounties/${bountyId}`);
+
+    return data;
+  }
+
+  async assignBounty (bountyId: string, assignee: string): Promise<BountyWithApplications> {
+
+    const data = await http.PUT<BountyWithApplications>(`/api/bounties/${bountyId}`, {
+      assignee,
+      status: 'assigned'
+    });
+
+    return data;
+  }
+
+  async changeBountyStatus (bountyId: string, newStatus: BountyStatus): Promise<BountyWithApplications> {
+
+    const data = await http.PUT<BountyWithApplications>(`/api/bounties/${bountyId}`, {
+      status: newStatus
+    });
+
+    return data;
+  }
+
+  async createApplication (proposal: Application): Promise<Application> {
+
+    const data = await http.POST<Application>('/api/applications', proposal);
+
+    return data;
+  }
+
+  async listApplications (bountyId: string): Promise<Application []> {
+
+    const data = await http.GET<Application []>('/api/applications', { bountyId });
 
     return data;
   }
