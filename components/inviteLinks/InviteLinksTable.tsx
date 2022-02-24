@@ -11,6 +11,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Close';
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
+import LinkIcon from '@mui/icons-material/Link';
 import { getDisplayName } from 'lib/users';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
@@ -70,12 +71,12 @@ export default function InvitesTable (props: Props) {
               <Tooltip
                 arrow
                 placement='top'
-                title={copied[row.id] ? 'Copied' : 'Click to copy link'}
+                title={copied[row.id] ? 'Copied!' : 'Click to copy link'}
                 disableInteractive
               >
                 <Box component='span' pr={1}>
                   <CopyToClipboard text={getInviteLink(row.code)} onCopy={() => onCopy(row.id)}>
-                    <Chip clickable color='secondary' size='small' variant='outlined' label='Share' />
+                    <Chip sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label={copied[row.id] ? 'Copied!' : 'Share'} />
                   </CopyToClipboard>
                 </Box>
               </Tooltip>
