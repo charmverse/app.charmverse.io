@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
-import { alpha, Box, useTheme } from '@mui/material';
 import { useEditorViewContext } from '@bangle.dev/react';
+import { alpha, Box, useTheme } from '@mui/material';
+import { useMemo } from 'react';
 
 export default function PlaceHolder () {
   const view = useEditorViewContext();
@@ -9,7 +9,7 @@ export default function PlaceHolder () {
   // @ts-ignore missing types from the @bangle.dev/react package
   const docContent: { content: { size: number } }[] = view.state.doc.content.content;
   const isEmpty = docContent.length <= 1
-    && (!docContent[0] || docContent[0].content.size === 0);
+  && (!docContent[0] || docContent[0].content.size === 0);
   // Only show placeholder if the editor content is empty
   return isEmpty ? (
     <Box sx={{

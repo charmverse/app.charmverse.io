@@ -18,7 +18,7 @@ import {
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
 import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
-import { table, tableCell, tableHeader, tablePlugins, tableRow } from '@bangle.dev/table';
+import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import styled from '@emotion/styled';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
@@ -182,7 +182,7 @@ export default function CharmEditor (
         name: 'iframe',
         containerDOM: ['div', { class: 'iframe-container' }]
       })
-      // TODO: Pasting iframe or image link shouldn't create those blocks. Maybe in the future we might allow this behavior and adjust it to that of Notion's
+      // TODO: Pasting iframe or image link shouldn't create those blocks for now
       // iframePlugin,
       // pasteImagePlugin
     ],

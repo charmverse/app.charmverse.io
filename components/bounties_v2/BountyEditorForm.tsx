@@ -8,12 +8,13 @@ import { Bounty, Bounty as IBounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor';
+import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/editor/CharmEditor';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import { PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
-import { useForm } from 'react-hook-form';
+import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
 export type FormMode = 'create' | 'update';
@@ -35,6 +36,25 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
+// This component was created to localize the state change of CharmEditor
+// Otherwise watching inside its parent would've caused the whole component tree to rerender
+function FormDescription ({ onPageContentChange, content, watch }:
+  {content?: PageContent, onPageContentChange: UpdatePageContent, watch: UseFormWatch<FormValues>}) {
+  watch(['description', 'descriptionNodes']);
+
+  return (
+    <Grid item>
+      <InputLabel>
+        Description
+      </InputLabel>
+      <CharmEditor
+        content={content}
+        onPageContentChange={onPageContentChange}
+      />
+    </Grid>
+  );
+}
+
 export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
   const { setBounties, bounties } = useBounties();
 
@@ -42,6 +62,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isValid, isSubmitting }
   } = useForm<FormValues>({
     mode: 'onBlur',
@@ -56,7 +77,6 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     if (mode === 'create') {
       value.spaceId = space!.id;
       value.createdBy = user!.id;
-      // TODO: Should we allow empty description?
       value.description = value.description ?? '';
       const createdBounty = await charmClient.createBounty(value);
       setBounties([...bounties, createdBounty]);
@@ -98,15 +118,13 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
           </Grid>
 
-          <Grid item>
-            <InputLabel>
-              Description
-            </InputLabel>
-            <CharmEditor
-              content={bounty?.descriptionNodes as any}
-              onPageContentChange={pageContent => setRichContent(pageContent)}
-            />
-          </Grid>
+          <FormDescription
+            watch={watch}
+            content={bounty?.descriptionNodes as PageContent}
+            onPageContentChange={(pageContent) => {
+              setRichContent(pageContent);
+            }}
+          />
 
           <Grid item>
             <InputLabel>
