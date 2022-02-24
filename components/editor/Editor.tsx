@@ -26,7 +26,7 @@ const PageControlItem = styled(ListItemButton)`
   opacity: 0.5;
   display: flex;
   padding: 0 ${({ theme }) => theme.spacing(0.75)};
-  width: fit-content;
+  flex-grow: 0;
 `;
 
 const Controls = styled(Box)`
