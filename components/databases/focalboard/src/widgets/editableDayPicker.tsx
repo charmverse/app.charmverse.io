@@ -15,7 +15,7 @@ type Props = {
     onChange: (value: string | undefined) => void
 }
 
-const loadedLocales: Record<string, moment.Locale> = {}
+const loadedLocales: Record<string, string> = {}
 
 const updateLocales = (locale: string) => {
     if (locale && locale !== 'en' && !loadedLocales[locale]) {
