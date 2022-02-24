@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { BountyList } from 'components/bounties_v2/BountyList';
+import { BountyList } from 'components/bounties/BountyList';
 import { PageLayout } from 'components/common/page-layout';
 import { setTitle } from 'hooks/usePageTitle';
 import { ReactElement } from 'react';
