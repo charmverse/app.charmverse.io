@@ -8,7 +8,6 @@ export default function PlaceHolder () {
   const color = useMemo(() => alpha(theme.palette.text.secondary, 0.35), [theme]);
   // @ts-ignore missing types from the @bangle.dev/react package
   const docContent: { content: { size: number } }[] = view.state.doc.content.content;
-  console.log(docContent);
   const isEmpty = docContent.length <= 1
     && (!docContent[0] || docContent[0].content.size === 0);
   // Only show placeholder if the editor content is empty
