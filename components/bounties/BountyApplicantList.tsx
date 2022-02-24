@@ -108,7 +108,7 @@ export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IB
               <TableCell size='small'>
                 {application.createdBy}
               </TableCell>
-              <TableCell>{application.message}</TableCell>
+              <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
               <TableCell>{application.createdAt}</TableCell>
               <TableCell>
                 {
