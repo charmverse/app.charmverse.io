@@ -14,6 +14,7 @@ import Avatar from 'components/common/Avatar';
 import { Contributor } from 'models';
 import getDisplayName from 'lib/users/getDisplayName';
 import useENSName from 'hooks/useENSName';
+import { useUser } from 'hooks/useUser';
 
 const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
@@ -36,12 +37,17 @@ function StyledListItemText (props: any) {
   );
 }
 
-const roleActions = ['makeAdmin', 'makeContributor', 'removeUser'] as const;
+const roleActions = ['makeAdmin', 'makeContributor', 'removeFromSpace'] as const;
 export type RoleAction = typeof roleActions[number];
 
-type Props = { contributor: Contributor, onChange: (action: RoleAction, contributor: Contributor) => void };
+interface Props {
+  contributor: Contributor;
+  isAdmin?: boolean;
+  isSpaceOwner?: boolean;
+  onChange: (action: RoleAction, contributor: Contributor) => void;
+}
 
-export default function ContributorRow ({ contributor, onChange }: Props) {
+export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, onChange }: Props) {
   const ensName = useENSName(contributor.addresses[0]);
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
 
@@ -49,6 +55,22 @@ export default function ContributorRow ({ contributor, onChange }: Props) {
     onChange(action, contributor);
     popupState.close();
   }
+
+  const actions = roleActions.filter(action => {
+    switch (action) {
+      case 'makeAdmin':
+        return isAdmin;
+      case 'makeContributor':
+        return isAdmin;
+      case 'removeFromSpace': {
+        return isAdmin && !isSpaceOwner;
+      }
+      default:
+        return false;
+    }
+  });
+
+  const activeRoleAction = (contributor.role === 'admin') ? 'makeAdmin' : 'makeContributor';
 
   return (
     <StyledRow pb={2} mb={2}>
@@ -77,7 +99,7 @@ export default function ContributorRow ({ contributor, onChange }: Props) {
           sx: { width: 300 }
         }}
       >
-        {roleActions.map((action) => (
+        {actions.map((action) => (
           <MenuItem
             key={action}
             // selected={index === selectedIndex}
@@ -91,18 +113,17 @@ export default function ContributorRow ({ contributor, onChange }: Props) {
             )}
             {action === 'makeContributor' && (
               <StyledListItemText
-                primary='Member'
+                primary='Contributor'
                 secondary='Cannot change workspace settings or invite new members to the workspace'
               />
             )}
-            {action === 'removeUser' && (
+            {action === 'removeFromSpace' && (
               <StyledListItemText
                 primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
                 primary='Remove from team'
               />
             )}
-            {((action === 'makeAdmin' && contributor.role === 'admin')
-            || (action === 'makeContributor' && contributor.role === 'contributor')) && (
+            {action === activeRoleAction && (
               <ListItemIcon>
                 <CheckIcon fontSize='small' />
               </ListItemIcon>

@@ -40,10 +40,6 @@ class CharmClient {
     });
   }
 
-  getContributors (spaceId: string) {
-    return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
-  }
-
   async createSpace (spaceOpts: Prisma.SpaceCreateInput) {
     const space = await http.POST<Space>('/api/spaces', spaceOpts);
     return space;
@@ -63,6 +59,18 @@ class CharmClient {
 
   checkDomain (params: { spaceId?: string, domain: string }) {
     return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
+  }
+
+  getContributors (spaceId: string) {
+    return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
+  }
+
+  updateContributor ({ spaceId, userId, role }: { spaceId: string, userId: string, role: string }) {
+    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { role });
+  }
+
+  removeContributor ({ spaceId, userId }: { spaceId: string, userId: string }) {
+    return http.DELETE<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`);
   }
 
   getPages (spaceId: string) {
