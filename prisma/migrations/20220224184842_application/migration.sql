@@ -17,7 +17,7 @@ CREATE TABLE "Application" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "bountyId" UUID NOT NULL,
-    "applicantId" UUID NOT NULL,
+    "createdBy" UUID NOT NULL,
     "walletAddress" TEXT NOT NULL,
     "message" TEXT NOT NULL,
 
@@ -25,7 +25,7 @@ CREATE TABLE "Application" (
 );
 
 -- AddForeignKey
-ALTER TABLE "Application" ADD CONSTRAINT "Application_applicantId_fkey" FOREIGN KEY ("applicantId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Application" ADD CONSTRAINT "Application_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Application" ADD CONSTRAINT "Application_bountyId_fkey" FOREIGN KEY ("bountyId") REFERENCES "Bounty"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

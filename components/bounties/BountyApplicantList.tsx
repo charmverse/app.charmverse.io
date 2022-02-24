@@ -82,7 +82,7 @@ export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IB
   function displayAssignmentButton (application: Application) {
     return (
       isAdmin === true
-      && application.applicantId !== bounty.assignee
+      && application.createdBy !== bounty.assignee
       // We don't want to reassign a bounty after the work is complete
       && ['complete', 'paid'].indexOf(bounty.status) === -1);
   }
@@ -114,7 +114,7 @@ export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IB
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell size='small'>
-                {application.applicantId}
+                {application.createdBy}
               </TableCell>
               <TableCell>{application.message}</TableCell>
               <TableCell>{application.createdAt}</TableCell>
@@ -122,7 +122,7 @@ export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IB
                 {
                   displayAssignmentButton(application) === true && (
                     <Button onClick={() => {
-                      assignBounty(application.applicantId);
+                      assignBounty(application.createdBy);
                     }}
                     >
                       Assign
@@ -130,7 +130,7 @@ export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IB
                   )
                 }
                 {
-                  bounty.assignee === application.applicantId && (
+                  bounty.assignee === application.createdBy && (
                     <Chip label='Assigned' color={BountyStatusColours.assigned} />
                   )
                 }

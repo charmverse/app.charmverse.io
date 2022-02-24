@@ -180,8 +180,8 @@ model Application {
   updatedAt        DateTime     @default(now())
   bountyId         String       @db.Uuid()
   bounty           Bounty       @relation(fields: [bountyId], references: [id])
-  applicantId      String       @db.Uuid()
-  applicant        User         @relation(fields: [applicantId], references: [id])
+  createdBy        String       @db.Uuid()
+  applicant        User         @relation(fields: [createdBy], references: [id])
   walletAddress    String
   message          String
 }

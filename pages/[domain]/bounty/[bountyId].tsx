@@ -52,7 +52,7 @@ export default function BountyDetails () {
       setIsReviewer(userIsReviewer);
 
       const userHasApplied = bounty.applications.findIndex(application => {
-        return application.applicantId === user.id;
+        return application.createdBy === user.id;
       }) > -1;
 
       setIsApplicant(userHasApplied);
@@ -70,7 +70,7 @@ export default function BountyDetails () {
   const router = useRouter();
 
   const walletAddressForPayment = bounty?.applications?.find(app => {
-    return app.applicantId === bounty.assignee;
+    return app.createdBy === bounty.assignee;
   })?.walletAddress;
 
   async function loadBounty () {

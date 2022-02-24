@@ -51,7 +51,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
 
   async function submitted (proposalToSave: Application) {
     if (mode === 'create') {
-      proposalToSave.applicantId = user!.id;
+      proposalToSave.createdBy = user!.id;
       proposalToSave.bountyId = bountyId;
       const createdApplication = await charmClient.createApplication(proposalToSave);
       onSubmit(createdApplication);

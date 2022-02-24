@@ -31,9 +31,9 @@ async function createApplication (req: NextApiRequest, res: NextApiResponse<Appl
   const data = req.body as Application;
   const ApplicationToCreate = { ...data } as any;
 
-  if (data.applicantId) {
-    (ApplicationToCreate as Prisma.ApplicationCreateInput).applicant = { connect: { id: data.applicantId } };
-    delete ApplicationToCreate.applicantId;
+  if (data.createdBy) {
+    (ApplicationToCreate as Prisma.ApplicationCreateInput).applicant = { connect: { id: data.createdBy } };
+    delete ApplicationToCreate.createdBy;
   }
   else {
     return res.status(406).json({ error: 'Please provide an applicant' } as any);
