@@ -71,6 +71,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
               {...register('message')}
               placeholder={applicationExample}
               multiline
+              variant='outlined'
               type='text'
               fullWidth
             />
@@ -88,7 +89,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
             <InputLabel>
               Address to get paid for this bounty
             </InputLabel>
-            <Input
+            <TextField
               {...register('walletAddress')}
               defaultValue={walletAddress}
               type='text'
