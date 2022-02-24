@@ -17,6 +17,8 @@ import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useState, useRef, useCallback } from 'react';
 import { BountyApplicantList } from 'components/bounties/BountyApplicantList';
 import { ApplicationEditorForm } from 'components/bounties/ApplicationEditorForm';
+import BountyPaymentButton from 'components/bounties/BountyPaymentButton';
+
 import { Modal } from 'components/common/Modal';
 import { BountyWithApplications } from 'models';
 
@@ -240,10 +242,12 @@ export default function BountyDetails () {
           {
             (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
               <Box>
-                Wallet address
-                {' '}
-                {walletAddressForPayment}
-                <Button onClick={markAsPaid}>Mark as paid</Button>
+                <BountyPaymentButton
+                  receiver={walletAddressForPayment!}
+                  amount={bounty.rewardAmount.toString()}
+                  tokenSymbol='ETH'
+
+                />
               </Box>
             )
           }

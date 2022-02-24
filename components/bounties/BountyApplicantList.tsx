@@ -16,7 +16,7 @@ import { useUser } from 'hooks/useUser';
 import { useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 import { BountyStatusColours } from 'components/bounties/BountyCard';
-import { humanFriendlyDate } from 'lib/dates';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
 export interface IBountyApplicantListProps {
   bounty: Bounty,
