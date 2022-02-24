@@ -1,13 +1,13 @@
 import styled from '@emotion/styled';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
-import { ListItemButton, ListItemProps } from '@mui/material';
+import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
-import React, { ChangeEvent, ReactNode } from 'react';
+import { ChangeEvent } from 'react';
 import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
@@ -117,9 +117,15 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
         >
           <EditorHeader>
             {page?.icon && (
-            <EmojiContainer updatePageIcon={updatePageIcon}>
-              <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-            </EmojiContainer>
+              <Box sx={{
+                // Moving the icon a bit upwards if the page banner is not present, otherwise the Add cover button and the icon overlaps
+                top: !page.headerImage ? -15 : 0, position: 'relative'
+              }}
+              >
+                <EmojiContainer updatePageIcon={updatePageIcon}>
+                  <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+                </EmojiContainer>
+              </Box>
             )}
             <Controls className='page-controls'>
               {!page.icon && (
