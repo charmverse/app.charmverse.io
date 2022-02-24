@@ -13,7 +13,7 @@ export default function PlaceHolder () {
   // Only show placeholder if the editor content is empty
   return isEmpty ? (
     <Box sx={{
-      top: '-2.1em',
+      top: '-2em',
       position: 'relative',
       color,
       // Place it beneath the actual editor
