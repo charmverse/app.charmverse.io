@@ -1,23 +1,24 @@
-import { useState, useRef, useEffect } from 'react';
-import { Application } from '@prisma/client';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import { v4 } from 'uuid';
-import { useUser } from 'hooks/useUser';
+import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useUser } from 'hooks/useUser';
+import { useEffect, useRef, useState } from 'react';
+import { v4 } from 'uuid';
 
 export interface IBountyApplicantListProps {
-  bountyId: string
+  bounty: Bounty,
+  bountyReassigned?: () => any
 }
 
 function createData (id: string, message: string, date: string) {
@@ -32,8 +33,12 @@ const rows = [
   createData(v4(), 'I can do this', new Date().toISOString())
 ];
 
-export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
+export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IBountyApplicantListProps) {
   const [user] = useUser();
+  const [space] = useCurrentSpace();
+
+  const [isAdmin, setIsAdmin] = useState(false);
+
   const [applications, setApplications] = useState([] as Application []);
   const loading = useRef(true);
 
@@ -41,11 +46,20 @@ export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
     refreshApplications();
   }, []);
 
-  const viewerCanAssignBounty: boolean = true;
+  useEffect(() => {
+    if (user && space) {
+      const adminRoleFound = user.spaceRoles.findIndex(spaceRole => {
+        return spaceRole.spaceId === space.id && spaceRole.role === 'admin';
+      }) > -1;
+
+      setIsAdmin(adminRoleFound);
+
+    }
+  }, [user, space]);
 
   async function refreshApplications () {
     loading.current = true;
-    const applicationList = await charmClient.listApplications(bountyId);
+    const applicationList = await charmClient.listApplications(bounty.id);
     loading.current = false;
     setApplications(applicationList);
   }
@@ -59,13 +73,26 @@ export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
     );
   }
 
+  async function assignBounty (assignee: string) {
+    const updatedBounty = charmClient.assignBounty(bounty.id, assignee);
+    bountyReassigned();
+  }
+
+  function displayAssignmentButton (application: Application) {
+    return (
+      isAdmin === true
+      && application.applicantId !== bounty.assignee
+      // We don't want to reassign a bounty after the work is complete
+      && ['complete', 'paid'].indexOf(bounty.status) === -1);
+  }
+
   const applicationsMade = applications.length;
 
   // Set min height large enough
   const minHeight = applicationsMade === 0 ? undefined : Math.min(300, (100 * applicationsMade));
 
   return (
-    <Box component='div' sx={{ minHeight: `${minHeight}px`, marginBottom: '15px', maxHeight: '50vh', overflowY: 'auto' }}>
+    <Box component='div' sx={{ minHeight: `${minHeight}px`, marginBottom: '15px', maxHeight: '70vh', overflowY: 'auto' }}>
 
       <Table stickyHeader={true} sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
         <TableHead>
@@ -76,11 +103,7 @@ export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
             </TableCell>
             <TableCell>Message</TableCell>
             <TableCell>Date</TableCell>
-            {
-                viewerCanAssignBounty === true && (
-                  <TableCell>Assign</TableCell>
-                )
-              }
+            <TableCell></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -94,14 +117,24 @@ export function BountyApplicantList ({ bountyId }: IBountyApplicantListProps) {
               </TableCell>
               <TableCell>{application.message}</TableCell>
               <TableCell>{application.createdAt}</TableCell>
-              {
-                viewerCanAssignBounty === true && (
-                  <TableCell>
-                    <Button>Assign</Button>
-                    {' '}
-                  </TableCell>
-                )
+              <TableCell>
+                {
+                  displayAssignmentButton(application) === true && (
+                    <Button onClick={() => {
+                      assignBounty(application.applicantId);
+                    }}
+                    >
+                      Assign
+                    </Button>
+                  )
                 }
+                {
+                  bounty.assignee === application.applicantId && (
+                    <Chip label='Assigned' color='green' />
+                  )
+                }
+              </TableCell>
+
             </TableRow>
           ))}
         </TableBody>

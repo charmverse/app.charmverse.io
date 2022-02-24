@@ -18,6 +18,7 @@ import { ReactElement, useEffect, useState, useRef, useCallback } from 'react';
 import { BountyApplicantList } from 'components/bounties_v2/BountyApplicantList';
 import { ApplicationEditorForm } from 'components/bounties_v2/ApplicationEditorForm';
 import { Modal } from 'components/common/Modal';
+import { BountyWithApplications } from 'models';
 
 type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 
@@ -27,11 +28,12 @@ export default function BountyDetails () {
 
   const [user] = useUser();
 
-  const [bounty, setBounty] = useState(null as any as Bounty);
+  const [bounty, setBounty] = useState(null as any as BountyWithApplications);
   const [showBountyEditDialog, setShowBountyEditDialog] = useState(false);
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
 
   const [isApplicant, setIsApplicant] = useState(true);
+  const [isAssignee, setIsAssignee] = useState(true);
   const [isReviewer, setIsReviewer] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -47,7 +49,16 @@ export default function BountyDetails () {
       setIsAdmin(adminRoleFound);
 
       const userIsReviewer = bounty.reviewer === user.id;
-      setIsReviewer(true);
+      setIsReviewer(userIsReviewer);
+
+      const userHasApplied = bounty.applications.findIndex(application => {
+        return application.applicantId === user.id;
+      }) > -1;
+
+      setIsApplicant(userHasApplied);
+
+      const userIsAssignee = bounty.assignee === user.id;
+      setIsAssignee(userIsAssignee);
     }
   }, [user, bounty, space]);
 
@@ -57,6 +68,10 @@ export default function BountyDetails () {
   const viewerCanModifyBounty: boolean = isAdmin === true;
 
   const router = useRouter();
+
+  const walletAddressForPayment = bounty?.applications?.find(app => {
+    return app.applicantId === bounty.assignee;
+  })?.walletAddress;
 
   async function loadBounty () {
     const { bountyId } = router.query;
@@ -71,12 +86,31 @@ export default function BountyDetails () {
 
   function applicationSubmitted () {
     toggleApplicationDialog();
-    // Force a refresh (and reload of children)
-    setBounty({ ...bounty });
+    loadBounty();
   }
 
   function toggleApplicationDialog () {
     setShowApplicationDialog(!showApplicationDialog);
+  }
+
+  async function requestReview () {
+    const updatedBounty = await charmClient.changeBountyStatus(bounty.id, 'review');
+    setBounty(updatedBounty);
+  }
+
+  async function moveToAssigned () {
+    const updatedBounty = await charmClient.changeBountyStatus(bounty.id, 'assigned');
+    setBounty(updatedBounty);
+  }
+
+  async function markAsComplete () {
+    const updatedBounty = await charmClient.changeBountyStatus(bounty.id, 'complete');
+    setBounty(updatedBounty);
+  }
+
+  async function markAsPaid () {
+    const updatedBounty = await charmClient.changeBountyStatus(bounty.id, 'paid');
+    setBounty(updatedBounty);
   }
 
   //  charmClient.getBounty();
@@ -127,13 +161,21 @@ export default function BountyDetails () {
         <Grid item xs={6}>
           <Typography variant='h5'>Reviewer</Typography>
 
-          <Box component='p' sx={{ display: 'flex' }}>
+          <Box component='div' sx={{ display: 'flex' }}>
 
             <Avatar></Avatar>
             <Box component='span' px={1}>
               {
               isReviewer === true && (
-                <>You</>
+                <>
+                  You
+                  { bounty.status === 'review' && (
+                  <Box>
+                    <Button onClick={markAsComplete}>Mark as complete</Button>
+                    <Button onClick={moveToAssigned}>Reopen task</Button>
+                  </Box>
+                  )}
+                </>
               )
               }
               {
@@ -149,12 +191,59 @@ export default function BountyDetails () {
         <Grid item xs={6}>
           <Typography variant='h5'>Assignee</Typography>
 
+          <Box component='div' display='flex'>
+            {
+
+              isAssignee === true && (
+                <>
+                  <Avatar></Avatar>
+                  <Box component='span' px={1}>
+
+                    {' '}
+                    you
+
+                    { bounty.status === 'assigned' && (<Button onClick={requestReview}>Request review</Button>)}
+                  </Box>
+                </>
+              )
+            }
+            {
+
+              (isAssignee === false && bounty.assignee) && (
+
+                <p>{bounty.assignee}</p>
+              )
+            }
+            {
+
+              (isApplicant === true && isAssignee === false) && (
+
+                <p>You've applied to this bounty.</p>
+              )
+              }
+            {
+
+              (isAssignee === false && !bounty.assignee) && (
+
+                <p>This bounty is awaiting assignment</p>
+              )
+            }
+          </Box>
           {
-            // eslint-disable-next-line eqeqeq
-            bounty.assignee == undefined && (
+            isApplicant === false && (
               <Box>
-                <p>Open to proposals</p>
                 <Button onClick={toggleApplicationDialog}>Apply now</Button>
+              </Box>
+            )
+          }
+
+          {
+            (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
+              <Box>
+                Wallet address
+                {' '}
+                {walletAddressForPayment}
+                <Button onClick={markAsPaid}>Mark as paid</Button>
               </Box>
             )
           }
@@ -162,9 +251,10 @@ export default function BountyDetails () {
         </Grid>
       </Grid>
 
-      <BountyApplicantList bountyId={bounty.id} />
+      {
+        bounty && (<BountyApplicantList bounty={bounty} bountyReassigned={loadBounty} />)
+      }
 
-      <p>Some text</p>
     </>
   );
 }
