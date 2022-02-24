@@ -284,6 +284,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
       defaultProps: {
         underline: 'none'
       }
+    },
+    MuiMenuItem: {
+      defaultProps: {
+        disableRipple: true
+      }
     }
   }
 });
