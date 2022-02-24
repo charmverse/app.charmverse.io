@@ -16,6 +16,7 @@ import { useUser } from 'hooks/useUser';
 import { useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 import { BountyStatusColours } from 'components/bounties/BountyCard';
+import { humanFriendlyDate } from 'lib/dates';
 
 export interface IBountyApplicantListProps {
   bounty: Bounty,
@@ -109,7 +110,7 @@ export function BountyApplicantList ({ bounty, bountyReassigned = () => {} }: IB
                 {application.createdBy}
               </TableCell>
               <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
-              <TableCell>{application.createdAt}</TableCell>
+              <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
               <TableCell>
                 {
                   displayAssignmentButton(application) === true && (
