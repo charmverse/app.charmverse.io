@@ -12,18 +12,50 @@ import { PageLayout } from 'components/common/page-layout';
 import BountyModal from 'components/bounties_v2/BountyModal';
 import CharmEditor from 'components/editor/CharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState, useRef, useCallback } from 'react';
 import { BountyApplicantList } from 'components/bounties_v2/BountyApplicantList';
 import { ApplicationEditorForm } from 'components/bounties_v2/ApplicationEditorForm';
 import { Modal } from 'components/common/Modal';
 
+type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
+
 export default function BountyDetails () {
 
   const [space] = useCurrentSpace();
+
+  const [user] = useUser();
+
   const [bounty, setBounty] = useState(null as any as Bounty);
   const [showBountyEditDialog, setShowBountyEditDialog] = useState(false);
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
+
+  const [isApplicant, setIsApplicant] = useState(true);
+  const [isReviewer, setIsReviewer] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    loadBounty();
+  }, []);
+
+  useEffect(() => {
+    if (user && bounty && space) {
+      const adminRoleFound = user.spaceRoles.findIndex(spaceRole => {
+        return spaceRole.spaceId === space!.id && spaceRole.role === 'admin';
+      }) > -1;
+      setIsAdmin(adminRoleFound);
+
+      const userIsReviewer = bounty.reviewer === user.id;
+      setIsReviewer(true);
+    }
+  }, [user, bounty, space]);
+
+  // Infer if the user is an admin or not
+
+  // For now, admins can do all actions. We will refine this model later on
+  const viewerCanModifyBounty: boolean = isAdmin === true;
+
   const router = useRouter();
 
   async function loadBounty () {
@@ -33,18 +65,19 @@ export default function BountyDetails () {
   }
 
   function toggleBountyEditDialog () {
+
     setShowBountyEditDialog(!showBountyEditDialog);
+  }
+
+  function applicationSubmitted () {
+    toggleApplicationDialog();
+    // Force a refresh (and reload of children)
+    setBounty({ ...bounty });
   }
 
   function toggleApplicationDialog () {
     setShowApplicationDialog(!showApplicationDialog);
   }
-
-  useEffect(() => {
-    loadBounty();
-  }, []);
-
-  const viewerCanModifyBounty: boolean = true;
 
   //  charmClient.getBounty();
 
@@ -62,7 +95,7 @@ export default function BountyDetails () {
       <BountyModal onSubmit={loadBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
 
       <Modal open={showApplicationDialog} onClose={toggleApplicationDialog}>
-        <ApplicationEditorForm bountyId={bounty.id} onSubmit={toggleApplicationDialog}></ApplicationEditorForm>
+        <ApplicationEditorForm bountyId={bounty.id} onSubmit={applicationSubmitted}></ApplicationEditorForm>
       </Modal>
 
       <Grid container direction='column' justifyContent='space-between'>
@@ -74,7 +107,6 @@ export default function BountyDetails () {
             {
               viewerCanModifyBounty === true && (
                 <EditIcon fontSize='small' onClick={toggleBountyEditDialog} />
-
               )
             }
           </Typography>
@@ -95,9 +127,21 @@ export default function BountyDetails () {
         <Grid item xs={6}>
           <Typography variant='h5'>Reviewer</Typography>
 
-          <Box sx={{ display: 'flex' }}>
+          <Box component='p' sx={{ display: 'flex' }}>
+
             <Avatar></Avatar>
-            {bounty.reviewer}
+            <Box component='span' px={1}>
+              {
+              isReviewer === true && (
+                <>You</>
+              )
+              }
+              {
+              isReviewer !== true && (
+                bounty.reviewer
+              )
+            }
+            </Box>
           </Box>
 
         </Grid>
@@ -119,6 +163,8 @@ export default function BountyDetails () {
       </Grid>
 
       <BountyApplicantList bountyId={bounty.id} />
+
+      <p>Some text</p>
     </>
   );
 }
