@@ -109,8 +109,8 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     setValue('description', content.rawText);
   }
 
-  function setReviewer (walletAddress: string) {
-    setValue('reviewer', walletAddress);
+  function setReviewer (userId: string) {
+    setValue('reviewer', userId);
   }
 
   return (
