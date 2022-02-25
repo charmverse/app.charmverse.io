@@ -61,7 +61,6 @@ const EditorHeader = styled.div`
 `;
 
 export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Page>) => void }) {
-  const { isEditing, setIsEditing } = usePages();
 
   let pageTop = 200;
   if (page.icon) {
@@ -97,12 +96,6 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
   }
 
   function updatePageContent (content: ICharmEditorOutput) {
-    if (!isEditing) {
-      setIsEditing(true);
-      setTimeout(() => {
-        setIsEditing(false);
-      }, 1500);
-    }
     setPage({ content: content.doc, contentText: content.rawText });
   }
 

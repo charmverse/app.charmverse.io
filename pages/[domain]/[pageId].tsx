@@ -8,10 +8,13 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect } from 'react';
+import debouncePromise from 'lib/utilities/debouncePromise';
+
+const debouncedPageUpdate = debouncePromise(charmClient.updatePage, 500);
 
 export default function BlocksEditorPage () {
 
-  const { currentPage, pages, setPages, setCurrentPage } = usePages();
+  const { currentPage, setIsEditing, pages, setPages, setCurrentPage } = usePages();
   const router = useRouter();
   const { pageId } = router.query;
   const [, setTitleState] = usePageTitle();
@@ -22,7 +25,14 @@ export default function BlocksEditorPage () {
     if (updates.title) {
       setTitleState(updates.title);
     }
-    await charmClient.updatePage({ id: currentPage!.id, ...updates } as Prisma.PageUpdateInput);
+
+    setIsEditing(true);
+    debouncedPageUpdate({ id: currentPage!.id, ...updates } as Prisma.PageUpdateInput)
+      .catch((err: any) => {
+        console.error('Error saving page', err);
+      }).finally(() => {
+        setIsEditing(false);
+      });
   }
 
   useEffect(() => {
