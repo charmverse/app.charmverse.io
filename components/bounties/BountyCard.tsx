@@ -20,17 +20,9 @@ export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
 };
 
 export function BountyCard ({ bounty }: IBountyInput) {
-  const theme = useTheme();
-  const [editBounty, setDisplayBountyDialog] = useState(false);
   const [space] = useCurrentSpace();
-
-  const bountyColor = theme.palette[BountyStatusColours[bounty.status]].main;
+  const bountyColor = BountyStatusColours[bounty.status];
   const bountyLabel = BountyLabels[bounty.status];
-
-  function closeDialog () {
-    setDisplayBountyDialog(false);
-  }
-
   const bountyUrl = `/${space!.domain}/bounty/${bounty.id}`;
 
   return (
@@ -56,7 +48,7 @@ export function BountyCard ({ bounty }: IBountyInput) {
 
             </Grid>
             <Grid item xs={12}>
-              <Chip variant='filled' label={bountyLabel} color={bountyColor as any} />
+              <Chip variant='filled' label={bountyLabel} color={bountyColor} />
             </Grid>
 
           </Grid>
