@@ -28,7 +28,7 @@ export default function BlocksEditorPage () {
     setPages(pages.map(p => p.id === currentPage!.id ? { ...p, ...updates } : p));
     setCurrentPage(_page => ({ ..._page, ...updates }) as Page);
     if (updates.hasOwnProperty('title')) {
-      setTitleState(updates.title!);
+      setTitleState(updates.title || 'Untitled');
     }
 
     debouncedPageUpdate({ id: currentPage!.id, ...updates } as Prisma.PageUpdateInput)
