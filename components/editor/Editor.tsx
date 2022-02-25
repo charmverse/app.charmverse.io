@@ -19,6 +19,7 @@ const Container = styled(Box)<{ top: number }>`
   padding: 0 20px 0 40px;
   position: relative;
   top: ${({ top }) => top}px;
+  padding-bottom: ${({ theme }) => theme.spacing(5)};
 `;
 
 const PageControlItem = styled(ListItemButton)`
@@ -109,7 +110,9 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
   return (
     <Box>
       {page.headerImage && <PageBanner image={page.headerImage} setImage={updatePageHeader} />}
-      <Container top={pageTop}>
+      <Container
+        top={pageTop}
+      >
         <CharmEditor
           key={page.id}
           content={page.content as PageContent}

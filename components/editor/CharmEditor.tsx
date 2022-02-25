@@ -17,10 +17,11 @@ import {
 } from '@bangle.dev/base-components';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
-import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
+import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import styled from '@emotion/styled';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
+import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev/react/ReactEditor';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
