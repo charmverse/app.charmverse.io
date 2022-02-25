@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -24,6 +25,7 @@ export interface IBountyBadgeProps {
 
 export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : IBountyBadgeProps) {
   const [space] = useCurrentSpace();
+  const theme = useTheme();
 
   const bountyLink = `/${space!.domain}/bounty/${bounty.id}`;
 
@@ -59,8 +61,7 @@ export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : I
         <Typography
           component='span'
           sx={{
-            fontWeight: 600,
-            color: grey[50]
+            fontWeight: 600
           }}
           mr={0.5}
           variant='h6'
@@ -74,7 +75,7 @@ export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : I
             position: 'relative',
             top: 2,
             fontSize: 12,
-            color: grey[50]
+            opacity: 0.75
           }}
         >
           {bounty.rewardToken}
@@ -92,13 +93,12 @@ export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : I
           )
         }
       </Box>
-      <Box p={0.5} borderRadius={1} sx={{ background: BountyStatusColours[bounty.status], textAlign: 'center', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Box p={0.5} borderRadius={1} sx={{ background: theme.palette[BountyStatusColours[bounty.status]].main, textAlign: 'center', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Typography
           component='span'
           sx={{
             textTransform: 'uppercase',
-            fontWeight: 600,
-            color: grey[50]
+            fontWeight: 600
           }}
           variant='body1'
           px={1}

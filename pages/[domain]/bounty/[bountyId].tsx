@@ -184,22 +184,43 @@ export default function BountyDetails () {
           container
           direction='row'
         >
-          <Grid item xs={7}>
-            <Box>
-              <Typography variant='h5' my={1}>Reviewer</Typography>
-              <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                <Avatar />
+          <Grid item xs={6}>
+            <Box mr={3}>
+              <Typography variant='h5' my={1.5}>Reviewer</Typography>
+              <Box
+                component='div'
+                sx={{ display: 'flex',
+                  gap: 1,
+                  alignItems: 'center',
+                  justifyContent: 'space-between' }}
+              >
+                <Box sx={{
+                  display: 'flex',
+                  gap: 1,
+                  alignItems: 'center'
+                }}
+                >
+                  <Avatar />
+                  <Typography variant='h6' component='span'>
+                    {isReviewer === true ? 'You' : bounty.reviewer}
+                  </Typography>
+                </Box>
                 {
                   isReviewer === true && (
-                    <>
-                      <Typography variant='h6' component='span'>
-                        You
-                      </Typography>
+                    <Box sx={{
+                      display: 'flex',
+                      gap: 1
+                    }}
+                    >
                       {bounty.status === 'review' && (
-                        <>
+                        <Box sx={{
+                          display: 'flex',
+                          gap: 1
+                        }}
+                        >
                           <Button onClick={markAsComplete}>Mark as complete</Button>
                           <Button onClick={moveToAssigned}>Reopen task</Button>
-                        </>
+                        </Box>
                       )}
                       {
                         (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
@@ -210,29 +231,31 @@ export default function BountyDetails () {
                         />
                         )
                       }
-                    </>
-                  )
-                }
-                {
-                  isReviewer !== true && (
-                    bounty.reviewer
+                    </Box>
                   )
                 }
               </Box>
             </Box>
           </Grid>
 
-          <Grid item xs={5}>
+          <Grid item xs={6}>
             <Box>
-              <Typography variant='h5' my={1}>Assignee</Typography>
-              <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Typography variant='h5' my={1.5}>Assignee</Typography>
+              <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'space-between' }}>
                 {
                   isAssignee === true ? (
                     <>
-                      <Avatar />
-                      <Typography variant='h6' component='span'>
-                        You
-                      </Typography>
+                      <Box sx={{
+                        display: 'flex',
+                        gap: 1,
+                        alignItems: 'center'
+                      }}
+                      >
+                        <Avatar />
+                        <Typography variant='h6' component='span'>
+                          You
+                        </Typography>
+                      </Box>
                       {bounty.status === 'assigned' && (
                         <Button onClick={requestReview}>Request review</Button>
                       )}
