@@ -1,10 +1,9 @@
 import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
-import Avatar from 'components/common/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
+import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Application } from '@prisma/client';
 import charmClient from 'charmClient';
@@ -13,18 +12,19 @@ import { BountyApplicantList } from 'components/bounties/BountyApplicantList';
 import { BountyBadge } from 'components/bounties/BountyBadge';
 import BountyModal from 'components/bounties/BountyModal';
 import BountyPaymentButton from 'components/bounties/BountyPaymentButton';
+import Avatar from 'components/common/Avatar';
 import { Modal } from 'components/common/Modal';
 import { PageLayout } from 'components/common/page-layout';
 import CharmEditor from 'components/editor/CharmEditor';
+import { Container } from 'components/editor/Editor';
+import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useENSName from 'hooks/useENSName';
 import { useUser } from 'hooks/useUser';
+import { getDisplayName } from 'lib/users';
 import { BountyWithApplications } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useState } from 'react';
-import { useContributors } from 'hooks/useContributors';
-import useENSName from 'hooks/useENSName';
-import { Container } from 'components/editor/Editor';
-import { getDisplayName } from 'lib/users';
 import { eToNumber } from 'lib/utilities/numbers';
 
 export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
@@ -46,8 +46,8 @@ export default function BountyDetails () {
   const isAssignee = bounty && user && bounty.assignee === user.id;
   const isReviewer = bounty && user && bounty.reviewer === user.id;
 
-  const isAdmin = user?.spaceRoles.some(spaceRole => {
-    return spaceRole.spaceId === space!.id && spaceRole.role === 'admin';
+  const isAdmin = space && user?.spaceRoles.some(spaceRole => {
+    return spaceRole.spaceId === space.id && spaceRole.role === 'admin';
   });
 
   const isApplicant = user && bounty?.applications.some(application => {
@@ -159,7 +159,8 @@ export default function BountyDetails () {
               display: 'flex',
               alignItems: 'center',
               fontSize: '40px',
-              fontWeight: 700
+              fontWeight: 700,
+              gap: 1
             }}
           >
             <Box component='span'>
@@ -174,14 +175,22 @@ export default function BountyDetails () {
             }
           </Typography>
         </Box>
-        <Box>
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center'
+        }}
+        >
           <BountyBadge bounty={bounty} hideLink={true} />
         </Box>
       </Box>
 
       <Box mt={3} mb={5}>
         <Box my={2}>
-          <CharmEditor content={bounty.descriptionNodes as any}></CharmEditor>
+          <CharmEditor
+            readOnly
+            content={bounty.descriptionNodes as any}
+          >
+          </CharmEditor>
         </Box>
         <Grid
           container
