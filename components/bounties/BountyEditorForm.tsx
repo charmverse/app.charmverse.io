@@ -31,7 +31,7 @@ export const schema = yup.object({
   rewardToken: yup.string().required(),
   descriptionNodes: yup.mixed(),
   description: yup.string(),
-  reviewer: yup.string()
+  reviewer: yup.string().nullable(true)
 });
 
 type FormValues = yup.InferType<typeof schema>
@@ -67,7 +67,10 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     formState: { errors, isValid, isSubmitting }
   } = useForm<FormValues>({
     mode: 'onBlur',
-    defaultValues: bounty as any,
+    defaultValues: {
+      rewardToken: 'ETH' as CryptoCurrency,
+      ...(bounty || {})
+    },
     resolver: yupResolver(schema)
   });
 
@@ -168,7 +171,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Reward token
               </InputLabel>
-              <InputSearchCrypto defaultValue={bounty?.rewardToken as CryptoCurrency || 'ETH'} label='' register={register} modelKey='rewardToken' />
+              <InputSearchCrypto label='' register={register} modelKey='rewardToken' />
             </Grid>
           </Grid>
           <Grid item>
