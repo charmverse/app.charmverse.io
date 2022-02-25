@@ -1,7 +1,6 @@
 import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { TextField } from '@mui/material';
-import { useTheme } from '@mui/system';
 import { TextSelection } from 'prosemirror-state';
 import { ChangeEvent, useContext } from 'react';
 
@@ -41,8 +40,6 @@ interface PageTitleProps {
 
 export default function PageTitle ({ value, onChange }: PageTitleProps) {
   const view = useContext(EditorViewContext);
-  const theme = useTheme();
-
   return (
     <StyledPageTitle
       value={value}

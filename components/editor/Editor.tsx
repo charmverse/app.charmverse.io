@@ -5,7 +5,6 @@ import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
-import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
 import { ChangeEvent } from 'react';
 import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
@@ -68,7 +67,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
   if (page.headerImage) {
     pageTop = 50;
     if (page.icon) {
-      pageTop = 75;
+      pageTop = 80;
     }
   }
   else if (page.icon) {
