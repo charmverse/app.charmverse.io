@@ -35,7 +35,7 @@ export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : I
       flexDirection: direction
     }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center' }} p={1}>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Box
           mr={0.75}
           component='span'
@@ -92,7 +92,7 @@ export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : I
           )
         }
       </Box>
-      <Box p={1} sx={{ background: BountyStatusColours[bounty.status], textAlign: 'center', fontWeight: 'bold' }}>
+      <Box p={0.5} borderRadius={1} sx={{ background: BountyStatusColours[bounty.status], textAlign: 'center', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Typography
           component='span'
           sx={{
@@ -100,7 +100,7 @@ export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : I
             fontWeight: 600,
             color: grey[50]
           }}
-          variant='h6'
+          variant='body1'
           px={1}
         >
           {BOUNTY_LABELS[bounty.status]}

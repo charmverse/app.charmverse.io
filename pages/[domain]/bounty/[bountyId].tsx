@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { Application } from '@prisma/client';
 import charmClient from 'charmClient';
 import { ApplicationEditorForm } from 'components/bounties/ApplicationEditorForm';
 import { BountyApplicantList } from 'components/bounties/BountyApplicantList';
@@ -25,6 +26,7 @@ export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 export default function BountyDetails () {
 
   const [space] = useCurrentSpace();
+  const [applications, setApplications] = useState([] as Application []);
 
   const [user] = useUser();
 
@@ -36,6 +38,15 @@ export default function BountyDetails () {
   const [isAssignee, setIsAssignee] = useState(true);
   const [isReviewer, setIsReviewer] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const router = useRouter();
+
+  async function loadBounty () {
+    const { bountyId } = router.query;
+    const foundBounty = await charmClient.getBounty(bountyId as string);
+    const applicationList = await charmClient.listApplications(foundBounty.id);
+    setApplications(applicationList);
+    setBounty(foundBounty);
+  }
 
   useEffect(() => {
     loadBounty();
@@ -67,17 +78,9 @@ export default function BountyDetails () {
   // For now, admins can do all actions. We will refine this model later on
   const viewerCanModifyBounty: boolean = isAdmin === true;
 
-  const router = useRouter();
-
   const walletAddressForPayment = bounty?.applications?.find(app => {
     return app.createdBy === bounty.assignee;
   })?.walletAddress;
-
-  async function loadBounty () {
-    const { bountyId } = router.query;
-    const foundBounty = await charmClient.getBounty(bountyId as string);
-    setBounty(foundBounty);
-  }
 
   async function saveBounty () {
     setShowBountyEditDialog(false);
@@ -85,17 +88,17 @@ export default function BountyDetails () {
   }
 
   function toggleBountyEditDialog () {
-
     setShowBountyEditDialog(!showBountyEditDialog);
   }
 
-  function applicationSubmitted () {
+  function applicationSubmitted (application: Application) {
     toggleApplicationDialog();
-    loadBounty();
+    setApplications([...applications, application]);
   }
 
   function toggleApplicationDialog () {
     setShowApplicationDialog(!showApplicationDialog);
+
   }
 
   async function requestReview () {
@@ -171,7 +174,7 @@ export default function BountyDetails () {
         </Box>
       </Box>
 
-      <Box my={3}>
+      <Box mt={3} mb={5}>
         <Box my={2}>
           <Typography variant='h5' sx={{ fontWeight: 'semibold' }}>Information</Typography>
           <CharmEditor content={bounty.descriptionNodes as any}></CharmEditor>
@@ -250,7 +253,7 @@ export default function BountyDetails () {
       </Box>
 
       {
-        bounty && (<BountyApplicantList bounty={bounty} bountyReassigned={loadBounty} />)
+        bounty && (<BountyApplicantList applications={applications} bounty={bounty} bountyReassigned={loadBounty} />)
       }
     </Box>
   );
