@@ -3,7 +3,7 @@
 import React, {useState} from 'react'
 import {IntlShape, useIntl} from 'react-intl'
 import DayPickerInput from 'react-day-picker/DayPickerInput'
-import MomentLocaleUtils from 'react-day-picker/moment'
+import { DateTime } from 'luxon';
 
 import {Utils} from '../utils'
 
@@ -46,7 +46,11 @@ function EditableDayPicker(props: Props): JSX.Element {
         if (str === inputValue) {
             return value
         }
-        return MomentLocaleUtils.parseDate(str, format, withLocale)
+        return DateTime.fromFormat(str, format, { locale: withLocale }).toJSDate()
+    }
+
+    const formatDate = (date: Date, format: string, withLocale: string) => {
+        return DateTime.fromJSDate(date).setLocale(withLocale).toFormat(format)
     }
 
     return (
@@ -68,10 +72,9 @@ function EditableDayPicker(props: Props): JSX.Element {
                 }}
                 dayPickerProps={{
                     locale,
-                    localeUtils: MomentLocaleUtils,
                     todayButton: intl.formatMessage({id: 'EditableDayPicker.today', defaultMessage: 'Today'}),
                 }}
-                formatDate={MomentLocaleUtils.formatDate}
+                formatDate={formatDate}
                 parseDate={parseDate}
                 format={dateFormat}
                 placeholder={dateFormat}
