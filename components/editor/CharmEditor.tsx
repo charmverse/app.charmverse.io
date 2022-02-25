@@ -111,8 +111,8 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 export default function CharmEditor (
-  { content = defaultContent, children, onPageContentChange, style }:
-  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent,
+  { content = defaultContent, children, onPageContentChange, style, readOnly = false }:
+  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent, readOnly?: boolean,
     style?: CSSProperties }
 ) {
   const state = useEditorState({
@@ -149,7 +149,7 @@ export default function CharmEditor (
       emojiPlugins(),
       // tablePlugins(),
       columnResizing,
-      floatingMenuPlugin(),
+      floatingMenuPlugin(readOnly),
       blockquote.plugins(),
       NodeView.createPlugin({
         name: 'blockquote',
@@ -200,6 +200,9 @@ export default function CharmEditor (
         ...(style ?? {}),
         width: '100%',
         height: '100%'
+      }}
+      pmViewOpts={{
+        editable: () => !readOnly
       }}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {

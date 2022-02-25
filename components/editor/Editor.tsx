@@ -12,7 +12,7 @@ import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
 
-const Container = styled(Box)<{ top: number }>`
+export const Container = styled(Box)<{ top: number }>`
   width: 860px;
   max-width: 100%;
   margin: 0 auto 5px;
@@ -63,7 +63,6 @@ const EditorHeader = styled.div`
 `;
 
 export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Page>) => void }) {
-  const { isEditing, setIsEditing } = usePages();
 
   let pageTop = 100;
   if (page.headerImage) {
@@ -99,12 +98,6 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
   }
 
   function updatePageContent (content: ICharmEditorOutput) {
-    if (!isEditing) {
-      setIsEditing(true);
-      setTimeout(() => {
-        setIsEditing(false);
-      }, 1500);
-    }
     setPage({ content: content.doc, contentText: content.rawText });
   }
 

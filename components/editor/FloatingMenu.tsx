@@ -57,10 +57,13 @@ export default function FloatingMenuComponent () {
   );
 }
 
-export const floatingMenuPlugin = () => {
+export const floatingMenuPlugin = (readonly?: boolean) => {
   return floatingMenu.plugins({
     key: menuKey,
-    calculateType: state => {
+    calculateType: (state) => {
+      if (readonly) {
+        return null;
+      }
       if (state.selection.empty
         || (state.selection as NodeSelection)?.node?.type?.name.match(/(image)|(cryptoPrice)|(iframe)/)) {
         return null;

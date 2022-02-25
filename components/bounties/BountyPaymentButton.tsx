@@ -32,7 +32,6 @@ export default function BountyPaymentButton ({
   const makePayment = async () => {
 
     const currentChain = Object.values(RPC).find((blockchain: any) => blockchain.chainId === chainId);
-
     const signer = await library.getSigner(account);
 
     try {

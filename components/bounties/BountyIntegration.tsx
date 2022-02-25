@@ -22,7 +22,7 @@ export function BountyIntegration (props: BountyIntegrationProps) {
       whiteSpace: 'nowrap'
     }}
     >
-      {linkedBounty ? <BountyBadge bounty={linkedBounty} /> : (
+      {linkedBounty ? <BountyBadge direction='column' bounty={linkedBounty} /> : (
         <>
           <Button onClick={() => {
             setIsModalOpen(true);
