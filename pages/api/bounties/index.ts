@@ -13,17 +13,15 @@ handler.use(requireUser).get(getBounties).post(createBounty);
 async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
   const { spaceId } = req.query;
 
-  if (spaceId === undefined) {
+  if (typeof spaceId !== 'string') {
     return res.status(400).send({ error: 'Please provide a valid spaceId' } as any);
   }
 
-  const bountyListQuery: Prisma.BountyFindManyArgs = spaceId ? {
+  const bounties = await prisma.bounty.findMany({
     where: {
       spaceId
     }
-  } : {} as any;
-
-  const bounties = await prisma.bounty.findMany(bountyListQuery);
+  });
   return res.status(200).json(bounties);
 }
 

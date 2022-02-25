@@ -1,12 +1,11 @@
-import { Card, CardHeader, CardContent, Chip, Typography, Grid, CardActionArea } from '@mui/material';
+import { useTheme } from '@emotion/react';
+import { Card, CardActionArea, CardContent, CardHeader, Chip, Grid, Typography } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
-import Button from '@mui/material/Button';
-import BountyModal from 'components/bounties/BountyModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useState } from 'react';
-import { BrandColors } from 'theme/colors';
 import { fancyTrim } from 'lib/utilities/strings';
 import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
+import { useState } from 'react';
+import { BrandColors } from 'theme/colors';
 
 export interface IBountyInput {
   bounty: IBounty
@@ -21,17 +20,9 @@ export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
 };
 
 export function BountyCard ({ bounty }: IBountyInput) {
-
-  const [editBounty, setDisplayBountyDialog] = useState(false);
   const [space] = useCurrentSpace();
-
   const bountyColor = BountyStatusColours[bounty.status];
   const bountyLabel = BountyLabels[bounty.status];
-
-  function closeDialog () {
-    setDisplayBountyDialog(false);
-  }
-
   const bountyUrl = `/${space!.domain}/bounty/${bounty.id}`;
 
   return (
@@ -57,7 +48,7 @@ export function BountyCard ({ bounty }: IBountyInput) {
 
             </Grid>
             <Grid item xs={12}>
-              <Chip variant='filled' label={bountyLabel} color={bountyColor as any} />
+              <Chip variant='filled' label={bountyLabel} color={bountyColor} />
             </Grid>
 
           </Grid>
