@@ -2,6 +2,7 @@ import { Contributor } from 'models';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 import charmClient from 'charmClient';
 import ContributorListItem, { RoleAction } from './ContributorListItem';
 
@@ -10,7 +11,7 @@ export default function ContributorList () {
   const [contributors, setContributors] = useContributors();
   const [space] = useCurrentSpace();
   const [user] = useUser();
-  const isAdmin = user?.spaceRoles.some(role => role.role === 'admin' && role.spaceId === space?.id);
+  const isAdmin = isSpaceAdmin(user, space?.id);
 
   async function updateContributor (action: RoleAction, contributor: Contributor) {
     switch (action) {
