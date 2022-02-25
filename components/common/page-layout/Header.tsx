@@ -42,10 +42,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const [isPublic, setIsPublic] = useState(currentPage?.isPublic === true);
   const theme = useTheme();
 
-  const isAdmin = user?.spaceRoles.some(spaceRole => {
-    return spaceRole.spaceId === space?.id && spaceRole.role === 'admin';
-  });
-
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');
@@ -122,25 +118,22 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         <Box>
           {isPage && (
           <>
-            {
-            isAdmin === true && (
-              <>
-                <Tooltip title={isPublic ? 'Make private' : 'Make public'} arrow placement='bottom'>
-                  <FormControlLabel
-                    control={(
-                      <Switch
-                        defaultChecked={isPublic}
-                        onChange={ev => {
-                          togglePublic(ev.target.checked);
-                        }}
-                        inputProps={{ 'aria-label': 'toggle public access' }}
-                      />
-                )}
-                    label={isPublic === true ? 'Public' : 'Private'}
+            <Tooltip title={isPublic ? 'Make private' : 'Make public'} arrow placement='bottom'>
+              <FormControlLabel
+                control={(
+                  <Switch
+                    defaultChecked={isPublic}
+                    onChange={ev => {
+                      togglePublic(ev.target.checked);
+                    }}
+                    inputProps={{ 'aria-label': 'toggle public access' }}
                   />
+                )}
+                label={isPublic === true ? 'Public' : 'Private'}
+              />
 
-                </Tooltip>
-                {
+            </Tooltip>
+            {
               isPublic === true && (
                 <Tooltip title='Copy sharing link' arrow placement='bottom'>
 
@@ -155,9 +148,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
                 </Tooltip>
               )
             }
-              </>
-            )
-          }
 
             <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
               <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
