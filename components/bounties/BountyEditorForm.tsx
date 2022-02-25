@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
+import Button from 'components/common/Button';
 import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
@@ -66,7 +66,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     getValues,
     formState: { errors, isValid, isSubmitting }
   } = useForm<FormValues>({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: {
       rewardToken: 'ETH' as CryptoCurrency,
       ...(bounty || {})
@@ -175,7 +175,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
             </Grid>
           </Grid>
           <Grid item>
-            <Button disabled={!isValid || isSubmitting} type='submit'>{mode === 'create' ? 'Create bounty' : 'Update bounty'}</Button>
+            <Button loading={isSubmitting} disabled={!isValid} type='submit'>{mode === 'create' ? 'Create bounty' : 'Update bounty'}</Button>
           </Grid>
         </Grid>
       </form>
