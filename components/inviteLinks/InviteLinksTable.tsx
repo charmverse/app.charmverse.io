@@ -46,7 +46,7 @@ export default function InvitesTable (props: Props) {
     <Table size='small' aria-label='simple table'>
       <TableHead>
         <TableRow>
-          <TableCell>Inviter</TableCell>
+          <TableCell sx={{ px: 0 }}>Inviter</TableCell>
           <TableCell>Invite Code</TableCell>
           <TableCell>Uses</TableCell>
           <TableCell>Expires</TableCell>
@@ -56,7 +56,7 @@ export default function InvitesTable (props: Props) {
       <TableBody>
         {props.invites.map((row) => (
           <StyledRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-            <TableCell>
+            <TableCell sx={{ px: 0 }}>
               <Typography><strong>{getDisplayName(row.author)}</strong></Typography>
             </TableCell>
             <TableCell><Typography>{row.code}</Typography></TableCell>
@@ -67,7 +67,7 @@ export default function InvitesTable (props: Props) {
               </Typography>
             </TableCell>
             <TableCell>{getExpires(row)}</TableCell>
-            <TableCell align='right'>
+            <TableCell width={150} sx={{ px: 0 }}>
               <Tooltip
                 arrow
                 placement='top'
