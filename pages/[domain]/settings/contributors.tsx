@@ -70,7 +70,7 @@ function InviteLinks ({ spaceId }: { spaceId: string }) {
     <>
       <Legend>
         Invite Links
-        <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right' }} onClick={open}>Add a link</Button>
+        <Button size='small' variant='outlined' sx={{ float: 'right' }} onClick={open}>Add a link</Button>
       </Legend>
       {data?.length === 0 && <Typography color='secondary'>No invite links yet</Typography>}
       {data && data?.length > 0 && <InvitesTable invites={data} onDelete={deleteLink} />}
