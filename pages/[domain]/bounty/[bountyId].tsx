@@ -204,45 +204,47 @@ export default function BountyDetails () {
           <Grid item xs={6}>
             <Card sx={{ height: '100%', p: 3 }} variant='outlined'>
               <Typography variant='body2' color='secondary' mb={2}>Reviewer</Typography>
-              <Box
-                component='div'
-                sx={{ display: 'flex',
-                  gap: 1,
-                  alignItems: 'center',
-                  justifyContent: 'space-between' }}
-              >
-                <Box display='flex' alignItems='center' gap={1}>
-                  <Avatar name={reviewerENSName || getDisplayName(reviewerUser)} />
-                  <Typography variant='h6' component='span'>
-                    {reviewerName}
-                  </Typography>
+              {reviewerUser ? (
+                <Box
+                  component='div'
+                  sx={{ display: 'flex',
+                    gap: 1,
+                    alignItems: 'center',
+                    justifyContent: 'space-between' }}
+                >
+                  <Box display='flex' alignItems='center' gap={1}>
+                    <Avatar name={reviewerENSName || getDisplayName(reviewerUser)} />
+                    <Typography variant='h6' component='span'>
+                      {reviewerName}
+                    </Typography>
+                  </Box>
+                  {
+                    isReviewer === true && (
+                      <Box sx={{
+                        display: 'flex',
+                        gap: 1
+                      }}
+                      >
+                        {bounty.status === 'review' && (
+                          <Box flexDirection='column' gap={1} display='flex'>
+                            <Button onClick={markAsComplete}>Mark as complete</Button>
+                            <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
+                          </Box>
+                        )}
+                        {
+                          (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
+                          <BountyPaymentButton
+                            receiver={walletAddressForPayment!}
+                            amount={eToNumber(bounty.rewardAmount)}
+                            tokenSymbol='ETH'
+                          />
+                          )
+                        }
+                      </Box>
+                    )
+                  }
                 </Box>
-                {
-                  isReviewer === true && (
-                    <Box sx={{
-                      display: 'flex',
-                      gap: 1
-                    }}
-                    >
-                      {bounty.status === 'review' && (
-                        <Box flexDirection='column' gap={1} display='flex'>
-                          <Button onClick={markAsComplete}>Mark as complete</Button>
-                          <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
-                        </Box>
-                      )}
-                      {
-                        (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
-                        <BountyPaymentButton
-                          receiver={walletAddressForPayment!}
-                          amount={eToNumber(bounty.rewardAmount)}
-                          tokenSymbol='ETH'
-                        />
-                        )
-                      }
-                    </Box>
-                  )
-                }
-              </Box>
+              ) : <Typography variant='body2'>No reviewer assigned</Typography>}
             </Card>
           </Grid>
 
