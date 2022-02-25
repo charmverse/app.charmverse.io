@@ -21,6 +21,7 @@ import { useColorMode } from 'context/color-mode';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRouter } from 'next/router';
 
 export const headerHeight = 56;
@@ -37,8 +38,13 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const [pageTitle] = usePageTitle();
   const { currentPage, isEditing } = usePages();
   const [user, setUser] = useUser();
+  const [space] = useCurrentSpace();
   const [isPublic, setIsPublic] = useState(currentPage?.isPublic === true);
   const theme = useTheme();
+
+  const isAdmin = user?.spaceRoles.some(spaceRole => {
+    return spaceRole.spaceId === space?.id && spaceRole.role === 'admin';
+  });
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
@@ -116,22 +122,25 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         <Box>
           {isPage && (
           <>
-            <Tooltip title={isPublic ? 'Make private' : 'Make public'} arrow placement='bottom'>
-              <FormControlLabel
-                control={(
-                  <Switch
-                    defaultChecked={isPublic}
-                    onChange={ev => {
-                      togglePublic(ev.target.checked);
-                    }}
-                    inputProps={{ 'aria-label': 'toggle public access' }}
-                  />
-                )}
-                label={isPublic === true ? 'Public' : 'Private'}
-              />
-
-            </Tooltip>
             {
+            isAdmin === true && (
+              <>
+                <Tooltip title={isPublic ? 'Make private' : 'Make public'} arrow placement='bottom'>
+                  <FormControlLabel
+                    control={(
+                      <Switch
+                        defaultChecked={isPublic}
+                        onChange={ev => {
+                          togglePublic(ev.target.checked);
+                        }}
+                        inputProps={{ 'aria-label': 'toggle public access' }}
+                      />
+                )}
+                    label={isPublic === true ? 'Public' : 'Private'}
+                  />
+
+                </Tooltip>
+                {
               isPublic === true && (
                 <Tooltip title='Copy sharing link' arrow placement='bottom'>
 
@@ -146,6 +155,10 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
                 </Tooltip>
               )
             }
+              </>
+            )
+          }
+
             <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
               <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
                 {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
