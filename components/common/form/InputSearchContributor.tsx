@@ -8,6 +8,7 @@ export interface IInputSearchContributorProps {
 }
 
 export function InputSearchContributor ({ onChange = () => {}, defaultValue }: IInputSearchContributorProps) {
+
   const [contributors] = useContributors();
 
   const preselectedContributor = defaultValue ? contributors.find(contributor => {
@@ -15,6 +16,7 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
   }) : null;
 
   function emitValue (selectedUser: Contributor) {
+
     if (selectedUser === null) {
       return;
     }
@@ -34,8 +36,8 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
 
   return (
     <Autocomplete
-      value={preselectedContributor ?? { id: '' } as any}
-      onChange={(_, value) => {
+      defaultValue={preselectedContributor}
+      onChange={(event, value) => {
         emitValue(value as any);
       }}
       sx={{ minWidth: 150 }}
