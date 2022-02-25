@@ -3,7 +3,7 @@
 
 import {IntlShape} from 'react-intl'
 
-import moment from 'moment'
+import { Duration } from 'luxon'
 
 import {Card} from '../../blocks/card'
 import {IPropertyTemplate} from '../../blocks/board'
@@ -292,7 +292,7 @@ function dateRange(cards: readonly Card[], property: IPropertyTemplate, intl: In
     if (resultLatest === Number.NEGATIVE_INFINITY) {
         return ''
     }
-    return moment.duration(resultLatest - resultEarliest, 'milliseconds').locale(intl.locale.toLowerCase()).humanize()
+    return Duration.fromMillis(resultLatest - resultEarliest).toHuman()
 }
 
 const Calculations: Record<string, (cards: readonly Card[], property: IPropertyTemplate, intl: IntlShape) => string> = {

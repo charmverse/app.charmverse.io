@@ -20,7 +20,8 @@ async function authenticate (req: NextApiRequest, res: NextApiResponse<LoggedInU
       }
     },
     include: {
-      favorites: true
+      favorites: true,
+      spaceRoles: true
     }
   });
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Tooltip from '@mui/material/Tooltip';
-import { shortenHex } from 'lib/strings';
+import { shortenHex } from 'lib/utilities/strings';
 import Button from '../common/Button';
 
 type Props = {

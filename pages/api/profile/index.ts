@@ -24,7 +24,8 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
       }
     },
     include: {
-      favorites: true
+      favorites: true,
+      spaceRoles: true
     }
   });
 
@@ -39,7 +40,8 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
         addresses: [address]
       },
       include: {
-        favorites: true
+        favorites: true,
+        spaceRoles: true
       }
     });
     req.session.user = newUser;
@@ -55,7 +57,8 @@ async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       id: req.session.user.id
     },
     include: {
-      favorites: true
+      favorites: true,
+      spaceRoles: true
     }
   });
   if (!profile) {

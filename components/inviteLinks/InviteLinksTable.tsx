@@ -11,6 +11,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Close';
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
+import LinkIcon from '@mui/icons-material/Link';
 import { getDisplayName } from 'lib/users';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
@@ -45,7 +46,7 @@ export default function InvitesTable (props: Props) {
     <Table size='small' aria-label='simple table'>
       <TableHead>
         <TableRow>
-          <TableCell>Inviter</TableCell>
+          <TableCell sx={{ px: 0 }}>Inviter</TableCell>
           <TableCell>Invite Code</TableCell>
           <TableCell>Uses</TableCell>
           <TableCell>Expires</TableCell>
@@ -55,7 +56,7 @@ export default function InvitesTable (props: Props) {
       <TableBody>
         {props.invites.map((row) => (
           <StyledRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-            <TableCell>
+            <TableCell sx={{ px: 0 }}>
               <Typography><strong>{getDisplayName(row.author)}</strong></Typography>
             </TableCell>
             <TableCell><Typography>{row.code}</Typography></TableCell>
@@ -65,17 +66,17 @@ export default function InvitesTable (props: Props) {
                 {row.maxUses > 0 ? ` / ${row.maxUses}` : ''}
               </Typography>
             </TableCell>
-            <TableCell>{getExpires(row)}</TableCell>
-            <TableCell align='right'>
+            <TableCell width={150}>{getExpires(row)}</TableCell>
+            <TableCell width={150} sx={{ px: 0 }}>
               <Tooltip
                 arrow
                 placement='top'
-                title={copied[row.id] ? 'Copied' : 'Click to copy link'}
+                title={copied[row.id] ? 'Copied!' : 'Click to copy link'}
                 disableInteractive
               >
                 <Box component='span' pr={1}>
                   <CopyToClipboard text={getInviteLink(row.code)} onCopy={() => onCopy(row.id)}>
-                    <Chip clickable color='secondary' size='small' variant='outlined' label='Share' />
+                    <Chip sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label={copied[row.id] ? 'Copied!' : 'Share'} />
                   </CopyToClipboard>
                 </Box>
               </Tooltip>

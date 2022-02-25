@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ListItem, Typography, useTheme } from '@mui/material';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Box from '@mui/material/Box';
 import { GetEmojiGroupsType, getSuggestTooltipKey, selectEmoji } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { getEmojiByAlias } from 'components/editor/EmojiSuggest';
@@ -154,6 +155,15 @@ export function EmojiSuggestContainer({
     [view, emojiSuggestKey],
   );
 
+  function closeTooltip () {
+    if (view.dispatch!) {
+      view.dispatch(
+        // Chain transactions together
+        view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
+      );
+    }
+  }
+
   return (
     <div
       className="bangle-emoji-suggest-container"
@@ -161,97 +171,73 @@ export function EmojiSuggestContainer({
         width: "100%"
       }}
     >
-      <Box sx={{
-        width: "fit-content",
-        display: "flex",
-        justifyContent: "space-between"
-      }}>
-        {insidePageIcon && !insideCallout && <ListItem onClick={() => {
-          // Set the page icon to be null
-          onClick(null)
-          // Hide the emoji suggest
-          if (view.dispatch!) {
-            view.dispatch(
-              // Chain transactions together
-              view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
-            );
-          }
-        }} button disableRipple sx={{
-          padding: theme.spacing(0.5),
-          margin: theme.spacing(1, 0, 0, 1),
-          borderRadius: theme.spacing(0.5)
-        }}>
-          <DeleteIcon sx={{
-            fontSize: 18,
-            marginRight: theme.spacing(0.5)
-          }}/>
-          <Typography sx={{
-            fontSize: 14,
-            opacity: 0.75,
-            fontWeight: 700,
-          }}>
-            Remove
-          </Typography>
-        </ListItem>}
-        <ListItem onClick={() => {
-          // Hide the emoji suggest
-          if (view.dispatch!) {
-            view.dispatch(
-              // Chain transactions together
-              view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
-            );
-          }
-        }} button disableRipple sx={{
-          padding: theme.spacing(0.5),
-          margin: theme.spacing(1, 0, 0, 1),
-          borderRadius: theme.spacing(0.5)
-        }}>
-          <CancelIcon sx={{
-            fontSize: 18,
-            marginRight: theme.spacing(0.5)
-          }}/>
-          <Typography sx={{
-            fontSize: 14,
-            opacity: 0.75,
-            fontWeight: 700,
-          }}>
-            Close
-          </Typography>
-        </ListItem>
-      </Box>
-      <Box sx={{height: insidePageIcon && !insideCallout ? 320 : 400, overflowX: "hidden"}}>
-        {emojiGroups.map(({ name: groupName, emojis }, i) => {
-          return (
-            <Box p={1} className="bangle-emoji-suggest-group" key={groupName || i}>
-              <GroupLabel sx={{
-                margin: 1
-              }} label={groupName} />
-              <Box sx={{
-                marginBottom: 1.5,
-                borderBottom: `1px solid ${theme.palette.divider}`
+      <ClickAwayListener onClickAway={closeTooltip}>
+        <span>
+          {insidePageIcon && !insideCallout && (
+            <Box sx={{
+              width: "fit-content",
+              display: "flex",
+              justifyContent: "space-between"
+            }}>
+              <ListItem onClick={() => {
+                // Set the page icon to be null
+                onClick(null)
+                // Hide the emoji suggest
+                closeTooltip();
+              }} button disableRipple sx={{
+                padding: theme.spacing(0.5),
+                margin: theme.spacing(1, 0, 0, 1),
+                borderRadius: theme.spacing(0.5)
               }}>
-                {emojis.slice(0, maxItems).map(([emojiAlias, emoji]) => (
-                  <EmojiSquare
-                    key={emojiAlias}
-                    isSelected={activeItem?.[0] === emojiAlias}
-                    emoji={emoji}
-                    emojiAlias={emojiAlias}
-                    onSelectEmoji={onSelectEmoji}
-                    selectedEmojiSquareId={selectedEmojiSquareId}
-                    style={{
-                      margin: squareMargin,
-                      width: squareSide,
-                      height: squareSide,
-                      lineHeight: squareSide + 'px',
-                      fontSize: Math.max(squareSide - 10, 4),
-                    }}
-                  />
-                ))}
-              </Box>
+                <DeleteIcon sx={{
+                  fontSize: 18,
+                  marginRight: theme.spacing(0.5)
+                }}/>
+                <Typography sx={{
+                  fontSize: 14,
+                  opacity: 0.75,
+                  fontWeight: 700,
+                }}>
+                  Remove
+                </Typography>
+              </ListItem>
             </Box>
-          );
-        })}
-      </Box>
+          )}
+          <Box sx={{height: insidePageIcon && !insideCallout ? 320 : 400, overflowX: "hidden"}}>
+            {emojiGroups.map(({ name: groupName, emojis }, i) => {
+              return (
+                <Box p={1} className="bangle-emoji-suggest-group" key={groupName || i}>
+                  <GroupLabel sx={{
+                    margin: 1
+                  }} label={groupName} />
+                  <Box sx={{
+                    marginBottom: 1.5,
+                    borderBottom: `1px solid ${theme.palette.divider}`
+                  }}>
+                    {emojis.slice(0, maxItems).map(([emojiAlias, emoji]) => (
+                      <EmojiSquare
+                        key={emojiAlias}
+                        isSelected={activeItem?.[0] === emojiAlias}
+                        emoji={emoji}
+                        emojiAlias={emojiAlias}
+                        onSelectEmoji={onSelectEmoji}
+                        selectedEmojiSquareId={selectedEmojiSquareId}
+                        style={{
+                          margin: squareMargin,
+                          width: squareSide,
+                          height: squareSide,
+                          lineHeight: squareSide + 'px',
+                          fontSize: Math.max(squareSide - 10, 4),
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              );
+            })}
+          </Box>
+        </span>
+      </ClickAwayListener>
     </div>
   );
 }

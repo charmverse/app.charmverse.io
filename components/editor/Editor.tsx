@@ -117,15 +117,9 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
         >
           <EditorHeader>
             {page?.icon && (
-              <Box sx={{
-                // Moving the icon a bit upwards if the page banner is not present, otherwise the Add cover button and the icon overlaps
-                top: !page.headerImage ? -15 : 0, position: 'relative'
-              }}
-              >
-                <EmojiContainer updatePageIcon={updatePageIcon}>
-                  <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-                </EmojiContainer>
-              </Box>
+              <EmojiContainer updatePageIcon={updatePageIcon}>
+                <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+              </EmojiContainer>
             )}
             <Controls className='page-controls'>
               {!page.icon && (

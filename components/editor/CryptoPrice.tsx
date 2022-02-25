@@ -7,7 +7,7 @@ import { InputSearchCurrency } from '../../components/common/form/InputSearchCur
 import { InputSearchCrypto } from '../../components/common/form/InputSearchCrypto';
 import { getPricing } from '../../hooks/usePricing';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from '../../models/Currency';
-import { formatMoney } from '../../utilities/formatting';
+import { formatMoney } from '../../lib/utilities/formatting';
 import { RelativeTime } from '../common/RelativeTime';
 
 /**

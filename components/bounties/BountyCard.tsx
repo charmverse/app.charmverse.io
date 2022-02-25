@@ -1,55 +1,69 @@
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
+import { Card, CardHeader, CardContent, Chip, Typography, Grid, CardActionArea } from '@mui/material';
+import { Bounty as IBounty } from '@prisma/client';
 import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
-import CardActions from '@mui/material/CardActions';
-import { useBounty } from 'components/bounties/hooks/useBounty';
-import styled from '@emotion/styled';
-
-import { Bounty } from '@prisma/client';
+import BountyModal from 'components/bounties/BountyModal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useState } from 'react';
-import { Typography } from '@mui/material';
+import { BrandColors } from 'theme/colors';
+import { fancyTrim } from 'lib/utilities/strings';
+import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
 
-const statusMap = {
-  pending: 'Not Started',
-  done: 'Done',
-  'in-progress': 'In Progress'
-};
-
-interface BountyCardProps {
-  bounty: Bounty;
+export interface IBountyInput {
+  bounty: IBounty
 }
 
-export default function BountyCard ({ bounty }: BountyCardProps) {
-  const [bountyDialogOpen, setBountyDialogOpen] = useState(false);
-  const { updateBounty } = useBounty();
-  const { id, title, status } = bounty;
+export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
+  open: 'gray',
+  assigned: 'blue',
+  review: 'red',
+  complete: 'purple',
+  paid: 'green'
+};
 
-  const handleUpdateBounty = (updatingBounty: Bounty) => {
-    updateBounty(updatingBounty);
-    setBountyDialogOpen(false);
-  };
+export function BountyCard ({ bounty }: IBountyInput) {
+
+  const [editBounty, setDisplayBountyDialog] = useState(false);
+  const [space] = useCurrentSpace();
+
+  const bountyColor = BountyStatusColours[bounty.status];
+  const bountyLabel = BountyLabels[bounty.status];
+
+  function closeDialog () {
+    setDisplayBountyDialog(false);
+  }
+
+  const bountyUrl = `/${space!.domain}/bounty/${bounty.id}`;
 
   return (
     <Card
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
         width: 290,
+        m: '5px',
         minHeight: 200,
         cursor: 'pointer'
       }}
-      onClick={() => {
-        setBountyDialogOpen(true);
-      }}
       variant='outlined'
     >
-      <CardHeader subheader={title} />
-      <CardContent sx={{ flexGrow: 1, display: 'flex', alignItems: 'flex-end' }}>
-        <Chip variant='outlined' label='Test' color='primary' />
-      </CardContent>
+      <CardActionArea href={bountyUrl}>
+        <CardHeader subheader={bounty.title} />
+        <CardContent sx={{ flexGrow: 1, display: 'block' }}>
+
+          <Grid container direction='column' justifyContent='space-between'>
+            <Grid item xs={12} sx={{ minHeight: '90px' }}>
+
+              <Typography paragraph={true}>
+                {fancyTrim(bounty.description, 120)}
+              </Typography>
+
+            </Grid>
+            <Grid item xs={12}>
+              <Chip variant='filled' label={bountyLabel} color={bountyColor as any} />
+            </Grid>
+
+          </Grid>
+        </CardContent>
+      </CardActionArea>
+
     </Card>
   );
 }

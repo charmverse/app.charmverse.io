@@ -9,7 +9,7 @@ import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
-import { shortenHex } from 'lib/strings';
+import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
 
 import gatesImage from 'public/images/artwork/gates.png';

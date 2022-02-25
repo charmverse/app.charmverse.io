@@ -68,3 +68,14 @@ export function generatePath (path: string, params: any = {}): string {
     })
     .replace(/\/*\*$/, _ => params['*'] == null ? '' : params['*'].replace(/^\/*/, '/'));
 }
+
+/**
+ * Change the first character of a string to uppercase
+ * Leaves other characters unchanged
+ * @param input
+ */
+export function upperCaseFirstCharacter (input: string): string {
+  const trimmed = input.trim();
+  return `${trimmed[0].toUpperCase()}${trimmed.slice(1)}`;
+}
+

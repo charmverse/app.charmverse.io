@@ -27,6 +27,10 @@ export function UserProvider ({ children }: { children: ReactNode }) {
           setIsLoaded(true);
         });
     }
+    else if (!account) {
+      // user disconnects their wallet
+      setUser(null);
+    }
   }, [account]);
 
   useEffect(() => {
