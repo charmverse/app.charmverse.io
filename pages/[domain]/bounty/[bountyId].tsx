@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { Application } from '@prisma/client';
+import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { ApplicationEditorForm } from 'components/bounties/ApplicationEditorForm';
 import { BountyApplicantList } from 'components/bounties/BountyApplicantList';
@@ -30,7 +30,6 @@ import { ReactElement, useEffect, useMemo, useState } from 'react';
 export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 
 export default function BountyDetails () {
-
   const [space] = useCurrentSpace();
   const [applications, setApplications] = useState([] as Application []);
 
@@ -95,9 +94,9 @@ export default function BountyDetails () {
     return app.createdBy === bounty.assignee;
   })?.walletAddress;
 
-  async function saveBounty () {
+  async function saveBounty (updatedBounty: Bounty) {
+    setBounty({ ...updatedBounty, applications: bounty?.applications ?? [] });
     setShowBountyEditDialog(false);
-    await loadBounty();
   }
 
   function toggleBountyEditDialog () {
@@ -111,7 +110,6 @@ export default function BountyDetails () {
 
   function toggleApplicationDialog () {
     setShowApplicationDialog(!showApplicationDialog);
-
   }
 
   async function requestReview () {
