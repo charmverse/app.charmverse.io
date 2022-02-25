@@ -46,9 +46,9 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
       sx={{ minWidth: 150 }}
       options={contributors}
       autoHighlight
-      getOptionLabel={option => option.id}
+      getOptionLabel={user => getDisplayName(user)}
       renderOption={(props, user) => (
-        <ReviewerOption user={user} />
+        <ReviewerOption {...props} user={user} />
       )}
       renderInput={(params) => (
         <TextField
@@ -62,10 +62,10 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
   );
 }
 
-function ReviewerOption ({ user }: { user: Contributor }) {
+function ReviewerOption ({ user, ...props }: { user: Contributor } & any) {
   const ensName = useENSName(user.addresses[0]);
   return (
-    <Box component='li' display='flex' gap={1}>
+    <Box component='li' display='flex' gap={1} {...props}>
       <Avatar name={ensName || getDisplayName(user)} />
       <Typography>{ensName || getDisplayName(user)}</Typography>
     </Box>
