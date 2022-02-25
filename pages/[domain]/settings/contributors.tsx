@@ -6,26 +6,26 @@ import useSWR from 'swr';
 import Legend from 'components/settings/Legend';
 import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
-import ContributorRow from 'components/settings/ContributorRow';
 import { setTitle } from 'hooks/usePageTitle';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import getDisplayName from 'lib/users/getDisplayName';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import InvitesTable from 'components/inviteLinks/InviteLinksTable';
 import InviteForm, { FormValues as InviteLinkFormValues } from 'components/inviteLinks/InviteLinkForm';
+import ContributorList from 'components/settings/ContributorList';
 import charmClient from 'charmClient';
 
 export default function ContributorSettings () {
 
   const [space] = useCurrentSpace();
-  const [contributors] = useContributors();
 
   setTitle('Contributors');
-
+  if (!space) {
+    return null;
+  }
   return (
     <>
-      {space && <InviteLinks spaceId={space.id} />}
+      <InviteLinks spaceId={space.id} />
       {/*
       <Legend>
         Token Gates
@@ -34,9 +34,7 @@ export default function ContributorSettings () {
       <Typography color='secondary'>No token gates yet</Typography> */}
 
       <Legend>Current Contributors</Legend>
-      {space && contributors.map(contributor => (
-        <ContributorRow key={getDisplayName(contributor)} contributor={contributor} />
-      ))}
+      <ContributorList />
     </>
   );
 }
