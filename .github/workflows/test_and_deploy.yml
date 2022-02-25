@@ -13,8 +13,6 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -46,7 +44,7 @@ jobs:
     name: Deploy to production
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-
+    needs: test
     steps:
       - uses: actions/checkout@v2
       - name: Install Node.js v16
