@@ -1,9 +1,10 @@
 import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
-import Avatar from '@mui/material/Avatar';
+import Avatar from 'components/common/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { Application } from '@prisma/client';
 import charmClient from 'charmClient';
@@ -20,6 +21,10 @@ import { useUser } from 'hooks/useUser';
 import { BountyWithApplications } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useState } from 'react';
+import { useContributors } from 'hooks/useContributors';
+import useENSName from 'hooks/useENSName';
+import { Container } from 'components/editor/Editor';
+import { getDisplayName } from 'lib/users';
 
 export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 
@@ -29,16 +34,31 @@ export default function BountyDetails () {
   const [applications, setApplications] = useState([] as Application []);
 
   const [user] = useUser();
+  const [contributors] = useContributors();
 
-  const [bounty, setBounty] = useState(null as any as BountyWithApplications);
+  const [bounty, setBounty] = useState<BountyWithApplications | null>(null);
   const [showBountyEditDialog, setShowBountyEditDialog] = useState(false);
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
 
-  const [isApplicant, setIsApplicant] = useState(true);
-  const [isAssignee, setIsAssignee] = useState(true);
-  const [isReviewer, setIsReviewer] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const router = useRouter();
+
+  const isAssignee = bounty && user && bounty.assignee === user.id;
+  const isReviewer = bounty && user && bounty.reviewer === user.id;
+
+  const isAdmin = user?.spaceRoles.some(spaceRole => {
+    return spaceRole.spaceId === space!.id && spaceRole.role === 'admin';
+  });
+
+  const isApplicant = user && bounty?.applications.some(application => {
+    return application.createdBy === user.id;
+  });
+
+  const reviewerUser = (bounty?.reviewer && getContributor(bounty.reviewer)) || undefined;
+  const reviewerENSName = useENSName(reviewerUser?.addresses[0]);
+  const reviewerName = isReviewer ? 'You' : reviewerENSName || getDisplayName(reviewerUser);
+  const assigneeUser = (bounty?.assignee && getContributor(bounty.assignee)) || undefined;
+  const assigneeENSName = useENSName(assigneeUser?.addresses[0]);
+  const assigneeName = isAssignee ? 'You' : assigneeENSName || getDisplayName(assigneeUser);
 
   async function loadBounty () {
     const { bountyId } = router.query;
@@ -48,30 +68,13 @@ export default function BountyDetails () {
     setBounty(foundBounty);
   }
 
+  function getContributor (userId: string) {
+    return contributors.find(c => c.id === userId);
+  }
+
   useEffect(() => {
     loadBounty();
   }, []);
-
-  useEffect(() => {
-    if (user && bounty && space) {
-      const adminRoleFound = user.spaceRoles.findIndex(spaceRole => {
-        return spaceRole.spaceId === space!.id && spaceRole.role === 'admin';
-      }) > -1;
-      setIsAdmin(adminRoleFound);
-
-      const userIsReviewer = bounty.reviewer === user.id;
-      setIsReviewer(userIsReviewer);
-
-      const userHasApplied = bounty.applications.findIndex(application => {
-        return application.createdBy === user.id;
-      }) > -1;
-
-      setIsApplicant(userHasApplied);
-
-      const userIsAssignee = bounty.assignee === user.id;
-      setIsAssignee(userIsAssignee);
-    }
-  }, [user, bounty, space]);
 
   // Infer if the user is an admin or not
 
@@ -102,22 +105,22 @@ export default function BountyDetails () {
   }
 
   async function requestReview () {
-    const updatedBounty = await charmClient.changeBountyStatus(bounty.id, 'review');
+    const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'review');
     setBounty(updatedBounty);
   }
 
   async function moveToAssigned () {
-    const updatedBounty = await charmClient.changeBountyStatus(bounty.id, 'assigned');
+    const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'assigned');
     setBounty(updatedBounty);
   }
 
   async function markAsComplete () {
-    const updatedBounty = await charmClient.changeBountyStatus(bounty.id, 'complete');
+    const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'complete');
     setBounty(updatedBounty);
   }
 
   async function markAsPaid () {
-    const updatedBounty = await charmClient.changeBountyStatus(bounty.id, 'paid');
+    const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'paid');
     setBounty(updatedBounty);
   }
 
@@ -125,14 +128,14 @@ export default function BountyDetails () {
 
   if (!space || !bounty) {
     return (
-      <>
-        Loading bounty
-      </>
+      <Container top={100}>
+        Loading bounty...
+      </Container>
     );
   }
 
   return (
-    <Box p={5}>
+    <Container top={100}>
       <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
 
       <Modal open={showApplicationDialog} onClose={toggleApplicationDialog}>
@@ -153,8 +156,9 @@ export default function BountyDetails () {
             variant='h1'
             sx={{
               display: 'flex',
-              gap: 0.5,
-              alignItems: 'center'
+              alignItems: 'center',
+              fontSize: '40px',
+              fontWeight: 700
             }}
           >
             <Box component='span'>
@@ -162,8 +166,8 @@ export default function BountyDetails () {
             </Box>
             {
               viewerCanModifyBounty === true && (
-                <IconButton>
-                  <EditIcon fontSize='small' onClick={toggleBountyEditDialog} />
+                <IconButton onClick={toggleBountyEditDialog}>
+                  <EditIcon fontSize='small' />
                 </IconButton>
               )
             }
@@ -176,17 +180,16 @@ export default function BountyDetails () {
 
       <Box mt={3} mb={5}>
         <Box my={2}>
-          <Typography variant='h5' sx={{ fontWeight: 'semibold' }}>Information</Typography>
           <CharmEditor content={bounty.descriptionNodes as any}></CharmEditor>
         </Box>
-
         <Grid
           container
           direction='row'
+          spacing={2}
         >
           <Grid item xs={6}>
-            <Box mr={3}>
-              <Typography variant='h5' my={1.5}>Reviewer</Typography>
+            <Card sx={{ height: '100%', p: 3 }} variant='outlined'>
+              <Typography variant='body2' color='secondary' mb={2}>Reviewer</Typography>
               <Box
                 component='div'
                 sx={{ display: 'flex',
@@ -194,15 +197,10 @@ export default function BountyDetails () {
                   alignItems: 'center',
                   justifyContent: 'space-between' }}
               >
-                <Box sx={{
-                  display: 'flex',
-                  gap: 1,
-                  alignItems: 'center'
-                }}
-                >
-                  <Avatar />
-                  <Typography variant='h6' component='span'>
-                    {isReviewer === true ? 'You' : bounty.reviewer}
+                <Box display='flex' alignItems='center'>
+                  <Avatar name={reviewerENSName || getDisplayName(reviewerUser)} />
+                  <Typography variant='h6' component='span' sx={{ pl: 2 }}>
+                    {reviewerName}
                   </Typography>
                 </Box>
                 {
@@ -235,12 +233,12 @@ export default function BountyDetails () {
                   )
                 }
               </Box>
-            </Box>
+            </Card>
           </Grid>
 
           <Grid item xs={6}>
-            <Box>
-              <Typography variant='h5' my={1.5}>Assignee</Typography>
+            <Card sx={{ height: '100%', p: 3 }} variant='outlined'>
+              <Typography variant='body2' color='secondary' mb={2}>Assignee</Typography>
               <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'space-between' }}>
                 {
                   isAssignee === true ? (
@@ -262,15 +260,24 @@ export default function BountyDetails () {
                     </>
                   ) : (
                     <>
-                      <Typography>{bounty.assignee ?? 'This bounty is awaiting assignment.'}</Typography>
-                      {isApplicant ? <Typography>You've applied to this bounty.</Typography> : (
-                        <Button onClick={toggleApplicationDialog}>Apply now</Button>
+                      {assigneeName && (
+                        <Box display='flex' alignItems='center'>
+                          <Avatar name={assigneeENSName || getDisplayName(assigneeUser)} />
+                          <Typography variant='h6' component='span' sx={{ pl: 2 }}>
+                            {assigneeName}
+                          </Typography>
+                        </Box>
+                      )}
+                      {!assigneeName && (
+                        isApplicant ? <Typography>You've applied to this bounty.</Typography> : (
+                          <Button onClick={toggleApplicationDialog}>Apply now</Button>
+                        )
                       )}
                     </>
                   )
                 }
               </Box>
-            </Box>
+            </Card>
           </Grid>
         </Grid>
       </Box>
@@ -278,7 +285,7 @@ export default function BountyDetails () {
       {
         bounty && (<BountyApplicantList applications={applications} bounty={bounty} bountyReassigned={loadBounty} />)
       }
-    </Box>
+    </Container>
   );
 }
 
