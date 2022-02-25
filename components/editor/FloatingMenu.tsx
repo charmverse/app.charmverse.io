@@ -79,7 +79,8 @@ export const floatingMenuPlugin = (readonly?: boolean) => {
       }
 
       // if inside a table, first check to see if we are resizing or not
-      const isInsideTable = state.selection.$anchor.parent.type.name.match(/^(table_cell|table_header)$/);
+      const isInsideTable = state.selection.$anchor
+        .parent.type.name.match(/^(table_cell|table_header|horizontalRule)$/);
       if (isInsideTable) {
         const { path } = (state.selection.$anchor) as ResolvedPos & { path: Node[] };
         if (path) {

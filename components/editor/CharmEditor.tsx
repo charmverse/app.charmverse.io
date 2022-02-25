@@ -96,6 +96,11 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
     font-size: 85%;
     color: ${({ theme }) => theme.palette.code.color};
   }
+
+  hr {
+    background-color: ${({ theme }) => theme.palette.background.light};
+    border: none;
+  }
 `;
 
 const defaultContent: PageContent = {
