@@ -3,7 +3,6 @@ import { ReactNode, createContext, useContext, useEffect, useState, useMemo } fr
 import { LoggedInUser } from 'models';
 import charmClient from 'charmClient';
 import useENSName from 'hooks/useENSName';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 type IContext = [user: LoggedInUser | null, setUser: (user: LoggedInUser | any) => void, isLoaded: boolean];
 
@@ -13,7 +12,6 @@ export function UserProvider ({ children }: { children: ReactNode }) {
 
   const { account } = useWeb3React();
   const [user, setUser] = useState<LoggedInUser | null>(null);
-  const [space] = useCurrentSpace();
   const [isLoaded, setIsLoaded] = useState(false);
   const ensName = useENSName(account);
 
@@ -40,13 +38,6 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       setUser({ ...user, ensName });
     }
   }, [user, ensName]);
-
-  useEffect(() => {
-    if (user && space) {
-      const isAdmin = user.spaceRoles.some(role => role.role === 'admin' && role.spaceId === space?.id);
-      setUser({ ...user, isAdmin });
-    }
-  }, [user, space]);
 
   const value = useMemo(() => [user, setUser, isLoaded] as const, [user, isLoaded]);
 
