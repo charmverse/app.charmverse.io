@@ -16,15 +16,15 @@
  * Note: No check is made for NaN or undefined input numbers.
  *
  **************************************************************** */
-export function eToNumber (num: number): string {
+export function eToNumber (num: number | string): string {
   let sign = '';
-  (num += '').charAt(0) == '-' && (num = num.substring(1), sign = '-');
-  const arr = num.split(/[e]/ig);
+  (num += '').charAt(0) == '-' && (num = num.toString().substring(1), sign = '-');
+  const arr = num.toString().split(/[e]/ig);
   if (arr.length < 2) return sign + num;
   const dot = (0.1).toLocaleString().substr(1, 1); let n = arr[0]; const exp = +arr[1];
-  let w = (n = n.replace(/^0+/, '')).replace(dot, '');
+  let w: any = (n = n.replace(/^0+/, '')).replace(dot, '');
   const pos = n.split(dot)[1] ? n.indexOf(dot) + exp : w.length + exp;
-  let L = pos - w.length; const
+  let L: any = pos - w.length; const
     s = `${BigInt(w)}`;
   w = exp >= 0 ? (L >= 0 ? s + '0'.repeat(L) : r()) : (pos <= 0 ? `0${dot}${'0'.repeat(Math.abs(pos))}${s}` : r());
   L = w.split(dot); if (L[0] == 0 && L[1] == 0 || (+w == 0 && +s == 0)) w = 0; //* * added 9/10/2021
