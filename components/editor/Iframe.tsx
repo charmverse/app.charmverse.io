@@ -137,6 +137,7 @@ function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement> & {type: 'v
 const StyledIFrame = styled(Box)`
   object-fit: contain;
   width: 100%;
+  height: 100%;
   min-height: 250px;
   user-select: none;
   &:hover {
