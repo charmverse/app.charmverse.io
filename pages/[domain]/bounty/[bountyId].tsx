@@ -22,9 +22,9 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useENSName from 'hooks/useENSName';
 import { useUser } from 'hooks/useUser';
 import { getDisplayName } from 'lib/users';
-import { BountyWithApplications } from 'models';
+import { BountyWithApplications, PageContent } from 'models';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useMemo, useState } from 'react';
 
 export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 
@@ -59,6 +59,15 @@ export default function BountyDetails () {
   const assigneeUser = (bounty?.assignee && getContributor(bounty.assignee)) || undefined;
   const assigneeENSName = useENSName(assigneeUser?.addresses[0]);
   const assigneeName = isAssignee ? 'You' : assigneeENSName || getDisplayName(assigneeUser);
+
+  const CharmEditorMemoized = useMemo(() => {
+    return bounty ? (
+      <CharmEditor
+        readOnly
+        content={bounty.descriptionNodes as PageContent}
+      />
+    ) : null;
+  }, [bounty]);
 
   async function loadBounty () {
     const { bountyId } = router.query;
@@ -185,11 +194,7 @@ export default function BountyDetails () {
 
       <Box mt={3} mb={5}>
         <Box my={2}>
-          <CharmEditor
-            readOnly
-            content={bounty.descriptionNodes as any}
-          >
-          </CharmEditor>
+          {CharmEditorMemoized}
         </Box>
         <Grid
           container
@@ -206,9 +211,9 @@ export default function BountyDetails () {
                   alignItems: 'center',
                   justifyContent: 'space-between' }}
               >
-                <Box display='flex' alignItems='center'>
+                <Box display='flex' alignItems='center' gap={1}>
                   <Avatar name={reviewerENSName || getDisplayName(reviewerUser)} />
-                  <Typography variant='h6' component='span' sx={{ pl: 2 }}>
+                  <Typography variant='h6' component='span'>
                     {reviewerName}
                   </Typography>
                 </Box>
@@ -220,11 +225,7 @@ export default function BountyDetails () {
                     }}
                     >
                       {bounty.status === 'review' && (
-                        <Box sx={{
-                          display: 'flex',
-                          gap: 1
-                        }}
-                        >
+                        <Box flexDirection='column' gap={1} display='flex'>
                           <Button onClick={markAsComplete}>Mark as complete</Button>
                           <Button onClick={moveToAssigned}>Reopen task</Button>
                         </Box>
