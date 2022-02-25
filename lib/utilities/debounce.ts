@@ -1,8 +1,10 @@
 
+type Task<T extends unknown[]> = (...args: T) => any;
+
 export default function debounce<
   T extends unknown[]
-> (func: (...args: T) => void, delay: number): () => void {
-  let timer: any | null = null;
+> (func: Task<T>, delay: number): Task<T> {
+  let timer: NodeJS.Timeout | null = null;
   return (...args: T) => {
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => {
