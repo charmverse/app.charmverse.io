@@ -37,7 +37,7 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
   return (
     <Autocomplete
       defaultValue={preselectedContributor}
-      onChange={(event, value) => {
+      onChange={(_, value) => {
         emitValue(value as any);
       }}
       sx={{ minWidth: 150 }}
