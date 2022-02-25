@@ -25,6 +25,7 @@ import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
 import { Container } from 'components/editor/Editor';
 import { getDisplayName } from 'lib/users';
+import { eToNumber } from 'lib/utilities/numbers';
 
 export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 
@@ -224,7 +225,7 @@ export default function BountyDetails () {
                         (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
                         <BountyPaymentButton
                           receiver={walletAddressForPayment!}
-                          amount={bounty.rewardAmount.toString()}
+                          amount={eToNumber(bounty.rewardAmount)}
                           tokenSymbol='ETH'
                         />
                         )
