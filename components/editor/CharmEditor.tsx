@@ -192,7 +192,7 @@ export default function CharmEditor (
       // iframePlugin,
       // pasteImagePlugin
     ],
-    initialValue: Node.fromJSON(specRegistry.schema, content),
+    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components
     dropCursorOpts: {
       color: 'transparent'

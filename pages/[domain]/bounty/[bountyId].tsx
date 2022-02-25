@@ -64,6 +64,7 @@ export default function BountyDetails () {
     return bounty ? (
       <CharmEditor
         readOnly
+        key={bounty.description}
         content={bounty.descriptionNodes as PageContent}
       />
     ) : null;

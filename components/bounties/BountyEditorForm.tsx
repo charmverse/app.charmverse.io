@@ -79,6 +79,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
       value.spaceId = space!.id;
       value.createdBy = user!.id;
       value.description = value.description ?? '';
+      value.descriptionNodes = value.descriptionNodes ?? '';
       const createdBounty = await charmClient.createBounty(value);
       setBounties([...bounties, createdBounty]);
       onSubmit(createdBounty);
