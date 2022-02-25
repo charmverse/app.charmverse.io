@@ -66,7 +66,7 @@ export default function InvitesTable (props: Props) {
                 {row.maxUses > 0 ? ` / ${row.maxUses}` : ''}
               </Typography>
             </TableCell>
-            <TableCell>{getExpires(row)}</TableCell>
+            <TableCell width={150}>{getExpires(row)}</TableCell>
             <TableCell width={150} sx={{ px: 0 }}>
               <Tooltip
                 arrow
