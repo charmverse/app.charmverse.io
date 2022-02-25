@@ -30,7 +30,7 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
     }
   }
 
-  if (!contributors) {
+  if (!contributors || contributors.length === 0) {
     return null;
   }
 
