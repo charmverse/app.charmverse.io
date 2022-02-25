@@ -74,7 +74,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
           gap: 2
         }}
         >
-          <Typography noWrap component='div' sx={{ fontWeight: 500 }}>
+          <Typography noWrap component='div' sx={{ fontWeight: 500, maxWidth: 500, textOverflow: 'ellipsis' }}>
             {pageTitle}
           </Typography>
           {isEditing && (
