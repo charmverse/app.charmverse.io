@@ -1,6 +1,6 @@
 import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { TextField } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import { TextSelection } from 'prosemirror-state';
 import { ChangeEvent, useContext } from 'react';
 
@@ -33,19 +33,28 @@ const StyledPageTitle = styled(TextField)`
   }
 `;
 
+const StyledReadOnlyTitle = styled(Typography)`
+  font-size: 40px;
+  font-weight: 700;
+`;
+
 interface PageTitleProps {
-  value: string
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void
+  value: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  readOnly?: boolean;
 }
 
-export default function PageTitle ({ value, onChange }: PageTitleProps) {
+export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps) {
   const view = useContext(EditorViewContext);
+  if (readOnly) {
+    return <StyledReadOnlyTitle>{value}</StyledReadOnlyTitle>;
+  }
   return (
     <StyledPageTitle
       value={value}
       onChange={onChange}
       placeholder='Untitled'
-      autoFocus
+      autoFocus={!readOnly}
       multiline
       variant='standard'
       onKeyDown={(e) => {

@@ -49,7 +49,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
 
   async function loadPublicPage (publicPageId: string) {
     const page = await charmClient.getPublicPage(publicPageId);
-    setTitleState(page.id);
+    setTitleState(page.title);
     setCurrentPage(page);
   }
 

@@ -122,7 +122,7 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
               </EmojiContainer>
             )}
             <Controls className='page-controls'>
-              {!page.icon && (
+              {!readOnly && !page.icon && (
                 <PageControlItem onClick={addPageIcon}>
                   <EmojiEmotionsIcon
                     fontSize='small'
@@ -131,7 +131,7 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
                   Add icon
                 </PageControlItem>
               )}
-              {!page.headerImage && (
+              {!readOnly && !page.headerImage && (
                 <PageControlItem onClick={addPageHeader}>
                   <ImageIcon
                     fontSize='small'
@@ -143,6 +143,7 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             </Controls>
           </EditorHeader>
           <PageTitle
+            readOnly={readOnly}
             value={page.title}
             onChange={updateTitle}
           />
