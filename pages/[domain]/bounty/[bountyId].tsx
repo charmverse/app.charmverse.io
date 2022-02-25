@@ -226,7 +226,7 @@ export default function BountyDetails () {
                       {bounty.status === 'review' && (
                         <Box flexDirection='column' gap={1} display='flex'>
                           <Button onClick={markAsComplete}>Mark as complete</Button>
-                          <Button onClick={moveToAssigned}>Reopen task</Button>
+                          <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
                         </Box>
                       )}
                       {
