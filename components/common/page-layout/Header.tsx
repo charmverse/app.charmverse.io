@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -38,9 +38,14 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const [pageTitle] = usePageTitle();
   const { currentPage, isEditing } = usePages();
   const [user, setUser] = useUser();
-  const [space] = useCurrentSpace();
   const [isPublic, setIsPublic] = useState(currentPage?.isPublic === true);
   const theme = useTheme();
+
+  useEffect(() => {
+    if (currentPage) {
+      setIsPublic(currentPage.isPublic);
+    }
+  }, [currentPage]);
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
@@ -122,7 +127,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
               <FormControlLabel
                 control={(
                   <Switch
-                    defaultChecked={isPublic}
+                    checked={isPublic}
                     onChange={ev => {
                       togglePublic(ev.target.checked);
                     }}
