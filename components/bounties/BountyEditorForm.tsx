@@ -12,7 +12,6 @@ import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/e
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { eToNumber } from 'lib/utilities/numbers';
 import { PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
 import { useForm, UseFormWatch } from 'react-hook-form';
@@ -151,8 +150,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               </InputLabel>
               <Input
                 {...register('rewardAmount', {
-                  valueAsNumber: true,
-                  value: eToNumber(getValues('rewardAmount')!) as any
+                  valueAsNumber: true
                 })}
                 type='number'
                 inputProps={{ step: 0.000000001 }}
