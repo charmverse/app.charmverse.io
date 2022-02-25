@@ -97,6 +97,10 @@ class CharmClient {
     return http.DELETE('/api/profile/favorites', { pageId });
   }
 
+  getPublicPage (pageId: string) {
+    return http.GET<Page>(`/api/public/pages/${pageId}`);
+  }
+
   createInviteLink (link: Partial<InviteLink>) {
     return http.POST<InviteLinkPopulated[]>('/api/invites', link);
   }
