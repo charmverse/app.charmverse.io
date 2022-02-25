@@ -147,11 +147,11 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
                 </PageControlItem>
               )}
             </Controls>
-            <PageTitle
-              value={page.title}
-              onChange={updateTitle}
-            />
           </EditorHeader>
+          <PageTitle
+            value={page.title}
+            onChange={updateTitle}
+          />
         </CharmEditor>
       </Container>
     </Box>
