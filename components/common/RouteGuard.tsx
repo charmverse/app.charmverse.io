@@ -8,6 +8,8 @@ import { useUser } from 'hooks/useUser';
 const walletConnectPages = ['/login', '/invite'];
 // Pages to create a user account
 const signupPages = ['/signup', '/invite'];
+// Pages shared to the public that don't require user login
+const publicPages = ['/share'];
 
 /**
  * Page loading:
@@ -58,8 +60,11 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   function authCheck (url: string) {
     // redirect to login page if accessing a private page and not logged in
     const path = url.split('?')[0];
-    // redirect to connect wallet
-    if (!account && !walletConnectPages.some(basePath => path.startsWith(basePath))) {
+
+    if (publicPages.some(basePath => path.startsWith(basePath))) {
+      setAuthorized(true);
+    }// redirect to connect wallet
+    else if (!account && !walletConnectPages.some(basePath => path.startsWith(basePath))) {
       setAuthorized(false);
       console.log('[RouteGuard]: redirect to login');
       router.push({
