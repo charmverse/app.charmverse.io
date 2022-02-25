@@ -27,8 +27,8 @@ interface IBountyEditorInput {
 }
 
 export const schema = yup.object({
-  title: yup.string().required('Please enter a title').min(10, 'Minimum of 10 characters'),
-  rewardAmount: yup.number().required(),
+  title: yup.string().required('Please enter a title'),
+  rewardAmount: yup.number().typeError('Amount must be a number').required('Please enter reward amount'),
   rewardToken: yup.string().required(),
   descriptionNodes: yup.mixed(),
   description: yup.string(),
