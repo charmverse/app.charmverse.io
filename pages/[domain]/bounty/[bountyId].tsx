@@ -81,6 +81,11 @@ export default function BountyDetails () {
     setBounty(foundBounty);
   }
 
+  async function saveBounty () {
+    setShowBountyEditDialog(false);
+    await loadBounty();
+  }
+
   function toggleBountyEditDialog () {
 
     setShowBountyEditDialog(!showBountyEditDialog);
@@ -128,7 +133,7 @@ export default function BountyDetails () {
   return (
     <>
 
-      <BountyModal onSubmit={loadBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
+      <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
 
       <Modal open={showApplicationDialog} onClose={toggleApplicationDialog}>
         <ApplicationEditorForm bountyId={bounty.id} onSubmit={applicationSubmitted}></ApplicationEditorForm>

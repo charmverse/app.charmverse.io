@@ -193,13 +193,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
     ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
   },
   components: {
-    // MuiTypography: {
-    //   styleOverrides: {
-    //     root: {
-    //       whiteSpace: 'nowrap'
-    //     }
-    //   }
-    // },
     MuiCard: {
       styleOverrides: {
         root: {
@@ -207,26 +200,19 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
         }
       }
     },
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true
+      }
+    },
     MuiButton: {
       defaultProps: {
-        disableRipple: true,
         variant: 'contained'
       },
       styleOverrides: {
         root: {
           borderRadius: '10px'
         }
-      }
-    },
-    MuiChip: {
-      defaultProps: {
-        // @ts-ignore mui library type is wrong
-        disableRipple: true
-      }
-    },
-    MuiListItemButton: {
-      defaultProps: {
-        disableRipple: true
       }
     },
     MuiPaper: {
@@ -248,11 +234,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
         root: {
           zIndex: 3000
         }
-      }
-    },
-    MuiIconButton: {
-      defaultProps: {
-        disableRipple: true
       }
     },
     MuiCardContent: {
@@ -283,11 +264,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
       },
       defaultProps: {
         underline: 'none'
-      }
-    },
-    MuiMenuItem: {
-      defaultProps: {
-        disableRipple: true
       }
     }
   }

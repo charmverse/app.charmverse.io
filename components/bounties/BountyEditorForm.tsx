@@ -82,6 +82,21 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
       setBounties([...bounties, createdBounty]);
       onSubmit(createdBounty);
     }
+    else if (bounty?.id && mode === 'update') {
+      const updates = {
+        updatedAt: new Date(),
+        title: value.title,
+        rewardAmount: value.rewardAmount,
+        rewardToken: value.rewardToken,
+        descriptionNodes: value.descriptionNodes,
+        description: value.description,
+        reviewer: value.reviewer
+      };
+      value.updatedAt = new Date();
+      const updatedBounty = await charmClient.updateBounty(bounty.id, updates);
+      setBounties(bounties.map(b => b.id === bounty.id ? updatedBounty : b));
+      onSubmit(updatedBounty);
+    }
   }
 
   function setRichContent (content: ICharmEditorOutput) {
@@ -160,13 +175,13 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Reward token
               </InputLabel>
-              <InputSearchCrypto defaultValue={bounty?.rewardToken as CryptoCurrency} label='' register={register} modelKey='rewardToken' />
+              <InputSearchCrypto defaultValue={bounty?.rewardToken as CryptoCurrency || 'ETH'} label='' register={register} modelKey='rewardToken' />
             </Grid>
 
           </Grid>
 
           <Grid item>
-            <Button disabled={!isValid || isSubmitting} type='submit'>Create bounty</Button>
+            <Button disabled={!isValid || isSubmitting} type='submit'>{mode === 'create' ? 'Create bounty' : 'Update bounty'}</Button>
           </Grid>
 
         </Grid>
