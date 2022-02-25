@@ -22,6 +22,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useENSName from 'hooks/useENSName';
 import { useUser } from 'hooks/useUser';
 import { getDisplayName } from 'lib/users';
+import { eToNumber } from 'lib/utilities/numbers';
 import { BountyWithApplications, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
@@ -234,7 +235,7 @@ export default function BountyDetails () {
                         (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
                         <BountyPaymentButton
                           receiver={walletAddressForPayment!}
-                          amount={bounty.rewardAmount.toString()}
+                          amount={eToNumber(bounty.rewardAmount)}
                           tokenSymbol='ETH'
                         />
                         )
