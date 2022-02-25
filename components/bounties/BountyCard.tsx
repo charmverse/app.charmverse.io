@@ -5,7 +5,7 @@ import BountyModal from 'components/bounties/BountyModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useState } from 'react';
 import { BrandColors } from 'theme/colors';
-import { fancyTrim } from 'lib/strings';
+import { fancyTrim } from 'lib/utilities/strings';
 import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
 
 export interface IBountyInput {

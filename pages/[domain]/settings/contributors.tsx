@@ -7,17 +7,21 @@ import Legend from 'components/settings/Legend';
 import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
 import { setTitle } from 'hooks/usePageTitle';
-import { useContributors } from 'hooks/useContributors';
+import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import InvitesTable from 'components/inviteLinks/InviteLinksTable';
 import InviteForm, { FormValues as InviteLinkFormValues } from 'components/inviteLinks/InviteLinkForm';
 import ContributorList from 'components/settings/ContributorList';
+import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 import charmClient from 'charmClient';
 
 export default function ContributorSettings () {
 
   const [space] = useCurrentSpace();
+  const [user] = useUser();
+
+  const isAdmin = isSpaceAdmin(user, space?.id);
 
   setTitle('Contributors');
   if (!space) {
@@ -25,7 +29,7 @@ export default function ContributorSettings () {
   }
   return (
     <>
-      <InviteLinks spaceId={space.id} />
+      <InviteLinks isAdmin={isAdmin} spaceId={space.id} />
       {/*
       <Legend>
         Token Gates
@@ -39,7 +43,7 @@ export default function ContributorSettings () {
   );
 }
 
-function InviteLinks ({ spaceId }: { spaceId: string }) {
+function InviteLinks ({ isAdmin, spaceId }: { isAdmin?: boolean, spaceId: string }) {
 
   const { data, mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));
   const {
@@ -70,7 +74,7 @@ function InviteLinks ({ spaceId }: { spaceId: string }) {
     <>
       <Legend>
         Invite Links
-        <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right' }} onClick={open}>Add a link</Button>
+        {isAdmin && <Button size='small' variant='outlined' sx={{ float: 'right' }} onClick={open}>Add a link</Button>}
       </Legend>
       {data?.length === 0 && <Typography color='secondary'>No invite links yet</Typography>}
       {data && data?.length > 0 && <InvitesTable invites={data} onDelete={deleteLink} />}

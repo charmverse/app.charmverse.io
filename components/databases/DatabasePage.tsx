@@ -1,4 +1,4 @@
-import { generatePath } from 'lib/strings';
+import { generatePath } from 'lib/utilities/strings';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';

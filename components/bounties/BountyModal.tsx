@@ -21,7 +21,7 @@ export default function BountyModal (props: Props) {
   return (
     <Modal size='large' open={open} onClose={onClose} sx={{ margin: 'auto', maxHeight: '80vh' }}>
       <DialogTitle onClose={onClose}>{modalTitles[mode]}</DialogTitle>
-      <BountyEditorForm onSubmit={onSubmit} bounty={bounty} />
+      <BountyEditorForm onSubmit={onSubmit} bounty={bounty} mode={mode} />
     </Modal>
   );
 }

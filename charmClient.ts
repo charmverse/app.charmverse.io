@@ -266,8 +266,16 @@ class CharmClient {
 
     const data = await http.PUT<BountyWithApplications>(`/api/bounties/${bountyId}`, {
       assignee,
-      status: 'assigned'
+      status: 'assigned',
+      updatedAt: new Date()
     });
+
+    return data;
+  }
+
+  async updateBounty (bountyId: string, bounty: Partial<Bounty>): Promise<BountyWithApplications> {
+
+    const data = await http.PUT<BountyWithApplications>(`/api/bounties/${bountyId}`, bounty);
 
     return data;
   }

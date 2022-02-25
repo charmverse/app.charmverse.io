@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React, {useCallback} from 'react'
 import {injectIntl, IntlShape} from 'react-intl'
-import { generatePath } from 'lib/strings'
+import { generatePath } from 'lib/utilities/strings'
 import { useRouter } from 'next/router';
 
 import {Board, IPropertyTemplate} from '../blocks/board'

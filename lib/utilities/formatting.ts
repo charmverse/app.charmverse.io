@@ -1,4 +1,4 @@
-import { FiatCurrency } from '../models/Currency';
+import { FiatCurrency } from '../../models/Currency';
 
 export function formatMoney (amount: number, currency: FiatCurrency): string {
 

@@ -3,7 +3,6 @@
 import React, {useState} from 'react'
 import {useIntl} from 'react-intl'
 import {DateUtils} from 'react-day-picker'
-import MomentLocaleUtils from 'react-day-picker/moment'
 import DayPicker from 'react-day-picker/DayPicker'
 
 import { DateTime } from 'luxon'
@@ -233,7 +232,6 @@ function DateRange(props: Props): JSX.Element {
                                 initialMonth={dateFrom || new Date()}
                                 showOutsideDays={false}
                                 locale={locale}
-                                localeUtils={MomentLocaleUtils}
                                 todayButton={intl.formatMessage({id: 'DateRange.today', defaultMessage: 'Today'})}
                                 onTodayButtonClick={handleDayClick}
                                 month={dateFrom}

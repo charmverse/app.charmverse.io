@@ -25,6 +25,8 @@ export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
 
   const bountyLink = `/${space!.domain}/bounty/${bounty.id}`;
 
+  const imageLogo = CryptoLogoPaths[bounty.rewardToken as CryptoCurrency];
+
   return (
     <Box sx={{ maxWidth: '400px', background: 'background' }} borderRadius={1}>
       <Box sx={{ display: 'flex', alignItems: 'center' }} p={1}>
@@ -37,12 +39,16 @@ export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
             alignItems: 'center'
           }}
         >
-          <Image
-            loading='lazy'
-            width={25}
-            height={25}
-            src={CryptoLogoPaths[bounty.rewardToken as CryptoCurrency]}
-          />
+          {
+            imageLogo !== undefined && (
+              <Image
+                loading='lazy'
+                width={25}
+                height={25}
+                src={imageLogo}
+              />
+            )
+          }
         </Box>
         <Typography
           component='span'

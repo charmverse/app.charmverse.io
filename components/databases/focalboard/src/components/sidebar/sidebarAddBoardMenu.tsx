@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React, {useCallback, useEffect} from 'react'
 import {FormattedMessage, IntlShape, useIntl} from 'react-intl'
-import { generatePath } from 'lib/strings'
+import { generatePath } from 'lib/utilities/strings'
 import { useRouter } from 'next/router'
 
 import {Block} from '../../blocks/block'

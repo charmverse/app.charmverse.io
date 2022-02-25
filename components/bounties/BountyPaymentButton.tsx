@@ -14,7 +14,7 @@ interface Props {
   tokenDecimals?: number;
   onSuccess?: (txId: string) => void;
   onError?: (err: any) => void;
-  children: React.ReactChild | React.ReactChild[];
+  children?: React.ReactChild | React.ReactChild[];
 }
 
 export default function BountyPaymentButton ({
@@ -25,7 +25,7 @@ export default function BountyPaymentButton ({
   tokenDecimals = 16,
   onSuccess = (tx: string) => {},
   onError = () => {},
-  children
+  children = 'Make a payment'
 }: Props) {
   const { account, library, chainId } = useWeb3React();
 

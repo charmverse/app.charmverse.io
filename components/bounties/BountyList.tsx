@@ -3,7 +3,7 @@ import { Bounty as IBounty, BountyStatus } from '@prisma/client';
 import BountyModal from 'components/bounties/BountyModal';
 import { BountiesContext } from 'hooks/useBounties';
 import { useContext, useState } from 'react';
-import { sortArrayByObjectProperty } from 'lib/strings';
+import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { BountyCard } from './BountyCard';
 
 export function BountyList () {
