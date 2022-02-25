@@ -1,6 +1,9 @@
-import { Autocomplete, Box, TextField } from '@mui/material';
+import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { useContributors } from 'hooks/useContributors';
 import { Contributor } from 'models';
+import useENSName from 'hooks/useENSName';
+import { getDisplayName } from 'lib/users';
+import Avatar from 'components/common/Avatar';
 
 export interface IInputSearchContributorProps {
   onChange?: (id: string) => any
@@ -11,9 +14,9 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
 
   const [contributors] = useContributors();
 
-  const preselectedContributor = defaultValue ? contributors.find(contributor => {
+  const preselectedContributor = contributors.find(contributor => {
     return contributor.id === defaultValue;
-  }) : null;
+  });
 
   function emitValue (selectedUser: Contributor) {
 
@@ -30,7 +33,7 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
     }
   }
 
-  if (!contributors || contributors.length === 0) {
+  if (contributors.length === 0) {
     return null;
   }
 
@@ -43,11 +46,9 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
       sx={{ minWidth: 150 }}
       options={contributors}
       autoHighlight
-      getOptionLabel={option => option.id}
-      renderOption={(props, option) => (
-        <Box component='li' sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-          {option.id}
-        </Box>
+      getOptionLabel={user => getDisplayName(user)}
+      renderOption={(props, user) => (
+        <ReviewerOption {...props} user={user} />
       )}
       renderInput={(params) => (
         <TextField
@@ -58,5 +59,15 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
         />
       )}
     />
+  );
+}
+
+function ReviewerOption ({ user, ...props }: { user: Contributor } & any) {
+  const ensName = useENSName(user.addresses[0]);
+  return (
+    <Box component='li' display='flex' gap={1} {...props}>
+      <Avatar name={ensName || getDisplayName(user)} />
+      <Typography>{ensName || getDisplayName(user)}</Typography>
+    </Box>
   );
 }
