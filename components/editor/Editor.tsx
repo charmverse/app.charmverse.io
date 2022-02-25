@@ -61,7 +61,10 @@ const EditorHeader = styled.div`
   }
 `;
 
-export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Page>) => void }) {
+export interface IEditorProps {
+  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean }
+
+export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   let pageTop = 100;
   if (page.headerImage) {
@@ -110,6 +113,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
           key={page.id}
           content={page.content as PageContent}
           onPageContentChange={updatePageContent}
+          readOnly={readOnly}
         >
           <EditorHeader>
             {page?.icon && (
@@ -118,7 +122,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
               </EmojiContainer>
             )}
             <Controls className='page-controls'>
-              {!page.icon && (
+              {!readOnly && !page.icon && (
                 <PageControlItem onClick={addPageIcon}>
                   <EmojiEmotionsIcon
                     fontSize='small'
@@ -127,7 +131,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
                   Add icon
                 </PageControlItem>
               )}
-              {!page.headerImage && (
+              {!readOnly && !page.headerImage && (
                 <PageControlItem onClick={addPageHeader}>
                   <ImageIcon
                     fontSize='small'
@@ -139,6 +143,7 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
             </Controls>
           </EditorHeader>
           <PageTitle
+            readOnly={readOnly}
             value={page.title}
             onChange={updateTitle}
           />

@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -7,14 +9,19 @@ import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import { Box, CircularProgress } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
+import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
+import LinkIcon from '@mui/icons-material/Link';
 import { useColorMode } from 'context/color-mode';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRouter } from 'next/router';
 
 export const headerHeight = 56;
@@ -31,9 +38,16 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const [pageTitle] = usePageTitle();
   const { currentPage, isEditing } = usePages();
   const [user, setUser] = useUser();
+  const [space] = useCurrentSpace();
+  const [isPublic, setIsPublic] = useState(currentPage?.isPublic === true);
   const theme = useTheme();
 
+  const isAdmin = user?.spaceRoles.some(spaceRole => {
+    return spaceRole.spaceId === space?.id && spaceRole.role === 'admin';
+  });
+
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
+
   const isPage = router.route.includes('pageId');
 
   async function toggleFavorite () {
@@ -43,6 +57,19 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
       ? await charmClient.unfavoritePage(pageId)
       : await charmClient.favoritePage(pageId);
     setUser(newUser);
+  }
+
+  async function togglePublic (newPublicStatus: boolean) {
+    const updatedPage = await charmClient.togglePagePublicAccess(currentPage!.id, newPublicStatus);
+    setIsPublic(updatedPage.isPublic);
+  }
+
+  function generateShareLink () {
+
+    const baseUrl = window.location.origin;
+    const shareLink = `${baseUrl}/share/${currentPage?.id}`;
+    navigator.clipboard.writeText(shareLink);
+    return shareLink;
   }
 
   return (
@@ -94,11 +121,50 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         {/** favorite toggle */}
         <Box>
           {isPage && (
-          <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
-            <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
-              {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
-            </IconButton>
-          </Tooltip>
+          <>
+            {
+            isAdmin === true && (
+              <>
+                <Tooltip title={isPublic ? 'Make private' : 'Make public'} arrow placement='bottom'>
+                  <FormControlLabel
+                    control={(
+                      <Switch
+                        defaultChecked={isPublic}
+                        onChange={ev => {
+                          togglePublic(ev.target.checked);
+                        }}
+                        inputProps={{ 'aria-label': 'toggle public access' }}
+                      />
+                )}
+                    label={isPublic === true ? 'Public' : 'Private'}
+                  />
+
+                </Tooltip>
+                {
+              isPublic === true && (
+                <Tooltip title='Copy sharing link' arrow placement='bottom'>
+
+                  <IconButton
+                    sx={{ ml: 1 }}
+                    color='inherit'
+                    onClick={generateShareLink}
+                  >
+                    {isPublic ? <LinkIcon color='secondary' /> : <LinkIcon color='secondary' />}
+                  </IconButton>
+
+                </Tooltip>
+              )
+            }
+              </>
+            )
+          }
+
+            <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
+              <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
+                {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
+              </IconButton>
+            </Tooltip>
+          </>
           )}
           {/** dark mode toggle */}
           <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>

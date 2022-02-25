@@ -10,7 +10,11 @@ import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo } from 'react';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-export default function BlocksEditorPage () {
+interface IBlocksEditorPage {
+  publicShare?: boolean
+}
+
+export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditorPage) {
 
   const { currentPage, setIsEditing, pages, setPages, setCurrentPage } = usePages();
   const router = useRouter();
@@ -25,6 +29,9 @@ export default function BlocksEditorPage () {
   }, []);
 
   async function setPage (updates: Partial<Page>) {
+    if (publicShare === true) {
+      return;
+    }
     setPages(pages.map(p => p.id === currentPage!.id ? { ...p, ...updates } : p));
     setCurrentPage(_page => ({ ..._page, ...updates }) as Page);
     if (updates.hasOwnProperty('title')) {
@@ -40,8 +47,18 @@ export default function BlocksEditorPage () {
       });
   }
 
+  async function loadPublicPage (publicPageId: string) {
+    const page = await charmClient.getPublicPage(publicPageId);
+    setTitleState(page.title);
+    setCurrentPage(page);
+  }
+
   useEffect(() => {
-    if (pageId && pages.length) {
+
+    if (publicShare === true && pageId) {
+      loadPublicPage(pageId as string);
+    }
+    else if (pageId && pages.length) {
       const pageByPath = pages.find(page => page.path === pageId || page.id === pageId);
       if (pageByPath) {
         setTitleState(pageByPath.title);
@@ -57,7 +74,7 @@ export default function BlocksEditorPage () {
     return <DatabaseEditor page={currentPage} setPage={setPage} />;
   }
   else {
-    return <Editor page={currentPage} setPage={setPage} />;
+    return <Editor page={currentPage} setPage={setPage} readOnly={publicShare} />;
   }
 }
 
