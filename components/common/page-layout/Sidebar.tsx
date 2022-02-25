@@ -137,7 +137,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   async function addPage (_space: Space, page: Partial<Page>) {
     const id = Math.random().toString().replace('0.', '');
-    const newPage = await charmClient.createPage({
+    const pageProperties: Prisma.PageCreateInput = {
       content: {
         type: 'doc',
         content: [{
@@ -163,12 +163,13 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       title: '',
       type: 'page',
       ...page
-    });
-    if (newPage.type === 'board') {
+    };
+    if (pageProperties.type === 'board') {
       await addBoardClicked(boardId => {
-        newPage.boardId = boardId;
+        pageProperties.boardId = boardId;
       }, intl);
     }
+    const newPage = await charmClient.createPage(pageProperties);
     setPages([newPage, ...pages]);
 
     // add delay to simulate a server call
