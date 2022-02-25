@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Image from 'components/common/Image';
@@ -45,8 +46,14 @@ export default function SignupPageContent () {
 
   const { account } = useWeb3React();
   const ensName = useENSName(account);
-  const [, setUser] = useUser();
+  const [user, setUser] = useUser();
   const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user]);
 
   async function createAccount () {
     const newUser = await charmClient.createUser({ address: account! });
