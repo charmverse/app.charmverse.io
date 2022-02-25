@@ -54,6 +54,7 @@ const EditorHeader = styled.div`
     min-height: 32px;
     opacity: 0;
     display: flex;
+    margin-top: ${({ theme }) => theme.spacing(1.5)};
   }
 
   &:hover .page-controls {
@@ -64,15 +65,15 @@ const EditorHeader = styled.div`
 export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Page>) => void }) {
   const { isEditing, setIsEditing } = usePages();
 
-  let pageTop = 200;
-  if (page.icon) {
-    pageTop = 280;
-  }
+  let pageTop = 100;
   if (page.headerImage) {
-    pageTop = 100;
+    pageTop = 50;
     if (page.icon) {
-      pageTop = 120;
+      pageTop = 75;
     }
+  }
+  else if (page.icon) {
+    pageTop = 200;
   }
 
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {

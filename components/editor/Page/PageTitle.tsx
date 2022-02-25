@@ -18,7 +18,7 @@ const StyledPageTitle = styled(TextField)`
     font-size: 40px;
     font-weight: 700;
     outline: none;
-    line-height: 1.5em;
+    line-height: 1.25em;
   }
 
   & .MuiInput-root:after {
