@@ -101,6 +101,10 @@ class CharmClient {
     return http.GET<Page>(`/api/public/pages/${pageId}`);
   }
 
+  togglePagePublicAccess (pageId: string, publiclyAccessible: boolean) {
+    return http.PUT<Page>(`/api/pages/${pageId}`, { isPublic: publiclyAccessible });
+  }
+
   createInviteLink (link: Partial<InviteLink>) {
     return http.POST<InviteLinkPopulated[]>('/api/invites', link);
   }
