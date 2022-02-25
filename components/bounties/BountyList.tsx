@@ -16,9 +16,8 @@ export function BountyList () {
   sortedBounties = sortedBounties.filter(bounty => {
     return bounty.status !== 'paid';
   });
-  console.log('sortedBounties', sortedBounties);
 
-  function bountyCreated (newBounty: IBounty) {
+  function bountyCreated () {
     setDisplayBountyDialog(false);
   }
   return (

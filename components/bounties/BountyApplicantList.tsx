@@ -13,8 +13,9 @@ import charmClient from 'charmClient';
 import { BountyStatusColours } from 'components/bounties/BountyCard';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import { useContributors } from 'hooks/useContributors';
+import { getDisplayName } from 'lib/users';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import { useEffect, useState } from 'react';
 
 export interface IBountyApplicantListProps {
   bounty: Bounty,
@@ -29,25 +30,17 @@ function createData (id: string, message: string, date: string) {
 export function BountyApplicantList ({ applications, bounty, bountyReassigned = () => {} }: IBountyApplicantListProps) {
   const [user] = useUser();
   const [space] = useCurrentSpace();
+  const [contributors] = useContributors();
 
-  const [isAdmin, setIsAdmin] = useState(false);
+  const isAdmin = user && user.spaceRoles.some(spaceRole => {
+    return spaceRole.spaceId === space?.id && spaceRole.role === 'admin';
+  });
 
   const theme = useTheme();
 
-  useEffect(() => {
-  }, []);
-
-  useEffect(() => {
-    if (user && space) {
-
-      const adminRoleFound = user.spaceRoles.some(spaceRole => {
-        return spaceRole.spaceId === space.id && spaceRole.role === 'admin';
-      });
-
-      setIsAdmin(adminRoleFound);
-
-    }
-  }, [user, space]);
+  function getContributor (userId: string) {
+    return contributors.find(c => c.id === userId);
+  }
 
   // if (loading.current === true) {
   //   return (
@@ -113,7 +106,7 @@ export function BountyApplicantList ({ applications, bounty, bountyReassigned = 
                 sx={{ backgroundColor: applicationIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell size='small'>
-                  {application.createdBy}
+                  {getDisplayName(getContributor(application.createdBy))}
                 </TableCell>
                 <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
                 <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
