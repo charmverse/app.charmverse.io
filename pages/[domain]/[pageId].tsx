@@ -7,10 +7,8 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect } from 'react';
+import { ReactElement, useEffect, useMemo } from 'react';
 import debouncePromise from 'lib/utilities/debouncePromise';
-
-const debouncedPageUpdate = debouncePromise(charmClient.updatePage, 500);
 
 export default function BlocksEditorPage () {
 
@@ -19,18 +17,25 @@ export default function BlocksEditorPage () {
   const { pageId } = router.query;
   const [, setTitleState] = usePageTitle();
 
+  const debouncedPageUpdate = useMemo(() => {
+    return debouncePromise((input: Prisma.PageUpdateInput) => {
+      setIsEditing(true);
+      return charmClient.updatePage(input);
+    }, 500);
+  }, []);
+
   async function setPage (updates: Partial<Page>) {
     setPages(pages.map(p => p.id === currentPage!.id ? { ...p, ...updates } : p));
     setCurrentPage(_page => ({ ..._page, ...updates }) as Page);
-    if (updates.title) {
-      setTitleState(updates.title);
+    if (updates.hasOwnProperty('title')) {
+      setTitleState(updates.title!);
     }
 
-    setIsEditing(true);
     debouncedPageUpdate({ id: currentPage!.id, ...updates } as Prisma.PageUpdateInput)
       .catch((err: any) => {
         console.error('Error saving page', err);
-      }).finally(() => {
+      })
+      .finally(() => {
         setIsEditing(false);
       });
   }

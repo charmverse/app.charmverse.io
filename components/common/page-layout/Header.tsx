@@ -75,7 +75,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         }}
         >
           <Typography noWrap component='div' sx={{ fontWeight: 500 }}>
-            {pageTitle}
+            {pageTitle || 'Untitled'}
           </Typography>
           {isEditing && (
             <Box sx={{

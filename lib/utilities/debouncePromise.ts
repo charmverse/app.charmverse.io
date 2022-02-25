@@ -1,7 +1,7 @@
 
-type TaskPromise<T extends unknown[]> = (...args: T) => Promise<any>;
+type AsyncTask = (...args: any) => Promise<any>;
 
-export default function debouncePromise<T extends unknown[]> (task: TaskPromise<T>, ms: number): TaskPromise<T> {
+export default function debouncePromise<T extends AsyncTask> (task: T, ms: number): AsyncTask {
   let t: ReturnType<typeof deferred> = {
     cancel: () => null,
     promise: Promise.resolve()
@@ -11,7 +11,7 @@ export default function debouncePromise<T extends unknown[]> (task: TaskPromise<
       t.cancel();
       t = deferred(ms);
       await t.promise;
-      await task(...args);
+      return await task(...args);
     }
     catch (_) { /* prevent memory leak */ }
   };
