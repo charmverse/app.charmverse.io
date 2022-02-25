@@ -13,14 +13,16 @@ import { BountyStatusColours } from './BountyCard';
 
 /**
  * @hideLink used in the Bounty page so we don't show a link when we are already on the page
+ * @direction used for the layout of the bounty info and bounty status
  */
 
 export interface IBountyBadgeProps {
   bounty: Bounty
-  hideLink?: boolean
+  hideLink?: boolean,
+  direction?: 'row' | 'column'
 }
 
-export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
+export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : IBountyBadgeProps) {
   const [space] = useCurrentSpace();
 
   const bountyLink = `/${space!.domain}/bounty/${bounty.id}`;
@@ -28,7 +30,11 @@ export function BountyBadge ({ bounty, hideLink = false } : IBountyBadgeProps) {
   const imageLogo = CryptoLogoPaths[bounty.rewardToken as CryptoCurrency];
 
   return (
-    <Box sx={{ maxWidth: '400px', background: 'background' }} borderRadius={1}>
+    <Box sx={{
+      display: 'flex',
+      flexDirection: direction
+    }}
+    >
       <Box sx={{ display: 'flex', alignItems: 'center' }} p={1}>
         <Box
           mr={0.75}

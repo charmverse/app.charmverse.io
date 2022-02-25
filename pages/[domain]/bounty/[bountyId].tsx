@@ -1,28 +1,26 @@
+import EditIcon from '@mui/icons-material/Edit';
+import { IconButton } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import EditIcon from '@mui/icons-material/Edit';
-import Table from '@mui/material/Table';
 import Typography from '@mui/material/Typography';
-import { Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
+import { ApplicationEditorForm } from 'components/bounties/ApplicationEditorForm';
+import { BountyApplicantList } from 'components/bounties/BountyApplicantList';
 import { BountyBadge } from 'components/bounties/BountyBadge';
-import { PageLayout } from 'components/common/page-layout';
 import BountyModal from 'components/bounties/BountyModal';
+import BountyPaymentButton from 'components/bounties/BountyPaymentButton';
+import { Modal } from 'components/common/Modal';
+import { PageLayout } from 'components/common/page-layout';
 import CharmEditor from 'components/editor/CharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useState, useRef, useCallback } from 'react';
-import { BountyApplicantList } from 'components/bounties/BountyApplicantList';
-import { ApplicationEditorForm } from 'components/bounties/ApplicationEditorForm';
-import BountyPaymentButton from 'components/bounties/BountyPaymentButton';
-
-import { Modal } from 'components/common/Modal';
 import { BountyWithApplications } from 'models';
+import { useRouter } from 'next/router';
+import { ReactElement, useEffect, useState } from 'react';
 
-type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
+export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 
 export default function BountyDetails () {
 
@@ -131,140 +129,130 @@ export default function BountyDetails () {
   }
 
   return (
-    <>
-
+    <Box p={5}>
       <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
 
       <Modal open={showApplicationDialog} onClose={toggleApplicationDialog}>
         <ApplicationEditorForm bountyId={bounty.id} onSubmit={applicationSubmitted}></ApplicationEditorForm>
       </Modal>
 
-      <Grid container direction='column' justifyContent='space-between'>
-        <Grid item xs={8}>
-          <Typography variant='h1'>
-            <Box component='span' px={1}>
+      <Box sx={{
+        justifyContent: 'space-between',
+        gap: 2,
+        display: 'flex'
+      }}
+      >
+        <Box sx={{
+          flexGrow: 1
+        }}
+        >
+          <Typography
+            variant='h1'
+            sx={{
+              display: 'flex',
+              gap: 0.5,
+              alignItems: 'center'
+            }}
+          >
+            <Box component='span'>
               {bounty.title}
             </Box>
             {
               viewerCanModifyBounty === true && (
-                <EditIcon fontSize='small' onClick={toggleBountyEditDialog} />
+                <IconButton>
+                  <EditIcon fontSize='small' onClick={toggleBountyEditDialog} />
+                </IconButton>
               )
             }
           </Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Box sx={{ float: 'right' }}>
-            <BountyBadge bounty={bounty} hideLink={true} />
-          </Box>
-        </Grid>
-      </Grid>
-
-      <Box sx={{ my: '10px' }}>
-        <Typography variant='h5'>Information</Typography>
-        <CharmEditor content={bounty.descriptionNodes as any}></CharmEditor>
+        </Box>
+        <Box>
+          <BountyBadge bounty={bounty} hideLink={true} />
+        </Box>
       </Box>
 
-      <Grid container direction='column'>
-        <Grid item xs={6}>
-          <Typography variant='h5'>Reviewer</Typography>
+      <Box my={3}>
+        <Box my={2}>
+          <Typography variant='h5' sx={{ fontWeight: 'semibold' }}>Information</Typography>
+          <CharmEditor content={bounty.descriptionNodes as any}></CharmEditor>
+        </Box>
 
-          <Box component='div' sx={{ display: 'flex' }}>
-
-            <Avatar></Avatar>
-            <Box component='span' px={1}>
-              {
-              isReviewer === true && (
-                <>
-                  You
-                  { bounty.status === 'review' && (
-                  <Box>
-                    <Button onClick={markAsComplete}>Mark as complete</Button>
-                    <Button onClick={moveToAssigned}>Reopen task</Button>
-                  </Box>
-                  )}
-                </>
-              )
-              }
-              {
-              isReviewer !== true && (
-                bounty.reviewer
-              )
-            }
+        <Grid
+          container
+          direction='row'
+        >
+          <Grid item xs={7}>
+            <Box>
+              <Typography variant='h5' my={1}>Reviewer</Typography>
+              <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <Avatar />
+                {
+                  isReviewer === true && (
+                    <>
+                      <Typography variant='h6' component='span'>
+                        You
+                      </Typography>
+                      {bounty.status === 'review' && (
+                        <>
+                          <Button onClick={markAsComplete}>Mark as complete</Button>
+                          <Button onClick={moveToAssigned}>Reopen task</Button>
+                        </>
+                      )}
+                      {
+                        (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
+                        <BountyPaymentButton
+                          receiver={walletAddressForPayment!}
+                          amount={bounty.rewardAmount.toString()}
+                          tokenSymbol='ETH'
+                        />
+                        )
+                      }
+                    </>
+                  )
+                }
+                {
+                  isReviewer !== true && (
+                    bounty.reviewer
+                  )
+                }
+              </Box>
             </Box>
-          </Box>
+          </Grid>
 
-        </Grid>
-
-        <Grid item xs={6}>
-          <Typography variant='h5'>Assignee</Typography>
-
-          <Box component='div' display='flex'>
-            {
-
-              isAssignee === true && (
-                <>
-                  <Avatar></Avatar>
-                  <Box component='span' px={1}>
-
-                    {' '}
-                    you
-
-                    { bounty.status === 'assigned' && (<Button onClick={requestReview}>Request review</Button>)}
-                  </Box>
-                </>
-              )
-            }
-            {
-
-              (isAssignee === false && bounty.assignee) && (
-
-                <p>{bounty.assignee}</p>
-              )
-            }
-            {
-
-              (isApplicant === true && isAssignee === false) && (
-
-                <p>You've applied to this bounty.</p>
-              )
-              }
-            {
-
-              (isAssignee === false && !bounty.assignee) && (
-
-                <p>This bounty is awaiting assignment</p>
-              )
-            }
-          </Box>
-          {
-            isApplicant === false && (
-              <Box>
-                <Button onClick={toggleApplicationDialog}>Apply now</Button>
+          <Grid item xs={5}>
+            <Box>
+              <Typography variant='h5' my={1}>Assignee</Typography>
+              <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                {
+                  isAssignee === true ? (
+                    <>
+                      <Avatar />
+                      <Typography variant='h6' component='span'>
+                        You
+                      </Typography>
+                      {bounty.status === 'assigned' && (
+                        <Button onClick={requestReview}>Request review</Button>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Typography>{bounty.assignee ?? 'This bounty is awaiting assignment.'}</Typography>
+                      {isApplicant ? <Typography>You've applied to this bounty.</Typography> : (
+                        <Button onClick={toggleApplicationDialog}>Apply now</Button>
+                      )}
+                    </>
+                  )
+                }
               </Box>
-            )
-          }
-
-          {
-            (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
-              <Box>
-                <BountyPaymentButton
-                  receiver={walletAddressForPayment!}
-                  amount={bounty.rewardAmount.toString()}
-                  tokenSymbol='ETH'
-
-                />
-              </Box>
-            )
-          }
-
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
 
       {
         bounty && (<BountyApplicantList bounty={bounty} bountyReassigned={loadBounty} />)
       }
-
-    </>
+    </Box>
   );
 }
 
