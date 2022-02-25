@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Contributor } from 'models';
 import charmClient from 'charmClient';
+import { Contributor } from 'models';
+import { useEffect, useState } from 'react';
 import { useCurrentSpace } from './useCurrentSpace';
 
 export function useContributors () {
