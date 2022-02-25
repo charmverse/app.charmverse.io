@@ -209,6 +209,7 @@ export default function CharmEditor (
       pmViewOpts={{
         editable: () => !readOnly
       }}
+      postEditorComponents={<Placeholder />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
         switch (props.node.type.name) {
@@ -277,7 +278,6 @@ export default function CharmEditor (
       {EmojiSuggest}
       {InlinePalette}
       {children}
-      <Placeholder />
     </StyledReactBangleEditor>
   );
 }
