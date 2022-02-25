@@ -74,7 +74,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     return <DatabaseEditor page={currentPage} setPage={setPage} />;
   }
   else {
-    return <Editor page={currentPage} setPage={setPage} />;
+    return <Editor page={currentPage} setPage={setPage} readOnly={publicShare} />;
   }
 }
 
