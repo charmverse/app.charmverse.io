@@ -1,6 +1,6 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
+import { CryptoCurrency, CryptoCurrencyList, CryptoLogoPaths } from 'models/Currency';
 import Image from 'next/image';
-import { CryptoCurrencyList, CryptoCurrency, CryptoLogoPaths } from 'models/Currency';
 import { UseFormRegister } from 'react-hook-form';
 
 const currencyOptions = Object.keys(CryptoCurrencyList);
@@ -28,8 +28,8 @@ export function InputSearchCrypto ({
 
   return (
     <Autocomplete
-      defaultValue={defaultValue}
-      onChange={(event, value) => {
+      defaultValue={defaultValue ?? 'ETH'}
+      onChange={(_, value) => {
         emitValue(value as any);
       }}
       sx={{ minWidth: 150 }}
@@ -37,17 +37,19 @@ export function InputSearchCrypto ({
       autoHighlight
       size='small'
       renderOption={(props, option) => (
-        <Box component='li' sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+        <Box component='li' sx={{ '& > img': { mr: 2, flexShrink: 0 }, display: 'flex', gap: 1 }} {...props}>
           <Image
             loading='lazy'
             width='20px'
             height='20px'
             src={CryptoLogoPaths[option as CryptoCurrency]}
           />
-          {'    '}
-          {option}
-          {' '}
-          {CryptoCurrencyList[option as CryptoCurrency]}
+          <Box component='span'>
+            {option}
+          </Box>
+          <Box component='span'>
+            {CryptoCurrencyList[option as CryptoCurrency]}
+          </Box>
         </Box>
       )}
       renderInput={(params) => (
