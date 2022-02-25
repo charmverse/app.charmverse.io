@@ -49,7 +49,7 @@ export default function BountyDetails () {
     return spaceRole.spaceId === space.id && spaceRole.role === 'admin';
   });
 
-  const isApplicant = user && bounty?.applications.some(application => {
+  const isApplicant = user && applications.some(application => {
     return application.createdBy === user.id;
   });
 
@@ -91,12 +91,12 @@ export default function BountyDetails () {
   // For now, admins can do all actions. We will refine this model later on
   const viewerCanModifyBounty: boolean = isAdmin === true;
 
-  const walletAddressForPayment = bounty?.applications?.find(app => {
-    return app.createdBy === bounty.assignee;
+  const walletAddressForPayment = applications?.find(app => {
+    return app.createdBy === bounty?.assignee;
   })?.walletAddress;
 
   async function saveBounty (updatedBounty: Bounty) {
-    setBounty({ ...updatedBounty, applications: bounty?.applications ?? [] });
+    setBounty({ ...updatedBounty, applications });
     setShowBountyEditDialog(false);
   }
 
