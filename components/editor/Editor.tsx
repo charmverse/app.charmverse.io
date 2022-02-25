@@ -5,20 +5,20 @@ import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
-import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
 import { ChangeEvent } from 'react';
 import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
 
-const Container = styled(Box)<{ top: number }>`
+export const Container = styled(Box)<{ top: number }>`
   width: 860px;
   max-width: 100%;
   margin: 0 auto 5px;
   padding: 0 20px 0 40px;
   position: relative;
   top: ${({ top }) => top}px;
+  padding-bottom: ${({ theme }) => theme.spacing(5)};
 `;
 
 const PageControlItem = styled(ListItemButton)`
@@ -53,6 +53,7 @@ const EditorHeader = styled.div`
     min-height: 32px;
     opacity: 0;
     display: flex;
+    margin-top: ${({ theme }) => theme.spacing(1.5)};
   }
 
   &:hover .page-controls {
@@ -62,15 +63,15 @@ const EditorHeader = styled.div`
 
 export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Page>) => void }) {
 
-  let pageTop = 200;
-  if (page.icon) {
-    pageTop = 280;
-  }
+  let pageTop = 100;
   if (page.headerImage) {
-    pageTop = 100;
+    pageTop = 50;
     if (page.icon) {
-      pageTop = 120;
+      pageTop = 80;
     }
+  }
+  else if (page.icon) {
+    pageTop = 200;
   }
 
   function updateTitle (event: ChangeEvent<HTMLInputElement>) {
@@ -102,7 +103,9 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
   return (
     <Box>
       {page.headerImage && <PageBanner image={page.headerImage} setImage={updatePageHeader} />}
-      <Container top={pageTop}>
+      <Container
+        top={pageTop}
+      >
         <CharmEditor
           key={page.id}
           content={page.content as PageContent}
@@ -134,11 +137,11 @@ export function Editor ({ page, setPage }: { page: Page, setPage: (p: Partial<Pa
                 </PageControlItem>
               )}
             </Controls>
-            <PageTitle
-              value={page.title}
-              onChange={updateTitle}
-            />
           </EditorHeader>
+          <PageTitle
+            value={page.title}
+            onChange={updateTitle}
+          />
         </CharmEditor>
       </Container>
     </Box>

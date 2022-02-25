@@ -2,7 +2,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import { Application } from '@prisma/client';
@@ -14,7 +13,7 @@ import * as yup from 'yup';
 import { FormMode } from './BountyEditorForm';
 
 interface IApplicationFormProps {
-  onSubmit: (bounty: Application) => any,
+  onSubmit: (application: Application) => any,
   bountyId: string
   mode?: FormMode
   proposal?: Application

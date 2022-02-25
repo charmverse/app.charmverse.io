@@ -17,10 +17,11 @@ import {
 } from '@bangle.dev/base-components';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
-import { BangleEditor as ReactBangleEditor, useEditorState } from '@bangle.dev/react';
+import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import styled from '@emotion/styled';
 import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
+import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev/react/ReactEditor';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
@@ -110,8 +111,8 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 export default function CharmEditor (
-  { content = defaultContent, children, onPageContentChange, style }:
-  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent,
+  { content = defaultContent, children, onPageContentChange, style, readOnly = false }:
+  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent, readOnly?: boolean,
     style?: CSSProperties }
 ) {
   const state = useEditorState({
@@ -148,7 +149,7 @@ export default function CharmEditor (
       emojiPlugins(),
       // tablePlugins(),
       columnResizing,
-      floatingMenuPlugin(),
+      floatingMenuPlugin(readOnly),
       blockquote.plugins(),
       NodeView.createPlugin({
         name: 'blockquote',
@@ -199,6 +200,9 @@ export default function CharmEditor (
         ...(style ?? {}),
         width: '100%',
         height: '100%'
+      }}
+      pmViewOpts={{
+        editable: () => !readOnly
       }}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {

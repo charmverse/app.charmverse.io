@@ -71,200 +71,204 @@ declare module '@mui/material/IconButton' {
 }
 
 // Explore all theme options: https://material-ui.com/customization/default-theme/
-export const createThemeLightSensitive = (mode: PaletteMode) => createTheme({
-  transitions: {
-    duration: {
-      shortest: 150,
-      shorter: 200,
-      short: 250,
-      standard: 300,
-      complex: 375,
-      enteringScreen: 225,
-      leavingScreen: 195
-    }
-  },
-  typography: {
-    fontFamily: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"',
-    fontSize: 12,
-    htmlFontSize: 14,
-    h1: {
-      fontSize: '2rem',
-      fontWeight: 500
-    },
-    h2: {
-      fontSize: '1.05rem',
-      fontWeight: 500
-    },
-    subtitle1: {
-      fontSize: '0.85rem',
-      fontWeight: 600
-    },
-    subtitle2: {
-      opacity: 0.65,
-      fontSize: '0.8rem',
-      fontWeight: 400
-    }
-  },
-  palette: {
-    mode,
-    action: {
-      focus: mode === 'dark' ? 'rgb(29, 92, 132)' : 'rgb(29, 92, 132, 0.1)', // darken(backgroundLightColor, 0.1)
-      hover: mode === 'dark' ? '#5b5f62' : '#e2e6e9',
-      selected: mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(22, 52, 71, 0.06)'
-    },
-    background: {
-      default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor,
-      light: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor,
-      dark: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
-    },
-    text: {
-      primary: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor
-    },
-    twitter: {
-      contrastText: '#ffffff',
-      dark: darken('#00aced', 0.1),
-      main: '#00aced'
-    },
-    facebook: {
-      contrastText: '#ffffff',
-      dark: darken('#3b5998', 0.1),
-      main: '#3b5998'
-    },
-    primary: {
-      main: blueColor // '#010101',
-    },
-    secondary: {
-      main: mode === 'dark' ? '#999' : '#888'
-    },
-    white: {
-      main: '#eee'
-    },
-    blue: {
-      main: mode === 'dark' ? darkModeColors.blue : lightModeColors.blue,
-      contrastText: '#ffffff' // Contrast text needs to be defined in the palette, otherwise consumers like Chip will throw an error, as contrast text is undefined
-    },
-    red: {
-      main: mode === 'dark' ? darkModeColors.red : lightModeColors.red,
-      contrastText: '#ffffff'
-    },
-    gray: {
-      main: mode === 'dark' ? darkModeColors.gray : lightModeColors.gray,
-      contrastText: '#ffffff'
-    },
-    brown: {
-      main: mode === 'dark' ? darkModeColors.brown : lightModeColors.brown,
-      contrastText: '#ffffff'
-    },
-    orange: {
-      main: mode === 'dark' ? darkModeColors.orange : lightModeColors.orange,
-      contrastText: '#ffffff'
-    },
-    yellow: {
-      main: mode === 'dark' ? darkModeColors.yellow : lightModeColors.yellow,
-      contrastText: '#ffffff'
-    },
-    green: {
-      main: mode === 'dark' ? darkModeColors.green : lightModeColors.green,
-      contrastText: '#ffffff'
-    },
-    purple: {
-      main: mode === 'dark' ? darkModeColors.purple : lightModeColors.purple,
-      contrastText: '#ffffff'
-    },
-    pink: {
-      main: mode === 'dark' ? darkModeColors.pink : lightModeColors.pink,
-      contrastText: '#ffffff'
-    },
-    // custom components
-    settingsHeader: {
-      background: mode === 'dark' ? settingsHeaderBackgroundColorDarkMode : settingsHeaderBackgroundColor
-    },
-    sidebar: {
-      avatarHighlight: mode === 'dark' ? 'rgba(255, 255, 255, .2)' : '#ccc',
-      background: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor
-    },
-    code: {
-      color: '#EB5757',
-      background: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
-    },
-    emoji: {
-      hoverBackground: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04);'
-    },
-    ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: '20px'
-        }
+export const createThemeLightSensitive = (mode: PaletteMode) => {
+  const contrastText = mode === 'dark' ? '#fff' : '#000';
+
+  return createTheme({
+    transitions: {
+      duration: {
+        shortest: 150,
+        shorter: 200,
+        short: 250,
+        standard: 300,
+        complex: 375,
+        enteringScreen: 225,
+        leavingScreen: 195
       }
     },
-    MuiButtonBase: {
-      defaultProps: {
-        disableRipple: true
-      }
-    },
-    MuiButton: {
-      defaultProps: {
-        variant: 'contained'
+    typography: {
+      fontFamily: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"',
+      fontSize: 12,
+      htmlFontSize: 14,
+      h1: {
+        fontSize: '2rem',
+        fontWeight: 500
       },
-      styleOverrides: {
-        root: {
-          borderRadius: '10px'
-        }
+      h2: {
+        fontSize: '1.05rem',
+        fontWeight: 500
+      },
+      subtitle1: {
+        fontSize: '0.85rem',
+        fontWeight: 600
+      },
+      subtitle2: {
+        opacity: 0.65,
+        fontSize: '0.8rem',
+        fontWeight: 400
       }
     },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundColor: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
-        }
-      }
+    palette: {
+      mode,
+      action: {
+        focus: mode === 'dark' ? 'rgb(29, 92, 132)' : 'rgb(29, 92, 132, 0.1)', // darken(backgroundLightColor, 0.1)
+        hover: mode === 'dark' ? '#5b5f62' : '#e2e6e9',
+        selected: mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(22, 52, 71, 0.06)'
+      },
+      background: {
+        default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor,
+        light: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor,
+        dark: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
+      },
+      text: {
+        primary: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor
+      },
+      twitter: {
+        contrastText,
+        dark: darken('#00aced', 0.1),
+        main: '#00aced'
+      },
+      facebook: {
+        contrastText,
+        dark: darken('#3b5998', 0.1),
+        main: '#3b5998'
+      },
+      primary: {
+        main: blueColor // '#010101',
+      },
+      secondary: {
+        main: mode === 'dark' ? '#999' : '#888'
+      },
+      white: {
+        main: '#eee'
+      },
+      blue: {
+        main: mode === 'dark' ? darkModeColors.blue : lightModeColors.blue,
+        contrastText // Contrast text needs to be defined in the palette, otherwise consumers like Chip will throw an error, as contrast text is undefined
+      },
+      red: {
+        main: mode === 'dark' ? darkModeColors.red : lightModeColors.red,
+        contrastText
+      },
+      gray: {
+        main: mode === 'dark' ? darkModeColors.gray : lightModeColors.gray,
+        contrastText
+      },
+      brown: {
+        main: mode === 'dark' ? darkModeColors.brown : lightModeColors.brown,
+        contrastText
+      },
+      orange: {
+        main: mode === 'dark' ? darkModeColors.orange : lightModeColors.orange,
+        contrastText
+      },
+      yellow: {
+        main: mode === 'dark' ? darkModeColors.yellow : lightModeColors.yellow,
+        contrastText
+      },
+      green: {
+        main: mode === 'dark' ? darkModeColors.green : lightModeColors.green,
+        contrastText
+      },
+      purple: {
+        main: mode === 'dark' ? darkModeColors.purple : lightModeColors.purple,
+        contrastText
+      },
+      pink: {
+        main: mode === 'dark' ? darkModeColors.pink : lightModeColors.pink,
+        contrastText
+      },
+      // custom components
+      settingsHeader: {
+        background: mode === 'dark' ? settingsHeaderBackgroundColorDarkMode : settingsHeaderBackgroundColor
+      },
+      sidebar: {
+        avatarHighlight: mode === 'dark' ? 'rgba(255, 255, 255, .2)' : '#ccc',
+        background: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor
+      },
+      code: {
+        color: '#EB5757',
+        background: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
+      },
+      emoji: {
+        hoverBackground: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04);'
+      },
+      ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
     },
-    MuiAutocomplete: {
-      styleOverrides: {
-        popper: {
-          zIndex: 3000
-        }
-      }
-    },
-    MuiPopover: {
-      styleOverrides: {
-        root: {
-          zIndex: 3000
-        }
-      }
-    },
-    MuiCardContent: {
-      styleOverrides: {
-        root: {
-          '&:last-child': {
-            paddingBottom: 16
-          }
-        }
-      }
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        input: {
-          padding: '10px 10px',
-          fontSize: 16
-        }
-      }
-    },
-    MuiLink: {
-      styleOverrides: {
-        root: {
-          color: darkBlueColor,
-          '&:hover': {
-            color: darken(darkBlueColor, 0.2)
+    components: {
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: '20px'
           }
         }
       },
-      defaultProps: {
-        underline: 'none'
+      MuiButtonBase: {
+        defaultProps: {
+          disableRipple: true
+        }
+      },
+      MuiButton: {
+        defaultProps: {
+          variant: 'contained'
+        },
+        styleOverrides: {
+          root: {
+            borderRadius: '10px'
+          }
+        }
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundColor: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
+          }
+        }
+      },
+      MuiAutocomplete: {
+        styleOverrides: {
+          popper: {
+            zIndex: 3000
+          }
+        }
+      },
+      MuiPopover: {
+        styleOverrides: {
+          root: {
+            zIndex: 3000
+          }
+        }
+      },
+      MuiCardContent: {
+        styleOverrides: {
+          root: {
+            '&:last-child': {
+              paddingBottom: 16
+            }
+          }
+        }
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          input: {
+            padding: '10px 10px',
+            fontSize: 16
+          }
+        }
+      },
+      MuiLink: {
+        styleOverrides: {
+          root: {
+            color: darkBlueColor,
+            '&:hover': {
+              color: darken(darkBlueColor, 0.2)
+            }
+          }
+        },
+        defaultProps: {
+          underline: 'none'
+        }
       }
     }
-  }
-});
+  });
+};

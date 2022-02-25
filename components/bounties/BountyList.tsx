@@ -6,18 +6,18 @@ import { useContext, useState } from 'react';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { BountyCard } from './BountyCard';
 
+const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete'];
+
 export function BountyList () {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
   const { bounties } = useContext(BountiesContext);
-
-  const bountyOrder: BountyStatus [] = ['open', 'assigned', 'review', 'complete'];
 
   let sortedBounties = bounties ? sortArrayByObjectProperty(bounties.slice(), 'status', bountyOrder) : [];
   sortedBounties = sortedBounties.filter(bounty => {
     return bounty.status !== 'paid';
   });
 
-  function bountyCreated (newBounty: IBounty) {
+  function bountyCreated () {
     setDisplayBountyDialog(false);
   }
   return (

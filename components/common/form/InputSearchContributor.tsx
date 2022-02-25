@@ -1,8 +1,6 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
-import Image from 'next/image';
 import { useContributors } from 'hooks/useContributors';
 import { Contributor } from 'models';
-import { FiatCurrencyList, FiatCurrency } from '../../../models/Currency';
 
 export interface IInputSearchContributorProps {
   onChange?: (id: string) => any
@@ -10,7 +8,6 @@ export interface IInputSearchContributorProps {
 }
 
 export function InputSearchContributor ({ onChange = () => {}, defaultValue }: IInputSearchContributorProps) {
-
   const [contributors] = useContributors();
 
   const preselectedContributor = defaultValue ? contributors.find(contributor => {
@@ -18,7 +15,6 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
   }) : null;
 
   function emitValue (selectedUser: Contributor) {
-
     if (selectedUser === null) {
       return;
     }
@@ -38,8 +34,8 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
 
   return (
     <Autocomplete
-      defaultValue={preselectedContributor}
-      onChange={(event, value) => {
+      value={preselectedContributor ?? { id: '' } as any}
+      onChange={(_, value) => {
         emitValue(value as any);
       }}
       sx={{ minWidth: 150 }}
