@@ -7,7 +7,7 @@ import { EditorViewContext } from '@bangle.dev/react';
 import { nodeViewUpdateStore, useNodeViews } from '@bangle.dev/react/node-view-helpers';
 import { NodeViewWrapper, RenderNodeViewsFunction } from '@bangle.dev/react/NodeViewWrapper';
 import { objectUid } from '@bangle.dev/utils';
-import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 
 const LOG = false;
@@ -23,6 +23,8 @@ interface BangleEditorProps<PluginMetadata = any>
   style?: React.CSSProperties;
   onReady?: (editor: CoreBangleEditor<PluginMetadata>) => void;
   editorViewRef?: typeof useRef;
+  // Components that should be placed underneath the editor
+  postEditorComponents?: ReactNode
 }
 
 export const BangleEditor = React.forwardRef<
@@ -40,6 +42,7 @@ export const BangleEditor = React.forwardRef<
       className,
       style,
       onReady = () => {},
+      postEditorComponents
     },
     ref,
   ) => {
@@ -83,24 +86,23 @@ export const BangleEditor = React.forwardRef<
 
     return (
       <React.Fragment>
-        {editor ? (
-          <EditorViewContext.Provider value={editor.view}>
-            {children}
-          </EditorViewContext.Provider>
-        ) : null}
-        <div ref={renderRef} id={id} className={className} style={style} />
-        {nodeViews.map((nodeView) => {
-          return reactDOM.createPortal(
-            <NodeViewWrapper
-              debugKey={objectUid.get(nodeView)}
-              nodeViewUpdateStore={nodeViewUpdateStore}
-              nodeView={nodeView}
-              renderNodeViews={renderNodeViews!}
-            />,
-            nodeView.containerDOM!,
-            objectUid.get(nodeView),
-          );
-        })}
+        <EditorViewContext.Provider value={editor?.view as any}>
+          {editor ? children : null}
+          <div ref={renderRef} id={id} className={className} style={style} />
+          {nodeViews.map((nodeView) => {
+            return reactDOM.createPortal(
+              <NodeViewWrapper
+                debugKey={objectUid.get(nodeView)}
+                nodeViewUpdateStore={nodeViewUpdateStore}
+                nodeView={nodeView}
+                renderNodeViews={renderNodeViews!}
+              />,
+              nodeView.containerDOM!,
+              objectUid.get(nodeView),
+            );
+          })}
+          {editor ? postEditorComponents : null}
+        </EditorViewContext.Provider>
       </React.Fragment>
     );
   },

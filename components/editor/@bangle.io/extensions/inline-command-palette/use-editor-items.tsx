@@ -4,6 +4,7 @@ import {
 } from '@bangle.dev/base-components';
 import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import ImageIcon from '@mui/icons-material/Image';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import PreviewIcon from '@mui/icons-material/Preview';
@@ -98,7 +99,7 @@ function createColumnPaletteItem(colCount: number): Omit<PaletteItemType, "group
 }
 
 const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> = {
-  crypto: [
+  other: [
     {
       uid: 'price',
       title: 'Crypto price',
@@ -110,6 +111,27 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
           // Execute the animation
           rafCommandExec(view!, (state, dispatch) => {
             return insertNode(state, dispatch, state.schema.nodes.cryptoPrice.create())
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+
+        };
+      },
+    },
+    {
+      uid: 'horizontal_rule',
+      title: 'Horizontal Rule',
+      icon: <HorizontalRuleIcon sx={{ fontSize: 16 }}
+      />,
+      description: 'Display horizontal rule',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          // Execute the animation
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.horizontalRule.create())
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,

@@ -7,9 +7,6 @@ import { ComponentProps, ElementType } from 'react';
 
 const StyledButton = styled(Button)`
   white-space: nowrap;
-  &.Mui-disabled {
-    color: rgba(255, 255, 255, 0.5);
-  }
 `;
 
 export const StyledSpinner = styled(CircularProgress)`
