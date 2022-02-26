@@ -33,9 +33,9 @@ import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import IFrame, { iframeSpec } from './Iframe';
-import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import Placeholder from './Placeholder';
+import { Resizable } from './Resizable';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -256,9 +256,9 @@ export default function CharmEditor (
           }
           case 'image': {
             return (
-              <Image {...props}>
+              <Resizable {...props}>
                 {NodeViewChildren}
-              </Image>
+              </Resizable>
             );
           }
           case 'iframe': {

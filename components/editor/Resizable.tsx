@@ -1,5 +1,5 @@
-import { NodeViewProps, Plugin } from '@bangle.dev/core';
-import { EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
+import { NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
+import { EditorState, EditorView, Node, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
@@ -80,7 +80,7 @@ function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
 }
 
 const StyledImage = styled.img`
-  object-fit: cover;
+  object-fit: contain;
   width: 100%;
   height: 100%;
   user-select: none;
@@ -90,15 +90,64 @@ const StyledImage = styled.img`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-export function Image ({ node, updateAttrs }: NodeViewProps) {
+export function imageSpec (): RawSpecs {
+  return {
+    type: 'node',
+    name: 'image',
+    schema: {
+      inline: true,
+      attrs: {
+        caption: {
+          default: null
+        },
+        src: {
+          default: null
+        },
+        alt: {
+          default: null
+        },
+        aspectRatio: {
+          default: 1
+        }
+      },
+      group: 'inline',
+      draggable: false,
+      parseDOM: [
+        {
+          tag: 'img[src]',
+          getAttrs: (dom: any) => ({
+            src: dom.getAttribute('src'),
+            alt: dom.getAttribute('alt')
+          })
+        }
+      ] as any,
+      toDOM: ((node: Node) => {
+        return ['img', node.attrs];
+      }) as any
+    }
+  };
+}
+
+function imagePromise (url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject();
+    img.src = url;
+  });
+}
+
+export function Resizable ({ node, updateAttrs }: NodeViewProps) {
   const theme = useTheme();
   const [size, setSize] = useState(MIN_IMAGE_SIZE);
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
-      <ImageSelector onImageSelect={(imageSrc) => {
+      <ImageSelector onImageSelect={async (imageSrc) => {
+        const image = await imagePromise(imageSrc);
         updateAttrs({
-          src: imageSrc
+          src: imageSrc,
+          aspectRatio: image.width / image.height
         });
       }}
       >

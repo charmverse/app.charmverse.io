@@ -11,6 +11,7 @@ interface ResizerProps {
   onResize?: ResizableProps['onResize']
   minConstraints?: ResizableProps['minConstraints']
   maxConstraints?: ResizableProps['maxConstraints']
+  onResizeStop?: ResizableProps['onResizeStop']
 }
 
 export const StyledResizeHandle = styled(Box)`
@@ -36,7 +37,8 @@ export const StyledResizeHandle = styled(Box)`
 `;
 
 export default function Resizer (props: ResizerProps) {
-  const { size = 250, onResize, minConstraints, maxConstraints, minSize = 250, maxSize = 750, children } = props;
+  const { size = 250, onResizeStop, onResize, minConstraints,
+    maxConstraints, minSize = 250, maxSize = 750, children } = props;
 
   return (
     <Box
@@ -60,6 +62,7 @@ export default function Resizer (props: ResizerProps) {
         lockAspectRatio
         minConstraints={minConstraints ?? [minSize, minSize]}
         maxConstraints={maxConstraints ?? [maxSize, maxSize]}
+        onResizeStop={onResizeStop}
         /* eslint-disable-next-line */
         handle={(handleAxis: string, ref: React.Ref<unknown>) => <StyledResizeHandle ref={ref} className={`react-resizable-handle react-resizable-handle-${handleAxis}`} />}
       >
