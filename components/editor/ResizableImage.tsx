@@ -1,5 +1,6 @@
 import { NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
 import { EditorState, EditorView, Node, Slice, Transaction } from '@bangle.dev/pm';
+import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
@@ -108,6 +109,9 @@ export function imageSpec (): RawSpecs {
         },
         aspectRatio: {
           default: 1
+        },
+        size: {
+          default: MIN_IMAGE_WIDTH
         }
       },
       group: 'inline',
@@ -137,9 +141,11 @@ function imagePromise (url: string): Promise<HTMLImageElement> {
   });
 }
 
-export function Resizable ({ node, updateAttrs }: NodeViewProps) {
+export function ResizableImage ({ onResizeStop, node, updateAttrs }:
+  NodeViewProps & {onResizeStop?: (view: EditorView) => void }) {
   const theme = useTheme();
-  const [size, setSize] = useState(MIN_IMAGE_WIDTH);
+  const [size, setSize] = useState(node.attrs.size);
+  const view = useEditorViewContext();
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -173,7 +179,16 @@ export function Resizable ({ node, updateAttrs }: NodeViewProps) {
         size={size}
       >
         <Resizer
-          size={size}
+          onResizeStop={(_, data) => {
+            updateAttrs({
+              size: data.size.width
+            });
+            if (onResizeStop) {
+              onResizeStop(view);
+            }
+          }}
+          width={size}
+          height={size / aspectRatio}
           onResize={(_, data) => {
             setSize(data.size.width);
           }}

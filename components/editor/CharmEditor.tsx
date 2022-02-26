@@ -35,7 +35,7 @@ import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import IFrame, { iframeSpec } from './Iframe';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import Placeholder from './Placeholder';
-import { imageSpec, Resizable } from './Resizable';
+import { imageSpec, ResizableImage } from './ResizableImage';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -256,9 +256,17 @@ export default function CharmEditor (
           }
           case 'image': {
             return (
-              <Resizable {...props}>
-                {NodeViewChildren}
-              </Resizable>
+              <ResizableImage
+                onResizeStop={(view) => {
+                  if (onPageContentChange) {
+                    onPageContentChange({
+                      doc: view.state.doc.toJSON() as PageContent,
+                      rawText: view.state.doc.textContent as string
+                    });
+                  }
+                }}
+                {...props}
+              />
             );
           }
           case 'iframe': {
