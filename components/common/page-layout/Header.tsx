@@ -31,7 +31,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const router = useRouter();
   const colorMode = useColorMode();
   const [pageTitle] = usePageTitle();
-  const { currentPage, isEditing } = usePages();
+  const { currentPage, setCurrentPage, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
 
@@ -97,7 +97,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         <Box>
           {isPage && (
           <>
-            {currentPage && <ShareButton headerHeight={headerHeight} page={currentPage} />}
+            {currentPage && <ShareButton headerHeight={headerHeight} />}
 
             <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
               <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>

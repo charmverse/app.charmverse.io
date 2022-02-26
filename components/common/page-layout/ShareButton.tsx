@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
@@ -7,9 +7,9 @@ import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
 import Switch from '@mui/material/Switch';
 import Input from '@mui/material/Input';
-import Tooltip from '@mui/material/Tooltip';
 import { usePopupState, bindPopover, bindTrigger } from 'material-ui-popup-state/hooks';
 import styled from '@emotion/styled';
+import { usePages } from 'hooks/usePages';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 
@@ -23,23 +23,33 @@ const LinkBox = styled(Box)`
   background: ${({ theme }) => theme.palette.background.dark};
 `;
 
-export default function ShareButton ({ page, headerHeight }: { page: Page, headerHeight: number }) {
+export default function ShareButton ({ headerHeight }: { headerHeight: number }) {
 
+  const { currentPage, setPages } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [copied, setCopied] = useState<boolean>(false);
-  const [isPublic, setIsPublic] = useState(page.isPublic);
+  const [isPublic, setIsPublic] = useState(false);
 
-  function onCopy (id: string) {
+  useEffect(() => {
+    if (currentPage) {
+      setIsPublic(currentPage.isPublic);
+    }
+  }, [currentPage]);
+
+  function onCopy () {
     setCopied(true);
     setTimeout(() => setCopied(false), 1000);
   }
 
   async function togglePublic () {
-    const updatedPage = await charmClient.togglePagePublicAccess(page.id, !isPublic);
+    const updatedPage = await charmClient.togglePagePublicAccess(currentPage!.id, !isPublic);
     setIsPublic(updatedPage.isPublic);
+    const updates = { isPublic: updatedPage.isPublic };
+    setPages(pages => pages.map(p => p.id === currentPage!.id ? { ...p, ...updates } : p));
   }
 
-  const shareLink = typeof window !== 'undefined' ? `${window.location.origin}/share/${page.id}` : '';
+  const shareLink = (currentPage && typeof window !== 'undefined')
+    ? `${window.location.origin}/share/${currentPage.id}` : '';
 
   return (
     <>
@@ -79,7 +89,11 @@ export default function ShareButton ({ page, headerHeight }: { page: Page, heade
         >
           <Box>
             <Typography>Share to web</Typography>
-            <Typography variant='body2' color='secondary'>Publish and share link with anyone</Typography>
+            <Typography variant='body2' color='secondary'>
+              {isPublic
+                ? 'Anyone with the link can view'
+                : 'Publish and share link with anyone'}
+            </Typography>
           </Box>
           <Switch
             checked={isPublic}
