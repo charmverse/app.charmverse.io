@@ -101,6 +101,27 @@ function createColumnPaletteItem(colCount: number): Omit<PaletteItemType, "group
 const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> = {
   other: [
     {
+      uid: 'page',
+      title: 'Insert page',
+      icon: <svg viewBox="0 0 32 32" height="1em" width="1em" className="page" style={{ transform: "scale(1.25)", fill: 'currentColor', flexShrink: 0, backfaceVisibility: 'hidden'}}><g> <path d="M16,1H4v28h22V11L16,1z M16,3.828L23.172,11H16V3.828z M24,27H6V3h8v10h10V27z M8,17h14v-2H8V17z M8,21h14v-2H8V21z M8,25h14v-2H8V25z" /> </g></svg>,
+      description: 'Insert a new page',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          // Execute the animation
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.page.create({
+              src: null
+            }))
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    },
+    {
       uid: 'price',
       title: 'Crypto price',
       icon: <InsertChartIcon sx={{ fontSize: 16 }}
