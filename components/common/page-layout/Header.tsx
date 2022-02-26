@@ -16,7 +16,6 @@ import { useColorMode } from 'context/color-mode';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRouter } from 'next/router';
 import ShareButton from './ShareButton';
 
@@ -34,13 +33,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const [pageTitle] = usePageTitle();
   const { currentPage, isEditing } = usePages();
   const [user, setUser] = useUser();
-  const [space] = useCurrentSpace();
-  const [isPublic, setIsPublic] = useState(currentPage?.isPublic === true);
   const theme = useTheme();
-
-  const isAdmin = user?.spaceRoles.some(spaceRole => {
-    return spaceRole.spaceId === space?.id && spaceRole.role === 'admin';
-  });
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
@@ -53,14 +46,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
       ? await charmClient.unfavoritePage(pageId)
       : await charmClient.favoritePage(pageId);
     setUser(newUser);
-  }
-
-  function generateShareLink () {
-
-    const baseUrl = window.location.origin;
-    const shareLink = `${baseUrl}/share/${currentPage?.id}`;
-    navigator.clipboard.writeText(shareLink);
-    return shareLink;
   }
 
   return (
@@ -112,7 +97,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         <Box>
           {isPage && (
           <>
-            {currentPage && <ShareButton page={currentPage} />}
+            {currentPage && <ShareButton headerHeight={headerHeight} page={currentPage} />}
 
             <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
               <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>

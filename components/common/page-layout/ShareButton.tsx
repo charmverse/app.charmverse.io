@@ -1,56 +1,107 @@
-
+import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Button from '@mui/material/Button';
+import Collapse from '@mui/material/Collapse';
+import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Popover from '@mui/material/Popover';
 import Switch from '@mui/material/Switch';
-import LinkIcon from '@mui/icons-material/Link';
-import IconButton from '@mui/material/IconButton';
+import Input from '@mui/material/Input';
 import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import { usePopupState, bindPopover, bindTrigger } from 'material-ui-popup-state/hooks';
 import styled from '@emotion/styled';
 import { Page } from '@prisma/client';
+import charmClient from 'charmClient';
 
-export default function ShareButton ({ page }: { page: Page }) {
+const StyledInput = styled(Input)`
+  border: 1px solid ${({ theme }) => theme.palette.divider};
+  font-size: .8em;
+  padding-left: 1em;
+`;
 
-  const { isPublic } = page;
+const LinkBox = styled(Box)`
+  background: ${({ theme }) => theme.palette.background.dark};
+`;
 
-  async function togglePublic (newPublicStatus: boolean) {
-    const updatedPage = await charmClient.togglePagePublicAccess(currentPage!.id, newPublicStatus);
+export default function ShareButton ({ page, headerHeight }: { page: Page, headerHeight: number }) {
+
+  const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
+  const [copied, setCopied] = useState<boolean>(false);
+  const [isPublic, setIsPublic] = useState(page.isPublic);
+
+  function onCopy (id: string) {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1000);
+  }
+
+  async function togglePublic () {
+    const updatedPage = await charmClient.togglePagePublicAccess(page.id, !isPublic);
     setIsPublic(updatedPage.isPublic);
   }
 
+  const shareLink = typeof window !== 'undefined' ? `${window.location.origin}/share/${page.id}` : '';
+
   return (
     <>
-      <Button color='secondary' variant='text' size='small'>
+      <Button
+        color='secondary'
+        variant='text'
+        size='small'
+        {...bindTrigger(popupState)}
+      >
         Share
       </Button>
-      <Box>
-        <Tooltip title={isPublic ? 'Make private' : 'Make public'} arrow placement='bottom'>
-          <FormControlLabel
-            control={(
-              <Switch
-                defaultChecked={isPublic}
-                onChange={ev => togglePublic(ev.target.checked)}
-                inputProps={{ 'aria-label': 'toggle public access' }}
-              />
-                )}
-            label={isPublic === true ? 'Public' : 'Private'}
+      <Popover
+        {...bindPopover(popupState)}
+        anchorOrigin={{
+          horizontal: 'right',
+          vertical: 'bottom'
+        }}
+        anchorReference='none'
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center'
+        }}
+        PaperProps={{
+          sx: {
+            width: 400,
+            top: headerHeight,
+            right: 0
+          }
+        }}
+      >
+        <Box
+          display='flex'
+          justifyContent='space-between'
+          alignItems='center'
+          onChange={togglePublic}
+          padding={1}
+        >
+          <Box>
+            <Typography>Share to web</Typography>
+            <Typography variant='body2' color='secondary'>Publish and share link with anyone</Typography>
+          </Box>
+          <Switch
+            checked={isPublic}
           />
-        </Tooltip>
-        {isPublic === true && (
-        <Tooltip title='Copy sharing link' arrow placement='bottom'>
-
-          <IconButton
-            sx={{ ml: 1 }}
-            color='inherit'
-            onClick={generateShareLink}
-          >
-            {isPublic ? <LinkIcon color='secondary' /> : <LinkIcon color='secondary' />}
-          </IconButton>
-
-        </Tooltip>
-        )}
-      </Box>
+        </Box>
+        <Collapse in={isPublic}>
+          <LinkBox p={1}>
+            <StyledInput
+              fullWidth
+              disableUnderline
+              value={shareLink}
+              endAdornment={(
+                <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                  <Button color='secondary' variant='text' size='small'>
+                    {copied ? 'Copied!' : 'Copy'}
+                  </Button>
+                </CopyToClipboard>
+              )}
+            />
+          </LinkBox>
+        </Collapse>
+      </Popover>
     </>
   );
 }
