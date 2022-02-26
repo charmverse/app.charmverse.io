@@ -20,7 +20,7 @@ import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import styled from '@emotion/styled';
-import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
+import { plugins as imagePlugins } from 'components/editor/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev/react/ReactEditor';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
@@ -33,9 +33,9 @@ import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import IFrame, { iframeSpec } from './Iframe';
-import { Image } from './Image';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import Placeholder from './Placeholder';
+import { imageSpec, ResizableImage } from './ResizableImage';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -256,9 +256,17 @@ export default function CharmEditor (
           }
           case 'image': {
             return (
-              <Image {...props}>
-                {NodeViewChildren}
-              </Image>
+              <ResizableImage
+                onResizeStop={(view) => {
+                  if (onPageContentChange) {
+                    onPageContentChange({
+                      doc: view.state.doc.toJSON() as PageContent,
+                      rawText: view.state.doc.textContent as string
+                    });
+                  }
+                }}
+                {...props}
+              />
             );
           }
           case 'iframe': {
