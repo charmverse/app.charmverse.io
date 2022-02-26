@@ -20,7 +20,7 @@ import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import styled from '@emotion/styled';
-import { plugins as imagePlugins, spec as imageSpec } from 'components/editor/@bangle.dev/base-components/image';
+import { plugins as imagePlugins } from 'components/editor/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev/react/ReactEditor';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
@@ -35,7 +35,7 @@ import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import IFrame, { iframeSpec } from './Iframe';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import Placeholder from './Placeholder';
-import { Resizable } from './Resizable';
+import { imageSpec, Resizable } from './Resizable';
 
 export interface ICharmEditorOutput {
   doc: PageContent,

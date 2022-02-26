@@ -9,8 +9,8 @@ import BlockAligner from './BlockAligner';
 import ImageSelector from './ImageSelector';
 import Resizer from './Resizer';
 
-const MAX_IMAGE_SIZE = 750; const
-  MIN_IMAGE_SIZE = 100;
+const MAX_IMAGE_WIDTH = 750; const
+  MIN_IMAGE_WIDTH = 100;
 
 const StyledEmptyImageContainer = styled(Box)`
   display: flex;
@@ -139,7 +139,7 @@ function imagePromise (url: string): Promise<HTMLImageElement> {
 
 export function Resizable ({ node, updateAttrs }: NodeViewProps) {
   const theme = useTheme();
-  const [size, setSize] = useState(MIN_IMAGE_SIZE);
+  const [size, setSize] = useState(MIN_IMAGE_WIDTH);
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -156,6 +156,7 @@ export function Resizable ({ node, updateAttrs }: NodeViewProps) {
     );
   }
 
+  const { aspectRatio } = node.attrs as {aspectRatio: number};
   return (
     <Box style={{
       margin: theme.spacing(3, 0),
@@ -176,8 +177,8 @@ export function Resizable ({ node, updateAttrs }: NodeViewProps) {
           onResize={(_, data) => {
             setSize(data.size.width);
           }}
-          maxSize={MAX_IMAGE_SIZE}
-          minSize={MIN_IMAGE_SIZE}
+          maxConstraints={[MAX_IMAGE_WIDTH, MAX_IMAGE_WIDTH / aspectRatio]}
+          minConstraints={[MIN_IMAGE_WIDTH, MIN_IMAGE_WIDTH / aspectRatio]}
         >
           <StyledImage
             draggable={false}
