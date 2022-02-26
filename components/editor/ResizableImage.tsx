@@ -1,5 +1,6 @@
-import { NodeViewProps, Plugin } from '@bangle.dev/core';
-import { EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
+import { NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
+import { EditorState, EditorView, Node, Slice, Transaction } from '@bangle.dev/pm';
+import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
@@ -9,8 +10,8 @@ import BlockAligner from './BlockAligner';
 import ImageSelector from './ImageSelector';
 import Resizer from './Resizer';
 
-const MAX_IMAGE_SIZE = 750; const
-  MIN_IMAGE_SIZE = 100;
+const MAX_IMAGE_WIDTH = 750; const
+  MIN_IMAGE_WIDTH = 100;
 
 const StyledEmptyImageContainer = styled(Box)`
   display: flex;
@@ -80,7 +81,7 @@ function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
 }
 
 const StyledImage = styled.img`
-  object-fit: cover;
+  object-fit: contain;
   width: 100%;
   height: 100%;
   user-select: none;
@@ -90,15 +91,69 @@ const StyledImage = styled.img`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-export function Image ({ node, updateAttrs }: NodeViewProps) {
+export function imageSpec (): RawSpecs {
+  return {
+    type: 'node',
+    name: 'image',
+    schema: {
+      inline: true,
+      attrs: {
+        caption: {
+          default: null
+        },
+        src: {
+          default: null
+        },
+        alt: {
+          default: null
+        },
+        aspectRatio: {
+          default: 1
+        },
+        size: {
+          default: MIN_IMAGE_WIDTH
+        }
+      },
+      group: 'inline',
+      draggable: false,
+      parseDOM: [
+        {
+          tag: 'img[src]',
+          getAttrs: (dom: any) => ({
+            src: dom.getAttribute('src'),
+            alt: dom.getAttribute('alt')
+          })
+        }
+      ] as any,
+      toDOM: ((node: Node) => {
+        return ['img', node.attrs];
+      }) as any
+    }
+  };
+}
+
+function imagePromise (url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject();
+    img.src = url;
+  });
+}
+
+export function ResizableImage ({ onResizeStop, node, updateAttrs }:
+  NodeViewProps & {onResizeStop?: (view: EditorView) => void }) {
   const theme = useTheme();
-  const [size, setSize] = useState(MIN_IMAGE_SIZE);
+  const [size, setSize] = useState(node.attrs.size);
+  const view = useEditorViewContext();
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
-      <ImageSelector onImageSelect={(imageSrc) => {
+      <ImageSelector onImageSelect={async (imageSrc) => {
+        const image = await imagePromise(imageSrc);
         updateAttrs({
-          src: imageSrc
+          src: imageSrc,
+          aspectRatio: image.width / image.height
         });
       }}
       >
@@ -107,6 +162,7 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
     );
   }
 
+  const { aspectRatio } = node.attrs as {aspectRatio: number};
   return (
     <Box style={{
       margin: theme.spacing(3, 0),
@@ -123,12 +179,21 @@ export function Image ({ node, updateAttrs }: NodeViewProps) {
         size={size}
       >
         <Resizer
-          size={size}
+          onResizeStop={(_, data) => {
+            updateAttrs({
+              size: data.size.width
+            });
+            if (onResizeStop) {
+              onResizeStop(view);
+            }
+          }}
+          width={size}
+          height={size / aspectRatio}
           onResize={(_, data) => {
             setSize(data.size.width);
           }}
-          maxSize={MAX_IMAGE_SIZE}
-          minSize={MIN_IMAGE_SIZE}
+          maxConstraints={[MAX_IMAGE_WIDTH, MAX_IMAGE_WIDTH / aspectRatio]}
+          minConstraints={[MIN_IMAGE_WIDTH, MIN_IMAGE_WIDTH / aspectRatio]}
         >
           <StyledImage
             draggable={false}

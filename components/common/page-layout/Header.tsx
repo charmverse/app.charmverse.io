@@ -31,7 +31,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const router = useRouter();
   const colorMode = useColorMode();
   const [pageTitle] = usePageTitle();
-  const { currentPage, setCurrentPage, isEditing } = usePages();
+  const { currentPage, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
 
@@ -96,15 +96,15 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         </Box>
         <Box>
           {isPage && (
-          <>
-            {currentPage && <ShareButton headerHeight={headerHeight} />}
+            <>
+              <ShareButton headerHeight={headerHeight} />
 
-            <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
-              <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
-                {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
-              </IconButton>
-            </Tooltip>
-          </>
+              <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
+                <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
+                  {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
+                </IconButton>
+              </Tooltip>
+            </>
           )}
           {/** dark mode toggle */}
           <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
