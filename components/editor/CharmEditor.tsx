@@ -272,9 +272,18 @@ export default function CharmEditor (
           }
           case 'iframe': {
             return (
-              <IFrame {...props}>
-                {NodeViewChildren}
-              </IFrame>
+              <IFrame
+                onResizeStop={(view) => {
+                  if (onPageContentChange) {
+                    // Save the current image size on the backend after we are done resizing
+                    onPageContentChange({
+                      doc: view.state.doc.toJSON() as PageContent,
+                      rawText: view.state.doc.textContent as string
+                    });
+                  }
+                }}
+                {...props}
+              />
             );
           }
           default: {

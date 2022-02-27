@@ -12,8 +12,10 @@ import BlockAligner from './BlockAligner';
 import IFrameSelector from './IFrameSelector';
 import Resizer from './Resizer';
 
-const MAX_EMBED_WIDTH = 750; const
-  MIN_EMBED_WIDTH = 100; const
+export const MAX_EMBED_WIDTH = 750;
+export const
+  MIN_EMBED_WIDTH = 100;
+const
   ASPECT_RATIO = 1.77;
 
 const name = 'iframe';
@@ -117,7 +119,7 @@ const StyledEmptyIFrameContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement> & {type: 'video' | 'embed'}) {
+function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement> & { type: 'video' | 'embed' }) {
   const theme = useTheme();
   const { type, ...rest } = props;
   return (
@@ -133,7 +135,7 @@ function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement> & {type: 'v
       {...rest}
     >
       <StyledEmptyIFrameContainer>
-        {type === 'embed' ? <PreviewIcon fontSize='small' /> : <VideoLibraryIcon fontSize='small' /> }
+        {type === 'embed' ? <PreviewIcon fontSize='small' /> : <VideoLibraryIcon fontSize='small' />}
         <Typography>
           {type === 'video' ? 'Insert a video' : 'Insert an embed'}
         </Typography>
@@ -155,7 +157,7 @@ const StyledIFrame = styled(Box)`
 `;
 
 export default function IFrame ({ node, updateAttrs, onResizeStop }:
-  NodeViewProps & {onResizeStop?: (view: EditorView) => void }) {
+  NodeViewProps & { onResizeStop?: (view: EditorView) => void }) {
   const theme = useTheme();
   const [size, setSize] = useState(node.attrs.size);
   const view = useEditorViewContext();
