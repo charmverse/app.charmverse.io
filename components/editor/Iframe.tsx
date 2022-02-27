@@ -1,15 +1,20 @@
 import { NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
 import { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
+import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, useState } from 'react';
 import BlockAligner from './BlockAligner';
 import IFrameSelector from './IFrameSelector';
 import Resizer from './Resizer';
+
+const MAX_EMBED_WIDTH = 750; const
+  MIN_EMBED_WIDTH = 100; const
+  ASPECT_RATIO = 1.77;
 
 const name = 'iframe';
 
@@ -74,6 +79,9 @@ export function iframeSpec (): RawSpecs {
       attrs: {
         src: {
           default: ''
+        },
+        size: {
+          default: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2
         },
         // Type of iframe, it could either be video or embed
         type: {
@@ -146,8 +154,12 @@ const StyledIFrame = styled(Box)`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
+export default function IFrame ({ node, updateAttrs, onResizeStop }:
+  NodeViewProps & {onResizeStop?: (view: EditorView) => void }) {
   const theme = useTheme();
+  const [size, setSize] = useState(node.attrs.size);
+  const view = useEditorViewContext();
+
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -171,13 +183,31 @@ export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
       flexDirection: 'column'
     }}
     >
-      <BlockAligner onDelete={() => {
-        updateAttrs({
-          src: null
-        });
-      }}
+      <BlockAligner
+        onDelete={() => {
+          updateAttrs({
+            src: null
+          });
+        }}
+        size={size}
       >
-        <Resizer minConstraints={[1.77 * 250, 250]} maxConstraints={[1.77 * 550, 600]}>
+        <Resizer
+          onResizeStop={(_, data) => {
+            updateAttrs({
+              size: data.size.width
+            });
+            if (onResizeStop) {
+              onResizeStop(view);
+            }
+          }}
+          width={size}
+          height={size / ASPECT_RATIO}
+          onResize={(_, data) => {
+            setSize(data.size.width);
+          }}
+          maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_WIDTH / ASPECT_RATIO]}
+          minConstraints={[MIN_EMBED_WIDTH, MIN_EMBED_WIDTH / ASPECT_RATIO]}
+        >
           <StyledIFrame>
             <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
           </StyledIFrame>

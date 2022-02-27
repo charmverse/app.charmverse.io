@@ -111,6 +111,7 @@ export function imageSpec (): RawSpecs {
           default: 1
         },
         size: {
+          // Making sure default size is middle of max and min range
           default: (MIN_IMAGE_WIDTH + MAX_IMAGE_WIDTH) / 2
         }
       },
@@ -132,6 +133,7 @@ export function imageSpec (): RawSpecs {
   };
 }
 
+// Create a new image element using a promise, this makes it possible to get the width and height of the image
 function imagePromise (url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
