@@ -445,7 +445,7 @@ export function useEditorItems() {
       editorExecuteCommand: (() => {
         return (async (state, dispatch, view) => {
           // Use the current space
-          const path = await addPage(undefined, {
+          const page = await addPage(undefined, {
             parentId: currentPage?.id
           }, false);
           
@@ -454,7 +454,8 @@ export function useEditorItems() {
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.page.create({
-                  src: path
+                  path: page.path,
+                  id: page.id
                 })
               ])
             ))

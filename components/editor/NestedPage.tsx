@@ -3,6 +3,7 @@ import { DOMOutputSpec } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import { Box } from '@mui/material';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 
 const name = 'page';
@@ -14,7 +15,10 @@ export function nestedPageSpec (): RawSpecs {
     schema: {
       inline: true,
       attrs: {
-        src: {
+        path: {
+          default: null
+        },
+        id: {
           default: null
         }
       },
@@ -32,6 +36,9 @@ export function NestedPage ({ node }: NodeViewProps) {
   const theme = useTheme();
   const router = useRouter();
   const [space] = useCurrentSpace();
+  const { pages } = usePages();
+
+  const nestedPage = pages.find(page => page.id === node.attrs.id);
 
   const transition = theme.transitions.create(['background-color'], {
     duration: theme.transitions.duration.short,
@@ -55,7 +62,7 @@ export function NestedPage ({ node }: NodeViewProps) {
         }
       }}
       onClick={() => {
-        router.push(`/${(space!).domain}/${node.attrs.src}`);
+        router.push(`/${(space!).domain}/${node.attrs.path}`);
       }}
     >
       <Box>
@@ -66,7 +73,7 @@ export function NestedPage ({ node }: NodeViewProps) {
         </svg>
       </Box>
       <Box fontWeight={600} component='span'>
-        Untitled
+        {nestedPage?.title ? nestedPage.title : 'Untitled'}
       </Box>
     </Box>
   );

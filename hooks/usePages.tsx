@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
-type AddPageFn = (space?: Space, page?: Partial<Page>, shouldRoute?: boolean) => Promise<string>;
+type AddPageFn = (space?: Space, page?: Partial<Page>, shouldRoute?: boolean) => Promise<Page>;
 type IContext = {
   currentPage: Page | null,
   pages: Page[],
@@ -26,9 +26,7 @@ export const PagesContext = createContext<Readonly<IContext>>({
   setPages: () => undefined,
   isEditing: true,
   setIsEditing: () => { },
-  addPage: async () => {
-    return '';
-  }
+  addPage: null as any
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
@@ -93,7 +91,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       // add delay to simulate a server call
       router.push(`/${(_space ?? space!).domain}/${newPage.path}`);
     }
-    return newPage.path;
+    return newPage;
   };
 
   const value: IContext = useMemo(() => ({
