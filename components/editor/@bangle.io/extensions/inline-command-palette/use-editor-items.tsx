@@ -109,9 +109,14 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
         return (state, dispatch, view) => {
           // Execute the animation
           rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.page.create({
-              src: null
-            }))
+            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.page.create({
+                  src: null
+                })
+              ])
+            ))
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,

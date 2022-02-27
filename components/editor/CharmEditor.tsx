@@ -34,6 +34,7 @@ import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import IFrame, { iframeSpec } from './Iframe';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
+import { NestedPage, nestedPageSpec } from './NestedPage';
 import Placeholder from './Placeholder';
 import { imageSpec, ResizableImage } from './ResizableImage';
 
@@ -83,7 +84,8 @@ const specRegistry = new SpecRegistry([
   cryptoPriceSpec(),
   imageSpec(),
   columnLayoutSpec(),
-  columnBlockSpec()
+  columnBlockSpec(),
+  nestedPageSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
@@ -187,6 +189,10 @@ export default function CharmEditor (
       NodeView.createPlugin({
         name: 'iframe',
         containerDOM: ['div', { class: 'iframe-container' }]
+      }),
+      NodeView.createPlugin({
+        name: 'page',
+        containerDOM: ['div', { class: 'page-container' }]
       })
       // TODO: Pasting iframe or image link shouldn't create those blocks for now
       // iframePlugin,
@@ -274,6 +280,13 @@ export default function CharmEditor (
               <IFrame {...props}>
                 {NodeViewChildren}
               </IFrame>
+            );
+          }
+          case 'page': {
+            return (
+              <NestedPage {...props}>
+                {NodeViewChildren}
+              </NestedPage>
             );
           }
           default: {
