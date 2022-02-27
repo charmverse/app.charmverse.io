@@ -1,16 +1,14 @@
 import { NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
 import { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
-import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { HTMLAttributes, useState } from 'react';
-import BlockAligner from './BlockAligner';
+import { HTMLAttributes } from 'react';
 import IFrameSelector from './IFrameSelector';
-import Resizer from './Resizer';
+import Resizable from './Resizable';
 
 export const MAX_EMBED_WIDTH = 750;
 export const
@@ -158,9 +156,6 @@ const StyledIFrame = styled(Box)`
 
 export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
   NodeViewProps & { onResizeStop?: (view: EditorView) => void }) {
-  const theme = useTheme();
-  const [size, setSize] = useState(node.attrs.size);
-  const view = useEditorViewContext();
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
@@ -179,42 +174,17 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
   }
 
   return (
-    <Box style={{
-      margin: theme.spacing(3, 0),
-      display: 'flex',
-      flexDirection: 'column'
-    }}
+    <Resizable
+      aspectRatio={ASPECT_RATIO}
+      initialSize={node.attrs.size}
+      maxWidth={MAX_EMBED_WIDTH}
+      minWidth={MIN_EMBED_WIDTH}
+      updateAttrs={updateAttrs}
+      onResizeStop={onResizeStop}
     >
-      <BlockAligner
-        onDelete={() => {
-          updateAttrs({
-            src: null
-          });
-        }}
-        size={size}
-      >
-        <Resizer
-          onResizeStop={(_, data) => {
-            updateAttrs({
-              size: data.size.width
-            });
-            if (onResizeStop) {
-              onResizeStop(view);
-            }
-          }}
-          width={size}
-          height={size / ASPECT_RATIO}
-          onResize={(_, data) => {
-            setSize(data.size.width);
-          }}
-          maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_WIDTH / ASPECT_RATIO]}
-          minConstraints={[MIN_EMBED_WIDTH, MIN_EMBED_WIDTH / ASPECT_RATIO]}
-        >
-          <StyledIFrame>
-            <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
-          </StyledIFrame>
-        </Resizer>
-      </BlockAligner>
-    </Box>
+      <StyledIFrame>
+        <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+      </StyledIFrame>
+    </Resizable>
   );
 }
