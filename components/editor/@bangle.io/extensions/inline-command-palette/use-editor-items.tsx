@@ -48,8 +48,7 @@ function createTableHeader(state: EditorState, text: string) {
   ]))
 }
 
-function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node, skipScrollIntoView?: boolean) {
-  skipScrollIntoView = skipScrollIntoView ?? false
+function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node) {
   const insertPos = state.selection.$from.after();
   
   const tr = state.tr;
@@ -59,7 +58,7 @@ function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => voi
     return false;
   }
 
-  if (dispatch && !skipScrollIntoView) {
+  if (dispatch) {
     dispatch(newTr.scrollIntoView());
   }
 
@@ -446,18 +445,19 @@ export function useEditorItems() {
       editorExecuteCommand: (() => {
         return (async (state, dispatch, view) => {
           // Use the current space
-          await addPage(undefined, {
+          const path = await addPage(undefined, {
             parentId: currentPage?.id
           }, false);
+          
           rafCommandExec(view!, (state, dispatch) => {
             return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.page.create({
-                  src: null
+                  src: path
                 })
               ])
-            ), true)
+            ))
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,

@@ -2,6 +2,8 @@ import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
 import { DOMOutputSpec } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import { Box } from '@mui/material';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useRouter } from 'next/router';
 
 const name = 'page';
 
@@ -28,6 +30,8 @@ export function nestedPageSpec (): RawSpecs {
 
 export function NestedPage ({ node }: NodeViewProps) {
   const theme = useTheme();
+  const router = useRouter();
+  const [space] = useCurrentSpace();
 
   const transition = theme.transitions.create(['background-color'], {
     duration: theme.transitions.duration.short,
@@ -49,6 +53,9 @@ export function NestedPage ({ node }: NodeViewProps) {
           backgroundColor: theme.palette.background.light,
           transition
         }
+      }}
+      onClick={() => {
+        router.push(`/${(space!).domain}/${node.attrs.src}`);
       }}
     >
       <Box>
