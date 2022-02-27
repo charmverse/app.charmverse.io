@@ -3,7 +3,7 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, List, ListItem } from '@mui/material';
 import GroupLabel from 'components/editor/GroupLabel';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
 import {
   useInlinePaletteItems,
@@ -114,7 +114,7 @@ export function InlineCommandPalette() {
   }, [
     view,
     query,
-    editorItems,
+    // editorItems,
     isItemDisabled,
     // so that we recompute things, especially disabled, is palette visibility changes
     isVisible,

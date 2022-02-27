@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
+type AddPageFn = (space?: Space, page?: Partial<Page>, shouldRoute?: boolean) => Promise<void>;
 type IContext = {
   currentPage: Page | null,
   pages: Page[],
@@ -15,7 +16,7 @@ type IContext = {
   setPages: Dispatch<SetStateAction<Page[]>>,
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
-  addPage: (space: Space, page: Partial<Page>) => void
+  addPage: AddPageFn
 };
 
 export const PagesContext = createContext<Readonly<IContext>>({
@@ -25,7 +26,7 @@ export const PagesContext = createContext<Readonly<IContext>>({
   setPages: () => undefined,
   isEditing: true,
   setIsEditing: () => { },
-  addPage: () => { }
+  addPage: async () => { }
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
@@ -47,7 +48,9 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
   }, [space]);
 
-  async function addPage (_space: Space, page: Partial<Page>) {
+  const addPage: AddPageFn = async (_space, page, shouldRoute) => {
+    shouldRoute = shouldRoute ?? true;
+    const spaceId = (_space?.id ?? space?.id)!;
     const id = Math.random().toString().replace('0.', '');
     const pageProperties: Prisma.PageCreateInput = {
       content: {
@@ -69,12 +72,12 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       path: `page-${id}`,
       space: {
         connect: {
-          id: _space.id
+          id: spaceId
         }
       },
       title: '',
       type: 'page',
-      ...page
+      ...(page ?? {})
     };
     if (pageProperties.type === 'board') {
       await addBoardClicked(boardId => {
@@ -84,9 +87,11 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     const newPage = await charmClient.createPage(pageProperties);
     setPages([newPage, ...pages]);
 
-    // add delay to simulate a server call
-    router.push(`/${_space.domain}/${newPage.path}`);
-  }
+    if (shouldRoute) {
+      // add delay to simulate a server call
+      router.push(`/${(_space ?? space!).domain}/${newPage.path}`);
+    }
+  };
 
   const value: IContext = useMemo(() => ({
     currentPage,

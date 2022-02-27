@@ -10,12 +10,13 @@ import InsertChartIcon from '@mui/icons-material/InsertChart';
 import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import { usePages } from 'hooks/usePages';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
   isList
 } from './commands';
 import { palettePluginKey } from './config';
-import { PaletteItem, PaletteItemType } from './palette-item';
+import { PaletteItem, PaletteItemType, PromisedCommand } from './palette-item';
 
 const { convertToParagraph } = paragraph;
 const {
@@ -47,7 +48,8 @@ function createTableHeader(state: EditorState, text: string) {
   ]))
 }
 
-function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node) {
+function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node, skipScrollIntoView?: boolean) {
+  skipScrollIntoView = skipScrollIntoView ?? false
   const insertPos = state.selection.$from.after();
   
   const tr = state.tr;
@@ -57,7 +59,7 @@ function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => voi
     return false;
   }
 
-  if (dispatch) {
+  if (dispatch && !skipScrollIntoView) {
     dispatch(newTr.scrollIntoView());
   }
 
@@ -100,32 +102,7 @@ function createColumnPaletteItem(colCount: number): Omit<PaletteItemType, "group
 
 const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> = {
   other: [
-    {
-      uid: 'page',
-      title: 'Insert page',
-      icon: <svg viewBox="0 0 32 32" height="1em" width="1em" className="page" style={{ transform: "scale(1.25)", fill: 'currentColor', flexShrink: 0, backfaceVisibility: 'hidden'}}><g> <path d="M16,1H4v28h22V11L16,1z M16,3.828L23.172,11H16V3.828z M24,27H6V3h8v10h10V27z M8,17h14v-2H8V17z M8,21h14v-2H8V21z M8,25h14v-2H8V25z" /> </g></svg>,
-      description: 'Insert a new page',
-      editorExecuteCommand: () => {
-        return (state, dispatch, view) => {
-          // Execute the animation
-          rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
-              undefined,
-              Fragment.fromArray([
-                state.schema.nodes.page.create({
-                  src: null
-                })
-              ])
-            ))
-          })
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view,
-          );
-        };
-      },
-    },
+    
     {
       uid: 'price',
       title: 'Crypto price',
@@ -454,17 +431,50 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
   ]
 };
 
-const paletteItems: PaletteItem[] = [];
-
-Object.entries(paletteGroupItemsRecord).forEach(([group, paletteItemsWithoutGroup]) => {
-  paletteItemsWithoutGroup.forEach(paletteItem => {
-    paletteItems.push(PaletteItem.create({
-      ...paletteItem,
-      group
-    }))
-  })
-})
 
 export function useEditorItems() {
+  const { addPage, currentPage } = usePages();
+
+  const paletteItems: PaletteItem[] = []
+  Object.entries({...paletteGroupItemsRecord, other: [
+    ...paletteGroupItemsRecord.other,
+    {
+      uid: 'page',
+      title: 'Insert page',
+      icon: <svg viewBox="0 0 32 32" height="1em" width="1em" className="page" style={{ transform: "scale(1.25)", fill: 'currentColor', flexShrink: 0, backfaceVisibility: 'hidden'}}><g> <path d="M16,1H4v28h22V11L16,1z M16,3.828L23.172,11H16V3.828z M24,27H6V3h8v10h10V27z M8,17h14v-2H8V17z M8,21h14v-2H8V21z M8,25h14v-2H8V25z" /> </g></svg>,
+      description: 'Insert a new page',
+      editorExecuteCommand: (() => {
+        return (async (state, dispatch, view) => {
+          // Use the current space
+          await addPage(undefined, {
+            parentId: currentPage?.id
+          }, false);
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.page.create({
+                  src: null
+                })
+              ])
+            ), true)
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        }) as PromisedCommand;
+      }),
+    }
+  ]}).forEach(([group, paletteItemsWithoutGroup]) => {
+    paletteItemsWithoutGroup.forEach(paletteItem => {
+      paletteItems.push(PaletteItem.create({
+        ...paletteItem,
+        group
+      }))
+    })
+  })
+
   return paletteItems;
 }
