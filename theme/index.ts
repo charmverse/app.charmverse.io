@@ -232,13 +232,13 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
-      MuiPopover: {
-        styleOverrides: {
-          root: {
-            zIndex: 3000
-          }
-        }
-      },
+      // MuiPopover: {
+      //   styleOverrides: {
+      //     root: {
+      //       zIndex: 3000
+      //     }
+      //   }
+      // },
       MuiCardContent: {
         styleOverrides: {
           root: {

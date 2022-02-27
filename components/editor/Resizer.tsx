@@ -4,6 +4,8 @@ import { ReactNode } from 'react';
 import { ResizableBox, ResizableProps } from 'react-resizable';
 
 interface ResizerProps {
+  width?: number
+  height?: number
   size?: number
   maxSize?: number
   minSize?: number
@@ -11,6 +13,7 @@ interface ResizerProps {
   onResize?: ResizableProps['onResize']
   minConstraints?: ResizableProps['minConstraints']
   maxConstraints?: ResizableProps['maxConstraints']
+  onResizeStop?: ResizableProps['onResizeStop']
 }
 
 export const StyledResizeHandle = styled(Box)`
@@ -36,7 +39,8 @@ export const StyledResizeHandle = styled(Box)`
 `;
 
 export default function Resizer (props: ResizerProps) {
-  const { size = 250, onResize, minConstraints, maxConstraints, minSize = 250, maxSize = 750, children } = props;
+  const { width, height, size = 250, onResizeStop, onResize, minConstraints,
+    maxConstraints, minSize = 250, maxSize = 750, children } = props;
 
   return (
     <Box
@@ -54,12 +58,13 @@ export default function Resizer (props: ResizerProps) {
     >
       <ResizableBox
         onResize={onResize}
-        width={maxConstraints?.[0] ?? size ?? maxSize}
-        height={maxConstraints?.[1] ?? size ?? maxSize}
+        width={width ?? maxConstraints?.[0] ?? size ?? maxSize}
+        height={height ?? maxConstraints?.[1] ?? size ?? maxSize}
         resizeHandles={['w', 'e']}
         lockAspectRatio
         minConstraints={minConstraints ?? [minSize, minSize]}
         maxConstraints={maxConstraints ?? [maxSize, maxSize]}
+        onResizeStop={onResizeStop}
         /* eslint-disable-next-line */
         handle={(handleAxis: string, ref: React.Ref<unknown>) => <StyledResizeHandle ref={ref} className={`react-resizable-handle react-resizable-handle-${handleAxis}`} />}
       >
