@@ -9,7 +9,6 @@ type IContext = [user: LoggedInUser | null, setUser: (user: LoggedInUser | any) 
 export const UserContext = createContext<Readonly<IContext>>([null, () => undefined, false]);
 
 export function UserProvider ({ children }: { children: ReactNode }) {
-
   const { account } = useWeb3React();
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
