@@ -111,7 +111,7 @@ export function imageSpec (): RawSpecs {
           default: 1
         },
         size: {
-          default: MIN_IMAGE_WIDTH
+          default: (MIN_IMAGE_WIDTH + MAX_IMAGE_WIDTH) / 2
         }
       },
       group: 'inline',
