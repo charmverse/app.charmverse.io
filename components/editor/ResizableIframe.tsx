@@ -111,7 +111,7 @@ export function iframeSpec (): RawSpecs {
   };
 }
 
-const StyledEmptyIFrameContainer = styled(Box)`
+const StyledEmptyIframeContainer = styled(Box)`
   display: flex;
   gap: ${({ theme }) => theme.spacing(1.5)};
   width: 100%;
@@ -119,7 +119,7 @@ const StyledEmptyIFrameContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement> & { type: 'video' | 'embed' }) {
+function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { type: 'video' | 'embed' }) {
   const theme = useTheme();
   const { type, ...rest } = props;
   return (
@@ -134,12 +134,12 @@ function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement> & { type: '
       }}
       {...rest}
     >
-      <StyledEmptyIFrameContainer>
+      <StyledEmptyIframeContainer>
         {type === 'embed' ? <PreviewIcon fontSize='small' /> : <VideoLibraryIcon fontSize='small' />}
         <Typography>
           {type === 'video' ? 'Insert a video' : 'Insert an embed'}
         </Typography>
-      </StyledEmptyIFrameContainer>
+      </StyledEmptyIframeContainer>
     </ListItem>
   );
 }
@@ -156,7 +156,7 @@ const StyledIFrame = styled(Box)`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-export default function IFrame ({ node, updateAttrs, onResizeStop }:
+export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
   NodeViewProps & { onResizeStop?: (view: EditorView) => void }) {
   const theme = useTheme();
   const [size, setSize] = useState(node.attrs.size);
@@ -173,7 +173,7 @@ export default function IFrame ({ node, updateAttrs, onResizeStop }:
           });
         }}
       >
-        <EmptyIFrameContainer type={node.attrs.type} />
+        <EmptyIframeContainer type={node.attrs.type} />
       </IFrameSelector>
     );
   }

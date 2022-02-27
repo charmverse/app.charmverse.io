@@ -10,7 +10,7 @@ import InsertChartIcon from '@mui/icons-material/InsertChart';
 import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import { MAX_EMBED_WIDTH, MIN_EMBED_WIDTH } from 'components/editor/Iframe';
+import { MAX_EMBED_WIDTH, MIN_EMBED_WIDTH } from 'components/editor/ResizableIframe';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
   isList
