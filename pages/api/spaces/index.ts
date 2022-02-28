@@ -52,7 +52,7 @@ function logSpaceCreation (space: Space) {
   const eventLog: IEventToLog = {
     funnelStage: 'acquisition',
     eventType: 'create_workspace',
-    message: `New workspace ${space.name} has just been created`
+    message: `New workspace ${space.domain} has just been created`
   };
 
   postToDiscord(eventLog);
