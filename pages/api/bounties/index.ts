@@ -74,7 +74,7 @@ async function logWorkspaceFirstBountyEvents (bounty: Bounty) {
     const event: IEventToLog = {
       eventType: 'first_workspace_create_bounty',
       funnelStage: 'activation',
-      message: `A user in ${workspace?.name} workspace just created their first bounty`
+      message: `${workspace?.name} workspace just posted its first bounty`
     };
 
     postToDiscord(event);
@@ -84,13 +84,13 @@ async function logWorkspaceFirstBountyEvents (bounty: Bounty) {
 }
 
 async function logUserFirstBountyEvents (bounty: Bounty) {
-  const bountiesInWorkspace = await prisma.bounty.findMany({
+  const bountiesFromUser = await prisma.bounty.findMany({
     where: {
       createdBy: bounty.createdBy
     }
   });
 
-  if (bountiesInWorkspace.length === 1) {
+  if (bountiesFromUser.length === 1) {
 
     const workspace = await prisma.space.findUnique({
       where: {
@@ -101,7 +101,7 @@ async function logUserFirstBountyEvents (bounty: Bounty) {
     const event: IEventToLog = {
       eventType: 'first_user_create_bounty',
       funnelStage: 'activation',
-      message: `${workspace?.name} workspace just created its first bounty`
+      message: `A user just created their first bounty inside the ${workspace?.name} workspace`
     };
 
     postToDiscord(event);
