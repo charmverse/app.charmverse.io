@@ -32,12 +32,13 @@ npx prisma migrate dev
 npm start
 ```
 
-3. (Optional) Configure your environment
-You can override your environment variables using dotenv.
+3. (Optional) Configure your environment.
 
-Create a file in the root directory ie. '.env.example'
+You can configure your environment variables using dotenv.
 
-Start the app from the dotenv CLI, which you can download [here](https://www.npmjs.com/package/dotenv-cli)
+To do so, create a file in the root directory ie. '.env.example'
+
+Start the app from the dotenv CLI, which you can download [here](https://www.npmjs.com/package/dotenv-cli).
 
 ```
 $ dotenv -e .env.example -- npm start
