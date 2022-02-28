@@ -19,6 +19,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import { Page } from 'models';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { usePages } from 'hooks/usePages';
 import NewPageMenu, { StyledArticleIcon, StyledDatabaseIcon } from '../NewPageMenu';
 import EmojiCon from '../Emoji';
 
@@ -380,6 +381,7 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
       roots.push(node);
     }
   }
+
   return roots;
 }
 
@@ -430,26 +432,19 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
 }
 
 type NavProps = {
-  addPage?: (s: Space, p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
-  pages: Page[];
-  currentPage: Page | null;
   space: Space;
   rootPageIds?: string[];
-  setPages: Dispatch<SetStateAction<Page[]>>;
 };
 
 export default function PageNavigation ({
-  addPage,
   deletePage,
   isFavorites,
-  pages,
-  currentPage,
   space,
-  rootPageIds,
-  setPages
+  rootPageIds
 }: NavProps) {
+  const { pages, currentPage, setPages, addPage } = usePages();
 
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
@@ -471,8 +466,6 @@ export default function PageNavigation ({
       return state.filter(id => id !== droppedItem.id);
     });
   };
-
-  const router = useRouter();
 
   useEffect(() => {
     for (const page of pages) {

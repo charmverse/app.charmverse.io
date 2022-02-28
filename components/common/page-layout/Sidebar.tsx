@@ -201,12 +201,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                     </SectionName>
                     <PageNavigation
                       isFavorites={true}
-                      currentPage={currentPage}
-                      pages={pages}
                       space={space}
                       rootPageIds={favoritePageIds}
-                      setPages={setPages}
-                      addPage={addPage}
                     />
                   </Box>
                 )}
@@ -219,11 +215,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                   </div>
                 </WorkspaceLabel>
                 <PageNavigation
-                  currentPage={currentPage}
-                  pages={pages}
                   space={space}
-                  setPages={setPages}
-                  addPage={addPage}
                   deletePage={deletePage}
                 />
               </Box>
