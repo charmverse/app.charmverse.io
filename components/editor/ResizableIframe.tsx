@@ -7,9 +7,14 @@ import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { HTMLAttributes } from 'react';
-import BlockAligner from './BlockAligner';
 import IFrameSelector from './IFrameSelector';
-import Resizer from './Resizer';
+import Resizable from './Resizable';
+
+export const MAX_EMBED_WIDTH = 750;
+export const
+  MIN_EMBED_WIDTH = 100;
+const
+  ASPECT_RATIO = 1.77;
 
 const name = 'iframe';
 
@@ -75,6 +80,9 @@ export function iframeSpec (): RawSpecs {
         src: {
           default: ''
         },
+        size: {
+          default: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2
+        },
         // Type of iframe, it could either be video or embed
         type: {
           default: 'embed'
@@ -101,7 +109,7 @@ export function iframeSpec (): RawSpecs {
   };
 }
 
-const StyledEmptyIFrameContainer = styled(Box)`
+const StyledEmptyIframeContainer = styled(Box)`
   display: flex;
   gap: ${({ theme }) => theme.spacing(1.5)};
   width: 100%;
@@ -109,7 +117,7 @@ const StyledEmptyIFrameContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement> & {type: 'video' | 'embed'}) {
+function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { type: 'video' | 'embed' }) {
   const theme = useTheme();
   const { type, ...rest } = props;
   return (
@@ -124,12 +132,12 @@ function EmptyIFrameContainer (props: HTMLAttributes<HTMLDivElement> & {type: 'v
       }}
       {...rest}
     >
-      <StyledEmptyIFrameContainer>
-        {type === 'embed' ? <PreviewIcon fontSize='small' /> : <VideoLibraryIcon fontSize='small' /> }
+      <StyledEmptyIframeContainer>
+        {type === 'embed' ? <PreviewIcon fontSize='small' /> : <VideoLibraryIcon fontSize='small' />}
         <Typography>
           {type === 'video' ? 'Insert a video' : 'Insert an embed'}
         </Typography>
-      </StyledEmptyIFrameContainer>
+      </StyledEmptyIframeContainer>
     </ListItem>
   );
 }
@@ -146,8 +154,9 @@ const StyledIFrame = styled(Box)`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
-  const theme = useTheme();
+export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
+  NodeViewProps & { onResizeStop?: (view: EditorView) => void }) {
+
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -159,30 +168,23 @@ export default function IFrame ({ node, updateAttrs }: NodeViewProps) {
           });
         }}
       >
-        <EmptyIFrameContainer type={node.attrs.type} />
+        <EmptyIframeContainer type={node.attrs.type} />
       </IFrameSelector>
     );
   }
 
   return (
-    <Box style={{
-      margin: theme.spacing(3, 0),
-      display: 'flex',
-      flexDirection: 'column'
-    }}
+    <Resizable
+      aspectRatio={ASPECT_RATIO}
+      initialSize={node.attrs.size}
+      maxWidth={MAX_EMBED_WIDTH}
+      minWidth={MIN_EMBED_WIDTH}
+      updateAttrs={updateAttrs}
+      onResizeStop={onResizeStop}
     >
-      <BlockAligner onDelete={() => {
-        updateAttrs({
-          src: null
-        });
-      }}
-      >
-        <Resizer minConstraints={[1.77 * 250, 250]} maxConstraints={[1.77 * 550, 600]}>
-          <StyledIFrame>
-            <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
-          </StyledIFrame>
-        </Resizer>
-      </BlockAligner>
-    </Box>
+      <StyledIFrame>
+        <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+      </StyledIFrame>
+    </Resizable>
   );
 }
