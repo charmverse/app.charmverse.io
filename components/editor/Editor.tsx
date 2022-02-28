@@ -118,7 +118,7 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
           <EditorHeader>
             {page?.icon && (
               <EmojiContainer updatePageIcon={updatePageIcon}>
-                <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+                <Emoji sx={{ fontSize: 60 }}>{page.icon}</Emoji>
               </EmojiContainer>
             )}
             <Controls className='page-controls'>

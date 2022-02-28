@@ -1,14 +1,14 @@
-import { useState, MouseEvent } from 'react';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
+import styled from '@emotion/styled';
+import AddIcon from '@mui/icons-material/Add';
 import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import DatabaseIcon from '@mui/icons-material/TableChart';
-import AddIcon from '@mui/icons-material/Add';
-import styled from '@emotion/styled';
+import IconButton from '@mui/material/IconButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import { useMenu } from 'hooks/useMenu';
 import { Page } from 'models';
 import { greyColor2 } from 'theme/colors';
 
@@ -40,33 +40,24 @@ export const StyledDatabaseIcon = styled(DatabaseIcon)`
 type Props = { addPage: (p: Partial<Page>) => void, tooltip: string, sx?: any };
 
 export default function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
-
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-    event.preventDefault();
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const { anchorEl, hideMenu, showMenu, isOpen } = useMenu();
   const createPage = (page: { type: Page['type'] }) => {
-    handleClose();
+    hideMenu();
     addPage(page);
   };
 
   return (
     <>
       <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement='right' arrow>
-        <StyledIconButton onClick={handleClick} {...props}>
+        <StyledIconButton onClick={showMenu} {...props}>
           <AddIcon color='secondary' />
         </StyledIconButton>
       </Tooltip>
 
       <Menu
         anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
+        open={isOpen}
+        onClose={hideMenu}
       >
         <MenuItem onClick={() => createPage({ type: 'page' })}>
           <ListItemIcon><StyledArticleIcon fontSize='small' /></ListItemIcon>

@@ -1,27 +1,27 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Space } from '@prisma/client';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
+import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import TreeView from '@mui/lab/TreeView';
-import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
+import { Space } from '@prisma/client';
+import { useLocalStorage } from 'hooks/useLocalStorage';
+import { useMenu } from 'hooks/useMenu';
+import { usePages } from 'hooks/usePages';
+import { Page } from 'models';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
-import { Page } from 'models';
-import { useLocalStorage } from 'hooks/useLocalStorage';
-import { usePages } from 'hooks/usePages';
-import NewPageMenu, { StyledArticleIcon, StyledDatabaseIcon } from '../NewPageMenu';
 import EmojiCon from '../Emoji';
+import NewPageMenu, { StyledArticleIcon, StyledDatabaseIcon } from '../NewPageMenu';
 
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
@@ -184,21 +184,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     ...other
   } = props;
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  function stopPropagation (event: SyntheticEvent) {
-    event.stopPropagation();
-  }
-
-  function showMenu (event: React.MouseEvent<HTMLElement>) {
-    setAnchorEl(event.currentTarget);
-    event.preventDefault();
-    event.stopPropagation();
-  }
-
-  function hideMenu (event: React.MouseEvent<HTMLElement>) {
-    setAnchorEl(null);
-  }
+  const { anchorEl, showMenu, hideMenu, isOpen } = useMenu();
 
   return (
     <>
@@ -226,7 +212,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
 
       <Menu
         anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
+        open={isOpen}
         onClose={hideMenu}
         onClick={hideMenu}
         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
@@ -267,7 +253,7 @@ type DraggableNodeProps = {
 }
 
 function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }: DraggableNodeProps) {
-
+  const { pages } = usePages();
   const theme = useTheme();
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
