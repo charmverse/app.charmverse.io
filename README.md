@@ -32,6 +32,20 @@ npx prisma migrate dev
 npm start
 ```
 
+3. (Optional) Configure your environment
+You can override your environment variables using dotenv.
+
+Create a file in the root directory ie. '.env.example'
+
+Start the app from the dotenv CLI, which you can download [here](https://www.npmjs.com/package/dotenv-cli)
+
+```
+$ dotenv -e .env.example -- npm start
+```
+
+For further information about environment variables in Next.js, see the [docs](https://nextjs.org/docs/basic-features/environment-variables).
+
+
 ### Third Party Dependencies
 
 CharmVerse is built with:
