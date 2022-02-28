@@ -6,6 +6,7 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { LoggedInUser } from 'models';
+import { postToDiscord, IDiscordMessage } from 'lib/logs/notifyDiscord';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -44,6 +45,15 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
         spaceRoles: true
       }
     });
+
+    const message = 'New user signed up';
+
+    postToDiscord({
+      funnelStage: 'acquisition',
+      eventType: 'create_user',
+      message
+    });
+
     req.session.user = newUser;
     await req.session.save();
     res.status(200).json(newUser);
