@@ -1,7 +1,5 @@
 import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec, Fragment } from '@bangle.dev/pm';
-import { useEditorViewContext } from '@bangle.dev/react';
-import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
+import { DOMOutputSpec } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -9,9 +7,9 @@ import { Box, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import ActionsMenu from 'components/common/ActionsMenu';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMenu } from 'hooks/useMenu';
+import useNestedPage from 'hooks/useNestedPage';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
-import { insertNode } from './@bangle.io/extensions/inline-command-palette/use-editor-items';
 
 const name = 'page';
 
@@ -43,8 +41,8 @@ export function NestedPage ({ node }: NodeViewProps) {
   const theme = useTheme();
   const router = useRouter();
   const [space] = useCurrentSpace();
-  const { currentPage, addPage, pages } = usePages();
-  const view = useEditorViewContext();
+  const { pages } = usePages();
+  const { addNestedPage } = useNestedPage();
 
   const { anchorEl, showMenu, hideMenu, isOpen } = useMenu();
 
@@ -114,23 +112,7 @@ export function NestedPage ({ node }: NodeViewProps) {
         </MenuItem>
         <MenuItem
           sx={{ padding: '3px 12px' }}
-          onClick={async () => {
-            const page = await addPage(undefined, {
-              parentId: currentPage?.id
-            }, false);
-
-            rafCommandExec(view!, (state, dispatch) => {
-              return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
-                undefined,
-                Fragment.fromArray([
-                  state.schema.nodes.page.create({
-                    path: page.path,
-                    id: page.id
-                  })
-                ])
-              ));
-            });
-          }}
+          onClick={addNestedPage}
         >
           <ListItemIcon>
             <ContentPasteIcon

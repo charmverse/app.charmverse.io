@@ -11,6 +11,7 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { MAX_EMBED_WIDTH, MIN_EMBED_WIDTH } from 'components/editor/ResizableIframe';
+import useNestedPage from 'hooks/useNestedPage';
 import { usePages } from 'hooks/usePages';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
@@ -436,6 +437,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
 
 export function useEditorItems() {
   const { addPage, currentPage } = usePages();
+  const { addNestedPage } = useNestedPage()
 
   const paletteItems: PaletteItem[] = []
   Object.entries({...paletteGroupItemsRecord, other: [
@@ -447,22 +449,7 @@ export function useEditorItems() {
       description: 'Insert a new page',
       editorExecuteCommand: (() => {
         return (async (state, dispatch, view) => {
-          // Use the current space
-          const page = await addPage(undefined, {
-            parentId: currentPage?.id
-          }, false);
-          
-          rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
-              undefined,
-              Fragment.fromArray([
-                state.schema.nodes.page.create({
-                  path: page.path,
-                  id: page.id
-                })
-              ])
-            ))
-          })
+          await addNestedPage();
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
             dispatch,
