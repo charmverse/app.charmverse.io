@@ -1,5 +1,7 @@
 import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec } from '@bangle.dev/pm';
+import { DOMOutputSpec, Fragment } from '@bangle.dev/pm';
+import { useEditorViewContext } from '@bangle.dev/react';
+import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
 import { useTheme } from '@emotion/react';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -9,6 +11,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMenu } from 'hooks/useMenu';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
+import { insertNode } from './@bangle.io/extensions/inline-command-palette/use-editor-items';
 
 const name = 'page';
 
@@ -40,7 +43,8 @@ export function NestedPage ({ node }: NodeViewProps) {
   const theme = useTheme();
   const router = useRouter();
   const [space] = useCurrentSpace();
-  const { pages } = usePages();
+  const { currentPage, addPage, pages } = usePages();
+  const view = useEditorViewContext();
 
   const { anchorEl, showMenu, hideMenu, isOpen } = useMenu();
 
@@ -110,11 +114,29 @@ export function NestedPage ({ node }: NodeViewProps) {
         </MenuItem>
         <MenuItem
           sx={{ padding: '3px 12px' }}
-          onClick={(e) => {
+          onClick={async () => {
+            const page = await addPage(undefined, {
+              parentId: currentPage?.id
+            }, false);
 
+            rafCommandExec(view!, (state, dispatch) => {
+              return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
+                undefined,
+                Fragment.fromArray([
+                  state.schema.nodes.page.create({
+                    path: page.path,
+                    id: page.id
+                  })
+                ])
+              ));
+            });
           }}
         >
-          <ListItemIcon><ContentPasteIcon fontSize='small' /></ListItemIcon>
+          <ListItemIcon>
+            <ContentPasteIcon
+              fontSize='small'
+            />
+          </ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Duplicate</Typography>
         </MenuItem>
       </Menu>

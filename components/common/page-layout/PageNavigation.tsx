@@ -123,7 +123,8 @@ const PageIcon = styled(EmojiCon)`
   margin-right: 4px;
 `;
 
-export const PageTitle = styled(Typography)<{isEmpty: number}>`
+// NOTE: Dont change isempty to isEmpty, React will throw an error in the console
+export const PageTitle = styled(Typography)<{isempty: number}>`
   color: inherit;
   display: flex;
   align-items: center;
@@ -132,7 +133,7 @@ export const PageTitle = styled(Typography)<{isEmpty: number}>`
   &:hover {
     color: inherit;
   }
-  ${(props) => props.isEmpty && 'opacity: 0.5;'}
+  ${(props) => props.isempty && 'opacity: 0.5;'}
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -148,7 +149,7 @@ interface PageLinkProps {
 
 export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
 
-  const isEmpty = !label;
+  const isempty = !label;
 
   function stopPropagation (event: SyntheticEvent) {
     event.stopPropagation();
@@ -162,8 +163,8 @@ export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
             {labelIcon}
           </PageIcon>
         )}
-        <PageTitle isEmpty={isEmpty ? 1 : 0}>
-          {isEmpty ? 'Untitled' : label}
+        <PageTitle isempty={isempty ? 1 : 0}>
+          {isempty ? 'Untitled' : label}
         </PageTitle>
         {children}
       </PageAnchor>
