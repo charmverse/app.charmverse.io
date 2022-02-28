@@ -1,8 +1,12 @@
 import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
 import { DOMOutputSpec } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
-import { Box } from '@mui/material';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import { Box, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import ActionsMenu from 'components/common/ActionsMenu';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMenu } from 'hooks/useMenu';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 
@@ -38,6 +42,8 @@ export function NestedPage ({ node }: NodeViewProps) {
   const [space] = useCurrentSpace();
   const { pages } = usePages();
 
+  const { anchorEl, showMenu, hideMenu, isOpen } = useMenu();
+
   const nestedPage = pages.find(page => page.id === node.attrs.id);
 
   const transition = theme.transitions.create(['background-color'], {
@@ -56,13 +62,14 @@ export function NestedPage ({ node }: NodeViewProps) {
       sx={{
         cursor: 'pointer',
         transition,
+        position: 'relative',
         '&:hover': {
           backgroundColor: theme.palette.background.light,
           transition
+        },
+        '&:hover .actions-menu': {
+          opacity: 1
         }
-      }}
-      onClick={() => {
-        router.push(`/${(space!).domain}/${node.attrs.path}`);
       }}
     >
       <Box>
@@ -74,9 +81,43 @@ export function NestedPage ({ node }: NodeViewProps) {
         </svg>
         )}
       </Box>
-      <Box fontWeight={600} component='span'>
+      <Box
+        fontWeight={600}
+        component='span'
+        onClick={() => {
+          router.push(`/${(space!).domain}/${node.attrs.path}`);
+        }}
+      >
         {nestedPage?.title ? nestedPage.title : 'Untitled'}
       </Box>
+
+      <ActionsMenu onClick={showMenu} />
+
+      <Menu
+        anchorEl={anchorEl}
+        open={isOpen}
+        onClose={hideMenu}
+        onClick={hideMenu}
+      >
+        <MenuItem
+          sx={{ padding: '3px 12px' }}
+          onClick={(e) => {
+
+          }}
+        >
+          <ListItemIcon><DeleteIcon fontSize='small' /></ListItemIcon>
+          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
+        </MenuItem>
+        <MenuItem
+          sx={{ padding: '3px 12px' }}
+          onClick={(e) => {
+
+          }}
+        >
+          <ListItemIcon><ContentPasteIcon fontSize='small' /></ListItemIcon>
+          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Duplicate</Typography>
+        </MenuItem>
+      </Menu>
     </Box>
   );
 }
