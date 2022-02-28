@@ -11,9 +11,9 @@ export interface IDiscordMessage {
 }
 
 /// ------ Event types
-export type FunnelEvent = 'awareness' | 'acquisition' | 'activation' | 'revenue' | 'referral'
+export type FunnelEvent = 'awareness' | 'acquisition' | 'activation' | 'revenue' | 'referral';
 
-export type EventType = 'first_user_create_page' | 'first_workspace_create_page' | 'create_user' | 'create_workspace' | 'join_from_link'
+export type EventType = 'create_user' | 'create_workspace'| 'first_user_create_page' | 'first_workspace_create_page' | 'create_bounty' | 'first_user_create_bounty' | 'first_workspace_create_bounty' | 'join_from_link';
 
 /// ------
 /**
@@ -35,13 +35,13 @@ export async function postToDiscord (eventLog: IEventToLog) {
 
   console.log('New event logged', message);
 
-  if (isProdEnvironment === true) {
+  //  if (isProdEnvironment === true) {
 
-    const webhookIdentifier = process.env.DISCORD_APP_EVENTS_HOOK_TOKEN;
+  const webhookIdentifier = process.env.DISCORD_EVENTS_WEBHOOK;
 
-    const requestUrl = `${webhookBaseUrl}${webhookIdentifier}`;
+  const requestUrl = `${webhookBaseUrl}${webhookIdentifier}`;
 
-    return http.POST<IDiscordMessage>(requestUrl, { content: message });
-  }
+  return http.POST<IDiscordMessage>(requestUrl, { content: message });
+  // }
 
 }

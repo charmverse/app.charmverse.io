@@ -1,12 +1,11 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { FavoritePage, User } from '@prisma/client';
 import { prisma } from 'db';
+import { postToDiscord } from 'lib/logs/notifyDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { LoggedInUser } from 'models';
-import { postToDiscord, IDiscordMessage } from 'lib/logs/notifyDiscord';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -46,13 +45,7 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
       }
     });
 
-    const message = 'New user signed up';
-
-    postToDiscord({
-      funnelStage: 'acquisition',
-      eventType: 'create_user',
-      message
-    });
+    logSignup();
 
     req.session.user = newUser;
     await req.session.save();
@@ -78,3 +71,12 @@ async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUse
 }
 
 export default withSessionRoute(handler);
+
+async function logSignup () {
+
+  postToDiscord({
+    funnelStage: 'acquisition',
+    eventType: 'create_user',
+    message: 'A new user has joined Charmverse'
+  });
+}

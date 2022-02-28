@@ -6,6 +6,7 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { gettingStartedPageContent } from 'seedData';
+import { postToDiscord, IDiscordMessage, IEventToLog } from 'lib/logs/notifyDiscord';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -41,7 +42,18 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
     }]
   };
   const space = await prisma.space.create({ data });
+  logSpaceCreation(space);
   return res.status(200).json(space);
 }
 
 export default withSessionRoute(handler);
+
+function logSpaceCreation (space: Space) {
+  const eventLog: IEventToLog = {
+    funnelStage: 'acquisition',
+    eventType: 'create_workspace',
+    message: `New workspace ${space.name} has just been created`
+  };
+
+  postToDiscord(eventLog);
+}

@@ -179,7 +179,7 @@ model Application {
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @default(now())
   bountyId         String       @db.Uuid()
-  bounty           Bounty       @relation(fields: [bountyId], references: [id])
+  bounty           Bounty       @relation(fields: [bountyId], references: [id], onDelete: Cascade)
   createdBy        String       @db.Uuid()
   applicant        User         @relation(fields: [createdBy], references: [id])
   walletAddress    String
