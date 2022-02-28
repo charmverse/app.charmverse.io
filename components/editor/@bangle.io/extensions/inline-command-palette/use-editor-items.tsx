@@ -12,7 +12,6 @@ import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { MAX_EMBED_WIDTH, MIN_EMBED_WIDTH } from 'components/editor/ResizableIframe';
 import useNestedPage from 'hooks/useNestedPage';
-import { usePages } from 'hooks/usePages';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
   isList
@@ -436,7 +435,6 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
 
 
 export function useEditorItems() {
-  const { addPage, currentPage } = usePages();
   const { addNestedPage } = useNestedPage()
 
   const paletteItems: PaletteItem[] = []

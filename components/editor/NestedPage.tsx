@@ -3,12 +3,15 @@ import { DOMOutputSpec } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import LinkIcon from '@mui/icons-material/Link';
 import { Box, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import ActionsMenu from 'components/common/ActionsMenu';
+import Snackbar from 'components/common/Snackbar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMenu } from 'hooks/useMenu';
 import useNestedPage from 'hooks/useNestedPage';
 import { usePages } from 'hooks/usePages';
+import useSnackbar from 'hooks/useSnackbar';
 import { useRouter } from 'next/router';
 
 const name = 'page';
@@ -37,12 +40,13 @@ export function nestedPageSpec (): RawSpecs {
   };
 }
 
-export function NestedPage ({ node }: NodeViewProps) {
+export function NestedPage ({ node, getPos, view }: NodeViewProps) {
   const theme = useTheme();
   const router = useRouter();
   const [space] = useCurrentSpace();
   const { pages } = usePages();
   const { addNestedPage } = useNestedPage();
+  const { message, handleClose, isOpen: isSnackbarOpen, showMessage } = useSnackbar();
 
   const { anchorEl, showMenu, hideMenu, isOpen } = useMenu();
 
@@ -104,7 +108,7 @@ export function NestedPage ({ node }: NodeViewProps) {
         <MenuItem
           sx={{ padding: '3px 12px' }}
           onClick={(e) => {
-
+            console.log(view, getPos());
           }}
         >
           <ListItemIcon><DeleteIcon fontSize='small' /></ListItemIcon>
@@ -121,7 +125,23 @@ export function NestedPage ({ node }: NodeViewProps) {
           </ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Duplicate</Typography>
         </MenuItem>
+        <MenuItem
+          sx={{ padding: '3px 12px' }}
+          onClick={() => {
+            // eslint-disable-next-line
+            navigator.clipboard.writeText(`${location.origin}/${space?.domain}/${node.attrs.path}`);
+            showMessage('Link copied');
+          }}
+        >
+          <ListItemIcon>
+            <LinkIcon
+              fontSize='small'
+            />
+          </ListItemIcon>
+          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Copy Link</Typography>
+        </MenuItem>
       </Menu>
+      <Snackbar severity='info' handleClose={handleClose} isOpen={isSnackbarOpen} message={message ?? ''} />
     </Box>
   );
 }
