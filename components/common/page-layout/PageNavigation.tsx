@@ -399,7 +399,7 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
         return;
       }
       charmClient.updatePage({
-        id: droppedItem.id,
+        id: item.id,
         parentId: null
       });
       setPages((stateNodes) => stateNodes.map((stateNode) => {
