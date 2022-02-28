@@ -10,6 +10,7 @@ import InsertChartIcon from '@mui/icons-material/InsertChart';
 import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import { MAX_EMBED_WIDTH, MIN_EMBED_WIDTH } from 'components/editor/ResizableIframe';
 import { usePages } from 'hooks/usePages';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
@@ -188,7 +189,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
               Fragment.fromArray([
                 state.schema.nodes.iframe.create({
                   src: null,
-                  type: "video"
+                  type: "video",
+                  size: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2
                 })
               ])
             ))
@@ -214,7 +216,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
               Fragment.fromArray([
                 state.schema.nodes.iframe.create({
                   src: null,
-                  type: "embed"
+                  type: "embed",
+                  size: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2
                 })
               ])
             ))

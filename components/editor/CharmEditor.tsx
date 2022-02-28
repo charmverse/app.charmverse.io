@@ -32,10 +32,10 @@ import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
-import IFrame, { iframeSpec } from './Iframe';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import { NestedPage, nestedPageSpec } from './NestedPage';
 import Placeholder from './Placeholder';
+import ResizableIframe, { iframeSpec } from './ResizableIframe';
 import { imageSpec, ResizableImage } from './ResizableImage';
 
 export interface ICharmEditorOutput {
@@ -265,6 +265,7 @@ export default function CharmEditor (
               <ResizableImage
                 onResizeStop={(view) => {
                   if (onPageContentChange) {
+                    // Save the current image size on the backend after we are done resizing
                     onPageContentChange({
                       doc: view.state.doc.toJSON() as PageContent,
                       rawText: view.state.doc.textContent as string
@@ -277,9 +278,18 @@ export default function CharmEditor (
           }
           case 'iframe': {
             return (
-              <IFrame {...props}>
-                {NodeViewChildren}
-              </IFrame>
+              <ResizableIframe
+                onResizeStop={(view) => {
+                  if (onPageContentChange) {
+                    // Save the current embed size on the backend after we are done resizing
+                    onPageContentChange({
+                      doc: view.state.doc.toJSON() as PageContent,
+                      rawText: view.state.doc.textContent as string
+                    });
+                  }
+                }}
+                {...props}
+              />
             );
           }
           case 'page': {
