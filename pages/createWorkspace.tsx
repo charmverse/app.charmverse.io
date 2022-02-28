@@ -11,13 +11,16 @@ import getDisplayName from 'lib/users/getDisplayName';
 
 export default function CreateSpace () {
 
-  const [user] = useUser();
+  const [user, setUser] = useUser();
   const [spaces, setSpaces] = useSpaces();
   const router = useRouter();
 
   async function addSpace (newSpace: Prisma.SpaceCreateInput) {
     const space = await charmClient.createSpace(newSpace);
     setSpaces([...spaces, space]);
+    // refresh user permissions
+    const _user = await charmClient.getUser();
+    setUser(_user);
     router.push(`/${space.domain}`);
   }
 
