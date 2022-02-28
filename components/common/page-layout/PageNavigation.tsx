@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
@@ -20,6 +19,7 @@ import Link from 'next/link';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
+import ActionsMenu from '../ActionsMenu';
 import EmojiCon from '../Emoji';
 import NewPageMenu, { StyledArticleIcon, StyledDatabaseIcon } from '../NewPageMenu';
 
@@ -112,7 +112,7 @@ const PageAnchor = styled.a`
     top: 0px;
     right: 0px;
   }
-  &:hover .page-actions {
+  &:hover .actions-menu {
     opacity: 1;
   }
 `;
@@ -123,7 +123,7 @@ const PageIcon = styled(EmojiCon)`
   margin-right: 4px;
 `;
 
-export const PageTitle = styled(Typography)<{isempty: number}>`
+export const PageTitle = styled(Typography)<{isEmpty: number}>`
   color: inherit;
   display: flex;
   align-items: center;
@@ -132,7 +132,7 @@ export const PageTitle = styled(Typography)<{isempty: number}>`
   &:hover {
     color: inherit;
   }
-  ${(props) => props.isempty && 'opacity: 0.5;'}
+  ${(props) => props.isEmpty && 'opacity: 0.5;'}
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -148,7 +148,7 @@ interface PageLinkProps {
 
 export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
 
-  const isempty = !label;
+  const isEmpty = !label;
 
   function stopPropagation (event: SyntheticEvent) {
     event.stopPropagation();
@@ -162,8 +162,8 @@ export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
             {labelIcon}
           </PageIcon>
         )}
-        <PageTitle isempty={isempty ? 1 : 0}>
-          {isempty ? 'Untitled' : label}
+        <PageTitle isEmpty={isEmpty ? 1 : 0}>
+          {isEmpty ? 'Untitled' : label}
         </PageTitle>
         {children}
       </PageAnchor>
@@ -195,14 +195,11 @@ const PageTreeItem = forwardRef((props: any, ref) => {
             label={label}
             labelIcon={labelIcon || (pageType === 'board' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
           >
-            <div className='page-actions'>
-              <IconButton size='small' onClick={showMenu}>
-                <MoreHorizIcon color='secondary' fontSize='small' />
-              </IconButton>
+            <ActionsMenu onClick={showMenu}>
               {addSubPage && (
                 <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} sx={{ marginLeft: '3px' }} />
               )}
-            </div>
+            </ActionsMenu>
           </PageLink>
         )}
         {...other}
