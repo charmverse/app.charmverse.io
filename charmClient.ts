@@ -161,6 +161,12 @@ class CharmClient {
       .then(blocks => this.fixBlocks(blocks));
   }
 
+  getSubtree (rootId?: string, levels = 2): Promise<FBBlock[]> {
+    return http.GET<Block[]>(`/api/blocks/${rootId}/subtree`, { levels })
+      .then(blocks => blocks.map(this.blockToFBBlock))
+      .then(blocks => this.fixBlocks(blocks));
+  }
+
   fixBlocks (blocks: FBBlock[]): FBBlock[] {
     // Hydrate is important, as it ensures that each block is complete to the current model
     const fixedBlocks = OctoUtils.hydrateBlocks(blocks);
