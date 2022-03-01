@@ -3,12 +3,12 @@ import { DOMOutputSpec } from '@bangle.dev/pm';
 import { ArrowDropDown, Autorenew } from '@mui/icons-material';
 import { Card, CardContent, CircularProgress, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { InputSearchCurrency } from '../../components/common/form/InputSearchCurrency';
-import { InputSearchCrypto } from '../../components/common/form/InputSearchCrypto';
-import { getPricing } from '../../hooks/usePricing';
-import { CryptoCurrency, FiatCurrency, IPairQuote } from '../../models/Currency';
-import { formatMoney } from '../../lib/utilities/formatting';
-import { RelativeTime } from '../common/RelativeTime';
+import { getPricing } from 'hooks/usePricing';
+import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
+import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
+import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
+import { formatMoney } from 'lib/utilities/formatting';
+import { RelativeTime } from 'components/common/RelativeTime';
 
 /**
  * Simple utility as the Crypto Price component allows selecting the base or quote
