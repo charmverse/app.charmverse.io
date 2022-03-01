@@ -46,6 +46,13 @@ $ dotenv -e .env.example -- npm start
 
 For further information about environment variables in Next.js, see the [docs](https://nextjs.org/docs/basic-features/environment-variables).
 
+4. (Optional) Configure S3 for image uploads.
+
+Until we have a decentralized solution, we currently use s3 to store images. You will need to add the following to your `.env.local` file:
+S3_UPLOAD_KEY=???
+S3_UPLOAD_SECRET=???
+S3_UPLOAD_BUCKET=charm.public.test
+S3_UPLOAD_REGION=us-east-1
 
 ### Third Party Dependencies
 
