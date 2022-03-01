@@ -66,11 +66,10 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
 
   useEffect(() => {
     // Load the price automatically on the initial render, or if a currency was changed
-    if (error === null
-      && (lastQuote.amount === 0 || lastQuote.base !== baseCurrency || lastQuote.quote !== quoteCurrency)) {
+    if (error === null && baseCurrency && quoteCurrency) {
       refreshPrice();
     }
-  });
+  }, [baseCurrency, quoteCurrency]);
 
   function refreshPrice () {
     setLoadingState(true);
