@@ -110,7 +110,7 @@ interface SidebarProps {
 
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
-  const [user] = useUser();
+  const [user, setUser] = useUser();
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
@@ -130,6 +130,9 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   async function addSpace (spaceOpts: Prisma.SpaceCreateInput) {
     const newSpace = await charmClient.createSpace(spaceOpts);
     setSpaces([...spaces, newSpace]);
+    // refresh user permissions
+    const _user = await charmClient.getUser();
+    setUser(_user);
     router.push(`/${newSpace.domain}`);
   }
 
