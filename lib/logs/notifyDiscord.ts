@@ -35,13 +35,20 @@ export async function postToDiscord (eventLog: IEventToLog) {
 
   console.log('New event logged', message);
 
-  //  if (isProdEnvironment === true) {
+  if (isProdEnvironment === true) {
 
-  const webhookIdentifier = process.env.DISCORD_EVENTS_WEBHOOK;
+    const webhookIdentifier = process.env.DISCORD_EVENTS_WEBHOOK;
 
-  const requestUrl = `${webhookBaseUrl}${webhookIdentifier}`;
+    const requestUrl = `${webhookBaseUrl}${webhookIdentifier}`;
 
-  return http.POST<IDiscordMessage>(requestUrl, { content: message });
-  // }
+    try {
+      const discordReponse = await http.POST<IDiscordMessage>(requestUrl, { content: message });
+      return discordReponse;
+    }
+    catch (error) {
+      console.log('Error posting to discord', error);
+    }
+
+  }
 
 }
