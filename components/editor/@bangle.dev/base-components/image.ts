@@ -175,7 +175,6 @@ async function defaultCreateImageNodes(
   _view: EditorView,
 ) {
   const { url } = await uploadToS3(files[0]);
-  console.log('url', url)
   return [
     imageType.create({
       src: url,
