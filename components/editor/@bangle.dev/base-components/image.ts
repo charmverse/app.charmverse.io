@@ -181,14 +181,6 @@ async function defaultCreateImageNodes(
       src: url,
     })
   ];
-  // let resolveBinaryStrings = await Promise.all(
-  //   files.map((file) => readFileAsBinaryString(file)),
-  // );
-  // return resolveBinaryStrings.map((binaryStr) => {
-  //   return imageType.create({
-  //     src: binaryStr,
-  //   });
-  // });
 }
 
 function addImagesToView(
@@ -206,33 +198,6 @@ function addImagesToView(
 
     view.dispatch(newTr);
   }
-}
-
-function readFileAsBinaryString(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    const onLoadBinaryString: FileReader['onload'] = (readerEvt) => {
-      const binarySrc = btoa(readerEvt.target!.result as string);
-      resolve(`data:${file.type};base64,${binarySrc}`);
-    };
-    const onLoadDataUrl: FileReader['onload'] = (readerEvt) => {
-      resolve(readerEvt.target!.result as string);
-    };
-    reader.onerror = () => {
-      reject(new Error('Error reading file' + file.name));
-    };
-
-    // Some browsers do not support this
-    if ('readAsDataURL' in reader) {
-      reader.onload = onLoadDataUrl;
-      reader.readAsDataURL(file);
-    } else {
-      // @ts-ignore reader was incorrectly inferred as 'never'
-      reader.onload = onLoadBinaryString;
-      // @ts-ignore
-      reader.readAsBinaryString(file);
-    }
-  });
 }
 
 function getFileData(data: DataTransfer, accept: string, multiple: boolean) {

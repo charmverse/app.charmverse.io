@@ -40,7 +40,7 @@ const makeRouteHandler = (options: Options = {}): Handler => {
       const filename = req.query.filename as string;
       const key = options.key
         ? await Promise.resolve(options.key(req, filename))
-        : `next-s3-uploads/${uuidv4()}/${filename.replace(/\s/g, '-')}`;
+        : `user-content/${uuidv4()}/${filename.replace(/\s/g, '-')}`;
 
       const policy = {
         Statement: [
@@ -104,4 +104,4 @@ let missingEnvs = (): string[] => {
 
 const APIRoute = makeRouteHandler();
 
-export { APIRoute };
+export default APIRoute;

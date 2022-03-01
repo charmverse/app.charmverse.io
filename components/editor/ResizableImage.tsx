@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
 import { HTMLAttributes } from 'react';
+import { uploadToS3 } from 'lib/aws/uploadToS3';
 import ImageSelector from './ImageSelector';
 import Resizable from './Resizable';
 
@@ -24,7 +25,7 @@ export const pasteImagePlugin = new Plugin({
     handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
       // @ts-ignore
       const contentRow = slice.content.content?.[0].content.content?.[0];
-
+      console.log('HANDLE PASTE', contentRow);
       if ((contentRow?.text as string)?.startsWith('http')) {
         const embedUrl = contentRow.text.split('.');
         if (embedUrl[embedUrl.length - 1].match(/(jpeg|jpg|png|webp|gif)/)) {
@@ -147,6 +148,7 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs }:
   if (!node.attrs.src) {
     return (
       <ImageSelector onImageSelect={async (imageSrc) => {
+        console.log('image src', imageSrc);
         const image = await imagePromise(imageSrc);
         updateAttrs({
           src: imageSrc,

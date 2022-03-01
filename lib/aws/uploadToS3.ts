@@ -43,12 +43,11 @@ export const uploadToS3 = async (file: File) => {
       params
     });
 
-    const uploadResult = await s3Upload.done();
-
-    console.log('uploadResult', uploadResult);
+    await s3Upload.done();
+    const location = `https://s3.amazonaws.com/${data.bucket}/${data.key}`;
 
     return {
-      url: '', // uploadResult.Location,
+      url: location,
       bucket: data.bucket,
       key: data.key
     };
