@@ -1,4 +1,5 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
+import { uploadToS3 } from 'lib/aws/uploadToS3';
 import {
   Command,
   EditorView,
@@ -173,14 +174,21 @@ async function defaultCreateImageNodes(
   imageType: NodeType,
   _view: EditorView,
 ) {
-  let resolveBinaryStrings = await Promise.all(
-    files.map((file) => readFileAsBinaryString(file)),
-  );
-  return resolveBinaryStrings.map((binaryStr) => {
-    return imageType.create({
-      src: binaryStr,
-    });
-  });
+  const { url } = await uploadToS3(files[0]);
+  console.log('url', url)
+  return [
+    imageType.create({
+      src: url,
+    })
+  ];
+  // let resolveBinaryStrings = await Promise.all(
+  //   files.map((file) => readFileAsBinaryString(file)),
+  // );
+  // return resolveBinaryStrings.map((binaryStr) => {
+  //   return imageType.create({
+  //     src: binaryStr,
+  //   });
+  // });
 }
 
 function addImagesToView(
