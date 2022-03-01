@@ -8,7 +8,7 @@ There are several ways you can contribute:
 
 - Tweet us: [@charmverse](https://twitter.com/charmverse)
 - Email us: [hello@charmverse.io](mailto:hello@charmverse.io)
-- Join Discord: [Charmverse.io](https://discord.gg/VvhEafEWcg)
+- Join Discord: [Charmverse.io](https://discord.gg/ACYCzBGC2M)
 - Pull Requests are welcome! See developer setup below 🙌
 
 ## Developer Docs
