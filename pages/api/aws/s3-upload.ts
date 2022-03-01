@@ -5,6 +5,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { STSClient, GetFederationTokenCommand, STSClientConfig } from '@aws-sdk/client-sts';
 import nc from 'next-connect';
+import { v4 as uuid } from 'uuid';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -45,7 +46,7 @@ const makeRouteHandler = (options: Options = {}): Handler => {
       const filename = req.query.filename as string;
       const key = options.key
         ? await Promise.resolve(options.key(req, filename))
-        : `user-content/${userId}/${filename.replace(/\s/g, '-')}`;
+        : `user-content/${userId}/${uuid()}/${filename.replace(/\s/g, '-')}`;
 
       const policy = {
         Statement: [
