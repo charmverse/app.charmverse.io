@@ -87,7 +87,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
         href={`/${(space!).domain}/${node.attrs.path}`}
         passHref
       >
-        <Box fontWeight={600} component='span'>
+        <Box fontWeight={600} component='div' width='100%'>
           {nestedPage?.title ? nestedPage.title : 'Untitled'}
         </Box>
       </Link>
