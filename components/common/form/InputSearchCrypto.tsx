@@ -28,7 +28,7 @@ export function InputSearchCrypto ({
 
   return (
     <Autocomplete
-      defaultValue={defaultValue ?? 'ETH'}
+      defaultValue={defaultValue ?? null}
       onChange={(_, value) => {
         emitValue(value as any);
       }}
