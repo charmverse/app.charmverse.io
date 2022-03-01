@@ -11,7 +11,7 @@ import { pricingGetter } from './getters';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getPrice);
+handler.use(requireUser).get(getPrice);
 
 async function getPrice (req: NextApiRequest, res: NextApiResponse<any>) {
   const { base, quote } = req.query;
