@@ -15,9 +15,26 @@ handler.use(requireUser).get(getBlocks).post(createBlocks).put(updateBlocks);
 
 async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
   const referer = req.headers.referer as string;
-  const spaceDomain = referer ? new URL(referer).pathname.split('/')[1] : null;
+  const url = new URL(referer);
+  url.hash = '';
+  url.search = '';
+  const pathnameParts = referer ? url.pathname.split('/') : [];
+  const spaceDomain = pathnameParts[1];
   if (!spaceDomain) {
     return res.status(400).json({ error: 'spaceId is required' });
+  }
+  // publicly shared focalboard
+  if (spaceDomain === 'share') {
+    const pageId = pathnameParts[2];
+    if (!pageId) {
+      return res.status(400).json({ error: 'pageId is required' });
+    }
+    const page = await prisma.page.findUnique({ where: { id: pageId } });
+    if (!page) {
+      return res.status(404).json({ error: 'page not found' });
+    }
+    const blocks = page.boardId ? await prisma.block.findMany({ where: { rootId: page.boardId } }) : [];
+    return res.status(200).json(blocks);
   }
 
   const space = await prisma.space.findUnique({
@@ -46,7 +63,10 @@ async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { 
 async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>) {
   const data = req.body as Omit<Block, ServerBlockFields>[];
   const referer = req.headers.referer as string;
-  const spaceDomain = referer ? new URL(referer).pathname.split('/')[1] : null;
+  const url = new URL(referer);
+  url.hash = '';
+  url.search = '';
+  const spaceDomain = referer ? url.pathname.split('/')[1] : null;
 
   if (spaceDomain) {
     const space = await prisma.space.findUnique({

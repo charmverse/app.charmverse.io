@@ -71,7 +71,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     return null;
   }
   else if (currentPage.type === 'board') {
-    return <DatabaseEditor page={currentPage} setPage={setPage} />;
+    return <DatabaseEditor page={currentPage} setPage={setPage} readonly={publicShare} />;
   }
   else {
     return <Editor page={currentPage} setPage={setPage} readOnly={publicShare} />;

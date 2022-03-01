@@ -37,7 +37,7 @@ export const initialLoad = createAsyncThunk(
 export const initialReadOnlyLoad = createAsyncThunk(
     'initialReadOnlyLoad',
     async (boardId: string) => {
-        const blocks = client.getSubtree(boardId, 3)
+        const blocks = charmClient.getSubtree(boardId, 3)
         return blocks
     },
 )
