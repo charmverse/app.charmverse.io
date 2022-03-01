@@ -162,8 +162,7 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs }:
   const { aspectRatio } = node.attrs as {aspectRatio: number};
 
   function onDelete () {
-    console.log('attrs', node.attrs);
-    if (node.attrs.src) {
+    if (node.attrs.src?.includes('s3.amazonaws.com')) {
       charmClient.deleteFromS3(node.attrs.src);
     }
     updateAttrs({
