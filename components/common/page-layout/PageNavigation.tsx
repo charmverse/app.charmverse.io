@@ -110,8 +110,9 @@ const PageAnchor = styled.a`
     background: ${({ theme }) => theme.palette.action.hover};
     opacity: 0;
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
   }
   &:hover .actions-menu {
     opacity: 1;

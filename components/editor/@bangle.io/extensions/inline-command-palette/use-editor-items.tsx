@@ -4,10 +4,18 @@ import {
 } from '@bangle.dev/base-components';
 import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import CodeIcon from '@mui/icons-material/Code';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import ImageIcon from '@mui/icons-material/Image';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
+import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import PreviewIcon from '@mui/icons-material/Preview';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { MAX_EMBED_WIDTH, MIN_EMBED_WIDTH } from 'components/editor/ResizableIframe';
@@ -232,7 +240,9 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
     },
     {
       uid: 'insertSimpleTable',
-      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM224 416H64v-96h160v96zm0-160H64v-96h160v96zm224 160H288v-96h160v96zm0-160H288v-96h160v96z" /></svg>,
+      icon: <TableChartIcon sx={{
+        fontSize: 16
+      }}/>,
       title: 'Table',
       keywords: ['table'],
       description: 'Insert a simple table below',
@@ -271,7 +281,9 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       uid: 'paraConvert',
       keywords: ['paragraph', 'text'],
       title: 'Text',
-      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z" /><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z" /></svg>,
+      icon: <TextFieldsIcon sx={{
+        fontSize: 16
+      }}/>,
       description: 'Convert the current block to paragraph',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
@@ -299,7 +311,9 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
     {
       uid: 'code',
       title: 'Code',
-      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 384 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M384 121.941V128H256V0h6.059c6.365 0 12.47 2.529 16.971 7.029l97.941 97.941A24.005 24.005 0 0 1 384 121.941zM248 160c-13.2 0-24-10.8-24-24V0H24C10.745 0 0 10.745 0 24v464c0 13.255 10.745 24 24 24h336c13.255 0 24-10.745 24-24V160H248zM123.206 400.505a5.4 5.4 0 0 1-7.633.246l-64.866-60.812a5.4 5.4 0 0 1 0-7.879l64.866-60.812a5.4 5.4 0 0 1 7.633.246l19.579 20.885a5.4 5.4 0 0 1-.372 7.747L101.65 336l40.763 35.874a5.4 5.4 0 0 1 .372 7.747l-19.579 20.884zm51.295 50.479l-27.453-7.97a5.402 5.402 0 0 1-3.681-6.692l61.44-211.626a5.402 5.402 0 0 1 6.692-3.681l27.452 7.97a5.4 5.4 0 0 1 3.68 6.692l-61.44 211.626a5.397 5.397 0 0 1-6.69 3.681zm160.792-111.045l-64.866 60.812a5.4 5.4 0 0 1-7.633-.246l-19.58-20.885a5.4 5.4 0 0 1 .372-7.747L284.35 336l-40.763-35.874a5.4 5.4 0 0 1-.372-7.747l19.58-20.885a5.4 5.4 0 0 1 7.633-.246l64.866 60.812a5.4 5.4 0 0 1-.001 7.879z" /></svg>,
+      icon: <CodeIcon sx={{
+        fontSize: 16
+      }}/>,
       description: 'Insert a code block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
@@ -322,7 +336,9 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
     {
       uid: 'callout',
       title: 'Callout',
-      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 64C141.1 64 48 139.2 48 232c0 64.9 45.6 121.2 112.3 149.2-5.2 25.8-21 47-33.5 60.5-2.3 2.5.2 6.5 3.6 6.3 11.5-.8 32.9-4.4 51-12.7 21.5-9.9 40.3-30.1 46.3-36.9 9.3 1 18.8 1.6 28.5 1.6 114.9 0 208-75.2 208-168C464 139.2 370.9 64 256 64z" /></svg>,
+      icon: <ChatBubbleIcon sx={{
+        fontSize: 16
+      }}/>,
       description: 'Insert a callout block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
@@ -372,7 +388,9 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
     {
       uid: 'bulletListConvert',
       title: 'Bullet List',
-      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} version="1.1" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M6 1h10v2h-10v-2zM6 7h10v2h-10v-2zM6 13h10v2h-10v-2zM0 2c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2zM0 8c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2zM0 14c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2z" /></svg>,
+      icon: <FormatListBulletedIcon sx={{
+        fontSize: 16
+      }}/>,
       keywords: ['unordered', 'lists'],
       description: 'Convert the current block to bullet list',
       editorExecuteCommand: () => {
@@ -393,7 +411,9 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
     {
       uid: 'todoListConvert',
       title: 'Todo List',
-      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><g><path fill="none" d="M0 0h24v24H0z" /><path d="M7 7V3a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-4v3.993c0 .556-.449 1.007-1.007 1.007H3.007A1.006 1.006 0 0 1 2 20.993l.003-12.986C2.003 7.451 2.452 7 3.01 7H7zm2 0h6.993C16.549 7 17 7.449 17 8.007V15h3V4H9v3zm-.497 11l5.656-5.657-1.414-1.414-4.242 4.243L6.38 13.05l-1.414 1.414L8.503 18z" /></g></svg>,
+      icon: <LibraryAddCheckIcon sx={{
+        fontSize: 16
+      }}/>,
       keywords: ['todo', 'lists', 'checkbox', 'checked'],
       description: 'Convert the current block to todo list',
       editorExecuteCommand: () => {
@@ -412,7 +432,9 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
     },
     {
       uid: 'orderedListConvert',
-      icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} version="1.1" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M6 13h10v2h-10zM6 7h10v2h-10zM6 1h10v2h-10zM3 0v4h-1v-3h-1v-1zM2 8.219v0.781h2v1h-3v-2.281l2-0.938v-0.781h-2v-1h3v2.281zM4 11v5h-3v-1h2v-1h-2v-1h2v-1h-2v-1z" /></svg>,
+      icon: <FormatListNumberedIcon sx={{
+        fontSize: 16
+      }}/>,
       title: 'Ordered List',
       keywords: ['numbered', 'lists'],
       description: 'Convert the current block to ordered list',
@@ -443,7 +465,9 @@ export function useEditorItems() {
     {
       uid: 'page',
       title: 'Insert page',
-      icon: <svg viewBox="0 0 32 32" height="1em" width="1em" className="page" style={{ transform: "scale(1.25)", fill: 'currentColor', flexShrink: 0, backfaceVisibility: 'hidden'}}><g> <path d="M16,1H4v28h22V11L16,1z M16,3.828L23.172,11H16V3.828z M24,27H6V3h8v10h10V27z M8,17h14v-2H8V17z M8,21h14v-2H8V21z M8,25h14v-2H8V25z" /> </g></svg>,
+      icon: <DescriptionOutlinedIcon sx={{
+        fontSize: 16
+      }}/>,
       description: 'Insert a new page',
       editorExecuteCommand: (() => {
         return (async (state, dispatch, view) => {

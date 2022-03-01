@@ -3,6 +3,7 @@ import { DOMOutputSpec } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import LinkIcon from '@mui/icons-material/Link';
 import { Box, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import ActionsMenu from 'components/common/ActionsMenu';
@@ -63,7 +64,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
       alignItems='center'
       gap={0.5}
       px={1}
-      py={0.5}
+      py={1}
       borderRadius={1}
       sx={{
         cursor: 'pointer',
@@ -78,15 +79,9 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
         }
       }}
     >
-      <Box>
-        {nestedPage?.icon ?? (
-        <svg viewBox='0 0 32 32' height='1em' width='1em' className='page' style={{ transform: 'scale(1.25)', fill: 'currentColor', flexShrink: 0, backfaceVisibility: 'hidden' }}>
-          <g>
-            <path d='M16,1H4v28h22V11L16,1z M16,3.828L23.172,11H16V3.828z M24,27H6V3h8v10h10V27z M8,17h14v-2H8V17z M8,21h14v-2H8V21z M8,25h14v-2H8V25z' />
-          </g>
-        </svg>
-        )}
-      </Box>
+      {nestedPage?.icon ? <Box>{nestedPage.icon}</Box> : (
+        <InsertDriveFileOutlinedIcon />
+      )}
       <Box
         fontWeight={600}
         component='span'
