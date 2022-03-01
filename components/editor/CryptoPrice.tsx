@@ -3,13 +3,12 @@ import { DOMOutputSpec } from '@bangle.dev/pm';
 import { ArrowDropDown, Autorenew } from '@mui/icons-material';
 import { Card, CardContent, CircularProgress, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getPricing } from 'hooks/usePricing';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
 import { formatMoney } from 'lib/utilities/formatting';
 import { RelativeTime } from 'components/common/RelativeTime';
-
+import charmClient from 'charmClient';
 /**
  * Simple utility as the Crypto Price component allows selecting the base or quote
  */
@@ -73,7 +72,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
 
   function refreshPrice () {
     setLoadingState(true);
-    getPricing(baseCurrency, quoteCurrency)
+    charmClient.getPricing(baseCurrency, quoteCurrency)
       .then((quote) => {
         setError(null);
         setPrice({ ...quote, receivedOn: Date.now() });

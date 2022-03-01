@@ -11,6 +11,7 @@ import { IUser, UserWorkspace } from 'components/databases/focalboard/src/user';
 import { IWorkspace } from 'components/databases/focalboard/src/blocks/workspace';
 import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
+import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -307,6 +308,13 @@ class CharmClient {
   async listApplications (bountyId: string): Promise<Application []> {
 
     const data = await http.GET<Application []>('/api/applications', { bountyId });
+
+    return data;
+  }
+
+  async getPricing (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
+
+    const data = await http.GET<IPairQuote>('/api/crypto-price', { base, quote });
 
     return data;
   }
