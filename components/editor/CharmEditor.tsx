@@ -215,6 +215,7 @@ export default function CharmEditor (
       pmViewOpts={{
         editable: () => !readOnly
       }}
+      // Components that should be placed after the editor component
       postEditorComponents={<Placeholder />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {

@@ -3,6 +3,7 @@ import { DOMOutputSpec } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import LinkIcon from '@mui/icons-material/Link';
 import { Box, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
@@ -13,8 +14,8 @@ import { useMenu } from 'hooks/useMenu';
 import useNestedPage from 'hooks/useNestedPage';
 import { usePages } from 'hooks/usePages';
 import useSnackbar from 'hooks/useSnackbar';
+import { PageContent } from 'models';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 const name = 'page';
 
@@ -44,15 +45,17 @@ export function nestedPageSpec (): RawSpecs {
 
 export function NestedPage ({ node, getPos, view }: NodeViewProps) {
   const theme = useTheme();
-  const router = useRouter();
   const [space] = useCurrentSpace();
   const { pages } = usePages();
   const { addNestedPage } = useNestedPage();
   const { message, handleClose, isOpen: isSnackbarOpen, showMessage } = useSnackbar();
-
   const { anchorEl, showMenu, hideMenu, isOpen } = useMenu();
-
   const nestedPage = pages.find(page => page.id === node.attrs.id);
+
+  const docContent = ((nestedPage?.content) as PageContent)?.content;
+
+  const isEditorEmpty = docContent && (docContent.length <= 1
+  && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
 
   const transition = theme.transitions.create(['background-color'], {
     duration: theme.transitions.duration.short,
@@ -81,7 +84,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
       }}
     >
       {nestedPage?.icon ? <Box>{nestedPage.icon}</Box> : (
-        <InsertDriveFileOutlinedIcon />
+        isEditorEmpty ? <InsertDriveFileOutlinedIcon /> : <DescriptionOutlinedIcon />
       )}
       <Link
         href={`/${(space!).domain}/${node.attrs.path}`}
