@@ -7,7 +7,9 @@
     "lint:prod": "npm run lint -- --quiet",
     "start": "next dev",
     "start:prod": "node_modules/next/dist/bin/next start",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "db-tool": "dotenv -e .env.production -- npx prisma studio",
+    "db-tool:dev": "dotenv -e .env.local -- npx prisma studio"
   },
   "prepare": "husky install",
   "lint-staged": {

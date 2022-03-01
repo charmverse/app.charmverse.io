@@ -19,6 +19,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import { Page } from 'models';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import charmClient from 'charmClient';
 import NewPageMenu, { StyledArticleIcon, StyledDatabaseIcon } from '../NewPageMenu';
 import EmojiCon from '../Emoji';
 
@@ -397,6 +398,10 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
       if (didDrop || !item.parentId) {
         return;
       }
+      charmClient.updatePage({
+        id: item.id,
+        parentId: null
+      });
       setPages((stateNodes) => stateNodes.map((stateNode) => {
         if (stateNode.id === item.id) {
           return {
@@ -455,6 +460,11 @@ export default function PageNavigation ({
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
 
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
+
+    charmClient.updatePage({
+      id: droppedItem.id,
+      parentId: containerItem.id
+    });
     setPages(stateNodes => stateNodes.map(stateNode => {
       if (stateNode.id === droppedItem.id && droppedItem.id !== containerItem.id) {
         return {
