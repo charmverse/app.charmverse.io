@@ -13,7 +13,10 @@ handler.use(requireUser).get(getCurrentSpace);
 async function getCurrentSpace (req: NextApiRequest, res: NextApiResponse<Space | null | { error: string }>) {
 
   const referer = req.headers.referer as string;
-  const pathnameParts = referer ? new URL(referer).pathname.split('/') : [];
+  const url = new URL(referer);
+  url.hash = '';
+  url.search = '';
+  const pathnameParts = referer ? url.pathname.split('/') : [];
   const spaceDomain = pathnameParts[1];
   if (!spaceDomain) {
     return res.status(400).json({ error: 'spaceId is required' });

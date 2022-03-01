@@ -15,7 +15,10 @@ handler.use(requireUser).get(getBlocks).post(createBlocks).put(updateBlocks);
 
 async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
   const referer = req.headers.referer as string;
-  const pathnameParts = referer ? new URL(referer).pathname.split('/') : [];
+  const url = new URL(referer);
+  url.hash = '';
+  url.search = '';
+  const pathnameParts = referer ? url.pathname.split('/') : [];
   const spaceDomain = pathnameParts[1];
   if (!spaceDomain) {
     return res.status(400).json({ error: 'spaceId is required' });
@@ -60,7 +63,10 @@ async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { 
 async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>) {
   const data = req.body as Omit<Block, ServerBlockFields>[];
   const referer = req.headers.referer as string;
-  const spaceDomain = referer ? new URL(referer).pathname.split('/')[1] : null;
+  const url = new URL(referer);
+  url.hash = '';
+  url.search = '';
+  const spaceDomain = referer ? url.pathname.split('/')[1] : null;
 
   if (spaceDomain) {
     const space = await prisma.space.findUnique({
