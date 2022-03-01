@@ -3,8 +3,10 @@
 // see this issue for more: https://github.com/ryanto/next-s3-upload/issues/15
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { STSClient, GetFederationTokenCommand } from '@aws-sdk/client-sts';
-import { v4 as uuidv4 } from 'uuid';
+import { STSClient, GetFederationTokenCommand, STSClientConfig } from '@aws-sdk/client-sts';
+import nc from 'next-connect';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 
 type NextRouteHandler = (
   req: NextApiRequest,
@@ -23,15 +25,18 @@ const makeRouteHandler = (options: Options = {}): Handler => {
   const route: NextRouteHandler = async function routeRequest (req, res) {
     // eslint-disable-next-line no-use-before-define
     const missing = missingEnvs();
+    const userId = req.session.user.id;
     if (missing.length > 0) {
       res
         .status(500)
         .json({ error: `Next S3 Upload: Missing ENVs ${missing.join(', ')}` });
     }
     else {
-      const config = {
-        accessKeyId: process.env.S3_UPLOAD_KEY,
-        secretAccessKey: process.env.S3_UPLOAD_SECRET,
+      const config: STSClientConfig = {
+        credentials: {
+          accessKeyId: process.env.S3_UPLOAD_KEY as string,
+          secretAccessKey: process.env.S3_UPLOAD_SECRET as string
+        },
         region: process.env.S3_UPLOAD_REGION
       };
 
@@ -40,7 +45,7 @@ const makeRouteHandler = (options: Options = {}): Handler => {
       const filename = req.query.filename as string;
       const key = options.key
         ? await Promise.resolve(options.key(req, filename))
-        : `user-content/${uuidv4()}/${filename.replace(/\s/g, '-')}`;
+        : `user-content/${userId}/${filename.replace(/\s/g, '-')}`;
 
       const policy = {
         Statement: [
@@ -104,4 +109,7 @@ let missingEnvs = (): string[] => {
 
 const APIRoute = makeRouteHandler();
 
-export default APIRoute;
+const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+handler.use(requireUser).get(APIRoute);
+
+export default withSessionRoute(handler);
