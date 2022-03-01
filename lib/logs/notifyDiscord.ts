@@ -37,12 +37,10 @@ export async function postToDiscord (eventLog: IEventToLog) {
 
   if (isProdEnvironment === true) {
 
-    const webhookIdentifier = process.env.DISCORD_EVENTS_WEBHOOK;
-
-    const requestUrl = `${webhookBaseUrl}${webhookIdentifier}`;
+    const webhook = process.env.DISCORD_EVENTS_WEBHOOK!;
 
     try {
-      const discordReponse = await http.POST<IDiscordMessage>(requestUrl, { content: message });
+      const discordReponse = await http.POST<IDiscordMessage>(webhook, { content: message });
       return discordReponse;
     }
     catch (error) {
