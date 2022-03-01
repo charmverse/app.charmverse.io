@@ -7,7 +7,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { gettingStartedPageContent } from 'seedData';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { pricingGetter } from './getters';
+import { pricingGetter } from 'lib/crypto-price/getters';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
