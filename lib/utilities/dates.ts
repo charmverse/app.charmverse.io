@@ -12,19 +12,19 @@ export type DateTimeFormat = 'relative' | 'absolute'
 
 export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
 
-export const millisecondsInSecond = 1000;
+const millisecondsInSecond = 1000;
 
-export const secondsInMinute = 60;
+const secondsInMinute = 60;
 
-export const minutesInHour = 60;
+const minutesInHour = 60;
 
-export const hoursInDay = 24;
+const hoursInDay = 24;
 
-export const millisecondsInDay = millisecondsInSecond * secondsInMinute * minutesInHour * hoursInDay;
+const millisecondsInDay = millisecondsInSecond * secondsInMinute * minutesInHour * hoursInDay;
 
-export const secondsInHour = secondsInMinute * minutesInHour;
+const secondsInHour = secondsInMinute * minutesInHour;
 
-export const SystemToLuxonUnitMapping: {[key in TimeUnit]: LuxonTimeUnit} = {
+const SystemToLuxonUnitMapping: {[key in TimeUnit]: LuxonTimeUnit} = {
   millisecond: 'millisecond',
   second: 'second',
   minute: 'minute',
