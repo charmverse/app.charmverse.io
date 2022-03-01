@@ -92,22 +92,18 @@ class PricingCache {
       return this.getPriceFromCoinMarketCap(base, quote);
     }
 
-    return new Promise((resolve, reject) => {
-      fetch(`https://min-api.cryptocompare.com/data/price?fsym=${base}&tsyms=${quote}`)
-        .then(data => {
+    return fetch(`https://min-api.cryptocompare.com/data/price?fsym=${base}&tsyms=${quote}`)
+      .then(data => {
 
-          const pairQuote: IPairQuote = {
-            base,
-            quote,
-            amount: data[quote],
-            receivedOn: Date.now()
-          };
+        const pairQuote: IPairQuote = {
+          base,
+          quote,
+          amount: data[quote],
+          receivedOn: Date.now()
+        };
 
-          resolve(pairQuote);
-        }).catch(error => {
-          reject(error);
-        });
-    });
+        return pairQuote;
+      });
 
   }
 
