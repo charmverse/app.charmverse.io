@@ -103,7 +103,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   }
 
   return (
-    <Card className='cryptoPrice' component='div' raised={true} sx={{ display: 'inline-block', mx: '10px', minWidth: '250px' }}>
+    <Card draggable={false} className='cryptoPrice' component='div' raised={true} sx={{ display: 'inline-block', mx: '10px', minWidth: '250px' }}>
 
       {
         (baseCurrency === null) && (
