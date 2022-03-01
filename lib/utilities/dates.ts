@@ -12,12 +12,50 @@ export type DateTimeFormat = 'relative' | 'absolute'
 
 export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
 
+export const millisecondsInSecond = 1000;
+
+export const secondsInMinute = 60;
+
+export const minutesInHour = 60;
+
+export const hoursInDay = 24;
+
+export const millisecondsInDay = millisecondsInSecond * secondsInMinute * minutesInHour * hoursInDay;
+
+export const secondsInHour = secondsInMinute * minutesInHour;
+
+export const SystemToLuxonUnitMapping: {[key in TimeUnit]: LuxonTimeUnit} = {
+  millisecond: 'millisecond',
+  second: 'second',
+  minute: 'minute',
+  hour: 'hour',
+  day: 'day',
+  week: 'week',
+  month: 'month',
+  year: 'year'
+};
+
 export function convertToLuxonDate (date: DateInput): DateTime {
   return typeof date === 'number'
     ? DateTime.fromMillis(date)
     : typeof date === 'string'
       ? DateTime.fromISO(date)
       : DateTime.fromJSDate(date);
+}
+
+export function getTimeDifference (
+  targetTime: DateInput,
+  unit: TimeUnit,
+  referenceTime: DateInput = new Date()
+): number {
+  const timeUnit = SystemToLuxonUnitMapping[unit];
+
+  const timeToAssess = convertToLuxonDate(targetTime).startOf(timeUnit);
+  const baseTime = convertToLuxonDate(referenceTime).startOf(timeUnit);
+
+  const timeDifference = timeToAssess.diff(baseTime, timeUnit);
+
+  return timeDifference[`${timeUnit}s`];
 }
 
 function getDaySuffix (dateTime: DateInput): string {
