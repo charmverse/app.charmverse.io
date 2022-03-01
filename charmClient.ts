@@ -316,6 +316,16 @@ class CharmClient {
 
     return data;
   }
+
+  // AWS
+  uploadToS3 (file: File): Promise<{ token: any, bucket: string, key: string, region: string }> {
+    const filename = encodeURIComponent(file.name);
+    return http.GET('/api/aws/s3-upload', { filename });
+  }
+
+  deleteFromS3 (src: string) {
+    return http.DELETE('/api/aws/s3-delete', { src });
+  }
 }
 
 const charmClient = new CharmClient();

@@ -5,11 +5,12 @@ import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
 import { HTMLAttributes } from 'react';
+import charmClient from 'charmClient';
 import ImageSelector from './ImageSelector';
 import Resizable from './Resizable';
 
-const MAX_IMAGE_WIDTH = 750; const
-  MIN_IMAGE_WIDTH = 100;
+const MAX_IMAGE_WIDTH = 750;
+const MIN_IMAGE_WIDTH = 100;
 
 const StyledEmptyImageContainer = styled(Box)`
   display: flex;
@@ -24,7 +25,6 @@ export const pasteImagePlugin = new Plugin({
     handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
       // @ts-ignore
       const contentRow = slice.content.content?.[0].content.content?.[0];
-
       if ((contentRow?.text as string)?.startsWith('http')) {
         const embedUrl = contentRow.text.split('.');
         if (embedUrl[embedUrl.length - 1].match(/(jpeg|jpg|png|webp|gif)/)) {
@@ -161,6 +161,17 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs }:
 
   const { aspectRatio } = node.attrs as {aspectRatio: number};
 
+  function onDelete () {
+    console.log('attrs', node.attrs);
+    if (node.attrs.src) {
+      charmClient.deleteFromS3(node.attrs.src);
+    }
+    updateAttrs({
+      src: null,
+      aspectRatio: 1
+    });
+  }
+
   return (
     <Resizable
       aspectRatio={aspectRatio}
@@ -168,6 +179,7 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs }:
       maxWidth={MAX_IMAGE_WIDTH}
       minWidth={MIN_IMAGE_WIDTH}
       updateAttrs={updateAttrs}
+      onDelete={onDelete}
       onResizeStop={onResizeStop}
     >
       <StyledImage

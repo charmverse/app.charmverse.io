@@ -173,6 +173,12 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
     );
   }
 
+  function onDelete () {
+    updateAttrs({
+      src: null
+    });
+  }
+
   return (
     <Resizable
       aspectRatio={ASPECT_RATIO}
@@ -180,6 +186,7 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
       maxWidth={MAX_EMBED_WIDTH}
       minWidth={MIN_EMBED_WIDTH}
       updateAttrs={updateAttrs}
+      onDelete={onDelete}
       onResizeStop={onResizeStop}
     >
       <StyledIFrame>
