@@ -13,7 +13,7 @@ export interface IDiscordMessage {
 /// ------ Event types
 export type FunnelEvent = 'awareness' | 'acquisition' | 'activation' | 'revenue' | 'referral';
 
-export type EventType = 'create_user' | 'create_workspace'| 'first_user_create_page' | 'first_workspace_create_page' | 'create_bounty' | 'first_user_create_bounty' | 'first_workspace_create_bounty' | 'join_from_link';
+export type EventType = 'create_user' | 'create_workspace'| 'first_user_create_page' | 'first_workspace_create_page' | 'create_bounty' | 'first_user_create_bounty' | 'first_workspace_create_bounty' | 'join_workspace_from_link';
 
 /// ------
 /**
