@@ -1,4 +1,4 @@
-import { Page, Prisma, Space } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
 import { useRouter } from 'next/router';
@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
-type AddPageFn = (space?: Space, page?: Partial<Page>, shouldRoute?: boolean) => Promise<Page>;
+type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
 type IContext = {
   currentPage: Page | null,
   pages: Page[],
@@ -16,7 +16,8 @@ type IContext = {
   setPages: Dispatch<SetStateAction<Page[]>>,
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
-  addPage: AddPageFn
+  addPage: AddPageFn,
+  addPageAndRedirect: (page?: Partial<Page>) => void
 };
 
 export const PagesContext = createContext<Readonly<IContext>>({
@@ -26,7 +27,8 @@ export const PagesContext = createContext<Readonly<IContext>>({
   setPages: () => undefined,
   isEditing: true,
   setIsEditing: () => { },
-  addPage: null as any
+  addPage: null as any,
+  addPageAndRedirect: null as any
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
@@ -48,9 +50,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
   }, [space]);
 
-  const addPage: AddPageFn = async (_space, page, shouldRoute) => {
-    shouldRoute = shouldRoute ?? true;
-    const spaceId = (_space?.id ?? space?.id)!;
+  const addPage: AddPageFn = async (page) => {
+    const spaceId = space?.id!;
     const id = Math.random().toString().replace('0.', '');
     const pageProperties: Prisma.PageCreateInput = {
       content: {
@@ -86,12 +87,12 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
     const newPage = await charmClient.createPage(pageProperties);
     setPages([newPage, ...pages]);
-
-    if (shouldRoute) {
-      // add delay to simulate a server call
-      router.push(`/${(_space ?? space!).domain}/${newPage.path}`);
-    }
     return newPage;
+  };
+
+  const addPageAndRedirect = async (page?: Partial<Page>) => {
+    const newPage = await addPage(page);
+    router.push(`/${(space!).domain}/${newPage.path}`);
   };
 
   const value: IContext = useMemo(() => ({
@@ -101,7 +102,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     pages,
     setCurrentPage,
     setPages,
-    addPage
+    addPage,
+    addPageAndRedirect
   }), [currentPage, isEditing, router, pages, user]);
 
   return (

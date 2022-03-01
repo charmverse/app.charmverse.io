@@ -214,7 +214,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                     WORKSPACE
                   </SectionName>
                   <div className='add-a-page'>
-                    <NewPageMenu tooltip='Add a page' addPage={page => addPage(space, page)} />
+                    <NewPageMenu tooltip='Add a page' addPage={page => addPage(page)} />
                   </div>
                 </WorkspaceLabel>
                 <PageNavigation

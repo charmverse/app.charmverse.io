@@ -252,7 +252,6 @@ type DraggableNodeProps = {
 }
 
 function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }: DraggableNodeProps) {
-  const { pages } = usePages();
   const theme = useTheme();
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
@@ -433,7 +432,7 @@ export default function PageNavigation ({
   space,
   rootPageIds
 }: NavProps) {
-  const { pages, currentPage, setPages, addPage } = usePages();
+  const { pages, currentPage, setPages, addPageAndRedirect } = usePages();
 
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
@@ -497,7 +496,7 @@ export default function PageNavigation ({
           item={item}
           onDrop={onDrop}
           pathPrefix={`/${space.domain}`}
-          addPage={page => addPage && addPage(space, page)}
+          addPage={page => addPageAndRedirect && addPageAndRedirect(page)}
           deletePage={deletePage}
         />
       ))}

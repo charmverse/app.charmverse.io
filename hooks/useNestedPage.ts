@@ -10,9 +10,9 @@ export default function useNestedPage () {
 
   return {
     async addNestedPage () {
-      const page = await addPage(undefined, {
+      const page = await addPage({
         parentId: currentPage?.id
-      }, false);
+      });
 
       rafCommandExec(view!, (state, dispatch) => {
         return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
