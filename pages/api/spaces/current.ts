@@ -25,7 +25,7 @@ async function getCurrentSpace (req: NextApiRequest, res: NextApiResponse<Space 
       return res.status(400).json({ error: 'pageId is required' });
     }
     const page = await prisma.page.findUnique({ where: { id: pageId } });
-    if (!page) {
+    if (!page?.spaceId) {
       return res.status(404).json({ error: 'page not found' });
     }
     const space = await prisma.space.findUnique({ where: { id: page.spaceId } });
