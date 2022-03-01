@@ -13,6 +13,7 @@ import { useMenu } from 'hooks/useMenu';
 import useNestedPage from 'hooks/useNestedPage';
 import { usePages } from 'hooks/usePages';
 import useSnackbar from 'hooks/useSnackbar';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 const name = 'page';
@@ -82,15 +83,14 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
       {nestedPage?.icon ? <Box>{nestedPage.icon}</Box> : (
         <InsertDriveFileOutlinedIcon />
       )}
-      <Box
-        fontWeight={600}
-        component='span'
-        onClick={() => {
-          router.push(`/${(space!).domain}/${node.attrs.path}`);
-        }}
+      <Link
+        href={`/${(space!).domain}/${node.attrs.path}`}
+        passHref
       >
-        {nestedPage?.title ? nestedPage.title : 'Untitled'}
-      </Box>
+        <Box fontWeight={600} component='span'>
+          {nestedPage?.title ? nestedPage.title : 'Untitled'}
+        </Box>
+      </Link>
 
       <ActionsMenu onClick={showMenu} />
 
@@ -103,7 +103,6 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
         <MenuItem
           sx={{ padding: '3px 12px' }}
           onClick={(e) => {
-            console.log(view, getPos());
           }}
         >
           <ListItemIcon><DeleteIcon fontSize='small' /></ListItemIcon>

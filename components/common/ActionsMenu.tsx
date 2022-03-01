@@ -7,8 +7,9 @@ const StyledActionsMenu = styled(Box)`
   background: ${({ theme }) => theme.palette.action.hover};
   opacity: 0;
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 5px;
 `;
 
 interface ActionsMenuProps {
