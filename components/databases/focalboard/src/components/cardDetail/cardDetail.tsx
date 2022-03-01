@@ -133,7 +133,7 @@ const CardDetail = (props: Props): JSX.Element|null => {
                       views={props.views}
                       readonly={props.readonly}
                   />
-                  <BountyIntegration linkedTaskId={card.id} title={title}/>
+                  <BountyIntegration linkedTaskId={card.id} title={title} readonly={props.readonly} />
                 </Box>
 
                 {/* Comments */}

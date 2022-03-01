@@ -8,6 +8,7 @@ import BountyModal from './BountyModal';
 interface BountyIntegrationProps {
   linkedTaskId: string
   title?: string
+  readonly?: boolean
 }
 
 export function BountyIntegration (props: BountyIntegrationProps) {
@@ -22,31 +23,32 @@ export function BountyIntegration (props: BountyIntegrationProps) {
       whiteSpace: 'nowrap'
     }}
     >
-      {linkedBounty ? <BountyBadge direction='column' bounty={linkedBounty} /> : (
-        <>
-          <Button onClick={() => {
-            setIsModalOpen(true);
-          }}
-          >
-            Assign a bounty
-          </Button>
-          {isModalOpen && (
-          <BountyModal
-            open={isModalOpen}
-            bounty={{
-              title,
-              linkedTaskId
+      {linkedBounty ? <BountyBadge direction='column' bounty={linkedBounty} />
+        : props.readonly ? null : (
+          <>
+            <Button onClick={() => {
+              setIsModalOpen(true);
             }}
-            onClose={() => {
-              setIsModalOpen(false);
-            }}
-            onSubmit={() => {
-              setIsModalOpen(false);
-            }}
-          />
-          )}
-        </>
-      )}
+            >
+              Assign a bounty
+            </Button>
+            {isModalOpen && (
+            <BountyModal
+              open={isModalOpen}
+              bounty={{
+                title,
+                linkedTaskId
+              }}
+              onClose={() => {
+                setIsModalOpen(false);
+              }}
+              onSubmit={() => {
+                setIsModalOpen(false);
+              }}
+            />
+            )}
+          </>
+        )}
     </Box>
   );
 }
