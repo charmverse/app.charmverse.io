@@ -50,7 +50,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
   }, [space]);
 
-  const addPage: AddPageFn = async (page) => {
+  const addPage: AddPageFn = React.useCallback(async (page) => {
     const spaceId = space?.id!;
     const id = Math.random().toString().replace('0.', '');
     const pageProperties: Prisma.PageCreateInput = {
@@ -88,7 +88,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     const newPage = await charmClient.createPage(pageProperties);
     setPages([newPage, ...pages]);
     return newPage;
-  };
+  }, [intl, pages, space, user]);
 
   const addPageAndRedirect = async (page?: Partial<Page>) => {
     const newPage = await addPage(page);

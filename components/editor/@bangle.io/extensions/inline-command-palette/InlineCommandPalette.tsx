@@ -114,7 +114,7 @@ export function InlineCommandPalette() {
   }, [
     view,
     query,
-    // editorItems,
+    editorItems,
     isItemDisabled,
     // so that we recompute things, especially disabled, is palette visibility changes
     isVisible,
