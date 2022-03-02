@@ -17,6 +17,7 @@ export function InputSearchCurrency ({ onChange }: {onChange: (value: FiatCurren
       onChange={(event, value) => {
         emitValue(value as any);
       }}
+      size='small'
       sx={{ minWidth: 150 }}
       options={currencyOptions}
       autoHighlight

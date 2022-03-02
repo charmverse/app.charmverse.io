@@ -1,42 +1,40 @@
 
-import { useState, useEffect } from 'react';
-import { useIntl } from 'react-intl';
 import styled from '@emotion/styled';
-import { Prisma } from '@prisma/client';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import SettingsIcon from '@mui/icons-material/Settings';
 import BountyIcon from '@mui/icons-material/RequestPage';
+import SettingsIcon from '@mui/icons-material/Settings';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import Typography from '@mui/material/Typography';
+import { Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
+import mutator from 'components/databases/focalboard/src//mutator';
+import { getSortedBoards } from 'components/databases/focalboard/src/store/boards';
+import { useAppSelector } from 'components/databases/focalboard/src/store/hooks';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import useENSName from 'hooks/useENSName';
-import { LoggedInUser, Page, Space } from 'models';
+import getDisplayName from 'lib/users/getDisplayName';
+import { LoggedInUser } from 'models';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
 import { greyColor2 } from 'theme/colors';
-import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
-import mutator from 'components/databases/focalboard/src//mutator';
-import { useAppSelector } from 'components/databases/focalboard/src/store/hooks';
-import { getSortedBoards } from 'components/databases/focalboard/src/store/boards';
-import getDisplayName from 'lib/users/getDisplayName';
 import Avatar from '../Avatar';
+import CreateWorkspaceForm from '../CreateSpaceForm';
 import Link from '../Link';
 import { Modal } from '../Modal';
+import NewPageMenu from '../NewPageMenu';
 import WorkspaceAvatar from '../WorkspaceAvatar';
-import CreateWorkspaceForm from '../CreateSpaceForm';
 import { headerHeight } from './Header';
 import PageNavigation, { PageLink, StyledTreeItem } from './PageNavigation';
-import NewPageMenu from '../NewPageMenu';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -116,7 +114,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
-  const { pages, currentPage, setPages } = usePages();
+  const { pages, currentPage, setPages, addPage } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
   const intl = useIntl();
@@ -136,47 +134,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     const _user = await charmClient.getUser();
     setUser(_user);
     router.push(`/${newSpace.domain}`);
-  }
-
-  async function addPage (_space: Space, page: Partial<Page>) {
-    const id = Math.random().toString().replace('0.', '');
-    const pageProperties: Prisma.PageCreateInput = {
-      content: {
-        type: 'doc',
-        content: [{
-          type: 'paragraph',
-          content: []
-        }]
-      } as any,
-      contentText: '',
-      createdAt: new Date(),
-      author: {
-        connect: {
-          id: user!.id
-        }
-      },
-      updatedAt: new Date(),
-      updatedBy: user!.id,
-      path: `page-${id}`,
-      space: {
-        connect: {
-          id: _space.id
-        }
-      },
-      title: '',
-      type: 'page',
-      ...page
-    };
-    if (pageProperties.type === 'board') {
-      await addBoardClicked(boardId => {
-        pageProperties.boardId = boardId;
-      }, intl);
-    }
-    const newPage = await charmClient.createPage(pageProperties);
-    setPages([newPage, ...pages]);
-
-    // add delay to simulate a server call
-    router.push(`/${_space.domain}/${newPage.path}`);
   }
 
   async function deletePage (pageId: string) {
@@ -247,12 +204,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                     </SectionName>
                     <PageNavigation
                       isFavorites={true}
-                      currentPage={currentPage}
-                      pages={pages}
                       space={space}
                       rootPageIds={favoritePageIds}
-                      setPages={setPages}
-                      addPage={addPage}
                     />
                   </Box>
                 )}
@@ -261,15 +214,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                     WORKSPACE
                   </SectionName>
                   <div className='add-a-page'>
-                    <NewPageMenu tooltip='Add a page' addPage={page => addPage(space, page)} />
+                    <NewPageMenu tooltip='Add a page' addPage={page => addPage(page)} />
                   </div>
                 </WorkspaceLabel>
                 <PageNavigation
-                  currentPage={currentPage}
-                  pages={pages}
                   space={space}
-                  setPages={setPages}
-                  addPage={addPage}
                   deletePage={deletePage}
                 />
               </Box>
@@ -293,7 +242,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 <Box display='flex' alignItems='center'>
                   <Avatar name={getDisplayName(user)} />
                   <Box pl={1}>
-                    <Typography>
+                    <Typography color='secondary'>
                       <strong>{getDisplayName(user)}</strong>
                     </Typography>
                   </Box>

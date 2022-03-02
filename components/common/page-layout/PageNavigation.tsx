@@ -1,27 +1,29 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Space } from '@prisma/client';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
+import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import TreeView from '@mui/lab/TreeView';
-import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
+import { Space } from '@prisma/client';
+import charmClient from 'charmClient';
+import { useLocalStorage } from 'hooks/useLocalStorage';
+import { usePages } from 'hooks/usePages';
+import { Page, PageContent } from 'models';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
-import { Page } from 'models';
-import { useLocalStorage } from 'hooks/useLocalStorage';
-import charmClient from 'charmClient';
-import NewPageMenu, { StyledArticleIcon, StyledDatabaseIcon } from '../NewPageMenu';
 import EmojiCon from '../Emoji';
+import NewPageMenu, { StyledDatabaseIcon } from '../NewPageMenu';
 
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
@@ -173,6 +175,7 @@ export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
 
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
+  const { pages } = usePages();
   const {
     addSubPage,
     deletePage,
@@ -181,8 +184,16 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     labelIcon,
     label,
     pageType,
+    pageId,
     ...other
   } = props;
+
+  const referencedPage = pages.find(_page => _page.id === pageId);
+
+  const docContent = ((referencedPage?.content) as PageContent)?.content;
+
+  const isEditorEmpty = docContent && (docContent.length <= 1
+  && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -207,7 +218,17 @@ const PageTreeItem = forwardRef((props: any, ref) => {
           <PageLink
             href={href}
             label={label}
-            labelIcon={labelIcon || (pageType === 'board' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
+            labelIcon={labelIcon || (pageType === 'board' ? <StyledDatabaseIcon /> : (isEditorEmpty ? (
+              <InsertDriveFileOutlinedIcon sx={{
+                opacity: 0.5
+              }}
+              />
+            ) : (
+              <DescriptionOutlinedIcon sx={{
+                opacity: 0.5
+              }}
+              />
+            )))}
           >
             <div className='page-actions'>
               <IconButton size='small' onClick={showMenu}>
@@ -317,6 +338,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
 
   return (
     <PageTreeItem
+      pageId={item.id}
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
       ref={mergeRefs([drag, drop, dragPreview, focusListener])}
@@ -381,6 +403,7 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
       roots.push(node);
     }
   }
+
   return roots;
 }
 
@@ -398,10 +421,6 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
       if (didDrop || !item.parentId) {
         return;
       }
-      charmClient.updatePage({
-        id: item.id,
-        parentId: null
-      });
       setPages((stateNodes) => stateNodes.map((stateNode) => {
         if (stateNode.id === item.id) {
           return {
@@ -435,26 +454,19 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
 }
 
 type NavProps = {
-  addPage?: (s: Space, p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
-  pages: Page[];
-  currentPage: Page | null;
   space: Space;
   rootPageIds?: string[];
-  setPages: Dispatch<SetStateAction<Page[]>>;
 };
 
 export default function PageNavigation ({
-  addPage,
   deletePage,
   isFavorites,
-  pages,
-  currentPage,
   space,
-  rootPageIds,
-  setPages
+  rootPageIds
 }: NavProps) {
+  const { pages, currentPage, setPages, addPage } = usePages();
 
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
@@ -484,8 +496,6 @@ export default function PageNavigation ({
       return state.filter(id => id !== droppedItem.id);
     });
   };
-
-  const router = useRouter();
 
   useEffect(() => {
     for (const page of pages) {
@@ -523,7 +533,7 @@ export default function PageNavigation ({
           item={item}
           onDrop={onDrop}
           pathPrefix={`/${space.domain}`}
-          addPage={page => addPage && addPage(space, page)}
+          addPage={page => addPage && addPage(page)}
           deletePage={deletePage}
         />
       ))}

@@ -104,7 +104,7 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   }
 
   return (
-    <Box>
+    <div>
       {page.headerImage && <PageBanner image={page.headerImage} setImage={updatePageHeader} />}
       <Container
         top={pageTop}
@@ -149,6 +149,6 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
           />
         </CharmEditor>
       </Container>
-    </Box>
+    </div>
   );
 }

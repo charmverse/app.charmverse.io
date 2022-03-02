@@ -32,7 +32,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     if (publicShare === true) {
       return;
     }
-    setPages(pages.map(p => p.id === currentPage!.id ? { ...p, ...updates } : p));
+    setPages((_pages) => _pages.map(p => p.id === currentPage!.id ? { ...p, ...updates } : p));
     setCurrentPage(_page => ({ ..._page, ...updates }) as Page);
     if (updates.hasOwnProperty('title')) {
       setTitleState(updates.title || 'Untitled');

@@ -33,6 +33,7 @@ import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
+import { NestedPage, nestedPageSpec } from './NestedPage';
 import Placeholder from './Placeholder';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
 import { imageSpec, ResizableImage } from './ResizableImage';
@@ -83,11 +84,20 @@ const specRegistry = new SpecRegistry([
   cryptoPriceSpec(),
   imageSpec(),
   columnLayoutSpec(),
-  columnBlockSpec()
+  columnBlockSpec(),
+  nestedPageSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
   position: relative;
+  /** DONT REMOVE THIS STYLING */
+  /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
+  left: -250px;
+  
+  /** DONT REMOVE THIS STYLING */
+  div.ProseMirror.bangle-editor {
+    padding-left: 250px;
+  }
 
   code {
     padding: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
@@ -187,6 +197,10 @@ export default function CharmEditor (
       NodeView.createPlugin({
         name: 'iframe',
         containerDOM: ['div', { class: 'iframe-container' }]
+      }),
+      NodeView.createPlugin({
+        name: 'page',
+        containerDOM: ['div', { class: 'page-container' }]
       })
       // TODO: Pasting iframe or image link shouldn't create those blocks for now
       // iframePlugin,
@@ -209,6 +223,7 @@ export default function CharmEditor (
       pmViewOpts={{
         editable: () => !readOnly
       }}
+      // Components that should be placed after the editor component
       postEditorComponents={<Placeholder />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
@@ -284,6 +299,13 @@ export default function CharmEditor (
                 }}
                 {...props}
               />
+            );
+          }
+          case 'page': {
+            return (
+              <NestedPage {...props}>
+                {NodeViewChildren}
+              </NestedPage>
             );
           }
           default: {

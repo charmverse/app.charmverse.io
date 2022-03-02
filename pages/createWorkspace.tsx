@@ -32,7 +32,7 @@ export default function CreateSpace () {
 
   return (
     <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto' }}>
-      <Card sx={{ p: 4 }}>
+      <Card sx={{ p: 4 }} variant='outlined'>
         <CreateSpaceForm defaultValues={defaultValues} onSubmit={addSpace} submitText='Get Started' />
       </Card>
     </Box>

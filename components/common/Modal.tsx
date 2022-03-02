@@ -14,8 +14,7 @@ const ModalContainer = styled.div<{ size?: ModalSize }>`
   transform: translate(-50%, -50%);
   width: ${({ size }) => size === 'large' ? '670px' : size === 'fluid' ? 'auto' : '400px'};
   background-color: ${({ theme }) => theme.palette.background.paper};
-  border: 2px solid ${({ theme }) => theme.palette.divider};
-  border-radius: 20px;
+  border-radius: ${({ theme }) => theme.spacing(1)};
   box-shadow: ${({ theme }) => theme.shadows[15]};
   padding: ${({ theme }) => theme.spacing(4)};
 `;
