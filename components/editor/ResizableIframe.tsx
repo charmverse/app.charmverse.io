@@ -12,7 +12,7 @@ import BlockAligner from './BlockAligner';
 import IFrameSelector from './IFrameSelector';
 import VerticalResizer from './VerticalResizer';
 
-export const MAX_EMBED_WIDTH = 750;
+export const MAX_EMBED_WIDTH = 900;
 export const
   MIN_EMBED_WIDTH = 100;
 const MAX_EMBED_HEIGHT = 2500;
@@ -85,7 +85,7 @@ export function iframeSpec (): RawSpecs {
           default: ''
         },
         width: {
-          default: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2
+          default: MAX_EMBED_WIDTH
         },
         height: {
           default: MIN_EMBED_HEIGHT
@@ -164,7 +164,6 @@ const StyledIFrame = styled(Box)`
 export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
   NodeViewProps & { onResizeStop?: (view: EditorView) => void }) {
   const theme = useTheme();
-  const [width, setWidth] = useState(node.attrs.width);
   const [height, setHeight] = useState(node.attrs.height);
   const view = useEditorViewContext();
 
@@ -199,7 +198,7 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
     >
       <BlockAligner
         onDelete={onDelete}
-        size={width}
+        size={node.attrs.width}
       >
         <VerticalResizer
           onResizeStop={(_, data) => {
@@ -210,7 +209,7 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
               onResizeStop(view);
             }
           }}
-          width={width}
+          width={node.attrs.width}
           height={height}
           onResize={(_, data) => {
             setHeight(data.size.height);
