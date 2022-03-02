@@ -1,20 +1,25 @@
 import { NodeViewProps, Plugin, RawSpecs } from '@bangle.dev/core';
 import { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
+import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, useState } from 'react';
+import BlockAligner from './BlockAligner';
 import IFrameSelector from './IFrameSelector';
 import Resizable from './Resizable';
+import VerticalResizer from './VerticalResizer';
 
-export const MAX_EMBED_WIDTH = 750;
+export const MAX_EMBED_WIDTH = 900;
 export const
   MIN_EMBED_WIDTH = 100;
-const
-  ASPECT_RATIO = 1.77;
+export const MAX_EMBED_HEIGHT = 2500;
+export const MIN_EMBED_HEIGHT = 500;
+export const
+  VIDEO_ASPECT_RATIO = 1.77;
 
 const name = 'iframe';
 
@@ -80,8 +85,11 @@ export function iframeSpec (): RawSpecs {
         src: {
           default: ''
         },
-        size: {
-          default: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2
+        width: {
+          default: MAX_EMBED_WIDTH
+        },
+        height: {
+          default: MIN_EMBED_HEIGHT
         },
         // Type of iframe, it could either be video or embed
         type: {
@@ -156,6 +164,10 @@ const StyledIFrame = styled(Box)`
 
 export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
   NodeViewProps & { onResizeStop?: (view: EditorView) => void }) {
+  const theme = useTheme();
+  const [height, setHeight] = useState(node.attrs.height);
+  const [width, setWidth] = useState(node.attrs.width);
+  const view = useEditorViewContext();
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
@@ -179,10 +191,44 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
     });
   }
 
-  return (
+  return node.attrs.type === 'embed' ? (
+    <Box style={{
+      margin: theme.spacing(3, 0),
+      display: 'flex',
+      flexDirection: 'column'
+    }}
+    >
+      <BlockAligner
+        onDelete={onDelete}
+        size={node.attrs.width}
+      >
+        <VerticalResizer
+          onResizeStop={(_, data) => {
+            updateAttrs({
+              height: data.size.height
+            });
+            if (onResizeStop) {
+              onResizeStop(view);
+            }
+          }}
+          width={node.attrs.width}
+          height={height}
+          onResize={(_, data) => {
+            setHeight(data.size.height);
+          }}
+          maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
+          minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
+        >
+          <StyledIFrame>
+            <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+          </StyledIFrame>
+        </VerticalResizer>
+      </BlockAligner>
+    </Box>
+  ) : (
     <Resizable
-      aspectRatio={ASPECT_RATIO}
-      initialSize={node.attrs.size}
+      aspectRatio={VIDEO_ASPECT_RATIO}
+      initialSize={node.attrs.width}
       maxWidth={MAX_EMBED_WIDTH}
       minWidth={MIN_EMBED_WIDTH}
       updateAttrs={updateAttrs}

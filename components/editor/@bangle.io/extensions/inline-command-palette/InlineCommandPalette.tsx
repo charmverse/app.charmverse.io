@@ -3,7 +3,7 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, List, ListItem } from '@mui/material';
 import GroupLabel from 'components/editor/GroupLabel';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import reactDOM from 'react-dom';
 import {
   useInlinePaletteItems,
