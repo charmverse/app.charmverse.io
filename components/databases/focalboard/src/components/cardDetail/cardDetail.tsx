@@ -4,6 +4,8 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions'
 import ImageIcon from '@mui/icons-material/Image'
 import { Box } from '@mui/material'
 import { BountyIntegration } from 'components/bounties/BountyIntegration'
+import { PageCoverGalleryImageGroups } from 'components/editor/Page/PageBanner'
+import { randomIntFromInterval } from 'lib/utilities/random'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { BlockIcons } from '../../blockIcons'
@@ -75,6 +77,11 @@ const CardDetail = (props: Props): JSX.Element|null => {
         mutator.changeIcon(card.id, card.fields.icon, newIcon)
     }, [card.id, card.fields.icon])
 
+    const setRandomHeaderImage = useCallback(() => {
+      const newHeaderImage = PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
+      mutator.changeHeaderImage(card.id, card.fields.headerImage, newHeaderImage)
+  }, [card.id, card.fields.headerImage])
+
     if (!card) {
         return null
     }
@@ -106,7 +113,7 @@ const CardDetail = (props: Props): JSX.Element|null => {
                   {!props.readonly && !card.fields.icon &&
                   <div className='add-buttons'>
                       <Button
-                          onClick={setRandomIcon}
+                          onClick={setRandomHeaderImage}
                           icon={<ImageIcon
                             fontSize='small'
                             sx={{ marginRight: 1 }}
