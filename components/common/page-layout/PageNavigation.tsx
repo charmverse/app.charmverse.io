@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
@@ -15,13 +17,13 @@ import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
-import { Page } from 'models';
+import { Page, PageContent } from 'models';
 import Link from 'next/link';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import EmojiCon from '../Emoji';
-import NewPageMenu, { StyledArticleIcon, StyledDatabaseIcon } from '../NewPageMenu';
+import NewPageMenu, { StyledDatabaseIcon } from '../NewPageMenu';
 
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
@@ -173,6 +175,7 @@ export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
 
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
+  const { pages } = usePages();
   const {
     addSubPage,
     deletePage,
@@ -181,8 +184,16 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     labelIcon,
     label,
     pageType,
+    pageId,
     ...other
   } = props;
+
+  const referencedPage = pages.find(_page => _page.id === pageId);
+
+  const docContent = ((referencedPage?.content) as PageContent)?.content;
+
+  const isEditorEmpty = docContent && (docContent.length <= 1
+  && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -207,7 +218,17 @@ const PageTreeItem = forwardRef((props: any, ref) => {
           <PageLink
             href={href}
             label={label}
-            labelIcon={labelIcon || (pageType === 'board' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
+            labelIcon={labelIcon || (pageType === 'board' ? <StyledDatabaseIcon /> : (isEditorEmpty ? (
+              <InsertDriveFileOutlinedIcon sx={{
+                opacity: 0.5
+              }}
+              />
+            ) : (
+              <DescriptionOutlinedIcon sx={{
+                opacity: 0.5
+              }}
+              />
+            )))}
           >
             <div className='page-actions'>
               <IconButton size='small' onClick={showMenu}>
@@ -317,6 +338,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
 
   return (
     <PageTreeItem
+      pageId={item.id}
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
       ref={mergeRefs([drag, drop, dragPreview, focusListener])}
