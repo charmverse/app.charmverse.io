@@ -1,5 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions'
+import ImageIcon from '@mui/icons-material/Image'
 import { Box } from '@mui/material'
 import { BountyIntegration } from 'components/bounties/BountyIntegration'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -14,16 +16,12 @@ import mutator from '../../mutator'
 import Button from '../../widgets/buttons/button'
 import { Focusable } from '../../widgets/editable'
 import EditableArea from '../../widgets/editableArea'
-import EmojiIcon from '../../widgets/icons/emoji'
 import BlockIconSelector from '../blockIconSelector'
 import CardDetailContents from './cardDetailContents'
 import { CardDetailProvider } from './cardDetailContext'
 import CardDetailProperties from './cardDetailProperties'
 import CommentsList from './commentsList'
 import useImagePaste from './imagePaste'
-
-
-
 
 type Props = {
     board: Board
@@ -89,18 +87,38 @@ const CardDetail = (props: Props): JSX.Element|null => {
                     size='l'
                     readonly={props.readonly}
                 />
-                {!props.readonly && !card.fields.icon &&
-                    <div className='add-buttons'>
-                        <Button
-                            onClick={setRandomIcon}
-                            icon={<EmojiIcon/>}
-                        >
-                            <FormattedMessage
-                                id='CardDetail.add-icon'
-                                defaultMessage='Add icon'
-                            />
-                        </Button>
-                    </div>}
+                <Box display={"flex"} gap={1} width={"100%"}>
+                  {!props.readonly && !card.fields.icon &&
+                      <div className='add-buttons'>
+                          <Button
+                              onClick={setRandomIcon}
+                              icon={<EmojiEmotionsIcon
+                                fontSize='small'
+                                sx={{ marginRight: 1 }}
+                              />}
+                          >
+                              <FormattedMessage
+                                  id='CardDetail.add-icon'
+                                  defaultMessage='Add icon'
+                              />
+                          </Button>
+                      </div>}
+                  {!props.readonly && !card.fields.icon &&
+                  <div className='add-buttons'>
+                      <Button
+                          onClick={setRandomIcon}
+                          icon={<ImageIcon
+                            fontSize='small'
+                            sx={{ marginRight: 1 }}
+                          />}
+                      >
+                          <FormattedMessage
+                              id='CardDetail.add-cover'
+                              defaultMessage='Add cover'
+                          />
+                      </Button>
+                  </div>}
+                </Box>
 
                 <EditableArea
                     ref={titleRef}

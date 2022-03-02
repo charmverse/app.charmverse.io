@@ -8,16 +8,15 @@
         flex-direction: column;
         min-height: 32px;
         color: rgba(var(--center-channel-color-rgb), 0.4);
-        width: 100%;
         align-items: flex-start;
 
         .Button {
-            display: none;
+            opacity: 0;
         }
 
         &:hover {
             .Button {
-                display: flex;
+              opacity: 1;
             }
         }
     }
