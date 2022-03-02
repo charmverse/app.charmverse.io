@@ -16,7 +16,7 @@ export interface IInputSearchCryptoProps {
 export function InputSearchCrypto ({
   onChange = () => {},
   defaultValue,
-  register = () => [] as any,
+  register = () => ({}) as any,
   modelKey = '-',
   label = 'Choose a crypto' }: IInputSearchCryptoProps) {
 
@@ -28,7 +28,7 @@ export function InputSearchCrypto ({
 
   return (
     <Autocomplete
-      defaultValue={defaultValue ?? 'ETH'}
+      defaultValue={defaultValue ?? null}
       onChange={(_, value) => {
         emitValue(value as any);
       }}
@@ -54,12 +54,11 @@ export function InputSearchCrypto ({
       )}
       renderInput={(params) => (
         <TextField
+          // disable propagation for bangle.dev
+          onMouseUp={(e) => e.stopPropagation()}
           {...register(modelKey)}
           {...params}
           label={label}
-          inputProps={{
-            ...params.inputProps
-          }}
         />
       )}
     />

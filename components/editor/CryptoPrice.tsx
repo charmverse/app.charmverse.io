@@ -3,13 +3,12 @@ import { DOMOutputSpec } from '@bangle.dev/pm';
 import { ArrowDropDown, Autorenew } from '@mui/icons-material';
 import { Card, CardContent, CircularProgress, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { InputSearchCurrency } from '../../components/common/form/InputSearchCurrency';
-import { InputSearchCrypto } from '../../components/common/form/InputSearchCrypto';
-import { getPricing } from '../../hooks/usePricing';
-import { CryptoCurrency, FiatCurrency, IPairQuote } from '../../models/Currency';
-import { formatMoney } from '../../lib/utilities/formatting';
-import { RelativeTime } from '../common/RelativeTime';
-
+import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
+import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
+import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
+import { formatMoney } from 'lib/utilities/formatting';
+import { RelativeTime } from 'components/common/RelativeTime';
+import charmClient from 'charmClient';
 /**
  * Simple utility as the Crypto Price component allows selecting the base or quote
  */
@@ -66,15 +65,14 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
 
   useEffect(() => {
     // Load the price automatically on the initial render, or if a currency was changed
-    if (error === null
-      && (lastQuote.amount === 0 || lastQuote.base !== baseCurrency || lastQuote.quote !== quoteCurrency)) {
+    if (error === null && baseCurrency && quoteCurrency) {
       refreshPrice();
     }
-  });
+  }, [baseCurrency, quoteCurrency]);
 
   function refreshPrice () {
     setLoadingState(true);
-    getPricing(baseCurrency, quoteCurrency)
+    charmClient.getPricing(baseCurrency, quoteCurrency)
       .then((quote) => {
         setError(null);
         setPrice({ ...quote, receivedOn: Date.now() });
@@ -105,7 +103,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   }
 
   return (
-    <Card className='cryptoPrice' component='div' raised={true} sx={{ display: 'inline-block', mx: '10px', minWidth: '250px' }}>
+    <Card draggable={false} className='cryptoPrice' component='div' raised={true} sx={{ display: 'inline-block', mx: '10px', minWidth: '250px' }}>
 
       {
         (baseCurrency === null) && (
