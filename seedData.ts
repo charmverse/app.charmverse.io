@@ -137,7 +137,7 @@ export function untitledPage ({ userId, spaceId }: {userId: string, spaceId: str
     },
     contentText: '',
     isPublic: false,
-    path: 'getting-started',
+    path: uuid(),
     title: '',
     type: 'page',
     updatedAt: new Date(),
