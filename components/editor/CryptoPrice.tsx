@@ -1,7 +1,8 @@
 import { BaseRawNodeSpec } from '@bangle.dev/core';
 import { DOMOutputSpec } from '@bangle.dev/pm';
+import Button from 'components/common/Button';
 import { ArrowDropDown, Autorenew } from '@mui/icons-material';
-import { Card, CardContent, CircularProgress, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { InputSearchCurrency } from '../../components/common/form/InputSearchCurrency';
 import { InputSearchCrypto } from '../../components/common/form/InputSearchCrypto';
@@ -104,78 +105,83 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
     }
   }
 
+  function toggleSelectionList (list: OptionListName): void {
+    if (selectionList === list) {
+      setSelectionList(null);
+    }
+    else {
+      setSelectionList(list);
+    }
+  }
+
   return (
     <Card className='cryptoPrice' component='div' raised={true} sx={{ display: 'inline-block', mx: '10px', minWidth: '250px' }}>
 
-      {
-        (baseCurrency === null) && (
-          <div style={{ marginTop: '4px', padding: '5px' }}>
-            <InputSearchCrypto onChange={changeBaseCurrency} />
-          </div>
-        )
-      }
+      {(baseCurrency === null) && (
+        <div style={{ marginTop: '4px', padding: '5px' }}>
+          <InputSearchCrypto onChange={changeBaseCurrency} />
+        </div>
+      )}
 
-      {
-        baseCurrency !== null && (
+      {baseCurrency !== null && (
         <CardContent>
-          <Typography variant='h5'>
-            {baseCurrency}
-            {' '}
-            <ArrowDropDown onClick={() => setSelectionList('base')} />
-            /
-            {' '}
-            {quoteCurrency}
-            {' '}
-            <ArrowDropDown onClick={() => setSelectionList('quote')} />
-            <Autorenew onClick={() => refreshPrice()} sx={{ float: 'right' }} />
-          </Typography>
-
-          {
-          (selectionList === 'base') && (
-            <div style={{ marginTop: '4px', padding: '5px' }}>
-              <InputSearchCrypto onChange={changeBaseCurrency} />
-            </div>
-          )
-        }
-
-          {
-          selectionList === 'quote' && (
-            <div style={{ marginTop: '4px', padding: '5px' }}>
-              <InputSearchCurrency onChange={changeQuoteCurrency} />
-            </div>
-          )
-        }
-
-          {(loading === true && error === null) && (
           <div>
-            <CircularProgress />
-            <h2 style={{ textAlign: 'center' }}>Loading price..</h2>
+            <Button color='secondary' component='span' variant='text' size='small' onClick={() => toggleSelectionList('base')}>
+              {baseCurrency}
+              {' '}
+              <ArrowDropDown />
+            </Button>
+            /
+            <Button color='secondary' component='span' variant='text' size='small' onClick={() => toggleSelectionList('quote')}>
+              {' '}
+              {quoteCurrency}
+              {' '}
+              <ArrowDropDown />
+            </Button>
+            <IconButton size='small' onClick={() => refreshPrice()} sx={{ float: 'right' }}>
+              <Autorenew />
+            </IconButton>
           </div>
+
+          {(selectionList === 'base') && (
+            <Box pt={1}>
+              <InputSearchCrypto onChange={changeBaseCurrency} />
+            </Box>
           )}
 
-          {(loading === false && lastQuote.amount > 0 && error === null) && (
-          <h2 style={{ textAlign: 'center' }}>{formatMoney(lastQuote.amount, quoteCurrency)}</h2>
+          {selectionList === 'quote' && (
+            <Box pt={1}>
+              <InputSearchCurrency onChange={changeQuoteCurrency} />
+            </Box>
           )}
 
-          {error !== null && (
-          <h2 style={{ textAlign: 'center' }}>No price found</h2>
-          )}
-
+          <Typography variant='h2' align='center' sx={{ fontSize: '2rem', margin: 0 }}>
+            {loading === false && !error && formatMoney(lastQuote.amount, quoteCurrency)}
+            {loading === true && !error && '- -'}
+            {error && 'No price found'}
+          </Typography>
         </CardContent>
-        )
-      }
+      )}
 
-      {
-        (loading === false && baseCurrency !== null) && (
-          <p style={{ margin: 'auto', textAlign: 'center', fontSize: '14px', paddingBottom: '3px' }}>
+      {(loading === true) && (
+        <CardActions sx={{ justifyContent: 'center' }}>
+          <Typography variant='caption' color='secondary'>
+            <CircularProgress size={10} color='inherit' sx={{ mr: 1 }} />
+            Loading price...
+          </Typography>
+        </CardActions>
+      )}
+      {(loading === false && baseCurrency !== null) && (
+        <CardActions sx={{ justifyContent: 'center' }}>
+          <Typography variant='caption' color='secondary'>
             Updated:
             {' '}
             <RelativeTime timestamp={(
               lastQuote?.receivedOn && lastQuote?.receivedOn > 0) ? lastQuote.receivedOn : Date.now()}
             />
-          </p>
-        )
-      }
+          </Typography>
+        </CardActions>
+      )}
     </Card>
   );
 }
