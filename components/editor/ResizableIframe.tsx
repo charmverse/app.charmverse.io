@@ -10,15 +10,16 @@ import { Box } from '@mui/system';
 import { HTMLAttributes, useState } from 'react';
 import BlockAligner from './BlockAligner';
 import IFrameSelector from './IFrameSelector';
+import Resizable from './Resizable';
 import VerticalResizer from './VerticalResizer';
 
 export const MAX_EMBED_WIDTH = 900;
 export const
   MIN_EMBED_WIDTH = 100;
-const MAX_EMBED_HEIGHT = 2500;
-const MIN_EMBED_HEIGHT = 500;
-const
-  ASPECT_RATIO = 1.77;
+export const MAX_EMBED_HEIGHT = 2500;
+export const MIN_EMBED_HEIGHT = 500;
+export const
+  VIDEO_ASPECT_RATIO = 1.77;
 
 const name = 'iframe';
 
@@ -165,6 +166,7 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
   NodeViewProps & { onResizeStop?: (view: EditorView) => void }) {
   const theme = useTheme();
   const [height, setHeight] = useState(node.attrs.height);
+  const [width, setWidth] = useState(node.attrs.width);
   const view = useEditorViewContext();
 
   // If there are no source for the node, return the image select component
@@ -189,7 +191,7 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
     });
   }
 
-  return (
+  return node.attrs.type === 'embed' ? (
     <Box style={{
       margin: theme.spacing(3, 0),
       display: 'flex',
@@ -223,5 +225,19 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
         </VerticalResizer>
       </BlockAligner>
     </Box>
+  ) : (
+    <Resizable
+      aspectRatio={VIDEO_ASPECT_RATIO}
+      initialSize={node.attrs.width}
+      maxWidth={MAX_EMBED_WIDTH}
+      minWidth={MIN_EMBED_WIDTH}
+      updateAttrs={updateAttrs}
+      onDelete={onDelete}
+      onResizeStop={onResizeStop}
+    >
+      <StyledIFrame>
+        <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+      </StyledIFrame>
+    </Resizable>
   );
 }

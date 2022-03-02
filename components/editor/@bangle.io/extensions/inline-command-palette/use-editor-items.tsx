@@ -10,7 +10,7 @@ import InsertChartIcon from '@mui/icons-material/InsertChart';
 import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import { MAX_EMBED_WIDTH, MIN_EMBED_WIDTH } from 'components/editor/ResizableIframe';
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'components/editor/ResizableIframe';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {
   isList
@@ -188,7 +188,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
                 state.schema.nodes.iframe.create({
                   src: null,
                   type: "video",
-                  size: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2
+                  width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
+                  height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
                 })
               ])
             ))
@@ -215,7 +216,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
                 state.schema.nodes.iframe.create({
                   src: null,
                   type: "embed",
-                  size: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2
+                  width: MAX_EMBED_WIDTH,
+                  height: MIN_EMBED_HEIGHT
                 })
               ])
             ))
