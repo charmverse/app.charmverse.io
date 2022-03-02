@@ -199,7 +199,7 @@ class Mutator {
         )
     }
 
-    async changeHeaderImage(blockId: string, oldHeaderImage: string|undefined, headerImage: string, description = 'change cover') {
+    async changeHeaderImage(blockId: string, oldHeaderImage: string | undefined | null, headerImage: string | null, description = 'change cover') {
       await undoManager.perform(
           async () => {
               await charmClient.patchBlock(blockId, {updatedFields: {headerImage}}, publishIncrementalUpdate)

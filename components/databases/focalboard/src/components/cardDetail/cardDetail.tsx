@@ -4,7 +4,7 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions'
 import ImageIcon from '@mui/icons-material/Image'
 import { Box } from '@mui/material'
 import { BountyIntegration } from 'components/bounties/BountyIntegration'
-import { PageCoverGalleryImageGroups } from 'components/editor/Page/PageBanner'
+import PageBanner, { PageCoverGalleryImageGroups } from 'components/editor/Page/PageBanner'
 import { randomIntFromInterval } from 'lib/utilities/random'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
@@ -77,9 +77,10 @@ const CardDetail = (props: Props): JSX.Element|null => {
         mutator.changeIcon(card.id, card.fields.icon, newIcon)
     }, [card.id, card.fields.icon])
 
-    const setRandomHeaderImage = useCallback(() => {
-      const newHeaderImage = PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
-      mutator.changeHeaderImage(card.id, card.fields.headerImage, newHeaderImage)
+    const setRandomHeaderImage = useCallback((headerImage?: string | null) => {
+      const newHeaderImage = headerImage ?? PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
+      // Null is passed if we want to remove the image
+      mutator.changeHeaderImage(card.id, card.fields.headerImage, headerImage !== null ? newHeaderImage : null)
   }, [card.id, card.fields.headerImage])
 
     if (!card) {
@@ -94,6 +95,11 @@ const CardDetail = (props: Props): JSX.Element|null => {
                     size='l'
                     readonly={props.readonly}
                 />
+                {card.fields.headerImage && <Box width={"100%"} mb={2}>
+                  <PageBanner focalBoard image={card.fields.headerImage} setImage={(headerImage) => {
+                    setRandomHeaderImage(headerImage!)
+                  }} />
+                </Box>}
                 <Box display={"flex"} gap={1} width={"100%"}>
                   {!props.readonly && !card.fields.icon &&
                       <div className='add-buttons'>
@@ -110,10 +116,10 @@ const CardDetail = (props: Props): JSX.Element|null => {
                               />
                           </Button>
                       </div>}
-                  {!props.readonly && !card.fields.icon &&
+                  {!props.readonly && !card.fields.headerImage &&
                   <div className='add-buttons'>
                       <Button
-                          onClick={setRandomHeaderImage}
+                          onClick={() => setRandomHeaderImage()}
                           icon={<ImageIcon
                             fontSize='small'
                             sx={{ marginRight: 1 }}
