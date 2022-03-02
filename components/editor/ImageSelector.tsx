@@ -5,6 +5,7 @@ import PopperPopup from 'components/common/PopperPopup';
 import Snackbar from 'components/common/Snackbar';
 import useSnackbar from 'hooks/useSnackbar';
 import { ReactNode, useState } from 'react';
+import { uploadToS3 } from 'lib/aws/uploadToS3';
 
 interface ImageSelectorProps {
   onImageSelect: (imageSrc: string) => void
@@ -38,22 +39,11 @@ export default function ImageSelector (props: ImageSelectorProps) {
                   type='file'
                   hidden
                   accept='image/*'
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const firstFile = e.target.files?.[0];
                     if (firstFile) {
-                      // file size in mb
-                      const fileSize = firstFile.size / 1024 / 1024;
-                      if (fileSize > 1) {
-                        showMessage(`File size ${fileSize.toFixed(2)} Mb too large. Limit 1 Mb`);
-                      }
-                      else {
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                          const { result } = reader;
-                          onImageSelect(result as string);
-                        };
-                        reader.readAsDataURL(firstFile);
-                      }
+                      const { url } = await uploadToS3(firstFile);
+                      onImageSelect(url);
                     }
                   }}
                 />

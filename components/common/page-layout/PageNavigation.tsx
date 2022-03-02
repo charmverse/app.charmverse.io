@@ -12,6 +12,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { Space } from '@prisma/client';
+import charmClient from 'charmClient';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { Page } from 'models';
@@ -449,8 +450,16 @@ export default function PageNavigation ({
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
 
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
+
+    if (droppedItem.id === containerItem.id) {
+      return;
+    }
+    charmClient.updatePage({
+      id: droppedItem.id,
+      parentId: containerItem.id
+    });
     setPages(stateNodes => stateNodes.map(stateNode => {
-      if (stateNode.id === droppedItem.id && droppedItem.id !== containerItem.id) {
+      if (stateNode.id === droppedItem.id) {
         return {
           ...stateNode,
           parentId: containerItem.id

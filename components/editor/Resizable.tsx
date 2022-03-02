@@ -4,21 +4,23 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import { Box } from '@mui/system';
 import { ReactNode, useState } from 'react';
+import charmClient from 'charmClient';
 import BlockAligner from './BlockAligner';
 import Resizer from './Resizer';
 
 interface ResizableProps {
-  initialSize: number
-  children: ReactNode
-  minWidth: number
-  maxWidth: number
-  aspectRatio: number
-  updateAttrs: NodeViewProps['updateAttrs']
-  onResizeStop?: (view: EditorView) => void
+  initialSize: number;
+  children: ReactNode;
+  minWidth: number;
+  maxWidth: number;
+  aspectRatio: number;
+  updateAttrs: NodeViewProps['updateAttrs'];
+  onDelete: () => void;
+  onResizeStop?: (view: EditorView) => void;
 }
 
 export default function Resizable (props: ResizableProps) {
-  const { onResizeStop, updateAttrs, initialSize, children, maxWidth, minWidth, aspectRatio } = props;
+  const { onResizeStop, updateAttrs, onDelete, initialSize, children, maxWidth, minWidth, aspectRatio } = props;
   const theme = useTheme();
   const [size, setSize] = useState(initialSize);
   const view = useEditorViewContext();
@@ -31,11 +33,7 @@ export default function Resizable (props: ResizableProps) {
     }}
     >
       <BlockAligner
-        onDelete={() => {
-          updateAttrs({
-            src: null
-          });
-        }}
+        onDelete={onDelete}
         size={size}
       >
         <Resizer

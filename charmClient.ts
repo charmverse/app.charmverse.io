@@ -161,6 +161,12 @@ class CharmClient {
       .then(blocks => this.fixBlocks(blocks));
   }
 
+  getSubtree (rootId?: string, levels = 2): Promise<FBBlock[]> {
+    return http.GET<Block[]>(`/api/blocks/${rootId}/subtree`, { levels })
+      .then(blocks => blocks.map(this.blockToFBBlock))
+      .then(blocks => this.fixBlocks(blocks));
+  }
+
   fixBlocks (blocks: FBBlock[]): FBBlock[] {
     // Hydrate is important, as it ensures that each block is complete to the current model
     const fixedBlocks = OctoUtils.hydrateBlocks(blocks);
@@ -309,6 +315,16 @@ class CharmClient {
     const data = await http.GET<Application []>('/api/applications', { bountyId });
 
     return data;
+  }
+
+  // AWS
+  uploadToS3 (file: File): Promise<{ token: any, bucket: string, key: string, region: string }> {
+    const filename = encodeURIComponent(file.name);
+    return http.GET('/api/aws/s3-upload', { filename });
+  }
+
+  deleteFromS3 (src: string) {
+    return http.DELETE('/api/aws/s3-delete', { src });
   }
 }
 
