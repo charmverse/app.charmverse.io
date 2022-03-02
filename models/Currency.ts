@@ -1,10 +1,9 @@
 export const CryptoCurrencyList = {
   ETH: 'Ether',
-  AETH: 'Ether (Arbitrum)',
   BNB: 'Binance Coin',
   MATIC: 'Polygon',
   AVAX: 'Avalanche',
-  XDAI: 'xDAI',
+  xDAI: 'xDAI',
   FTM: 'Fantom',
   CELO: 'Celo',
   ONE: 'Harmony'
@@ -17,11 +16,10 @@ export type CryptoCurrency = keyof typeof CryptoCurrencyList;
  */
 export const CryptoLogoPaths: Record<CryptoCurrency, string> = {
   ETH: '/cryptoLogos/ethereum-eth-logo.svg',
-  AETH: '/cryptoLogos/ethereum-eth-logo.svg',
   BNB: '/cryptoLogos/binance-coin-bnb-logo.svg',
   MATIC: '/cryptoLogos/polygon-matic-logo.svg',
   AVAX: '/cryptoLogos/avalanche-avax-logo.svg',
-  XDAI: '/cryptoLogos/gnosis-xdai-logo.svg',
+  xDAI: '/cryptoLogos/gnosis-xdai-logo.svg',
   FTM: '/cryptoLogos/fantom-ftm-logo.svg',
   CELO: '/cryptoLogos/celo-celo-logo.svg',
   ONE: '/cryptoLogos/harmony-one-logo.svg'
