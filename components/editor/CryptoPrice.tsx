@@ -155,7 +155,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
             </Box>
           )}
 
-          <Typography variant='h2' align='center' sx={{ fontSize: '2rem', margin: 0 }}>
+          <Typography variant='h2' align='center'>
             {loading === false && !error && formatMoney(lastQuote.amount, quoteCurrency)}
             {loading === true && !error && '- -'}
             {error && 'No price found'}
