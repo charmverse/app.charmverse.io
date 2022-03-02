@@ -293,7 +293,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 <Box display='flex' alignItems='center'>
                   <Avatar name={getDisplayName(user)} />
                   <Box pl={1}>
-                    <Typography>
+                    <Typography color='secondary'>
                       <strong>{getDisplayName(user)}</strong>
                     </Typography>
                   </Box>

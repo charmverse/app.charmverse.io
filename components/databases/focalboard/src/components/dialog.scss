@@ -14,6 +14,11 @@
         height: 100%;
         background-color: rgba(var(--center-channel-color-rgb), 0.5);
     }
+    @media (prefers-color-scheme: dark) {
+        .wrapper {
+            background-color: rgba(15, 15, 15, 0.8);
+        }
+    }
 
     .dialog {
         display: flex;

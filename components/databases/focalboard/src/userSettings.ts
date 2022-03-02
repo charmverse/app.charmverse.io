@@ -86,7 +86,7 @@ export class UserSettings {
     }
 
     static get prefillRandomIcons(): boolean {
-        return UserSettings.get(UserSettingKey.RandomIcons) !== 'false'
+        return UserSettings.get(UserSettingKey.RandomIcons) === 'true'
     }
 
     static set prefillRandomIcons(newValue: boolean) {

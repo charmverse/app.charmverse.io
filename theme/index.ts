@@ -75,6 +75,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
   const contrastText = mode === 'dark' ? '#fff' : '#000';
 
   return createTheme({
+    shape: {
+      borderRadius: 3 // defaults to 4
+    },
     transitions: {
       duration: {
         shortest: 150,
@@ -196,10 +199,10 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
     },
     components: {
-      MuiCard: {
+      MuiAutocomplete: {
         styleOverrides: {
-          root: {
-            borderRadius: '20px'
+          popper: {
+            zIndex: 3000
           }
         }
       },
@@ -214,7 +217,32 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         },
         styleOverrides: {
           root: {
-            borderRadius: '10px'
+            textTransform: 'none'
+            // borderRadius: '10px'
+          }
+        }
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: '20px'
+          }
+        }
+      },
+      MuiCardContent: {
+        styleOverrides: {
+          root: {
+            '&:last-child': {
+              paddingBottom: 16
+            }
+          }
+        }
+      },
+      MuiCssBaseline: {
+        styleOverrides: {
+          html: {
+            // this makes the text look lighter
+            MozOsxFontSmoothing: 'none'
           }
         }
       },
@@ -225,13 +253,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
-      MuiAutocomplete: {
-        styleOverrides: {
-          popper: {
-            zIndex: 3000
-          }
-        }
-      },
       // MuiPopover: {
       //   styleOverrides: {
       //     root: {
@@ -239,15 +260,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       //     }
       //   }
       // },
-      MuiCardContent: {
-        styleOverrides: {
-          root: {
-            '&:last-child': {
-              paddingBottom: 16
-            }
-          }
-        }
-      },
       MuiOutlinedInput: {
         styleOverrides: {
           input: {

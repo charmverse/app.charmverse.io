@@ -27,6 +27,7 @@ const darkFocalboardBrandColors = renameColorsForFocalboard(darkModeColors);
 
 export const darkTheme: Theme = {
   ...originalDarkTheme,
+  mainBg: '25, 25, 25',
   ...darkFocalboardBrandColors
 };
 
