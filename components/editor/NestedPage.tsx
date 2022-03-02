@@ -10,10 +10,10 @@ import { Box, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import ActionsMenu from 'components/common/ActionsMenu';
 import Snackbar from 'components/common/Snackbar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMenu } from 'hooks/useMenu';
 import useNestedPage from 'hooks/useNestedPage';
 import { usePages } from 'hooks/usePages';
 import useSnackbar from 'hooks/useSnackbar';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { PageContent } from 'models';
 import Link from 'next/link';
 
@@ -50,8 +50,8 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
   const { pages } = usePages();
   const { addNestedPage } = useNestedPage();
   const { message, handleClose, isOpen: isSnackbarOpen, showMessage } = useSnackbar();
-  const { anchorEl, showMenu, hideMenu, isOpen } = useMenu();
   const nestedPage = pages.find(page => page.id === node.attrs.id);
+  const popupState = usePopupState({ variant: 'popover', popupId: 'nested-page' });
 
   const docContent = ((nestedPage?.content) as PageContent)?.content;
 
@@ -96,13 +96,10 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
         </Box>
       </Link>
 
-      <ActionsMenu onClick={showMenu} />
+      <ActionsMenu {...bindTrigger(popupState)} />
 
       <Menu
-        anchorEl={anchorEl}
-        open={isOpen}
-        onClose={hideMenu}
-        onClick={hideMenu}
+        {...bindMenu(popupState)}
       >
         <MenuItem
           sx={{ padding: '3px 12px' }}

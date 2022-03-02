@@ -8,8 +8,8 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { Page } from 'models';
+import { MouseEvent, useState } from 'react';
 import { greyColor2 } from 'theme/colors';
 
 const StyledIconButton = styled(IconButton)`
@@ -40,23 +40,33 @@ export const StyledDatabaseIcon = styled(DatabaseIcon)`
 type Props = { addPage: (p: Partial<Page>) => void, tooltip: string, sx?: any };
 
 export default function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
-  const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+    event.preventDefault();
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const createPage = (page: { type: Page['type'] }) => {
+    handleClose();
     addPage(page);
-    popupState.close();
   };
 
   return (
     <>
       <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement='right' arrow>
-        <StyledIconButton {...props} {...bindTrigger(popupState)}>
+        <StyledIconButton onClick={handleClick} {...props}>
           <AddIcon color='secondary' />
         </StyledIconButton>
       </Tooltip>
 
       <Menu
-        {...bindMenu(popupState)}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
       >
         <MenuItem onClick={() => createPage({ type: 'page' })}>
           <ListItemIcon><StyledArticleIcon fontSize='small' /></ListItemIcon>

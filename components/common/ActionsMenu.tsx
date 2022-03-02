@@ -20,7 +20,10 @@ interface ActionsMenuProps {
 export default function ActionsMenu ({ onClick, children }: ActionsMenuProps) {
   return (
     <StyledActionsMenu className='actions-menu'>
-      <IconButton size='small' onClick={onClick}>
+      <IconButton
+        size='small'
+        onClick={onClick}
+      >
         <MoreHorizIcon color='secondary' fontSize='small' />
       </IconButton>
       {children}

@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
@@ -11,16 +12,13 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { Space } from '@prisma/client';
-import charmClient from 'charmClient';
 import { useLocalStorage } from 'hooks/useLocalStorage';
-import { useMenu } from 'hooks/useMenu';
 import { usePages } from 'hooks/usePages';
 import { Page } from 'models';
 import Link from 'next/link';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
-import ActionsMenu from '../ActionsMenu';
 import EmojiCon from '../Emoji';
 import NewPageMenu, { StyledArticleIcon, StyledDatabaseIcon } from '../NewPageMenu';
 
@@ -110,11 +108,10 @@ const PageAnchor = styled.a`
     background: ${({ theme }) => theme.palette.action.hover};
     opacity: 0;
     position: absolute;
-    top: 50%;
-    right: 5px;
-    transform: translateY(-50%);
+    top: 0px;
+    right: 0px;
   }
-  &:hover .actions-menu {
+  &:hover .page-actions {
     opacity: 1;
   }
 `;
@@ -125,7 +122,6 @@ const PageIcon = styled(EmojiCon)`
   margin-right: 4px;
 `;
 
-// NOTE: Dont change isempty to isEmpty, React will throw an error in the console
 export const PageTitle = styled(Typography)<{isempty: number}>`
   color: inherit;
   display: flex;
@@ -187,7 +183,21 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     ...other
   } = props;
 
-  const { anchorEl, showMenu, hideMenu, isOpen } = useMenu();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  function stopPropagation (event: SyntheticEvent) {
+    event.stopPropagation();
+  }
+
+  function showMenu (event: React.MouseEvent<HTMLElement>) {
+    setAnchorEl(event.currentTarget);
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function hideMenu (event: React.MouseEvent<HTMLElement>) {
+    setAnchorEl(null);
+  }
 
   return (
     <>
@@ -198,11 +208,14 @@ const PageTreeItem = forwardRef((props: any, ref) => {
             label={label}
             labelIcon={labelIcon || (pageType === 'board' ? <StyledDatabaseIcon /> : <StyledArticleIcon />)}
           >
-            <ActionsMenu onClick={showMenu}>
+            <div className='page-actions'>
+              <IconButton size='small' onClick={showMenu}>
+                <MoreHorizIcon color='secondary' fontSize='small' />
+              </IconButton>
               {addSubPage && (
                 <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} sx={{ marginLeft: '3px' }} />
               )}
-            </ActionsMenu>
+            </div>
           </PageLink>
         )}
         {...other}
@@ -212,7 +225,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
 
       <Menu
         anchorEl={anchorEl}
-        open={isOpen}
+        open={Boolean(anchorEl)}
         onClose={hideMenu}
         onClick={hideMenu}
         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
@@ -253,6 +266,7 @@ type DraggableNodeProps = {
 }
 
 function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }: DraggableNodeProps) {
+
   const theme = useTheme();
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
@@ -384,10 +398,6 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
       if (didDrop || !item.parentId) {
         return;
       }
-      charmClient.updatePage({
-        id: item.id,
-        parentId: null
-      });
       setPages((stateNodes) => stateNodes.map((stateNode) => {
         if (stateNode.id === item.id) {
           return {
@@ -433,17 +443,12 @@ export default function PageNavigation ({
   space,
   rootPageIds
 }: NavProps) {
-  const { pages, currentPage, setPages, addPageAndRedirect } = usePages();
+  const { pages, currentPage, setPages, addPage } = usePages();
 
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
 
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
-
-    charmClient.updatePage({
-      id: droppedItem.id,
-      parentId: containerItem.id
-    });
     setPages(stateNodes => stateNodes.map(stateNode => {
       if (stateNode.id === droppedItem.id && droppedItem.id !== containerItem.id) {
         return {
@@ -497,7 +502,7 @@ export default function PageNavigation ({
           item={item}
           onDrop={onDrop}
           pathPrefix={`/${space.domain}`}
-          addPage={page => addPageAndRedirect && addPageAndRedirect(page)}
+          addPage={page => addPage && addPage(page)}
           deletePage={deletePage}
         />
       ))}
