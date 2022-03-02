@@ -217,7 +217,7 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
             setHeight(data.size.height);
           }}
           maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
-          minConstraints={[MIN_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
+          minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
         >
           <StyledIFrame>
             <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />

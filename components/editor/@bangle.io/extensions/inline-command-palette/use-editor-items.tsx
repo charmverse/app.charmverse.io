@@ -217,6 +217,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       uid: 'embed',
       title: 'Embed',
       icon: <PreviewIcon sx={{fontSize: 16}}/>,
+      keywords: ['iframe'],
       description: 'Insert an embed block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
