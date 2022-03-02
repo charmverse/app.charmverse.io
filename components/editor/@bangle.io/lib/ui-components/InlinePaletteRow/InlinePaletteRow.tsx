@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   isTouchDevice,
   safeScrollIntoViewIfNeeded
 } from 'components/editor/utility';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 const BASE_PADDING = 10;
 
@@ -32,7 +32,7 @@ const StyledInlinePaletteRow = styled.div<{ active: boolean, disabled: boolean }
   gap: ${({ theme }) => theme.spacing(1.5)};
   width: 100%;
   ${props => props.active && `background-color: rgb(0, 0, 0, 0.125);`};
-  font-weight: 500;
+  font-weight: bold;
   font-size: 14px;
   padding: 5px ${BASE_PADDING}px
 `;

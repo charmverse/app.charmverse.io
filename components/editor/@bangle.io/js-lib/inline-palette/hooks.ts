@@ -1,7 +1,8 @@
-import type { Command, EditorState, EditorView, PluginKey, Transaction } from '@bangle.dev/pm';
+import type { EditorState, EditorView, PluginKey, Transaction } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { suggestTooltip } from '@bangle.dev/tooltip';
 import { useCallback, useEffect } from 'react';
+import { PromisedCommand } from '../../extensions/inline-command-palette/palette-item';
 import { getSuggestTooltipKey } from './inline-palette';
 
 export function useInlinePaletteQuery(inlinePaletteKey: PluginKey) {
@@ -65,11 +66,11 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
         return () => true;
       }
 
-      return (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, view: EditorView) => {
-        return item.editorExecuteCommand({
+      return async (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, view: EditorView) => {
+        return await (item.editorExecuteCommand({
           item,
           itemIndex,
-        })(state, dispatch, view);
+        })(state, dispatch, view));
       };
     },
     [inlinePaletteKey, items, isItemDisabled],
@@ -120,5 +121,5 @@ export interface InlinePaletteItem {
   editorExecuteCommand: (arg: {
     item: InlinePaletteItem;
     itemIndex: number;
-  }) => Command;
+  }) => PromisedCommand;
 }

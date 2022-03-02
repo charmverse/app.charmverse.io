@@ -1,3 +1,4 @@
+import '@bangle.dev/tooltip/style.css';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
 // fullcalendar css
@@ -151,7 +152,6 @@ import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import { createThemeLightSensitive } from 'theme';
-import '@bangle.dev/tooltip/style.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/focalboard/styles.scss';
 import {
@@ -287,17 +287,17 @@ function FocalBoardProviders ({ children }: { children: ReactNode }) {
 function DataProviders ({ children }: { children: ReactNode }) {
   return (
     <SpacesProvider>
-      <PagesProvider>
-        <BountiesProvider>
-          <DatabaseBlocksProvider>
-            <PageTitleProvider>
-              <UserProvider>
+      <UserProvider>
+        <PagesProvider>
+          <BountiesProvider>
+            <DatabaseBlocksProvider>
+              <PageTitleProvider>
                 {children}
-              </UserProvider>
-            </PageTitleProvider>
-          </DatabaseBlocksProvider>
-        </BountiesProvider>
-      </PagesProvider>
+              </PageTitleProvider>
+            </DatabaseBlocksProvider>
+          </BountiesProvider>
+        </PagesProvider>
+      </UserProvider>
     </SpacesProvider>
   );
 }
