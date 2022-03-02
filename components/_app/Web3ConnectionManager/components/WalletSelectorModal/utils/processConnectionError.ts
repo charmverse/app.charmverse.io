@@ -33,7 +33,13 @@ const processConnectionError = (error: Error): ErrorInfo => {
         description: error.message
       };
     default:
-      console.error(error);
+      if ((<any> error).code === -32002) {
+        return {
+          title: 'Sign in to MetaMask',
+          description:
+            'Please make sure you are signed in.'
+        };
+      }
       return {
         title: 'An unknown error occurred',
         description: 'Check the console for more details.'
