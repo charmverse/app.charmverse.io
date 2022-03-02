@@ -18,7 +18,7 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import { MAX_EMBED_WIDTH, MIN_EMBED_WIDTH } from 'components/editor/ResizableIframe';
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'components/editor/ResizableIframe';
 import useNestedPage from 'hooks/useNestedPage';
 import { useMemo } from 'react';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
@@ -199,7 +199,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
                 state.schema.nodes.iframe.create({
                   src: null,
                   type: "video",
-                  size: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2
+                  width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
+                  height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
                 })
               ])
             ))
@@ -216,6 +217,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       uid: 'embed',
       title: 'Embed',
       icon: <PreviewIcon sx={{fontSize: 16}}/>,
+      keywords: ['iframe'],
       description: 'Insert an embed block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
@@ -226,7 +228,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
                 state.schema.nodes.iframe.create({
                   src: null,
                   type: "embed",
-                  size: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2
+                  width: MAX_EMBED_WIDTH,
+                  height: MIN_EMBED_HEIGHT
                 })
               ])
             ))

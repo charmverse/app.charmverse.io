@@ -92,11 +92,12 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   position: relative;
   /** DONT REMOVE THIS STYLING */
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
-  left: -250px;
+  left: -50px;
   
   /** DONT REMOVE THIS STYLING */
   div.ProseMirror.bangle-editor {
-    padding-left: 250px;
+    padding-left: 50px;
+    width: calc(100% + 50px);
   }
 
   code {
