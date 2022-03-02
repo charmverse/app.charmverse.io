@@ -13,7 +13,8 @@ import {Card} from '../../blocks/card'
 import {BoardView} from '../../blocks/boardView'
 import mutator from '../../mutator'
 import {Utils, IDType} from '../../utils'
-import Button from '../../widgets/buttons/button'
+//import Button from '../../widgets/buttons/button'
+import Button from '@mui/material/Button'
 import {Constants} from '../../constants'
 
 import {dragAndDropRearrange} from '../cardDetail/cardDetailContentsUtility'
@@ -224,6 +225,22 @@ const Kanban = (props: Props) => {
                     />
                 ))}
 
+                {!props.readonly &&
+                    <div className='octo-board-header-cell narrow'>
+                        <Button
+                            size='small'
+                            variant='text'
+                            color='secondary'
+                            onClick={addGroupClicked}
+                        >
+                            <FormattedMessage
+                                id='BoardComponent.add-a-group'
+                                defaultMessage='+ Add a group'
+                            />
+                        </Button>
+                    </div>
+                }
+
                 {/* Hidden column header */}
 
                 {hiddenGroups.length > 0 &&
@@ -232,19 +249,6 @@ const Kanban = (props: Props) => {
                             id='BoardComponent.hidden-columns'
                             defaultMessage='Hidden columns'
                         />
-                    </div>
-                }
-
-                {!props.readonly &&
-                    <div className='octo-board-header-cell narrow'>
-                        <Button
-                            onClick={addGroupClicked}
-                        >
-                            <FormattedMessage
-                                id='BoardComponent.add-a-group'
-                                defaultMessage='+ Add a group'
-                            />
-                        </Button>
                     </div>
                 }
             </div>
@@ -281,6 +285,10 @@ const Kanban = (props: Props) => {
                         ))}
                         {!props.readonly &&
                         <Button
+                            size='small'
+                            variant='text'
+                            color='secondary'
+                            sx={{ justifyContent: 'flex-start' }}
                             onClick={() => {
                                 props.addCard(group.option.id, true)
                             }}
@@ -293,6 +301,13 @@ const Kanban = (props: Props) => {
                         }
                     </KanbanColumn>
                 ))}
+
+                {/* Add whitespace underneath "Add a group" button */}
+
+                {!props.readonly &&
+                    <div className='octo-board-header-cell narrow'>
+                    </div>
+                }
 
                 {/* Hidden columns */}
 
