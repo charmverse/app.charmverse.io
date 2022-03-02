@@ -1,5 +1,5 @@
 import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec } from '@bangle.dev/pm';
+import { DOMOutputSpec, TextSelection } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -29,6 +29,7 @@ export function nestedPageSpec (): RawSpecs {
         path: {
           default: null
         },
+        // This property is used to reference the page
         id: {
           default: null
         }
@@ -105,7 +106,12 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
       >
         <MenuItem
           sx={{ padding: '3px 12px' }}
-          onClick={(e) => {
+          onClick={() => {
+            const pos = getPos();
+            view.dispatch(view.state.tr.setSelection(
+              TextSelection.create(view.state.doc, pos - 1, pos + 1)
+            ));
+            view.dispatch(view.state.tr.deleteSelection());
           }}
         >
           <ListItemIcon><DeleteIcon fontSize='small' /></ListItemIcon>
