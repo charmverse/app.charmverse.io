@@ -42,6 +42,11 @@ const setHeadingBlockType = (level: number) => (state: EditorState, dispatch: ((
   return setBlockType(type, { level })(state, dispatch);
 };
 
+const setCollapsibleHeadingBlockType = (level: number) => (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined) => {
+  const type = state.schema.nodes.collapsibleHeading;
+  return setBlockType(type, { level })(state, dispatch);
+};
+
 function createTableCell(state: EditorState, text: string) {
   return state.schema.nodes.table_cell.create(undefined, Fragment.fromArray([
     state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
@@ -378,6 +383,29 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
             rafCommandExec(view!, setHeadingBlockType(level));
+            return replaceSuggestionMarkWith(palettePluginKey, '')(
+              state,
+              dispatch,
+              view,
+            );
+          };
+        },
+      } as Omit<PaletteItemType, "group">;
+    }),
+    ...Array.from({ length: 3 }, (_, i) => {
+      const level = i + 1;
+      return {
+        uid: 'collapsibleHeading' + level,
+        icon: <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M448 96v320h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H320a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V288H160v128h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V96H32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-32v128h192V96h-32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16z" /></svg>,
+        title: 'Collapsible heading ' + level,
+        description: 'Create collapsible heading ' + level,
+        disabled: (state) => {
+          const result = isList()(state);
+          return result;
+        },
+        editorExecuteCommand: () => {
+          return (state, dispatch, view) => {
+            rafCommandExec(view!, setCollapsibleHeadingBlockType(level));
             return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,

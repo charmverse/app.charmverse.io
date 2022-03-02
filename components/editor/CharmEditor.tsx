@@ -37,6 +37,7 @@ import { NestedPage, nestedPageSpec } from './NestedPage';
 import Placeholder from './Placeholder';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
 import { imageSpec, ResizableImage } from './ResizableImage';
+import { CollapsibleHeading, collapsibleHeadingSpec } from './CollapsibleHeading';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -85,7 +86,8 @@ const specRegistry = new SpecRegistry([
   imageSpec(),
   columnLayoutSpec(),
   columnBlockSpec(),
-  nestedPageSpec()
+  nestedPageSpec(),
+  collapsibleHeadingSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
@@ -202,6 +204,10 @@ export default function CharmEditor (
       NodeView.createPlugin({
         name: 'page',
         containerDOM: ['div', { class: 'page-container' }]
+      }),
+      NodeView.createPlugin({
+        name: 'collapsibleHeading',
+        containerDOM: ['div']
       })
       // TODO: Pasting iframe or image link shouldn't create those blocks for now
       // iframePlugin,
@@ -229,6 +235,9 @@ export default function CharmEditor (
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
         switch (props.node.type.name) {
+          case 'collapsibleHeading': {
+            return <CollapsibleHeading {...props}>{NodeViewChildren}</CollapsibleHeading>;
+          }
           case 'columnLayout': {
             return <ColumnLayout node={props.node}>{NodeViewChildren}</ColumnLayout>;
           }
