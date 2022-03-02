@@ -173,7 +173,7 @@ const CardDetailContents = React.memo((props: Props) => {
     return (
         <div className='octo-content CardDetailContents'>
             <div className='octo-block' style={{ position: 'relative', zIndex: 1 }}>
-                <CharmEditor content={content} onPageContentChange={updatePageContent} />
+                <CharmEditor content={content} onPageContentChange={updatePageContent} readOnly={props.readonly} />
                 <Box mb={6} />
             </div>
         </div>

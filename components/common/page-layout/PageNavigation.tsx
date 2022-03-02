@@ -461,12 +461,15 @@ export default function PageNavigation ({
 
   const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
 
+    if (droppedItem.id === containerItem.id) {
+      return;
+    }
     charmClient.updatePage({
       id: droppedItem.id,
       parentId: containerItem.id
     });
     setPages(stateNodes => stateNodes.map(stateNode => {
-      if (stateNode.id === droppedItem.id && droppedItem.id !== containerItem.id) {
+      if (stateNode.id === droppedItem.id) {
         return {
           ...stateNode,
           parentId: containerItem.id
