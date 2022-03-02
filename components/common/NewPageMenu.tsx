@@ -8,7 +8,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { useMenu } from 'hooks/useMenu';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { Page } from 'models';
 import { greyColor2 } from 'theme/colors';
 
@@ -40,24 +40,23 @@ export const StyledDatabaseIcon = styled(DatabaseIcon)`
 type Props = { addPage: (p: Partial<Page>) => void, tooltip: string, sx?: any };
 
 export default function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
-  const { anchorEl, hideMenu, showMenu, isOpen } = useMenu();
+  const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
+
   const createPage = (page: { type: Page['type'] }) => {
-    hideMenu();
     addPage(page);
+    popupState.close();
   };
 
   return (
     <>
       <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement='right' arrow>
-        <StyledIconButton onClick={showMenu} {...props}>
+        <StyledIconButton {...props} {...bindTrigger(popupState)}>
           <AddIcon color='secondary' />
         </StyledIconButton>
       </Tooltip>
 
       <Menu
-        anchorEl={anchorEl}
-        open={isOpen}
-        onClose={hideMenu}
+        {...bindMenu(popupState)}
       >
         <MenuItem onClick={() => createPage({ type: 'page' })}>
           <ListItemIcon><StyledArticleIcon fontSize='small' /></ListItemIcon>

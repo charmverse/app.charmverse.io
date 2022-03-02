@@ -84,7 +84,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
         }
       }}
     >
-      {nestedPage?.icon ? <Box>{nestedPage.icon}</Box> : (
+      {nestedPage?.icon ? <div>{nestedPage.icon}</div> : (
         isEditorEmpty ? <InsertDriveFileOutlinedIcon /> : <DescriptionOutlinedIcon />
       )}
       <Link
