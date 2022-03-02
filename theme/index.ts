@@ -241,6 +241,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiCssBaseline: {
         styleOverrides: {
           html: {
+            // this makes the text look lighter
             MozOsxFontSmoothing: 'none'
           }
         }
