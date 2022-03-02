@@ -88,8 +88,11 @@ const specRegistry = new SpecRegistry([
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
   position: relative;
+  /** DONT REMOVE THIS STYLING */
+  /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
   left: -250px;
-
+  
+  /** DONT REMOVE THIS STYLING */
   div.ProseMirror.bangle-editor {
     padding-left: 250px;
   }
