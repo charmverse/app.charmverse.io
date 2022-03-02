@@ -88,6 +88,11 @@ const specRegistry = new SpecRegistry([
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
   position: relative;
+  left: -250px;
+
+  div.ProseMirror.bangle-editor {
+    padding-left: 250px;
+  }
 
   code {
     padding: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
