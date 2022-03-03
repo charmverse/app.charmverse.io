@@ -29,7 +29,7 @@ export async function postToDiscord (eventLog: IEventToLog) {
 
   let message = `Event: ${eventLog.funnelStage.toUpperCase()} / ${eventLog.eventType}\r\n`;
 
-  const isProdEnvironment = process.env.ENV === 'production';
+  const isProdEnvironment = process.env.NODE_ENV === 'production';
 
   message += eventLog.message;
 
