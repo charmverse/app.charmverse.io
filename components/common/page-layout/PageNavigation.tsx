@@ -1,6 +1,6 @@
-import React, { useRef, ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
+import React, { useRef, useState, ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useTheme } from '@emotion/react';
-import update from 'immutability-helper';
+import useRefState from 'hooks/useRefState';
 import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
@@ -209,10 +209,6 @@ const PageTreeItem = forwardRef((props: any, ref) => {
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  function stopPropagation (event: SyntheticEvent) {
-    event.stopPropagation();
-  }
-
   function showMenu (event: React.MouseEvent<HTMLElement>) {
     setAnchorEl(event.currentTarget);
     event.preventDefault();
@@ -291,121 +287,70 @@ function mergeRefs (refs: any) {
   };
 }
 
-type DraggableNodeProps = {
+type NodeProps = {
   item: MenuNode;
-  onDrop: (a: MenuNode, b: MenuNode, c?: number, d?: number) => void;
+  onDropAdjacent: (a: MenuNode, b: MenuNode) => void;
+  onDropChild: (a: MenuNode, b: MenuNode) => void;
   pathPrefix: string;
   addPage?: (p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
 }
 
-function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }: DraggableNodeProps) {
+function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage }: NodeProps) {
 
   const ref = useRef<HTMLDivElement>(null);
   const theme = useTheme();
-  const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
+  const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
+  const [{ handlerId, isDragging }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
     item,
     collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-      handlerId: monitor.getHandlerId()
+      handlerId: monitor.getHandlerId(),
+      isDragging: monitor.isDragging()
     })
   }));
-  const [{ canDrop, isAdjacent, isOverCurrent }, drop] = useDrop(() => ({
+  const [{ canDrop, isOverCurrent }, drop] = useDrop(() => ({
     accept: 'item',
     drop (droppedItem: MenuNode, monitor) {
       const didDrop = monitor.didDrop();
       if (didDrop) {
         return;
       }
-      onDrop(droppedItem, item);
+      if (isAdjacentRef.current) {
+        onDropAdjacent(droppedItem, item);
+        setIsAdjacent(false);
+      }
+      else {
+        onDropChild(droppedItem, item);
+      }
     },
 
-    // hover (_item: MenuNode, monitor) {
-    //   if (!ref.current) {
-    //     return;
-    //   }
-    //   const isAdjacent = false;
-    //   if (isOverCurrent) {
-    //     const dragIndex = _item.index;
-    //     const hoverIndex = item.index;
-
-    //     // Don't replace items with themselves
-    //     if (dragIndex === hoverIndex) {
-    //       return;
-    //     }
-
-    //     // Determine rectangle on screen
-    //     const hoverBoundingRect = ref.current?.getBoundingClientRect();
-
-    //     // Get vertical middle
-    //     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-    //     // Determine mouse position
-    //     const clientOffset = monitor.getClientOffset();
-
-    //     // Get pixels to the top
-    //     const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
-
-    //     // Only perform the move when the mouse has crossed half of the items height
-    //     // When dragging downwards, only move when the cursor is below 50%
-    //     // When dragging upwards, only move when the cursor is above 50%
-
-    //     // Dragging downwards
-    //     if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-    //       return;
-    //     }
-
-    //     // Dragging upwards
-    //     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-    //       return;
-    //     }
-    //   }
-
-    //   // Time to actually perform the action
-    //   // moveCard(dragIndex, hoverIndex);
-    //   console.log('move node', { title: item.title, current: item.index, _title: item.title, _current: _item.index, isAdjacent, dragIndex, hoverIndex });
-
-    //   // Note: we're mutating the monitored item here!
-    //   // Generally it's better to avoid mutations,
-    //   // but it's good here for the sake of performance
-    //   // to avoid expensive index searches.
-    //   _item.index = hoverIndex;
-    // },
-    collect: monitor => {
-      console.log('collect!', item.title);
+    // listen to hover events to determine if the mouse is over the top portion of the node
+    hover (_item: MenuNode, monitor) {
+      if (!ref.current) {
+        return;
+      }
       const _isOverCurrent = monitor.isOver({ shallow: true });
       let _isAdjacent = false;
       if (_isOverCurrent) {
-
-        // Determine rectangle on screen
+        // Determine element rectangle on screen
         const hoverBoundingRect = ref.current!.getBoundingClientRect();
         const topOfElement = hoverBoundingRect.top;
-        console.log('hoverBoundingRect', hoverBoundingRect.bottom, hoverBoundingRect.top);
-        const threshold = topOfElement + 10;
-        // Get vertical middle
-        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+        const threshold = topOfElement + 5;
 
         // Determine mouse position
-        const clientOffset = monitor.getClientOffset();
+        const mouseY = monitor.getClientOffset()!.y;
 
-        // Get pixels to the top
-        const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
-        console.log(hoverClientY, threshold);
-        // Only perform the move when the mouse has crossed half of the items height
-        // When dragging downwards, only move when the cursor is below 50%
-        // When dragging upwards, only move when the cursor is above 50%
-
-        // Dragging upwards
-        if (hoverClientY > threshold) {
-          console.log('adjacent', hoverClientY, hoverMiddleY);
+        if (_isOverCurrent && mouseY < threshold) {
           _isAdjacent = true;
         }
-      }
 
+      }
+      setIsAdjacent(_isAdjacent);
+    },
+    collect: monitor => {
       return {
-        isOverCurrent: _isOverCurrent,
-        isAdjacent: _isAdjacent,
+        isOverCurrent: monitor.isOver({ shallow: true }),
         canDrop: monitor.canDrop()
       };
     }
@@ -421,9 +366,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
   }, [drag]);
 
   const isActive = !isAdjacent && canDrop && isOverCurrent;
-  if (isOverCurrent || isAdjacent) {
-    console.log('isOverCurrent', isActive, isAdjacent, item.title);
-  }
+  const isAdjacentActive = isAdjacent && canDrop && isOverCurrent;
 
   function addSubPage (page: Partial<Page>) {
     if (addPage) {
@@ -439,6 +382,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
 
   return (
     <PageTreeItem
+      data-handler-id={handlerId}
       pageId={item.id}
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
@@ -452,7 +396,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
       sx={{
         backgroundColor: isActive ? theme.palette.action.focus : 'unset', // 'rgba(22, 52, 71, 0.08)' : 'unset'
         position: 'relative',
-        borderTop: isAdjacent ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
+        borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
       }}
     >
       {isDragging
@@ -460,7 +404,8 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
         : item.children?.length > 0
           ? item.children.map((childItem, index) => (
             <RenderDraggableNode
-              onDrop={onDrop}
+              onDropAdjacent={onDropAdjacent}
+              onDropChild={onDropChild}
               pathPrefix={pathPrefix}
               key={childItem.id}
               item={childItem}
@@ -479,11 +424,10 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
 }
 
 function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuNode[] {
-  const tempItems = items.map((item, index): MenuNode => {
+  const tempItems = items.map((item): MenuNode => {
     return {
       ...item,
-      children: [],
-      index
+      children: []
     };
   });
   const map: { [key: string]: number } = {};
@@ -572,26 +516,62 @@ export default function PageNavigation ({
   space,
   rootPageIds
 }: NavProps) {
-  const { pages, currentPage, setPages, addPage } = usePages();
+  const { pages, currentPage, setPages, addPageAndRedirect } = usePages();
 
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
-  console.log('items:\n', mappedItems.map(i => `${i.index} - ${i.title || 'Untitled'}`).join('\n'));
-  const onDrop = (droppedItem: MenuNode, containerItem: MenuNode | null, originIndex?: number, newIndex?: number) => {
+
+  const onDropAdjacent = (droppedItem: MenuNode, containerItem: MenuNode) => {
 
     if (droppedItem.id === containerItem?.id) {
       return;
     }
-    const index = newIndex || droppedItem.index;
-    const parentId = containerItem?.id || droppedItem.parentId;
-    console.log('onDrop', index, parentId, droppedItem);
+    const parentId = containerItem.parentId;
+    // console.log('onDropAdjacent:', droppedItem.title, 'to', containerItem.title);
+    setPages(_pages => {
+      const siblings = _pages.filter((page) => page.parentId === parentId && page.id !== droppedItem.id);
+      const originIndex = siblings.findIndex((page) => page.id === containerItem.id);
+      siblings.splice(originIndex, 0, droppedItem);
+      siblings.forEach((page, _index) => {
+        page.index = _index;
+        page.parentId = parentId;
+        charmClient.updatePage({
+          id: page.id,
+          index: _index,
+          parentId
+        });
+      });
+      siblings.forEach(page => {
+        const _pageIndex = _pages.findIndex(stateNode => stateNode.id === page.id);
+        if (_pageIndex > -1) {
+          _pages[_pageIndex] = {
+            ..._pages[_pageIndex],
+            index: page.index,
+            parentId: page.parentId
+          };
+          // _page.index = page.index;
+          // _page.parentId = parentId;
+        }
+      });
+      return [..._pages];
+    });
+  };
+
+  const onDropChild = (droppedItem: MenuNode, containerItem: MenuNode) => {
+
+    if (droppedItem.id === containerItem?.id) {
+      return;
+    }
+    const index = 1000; // send it to the end
+    const parentId = containerItem.id;
+    // console.log('onDropChild:', droppedItem.title, 'under', containerItem.title);
     charmClient.updatePage({
       id: droppedItem.id,
-      index,
+      index, // send it to the end
       parentId
     });
     setPages(stateNodes => {
-      const newNodes = stateNodes.map(stateNode => {
+      return stateNodes.map(stateNode => {
         if (stateNode.id === droppedItem.id) {
           return {
             ...stateNode,
@@ -603,22 +583,6 @@ export default function PageNavigation ({
           return stateNode;
         }
       });
-      console.log('update page order', originIndex, newIndex);
-      if (originIndex && newIndex) {
-        return update(newNodes, {
-          $splice: [
-            [originIndex, 1],
-            [newIndex, 0, stateNodes[originIndex] as MenuNode]
-          ]
-        });
-      }
-      else {
-        return newNodes;
-      }
-    });
-    // collapse the dropped node
-    setExpanded(state => {
-      return state.filter(id => id !== droppedItem.id);
     });
   };
 
@@ -656,9 +620,10 @@ export default function PageNavigation ({
         <RenderDraggableNode
           key={item.id}
           item={item}
-          onDrop={onDrop}
+          onDropChild={onDropChild}
+          onDropAdjacent={onDropAdjacent}
           pathPrefix={`/${space.domain}`}
-          addPage={page => addPage && addPage(page)}
+          addPage={page => addPageAndRedirect(page)}
           deletePage={deletePage}
         />
       ))}

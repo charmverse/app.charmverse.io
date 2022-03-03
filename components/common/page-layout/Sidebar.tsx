@@ -114,7 +114,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
-  const { pages, currentPage, setPages, addPage } = usePages();
+  const { pages, setPages, addPageAndRedirect } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
   const intl = useIntl();
@@ -214,7 +214,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                     WORKSPACE
                   </SectionName>
                   <div className='add-a-page'>
-                    <NewPageMenu tooltip='Add a page' addPage={page => addPage(page)} />
+                    <NewPageMenu tooltip='Add a page' addPage={page => addPageAndRedirect(page)} />
                   </div>
                 </WorkspaceLabel>
                 <PageNavigation
