@@ -185,9 +185,10 @@ export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
   );
 }
 
-const TreeItemComponent = React.forwardRef<TreeItemContent, { isAdjacent: boolean }>(
+const TreeItemComponent = React.forwardRef<typeof TreeItemContent, { isAdjacent: boolean }>(
   ({ isAdjacent, ...props }, ref) => (
     <div style={{ position: 'relative' }}>
+      {/* @ts-ignore MUI exports TreeItemContent but without the TS interface */}
       <TreeItemContent {...props} ref={ref} />
       {isAdjacent && <AdjacentDropZone />}
     </div>
