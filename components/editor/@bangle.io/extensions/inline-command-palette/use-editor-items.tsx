@@ -364,6 +364,33 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
         };
       },
     },
+    {
+      uid: 'quote',
+      title: 'Quote',
+      icon: <ChatBubbleIcon sx={{
+        fontSize: 16
+      }}/>,
+      description: 'Insert a quote in the line below',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.quote.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
+                  state.schema.text("Add a quote")
+                ]))
+              ])
+            ))
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    },
     ...Array.from({ length: 3 }, (_, i) => {
       const level = i + 1;
       return {
