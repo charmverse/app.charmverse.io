@@ -2,8 +2,8 @@
 // See LICENSE.txt for license information.
 
 import difference from 'lodash/difference'
+import { Utils } from '../utils'
 
-import {Utils} from '../utils'
 
 const contentBlockTypes = ['text', 'image', 'divider', 'checkbox', 'charm_text'] as const
 const blockTypes = [...contentBlockTypes, 'board', 'view', 'card', 'comment', 'unknown'] as const
@@ -107,5 +107,6 @@ function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): BlockPatch[]
     ]
 }
 
-export type {ContentBlockTypes, BlockTypes, Block, BlockPatch}
-export {blockTypes, contentBlockTypes, createBlock, createPatchesFromBlocks}
+export type { ContentBlockTypes, BlockTypes, Block, BlockPatch }
+export { blockTypes, contentBlockTypes, createBlock, createPatchesFromBlocks }
+

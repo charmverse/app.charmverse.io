@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {Block, createBlock} from './block'
+import { Block, createBlock } from './block'
 
 type CardFields = {
     icon?: string
@@ -35,9 +35,11 @@ function createCard(block?: Block): Card {
             properties: {...(block?.fields.properties || {})},
             contentOrder,
             isTemplate: block?.fields.isTemplate || false,
+            headerImage: block?.fields.headerImage || null,
         },
     }
 }
 
-export {createCard}
-export type {Card}
+export { createCard }
+export type { Card }
+

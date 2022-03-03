@@ -1,40 +1,43 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 /* eslint-disable max-lines */
+import { Box } from '@mui/system'
+import PageBanner, { PageCoverGalleryImageGroups } from 'components/editor/Page/PageBanner'
+import { randomIntFromInterval } from 'lib/utilities/random'
+import { Page } from 'models'
 import React from 'react'
-import {injectIntl, IntlShape} from 'react-intl'
-import {connect} from 'react-redux'
 import Hotkeys from 'react-hot-keys'
-
-import {ClientConfig} from '../config/clientConfig'
-
-import {Block} from '../blocks/block'
-import {BlockIcons} from '../blockIcons'
-import {Card, createCard} from '../blocks/card'
-import {Board, IPropertyTemplate, IPropertyOption, BoardGroup} from '../blocks/board'
-import {BoardView} from '../blocks/boardView'
+import { injectIntl, IntlShape } from 'react-intl'
+import { connect } from 'react-redux'
+import { BlockIcons } from '../blockIcons'
+import { Block } from '../blocks/block'
+import { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../blocks/board'
+import { BoardView } from '../blocks/boardView'
+import { Card, createCard } from '../blocks/card'
 import { createCharmTextBlock } from '../blocks/charmBlock'
-import {CardFilter} from '../cardFilter'
+import { CardFilter } from '../cardFilter'
+import { ClientConfig } from '../config/clientConfig'
 import mutator from '../mutator'
-import {Utils} from '../utils'
-import {UserSettings} from '../userSettings'
-import {addCard, addTemplate} from '../store/cards'
-import {updateView} from '../store/views'
-
-
+import { addCard, addTemplate } from '../store/cards'
+import { updateView } from '../store/views'
+import { UserSettings } from '../userSettings'
+import { Utils } from '../utils'
+import CalendarFullView from './calendar/fullCalendar'
 import CardDialog from './cardDialog'
+import Gallery from './gallery/gallery'
+import Kanban from './kanban/kanban'
 import RootPortal from './rootPortal'
+import Table from './table/table'
 import ViewHeader from './viewHeader/viewHeader'
 import ViewTitle from './viewTitle'
-import Kanban from './kanban/kanban'
 
-import Table from './table/table'
 
-import CalendarFullView from './calendar/fullCalendar'
 
-import Gallery from './gallery/gallery'
 
-import { Page } from 'models';
+
+
+
+
 
 type Props = {
     clientConfig?: ClientConfig
@@ -112,10 +115,16 @@ class CenterPanel extends React.Component<Props, State> {
         // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.ViewBoard, {board: this.props.board.id, view: this.props.activeView.id, viewType: this.props.activeView.fields.viewType})
     }
 
+    setRandomHeaderImage(board: Board, headerImage?: string | null) {
+      const newHeaderImage = headerImage ?? PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
+      // Null is passed if we want to remove the image
+      mutator.changeHeaderImage(board.id, board.fields.headerImage, headerImage !== null ? newHeaderImage : null)
+    }
+
     render(): JSX.Element {
         const {groupByProperty, activeView, board, views, cards} = this.props
         const {visible: visibleGroups, hidden: hiddenGroups} = this.getVisibleAndHiddenGroups(cards, activeView.fields.visibleOptionIds, activeView.fields.hiddenOptionIds, groupByProperty)
-
+        
         return (
             <div
                 className='BoardComponent'
@@ -142,7 +151,11 @@ class CenterPanel extends React.Component<Props, State> {
                             readonly={this.props.readonly}
                         />
                     </RootPortal>}
-
+                {board.fields.headerImage && <Box width={"100%"} p={0} mb={2}>
+                  <PageBanner focalBoard image={board.fields.headerImage} setImage={(headerImage) => {
+                    this.setRandomHeaderImage(board, headerImage!)
+                  }} />
+                </Box>}
                 <div className='top-head'>
                     <ViewTitle
                         key={board.id + board.title}

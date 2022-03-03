@@ -5,6 +5,7 @@ import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import Emoji, { EmojiContainer } from 'components/common/Emoji';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
+import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page, PageContent } from 'models';
 import { ChangeEvent } from 'react';
 import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
@@ -34,10 +35,6 @@ const Controls = styled(Box)`
   display: flex;
   gap: ${({ theme }) => theme.spacing(0.5)};
 `;
-
-function randomIntFromInterval (min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
 
 const EditorHeader = styled.div`
   position: absolute;
