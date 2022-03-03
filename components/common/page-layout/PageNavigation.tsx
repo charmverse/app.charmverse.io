@@ -9,6 +9,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
+import TreeItemContent from '@mui/lab/TreeItem/TreeItemContent';
 import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -89,12 +90,13 @@ export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
 
 const AdjacentDropZone = styled.div`
   position: absolute;
-  top: 0;
+  top: -2px;
   left: 0;
   right: 0;
-  height: 2px;
+  height: 4px;
   background-color: ${({ theme }) => theme.palette.primary.main};
 `;
+
 export const StyledIconButton = styled(IconButton)`
   border-radius: 3px;
   border: 1px solid ${({ theme }) => theme.palette.divider};
@@ -183,6 +185,15 @@ export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
   );
 }
 
+const TreeItemComponent = React.forwardRef<TreeItemContent, { isAdjacent: boolean }>(
+  ({ isAdjacent, ...props }, ref) => (
+    <div style={{ position: 'relative' }}>
+      <TreeItemContent {...props} ref={ref} />
+      {isAdjacent && <AdjacentDropZone />}
+    </div>
+  )
+);
+
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
   const { pages } = usePages();
@@ -191,6 +202,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     deletePage,
     color,
     href,
+    isAdjacent,
     labelIcon,
     label,
     pageType,
@@ -246,6 +258,8 @@ const PageTreeItem = forwardRef((props: any, ref) => {
             </div>
           </PageLink>
         )}
+        ContentComponent={TreeItemComponent}
+        ContentProps={{ isAdjacent }}
         {...other}
         TransitionProps={{ timeout: 50 }}
         ref={ref}
@@ -389,12 +403,13 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       nodeId={item.id}
       label={item.title}
       href={`${pathPrefix}/${item.path}`}
+      isAdjacent={isAdjacentActive}
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}
       sx={{
         backgroundColor: isActive ? theme.palette.action.focus : 'unset', // 'rgba(22, 52, 71, 0.08)' : 'unset'
-        position: 'relative',
-        borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
+        position: 'relative'
+        // borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
       }}
     >
       {isDragging
@@ -416,7 +431,6 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
               No pages inside
             </Typography>
           )}
-      {isAdjacent && <AdjacentDropZone />}
     </PageTreeItem>
   );
 }
