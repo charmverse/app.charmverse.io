@@ -1,6 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+import ImageIcon from '@mui/icons-material/Image'
 import CharmEditor from 'components/editor/CharmEditor'
+import { PageCoverGalleryImageGroups } from 'components/editor/Page/PageBanner'
+import { randomIntFromInterval } from 'lib/utilities/random'
 import { Page } from 'models'
 import React, { useCallback, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -13,7 +16,6 @@ import EmojiIcon from '../widgets/icons/emoji'
 import HideIcon from '../widgets/icons/hide'
 import ShowIcon from '../widgets/icons/show'
 import BlockIconSelector from './blockIconSelector'
-
 
 
 type Props = {
@@ -39,6 +41,11 @@ const ViewTitle = React.memo((props: Props) => {
         const newIcon = BlockIcons.shared.randomIcon()
         mutator.changeIcon(board.id, board.fields.icon, newIcon)
     }, [board.id, board.fields.icon])
+    const setRandomHeaderImage = useCallback((headerImage?: string | null) => {
+      const newHeaderImage = headerImage ?? PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
+      // Null is passed if we want to remove the image
+      mutator.changeHeaderImage(board.id, board.fields.headerImage, headerImage !== null ? newHeaderImage : null)
+    }, [board.id, board.fields.headerImage])
     const onShowDescription = useCallback(() => mutator.showDescription(board.id, Boolean(board.fields.showDescription), true), [board.id, board.fields.showDescription])
     const onHideDescription = useCallback(() => mutator.showDescription(board.id, Boolean(board.fields.showDescription), false), [board.id, board.fields.showDescription])
 
@@ -47,6 +54,21 @@ const ViewTitle = React.memo((props: Props) => {
     return (
         <div className='ViewTitle'>
             <div className='add-buttons add-visible'>
+                {!props.readonly && !board.fields.headerImage &&
+                  <div className='add-buttons'>
+                    <Button
+                        onClick={() => setRandomHeaderImage()}
+                        icon={<ImageIcon
+                          fontSize='small'
+                          sx={{ marginRight: 1 }}
+                        />}
+                    >
+                        <FormattedMessage
+                            id='CardDetail.add-cover'
+                            defaultMessage='Add cover'
+                        />
+                    </Button>
+                </div>}
                 {!props.readonly && !board.fields.icon &&
                     <Button
                         onClick={onAddRandomIcon}

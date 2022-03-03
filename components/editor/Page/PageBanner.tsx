@@ -11,7 +11,8 @@ const StyledPageBanner = styled(Box)<{focalBoard?: boolean}>`
   height: 200px;
   justify-content: center;
   position: relative;
-
+  width: 100%;
+  
   img {
     width: 100%;
     object-fit: cover;

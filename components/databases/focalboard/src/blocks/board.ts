@@ -1,9 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {Utils, IDType} from '../utils'
+import { IDType, Utils } from '../utils'
+import { Block, createBlock } from './block'
+import { Card } from './card'
 
-import {Block, createBlock} from './block'
-import {Card} from './card'
 
 type PropertyType = 'text' | 'number' | 'select' | 'multiSelect' | 'date' | 'person' | 'file' | 'checkbox' | 'url' | 'email' | 'phone' | 'createdTime' | 'createdBy' | 'updatedTime' | 'updatedBy'
 
@@ -68,6 +68,7 @@ function createBoard(block?: Block): Board {
             icon: block?.fields.icon || '',
             isTemplate: block?.fields.isTemplate || false,
             columnCalculations: block?.fields.columnCalculations || [],
+            headerImage: block?.fields.headerImage || null,
             cardProperties,
         },
     }
@@ -78,5 +79,6 @@ type BoardGroup = {
     cards: Card[]
 }
 
-export {createBoard}
-export type {Board, PropertyType, IPropertyOption, IPropertyTemplate, BoardGroup}
+export { createBoard }
+export type { Board, PropertyType, IPropertyOption, IPropertyTemplate, BoardGroup }
+
