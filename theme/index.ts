@@ -42,12 +42,14 @@ declare module '@mui/material/styles/createPalette' {
     facebook: PaletteOptions['primary'];
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
+    quoteMarker: PaletteOptions['primary'];
   }
   interface Palette extends CustomColors {
     blue: Palette['primary'];
     facebook: Palette['primary'];
     twitter: Palette['primary'];
     white: Palette['primary'];
+    quoteMarker: Palette['primary'];
   }
   interface TypeBackground {
     light: string
@@ -195,6 +197,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       emoji: {
         hoverBackground: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04);'
+      },
+      quoteMarker: {
+        main: mode === 'dark' ? '#F3EFF5' : '#111111'
       },
       ...(mode === 'dark' ? darkThemeFocalBoard : lightThemeFocalBoard)
     },
