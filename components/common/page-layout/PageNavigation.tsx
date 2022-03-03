@@ -1,4 +1,6 @@
+import React, { useRef, ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useTheme } from '@emotion/react';
+import update from 'immutability-helper';
 import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
@@ -19,9 +21,10 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
 import Link from 'next/link';
-import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import type { XYCoord } from 'dnd-core';
 import { greyColor2 } from 'theme/colors';
+import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import EmojiCon from '../Emoji';
 import NewPageMenu, { StyledDatabaseIcon } from '../NewPageMenu';
 
@@ -29,6 +32,7 @@ import NewPageMenu, { StyledDatabaseIcon } from '../NewPageMenu';
 
 export type MenuNode = Page & {
   children: MenuNode[];
+  index: number;
 }
 
 export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
@@ -85,6 +89,14 @@ export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
   }
 }));
 
+const AdjacentDropZone = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: ${({ theme }) => theme.palette.primary.main};
+`;
 export const StyledIconButton = styled(IconButton)`
   border-radius: 3px;
   border: 1px solid ${({ theme }) => theme.palette.divider};
@@ -281,7 +293,7 @@ function mergeRefs (refs: any) {
 
 type DraggableNodeProps = {
   item: MenuNode;
-  onDrop: (a: MenuNode, b: MenuNode) => void;
+  onDrop: (a: MenuNode, b: MenuNode, c?: number, d?: number) => void;
   pathPrefix: string;
   addPage?: (p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
@@ -289,6 +301,7 @@ type DraggableNodeProps = {
 
 function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }: DraggableNodeProps) {
 
+  const ref = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
@@ -298,7 +311,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
       handlerId: monitor.getHandlerId()
     })
   }));
-  const [{ canDrop, isOverCurrent }, drop] = useDrop(() => ({
+  const [{ canDrop, isAdjacent, isOverCurrent }, drop] = useDrop(() => ({
     accept: 'item',
     drop (droppedItem: MenuNode, monitor) {
       const didDrop = monitor.didDrop();
@@ -307,10 +320,95 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
       }
       onDrop(droppedItem, item);
     },
-    collect: monitor => ({
-      isOverCurrent: monitor.isOver({ shallow: true }),
-      canDrop: monitor.canDrop()
-    })
+
+    // hover (_item: MenuNode, monitor) {
+    //   if (!ref.current) {
+    //     return;
+    //   }
+    //   const isAdjacent = false;
+    //   if (isOverCurrent) {
+    //     const dragIndex = _item.index;
+    //     const hoverIndex = item.index;
+
+    //     // Don't replace items with themselves
+    //     if (dragIndex === hoverIndex) {
+    //       return;
+    //     }
+
+    //     // Determine rectangle on screen
+    //     const hoverBoundingRect = ref.current?.getBoundingClientRect();
+
+    //     // Get vertical middle
+    //     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+
+    //     // Determine mouse position
+    //     const clientOffset = monitor.getClientOffset();
+
+    //     // Get pixels to the top
+    //     const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
+
+    //     // Only perform the move when the mouse has crossed half of the items height
+    //     // When dragging downwards, only move when the cursor is below 50%
+    //     // When dragging upwards, only move when the cursor is above 50%
+
+    //     // Dragging downwards
+    //     if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+    //       return;
+    //     }
+
+    //     // Dragging upwards
+    //     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+    //       return;
+    //     }
+    //   }
+
+    //   // Time to actually perform the action
+    //   // moveCard(dragIndex, hoverIndex);
+    //   console.log('move node', { title: item.title, current: item.index, _title: item.title, _current: _item.index, isAdjacent, dragIndex, hoverIndex });
+
+    //   // Note: we're mutating the monitored item here!
+    //   // Generally it's better to avoid mutations,
+    //   // but it's good here for the sake of performance
+    //   // to avoid expensive index searches.
+    //   _item.index = hoverIndex;
+    // },
+    collect: monitor => {
+      console.log('collect!', item.title);
+      const _isOverCurrent = monitor.isOver({ shallow: true });
+      let _isAdjacent = false;
+      if (_isOverCurrent) {
+
+        // Determine rectangle on screen
+        const hoverBoundingRect = ref.current!.getBoundingClientRect();
+        const topOfElement = hoverBoundingRect.top;
+        console.log('hoverBoundingRect', hoverBoundingRect.bottom, hoverBoundingRect.top);
+        const threshold = topOfElement + 10;
+        // Get vertical middle
+        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+
+        // Determine mouse position
+        const clientOffset = monitor.getClientOffset();
+
+        // Get pixels to the top
+        const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
+        console.log(hoverClientY, threshold);
+        // Only perform the move when the mouse has crossed half of the items height
+        // When dragging downwards, only move when the cursor is below 50%
+        // When dragging upwards, only move when the cursor is above 50%
+
+        // Dragging upwards
+        if (hoverClientY > threshold) {
+          console.log('adjacent', hoverClientY, hoverMiddleY);
+          _isAdjacent = true;
+        }
+      }
+
+      return {
+        isOverCurrent: _isOverCurrent,
+        isAdjacent: _isAdjacent,
+        canDrop: monitor.canDrop()
+      };
+    }
   }));
 
   const focusListener = useCallback(elt => {
@@ -322,7 +420,10 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
     drag(elt);
   }, [drag]);
 
-  const isActive = canDrop && isOverCurrent;
+  const isActive = !isAdjacent && canDrop && isOverCurrent;
+  if (isOverCurrent || isAdjacent) {
+    console.log('isOverCurrent', isActive, isAdjacent, item.title);
+  }
 
   function addSubPage (page: Partial<Page>) {
     if (addPage) {
@@ -341,7 +442,7 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
       pageId={item.id}
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
-      ref={mergeRefs([drag, drop, dragPreview, focusListener])}
+      ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
       key={item.id}
       nodeId={item.id}
       label={item.title}
@@ -350,7 +451,8 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
       pageType={item.type as 'page'}
       sx={{
         backgroundColor: isActive ? theme.palette.action.focus : 'unset', // 'rgba(22, 52, 71, 0.08)' : 'unset'
-        position: 'relative'
+        position: 'relative',
+        borderTop: isAdjacent ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
       }}
     >
       {isDragging
@@ -371,15 +473,17 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
               No pages inside
             </Typography>
           )}
+      {isAdjacent && <AdjacentDropZone />}
     </PageTreeItem>
   );
 }
 
 function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuNode[] {
-  const tempItems = items.map(item => {
+  const tempItems = items.map((item, index): MenuNode => {
     return {
       ...item,
-      children: []
+      children: [],
+      index
     };
   });
   const map: { [key: string]: number } = {};
@@ -393,8 +497,8 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
     node = tempItems[i];
     const index = node[key] ? map[node[key]!] : -1;
     if (node[key] && tempItems[index]) {
-      // @ts-ignore
       tempItems[index].children.push(node);
+      sortArrayByObjectProperty(tempItems[index].children, 'index');
     }
     else if (!rootPageIds) {
       roots.push(node);
@@ -403,6 +507,8 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
       roots.push(node);
     }
   }
+
+  sortArrayByObjectProperty(roots, 'index');
 
   return roots;
 }
@@ -470,27 +576,46 @@ export default function PageNavigation ({
 
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
+  console.log('items:\n', mappedItems.map(i => `${i.index} - ${i.title || 'Untitled'}`).join('\n'));
+  const onDrop = (droppedItem: MenuNode, containerItem: MenuNode | null, originIndex?: number, newIndex?: number) => {
 
-  const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
-
-    if (droppedItem.id === containerItem.id) {
+    if (droppedItem.id === containerItem?.id) {
       return;
     }
+    const index = newIndex || droppedItem.index;
+    const parentId = containerItem?.id || droppedItem.parentId;
+    console.log('onDrop', index, parentId, droppedItem);
     charmClient.updatePage({
       id: droppedItem.id,
-      parentId: containerItem.id
+      index,
+      parentId
     });
-    setPages(stateNodes => stateNodes.map(stateNode => {
-      if (stateNode.id === droppedItem.id) {
-        return {
-          ...stateNode,
-          parentId: containerItem.id
-        };
+    setPages(stateNodes => {
+      const newNodes = stateNodes.map(stateNode => {
+        if (stateNode.id === droppedItem.id) {
+          return {
+            ...stateNode,
+            index,
+            parentId
+          };
+        }
+        else {
+          return stateNode;
+        }
+      });
+      console.log('update page order', originIndex, newIndex);
+      if (originIndex && newIndex) {
+        return update(newNodes, {
+          $splice: [
+            [originIndex, 1],
+            [newIndex, 0, stateNodes[originIndex] as MenuNode]
+          ]
+        });
       }
       else {
-        return stateNode;
+        return newNodes;
       }
-    }));
+    });
     // collapse the dropped node
     setExpanded(state => {
       return state.filter(id => id !== droppedItem.id);

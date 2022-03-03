@@ -1,6 +1,7 @@
 import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
+import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
@@ -45,7 +46,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       setPages([]);
       charmClient.getPages(space.id)
         .then(_pages => {
-          setPages(_pages);
+          setPages(sortArrayByObjectProperty(_pages, 'index'));
         });
     }
   }, [space]);
