@@ -9,6 +9,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
+// @ts-ignore
 import TreeItemContent from '@mui/lab/TreeItem/TreeItemContent';
 import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
@@ -413,25 +414,23 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
         // borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
       }}
     >
-      {isDragging
-        ? null
-        : item.children?.length > 0
-          ? item.children.map((childItem, index) => (
-            <RenderDraggableNode
-              onDropAdjacent={onDropAdjacent}
-              onDropChild={onDropChild}
-              pathPrefix={pathPrefix}
-              key={childItem.id}
-              item={childItem}
-              addPage={addPage}
-              deletePage={deletePage}
-            />
-          ))
-          : (
-            <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
-              No pages inside
-            </Typography>
-          )}
+      {item.children?.length > 0
+        ? item.children.map((childItem, index) => (
+          <RenderDraggableNode
+            onDropAdjacent={onDropAdjacent}
+            onDropChild={onDropChild}
+            pathPrefix={pathPrefix}
+            key={childItem.id}
+            item={childItem}
+            addPage={addPage}
+            deletePage={deletePage}
+          />
+        ))
+        : (
+          <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
+            No pages inside
+          </Typography>
+        )}
     </PageTreeItem>
   );
 }

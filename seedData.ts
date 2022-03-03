@@ -61,6 +61,7 @@ function MockPage (partial: Partial<Page>): Page {
     updatedBy: author,
     headerImage: null,
     icon: null,
+    index: -1,
     boardId: null,
     type: 'page',
     title: '',
