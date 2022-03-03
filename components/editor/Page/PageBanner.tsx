@@ -2,17 +2,17 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { Page } from 'models';
 import ImageSelector from '../ImageSelector';
 import { ImageSelectorGallery } from '../ImageSelectorGallery';
 
-const StyledPageBanner = styled(Box)`
+const StyledPageBanner = styled(Box)<{focalBoard?: boolean}>`
   display: flex;
   align-items: center;
   height: 200px;
   justify-content: center;
   position: relative;
-
+  width: 100%;
+  
   img {
     width: 100%;
     object-fit: cover;
@@ -23,7 +23,7 @@ const StyledPageBanner = styled(Box)`
     visibility: hidden;
     position: absolute;
     bottom: 10px;
-    right: 200px
+    right: ${({ focalBoard }) => focalBoard ? '10px' : '200px'};
   }
 
   &:hover .page-cover-controls {
@@ -47,11 +47,12 @@ export const PageCoverGalleryImageGroups = {
   ]
 };
 
-export default function PageBanner ({ image, setImage }: { image: string, setImage: (_: string | null) => void }) {
+export default function PageBanner ({ focalBoard, image, setImage }:
+  { image: string, setImage: (_: string | null) => void, focalBoard?: boolean }) {
   const theme = useTheme();
 
   return (
-    <StyledPageBanner>
+    <StyledPageBanner focalBoard={focalBoard}>
       {/* eslint-disable-next-line */}
       <img src={image} alt='Page Banner' />
       <Box

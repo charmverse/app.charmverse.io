@@ -1,18 +1,19 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {BlockIcons} from './blockIcons'
-import {Block, BlockPatch, createPatchesFromBlocks} from './blocks/block'
-import {Board, IPropertyOption, IPropertyTemplate, PropertyType, createBoard} from './blocks/board'
-import {BoardView, ISortOption, createBoardView, KanbanCalculationFields} from './blocks/boardView'
-import {Card, createCard} from './blocks/card'
-import {FilterGroup} from './blocks/filterGroup'
-import octoClient, {OctoClient} from './octoClient'
 import charmClient from 'charmClient'
-import {OctoUtils} from './octoUtils'
+import { PageContent } from 'models'
+import { publishIncrementalUpdate } from '../../publisher'
+import { BlockIcons } from './blockIcons'
+import { Block, BlockPatch, createPatchesFromBlocks } from './blocks/block'
+import { Board, createBoard, IPropertyOption, IPropertyTemplate, PropertyType } from './blocks/board'
+import { BoardView, createBoardView, ISortOption, KanbanCalculationFields } from './blocks/boardView'
+import { Card, createCard } from './blocks/card'
+import { FilterGroup } from './blocks/filterGroup'
+import octoClient, { OctoClient } from './octoClient'
+import { OctoUtils } from './octoUtils'
 import undoManager from './undomanager'
-import {Utils, IDType} from './utils'
-import {UserSettings} from './userSettings'
-import { publishIncrementalUpdate } from '../../publisher';
+import { UserSettings } from './userSettings'
+import { IDType, Utils } from './utils'
 
 //
 // The Mutator is used to make all changes to server state
@@ -199,7 +200,20 @@ class Mutator {
         )
     }
 
-    async changeDescription(blockId: string, oldBlockDescription: string|undefined, blockDescription: string, description = 'change description') {
+    async changeHeaderImage(blockId: string, oldHeaderImage: string | undefined | null, headerImage: string | null, description = 'change cover') {
+      await undoManager.perform(
+          async () => {
+              await charmClient.patchBlock(blockId, {updatedFields: {headerImage}}, publishIncrementalUpdate)
+          },
+          async () => {
+              await charmClient.patchBlock(blockId, {updatedFields: {icon: oldHeaderImage}}, publishIncrementalUpdate)
+          },
+          description,
+          this.undoGroupId,
+      )
+  }
+
+    async changeDescription(blockId: string, oldBlockDescription: PageContent|undefined, blockDescription: PageContent, description = 'change description') {
         await undoManager.perform(
             async () => {
                 await charmClient.patchBlock(blockId, {updatedFields: {description: blockDescription}}, publishIncrementalUpdate)
@@ -845,4 +859,5 @@ class Mutator {
 const mutator = new Mutator()
 export default mutator
 
-export {mutator}
+export { mutator }
+

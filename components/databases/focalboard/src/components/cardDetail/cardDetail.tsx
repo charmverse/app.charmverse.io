@@ -1,7 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions'
+import ImageIcon from '@mui/icons-material/Image'
 import { Box } from '@mui/material'
 import { BountyIntegration } from 'components/bounties/BountyIntegration'
+import PageBanner, { PageCoverGalleryImageGroups } from 'components/editor/Page/PageBanner'
+import { randomIntFromInterval } from 'lib/utilities/random'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { BlockIcons } from '../../blockIcons'
@@ -14,16 +18,12 @@ import mutator from '../../mutator'
 import Button from '../../widgets/buttons/button'
 import { Focusable } from '../../widgets/editable'
 import EditableArea from '../../widgets/editableArea'
-import EmojiIcon from '../../widgets/icons/emoji'
 import BlockIconSelector from '../blockIconSelector'
 import CardDetailContents from './cardDetailContents'
 import { CardDetailProvider } from './cardDetailContext'
 import CardDetailProperties from './cardDetailProperties'
 import CommentsList from './commentsList'
 import useImagePaste from './imagePaste'
-
-
-
 
 type Props = {
     board: Board
@@ -77,30 +77,62 @@ const CardDetail = (props: Props): JSX.Element|null => {
         mutator.changeIcon(card.id, card.fields.icon, newIcon)
     }, [card.id, card.fields.icon])
 
+    const setRandomHeaderImage = useCallback((headerImage?: string | null) => {
+      const newHeaderImage = headerImage ?? PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
+      // Null is passed if we want to remove the image
+      mutator.changeHeaderImage(card.id, card.fields.headerImage, headerImage !== null ? newHeaderImage : null)
+  }, [card.id, card.fields.headerImage])
+
     if (!card) {
         return null
     }
 
     return (
         <>
+            {card.fields.headerImage && <Box width={"100%"} mb={2}>
+              <PageBanner focalBoard image={card.fields.headerImage} setImage={(headerImage) => {
+                setRandomHeaderImage(headerImage!)
+              }} />
+            </Box>}
             <div className='CardDetail content'>
                 <BlockIconSelector
                     block={card}
                     size='l'
                     readonly={props.readonly}
                 />
-                {!props.readonly && !card.fields.icon &&
-                    <div className='add-buttons'>
-                        <Button
-                            onClick={setRandomIcon}
-                            icon={<EmojiIcon/>}
-                        >
-                            <FormattedMessage
-                                id='CardDetail.add-icon'
-                                defaultMessage='Add icon'
-                            />
-                        </Button>
-                    </div>}
+                
+                <Box display={"flex"} gap={1} width={"100%"}>
+                  {!props.readonly && !card.fields.icon &&
+                      <div className='add-buttons'>
+                          <Button
+                              onClick={setRandomIcon}
+                              icon={<EmojiEmotionsIcon
+                                fontSize='small'
+                                sx={{ marginRight: 1 }}
+                              />}
+                          >
+                              <FormattedMessage
+                                  id='CardDetail.add-icon'
+                                  defaultMessage='Add icon'
+                              />
+                          </Button>
+                      </div>}
+                  {!props.readonly && !card.fields.headerImage &&
+                  <div className='add-buttons'>
+                      <Button
+                          onClick={() => setRandomHeaderImage()}
+                          icon={<ImageIcon
+                            fontSize='small'
+                            sx={{ marginRight: 1 }}
+                          />}
+                      >
+                          <FormattedMessage
+                              id='CardDetail.add-cover'
+                              defaultMessage='Add cover'
+                          />
+                      </Button>
+                  </div>}
+                </Box>
 
                 <EditableArea
                     ref={titleRef}

@@ -54,8 +54,6 @@ export function InputSearchCrypto ({
       )}
       renderInput={(params) => (
         <TextField
-          // disable propagation for bangle.dev
-          onMouseUp={(e) => e.stopPropagation()}
           {...register(modelKey)}
           {...params}
           label={label}
