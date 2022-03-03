@@ -22,7 +22,6 @@ import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
 import Link from 'next/link';
 import { useDrag, useDrop } from 'react-dnd';
-import type { XYCoord } from 'dnd-core';
 import { greyColor2 } from 'theme/colors';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import EmojiCon from '../Emoji';
@@ -32,7 +31,6 @@ import NewPageMenu, { StyledDatabaseIcon } from '../NewPageMenu';
 
 export type MenuNode = Page & {
   children: MenuNode[];
-  index: number;
 }
 
 export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
