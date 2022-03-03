@@ -203,7 +203,7 @@ function StyledButton ({ children, active, onClick }: ButtonProps) {
       endIcon={<ArrowDropDown />}
       component='span'
       variant='text'
-      sx={{ color: active ? '#fff' : undefined, p: 0, px: 0.5 }}
+      sx={{ color: active ? 'text.primary' : undefined, p: 0, px: 0.5 }}
       onClick={onClick}
     >
       {children}
