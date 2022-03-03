@@ -8,9 +8,8 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
-// @ts-ignore
-import TreeItemContent from '@mui/lab/TreeItem/TreeItemContent';
+import TreeItem, { TreeItemContentProps, treeItemClasses } from '@mui/lab/TreeItem';
+import TreeItemContent from 'components/common/TreeItemContent';
 import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -186,11 +185,10 @@ export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
   );
 }
 
-const TreeItemComponent = React.forwardRef<typeof TreeItemContent, { isAdjacent: boolean }>(
+const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent: boolean }>(
   ({ isAdjacent, ...props }, ref) => (
     <div style={{ position: 'relative' }}>
-      {/* @ts-ignore MUI exports TreeItemContent but without the TS interface */}
-      <TreeItemContent {...props} ref={ref} />
+      <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
       {isAdjacent && <AdjacentDropZone />}
     </div>
   )

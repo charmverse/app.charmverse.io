@@ -115,7 +115,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
-  const { pages, setPages, addPageAndRedirect } = usePages();
+  const { currentPage, pages, setPages, addPageAndRedirect } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
   const intl = useIntl();
@@ -169,7 +169,14 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
     // Redirect from current page
     if (page && currentPage && page.id === currentPage.id) {
-      router.push(`/${space!.domain}`);
+      let newPath = `/${space!.domain}`;
+      if (currentPage.parentId) {
+        const parent = pages.find(p => p.id === currentPage.parentId);
+        if (parent) {
+          newPath += `/${parent.path}`;
+        }
+      }
+      router.push(newPath);
     }
   }
 
