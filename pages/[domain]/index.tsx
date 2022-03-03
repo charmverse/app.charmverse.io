@@ -7,23 +7,31 @@ import { useRouter } from 'next/router';
 import { prisma } from 'db';
 import { untitledPage } from 'seedData';
 import { withSessionSsr } from 'lib/session/withSession';
+import { checkUserCanVisitWorkspace, IUserCannotAccessSpace } from 'lib/middleware/serverSidePropsRoleCheck';
 
 import { GetServerSideProps } from 'next';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context) => {
 
-  const domain = context.query.domain as string;
-  const space = await prisma.space.findUnique({ where: { domain } });
-  if (!space) {
-    console.error(`No space found by domain: ${domain}`);
-    return {
-      notFound: true
-    };
+  const {
+    redirect,
+    notFound
+  } = await checkUserCanVisitWorkspace(context);
+
+  if (redirect) {
+    return { redirect };
   }
+
+  if (notFound) {
+    return { notFound };
+  }
+
+  const domain = context.query.domain as string;
+  const space = (await prisma.space.findUnique({ where: { domain } }))!;
+  const userId = context.req.session.user?.id;
+
   let firstPage = await prisma.page.findFirst({ where: { spaceId: space.id } });
   if (!firstPage) {
-
-    const userId = context.req.session.user.id;
 
     firstPage = await prisma.page.create({
       data: untitledPage({ userId, spaceId: space.id })
