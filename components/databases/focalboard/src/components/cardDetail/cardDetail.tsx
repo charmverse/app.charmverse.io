@@ -89,17 +89,18 @@ const CardDetail = (props: Props): JSX.Element|null => {
 
     return (
         <>
+            {card.fields.headerImage && <Box width={"100%"} mb={2}>
+              <PageBanner focalBoard image={card.fields.headerImage} setImage={(headerImage) => {
+                setRandomHeaderImage(headerImage!)
+              }} />
+            </Box>}
             <div className='CardDetail content'>
                 <BlockIconSelector
                     block={card}
                     size='l'
                     readonly={props.readonly}
                 />
-                {card.fields.headerImage && <Box width={"100%"} mb={2}>
-                  <PageBanner focalBoard image={card.fields.headerImage} setImage={(headerImage) => {
-                    setRandomHeaderImage(headerImage!)
-                  }} />
-                </Box>}
+                
                 <Box display={"flex"} gap={1} width={"100%"}>
                   {!props.readonly && !card.fields.icon &&
                       <div className='add-buttons'>
