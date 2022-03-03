@@ -27,6 +27,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { greyColor2 } from 'theme/colors';
+import { untitledPage } from 'seedData';
 import Avatar from '../Avatar';
 import CreateWorkspaceForm from '../CreateSpaceForm';
 import Link from '../Link';
@@ -138,9 +139,16 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   async function deletePage (pageId: string) {
     const page = pages.find(p => p.id === pageId);
-    const newPages = pages.filter(p => p.id !== pageId);
+    let newPages = pages.filter(p => p.id !== pageId);
     if (page) {
       await charmClient.deletePage(page.id);
+      if (pages.length === 1) {
+        const newPage = await charmClient.createPage(untitledPage({
+          userId: user!.id,
+          spaceId: space!.id
+        }));
+        newPages = [newPage];
+      }
     }
     setPages(newPages);
     if (page?.boardId) {
@@ -157,6 +165,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           }
         );
       }
+    }
+
+    // Redirect from current page
+    if (page && currentPage && page.id === currentPage.id) {
+      router.push(`/${space!.domain}`);
     }
   }
 
