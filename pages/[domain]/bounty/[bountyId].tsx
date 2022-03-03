@@ -128,9 +128,15 @@ export default function BountyDetails () {
     setBounty(updatedBounty);
   }
 
-  async function markAsPaid () {
+  async function recordPaymentSuccess (transactionId: string, chainId: number | string) {
+    await charmClient.recordTransaction({
+      bountyId: bounty!.id,
+      transactionId,
+      chainId: chainId.toString()
+    });
     const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'paid');
     setBounty(updatedBounty);
+
   }
 
   //  charmClient.getBounty();
@@ -237,6 +243,7 @@ export default function BountyDetails () {
                             receiver={walletAddressForPayment!}
                             amount={eToNumber(bounty.rewardAmount)}
                             tokenSymbol='ETH'
+                            onSuccess={recordPaymentSuccess}
                           />
                           )
                         }
