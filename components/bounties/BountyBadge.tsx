@@ -66,7 +66,7 @@ export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : I
           mr={0.5}
           variant='h6'
         >
-          {millify(bounty.rewardAmount)}
+          {bounty.rewardAmount}
         </Typography>
         <Box
           component='span'
