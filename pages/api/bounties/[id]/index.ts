@@ -28,7 +28,8 @@ async function getBounty (req: NextApiRequest, res: NextApiResponse<BountyWithAp
       id: id as string
     },
     include: {
-      applications: true
+      applications: true,
+      transactions: true
     }
   });
 
@@ -51,7 +52,8 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
     },
     data: body,
     include: {
-      applications: true
+      applications: true,
+      transactions: true
     }
   });
 

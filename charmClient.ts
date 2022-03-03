@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, BountyStatus } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser, BountyWithApplications } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -333,6 +333,10 @@ class CharmClient {
 
   deleteFromS3 (src: string) {
     return http.DELETE('/api/aws/s3-delete', { src });
+  }
+
+  recordTransaction (details: Pick<Transaction, 'bountyId' | 'transactionId' | 'chainId'>) {
+    return http.POST('/api/transactions', details);
   }
 }
 
