@@ -5,9 +5,10 @@ import { DatabaseEditor } from 'components/databases';
 import { Editor } from 'components/editor';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useMemo } from 'react';
+import { ReactElement, useEffect, useMemo, useState } from 'react';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 interface IBlocksEditorPage {
@@ -20,6 +21,8 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   const router = useRouter();
   const { pageId } = router.query;
   const [, setTitleState] = usePageTitle();
+  const [pageNotFound, setPageNotFound] = useState(false);
+  const [space] = useCurrentSpace();
 
   const debouncedPageUpdate = useMemo(() => {
     return debouncePromise((input: Prisma.PageUpdateInput) => {
@@ -64,8 +67,15 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
         setTitleState(pageByPath.title);
         setCurrentPage(pageByPath);
       }
+      else {
+        setPageNotFound(true);
+      }
     }
   }, [pageId, pages.length > 0]);
+
+  if (!currentPage && pageNotFound === true && space) {
+    router.push(`/${space.domain}`);
+  }
 
   if (!currentPage) {
     return null;
