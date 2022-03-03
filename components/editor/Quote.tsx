@@ -6,9 +6,7 @@ import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-su
 import { emojiSuggestKey } from './EmojiSuggest';
 
 const StyledBlockQuote = styled.div`
-  background-color: ${({ theme }) => theme.palette.red.main}: 
-  border-radius-left: 5px;
-  border-color: white
+  border-left: 8px solid ${({ theme }) => theme.palette.sidebar.background};
   font-size: 20px;
   padding: ${({ theme }) => theme.spacing(1)};
   margin-top: ${({ theme }) => theme.spacing(1)};
@@ -20,14 +18,12 @@ const StyledBlockQuote = styled.div`
 export function quoteSpec () {
   const spec = blockquote.spec() as BaseRawNodeSpec;
   spec.name = 'quote';
-  spec.schema.defining = true;
   return spec;
 }
 
 export function Quote ({ children, node, updateAttrs, view, getPos }: NodeViewProps & { children: ReactNode }) {
   return (
     <StyledBlockQuote>
-
       {children}
     </StyledBlockQuote>
   );

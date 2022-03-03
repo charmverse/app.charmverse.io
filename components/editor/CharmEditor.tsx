@@ -204,6 +204,11 @@ export default function CharmEditor (
       NodeView.createPlugin({
         name: 'page',
         containerDOM: ['div', { class: 'page-container' }]
+      }),
+      NodeView.createPlugin({
+        name: 'quote',
+        containerDOM: ['blockquote', { class: 'charm-quote' }],
+        contentDOM: ['div']
       })
       // TODO: Pasting iframe or image link shouldn't create those blocks for now
       // iframePlugin,
