@@ -26,6 +26,7 @@ import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { CSSProperties, ReactNode } from 'react';
+import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { BlockQuote, blockQuoteSpec } from './BlockQuote';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
@@ -93,7 +94,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   /** DONT REMOVE THIS STYLING */
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
   left: -50px;
-  
+
   /** DONT REMOVE THIS STYLING */
   div.ProseMirror.bangle-editor {
     padding-left: 50px;
@@ -126,10 +127,16 @@ const defaultContent: PageContent = {
 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
-export default function CharmEditor (
-  { content = defaultContent, children, onPageContentChange, style, readOnly = false }:
-  { content?: PageContent, children?: ReactNode, onPageContentChange?: UpdatePageContent, readOnly?: boolean,
-    style?: CSSProperties }
+interface CharmEditorProps {
+  content?: PageContent;
+  children?: ReactNode;
+  onPageContentChange?: UpdatePageContent;
+  readOnly?: boolean;
+  style?: CSSProperties;
+}
+
+function CharmEditor (
+  { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
 ) {
   const state = useEditorState({
     specRegistry,
@@ -320,5 +327,13 @@ export default function CharmEditor (
       {InlinePalette}
       {children}
     </StyledReactBangleEditor>
+  );
+}
+
+export default function CharmEditorSafe (props: CharmEditorProps) {
+  return (
+    <ErrorBoundary>
+      <CharmEditor {...props} />
+    </ErrorBoundary>
   );
 }

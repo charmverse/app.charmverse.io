@@ -1,4 +1,6 @@
+import React, { useRef, useState, ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useTheme } from '@emotion/react';
+import useRefState from 'hooks/useRefState';
 import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
@@ -6,7 +8,8 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
+import TreeItem, { TreeItemContentProps, treeItemClasses } from '@mui/lab/TreeItem';
+import TreeItemContent from 'components/common/TreeItemContent';
 import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -19,9 +22,9 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
 import Link from 'next/link';
-import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
+import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import EmojiCon from '../Emoji';
 import NewPageMenu, { StyledDatabaseIcon } from '../NewPageMenu';
 
@@ -84,6 +87,15 @@ export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
     }
   }
 }));
+
+const AdjacentDropZone = styled.div`
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: ${({ theme }) => theme.palette.primary.main};
+`;
 
 export const StyledIconButton = styled(IconButton)`
   border-radius: 3px;
@@ -173,6 +185,15 @@ export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
   );
 }
 
+const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent: boolean }>(
+  ({ isAdjacent, ...props }, ref) => (
+    <div style={{ position: 'relative' }}>
+      <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
+      {isAdjacent && <AdjacentDropZone />}
+    </div>
+  )
+);
+
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
   const { pages } = usePages();
@@ -181,6 +202,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     deletePage,
     color,
     href,
+    isAdjacent,
     labelIcon,
     label,
     pageType,
@@ -196,10 +218,6 @@ const PageTreeItem = forwardRef((props: any, ref) => {
   && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  function stopPropagation (event: SyntheticEvent) {
-    event.stopPropagation();
-  }
 
   function showMenu (event: React.MouseEvent<HTMLElement>) {
     setAnchorEl(event.currentTarget);
@@ -240,6 +258,8 @@ const PageTreeItem = forwardRef((props: any, ref) => {
             </div>
           </PageLink>
         )}
+        ContentComponent={TreeItemComponent}
+        ContentProps={{ isAdjacent }}
         {...other}
         TransitionProps={{ timeout: 50 }}
         ref={ref}
@@ -279,23 +299,26 @@ function mergeRefs (refs: any) {
   };
 }
 
-type DraggableNodeProps = {
+type NodeProps = {
   item: MenuNode;
-  onDrop: (a: MenuNode, b: MenuNode) => void;
+  onDropAdjacent: (a: MenuNode, b: MenuNode) => void;
+  onDropChild: (a: MenuNode, b: MenuNode) => void;
   pathPrefix: string;
   addPage?: (p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
 }
 
-function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }: DraggableNodeProps) {
+function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage }: NodeProps) {
 
+  const ref = useRef<HTMLDivElement>(null);
   const theme = useTheme();
-  const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
+  const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
+  const [{ handlerId, isDragging }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
     item,
     collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-      handlerId: monitor.getHandlerId()
+      handlerId: monitor.getHandlerId(),
+      isDragging: monitor.isDragging()
     })
   }));
   const [{ canDrop, isOverCurrent }, drop] = useDrop(() => ({
@@ -305,12 +328,44 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
       if (didDrop) {
         return;
       }
-      onDrop(droppedItem, item);
+      if (isAdjacentRef.current) {
+        onDropAdjacent(droppedItem, item);
+        setIsAdjacent(false);
+      }
+      else {
+        onDropChild(droppedItem, item);
+      }
     },
-    collect: monitor => ({
-      isOverCurrent: monitor.isOver({ shallow: true }),
-      canDrop: monitor.canDrop()
-    })
+
+    // listen to hover events to determine if the mouse is over the top portion of the node
+    hover (_item: MenuNode, monitor) {
+      if (!ref.current) {
+        return;
+      }
+      const _isOverCurrent = monitor.isOver({ shallow: true });
+      let _isAdjacent = false;
+      if (_isOverCurrent) {
+        // Determine element rectangle on screen
+        const hoverBoundingRect = ref.current!.getBoundingClientRect();
+        const topOfElement = hoverBoundingRect.top;
+        const threshold = topOfElement + 5;
+
+        // Determine mouse position
+        const mouseY = monitor.getClientOffset()!.y;
+
+        if (_isOverCurrent && mouseY < threshold) {
+          _isAdjacent = true;
+        }
+
+      }
+      setIsAdjacent(_isAdjacent);
+    },
+    collect: monitor => {
+      return {
+        isOverCurrent: monitor.isOver({ shallow: true }),
+        canDrop: monitor.canDrop()
+      };
+    }
   }));
 
   const focusListener = useCallback(elt => {
@@ -322,7 +377,8 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
     drag(elt);
   }, [drag]);
 
-  const isActive = canDrop && isOverCurrent;
+  const isActive = !isAdjacent && canDrop && isOverCurrent;
+  const isAdjacentActive = isAdjacent && canDrop && isOverCurrent;
 
   function addSubPage (page: Partial<Page>) {
     if (addPage) {
@@ -338,45 +394,47 @@ function RenderDraggableNode ({ item, onDrop, pathPrefix, addPage, deletePage }:
 
   return (
     <PageTreeItem
+      data-handler-id={handlerId}
       pageId={item.id}
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
-      ref={mergeRefs([drag, drop, dragPreview, focusListener])}
+      ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
       key={item.id}
       nodeId={item.id}
       label={item.title}
       href={`${pathPrefix}/${item.path}`}
+      isAdjacent={isAdjacentActive}
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}
       sx={{
         backgroundColor: isActive ? theme.palette.action.focus : 'unset', // 'rgba(22, 52, 71, 0.08)' : 'unset'
         position: 'relative'
+        // borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
       }}
     >
-      {isDragging
-        ? null
-        : item.children?.length > 0
-          ? item.children.map((childItem, index) => (
-            <RenderDraggableNode
-              onDrop={onDrop}
-              pathPrefix={pathPrefix}
-              key={childItem.id}
-              item={childItem}
-              addPage={addPage}
-              deletePage={deletePage}
-            />
-          ))
-          : (
-            <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
-              No pages inside
-            </Typography>
-          )}
+      {item.children?.length > 0
+        ? item.children.map((childItem, index) => (
+          <RenderDraggableNode
+            onDropAdjacent={onDropAdjacent}
+            onDropChild={onDropChild}
+            pathPrefix={pathPrefix}
+            key={childItem.id}
+            item={childItem}
+            addPage={addPage}
+            deletePage={deletePage}
+          />
+        ))
+        : (
+          <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
+            No pages inside
+          </Typography>
+        )}
     </PageTreeItem>
   );
 }
 
 function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuNode[] {
-  const tempItems = items.map(item => {
+  const tempItems = items.map((item): MenuNode => {
     return {
       ...item,
       children: []
@@ -393,8 +451,8 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
     node = tempItems[i];
     const index = node[key] ? map[node[key]!] : -1;
     if (node[key] && tempItems[index]) {
-      // @ts-ignore
       tempItems[index].children.push(node);
+      sortArrayByObjectProperty(tempItems[index].children, 'index');
     }
     else if (!rootPageIds) {
       roots.push(node);
@@ -403,6 +461,8 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
       roots.push(node);
     }
   }
+
+  sortArrayByObjectProperty(roots, 'index');
 
   return roots;
 }
@@ -466,34 +526,73 @@ export default function PageNavigation ({
   space,
   rootPageIds
 }: NavProps) {
-  const { pages, currentPage, setPages, addPage } = usePages();
+  const { pages, currentPage, setPages, addPageAndRedirect } = usePages();
 
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
 
-  const onDrop = (droppedItem: MenuNode, containerItem: MenuNode) => {
+  const onDropAdjacent = (droppedItem: MenuNode, containerItem: MenuNode) => {
 
-    if (droppedItem.id === containerItem.id) {
+    if (droppedItem.id === containerItem?.id) {
       return;
     }
+    const parentId = containerItem.parentId;
+    // console.log('onDropAdjacent:', droppedItem.title, 'to', containerItem.title);
+    setPages(_pages => {
+      const siblings = _pages.filter((page) => page.parentId === parentId && page.id !== droppedItem.id);
+      const originIndex = siblings.findIndex((page) => page.id === containerItem.id);
+      siblings.splice(originIndex, 0, droppedItem);
+      siblings.forEach((page, _index) => {
+        page.index = _index;
+        page.parentId = parentId;
+        charmClient.updatePage({
+          id: page.id,
+          index: _index,
+          parentId
+        });
+      });
+      siblings.forEach(page => {
+        const _pageIndex = _pages.findIndex(stateNode => stateNode.id === page.id);
+        if (_pageIndex > -1) {
+          _pages[_pageIndex] = {
+            ..._pages[_pageIndex],
+            index: page.index,
+            parentId: page.parentId
+          };
+          // _page.index = page.index;
+          // _page.parentId = parentId;
+        }
+      });
+      return [..._pages];
+    });
+  };
+
+  const onDropChild = (droppedItem: MenuNode, containerItem: MenuNode) => {
+
+    if (droppedItem.id === containerItem?.id) {
+      return;
+    }
+    const index = 1000; // send it to the end
+    const parentId = containerItem.id;
+    // console.log('onDropChild:', droppedItem.title, 'under', containerItem.title);
     charmClient.updatePage({
       id: droppedItem.id,
-      parentId: containerItem.id
+      index, // send it to the end
+      parentId
     });
-    setPages(stateNodes => stateNodes.map(stateNode => {
-      if (stateNode.id === droppedItem.id) {
-        return {
-          ...stateNode,
-          parentId: containerItem.id
-        };
-      }
-      else {
-        return stateNode;
-      }
-    }));
-    // collapse the dropped node
-    setExpanded(state => {
-      return state.filter(id => id !== droppedItem.id);
+    setPages(stateNodes => {
+      return stateNodes.map(stateNode => {
+        if (stateNode.id === droppedItem.id) {
+          return {
+            ...stateNode,
+            index,
+            parentId
+          };
+        }
+        else {
+          return stateNode;
+        }
+      });
     });
   };
 
@@ -531,9 +630,10 @@ export default function PageNavigation ({
         <RenderDraggableNode
           key={item.id}
           item={item}
-          onDrop={onDrop}
+          onDropChild={onDropChild}
+          onDropAdjacent={onDropAdjacent}
           pathPrefix={`/${space.domain}`}
-          addPage={page => addPage && addPage(page)}
+          addPage={page => addPageAndRedirect(page)}
           deletePage={deletePage}
         />
       ))}

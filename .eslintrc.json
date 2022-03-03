@@ -81,6 +81,7 @@
     ],
     "object-curly-newline": "off",
     "padded-blocks": "off",
+    "prefer-destructuring": "off",
     "prefer-promise-reject-errors": "off",
     "react/destructuring-assignment": "off",
     "react/jsx-boolean-value": "off",
