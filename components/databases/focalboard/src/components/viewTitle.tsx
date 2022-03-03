@@ -1,10 +1,10 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import ImageIcon from '@mui/icons-material/Image'
-import CharmEditor from 'components/editor/CharmEditor'
+import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor'
 import { PageCoverGalleryImageGroups } from 'components/editor/Page/PageBanner'
 import { randomIntFromInterval } from 'lib/utilities/random'
-import { Page } from 'models'
+import { Page, PageContent } from 'models'
 import React, { useCallback, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { BlockIcons } from '../blockIcons'
@@ -36,7 +36,7 @@ const ViewTitle = React.memo((props: Props) => {
         setTitle(board.title)
         props.setPage({ title: board.title })
     }, [board.title])
-    const onDescriptionBlur = useCallback((text) => mutator.changeDescription(board.id, board.fields.description, text), [board.id, board.fields.description])
+    const onDescriptionChange = useCallback((text: PageContent) => mutator.changeDescription(board.id, board.fields.description, text), [board.id, board.fields.description])
     const onAddRandomIcon = useCallback(() => {
         const newIcon = BlockIcons.shared.randomIcon()
         mutator.changeIcon(board.id, board.fields.icon, newIcon)
@@ -121,7 +121,9 @@ const ViewTitle = React.memo((props: Props) => {
 
             {board.fields.showDescription &&
                 <div className='description'>
-                    <CharmEditor />
+                    <CharmEditor content={board.fields.description} onPageContentChange={(content: ICharmEditorOutput) => {
+                      onDescriptionChange(content.doc)
+                    }} />
                 </div>
             }
         </div>

@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import charmClient from 'charmClient'
+import { PageContent } from 'models'
 import { publishIncrementalUpdate } from '../../publisher'
 import { BlockIcons } from './blockIcons'
 import { Block, BlockPatch, createPatchesFromBlocks } from './blocks/block'
@@ -212,7 +213,7 @@ class Mutator {
       )
   }
 
-    async changeDescription(blockId: string, oldBlockDescription: string|undefined, blockDescription: string, description = 'change description') {
+    async changeDescription(blockId: string, oldBlockDescription: PageContent|undefined, blockDescription: PageContent, description = 'change description') {
         await undoManager.perform(
             async () => {
                 await charmClient.patchBlock(blockId, {updatedFields: {description: blockDescription}}, publishIncrementalUpdate)

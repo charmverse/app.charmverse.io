@@ -18,7 +18,15 @@ class TestBlockFactory {
         const board = createBoard()
         board.rootId = board.id
         board.title = 'board title'
-        board.fields.description = 'description'
+        board.fields.description = {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: []
+            }
+          ]
+        };
         board.fields.showDescription = true
         board.fields.icon = 'i'
 

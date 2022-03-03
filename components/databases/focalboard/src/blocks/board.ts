@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+import { PageContent } from 'models'
 import { IDType, Utils } from '../utils'
 import { Block, createBlock } from './block'
 import { Card } from './card'
@@ -23,7 +24,7 @@ interface IPropertyTemplate {
 
 type BoardFields = {
     icon: string
-    description: string
+    description: PageContent
     showDescription?: boolean
     isTemplate?: boolean
     cardProperties: IPropertyTemplate[]
