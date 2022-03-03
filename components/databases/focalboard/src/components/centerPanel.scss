@@ -26,7 +26,7 @@
             padding: 0 40px;
         }
 
-        &:first-child {
+        &:nth-child(1) {
             padding-top: 24px;
             @media screen and (max-width: 768px) {
                 padding: 0 8px;
@@ -46,7 +46,7 @@
         z-index: 100;
     }
 
-    > div:nth-child(2) {
+    > div:nth-child(3) {
         padding: 0 0 0 1px;
         margin-left: 80px;
 
