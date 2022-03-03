@@ -139,7 +139,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   async function deletePage (pageId: string) {
     const page = pages.find(p => p.id === pageId);
-    const newPages = pages.filter(p => p.id !== pageId);
+    let newPages = pages.filter(p => p.id !== pageId);
     if (page) {
       await charmClient.deletePage(page.id);
       if (pages.length === 1) {
@@ -147,7 +147,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           userId: user!.id,
           spaceId: space!.id
         }));
-        setPages([newPage]);
+        newPages = [newPage];
       }
     }
     setPages(newPages);
@@ -165,6 +165,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           }
         );
       }
+    }
+
+    // Redirect from current page
+    if (page && currentPage && page.id === currentPage.id) {
+      router.push(`/${space!.domain}`);
     }
   }
 
