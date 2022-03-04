@@ -1,6 +1,7 @@
 import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -57,6 +58,9 @@ export default function BountyDetails () {
   const isApplicant = user && applications.some(application => {
     return application.createdBy === user.id;
   });
+  const applicantProposal = applications?.find(application => {
+    return application.createdBy === user?.id;
+  });
 
   const reviewerUser = (bounty?.reviewer && getContributor(bounty.reviewer)) || undefined;
   const reviewerENSName = useENSName(reviewerUser?.addresses[0]);
@@ -112,7 +116,7 @@ export default function BountyDetails () {
 
   function applicationSubmitted (application: Application) {
     toggleApplicationDialog();
-    setApplications([...applications, application]);
+    loadBounty();
   }
 
   function toggleApplicationDialog () {
@@ -160,7 +164,12 @@ export default function BountyDetails () {
       <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
 
       <Modal open={showApplicationDialog} onClose={toggleApplicationDialog}>
-        <ApplicationEditorForm bountyId={bounty.id} onSubmit={applicationSubmitted}></ApplicationEditorForm>
+        <ApplicationEditorForm
+          bountyId={bounty.id}
+          onSubmit={applicationSubmitted}
+          proposal={applicantProposal}
+          mode={applicantProposal ? 'update' : 'create'}
+        />
       </Modal>
 
       <Box sx={{
@@ -294,7 +303,18 @@ export default function BountyDetails () {
                         </Box>
                       )}
                       {!assigneeName && (
-                        isApplicant ? <Typography>You've applied to this bounty.</Typography> : (
+                        isApplicant ? (
+                          <Box>
+                            <Typography>You've applied to this bounty.</Typography>
+                            <Button
+                              sx={{ mt: 2 }}
+                              onClick={toggleApplicationDialog}
+                            >
+                              <Box sx={{ pr: 1 }}>Edit your application</Box>
+                              <EditOutlinedIcon />
+                            </Button>
+                          </Box>
+                        ) : (
                           <Button onClick={toggleApplicationDialog}>Apply now</Button>
                         )
                       )}

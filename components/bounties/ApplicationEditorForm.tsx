@@ -54,6 +54,11 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
       const createdApplication = await charmClient.createApplication(proposalToSave);
       onSubmit(createdApplication);
     }
+    else if (mode === 'update') {
+      const updatedApplication = await charmClient.updateApplication(proposalToSave);
+      onSubmit(proposalToSave);
+    }
+
   }
 
   return (
@@ -104,7 +109,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
           </Grid>
 
           <Grid item>
-            <Button disabled={!isValid} type='submit'>Submit application</Button>
+            <Button disabled={!isValid} type='submit'>{mode === 'create' ? ' Submit application' : 'Update application'}</Button>
           </Grid>
 
         </Grid>
