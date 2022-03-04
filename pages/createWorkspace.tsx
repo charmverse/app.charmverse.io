@@ -17,7 +17,6 @@ export default function CreateSpace () {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('Effect ran');
     if (spaces.length > 0) {
       router.push(`/${spaces[0].domain}`);
     }
