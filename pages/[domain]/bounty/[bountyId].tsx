@@ -120,6 +120,8 @@ export default function BountyDetails () {
     setShowBountyDeleteDialog(!showBountyDeleteDialog);
   }
 
+  const deleteableBounty = bounty?.status === 'open';
+
   async function deleteBounty () {
     await charmClient.deleteBounty(bounty!.id);
     router.push(`/${space!.domain}/bounties`);
@@ -229,9 +231,13 @@ export default function BountyDetails () {
                   <IconButton onClick={toggleBountyEditDialog}>
                     <EditIcon fontSize='small' />
                   </IconButton>
-                  <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
-                    <DeleteIcon fontSize='small' sx={{ color: 'red.main' }} />
-                  </IconButton>
+                  {
+                    deleteableBounty === true && (
+                    <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
+                      <DeleteIcon fontSize='small' sx={{ color: 'red.main' }} />
+                    </IconButton>
+                    )
+                  }
                 </>
               )
             }
