@@ -277,6 +277,13 @@ class CharmClient {
     return data;
   }
 
+  async deleteBounty (bountyId: string): Promise<any> {
+
+    const data = await http.DELETE(`/api/bounties/${bountyId}`);
+
+    return data;
+  }
+
   async assignBounty (bountyId: string, assignee: string): Promise<BountyWithDetails> {
 
     const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, {

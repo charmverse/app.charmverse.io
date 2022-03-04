@@ -1,6 +1,7 @@
 import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -45,6 +46,7 @@ export default function BountyDetails () {
   const [bounty, setBounty] = useState<BountyWithDetails | null>(null);
   const [showBountyEditDialog, setShowBountyEditDialog] = useState(false);
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
+  const [showBountyDeleteDialog, setShowBountyDeleteDialog] = useState(false);
 
   const router = useRouter();
 
@@ -114,6 +116,16 @@ export default function BountyDetails () {
     setShowBountyEditDialog(!showBountyEditDialog);
   }
 
+  function toggleBountyDeleteDialog () {
+    setShowBountyDeleteDialog(!showBountyDeleteDialog);
+  }
+
+  async function deleteBounty () {
+    await charmClient.deleteBounty(bounty!.id);
+    router.push(`/${space!.domain}/bounties`);
+    console.log('Deleting bounty');
+  }
+
   function applicationSubmitted (application: Application) {
     toggleApplicationDialog();
     loadBounty();
@@ -172,9 +184,25 @@ export default function BountyDetails () {
         />
       </Modal>
 
+      <Modal open={showBountyDeleteDialog} onClose={toggleBountyDeleteDialog}>
+
+        <Typography>
+          Are you sure you want to delete this bounty?
+        </Typography>
+
+        <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
+          <Button color='error' sx={{ mr: 2, fontWeight: 'bold' }} onClick={deleteBounty}>Delete bounty</Button>
+
+          {
+            bounty.status === 'open' && <Button color='secondary' onClick={toggleBountyDeleteDialog}>Cancel</Button>
+          }
+        </Box>
+
+      </Modal>
+
       <Box sx={{
         justifyContent: 'space-between',
-        gap: 2,
+        gap: 1,
         display: 'flex'
       }}
       >
@@ -197,9 +225,14 @@ export default function BountyDetails () {
             </Box>
             {
               viewerCanModifyBounty === true && (
-                <IconButton onClick={toggleBountyEditDialog}>
-                  <EditIcon fontSize='small' />
-                </IconButton>
+                <>
+                  <IconButton onClick={toggleBountyEditDialog}>
+                    <EditIcon fontSize='small' />
+                  </IconButton>
+                  <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
+                    <DeleteIcon fontSize='small' sx={{ color: 'red.main' }} />
+                  </IconButton>
+                </>
               )
             }
           </Typography>

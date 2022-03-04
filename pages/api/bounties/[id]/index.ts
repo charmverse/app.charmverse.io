@@ -18,7 +18,8 @@ handler.use(requireUser)
     next();
   })
   .get(getBounty)
-  .put(updateBounty);
+  .put(updateBounty)
+  .delete(deleteBounty);
 
 async function getBounty (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id } = req.query;
@@ -62,6 +63,19 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
   }
 
   res.status(200).json(bounty);
+
+}
+
+async function deleteBounty (req: NextApiRequest, res: NextApiResponse) {
+  const { id } = req.query;
+
+  await prisma.bounty.delete({
+    where: {
+      id: id as string
+    }
+  });
+
+  res.status(200).json({ success: true });
 
 }
 
