@@ -13,15 +13,15 @@ export const getServerSideProps = withSessionSsr(
         }
       };
     }
-    const spaceRoles = await prisma.spaceRole.findMany({
+    const spaceRole = await prisma.spaceRole.findFirst({
       where: {
         userId: user.id
       }
     });
 
-    const space = spaceRoles.length ? await prisma.space.findFirst({
+    const space = spaceRole ? await prisma.space.findFirst({
       where: {
-        id: spaceRoles[0].spaceId
+        id: spaceRole.spaceId
       }
     }) : null;
 
