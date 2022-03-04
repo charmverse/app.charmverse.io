@@ -28,7 +28,7 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
       spaceRoles: true
     }
   });
-  console.log('check for user!', user, req.body);
+
   if (user) {
     req.session.user = user;
     await req.session.save();
