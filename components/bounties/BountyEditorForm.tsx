@@ -171,7 +171,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Reward token
               </InputLabel>
-              <InputSearchCrypto label='' register={register} modelKey='rewardToken' />
+              <InputSearchCrypto label='' register={register} modelKey='rewardToken' defaultValue={bounty?.rewardToken as CryptoCurrency} />
             </Grid>
           </Grid>
           <Grid item>
