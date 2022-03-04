@@ -5,6 +5,7 @@ import {
 import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import CodeIcon from '@mui/icons-material/Code';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -350,11 +351,35 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
             return insertNode(state, dispatch, state.schema.nodes.blockquote.create(
               undefined,
               Fragment.fromArray([
-                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
-                  state.schema.text("Hello World")
-                ]))
+                state.schema.nodes.paragraph.create()
               ])
             ))
+          })
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view,
+          );
+        };
+      },
+    },
+    {
+      uid: 'quote',
+      title: 'Quote',
+      icon: <ChatOutlinedIcon sx={{
+        fontSize: 16
+      }}/>,
+      description: 'Insert a quote in the line below',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (state, dispatch) => {
+            return insertNode(state, dispatch, state.schema.nodes.quote.create(
+              undefined,
+              Fragment.fromArray([
+                state.schema.nodes.paragraph.create()
+              ])
+            )
+            )
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
