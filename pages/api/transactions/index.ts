@@ -17,8 +17,8 @@ async function createTransaction (req: NextApiRequest, res: NextApiResponse<Tran
   if (data.bountyId) {
     (transactionToCreate as Prisma.TransactionCreateInput).bounty = { connect: { id: data.bountyId } };
 
-    // Remove createdBy passed from client to ensure Prisma doesn't throw an error
-    delete transactionToCreate.createdBy;
+    // Remove bountyId passed from client to ensure Prisma doesn't throw an error
+    delete transactionToCreate.bountyId;
   }
 
   const transaction = await prisma.transaction.create({ data: transactionToCreate });
