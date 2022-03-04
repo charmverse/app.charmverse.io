@@ -5,6 +5,7 @@ import {
 import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import CodeIcon from '@mui/icons-material/Code';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -367,7 +368,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
     {
       uid: 'quote',
       title: 'Quote',
-      icon: <ChatBubbleIcon sx={{
+      icon: <ChatOutlinedIcon sx={{
         fontSize: 16
       }}/>,
       description: 'Insert a quote in the line below',
