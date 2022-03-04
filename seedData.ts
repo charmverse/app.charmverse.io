@@ -1,4 +1,4 @@
-import { Page, Space, User, SpaceRole, Prisma } from '@prisma/client';
+import { Page, Prisma, Space, SpaceRole, User } from '@prisma/client';
 import { LoggedInUser, PageContent } from 'models';
 import { v4 as uuid } from 'uuid';
 

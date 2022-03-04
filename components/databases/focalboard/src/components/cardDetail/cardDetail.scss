@@ -81,7 +81,18 @@
         }
 
         .Label {
-            margin: 0 4px 0 0;
+          display: flex;
+          align-items: center;
+          flex-shrink: 1;
+          min-width: 0px;
+          height: 22px;
+          border-radius: 3px;
+          padding-left: 6px;
+          padding-right: 6px;
+          font-size: 14px;
+          line-height: 120%;
+          margin: 0px;
+          width: fit-content;
         }
     }
 
