@@ -304,9 +304,16 @@ class CharmClient {
     return data;
   }
 
-  async createApplication (proposal: Application): Promise<Application> {
+  async updateApplication (application: Application): Promise<Application> {
 
-    const data = await http.POST<Application>('/api/applications', proposal);
+    const data = await http.PUT<Application>(`/api/applications/${application.id}`, application);
+
+    return data;
+  }
+
+  async createApplication (application: Application): Promise<Application> {
+
+    const data = await http.POST<Application>('/api/applications', application);
 
     return data;
   }
