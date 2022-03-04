@@ -24,7 +24,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
           setBounties(_bounties);
         });
     }
-  }, [space]);
+  }, [space?.id]);
 
   const value = useMemo(() => ({
     bounties,

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Prisma } from '@prisma/client';
 import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
@@ -29,6 +30,12 @@ export default function CreateSpace () {
     name: defaultName,
     domain: getDomainFromName(defaultName)
   };
+
+  useEffect(() => {
+    if (spaces.length > 0) {
+      router.push(`/${spaces[0].domain}`);
+    }
+  }, []);
 
   return (
     <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto' }}>

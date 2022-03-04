@@ -286,8 +286,8 @@ function FocalBoardProviders ({ children }: { children: ReactNode }) {
 
 function DataProviders ({ children }: { children: ReactNode }) {
   return (
-    <SpacesProvider>
-      <UserProvider>
+    <UserProvider>
+      <SpacesProvider>
         <PagesProvider>
           <BountiesProvider>
             <DatabaseBlocksProvider>
@@ -297,7 +297,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
             </DatabaseBlocksProvider>
           </BountiesProvider>
         </PagesProvider>
-      </UserProvider>
-    </SpacesProvider>
+      </SpacesProvider>
+    </UserProvider>
   );
 }
