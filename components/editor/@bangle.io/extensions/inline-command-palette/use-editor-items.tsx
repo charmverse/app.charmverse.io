@@ -351,9 +351,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
             return insertNode(state, dispatch, state.schema.nodes.blockquote.create(
               undefined,
               Fragment.fromArray([
-                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
-                  state.schema.text("Hello World")
-                ]))
+                state.schema.nodes.paragraph.create()
               ])
             ))
           })
@@ -378,11 +376,10 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
             return insertNode(state, dispatch, state.schema.nodes.quote.create(
               undefined,
               Fragment.fromArray([
-                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
-                  state.schema.text("Add a quote")
-                ]))
+                state.schema.nodes.paragraph.create()
               ])
-            ))
+            )
+            )
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
