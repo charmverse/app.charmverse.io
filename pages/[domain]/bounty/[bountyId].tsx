@@ -328,44 +328,6 @@ export default function BountyDetails () {
       </Box>
 
       {
-        (bounty.status === 'paid' && bounty.transactions) && (
-          <Box sx={{ mt: 2, mb: 5 }}>
-            <Card sx={{ height: '100%', p: 3 }} variant='outlined'>
-              <Typography variant='body2' color='secondary' mb={2}>Transactions</Typography>
-              <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'space-between' }}>
-                {
-                  bounty.transactions.length === 0 && (<Typography>No transactions found</Typography>)
-                }
-                <Grid container direction='row' spacing={2}>
-
-                  {
-                    bounty.transactions.map(tx => {
-                      return (
-                        <Grid key={tx.id} item xs>
-                          <Box sx={{ display: 'inline' }}>
-                            {shortenHex(tx.transactionId, 8)}
-                            <a style={{ textDecoration: 'none' }} href={getChainExplorerLink(tx.chainId, tx.transactionId)} target='_blank' rel='noreferrer'>
-
-                              <Button sx={{ ml: 2 }}>
-                                <Box sx={{ mr: 2 }}> View details</Box>
-                                <LaunchIcon></LaunchIcon>
-                              </Button>
-
-                            </a>
-                          </Box>
-                        </Grid>
-                      );
-                    })
-                  }
-
-                </Grid>
-              </Box>
-            </Card>
-          </Box>
-        )
-      }
-
-      {
         bounty && (<BountyApplicantList applications={applications} bounty={bounty} bountyReassigned={loadBounty} />)
       }
     </Container>
