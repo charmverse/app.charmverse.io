@@ -6,6 +6,7 @@ import '@fullcalendar/common/main.css';
 import '@fullcalendar/daygrid/main.css';
 // init focalboard
 import '@mattermost/compass-icons/css/compass-icons.css';
+import 'node_modules/react-virtualized/styles.css';
 import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';

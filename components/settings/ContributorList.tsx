@@ -1,28 +1,30 @@
 import { Contributor } from 'models';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useUser } from 'hooks/useUser';
-import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 import charmClient from 'charmClient';
+import Legend from './Legend';
 import ContributorListItem, { RoleAction } from './ContributorListItem';
 
-export default function ContributorList () {
+interface Props {
+  isAdmin: boolean;
+  spaceId: string;
+  spaceOwner: string;
+}
+
+export default function ContributorList ({ isAdmin, spaceId, spaceOwner }: Props) {
 
   const [contributors, setContributors] = useContributors();
-  const [space] = useCurrentSpace();
-  const [user] = useUser();
-  const isAdmin = isSpaceAdmin(user, space?.id);
 
   async function updateContributor (action: RoleAction, contributor: Contributor) {
     switch (action) {
 
       case 'makeAdmin':
-        await charmClient.updateContributor({ spaceId: space!.id, userId: contributor.id, role: 'admin' });
+        await charmClient.updateContributor({ spaceId, userId: contributor.id, role: 'admin' });
         setContributors(contributors.map(c => c.id === contributor.id ? { ...c, role: 'admin' } : c));
         break;
 
       case 'makeContributor':
-        await charmClient.updateContributor({ spaceId: space!.id, userId: contributor.id, role: 'contributor' });
+        await charmClient.updateContributor({ spaceId, userId: contributor.id, role: 'contributor' });
         setContributors(contributors.map(c => c.id === contributor.id ? { ...c, role: 'contributor' } : c));
         break;
 
@@ -30,7 +32,7 @@ export default function ContributorList () {
         if (!window.confirm('Please confirm you want to remove this person')) {
           return;
         }
-        await charmClient.removeContributor({ spaceId: space!.id, userId: contributor.id });
+        await charmClient.removeContributor({ spaceId, userId: contributor.id });
         setContributors(contributors.filter(c => c.id !== contributor.id));
         break;
 
@@ -40,11 +42,12 @@ export default function ContributorList () {
   }
   return (
     <>
+      <Legend>Current Contributors</Legend>
       {contributors.map(contributor => (
         <ContributorListItem
           isAdmin={isAdmin}
           key={contributor.id}
-          isSpaceOwner={space?.createdBy === contributor.id}
+          isSpaceOwner={spaceOwner === contributor.id}
           contributor={contributor}
           onChange={updateContributor}
         />

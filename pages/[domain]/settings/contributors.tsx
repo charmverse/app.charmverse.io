@@ -1,20 +1,12 @@
 import SettingsLayout from 'components/settings/Layout';
 import { ReactElement } from 'react';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { Modal } from 'components/common/Modal';
-import useSWR from 'swr';
-import Legend from 'components/settings/Legend';
-import Button from 'components/common/Button';
-import Typography from '@mui/material/Typography';
 import { setTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { InviteLinkPopulated } from 'pages/api/invites/index';
-import InvitesTable from 'components/inviteLinks/InviteLinksTable';
-import InviteForm, { FormValues as InviteLinkFormValues } from 'components/inviteLinks/InviteLinkForm';
+import InviteLinkList from 'components/settings/InviteLinkList';
+import TokenGateList from 'components/settings/TokenGateList';
 import ContributorList from 'components/settings/ContributorList';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
-import charmClient from 'charmClient';
 
 export default function ContributorSettings () {
 
@@ -29,58 +21,9 @@ export default function ContributorSettings () {
   }
   return (
     <>
-      <InviteLinks isAdmin={isAdmin} spaceId={space.id} />
-      {/*
-      <Legend>
-        Token Gates
-        <Button color='secondary' size='small' variant='outlined' sx={{ float: 'right' }}>Add a gate</Button>
-      </Legend>
-      <Typography color='secondary'>No token gates yet</Typography> */}
-
-      <Legend>Current Contributors</Legend>
-      <ContributorList />
-    </>
-  );
-}
-
-function InviteLinks ({ isAdmin, spaceId }: { isAdmin?: boolean, spaceId: string }) {
-
-  const { data, mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));
-  const {
-    isOpen,
-    open,
-    close
-  } = usePopupState({ variant: 'popover', popupId: 'invite-link' });
-
-  async function createLink (values: InviteLinkFormValues) {
-    await charmClient.createInviteLink({
-      spaceId,
-      ...values
-    });
-    // update the list of links
-    await mutate();
-    close();
-  }
-
-  async function deleteLink (link: InviteLinkPopulated) {
-    if (window.confirm('Are you sure?')) {
-      await charmClient.deleteInviteLink(link.id);
-      // update the list of links
-      await mutate();
-    }
-  }
-
-  return (
-    <>
-      <Legend>
-        Invite Links
-        {isAdmin && <Button size='small' variant='outlined' sx={{ float: 'right' }} onClick={open}>Add a link</Button>}
-      </Legend>
-      {data?.length === 0 && <Typography color='secondary'>No invite links yet</Typography>}
-      {data && data?.length > 0 && <InvitesTable invites={data} onDelete={deleteLink} />}
-      <Modal open={isOpen} onClose={close}>
-        <InviteForm onSubmit={createLink} onClose={close} />
-      </Modal>
+      <InviteLinkList isAdmin={isAdmin} spaceId={space.id} />
+      <TokenGateList isAdmin={isAdmin} spaceId={space.id} />
+      <ContributorList isAdmin={isAdmin} spaceId={space.id} spaceOwner={space.createdBy} />
     </>
   );
 }
