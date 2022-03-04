@@ -49,11 +49,12 @@ export default function SignupPageContent () {
   const [user, setUser] = useUser();
   const router = useRouter();
 
+  // redirect user to workspace if they are already logged in
   useEffect(() => {
     if (user) {
       router.push('/');
     }
-  }, [user]);
+  }, []);
 
   async function createAccount () {
     const newUser = await charmClient.createUser({ address: account! });

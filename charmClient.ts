@@ -20,12 +20,12 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 //
 class CharmClient {
 
-  async login (address: string) {
-    const user = await http.POST<LoggedInUser>('/api/session/login', {
-      address
-    });
-    return user;
-  }
+  // async login (address: string) {
+  //   const user = await http.POST<LoggedInUser>('/api/session/login', {
+  //     address
+  //   });
+  //   return user;
+  // }
 
   async logout () {
     await http.POST('/api/session/logout');

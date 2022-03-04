@@ -49,7 +49,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
           setPages(sortArrayByObjectProperty(_pages, 'index'));
         });
     }
-  }, [space]);
+  }, [space?.id]);
 
   const addPage: AddPageFn = React.useCallback(async (page) => {
     const spaceId = space?.id!;
