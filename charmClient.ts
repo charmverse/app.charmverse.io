@@ -2,7 +2,7 @@
 
 import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus } from '@prisma/client';
 import * as http from 'adapters/http';
-import { Contributor, LoggedInUser, BountyWithApplications } from 'models';
+import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { getDisplayName } from 'lib/users';
@@ -270,16 +270,16 @@ class CharmClient {
     return data;
   }
 
-  async getBounty (bountyId: string): Promise<BountyWithApplications> {
+  async getBounty (bountyId: string): Promise<BountyWithDetails> {
 
-    const data = await http.GET<BountyWithApplications>(`/api/bounties/${bountyId}`);
+    const data = await http.GET<BountyWithDetails>(`/api/bounties/${bountyId}`);
 
     return data;
   }
 
-  async assignBounty (bountyId: string, assignee: string): Promise<BountyWithApplications> {
+  async assignBounty (bountyId: string, assignee: string): Promise<BountyWithDetails> {
 
-    const data = await http.PUT<BountyWithApplications>(`/api/bounties/${bountyId}`, {
+    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, {
       assignee,
       status: 'assigned',
       updatedAt: new Date()
@@ -288,16 +288,16 @@ class CharmClient {
     return data;
   }
 
-  async updateBounty (bountyId: string, bounty: Partial<Bounty>): Promise<BountyWithApplications> {
+  async updateBounty (bountyId: string, bounty: Partial<Bounty>): Promise<BountyWithDetails> {
 
-    const data = await http.PUT<BountyWithApplications>(`/api/bounties/${bountyId}`, bounty);
+    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, bounty);
 
     return data;
   }
 
-  async changeBountyStatus (bountyId: string, newStatus: BountyStatus): Promise<BountyWithApplications> {
+  async changeBountyStatus (bountyId: string, newStatus: BountyStatus): Promise<BountyWithDetails> {
 
-    const data = await http.PUT<BountyWithApplications>(`/api/bounties/${bountyId}`, {
+    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, {
       status: newStatus
     });
 

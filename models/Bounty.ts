@@ -1,4 +1,4 @@
-import { BountyStatus as BountyStatusEnum, Bounty, Application } from '@prisma/client';
+import { BountyStatus as BountyStatusEnum, Bounty, Application, Transaction } from '@prisma/client';
 import { PageContent } from '.';
 import { CryptoCurrency } from './Currency';
 
@@ -14,4 +14,4 @@ export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   paid: 'Paid'
 };
 
-export type BountyWithApplications = Bounty & {applications: Application []}
+export type BountyWithDetails = Bounty & {applications: Application [], transactions: Transaction []}
