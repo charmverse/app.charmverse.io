@@ -6,11 +6,10 @@ import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-su
 import { emojiSuggestKey } from './EmojiSuggest';
 
 const StyledBlockQuote = styled.div`
-  border-left: 8px solid ${({ theme }) => theme.palette.quoteMarker.main};
+  border-left: 4px solid ${({ theme }) => theme.palette.text.primary};
   font-size: 20px;
   padding: ${({ theme }) => theme.spacing(1)};
   margin-top: ${({ theme }) => theme.spacing(1)};
-  border-radius: ${({ theme }) => theme.spacing(0.5)};
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
 `;
