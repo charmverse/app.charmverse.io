@@ -9,7 +9,7 @@ import InvitesTable from 'components/inviteLinks/InviteLinksTable';
 import InviteForm, { FormValues as InviteLinkFormValues } from 'components/inviteLinks/InviteLinkForm';
 import charmClient from 'charmClient';
 
-export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin?: boolean, spaceId: string }) {
+export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
 
   const { data, mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));
   const {
@@ -40,10 +40,10 @@ export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin?: boolea
     <>
       <Legend>
         Invite Links
-        {isAdmin && <Button size='small' variant='outlined' sx={{ float: 'right' }} onClick={open}>Add a link</Button>}
+        {isAdmin && <Button variant='outlined' sx={{ float: 'right' }} onClick={open}>Add a link</Button>}
       </Legend>
-      {data?.length === 0 && <Typography color='secondary'>No invite links yet</Typography>}
-      {data && data?.length > 0 && <InvitesTable invites={data} onDelete={deleteLink} />}
+      {data && data.length === 0 && <Typography color='secondary'>No invite links yet</Typography>}
+      {data && data?.length > 0 && <InvitesTable isAdmin={isAdmin} invites={data} onDelete={deleteLink} />}
       <Modal open={isOpen} onClose={close}>
         <InviteForm onSubmit={createLink} onClose={close} />
       </Modal>

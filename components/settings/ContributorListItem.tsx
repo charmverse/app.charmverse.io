@@ -15,7 +15,7 @@ import { Contributor } from 'models';
 import getDisplayName from 'lib/users/getDisplayName';
 import useENSName from 'hooks/useENSName';
 
-const StyledRow = styled(Box)`
+export const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
   display: flex;
   align-items: center;

@@ -3,8 +3,8 @@ import { ReactElement } from 'react';
 import { setTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import InviteLinkList from 'components/settings/InviteLinkList';
-import TokenGateList from 'components/settings/TokenGateList';
+import InviteLinkList from 'components/settings/InviteLinks';
+import TokenGateList from 'components/settings/TokenGates';
 import ContributorList from 'components/settings/ContributorList';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 

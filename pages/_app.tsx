@@ -6,7 +6,8 @@ import '@fullcalendar/common/main.css';
 import '@fullcalendar/daygrid/main.css';
 // init focalboard
 import '@mattermost/compass-icons/css/compass-icons.css';
-import 'node_modules/react-virtualized/styles.css';
+// Lit Protocol CSS
+import 'lit-modal-vite/dist/style.css';
 import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
@@ -134,6 +135,7 @@ import FocalBoardPortal from 'components/databases/FocalBoardPortal';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { ColorModeContext } from 'context/color-mode';
 import { BountiesProvider } from 'hooks/useBounties';
+import { LitProtocolProvider } from 'adapters/litProtocol/hooks/useLitProtocol';
 import { DatabaseBlocksProvider } from 'hooks/useDatabaseBlocks';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PagesProvider } from 'hooks/usePages';
@@ -229,33 +231,35 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
       <ThemeProvider theme={theme}>
         <Web3ReactProvider getLibrary={getLibrary}>
           <Web3ConnectionManager>
-            <ReduxProvider store={store}>
-              <FocalBoardProviders>
-                <DataProviders>
-                  <TitleContext.Consumer>
-                    {([title]) => (
-                      <Head>
-                        <title>
-                          {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-                        </title>
-                      </Head>
-                    )}
-                  </TitleContext.Consumer>
-                  <Head>
-                    <meta name='description' content='The Notion of Web3' />
-                    <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                  </Head>
-                  <CssBaseline enableColorScheme={true} />
-                  <RouteGuard>
-                    <ErrorBoundary>
-                      {getLayout(<Component {...pageProps} />)}
-                    </ErrorBoundary>
-                  </RouteGuard>
-                </DataProviders>
-              </FocalBoardProviders>
-              {/** include the root portal for focalboard's popup */}
-              <FocalBoardPortal />
-            </ReduxProvider>
+            <LitProtocolProvider>
+              <ReduxProvider store={store}>
+                <FocalBoardProviders>
+                  <DataProviders>
+                    <TitleContext.Consumer>
+                      {([title]) => (
+                        <Head>
+                          <title>
+                            {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+                          </title>
+                        </Head>
+                      )}
+                    </TitleContext.Consumer>
+                    <Head>
+                      <meta name='description' content='The Notion of Web3' />
+                      <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+                    </Head>
+                    <CssBaseline enableColorScheme={true} />
+                    <RouteGuard>
+                      <ErrorBoundary>
+                        {getLayout(<Component {...pageProps} />)}
+                      </ErrorBoundary>
+                    </RouteGuard>
+                  </DataProviders>
+                </FocalBoardProviders>
+                {/** include the root portal for focalboard's popup */}
+                <FocalBoardPortal />
+              </ReduxProvider>
+            </LitProtocolProvider>
           </Web3ConnectionManager>
         </Web3ReactProvider>
       </ThemeProvider>

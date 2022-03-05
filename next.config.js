@@ -16,23 +16,23 @@ const config = {
       test: /\.svg$/,
       use: ['@svgr/webpack']
     });
-    const oneOf = _config.module.rules.find(
-      (rule) => typeof rule.oneOf === 'object'
-    );
+    // const oneOf = _config.module.rules.find(
+    //   (rule) => typeof rule.oneOf === 'object'
+    // );
 
-    if (oneOf) {
-      const moduleCssRule = oneOf.oneOf.find(
-        (rule) => regexEqual(rule.test, /\.module\.(scss|sass)$/)
-        // regexEqual(rule.test, /\.module\.(scss|sass)$/)
-      );
+    // if (oneOf) {
+    //   const moduleCssRule = oneOf.oneOf.find(
+    //     (rule) => regexEqual(rule.test, /\.module\.(scss|sass)$/)
+    //     // regexEqual(rule.test, /\.module\.(scss|sass)$/)
+    //   );
 
-      if (moduleCssRule) {
-        const cssLoader = moduleCssRule.use.find(({ loader }) => loader.includes('css-loader'));
-        if (cssLoader) {
-          cssLoader.options.modules.mode = 'local';
-        }
-      }
-    }
+    //   if (moduleCssRule) {
+    //     const cssLoader = moduleCssRule.use.find(({ loader }) => loader.includes('css-loader'));
+    //     if (cssLoader) {
+    //       cssLoader.options.modules.mode = 'local';
+    //     }
+    //   }
+    // }
     return _config;
   }
 };
@@ -92,10 +92,10 @@ const withTM = require('next-transpile-modules')([
   '@fullcalendar/core',
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
-  '@fullcalendar/react',
-  'lit-access-control-conditions-modal',
-  'react-virtualized',
-  'react-select-virtualized'
+  '@fullcalendar/react'
+  // 'lit-access-control-conditions-modal',
+  // 'react-virtualized',
+  // 'react-select-virtualized'
 ]);
 
 module.exports = withBundleAnalyzer(withTM(config));

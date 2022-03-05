@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, BountyStatus } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, BountyStatus, TokenGate } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser, BountyWithApplications } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -333,6 +333,23 @@ class CharmClient {
 
   deleteFromS3 (src: string) {
     return http.DELETE('/api/aws/s3-delete', { src });
+  }
+
+  // Token Gates
+  getTokenGates (query: { spaceId: string }) {
+    return http.GET<TokenGate[]>('/api/token-gates', query);
+  }
+
+  saveTokenGate (tokenGate: Partial<TokenGate>): Promise<TokenGate> {
+    return http.POST<TokenGate>('/api/token-gates', tokenGate);
+  }
+
+  deleteTokenGate (id: string) {
+    return http.DELETE<TokenGate>(`/api/token-gates/${id}`);
+  }
+
+  verifyTokenGate ({ id, jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
+    return http.POST(`/api/token-gates/${id}/verify`, { jwt });
   }
 }
 
