@@ -1,4 +1,4 @@
-import { Page, Space, User, SpaceRole, Prisma } from '@prisma/client';
+import { Page, Prisma, Space, SpaceRole, User } from '@prisma/client';
 import { LoggedInUser, PageContent } from 'models';
 import { v4 as uuid } from 'uuid';
 
@@ -286,7 +286,6 @@ export function gettingStartedPageContent (): PageContent {
               }
             ]
           }
-
         ]
       },
       {
@@ -298,9 +297,40 @@ export function gettingStartedPageContent (): PageContent {
         content: [
           {
             type: 'text',
-            text: 'See how it works'
+            text: 'Getting started with CharmVerse'
           }
         ]
+      },
+      {
+        type: 'iframe',
+        attrs: {
+          src: 'https://www.youtube.com/embed/LGgi6bFRRTw',
+          width: 800,
+          height: 451.9774011299435,
+          type: 'video'
+        }
+      },
+      {
+        type: 'heading',
+        attrs: {
+          level: 3,
+          collapseContent: null
+        },
+        content: [
+          {
+            type: 'text',
+            text: 'Inviting others'
+          }
+        ]
+      },
+      {
+        type: 'iframe',
+        attrs: {
+          src: 'https://www.youtube.com/embed/sZjggbVYGMo',
+          width: 800,
+          height: 451.9774011299435,
+          type: 'video'
+        }
       },
       {
         type: 'blockquote',
@@ -343,7 +373,7 @@ export function gettingStartedPageContent (): PageContent {
                   {
                     type: 'link',
                     attrs: {
-                      href: 'https://discord.gg/ACYCzBGC2M'
+                      href: 'https://discord.gg/VvhEafEWcg'
                     }
                   }
                 ],

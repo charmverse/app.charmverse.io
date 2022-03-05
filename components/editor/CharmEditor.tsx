@@ -38,6 +38,7 @@ import { NestedPage, nestedPageSpec } from './NestedPage';
 import Placeholder from './Placeholder';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
 import { imageSpec, ResizableImage } from './ResizableImage';
+import { Quote, quoteSpec } from './Quote';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -86,7 +87,8 @@ const specRegistry = new SpecRegistry([
   imageSpec(),
   columnLayoutSpec(),
   columnBlockSpec(),
-  nestedPageSpec()
+  nestedPageSpec(),
+  quoteSpec()
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
@@ -209,6 +211,11 @@ function CharmEditor (
       NodeView.createPlugin({
         name: 'page',
         containerDOM: ['div', { class: 'page-container' }]
+      }),
+      NodeView.createPlugin({
+        name: 'quote',
+        containerDOM: ['blockquote', { class: 'charm-quote' }],
+        contentDOM: ['div']
       })
       // TODO: Pasting iframe or image link shouldn't create those blocks for now
       // iframePlugin,
@@ -236,6 +243,8 @@ function CharmEditor (
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
         switch (props.node.type.name) {
+          case 'quote':
+            return <Quote {...props}>{NodeViewChildren}</Quote>;
           case 'columnLayout': {
             return <ColumnLayout node={props.node}>{NodeViewChildren}</ColumnLayout>;
           }
