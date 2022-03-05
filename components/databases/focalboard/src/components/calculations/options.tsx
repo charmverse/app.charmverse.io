@@ -1,8 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React from 'react'
-
-import Select, {components, IndicatorProps} from 'react-select'
+import Select, {components} from 'react-select'
 
 import {CSSObject} from '@emotion/serialize'
 
@@ -151,7 +149,7 @@ const styles = {
     }),
 }
 
-const DropdownIndicator = (props: IndicatorProps<Option, false>) => {
+const DropdownIndicator: typeof components.DropdownIndicator = (props) => {
     return (
         <components.DropdownIndicator {...props}>
             <ChevronUp/>

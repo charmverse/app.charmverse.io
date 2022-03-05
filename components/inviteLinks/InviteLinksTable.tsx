@@ -11,24 +11,15 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Close';
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
-import LinkIcon from '@mui/icons-material/Link';
 import { getDisplayName } from 'lib/users';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import ButtonChip from 'components/common/ButtonChip';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
-
-const StyledRow = styled(TableRow)`
-  .row-actions {
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-  }
-  &:hover .row-actions {
-    opacity: 1;
-  }
-`;
+import { StyledRow } from 'components/settings/TokenGatesTable';
 
 interface Props {
+  isAdmin: boolean;
   invites: InviteLinkPopulated[];
   onDelete: (invite: InviteLinkPopulated) => void;
 }
@@ -47,7 +38,7 @@ export default function InvitesTable (props: Props) {
       <TableHead>
         <TableRow>
           <TableCell sx={{ px: 0 }}>Inviter</TableCell>
-          <TableCell>Invite Code</TableCell>
+          {/* <TableCell>Invite Code</TableCell> */}
           <TableCell>Uses</TableCell>
           <TableCell>Expires</TableCell>
           <TableCell>{/* actions */}</TableCell>
@@ -59,7 +50,7 @@ export default function InvitesTable (props: Props) {
             <TableCell sx={{ px: 0 }}>
               <Typography><strong>{getDisplayName(row.author)}</strong></Typography>
             </TableCell>
-            <TableCell><Typography>{row.code}</Typography></TableCell>
+            {/* <TableCell><Typography>{row.code}</Typography></TableCell> */}
             <TableCell>
               <Typography>
                 {row.useCount}
@@ -67,7 +58,7 @@ export default function InvitesTable (props: Props) {
               </Typography>
             </TableCell>
             <TableCell width={150}>{getExpires(row)}</TableCell>
-            <TableCell width={150} sx={{ px: 0 }}>
+            <TableCell width={150} sx={{ px: 0 }} align='right'>
               <Tooltip
                 arrow
                 placement='top'
@@ -80,6 +71,7 @@ export default function InvitesTable (props: Props) {
                   </CopyToClipboard>
                 </Box>
               </Tooltip>
+              {props.isAdmin && (
               <Tooltip arrow placement='top' title='Delete'>
                 <ButtonChip
                   className='row-actions'
@@ -91,6 +83,7 @@ export default function InvitesTable (props: Props) {
                   onClick={() => props.onDelete(row)}
                 />
               </Tooltip>
+              )}
             </TableCell>
           </StyledRow>
         ))}

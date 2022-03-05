@@ -49,8 +49,6 @@ export async function checkUserCanVisitWorkspace (
     return role.spaceId === space.id;
   });
 
-  console.log('Has space role', userHasSpaceRole);
-
   if (!userHasSpaceRole) {
 
     const redirectSpace = await prisma.space.findUnique({

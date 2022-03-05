@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -332,6 +332,10 @@ class CharmClient {
     return data;
   }
 
+  recordTransaction (details: Pick<Transaction, 'bountyId' | 'transactionId' | 'chainId'>) {
+    return http.POST('/api/transactions', details);
+  }
+
   async getPricing (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
 
     const data = await http.GET<IPairQuote>('/api/crypto-price', { base, quote });
@@ -349,8 +353,32 @@ class CharmClient {
     return http.DELETE('/api/aws/s3-delete', { src });
   }
 
-  recordTransaction (details: Pick<Transaction, 'bountyId' | 'transactionId' | 'chainId'>) {
-    return http.POST('/api/transactions', details);
+  // Token Gates
+  getTokenGates (query: { spaceId: string }) {
+    return http.GET<TokenGate[]>('/api/token-gates', query);
+  }
+
+  getTokenGateForSpace (query: { spaceDomain: string }) {
+    return http.GET<TokenGate[]>('/api/token-gates', query).then(result => result[0]);
+  }
+
+  saveTokenGate (tokenGate: Partial<TokenGate>): Promise<TokenGate> {
+    return http.POST<TokenGate>('/api/token-gates', tokenGate);
+  }
+
+  deleteTokenGate (id: string) {
+    return http.DELETE<TokenGate>(`/api/token-gates/${id}`);
+  }
+
+  verifyTokenGate ({ id, jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
+
+    return http.POST(`/api/token-gates/${id}/verify`, { jwt });
+  }
+
+  unlockTokenGate ({ id, jwt }: { id: string, jwt: string }):
+    Promise<{ error?: string, success?: boolean, space: Space }> {
+
+    return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
   }
 }
 

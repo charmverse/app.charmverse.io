@@ -43,6 +43,7 @@ model Space {
   blocks      Block[]
   inviteLinks InviteLink[]
   bounties    Bounty[]
+  TokenGate   TokenGate[]
 }
 
 model Page {
@@ -126,11 +127,14 @@ model PagePermission {
 }
 
 model SpaceRole {
-  role    Role   @default(contributor)
-  spaceId String @db.Uuid
-  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  userId  String @db.Uuid
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  role                   Role       @default(contributor)
+  spaceId                String     @db.Uuid
+  space                  Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId                 String     @db.Uuid
+  user                   User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tokenGateId            String?    @db.Uuid
+  tokenGate              TokenGate? @relation(fields: [tokenGateId], references: [id])
+  tokenGateConnectedDate DateTime?
 
   @@unique([spaceId, userId])
 }
@@ -172,9 +176,9 @@ model Bounty {
   rewardToken      String
   status           BountyStatus  @default(open)
   title            String
-  linkedTaskId     String?      @db.Uuid
-  applications     Application []
-  transactions     Transaction []
+  linkedTaskId     String?       @db.Uuid
+  applications     Application[]
+  transactions     Transaction[]
 }
 
 model Application {
@@ -190,12 +194,23 @@ model Application {
 }
 
 model Transaction {
-  id               String       @id @default(uuid()) @db.Uuid
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @default(now())
-  transactionId    String
-  chainId          String
-  bountyId         String       @db.Uuid()
-  bounty           Bounty       @relation(fields: [bountyId], references: [id], onDelete: SetDefault)
+  id            String   @id @default(uuid()) @db.Uuid
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+  transactionId String
+  chainId       String
+  bountyId      String   @db.Uuid()
+  bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: SetDefault)
 }
 
+model TokenGate {
+  id         String      @id @default(uuid()) @db.Uuid
+  createdAt  DateTime    @default(now())
+  createdBy  String      @db.Uuid()
+  spaceId    String      @db.Uuid
+  space      Space       @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  conditions Json
+  resourceId Json
+  userRole   Role?
+  spaceRoles SpaceRole[]
+}

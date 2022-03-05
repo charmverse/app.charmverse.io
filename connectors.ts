@@ -13,7 +13,8 @@ enum Chains {
   CELO = 42220,
   HARMONY = 1666600000,
   GOERLI = 5,
-  RINKEBY = 4
+  RINKEBY = 4,
+  MUMBAI = 80001
 }
 
 const RPC = {
@@ -181,6 +182,21 @@ const RPC = {
     blockExplorerUrls: ['https://rinkeby-explorer.arbitrum.io/#/'],
     iconUrls: ['/networkLogos/ethereum.svg'],
     rpcUrls: ['https://rinkeby-light.eth.linkpool.io/']
+  },
+  MUMBAI: {
+    chainId: 80001,
+    chainName: 'Mumbai',
+    nativeCurrency: {
+      name: 'Polygon',
+      symbol: 'MATIC',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI:
+        'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+    },
+    rpcUrls: ['https://rpc-mumbai.matic.today'],
+    blockExplorerUrls: ['https://mumbai.polygonscan.com'],
+    iconUrls: ['/networkLogos/polygon.svg']
   }
 } as const;
 
@@ -197,7 +213,8 @@ const supportedChains = [
   'HARMONY',
   'BSC',
   'GOERLI',
-  'RINKEBY'
+  'RINKEBY',
+  'MUMBAI'
 ] as const;
 
 const supportedChainIds = supportedChains.map((_) => Chains[_]);

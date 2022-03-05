@@ -28,7 +28,7 @@ const AdventureCard = styled(Card)`
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  height: 100%;
+  height: 490px;
   padding: ${({ theme }) => theme.spacing(6)};
   &:hover {
     box-shadow: ${({ theme }) => theme.shadows[12]};
@@ -56,10 +56,16 @@ export default function SignupPageContent () {
     }
   }, []);
 
-  async function createAccount () {
+  async function createWorkspace () {
     const newUser = await charmClient.createUser({ address: account! });
     setUser(newUser);
     router.push('/createWorkspace');
+  }
+
+  async function joinWorkspace () {
+    const newUser = await charmClient.createUser({ address: account! });
+    setUser(newUser);
+    router.push('/joinWorkspace');
   }
 
   const welcomeMessage = `Welcome, ${account ? ensName || shortenHex(account) : ''}!`;
@@ -74,9 +80,9 @@ export default function SignupPageContent () {
           Choose your adventure:
         </Typography> */}
       </Box>
-      <Grid container spacing={6}>
-        <Grid item xs sm={6} sx={{ margin: 'auto' }}>
-          <AdventureCard onClick={createAccount}>
+      <Grid container spacing={6} alignItems='stretch'>
+        <Grid item xs sm={6} sx={{ height: '100%', margin: 'auto' }}>
+          <AdventureCard onClick={createWorkspace}>
             <ImageContainer>
               <Image src={rocketImage} />
             </ImageContainer>
@@ -85,8 +91,8 @@ export default function SignupPageContent () {
             </PrimaryButton>
           </AdventureCard>
         </Grid>
-        {/* <Grid item xs>
-          <AdventureCard>
+        <Grid item xs>
+          <AdventureCard onClick={joinWorkspace}>
             <ImageContainer>
               <Image src={gatesImage} />
             </ImageContainer>
@@ -94,7 +100,7 @@ export default function SignupPageContent () {
               Join an existing workspace
             </PrimaryButton>
           </AdventureCard>
-        </Grid> */}
+        </Grid>
       </Grid>
     </Content>
   );
