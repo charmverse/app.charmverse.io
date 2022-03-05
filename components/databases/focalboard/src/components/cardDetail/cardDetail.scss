@@ -81,8 +81,6 @@
         }
 
         .Label {
-          display: flex;
-          align-items: center;
           flex-shrink: 1;
           min-width: 0px;
           height: 22px;
@@ -91,7 +89,8 @@
           padding-right: 6px;
           font-size: 14px;
           line-height: 120%;
-          margin: 0px;
+          margin-right: 5px;
+          margin-bottom: 5px;
           width: fit-content;
         }
     }
