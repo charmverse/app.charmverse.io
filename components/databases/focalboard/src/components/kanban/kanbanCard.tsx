@@ -208,7 +208,7 @@ const KanbanCard = React.memo((props: Props) => {
                       gap: 0.25
                     }}>
                       <Box component="span">
-                        {millify(linkedBounty.rewardAmount)}
+                        {linkedBounty.rewardAmount}
                       </Box>
                       {/* <Box component="span" sx={{
                         fontWeight: 400,
