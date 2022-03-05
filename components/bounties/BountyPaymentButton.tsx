@@ -12,7 +12,7 @@ interface Props {
   tokenSymbol: string;
   tokenContractAddress?: string;
   tokenDecimals?: number;
-  onSuccess?: (txId: string) => void;
+  onSuccess?: (txId: string, chainId: number | string) => void;
   onError?: (err: any) => void;
   children?: React.ReactChild | React.ReactChild[];
 }
@@ -23,7 +23,7 @@ export default function BountyPaymentButton ({
   tokenSymbol = 'ETH',
   tokenContractAddress = '',
   tokenDecimals = 16,
-  onSuccess = (tx: string) => {},
+  onSuccess = (tx: string, chainId: number | string) => {},
   onError = () => {},
   children = 'Make a payment'
 }: Props) {
@@ -34,6 +34,8 @@ export default function BountyPaymentButton ({
     const currentChain = Object.values(RPC).find((blockchain: any) => blockchain.chainId === chainId);
     const signer = await library.getSigner(account);
 
+    console.log('Signer', signer);
+
     try {
       // if it's native currency
       if (tokenSymbol.toLowerCase() === currentChain?.nativeCurrency.symbol.toLowerCase()) {
@@ -42,7 +44,7 @@ export default function BountyPaymentButton ({
           value: ethers.utils.parseEther(amount)
         });
 
-        onSuccess(tx.hash);
+        onSuccess(tx.hash, currentChain.chainId);
       }
       else {
         const tokenContract = new ethers.Contract(tokenContractAddress, ERC20ABI, signer);
@@ -58,7 +60,7 @@ export default function BountyPaymentButton ({
 
         // transfer token
         const tx = await tokenContract.transfer(receiver, parsedTokenAmount);
-        onSuccess(tx.hash);
+        onSuccess(tx.hash, currentChain!.chainId);
       }
     }
     catch (err) {

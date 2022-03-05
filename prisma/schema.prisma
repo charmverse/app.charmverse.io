@@ -178,6 +178,7 @@ model Bounty {
   title            String
   linkedTaskId     String?       @db.Uuid
   applications     Application[]
+  transactions     Transaction[]
 }
 
 model Application {
@@ -190,6 +191,16 @@ model Application {
   applicant     User     @relation(fields: [createdBy], references: [id])
   walletAddress String
   message       String
+}
+
+model Transaction {
+  id            String   @id @default(uuid()) @db.Uuid
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+  transactionId String
+  chainId       String
+  bountyId      String   @db.Uuid()
+  bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: SetDefault)
 }
 
 model TokenGate {

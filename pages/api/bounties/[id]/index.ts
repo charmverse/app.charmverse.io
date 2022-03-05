@@ -1,6 +1,6 @@
 
 import { Bounty, Prisma } from '@prisma/client';
-import { BountyWithApplications } from 'models';
+import { BountyWithDetails } from 'models';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -18,9 +18,10 @@ handler.use(requireUser)
     next();
   })
   .get(getBounty)
-  .put(updateBounty);
+  .put(updateBounty)
+  .delete(deleteBounty);
 
-async function getBounty (req: NextApiRequest, res: NextApiResponse<BountyWithApplications>) {
+async function getBounty (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id } = req.query;
 
   const bounty = await prisma.bounty.findUnique({
@@ -28,7 +29,8 @@ async function getBounty (req: NextApiRequest, res: NextApiResponse<BountyWithAp
       id: id as string
     },
     include: {
-      applications: true
+      applications: true,
+      transactions: true
     }
   });
 
@@ -36,11 +38,11 @@ async function getBounty (req: NextApiRequest, res: NextApiResponse<BountyWithAp
     return res.status(421).send({ error: 'Bounty not found' } as any);
   }
 
-  res.status(200).json(bounty as any as BountyWithApplications);
+  res.status(200).json(bounty as any as BountyWithDetails);
 
 }
 
-async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWithApplications>) {
+async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id } = req.query;
 
   const { body } = req;
@@ -51,7 +53,8 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
     },
     data: body,
     include: {
-      applications: true
+      applications: true,
+      transactions: true
     }
   });
 
@@ -60,6 +63,19 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
   }
 
   res.status(200).json(bounty);
+
+}
+
+async function deleteBounty (req: NextApiRequest, res: NextApiResponse) {
+  const { id } = req.query;
+
+  await prisma.bounty.delete({
+    where: {
+      id: id as string
+    }
+  });
+
+  res.status(200).json({ success: true });
 
 }
 

@@ -13,15 +13,23 @@ export const getServerSideProps = withSessionSsr(
         }
       };
     }
-    const spaces = await prisma.space.findMany({
+    const spaceRole = await prisma.spaceRole.findFirst({
       where: {
-        createdBy: user.id
+        userId: user.id
       }
     });
-    if (spaces.length) {
+
+    const space = spaceRole ? await prisma.space.findFirst({
+      where: {
+        id: spaceRole.spaceId
+      }
+    }) : null;
+
+    if (space) {
+
       return {
         redirect: {
-          destination: `/${spaces[0].domain}`,
+          destination: `/${space.domain}`,
           permanent: false
         }
       };
