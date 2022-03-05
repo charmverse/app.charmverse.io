@@ -149,6 +149,10 @@ const valueSelectorStyle = {
         background: 'rgb(var(--center-channel-bg-rgb))',
         minWidth: '260px',
     }),
+    input: (provided: CSSObject): CSSObject => ({
+      ...provided,
+      color: 'inherit',
+  }),
 }
 
 function ValueSelector(props: Props): JSX.Element {
