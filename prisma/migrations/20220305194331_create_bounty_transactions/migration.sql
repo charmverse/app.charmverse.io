@@ -1,6 +1,3 @@
--- AlterTable
-ALTER TABLE "Page" ADD COLUMN     "index" INTEGER NOT NULL DEFAULT -1;
-
 -- CreateTable
 CREATE TABLE "Transaction" (
     "id" UUID NOT NULL,
