@@ -59,7 +59,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
 
   async function deleteTokenGate (tokenGate: TokenGate) {
     if (window.confirm('Are you sure?')) {
-      await charmClient.deleteInviteLink(tokenGate.id);
+      await charmClient.deleteTokenGate(tokenGate.id);
       // update the list of links
       await mutate();
     }

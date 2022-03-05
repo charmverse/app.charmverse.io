@@ -38,7 +38,7 @@ export default function InvitesTable (props: Props) {
       <TableHead>
         <TableRow>
           <TableCell sx={{ px: 0 }}>Inviter</TableCell>
-          <TableCell>Invite Code</TableCell>
+          {/* <TableCell>Invite Code</TableCell> */}
           <TableCell>Uses</TableCell>
           <TableCell>Expires</TableCell>
           <TableCell>{/* actions */}</TableCell>
@@ -50,7 +50,7 @@ export default function InvitesTable (props: Props) {
             <TableCell sx={{ px: 0 }}>
               <Typography><strong>{getDisplayName(row.author)}</strong></Typography>
             </TableCell>
-            <TableCell><Typography>{row.code}</Typography></TableCell>
+            {/* <TableCell><Typography>{row.code}</Typography></TableCell> */}
             <TableCell>
               <Typography>
                 {row.useCount}

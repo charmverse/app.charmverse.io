@@ -38,24 +38,26 @@ export default function WalletConnection () {
     account ? (
       <Grid container my={3}>
         <Grid item xs={12} md={6}>
-          <Typography sx={{ display: 'flex', alignItems: 'center', fontSize: 20, color: 'inherit', px: 0 }}>
-            <Grid container>
-              {ensName && (
-                <Grid item xs={12} md={6}>
-                  <Box mr={6}>{ensName}</Box>
-                </Grid>
-              )}
-              <Grid item xs={12} md={6}>
-                {account ? (
-                  <CopyableAddress
-                    address={account}
-                    decimals={5}
-                    sx={{ fontSize: ensName ? 16 : 20, fontWeight: 'normal', background: 'transparent !important', color: 'inherit', p: 0 }}
-                  />
-                ) : <div></div>}
-              </Grid>
+          <Grid container>
+            {ensName && (
+            <Grid item xs={12} md={6}>
+              <Box mr={6}>
+                <Typography sx={{ display: 'flex', alignItems: 'center', fontSize: 20, color: 'inherit', px: 0 }}>
+                  {ensName}
+                </Typography>
+              </Box>
             </Grid>
-          </Typography>
+            )}
+            <Grid item xs={12} md={6}>
+              {account ? (
+                <CopyableAddress
+                  address={account}
+                  decimals={5}
+                  sx={{ fontSize: ensName ? 16 : 20, fontWeight: 'normal', background: 'transparent !important', color: 'inherit', p: 0 }}
+                />
+              ) : <div></div>}
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item xs={12} md={6} container alignItems='center' sx={{ justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
           <Typography color='secondary' variant='body2'>
