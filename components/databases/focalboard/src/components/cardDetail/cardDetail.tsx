@@ -181,7 +181,9 @@ const CardDetail = (props: Props): JSX.Element|null => {
 
             {/* Content blocks */}
 
-            <div className='CardDetail content fullwidth content-blocks'>
+            <div className='CardDetail content fullwidth content-blocks' style={{
+              height: 150
+            }}>
                 <CardDetailProvider card={card}>
                     <CardDetailContents
                         card={props.card}

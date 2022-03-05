@@ -18,7 +18,7 @@ type Props = {
     block: Board|Card
     size?: 's' | 'm' | 'l'
     readonly?: boolean
-    setPage: (page: Partial<Page>) => void
+    setPage?: (page: Partial<Page>) => void
 }
 
 const BlockIconSelector = React.memo((props: Props) => {
@@ -58,7 +58,7 @@ const BlockIconSelector = React.memo((props: Props) => {
                         icon={<EmojiIcon/>}
                         name={intl.formatMessage({id: 'ViewTitle.random-icon', defaultMessage: 'Random'})}
                         onClick={() => {
-                          setPage({icon: onAddRandomIcon()})
+                          setPage && setPage({icon: onAddRandomIcon()})
                         }}
                     />
                     <Menu.SubMenu
@@ -68,7 +68,7 @@ const BlockIconSelector = React.memo((props: Props) => {
                     >
                         <EmojiPicker onSelect={(emoji) => {
                           onSelectEmoji(emoji)
-                          setPage({icon: emoji})
+                          setPage && setPage({icon: emoji})
                         }}/>
                     </Menu.SubMenu>
                     <Menu.Text
@@ -77,7 +77,7 @@ const BlockIconSelector = React.memo((props: Props) => {
                         name={intl.formatMessage({id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon'})}
                         onClick={() => {
                           onRemoveIcon()
-                          setPage({icon: null})
+                          setPage && setPage({icon: null})
                         }}
                     />
                 </Menu>
