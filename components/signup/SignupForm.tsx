@@ -28,7 +28,7 @@ const AdventureCard = styled(Card)`
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  height: 100%;
+  height: 490px;
   padding: ${({ theme }) => theme.spacing(6)};
   &:hover {
     box-shadow: ${({ theme }) => theme.shadows[12]};
@@ -80,8 +80,8 @@ export default function SignupPageContent () {
           Choose your adventure:
         </Typography> */}
       </Box>
-      <Grid container spacing={6}>
-        <Grid item xs sm={6} sx={{ margin: 'auto' }}>
+      <Grid container spacing={6} alignItems='stretch'>
+        <Grid item xs sm={6} sx={{ height: '100%', margin: 'auto' }}>
           <AdventureCard onClick={createWorkspace}>
             <ImageContainer>
               <Image src={rocketImage} />

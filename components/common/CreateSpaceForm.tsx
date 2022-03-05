@@ -126,7 +126,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
             helperText={errors.domain?.message}
           />
         </Grid>
-        <Grid item>
+        <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
           <PrimaryButton disabled={!watchName || !watchDomain} type='submit'>
             {submitText || 'Create Workspace'}
           </PrimaryButton>

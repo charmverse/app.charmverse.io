@@ -53,14 +53,6 @@ async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGat
     return res.status(400).json({ error: 'spaceId is required' });
   }
 
-  const { error } = await hasAccessToSpace({
-    userId: req.session.user.id,
-    spaceId
-  });
-  if (error) {
-    return res.status(401).json({ error });
-  }
-
   const result = await prisma.tokenGate.findMany({
     where: {
       spaceId

@@ -7,17 +7,23 @@ import getBaseLayout from 'components/common/base-layout/getLayout';
 import JoinSpaceForm from 'components/common/JoinSpaceForm';
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
+import { useSpaces } from 'hooks/useSpaces';
 
 export default function CreateSpace () {
 
   const [, setUser] = useUser();
+  const [, setSpaces] = useSpaces();
   const router = useRouter();
 
   async function onJoinSpace (space: Space) {
     // refresh user permissions
     const _user = await charmClient.getUser();
     setUser(_user);
-    router.push(`/${space.domain}`);
+    charmClient.getSpaces()
+      .then(_spaces => {
+        setSpaces(_spaces);
+        router.push(`/${space.domain}`);
+      });
   }
 
   return (

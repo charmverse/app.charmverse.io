@@ -27,12 +27,12 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const result = await verifyJwt({ jwt });
-    console.log('result', result);
+    console.log('verifyJwt result', result);
     if (!result.verified) {
       console.error('Could not verifiy wallet', { userId: user.id, result });
       throw new Error('This wallet could not be verified');
     }
-    if (req.query.commit) {
+    if (req.body.commit) {
       const spaceRole = await prisma.spaceRole.findFirst({
         where: {
           userId: user.id,
@@ -49,6 +49,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
             tokenGateConnectedDate: new Date()
           }
         });
+        console.log('Gave user access to workspace', { tokenGateId: tokenGate.id, userId: user.id });
       }
       else if (spaceRole.tokenGateId || spaceRole.role !== 'admin') {
         await prisma.spaceRole.update({

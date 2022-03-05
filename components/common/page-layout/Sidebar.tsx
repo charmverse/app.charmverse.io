@@ -4,6 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import BountyIcon from '@mui/icons-material/RequestPage';
 import SettingsIcon from '@mui/icons-material/Settings';
+import LaunchIcon from '@mui/icons-material/Launch';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -203,6 +204,13 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         </Grid>
         <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
           <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
+          <Typography variant='body2' align='center' sx={{ pt: 3 }}>
+            <Link color='secondary' href='/joinWorkspace/'>
+              Join an existing workspace
+              {' '}
+              <LaunchIcon fontSize='small' />
+            </Link>
+          </Typography>
         </Modal>
       </WorkspacesContainer>
       {space && (
