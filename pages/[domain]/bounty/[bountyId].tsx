@@ -23,6 +23,7 @@ import CharmEditor from 'components/editor/CharmEditor';
 import { Container } from 'components/editor/Editor';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useBounties } from 'hooks/useBounties';
 import useENSName from 'hooks/useENSName';
 import { useUser } from 'hooks/useUser';
 import { getDisplayName } from 'lib/users';
@@ -42,8 +43,9 @@ export default function BountyDetails () {
 
   const [user] = useUser();
   const [contributors] = useContributors();
-
+  const { bounties, setBounties } = useBounties();
   const [bounty, setBounty] = useState<BountyWithDetails | null>(null);
+
   const [showBountyEditDialog, setShowBountyEditDialog] = useState(false);
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
   const [showBountyDeleteDialog, setShowBountyDeleteDialog] = useState(false);
@@ -108,7 +110,7 @@ export default function BountyDetails () {
 
   async function saveBounty (updatedBounty: Bounty) {
     // The API should return a Bounty with a list of transactions
-    setBounty({ ...updatedBounty, applications } as any);
+    updateBounty({ ...updatedBounty, applications } as any);
     setShowBountyEditDialog(false);
   }
 
@@ -124,8 +126,11 @@ export default function BountyDetails () {
 
   async function deleteBounty () {
     await charmClient.deleteBounty(bounty!.id);
+    const filteredBounties = bounties.filter(bountyInList => {
+      return bountyInList.id !== bounty!.id;
+    });
+    setBounties(filteredBounties);
     router.push(`/${space!.domain}/bounties`);
-    console.log('Deleting bounty');
   }
 
   function applicationSubmitted (application: Application) {
@@ -139,17 +144,17 @@ export default function BountyDetails () {
 
   async function requestReview () {
     const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'review');
-    setBounty(updatedBounty);
+    updateBounty(updatedBounty);
   }
 
   async function moveToAssigned () {
     const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'assigned');
-    setBounty(updatedBounty);
+    updateBounty(updatedBounty);
   }
 
   async function markAsComplete () {
     const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'complete');
-    setBounty(updatedBounty);
+    updateBounty(updatedBounty);
   }
 
   async function recordPaymentSuccess (transactionId: string, chainId: number | string) {
@@ -159,8 +164,21 @@ export default function BountyDetails () {
       chainId: chainId.toString()
     });
     const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'paid');
-    setBounty(updatedBounty);
+    updateBounty(updatedBounty);
 
+  }
+
+  function updateBounty (updatedBounty: BountyWithDetails) {
+    const inMemoryBountyIndex = bounties.findIndex(bountyInMemory => {
+      return bountyInMemory.id === updatedBounty.id;
+    });
+    if (inMemoryBountyIndex > -1) {
+      const copiedBounties = bounties.slice();
+      copiedBounties.splice(inMemoryBountyIndex, 1, updatedBounty);
+      setBounties(copiedBounties);
+    }
+
+    setBounty(updatedBounty);
   }
 
   //  charmClient.getBounty();
