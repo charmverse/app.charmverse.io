@@ -1,5 +1,8 @@
 import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -7,6 +10,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
+import { getChainExplorerLink } from 'connectors';
 import { ApplicationEditorForm } from 'components/bounties/ApplicationEditorForm';
 import { BountyApplicantList } from 'components/bounties/BountyApplicantList';
 import { BountyBadge } from 'components/bounties/BountyBadge';
@@ -19,13 +23,17 @@ import CharmEditor from 'components/editor/CharmEditor';
 import { Container } from 'components/editor/Editor';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useBounties } from 'hooks/useBounties';
 import useENSName from 'hooks/useENSName';
 import { useUser } from 'hooks/useUser';
 import { getDisplayName } from 'lib/users';
 import { eToNumber } from 'lib/utilities/numbers';
-import { BountyWithApplications, PageContent } from 'models';
+import { BountyWithDetails, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
+import { shortenHex } from 'lib/utilities/strings';
+import { humanFriendlyDate } from 'lib/utilities/dates';
+import Link from 'next/link';
 
 export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 
@@ -35,10 +43,12 @@ export default function BountyDetails () {
 
   const [user] = useUser();
   const [contributors] = useContributors();
+  const { bounties, setBounties } = useBounties();
+  const [bounty, setBounty] = useState<BountyWithDetails | null>(null);
 
-  const [bounty, setBounty] = useState<BountyWithApplications | null>(null);
   const [showBountyEditDialog, setShowBountyEditDialog] = useState(false);
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
+  const [showBountyDeleteDialog, setShowBountyDeleteDialog] = useState(false);
 
   const router = useRouter();
 
@@ -51,6 +61,9 @@ export default function BountyDetails () {
 
   const isApplicant = user && applications.some(application => {
     return application.createdBy === user.id;
+  });
+  const applicantProposal = applications.find(application => {
+    return application.createdBy === user?.id;
   });
 
   const reviewerUser = (bounty?.reviewer && getContributor(bounty.reviewer)) || undefined;
@@ -96,7 +109,8 @@ export default function BountyDetails () {
   })?.walletAddress;
 
   async function saveBounty (updatedBounty: Bounty) {
-    setBounty({ ...updatedBounty, applications });
+    // The API should return a Bounty with a list of transactions
+    updateBounty({ ...updatedBounty, applications } as any);
     setShowBountyEditDialog(false);
   }
 
@@ -104,9 +118,24 @@ export default function BountyDetails () {
     setShowBountyEditDialog(!showBountyEditDialog);
   }
 
+  function toggleBountyDeleteDialog () {
+    setShowBountyDeleteDialog(!showBountyDeleteDialog);
+  }
+
+  const deleteableBounty = bounty?.status === 'open';
+
+  async function deleteBounty () {
+    await charmClient.deleteBounty(bounty!.id);
+    const filteredBounties = bounties.filter(bountyInList => {
+      return bountyInList.id !== bounty!.id;
+    });
+    setBounties(filteredBounties);
+    router.push(`/${space!.domain}/bounties`);
+  }
+
   function applicationSubmitted (application: Application) {
     toggleApplicationDialog();
-    setApplications([...applications, application]);
+    loadBounty();
   }
 
   function toggleApplicationDialog () {
@@ -115,21 +144,40 @@ export default function BountyDetails () {
 
   async function requestReview () {
     const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'review');
-    setBounty(updatedBounty);
+    updateBounty(updatedBounty);
   }
 
   async function moveToAssigned () {
     const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'assigned');
-    setBounty(updatedBounty);
+    updateBounty(updatedBounty);
   }
 
   async function markAsComplete () {
     const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'complete');
-    setBounty(updatedBounty);
+    updateBounty(updatedBounty);
   }
 
-  async function markAsPaid () {
+  async function recordPaymentSuccess (transactionId: string, chainId: number | string) {
+    await charmClient.recordTransaction({
+      bountyId: bounty!.id,
+      transactionId,
+      chainId: chainId.toString()
+    });
     const updatedBounty = await charmClient.changeBountyStatus(bounty!.id, 'paid');
+    updateBounty(updatedBounty);
+
+  }
+
+  function updateBounty (updatedBounty: BountyWithDetails) {
+    const inMemoryBountyIndex = bounties.findIndex(bountyInMemory => {
+      return bountyInMemory.id === updatedBounty.id;
+    });
+    if (inMemoryBountyIndex > -1) {
+      const copiedBounties = bounties.slice();
+      copiedBounties.splice(inMemoryBountyIndex, 1, updatedBounty);
+      setBounties(copiedBounties);
+    }
+
     setBounty(updatedBounty);
   }
 
@@ -148,12 +196,33 @@ export default function BountyDetails () {
       <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
 
       <Modal open={showApplicationDialog} onClose={toggleApplicationDialog}>
-        <ApplicationEditorForm bountyId={bounty.id} onSubmit={applicationSubmitted}></ApplicationEditorForm>
+        <ApplicationEditorForm
+          bountyId={bounty.id}
+          onSubmit={applicationSubmitted}
+          proposal={applicantProposal}
+          mode={applicantProposal ? 'update' : 'create'}
+        />
+      </Modal>
+
+      <Modal open={showBountyDeleteDialog} onClose={toggleBountyDeleteDialog}>
+
+        <Typography>
+          Are you sure you want to delete this bounty?
+        </Typography>
+
+        <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
+          <Button color='error' sx={{ mr: 2, fontWeight: 'bold' }} onClick={deleteBounty}>Delete bounty</Button>
+
+          {
+            bounty.status === 'open' && <Button color='secondary' onClick={toggleBountyDeleteDialog}>Cancel</Button>
+          }
+        </Box>
+
       </Modal>
 
       <Box sx={{
         justifyContent: 'space-between',
-        gap: 2,
+        gap: 1,
         display: 'flex'
       }}
       >
@@ -176,9 +245,18 @@ export default function BountyDetails () {
             </Box>
             {
               viewerCanModifyBounty === true && (
-                <IconButton onClick={toggleBountyEditDialog}>
-                  <EditIcon fontSize='small' />
-                </IconButton>
+                <>
+                  <IconButton onClick={toggleBountyEditDialog}>
+                    <EditIcon fontSize='small' />
+                  </IconButton>
+                  {
+                    deleteableBounty === true && (
+                    <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
+                      <DeleteIcon fontSize='small' sx={{ color: 'red.main' }} />
+                    </IconButton>
+                    )
+                  }
+                </>
               )
             }
           </Typography>
@@ -237,6 +315,7 @@ export default function BountyDetails () {
                             receiver={walletAddressForPayment!}
                             amount={eToNumber(bounty.rewardAmount)}
                             tokenSymbol='ETH'
+                            onSuccess={recordPaymentSuccess}
                           />
                           )
                         }
@@ -281,7 +360,18 @@ export default function BountyDetails () {
                         </Box>
                       )}
                       {!assigneeName && (
-                        isApplicant ? <Typography>You've applied to this bounty.</Typography> : (
+                        isApplicant ? (
+                          <Box>
+                            <Typography>You've applied to this bounty.</Typography>
+                            <Button
+                              sx={{ mt: 2 }}
+                              onClick={toggleApplicationDialog}
+                            >
+                              <Box sx={{ pr: 1 }}>Edit your application</Box>
+                              <EditOutlinedIcon />
+                            </Button>
+                          </Box>
+                        ) : (
                           <Button onClick={toggleApplicationDialog}>Apply now</Button>
                         )
                       )}

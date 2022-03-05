@@ -6,6 +6,7 @@ import { fancyTrim } from 'lib/utilities/strings';
 import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
 import { useState } from 'react';
 import { BrandColors } from 'theme/colors';
+import { BountyBadge } from './BountyBadge';
 
 export interface IBountyInput {
   bounty: IBounty
@@ -48,7 +49,7 @@ export function BountyCard ({ bounty }: IBountyInput) {
 
             </Grid>
             <Grid item xs={12}>
-              <Chip variant='filled' label={bountyLabel} color={bountyColor} />
+              <BountyBadge bounty={bounty} hideLink={true} />
             </Grid>
 
           </Grid>

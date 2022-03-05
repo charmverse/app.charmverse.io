@@ -223,4 +223,50 @@ const walletLink = new WalletLinkConnector({
   supportedChainIds
 });
 
+export function getChainExplorerLink (chainId: string | number, transactionId: string): string {
+
+  chainId = chainId.toString();
+
+  switch (chainId) {
+
+    case '1':
+      return `https://etherscan.io/tx/${transactionId}`;
+
+    case '0x38':
+    case '56':
+      return `https://bscscan.com/tx/${transactionId}`;
+
+    case '0x89':
+    case '137':
+      return `https://polygonscan.com/tx/${transactionId}`;
+
+    case '43114':
+      return `https://snowtrace.io/tx/${transactionId}`;
+
+    case '100':
+      return `https://explorer.poa.network/xdai/mainnet/tx/${transactionId}`;
+
+    case '250':
+      return `https://ftmscan.com/tx/${transactionId}`;
+
+    case '42161':
+      return `https://arbiscan.io/tx/${transactionId}`;
+
+    case '42220':
+      return `https://explorer.celo.org/tx/${transactionId}`;
+
+    case '1666600000':
+      return `https://explorer.harmony.one/tx/${transactionId}`;
+
+    case '5':
+      return `https://goerli.etherscan.io/tx/${transactionId}`;
+
+    case '4':
+      return `https://rinkeby.etherscan.io/tx/${transactionId}`;
+
+    default:
+      throw new Error('Chain is unsupported');
+  }
+}
+
 export { Chains, RPC, supportedChains, injected, walletConnect, walletLink };
