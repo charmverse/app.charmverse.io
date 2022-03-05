@@ -62,7 +62,7 @@ export default function BountyDetails () {
   const isApplicant = user && applications.some(application => {
     return application.createdBy === user.id;
   });
-  const applicantProposal = applications?.find(application => {
+  const applicantProposal = applications.find(application => {
     return application.createdBy === user?.id;
   });
 
