@@ -340,6 +340,10 @@ class CharmClient {
     return http.GET<TokenGate[]>('/api/token-gates', query);
   }
 
+  getTokenGateForSpace (query: { spaceDomain: string }) {
+    return http.GET<TokenGate[]>('/api/token-gates', query).then(result => result[0]);
+  }
+
   saveTokenGate (tokenGate: Partial<TokenGate>): Promise<TokenGate> {
     return http.POST<TokenGate>('/api/token-gates', tokenGate);
   }
@@ -349,7 +353,14 @@ class CharmClient {
   }
 
   verifyTokenGate ({ id, jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
+
     return http.POST(`/api/token-gates/${id}/verify`, { jwt });
+  }
+
+  unlockTokenGate ({ id, jwt }: { id: string, jwt: string }):
+    Promise<{ error?: string, success?: boolean, space: Space }> {
+
+    return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
   }
 }
 

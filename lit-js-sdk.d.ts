@@ -9,14 +9,15 @@ declare module 'lit-js-sdk' {
     | 'rinkeby' | 'cronos' | 'optimism';
   export type Chain = EVMChain | SolanaChain;
 
-  type LitChain = {
+  type ChainConfig = {
     chainId: string;
     contractAddress: string;
     name: string;
     symbol: string;
   }
 
-  export interface LIT_CHAINS { [chain: EVMChain]: LitChain }
+  export const LIT_CHAINS: Record<EVMChain, ChainConfig>;
+  export const ALL_LIT_CHAINS: Record<Chain, ChainConfig>;
 
   type ReturnValueTest = {
     key: string;

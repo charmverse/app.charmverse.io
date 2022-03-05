@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { humanizeAccessControlConditions, ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
+import { humanizeAccessControlConditions, Chain, checkAndSignAuthMessage, ALL_LIT_CHAINS } from 'lit-js-sdk';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -51,7 +51,6 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
   const litClient = useLitProtocol();
 
   useEffect(() => {
-    console.log('set descritpions');
     Promise.all(tokenGates.map(tokenGate => humanizeAccessControlConditions({
       myWalletAddress: account || '',
       accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
@@ -62,21 +61,17 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
   }, [tokenGates]);
 
   async function testConnect (tokenGate: TokenGate) {
-    console.log('testConnect', tokenGate);
-    const chain = 'mumbai';
+    const chain = getChain(tokenGate);
     const authSig = await checkAndSignAuthMessage({
       chain
     });
-    console.log(authSig);
     const jwt = await litClient!.getSignedToken({
       resourceId: tokenGate.resourceId as any,
       authSig,
       chain,
-      accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions
+      accessControlConditions: (tokenGate.conditions as any)!.accessControlConditions
     });
-    console.log('jwt', jwt);
     const authMessage = await charmClient.verifyTokenGate({ jwt, id: tokenGate.id });
-    console.log('getSignedToken', authMessage);
     if (authMessage) {
       alert('Success!');
     }
@@ -87,6 +82,7 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
       <TableHead>
         <TableRow>
           <TableCell sx={{ px: 0 }}>Description</TableCell>
+          <TableCell>Chain</TableCell>
           <TableCell>Created</TableCell>
           <TableCell>{/* actions */}</TableCell>
         </TableRow>
@@ -96,6 +92,9 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
           <StyledRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
             <TableCell sx={{ px: 0 }}>
               <Typography>{descriptions[index]}</Typography>
+            </TableCell>
+            <TableCell width={150}>
+              <Typography>{ALL_LIT_CHAINS[getChain(row)]?.name}</Typography>
             </TableCell>
             <TableCell width={150}>{new Date(row.createdAt).toDateString()}</TableCell>
             <TableCell width={150} sx={{ px: 0 }} align='right'>
@@ -121,4 +120,8 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
       </TableBody>
     </Table>
   );
+}
+
+function getChain (tokenGate: TokenGate): Chain {
+  return (tokenGate.conditions as any)!.accessControlConditions![0].chain;
 }

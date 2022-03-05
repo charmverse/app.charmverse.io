@@ -1,7 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { TokenGate } from '@prisma/client';
+import { TokenGate, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser, hasAccessToSpace } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -36,17 +36,29 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
 
 async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGate[] | { error: string }>) {
 
+  let space: Space | null = null;
+  if (req.query.spaceDomain) {
+    space = await prisma.space.findFirst({
+      where: {
+        domain: req.query.spaceDomain as string
+      }
+    });
+    if (!space) {
+      return res.status(201).end();
+    }
+  }
+  const spaceId = space?.id || req.query.spaceId as string;
+
+  if (!spaceId) {
+    return res.status(400).json({ error: 'spaceId is required' });
+  }
+
   const { error } = await hasAccessToSpace({
     userId: req.session.user.id,
-    spaceId: req.query.spaceId as string
+    spaceId
   });
   if (error) {
     return res.status(401).json({ error });
-  }
-
-  const spaceId = req.query.spaceId as string;
-  if (!spaceId) {
-    return res.status(400).json({ error: 'spaceId is required' });
   }
 
   const result = await prisma.tokenGate.findMany({

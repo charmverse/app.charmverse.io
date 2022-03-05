@@ -200,5 +200,6 @@ model TokenGate {
   space      Space       @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   conditions Json
   resourceId Json
+  userRole   Role?
   spaceRoles SpaceRole[]
 }

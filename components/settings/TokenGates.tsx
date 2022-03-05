@@ -37,7 +37,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   }
 
   async function saveTokenGate (conditions: Partial<SigningConditions>) {
-    const chain = 'mumbai';
+    const chain = conditions.accessControlConditions![0].chain;
     const authSig = await checkAndSignAuthMessage({
       chain
     });
