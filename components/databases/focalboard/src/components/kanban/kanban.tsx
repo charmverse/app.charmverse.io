@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 /* eslint-disable max-lines */
+//import Button from '../../widgets/buttons/button'
 import React, {useCallback, useState} from 'react'
 import {FormattedMessage, injectIntl, IntlShape} from 'react-intl'
 
@@ -23,6 +24,38 @@ import KanbanCard from './kanbanCard'
 import KanbanColumn from './kanbanColumn'
 import KanbanColumnHeader from './kanbanColumnHeader'
 import KanbanHiddenColumnItem from './kanbanHiddenColumnItem'
+import { TextField, Menu } from '@mui/material'
+import { Box } from '@mui/system'
+import { bindTrigger, bindMenu } from 'material-ui-popup-state'
+import { usePopupState } from 'material-ui-popup-state/hooks'
+
+
+
+
+interface NewGroupTextFieldProps {
+  onClick: (groupName: string) => void
+}
+
+function NewGroupTextField(props: NewGroupTextFieldProps) {
+  const {onClick} = props;
+  const [groupName, setGroupName] = useState('')
+  return <Box sx={{
+    display: "flex",
+    gap: 1,
+    px: 1
+  }}>
+    <TextField placeholder='New group' sx={{
+      "& .MuiOutlinedInput-input": {
+        padding: 1
+      },
+    }} value={groupName} onChange={(e) => {
+      setGroupName(e.target.value)
+    }}/>
+    <Button onClick={() => onClick(groupName)}>
+      Done
+    </Button>
+  </Box>
+}
 
 
 type Props = {
@@ -48,6 +81,8 @@ const Kanban = (props: Props) => {
         return <div/>
     }
 
+    const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
+    
     const propertyValues = groupByProperty.options || []
     Utils.log(`${propertyValues.length} propertyValues`)
 
@@ -60,12 +95,12 @@ const Kanban = (props: Props) => {
         await mutator.changePropertyOptionValue(board, groupByProperty!, option, text)
     }, [board, groupByProperty])
 
-    const addGroupClicked = useCallback(async () => {
+    const addGroupClicked = useCallback(async (groupName: string) => {
         Utils.log('onAddGroupClicked')
 
         const option: IPropertyOption = {
             id: Utils.createGuid(IDType.BlockID),
-            value: 'New group',
+            value: groupName,
             color: 'propColorDefault',
         }
 
@@ -196,10 +231,8 @@ const Kanban = (props: Props) => {
     const vStrength = createVerticalStrength(Utils.isMobile() ? 60 : 250)
 
     return (
-        <ScrollingComponent
+        <Box
             className='Kanban'
-            horizontalStrength={hStrength}
-            verticalStrength={vStrength}
         >
             <div
                 className='octo-board-header'
@@ -225,21 +258,27 @@ const Kanban = (props: Props) => {
                     />
                 ))}
 
-                {!props.readonly &&
-                    <div className='octo-board-header-cell narrow'>
-                        <Button
-                            size='small'
-                            variant='text'
-                            color='secondary'
-                            onClick={addGroupClicked}
-                        >
-                            <FormattedMessage
-                                id='BoardComponent.add-a-group'
-                                defaultMessage='+ Add a group'
-                            />
-                        </Button>
-                    </div>
-                }
+                <div className='octo-board-header-cell narrow' {...bindTrigger(popupState)}>
+                    <Button
+                        size='small'
+                        variant='text'
+                        color='secondary'
+                    >
+                        <FormattedMessage
+                            id='BoardComponent.add-a-group'
+                            defaultMessage='+ Add a group'
+                        />
+                    </Button>
+                </div>
+
+                <Menu
+                  {...bindMenu(popupState)}
+                >
+                  <NewGroupTextField onClick={(groupName) => {
+                    addGroupClicked(groupName)
+                    popupState.close()
+                  }}/>
+                </Menu>
 
                 {/* Hidden column header */}
 
@@ -255,77 +294,80 @@ const Kanban = (props: Props) => {
 
             {/* Main content */}
 
-            <div
-                className='octo-board-body'
-                id='mainBoardBody'
-            >
-                {/* Columns */}
+            <ScrollingComponent horizontalStrength={hStrength}
+            verticalStrength={vStrength}>
+              <div
+                  className='octo-board-body'
+                  id='mainBoardBody'
+              >
+                  {/* Columns */}
 
-                {visibleGroups.map((group) => (
-                    <KanbanColumn
-                        key={group.option.id || 'empty'}
-                        onDrop={(card: Card) => onDropToColumn(group.option, card)}
-                    >
-                        {group.cards.map((card) => (
-                            <KanbanCard
-                                card={card}
-                                board={board}
-                                visiblePropertyTemplates={visiblePropertyTemplates}
-                                visibleBadges={visibleBadges}
-                                key={card.id}
-                                readonly={props.readonly}
-                                isSelected={props.selectedCardIds.includes(card.id)}
-                                onClick={(e) => {
-                                    props.onCardClicked(e, card)
-                                }}
-                                onDrop={onDropToCard}
-                                showCard={props.showCard}
-                                isManualSort={isManualSort}
-                            />
-                        ))}
-                        {!props.readonly &&
-                        <Button
-                            size='small'
-                            variant='text'
-                            color='secondary'
-                            sx={{ justifyContent: 'flex-start' }}
-                            onClick={() => {
-                                props.addCard(group.option.id, true)
-                            }}
-                        >
-                            <FormattedMessage
-                                id='BoardComponent.new'
-                                defaultMessage='+ New'
-                            />
-                        </Button>
-                        }
-                    </KanbanColumn>
-                ))}
+                  {visibleGroups.map((group) => (
+                      <KanbanColumn
+                          key={group.option.id || 'empty'}
+                          onDrop={(card: Card) => onDropToColumn(group.option, card)}
+                      >
+                          {group.cards.map((card) => (
+                              <KanbanCard
+                                  card={card}
+                                  board={board}
+                                  visiblePropertyTemplates={visiblePropertyTemplates}
+                                  visibleBadges={visibleBadges}
+                                  key={card.id}
+                                  readonly={props.readonly}
+                                  isSelected={props.selectedCardIds.includes(card.id)}
+                                  onClick={(e) => {
+                                      props.onCardClicked(e, card)
+                                  }}
+                                  onDrop={onDropToCard}
+                                  showCard={props.showCard}
+                                  isManualSort={isManualSort}
+                              />
+                          ))}
+                          {!props.readonly &&
+                          <Button
+                              size='small'
+                              variant='text'
+                              color='secondary'
+                              sx={{ justifyContent: 'flex-start' }}
+                              onClick={() => {
+                                  props.addCard(group.option.id, true)
+                              }}
+                          >
+                              <FormattedMessage
+                                  id='BoardComponent.new'
+                                  defaultMessage='+ New'
+                              />
+                          </Button>
+                          }
+                      </KanbanColumn>
+                  ))}
 
-                {/* Add whitespace underneath "Add a group" button */}
+                  {/* Add whitespace underneath "Add a group" button */}
 
-                {!props.readonly &&
-                    <div className='octo-board-header-cell narrow'>
-                    </div>
-                }
+                  {!props.readonly &&
+                      <div className='octo-board-header-cell narrow'>
+                      </div>
+                  }
 
-                {/* Hidden columns */}
+                  {/* Hidden columns */}
 
-                {hiddenGroups.length > 0 &&
-                <div className='octo-board-column narrow'>
-                    {hiddenGroups.map((group) => (
-                        <KanbanHiddenColumnItem
-                            key={group.option.id}
-                            group={group}
-                            activeView={activeView}
-                            intl={props.intl}
-                            readonly={props.readonly}
-                            onDrop={(card: Card) => onDropToColumn(group.option, card)}
-                        />
-                    ))}
-                </div>}
-            </div>
-        </ScrollingComponent>
+                  {hiddenGroups.length > 0 &&
+                  <div className='octo-board-column narrow'>
+                      {hiddenGroups.map((group) => (
+                          <KanbanHiddenColumnItem
+                              key={group.option.id}
+                              group={group}
+                              activeView={activeView}
+                              intl={props.intl}
+                              readonly={props.readonly}
+                              onDrop={(card: Card) => onDropToColumn(group.option, card)}
+                          />
+                      ))}
+                  </div>}
+              </div>
+            </ScrollingComponent>
+        </Box>
     )
 }
 
