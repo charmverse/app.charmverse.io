@@ -1,10 +1,8 @@
-import { useTheme } from '@emotion/react';
-import { Card, CardActionArea, CardContent, CardHeader, Chip, Grid, Typography } from '@mui/material';
+import { Card, CardActionArea, CardContent, CardHeader, Grid, Tooltip, Typography } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { fancyTrim } from 'lib/utilities/strings';
 import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
-import { useState } from 'react';
 import { BrandColors } from 'theme/colors';
 import { BountyBadge } from './BountyBadge';
 
@@ -20,10 +18,10 @@ export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
   paid: 'green'
 };
 
+const maxBountyTitleCharacters = 40;
+
 export function BountyCard ({ bounty }: IBountyInput) {
   const [space] = useCurrentSpace();
-  const bountyColor = BountyStatusColours[bounty.status];
-  const bountyLabel = BountyLabels[bounty.status];
   const bountyUrl = `/${space!.domain}/bounty/${bounty.id}`;
 
   return (
@@ -37,7 +35,9 @@ export function BountyCard ({ bounty }: IBountyInput) {
       variant='outlined'
     >
       <CardActionArea href={bountyUrl}>
-        <CardHeader subheader={bounty.title} />
+        <Tooltip title={bounty.title} placement='bottom'>
+          <CardHeader subheader={fancyTrim(bounty.title, maxBountyTitleCharacters)} />
+        </Tooltip>
         <CardContent sx={{ flexGrow: 1, display: 'block' }}>
 
           <Grid container direction='column' justifyContent='space-between'>
