@@ -41,7 +41,7 @@ export function BountyList () {
         }
 
         <Grid item xs={8}>
-          <h1>Bounty list</h1>
+          <Typography variant='h1'>Bounty list</Typography>
         </Grid>
 
         <Grid item xs={4}>
@@ -58,10 +58,10 @@ export function BountyList () {
 
       </Grid>
 
-      <Grid container>
+      <Grid item container sx={{ mt: 3 }}>
         {
           bounties.length === 0
-            ? <Typography paragraph={true}>No bounties were found</Typography>
+            ? <Typography paragraph={true}>No bounties available</Typography>
             : sortedBounties.map(bounty => {
               return <BountyCard key={bounty.id} bounty={bounty} />;
             })
