@@ -3,11 +3,18 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
 import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
-import Emoji, { EmojiContainer } from 'components/common/Emoji';
+import { BlockIcons } from 'components/databases/focalboard/src/blockIcons';
+import EmojiPicker from 'components/databases/focalboard/src/widgets/emojiPicker';
+import DeleteIcon from 'components/databases/focalboard/src/widgets/icons/delete';
+import EmojiIcon from 'components/databases/focalboard/src/widgets/icons/emoji';
+import Menu from 'components/databases/focalboard/src/widgets/menu';
+import MenuWrapper from 'components/databases/focalboard/src/widgets/menuWrapper';
 import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page, PageContent } from 'models';
 import { ChangeEvent } from 'react';
+import { useIntl } from 'react-intl';
+import { Emoji } from '../common/Emoji';
 import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
@@ -92,9 +99,11 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     setPage({ icon });
   }
 
-  function updatePageIcon (icon: string) {
+  function updatePageIcon (icon: string | null) {
     setPage({ icon });
   }
+
+  const intl = useIntl();
 
   function updatePageContent (content: ICharmEditorOutput) {
     setPage({ content: content.doc, contentText: content.rawText });
@@ -114,9 +123,37 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
         >
           <EditorHeader>
             {page?.icon && (
-              <EmojiContainer updatePageIcon={updatePageIcon}>
+              <MenuWrapper>
                 <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
-              </EmojiContainer>
+                <Menu>
+                  <Menu.Text
+                    id='random'
+                    icon={<EmojiIcon />}
+                    name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
+                    onClick={() => {
+                      updatePageIcon(BlockIcons.shared.randomIcon());
+                    }}
+                  />
+                  <Menu.SubMenu
+                    id='pick'
+                    icon={<EmojiIcon />}
+                    name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
+                  >
+                    <EmojiPicker onSelect={(emoji) => {
+                      updatePageIcon(emoji);
+                    }}
+                    />
+                  </Menu.SubMenu>
+                  <Menu.Text
+                    id='remove'
+                    icon={<DeleteIcon />}
+                    name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
+                    onClick={() => {
+                      updatePageIcon(null);
+                    }}
+                  />
+                </Menu>
+              </MenuWrapper>
             )}
             <Controls className='page-controls'>
               {!readOnly && !page.icon && (
