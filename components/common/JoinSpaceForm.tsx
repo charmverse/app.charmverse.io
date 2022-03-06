@@ -130,12 +130,12 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit }: Props) {
               <Card variant='outlined' sx={{ my: 2 }}>
                 <CardContent>
                   <Typography gutterBottom>
+                    {description}
+                  </Typography>
+                  <Typography variant='body2'>
                     Chain:
                     {' '}
                     {tokenGate && getChainName(tokenGate)}
-                  </Typography>
-                  <Typography>
-                    {description}
                   </Typography>
                 </CardContent>
               </Card>
