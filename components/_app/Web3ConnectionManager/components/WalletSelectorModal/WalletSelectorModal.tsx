@@ -73,7 +73,7 @@ function WalletSelectorModal ({
       <DialogTitle onClose={closeModal}>Connect to a wallet</DialogTitle>
       <Error error={error} processError={processConnectionError} />
       <Grid container spacing={2}>
-        <Grid item xs>
+        <Grid item xs={12}>
           <ConnectorButton
             name={
               typeof window !== 'undefined'
@@ -93,7 +93,7 @@ function WalletSelectorModal ({
             isLoading={activatingConnector === injected}
           />
         </Grid>
-        <Grid item xs>
+        <Grid item xs={12}>
           <ConnectorButton
             name='WalletConnect'
             onClick={() => handleConnect(walletConnect)}
@@ -103,7 +103,7 @@ function WalletSelectorModal ({
             isLoading={activatingConnector === walletConnect}
           />
         </Grid>
-        <Grid item xs>
+        <Grid item xs={12}>
           <ConnectorButton
             name='Coinbase Wallet'
             onClick={() => handleConnect(walletLink)}

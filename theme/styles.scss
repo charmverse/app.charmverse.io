@@ -23,3 +23,8 @@ body {
 div[role="presentation"] {
   z-index: 2500;
 }
+
+/** react-select is used by lit-modal-vite */
+.react-select__menu-portal {
+  z-index: 99999;
+}
