@@ -35,9 +35,21 @@ export function BountyCard ({ bounty }: IBountyInput) {
       variant='outlined'
     >
       <CardActionArea href={bountyUrl}>
-        <Tooltip title={bounty.title} placement='bottom'>
+
+        {
+          bounty.title.length > maxBountyTitleCharacters && (
+          <Tooltip title={bounty.title} placement='bottom'>
+            <CardHeader subheader={fancyTrim(bounty.title, maxBountyTitleCharacters)} />
+          </Tooltip>
+          )
+        }
+
+        {
+          bounty.title.length <= maxBountyTitleCharacters && (
           <CardHeader subheader={fancyTrim(bounty.title, maxBountyTitleCharacters)} />
-        </Tooltip>
+          )
+        }
+
         <CardContent sx={{ flexGrow: 1, display: 'block' }}>
 
           <Grid container direction='column' justifyContent='space-between'>
