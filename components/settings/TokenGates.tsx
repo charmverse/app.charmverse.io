@@ -81,6 +81,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
       {data && data.length > 0 && <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />}
       <Portal>
         <BackDrop
+          onClick={popupState.close}
           open={popupState.isOpen}
           sx={{ zIndex: 9999 }}
         >
