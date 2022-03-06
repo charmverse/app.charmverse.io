@@ -80,7 +80,7 @@ export default function SignupPageContent () {
           Choose your adventure:
         </Typography> */}
       </Box>
-      <Grid container spacing={6} alignItems='stretch'>
+      <Grid container spacing={6} alignItems='stretch' sx={{ mb: 6 }}>
         <Grid item xs sm={6} sx={{ height: '100%', margin: 'auto' }}>
           <AdventureCard onClick={createWorkspace}>
             <ImageContainer>
