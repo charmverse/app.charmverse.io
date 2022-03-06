@@ -1,11 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useCallback} from 'react'
-import {useIntl} from 'react-intl'
-
-import {BlockIcons} from '../blockIcons'
-import {Board} from '../blocks/board'
-import {Card} from '../blocks/card'
+import { Page } from '@prisma/client'
+import React, { useCallback } from 'react'
+import { useIntl } from 'react-intl'
+import { BlockIcons } from '../blockIcons'
+import { Board } from '../blocks/board'
+import { Card } from '../blocks/card'
 import mutator from '../mutator'
 import EmojiPicker from '../widgets/emojiPicker'
 import DeleteIcon from '../widgets/icons/delete'
@@ -13,21 +13,27 @@ import EmojiIcon from '../widgets/icons/emoji'
 import Menu from '../widgets/menu'
 import MenuWrapper from '../widgets/menuWrapper'
 
+
 type Props = {
     block: Board|Card
     size?: 's' | 'm' | 'l'
     readonly?: boolean
+    setPage?: (page: Partial<Page>) => void
 }
 
 const BlockIconSelector = React.memo((props: Props) => {
-    const {block, size} = props
+    const {block, size, setPage} = props
     const intl = useIntl()
 
     const onSelectEmoji = useCallback((emoji: string) => {
         mutator.changeIcon(block.id, block.fields.icon, emoji)
         document.body.click()
     }, [block.id, block.fields.icon])
-    const onAddRandomIcon = useCallback(() => mutator.changeIcon(block.id, block.fields.icon, BlockIcons.shared.randomIcon()), [block.id, block.fields.icon])
+    const onAddRandomIcon = useCallback(() => {
+      const randomIcon = BlockIcons.shared.randomIcon()
+      mutator.changeIcon(block.id, block.fields.icon, randomIcon)
+      return randomIcon;
+    }, [block.id, block.fields.icon])
     const onRemoveIcon = useCallback(() => mutator.changeIcon(block.id, block.fields.icon, '', 'remove icon'), [block.id, block.fields.icon])
 
     if (!block.fields.icon) {
@@ -51,20 +57,28 @@ const BlockIconSelector = React.memo((props: Props) => {
                         id='random'
                         icon={<EmojiIcon/>}
                         name={intl.formatMessage({id: 'ViewTitle.random-icon', defaultMessage: 'Random'})}
-                        onClick={onAddRandomIcon}
+                        onClick={() => {
+                          setPage && setPage({icon: onAddRandomIcon()})
+                        }}
                     />
                     <Menu.SubMenu
                         id='pick'
                         icon={<EmojiIcon/>}
                         name={intl.formatMessage({id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon'})}
                     >
-                        <EmojiPicker onSelect={onSelectEmoji}/>
+                        <EmojiPicker onSelect={(emoji) => {
+                          onSelectEmoji(emoji)
+                          setPage && setPage({icon: emoji})
+                        }}/>
                     </Menu.SubMenu>
                     <Menu.Text
                         id='remove'
                         icon={<DeleteIcon/>}
                         name={intl.formatMessage({id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon'})}
-                        onClick={onRemoveIcon}
+                        onClick={() => {
+                          onRemoveIcon()
+                          setPage && setPage({icon: null})
+                        }}
                     />
                 </Menu>
             </MenuWrapper>

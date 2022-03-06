@@ -4,6 +4,8 @@
     color: rgb(var(--center-channel-color-rgb));
     display: flex;
 
+    z-index: 2500;
+
     > .Label {
         margin: 0 10px;
         max-width: calc(100% - 10px);
@@ -49,6 +51,7 @@
         text-overflow: ellipsis;
         overflow: hidden;
         max-width: 250px;
+        white-space: nowrap;
     }
 
     .value-menu-option {

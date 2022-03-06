@@ -23,6 +23,10 @@ import CreatedAt from './properties/createdAt/createdAt'
 import CreatedBy from './properties/createdBy/createdBy'
 import DateRange from './properties/dateRange/dateRange'
 import SelectProperty from './properties/select/select'
+import { randomIntFromInterval } from 'lib/utilities/random'
+import { Constants } from '../constants'
+
+const menuColors = Object.keys(Constants.menuColors)
 
 type Props = {
     board: Board
@@ -112,7 +116,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                         const option: IPropertyOption = {
                             id: Utils.createGuid(IDType.BlockID),
                             value: newValue,
-                            color: 'propColorDefault',
+                            color: menuColors[randomIntFromInterval(0, menuColors.length - 1)],
                         }
                         currentValues.push(option)
                         await mutator.insertPropertyOption(board, propertyTemplate, option, 'add property option')
@@ -136,7 +140,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                         const option: IPropertyOption = {
                             id: Utils.createGuid(IDType.BlockID),
                             value: newValue,
-                            color: 'propColorDefault',
+                            color: menuColors[randomIntFromInterval(0, menuColors.length - 1)],
                         }
                         await mutator.insertPropertyOption(board, propertyTemplate, option, 'add property option')
                         mutator.changePropertyValue(card, propertyTemplate.id, option.id)

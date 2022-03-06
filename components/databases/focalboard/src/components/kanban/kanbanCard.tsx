@@ -210,14 +210,6 @@ const KanbanCard = React.memo((props: Props) => {
                       <Box component="span">
                         {linkedBounty.rewardAmount}
                       </Box>
-                      {/* <Box component="span" sx={{
-                        fontWeight: 400,
-                        fontSize: 10,
-                        position: 'relative',
-                        top: 2.5,
-                      }}>
-                        {linkedBounty.rewardToken}
-                      </Box> */}
                     </Box>
                   </Box>
                   <Box style={{

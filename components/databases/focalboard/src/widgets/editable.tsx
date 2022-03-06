@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {forwardRef, useImperativeHandle, useLayoutEffect, useRef} from 'react'
+import React, { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from 'react'
 
 
 export type EditableProps = {
@@ -134,7 +134,7 @@ const Editable = (props: EditableProps, ref: React.Ref<Focusable>): JSX.Element 
             input.style.width = `${input.scrollWidth + borderWidth(computed) + 1}px`
         }
     })
-
+    
     return (
         <input
             {...elementProps}

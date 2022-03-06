@@ -40,6 +40,7 @@ const ViewTitle = React.memo((props: Props) => {
     const onAddRandomIcon = useCallback(() => {
         const newIcon = BlockIcons.shared.randomIcon()
         mutator.changeIcon(board.id, board.fields.icon, newIcon)
+        return newIcon
     }, [board.id, board.fields.icon])
     const setRandomHeaderImage = useCallback((headerImage?: string | null) => {
       const newHeaderImage = headerImage ?? PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
@@ -71,7 +72,9 @@ const ViewTitle = React.memo((props: Props) => {
                 </div>}
                 {!props.readonly && !board.fields.icon &&
                     <Button
-                        onClick={onAddRandomIcon}
+                        onClick={() => {
+                          props.setPage({icon: onAddRandomIcon()})
+                        }}
                         icon={<EmojiIcon/>}
                     >
                         <FormattedMessage
@@ -105,7 +108,7 @@ const ViewTitle = React.memo((props: Props) => {
             </div>
 
             <div className='title'>
-                <BlockIconSelector block={board}/>
+                <BlockIconSelector block={board} setPage={props.setPage}/>
                 <Editable
                     className='title'
                     value={title}
