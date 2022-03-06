@@ -1,6 +1,4 @@
-import React, { useRef, useState, ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { useTheme } from '@emotion/react';
-import useRefState from 'hooks/useRefState';
 import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
@@ -8,8 +6,7 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import TreeItem, { TreeItemContentProps, treeItemClasses } from '@mui/lab/TreeItem';
-import TreeItemContent from 'components/common/TreeItemContent';
+import TreeItem, { treeItemClasses, TreeItemContentProps } from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -18,13 +15,18 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
+import TreeItemContent from 'components/common/TreeItemContent';
+import EmojiPicker from 'components/databases/focalboard/src/widgets/emojiPicker';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
+import useRefState from 'hooks/useRefState';
+import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { Page, PageContent } from 'models';
 import Link from 'next/link';
+import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
-import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import EmojiCon from '../Emoji';
 import NewPageMenu, { StyledDatabaseIcon } from '../NewPageMenu';
 
@@ -135,6 +137,7 @@ const PageIcon = styled(EmojiCon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
+  color: rgb(255, 255, 255);
 `;
 
 export const PageTitle = styled(Typography)<{isempty: number}>`
@@ -158,30 +161,58 @@ interface PageLinkProps {
   href: string;
   label?: string;
   labelIcon?: React.ReactNode;
+  pageId?: string
 }
 
-export function PageLink ({ children, href, label, labelIcon }: PageLinkProps) {
-
+export function PageLink ({ children, href, label, labelIcon, pageId }: PageLinkProps) {
+  const { setPages } = usePages();
   const isempty = !label;
 
   function stopPropagation (event: SyntheticEvent) {
     event.stopPropagation();
   }
 
+  const popupState = usePopupState({
+    popupId: 'page-emoji',
+    variant: 'popover'
+  });
+
   return (
-    <Link href={href} passHref>
-      <PageAnchor onClick={stopPropagation}>
-        {labelIcon && (
-          <PageIcon>
-            {labelIcon}
-          </PageIcon>
-        )}
+    <PageAnchor onClick={stopPropagation}>
+      {labelIcon && (
+        <PageIcon {...bindTrigger(popupState)}>
+          {labelIcon}
+        </PageIcon>
+      )}
+      <Link href={href} passHref>
         <PageTitle isempty={isempty ? 1 : 0}>
           {isempty ? 'Untitled' : label}
         </PageTitle>
-        {children}
-      </PageAnchor>
-    </Link>
+      </Link>
+      {children}
+      <Menu {...bindMenu(popupState)}>
+        <EmojiPicker onSelect={async (emoji) => {
+          if (pageId) {
+            await charmClient.updatePage({
+              id: pageId,
+              icon: emoji
+            });
+            // Update the state
+            setPages((pages) => pages.map(page => {
+              if (page.id === pageId) {
+                return {
+                  ...page,
+                  icon: emoji
+                };
+              }
+              return page;
+            }));
+            popupState.close();
+          }
+        }}
+        />
+      </Menu>
+    </PageAnchor>
   );
 }
 
@@ -229,6 +260,30 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     setAnchorEl(null);
   }
 
+  let Icon: null | ReactNode = labelIcon;
+
+  if (!labelIcon) {
+    if (pageType === 'board') {
+      Icon = (<StyledDatabaseIcon />);
+    }
+    else if (isEditorEmpty) {
+      Icon = (
+        <InsertDriveFileOutlinedIcon sx={{
+          opacity: 0.5
+        }}
+        />
+      );
+    }
+    else {
+      Icon = (
+        <DescriptionOutlinedIcon sx={{
+          opacity: 0.5
+        }}
+        />
+      );
+    }
+  }
+
   return (
     <>
       <StyledTreeItem
@@ -236,17 +291,8 @@ const PageTreeItem = forwardRef((props: any, ref) => {
           <PageLink
             href={href}
             label={label}
-            labelIcon={labelIcon || (pageType === 'board' ? <StyledDatabaseIcon /> : (isEditorEmpty ? (
-              <InsertDriveFileOutlinedIcon sx={{
-                opacity: 0.5
-              }}
-              />
-            ) : (
-              <DescriptionOutlinedIcon sx={{
-                opacity: 0.5
-              }}
-              />
-            )))}
+            labelIcon={Icon}
+            pageId={referencedPage?.id}
           >
             <div className='page-actions'>
               <IconButton size='small' onClick={showMenu}>
