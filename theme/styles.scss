@@ -1,9 +1,23 @@
 /* Make the Next.j wrappers 100% height */
-html,
-body,
-body > div:first-child,
-div#__next {
+
+
+html {
   height: 100%;
+width: 100%;
+  display: table;
+}
+
+body {
+  width: 100%;
+  display: table-cell;
+}
+
+#__next {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
 }
 
 div[role="presentation"] {

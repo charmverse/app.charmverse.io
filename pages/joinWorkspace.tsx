@@ -22,12 +22,17 @@ export default function CreateSpace () {
     charmClient.getSpaces()
       .then(_spaces => {
         setSpaces(_spaces);
-        router.push(`/${space.domain}`);
+        if (typeof router.query.returnUrl === 'string') {
+          router.push(router.query.returnUrl);
+        }
+        else {
+          router.push(`/${space.domain}`);
+        }
       });
   }
 
   return (
-    <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto' }}>
+    <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6 }}>
       <Card sx={{ p: 4 }} variant='outlined'>
         <JoinSpaceForm onSubmit={onJoinSpace} />
       </Card>

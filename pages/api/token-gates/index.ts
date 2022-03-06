@@ -56,6 +56,9 @@ async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGat
   const result = await prisma.tokenGate.findMany({
     where: {
       spaceId
+    },
+    include: {
+      space: true
     }
   });
 

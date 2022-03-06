@@ -358,8 +358,8 @@ class CharmClient {
     return http.GET<TokenGate[]>('/api/token-gates', query);
   }
 
-  getTokenGateForSpace (query: { spaceDomain: string }) {
-    return http.GET<TokenGate[]>('/api/token-gates', query).then(result => result[0]);
+  getTokenGatesForSpace (query: { spaceDomain: string }) {
+    return http.GET<(TokenGate & { space: Space })[]>('/api/token-gates', query);
   }
 
   saveTokenGate (tokenGate: Partial<TokenGate>): Promise<TokenGate> {

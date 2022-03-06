@@ -1,7 +1,9 @@
-import { humanizeAccessControlConditions, Chain, checkAndSignAuthMessage } from 'lit-js-sdk';
+import { ALL_LIT_CHAINS, humanizeAccessControlConditions, Chain, checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -12,6 +14,7 @@ import { TokenGate, Space } from '@prisma/client';
 import { DialogTitle } from 'components/common/Modal';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
+import { useRouter } from 'next/router';
 
 interface Props {
   onSubmit: (values: Space) => void;
@@ -19,10 +22,13 @@ interface Props {
 
 export default function WorkspaceSettings ({ onSubmit: _onSubmit }: Props) {
 
+  const router = useRouter();
   const { account } = useWeb3React();
-  const [tokenGate, setTokenGate] = useState<TokenGate | null>(null);
-  const [description, setDescription] = useState<string>('');
+  const [tokenGate, setTokenGate] = useState<TokenGate & { space: Space } | null>(null);
+  const [description, setDescription] = useState('');
+  const [spaceDomain, setSpaceDomain] = useState('');
   const litClient = useLitProtocol();
+  const [userInputStatus, setStatus] = useState('');
 
   useEffect(() => {
     if (!tokenGate) {
@@ -37,6 +43,31 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit }: Props) {
       });
     }
   }, [tokenGate]);
+
+  useEffect(() => {
+    if (router.query.domain) {
+      setSpaceDomain(stripUrlParts(router.query.domain as string));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (spaceDomain.length < 3) {
+      setStatus('');
+      setTokenGate(null);
+    }
+    else {
+      charmClient.getTokenGatesForSpace({ spaceDomain })
+        .then(gates => {
+          setTokenGate(gates[0]);
+          if (gates[0]) {
+            setStatus('Workspace found');
+          }
+          else {
+            setStatus('Workspace not found');
+          }
+        });
+    }
+  }, [spaceDomain]);
 
   async function onSubmit () {
     if (!tokenGate || !litClient) {
@@ -59,11 +90,12 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit }: Props) {
   }
 
   function onChangeDomainName (event: ChangeEvent<HTMLInputElement>) {
-    const spaceDomain = event.target.value.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
-    charmClient.getTokenGateForSpace({ spaceDomain })
-      .then(gate => {
-        setTokenGate(gate);
-      });
+    const domain = stripUrlParts(event.target.value);
+    setSpaceDomain(domain);
+  }
+
+  function stripUrlParts (maybeUrl: string) {
+    return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
   }
 
   return (
@@ -73,31 +105,43 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit }: Props) {
       <br />
       <Grid container direction='column' spacing={2}>
         <Grid item>
-          <FieldLabel>Domain</FieldLabel>
+          <FieldLabel>Enter a CharmVerse Domain or URL</FieldLabel>
           <TextField
             onChange={onChangeDomainName}
             autoFocus
+            placeholder='https://app.charmverse.io/my-space'
             fullWidth
-            helperText='Enter a URL or the domain of the space you want to join'
+            value={spaceDomain}
+            helperText={userInputStatus}
             InputProps={{
-              endAdornment: tokenGate && <CheckIcon />
+              endAdornment: tokenGate && <CheckIcon color='success' />
             }}
           />
         </Grid>
         {description && (
           <>
             <Grid item>
-              <Typography>
-                <strong>
-                  Requirements for joining:
-                </strong>
+              <Typography variant='h6' gutterBottom>
+                {tokenGate?.space?.name}
               </Typography>
               <Typography variant='body2'>
-                {description}
+                Please verify that you meet the requirements to join
               </Typography>
+              <Card variant='outlined' sx={{ my: 2 }}>
+                <CardContent>
+                  <Typography gutterBottom>
+                    Chain:
+                    {' '}
+                    {tokenGate && getChainName(tokenGate)}
+                  </Typography>
+                  <Typography>
+                    {description}
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
             <Grid item>
-              <PrimaryButton type='submit' onClick={onSubmit}>
+              <PrimaryButton fullWidth type='submit' onClick={onSubmit}>
                 Verify Wallet
               </PrimaryButton>
             </Grid>
@@ -111,4 +155,9 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit }: Props) {
 
 function getChain (tokenGate: TokenGate): Chain {
   return (tokenGate.conditions as any)!.accessControlConditions![0].chain;
+}
+
+function getChainName (tokenGate: TokenGate): string | undefined {
+  const chain = getChain(tokenGate);
+  return ALL_LIT_CHAINS[chain]?.name;
 }
