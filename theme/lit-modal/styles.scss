@@ -23,6 +23,18 @@
     }
   }
 
+  .lms-choose-access-button:last-child {
+    margin-bottom: 24px;
+  }
+
+  // header when selecting a blockchain
+  .lms-fixed.lms-top-0.lms-left-0.lms-w-full.lms-py-4.lms-bg-brand-4.lms-text-white.lms-h-14 {
+    background-color: var( --charm-lit-color-light );
+    color: var( --charm-lit-text-color );
+    font-weight: bold;
+  }
+
+  // footer content on first view
   .lms-flex.lms-justify-center.lms-mt-8.lms-mx-auto.lms-items-center.lms-cursor-pointer {
     margin-bottom: 24px;
   }
