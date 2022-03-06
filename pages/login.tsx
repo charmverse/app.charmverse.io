@@ -12,7 +12,9 @@ export default function LoginPage () {
   const router = useRouter();
   const [, setTitleState] = usePageTitle();
 
-  setTitleState('Login');
+  useEffect(() => {
+    setTitleState('Login');
+  }, []);
 
   useEffect(() => {
     if (account && typeof router.query.returnUrl === 'string') {
