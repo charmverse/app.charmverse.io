@@ -26,6 +26,10 @@ import ImageElement from '../content/imageElement'
 import {sendFlashMessage} from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
 import CardBadges from '../cardBadges'
+import { Block } from '../../blocks/block'
+import { PageContent } from 'models'
+import { CharmTextBlock } from '../../blocks/charmBlock'
+
 
 type Props = {
     board: Board
@@ -49,22 +53,33 @@ const GalleryCard = React.memo((props: Props) => {
 
     const visiblePropertyTemplates = props.visiblePropertyTemplates || []
 
-    let image: ContentBlock | undefined
-    for (let i = 0; i < contents.length; ++i) {
-        if (Array.isArray(contents[i])) {
-            image = (contents[i] as ContentBlock[]).find((c) => c.type === 'image')
-        } else if ((contents[i] as ContentBlock).type === 'image') {
-            image = contents[i] as ContentBlock
-        }
-
-        if (image) {
-            break
-        }
-    }
-
     let className = props.isSelected ? 'GalleryCard selected' : 'GalleryCard'
     if (isOver) {
         className += ' dragover'
+    }
+
+
+    let galleryImageUrl: null | string = null;
+
+    const charmTextContent = contents.find(content => (content as Block).type === "charm_text") as CharmTextBlock
+
+    if (charmTextContent) {
+      const { content } = charmTextContent.fields as {content: PageContent};
+
+      if (content?.content) {
+        for (let index = 0; index < content.content.length; index++) {
+          const item = content.content[index];
+          if (item.type === "paragraph") {
+            const imageNode = item?.content?.[0]
+            if (imageNode?.type === "image") {
+              if (imageNode.attrs?.src) {
+                galleryImageUrl = imageNode.attrs.src
+                break;
+              }
+            }
+          }
+        }
+      }
     }
 
     return (
@@ -114,36 +129,17 @@ const GalleryCard = React.memo((props: Props) => {
                     </Menu>
                 </MenuWrapper>
             }
-
-            {image &&
+            {galleryImageUrl &&
                 <div className='gallery-image'>
-                    <ImageElement block={image}/>
+                    <img
+                        className='ImageElement'
+                        src={galleryImageUrl}
+                        alt={"Gallery item"}
+                    />
                 </div>}
-            {!image &&
+            {!galleryImageUrl &&
                 <CardDetailProvider card={card}>
-                    <div className='gallery-item'>
-                        {contents.map((block) => {
-                            if (Array.isArray(block)) {
-                                return block.map((b) => (
-                                    <ContentElement
-                                        key={b.id}
-                                        block={b}
-                                        readonly={true}
-                                        cords={{x: 0}}
-                                    />
-                                ))
-                            }
-
-                            return (
-                                <ContentElement
-                                    key={block.id}
-                                    block={block}
-                                    readonly={true}
-                                    cords={{x: 0}}
-                                />
-                            )
-                        })}
-                    </div>
+                    <div className='gallery-item'/>
                 </CardDetailProvider>}
             {props.visibleTitle &&
                 <div className='gallery-title'>
