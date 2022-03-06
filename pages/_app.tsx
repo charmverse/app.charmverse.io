@@ -131,6 +131,7 @@ import 'components/databases/focalboard/src/widgets/propertyMenu.scss';
 import 'components/databases/focalboard/src/widgets/switch.scss';
 import 'components/databases/focalboard/src/widgets/tooltip.scss';
 import 'components/databases/focalboard/src/widgets/valueSelector.scss';
+import 'theme/lit-modal/styles.scss';
 import FocalBoardPortal from 'components/databases/FocalBoardPortal';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { ColorModeContext } from 'context/color-mode';
@@ -164,6 +165,7 @@ import {
 import 'theme/styles.scss';
 import { CacheProvider } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
 import createCache from '@emotion/cache';
+import { setTheme as setLitProtocolTheme } from 'theme/lit-modal/theme';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -207,11 +209,12 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   // Update the theme only if the mode changes
   const theme = useMemo(() => {
-    // set focalboard theme - dont run for SSR
+    const muiTheme = createThemeLightSensitive(mode);
     if (typeof window !== 'undefined') {
       setTheme(mode === 'dark' ? darkTheme : lightTheme);
+      setLitProtocolTheme(mode, muiTheme);
     }
-    return createThemeLightSensitive(mode);
+    return muiTheme;
   }, [mode]);
 
   useEffect(() => {

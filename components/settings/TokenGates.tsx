@@ -1,11 +1,14 @@
 import Typography from '@mui/material/Typography';
 import useSWR from 'swr';
+import { v4 as uuid } from 'uuid';
 import { ShareModal } from 'lit-modal-vite';
 import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
 import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
-import Prisma, { TokenGate } from '@prisma/client';
+import { TokenGate } from '@prisma/client';
 import charmClient from 'charmClient';
+import BackDrop from '@mui/material/Backdrop';
+import Portal from '@mui/material/Portal';
 import Legend from './Legend';
 import Button from '../common/Button';
 import TokenGatesTable from './TokenGatesTable';
@@ -36,6 +39,16 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
 
   async function saveTokenGate (conditions: Partial<SigningConditions>) {
     const chain = conditions.accessControlConditions![0].chain;
+    const tokenGateId = uuid();
+    const resourceId: ResourceId = {
+      baseUrl: 'https://app.charmverse.io',
+      path: `${Math.random()}`,
+      orgId: spaceId,
+      role: 'member',
+      extraData: JSON.stringify({
+        tokenGateId
+      })
+    };
     const authSig = await checkAndSignAuthMessage({
       chain
     });
@@ -43,12 +56,13 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
       ...conditions,
       authSig,
       chain,
-      resourceId: spaceResourceId
+      resourceId
     });
     await charmClient.saveTokenGate({
       conditions: conditions as any,
-      resourceId: spaceResourceId,
-      spaceId
+      resourceId,
+      spaceId,
+      id: tokenGateId
     });
     await mutate();
   }
@@ -77,11 +91,21 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
       </Legend>
       {data && data.length === 0 && <Typography color='secondary'>No token gates yet</Typography>}
       {data && data.length > 0 && <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />}
-      <ShareModal
-        onClose={popupState.close}
-        showModal={popupState.isOpen}
-        onAccessControlConditionsSelected={onSubmit}
-      />
+      <Portal>
+        <BackDrop
+          onClick={popupState.close}
+          open={popupState.isOpen}
+          sx={{ zIndex: 9999 }}
+        >
+          <div role='dialog' onClick={e => e.stopPropagation()}>
+            <ShareModal
+              onClose={popupState.close}
+              showModal={popupState.isOpen}
+              onAccessControlConditionsSelected={onSubmit}
+            />
+          </div>
+        </BackDrop>
+      </Portal>
     </>
   );
 }

@@ -29,7 +29,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
     const result = await verifyJwt({ jwt });
     console.log('verifyJwt result', result);
     if (!result.verified) {
-      console.error('Could not verifiy wallet', { userId: user.id, result });
+      console.error('Could not verify wallet', { userId: user.id, result });
       throw new Error('This wallet could not be verified');
     }
     if (req.body.commit) {
