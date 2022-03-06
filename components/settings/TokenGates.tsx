@@ -6,7 +6,6 @@ import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import Prisma, { TokenGate } from '@prisma/client';
 import charmClient from 'charmClient';
-import { useEffect, useState } from 'react';
 import Legend from './Legend';
 import Button from '../common/Button';
 import TokenGatesTable from './TokenGatesTable';
@@ -31,7 +30,6 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   };
 
   async function onSubmit (conditions: ConditionsModalResult) {
-    console.log('onAccessControlConditionsSelected', conditions);
     await saveTokenGate(conditions);
     popupState.close();
   }
@@ -41,14 +39,12 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
     const authSig = await checkAndSignAuthMessage({
       chain
     });
-    console.log('authsig', authSig);
     const success = await litClient?.saveSigningCondition({
       ...conditions,
       authSig,
       chain,
       resourceId: spaceResourceId
     });
-    console.log('success', success);
     await charmClient.saveTokenGate({
       conditions: conditions as any,
       resourceId: spaceResourceId,

@@ -14,18 +14,7 @@ import DeleteIcon from '@mui/icons-material/Close';
 import ButtonChip from 'components/common/ButtonChip';
 import Tooltip from '@mui/material/Tooltip';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
-import Button from 'components/common/Button';
-import CheckIcon from '@mui/icons-material/Check';
 import Chip from '@mui/material/Chip';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import ListItemText from '@mui/material/ListItemText';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
-import Avatar from 'components/common/Avatar';
-import { Contributor } from 'models';
-import getDisplayName from 'lib/users/getDisplayName';
-import useENSName from 'hooks/useENSName';
 import charmClient from 'charmClient';
 
 export const StyledRow = styled(TableRow)`

@@ -162,6 +162,8 @@ import {
   lightTheme
 } from 'theme/focalboard/theme';
 import 'theme/styles.scss';
+import { CacheProvider } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
+import createCache from '@emotion/cache';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -227,43 +229,45 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
     return null;
   }
   return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <Web3ReactProvider getLibrary={getLibrary}>
-          <Web3ConnectionManager>
-            <LitProtocolProvider>
-              <ReduxProvider store={store}>
-                <FocalBoardProviders>
-                  <DataProviders>
-                    <TitleContext.Consumer>
-                      {([title]) => (
-                        <Head>
-                          <title>
-                            {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-                          </title>
-                        </Head>
-                      )}
-                    </TitleContext.Consumer>
-                    <Head>
-                      <meta name='description' content='The Notion of Web3' />
-                      <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                    </Head>
-                    <CssBaseline enableColorScheme={true} />
-                    <RouteGuard>
-                      <ErrorBoundary>
-                        {getLayout(<Component {...pageProps} />)}
-                      </ErrorBoundary>
-                    </RouteGuard>
-                  </DataProviders>
-                </FocalBoardProviders>
-                {/** include the root portal for focalboard's popup */}
-                <FocalBoardPortal />
-              </ReduxProvider>
-            </LitProtocolProvider>
-          </Web3ConnectionManager>
-        </Web3ReactProvider>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+    <CacheProvider value={createCache({ key: 'app' })}>
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <Web3ConnectionManager>
+              <LitProtocolProvider>
+                <ReduxProvider store={store}>
+                  <FocalBoardProviders>
+                    <DataProviders>
+                      <TitleContext.Consumer>
+                        {([title]) => (
+                          <Head>
+                            <title>
+                              {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+                            </title>
+                          </Head>
+                        )}
+                      </TitleContext.Consumer>
+                      <Head>
+                        <meta name='description' content='The Notion of Web3' />
+                        <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+                      </Head>
+                      <CssBaseline enableColorScheme={true} />
+                      <RouteGuard>
+                        <ErrorBoundary>
+                          {getLayout(<Component {...pageProps} />)}
+                        </ErrorBoundary>
+                      </RouteGuard>
+                    </DataProviders>
+                  </FocalBoardProviders>
+                  {/** include the root portal for focalboard's popup */}
+                  <FocalBoardPortal />
+                </ReduxProvider>
+              </LitProtocolProvider>
+            </Web3ConnectionManager>
+          </Web3ReactProvider>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
+    </CacheProvider>
   );
 }
 
