@@ -93,9 +93,6 @@ const withTM = require('next-transpile-modules')([
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
   '@fullcalendar/react'
-  // 'lit-access-control-conditions-modal',
-  // 'react-virtualized',
-  // 'react-select-virtualized'
 ]);
 
 module.exports = withBundleAnalyzer(withTM(config));
