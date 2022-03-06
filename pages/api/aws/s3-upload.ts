@@ -43,7 +43,8 @@ const makeRouteHandler = (options: Options = {}): Handler => {
 
       const bucket = process.env.S3_UPLOAD_BUCKET;
 
-      const filename = req.query.filename as string;
+      const filename = decodeURIComponent(req.query.filename as string);
+
       const key = options.key
         ? await Promise.resolve(options.key(req, filename))
         : `user-content/${userId}/${uuid()}/${filename.replace(/\s/g, '-')}`;
