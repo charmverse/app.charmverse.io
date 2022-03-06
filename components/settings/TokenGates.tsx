@@ -4,8 +4,10 @@ import { ShareModal } from 'lit-modal-vite';
 import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
 import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
-import Prisma, { TokenGate } from '@prisma/client';
+import { TokenGate } from '@prisma/client';
 import charmClient from 'charmClient';
+import BackDrop from '@mui/material/Backdrop';
+import Portal from '@mui/material/Portal';
 import Legend from './Legend';
 import Button from '../common/Button';
 import TokenGatesTable from './TokenGatesTable';
@@ -77,11 +79,18 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
       </Legend>
       {data && data.length === 0 && <Typography color='secondary'>No token gates yet</Typography>}
       {data && data.length > 0 && <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />}
-      <ShareModal
-        onClose={popupState.close}
-        showModal={popupState.isOpen}
-        onAccessControlConditionsSelected={onSubmit}
-      />
+      <Portal>
+        <BackDrop
+          open={popupState.isOpen}
+          sx={{ zIndex: 9999 }}
+        >
+          <ShareModal
+            onClose={popupState.close}
+            showModal={popupState.isOpen}
+            onAccessControlConditionsSelected={onSubmit}
+          />
+        </BackDrop>
+      </Portal>
     </>
   );
 }
