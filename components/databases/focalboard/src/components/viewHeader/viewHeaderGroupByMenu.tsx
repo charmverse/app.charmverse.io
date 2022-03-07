@@ -21,7 +21,8 @@ type Props = {
 const ViewHeaderGroupByMenu = React.memo((props: Props) => {
     const {properties, activeView, groupByProperty} = props
     const intl = useIntl()
-    const hasPropertiesToGroupBy = (properties || []).filter((o: IPropertyTemplate) => o.type === 'select').length > 0;
+    const showTableUngroup = (activeView.fields.viewType === 'table' && activeView.fields.groupById)
+    const hasPropertiesToGroupBy = showTableUngroup || (properties || []).filter((o: IPropertyTemplate) => o.type === 'select').length > 0;
 
     return (
         <MenuWrapper className={hasPropertiesToGroupBy ? '' : 'disabled'}>
@@ -42,7 +43,7 @@ const ViewHeaderGroupByMenu = React.memo((props: Props) => {
                 />
             </Button>
             <Menu>
-                {activeView.fields.viewType === 'table' && activeView.fields.groupById &&
+                {showTableUngroup &&
                 <>
                     <Menu.Text
                         key={'ungroup'}
