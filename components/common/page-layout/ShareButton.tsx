@@ -1,22 +1,17 @@
-import { useEffect, useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import NativeSelect from '@mui/material/NativeSelect';
-import CircularProgress from '@mui/material/CircularProgress';
+import styled from '@emotion/styled';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import Input from '@mui/material/Input';
 import Popover from '@mui/material/Popover';
 import Switch from '@mui/material/Switch';
-import Input from '@mui/material/Input';
-import { usePopupState, bindPopover, bindTrigger } from 'material-ui-popup-state/hooks';
-import styled from '@emotion/styled';
-import { usePages } from 'hooks/usePages';
-import { Page, Block } from '@prisma/client';
+import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
+import { usePages } from 'hooks/usePages';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const StyledInput = styled(Input)`
   border: 1px solid ${({ theme }) => theme.palette.divider};
@@ -28,35 +23,6 @@ const LinkBox = styled(Box)`
   background: ${({ theme }) => theme.palette.background.dark};
 `;
 
-function SelectBlockView ({
-  views,
-  currentView,
-  onSelected }: {
-    views: Block [],
-    currentView?: string | null,
-    onSelected: (viewId: string) => any}) {
-  return (
-    <FormControl fullWidth>
-      <InputLabel variant='standard' htmlFor='uncontrolled-native'>
-        Select view to share
-      </InputLabel>
-      <NativeSelect
-        defaultValue={currentView}
-        inputProps={{
-          id: 'select-view'
-        }}
-        onChange={e => onSelected(e.target.value)}
-      >
-        {
-          views.map(view => {
-            return <option key={view.id} value={view.id}>{view.title}</option>;
-          })
-        }
-      </NativeSelect>
-    </FormControl>
-  );
-}
-
 export default function ShareButton ({ headerHeight }: { headerHeight: number }) {
 
   const { currentPage, setPages } = usePages();
@@ -64,37 +30,22 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [copied, setCopied] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState(false);
-  const [views, setViews] = useState<Block []>([]);
-
-  const [viewIdToShare, setViewIdToShare] = useState<null | string>((router.query.viewId as string) ?? null);
   const [shareLink, setShareLink] = useState<null | string>(null);
-
-  const [loadingViews, setLoadingViews] = useState(false);
 
   useEffect(() => {
     if (currentPage) {
       setIsPublic(currentPage.isPublic);
-      if (currentPage.type === 'board') {
-        loadViews();
-      }
 
     }
   }, [currentPage]);
 
   useEffect(() => {
     updateShareLink();
-  }, [isPublic, viewIdToShare, views]);
+  }, [isPublic, router.query.viewId]);
 
   function onCopy () {
     setCopied(true);
     setTimeout(() => setCopied(false), 1000);
-  }
-
-  async function loadViews () {
-    setLoadingViews(false);
-    const foundViews = await charmClient.getBlockViewsByPageId(currentPage!.id);
-    setViews(foundViews);
-    setLoadingViews(false);
   }
 
   async function togglePublic () {
@@ -114,18 +65,11 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
       setShareLink(shareLinkToSet);
     }
     else if (currentPage?.type === 'board') {
-      const viewIdToProvide = viewIdToShare ?? router.query.viewId;
+      const viewIdToProvide = router.query.viewId;
       const shareLinkToSet = (currentPage && typeof window !== 'undefined')
-        ? `${window.location.origin}/share/view/${viewIdToProvide}` : '';
+        ? `${window.location.origin}/share/${currentPage.id}?viewId=${viewIdToProvide}` : '';
       setShareLink(shareLinkToSet);
     }
-  }
-
-  function viewSelected (selectedViewId: string) {
-    if (selectedViewId) {
-      setViewIdToShare(selectedViewId);
-    }
-
   }
 
   // We'll need to modify this
@@ -179,25 +123,6 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
           />
         </Box>
         <Collapse in={isPublic}>
-          {
-            loadingViews === true && (
-              <Box component='p'>
-                <CircularProgress size={20} />
-                <Box component='span' alignItems='center' sx={{ pl: 2 }}>
-                  Loading views
-                </Box>
-              </Box>
-
-            )
-          }
-          {
-            currentPage?.type === 'board' && loadingViews === false && (
-              <Box alignItems='center' sx={{ pl: 2 }}>
-                <SelectBlockView views={views} currentView={viewIdToShare} onSelected={viewSelected} />
-              </Box>
-
-            )
-          }
           {
             shareLink && (
             <LinkBox p={1}>
