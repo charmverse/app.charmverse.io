@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography';
 import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
 import TreeItemContent from 'components/common/TreeItemContent';
+import mutator from 'components/databases/focalboard/src/mutator';
 import EmojiPicker from 'components/databases/focalboard/src/widgets/emojiPicker';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
@@ -198,11 +199,16 @@ export function PageLink ({ children, href, label, labelIcon, pageId }: PageLink
               icon: emoji
             });
             let isCurrentPageEdited = false;
+            let boardId: null | string = null;
             // Update the state
             setPages((pages) => pages.map(page => {
               if (page.id === pageId) {
                 if (page.id === currentPage?.id) {
                   isCurrentPageEdited = true;
+                }
+
+                if (page.boardId !== null) {
+                  boardId = page.boardId;
                 }
                 return {
                   ...page,
@@ -217,6 +223,10 @@ export function PageLink ({ children, href, label, labelIcon, pageId }: PageLink
                 ...currentPage,
                 icon: emoji
               });
+            }
+
+            if (boardId) {
+              await mutator.changeIcon(boardId, emoji, emoji);
             }
             popupState.close();
           }
