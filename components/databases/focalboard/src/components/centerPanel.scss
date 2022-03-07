@@ -14,9 +14,8 @@
 
 .BoardComponent {
     flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
     overflow: hidden;
+    padding-bottom: 20px;
 
     > * {
 
