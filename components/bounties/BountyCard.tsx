@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import { Card, CardActionArea, CardContent, CardHeader, Chip, Grid, Typography } from '@mui/material';
+import { Box, Card, CardActionArea, CardContent, CardHeader, Chip, Grid, Typography } from '@mui/material';
 import { Bounty as IBounty } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { fancyTrim } from 'lib/utilities/strings';
@@ -10,6 +10,7 @@ import { BountyBadge } from './BountyBadge';
 
 export interface IBountyInput {
   bounty: IBounty
+  truncate?: boolean
 }
 
 export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
@@ -20,10 +21,8 @@ export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
   paid: 'green'
 };
 
-export function BountyCard ({ bounty }: IBountyInput) {
+export function BountyCard ({ truncate = true, bounty }: IBountyInput) {
   const [space] = useCurrentSpace();
-  const bountyColor = BountyStatusColours[bounty.status];
-  const bountyLabel = BountyLabels[bounty.status];
   const bountyUrl = `/${space!.domain}/bounty/${bounty.id}`;
 
   return (
@@ -36,26 +35,24 @@ export function BountyCard ({ bounty }: IBountyInput) {
       }}
       variant='outlined'
     >
-      <CardActionArea href={bountyUrl}>
+      <CardActionArea
+        href={bountyUrl}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between'
+        }}
+      >
         <CardHeader subheader={bounty.title} />
-        <CardContent sx={{ flexGrow: 1, display: 'block' }}>
-
-          <Grid container direction='column' justifyContent='space-between'>
-            <Grid item xs={12} sx={{ minHeight: '90px' }}>
-
-              <Typography paragraph={true}>
-                {fancyTrim(bounty.description, 120)}
-              </Typography>
-
-            </Grid>
-            <Grid item xs={12}>
-              <BountyBadge bounty={bounty} hideLink={true} />
-            </Grid>
-
-          </Grid>
-        </CardContent>
+        <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
+          <Typography paragraph={true}>
+            {fancyTrim(bounty.description, 120)}
+          </Typography>
+          <BountyBadge truncate={truncate} bounty={bounty} hideLink={true} />
+        </Box>
       </CardActionArea>
-
     </Card>
   );
 }

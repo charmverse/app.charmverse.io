@@ -74,7 +74,9 @@ export default function BountyDetails () {
   const assigneeName = isAssignee ? 'You' : assigneeENSName || getDisplayName(assigneeUser);
 
   const CharmEditorMemoized = useMemo(() => {
-    return bounty ? (
+    // Only show the editor if the description exist
+    // Otherwise it shows the `Type / for commands` placeholder
+    return bounty && bounty.description ? (
       <CharmEditor
         readOnly
         key={bounty.description}
