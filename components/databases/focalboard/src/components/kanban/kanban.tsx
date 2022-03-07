@@ -32,6 +32,11 @@ import { usePopupState } from 'material-ui-popup-state/hooks'
 
 
 
+
+
+
+
+
 interface NewGroupTextFieldProps {
   onClick: (groupName: string) => void
 }
@@ -230,6 +235,7 @@ const Kanban = (props: Props) => {
     const hStrength = createHorizontalStrength(Utils.isMobile() ? 60 : 250)
     const vStrength = createVerticalStrength(Utils.isMobile() ? 60 : 250)
 
+    const menuTriggerProps = !props.readonly ? bindTrigger(popupState) : {}
     return (
         <Box
             className='Kanban'
@@ -258,7 +264,7 @@ const Kanban = (props: Props) => {
                     />
                 ))}
 
-                <div className='octo-board-header-cell narrow' {...bindTrigger(popupState)}>
+                <div className='octo-board-header-cell narrow' {...menuTriggerProps}>
                     <Button
                         size='small'
                         variant='text'
