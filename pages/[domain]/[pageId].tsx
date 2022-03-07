@@ -11,6 +11,9 @@ import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
+/**
+ * @viewId - Enforce a specific view inside the nested blocks editor
+ */
 interface IBlocksEditorPage {
   publicShare?: boolean
 }
@@ -19,6 +22,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
 
   const { currentPage, setIsEditing, pages, setPages, setCurrentPage } = usePages();
   const router = useRouter();
+  const { viewId } = router.query;
   const { pageId } = router.query;
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
@@ -56,10 +60,18 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     setCurrentPage(page);
   }
 
-  useEffect(() => {
+  async function loadPublicBoardView (publicViewId: string) {
+    const page = await charmClient.getPublicPageByViewId(publicViewId);
+    setTitleState(page.title);
+    setCurrentPage(page);
+  }
 
+  useEffect(() => {
     if (publicShare === true && pageId) {
       loadPublicPage(pageId as string);
+    }
+    else if (publicShare === true && viewId) {
+      loadPublicBoardView(viewId as string);
     }
     else if (pageId && pages.length) {
       const pageByPath = pages.find(page => page.path === pageId || page.id === pageId);

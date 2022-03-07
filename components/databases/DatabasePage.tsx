@@ -38,11 +38,12 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
 
   useEffect(() => {
     const boardId = page.boardId!;
-    const viewId = router.query.viewId as string;
+    const urlViewId = router.query.viewId as string;
 
     // Ensure boardViews is for our boardId before redirecting
     const isCorrectBoardView = boardViews.length > 0 && boardViews[0].parentId === boardId;
-    if (!viewId && isCorrectBoardView) {
+
+    if (!urlViewId && isCorrectBoardView) {
       const newPath = generatePath(router.pathname, { ...router.query, boardId });
       router.replace({
         pathname: newPath,
@@ -52,7 +53,7 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
     }
 
     dispatch(setCurrentBoard(boardId));
-    dispatch(setCurrentView(viewId || ''));
+    dispatch(setCurrentView(urlViewId || ''));
 
   }, [page.boardId, router.query.viewId, boardViews]);
 
@@ -104,11 +105,15 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
   });
 
   const showCard = useCallback((cardId?: string) => {
-    let newPath = generatePath(router.pathname, router.query);
+    const newPath = generatePath(router.pathname, router.query);
+
+    const query: any = { cardId, viewId: router.query.viewId };
+
     if (readonly) {
-      newPath += `?r=${Utils.getReadToken()}`;
+      query.r = Utils.getReadToken();
     }
-    router.push({ pathname: newPath, query: { cardId, viewId: router.query.viewId } }, undefined, { shallow: true });
+
+    router.push({ pathname: newPath, query }, undefined, { shallow: true });
   }, [router.query]);
 
   if (board && activeView) {
@@ -121,6 +126,11 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
     if (!displayProperty && activeView.fields.viewType === 'calendar') {
       displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
     }
+
+    const viewsToProvide = readonly ? boardViews.filter(view => {
+      return view.id === activeView.id;
+    }) : boardViews;
+
     return (
       <div className='focalboard-body' style={{ flexGrow: 1, height: 'calc(100% - 56px)' }}>
         <CenterPanel
@@ -134,7 +144,7 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
           activeView={activeView}
           groupByProperty={property}
           dateDisplayProperty={displayProperty}
-          views={boardViews}
+          views={viewsToProvide}
           showShared={clientConfig?.enablePublicSharedBoards || false}
         />
       </div>

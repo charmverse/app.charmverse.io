@@ -75,15 +75,17 @@ const ViewHeader = React.memo((props: Props) => {
                 spellCheck={true}
                 autoExpand={false}
             />
-            <MenuWrapper>
-                <IconButton icon={<DropdownIcon/>}/>
-                <ViewMenu
-                    board={board}
-                    activeView={activeView}
-                    views={views}
-                    readonly={props.readonly}
-                />
-            </MenuWrapper>
+            {
+                  !props.readonly && <MenuWrapper>
+                  <IconButton icon={<DropdownIcon/>}/>
+                  <ViewMenu
+                      board={board}
+                      activeView={activeView}
+                      views={views}
+                      readonly={props.readonly}
+                  />
+              </MenuWrapper>
+            }
 
             <div className='octo-spacer'/>
 
