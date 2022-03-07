@@ -108,7 +108,7 @@ const ViewTitle = React.memo((props: Props) => {
             </div>
 
             <div className='title'>
-                <BlockIconSelector block={board} setPage={props.setPage}/>
+                <BlockIconSelector readonly={props.readonly} block={board} setPage={props.setPage}/>
                 <Editable
                     className='title'
                     value={title}

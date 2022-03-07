@@ -122,7 +122,7 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
       displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
     }
     return (
-      <div className='focalboard-body' style={{ flexGrow: 1 }}>
+      <div className='focalboard-body' style={{ flexGrow: 1, height: 'fit-content' }}>
         <CenterPanel
           clientConfig={clientConfig}
           readonly={!!readonly}
