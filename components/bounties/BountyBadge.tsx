@@ -6,6 +6,7 @@ import Grid from '@mui/material/Grid';
 import { Bounty } from '@prisma/client';
 import { getChainExplorerLink } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import millify from 'millify';
 import { BountyWithDetails } from 'models';
 import { BOUNTY_LABELS } from 'models/Bounty';
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency';
@@ -22,9 +23,10 @@ export interface IBountyBadgeProps {
   bounty: Bounty
   hideLink?: boolean,
   direction?: 'row' | 'column'
+  truncate?: boolean
 }
 
-export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : IBountyBadgeProps) {
+export function BountyBadge ({ truncate = false, bounty, direction = 'row', hideLink = false } : IBountyBadgeProps) {
   const [space] = useCurrentSpace();
   const theme = useTheme();
 
@@ -71,7 +73,7 @@ export function BountyBadge ({ bounty, direction = 'row', hideLink = false } : I
               mr={0.5}
               variant='h6'
             >
-              {bounty.rewardAmount}
+              {truncate ? millify(bounty.rewardAmount) : bounty.rewardAmount}
             </Typography>
             <Box
               component='span'

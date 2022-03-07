@@ -63,7 +63,7 @@ export function BountyList () {
           bounties.length === 0
             ? <Typography paragraph={true}>No bounties were found</Typography>
             : sortedBounties.map(bounty => {
-              return <BountyCard key={bounty.id} bounty={bounty} />;
+              return <BountyCard truncate key={bounty.id} bounty={bounty} />;
             })
         }
       </Grid>
