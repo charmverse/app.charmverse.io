@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import { emojiSuggestKey } from 'components/editor/EmojiSuggest';
 import { ComponentProps, ReactNode, useContext, useRef } from 'react';
 
-const Emoji = styled(Box)`
+export const Emoji = styled(Box)`
   /* font family taken from Notion */
   font-family: "Apple Color Emoji", "Segoe UI Emoji", NotoColorEmoji, "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", EmojiSymbols;
   white-space: nowrap;
