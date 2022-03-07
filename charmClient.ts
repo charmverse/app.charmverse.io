@@ -74,6 +74,10 @@ class CharmClient {
     return http.DELETE<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`);
   }
 
+  getPublicPageByViewId (viewId: string) {
+    return http.GET<Page>(`/api/public/view/${viewId}`);
+  }
+
   getPages (spaceId: string) {
     return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
   }
