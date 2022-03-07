@@ -38,10 +38,12 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
 
   return (
     <Grid container direction='column' alignItems='center'>
-      <Grid item xs>
+      <Grid item xs width='100%'>
         <Box sx={{
           display: 'flex',
-          flexDirection: direction
+          flexDirection: direction,
+          width: '100%',
+          justifyContent: 'space-between'
         }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center' }}>

@@ -23,7 +23,7 @@ export function BountyList () {
   return (
     <Grid container>
 
-      <Grid item container xs alignItems='center'>
+      <Grid item container xs alignItems='center' mb={3}>
 
         {
           /**

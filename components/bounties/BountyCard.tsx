@@ -46,7 +46,7 @@ export function BountyCard ({ truncate = true, bounty }: IBountyInput) {
         }}
       >
         <CardHeader subheader={bounty.title} />
-        <Box p={2} display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
+        <Box p={2} width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>
             {fancyTrim(bounty.description, 120)}
           </Typography>
