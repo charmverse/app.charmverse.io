@@ -64,7 +64,6 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [copied, setCopied] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState(false);
-  const [isBoard, setIsBoard] = useState(false);
   const [views, setViews] = useState<Block []>([]);
 
   const [viewIdToShare, setViewIdToShare] = useState<null | string>((router.query.viewId as string) ?? null);
@@ -76,7 +75,6 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
     if (currentPage) {
       setIsPublic(currentPage.isPublic);
       if (currentPage.type === 'board') {
-        setIsBoard(true);
         loadViews();
       }
 
@@ -193,7 +191,7 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
             )
           }
           {
-            isBoard === true && loadingViews === false && (
+            currentPage!.type === 'board' && loadingViews === false && (
               <Box alignItems='center' sx={{ pl: 2 }}>
                 <SelectBlockView views={views} currentView={viewIdToShare} onSelected={viewSelected} />
               </Box>
