@@ -1,6 +1,6 @@
-import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
 import fetch from 'adapters/http/fetch';
 import { getTimeDifference } from 'lib/utilities/dates';
+import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
 
 const CoinMarketCapCryptoMapping: Record<CryptoCurrency, number> = {
   AVAX: 5805,
@@ -10,7 +10,7 @@ const CoinMarketCapCryptoMapping: Record<CryptoCurrency, number> = {
   FTM: 3513,
   MATIC: 3890,
   ONE: 3945,
-  xDAI: 8635
+  XDAI: 8635
 };
 
 class PricingCache {
@@ -28,7 +28,7 @@ class PricingCache {
     // Currently we only need caching for xDai.
     // Our daily limit is 333 requests
     // This duration in seconds allows us to get an xDai quote for all 4 fiat currencies 83 times a day
-    xDAI: 1053
+    XDAI: 1053
   };
 
   cache: IPairQuote [];
@@ -88,7 +88,7 @@ class PricingCache {
 
   private getPricing (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
 
-    if (base === 'xDAI') {
+    if (base === 'XDAI') {
       return this.getPriceFromCoinMarketCap(base, quote);
     }
 
