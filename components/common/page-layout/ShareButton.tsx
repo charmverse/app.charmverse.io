@@ -108,12 +108,12 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
     if (isPublic === false) {
       setShareLink(null);
     }
-    else if (currentPage!.type === 'page') {
+    else if (currentPage?.type === 'page') {
       const shareLinkToSet = (currentPage && typeof window !== 'undefined')
         ? `${window.location.origin}/share/${currentPage.id}` : '';
       setShareLink(shareLinkToSet);
     }
-    else if (currentPage!.type === 'board') {
+    else if (currentPage?.type === 'board') {
       const viewIdToProvide = viewIdToShare ?? router.query.viewId;
       const shareLinkToSet = (currentPage && typeof window !== 'undefined')
         ? `${window.location.origin}/share/view/${viewIdToProvide}` : '';
@@ -191,7 +191,7 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
             )
           }
           {
-            currentPage!.type === 'board' && loadingViews === false && (
+            currentPage?.type === 'board' && loadingViews === false && (
               <Box alignItems='center' sx={{ pl: 2 }}>
                 <SelectBlockView views={views} currentView={viewIdToShare} onSelected={viewSelected} />
               </Box>
