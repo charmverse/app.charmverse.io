@@ -1,4 +1,6 @@
 
+const PluginTransformImport = require('swc-plugin-transform-import').default;
+
 const config = {
   poweredByHeader: false,
   webpack5: true,
@@ -16,6 +18,24 @@ const config = {
       test: /\.svg$/,
       use: ['@svgr/webpack']
     });
+    const swcRule = _config.module.rules.find(rule => rule.use?.loader === 'next-swc-loader');
+    swcRule.use.options.plugin = (m) => new PluginTransformImport({
+      '@mui/material': {
+        // eslint-disable-next-line no-template-curly-in-string
+        transform: '@mui/material/${member}',
+        preventFullImport: true
+      },
+      '@mui/icons-material': {
+        // eslint-disable-next-line no-template-curly-in-string
+        transform: '@mui/icons-material/${member}',
+        preventFullImport: true
+      },
+      '@mui/lab': {
+        // eslint-disable-next-line no-template-curly-in-string
+        transform: '@mui/lab/${member}',
+        preventFullImport: true
+      }
+    }).visitProgram(m);
     return _config;
   }
 };

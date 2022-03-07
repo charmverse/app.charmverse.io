@@ -101,6 +101,7 @@
     "react-resizable": "^3.0.4",
     "react-select": "^5.2.1",
     "reselect": "^4.0.0",
+    "swc-plugin-transform-import": "^1.1.2",
     "swr": "^1.2.1",
     "uuid": "^8.3.2",
     "yup": "^0.32.11"
