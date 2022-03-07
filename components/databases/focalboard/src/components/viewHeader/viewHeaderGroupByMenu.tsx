@@ -21,8 +21,10 @@ type Props = {
 const ViewHeaderGroupByMenu = React.memo((props: Props) => {
     const {properties, activeView, groupByProperty} = props
     const intl = useIntl()
+    const hasPropertiesToGroupBy = (properties || []).filter((o: IPropertyTemplate) => o.type === 'select').length > 0;
+
     return (
-        <MenuWrapper>
+        <MenuWrapper className={hasPropertiesToGroupBy ? '' : 'disabled'}>
             <Button>
                 <FormattedMessage
                     id='ViewHeader.group-by'
@@ -71,6 +73,11 @@ const ViewHeaderGroupByMenu = React.memo((props: Props) => {
                         }}
                     />
                 ))}
+                {!hasPropertiesToGroupBy && (
+                    <div className='MenuOption TextOption menu-option disabled-option'>
+                        <div className='menu-name'>Add a Select type property to group cards</div>
+                    </div>
+                )}
             </Menu>
         </MenuWrapper>
     )
