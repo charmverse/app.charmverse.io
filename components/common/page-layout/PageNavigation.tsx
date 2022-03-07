@@ -165,7 +165,7 @@ interface PageLinkProps {
 }
 
 export function PageLink ({ children, href, label, labelIcon, pageId }: PageLinkProps) {
-  const { setPages } = usePages();
+  const { currentPage, setCurrentPage, setPages } = usePages();
   const isempty = !label;
 
   function stopPropagation (event: SyntheticEvent) {
@@ -197,9 +197,13 @@ export function PageLink ({ children, href, label, labelIcon, pageId }: PageLink
               id: pageId,
               icon: emoji
             });
+            let isCurrentPageEdited = false;
             // Update the state
             setPages((pages) => pages.map(page => {
               if (page.id === pageId) {
+                if (page.id === currentPage?.id) {
+                  isCurrentPageEdited = true;
+                }
                 return {
                   ...page,
                   icon: emoji
@@ -207,6 +211,13 @@ export function PageLink ({ children, href, label, labelIcon, pageId }: PageLink
               }
               return page;
             }));
+
+            if (currentPage && isCurrentPageEdited) {
+              setCurrentPage({
+                ...currentPage,
+                icon: emoji
+              });
+            }
             popupState.close();
           }
         }}
