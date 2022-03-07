@@ -191,7 +191,7 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
             )
           }
           {
-            currentPage!.type === 'board' && loadingViews === false && (
+            currentPage?.type === 'board' && loadingViews === false && (
               <Box alignItems='center' sx={{ pl: 2 }}>
                 <SelectBlockView views={views} currentView={viewIdToShare} onSelected={viewSelected} />
               </Box>
