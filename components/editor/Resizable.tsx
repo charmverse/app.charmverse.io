@@ -4,7 +4,6 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import { Box } from '@mui/system';
 import { ReactNode, useState } from 'react';
-import charmClient from 'charmClient';
 import BlockAligner from './BlockAligner';
 import Resizer from './Resizer';
 
