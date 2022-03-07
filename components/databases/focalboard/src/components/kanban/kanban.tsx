@@ -83,12 +83,11 @@ const Kanban = (props: Props) => {
 
     if (!groupByProperty) {
         Utils.assertFailure('Board views must have groupByProperty set')
-        return <div/>
     }
 
     const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
     
-    const propertyValues = groupByProperty.options || []
+    const propertyValues = groupByProperty?.options || []
     Utils.log(`${propertyValues.length} propertyValues`)
 
     const visiblePropertyTemplates =
@@ -182,7 +181,7 @@ const Kanban = (props: Props) => {
     }, [cards, visibleGroups, activeView, groupByProperty, props.selectedCardIds])
 
     const onDropToCard = useCallback(async (srcCard: Card, dstCard: Card) => {
-        if (srcCard.id === dstCard.id) {
+        if (srcCard.id === dstCard.id || !groupByProperty) {
             return
         }
         Utils.log(`onDropToCard: ${dstCard.title}`)
@@ -300,15 +299,15 @@ const Kanban = (props: Props) => {
 
             {/* Main content */}
 
-            <ScrollingComponent horizontalStrength={hStrength}
-            verticalStrength={vStrength}>
+            <ScrollingComponent horizontalStrength={hStrength} verticalStrength={vStrength}>
               <div
                   className='octo-board-body'
                   id='mainBoardBody'
               >
                   {/* Columns */}
 
-                  {visibleGroups.map((group) => (
+                  {visibleGroups.map((group) => {
+                    return (
                       <KanbanColumn
                           key={group.option.id || 'empty'}
                           onDrop={(card: Card) => onDropToColumn(group.option, card)}
@@ -347,7 +346,8 @@ const Kanban = (props: Props) => {
                           </Button>
                           }
                       </KanbanColumn>
-                  ))}
+                  )
+                  })}
 
                   {/* Add whitespace underneath "Add a group" button */}
 
