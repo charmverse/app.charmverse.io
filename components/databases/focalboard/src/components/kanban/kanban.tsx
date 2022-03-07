@@ -81,14 +81,9 @@ type Props = {
 const Kanban = (props: Props) => {
     const {board, activeView, cards, groupByProperty, visibleGroups, hiddenGroups} = props
 
-    if (!groupByProperty) {
-        Utils.assertFailure('Board views must have groupByProperty set')
-        return <div/>
-    }
-
     const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
-    
-    const propertyValues = groupByProperty.options || []
+
+    const propertyValues = groupByProperty?.options || []
     Utils.log(`${propertyValues.length} propertyValues`)
 
     const visiblePropertyTemplates =
@@ -97,7 +92,9 @@ const Kanban = (props: Props) => {
     const visibleBadges = activeView.fields.visiblePropertyIds.includes(Constants.badgesColumnId)
 
     const propertyNameChanged = useCallback(async (option: IPropertyOption, text: string): Promise<void> => {
-        await mutator.changePropertyOptionValue(board, groupByProperty!, option, text)
+        if (groupByProperty) {
+            await mutator.changePropertyOptionValue(board, groupByProperty, option, text)
+        }
     }, [board, groupByProperty])
 
     const addGroupClicked = useCallback(async (groupName: string) => {
@@ -182,7 +179,7 @@ const Kanban = (props: Props) => {
     }, [cards, visibleGroups, activeView, groupByProperty, props.selectedCardIds])
 
     const onDropToCard = useCallback(async (srcCard: Card, dstCard: Card) => {
-        if (srcCard.id === dstCard.id) {
+        if (srcCard.id === dstCard.id || !groupByProperty) {
             return
         }
         Utils.log(`onDropToCard: ${dstCard.title}`)
@@ -264,7 +261,7 @@ const Kanban = (props: Props) => {
                     />
                 ))}
 
-                <div className='octo-board-header-cell narrow' {...menuTriggerProps}>
+                {groupByProperty && <div className='octo-board-header-cell narrow' {...menuTriggerProps}>
                     <Button
                         size='small'
                         variant='text'
@@ -275,7 +272,7 @@ const Kanban = (props: Props) => {
                             defaultMessage='+ Add a group'
                         />
                     </Button>
-                </div>
+                </div>}
 
                 <Menu
                   {...bindMenu(popupState)}

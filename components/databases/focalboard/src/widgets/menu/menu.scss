@@ -56,6 +56,11 @@
             padding: 4px 20px;
             cursor: pointer;
 
+            &.disabled-option {
+                background: transparent !important;
+                cursor: default;
+            }
+
             &:hover {
                 background: rgba(var(--button-bg-rgb), 0.08);
             }
