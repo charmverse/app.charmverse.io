@@ -16,13 +16,13 @@ import debouncePromise from 'lib/utilities/debouncePromise';
  */
 interface IBlocksEditorPage {
   publicShare?: boolean
-  viewId?: string
 }
 
-export default function BlocksEditorPage ({ publicShare = false, viewId }: IBlocksEditorPage) {
+export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditorPage) {
 
   const { currentPage, setIsEditing, pages, setPages, setCurrentPage } = usePages();
   const router = useRouter();
+  const { viewId } = router.query;
   const { pageId } = router.query;
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
@@ -67,12 +67,11 @@ export default function BlocksEditorPage ({ publicShare = false, viewId }: IBloc
   }
 
   useEffect(() => {
-
     if (publicShare === true && pageId) {
       loadPublicPage(pageId as string);
     }
     else if (publicShare === true && viewId) {
-      loadPublicBoardView(viewId);
+      loadPublicBoardView(viewId as string);
     }
     else if (pageId && pages.length) {
       const pageByPath = pages.find(page => page.path === pageId || page.id === pageId);
@@ -94,7 +93,7 @@ export default function BlocksEditorPage ({ publicShare = false, viewId }: IBloc
     return null;
   }
   else if (currentPage.type === 'board') {
-    return <DatabaseEditor page={currentPage} setPage={setPage} readonly={publicShare} viewId={viewId} />;
+    return <DatabaseEditor page={currentPage} setPage={setPage} readonly={publicShare} />;
   }
   else {
     return <Editor page={currentPage} setPage={setPage} readOnly={publicShare} />;

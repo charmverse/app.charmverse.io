@@ -23,14 +23,13 @@ interface Props {
   page: Page;
   readonly?: boolean;
   setPage: (p: Partial<Page>) => void;
-  viewId?: string
 }
 
-export function DatabaseEditor ({ page, setPage, readonly, viewId }: Props) {
+export function DatabaseEditor ({ page, setPage, readonly }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
-  const activeView = useAppSelector(getView(viewId ?? router.query.viewId as string));
+  const activeView = useAppSelector(getView(router.query.viewId as string));
   const boardViews = useAppSelector(getCurrentBoardViews);
   const groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
@@ -43,7 +42,8 @@ export function DatabaseEditor ({ page, setPage, readonly, viewId }: Props) {
 
     // Ensure boardViews is for our boardId before redirecting
     const isCorrectBoardView = boardViews.length > 0 && boardViews[0].parentId === boardId;
-    if (!viewId && !urlViewId && isCorrectBoardView) {
+
+    if (!urlViewId && isCorrectBoardView) {
       const newPath = generatePath(router.pathname, { ...router.query, boardId });
       router.replace({
         pathname: newPath,
@@ -53,7 +53,7 @@ export function DatabaseEditor ({ page, setPage, readonly, viewId }: Props) {
     }
 
     dispatch(setCurrentBoard(boardId));
-    dispatch(setCurrentView(viewId || ''));
+    dispatch(setCurrentView(urlViewId || ''));
 
   }, [page.boardId, router.query.viewId, boardViews]);
 
