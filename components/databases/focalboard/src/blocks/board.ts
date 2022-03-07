@@ -44,10 +44,6 @@ function createBoard(block?: Block): Board {
             name: 'Status',
             type: 'select',
             options: [{
-              color: 'propColorRed',
-              id: Utils.createGuid(IDType.BlockID),
-              value: 'Not started'
-            }, {
               color: 'propColorGreen',
               id: Utils.createGuid(IDType.BlockID),
               value: 'Completed'
@@ -55,6 +51,10 @@ function createBoard(block?: Block): Board {
               color: 'propColorYellow',
               id: Utils.createGuid(IDType.BlockID),
               value: 'In progress'
+            }, {
+              color: 'propColorRed',
+              id: Utils.createGuid(IDType.BlockID),
+              value: 'Not started'
             }],
         }
         cardProperties.push(property)

@@ -107,7 +107,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
           overflow: 'auto'
         }}
         >
-          <Box component='main'>
+          <Box component='main' height='100%'>
             <HeaderSpacer />
             {children}
           </Box>
