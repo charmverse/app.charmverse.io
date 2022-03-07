@@ -15,7 +15,6 @@
 .BoardComponent {
     flex: 1 1 auto;
     overflow: hidden;
-    padding-bottom: 20px;
 
     > * {
 
@@ -33,7 +32,7 @@
         }
 
         &:last-child {
-            padding-bottom: 8px;
+          padding: 20px 0px 20px 10px;
         }
     }
 
@@ -46,7 +45,6 @@
     }
 
     > div:nth-child(3) {
-        padding: 0 0 0 1px;
         margin-left: 80px;
 
         @media (max-width: 768px) {
