@@ -29,6 +29,11 @@ export const Container = styled(Box)<{ top: number }>`
   padding-bottom: ${({ theme }) => theme.spacing(5)};
 `;
 
+const ScrollableWindow = styled.div`
+  flex-grow: 1;
+  overflow: auto;
+`;
+
 const PageControlItem = styled(ListItemButton)`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   opacity: 0.5;
@@ -110,7 +115,7 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   }
 
   return (
-    <div>
+    <ScrollableWindow>
       {page.headerImage && <PageBanner image={page.headerImage} setImage={updatePageHeader} />}
       <Container
         top={pageTop}
@@ -183,6 +188,6 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
           />
         </CharmEditor>
       </Container>
-    </div>
+    </ScrollableWindow>
   );
 }
