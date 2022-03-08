@@ -52,9 +52,11 @@ const FormatOptionLabel = ({ user }: { user: IUser }) => {
 const UserProperty = (props: Props): JSX.Element => {
     const workspaceUsers = useAppSelector<IUser[]>(getWorkspaceUsersList)
     const workspaceUsersById = useAppSelector<{[key:string]: IUser}>(getWorkspaceUsers)
+    console.log('get ens name', workspaceUsersById[props.value]?.username || props.value)
+    const readonlyENSName = useENSName(workspaceUsersById[props.value]?.wallet_address)
 
     if (props.readonly) {
-        return (<div className='UserProperty octo-propertyvalue readonly'>{workspaceUsersById[props.value]?.username || props.value}</div>)
+        return (<div className='UserProperty octo-propertyvalue readonly'>{readonlyENSName || workspaceUsersById[props.value]?.username || props.value}</div>)
     }
 
     return (
