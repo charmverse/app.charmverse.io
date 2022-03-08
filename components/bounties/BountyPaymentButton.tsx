@@ -49,6 +49,9 @@ export default function BountyPaymentButton ({
 
         onSuccess(tx.hash, currentChain.chainId);
       }
+      else if (nativeChains.length > 0) {
+        onError(`Please make sure your active wallet is on the ${nativeChains[0]?.chainName} network`);
+      }
       else if (tokenContractAddress) {
         const tokenContract = new ethers.Contract(tokenContractAddress, ERC20ABI, signer);
         const parsedTokenAmount = ethers.utils.parseUnits(amount, tokenDecimals);
