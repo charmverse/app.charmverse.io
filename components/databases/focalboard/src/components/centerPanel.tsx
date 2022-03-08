@@ -124,7 +124,7 @@ class CenterPanel extends React.Component<Props, State> {
     render(): JSX.Element {
         const {groupByProperty, activeView, board, views, cards} = this.props
         const {visible: visibleGroups, hidden: hiddenGroups} = this.getVisibleAndHiddenGroups(cards, activeView.fields.visibleOptionIds, activeView.fields.hiddenOptionIds, groupByProperty)
-        
+
         return (
             <div
                 className='BoardComponent'
@@ -151,7 +151,7 @@ class CenterPanel extends React.Component<Props, State> {
                             readonly={this.props.readonly}
                         />
                     </RootPortal>}
-                {board.fields.headerImage && <Box width={"100%"} p={0} mb={2}>
+                {board.fields.headerImage && <Box className='PageBanner' width={"100%"} mb={2}>
                   <PageBanner focalBoard image={board.fields.headerImage} setImage={(headerImage) => {
                     this.setRandomHeaderImage(board, headerImage!)
                   }} />

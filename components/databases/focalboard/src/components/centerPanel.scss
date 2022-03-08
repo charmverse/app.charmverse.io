@@ -26,8 +26,9 @@
             padding: 0 40px;
         }
 
-        &:nth-child(1) {
-            padding-top: 24px;
+        &.PageBanner {
+            // padding-top: 24px;
+            padding: 0;
             position: sticky;
             left: 0;
             top: 0;
