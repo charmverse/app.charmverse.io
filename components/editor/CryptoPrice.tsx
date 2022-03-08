@@ -1,7 +1,8 @@
 import { BaseRawNodeSpec } from '@bangle.dev/core';
 import { DOMOutputSpec } from '@bangle.dev/pm';
 import Button from 'components/common/Button';
-import { ArrowDropDown, Autorenew } from '@mui/icons-material';
+import Autorenew from '@mui/icons-material/Autorenew';
+import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';

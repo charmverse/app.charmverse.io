@@ -72,6 +72,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
             </InputLabel>
             <TextField
               {...register('message')}
+              autoFocus
               placeholder={applicationExample}
               multiline
               variant='outlined'
