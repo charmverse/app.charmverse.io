@@ -4,6 +4,7 @@ import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -49,6 +50,7 @@ export default function BountyDetails () {
   const [showBountyEditDialog, setShowBountyEditDialog] = useState(false);
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
   const [showBountyDeleteDialog, setShowBountyDeleteDialog] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
 
   const router = useRouter();
 
@@ -160,6 +162,7 @@ export default function BountyDetails () {
   }
 
   async function recordPaymentSuccess (transactionId: string, chainId: number | string) {
+    setPaymentError('');
     await charmClient.recordTransaction({
       bountyId: bounty!.id,
       transactionId,
@@ -181,6 +184,10 @@ export default function BountyDetails () {
     }
 
     setBounty(updatedBounty);
+  }
+
+  function onError (err: string) {
+    setPaymentError(err);
   }
 
   //  charmClient.getBounty();
@@ -313,12 +320,15 @@ export default function BountyDetails () {
                         )}
                         {
                           (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
-                          <BountyPaymentButton
-                            receiver={walletAddressForPayment!}
-                            amount={eToNumber(bounty.rewardAmount)}
-                            tokenSymbol='ETH'
-                            onSuccess={recordPaymentSuccess}
-                          />
+                            <Box onClick={e => setPaymentError('')}>
+                              <BountyPaymentButton
+                                receiver={walletAddressForPayment!}
+                                amount={eToNumber(bounty.rewardAmount)}
+                                tokenSymbol='ETH'
+                                onSuccess={recordPaymentSuccess}
+                                onError={onError}
+                              />
+                            </Box>
                           )
                         }
                       </Box>
@@ -326,6 +336,10 @@ export default function BountyDetails () {
                   }
                 </Box>
               ) : <Typography variant='body2'>No reviewer assigned</Typography>}
+
+              {paymentError && (
+                <Alert sx={{ mt: 2 }} severity='error'>{paymentError}</Alert>
+              )}
             </Card>
           </Grid>
 
