@@ -19,27 +19,22 @@ export function InputBlockchainSearch ({
   register = () => ({}) as any }: Props) {
 
   const defaultValueToAssign = defaultChainId ? RPCList.find(rpc => {
-    return parseInt(rpc.chainId.toString(), 10) === parseInt(defaultChainId.toString(), 10);
+    return rpc.chainId === defaultChainId;
   }) : null;
-
-  function emitValue (value: any) {
-
-  }
 
   return (
     <Autocomplete
       defaultValue={defaultValueToAssign}
-      onChange={(_, value) => {
-        if (value) {
-          onChange(value?.chainId.toString());
+      {...register(modelKey ?? 'selectBlockchain', {
+        onChange: (event) => {
+
         }
-      }}
+      })}
       sx={{ minWidth: 150 }}
       options={RPCList}
       autoHighlight
       size='small'
       getOptionLabel={option => `${option.nativeCurrency.name} (${option.chainName})`}
-      /*
       renderOption={(props, option) => (
         <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
           <Box component='span'>
@@ -50,10 +45,8 @@ export function InputBlockchainSearch ({
           </Box>
         </Box>
       )}
-      */
       renderInput={(params) => (
         <TextField
-          {...register(modelKey ?? 'selectBlockchain')}
           {...params}
         />
       )}

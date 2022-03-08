@@ -172,7 +172,7 @@ model Bounty {
   descriptionNodes Json
   reviewer         String?       @db.Uuid
   assignee         String?       @db.Uuid
-  chainId          String       
+  chainId          Int?       
   rewardAmount     Float
   rewardToken      String
   status           BountyStatus  @default(open)

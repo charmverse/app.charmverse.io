@@ -327,6 +327,7 @@ export default function BountyDetails () {
                                 tokenSymbol={bounty.rewardToken}
                                 onSuccess={recordPaymentSuccess}
                                 onError={onError}
+                                chainIdToUse={bounty.chainId}
                               />
                             </Box>
                           )

@@ -35,7 +35,7 @@ export const schema = yup.object({
   descriptionNodes: yup.mixed(),
   description: yup.string(),
   reviewer: yup.string().nullable(true),
-  chainId: yup.string().required()
+  chainId: yup.number().required()
 });
 
 type FormValues = yup.InferType<typeof schema>
