@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { emojiSuggestKey } from './EmojiSuggest';
 
-const StyledBlockQuote = styled.div`
+const StyledCallout = styled.div`
   background-color: ${({ theme }) => theme.palette.background.light};
   font-size: 20px;
   padding: ${({ theme }) => theme.spacing(1)};
@@ -15,7 +15,7 @@ const StyledBlockQuote = styled.div`
   gap: ${({ theme }) => theme.spacing(1)};
 `;
 
-const BlockQuoteEmoji = styled.div`
+const CalloutEmoji = styled.div`
   cursor: pointer;
   display: flex;
   align-items: flex-start;
@@ -36,18 +36,19 @@ const BlockQuoteEmoji = styled.div`
   }
 `;
 
-export function blockQuoteSpec () {
+export function calloutSpec () {
   const spec = blockquote.spec() as BaseRawNodeSpec;
+  spec.name = 'blockquote';
   spec.schema.attrs = {
     emoji: { default: '😃' }
   };
   return spec;
 }
 
-export function BlockQuote ({ children, node, updateAttrs, view, getPos }: NodeViewProps & { children: ReactNode }) {
+export function Callout ({ children, node, updateAttrs, view, getPos }: NodeViewProps & { children: ReactNode }) {
   return (
-    <StyledBlockQuote>
-      <BlockQuoteEmoji>
+    <StyledCallout>
+      <CalloutEmoji>
         <span
           tabIndex={0}
           role='button'
@@ -74,8 +75,8 @@ export function BlockQuote ({ children, node, updateAttrs, view, getPos }: NodeV
         >
           {node.attrs.emoji}
         </span>
-      </BlockQuoteEmoji>
+      </CalloutEmoji>
       {children}
-    </StyledBlockQuote>
+    </StyledCallout>
   );
 }
