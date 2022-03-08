@@ -138,7 +138,7 @@ const PageIcon = styled(EmojiCon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
-  color: rgb(255, 255, 255);
+  color: ${({ theme }) => theme.palette.secondary.light};
 `;
 
 export const PageTitle = styled(Typography)<{isempty: number}>`

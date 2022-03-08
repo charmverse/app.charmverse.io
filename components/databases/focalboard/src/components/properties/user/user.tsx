@@ -1,13 +1,14 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React from 'react'
+import { useState } from 'react'
 import Select from 'react-select'
 import {CSSObject} from '@emotion/serialize'
 
 import {IUser} from '../../../user'
 import {getWorkspaceUsersList, getWorkspaceUsers} from '../../../store/users'
 import {useAppSelector} from '../../../store/hooks'
+import useENSName from 'hooks/useENSName'
 
 import {getSelectBaseStyle} from '../../../theme'
 
@@ -27,11 +28,13 @@ const selectStyles = {
     }),
 }
 
-const formatOptionLabel = (user: any) => {
+const FormatOptionLabel = ({ user }: { user: IUser }) => {
     let profileImg
     if (imageURLForUser) {
         profileImg = imageURLForUser(user.id)
     }
+    const ensName = useENSName(user.wallet_address)
+    console.log(ensName, user.wallet_address)
 
     return (
         <div className='UserProperty-item'>
@@ -41,7 +44,7 @@ const formatOptionLabel = (user: any) => {
                     src={profileImg}
                 />
             )}
-            {user.username}
+            {ensName || user.username}
         </div>
     )
 }
@@ -62,7 +65,7 @@ const UserProperty = (props: Props): JSX.Element => {
             backspaceRemovesValue={true}
             className={'UserProperty octo-propertyvalue'}
             classNamePrefix={'react-select'}
-            formatOptionLabel={formatOptionLabel}
+            formatOptionLabel={u => <FormatOptionLabel user={u} />}
             styles={selectStyles}
             placeholder={'Empty'}
             getOptionLabel={(o: IUser) => o.username}
