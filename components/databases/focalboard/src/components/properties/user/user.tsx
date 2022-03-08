@@ -1,13 +1,14 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React from 'react'
+import { useState } from 'react'
 import Select from 'react-select'
 import {CSSObject} from '@emotion/serialize'
 
 import {IUser} from '../../../user'
 import {getWorkspaceUsersList, getWorkspaceUsers} from '../../../store/users'
 import {useAppSelector} from '../../../store/hooks'
+import useENSName from 'hooks/useENSName'
 
 import {getSelectBaseStyle} from '../../../theme'
 
@@ -27,11 +28,12 @@ const selectStyles = {
     }),
 }
 
-const formatOptionLabel = (user: any) => {
+const FormatOptionLabel = ({ user }: { user: IUser }) => {
     let profileImg
     if (imageURLForUser) {
         profileImg = imageURLForUser(user.id)
     }
+    const ensName = useENSName(user.wallet_address)
 
     return (
         <div className='UserProperty-item'>
@@ -41,7 +43,7 @@ const formatOptionLabel = (user: any) => {
                     src={profileImg}
                 />
             )}
-            {user.username}
+            {ensName || user.username}
         </div>
     )
 }
@@ -49,9 +51,10 @@ const formatOptionLabel = (user: any) => {
 const UserProperty = (props: Props): JSX.Element => {
     const workspaceUsers = useAppSelector<IUser[]>(getWorkspaceUsersList)
     const workspaceUsersById = useAppSelector<{[key:string]: IUser}>(getWorkspaceUsers)
+    const readonlyENSName = useENSName(workspaceUsersById[props.value]?.wallet_address)
 
     if (props.readonly) {
-        return (<div className='UserProperty octo-propertyvalue readonly'>{workspaceUsersById[props.value]?.username || props.value}</div>)
+        return (<div className='UserProperty octo-propertyvalue readonly'>{readonlyENSName || workspaceUsersById[props.value]?.username || props.value}</div>)
     }
 
     return (
@@ -62,7 +65,7 @@ const UserProperty = (props: Props): JSX.Element => {
             backspaceRemovesValue={true}
             className={'UserProperty octo-propertyvalue'}
             classNamePrefix={'react-select'}
-            formatOptionLabel={formatOptionLabel}
+            formatOptionLabel={u => <FormatOptionLabel user={u} />}
             styles={selectStyles}
             placeholder={'Empty'}
             getOptionLabel={(o: IUser) => o.username}

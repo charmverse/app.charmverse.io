@@ -74,7 +74,7 @@ type Props = {
     intl: IntlShape
     readonly: boolean
     onCardClicked: (e: React.MouseEvent, card: Card) => void
-    addCard: (groupByOptionId?: string, show?:boolean) => Promise<void>
+    addCard: (groupByOptionId?: string, show?:boolean, props?: any, insertLast?: boolean) => Promise<void>
     showCard: (cardId?: string) => void
 }
 
@@ -334,7 +334,7 @@ const Kanban = (props: Props) => {
                               color='secondary'
                               sx={{ justifyContent: 'flex-start' }}
                               onClick={() => {
-                                  props.addCard(group.option.id, true)
+                                  props.addCard(group.option.id, true, {}, true)
                               }}
                           >
                               <FormattedMessage

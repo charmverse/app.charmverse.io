@@ -124,7 +124,7 @@ class CenterPanel extends React.Component<Props, State> {
     render(): JSX.Element {
         const {groupByProperty, activeView, board, views, cards} = this.props
         const {visible: visibleGroups, hidden: hiddenGroups} = this.getVisibleAndHiddenGroups(cards, activeView.fields.visibleOptionIds, activeView.fields.hiddenOptionIds, groupByProperty)
-        
+
         return (
             <div
                 className='BoardComponent'
@@ -264,7 +264,7 @@ class CenterPanel extends React.Component<Props, State> {
         })
     }
 
-    addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}): Promise<void> => {
+    addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = false): Promise<void> => {
         const {activeView, board, groupByProperty} = this.props
 
         const card = createCard()
@@ -292,14 +292,19 @@ class CenterPanel extends React.Component<Props, State> {
         card.fields.contentOrder = [charmTextBlock.id];
 
         mutator.performAsUndoGroup(async () => {
-            const newCard = await mutator.insertBlock(
+            const newCardOrder = insertLast ? [...activeView.fields.cardOrder, card.id] : [card.id, ...activeView.fields.cardOrder]
+            // update view order first so that when we add the block it appears in the right spot
+            await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card')
+
+            await mutator.insertBlock(
                 card,
                 'add card',
                 async (block: Block) => {
                     await mutator.insertBlock(charmTextBlock, 'add card description')
                     if (show) {
+                        console.log('add card', this.props.addCard.toString());
                         this.props.addCard(createCard(block))
-                        this.props.updateView({...activeView, fields: {...activeView.fields, cardOrder: [...activeView.fields.cardOrder, block.id]}})
+                        this.props.updateView({...activeView, fields: {...activeView.fields, cardOrder: newCardOrder}})
                         this.showCard(block.id)
                     } else {
                         // Focus on this card's title inline on next render
@@ -311,7 +316,6 @@ class CenterPanel extends React.Component<Props, State> {
                     this.showCard(undefined)
                 },
             )
-            await mutator.changeViewCardOrder(activeView, [...activeView.fields.cardOrder, newCard.id], 'add-card')
         })
     }
 
