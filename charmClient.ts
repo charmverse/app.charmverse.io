@@ -216,7 +216,8 @@ class CharmClient {
       props: {},
       create_at: new Date(user.createdAt).getTime(),
       update_at: new Date(user.updatedAt).getTime(),
-      is_bot: false
+      is_bot: false,
+      wallet_address: user.addresses[0]
     };
   }
 
