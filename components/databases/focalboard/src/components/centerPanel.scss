@@ -31,7 +31,6 @@
             padding: 0;
             position: sticky;
             left: 0;
-            top: 0;
             @media screen and (max-width: 768px) {
                 padding: 0 8px;
             }
@@ -44,20 +43,18 @@
 
     > .top-head {
         position: sticky;
-        top: 0;
         left: 0;
         background: rgb(var(--center-channel-bg-rgb));
         z-index: 100;
     }
 
-    > div:nth-child(3) {
-        padding: 0 0 0 1px;
-        margin-left: 80px;
+    > .container-container {
+        padding: 0 0 180px 1px;
 
-        @media (max-width: 768px) {
-            margin-left: 0;
-            padding-left: 20px;
-            -webkit-overflow-scrolling: touch;
-        }
+        // @media (max-width: 768px) {
+        //     margin-left: 0;
+        //     padding-left: 20px;
+        //     -webkit-overflow-scrolling: touch;
+        // }
     }
 }
