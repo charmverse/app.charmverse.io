@@ -36,15 +36,12 @@ export default function BountyPaymentButton ({
       blockchain.nativeCurrency.symbol.toLowerCase() === tokenSymbol.toLowerCase()));
     const signer = await library.getSigner(account);
 
-    console.log('Signer', tokenSymbol, tokenContractAddress, amount, currentChain);
-
     try {
       if (!currentChain) {
         onError('Unsupported chain');
       }
       // if it's native currency
       else if (nativeChains.some(chain => chain.chainId === currentChain.chainId)) {
-        console.log('natiive');
         const tx = await signer.sendTransaction({
           to: receiver,
           value: ethers.utils.parseEther(amount)
@@ -52,11 +49,7 @@ export default function BountyPaymentButton ({
 
         onSuccess(tx.hash, currentChain.chainId);
       }
-      else if (nativeChains.length > 0) {
-        onError(`Please make sure your active wallet is on the ${nativeChains[0]?.chainName} network`);
-      }
       else if (tokenContractAddress) {
-        console.log('token address', tokenContractAddress);
         const tokenContract = new ethers.Contract(tokenContractAddress, ERC20ABI, signer);
         const parsedTokenAmount = ethers.utils.parseUnits(amount, tokenDecimals);
 
@@ -77,7 +70,14 @@ export default function BountyPaymentButton ({
       }
     }
     catch (err) {
-      onError(err);
+      // MetaMask error
+      const metaMaskError = (err as any).data.message;
+      if (metaMaskError) {
+        onError(metaMaskError.replace('err: ', ''));
+      }
+      else {
+        onError((err as Error).message || err);
+      }
     }
   };
 

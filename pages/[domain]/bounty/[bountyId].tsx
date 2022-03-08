@@ -324,7 +324,7 @@ export default function BountyDetails () {
                               <BountyPaymentButton
                                 receiver={walletAddressForPayment!}
                                 amount={eToNumber(bounty.rewardAmount)}
-                                tokenSymbol='ETH'
+                                tokenSymbol={bounty.rewardToken}
                                 onSuccess={recordPaymentSuccess}
                                 onError={onError}
                               />
