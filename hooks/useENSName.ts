@@ -13,7 +13,6 @@ const useENSName = (account: string | null | undefined): string | null | undefin
     shouldFetch ? ['ENS', library, account, chainId] : null,
     fetchENSName
   );
-  console.log('result', data);
 
   return data;
 };

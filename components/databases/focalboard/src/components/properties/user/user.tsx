@@ -34,7 +34,6 @@ const FormatOptionLabel = ({ user }: { user: IUser }) => {
         profileImg = imageURLForUser(user.id)
     }
     const ensName = useENSName(user.wallet_address)
-    console.log(ensName, user.wallet_address)
 
     return (
         <div className='UserProperty-item'>
@@ -52,7 +51,6 @@ const FormatOptionLabel = ({ user }: { user: IUser }) => {
 const UserProperty = (props: Props): JSX.Element => {
     const workspaceUsers = useAppSelector<IUser[]>(getWorkspaceUsersList)
     const workspaceUsersById = useAppSelector<{[key:string]: IUser}>(getWorkspaceUsers)
-    console.log('get ens name', workspaceUsersById[props.value]?.username || props.value)
     const readonlyENSName = useENSName(workspaceUsersById[props.value]?.wallet_address)
 
     if (props.readonly) {
