@@ -157,7 +157,10 @@ import { Provider as ReduxProvider } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import { createThemeLightSensitive } from 'theme';
 import 'theme/@bangle.dev/styles.scss';
-import 'theme/focalboard/styles.scss';
+import 'theme/focalboard/focalboard.typography.scss';
+import 'theme/focalboard/focalboard.main.scss';
+import 'theme/focalboard/focalboard.button.scss';
+
 import {
   darkTheme,
   lightTheme
