@@ -4,8 +4,8 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
-import { HTMLAttributes } from 'react';
 import charmClient from 'charmClient';
+import { HTMLAttributes } from 'react';
 import ImageSelector from './ImageSelector';
 import Resizable from './Resizable';
 
@@ -94,7 +94,7 @@ export function imageSpec (): RawSpecs {
     type: 'node',
     name: 'image',
     schema: {
-      inline: true,
+      inline: false,
       attrs: {
         caption: {
           default: null
@@ -113,7 +113,7 @@ export function imageSpec (): RawSpecs {
           default: (MIN_IMAGE_WIDTH + MAX_IMAGE_WIDTH) / 2
         }
       },
-      group: 'inline',
+      group: 'block',
       draggable: false,
       parseDOM: [
         {
@@ -146,16 +146,19 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs }:
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
-      <ImageSelector onImageSelect={async (imageSrc) => {
-        const image = await imagePromise(imageSrc);
-        updateAttrs({
-          src: imageSrc,
-          aspectRatio: image.width / image.height
-        });
-      }}
-      >
-        <EmptyImageContainer />
-      </ImageSelector>
+      <Box my={1}>
+        <ImageSelector onImageSelect={async (imageSrc) => {
+          const image = await imagePromise(imageSrc);
+          updateAttrs({
+            src: imageSrc,
+            aspectRatio: image.width / image.height
+          });
+        }}
+        >
+          <EmptyImageContainer />
+        </ImageSelector>
+      </Box>
+
     );
   }
 
@@ -172,6 +175,7 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs }:
   }
 
   return (
+
     <Resizable
       aspectRatio={aspectRatio}
       initialSize={node.attrs.size}
