@@ -21,9 +21,9 @@ html {
 .focalboard-body {
   padding: 0;
   margin: 0;
-  /* -webkit-font-smoothing: auto; */
   font-size: 14px;
-  line-height: 24px;
+line-height: 24px;
+  flex-grow: 1;
 
   * {
     box-sizing: border-box;

@@ -16,7 +16,7 @@
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: auto;
 
     > * {
 
@@ -28,6 +28,9 @@
 
         &:nth-child(1) {
             padding-top: 24px;
+            position: sticky;
+            left: 0;
+            top: 0;
             @media screen and (max-width: 768px) {
                 padding: 0 8px;
             }
