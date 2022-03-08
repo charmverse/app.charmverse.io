@@ -75,6 +75,14 @@ const HeaderSpacer = styled.div`
   min-height: ${headerHeight}px;
 `;
 
+export function PageContainer ({ children }: { children: React.ReactNode }) {
+  return (
+    <Box component='main' height='100%' sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, overflow: 'hidden' }}>
+      {children}
+    </Box>
+  );
+}
+
 export function PageLayout ({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
   const [user] = useUser();
@@ -102,16 +110,10 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
         <Drawer variant='permanent' open={open}>
           <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
         </Drawer>
-        <Box sx={{
-          flexGrow: 1,
-          overflow: 'auto'
-        }}
-        >
-          <Box component='main' height='100%' sx={{ display: 'flex', flexDirection: 'column' }}>
-            <HeaderSpacer />
-            {children}
-          </Box>
-        </Box>
+        <PageContainer>
+          <HeaderSpacer />
+          {children}
+        </PageContainer>
       </Box>
     </>
   );
