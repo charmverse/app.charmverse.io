@@ -20,7 +20,7 @@ enum Chains {
 }
 
 export interface IChainDetails {
-  chainId: number | string,
+  chainId: number,
   chainName: string,
   nativeCurrency: {
   name: string,

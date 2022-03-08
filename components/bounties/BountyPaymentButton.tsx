@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { RPC } from 'connectors';
+import { getChainById, RPC } from 'connectors';
 import ERC20ABI from '../../abis/ERC20ABI.json';
 
 interface Props {
@@ -12,7 +12,8 @@ interface Props {
   tokenSymbol: string;
   tokenContractAddress?: string;
   tokenDecimals?: number;
-  onSuccess?: (txId: string, chainId: number | string) => void;
+  chainIdToUse: number
+  onSuccess?: (txId: string, chainId: number) => void;
   onError?: (err: any) => void;
   children?: React.ReactChild | React.ReactChild[];
 }
@@ -20,10 +21,11 @@ interface Props {
 export default function BountyPaymentButton ({
   receiver,
   amount,
+  chainIdToUse,
   tokenSymbol = 'ETH',
   tokenContractAddress = '',
   tokenDecimals = 16,
-  onSuccess = (tx: string, chainId: number | string) => {},
+  onSuccess = (tx: string, chainId: number) => {},
   onError = () => {},
   children = 'Make a payment'
 }: Props) {
@@ -31,26 +33,39 @@ export default function BountyPaymentButton ({
 
   const makePayment = async () => {
 
-    const currentChain = Object.values(RPC).find((blockchain: any) => blockchain.chainId === chainId);
-    const nativeChains = Object.values(RPC).filter((blockchain: any) => (
-      blockchain.nativeCurrency.symbol.toLowerCase() === tokenSymbol.toLowerCase()));
+    if (!chainIdToUse) {
+      onError('Please provide a chainId');
+      return;
+    }
+
+    const chainToUse = getChainById(chainIdToUse);
+
+    if (!chainToUse) {
+      onError('This chain is not supported');
+      return;
+    }
+
+    const currentUserChain = chainId ? getChainById(chainId) : undefined;
+
+    if (!currentUserChain) {
+      onError('Could not detect your chain');
+      return;
+    }
+
     const signer = await library.getSigner(account);
 
+    if (chainToUse.chainId !== currentUserChain.chainId) {
+      // Attempt to switch chains
+    }
+
     try {
-      if (!currentChain) {
-        onError('Unsupported chain');
-      }
-      // if it's native currency
-      else if (nativeChains.some(chain => chain.chainId === currentChain.chainId)) {
+      if (chainToUse.nativeCurrency.symbol === tokenSymbol) {
         const tx = await signer.sendTransaction({
           to: receiver,
           value: ethers.utils.parseEther(amount)
         });
 
-        onSuccess(tx.hash, currentChain.chainId);
-      }
-      else if (nativeChains.length > 0) {
-        onError(`Please make sure your active wallet is on the ${nativeChains[0]?.chainName} network`);
+        onSuccess(tx.hash, chainToUse.chainId);
       }
       else if (tokenContractAddress) {
         const tokenContract = new ethers.Contract(tokenContractAddress, ERC20ABI, signer);
@@ -66,20 +81,24 @@ export default function BountyPaymentButton ({
 
         // transfer token
         const tx = await tokenContract.transfer(receiver, parsedTokenAmount);
-        onSuccess(tx.hash, currentChain!.chainId);
+        onSuccess(tx.hash, chainToUse!.chainId);
       }
       else {
         onError('Token contract address required');
       }
     }
     catch (err) {
-      // MetaMask error
-      const metaMaskError = (err as any).data.message;
-      if (metaMaskError) {
+
+      const metaMaskError = (err as any).data?.message;
+
+      if ((err as any)?.code === 'INSUFFICIENT_FUNDS') {
+        onError('You do not have sufficient funds to perform this transaction.');
+      }
+      else if (metaMaskError) {
         onError(metaMaskError.replace('err: ', ''));
       }
       else {
-        onError((err as Error).message || err);
+        onError((err as any).reason || err);
       }
     }
   };
