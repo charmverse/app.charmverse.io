@@ -1,6 +1,8 @@
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
+import { uniqueValues } from 'lib/utilities/array';
+import { CryptoCurrency } from './models/Currency';
 
 enum Chains {
   ETHEREUM = 1,
@@ -17,7 +19,22 @@ enum Chains {
   MUMBAI = 80001
 }
 
-const RPC = {
+export interface IChainDetails {
+  chainId: number | string,
+  chainName: string,
+  nativeCurrency: {
+  name: string,
+  symbol: string,
+  decimals: number,
+  address: string,
+  logoURI: string
+  },
+  rpcUrls: readonly string [],
+  blockExplorerUrls: readonly string [],
+  iconUrls: readonly string []
+}
+
+const RPC: Record<string, IChainDetails> = {
   ETHEREUM: {
     chainId: 1,
     chainName: 'Ethereum',
@@ -113,7 +130,7 @@ const RPC = {
     chainName: 'Arbitrum One',
     nativeCurrency: {
       name: 'Ether',
-      symbol: 'AETH',
+      symbol: 'ETH',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
       logoURI:
@@ -201,6 +218,19 @@ const RPC = {
 } as const;
 
 export type Blockchain = keyof typeof RPC;
+
+export const RPCList = Object.values(RPC);
+
+export const CryptoCurrencies = uniqueValues<CryptoCurrency>(RPCList.map(chain => {
+  return chain.nativeCurrency.symbol as CryptoCurrency;
+}));
+
+export function getChainById (chainId: string | number): IChainDetails | undefined {
+  return RPCList.find(rpc => {
+    // eslint-disable-next-line radix
+    return parseInt(rpc.chainId.toString()) === parseInt(chainId.toString());
+  });
+}
 
 const supportedChains = [
   'ETHEREUM',

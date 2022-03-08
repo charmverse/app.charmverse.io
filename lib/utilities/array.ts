@@ -30,3 +30,8 @@ export function sortArrayByObjectProperty<T = any> (data: T[], propertyKey: keyo
   return sortedData;
 
 }
+
+export function uniqueValues<T = any> (values: T []): T [] {
+  return Array.from(new Set(values));
+}
+
