@@ -53,7 +53,7 @@ function insertImageNode (state: EditorState, dispatch: DispatchFn, view: Editor
   }
 }
 
-function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
+function EmptyImageContainer ({ isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {isSelected?: boolean}) {
   const theme = useTheme();
 
   return (
@@ -61,7 +61,7 @@ function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
       button
       disableRipple
       sx={{
-        backgroundColor: theme.palette.background.light,
+        backgroundColor: isSelected ? 'rgba(46, 170, 220, 0.2)' : theme.palette.background.light,
         p: 2,
         display: 'flex',
         borderRadius: theme.spacing(0.5)
@@ -141,8 +141,9 @@ function imagePromise (url: string): Promise<HTMLImageElement> {
   });
 }
 
-export function ResizableImage ({ onResizeStop, node, updateAttrs }:
+export function ResizableImage ({ onResizeStop, node, updateAttrs, selected }:
   NodeViewProps & {onResizeStop?: (view: EditorView) => void }) {
+
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
@@ -155,10 +156,9 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs }:
           });
         }}
         >
-          <EmptyImageContainer />
+          <EmptyImageContainer isSelected={selected} />
         </ImageSelector>
       </Box>
-
     );
   }
 
@@ -175,7 +175,6 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs }:
   }
 
   return (
-
     <Resizable
       aspectRatio={aspectRatio}
       initialSize={node.attrs.size}
