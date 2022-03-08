@@ -2,15 +2,16 @@ import { Autocomplete, Box, TextField } from '@mui/material';
 import { CryptoCurrency, CryptoCurrencyList, CryptoLogoPaths } from 'models/Currency';
 import Image from 'next/image';
 import { UseFormRegister } from 'react-hook-form';
-
-const currencyOptions = Object.keys(CryptoCurrencyList);
+import { CryptoCurrencies } from 'connectors';
 
 export interface IInputSearchCryptoProps {
   onChange?: (value: CryptoCurrency) => any,
-  defaultValue?: CryptoCurrency,
+  defaultValue?: CryptoCurrency | string,
   register?: UseFormRegister<any>
   modelKey?: string,
-  label?: string
+  label?: string,
+  readOnly?: boolean,
+  cryptoList?: Array<string | CryptoCurrency>
 }
 
 export function InputSearchCrypto ({
@@ -18,22 +19,28 @@ export function InputSearchCrypto ({
   defaultValue,
   register = () => ({}) as any,
   modelKey = '-',
+  readOnly = false,
+  cryptoList = CryptoCurrencies,
   label = 'Choose a crypto' }: IInputSearchCryptoProps) {
 
   function emitValue (value: string) {
-    if (value !== null && currencyOptions.indexOf(value) >= 0) {
+    console.log('To Emit', value);
+    if (value !== null && cryptoList.indexOf(value as CryptoCurrency) >= 0) {
       onChange(value as CryptoCurrency);
     }
   }
 
+  const valueToDisplay = defaultValue ?? cryptoList[0];
+
   return (
     <Autocomplete
-      defaultValue={defaultValue ?? null}
+      defaultValue={valueToDisplay}
       onChange={(_, value) => {
         emitValue(value as any);
       }}
       sx={{ minWidth: 150 }}
-      options={currencyOptions}
+      options={cryptoList}
+      disableClearable={true}
       autoHighlight
       size='small'
       renderOption={(props, option) => (
@@ -57,6 +64,7 @@ export function InputSearchCrypto ({
           {...register(modelKey)}
           {...params}
           label={label}
+          value={valueToDisplay}
         />
       )}
     />
