@@ -38,7 +38,7 @@ export default function BountyPaymentButton ({
 
     try {
       if (!currentChain) {
-        onError('Unsupported chain');
+        onError(`Unsupported chain id: ${chainId}`);
       }
       // if it's native currency
       else if (nativeChains.some(chain => chain.chainId === currentChain.chainId)) {
