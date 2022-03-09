@@ -4,8 +4,12 @@ html {
   height: 100%;
 }
 
-.focalboard-body,
-#focalboard-app {
+
+.focalboard-plugin-root {
+  height: 100%;
+}
+
+.focalboard-body {
   flex-direction: column;
   overflow-y: auto;
 
@@ -13,19 +17,9 @@ html {
   height: 100%;
   color: rgb(var(--center-channel-color-rgb));
   background: rgb(var(--center-channel-bg-rgb));
-  padding: 0;
+  padding: 0 0 180px;
   margin: 0;
-}
 
-.focalboard-plugin-root {
-  height: 100%;
-}
-
-.focalboard-body {
-  --cursor-color: rgb(var(--center-channel-color-rgb));
-
-  padding: 0;
-  margin: 0;
   font-family: "Open Sans", sans-serif;
   /* -webkit-font-smoothing: auto; */
   font-size: 14px;
@@ -188,8 +182,6 @@ html {
   }
 
   .octo-block img {
-    max-width: 500px;
-    max-height: 500px;
     margin: 5px 0;
     object-fit: contain;
     flex: none;

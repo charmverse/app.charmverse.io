@@ -1,7 +1,11 @@
 import BlocksEditorPage from 'pages/[domain]/[pageId]';
-import router from 'next/router';
+import { PageContainer } from 'components/common/page-layout/PageLayout';
 
 export default function PublicPage () {
 
-  return <BlocksEditorPage publicShare={true} />;
+  return (
+    <PageContainer>
+      <BlocksEditorPage publicShare={true} />
+    </PageContainer>
+  );
 }

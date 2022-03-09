@@ -124,7 +124,7 @@ class CenterPanel extends React.Component<Props, State> {
     render(): JSX.Element {
         const {groupByProperty, activeView, board, views, cards} = this.props
         const {visible: visibleGroups, hidden: hiddenGroups} = this.getVisibleAndHiddenGroups(cards, activeView.fields.visibleOptionIds, activeView.fields.hiddenOptionIds, groupByProperty)
-        
+
         return (
             <div
                 className='BoardComponent'
@@ -151,7 +151,7 @@ class CenterPanel extends React.Component<Props, State> {
                             readonly={this.props.readonly}
                         />
                     </RootPortal>}
-                {board.fields.headerImage && <Box width={"100%"} p={0} mb={2}>
+                {board.fields.headerImage && <Box className='PageBanner' width={"100%"} mb={2}>
                   <PageBanner focalBoard image={board.fields.headerImage} setImage={(headerImage) => {
                     this.setRandomHeaderImage(board, headerImage!)
                   }} />
@@ -179,58 +179,60 @@ class CenterPanel extends React.Component<Props, State> {
                     />
                 </div>
 
-                {activeView.fields.viewType === 'board' &&
-                <Kanban
-                    board={this.props.board}
-                    activeView={this.props.activeView}
-                    cards={this.props.cards}
-                    groupByProperty={this.props.groupByProperty}
-                    visibleGroups={visibleGroups}
-                    hiddenGroups={hiddenGroups}
-                    selectedCardIds={this.state.selectedCardIds}
-                    readonly={this.props.readonly}
-                    onCardClicked={this.cardClicked}
-                    addCard={this.addCard}
-                    showCard={this.showCard}
-                />}
-                {activeView.fields.viewType === 'table' &&
-                    <Table
+                <div className='container-container'>
+                    {activeView.fields.viewType === 'board' &&
+                    <Kanban
                         board={this.props.board}
                         activeView={this.props.activeView}
                         cards={this.props.cards}
                         groupByProperty={this.props.groupByProperty}
-                        views={this.props.views}
                         visibleGroups={visibleGroups}
+                        hiddenGroups={hiddenGroups}
                         selectedCardIds={this.state.selectedCardIds}
                         readonly={this.props.readonly}
-                        cardIdToFocusOnRender={this.state.cardIdToFocusOnRender}
-                        showCard={this.showCard}
+                        onCardClicked={this.cardClicked}
                         addCard={this.addCard}
-                        onCardClicked={this.cardClicked}
-                    />}
-                {activeView.fields.viewType === 'calendar' &&
-                    <CalendarFullView
-                        board={this.props.board}
-                        cards={this.props.cards}
-                        activeView={this.props.activeView}
-                        readonly={this.props.readonly}
-                        dateDisplayProperty={this.props.dateDisplayProperty}
                         showCard={this.showCard}
-                        addCard={(properties: Record<string, string>) => {
-                            this.addCard('', true, properties)
-                        }}
                     />}
+                    {activeView.fields.viewType === 'table' &&
+                        <Table
+                            board={this.props.board}
+                            activeView={this.props.activeView}
+                            cards={this.props.cards}
+                            groupByProperty={this.props.groupByProperty}
+                            views={this.props.views}
+                            visibleGroups={visibleGroups}
+                            selectedCardIds={this.state.selectedCardIds}
+                            readonly={this.props.readonly}
+                            cardIdToFocusOnRender={this.state.cardIdToFocusOnRender}
+                            showCard={this.showCard}
+                            addCard={this.addCard}
+                            onCardClicked={this.cardClicked}
+                        />}
+                    {activeView.fields.viewType === 'calendar' &&
+                        <CalendarFullView
+                            board={this.props.board}
+                            cards={this.props.cards}
+                            activeView={this.props.activeView}
+                            readonly={this.props.readonly}
+                            dateDisplayProperty={this.props.dateDisplayProperty}
+                            showCard={this.showCard}
+                            addCard={(properties: Record<string, string>) => {
+                                this.addCard('', true, properties)
+                            }}
+                        />}
 
-                {activeView.fields.viewType === 'gallery' &&
-                    <Gallery
-                        board={this.props.board}
-                        cards={this.props.cards}
-                        activeView={this.props.activeView}
-                        readonly={this.props.readonly}
-                        onCardClicked={this.cardClicked}
-                        selectedCardIds={this.state.selectedCardIds}
-                        addCard={(show) => this.addCard('', show)}
-                    />}
+                    {activeView.fields.viewType === 'gallery' &&
+                        <Gallery
+                            board={this.props.board}
+                            cards={this.props.cards}
+                            activeView={this.props.activeView}
+                            readonly={this.props.readonly}
+                            onCardClicked={this.cardClicked}
+                            selectedCardIds={this.state.selectedCardIds}
+                            addCard={(show) => this.addCard('', show)}
+                        />}
+                </div>
             </div>
         )
     }
@@ -264,7 +266,7 @@ class CenterPanel extends React.Component<Props, State> {
         })
     }
 
-    addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}): Promise<void> => {
+    addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = false): Promise<void> => {
         const {activeView, board, groupByProperty} = this.props
 
         const card = createCard()
@@ -292,14 +294,19 @@ class CenterPanel extends React.Component<Props, State> {
         card.fields.contentOrder = [charmTextBlock.id];
 
         mutator.performAsUndoGroup(async () => {
-            const newCard = await mutator.insertBlock(
+            const newCardOrder = insertLast ? [...activeView.fields.cardOrder, card.id] : [card.id, ...activeView.fields.cardOrder]
+            // update view order first so that when we add the block it appears in the right spot
+            await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card')
+
+            await mutator.insertBlock(
                 card,
                 'add card',
                 async (block: Block) => {
                     await mutator.insertBlock(charmTextBlock, 'add card description')
                     if (show) {
+                        console.log('add card', this.props.addCard.toString());
                         this.props.addCard(createCard(block))
-                        this.props.updateView({...activeView, fields: {...activeView.fields, cardOrder: [...activeView.fields.cardOrder, block.id]}})
+                        this.props.updateView({...activeView, fields: {...activeView.fields, cardOrder: newCardOrder}})
                         this.showCard(block.id)
                     } else {
                         // Focus on this card's title inline on next render
@@ -311,7 +318,6 @@ class CenterPanel extends React.Component<Props, State> {
                     this.showCard(undefined)
                 },
             )
-            await mutator.changeViewCardOrder(activeView, [...activeView.fields.cardOrder, newCard.id], 'add-card')
         })
     }
 
