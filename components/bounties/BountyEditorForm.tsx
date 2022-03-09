@@ -73,7 +73,8 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     mode: 'onChange',
     defaultValues: {
       rewardToken: 'ETH' as CryptoCurrency,
-      chainId: '1' as any,
+      // TBC till we agree on Prisma migration
+      chainId: 1 as any,
       ...(bounty || {})
     },
     resolver: yupResolver(schema)
@@ -202,7 +203,13 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Reward token
               </InputLabel>
-              <InputSearchCrypto cryptoList={availableCryptos} readOnly={true} label='' register={register} modelKey='rewardToken' defaultValue={bounty?.rewardToken as CryptoCurrency} />
+              <InputSearchCrypto
+                cryptoList={availableCryptos}
+                defaultValue={bounty?.rewardToken as CryptoCurrency}
+                onChange={newToken => {
+                  setValue('rewardToken', newToken);
+                }}
+              />
             </Grid>
           </Grid>
           <Grid item>

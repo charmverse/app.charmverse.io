@@ -8,40 +8,32 @@ import { UseFormRegister } from 'react-hook-form';
 export interface IInputSearchCryptoProps {
   onChange?: (value: CryptoCurrency) => any,
   defaultValue?: CryptoCurrency | string,
-  register?: UseFormRegister<any>
-  modelKey?: string,
-  label?: string,
-  readOnly?: boolean,
+
   cryptoList?: Array<string | CryptoCurrency>
 }
 
 export function InputSearchCrypto ({
   onChange = () => {},
   defaultValue,
-  register = () => ({}) as any,
-  modelKey = '-',
-  readOnly = false,
-  cryptoList = CryptoCurrencies,
-  label = 'Choose a crypto' }: IInputSearchCryptoProps) {
+  cryptoList = CryptoCurrencies
+}: IInputSearchCryptoProps) {
 
   function emitValue (value: string) {
-    console.log('To Emit', value);
     if (value !== null && cryptoList.indexOf(value as CryptoCurrency) >= 0) {
       onChange(value as CryptoCurrency);
     }
   }
 
-  const [inputValue, setInputValue] = useState('');
+  const valueToDisplay = defaultValue ?? (cryptoList[0] ?? '');
 
-  const valueToDisplay = defaultValue ?? cryptoList[0];
+  const [inputValue, setInputValue] = useState('');
 
   const [value, setValue] = useState(valueToDisplay);
 
-  console.log('ToDisplay', valueToDisplay, 'Value', value);
-
   useEffect(() => {
     setInputValue(valueToDisplay);
-  }, [valueToDisplay, cryptoList]);
+    setValue(valueToDisplay);
+  }, [cryptoList]);
 
   return (
     <Autocomplete
@@ -51,12 +43,8 @@ export function InputSearchCrypto ({
       }}
       value={value}
       inputValue={inputValue}
-      isOptionEqualToValue={(option, _value) => {
-        console.log(option, _value);
-        return true;
-      }}
       onInputChange={(event, newInputValue) => {
-        setValue(newInputValue);
+        setInputValue(newInputValue);
       }}
       options={cryptoList}
       disableClearable={true}
@@ -80,7 +68,6 @@ export function InputSearchCrypto ({
       )}
       renderInput={(params) => (
         <TextField
-          {...register(modelKey)}
           {...params}
         />
       )}
