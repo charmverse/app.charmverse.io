@@ -59,10 +59,18 @@ async function switchActiveNetwork (chainId: number, errorCallback: (message: st
 
       const chainInfo = getChainById(chainId);
 
+      if (!chainInfo) {
+        throw new Error('Unsupported chain');
+      }
+
       return (window as any).ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [
-          chainInfo
+          {
+            ...chainInfo,
+            chainId: ethers.utils.hexValue(chainInfo?.chainId)
+          }
+
         ]
       });
 
