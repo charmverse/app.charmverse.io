@@ -2,7 +2,7 @@ import { Autocomplete, Box, TextField } from '@mui/material';
 import { CryptoCurrencies } from 'connectors';
 import { CryptoCurrency, CryptoCurrencyList, CryptoLogoPaths } from 'models/Currency';
 import Image from 'next/image';
-import React, { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { UseFormRegister } from 'react-hook-form';
 
 export interface IInputSearchCryptoProps {
@@ -31,15 +31,17 @@ export function InputSearchCrypto ({
     }
   }
 
-  const [inputValue, setInputValue] = React.useState('');
+  const [inputValue, setInputValue] = useState('');
 
   const valueToDisplay = defaultValue ?? cryptoList[0];
 
-  const [value, setValue] = React.useState(valueToDisplay);
+  const [value, setValue] = useState(valueToDisplay);
+
+  console.log('ToDisplay', valueToDisplay, 'Value', value);
 
   useEffect(() => {
-    setValue(valueToDisplay);
-  }, [valueToDisplay]);
+    setInputValue(valueToDisplay);
+  }, [valueToDisplay, cryptoList]);
 
   return (
     <Autocomplete
@@ -49,8 +51,12 @@ export function InputSearchCrypto ({
       }}
       value={value}
       inputValue={inputValue}
+      isOptionEqualToValue={(option, _value) => {
+        console.log(option, _value);
+        return true;
+      }}
       onInputChange={(event, newInputValue) => {
-        setInputValue(newInputValue);
+        setValue(newInputValue);
       }}
       options={cryptoList}
       disableClearable={true}
