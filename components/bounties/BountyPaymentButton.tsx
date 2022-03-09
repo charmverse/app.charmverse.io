@@ -87,7 +87,7 @@ export default function BountyPaymentButton ({
   chainIdToUse,
   tokenSymbol = 'ETH',
   tokenContractAddress = '',
-  tokenDecimals = 16,
+  tokenDecimals = 18,
   onSuccess = (tx: string, chainId: number) => {},
   onError = () => {},
   children = 'Make a payment'
