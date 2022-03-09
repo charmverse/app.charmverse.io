@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useUser } from 'hooks/useUser';
+import { useSpaces } from 'hooks/useSpaces';
+import { isSpaceDomain } from 'lib/spaces';
 
 // Pages to connect your wallet
 const walletConnectPages = ['/login', '/invite'];
@@ -26,6 +28,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const { triedEager } = useContext(Web3Connection);
   const { account, active } = useWeb3React();
   const [user, _, isUserLoaded] = useUser();
+  const [spaces] = useSpaces();
   const isUserLoading = !!(account && !isUserLoaded);
   const isWalletLoading = (!triedEager && !account);
   const isReactLoading = !router.isReady;
@@ -55,15 +58,17 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheck);
     };
-  }, [account, isLoading, isUserLoaded, user]);
+  }, [account, isLoading, isUserLoaded, spaces, user]);
 
   function authCheck (url: string) {
     // redirect to login page if accessing a private page and not logged in
     const path = url.split('?')[0];
+    const spaceDomain = path.split('/')[1];
 
     if (publicPages.some(basePath => path.startsWith(basePath))) {
       setAuthorized(true);
-    }// redirect to connect wallet
+    }
+    // redirect to connect wallet
     else if (!account && !walletConnectPages.some(basePath => path.startsWith(basePath))) {
       setAuthorized(false);
       console.log('[RouteGuard]: redirect to login');
@@ -78,6 +83,13 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       console.log('[RouteGuard]: redirect to signup', account, path);
       router.push({
         pathname: '/signup'
+      });
+    }
+    else if (isSpaceDomain(spaceDomain) && spaces.length > 0 && !spaces.some(s => s.domain === spaceDomain)) {
+      console.log('[RouteGuard]: send to join workspace page');
+      router.push({
+        pathname: '/joinWorkspace',
+        query: { domain: spaceDomain, returnUrl: router.asPath }
       });
     }
     else {
