@@ -176,7 +176,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Select a chain for this transaction
               </InputLabel>
-              <InputBlockchainSearch onChange={setChainId} />
+              <InputBlockchainSearch defaultChainId={bounty?.chainId as number} onChange={setChainId} />
             </Grid>
           </Grid>
           <Grid container item>
