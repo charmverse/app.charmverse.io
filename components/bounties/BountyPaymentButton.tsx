@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
@@ -14,8 +15,62 @@ interface Props {
   tokenDecimals?: number;
   chainIdToUse: number
   onSuccess?: (txId: string, chainId: number) => void;
-  onError?: (err: any) => void;
+  onError?: (err: any, severity?: AlertColor) => void;
   children?: React.ReactChild | React.ReactChild[];
+}
+
+function extractWalletErrorMessage (error: any): string {
+  if ((error)?.code === 'INSUFFICIENT_FUNDS') {
+    return 'You do not have sufficient funds to perform this transaction.';
+  }
+  else if ((error)?.code === 4001) {
+    return 'You rejected this transaction.';
+  }
+  else if ((error)?.reason) {
+    return error.reason;
+  }
+  else if (typeof error === 'object') {
+    return JSON.stringify(error);
+  }
+  else if (typeof error === 'string') {
+    return error;
+  }
+  else {
+    return 'An unknown error occurred';
+  }
+}
+
+/**
+ * See
+ * https://stackoverflow.com/a/68267546
+ * @param chainId
+ * @returns
+ */
+async function switchActiveNetwork (chainId: number, errorCallback: (message: string) => void = () => {}) {
+  try {
+    await (window as any).ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: ethers.utils.hexValue(chainId) }]
+    });
+    return;
+  }
+  catch (error: any) {
+    if (error.code === 4902) {
+
+      const chainInfo = getChainById(chainId);
+
+      return (window as any).ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          chainInfo
+        ]
+      });
+
+    }
+    else {
+      throw error;
+    }
+  }
 }
 
 export default function BountyPaymentButton ({
@@ -29,7 +84,7 @@ export default function BountyPaymentButton ({
   onError = () => {},
   children = 'Make a payment'
 }: Props) {
-  const { account, library, chainId } = useWeb3React();
+  const { account, library, chainId, activate } = useWeb3React();
 
   const makePayment = async () => {
 
@@ -52,13 +107,15 @@ export default function BountyPaymentButton ({
       return;
     }
 
-    const signer = await library.getSigner(account);
-
-    if (chainToUse.chainId !== currentUserChain.chainId) {
-      // Attempt to switch chains
-    }
-
     try {
+
+      if (chainToUse.chainId !== currentUserChain.chainId) {
+
+        await switchActiveNetwork(chainToUse.chainId);
+      }
+
+      const signer = await library.getSigner(account);
+
       if (chainToUse.nativeCurrency.symbol === tokenSymbol) {
         const tx = await signer.sendTransaction({
           to: receiver,
@@ -87,19 +144,17 @@ export default function BountyPaymentButton ({
         onError('Token contract address required');
       }
     }
-    catch (err) {
+    catch (err: any) {
 
-      const metaMaskError = (err as any).data?.message;
+      const errorMessage = extractWalletErrorMessage(err);
 
-      if ((err as any)?.code === 'INSUFFICIENT_FUNDS') {
-        onError('You do not have sufficient funds to perform this transaction.');
-      }
-      else if (metaMaskError) {
-        onError(metaMaskError.replace('err: ', ''));
+      if (errorMessage === 'underlying network changed') {
+        onError("You've changed your active network.\r\nRe-select 'Make a payment' to complete this transaction", 'warning');
       }
       else {
-        onError((err as any).reason || err);
+        onError(errorMessage);
       }
+
     }
   };
 
