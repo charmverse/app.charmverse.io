@@ -32,6 +32,8 @@ export function InputSearchCrypto ({
 
   const valueToDisplay = defaultValue ?? cryptoList[0];
 
+  console.log(cryptoList);
+
   return (
     <Autocomplete
       defaultValue={valueToDisplay}
@@ -63,8 +65,6 @@ export function InputSearchCrypto ({
         <TextField
           {...register(modelKey)}
           {...params}
-          label={label}
-          value={valueToDisplay}
         />
       )}
     />

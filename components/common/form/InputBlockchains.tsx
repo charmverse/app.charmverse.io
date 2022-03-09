@@ -6,30 +6,27 @@ import TextField from '@mui/material/TextField';
 import { UseFormRegister } from 'react-hook-form';
 
 interface Props {
-  onChange?: (chainId: string) => void
-  defaultChainId?: string | number
-  modelKey?: string
-  register?: UseFormRegister<any>,
+  onChange?: (chainId: number) => void
+  defaultChainId?: number
 }
 
 export function InputBlockchainSearch ({
   defaultChainId,
-  onChange = () => {},
-  modelKey,
-  register = () => ({}) as any }: Props) {
+  onChange = () => {}
+}: Props) {
 
   const defaultValueToAssign = defaultChainId ? RPCList.find(rpc => {
     return rpc.chainId === defaultChainId;
-  }) : null;
+  }) : undefined;
 
   return (
     <Autocomplete
       defaultValue={defaultValueToAssign}
-      {...register(modelKey ?? 'selectBlockchain', {
-        onChange: (event) => {
-
+      onChange={(_, event) => {
+        if (event?.chainId) {
+          onChange(event.chainId);
         }
-      })}
+      }}
       sx={{ minWidth: 150 }}
       options={RPCList}
       autoHighlight
@@ -48,6 +45,9 @@ export function InputBlockchainSearch ({
       renderInput={(params) => (
         <TextField
           {...params}
+          inputProps={{
+            ...params.inputProps
+          }}
         />
       )}
     />

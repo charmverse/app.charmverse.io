@@ -124,7 +124,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     setValue('reviewer', userId);
   }
 
-  function setChainId (chainId: string) {
+  function setChainId (chainId: number) {
     setValue('chainId', chainId);
 
     // Set the default chain currency
@@ -175,7 +175,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Select a chain for this transaction
               </InputLabel>
-              <InputBlockchainSearch register={register} modelKey='chainId' onChange={setChainId} />
+              <InputBlockchainSearch onChange={setChainId} />
             </Grid>
           </Grid>
           <Grid container item>
