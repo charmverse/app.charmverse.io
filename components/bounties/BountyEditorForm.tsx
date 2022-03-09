@@ -16,7 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -85,6 +85,12 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
   const [availableCryptos, setAvailableCryptos] = useState < Array<string | CryptoCurrency>>([]);
 
+  useEffect(() => {
+    if (bounty?.chainId) {
+      refreshCryptoList(bounty.chainId);
+    }
+  }, []);
+
   const values = watch();
 
   console.log('Values', values);
@@ -127,6 +133,11 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
   function setChainId (chainId: number) {
     setValue('chainId', chainId);
+
+    refreshCryptoList(chainId);
+  }
+
+  function refreshCryptoList (chainId: number) {
 
     // Set the default chain currency
     const selectedChain = getChainById(chainId);
