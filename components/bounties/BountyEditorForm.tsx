@@ -6,19 +6,19 @@ import InputLabel from '@mui/material/InputLabel';
 import { Bounty, Bounty as IBounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
 import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/editor/CharmEditor';
+import { getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
+import { useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
-import { RPCList, getChainById } from 'connectors';
-import { useState } from 'react';
 
 export type FormMode = 'create' | 'update';
 
