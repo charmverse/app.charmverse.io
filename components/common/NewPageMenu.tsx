@@ -27,20 +27,19 @@ const StyledIconButton = styled(IconButton)`
 
 export const StyledArticleIcon = styled(ArticleIcon)`
   color: ${greyColor2};
-  opacity: 0.5;
+  ${({ theme }) => theme.palette.mode !== 'light' && 'opacity: 0.5'};
   font-size: 22px;
 `;
 
 export const StyledDatabaseIcon = styled(DatabaseIcon)`
   color: ${greyColor2};
-  opacity: 0.5;
+  ${({ theme }) => theme.palette.mode !== 'light' && 'opacity: 0.5'};
   font-size: 22px;
 `;
 
 type Props = { addPage: (p: Partial<Page>) => void, tooltip: string, sx?: any };
 
 export default function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
