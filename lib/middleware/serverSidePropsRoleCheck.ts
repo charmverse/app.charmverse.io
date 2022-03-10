@@ -29,8 +29,25 @@ export async function checkUserCanVisitWorkspace (
   // Handle user access
   const userId = context.req.session.user?.id;
 
+  console.log('User id', userId);
   // No user available in this session. Redirect to home page
   if (!userId) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false
+      }
+    };
+  }
+
+  const userProfile = await prisma.user.findUnique({
+    where: {
+      id: userId
+    }
+  });
+
+  // Sometimes, the user may still have a session despite their account being deleted
+  if (!userProfile) {
     return {
       redirect: {
         destination: '/login',
