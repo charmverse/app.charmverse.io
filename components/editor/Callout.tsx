@@ -1,9 +1,11 @@
 import { blockquote } from '@bangle.dev/base-components';
 import { BaseRawNodeSpec, NodeViewProps } from '@bangle.dev/core';
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { ReactNode } from 'react';
-import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
-import { emojiSuggestKey } from './EmojiSuggest';
+import { Menu } from '@mui/material';
+import { Box } from '@mui/system';
+import { BaseEmoji, Picker } from 'emoji-mart';
+import { MouseEvent, ReactNode, useState } from 'react';
 
 const StyledCallout = styled.div`
   background-color: ${({ theme }) => theme.palette.background.light};
@@ -46,35 +48,39 @@ export function calloutSpec () {
 }
 
 export function Callout ({ children, node, updateAttrs, view, getPos }: NodeViewProps & { children: ReactNode }) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+    setAnchorEl(event.currentTarget);
+    event.preventDefault();
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const theme = useTheme();
+
   return (
     <StyledCallout>
       <CalloutEmoji>
-        <span
-          tabIndex={0}
-          role='button'
-          onClick={e => {
-            e.stopPropagation();
-            if (view.dispatch!) {
-              const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
-              const emojiSuggestState = emojiSuggestKey.getState(view.state);
-              // If we are already inside a callout we need to hide the emoji palette
-              if (emojiSuggestState.insideCallout) {
-                view.dispatch(
-                  // Chain transactions together
-                  view.state.tr.setMeta(emojiSuggestKey, { type: 'OUTSIDE_CALLOUT', updateAttrs, getPos }).setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
-                );
-              }
-              else {
-                view.dispatch(
-                  // Chain transactions together
-                  view.state.tr.setMeta(emojiSuggestKey, { type: 'INSIDE_CALLOUT', updateAttrs, getPos }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
-                );
-              }
-            }
-          }}
-        >
+        <Box onClick={handleClick}>
           {node.attrs.emoji}
-        </span>
+        </Box>
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+        >
+          <Picker
+            theme={theme.palette.mode}
+            onSelect={(emoji: BaseEmoji) => {
+              updateAttrs({
+                emoji: emoji.native
+              });
+              handleClose();
+            }}
+          />
+        </Menu>
       </CalloutEmoji>
       {children}
     </StyledCallout>
