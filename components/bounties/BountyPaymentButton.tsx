@@ -26,6 +26,9 @@ function extractWalletErrorMessage (error: any): string {
   else if ((error)?.code === 4001) {
     return 'You rejected this transaction.';
   }
+  else if ((error)?.code === -32602) {
+    return 'A valid recipient must be provided';
+  }
   else if ((error)?.reason) {
     return error.reason;
   }
@@ -125,6 +128,8 @@ export default function BountyPaymentButton ({
       const signer = await library.getSigner(account);
 
       if (chainToUse.nativeCurrency.symbol === tokenSymbol) {
+        console.log('Executing transaction');
+        console.log('Receiver', receiver);
         const tx = await signer.sendTransaction({
           to: receiver,
           value: ethers.utils.parseEther(amount)

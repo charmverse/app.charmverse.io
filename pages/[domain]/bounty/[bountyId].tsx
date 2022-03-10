@@ -364,7 +364,16 @@ export default function BountyDetails () {
                         <Typography variant='h6' component='span'>
                           You
                         </Typography>
+
+                        <Button
+                          sx={{ mt: 2 }}
+                          onClick={toggleApplicationDialog}
+                        >
+                          <Box sx={{ pr: 1 }}>Edit your payment details</Box>
+                          <EditOutlinedIcon />
+                        </Button>
                       </Box>
+
                       {bounty.status === 'assigned' && (
                         <Button onClick={requestReview}>Request review</Button>
                       )}
