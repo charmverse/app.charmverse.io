@@ -27,13 +27,13 @@ const StyledIconButton = styled(IconButton)`
 
 export const StyledArticleIcon = styled(ArticleIcon)`
   color: ${greyColor2};
-  ${({ theme }) => theme.palette.mode !== 'light' && 'opacity: 0.5'};
+  opacity: 0.5;
   font-size: 22px;
 `;
 
 export const StyledDatabaseIcon = styled(DatabaseIcon)`
   color: ${greyColor2};
-  ${({ theme }) => theme.palette.mode !== 'light' && 'opacity: 0.5'};
+  opacity: 0.5;
   font-size: 22px;
 `;
 
