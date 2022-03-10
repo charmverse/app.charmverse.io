@@ -297,12 +297,14 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 />
               </Box>
             </Box>
-            <SidebarLink
-              href={`/${space.domain}/bounties`}
-              active={router.pathname.startsWith('/[domain]/bounties')}
-              icon={<BountyIcon fontSize='small' />}
-              label='Bounties'
-            />
+            <Box sx={{ mt: 3 }}>
+              <SidebarLink
+                href={`/${space.domain}/bounties`}
+                active={router.pathname.startsWith('/[domain]/bounties')}
+                icon={<BountyIcon fontSize='small' />}
+                label='Bounties'
+              />
+            </Box>
           </Box>
           <Box>
             <Divider />
