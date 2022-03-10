@@ -52,7 +52,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   BSC: {
     chainId: 56,
-    chainName: 'BSC',
+    chainName: 'Binance Smart Chain',
     nativeCurrency: {
       name: 'Binance Coin',
       symbol: 'BNB',
@@ -67,7 +67,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   POLYGON: {
     chainId: 137,
-    chainName: 'Matic',
+    chainName: 'Polygon',
     nativeCurrency: {
       name: 'Polygon',
       symbol: 'MATIC',
@@ -82,7 +82,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   AVALANCHE: {
     chainId: 43114,
-    chainName: 'Avalanche Mainnet',
+    chainName: 'Avalanche',
     nativeCurrency: {
       name: 'Avalanche',
       symbol: 'AVAX',
@@ -97,7 +97,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   XDAI: {
     chainId: 100,
-    chainName: 'xDAI Chain',
+    chainName: 'Gnosis',
     nativeCurrency: {
       name: 'xDAI',
       symbol: 'XDAI',
@@ -142,7 +142,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   CELO: {
     chainId: 42220,
-    chainName: 'Celo Mainnet',
+    chainName: 'Celo',
     nativeCurrency: {
       name: 'Celo',
       symbol: 'CELO',
@@ -172,7 +172,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   GOERLI: {
     chainId: 5,
-    chainName: 'Goerli Test Network',
+    chainName: 'Ethereum - Goerli',
     nativeCurrency: {
       name: 'Ether',
       symbol: 'ETH',
@@ -187,7 +187,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   RINKEBY: {
     chainId: 4,
-    chainName: 'Rinkeby',
+    chainName: 'Ethereum - Rinkeby',
     nativeCurrency: {
       name: 'Ether',
       symbol: 'ETH',
@@ -202,7 +202,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   MUMBAI: {
     chainId: 80001,
-    chainName: 'Mumbai',
+    chainName: 'Polygon - Mumbai',
     nativeCurrency: {
       name: 'Polygon',
       symbol: 'MATIC',

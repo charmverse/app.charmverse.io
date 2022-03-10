@@ -31,12 +31,9 @@ export function InputBlockchainSearch ({
       options={RPCList}
       autoHighlight
       size='small'
-      getOptionLabel={option => `${option.nativeCurrency.name} (${option.chainName})`}
+      getOptionLabel={option => `${option.chainName}`}
       renderOption={(props, option) => (
         <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
-          <Box component='span'>
-            {option.nativeCurrency.name}
-          </Box>
           <Box component='span'>
             {option.chainName}
           </Box>
