@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
@@ -26,26 +25,21 @@ const StyledIconButton = styled(IconButton)`
   }
 `;
 
-export const StyledArticleIcon = styled(ArticleIcon)<{
-  isLightMode?: boolean
-}>`
+export const StyledArticleIcon = styled(ArticleIcon)`
   color: ${greyColor2};
-  ${({ isLightMode }) => !isLightMode && 'opacity: 0.5'};
+  ${({ theme }) => theme.palette.mode !== 'light' && 'opacity: 0.5'};
   font-size: 22px;
 `;
 
-export const StyledDatabaseIcon = styled(DatabaseIcon)<{
-  isLightMode?: boolean
-}>`
+export const StyledDatabaseIcon = styled(DatabaseIcon)`
   color: ${greyColor2};
-  ${({ isLightMode }) => !isLightMode && 'opacity: 0.5'};
+  ${({ theme }) => theme.palette.mode !== 'light' && 'opacity: 0.5'};
   font-size: 22px;
 `;
 
 type Props = { addPage: (p: Partial<Page>) => void, tooltip: string, sx?: any };
 
 export default function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
-  const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -74,11 +68,11 @@ export default function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
         onClose={handleClose}
       >
         <MenuItem onClick={() => createPage({ type: 'page' })}>
-          <ListItemIcon><StyledArticleIcon fontSize='small' isLightMode={theme.palette.mode === 'light'} /></ListItemIcon>
+          <ListItemIcon><StyledArticleIcon fontSize='small' /></ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Page</Typography>
         </MenuItem>
         <MenuItem onClick={() => createPage({ type: 'board' })}>
-          <ListItemIcon><StyledDatabaseIcon fontSize='small' isLightMode={theme.palette.mode === 'light'} /></ListItemIcon>
+          <ListItemIcon><StyledDatabaseIcon fontSize='small' /></ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Board</Typography>
         </MenuItem>
       </Menu>

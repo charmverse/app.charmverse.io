@@ -286,7 +286,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
 
   if (!labelIcon) {
     if (pageType === 'board') {
-      Icon = (<StyledDatabaseIcon isLightMode={theme.palette.mode === 'light'} />);
+      Icon = (<StyledDatabaseIcon />);
     }
     else if (isEditorEmpty) {
       Icon = (
