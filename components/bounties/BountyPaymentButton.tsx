@@ -99,6 +99,8 @@ export default function BountyPaymentButton ({
 
   const makePayment = async () => {
 
+    onError(null);
+
     if (!chainIdToUse) {
       onError('Please provide a chainId');
       return;

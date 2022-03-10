@@ -186,11 +186,18 @@ export default function BountyDetails () {
     setBounty(updatedBounty);
   }
 
-  function onError (err: string, severity: AlertColor = 'error') {
-    setPaymentError({
-      message: err,
-      severity
-    });
+  function onError (err: string | null, severity: AlertColor = 'error') {
+
+    if (err === null) {
+      setPaymentError(null);
+    }
+    else {
+      setPaymentError({
+        message: err,
+        severity
+      });
+    }
+
   }
 
   //  charmClient.getBounty();
@@ -323,7 +330,7 @@ export default function BountyDetails () {
                         )}
                         {
                           (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
-                            <Box onClick={e => setPaymentError(null)}>
+                            <Box>
                               <BountyPaymentButton
                                 receiver={walletAddressForPayment!}
                                 amount={eToNumber(bounty.rewardAmount)}
