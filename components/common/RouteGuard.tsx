@@ -59,7 +59,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }, [account, isLoading, isUserLoaded, spaces, user]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
-  function authCheck (url: string) {
+  async function authCheck (url: string) {
     const path = url.split('?')[0];
     const spaceDomain = path.split('/')[1];
 
@@ -76,23 +76,23 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         query: { returnUrl: router.asPath }
       });
     }
+    // condition: signed in but needing access to a space
+    else if (isSpaceDomain(spaceDomain) && (
+      !user || (spaces.length > 0 && !spaces.some(s => s.domain === spaceDomain))
+    )) {
+      setAuthorized(false);
+      console.log('[RouteGuard]: send to join workspace page');
+      router.push({
+        pathname: '/join',
+        query: { domain: spaceDomain, returnUrl: router.asPath }
+      });
+    }
     // condition: wallet connected, but no user in session
     else if (!user && !walletRequiredPages.some(basePath => path.startsWith(basePath))) {
       setAuthorized(false);
       console.log('[RouteGuard]: redirect to signup', account, path);
       router.push({
         pathname: '/signup'
-      });
-    }
-    // condition: signed in but needing access to a space
-    else if (isSpaceDomain(spaceDomain) && (
-      !user || (spaces.length > 0 && !spaces.some(s => s.domain === spaceDomain))
-    )) {
-      setAuthorized(true);
-      console.log('[RouteGuard]: send to join workspace page');
-      router.push({
-        pathname: '/join',
-        query: { domain: spaceDomain, returnUrl: router.asPath }
       });
     }
     else {
