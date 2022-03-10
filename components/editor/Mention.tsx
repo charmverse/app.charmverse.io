@@ -1,11 +1,13 @@
-import { RawSpecs } from '@bangle.dev/core';
-import { Command, DOMOutputSpec, PluginKey } from '@bangle.dev/pm';
+import { domSerializationHelpers, RawSpecs } from '@bangle.dev/core';
+import { Command, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
-import { ClickAwayListener } from '@mui/material';
+import { Box, ClickAwayListener, Typography } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
 import * as emojiSuggest from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { getSuggestTooltipKey } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import * as suggestTooltip from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
+import { useContributors } from 'hooks/useContributors';
 import { useCallback } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -15,7 +17,18 @@ export const mentionSuggestKey = new PluginKey('mentionSuggestKey');
 export const mentionSuggestMarkName = 'mentionSuggest';
 export const mentionTrigger = '@';
 
-export function mentionSpec (): RawSpecs {
+export function mentionSpecs (): RawSpecs {
+  const { toDOM, parseDOM } = domSerializationHelpers(name, {
+    tag: 'span',
+    parsingPriority: 52,
+    content: (node) => {
+      const spanElement = document.createElement('span');
+      spanElement.textContent = node.attrs.value;
+      spanElement.classList.add('mention-value');
+      return spanElement;
+    }
+  });
+
   return [
     {
       type: 'node',
@@ -33,10 +46,8 @@ export function mentionSpec (): RawSpecs {
         group: 'inline',
         draggable: true,
         atom: true,
-        parseDOM: [{ tag: 'span' }],
-        toDOM: (): DOMOutputSpec => {
-          return ['span', { class: 'mention' }];
-        }
+        parseDOM,
+        toDOM
       }
     },
     emojiSuggest.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger })
@@ -71,6 +82,7 @@ export function selectMention (key: PluginKey, mentionValue: string, mentionType
 }
 
 export function MentionSuggest () {
+  const [contributors] = useContributors();
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -103,7 +115,19 @@ export function MentionSuggest () {
   if (isVisible) {
     return createPortal(
       <ClickAwayListener onClickAway={closeTooltip}>
-        <div>Hello World</div>
+        <Box>
+          {contributors.map(contributor => (
+            <MenuItem
+              sx={{
+                background: theme.palette.background.light
+              }}
+              onClick={() => onSelectMention(contributor.id, 'user')}
+              key={contributor.id}
+            >
+              <Typography sx={{ fontSize: 15, fontWeight: 600 }}>{contributor.addresses[0]}</Typography>
+            </MenuItem>
+          ))}
+        </Box>
       </ClickAwayListener>,
       tooltipContentDOM
     );

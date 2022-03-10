@@ -34,6 +34,7 @@ import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
+import { mentionPlugins, mentionSpecs, MentionSuggest } from './Mention';
 import { NestedPage, nestedPageSpec } from './NestedPage';
 import Placeholder from './Placeholder';
 import { Quote, quoteSpec } from './Quote';
@@ -73,6 +74,7 @@ const specRegistry = new SpecRegistry([
   strike.spec(),
   underline.spec(),
   emojiSpecs(),
+  mentionSpecs(),
   code.spec(),
   codeBlock.spec(),
   iframeSpec(),
@@ -172,7 +174,7 @@ function CharmEditor (
       strike.plugins(),
       underline.plugins(),
       emojiPlugins(),
-      // tablePlugins(),
+      mentionPlugins(),
       columnResizing,
       floatingMenuPlugin(readOnly),
       blockquote.plugins(),
@@ -332,6 +334,7 @@ function CharmEditor (
       }}
     >
       <FloatingMenu />
+      <MentionSuggest />
       {EmojiSuggest}
       {InlinePalette}
       {children}
