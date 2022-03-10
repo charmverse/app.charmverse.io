@@ -9,6 +9,8 @@ import * as emojiSuggest from 'components/editor/@bangle.dev/react-emoji-suggest
 import { getSuggestTooltipKey } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import * as suggestTooltip from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
 import { useContributors } from 'hooks/useContributors';
+import useENSName from 'hooks/useENSName';
+import { getDisplayName } from 'lib/users';
 import { useCallback } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -129,8 +131,11 @@ export function MentionSuggest () {
 
 export function Mention ({ node }: NodeViewProps) {
   const theme = useTheme();
+  const [contributors] = useContributors();
+  const contributor = contributors.find(_contributor => _contributor.id === node.attrs.value)!;
+  const ensName = useENSName(contributor?.addresses[0]);
 
-  return (
+  return contributor ? (
     <Box
       component='span'
       sx={{
@@ -141,16 +146,15 @@ export function Mention ({ node }: NodeViewProps) {
         backgroundColor: theme.palette.background.light,
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 0.5
+        gap: 0.75
       }}
+      mx={0.5}
     >
       <PersonIcon sx={{
         fontSize: 16
       }}
       />
-      <span>
-        {node.attrs.value}
-      </span>
+      <Typography>{ensName || getDisplayName(contributor)}</Typography>
     </Box>
-  );
+  ) : null;
 }
