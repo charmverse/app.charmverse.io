@@ -1,13 +1,12 @@
-import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
-import { Command, DOMOutputSpec, PluginKey } from '@bangle.dev/pm';
+import { NodeViewProps, RawSpecs, SpecRegistry } from '@bangle.dev/core';
+import { Command, DOMOutputSpec, EditorState, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { useTheme } from '@emotion/react';
 import PersonIcon from '@mui/icons-material/Group';
 import { Box, ClickAwayListener, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import Avatar from 'components/common/Avatar';
-import * as emojiSuggest from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
-import { getSuggestTooltipKey } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import * as suggestTooltip from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
 import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
@@ -22,7 +21,74 @@ export const mentionSuggestKey = new PluginKey('mentionSuggestKey');
 export const mentionSuggestMarkName = 'mentionSuggest';
 export const mentionTrigger = '@';
 
+function pluginsFactory ({
+  key = new PluginKey('emojiSuggestMenu'),
+  markName,
+  tooltipRenderOpts = {}
+}: {
+  markName: string;
+  key?: PluginKey;
+  tooltipRenderOpts?: SuggestTooltipRenderOpts;
+}) {
+  return ({
+    specRegistry
+  }: {
+    schema: Schema;
+    specRegistry: SpecRegistry;
+  }) => {
+    const { trigger } = specRegistry.options[markName as any] as any;
+
+    const suggestTooltipKey = new PluginKey('suggestTooltipKey');
+
+    // We are converting to DOM elements so that their instances
+    // can be shared across plugins.
+    const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
+
+    return [
+      new Plugin({
+        key,
+        state: {
+          init () {
+            return {
+              tooltipContentDOM: tooltipDOMSpec.contentDOM,
+              markName,
+              suggestTooltipKey
+            };
+          },
+          apply (_, pluginState) {
+            return pluginState;
+          }
+        }
+      }),
+      suggestTooltip.plugins({
+        key: suggestTooltipKey,
+        markName,
+        trigger,
+        tooltipRenderOpts: {
+          ...tooltipRenderOpts,
+          tooltipDOMSpec
+        }
+      })
+    ];
+  };
+}
+
+export function getSuggestTooltipKey (key: PluginKey) {
+  return (state: EditorState) => {
+    return key.getState(state).suggestTooltipKey as PluginKey;
+  };
+}
+
+/** Commands */
+export function queryTriggerText (key: PluginKey) {
+  return (state: EditorState) => {
+    const suggestKey = getSuggestTooltipKey(key)(state);
+    return suggestTooltip.queryTriggerText(suggestKey)(state);
+  };
+}
+
 export function mentionSpecs (): RawSpecs {
+  const spec = suggestTooltip.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger });
   return [
     {
       type: 'node',
@@ -46,12 +112,17 @@ export function mentionSpecs (): RawSpecs {
         }
       }
     },
-    emojiSuggest.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger })
+    {
+      ...spec,
+      options: {
+        trigger: mentionTrigger
+      }
+    }
   ];
 }
 
 export function mentionPlugins () {
-  return emojiSuggest.plugins({
+  return pluginsFactory({
     key: mentionSuggestKey,
     markName: mentionSuggestMarkName,
     tooltipRenderOpts: {
