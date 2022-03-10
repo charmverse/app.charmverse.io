@@ -57,8 +57,7 @@ export const emojiPlugins = () => {
       markName: emojiSuggestMarkName,
       tooltipRenderOpts: {
         placement: 'bottom'
-      },
-      squareSide: 35
+      }
     })
   ];
 };

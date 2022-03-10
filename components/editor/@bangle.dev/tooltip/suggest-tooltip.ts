@@ -1,9 +1,7 @@
 import type { BaseRawMarkSpec, RawPlugins } from '@bangle.dev/core';
 import {
   Command,
-  EditorState, Fragment,
-  keymap,
-  MarkType,
+  EditorState, Fragment, MarkType,
   Node,
   Plugin,
   PluginKey,
@@ -13,9 +11,7 @@ import {
 import { tooltipPlacement, TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
-import {
-  createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert
-} from '@bangle.dev/utils';
+import { findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import { emojiSuggestKey } from "components/editor/EmojiSuggest";
 
 export const spec = specFactory;
@@ -101,15 +97,6 @@ function pluginsFactory({
   markName,
   trigger,
   tooltipRenderOpts,
-  keybindings = defaultKeys,
-  onEnter = (state, dispatch, view) => {
-    return removeSuggestMark(key)(state, dispatch, view);
-  },
-  onEscape = (state, dispatch, view) => {
-    return removeSuggestMark(key)(state, dispatch, view);
-  },
-  onArrowLeft,
-  onArrowRight,
 }: PluginsOptions): RawPlugins {
   return ({ schema }: { schema: Schema }) => {
     const isActiveCheck = queryIsSuggestTooltipActive(key);
@@ -148,17 +135,8 @@ function pluginsFactory({
                 counter: 0,
               };
             }
-            if (meta.type === 'INCREMENT_COUNTER') {
-              return { ...pluginState, counter: pluginState.counter + 1 };
-            }
             if (meta.type === 'RESET_COUNTER') {
               return { ...pluginState, counter: 0 };
-            }
-            if (meta.type === 'UPDATE_COUNTER') {
-              return { ...pluginState, counter: meta.value };
-            }
-            if (meta.type === 'DECREMENT_COUNTER') {
-              return { ...pluginState, counter: pluginState.counter - 1 };
             }
             throw new Error('Unknown type');
           },
@@ -199,12 +177,6 @@ function pluginsFactory({
         markName,
         key,
       }),
-      keybindings &&
-        keymap(
-          createObject([
-            [keybindings.select, filter(isActiveCheck, onEnter)],
-          ]),
-        ),
     ];
   };
 }

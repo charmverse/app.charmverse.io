@@ -4,7 +4,6 @@ import { EmojiGroupType } from '@bangle.dev/react-emoji-suggest/types';
 import { resolveCounter } from '@bangle.dev/react-emoji-suggest/utils';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import {
-  bangleWarn,
   rafCommandExec,
   uuid
 } from '@bangle.dev/utils';
@@ -13,7 +12,6 @@ import * as suggestTooltip from "components/editor/@bangle.dev/tooltip/suggest-t
 const {
   removeSuggestMark,
   resetSuggestTooltipCounter,
-  defaultKeys,
 } = suggestTooltip;
 
 export const spec = specFactory;
@@ -50,19 +48,11 @@ function pluginsFactory({
   markName,
   tooltipRenderOpts = {},
   getEmojiGroups,
-  maxItems = defaultMaxItems,
-  squareSide = 32,
-  squareMargin = 2,
-  rowWidth = 400,
 }: {
   markName: string;
   key?: PluginKey;
   tooltipRenderOpts?: SuggestTooltipRenderOpts;
   getEmojiGroups: GetEmojiGroupsType;
-  maxItems?: number;
-  squareSide?: number;
-  squareMargin?: number;
-  rowWidth?: number;
 }) {
   return ({
     schema,
@@ -79,13 +69,6 @@ function pluginsFactory({
     // can be shared across plugins.
     const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
 
-    if (!schema.marks[markName]) {
-      bangleWarn(
-        `Couldn't find the markName:${markName}, please make sure you have initialized to use the same markName you initialized the spec with`,
-      );
-      throw new Error(`markName ${markName} not found`);
-    }
-
     const selectedEmojiSquareId = uuid(6);
 
     return [
@@ -95,13 +78,9 @@ function pluginsFactory({
           init() {
             return {
               getEmojiGroups,
-              maxItems,
               tooltipContentDOM: tooltipDOMSpec.contentDOM,
               markName,
-              squareSide,
-              squareMargin,
               selectedEmojiSquareId,
-              rowWidth,
               suggestTooltipKey,
               getPos: null,
               onClick: () => {}
@@ -122,12 +101,6 @@ function pluginsFactory({
         tooltipRenderOpts: {
           ...tooltipRenderOpts,
           tooltipDOMSpec,
-        },
-
-        keybindings: {
-          ...defaultKeys,
-          left: 'ArrowLeft',
-          right: 'ArrowRight',
         },
 
         onEnter: (state, dispatch, view) => {
