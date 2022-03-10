@@ -1,17 +1,16 @@
 import type { BaseRawMarkSpec, RawPlugins } from '@bangle.dev/core';
 import {
   Command,
-  EditorState, Fragment, MarkType,
+  EditorState, Fragment, keymap, MarkType,
   Node,
   Plugin,
-  PluginKey,
-  Schema,
+  PluginKey, Schema,
   Selection
 } from '@bangle.dev/pm';
 import { tooltipPlacement, TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
-import { findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
+import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import { emojiSuggestKey } from "components/editor/EmojiSuggest";
 
 export const spec = specFactory;
@@ -20,6 +19,8 @@ export const commands = {
   queryTriggerText,
   queryIsSuggestTooltipActive,
   replaceSuggestMarkWith,
+  incrementSuggestTooltipCounter,
+  decrementSuggestTooltipCounter,
   resetSuggestTooltipCounter,
 };
 
@@ -97,8 +98,20 @@ function pluginsFactory({
   markName,
   trigger,
   tooltipRenderOpts,
+  keybindings = defaultKeys,
+  onEnter = (state, dispatch, view) => {
+    return removeSuggestMark(key)(state, dispatch, view);
+  },
+  onArrowDown = incrementSuggestTooltipCounter(key),
+  onArrowUp = decrementSuggestTooltipCounter(key),
+  onEscape = (state, dispatch, view) => {
+    return removeSuggestMark(key)(state, dispatch, view);
+  },
+  onArrowLeft,
+  onArrowRight,
 }: PluginsOptions): RawPlugins {
   return ({ schema }: { schema: Schema }) => {
+    const isActiveCheck = queryIsSuggestTooltipActive(key);
     return [
       new Plugin<PluginState, Schema>({
         key,
@@ -127,6 +140,10 @@ function pluginsFactory({
               };
             }
             if (meta.type === 'HIDE_TOOLTIP') {
+              // Do not change object reference if show was and is false
+              if (pluginState.show === false) {
+                return pluginState;
+              }
               return {
                 ...pluginState,
                 triggerText: '',
@@ -134,8 +151,17 @@ function pluginsFactory({
                 counter: 0,
               };
             }
+            if (meta.type === 'INCREMENT_COUNTER') {
+              return { ...pluginState, counter: pluginState.counter + 1 };
+            }
             if (meta.type === 'RESET_COUNTER') {
               return { ...pluginState, counter: 0 };
+            }
+            if (meta.type === 'UPDATE_COUNTER') {
+              return { ...pluginState, counter: meta.value };
+            }
+            if (meta.type === 'DECREMENT_COUNTER') {
+              return { ...pluginState, counter: pluginState.counter - 1 };
             }
             throw new Error('Unknown type');
           },
@@ -163,6 +189,17 @@ function pluginsFactory({
         markName,
         key,
       }),
+      keybindings &&
+        keymap(
+          createObject([
+            [keybindings.select, filter(isActiveCheck, onEnter)],
+            [keybindings.up, filter(isActiveCheck, onArrowUp)],
+            [keybindings.down, filter(isActiveCheck, onArrowDown)],
+            [keybindings.left, filter(isActiveCheck, onArrowLeft)],
+            [keybindings.right, filter(isActiveCheck, onArrowRight)],
+            [keybindings.hide, filter(isActiveCheck, onEscape)],
+          ]),
+        ),
     ];
   };
 }
@@ -500,12 +537,54 @@ export function removeSuggestMark(key: PluginKey): Command {
   };
 }
 
+export function incrementSuggestTooltipCounter(key: PluginKey): Command {
+  return (state, dispatch, _view) => {
+    if (dispatch) {
+      dispatch(
+        state.tr
+          .setMeta(key, { type: 'INCREMENT_COUNTER' })
+          .setMeta('addToHistory', false),
+      );
+    }
+    return true;
+  };
+}
+
+export function decrementSuggestTooltipCounter(key: PluginKey): Command {
+  return (state, dispatch, _view) => {
+    if (dispatch) {
+      dispatch(
+        state.tr
+          .setMeta(key, { type: 'DECREMENT_COUNTER' })
+          .setMeta('addToHistory', false),
+      );
+    }
+    return true;
+  };
+}
+
 export function resetSuggestTooltipCounter(key: PluginKey): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
       dispatch(
         state.tr
           .setMeta(key, { type: 'RESET_COUNTER' })
+          .setMeta('addToHistory', false),
+      );
+    }
+    return true;
+  };
+}
+
+export function updateSuggestTooltipCounter(
+  key: PluginKey,
+  counter: number,
+): Command {
+  return (state, dispatch, _view) => {
+    if (dispatch) {
+      dispatch(
+        state.tr
+          .setMeta(key, { type: 'UPDATE_COUNTER', value: counter })
           .setMeta('addToHistory', false),
       );
     }
