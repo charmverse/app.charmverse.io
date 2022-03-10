@@ -96,6 +96,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
   const values = watch();
 
   async function submitted (value: IBounty) {
+
     if (mode === 'create') {
       value.spaceId = space!.id;
       value.createdBy = user!.id;
@@ -113,9 +114,9 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
         rewardToken: value.rewardToken,
         descriptionNodes: value.descriptionNodes,
         description: value.description,
-        reviewer: value.reviewer
+        reviewer: value.reviewer,
+        chainId: value.chainId
       };
-      value.updatedAt = new Date();
       const updatedBounty = await charmClient.updateBounty(bounty.id, updates);
       setBounties(bounties.map(b => b.id === bounty.id ? updatedBounty : b));
       onSubmit(updatedBounty);
