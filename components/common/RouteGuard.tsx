@@ -6,12 +6,10 @@ import { useUser } from 'hooks/useUser';
 import { useSpaces } from 'hooks/useSpaces';
 import { isSpaceDomain } from 'lib/spaces';
 
-// Pages to connect your wallet
-const walletConnectPages = ['/login', '/invite'];
-// Pages to create a user account
-const signupPages = ['/signup', '/invite'];
 // Pages shared to the public that don't require user login
-const publicPages = ['/share'];
+const publicPages = ['/login', '/invite', '/share'];
+// Pages to create a user account
+const walletRequiredPages = ['/signup', '/invite', '/join'];
 
 /**
  * Page loading:
@@ -60,16 +58,18 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     };
   }, [account, isLoading, isUserLoaded, spaces, user]);
 
+  // authCheck runs before each page load and redirects to login if user is not logged in
   function authCheck (url: string) {
-    // redirect to login page if accessing a private page and not logged in
+
     const path = url.split('?')[0];
     const spaceDomain = path.split('/')[1];
 
+    // condition: public page
     if (publicPages.some(basePath => path.startsWith(basePath))) {
       setAuthorized(true);
     }
-    // redirect to connect wallet
-    else if (!account && !walletConnectPages.some(basePath => path.startsWith(basePath))) {
+    // condition: wallet not connected
+    else if (!account) {
       setAuthorized(false);
       console.log('[RouteGuard]: redirect to login');
       router.push({
@@ -77,19 +77,21 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         query: { returnUrl: router.asPath }
       });
     }
-    // redirect to create a user
-    else if (account && !user && !signupPages.some(basePath => path.startsWith(basePath))) {
+    // condition: user session, but no wallet
+    else if (isSpaceDomain(spaceDomain) && spaces.length > 0 && !spaces.some(s => s.domain === spaceDomain)) {
+      setAuthorized(true);
+      console.log('[RouteGuard]: send to join workspace page');
+      router.push({
+        pathname: '/join',
+        query: { domain: spaceDomain, returnUrl: router.asPath }
+      });
+    }
+    // condition: wallet connected, but no user in session
+    else if (!user && !walletRequiredPages.some(basePath => path.startsWith(basePath))) {
       setAuthorized(false);
       console.log('[RouteGuard]: redirect to signup', account, path);
       router.push({
         pathname: '/signup'
-      });
-    }
-    else if (isSpaceDomain(spaceDomain) && spaces.length > 0 && !spaces.some(s => s.domain === spaceDomain)) {
-      console.log('[RouteGuard]: send to join workspace page');
-      router.push({
-        pathname: '/joinWorkspace',
-        query: { domain: spaceDomain, returnUrl: router.asPath }
       });
     }
     else {
