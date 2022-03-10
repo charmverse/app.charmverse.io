@@ -69,7 +69,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       setAuthorized(true);
     }
     // condition: wallet not connected
-    else if (!account) {
+    else if (!account || !user) {
       setAuthorized(false);
       console.log('[RouteGuard]: redirect to login');
       router.push({
@@ -86,9 +86,9 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         query: { domain: spaceDomain, returnUrl: router.asPath }
       });
     }
-    // condition: wallet connected, but no user in session
-    else if (!user && !walletRequiredPages.some(basePath => path.startsWith(basePath))) {
-      setAuthorized(false);
+    // condition: wallet connected, but no user spaces
+    else if (spaces.length === 0) {
+      setAuthorized(true);
       console.log('[RouteGuard]: redirect to signup', account, path);
       router.push({
         pathname: '/signup'

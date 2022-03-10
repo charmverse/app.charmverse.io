@@ -1,6 +1,7 @@
 import { GetServerSidePropsContext, Redirect } from 'next';
 import { prisma } from 'db';
 import { User, Space } from '@prisma/client';
+import { isSpaceDomain } from 'lib/spaces/index';
 
 export interface IUserCannotAccessSpace {
   redirect?: Redirect
@@ -32,9 +33,14 @@ export async function checkUserCanVisitWorkspace (
   console.log('User id', userId);
   // No user available in this session. Redirect to home page
   if (!userId) {
+
+    console.log('Return url');
+
+    const redirectSuffix = (context.req.url && isSpaceDomain(context.req.url)) ? `?returnUrl=${encodeURIComponent(context.req.url)}` : '';
+
     return {
       redirect: {
-        destination: '/login',
+        destination: `/login${redirectSuffix}`,
         permanent: false
       }
     };

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -6,6 +6,8 @@ import Image from 'components/common/Image';
 import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+import { useUser } from 'hooks/useUser';
+import charmClient from 'charmClient';
 
 import splashImage from 'public/images/artwork/world.png';
 
@@ -18,6 +20,29 @@ export const Container = styled(Box)`
 export default function LoginPageContent ({ account }: { account: string | null | undefined }) {
 
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+
+  const [user, setUser] = useUser();
+
+  useEffect(() => {
+    if (account && !user) {
+      loginUser(account);
+    }
+  }, [account, user]);
+
+  async function loginUser (loginAddress: string) {
+
+    try {
+      const loggedInUser = await charmClient.login(loginAddress);
+      setUser(loggedInUser);
+    }
+    catch (error) {
+      const newUser = await charmClient.createUser({ address: loginAddress });
+      setUser(newUser);
+    }
+
+  }
+
+  console.log('Account', account);
 
   return (
     <Container px={3}>
@@ -62,7 +87,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
             <Typography sx={{ fontSize: 20, mb: 6 }}>
               Tasks, docs, bounties, and more
             </Typography>
-            {account ? (
+            {user ? (
               <PrimaryButton size='large' href='/'>
                 Go to Workspace
               </PrimaryButton>
