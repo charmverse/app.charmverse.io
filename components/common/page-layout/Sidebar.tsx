@@ -217,7 +217,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       router.push(newPath);
     }
   }
-  console.log(router.pathname);
 
   return (
     <SidebarContainer>
