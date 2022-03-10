@@ -1,16 +1,12 @@
-import { UpdateAttrsFunction } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { getSquareDimensions, resolveCounter } from '@bangle.dev/react-emoji-suggest/utils';
+import { resolveCounter } from '@bangle.dev/react-emoji-suggest/utils';
 import styled from '@emotion/styled';
-import CancelIcon from '@mui/icons-material/Cancel';
-import DeleteIcon from "@mui/icons-material/Delete";
-import { ListItem, Typography, useTheme } from '@mui/material';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
+import { useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { GetEmojiGroupsType, getSuggestTooltipKey, selectEmoji } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
-import { getEmojiByAlias } from 'components/editor/EmojiSuggest';
 import GroupLabel from 'components/editor/GroupLabel';
 import { useCallback, useMemo } from 'react';
 import reactDOM from 'react-dom';
@@ -38,10 +34,7 @@ export function EmojiSuggest({
     rowWidth,
     selectedEmojiSquareId,
     suggestTooltipKey,
-    insideCallout,
-    updateAttrs,
     onClick,
-    ref
   } = usePluginState(emojiSuggestKey);
   const theme = useTheme();
   const {
@@ -64,7 +57,6 @@ export function EmojiSuggest({
         {isVisible && (
           <EmojiSuggestContainer
             view={view}
-            insideCallout={insideCallout}
             rowWidth={rowWidth}
             squareMargin={squareMargin}
             squareSide={squareSide}
@@ -74,10 +66,8 @@ export function EmojiSuggest({
             triggerText={triggerText}
             counter={counter}
             selectedEmojiSquareId={selectedEmojiSquareId}
-            updateAttrs={updateAttrs}
             onClick={onClick}
             // if ref exists then we clicked on page icon
-            insidePageIcon={Boolean(ref)}
           />
         )}
       </div>
@@ -97,9 +87,6 @@ export function EmojiSuggestContainer({
   counter,
   selectedEmojiSquareId,
   maxItems,
-  insideCallout,
-  updateAttrs,
-  insidePageIcon,
   onClick
 }: {
   view: EditorView;
@@ -112,45 +99,22 @@ export function EmojiSuggestContainer({
   counter: number;
   selectedEmojiSquareId: string;
   maxItems: number;
-  insideCallout: boolean,
-  updateAttrs: UpdateAttrsFunction,
   onClick: (icon: string | null) => void,
-  insidePageIcon: boolean
 }) {
   const emojiGroups = useMemo(
     () => getEmojiGroups(triggerText),
     [getEmojiGroups, triggerText],
   );
-  const { containerWidth } = getSquareDimensions({
-    rowWidth,
-    squareMargin,
-    squareSide,
-  });
   const theme = useTheme();
   const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
 
   const { item: activeItem } = resolveCounter(counter, emojiGroups);
   const onSelectEmoji = useCallback(
     (emojiAlias: string) => {
-      if (insidePageIcon) {
-        onClick(getEmojiByAlias(emojiAlias)?.[1] ?? "👋")
-      } else if (insideCallout) {
-        updateAttrs({
-          emoji: getEmojiByAlias(emojiAlias)?.[1] ?? "👋"
-        })
-      } else {
-        selectEmoji(emojiSuggestKey, emojiAlias)(view.state, view.dispatch, view);
-      }
-      // Hide the tooltip on clicking an emoji if we are setting emoji for page icon
-
-      if (view.dispatch! && insidePageIcon && !insideCallout) {
-        view.dispatch(
-          view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
-        );
-      }
+      selectEmoji(emojiSuggestKey, emojiAlias)(view.state, view.dispatch, view);
       view.dispatch(
-        view.state.tr.setMeta(emojiSuggestKey, { type: "OUTSIDE_CALLOUT" })
-      )
+        view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
+      );
     },
     [view, emojiSuggestKey],
   );
@@ -173,37 +137,7 @@ export function EmojiSuggestContainer({
     >
       <ClickAwayListener onClickAway={closeTooltip}>
         <span>
-          {insidePageIcon && !insideCallout && (
-            <Box sx={{
-              width: "fit-content",
-              display: "flex",
-              justifyContent: "space-between"
-            }}>
-              <ListItem onClick={() => {
-                // Set the page icon to be null
-                onClick(null)
-                // Hide the emoji suggest
-                closeTooltip();
-              }} button disableRipple sx={{
-                padding: theme.spacing(0.5),
-                margin: theme.spacing(1, 0, 0, 1),
-                borderRadius: theme.spacing(0.5)
-              }}>
-                <DeleteIcon sx={{
-                  fontSize: 18,
-                  marginRight: theme.spacing(0.5)
-                }}/>
-                <Typography sx={{
-                  fontSize: 14,
-                  opacity: 0.75,
-                  fontWeight: 700,
-                }}>
-                  Remove
-                </Typography>
-              </ListItem>
-            </Box>
-          )}
-          <Box sx={{height: insidePageIcon && !insideCallout ? 320 : 400, overflowX: "hidden"}}>
+          <Box sx={{height: 400, overflowX: "hidden"}}>
             {emojiGroups.map(({ name: groupName, emojis }, i) => {
               return (
                 <Box p={1} className="bangle-emoji-suggest-group" key={groupName || i}>

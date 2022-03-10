@@ -24,8 +24,6 @@ export const commands = {
   queryTriggerText,
   queryIsSuggestTooltipActive,
   replaceSuggestMarkWith,
-  incrementSuggestTooltipCounter,
-  decrementSuggestTooltipCounter,
   resetSuggestTooltipCounter,
 };
 
@@ -107,8 +105,6 @@ function pluginsFactory({
   onEnter = (state, dispatch, view) => {
     return removeSuggestMark(key)(state, dispatch, view);
   },
-  onArrowDown = incrementSuggestTooltipCounter(key),
-  onArrowUp = decrementSuggestTooltipCounter(key),
   onEscape = (state, dispatch, view) => {
     return removeSuggestMark(key)(state, dispatch, view);
   },
@@ -207,11 +203,6 @@ function pluginsFactory({
         keymap(
           createObject([
             [keybindings.select, filter(isActiveCheck, onEnter)],
-            [keybindings.up, filter(isActiveCheck, onArrowUp)],
-            [keybindings.down, filter(isActiveCheck, onArrowDown)],
-            [keybindings.left, filter(isActiveCheck, onArrowLeft)],
-            [keybindings.right, filter(isActiveCheck, onArrowRight)],
-            [keybindings.hide, filter(isActiveCheck, onEscape)],
           ]),
         ),
     ];
@@ -551,54 +542,12 @@ export function removeSuggestMark(key: PluginKey): Command {
   };
 }
 
-export function incrementSuggestTooltipCounter(key: PluginKey): Command {
-  return (state, dispatch, _view) => {
-    if (dispatch) {
-      dispatch(
-        state.tr
-          .setMeta(key, { type: 'INCREMENT_COUNTER' })
-          .setMeta('addToHistory', false),
-      );
-    }
-    return true;
-  };
-}
-
-export function decrementSuggestTooltipCounter(key: PluginKey): Command {
-  return (state, dispatch, _view) => {
-    if (dispatch) {
-      dispatch(
-        state.tr
-          .setMeta(key, { type: 'DECREMENT_COUNTER' })
-          .setMeta('addToHistory', false),
-      );
-    }
-    return true;
-  };
-}
-
 export function resetSuggestTooltipCounter(key: PluginKey): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
       dispatch(
         state.tr
           .setMeta(key, { type: 'RESET_COUNTER' })
-          .setMeta('addToHistory', false),
-      );
-    }
-    return true;
-  };
-}
-
-export function updateSuggestTooltipCounter(
-  key: PluginKey,
-  counter: number,
-): Command {
-  return (state, dispatch, _view) => {
-    if (dispatch) {
-      dispatch(
-        state.tr
-          .setMeta(key, { type: 'UPDATE_COUNTER', value: counter })
           .setMeta('addToHistory', false),
       );
     }

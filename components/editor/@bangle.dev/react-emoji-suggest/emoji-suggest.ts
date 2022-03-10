@@ -1,7 +1,7 @@
 import { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
 import { Command, EditorState, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { EmojiGroupType } from '@bangle.dev/react-emoji-suggest/types';
-import { getSquareDimensions, resolveCounter, resolveRowJump } from '@bangle.dev/react-emoji-suggest/utils';
+import { resolveCounter } from '@bangle.dev/react-emoji-suggest/utils';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import {
   bangleWarn,
@@ -9,13 +9,8 @@ import {
   uuid
 } from '@bangle.dev/utils';
 import * as suggestTooltip from "components/editor/@bangle.dev/tooltip/suggest-tooltip";
-import { emojiSuggestKey, getEmojiByAlias } from 'components/editor/EmojiSuggest';
-import { safeScrollIntoViewIfNeeded } from 'components/editor/utility';
 
 const {
-  decrementSuggestTooltipCounter,
-  incrementSuggestTooltipCounter,
-  updateSuggestTooltipCounter,
   removeSuggestMark,
   resetSuggestTooltipCounter,
   defaultKeys,
@@ -30,6 +25,7 @@ export const commands = {
 
 const defaultTrigger = ':';
 const defaultMaxItems = 2000;
+
 function specFactory({
   markName,
   trigger = defaultTrigger,
@@ -83,9 +79,6 @@ function pluginsFactory({
     // can be shared across plugins.
     const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
 
-    const getIsTop = () =>
-      tooltipDOMSpec.dom.getAttribute('data-popper-placement') === 'top-start';
-
     if (!schema.marks[markName]) {
       bangleWarn(
         `Couldn't find the markName:${markName}, please make sure you have initialized to use the same markName you initialized the spec with`,
@@ -94,61 +87,6 @@ function pluginsFactory({
     }
 
     const selectedEmojiSquareId = uuid(6);
-
-    const updateCounter = (
-      keyType: 'LEFT' | 'RIGHT' | 'UP' | 'DOWN',
-    ): Command => {
-      return (state, dispatch, view) => {
-        requestAnimationFrame(() => {
-          const selectedEmoji = document.getElementById(selectedEmojiSquareId);
-          if (selectedEmoji) {
-            safeScrollIntoViewIfNeeded(selectedEmoji);
-          }
-          view?.focus();
-        });
-        if (keyType === 'LEFT') {
-          return decrementSuggestTooltipCounter(suggestTooltipKey)(
-            state,
-            dispatch,
-            view,
-          );
-        }
-        if (keyType === 'RIGHT') {
-          return incrementSuggestTooltipCounter(suggestTooltipKey)(
-            state,
-            dispatch,
-            view,
-          );
-        }
-
-        const goUp = keyType === 'UP' ? !getIsTop() : getIsTop();
-        const namedEmojiGroups = getEmojiGroups(queryTriggerText(key)(state));
-
-        const { counter } = suggestTooltipKey.getState(state);
-        const { rowCount } = getSquareDimensions({
-          rowWidth,
-          squareMargin,
-          squareSide,
-        });
-
-        const newCounter = resolveRowJump(
-          counter,
-          goUp ? -1 : 1,
-          rowCount,
-          namedEmojiGroups,
-        );
-
-        if (newCounter == null) {
-          return false;
-        }
-
-        return updateSuggestTooltipCounter(suggestTooltipKey, newCounter)(
-          state,
-          dispatch,
-          view,
-        );
-      };
-    };
 
     return [
       new Plugin({
@@ -165,10 +103,7 @@ function pluginsFactory({
               selectedEmojiSquareId,
               rowWidth,
               suggestTooltipKey,
-              insideCallout: false,
               getPos: null,
-              updateAttrs: null,
-              ref: null,
               onClick: () => {}
             };
           },
@@ -176,45 +111,6 @@ function pluginsFactory({
             const meta = tr.getMeta(key);
             if (meta === undefined) {
               return pluginState;
-            }
-            if (meta.type === "INSIDE_CALLOUT") {
-              return {
-                ...pluginState,
-                insideCallout: true,
-                updateAttrs: meta.updateAttrs,
-                getPos: meta.getPos,
-                ref: null,
-              }
-            }
-
-            if (meta.type === "INSIDE_PAGE_ICON") {
-              return {
-                ...pluginState,
-                insideCallout: false,
-                updateAttrs: () => {},
-                getPos: () => {},
-                ref: meta.ref,
-                onClick: meta.onClick,
-              }
-            }
-
-            if (meta.type === "OUTSIDE_PAGE_ICON") {
-              return {
-                ...pluginState,
-                insideCallout: false,
-                ref: null,
-                show: false
-              }
-            }
-
-            if (meta.type === "OUTSIDE_CALLOUT") {
-              return {
-                ...pluginState,
-                insideCallout: false,
-                updateAttrs: null,
-                getPos: null,
-                ref: null,
-              }
             }
           },
         },
@@ -237,7 +133,6 @@ function pluginsFactory({
         onEnter: (state, dispatch, view) => {
           const emojiGroups = getEmojiGroups(queryTriggerText(key)(state));
           const matchedEmojis = emojiGroups.flatMap((r) => r.emojis);
-          const {insideCallout, updateAttrs} = emojiSuggestKey.getState(state);
           if (matchedEmojis.length === 0) {
             return removeSuggestMark(key)(state, dispatch, view);
           }
@@ -252,26 +147,8 @@ function pluginsFactory({
           const emojiAlias = activeItem[0];
           view &&
             rafCommandExec(view, resetSuggestTooltipCounter(suggestTooltipKey));
-
-          if (!insideCallout) {
-            return selectEmoji(key, emojiAlias)(state, dispatch, view);
-          } else {
-            updateAttrs({
-              emoji: getEmojiByAlias(emojiAlias)?.[1] ?? "👋"
-            })
-            if (view) {
-              view.dispatch(
-                view.state.tr.setMeta(emojiSuggestKey, { type: "OUTSIDE_CALLOUT" })
-              )
-            }
-            return true;
-          }
+          return selectEmoji(key, emojiAlias)(state, dispatch, view);
         },
-
-        onArrowDown: updateCounter('DOWN'),
-        onArrowUp: updateCounter('UP'),
-        onArrowLeft: updateCounter('LEFT'),
-        onArrowRight: updateCounter('RIGHT'),
       }),
     ];
   };
