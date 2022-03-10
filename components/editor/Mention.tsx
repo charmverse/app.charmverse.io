@@ -5,12 +5,14 @@ import { useTheme } from '@emotion/react';
 import PersonIcon from '@mui/icons-material/Group';
 import { Box, ClickAwayListener, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
+import Avatar from 'components/common/Avatar';
 import * as emojiSuggest from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { getSuggestTooltipKey } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import * as suggestTooltip from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
 import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
+import { Contributor } from 'models';
 import { useCallback } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -118,7 +120,7 @@ export function MentionSuggest () {
               onClick={() => onSelectMention(contributor.id, 'user')}
               key={contributor.id}
             >
-              <Typography sx={{ fontSize: 15, fontWeight: 600 }}>{contributor.addresses[0]}</Typography>
+              <ContributorMenuOption user={contributor} />
             </MenuItem>
           ))}
         </Box>
@@ -127,6 +129,18 @@ export function MentionSuggest () {
     );
   }
   return null;
+}
+
+function ContributorMenuOption ({ user }: {user: Contributor}) {
+  const ensName = useENSName(user.addresses[0]);
+  return (
+    <Box display='flex' alignItems='center' gap={1}>
+      <Avatar name={ensName || getDisplayName(user)} size='small' />
+      <Typography>
+        {ensName || getDisplayName(user)}
+      </Typography>
+    </Box>
+  );
 }
 
 export function Mention ({ node }: NodeViewProps) {
