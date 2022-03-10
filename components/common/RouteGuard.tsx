@@ -77,8 +77,8 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         query: { returnUrl: router.asPath }
       });
     }
-    // condition: user session, but no wallet
-    else if (isSpaceDomain(spaceDomain) && spaces.length > 0 && !spaces.some(s => s.domain === spaceDomain)) {
+    // condition: wallet connected, but user is not in space
+    else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
       setAuthorized(true);
       console.log('[RouteGuard]: send to join workspace page');
       router.push({

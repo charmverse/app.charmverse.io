@@ -9,9 +9,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .get(getTokenGates)
   .use(requireUser)
-  .post(saveTokenGate)
-  .get(getTokenGates);
+  .post(saveTokenGate);
 
 async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
 
