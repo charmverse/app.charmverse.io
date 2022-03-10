@@ -475,7 +475,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       key={item.id}
       nodeId={item.id}
       label={item.title}
-      href={`${pathPrefix}/${item.path}${page.type === 'board' && page.boardId ? `?view=${focalboardViewsRecord[page.boardId]}` : ''}`}
+      href={`${pathPrefix}/${item.path}${page.type === 'board' && page.boardId && focalboardViewsRecord[page.boardId] ? `?viewId=${focalboardViewsRecord[page.boardId]}` : ''}`}
       isAdjacent={isAdjacentActive}
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}

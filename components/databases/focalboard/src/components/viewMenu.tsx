@@ -1,24 +1,25 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useCallback} from 'react'
-import {injectIntl, IntlShape} from 'react-intl'
-import { generatePath } from 'lib/utilities/strings'
+import { useFocalboardViews } from 'hooks/useFocalboardViews';
+import { generatePath } from 'lib/utilities/strings';
 import { useRouter } from 'next/router';
+import React, { useCallback } from 'react';
+import { injectIntl, IntlShape } from 'react-intl';
+import { Block } from '../blocks/block';
+import { Board, IPropertyTemplate } from '../blocks/board';
+import { BoardView, createBoardView, IViewType } from '../blocks/boardView';
+import { Constants } from '../constants';
+import mutator from '../mutator';
+import { IDType, Utils } from '../utils';
+import AddIcon from '../widgets/icons/add';
+import BoardIcon from '../widgets/icons/board';
+import CalendarIcon from '../widgets/icons/calendar';
+import DeleteIcon from '../widgets/icons/delete';
+import DuplicateIcon from '../widgets/icons/duplicate';
+import GalleryIcon from '../widgets/icons/gallery';
+import TableIcon from '../widgets/icons/table';
+import Menu from '../widgets/menu';
 
-import {Board, IPropertyTemplate} from '../blocks/board'
-import {BoardView, createBoardView, IViewType} from '../blocks/boardView'
-import {Constants} from '../constants'
-import mutator from '../mutator'
-import {Block} from '../blocks/block'
-import {IDType, Utils} from '../utils'
-import AddIcon from '../widgets/icons/add'
-import BoardIcon from '../widgets/icons/board'
-import CalendarIcon from '../widgets/icons/calendar'
-import DeleteIcon from '../widgets/icons/delete'
-import DuplicateIcon from '../widgets/icons/duplicate'
-import GalleryIcon from '../widgets/icons/gallery'
-import TableIcon from '../widgets/icons/table'
-import Menu from '../widgets/menu'
 
 type Props = {
     board: Board,
@@ -30,6 +31,8 @@ type Props = {
 
 const ViewMenu = React.memo((props: Props) => {
     const router = useRouter()
+    const {board, activeView} = props
+    const { setFocalboardViewsRecord } = useFocalboardViews();
 
     const showView = useCallback((viewId) => {
         let newPath = generatePath(router.pathname, router.query)
@@ -40,7 +43,6 @@ const ViewMenu = React.memo((props: Props) => {
     }, [router.query, history])
 
     const handleDuplicateView = useCallback(() => {
-        const {board, activeView} = props
         Utils.log('duplicateView')
         // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.DuplicateBoardView, {board: board.id, view: activeView.id})
         const currentViewId = activeView.id
@@ -81,6 +83,7 @@ const ViewMenu = React.memo((props: Props) => {
         Utils.assert(view, `view not found: ${id}`)
         if (view) {
             showView(view.id)
+            setFocalboardViewsRecord((focalboardViewsRecord) => ({...focalboardViewsRecord, [board.id]: view.id}))
         }
     }, [props.views, showView])
 

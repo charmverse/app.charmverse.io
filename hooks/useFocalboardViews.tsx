@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useDatabaseBlocks } from './useDatabaseBlocks';
+import { useLocalStorage } from './useLocalStorage';
 import { usePages } from './usePages';
 
 type FocalboardViewsRecord = Record<string, null | string>;
@@ -17,12 +18,15 @@ export const FocalboardViewsContext = createContext<Readonly<IContext>>({
 export function FocalboardViewsProvider ({ children }: { children: ReactNode }) {
   const { blocks } = useDatabaseBlocks();
   const { pages } = usePages();
-
   const [focalboardViewsRecord, setFocalboardViewsRecord] = useState<FocalboardViewsRecord>({});
+  const [localStorageValue] = useLocalStorage('focalboard.views', focalboardViewsRecord);
 
   useEffect(() => {
     pages.forEach(page => {
-      if (page.type === 'board' && page.boardId) focalboardViewsRecord[page.boardId] = null;
+      // Get the value from localstorage first
+      if (page.type === 'board' && page.boardId) {
+        focalboardViewsRecord[page.boardId] = localStorageValue?.[page.boardId] ?? null;
+      }
     });
 
     blocks.forEach(block => {
@@ -31,12 +35,16 @@ export function FocalboardViewsProvider ({ children }: { children: ReactNode }) 
         focalboardViewsRecord[block.parentId] = block.id;
       }
     });
+
+    setFocalboardViewsRecord(focalboardViewsRecord);
   }, [blocks, pages]);
 
-  const value = useMemo<IContext>(() => ({
-    focalboardViewsRecord,
-    setFocalboardViewsRecord
-  }), [blocks, pages]);
+  const value = useMemo<IContext>(() => {
+    return {
+      focalboardViewsRecord,
+      setFocalboardViewsRecord: setFocalboardViewsRecord as any
+    };
+  }, [blocks, pages]);
 
   return (
     <FocalboardViewsContext.Provider value={value}>
