@@ -205,7 +205,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
           <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
           <Typography variant='body2' align='center' sx={{ pt: 3 }}>
-            <Link color='secondary' href='/joinWorkspace/'>
+            <Link color='secondary' href='/join'>
               Join an existing workspace
               {' '}
               <LaunchIcon fontSize='small' />

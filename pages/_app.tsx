@@ -157,7 +157,10 @@ import { Provider as ReduxProvider } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import { createThemeLightSensitive } from 'theme';
 import 'theme/@bangle.dev/styles.scss';
-import 'theme/focalboard/styles.scss';
+import 'theme/focalboard/focalboard.typography.scss';
+import 'theme/focalboard/focalboard.main.scss';
+import 'theme/focalboard/focalboard.button.scss';
+
 import {
   darkTheme,
   lightTheme
@@ -250,10 +253,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                           </Head>
                         )}
                       </TitleContext.Consumer>
-                      <Head>
-                        <meta name='description' content='The Notion of Web3' />
-                        <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                      </Head>
                       <CssBaseline enableColorScheme={true} />
                       <RouteGuard>
                         <ErrorBoundary>

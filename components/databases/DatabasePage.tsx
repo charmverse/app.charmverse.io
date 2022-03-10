@@ -132,7 +132,7 @@ export function DatabaseEditor ({ page, setPage, readonly }: Props) {
     }) : boardViews;
 
     return (
-      <div className='focalboard-body' style={{ flexGrow: 1, height: 'fit-content' }}>
+      <div className='focalboard-body' style={{ flexGrow: 1 }}>
         <CenterPanel
           clientConfig={clientConfig}
           readonly={!!readonly}

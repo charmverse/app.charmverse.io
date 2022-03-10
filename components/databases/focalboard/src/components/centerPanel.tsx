@@ -151,7 +151,7 @@ class CenterPanel extends React.Component<Props, State> {
                             readonly={this.props.readonly}
                         />
                     </RootPortal>}
-                {board.fields.headerImage && <Box width={"100%"} p={0} mb={2}>
+                {board.fields.headerImage && <Box className='PageBanner' width={"100%"} mb={2}>
                   <PageBanner focalBoard image={board.fields.headerImage} setImage={(headerImage) => {
                     this.setRandomHeaderImage(board, headerImage!)
                   }} />
@@ -179,58 +179,60 @@ class CenterPanel extends React.Component<Props, State> {
                     />
                 </div>
 
-                {activeView.fields.viewType === 'board' &&
-                <Kanban
-                    board={this.props.board}
-                    activeView={this.props.activeView}
-                    cards={this.props.cards}
-                    groupByProperty={this.props.groupByProperty}
-                    visibleGroups={visibleGroups}
-                    hiddenGroups={hiddenGroups}
-                    selectedCardIds={this.state.selectedCardIds}
-                    readonly={this.props.readonly}
-                    onCardClicked={this.cardClicked}
-                    addCard={this.addCard}
-                    showCard={this.showCard}
-                />}
-                {activeView.fields.viewType === 'table' &&
-                    <Table
+                <div className='container-container'>
+                    {activeView.fields.viewType === 'board' &&
+                    <Kanban
                         board={this.props.board}
                         activeView={this.props.activeView}
                         cards={this.props.cards}
                         groupByProperty={this.props.groupByProperty}
-                        views={this.props.views}
                         visibleGroups={visibleGroups}
+                        hiddenGroups={hiddenGroups}
                         selectedCardIds={this.state.selectedCardIds}
                         readonly={this.props.readonly}
-                        cardIdToFocusOnRender={this.state.cardIdToFocusOnRender}
-                        showCard={this.showCard}
+                        onCardClicked={this.cardClicked}
                         addCard={this.addCard}
-                        onCardClicked={this.cardClicked}
-                    />}
-                {activeView.fields.viewType === 'calendar' &&
-                    <CalendarFullView
-                        board={this.props.board}
-                        cards={this.props.cards}
-                        activeView={this.props.activeView}
-                        readonly={this.props.readonly}
-                        dateDisplayProperty={this.props.dateDisplayProperty}
                         showCard={this.showCard}
-                        addCard={(properties: Record<string, string>) => {
-                            this.addCard('', true, properties)
-                        }}
                     />}
+                    {activeView.fields.viewType === 'table' &&
+                        <Table
+                            board={this.props.board}
+                            activeView={this.props.activeView}
+                            cards={this.props.cards}
+                            groupByProperty={this.props.groupByProperty}
+                            views={this.props.views}
+                            visibleGroups={visibleGroups}
+                            selectedCardIds={this.state.selectedCardIds}
+                            readonly={this.props.readonly}
+                            cardIdToFocusOnRender={this.state.cardIdToFocusOnRender}
+                            showCard={this.showCard}
+                            addCard={this.addCard}
+                            onCardClicked={this.cardClicked}
+                        />}
+                    {activeView.fields.viewType === 'calendar' &&
+                        <CalendarFullView
+                            board={this.props.board}
+                            cards={this.props.cards}
+                            activeView={this.props.activeView}
+                            readonly={this.props.readonly}
+                            dateDisplayProperty={this.props.dateDisplayProperty}
+                            showCard={this.showCard}
+                            addCard={(properties: Record<string, string>) => {
+                                this.addCard('', true, properties)
+                            }}
+                        />}
 
-                {activeView.fields.viewType === 'gallery' &&
-                    <Gallery
-                        board={this.props.board}
-                        cards={this.props.cards}
-                        activeView={this.props.activeView}
-                        readonly={this.props.readonly}
-                        onCardClicked={this.cardClicked}
-                        selectedCardIds={this.state.selectedCardIds}
-                        addCard={(show) => this.addCard('', show)}
-                    />}
+                    {activeView.fields.viewType === 'gallery' &&
+                        <Gallery
+                            board={this.props.board}
+                            cards={this.props.cards}
+                            activeView={this.props.activeView}
+                            readonly={this.props.readonly}
+                            onCardClicked={this.cardClicked}
+                            selectedCardIds={this.state.selectedCardIds}
+                            addCard={(show) => this.addCard('', show)}
+                        />}
+                </div>
             </div>
         )
     }
