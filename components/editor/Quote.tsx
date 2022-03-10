@@ -2,8 +2,6 @@ import { blockquote } from '@bangle.dev/base-components';
 import { BaseRawNodeSpec, NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import { ReactNode } from 'react';
-import { getSuggestTooltipKey } from './@bangle.dev/react-emoji-suggest/emoji-suggest';
-import { emojiSuggestKey } from './EmojiSuggest';
 
 const StyledBlockQuote = styled.div`
   border-left: 4px solid ${({ theme }) => theme.palette.text.primary};
@@ -22,7 +20,7 @@ export function quoteSpec () {
   return spec;
 }
 
-export function Quote ({ children, node, updateAttrs, view, getPos }: NodeViewProps & { children: ReactNode }) {
+export function Quote ({ children }: NodeViewProps & { children: ReactNode }) {
   return (
     <StyledBlockQuote>
       {children}

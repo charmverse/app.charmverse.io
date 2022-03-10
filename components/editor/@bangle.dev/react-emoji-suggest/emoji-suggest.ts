@@ -1,16 +1,10 @@
 import { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
 import { Command, EditorState, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
-import { EmojiGroupType } from '@bangle.dev/react-emoji-suggest/types';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import {
   uuid
 } from '@bangle.dev/utils';
 import * as suggestTooltip from "components/editor/@bangle.dev/tooltip/suggest-tooltip";
-
-const {
-  removeSuggestMark,
-  resetSuggestTooltipCounter,
-} = suggestTooltip;
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -39,8 +33,6 @@ function specFactory({
   };
 }
 
-export type GetEmojiGroupsType = (queryText: string) => EmojiGroupType;
-
 function pluginsFactory({
   key = new PluginKey('emojiSuggestMenu'),
   markName,
@@ -51,7 +43,6 @@ function pluginsFactory({
   tooltipRenderOpts?: SuggestTooltipRenderOpts;
 }) {
   return ({
-    schema,
     specRegistry,
   }: {
     schema: Schema;
