@@ -34,7 +34,7 @@ import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
-import { mentionPlugins, mentionSpecs, MentionSuggest } from './Mention';
+import { Mention, mentionPlugins, mentionSpecs, MentionSuggest } from './Mention';
 import { NestedPage, nestedPageSpec } from './NestedPage';
 import Placeholder from './Placeholder';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
@@ -142,6 +142,7 @@ interface CharmEditorProps {
 function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
 ) {
+
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -218,6 +219,10 @@ function CharmEditor (
         name: 'quote',
         containerDOM: ['blockquote', { class: 'charm-quote' }],
         contentDOM: ['div']
+      }),
+      NodeView.createPlugin({
+        name: 'mention',
+        containerDOM: ['span', { class: 'mention-value' }]
       })
       // TODO: Pasting iframe or image link shouldn't create those blocks for now
       // iframePlugin,
@@ -318,6 +323,13 @@ function CharmEditor (
                 }}
                 {...props}
               />
+            );
+          }
+          case 'mention': {
+            return (
+              <Mention {...props}>
+                {NodeViewChildren}
+              </Mention>
             );
           }
           case 'page': {
