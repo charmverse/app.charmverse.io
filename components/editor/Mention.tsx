@@ -1,7 +1,8 @@
-import { domSerializationHelpers, RawSpecs } from '@bangle.dev/core';
-import { Command, PluginKey } from '@bangle.dev/pm';
+import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
+import { Command, DOMOutputSpec, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
+import PersonIcon from '@mui/icons-material/Group';
 import { Box, ClickAwayListener, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import * as emojiSuggest from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
@@ -18,17 +19,6 @@ export const mentionSuggestMarkName = 'mentionSuggest';
 export const mentionTrigger = '@';
 
 export function mentionSpecs (): RawSpecs {
-  const { toDOM, parseDOM } = domSerializationHelpers(name, {
-    tag: 'span',
-    parsingPriority: 52,
-    content: (node) => {
-      const spanElement = document.createElement('span');
-      spanElement.textContent = node.attrs.value;
-      spanElement.classList.add('mention-value');
-      return spanElement;
-    }
-  });
-
   return [
     {
       type: 'node',
@@ -46,8 +36,10 @@ export function mentionSpecs (): RawSpecs {
         group: 'inline',
         draggable: true,
         atom: true,
-        parseDOM,
-        toDOM
+        parseDOM: [{ tag: 'span' }],
+        toDOM: (): DOMOutputSpec => {
+          return ['span', { class: 'mention-value' }];
+        }
       }
     },
     emojiSuggest.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger })
@@ -133,4 +125,32 @@ export function MentionSuggest () {
     );
   }
   return null;
+}
+
+export function Mention ({ node }: NodeViewProps) {
+  const theme = useTheme();
+
+  return (
+    <Box
+      component='span'
+      sx={{
+        padding: theme.spacing(0.5, 1),
+        borderRadius: theme.spacing(0.5),
+        fontWeight: 600,
+        opacity: 0.75,
+        backgroundColor: theme.palette.background.light,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.5
+      }}
+    >
+      <PersonIcon sx={{
+        fontSize: 16
+      }}
+      />
+      <span>
+        {node.attrs.value}
+      </span>
+    </Box>
+  );
 }
