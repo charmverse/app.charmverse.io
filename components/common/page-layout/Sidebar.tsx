@@ -37,7 +37,7 @@ import { Modal } from '../Modal';
 import NewPageMenu from '../NewPageMenu';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import { headerHeight } from './Header';
-import PageNavigation, { PageAnchor, PageIcon, PageTitle } from './PageNavigation';
+import PageNavigation from './PageNavigation';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;

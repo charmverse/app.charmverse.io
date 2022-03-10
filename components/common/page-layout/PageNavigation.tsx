@@ -37,8 +37,6 @@ export type MenuNode = Page & {
   children: MenuNode[];
 }
 
-// export const NonTreeItemLink = styled
-
 export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
 
   position: 'relative',
@@ -115,7 +113,7 @@ export const StyledIconButton = styled(IconButton)`
   }
 `;
 
-export const PageAnchor = styled.a`
+const PageAnchor = styled.a`
   color: inherit;
   text-decoration: none;
   display: flex;
@@ -136,14 +134,14 @@ export const PageAnchor = styled.a`
   }
 `;
 
-export const PageIcon = styled(EmojiCon)`
+const PageIcon = styled(EmojiCon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
 `;
 
-export const PageTitle = styled(Typography)<{ isempty?: number }>`
+const PageTitle = styled(Typography)<{ isempty?: number }>`
   color: inherit;
   display: flex;
   align-items: center;
