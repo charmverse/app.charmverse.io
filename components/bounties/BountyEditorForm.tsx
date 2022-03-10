@@ -10,7 +10,7 @@ import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/editor/CharmEditor';
-import { getChainById } from 'connectors';
+import { getChainById, getCryptos } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
@@ -62,6 +62,8 @@ function FormDescription ({ onPageContentChange, content, watch }:
 export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
   const { setBounties, bounties } = useBounties();
 
+  const defaultChainId = bounty?.chainId ?? 1;
+
   const {
     register,
     handleSubmit,
@@ -74,7 +76,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     defaultValues: {
       rewardToken: 'ETH' as CryptoCurrency,
       // TBC till we agree on Prisma migration
-      chainId: 1 as any,
+      chainId: defaultChainId as any,
       ...(bounty || {})
     },
     resolver: yupResolver(schema)
@@ -83,7 +85,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
   const [space] = useCurrentSpace();
   const [user] = useUser();
 
-  const [availableCryptos, setAvailableCryptos] = useState < Array<string | CryptoCurrency>>([]);
+  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>(getCryptos(defaultChainId));
 
   useEffect(() => {
     if (bounty?.chainId) {
@@ -92,8 +94,6 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
   }, []);
 
   const values = watch();
-
-  console.log('Values', values);
 
   async function submitted (value: IBounty) {
     if (mode === 'create') {
@@ -187,9 +187,15 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Select a chain for this transaction
               </InputLabel>
-              <InputBlockchainSearch defaultChainId={bounty?.chainId as number} onChange={setChainId} />
+              <InputBlockchainSearch
+                defaultChainId={defaultChainId}
+                onChange={setChainId}
+              />
             </Grid>
           </Grid>
+          {
+
+          }
           <Grid container item>
             <Grid item xs={6}>
               <InputLabel>
@@ -216,7 +222,6 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               </InputLabel>
               <InputSearchCrypto
                 cryptoList={availableCryptos}
-                defaultValue={bounty?.rewardToken as CryptoCurrency}
                 onChange={newToken => {
                   setValue('rewardToken', newToken);
                 }}
