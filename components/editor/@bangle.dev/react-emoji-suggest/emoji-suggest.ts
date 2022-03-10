@@ -1,9 +1,6 @@
 import { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
 import { Command, EditorState, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
-import {
-  uuid
-} from '@bangle.dev/utils';
 import * as suggestTooltip from "components/editor/@bangle.dev/tooltip/suggest-tooltip";
 
 export const spec = specFactory;
@@ -14,7 +11,6 @@ export const commands = {
 };
 
 const defaultTrigger = ':';
-const defaultMaxItems = 2000;
 
 function specFactory({
   markName,
@@ -56,8 +52,6 @@ function pluginsFactory({
     // can be shared across plugins.
     const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
 
-    const selectedEmojiSquareId = uuid(6);
-
     return [
       new Plugin({
         key,
@@ -66,16 +60,11 @@ function pluginsFactory({
             return {
               tooltipContentDOM: tooltipDOMSpec.contentDOM,
               markName,
-              selectedEmojiSquareId,
               suggestTooltipKey,
-              onClick: () => {}
             };
           },
-          apply(tr, pluginState) {
-            const meta = tr.getMeta(key);
-            if (meta === undefined) {
-              return pluginState;
-            }
+          apply(_, pluginState) {
+            return pluginState;
           },
         },
       }),
