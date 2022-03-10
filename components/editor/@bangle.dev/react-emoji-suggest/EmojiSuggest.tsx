@@ -5,6 +5,7 @@ import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { selectEmoji } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
 import { BaseEmoji, Picker } from 'emoji-mart';
 import { useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 export function EmojiSuggest({
   emojiSuggestKey,
@@ -13,6 +14,7 @@ export function EmojiSuggest({
 }) {
   const view = useEditorViewContext();
   const {
+    tooltipContentDOM,
     suggestTooltipKey,
   } = usePluginState(emojiSuggestKey);
 
@@ -39,12 +41,13 @@ export function EmojiSuggest({
     [view, emojiSuggestKey],
   );
 
-  return isVisible && <ClickAwayListener onClickAway={closeTooltip}>
+  return isVisible && 
+  createPortal(<ClickAwayListener onClickAway={closeTooltip}>
     <Picker
       theme={theme.palette.mode}
       onSelect={(emoji: BaseEmoji) => {
         onSelectEmoji(emoji.native);
       }}
     />
-  </ClickAwayListener>
+  </ClickAwayListener>, tooltipContentDOM)
 }

@@ -99,7 +99,6 @@ function pluginsFactory({
   tooltipRenderOpts,
 }: PluginsOptions): RawPlugins {
   return ({ schema }: { schema: Schema }) => {
-    const isActiveCheck = queryIsSuggestTooltipActive(key);
     return [
       new Plugin<PluginState, Schema>({
         key,
@@ -147,27 +146,14 @@ function pluginsFactory({
         renderOpts: {
           ...tooltipRenderOpts,
           getReferenceElement: referenceElement((state: EditorState) => {
-            const emojiSuggestState = emojiSuggestKey.getState(state);
-            // We are inside a callout, so dont search for mark,
-            // Instead use the getPos key of the emoji suggest plugin state
-            // to get the position of the callout node
-            const {getPos} = emojiSuggestState
-            if (getPos) {
-              const position = getPos();
-              return {
-                end: position,
-                start: position
-              };
-            } else {
-              const markType = schema.marks[markName];
-              const { selection } = state;
-              return findFirstMarkPosition(
-                markType,
-                state.doc,
-                selection.from - 1,
-                selection.to,
-              );
-            }
+            const markType = schema.marks[markName];
+            const { selection } = state;
+            return findFirstMarkPosition(
+              markType,
+              state.doc,
+              selection.from - 1,
+              selection.to,
+            );
           }),
         },
       }),

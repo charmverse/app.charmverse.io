@@ -77,7 +77,6 @@ function pluginsFactory({
               markName,
               selectedEmojiSquareId,
               suggestTooltipKey,
-              getPos: null,
               onClick: () => {}
             };
           },

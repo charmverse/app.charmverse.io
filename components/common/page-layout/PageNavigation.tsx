@@ -249,6 +249,7 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
   const { pages } = usePages();
+  const theme = useTheme();
   const {
     addSubPage,
     deletePage,
@@ -285,12 +286,12 @@ const PageTreeItem = forwardRef((props: any, ref) => {
 
   if (!labelIcon) {
     if (pageType === 'board') {
-      Icon = (<StyledDatabaseIcon />);
+      Icon = (<StyledDatabaseIcon isLightMode={theme.palette.mode === 'light'} />);
     }
     else if (isEditorEmpty) {
       Icon = (
         <InsertDriveFileOutlinedIcon sx={{
-          opacity: 0.5
+          opacity: theme.palette.mode !== 'light' ? 0.5 : 1
         }}
         />
       );
@@ -298,7 +299,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     else {
       Icon = (
         <DescriptionOutlinedIcon sx={{
-          opacity: 0.5
+          opacity: theme.palette.mode !== 'light' ? 0.5 : 1
         }}
         />
       );
