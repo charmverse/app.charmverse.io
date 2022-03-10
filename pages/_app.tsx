@@ -1,4 +1,6 @@
 import '@bangle.dev/tooltip/style.css';
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
 // fullcalendar css
@@ -6,13 +8,12 @@ import '@fullcalendar/common/main.css';
 import '@fullcalendar/daygrid/main.css';
 // init focalboard
 import '@mattermost/compass-icons/css/compass-icons.css';
-// Lit Protocol CSS
-import 'lit-modal-vite/dist/style.css';
 import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Web3ReactProvider } from '@web3-react/core';
+import { LitProtocolProvider } from 'adapters/litProtocol/hooks/useLitProtocol';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import RouteGuard from 'components/common/RouteGuard';
 import 'components/databases/focalboard/src/components/blockIconSelector.scss';
@@ -131,19 +132,20 @@ import 'components/databases/focalboard/src/widgets/propertyMenu.scss';
 import 'components/databases/focalboard/src/widgets/switch.scss';
 import 'components/databases/focalboard/src/widgets/tooltip.scss';
 import 'components/databases/focalboard/src/widgets/valueSelector.scss';
-import 'theme/lit-modal/styles.scss';
 import FocalBoardPortal from 'components/databases/FocalBoardPortal';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { ColorModeContext } from 'context/color-mode';
 import { BountiesProvider } from 'hooks/useBounties';
-import { LitProtocolProvider } from 'adapters/litProtocol/hooks/useLitProtocol';
 import { DatabaseBlocksProvider } from 'hooks/useDatabaseBlocks';
+import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, TitleContext } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { isMobile } from 'lib/browser';
+// Lit Protocol CSS
+import 'lit-modal-vite/dist/style.css';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -157,18 +159,16 @@ import { Provider as ReduxProvider } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import { createThemeLightSensitive } from 'theme';
 import 'theme/@bangle.dev/styles.scss';
-import 'theme/focalboard/focalboard.typography.scss';
-import 'theme/focalboard/focalboard.main.scss';
 import 'theme/focalboard/focalboard.button.scss';
-
+import 'theme/focalboard/focalboard.main.scss';
+import 'theme/focalboard/focalboard.typography.scss';
 import {
   darkTheme,
   lightTheme
 } from 'theme/focalboard/theme';
-import 'theme/styles.scss';
-import { CacheProvider } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
-import createCache from '@emotion/cache';
+import 'theme/lit-modal/styles.scss';
 import { setTheme as setLitProtocolTheme } from 'theme/lit-modal/theme';
+import 'theme/styles.scss';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -303,7 +303,9 @@ function DataProviders ({ children }: { children: ReactNode }) {
           <BountiesProvider>
             <DatabaseBlocksProvider>
               <PageTitleProvider>
-                {children}
+                <FocalboardViewsProvider>
+                  {children}
+                </FocalboardViewsProvider>
               </PageTitleProvider>
             </DatabaseBlocksProvider>
           </BountiesProvider>

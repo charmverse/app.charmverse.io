@@ -26,7 +26,10 @@ export function FocalboardViewsProvider ({ children }: { children: ReactNode }) 
     });
 
     blocks.forEach(block => {
-      if (block.type === 'view' && focalboardViewsRecord[block.parentId]) focalboardViewsRecord[block.parentId] = block.id;
+      // Set it to the first view
+      if (block.type === 'view' && focalboardViewsRecord[block.parentId] === null) {
+        focalboardViewsRecord[block.parentId] = block.id;
+      }
     });
   }, [blocks, pages]);
 

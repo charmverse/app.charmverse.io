@@ -18,6 +18,7 @@ import charmClient from 'charmClient';
 import TreeItemContent from 'components/common/TreeItemContent';
 import mutator from 'components/databases/focalboard/src/mutator';
 import EmojiPicker from 'components/databases/focalboard/src/widgets/emojiPicker';
+import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import useRefState from 'hooks/useRefState';
@@ -459,6 +460,11 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
     }
   }
 
+  const { focalboardViewsRecord } = useFocalboardViews();
+  const { pagesRecord } = usePages();
+
+  const page = pagesRecord[item.id];
+
   return (
     <PageTreeItem
       data-handler-id={handlerId}
@@ -469,7 +475,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       key={item.id}
       nodeId={item.id}
       label={item.title}
-      href={`${pathPrefix}/${item.path}`}
+      href={`${pathPrefix}/${item.path}${page.type === 'board' && page.boardId ? `?view=${focalboardViewsRecord[page.boardId]}` : ''}`}
       isAdjacent={isAdjacentActive}
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}
@@ -594,7 +600,6 @@ export default function PageNavigation ({
   rootPageIds
 }: NavProps) {
   const { pages, currentPage, setPages, addPageAndRedirect } = usePages();
-
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
 
