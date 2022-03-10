@@ -1,5 +1,6 @@
 
 import styled from '@emotion/styled';
+import { css, Theme } from '@emotion/react';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import BountyIcon from '@mui/icons-material/RequestPage';
@@ -36,7 +37,7 @@ import { Modal } from '../Modal';
 import NewPageMenu from '../NewPageMenu';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import { headerHeight } from './Header';
-import PageNavigation, { PageLink, StyledTreeItem } from './PageNavigation';
+import PageNavigation from './PageNavigation';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -76,14 +77,41 @@ const SidebarContainer = styled.div`
   }
 `;
 
+const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
+  padding-left: ${theme.spacing(2)};
+  padding-right: ${theme.spacing(2)};
+  margin-bottom: ${theme.spacing(0.5)};
+`;
+
 const SectionName = styled(Typography)`
+  ${sidebarItemStyles}
   color: ${greyColor2};
   font-size: 12px;
   letter-spacing: 0.03em;
   font-weight: 600;
-  padding-left: ${({ theme }) => theme.spacing(2)};
-  padding-right: ${({ theme }) => theme.spacing(2)};
-  margin-bottom: ${({ theme }) => theme.spacing(0.5)};
+`;
+
+const MenuItem = styled(Link)<{ active: boolean }>`
+  ${sidebarItemStyles}
+  align-items: center;
+  color: ${({ theme }) => theme.palette.text.secondary};
+  display: flex;
+  font-size: 14px;
+  font-weight: 500;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  :hover {
+    background-color: ${({ theme }) => theme.palette.action.hover};
+    color: inherit;
+  }
+  ${({ active, theme }) => active ? `
+    background-color: ${theme.palette.action.selected};
+    color: ${theme.palette.text.primary};
+  ` : ''}
+  svg {
+    font-size: 1.2em;
+    margin-right: ${({ theme }) => theme.spacing(1)};
+  }
 `;
 
 const SidebarHeader = styled.div(({ theme }) => ({
@@ -104,6 +132,15 @@ const SidebarHeader = styled.div(({ theme }) => ({
   // necessary for content to be below app bar
   minHeight: headerHeight
 }));
+
+function SidebarLink ({ active, href, icon, label }: { active: boolean, href: string, icon: any, label: string }) {
+  return (
+    <MenuItem href={href} active={active}>
+      {icon}
+      {label}
+    </MenuItem>
+  );
+}
 
 interface SidebarProps {
   closeSidebar: () => void;
@@ -224,7 +261,15 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                     <ChevronLeftIcon />
                   </IconButton>
                 </SidebarHeader>
-                <Divider sx={{ mb: 3 }} />
+                <Divider sx={{ mb: 2 }} />
+                <Box mb={2}>
+                  <SidebarLink
+                    active={router.pathname.startsWith('/[domain]/settings')}
+                    href={`/${space.domain}/settings/account`}
+                    icon={<SettingsIcon color='secondary' fontSize='small' />}
+                    label='Settings & Members'
+                  />
+                </Box>
                 {favoritePageIds.length > 0 && (
                   <Box mb={2}>
                     <SectionName>
@@ -251,17 +296,14 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 />
               </Box>
             </Box>
-            <StyledTreeItem
-              sx={{ mt: 3 }}
-              nodeId='bounties'
-              icon={<BountyIcon fontSize='small' />}
-              label={
-                <PageLink href={`/${space.domain}/bounties`} label='Bounties' />
-              }
-              ContentProps={{
-                className: router.pathname.includes('bounties') ? 'Mui-selected' : ''
-              }}
-            />
+            <Box sx={{ mt: 3 }}>
+              <SidebarLink
+                href={`/${space.domain}/bounties`}
+                active={router.pathname.startsWith('/[domain]/bounties')}
+                icon={<BountyIcon fontSize='small' />}
+                label='Bounties'
+              />
+            </Box>
           </Box>
           <Box>
             <Divider />
@@ -276,11 +318,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                   </Box>
                 </Box>
               )}
-              <Link href={`/${space.domain}/settings/account`}>
-                <IconButton>
-                  <SettingsIcon color='secondary' />
-                </IconButton>
-              </Link>
             </Box>
           </Box>
         </Box>
