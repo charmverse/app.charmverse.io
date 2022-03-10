@@ -37,6 +37,8 @@ export type MenuNode = Page & {
   children: MenuNode[];
 }
 
+// export const NonTreeItemLink = styled
+
 export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
 
   position: 'relative',
@@ -113,7 +115,7 @@ export const StyledIconButton = styled(IconButton)`
   }
 `;
 
-const PageAnchor = styled.a`
+export const PageAnchor = styled.a`
   color: inherit;
   text-decoration: none;
   display: flex;
@@ -134,14 +136,14 @@ const PageAnchor = styled.a`
   }
 `;
 
-const PageIcon = styled(EmojiCon)`
+export const PageIcon = styled(EmojiCon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
 `;
 
-export const PageTitle = styled(Typography)<{isempty: number}>`
+export const PageTitle = styled(Typography)<{ isempty?: number }>`
   color: inherit;
   display: flex;
   align-items: center;
@@ -179,61 +181,63 @@ export function PageLink ({ children, href, label, labelIcon, pageId }: PageLink
   });
 
   return (
-    <PageAnchor onClick={stopPropagation}>
-      {labelIcon && (
-        <PageIcon {...bindTrigger(popupState)}>
-          {labelIcon}
-        </PageIcon>
-      )}
-      <Link href={href} passHref>
-        <PageTitle isempty={isempty ? 1 : 0}>
-          {isempty ? 'Untitled' : label}
-        </PageTitle>
-      </Link>
-      {children}
-      <Menu {...bindMenu(popupState)}>
-        <EmojiPicker onSelect={async (emoji) => {
-          if (pageId) {
-            await charmClient.updatePage({
-              id: pageId,
-              icon: emoji
-            });
-            let isCurrentPageEdited = false;
-            let boardId: null | string = null;
-            // Update the state
-            setPages((pages) => pages.map(page => {
-              if (page.id === pageId) {
-                if (page.id === currentPage?.id) {
-                  isCurrentPageEdited = true;
-                }
-
-                if (page.boardId !== null) {
-                  boardId = page.boardId;
-                }
-                return {
-                  ...page,
-                  icon: emoji
-                };
-              }
-              return page;
-            }));
-
-            if (currentPage && isCurrentPageEdited) {
-              setCurrentPage({
-                ...currentPage,
+    <Link href={href} passHref>
+      <PageAnchor onClick={stopPropagation}>
+        {labelIcon && (
+          <PageIcon {...bindTrigger(popupState)}>
+            {labelIcon}
+          </PageIcon>
+        )}
+        <Link href={href}>
+          <PageTitle isempty={isempty ? 1 : 0}>
+            {isempty ? 'Untitled' : label}
+          </PageTitle>
+        </Link>
+        {children}
+        <Menu {...bindMenu(popupState)}>
+          <EmojiPicker onSelect={async (emoji) => {
+            if (pageId) {
+              await charmClient.updatePage({
+                id: pageId,
                 icon: emoji
               });
-            }
+              let isCurrentPageEdited = false;
+              let boardId: null | string = null;
+              // Update the state
+              setPages((pages) => pages.map(page => {
+                if (page.id === pageId) {
+                  if (page.id === currentPage?.id) {
+                    isCurrentPageEdited = true;
+                  }
 
-            if (boardId) {
-              await mutator.changeIcon(boardId, emoji, emoji);
+                  if (page.boardId !== null) {
+                    boardId = page.boardId;
+                  }
+                  return {
+                    ...page,
+                    icon: emoji
+                  };
+                }
+                return page;
+              }));
+
+              if (currentPage && isCurrentPageEdited) {
+                setCurrentPage({
+                  ...currentPage,
+                  icon: emoji
+                });
+              }
+
+              if (boardId) {
+                await mutator.changeIcon(boardId, emoji, emoji);
+              }
+              popupState.close();
             }
-            popupState.close();
-          }
-        }}
-        />
-      </Menu>
-    </PageAnchor>
+          }}
+          />
+        </Menu>
+      </PageAnchor>
+    </Link>
   );
 }
 
