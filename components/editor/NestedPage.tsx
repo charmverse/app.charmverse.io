@@ -10,6 +10,7 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import LinkIcon from '@mui/icons-material/Link';
 import { Box, ClickAwayListener, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import ActionsMenu from 'components/common/ActionsMenu';
+import { PageIcon, PageTitle } from 'components/common/page-layout/PageNavigation';
 import Snackbar from 'components/common/Snackbar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useNestedPage from 'hooks/useNestedPage';
@@ -158,17 +159,35 @@ export function NestedPagesList () {
       }}
       >
         <Box>
-          {pages.map(page => (
-            <MenuItem
-              sx={{
-                background: theme.palette.background.light
-              }}
-              onClick={() => onSelectPage(page)}
-              key={page.id}
-            >
-              <div>{page.title}</div>
-            </MenuItem>
-          ))}
+          {pages.map(page => {
+            const docContent = ((page?.content) as PageContent)?.content;
+            const isEditorEmpty = docContent && (docContent.length <= 1
+              && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
+
+            return (
+              <MenuItem
+                sx={{
+                  background: theme.palette.background.light
+                }}
+                onClick={() => onSelectPage(page)}
+                key={page.id}
+              >
+                <>
+                  <div>
+                    {page.icon ?? <PageIcon isEditorEmpty={Boolean(isEditorEmpty)} pageType={page.type} />}
+                  </div>
+                  <PageTitle
+                    isempty={page.title.length === 0 ? 1 : 0}
+                    sx={{
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {page.title.length !== 0 ? page.title : 'Untitled'}
+                  </PageTitle>
+                </>
+              </MenuItem>
+            );
+          })}
         </Box>
       </ClickAwayListener>,
       tooltipContentDOM

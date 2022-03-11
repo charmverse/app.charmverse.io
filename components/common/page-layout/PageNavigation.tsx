@@ -135,14 +135,14 @@ const PageAnchor = styled.a`
   }
 `;
 
-const PageIcon = styled(EmojiCon)`
+const StyledPageIcon = styled(EmojiCon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
 `;
 
-const PageTitle = styled(Typography)<{ isempty?: number }>`
+export const PageTitle = styled(Typography)<{ isempty?: number }>`
   color: inherit;
   display: flex;
   align-items: center;
@@ -183,9 +183,9 @@ export function PageLink ({ children, href, label, labelIcon, pageId }: PageLink
     <Link href={href} passHref>
       <PageAnchor onClick={stopPropagation}>
         {labelIcon && (
-          <PageIcon {...bindTrigger(popupState)}>
+          <div {...bindTrigger(popupState)}>
             {labelIcon}
-          </PageIcon>
+          </div>
         )}
         <Link passHref href={href}>
           <PageTitle isempty={isempty ? 1 : 0}>
@@ -249,6 +249,29 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
+export function PageIcon ({ isEditorEmpty, pageType }: {pageType: Page['type'], isEditorEmpty: boolean}) {
+  let Icon: null | ReactNode = null;
+  if (pageType === 'board') {
+    Icon = (<StyledDatabaseIcon />);
+  }
+  else if (isEditorEmpty) {
+    Icon = (
+      <InsertDriveFileOutlinedIcon />
+    );
+  }
+  else {
+    Icon = (
+      <DescriptionOutlinedIcon />
+    );
+  }
+
+  return (
+    <StyledPageIcon>
+      {Icon}
+    </StyledPageIcon>
+  );
+}
+
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
   const { pages } = usePages();
@@ -285,30 +308,6 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     setAnchorEl(null);
   }
 
-  let Icon: null | ReactNode = labelIcon;
-
-  if (!labelIcon) {
-    if (pageType === 'board') {
-      Icon = (<StyledDatabaseIcon />);
-    }
-    else if (isEditorEmpty) {
-      Icon = (
-        <InsertDriveFileOutlinedIcon sx={{
-          opacity: theme.palette.mode !== 'light' ? 0.5 : 1
-        }}
-        />
-      );
-    }
-    else {
-      Icon = (
-        <DescriptionOutlinedIcon sx={{
-          opacity: theme.palette.mode !== 'light' ? 0.5 : 1
-        }}
-        />
-      );
-    }
-  }
-
   return (
     <>
       <StyledTreeItem
@@ -316,7 +315,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
           <PageLink
             href={href}
             label={label}
-            labelIcon={Icon}
+            labelIcon={labelIcon ?? <PageIcon isEditorEmpty={Boolean(isEditorEmpty)} pageType={pageType} />}
             pageId={referencedPage?.id}
           >
             <div className='page-actions'>
