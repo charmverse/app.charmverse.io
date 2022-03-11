@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { Space } from 'models';
+import { Space } from '@prisma/client';
 import { useSpaces } from './useSpaces';
 
 export function useCurrentSpace () {

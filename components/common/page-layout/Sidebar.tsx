@@ -1,5 +1,6 @@
 
 import styled from '@emotion/styled';
+import { css, Theme } from '@emotion/react';
 import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import BountyIcon from '@mui/icons-material/RequestPage';
@@ -36,7 +37,7 @@ import { Modal } from '../Modal';
 import NewPageMenu from '../NewPageMenu';
 import WorkspaceAvatar from '../WorkspaceAvatar';
 import { headerHeight } from './Header';
-import PageNavigation, { PageLink, StyledTreeItem } from './PageNavigation';
+import PageNavigation from './PageNavigation';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -76,14 +77,41 @@ const SidebarContainer = styled.div`
   }
 `;
 
+const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
+  padding-left: ${theme.spacing(2)};
+  padding-right: ${theme.spacing(2)};
+`;
+
 const SectionName = styled(Typography)`
-  color: ${greyColor2};
-  font-size: 12px;
-  letter-spacing: 0.03em;
+  ${sidebarItemStyles}
+  color: ${({ theme }) => theme.palette.secondary.main};
+  font-size: 11.5px;
   font-weight: 600;
-  padding-left: ${({ theme }) => theme.spacing(2)};
-  padding-right: ${({ theme }) => theme.spacing(2)};
+  letter-spacing: 0.03em;
   margin-bottom: ${({ theme }) => theme.spacing(0.5)};
+`;
+
+const StyledSidebarLink = styled(Link)<{ active: boolean }>`
+  ${sidebarItemStyles}
+  align-items: center;
+  color: ${({ theme }) => theme.palette.secondary.main};
+  display: flex;
+  font-size: 14px;
+  font-weight: 500;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  :hover {
+    background-color: ${({ theme }) => theme.palette.action.hover};
+    color: inherit;
+  }
+  ${({ active, theme }) => active ? `
+    background-color: ${theme.palette.action.selected};
+    color: ${theme.palette.text.primary};
+  ` : ''}
+  svg {
+    font-size: 1.2em;
+    margin-right: ${({ theme }) => theme.spacing(1)};
+  }
 `;
 
 const SidebarHeader = styled.div(({ theme }) => ({
@@ -105,6 +133,30 @@ const SidebarHeader = styled.div(({ theme }) => ({
   minHeight: headerHeight
 }));
 
+const SidebarFooter = styled.div`
+  padding: ${({ theme }) => theme.spacing(1)};
+  display: flex;
+  align-items: center;
+  border-top: 1px solid ${({ theme }) => theme.palette.divider};
+`;
+
+const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
+  flex-grow: 1;
+  overflow-y: auto;
+  transition: border-color 0.2s ease-out;
+  border-top: 1px solid transparent;
+  ${({ isScrolled, theme }) => isScrolled ? `border-top: 1px solid ${theme.palette.divider}` : ''};
+`;
+
+function SidebarLink ({ active, href, icon, label }: { active: boolean, href: string, icon: any, label: string }) {
+  return (
+    <StyledSidebarLink href={href} active={active}>
+      {icon}
+      {label}
+    </StyledSidebarLink>
+  );
+}
+
 interface SidebarProps {
   closeSidebar: () => void;
   favorites: LoggedInUser['favorites'];
@@ -118,6 +170,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const boards = useAppSelector(getSortedBoards);
   const { currentPage, pages, setPages, addPageAndRedirect } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
   const intl = useIntl();
 
@@ -127,6 +180,10 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   function closeSpaceForm () {
     setSpaceFormOpen(false);
+  }
+
+  function onScroll (e: React.UIEvent<HTMLDivElement>) {
+    setIsScrolled(e.currentTarget?.scrollTop > 0);
   }
 
   async function addSpace (spaceOpts: Prisma.SpaceCreateInput) {
@@ -205,7 +262,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
           <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
           <Typography variant='body2' align='center' sx={{ pt: 3 }}>
-            <Link color='secondary' href='/joinWorkspace/'>
+            <Link color='secondary' href='/join'>
               Join an existing workspace
               {' '}
               <LaunchIcon fontSize='small' />
@@ -215,74 +272,68 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       </WorkspacesContainer>
       {space && (
         <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-          <Box sx={{ flexGrow: 1 }}>
-            <Box sx={{ flexGrow: 1 }}>
-              <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
-                <SidebarHeader>
-                  <Typography><strong>{space.name}</strong></Typography>
-                  <IconButton onClick={closeSidebar}>
-                    <ChevronLeftIcon />
-                  </IconButton>
-                </SidebarHeader>
-                <Divider sx={{ mb: 3 }} />
-                {favoritePageIds.length > 0 && (
-                  <Box mb={2}>
-                    <SectionName>
-                      FAVORITES
-                    </SectionName>
-                    <PageNavigation
-                      isFavorites={true}
-                      space={space}
-                      rootPageIds={favoritePageIds}
-                    />
-                  </Box>
-                )}
-                <WorkspaceLabel>
-                  <SectionName>
-                    WORKSPACE
-                  </SectionName>
-                  <div className='add-a-page'>
-                    <NewPageMenu tooltip='Add a page' addPage={page => addPageAndRedirect(page)} />
-                  </div>
-                </WorkspaceLabel>
-                <PageNavigation
-                  space={space}
-                  deletePage={deletePage}
-                />
-              </Box>
-            </Box>
-            <StyledTreeItem
-              sx={{ mt: 3 }}
-              nodeId='bounties'
-              icon={<BountyIcon fontSize='small' />}
-              label={
-                <PageLink href={`/${space.domain}/bounties`} label='Bounties' />
-              }
-              ContentProps={{
-                className: router.pathname.includes('bounties') ? 'Mui-selected' : ''
-              }}
+          <SidebarHeader>
+            <Typography><strong>{space.name}</strong></Typography>
+            <IconButton onClick={closeSidebar}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </SidebarHeader>
+          <Box mb={2}>
+            <SidebarLink
+              active={router.pathname.startsWith('/[domain]/settings')}
+              href={`/${space.domain}/settings/account`}
+              icon={<SettingsIcon color='secondary' fontSize='small' />}
+              label='Settings & Members'
             />
           </Box>
-          <Box>
-            <Divider />
-            <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
-              {user && (
-                <Box display='flex' alignItems='center'>
-                  <Avatar name={getDisplayName(user)} />
-                  <Box pl={1}>
-                    <Typography color='secondary'>
-                      <strong>{getDisplayName(user)}</strong>
-                    </Typography>
-                  </Box>
-                </Box>
-              )}
-              <Link href={`/${space.domain}/settings/account`}>
-                <IconButton>
-                  <SettingsIcon color='secondary' />
-                </IconButton>
-              </Link>
+          <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll}>
+            {favoritePageIds.length > 0 && (
+            <Box mb={2}>
+              <SectionName>
+                FAVORITES
+              </SectionName>
+              <PageNavigation
+                isFavorites={true}
+                space={space}
+                rootPageIds={favoritePageIds}
+              />
             </Box>
-          </Box>
+            )}
+            <WorkspaceLabel>
+              <SectionName>
+                WORKSPACE
+              </SectionName>
+              <div className='add-a-page'>
+                <NewPageMenu tooltip='Add a page' addPage={page => addPageAndRedirect(page)} />
+              </div>
+            </WorkspaceLabel>
+            <Box sx={{ mb: 6 }}>
+              <PageNavigation
+                space={space}
+                deletePage={deletePage}
+              />
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <SidebarLink
+                href={`/${space.domain}/bounties`}
+                active={router.pathname.startsWith('/[domain]/bounties')}
+                icon={<BountyIcon fontSize='small' />}
+                label='Bounties'
+              />
+            </Box>
+          </ScrollingContainer>
+          <SidebarFooter>
+            {user && (
+            <Box display='flex' alignItems='center'>
+              <Avatar name={getDisplayName(user)} />
+              <Box pl={1}>
+                <Typography color='secondary'>
+                  <strong>{getDisplayName(user)}</strong>
+                </Typography>
+              </Box>
+            </Box>
+            )}
+          </SidebarFooter>
         </Box>
       )}
     </SidebarContainer>

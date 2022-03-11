@@ -33,7 +33,7 @@ type Props = {
   target?: string
 };
 
-export default function Link ({ href, children, sx, className, color = 'blue', external, target }: Props) {
+export default function Link ({ href, children, sx, className, color = 'primary', external, target }: Props) {
   return (
     external ? (
       <StyledMuiLink className={className} color={color} href={href} sx={sx} target={target} underline='none'>

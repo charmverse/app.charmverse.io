@@ -8,13 +8,20 @@ import Box from '@mui/material/Box';
 import AccountIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/WorkOutline';
 import PersonIcon from '@mui/icons-material/Group';
+import LockIcon from '@mui/icons-material/LockOpen';
 import { PageLayout } from '../common/page-layout';
 
 const SETTINGS_TABS = [
   { icon: <AccountIcon fontSize='small' />, path: 'account', label: 'My account' },
   { icon: <SettingsIcon fontSize='small' />, path: 'workspace', label: 'Workspace' },
-  { icon: <PersonIcon fontSize='small' />, path: 'contributors', label: 'Contributors' }
+  { icon: <PersonIcon fontSize='small' />, path: 'contributors', label: 'Contributors' },
+  { icon: <LockIcon fontSize='small' />, path: 'token-gates', label: 'Token Gates' }
 ];
+
+const ScrollableWindow = styled.div`
+  flex-grow: 1;
+  overflow: auto;
+`;
 
 const Container = styled(Box)`
   width: 800px;
@@ -46,22 +53,24 @@ export default function SettingsLayout ({ children }: { children: ReactNode }) {
 
   return (
     <PageLayout>
-      <NavigationContainer>
+      <ScrollableWindow>
+        <NavigationContainer>
+          <Container>
+            <Tabs value={tab} indicatorColor='primary' sx={{ minHeight: 44 }}>
+              {/* combining next links with MUI tabs - https://stackoverflow.com/questions/65471275/material-ui-tabs-with-nextjs */}
+              {SETTINGS_TABS.map(({ icon, path, label }) => (
+                <Link href={`/${domain}/settings/${path}`} passHref key={label}>
+                  <Tab icon={icon} iconPosition='start' component='a' disableRipple label={label} sx={{ fontSize: 14, minHeight: 0 }} />
+                </Link>
+              ))}
+            </Tabs>
+          </Container>
+        </NavigationContainer>
         <Container>
-          <Tabs value={tab} indicatorColor='primary' sx={{ minHeight: 44 }}>
-            {/* combining next links with MUI tabs - https://stackoverflow.com/questions/65471275/material-ui-tabs-with-nextjs */}
-            {SETTINGS_TABS.map(({ icon, path, label }) => (
-              <Link href={`/${domain}/settings/${path}`} passHref key={label}>
-                <Tab icon={icon} iconPosition='start' component='a' disableRipple label={label} sx={{ fontSize: 14, minHeight: 0 }} />
-              </Link>
-            ))}
-          </Tabs>
+          {children}
         </Container>
-      </NavigationContainer>
-      <Container>
-        {children}
-      </Container>
-      <Box pb={8} />
+        <Box pb={8} />
+      </ScrollableWindow>
     </PageLayout>
   );
 }
