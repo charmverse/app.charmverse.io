@@ -102,6 +102,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       }
       return { authorized: false, user: _user };
     }
+    // condition: user switches to a new/unknown address
     else if (!user.addresses.includes(account)) {
       console.log('[RouteGuard]: unknown address');
       let _user = await charmClient.login(account).catch(err => null);

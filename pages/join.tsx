@@ -23,7 +23,6 @@ export default function CreateSpace () {
     }
   }
   useEffect(() => {
-    console.log(spaces, router.query.domain);
     if (spaces.some(space => space.domain === router.query.domain)) {
       router.push(`/${router.query.domain}`);
     }
