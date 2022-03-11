@@ -140,7 +140,7 @@ const SidebarFooter = styled.div`
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
-const ScrollingContainer = styled.div<{ isScrolled: 1 }>`
+const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   flex-grow: 1;
   overflow-y: auto;
   transition: border-color 0.2s ease-out;
