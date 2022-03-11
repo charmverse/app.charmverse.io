@@ -7,6 +7,7 @@ import { Box, ClickAwayListener, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import Avatar from 'components/common/Avatar';
 import * as suggestTooltip from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip } from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
 import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
@@ -161,26 +162,20 @@ export function MentionSuggest () {
 
   const theme = useTheme();
 
-  function closeTooltip () {
-    if (view.dispatch!) {
-      view.dispatch(
-        // Chain transactions together
-        view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
-      );
-    }
-  }
-
   const onSelectMention = useCallback(
     (value: string, type: string) => {
       selectMention(mentionSuggestKey, value, type)(view.state, view.dispatch, view);
-      closeTooltip();
+      hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
     },
     [view, mentionSuggestKey]
   );
 
   if (isVisible) {
     return createPortal(
-      <ClickAwayListener onClickAway={closeTooltip}>
+      <ClickAwayListener onClickAway={() => {
+        hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
+      }}
+      >
         <Box>
           {contributors.map(contributor => (
             <MenuItem

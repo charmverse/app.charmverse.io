@@ -1,13 +1,14 @@
 import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
 import { Schema, Plugin, DOMOutputSpec, TextSelection, PluginKey } from '@bangle.dev/pm';
-import { SuggestTooltipRenderOpts, tooltipPlacement } from '@bangle.dev/tooltip';
+import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import { createTooltipDOM, SuggestTooltipRenderOpts, tooltipPlacement } from '@bangle.dev/tooltip';
 import { useTheme } from '@emotion/react';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import LinkIcon from '@mui/icons-material/Link';
-import { Box, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { Box, ClickAwayListener, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import ActionsMenu from 'components/common/ActionsMenu';
 import Snackbar from 'components/common/Snackbar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -15,9 +16,14 @@ import useNestedPage from 'hooks/useNestedPage';
 import { usePages } from 'hooks/usePages';
 import useSnackbar from 'hooks/useSnackbar';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { PageContent } from 'models';
+import { Page, PageContent } from 'models';
 import Link from 'next/link';
-import { referenceElement } from './@bangle.dev/tooltip/suggest-tooltip';
+import contributors from 'pages/[domain]/settings/contributors';
+import { useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import { hideSuggestionsTooltip, referenceElement } from './@bangle.dev/tooltip/suggest-tooltip';
+import { replaceSuggestionMarkWith } from './@bangle.io/js-lib/inline-palette';
+import { selectMention, mentionSuggestKey } from './Mention';
 
 const name = 'page';
 export const NestedPagePluginKey = new PluginKey('suggest_tooltip');
@@ -50,6 +56,7 @@ export function nestedPageSpec (): RawSpecs {
 interface NestedPagePluginState {
   show: boolean;
   counter: number;
+  tooltipContentDOM: HTMLElement
 }
 
 interface NestedPagePluginOptions {
@@ -57,6 +64,8 @@ interface NestedPagePluginOptions {
 }
 
 export function nestedPagePlugins ({ tooltipRenderOpts }: NestedPagePluginOptions) {
+  const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
+
   return [
     new Plugin<NestedPagePluginState, Schema>({
       key: NestedPagePluginKey,
@@ -64,7 +73,8 @@ export function nestedPagePlugins ({ tooltipRenderOpts }: NestedPagePluginOption
         init (_, _state) {
           return {
             show: false,
-            counter: 0
+            counter: 0,
+            tooltipContentDOM: tooltipDOMSpec.contentDOM
           };
         },
         apply (tr, pluginState, _oldState) {
@@ -109,6 +119,7 @@ export function nestedPagePlugins ({ tooltipRenderOpts }: NestedPagePluginOption
       stateKey: NestedPagePluginKey,
       renderOpts: {
         ...tooltipRenderOpts,
+        tooltipDOMSpec,
         getReferenceElement: referenceElement((state) => {
           const { selection } = state;
           return {
@@ -119,6 +130,51 @@ export function nestedPagePlugins ({ tooltipRenderOpts }: NestedPagePluginOption
       }
     })
   ];
+}
+
+export function NestedPagesList () {
+  const { pages } = usePages();
+  const { addNestedPage } = useNestedPage();
+  const view = useEditorViewContext();
+  const {
+    tooltipContentDOM,
+    show: isVisible
+  } = usePluginState(NestedPagePluginKey) as NestedPagePluginState;
+
+  const theme = useTheme();
+
+  const onSelectPage = useCallback(
+    (page: Page) => {
+      addNestedPage(page.id);
+      hideSuggestionsTooltip(NestedPagePluginKey)(view.state, view.dispatch, view);
+    },
+    [view, mentionSuggestKey]
+  );
+
+  if (isVisible) {
+    return createPortal(
+      <ClickAwayListener onClickAway={() => {
+        hideSuggestionsTooltip(NestedPagePluginKey)(view.state, view.dispatch, view);
+      }}
+      >
+        <Box>
+          {pages.map(page => (
+            <MenuItem
+              sx={{
+                background: theme.palette.background.light
+              }}
+              onClick={() => onSelectPage(page)}
+              key={page.id}
+            >
+              <div>{page.title}</div>
+            </MenuItem>
+          ))}
+        </Box>
+      </ClickAwayListener>,
+      tooltipContentDOM
+    );
+  }
+  return null;
 }
 
 export function NestedPage ({ node, getPos, view }: NodeViewProps) {

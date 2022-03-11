@@ -10,16 +10,16 @@ export default function useNestedPage () {
   const { currentPage, addPage, pagesRecord } = usePages();
   const view = useEditorViewContext();
 
-  const addNestedPage = useCallback(async (pageLink?: string) => {
+  const addNestedPage = useCallback(async (pageId?: string) => {
     let page: Page = null as any;
     // Creating a new page
-    if (!pageLink) {
+    if (!pageId) {
       page = await addPage({
         parentId: currentPage?.id
       });
     }
     else {
-      page = pagesRecord[pageLink];
+      page = pagesRecord[pageId];
     }
 
     rafCommandExec(view!, (state, dispatch) => {

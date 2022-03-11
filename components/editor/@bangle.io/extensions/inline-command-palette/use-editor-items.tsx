@@ -490,7 +490,7 @@ export function useEditorItems() {
     Object.entries({...paletteGroupItemsRecord, other: [
       ...paletteGroupItemsRecord.other,
       {
-        uid: 'page',
+        uid: 'insert-page',
         title: 'Insert page',
         icon: <DescriptionOutlinedIcon sx={{
           fontSize: 16
@@ -508,7 +508,7 @@ export function useEditorItems() {
         }),
       },
       {
-        uid: 'page',
+        uid: 'link-to-page',
         title: 'Link to page',
         icon: <DescriptionOutlinedIcon sx={{
           fontSize: 16
@@ -516,7 +516,12 @@ export function useEditorItems() {
         description: 'Link to a new page',
         editorExecuteCommand: (() => {
           return (async (state, dispatch, view) => {
-            return renderSuggestionsTooltip(NestedPagePluginKey)(state, dispatch, view);
+            renderSuggestionsTooltip(NestedPagePluginKey)(state, dispatch, view);
+            return replaceSuggestionMarkWith(NestedPagePluginKey, '')(
+              state,
+              dispatch,
+              view
+            );
           }) as PromisedCommand;
         }),
       }
