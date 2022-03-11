@@ -693,7 +693,7 @@ export default function PageNavigation ({
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
       defaultExpandIcon={<ChevronRightIcon fontSize='large' />}
       isFavorites={isFavorites}
-      sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto', pb: 3 }}
+      sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
     >
       {mappedItems.map((item, index) => (
         <RenderDraggableNode

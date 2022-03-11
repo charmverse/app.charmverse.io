@@ -80,21 +80,21 @@ const SidebarContainer = styled.div`
 const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
   padding-left: ${theme.spacing(2)};
   padding-right: ${theme.spacing(2)};
-  margin-bottom: ${theme.spacing(0.5)};
 `;
 
 const SectionName = styled(Typography)`
   ${sidebarItemStyles}
-  color: ${greyColor2};
-  font-size: 12px;
-  letter-spacing: 0.03em;
+  color: ${({ theme }) => theme.palette.secondary.main};
+  font-size: 11.5px;
   font-weight: 600;
+  letter-spacing: 0.03em;
+  margin-bottom: ${({ theme }) => theme.spacing(0.5)};
 `;
 
-const MenuItem = styled(Link)<{ active: boolean }>`
+const StyledSidebarLink = styled(Link)<{ active: boolean }>`
   ${sidebarItemStyles}
   align-items: center;
-  color: ${({ theme }) => theme.palette.text.secondary};
+  color: ${({ theme }) => theme.palette.secondary.main};
   display: flex;
   font-size: 14px;
   font-weight: 500;
@@ -133,12 +133,24 @@ const SidebarHeader = styled.div(({ theme }) => ({
   minHeight: headerHeight
 }));
 
+const SidebarFooter = styled.div`
+  padding: ${({ theme }) => theme.spacing(1)};
+  display: flex;
+  align-items: center;
+  border-top: 1px solid ${({ theme }) => theme.palette.divider};
+`;
+
+const ScrollingContainer = styled.div`
+  flex-grow: 1;
+  overflow-y: auto;
+`;
+
 function SidebarLink ({ active, href, icon, label }: { active: boolean, href: string, icon: any, label: string }) {
   return (
-    <MenuItem href={href} active={active}>
+    <StyledSidebarLink href={href} active={active}>
       {icon}
       {label}
-    </MenuItem>
+    </StyledSidebarLink>
   );
 }
 
@@ -252,51 +264,48 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       </WorkspacesContainer>
       {space && (
         <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-          <Box sx={{ flexGrow: 1 }}>
-            <Box sx={{ flexGrow: 1 }}>
-              <Box display='flex' flexDirection='column' sx={{ height: '100%' }}>
-                <SidebarHeader>
-                  <Typography><strong>{space.name}</strong></Typography>
-                  <IconButton onClick={closeSidebar}>
-                    <ChevronLeftIcon />
-                  </IconButton>
-                </SidebarHeader>
-                <Divider sx={{ mb: 2 }} />
-                <Box mb={2}>
-                  <SidebarLink
-                    active={router.pathname.startsWith('/[domain]/settings')}
-                    href={`/${space.domain}/settings/account`}
-                    icon={<SettingsIcon color='secondary' fontSize='small' />}
-                    label='Settings & Members'
-                  />
-                </Box>
-                {favoritePageIds.length > 0 && (
-                  <Box mb={2}>
-                    <SectionName>
-                      FAVORITES
-                    </SectionName>
-                    <PageNavigation
-                      isFavorites={true}
-                      space={space}
-                      rootPageIds={favoritePageIds}
-                    />
-                  </Box>
-                )}
-                <WorkspaceLabel>
-                  <SectionName>
-                    WORKSPACE
-                  </SectionName>
-                  <div className='add-a-page'>
-                    <NewPageMenu tooltip='Add a page' addPage={page => addPageAndRedirect(page)} />
-                  </div>
-                </WorkspaceLabel>
-                <PageNavigation
-                  space={space}
-                  deletePage={deletePage}
-                />
-              </Box>
+          <SidebarHeader>
+            <Typography><strong>{space.name}</strong></Typography>
+            <IconButton onClick={closeSidebar}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </SidebarHeader>
+          <Box mb={2}>
+            <SidebarLink
+              active={router.pathname.startsWith('/[domain]/settings')}
+              href={`/${space.domain}/settings/account`}
+              icon={<SettingsIcon color='secondary' fontSize='small' />}
+              label='Settings & Members'
+            />
+          </Box>
+          <ScrollingContainer>
+            {favoritePageIds.length > 0 && (
+            <Box mb={2}>
+              <SectionName>
+                FAVORITES
+              </SectionName>
+              <PageNavigation
+                isFavorites={true}
+                space={space}
+                rootPageIds={favoritePageIds}
+              />
             </Box>
-            <Box sx={{ mt: 3 }}>
+            )}
+            <WorkspaceLabel>
+              <SectionName>
+                WORKSPACE
+              </SectionName>
+              <div className='add-a-page'>
+                <NewPageMenu tooltip='Add a page' addPage={page => addPageAndRedirect(page)} />
+              </div>
+            </WorkspaceLabel>
+            <Box sx={{ mb: 6 }}>
+              <PageNavigation
+                space={space}
+                deletePage={deletePage}
+              />
+            </Box>
+            <Box sx={{ mb: 2 }}>
               <SidebarLink
                 href={`/${space.domain}/bounties`}
                 active={router.pathname.startsWith('/[domain]/bounties')}
@@ -304,22 +313,19 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 label='Bounties'
               />
             </Box>
-          </Box>
-          <Box>
-            <Divider />
-            <Box p={1} display='flex' alignItems='center' justifyContent='space-between'>
-              {user && (
-                <Box display='flex' alignItems='center'>
-                  <Avatar name={getDisplayName(user)} />
-                  <Box pl={1}>
-                    <Typography color='secondary'>
-                      <strong>{getDisplayName(user)}</strong>
-                    </Typography>
-                  </Box>
-                </Box>
-              )}
+          </ScrollingContainer>
+          <SidebarFooter>
+            {user && (
+            <Box display='flex' alignItems='center'>
+              <Avatar name={getDisplayName(user)} />
+              <Box pl={1}>
+                <Typography color='secondary'>
+                  <strong>{getDisplayName(user)}</strong>
+                </Typography>
+              </Box>
             </Box>
-          </Box>
+            )}
+          </SidebarFooter>
         </Box>
       )}
     </SidebarContainer>
