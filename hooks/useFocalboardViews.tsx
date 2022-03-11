@@ -1,7 +1,6 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
-import { useDatabaseBlocks } from './useDatabaseBlocks';
+import { createContext, ReactNode, useContext, useMemo } from 'react';
+import { useCurrentSpace } from './useCurrentSpace';
 import { useLocalStorage } from './useLocalStorage';
-import { usePages } from './usePages';
 
 type FocalboardViewsRecord = Record<string, null | string>;
 
@@ -16,37 +15,18 @@ export const FocalboardViewsContext = createContext<Readonly<IContext>>({
 });
 
 export function FocalboardViewsProvider ({ children }: { children: ReactNode }) {
-  const { blocks } = useDatabaseBlocks();
-  const { pages } = usePages();
-  const [focalboardViewsRecord, setFocalboardViewsRecord] = useState<FocalboardViewsRecord>({});
-  const [localStorageValue] = useLocalStorage('focalboard.views', focalboardViewsRecord);
+  const [space] = useCurrentSpace();
 
-  useEffect(() => {
-    pages.forEach(page => {
-      // Get the value from localstorage first
-      if (page.type === 'board' && page.boardId) {
-        focalboardViewsRecord[page.boardId] = localStorageValue?.[page.boardId] ?? null;
-      }
-    });
+  // No need to store charmverse.v1.undefined.default-views in ls so the 3rd argument is a boolean, which would be false if the current space hasn't been set yet
+  const [focalboardViewsRecord, setFocalboardViewsRecord] = useLocalStorage<FocalboardViewsRecord>(`${space?.id}.default-views`, {}, Boolean(space?.id));
 
-    blocks.forEach(block => {
-      // Set it to the first view
-      if (block.type === 'view' && focalboardViewsRecord[block.parentId] === null) {
-        focalboardViewsRecord[block.parentId] = block.id;
-      }
-    });
-
-    setFocalboardViewsRecord(focalboardViewsRecord);
-  }, [blocks, pages]);
-
-  const value = useMemo<IContext>(() => {
-    return {
-      focalboardViewsRecord,
-      setFocalboardViewsRecord: setFocalboardViewsRecord as any
-    };
-  }, [blocks, pages]);
+  const value = useMemo(() => ({
+    focalboardViewsRecord,
+    setFocalboardViewsRecord
+  }), [focalboardViewsRecord]);
 
   return (
+    // eslint-disable-next-line
     <FocalboardViewsContext.Provider value={value}>
       {children}
     </FocalboardViewsContext.Provider>

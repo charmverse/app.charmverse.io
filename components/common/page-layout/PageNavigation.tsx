@@ -187,7 +187,7 @@ export function PageLink ({ children, href, label, labelIcon, pageId }: PageLink
             {labelIcon}
           </PageIcon>
         )}
-        <Link href={href}>
+        <Link passHref href={href}>
           <PageTitle isempty={isempty ? 1 : 0}>
             {isempty ? 'Untitled' : label}
           </PageTitle>
