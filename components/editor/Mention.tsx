@@ -3,7 +3,6 @@ import { Command, DOMOutputSpec, EditorState, Plugin, PluginKey, Schema } from '
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { useTheme } from '@emotion/react';
-import PersonIcon from '@mui/icons-material/Group';
 import { Box, ClickAwayListener, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import Avatar from 'components/common/Avatar';
@@ -228,18 +227,18 @@ export function Mention ({ node }: NodeViewProps) {
         borderRadius: theme.spacing(0.5),
         fontWeight: 600,
         opacity: 0.75,
-        backgroundColor: theme.palette.background.light,
         display: 'inline-flex',
         alignItems: 'center',
         gap: 0.75
       }}
-      mx={0.5}
     >
-      <PersonIcon sx={{
-        fontSize: 16
+      <Typography sx={{
+        fontSize: 12
       }}
-      />
-      <Typography>{ensName || getDisplayName(contributor)}</Typography>
+      >
+        @
+        {ensName || getDisplayName(contributor)}
+      </Typography>
     </Box>
   ) : null;
 }
