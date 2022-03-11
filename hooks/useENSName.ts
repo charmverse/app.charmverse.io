@@ -1,15 +1,15 @@
 import type { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 const fetchENSName = (_: any, library: Web3Provider, address: string) => library.lookupAddress(address);
 
 const useENSName = (account: string | null | undefined): string | null | undefined => {
   const { library, chainId } = useWeb3React<Web3Provider>();
-
+  console.log('useENSNAme');
   const shouldFetch = Boolean(library && account);
 
-  const { data } = useSWR(
+  const { data } = useSWRImmutable(
     shouldFetch ? ['ENS', library, account, chainId] : null,
     fetchENSName
   );
