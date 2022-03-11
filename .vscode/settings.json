@@ -17,4 +17,7 @@
       "source.fixAll.eslint": true
     }
   },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": false
+  },
 }

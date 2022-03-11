@@ -9,6 +9,7 @@ export function getStorageValue<T = any> (key: string, defaultValue: T): T {
 
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem(getKey(key));
+
     if (typeof saved === 'string') {
       try {
         return JSON.parse(saved);
@@ -27,10 +28,14 @@ export function setStorageValue<T = any> (key: string, value: T): T {
 }
 
 export function useLocalStorage<T = any> (key: string, defaultValue: T) {
-
   const [value, setValue] = useState<T>(() => {
     return getStorageValue(key, defaultValue);
   });
+
+  // Any time the key changes we need to get the value from ls again
+  useEffect(() => {
+    setValue(getStorageValue(key, defaultValue));
+  }, [key]);
 
   useEffect(() => {
     setStorageValue(key, value);

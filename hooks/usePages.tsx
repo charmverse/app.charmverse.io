@@ -18,7 +18,8 @@ type IContext = {
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   addPage: AddPageFn,
-  addPageAndRedirect: (page?: Partial<Page>) => void
+  addPageAndRedirect: (page?: Partial<Page>) => void,
+  pagesRecord: Record<string, Page>
 };
 
 export const PagesContext = createContext<Readonly<IContext>>({
@@ -29,7 +30,8 @@ export const PagesContext = createContext<Readonly<IContext>>({
   isEditing: true,
   setIsEditing: () => { },
   addPage: null as any,
-  addPageAndRedirect: null as any
+  addPageAndRedirect: null as any,
+  pagesRecord: {}
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
@@ -96,6 +98,14 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     router.push(`/${(space!).domain}/${newPage.path}`);
   };
 
+  const pagesRecord = useMemo(() => {
+    const _pagesRecord: Record<string, Page> = {};
+    pages.forEach(page => {
+      _pagesRecord[page.id] = page;
+    });
+    return _pagesRecord;
+  }, [pages]);
+
   const value: IContext = useMemo(() => ({
     currentPage,
     isEditing,
@@ -104,7 +114,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     setCurrentPage,
     setPages,
     addPage,
-    addPageAndRedirect
+    addPageAndRedirect,
+    pagesRecord
   }), [currentPage, isEditing, router, pages, user]);
 
   return (
