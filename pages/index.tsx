@@ -8,7 +8,7 @@ export const getServerSideProps = withSessionSsr(
       console.log('Send user to login');
       return {
         redirect: {
-          destination: '/login',
+          destination: '/signup',
           permanent: false
         }
       };

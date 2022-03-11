@@ -4,8 +4,8 @@ import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import Snackbar from 'components/common/Snackbar';
 import useSnackbar from 'hooks/useSnackbar';
-import { ReactNode, useState } from 'react';
 import { uploadToS3 } from 'lib/aws/uploadToS3';
+import { ReactNode, useState } from 'react';
 
 interface ImageSelectorProps {
   onImageSelect: (imageSrc: string) => void
@@ -14,7 +14,7 @@ interface ImageSelectorProps {
 }
 
 export default function ImageSelector (props: ImageSelectorProps) {
-  const { message, handleClose, isOpen, showMessage } = useSnackbar();
+  const { message, handleClose, isOpen } = useSnackbar();
   const [embedLink, setEmbedLink] = useState('');
   const { tabs = [], children, onImageSelect } = props;
   return (

@@ -52,8 +52,6 @@ const withTM = require('next-transpile-modules')([
   '@bangle.dev/markdown',
   '@bangle.dev/tooltip',
   '@bangle.dev/react-menu',
-  '@bangle.dev/emoji',
-  '@bangle.dev/react-emoji-suggest',
   '@bangle.dev/table',
   '@popperjs/core',
   '@fullcalendar/common',

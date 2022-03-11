@@ -20,14 +20,14 @@ import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import styled from '@emotion/styled';
+import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/editor/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev/react/ReactEditor';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { CSSProperties, ReactNode } from 'react';
-import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import { BlockQuote, blockQuoteSpec } from './BlockQuote';
+import { Callout, calloutSpec } from './Callout';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
@@ -37,9 +37,9 @@ import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './Inlin
 import { Mention, mentionPlugins, mentionSpecs, MentionSuggest } from './Mention';
 import { NestedPage, nestedPageSpec } from './NestedPage';
 import Placeholder from './Placeholder';
+import { Quote, quoteSpec } from './Quote';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
 import { imageSpec, ResizableImage } from './ResizableImage';
-import { Quote, quoteSpec } from './Quote';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -84,7 +84,7 @@ const specRegistry = new SpecRegistry([
   tableCell,
   tableHeader,
   tableRow,
-  blockQuoteSpec(),
+  calloutSpec(),
   cryptoPriceSpec(),
   imageSpec(),
   columnLayoutSpec(),
@@ -281,9 +281,9 @@ function CharmEditor (
           }
           case 'blockquote': {
             return (
-              <BlockQuote {...props}>
+              <Callout {...props}>
                 {NodeViewChildren}
-              </BlockQuote>
+              </Callout>
             );
           }
           case 'codeBlock': {
