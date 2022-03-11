@@ -517,7 +517,7 @@ export function useEditorItems() {
         editorExecuteCommand: (() => {
           return (async (state, dispatch, view) => {
             renderSuggestionsTooltip(NestedPagePluginKey)(state, dispatch, view);
-            return replaceSuggestionMarkWith(NestedPagePluginKey, '')(
+            return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,
               view

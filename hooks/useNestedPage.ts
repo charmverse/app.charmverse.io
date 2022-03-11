@@ -1,4 +1,3 @@
-import { Fragment } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
 import { Page } from '@prisma/client';
@@ -23,15 +22,10 @@ export default function useNestedPage () {
     }
 
     rafCommandExec(view!, (state, dispatch) => {
-      return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
-        undefined,
-        Fragment.fromArray([
-          state.schema.nodes.page.create({
-            path: page.path,
-            id: page.id
-          })
-        ])
-      ));
+      return insertNode(state, dispatch, state.schema.nodes.page.create({
+        path: page.path,
+        id: page.id
+      }));
     });
   }, [currentPage, addPage, view]);
 

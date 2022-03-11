@@ -34,7 +34,7 @@ export function nestedPageSpec (): RawSpecs {
     type: 'node',
     name,
     schema: {
-      inline: true,
+      inline: false,
       attrs: {
         path: {
           default: null
@@ -44,7 +44,7 @@ export function nestedPageSpec (): RawSpecs {
           default: null
         }
       },
-      group: 'inline',
+      group: 'block',
       draggable: false,
       parseDOM: [{ tag: 'div' }],
       toDOM: (): DOMOutputSpec => {
@@ -149,7 +149,7 @@ export function NestedPagesList () {
       addNestedPage(page.id);
       hideSuggestionsTooltip(NestedPagePluginKey)(view.state, view.dispatch, view);
     },
-    [view, mentionSuggestKey]
+    [view]
   );
 
   if (isVisible) {
@@ -263,18 +263,24 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
             view.dispatch(view.state.tr.deleteSelection());
           }}
         >
-          <ListItemIcon><DeleteIcon fontSize='small' /></ListItemIcon>
+          <DeleteIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
         </MenuItem>
         <MenuItem
           sx={{ padding: '3px 12px' }}
           onClick={() => addNestedPage()}
         >
-          <ListItemIcon>
-            <ContentPasteIcon
-              fontSize='small'
-            />
-          </ListItemIcon>
+          <ContentPasteIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Duplicate</Typography>
         </MenuItem>
         <MenuItem
@@ -285,11 +291,12 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
             showMessage('Link copied');
           }}
         >
-          <ListItemIcon>
-            <LinkIcon
-              fontSize='small'
-            />
-          </ListItemIcon>
+          <LinkIcon
+            fontSize='small'
+            sx={{
+              mr: 1
+            }}
+          />
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Copy Link</Typography>
         </MenuItem>
       </Menu>
