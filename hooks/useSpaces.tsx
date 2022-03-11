@@ -12,10 +12,9 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
   const [user, _, isUserLoaded] = useUser();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  console.log('get spaces!', !!user, isUserLoaded);
+
   useEffect(() => {
     if (user) {
-      console.log('get spaces for user');
       setIsLoaded(false);
       charmClient.getSpaces()
         .then(_spaces => {
@@ -25,7 +24,6 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
         .catch(err => {});
     }
     else if (isUserLoaded) {
-      console.log('user is loaded');
       setIsLoaded(true);
     }
   }, [user?.id, isUserLoaded]);
