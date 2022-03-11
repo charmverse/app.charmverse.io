@@ -44,7 +44,7 @@ export default function CreateSpace () {
         <CreateSpaceForm defaultValues={defaultValues} onSubmit={addSpace} submitText='Get Started' />
       </Card>
       <AlternateRouteButton href='/join'>
-        Join an existing workspace instead
+        Join an existing workspace
       </AlternateRouteButton>
     </Box>
   );

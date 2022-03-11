@@ -7,12 +7,18 @@ import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import getBaseLayout from 'components/common/base-layout/getLayout';
 import TokenGateForm from 'components/common/TokenGateForm';
 import Button from 'components/common/Button';
-import Link from 'components/common/Link';
 import { useSpaces } from 'hooks/useSpaces';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
+  const [spaces] = useSpaces();
+  const showMySpacesLink = spaces.length > 0;
   return (
-    <Box display='flex' alignItems='center' justifyContent='center'>
+    <Box display='flex' alignItems='center' justifyContent={showMySpacesLink ? 'space-between' : 'center'}>
+      {showMySpacesLink && (
+        <Button variant='text' href={`/${spaces[0]!.domain}`} endIcon={<NavigateNextIcon />}>
+          Go to my workspace
+        </Button>
+      )}
       <Button variant='text' href={href} endIcon={<NavigateNextIcon />}>
         {children}
       </Button>
@@ -45,7 +51,7 @@ export default function CreateSpace () {
         <TokenGateForm onSubmit={onJoinSpace} />
       </Card>
       <AlternateRouteButton href='/createWorkspace'>
-        Create a new workspace instead
+        Create a new workspace
       </AlternateRouteButton>
     </Box>
   );
