@@ -1,13 +1,24 @@
-import { useEffect } from 'react';
+import { useEffect, ReactNode } from 'react';
 import { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import getBaseLayout from 'components/common/base-layout/getLayout';
 import TokenGateForm from 'components/common/TokenGateForm';
-import charmClient from 'charmClient';
-import { useUser } from 'hooks/useUser';
+import Button from 'components/common/Button';
+import Link from 'components/common/Link';
 import { useSpaces } from 'hooks/useSpaces';
+
+export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
+  return (
+    <Box display='flex' alignItems='center' justifyContent='center'>
+      <Button variant='text' href={href} endIcon={<NavigateNextIcon />}>
+        {children}
+      </Button>
+    </Box>
+  );
+}
 
 export default function CreateSpace () {
 
@@ -30,9 +41,12 @@ export default function CreateSpace () {
 
   return (
     <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6 }}>
-      <Card sx={{ p: 4 }} variant='outlined'>
+      <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <TokenGateForm onSubmit={onJoinSpace} />
       </Card>
+      <AlternateRouteButton href='/createWorkspace'>
+        Create a new workspace instead
+      </AlternateRouteButton>
     </Box>
   );
 }
