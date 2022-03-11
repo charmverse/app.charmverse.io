@@ -13,18 +13,18 @@ import { GetServerSideProps } from 'next';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context) => {
 
-  const {
-    redirect,
-    notFound
-  } = await checkUserCanVisitWorkspace(context);
+  // const {
+  //   redirect,
+  //   notFound
+  // } = await checkUserCanVisitWorkspace(context);
 
-  if (redirect) {
-    return { redirect };
-  }
+  // if (redirect) {
+  //   return { redirect };
+  // }
 
-  if (notFound) {
-    return { notFound };
-  }
+  // if (notFound) {
+  //   return { notFound };
+  // }
 
   const domain = context.query.domain as string;
   const space = (await prisma.space.findUnique({ where: { domain } }))!;
@@ -48,7 +48,6 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 export default function IndexPage () {
   const [space] = useCurrentSpace();
   const [, setTitleState] = usePageTitle();
-  const router = useRouter();
 
   useEffect(() => {
     if (space) {

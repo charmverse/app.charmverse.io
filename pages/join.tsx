@@ -12,6 +12,7 @@ import { useSpaces } from 'hooks/useSpaces';
 export default function CreateSpace () {
 
   const router = useRouter();
+  const [spaces] = useSpaces();
 
   async function onJoinSpace (space: Space) {
     if (typeof router.query.returnUrl === 'string') {
@@ -21,6 +22,12 @@ export default function CreateSpace () {
       router.push(`/${space.domain}`);
     }
   }
+  useEffect(() => {
+    console.log(spaces, router.query.domain);
+    if (spaces.some(space => space.domain === router.query.domain)) {
+      router.push(`/${router.query.domain}`);
+    }
+  }, [spaces]);
 
   return (
     <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6 }}>
