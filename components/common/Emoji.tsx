@@ -1,9 +1,6 @@
-import { EditorViewContext } from '@bangle.dev/react';
-import { getSuggestTooltipKey } from '@bangle.dev/react-emoji-suggest/dist/emoji-suggest';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
-import { emojiSuggestKey } from 'components/editor/EmojiSuggest';
-import { ComponentProps, ReactNode, useContext, useRef } from 'react';
+import { ComponentProps } from 'react';
 
 export const Emoji = styled(Box)`
   /* font family taken from Notion */
@@ -29,49 +26,5 @@ export const Emoji = styled(Box)`
 export default function EmojiCon ({ children, ...props }: ComponentProps<typeof Emoji>) {
   return (
     <Emoji {...props}>{children}</Emoji>
-  );
-}
-
-export function EmojiContainer (
-  { updatePageIcon, children }: { updatePageIcon: (icon: string) => void, children: ReactNode }
-) {
-  const view = useContext(EditorViewContext);
-  const ref = useRef<HTMLDivElement>(null);
-
-  return (
-    <Box
-      sx={{
-        width: 'fit-content',
-        display: 'flex'
-      }}
-      ref={ref}
-      onClick={() => {
-        if (view.dispatch!) {
-          const suggestTooltipKey = getSuggestTooltipKey(emojiSuggestKey)(view.state);
-          const suggestTooltipState = suggestTooltipKey.getState(view.state);
-
-          // If the emoji suggest already has a ref attached its already visible, we need to hide it
-
-          if (suggestTooltipState.show) {
-            view.dispatch(
-              view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
-            );
-          }
-          else {
-            view.dispatch(
-              // Chain transactions together
-              view.state.tr.setMeta(emojiSuggestKey, {
-                type: 'INSIDE_PAGE_ICON',
-                onClick: (emoji: string) => updatePageIcon(emoji),
-                ref: ref.current,
-                getPos: () => 0
-              }).setMeta(suggestTooltipKey, { type: 'RENDER_TOOLTIP' }).setMeta('addToHistory', false)
-            );
-          }
-        }
-      }}
-    >
-      {children}
-    </Box>
   );
 }

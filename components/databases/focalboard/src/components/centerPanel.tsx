@@ -31,14 +31,6 @@ import Table from './table/table'
 import ViewHeader from './viewHeader/viewHeader'
 import ViewTitle from './viewTitle'
 
-
-
-
-
-
-
-
-
 type Props = {
     clientConfig?: ClientConfig
     board: Board
@@ -438,8 +430,6 @@ class CenterPanel extends React.Component<Props, State> {
                         cards: c,
                     }
                     groups.push(group)
-                } else {
-                    Utils.logError(`groupCardsByOptions: Missing option with id: ${optionId}`)
                 }
             } else {
                 // Empty group

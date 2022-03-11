@@ -4,8 +4,8 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
-import { HTMLAttributes } from 'react';
 import charmClient from 'charmClient';
+import { HTMLAttributes } from 'react';
 import ImageSelector from './ImageSelector';
 import Resizable from './Resizable';
 
@@ -53,7 +53,7 @@ function insertImageNode (state: EditorState, dispatch: DispatchFn, view: Editor
   }
 }
 
-function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
+function EmptyImageContainer ({ isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {isSelected?: boolean}) {
   const theme = useTheme();
 
   return (
@@ -61,7 +61,7 @@ function EmptyImageContainer (props: HTMLAttributes<HTMLDivElement>) {
       button
       disableRipple
       sx={{
-        backgroundColor: theme.palette.background.light,
+        backgroundColor: isSelected ? 'rgba(46, 170, 220, 0.2)' : theme.palette.background.light,
         p: 2,
         display: 'flex',
         borderRadius: theme.spacing(0.5)
@@ -94,7 +94,7 @@ export function imageSpec (): RawSpecs {
     type: 'node',
     name: 'image',
     schema: {
-      inline: true,
+      inline: false,
       attrs: {
         caption: {
           default: null
@@ -113,7 +113,7 @@ export function imageSpec (): RawSpecs {
           default: (MIN_IMAGE_WIDTH + MAX_IMAGE_WIDTH) / 2
         }
       },
-      group: 'inline',
+      group: 'block',
       draggable: false,
       parseDOM: [
         {
@@ -141,21 +141,24 @@ function imagePromise (url: string): Promise<HTMLImageElement> {
   });
 }
 
-export function ResizableImage ({ onResizeStop, node, updateAttrs }:
+export function ResizableImage ({ onResizeStop, node, updateAttrs, selected }:
   NodeViewProps & {onResizeStop?: (view: EditorView) => void }) {
+
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
-      <ImageSelector onImageSelect={async (imageSrc) => {
-        const image = await imagePromise(imageSrc);
-        updateAttrs({
-          src: imageSrc,
-          aspectRatio: image.width / image.height
-        });
-      }}
-      >
-        <EmptyImageContainer />
-      </ImageSelector>
+      <Box my={1}>
+        <ImageSelector onImageSelect={async (imageSrc) => {
+          const image = await imagePromise(imageSrc);
+          updateAttrs({
+            src: imageSrc,
+            aspectRatio: image.width / image.height
+          });
+        }}
+        >
+          <EmptyImageContainer isSelected={selected} />
+        </ImageSelector>
+      </Box>
     );
   }
 

@@ -20,25 +20,26 @@ import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import styled from '@emotion/styled';
+import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/editor/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev/react/ReactEditor';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { CSSProperties, ReactNode } from 'react';
-import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import { BlockQuote, blockQuoteSpec } from './BlockQuote';
+import { Callout, calloutSpec } from './Callout';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
+import { Mention, mentionPlugins, mentionSpecs, MentionSuggest } from './Mention';
 import { NestedPage, nestedPageSpec } from './NestedPage';
 import Placeholder from './Placeholder';
+import { Quote, quoteSpec } from './Quote';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
 import { imageSpec, ResizableImage } from './ResizableImage';
-import { Quote, quoteSpec } from './Quote';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -73,6 +74,7 @@ const specRegistry = new SpecRegistry([
   strike.spec(),
   underline.spec(),
   emojiSpecs(),
+  mentionSpecs(),
   code.spec(),
   codeBlock.spec(),
   iframeSpec(),
@@ -82,7 +84,7 @@ const specRegistry = new SpecRegistry([
   tableCell,
   tableHeader,
   tableRow,
-  blockQuoteSpec(),
+  calloutSpec(),
   cryptoPriceSpec(),
   imageSpec(),
   columnLayoutSpec(),
@@ -140,6 +142,7 @@ interface CharmEditorProps {
 function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
 ) {
+
   const state = useEditorState({
     specRegistry,
     plugins: () => [
@@ -172,7 +175,7 @@ function CharmEditor (
       strike.plugins(),
       underline.plugins(),
       emojiPlugins(),
-      // tablePlugins(),
+      mentionPlugins(),
       columnResizing,
       floatingMenuPlugin(readOnly),
       blockquote.plugins(),
@@ -216,6 +219,10 @@ function CharmEditor (
         name: 'quote',
         containerDOM: ['blockquote', { class: 'charm-quote' }],
         contentDOM: ['div']
+      }),
+      NodeView.createPlugin({
+        name: 'mention',
+        containerDOM: ['span', { class: 'mention-value' }]
       })
       // TODO: Pasting iframe or image link shouldn't create those blocks for now
       // iframePlugin,
@@ -274,9 +281,9 @@ function CharmEditor (
           }
           case 'blockquote': {
             return (
-              <BlockQuote {...props}>
+              <Callout {...props}>
                 {NodeViewChildren}
-              </BlockQuote>
+              </Callout>
             );
           }
           case 'codeBlock': {
@@ -318,6 +325,13 @@ function CharmEditor (
               />
             );
           }
+          case 'mention': {
+            return (
+              <Mention {...props}>
+                {NodeViewChildren}
+              </Mention>
+            );
+          }
           case 'page': {
             return (
               <NestedPage {...props}>
@@ -332,6 +346,7 @@ function CharmEditor (
       }}
     >
       <FloatingMenu />
+      <MentionSuggest />
       {EmojiSuggest}
       {InlinePalette}
       {children}

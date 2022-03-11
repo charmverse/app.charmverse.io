@@ -18,6 +18,7 @@ import charmClient from 'charmClient';
 import TreeItemContent from 'components/common/TreeItemContent';
 import mutator from 'components/databases/focalboard/src/mutator';
 import EmojiPicker from 'components/databases/focalboard/src/widgets/emojiPicker';
+import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import useRefState from 'hooks/useRefState';
@@ -141,7 +142,7 @@ const PageIcon = styled(EmojiCon)`
   color: ${({ theme }) => theme.palette.secondary.light};
 `;
 
-export const PageTitle = styled(Typography)<{isempty: number}>`
+const PageTitle = styled(Typography)<{ isempty?: number }>`
   color: inherit;
   display: flex;
   align-items: center;
@@ -179,61 +180,63 @@ export function PageLink ({ children, href, label, labelIcon, pageId }: PageLink
   });
 
   return (
-    <PageAnchor onClick={stopPropagation}>
-      {labelIcon && (
-        <PageIcon {...bindTrigger(popupState)}>
-          {labelIcon}
-        </PageIcon>
-      )}
-      <Link href={href} passHref>
-        <PageTitle isempty={isempty ? 1 : 0}>
-          {isempty ? 'Untitled' : label}
-        </PageTitle>
-      </Link>
-      {children}
-      <Menu {...bindMenu(popupState)}>
-        <EmojiPicker onSelect={async (emoji) => {
-          if (pageId) {
-            await charmClient.updatePage({
-              id: pageId,
-              icon: emoji
-            });
-            let isCurrentPageEdited = false;
-            let boardId: null | string = null;
-            // Update the state
-            setPages((pages) => pages.map(page => {
-              if (page.id === pageId) {
-                if (page.id === currentPage?.id) {
-                  isCurrentPageEdited = true;
-                }
-
-                if (page.boardId !== null) {
-                  boardId = page.boardId;
-                }
-                return {
-                  ...page,
-                  icon: emoji
-                };
-              }
-              return page;
-            }));
-
-            if (currentPage && isCurrentPageEdited) {
-              setCurrentPage({
-                ...currentPage,
+    <Link href={href} passHref>
+      <PageAnchor onClick={stopPropagation}>
+        {labelIcon && (
+          <PageIcon {...bindTrigger(popupState)}>
+            {labelIcon}
+          </PageIcon>
+        )}
+        <Link passHref href={href}>
+          <PageTitle isempty={isempty ? 1 : 0}>
+            {isempty ? 'Untitled' : label}
+          </PageTitle>
+        </Link>
+        {children}
+        <Menu {...bindMenu(popupState)}>
+          <EmojiPicker onSelect={async (emoji) => {
+            if (pageId) {
+              await charmClient.updatePage({
+                id: pageId,
                 icon: emoji
               });
-            }
+              let isCurrentPageEdited = false;
+              let boardId: null | string = null;
+              // Update the state
+              setPages((pages) => pages.map(page => {
+                if (page.id === pageId) {
+                  if (page.id === currentPage?.id) {
+                    isCurrentPageEdited = true;
+                  }
 
-            if (boardId) {
-              await mutator.changeIcon(boardId, emoji, emoji);
+                  if (page.boardId !== null) {
+                    boardId = page.boardId;
+                  }
+                  return {
+                    ...page,
+                    icon: emoji
+                  };
+                }
+                return page;
+              }));
+
+              if (currentPage && isCurrentPageEdited) {
+                setCurrentPage({
+                  ...currentPage,
+                  icon: emoji
+                });
+              }
+
+              if (boardId) {
+                await mutator.changeIcon(boardId, emoji, emoji);
+              }
+              popupState.close();
             }
-            popupState.close();
-          }
-        }}
-        />
-      </Menu>
-    </PageAnchor>
+          }}
+          />
+        </Menu>
+      </PageAnchor>
+    </Link>
   );
 }
 
@@ -249,6 +252,7 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
   const { pages } = usePages();
+  const theme = useTheme();
   const {
     addSubPage,
     deletePage,
@@ -290,7 +294,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     else if (isEditorEmpty) {
       Icon = (
         <InsertDriveFileOutlinedIcon sx={{
-          opacity: 0.5
+          opacity: theme.palette.mode !== 'light' ? 0.5 : 1
         }}
         />
       );
@@ -298,7 +302,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     else {
       Icon = (
         <DescriptionOutlinedIcon sx={{
-          opacity: 0.5
+          opacity: theme.palette.mode !== 'light' ? 0.5 : 1
         }}
         />
       );
@@ -459,6 +463,11 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
     }
   }
 
+  const { focalboardViewsRecord } = useFocalboardViews();
+  const { pagesRecord } = usePages();
+
+  const page = pagesRecord[item.id];
+
   return (
     <PageTreeItem
       data-handler-id={handlerId}
@@ -469,7 +478,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       key={item.id}
       nodeId={item.id}
       label={item.title}
-      href={`${pathPrefix}/${item.path}`}
+      href={`${pathPrefix}/${item.path}${page.type === 'board' && page.boardId && focalboardViewsRecord[page.boardId] ? `?viewId=${focalboardViewsRecord[page.boardId]}` : ''}`}
       isAdjacent={isAdjacentActive}
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}
@@ -594,7 +603,6 @@ export default function PageNavigation ({
   rootPageIds
 }: NavProps) {
   const { pages, currentPage, setPages, addPageAndRedirect } = usePages();
-
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
   const mappedItems = useMemo(() => mapTree(pages, 'parentId', rootPageIds), [pages, rootPageIds]);
 
@@ -691,7 +699,7 @@ export default function PageNavigation ({
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
       defaultExpandIcon={<ChevronRightIcon fontSize='large' />}
       isFavorites={isFavorites}
-      sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto', pb: 3 }}
+      sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
     >
       {mappedItems.map((item, index) => (
         <RenderDraggableNode
