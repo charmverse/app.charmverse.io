@@ -28,6 +28,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
         });
     }
     else if (!account) {
+      console.log('no account');
       // user disconnects their wallet
       setUser(null);
       setIsLoaded(true);
