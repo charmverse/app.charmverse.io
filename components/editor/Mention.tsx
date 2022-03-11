@@ -1,11 +1,16 @@
-import { RawSpecs } from '@bangle.dev/core';
-import { Command, DOMOutputSpec, PluginKey } from '@bangle.dev/pm';
+import { NodeViewProps, RawSpecs, SpecRegistry } from '@bangle.dev/core';
+import { Command, DOMOutputSpec, EditorState, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { useTheme } from '@emotion/react';
-import { ClickAwayListener } from '@mui/material';
-import * as emojiSuggest from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
-import { getSuggestTooltipKey } from 'components/editor/@bangle.dev/react-emoji-suggest/emoji-suggest';
+import { Box, ClickAwayListener, Typography } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import Avatar from 'components/common/Avatar';
 import * as suggestTooltip from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
+import { useContributors } from 'hooks/useContributors';
+import useENSName from 'hooks/useENSName';
+import { getDisplayName } from 'lib/users';
+import { Contributor } from 'models';
 import { useCallback } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -15,7 +20,74 @@ export const mentionSuggestKey = new PluginKey('mentionSuggestKey');
 export const mentionSuggestMarkName = 'mentionSuggest';
 export const mentionTrigger = '@';
 
-export function mentionSpec (): RawSpecs {
+function pluginsFactory ({
+  key = new PluginKey('emojiSuggestMenu'),
+  markName,
+  tooltipRenderOpts = {}
+}: {
+  markName: string;
+  key?: PluginKey;
+  tooltipRenderOpts?: SuggestTooltipRenderOpts;
+}) {
+  return ({
+    specRegistry
+  }: {
+    schema: Schema;
+    specRegistry: SpecRegistry;
+  }) => {
+    const { trigger } = specRegistry.options[markName as any] as any;
+
+    const suggestTooltipKey = new PluginKey('suggestTooltipKey');
+
+    // We are converting to DOM elements so that their instances
+    // can be shared across plugins.
+    const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
+
+    return [
+      new Plugin({
+        key,
+        state: {
+          init () {
+            return {
+              tooltipContentDOM: tooltipDOMSpec.contentDOM,
+              markName,
+              suggestTooltipKey
+            };
+          },
+          apply (_, pluginState) {
+            return pluginState;
+          }
+        }
+      }),
+      suggestTooltip.plugins({
+        key: suggestTooltipKey,
+        markName,
+        trigger,
+        tooltipRenderOpts: {
+          ...tooltipRenderOpts,
+          tooltipDOMSpec
+        }
+      })
+    ];
+  };
+}
+
+export function getSuggestTooltipKey (key: PluginKey) {
+  return (state: EditorState) => {
+    return key.getState(state).suggestTooltipKey as PluginKey;
+  };
+}
+
+/** Commands */
+export function queryTriggerText (key: PluginKey) {
+  return (state: EditorState) => {
+    const suggestKey = getSuggestTooltipKey(key)(state);
+    return suggestTooltip.queryTriggerText(suggestKey)(state);
+  };
+}
+
+export function mentionSpecs (): RawSpecs {
+  const spec = suggestTooltip.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger });
   return [
     {
       type: 'node',
@@ -35,16 +107,21 @@ export function mentionSpec (): RawSpecs {
         atom: true,
         parseDOM: [{ tag: 'span' }],
         toDOM: (): DOMOutputSpec => {
-          return ['span', { class: 'mention' }];
+          return ['span', { class: 'mention-value' }];
         }
       }
     },
-    emojiSuggest.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger })
+    {
+      ...spec,
+      options: {
+        trigger: mentionTrigger
+      }
+    }
   ];
 }
 
 export function mentionPlugins () {
-  return emojiSuggest.plugins({
+  return pluginsFactory({
     key: mentionSuggestKey,
     markName: mentionSuggestMarkName,
     tooltipRenderOpts: {
@@ -71,6 +148,7 @@ export function selectMention (key: PluginKey, mentionValue: string, mentionType
 }
 
 export function MentionSuggest () {
+  const [contributors] = useContributors();
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -103,10 +181,64 @@ export function MentionSuggest () {
   if (isVisible) {
     return createPortal(
       <ClickAwayListener onClickAway={closeTooltip}>
-        <div>Hello World</div>
+        <Box>
+          {contributors.map(contributor => (
+            <MenuItem
+              sx={{
+                background: theme.palette.background.light
+              }}
+              onClick={() => onSelectMention(contributor.id, 'user')}
+              key={contributor.id}
+            >
+              <ContributorMenuOption user={contributor} />
+            </MenuItem>
+          ))}
+        </Box>
       </ClickAwayListener>,
       tooltipContentDOM
     );
   }
   return null;
+}
+
+function ContributorMenuOption ({ user }: {user: Contributor}) {
+  const ensName = useENSName(user.addresses[0]);
+  return (
+    <Box display='flex' alignItems='center' gap={1}>
+      <Avatar name={ensName || getDisplayName(user)} size='small' />
+      <Typography>
+        {ensName || getDisplayName(user)}
+      </Typography>
+    </Box>
+  );
+}
+
+export function Mention ({ node }: NodeViewProps) {
+  const theme = useTheme();
+  const [contributors] = useContributors();
+  const contributor = contributors.find(_contributor => _contributor.id === node.attrs.value)!;
+  const ensName = useENSName(contributor?.addresses[0]);
+
+  return contributor ? (
+    <Box
+      component='span'
+      sx={{
+        padding: theme.spacing(0.5, 1),
+        borderRadius: theme.spacing(0.5),
+        fontWeight: 600,
+        opacity: 0.75,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.75
+      }}
+    >
+      <Typography sx={{
+        fontSize: 12
+      }}
+      >
+        @
+        {ensName || getDisplayName(contributor)}
+      </Typography>
+    </Box>
+  ) : null;
 }
