@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { Space } from 'models';
+import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useUser } from './useUser';
 

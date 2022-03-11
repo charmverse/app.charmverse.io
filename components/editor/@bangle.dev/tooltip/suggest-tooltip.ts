@@ -1,21 +1,16 @@
 import type { BaseRawMarkSpec, RawPlugins } from '@bangle.dev/core';
 import {
   Command,
-  EditorState, Fragment,
-  keymap,
-  MarkType,
+  EditorState, Fragment, keymap, MarkType,
   Node,
   Plugin,
-  PluginKey,
-  Schema,
+  PluginKey, Schema,
   Selection
 } from '@bangle.dev/pm';
 import { tooltipPlacement, TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
-import {
-  createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert
-} from '@bangle.dev/utils';
+import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import { emojiSuggestKey } from "components/editor/EmojiSuggest";
 
 export const spec = specFactory;
@@ -145,6 +140,10 @@ function pluginsFactory({
               };
             }
             if (meta.type === 'HIDE_TOOLTIP') {
+              // Do not change object reference if show was and is false
+              if (pluginState.show === false) {
+                return pluginState;
+              }
               return {
                 ...pluginState,
                 triggerText: '',
@@ -173,27 +172,14 @@ function pluginsFactory({
         renderOpts: {
           ...tooltipRenderOpts,
           getReferenceElement: referenceElement((state: EditorState) => {
-            const emojiSuggestState = emojiSuggestKey.getState(state);
-            // We are inside a callout, so dont search for mark,
-            // Instead use the getPos key of the emoji suggest plugin state
-            // to get the position of the callout node
-            const {getPos} = emojiSuggestState
-            if (getPos) {
-              const position = getPos();
-              return {
-                end: position,
-                start: position
-              };
-            } else {
-              const markType = schema.marks[markName];
-              const { selection } = state;
-              return findFirstMarkPosition(
-                markType,
-                state.doc,
-                selection.from - 1,
-                selection.to,
-              );
-            }
+            const markType = schema.marks[markName];
+            const { selection } = state;
+            return findFirstMarkPosition(
+              markType,
+              state.doc,
+              selection.from - 1,
+              selection.to,
+            );
           }),
         },
       }),

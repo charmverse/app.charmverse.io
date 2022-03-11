@@ -65,7 +65,7 @@ export default function SignupPageContent () {
   async function joinWorkspace () {
     const newUser = await charmClient.createUser({ address: account! });
     setUser(newUser);
-    router.push('/joinWorkspace');
+    router.push('/join');
   }
 
   const welcomeMessage = `Welcome, ${account ? ensName || shortenHex(account) : ''}!`;

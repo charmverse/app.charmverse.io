@@ -161,20 +161,15 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       uid: 'image',
       title: 'Image',
       icon: <ImageIcon
-        sx={{ fontSize: 16 }}
+      sx={{ fontSize: 16 }}
       />,
       description: 'Insert a image block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
-              undefined,
-              Fragment.fromArray([
-                state.schema.nodes.image.create({
-                  src: null
-                })
-              ])
-            ))
+            return insertNode(state, dispatch, state.schema.nodes.image.create({
+              src: null
+            }))
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
@@ -351,7 +346,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
             return insertNode(state, dispatch, state.schema.nodes.blockquote.create(
               undefined,
               Fragment.fromArray([
-                state.schema.nodes.paragraph.create()
+                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
+                ]))
               ])
             ))
           })

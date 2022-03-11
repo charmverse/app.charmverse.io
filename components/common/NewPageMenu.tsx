@@ -40,7 +40,6 @@ export const StyledDatabaseIcon = styled(DatabaseIcon)`
 type Props = { addPage: (p: Partial<Page>) => void, tooltip: string, sx?: any };
 
 export default function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
