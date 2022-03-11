@@ -27,9 +27,7 @@ export function setStorageValue<T = any> (key: string, value: T): T {
   return value;
 }
 
-export function useLocalStorage<T = any> (key: string, defaultValue: T, shouldStore?: boolean) {
-  shouldStore = shouldStore ?? true;
-
+export function useLocalStorage<T = any> (key: string, defaultValue: T) {
   const [value, setValue] = useState<T>(() => {
     return getStorageValue(key, defaultValue);
   });
@@ -40,9 +38,7 @@ export function useLocalStorage<T = any> (key: string, defaultValue: T, shouldSt
   }, [key]);
 
   useEffect(() => {
-    if (shouldStore) {
-      setStorageValue(key, value);
-    }
+    setStorageValue(key, value);
   }, [key, value]);
   return [value, setValue] as const;
 }
