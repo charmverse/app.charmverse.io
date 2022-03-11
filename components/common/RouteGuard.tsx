@@ -77,7 +77,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
     const path = url.split('?')[0];
     const spaceDomain = path.split('/')[1];
-    console.log(spaceDomain, path);
 
     // condition: public page
     if (publicPages.some(basePath => path.startsWith(basePath))) {
