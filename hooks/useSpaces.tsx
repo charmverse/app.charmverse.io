@@ -15,7 +15,6 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (user) {
-      console.log('user loaded, load spaces');
       setIsLoaded(false);
       charmClient.getSpaces()
         .then(_spaces => {
@@ -25,7 +24,6 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
         .catch(err => {});
     }
     else if (isUserLoaded) {
-      console.log('is user loaded but no user');
       setIsLoaded(true);
     }
   }, [user?.id, isUserLoaded]);
