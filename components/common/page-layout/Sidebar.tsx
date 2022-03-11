@@ -140,9 +140,12 @@ const SidebarFooter = styled.div`
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
-const ScrollingContainer = styled.div`
+const ScrollingContainer = styled.div<{ isScrolled: 1 }>`
   flex-grow: 1;
   overflow-y: auto;
+  transition: border-color 0.2s ease-out;
+  border-top: 1px solid transparent;
+  ${({ isScrolled, theme }) => isScrolled ? `border-top: 1px solid ${theme.palette.divider}` : ''};
 `;
 
 function SidebarLink ({ active, href, icon, label }: { active: boolean, href: string, icon: any, label: string }) {
@@ -167,6 +170,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const boards = useAppSelector(getSortedBoards);
   const { currentPage, pages, setPages, addPageAndRedirect } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
   const intl = useIntl();
 
@@ -176,6 +180,10 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   function closeSpaceForm () {
     setSpaceFormOpen(false);
+  }
+
+  function onScroll (e: React.UIEvent<HTMLDivElement>) {
+    setIsScrolled(e.currentTarget?.scrollTop > 0);
   }
 
   async function addSpace (spaceOpts: Prisma.SpaceCreateInput) {
@@ -278,7 +286,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               label='Settings & Members'
             />
           </Box>
-          <ScrollingContainer>
+          <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll}>
             {favoritePageIds.length > 0 && (
             <Box mb={2}>
               <SectionName>
