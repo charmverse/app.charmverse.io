@@ -5,9 +5,9 @@ import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import BountyIcon from '@mui/icons-material/RequestPage';
 import SettingsIcon from '@mui/icons-material/Settings';
-import LaunchIcon from '@mui/icons-material/Launch';
+import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
+import Button from 'components/common/Button';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
@@ -262,11 +262,9 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
           <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
           <Typography variant='body2' align='center' sx={{ pt: 3 }}>
-            <Link color='secondary' href='/join'>
+            <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
               Join an existing workspace
-              {' '}
-              <LaunchIcon fontSize='small' />
-            </Link>
+            </Button>
           </Typography>
         </Modal>
       </WorkspacesContainer>
