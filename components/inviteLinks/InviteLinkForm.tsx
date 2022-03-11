@@ -1,20 +1,15 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Button from 'components/common/Button';
-import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import Typography from '@mui/material/Typography';
+import Button from 'components/common/Button';
+import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useUser } from 'hooks/useUser';
-import { Prisma, Space } from '@prisma/client';
-import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
-import charmClient from 'charmClient';
+import * as yup from 'yup';
 
 export const schema = yup.object({
   maxAgeMinutes: yup.number().required(),
