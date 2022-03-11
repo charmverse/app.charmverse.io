@@ -1,18 +1,26 @@
 import { Fragment } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
+import { Page } from '@prisma/client';
 import { insertNode } from 'components/editor/@bangle.io/extensions/inline-command-palette/use-editor-items';
 import { useCallback } from 'react';
 import { usePages } from './usePages';
 
 export default function useNestedPage () {
-  const { currentPage, addPage } = usePages();
+  const { currentPage, addPage, pagesRecord } = usePages();
   const view = useEditorViewContext();
 
-  const addNestedPage = useCallback(async () => {
-    const page = await addPage({
-      parentId: currentPage?.id
-    });
+  const addNestedPage = useCallback(async (pageLink?: string) => {
+    let page: Page = null as any;
+    // Creating a new page
+    if (!pageLink) {
+      page = await addPage({
+        parentId: currentPage?.id
+      });
+    }
+    else {
+      page = pagesRecord[pageLink];
+    }
 
     rafCommandExec(view!, (state, dispatch) => {
       return insertNode(state, dispatch, state.schema.nodes.paragraph.create(

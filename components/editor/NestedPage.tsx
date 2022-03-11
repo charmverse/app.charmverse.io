@@ -1,5 +1,6 @@
 import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec, TextSelection } from '@bangle.dev/pm';
+import { Schema, Plugin, DOMOutputSpec, TextSelection, PluginKey } from '@bangle.dev/pm';
+import { SuggestTooltipRenderOpts, tooltipPlacement } from '@bangle.dev/tooltip';
 import { useTheme } from '@emotion/react';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -16,8 +17,10 @@ import useSnackbar from 'hooks/useSnackbar';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { PageContent } from 'models';
 import Link from 'next/link';
+import { referenceElement } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'page';
+export const NestedPagePluginKey = new PluginKey('suggest_tooltip');
 
 export function nestedPageSpec (): RawSpecs {
   return {
@@ -42,6 +45,80 @@ export function nestedPageSpec (): RawSpecs {
       }
     }
   };
+}
+
+interface NestedPagePluginState {
+  show: boolean;
+  counter: number;
+}
+
+interface NestedPagePluginOptions {
+  tooltipRenderOpts: SuggestTooltipRenderOpts;
+}
+
+export function nestedPagePlugins ({ tooltipRenderOpts }: NestedPagePluginOptions) {
+  return [
+    new Plugin<NestedPagePluginState, Schema>({
+      key: NestedPagePluginKey,
+      state: {
+        init (_, _state) {
+          return {
+            show: false,
+            counter: 0
+          };
+        },
+        apply (tr, pluginState, _oldState) {
+          const meta = tr.getMeta(NestedPagePluginKey);
+          if (meta === undefined) {
+            return pluginState;
+          }
+          if (meta.type === 'RENDER_TOOLTIP') {
+            return {
+              ...pluginState,
+              show: true
+            };
+          }
+          if (meta.type === 'HIDE_TOOLTIP') {
+            // Do not change object reference if show was and is false
+            if (pluginState.show === false) {
+              return pluginState;
+            }
+            return {
+              ...pluginState,
+              show: false,
+              counter: 0
+            };
+          }
+          if (meta.type === 'INCREMENT_COUNTER') {
+            return { ...pluginState, counter: pluginState.counter + 1 };
+          }
+          if (meta.type === 'RESET_COUNTER') {
+            return { ...pluginState, counter: 0 };
+          }
+          if (meta.type === 'UPDATE_COUNTER') {
+            return { ...pluginState, counter: meta.value };
+          }
+          if (meta.type === 'DECREMENT_COUNTER') {
+            return { ...pluginState, counter: pluginState.counter - 1 };
+          }
+          throw new Error('Unknown type');
+        }
+      }
+    }),
+    tooltipPlacement.plugins({
+      stateKey: NestedPagePluginKey,
+      renderOpts: {
+        ...tooltipRenderOpts,
+        getReferenceElement: referenceElement((state) => {
+          const { selection } = state;
+          return {
+            end: selection.to,
+            start: selection.from
+          };
+        })
+      }
+    })
+  ];
 }
 
 export function NestedPage ({ node, getPos, view }: NodeViewProps) {
@@ -116,7 +193,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
         </MenuItem>
         <MenuItem
           sx={{ padding: '3px 12px' }}
-          onClick={addNestedPage}
+          onClick={() => addNestedPage()}
         >
           <ListItemIcon>
             <ContentPasteIcon

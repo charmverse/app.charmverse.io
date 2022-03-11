@@ -19,6 +19,8 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import { renderSuggestionsTooltip } from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
+import { NestedPagePluginKey } from 'components/editor/NestedPage';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'components/editor/ResizableIframe';
 import useNestedPage from 'hooks/useNestedPage';
 import { useMemo } from 'react';
@@ -112,7 +114,6 @@ function createColumnPaletteItem(colCount: number): Omit<PaletteItemType, "group
 
 const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> = {
   other: [
-    
     {
       uid: 'price',
       title: 'Crypto price',
@@ -503,6 +504,19 @@ export function useEditorItems() {
               dispatch,
               view,
             );
+          }) as PromisedCommand;
+        }),
+      },
+      {
+        uid: 'page',
+        title: 'Link to page',
+        icon: <DescriptionOutlinedIcon sx={{
+          fontSize: 16
+        }}/>,
+        description: 'Link to a new page',
+        editorExecuteCommand: (() => {
+          return (async (state, dispatch, view) => {
+            return renderSuggestionsTooltip(NestedPagePluginKey)(state, dispatch, view);
           }) as PromisedCommand;
         }),
       }
