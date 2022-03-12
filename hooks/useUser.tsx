@@ -16,6 +16,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (account && !user) {
+      setIsLoaded(false);
       charmClient.getUser()
         .then(_user => {
           setUser(_user);
@@ -29,6 +30,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     else if (!account) {
       // user disconnects their wallet
       setUser(null);
+      setIsLoaded(true);
     }
   }, [account]);
 

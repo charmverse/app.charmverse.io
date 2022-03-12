@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Image from 'components/common/Image';
@@ -7,8 +7,6 @@ import Card from '@mui/material/Card';
 import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useWeb3React } from '@web3-react/core';
-import charmClient from 'charmClient';
-import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
@@ -46,25 +44,13 @@ export default function SignupPageContent () {
 
   const { account } = useWeb3React();
   const ensName = useENSName(account);
-  const [user, setUser] = useUser();
   const router = useRouter();
 
-  // redirect user to workspace if they are already logged in
-  useEffect(() => {
-    if (user) {
-      router.push('/');
-    }
-  }, []);
-
   async function createWorkspace () {
-    const newUser = await charmClient.createUser({ address: account! });
-    setUser(newUser);
     router.push('/createWorkspace');
   }
 
   async function joinWorkspace () {
-    const newUser = await charmClient.createUser({ address: account! });
-    setUser(newUser);
     router.push('/join');
   }
 
