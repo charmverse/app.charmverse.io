@@ -250,6 +250,8 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                             <title>
                               {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
                             </title>
+                            {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
+                            <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
                           </Head>
                         )}
                       </TitleContext.Consumer>
