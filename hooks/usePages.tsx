@@ -99,7 +99,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     const newPage = await addPage(page);
     router.push(`/${(space!).domain}/${newPage.path}`);
   };
-  console.log('pages provider');
 
   const value: IContext = useMemo(() => ({
     currentPage,
