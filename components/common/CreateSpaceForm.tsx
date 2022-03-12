@@ -11,7 +11,6 @@ import { Prisma, Space } from '@prisma/client';
 import { ChangeEvent } from 'react';
 import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
-import getDisplayName from 'lib/users/getDisplayName';
 import { DOMAIN_BLACKLIST } from 'lib/spaces';
 import charmClient from 'charmClient';
 
