@@ -20,9 +20,9 @@ interface IBlocksEditorPage {
 
 export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditorPage) {
 
-  const { currentPage, setIsEditing, pages, setPages, setCurrentPage } = usePages();
+  const { currentPageId, setIsEditing, pages, setPages, setCurrentPageId } = usePages();
   const router = useRouter();
-  const { pageId } = router.query;
+  const pageId = router.query.pageId as string;
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
@@ -35,16 +35,20 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   }, []);
 
   async function setPage (updates: Partial<Page>) {
-    if (publicShare === true) {
+    if (!currentPageId || publicShare === true) {
       return;
     }
-    setPages((_pages) => _pages.map(p => p.id === currentPage!.id ? { ...p, ...updates } : p));
-    setCurrentPage(_page => ({ ..._page, ...updates }) as Page);
+    setPages((_pages) => ({
+      ..._pages,
+      [currentPageId]: {
+        ..._pages[currentPageId],
+        ...updates
+      }
+    }));
     if (updates.hasOwnProperty('title')) {
       setTitleState(updates.title || 'Untitled');
     }
-
-    debouncedPageUpdate({ id: currentPage!.id, ...updates } as Prisma.PageUpdateInput)
+    debouncedPageUpdate({ id: currentPageId, ...updates } as Prisma.PageUpdateInput)
       .catch((err: any) => {
         console.error('Error saving page', err);
       })
@@ -56,24 +60,27 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   async function loadPublicPage (publicPageId: string) {
     const page = await charmClient.getPublicPage(publicPageId);
     setTitleState(page.title);
-    setCurrentPage(page);
+    setCurrentPageId(page.id);
   }
 
   useEffect(() => {
     if (publicShare === true && pageId) {
       loadPublicPage(pageId as string);
     }
-    else if (pageId && pages.length) {
-      const pageByPath = pages.find(page => page.path === pageId || page.id === pageId);
+    else if (pageId) {
+      const pageByPath = pages[pageId] || Object.values(pages).find(page => page.path === pageId);
+      console.log('set current page', pageByPath?.title);
       if (pageByPath) {
         setTitleState(pageByPath.title);
-        setCurrentPage(pageByPath);
+        setCurrentPageId(pageByPath.id);
       }
       else {
         setPageNotFound(true);
       }
     }
-  }, [pageId, pages.length > 0]);
+  }, [pageId, Object.keys(pages).length > 0]);
+
+  const currentPage = pages[currentPageId];
 
   if (!currentPage && pageNotFound === true && space) {
     router.push(`/${space.domain}`);

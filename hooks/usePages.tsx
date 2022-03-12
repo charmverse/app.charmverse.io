@@ -1,7 +1,6 @@
 import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
-import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
@@ -11,44 +10,46 @@ import { useUser } from './useUser';
 
 type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
 type IContext = {
-  currentPage: Page | null,
-  pages: Page[],
-  setCurrentPage: Dispatch<SetStateAction<Page | null>>,
-  setPages: Dispatch<SetStateAction<Page[]>>,
+  currentPageId: string,
+  pages: Record<string, Page>,
+  setCurrentPageId: Dispatch<SetStateAction<string>>,
+  setPages: Dispatch<SetStateAction<Record<string, Page>>>,
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   addPage: AddPageFn,
-  addPageAndRedirect: (page?: Partial<Page>) => void,
-  pagesRecord: Record<string, Page>
+  addPageAndRedirect: (page?: Partial<Page>) => void
 };
 
 export const PagesContext = createContext<Readonly<IContext>>({
-  currentPage: null,
-  pages: [],
-  setCurrentPage: () => undefined,
+  currentPageId: '',
+  pages: {},
+  setCurrentPageId: () => '',
   setPages: () => undefined,
   isEditing: true,
   setIsEditing: () => { },
   addPage: null as any,
-  addPageAndRedirect: null as any,
-  pagesRecord: {}
+  addPageAndRedirect: null as any
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
   const [isEditing, setIsEditing] = useState(false);
   const [space] = useCurrentSpace();
-  const [pages, setPages] = useState<Page[]>([]);
-  const [currentPage, setCurrentPage] = useState<Page | null>(null);
+  const [pages, setPages] = useState<Record<string, Page>>({});
+  const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const intl = useIntl();
   const [user] = useUser();
 
   useEffect(() => {
     if (space) {
-      setPages([]);
+      setPages({});
       charmClient.getPages(space.id)
         .then(_pages => {
-          setPages(sortArrayByObjectProperty(_pages, 'index'));
+          const state: { [key: string]: Page } = {};
+          for (const page of _pages) {
+            state[page.id] = page;
+          }
+          setPages(state);
         });
     }
   }, [space?.id]);
@@ -89,7 +90,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       }, intl);
     }
     const newPage = await charmClient.createPage(pageProperties);
-    setPages([newPage, ...pages]);
+    setPages({ ...pages, [newPage.id]: newPage });
     return newPage;
   }, [intl, pages, space, user]);
 
@@ -98,25 +99,16 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     router.push(`/${(space!).domain}/${newPage.path}`);
   };
 
-  const pagesRecord = useMemo(() => {
-    const _pagesRecord: Record<string, Page> = {};
-    pages.forEach(page => {
-      _pagesRecord[page.id] = page;
-    });
-    return _pagesRecord;
-  }, [pages]);
-
   const value: IContext = useMemo(() => ({
-    currentPage,
+    currentPageId,
     isEditing,
     setIsEditing,
     pages,
-    setCurrentPage,
+    setCurrentPageId,
     setPages,
     addPage,
-    addPageAndRedirect,
-    pagesRecord
-  }), [currentPage, isEditing, router, pages, user]);
+    addPageAndRedirect
+  }), [currentPageId, isEditing, router, pages, user]);
 
   return (
     <PagesContext.Provider value={value}>

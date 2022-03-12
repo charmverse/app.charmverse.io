@@ -31,9 +31,11 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const router = useRouter();
   const colorMode = useColorMode();
   const [pageTitle] = usePageTitle();
-  const { currentPage, isEditing } = usePages();
+  const { pages, currentPageId, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
+
+  const currentPage = currentPageId && pages[currentPageId];
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
