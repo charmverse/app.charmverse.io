@@ -44,7 +44,7 @@ export default function LoginPage () {
   }, [account, isLoading]);
 
   if (isLoading) {
-    return 'Loading';
+    return null;
   }
 
   return (
