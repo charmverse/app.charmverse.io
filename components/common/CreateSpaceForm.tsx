@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import Grid from '@mui/material/Grid';
+import Alert from '@mui/material/Alert';
 import TextField from '@mui/material/TextField';
 import PrimaryButton from 'components/common/PrimaryButton';
 import FieldLabel from 'components/settings/FieldLabel';
@@ -8,7 +9,7 @@ import Avatar from 'components/settings/LargeAvatar';
 import Divider from '@mui/material/Divider';
 import { useUser } from 'hooks/useUser';
 import { Prisma, Space } from '@prisma/client';
-import { ChangeEvent } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
 import { DOMAIN_BLACKLIST } from 'lib/spaces';
@@ -43,6 +44,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
 
   const [user] = useUser();
 
+  const [saveError, setSaveError] = useState<any | null>(null);
   const {
     register,
     handleSubmit,
@@ -59,6 +61,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
 
   function onSubmit (values: FormValues) {
     try {
+      setSaveError(null);
       _onSubmit({
         author: {
           connect: {
@@ -81,9 +84,9 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         ...values
       });
     }
-    catch (e) {
-      // eslint-disable-next-line
-      console.error(e);
+    catch (err) {
+      console.error(err);
+      setSaveError((err as Error).message || err);
     }
   }
 
@@ -130,6 +133,13 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
             {submitText || 'Create Workspace'}
           </PrimaryButton>
         </Grid>
+        {saveError && (
+          <Grid item>
+            <Alert severity='error'>
+              {saveError}
+            </Alert>
+          </Grid>
+        )}
       </Grid>
     </form>
   );
