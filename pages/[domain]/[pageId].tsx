@@ -20,7 +20,7 @@ interface IBlocksEditorPage {
 
 export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditorPage) {
 
-  const { currentPage, setIsEditing, pages, setPages, setCurrentPage } = usePages();
+  const { currentPageId, setIsEditing, pages, setPages, setCurrentPageId } = usePages();
   const router = useRouter();
   const pageId = router.query.pageId as string;
   const [, setTitleState] = usePageTitle();
@@ -35,20 +35,20 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   }, []);
 
   async function setPage (updates: Partial<Page>) {
-    if (!currentPage || publicShare === true) {
+    if (!currentPageId || publicShare === true) {
       return;
     }
     setPages((_pages) => ({
       ..._pages,
-      [currentPage.id]: {
-        ..._pages[currentPage.id],
+      [currentPageId]: {
+        ..._pages[currentPageId],
         ...updates
       }
     }));
     if (updates.hasOwnProperty('title')) {
       setTitleState(updates.title || 'Untitled');
     }
-    debouncedPageUpdate({ id: currentPage!.id, ...updates } as Prisma.PageUpdateInput)
+    debouncedPageUpdate({ id: currentPageId, ...updates } as Prisma.PageUpdateInput)
       .catch((err: any) => {
         console.error('Error saving page', err);
       })
@@ -60,7 +60,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   async function loadPublicPage (publicPageId: string) {
     const page = await charmClient.getPublicPage(publicPageId);
     setTitleState(page.title);
-    setCurrentPage(page);
+    setCurrentPageId(page.id);
   }
 
   useEffect(() => {
@@ -69,9 +69,10 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     }
     else if (pageId) {
       const pageByPath = pages[pageId] || Object.values(pages).find(page => page.path === pageId);
+      console.log('set current page', pageByPath?.title);
       if (pageByPath) {
         setTitleState(pageByPath.title);
-        setCurrentPage(pageByPath);
+        setCurrentPageId(pageByPath.id);
       }
       else {
         setPageNotFound(true);
@@ -79,12 +80,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     }
   }, [pageId, Object.keys(pages).length > 0]);
 
-  useEffect(() => {
-    // keep currentPage updated with page state
-    if (currentPage) {
-      setCurrentPage(pages[currentPage.id]);
-    }
-  }, [pages]);
+  const currentPage = pages[currentPageId];
 
   if (!currentPage && pageNotFound === true && space) {
     router.push(`/${space.domain}`);
