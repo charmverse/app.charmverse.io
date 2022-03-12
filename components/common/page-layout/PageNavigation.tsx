@@ -135,14 +135,14 @@ const PageAnchor = styled.a`
   }
 `;
 
-const PageIcon = styled(EmojiCon)`
+const StyledPageIcon = styled(EmojiCon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
 `;
 
-const PageTitle = styled(Typography)<{ isempty?: number }>`
+export const PageTitle = styled(Typography)<{ isempty?: number }>`
   color: inherit;
   display: flex;
   align-items: center;
@@ -181,12 +181,12 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
   });
 
   return (
-    <Link href={href} passHref>
+    <Link passHref href={href}>
       <PageAnchor onClick={stopPropagation}>
         {labelIcon && (
-          <PageIcon {...bindTrigger(popupState)}>
+          <StyledPageIcon {...bindTrigger(popupState)}>
             {labelIcon}
-          </PageIcon>
+          </StyledPageIcon>
         )}
         <Link passHref href={href}>
           <PageTitle isempty={isempty ? 1 : 0}>
@@ -213,6 +213,11 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
               }
               popupState.close();
             }
+
+            if (boardId) {
+              await mutator.changeIcon(boardId, emoji, emoji);
+            }
+            popupState.close();
           }}
           />
         </Menu>
@@ -229,6 +234,29 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
     </div>
   )
 );
+
+export function PageIcon ({ isEditorEmpty, pageType }: {pageType: Page['type'], isEditorEmpty: boolean}) {
+  let Icon: null | ReactNode = null;
+  if (pageType === 'board') {
+    Icon = (<StyledDatabaseIcon />);
+  }
+  else if (isEditorEmpty) {
+    Icon = (
+      <InsertDriveFileOutlinedIcon />
+    );
+  }
+  else {
+    Icon = (
+      <DescriptionOutlinedIcon />
+    );
+  }
+
+  return (
+    <StyledPageIcon>
+      {Icon}
+    </StyledPageIcon>
+  );
+}
 
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
