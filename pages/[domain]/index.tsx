@@ -3,7 +3,8 @@ import { useRouter } from 'next/router';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 
-export default function IndexPage () {
+// Redirect users to an initial page
+export default function RedirectToMainPage () {
   const router = useRouter();
   const [space] = useCurrentSpace();
   const { pages } = usePages();
