@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 import { usePages } from './usePages';
 
 export default function useNestedPage () {
-  const { currentPage, addPage, pagesRecord } = usePages();
+  const { currentPage, addPage, pages } = usePages();
   const view = useEditorViewContext();
 
   const addNestedPage = useCallback(async (pageId?: string) => {
@@ -18,7 +18,7 @@ export default function useNestedPage () {
       });
     }
     else {
-      page = pagesRecord[pageId];
+      page = pages[pageId];
     }
 
     rafCommandExec(view!, (state, dispatch) => {

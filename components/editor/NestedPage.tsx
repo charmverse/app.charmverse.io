@@ -159,7 +159,7 @@ export function NestedPagesList () {
       }}
       >
         <Box>
-          {pages.map(page => {
+          {Object.values(pages).map(page => {
             const docContent = ((page?.content) as PageContent)?.content;
             const isEditorEmpty = docContent && (docContent.length <= 1
               && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
