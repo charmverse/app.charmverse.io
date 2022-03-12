@@ -17,7 +17,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
-  const { account, active } = useWeb3React();
+  const { account } = useWeb3React();
   const [user, setUser, isUserLoaded] = useUser();
   const [spaces, _, isSpacesLoaded] = useSpaces();
   const isUserLoading = !!(account && !isUserLoaded);
@@ -32,7 +32,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     if (isLoading) {
       return;
     }
-
     function authCheckAndRedirect (path: string) {
       authCheck(path)
         .then(result => {
@@ -103,7 +102,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
     // condition: trying to access a space without access
     else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
-      console.log('[RouteGuard]: send to join workspace page', spaces, spaceDomain);
+      console.log('[RouteGuard]: send to join workspace page');
       return {
         authorized: false,
         redirect: {

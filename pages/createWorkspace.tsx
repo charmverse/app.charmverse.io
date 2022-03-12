@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Prisma } from '@prisma/client';
 import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
@@ -17,17 +16,11 @@ export default function CreateSpace () {
   const [spaces, setSpaces] = useSpaces();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (spaces.length > 0) {
-  //     router.push(`/${spaces[0].domain}`);
-  //   }
-  // }, [spaces]);
-
   async function addSpace (newSpace: Prisma.SpaceCreateInput) {
     const space = await charmClient.createSpace(newSpace);
+    setSpaces([...spaces, space]);
     // refresh user permissions
     const _user = await charmClient.getUser();
-    setSpaces([...spaces, space]);
     setUser(_user);
     router.push(`/${space.domain}`);
   }

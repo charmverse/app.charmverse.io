@@ -15,6 +15,7 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (user) {
+      console.log('load spaces because user changed');
       setIsLoaded(false);
       charmClient.getSpaces()
         .then(_spaces => {
