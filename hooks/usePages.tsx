@@ -1,4 +1,5 @@
 import { Page, Prisma } from '@prisma/client';
+import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
@@ -41,19 +42,26 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const intl = useIntl();
   const [user] = useUser();
 
+  const { data } = useSWR(() => space ? `pages/${space?.id}` : null, () => charmClient.getPages(space!.id));
+
   useEffect(() => {
-    if (space) {
-      setPages({});
-      charmClient.getPages(space.id)
-        .then(_pages => {
-          const state: { [key: string]: Page } = {};
-          for (const page of _pages) {
-            state[page.id] = page;
-          }
-          setPages(state);
-        });
-    }
-  }, [space?.id]);
+    console.log('data', data);
+    setPages(data?.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
+  }, [data]);
+
+  // useEffect(() => {
+  //   if (space) {
+  //     setPages({});
+  //     charmClient.getPages(space.id)
+  //       .then(_pages => {
+  //         const state: { [key: string]: Page } = {};
+  //         for (const page of _pages) {
+  //           state[page.id] = page;
+  //         }
+  //         setPages(state);
+  //       });
+  //   }
+  // }, [space?.id]);
 
   const addPage: AddPageFn = React.useCallback(async (page) => {
     const spaceId = space?.id!;
