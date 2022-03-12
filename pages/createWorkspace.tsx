@@ -22,7 +22,10 @@ export default function CreateSpace () {
     // refresh user permissions
     const _user = await charmClient.getUser();
     setUser(_user);
-    router.push(`/${space.domain}`);
+    // give some time for spaces state to update or user will be redirected to /join in RouteGuard
+    setTimeout(() => {
+      router.push(`/${space.domain}`);
+    }, 50);
   }
 
   const defaultName = `${getDisplayName(user!)}'s Workspace`;
