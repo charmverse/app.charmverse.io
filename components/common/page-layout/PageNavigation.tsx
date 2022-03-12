@@ -181,48 +181,46 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
   });
 
   return (
-    <Link passHref href={href}>
-      <PageAnchor onClick={stopPropagation}>
-        {labelIcon && (
-          <StyledPageIcon {...bindTrigger(popupState)}>
-            {labelIcon}
-          </StyledPageIcon>
-        )}
-        <Link passHref href={href}>
-          <PageTitle isempty={isempty ? 1 : 0}>
-            {isempty ? 'Untitled' : label}
-          </PageTitle>
-        </Link>
-        {children}
-        <Menu {...bindMenu(popupState)}>
-          <EmojiPicker onSelect={async (emoji) => {
-            if (pageId) {
-              await charmClient.updatePage({
-                id: pageId,
+    <PageAnchor onClick={stopPropagation}>
+      {labelIcon && (
+        <StyledPageIcon {...bindTrigger(popupState)}>
+          {labelIcon}
+        </StyledPageIcon>
+      )}
+      <Link passHref href={href}>
+        <PageTitle isempty={isempty ? 1 : 0}>
+          {isempty ? 'Untitled' : label}
+        </PageTitle>
+      </Link>
+      {children}
+      <Menu {...bindMenu(popupState)}>
+        <EmojiPicker onSelect={async (emoji) => {
+          if (pageId) {
+            await charmClient.updatePage({
+              id: pageId,
+              icon: emoji
+            });
+            setPages(_pages => ({
+              ..._pages,
+              [pageId]: {
+                ..._pages[pageId],
                 icon: emoji
-              });
-              setPages(_pages => ({
-                ..._pages,
-                [pageId]: {
-                  ..._pages[pageId],
-                  icon: emoji
-                }
-              }));
-              if (boardId) {
-                await mutator.changeIcon(boardId, emoji, emoji);
               }
-              popupState.close();
-            }
-
+            }));
             if (boardId) {
               await mutator.changeIcon(boardId, emoji, emoji);
             }
             popupState.close();
-          }}
-          />
-        </Menu>
-      </PageAnchor>
-    </Link>
+          }
+
+          if (boardId) {
+            await mutator.changeIcon(boardId, emoji, emoji);
+          }
+          popupState.close();
+        }}
+        />
+      </Menu>
+    </PageAnchor>
   );
 }
 
