@@ -12,7 +12,7 @@ type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
 type IContext = {
   currentPageId: string,
   pages: Record<string, Page>,
-  setCurrentPageId: Dispatch<SetStateAction<string | null>>,
+  setCurrentPageId: Dispatch<SetStateAction<string>>,
   setPages: Dispatch<SetStateAction<Record<string, Page>>>,
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
@@ -23,7 +23,7 @@ type IContext = {
 export const PagesContext = createContext<Readonly<IContext>>({
   currentPageId: '',
   pages: {},
-  setCurrentPageId: () => undefined,
+  setCurrentPageId: () => '',
   setPages: () => undefined,
   isEditing: true,
   setIsEditing: () => { },
