@@ -74,9 +74,9 @@ export type SuggestTooltipRenderOpts = Omit<
 
 interface PluginsOptions {
   key?: PluginKey;
+  tooltipRenderOpts: SuggestTooltipRenderOpts;
   markName: string;
   trigger: string;
-  tooltipRenderOpts: SuggestTooltipRenderOpts;
   keybindings?: any;
   onEnter?: Command;
   onArrowDown?: Command;
@@ -204,7 +204,7 @@ function pluginsFactory({
   };
 }
 
-function referenceElement(
+export function referenceElement(
   getActiveMarkPos: (state: EditorState) => { start: number; end: number },
 ): GetReferenceElementFunction {
   return (view) => {
@@ -333,7 +333,7 @@ function doesQueryHaveTrigger(
   return textContent.includes(trigger);
 }
 
-function renderSuggestionsTooltip(key: PluginKey): Command {
+export function renderSuggestionsTooltip(key: PluginKey): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
       dispatch(
@@ -346,7 +346,7 @@ function renderSuggestionsTooltip(key: PluginKey): Command {
   };
 }
 
-function hideSuggestionsTooltip(key: PluginKey): Command {
+export function hideSuggestionsTooltip(key: PluginKey): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
       dispatch(

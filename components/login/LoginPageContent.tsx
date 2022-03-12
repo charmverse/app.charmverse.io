@@ -62,15 +62,9 @@ export default function LoginPageContent ({ account }: { account: string | null 
             <Typography sx={{ fontSize: 20, mb: 6 }}>
               Tasks, docs, bounties, and more
             </Typography>
-            {account ? (
-              <PrimaryButton size='large' href='/'>
-                Go to Workspace
-              </PrimaryButton>
-            ) : (
-              <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
-                Connect Wallet
-              </PrimaryButton>
-            )}
+            <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
+              Connect Wallet
+            </PrimaryButton>
           </Box>
         </Grid>
         <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>

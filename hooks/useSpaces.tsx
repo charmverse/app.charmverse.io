@@ -3,26 +3,32 @@ import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useUser } from './useUser';
 
-type IContext = [spaces: Space[], setSpaces: (user: Space[]) => void];
+type IContext = [spaces: Space[], setSpaces: (user: Space[]) => void, isLoaded: boolean];
 
-export const SpacesContext = createContext<Readonly<IContext>>([[], () => undefined]);
+export const SpacesContext = createContext<Readonly<IContext>>([[], () => undefined, false]);
 
 export function SpacesProvider ({ children }: { children: ReactNode }) {
 
-  const [user] = useUser();
+  const [user, _, isUserLoaded] = useUser();
   const [spaces, setSpaces] = useState<Space[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     if (user) {
+      setIsLoaded(false);
       charmClient.getSpaces()
         .then(_spaces => {
           setSpaces(_spaces);
+          setIsLoaded(true);
         })
         .catch(err => {});
     }
-  }, [user?.id]);
+    else if (isUserLoaded) {
+      setIsLoaded(true);
+    }
+  }, [user?.id, isUserLoaded]);
 
-  const value = useMemo(() => [spaces, setSpaces] as const, [spaces]);
+  const value = useMemo(() => [spaces, setSpaces, isLoaded] as const, [spaces, isLoaded]);
 
   return (
     <SpacesContext.Provider value={value}>

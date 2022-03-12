@@ -35,7 +35,7 @@ import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './InlinePalette';
 import { Mention, mentionPlugins, mentionSpecs, MentionSuggest } from './Mention';
-import { NestedPage, nestedPageSpec } from './NestedPage';
+import { NestedPage, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './NestedPage';
 import Placeholder from './Placeholder';
 import { Quote, quoteSpec } from './Quote';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
@@ -157,6 +157,11 @@ function CharmEditor (
             }
           }
         })
+      }),
+      nestedPagePlugins({
+        tooltipRenderOpts: {
+          placement: 'bottom'
+        }
       }),
       imagePlugins(),
       inlinePalettePlugins(),
@@ -347,6 +352,7 @@ function CharmEditor (
     >
       <FloatingMenu />
       <MentionSuggest />
+      <NestedPagesList />
       {EmojiSuggest}
       {InlinePalette}
       {children}

@@ -9,6 +9,7 @@ import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import getDisplayName from 'lib/users/getDisplayName';
+import { AlternateRouteButton } from './join';
 
 export default function CreateSpace () {
 
@@ -16,17 +17,17 @@ export default function CreateSpace () {
   const [spaces, setSpaces] = useSpaces();
   const router = useRouter();
 
-  useEffect(() => {
-    if (spaces.length > 0) {
-      router.push(`/${spaces[0].domain}`);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (spaces.length > 0) {
+  //     router.push(`/${spaces[0].domain}`);
+  //   }
+  // }, [spaces]);
 
   async function addSpace (newSpace: Prisma.SpaceCreateInput) {
     const space = await charmClient.createSpace(newSpace);
-    setSpaces([...spaces, space]);
     // refresh user permissions
     const _user = await charmClient.getUser();
+    setSpaces([...spaces, space]);
     setUser(_user);
     router.push(`/${space.domain}`);
   }
@@ -39,9 +40,12 @@ export default function CreateSpace () {
 
   return (
     <Box sx={{ width: 400, maxWidth: '100%', mx: 'auto' }}>
-      <Card sx={{ p: 4 }} variant='outlined'>
+      <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <CreateSpaceForm defaultValues={defaultValues} onSubmit={addSpace} submitText='Get Started' />
       </Card>
+      <AlternateRouteButton href='/join'>
+        Join an existing workspace
+      </AlternateRouteButton>
     </Box>
   );
 }

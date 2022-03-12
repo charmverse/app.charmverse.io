@@ -5,9 +5,9 @@ import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import BountyIcon from '@mui/icons-material/RequestPage';
 import SettingsIcon from '@mui/icons-material/Settings';
-import LaunchIcon from '@mui/icons-material/Launch';
+import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
+import Button from 'components/common/Button';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
@@ -168,7 +168,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
-  const { currentPage, pages, setPages, addPageAndRedirect } = usePages();
+  const { currentPageId, pages, setPages, addPageAndRedirect } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
@@ -196,16 +196,17 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   }
 
   async function deletePage (pageId: string) {
-    const page = pages.find(p => p.id === pageId);
-    let newPages = pages.filter(p => p.id !== pageId);
+    const page = pages[pageId];
+    let newPages = { ...pages };
+    delete newPages[pageId];
     if (page) {
       await charmClient.deletePage(page.id);
-      if (pages.length === 1) {
+      if (Object.keys(newPages).length === 0) {
         const newPage = await charmClient.createPage(untitledPage({
           userId: user!.id,
           spaceId: space!.id
         }));
-        newPages = [newPage];
+        newPages = { [newPage.id]: newPage };
       }
     }
     setPages(newPages);
@@ -225,11 +226,12 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       }
     }
 
+    const currentPage = pages[currentPageId];
     // Redirect from current page
     if (page && currentPage && page.id === currentPage.id) {
       let newPath = `/${space!.domain}`;
       if (currentPage.parentId) {
-        const parent = pages.find(p => p.id === currentPage.parentId);
+        const parent = pages[currentPage.parentId];
         if (parent) {
           newPath += `/${parent.path}`;
         }
@@ -262,11 +264,9 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
           <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
           <Typography variant='body2' align='center' sx={{ pt: 3 }}>
-            <Link color='secondary' href='/join'>
+            <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
               Join an existing workspace
-              {' '}
-              <LaunchIcon fontSize='small' />
-            </Link>
+            </Button>
           </Typography>
         </Modal>
       </WorkspacesContainer>

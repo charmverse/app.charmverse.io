@@ -1,17 +1,35 @@
-import { useEffect } from 'react';
+import { useEffect, ReactNode } from 'react';
 import { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import getBaseLayout from 'components/common/base-layout/getLayout';
 import TokenGateForm from 'components/common/TokenGateForm';
-import charmClient from 'charmClient';
-import { useUser } from 'hooks/useUser';
+import Button from 'components/common/Button';
 import { useSpaces } from 'hooks/useSpaces';
+
+export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
+  const [spaces] = useSpaces();
+  const showMySpacesLink = spaces.length > 0;
+  return (
+    <Box display='flex' alignItems='center' justifyContent={showMySpacesLink ? 'space-between' : 'center'}>
+      {showMySpacesLink && (
+        <Button variant='text' href={`/${spaces[0]!.domain}`} endIcon={<NavigateNextIcon />}>
+          Go to my workspace
+        </Button>
+      )}
+      <Button variant='text' href={href} endIcon={<NavigateNextIcon />}>
+        {children}
+      </Button>
+    </Box>
+  );
+}
 
 export default function CreateSpace () {
 
   const router = useRouter();
+  const [spaces] = useSpaces();
 
   async function onJoinSpace (space: Space) {
     if (typeof router.query.returnUrl === 'string') {
@@ -21,12 +39,20 @@ export default function CreateSpace () {
       router.push(`/${space.domain}`);
     }
   }
+  useEffect(() => {
+    if (spaces.some(space => space.domain === router.query.domain)) {
+      router.push(`/${router.query.domain}`);
+    }
+  }, [spaces]);
 
   return (
     <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6 }}>
-      <Card sx={{ p: 4 }} variant='outlined'>
+      <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <TokenGateForm onSubmit={onJoinSpace} />
       </Card>
+      <AlternateRouteButton href='/createWorkspace'>
+        Create a new workspace
+      </AlternateRouteButton>
     </Box>
   );
 }
