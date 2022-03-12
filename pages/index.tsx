@@ -32,6 +32,7 @@ export default function LoginPage () {
         router.push(router.query.returnUrl);
       }
       else if (!isLoading) {
+        console.log('spaces', isSpacesLoaded, spaces);
         if (spaces.length > 0) {
           router.push(`/${spaces[0]!.domain}`);
         }

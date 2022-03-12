@@ -9,11 +9,6 @@ const config = {
         destination: '/:domain/settings/account',
         permanent: false
       },
-      {
-        source: '/',
-        destination: '/',
-        permanent: false
-      },
       // temporary redirect to fix the old redirect from '/' to '/login'
       {
         source: '/login',
