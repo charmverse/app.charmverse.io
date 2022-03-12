@@ -11,16 +11,6 @@ import type { UrlObject } from 'url';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', '/invite', '/share'];
-// Pages to create a user account but require a wallet connected
-const walletRequiredPages = ['/signup', '/invite', '/join'];
-
-/**
- * Page loading:
- * 1. React loads
- * 2a. Request user from session
- * 2b. Request connected wallet from browser extension
- *
- */
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
 
@@ -77,10 +67,9 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
     const path = url.split('?')[0];
     const spaceDomain = path.split('/')[1];
-    console.log('isSpaceDomain(spaceDomain)', isSpaceDomain(spaceDomain), !spaces.some(s => s.domain === spaceDomain));
+
     // condition: public page
     if (publicPages.some(basePath => path === basePath)) {
-      console.log('public page');
       return { authorized: true };
     }
     // condition: wallet not connected
