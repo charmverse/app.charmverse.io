@@ -168,7 +168,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
-  const { currentPage, pages, setPages, addPageAndRedirect } = usePages();
+  const { currentPageId, pages, setPages, addPageAndRedirect } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
@@ -225,6 +225,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         );
       }
     }
+
+    const currentPage = pages[currentPageId];
 
     // Redirect from current page
     if (page && currentPage && page.id === currentPage.id) {
