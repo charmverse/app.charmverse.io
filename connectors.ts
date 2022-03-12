@@ -231,8 +231,22 @@ export const CryptoCurrencies = uniqueValues<CryptoCurrency>(RPCList.map(chain =
 
 export function getChainById (chainId: string | number): IChainDetails | undefined {
   return RPCList.find(rpc => {
-    // eslint-disable-next-line radix
-    return parseInt(rpc.chainId.toString()) === parseInt(chainId.toString());
+
+    try {
+      // eslint-disable-next-line radix
+      const parsedChainId = parseInt(rpc.chainId.toString());
+      // eslint-disable-next-line radix
+      const parsedTargetChainId = parseInt(chainId.toString());
+
+      if (Number.isNaN(parsedChainId) || Number.isNaN(parsedTargetChainId)) {
+        return false;
+      }
+
+      return parsedChainId === parsedTargetChainId;
+    }
+    catch (error) {
+      return false;
+    }
   });
 }
 
