@@ -13,6 +13,12 @@ const config = {
         source: '/',
         destination: '/',
         permanent: false
+      },
+      // temporary redirect to fix the old redirect from '/' to '/login'
+      {
+        source: '/login',
+        destination: '/',
+        permanent: false
       }
     ];
   },
