@@ -7,7 +7,12 @@ const config = {
       {
         source: '/:domain/settings',
         destination: '/:domain/settings/account',
-        permanent: true
+        permanent: false
+      },
+      {
+        source: '/',
+        destination: '/',
+        permanent: false
       }
     ];
   },
