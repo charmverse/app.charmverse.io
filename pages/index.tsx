@@ -18,19 +18,20 @@ export default function LoginPage () {
   const [user, setUser, isUserLoaded] = useUser();
   const [spaces, setSpaces, isSpacesLoaded] = useSpaces();
 
-  const isLoading = !triedEager || isSpacesLoaded || !isUserLoaded;
+  const isLoading = !triedEager || !isSpacesLoaded || !isUserLoaded;
 
   useEffect(() => {
-    setTitleState('Login');
+    setTitleState('Welcome');
   }, []);
 
-  // redirect user once wallet is connected
   useEffect(() => {
+
+    // redirect user once wallet is connected
     if (account) {
       if (typeof router.query.returnUrl === 'string') {
         router.push(router.query.returnUrl);
       }
-      else if (triedEager && isSpacesLoaded && isUserLoaded) {
+      else if (!isLoading) {
         if (spaces.length > 0) {
           router.push(`/${spaces[0]!.domain}`);
         }
@@ -39,6 +40,7 @@ export default function LoginPage () {
         }
       }
     }
+
   }, [account, isLoading]);
 
   if (isLoading) {
