@@ -22,7 +22,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
 
   const { currentPage, setIsEditing, pages, setPages, setCurrentPage } = usePages();
   const router = useRouter();
-  const { pageId } = router.query;
+  const pageId = router.query.pageId as string;
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
@@ -35,15 +35,19 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   }, []);
 
   async function setPage (updates: Partial<Page>) {
-    if (publicShare === true) {
+    if (!currentPage || publicShare === true) {
       return;
     }
-    setPages((_pages) => _pages.map(p => p.id === currentPage!.id ? { ...p, ...updates } : p));
-    setCurrentPage(_page => ({ ..._page, ...updates }) as Page);
+    setPages((_pages) => ({
+      ..._pages,
+      [currentPage.id]: {
+        ..._pages[currentPage.id],
+        ...updates
+      }
+    }));
     if (updates.hasOwnProperty('title')) {
       setTitleState(updates.title || 'Untitled');
     }
-
     debouncedPageUpdate({ id: currentPage!.id, ...updates } as Prisma.PageUpdateInput)
       .catch((err: any) => {
         console.error('Error saving page', err);
@@ -63,8 +67,8 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     if (publicShare === true && pageId) {
       loadPublicPage(pageId as string);
     }
-    else if (pageId && pages.length) {
-      const pageByPath = pages.find(page => page.path === pageId || page.id === pageId);
+    else if (pageId) {
+      const pageByPath = pages[pageId] || Object.values(pages).find(page => page.path === pageId);
       if (pageByPath) {
         setTitleState(pageByPath.title);
         setCurrentPage(pageByPath);
@@ -73,7 +77,14 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
         setPageNotFound(true);
       }
     }
-  }, [pageId, pages.length > 0]);
+  }, [pageId, Object.keys(pages).length > 0]);
+
+  useEffect(() => {
+    // keep currentPage updated with page state
+    if (currentPage) {
+      setCurrentPage(pages[currentPage.id]);
+    }
+  }, [pages]);
 
   if (!currentPage && pageNotFound === true && space) {
     router.push(`/${space.domain}`);
