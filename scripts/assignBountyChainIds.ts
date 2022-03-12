@@ -6,8 +6,7 @@ function assignChainIds (): Promise<any> {
   return Promise.all(
     RPCList
       .filter(chain => {
-        // Ignore Goerli, Rinkeby and Mumbai chains
-        return [5, 4, 80001].indexOf(chain.chainId) === -1;
+        return chain.testnet !== true;
       })
       .map(chain => {
         const nativeCurrency = chain.nativeCurrency.symbol;

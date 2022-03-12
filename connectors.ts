@@ -31,7 +31,8 @@ export interface IChainDetails {
   },
   rpcUrls: readonly string [],
   blockExplorerUrls: readonly string [],
-  iconUrls: readonly string []
+  iconUrls: readonly string [],
+  testnet?: boolean
 }
 
 const RPC: Record<string, IChainDetails> = {
@@ -183,7 +184,8 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
-    iconUrls: ['/networkLogos/ethereum.svg']
+    iconUrls: ['/networkLogos/ethereum.svg'],
+    testnet: true
   },
   RINKEBY: {
     chainId: 4,
@@ -198,7 +200,8 @@ const RPC: Record<string, IChainDetails> = {
     },
     blockExplorerUrls: ['https://rinkeby-explorer.arbitrum.io/#/'],
     iconUrls: ['/networkLogos/ethereum.svg'],
-    rpcUrls: ['https://rinkeby-light.eth.linkpool.io/']
+    rpcUrls: ['https://rinkeby-light.eth.linkpool.io/'],
+    testnet: true
   },
   MUMBAI: {
     chainId: 80001,
@@ -213,7 +216,8 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://rpc-mumbai.matic.today'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
-    iconUrls: ['/networkLogos/polygon.svg']
+    iconUrls: ['/networkLogos/polygon.svg'],
+    testnet: true
   }
 } as const;
 
