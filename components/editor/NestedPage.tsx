@@ -50,7 +50,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
   const { pages } = usePages();
   const { addNestedPage } = useNestedPage();
   const { message, handleClose, isOpen: isSnackbarOpen, showMessage } = useSnackbar();
-  const nestedPage = pages.find(page => page.id === node.attrs.id);
+  const nestedPage = pages[node.attrs.id];
   const popupState = usePopupState({ variant: 'popover', popupId: 'nested-page' });
 
   const docContent = ((nestedPage?.content) as PageContent)?.content;

@@ -52,7 +52,13 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
     const updatedPage = await charmClient.togglePagePublicAccess(currentPage!.id, !isPublic);
     setIsPublic(updatedPage.isPublic);
     const updates = { isPublic: updatedPage.isPublic };
-    setPages(pages => pages.map(p => p.id === currentPage!.id ? { ...p, ...updates } : p));
+    setPages(_pages => ({
+      ..._pages,
+      [currentPage!.id]: {
+        ..._pages[currentPage!.id],
+        ...updates
+      }
+    }));
   }
 
   async function updateShareLink () {
