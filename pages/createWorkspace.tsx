@@ -17,12 +17,6 @@ export default function CreateSpace () {
   const [spaces, setSpaces] = useSpaces();
   const router = useRouter();
 
-  useEffect(() => {
-    if (spaces.length > 0) {
-      router.push(`/${spaces[0].domain}`);
-    }
-  }, []);
-
   async function addSpace (newSpace: Prisma.SpaceCreateInput) {
     const space = await charmClient.createSpace(newSpace);
     setSpaces([...spaces, space]);

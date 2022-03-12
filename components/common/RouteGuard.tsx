@@ -112,17 +112,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         }
       };
     }
-    // condition: no space associated with user
-    // else if (spaces.length === 0 && !isSpaceDomain(spaceDomain)) {
-    //   console.log('[RouteGuard]: redirect to create or join a workspace', router.pathname);
-    //   return {
-    //     authorized: false,
-    //     redirect: {
-    //       pathname: '/signup',
-    //       query: { returnUrl: router.asPath }
-    //     }
-    //   };
-    // }
     else {
       return { authorized: true };
     }
