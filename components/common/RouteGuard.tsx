@@ -10,24 +10,14 @@ import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 
 // Pages shared to the public that don't require user login
-const publicPages = ['/login', '/invite', '/share'];
-// Pages to create a user account but require a wallet connected
-const walletRequiredPages = ['/signup', '/invite', '/join'];
-
-/**
- * Page loading:
- * 1. React loads
- * 2a. Request user from session
- * 2b. Request connected wallet from browser extension
- *
- */
+const publicPages = ['/', '/invite', '/share'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
 
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
-  const { account, active } = useWeb3React();
+  const { account } = useWeb3React();
   const [user, setUser, isUserLoaded] = useUser();
   const [spaces, _, isSpacesLoaded] = useSpaces();
   const isUserLoading = !!(account && !isUserLoaded);
@@ -42,7 +32,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     if (isLoading) {
       return;
     }
-
     function authCheckAndRedirect (path: string) {
       authCheck(path)
         .then(result => {
@@ -79,7 +68,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     const spaceDomain = path.split('/')[1];
 
     // condition: public page
-    if (publicPages.some(basePath => path.startsWith(basePath))) {
+    if (publicPages.some(basePath => path === basePath)) {
       return { authorized: true };
     }
     // condition: wallet not connected
@@ -88,7 +77,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return {
         authorized: false,
         redirect: {
-          pathname: '/login',
+          pathname: '/',
           query: { returnUrl: router.asPath }
         }
       };
@@ -117,22 +106,11 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return {
         authorized: false,
         redirect: {
-          pathname: '/signup',
+          pathname: '/join',
           query: { domain: spaceDomain, returnUrl: router.asPath }
         }
       };
     }
-    // condition: no space associated with user
-    // else if (spaces.length === 0 && !isSpaceDomain(spaceDomain)) {
-    //   console.log('[RouteGuard]: redirect to create or join a workspace', router.pathname);
-    //   return {
-    //     authorized: false,
-    //     redirect: {
-    //       pathname: '/signup',
-    //       query: { returnUrl: router.asPath }
-    //     }
-    //   };
-    // }
     else {
       return { authorized: true };
     }

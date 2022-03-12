@@ -135,14 +135,14 @@ const PageAnchor = styled.a`
   }
 `;
 
-const PageIcon = styled(EmojiCon)`
+const StyledPageIcon = styled(EmojiCon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
 `;
 
-const PageTitle = styled(Typography)<{ isempty?: number }>`
+export const PageTitle = styled(Typography)<{ isempty?: number }>`
   color: inherit;
   display: flex;
   align-items: center;
@@ -181,43 +181,46 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
   });
 
   return (
-    <Link href={href} passHref>
-      <PageAnchor onClick={stopPropagation}>
-        {labelIcon && (
-          <PageIcon {...bindTrigger(popupState)}>
-            {labelIcon}
-          </PageIcon>
-        )}
-        <Link passHref href={href}>
-          <PageTitle isempty={isempty ? 1 : 0}>
-            {isempty ? 'Untitled' : label}
-          </PageTitle>
-        </Link>
-        {children}
-        <Menu {...bindMenu(popupState)}>
-          <EmojiPicker onSelect={async (emoji) => {
-            if (pageId) {
-              await charmClient.updatePage({
-                id: pageId,
+    <PageAnchor onClick={stopPropagation}>
+      {labelIcon && (
+        <StyledPageIcon {...bindTrigger(popupState)}>
+          {labelIcon}
+        </StyledPageIcon>
+      )}
+      <Link passHref href={href}>
+        <PageTitle isempty={isempty ? 1 : 0}>
+          {isempty ? 'Untitled' : label}
+        </PageTitle>
+      </Link>
+      {children}
+      <Menu {...bindMenu(popupState)}>
+        <EmojiPicker onSelect={async (emoji) => {
+          if (pageId) {
+            await charmClient.updatePage({
+              id: pageId,
+              icon: emoji
+            });
+            setPages(_pages => ({
+              ..._pages,
+              [pageId]: {
+                ..._pages[pageId],
                 icon: emoji
-              });
-              setPages(_pages => ({
-                ..._pages,
-                [pageId]: {
-                  ..._pages[pageId],
-                  icon: emoji
-                }
-              }));
-              if (boardId) {
-                await mutator.changeIcon(boardId, emoji, emoji);
               }
-              popupState.close();
+            }));
+            if (boardId) {
+              await mutator.changeIcon(boardId, emoji, emoji);
             }
-          }}
-          />
-        </Menu>
-      </PageAnchor>
-    </Link>
+            popupState.close();
+          }
+
+          if (boardId) {
+            await mutator.changeIcon(boardId, emoji, emoji);
+          }
+          popupState.close();
+        }}
+        />
+      </Menu>
+    </PageAnchor>
   );
 }
 
@@ -229,6 +232,29 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
     </div>
   )
 );
+
+export function PageIcon ({ isEditorEmpty, pageType }: {pageType: Page['type'], isEditorEmpty: boolean}) {
+  let Icon: null | ReactNode = null;
+  if (pageType === 'board') {
+    Icon = (<StyledDatabaseIcon />);
+  }
+  else if (isEditorEmpty) {
+    Icon = (
+      <InsertDriveFileOutlinedIcon />
+    );
+  }
+  else {
+    Icon = (
+      <DescriptionOutlinedIcon />
+    );
+  }
+
+  return (
+    <StyledPageIcon>
+      {Icon}
+    </StyledPageIcon>
+  );
+}
 
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
@@ -576,7 +602,7 @@ export default function PageNavigation ({
   space,
   rootPageIds
 }: NavProps) {
-  const { pages, currentPage, setPages, addPageAndRedirect } = usePages();
+  const { pages, currentPageId, setPages, addPageAndRedirect } = usePages();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
 
   const mappedItems = useMemo(() => {
@@ -611,8 +637,6 @@ export default function PageNavigation ({
             index: page.index,
             parentId: page.parentId
           };
-          // _page.index = page.index;
-          // _page.parentId = parentId;
         }
       });
       return { ..._pages };
@@ -643,13 +667,14 @@ export default function PageNavigation ({
   };
 
   useEffect(() => {
+    const currentPage = pages[currentPageId];
     // expand the parent of the active page
     if (currentPage?.parentId && !isFavorites) {
       if (!expanded.includes(currentPage.parentId)) {
         setExpanded(expanded.concat(currentPage.parentId));
       }
     }
-  }, [currentPage, isFavorites]);
+  }, [currentPageId, pages, isFavorites]);
 
   function onNodeToggle (event: SyntheticEvent, nodeIds: string[]) {
     setExpanded(nodeIds);
@@ -660,7 +685,7 @@ export default function PageNavigation ({
       setPages={setPages}
       expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
-      selected={currentPage?.id || null}
+      selected={currentPageId || null}
       onNodeToggle={onNodeToggle}
       aria-label='items navigator'
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
