@@ -4,7 +4,7 @@ import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { Bounty } from '@prisma/client';
-import { getChainExplorerLink } from 'connectors';
+import { getChainExplorerLink, getChainById } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import millify from 'millify';
 import { BountyWithDetails } from 'models';
@@ -36,6 +36,8 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
 
   const transactionInfo = (bounty as BountyWithDetails).transactions?.[0];
 
+  const chainName = getChainById(bounty?.chainId as number)?.chainName ?? '';
+
   return (
     <Grid container direction='column' alignItems='center'>
       <Grid item xs width='100%'>
@@ -46,17 +48,18 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
           justifyContent: 'space-between'
         }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box
-              mr={0.75}
-              component='span'
-              sx={{
-                width: 25,
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              {
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box
+                mr={0.75}
+                component='span'
+                sx={{
+                  width: 25,
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                {
             imageLogo !== undefined && (
               <Image
                 loading='lazy'
@@ -66,30 +69,30 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
               />
             )
           }
-            </Box>
-            <Typography
-              component='span'
-              sx={{
-                fontWeight: 600
-              }}
-              mr={0.5}
-              variant='h6'
-            >
-              {truncate ? millify(bounty.rewardAmount) : bounty.rewardAmount}
-            </Typography>
-            <Box
-              component='span'
-              mr={2}
-              sx={{
-                position: 'relative',
-                top: 2,
-                fontSize: 12,
-                opacity: 0.75
-              }}
-            >
-              {bounty.rewardToken}
-            </Box>
-            {
+              </Box>
+              <Typography
+                component='span'
+                sx={{
+                  fontWeight: 600
+                }}
+                mr={0.5}
+                variant='h6'
+              >
+                {truncate ? millify(bounty.rewardAmount) : bounty.rewardAmount}
+              </Typography>
+              <Box
+                component='span'
+                mr={2}
+                sx={{
+                  position: 'relative',
+                  top: 2,
+                  fontSize: 12,
+                  opacity: 0.75
+                }}
+              >
+                {bounty.rewardToken}
+              </Box>
+              {
           hideLink === false && (
             <Link href={bountyLink} passHref={true}>
               <IconButton>
@@ -101,6 +104,18 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
             </Link>
           )
         }
+
+            </Box>
+            <Box sx={{ textAlign: 'left' }}>
+              <Typography
+                component='span'
+                variant='caption'
+                px={1}
+              >
+
+                {chainName}
+              </Typography>
+            </Box>
           </Box>
           <Box p={0.5} borderRadius={1} sx={{ background: theme.palette[BountyStatusColours[bounty.status]].main, textAlign: 'center', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Typography
@@ -121,7 +136,7 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
         (bounty.status === 'paid' && transactionInfo) && (
           <Grid item xs>
             <a style={{ textDecoration: 'none', color: 'text.primary' }} href={getChainExplorerLink(transactionInfo.chainId, transactionInfo.transactionId)} target='_blank' rel='noreferrer'>
-              <Box sx={{ color: 'text.primary', pt: 0.5 }}>
+              <Box sx={{ color: 'text.primary', pt: 0.5, display: 'block' }}>
                 <Typography
                   variant='caption'
                   px={1}

@@ -1,39 +1,53 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
+import { CryptoCurrencies } from 'connectors';
 import { CryptoCurrency, CryptoCurrencyList, CryptoLogoPaths } from 'models/Currency';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { UseFormRegister } from 'react-hook-form';
-
-const currencyOptions = Object.keys(CryptoCurrencyList);
 
 export interface IInputSearchCryptoProps {
   onChange?: (value: CryptoCurrency) => any,
-  defaultValue?: CryptoCurrency,
-  register?: UseFormRegister<any>
-  modelKey?: string,
-  label?: string
+  defaultValue?: CryptoCurrency | string,
+
+  cryptoList?: Array<string | CryptoCurrency>
 }
 
 export function InputSearchCrypto ({
   onChange = () => {},
   defaultValue,
-  register = () => ({}) as any,
-  modelKey = '-',
-  label = 'Choose a crypto' }: IInputSearchCryptoProps) {
+  cryptoList = CryptoCurrencies
+}: IInputSearchCryptoProps) {
 
   function emitValue (value: string) {
-    if (value !== null && currencyOptions.indexOf(value) >= 0) {
+    if (value !== null && cryptoList.indexOf(value as CryptoCurrency) >= 0) {
       onChange(value as CryptoCurrency);
     }
   }
 
+  const valueToDisplay = defaultValue ?? (cryptoList[0] ?? '');
+
+  const [inputValue, setInputValue] = useState('');
+
+  const [value, setValue] = useState(valueToDisplay);
+
+  useEffect(() => {
+    setInputValue(valueToDisplay);
+    setValue(valueToDisplay);
+  }, [cryptoList]);
+
   return (
     <Autocomplete
-      defaultValue={defaultValue ?? null}
-      onChange={(_, value) => {
-        emitValue(value as any);
-      }}
       sx={{ minWidth: 150 }}
-      options={currencyOptions}
+      onChange={(_, _value) => {
+        emitValue(_value as any);
+      }}
+      value={value}
+      inputValue={inputValue}
+      onInputChange={(event, newInputValue) => {
+        setInputValue(newInputValue);
+      }}
+      options={cryptoList}
+      disableClearable={true}
       autoHighlight
       size='small'
       renderOption={(props, option) => (
@@ -54,9 +68,7 @@ export function InputSearchCrypto ({
       )}
       renderInput={(params) => (
         <TextField
-          {...register(modelKey)}
           {...params}
-          label={label}
         />
       )}
     />

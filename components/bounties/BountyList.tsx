@@ -58,7 +58,7 @@ export function BountyList () {
 
       </Grid>
 
-      <Grid container>
+      <Grid container sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
         {
           bounties.length === 0
             ? <Typography paragraph={true}>No bounties were found</Typography>

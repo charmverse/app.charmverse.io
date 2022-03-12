@@ -1,8 +1,10 @@
 {
   "ts-node": {
     "compilerOptions": {
-      "jsx": "react"
-    }
+      "jsx": "react",
+      "module": "CommonJS"
+    },
+    "require": ["tsconfig-paths/register"]
   },
   "compilerOptions": {
     "baseUrl": ".",

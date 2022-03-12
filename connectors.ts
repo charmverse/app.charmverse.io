@@ -1,6 +1,8 @@
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
+import { uniqueValues } from 'lib/utilities/array';
+import { CryptoCurrency } from './models/Currency';
 
 enum Chains {
   ETHEREUM = 1,
@@ -17,7 +19,23 @@ enum Chains {
   MUMBAI = 80001
 }
 
-const RPC = {
+export interface IChainDetails {
+  chainId: number,
+  chainName: string,
+  nativeCurrency: {
+  name: string,
+  symbol: string,
+  decimals: number,
+  address: string,
+  logoURI: string
+  },
+  rpcUrls: readonly string [],
+  blockExplorerUrls: readonly string [],
+  iconUrls: readonly string [],
+  testnet?: boolean
+}
+
+const RPC: Record<string, IChainDetails> = {
   ETHEREUM: {
     chainId: 1,
     chainName: 'Ethereum',
@@ -35,7 +53,7 @@ const RPC = {
   },
   BSC: {
     chainId: 56,
-    chainName: 'BSC',
+    chainName: 'Binance Smart Chain',
     nativeCurrency: {
       name: 'Binance Coin',
       symbol: 'BNB',
@@ -50,7 +68,7 @@ const RPC = {
   },
   POLYGON: {
     chainId: 137,
-    chainName: 'Matic',
+    chainName: 'Polygon',
     nativeCurrency: {
       name: 'Polygon',
       symbol: 'MATIC',
@@ -65,7 +83,7 @@ const RPC = {
   },
   AVALANCHE: {
     chainId: 43114,
-    chainName: 'Avalanche Mainnet',
+    chainName: 'Avalanche',
     nativeCurrency: {
       name: 'Avalanche',
       symbol: 'AVAX',
@@ -80,7 +98,7 @@ const RPC = {
   },
   XDAI: {
     chainId: 100,
-    chainName: 'xDAI Chain',
+    chainName: 'Gnosis',
     nativeCurrency: {
       name: 'xDAI',
       symbol: 'XDAI',
@@ -113,7 +131,7 @@ const RPC = {
     chainName: 'Arbitrum One',
     nativeCurrency: {
       name: 'Ether',
-      symbol: 'AETH',
+      symbol: 'ETH',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
       logoURI:
@@ -125,7 +143,7 @@ const RPC = {
   },
   CELO: {
     chainId: 42220,
-    chainName: 'Celo Mainnet',
+    chainName: 'Celo',
     nativeCurrency: {
       name: 'Celo',
       symbol: 'CELO',
@@ -155,7 +173,7 @@ const RPC = {
   },
   GOERLI: {
     chainId: 5,
-    chainName: 'Goerli Test Network',
+    chainName: 'Ethereum - Goerli',
     nativeCurrency: {
       name: 'Ether',
       symbol: 'ETH',
@@ -166,11 +184,12 @@ const RPC = {
     },
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
-    iconUrls: ['/networkLogos/ethereum.svg']
+    iconUrls: ['/networkLogos/ethereum.svg'],
+    testnet: true
   },
   RINKEBY: {
     chainId: 4,
-    chainName: 'Rinkeby',
+    chainName: 'Ethereum - Rinkeby',
     nativeCurrency: {
       name: 'Ether',
       symbol: 'ETH',
@@ -181,11 +200,12 @@ const RPC = {
     },
     blockExplorerUrls: ['https://rinkeby-explorer.arbitrum.io/#/'],
     iconUrls: ['/networkLogos/ethereum.svg'],
-    rpcUrls: ['https://rinkeby-light.eth.linkpool.io/']
+    rpcUrls: ['https://rinkeby-light.eth.linkpool.io/'],
+    testnet: true
   },
   MUMBAI: {
     chainId: 80001,
-    chainName: 'Mumbai',
+    chainName: 'Polygon - Mumbai',
     nativeCurrency: {
       name: 'Polygon',
       symbol: 'MATIC',
@@ -196,11 +216,39 @@ const RPC = {
     },
     rpcUrls: ['https://rpc-mumbai.matic.today'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
-    iconUrls: ['/networkLogos/polygon.svg']
+    iconUrls: ['/networkLogos/polygon.svg'],
+    testnet: true
   }
 } as const;
 
 export type Blockchain = keyof typeof RPC;
+
+export const RPCList = Object.values(RPC);
+
+export const CryptoCurrencies = uniqueValues<CryptoCurrency>(RPCList.map(chain => {
+  return chain.nativeCurrency.symbol as CryptoCurrency;
+}));
+
+export function getChainById (chainId: string | number): IChainDetails | undefined {
+  return RPCList.find(rpc => {
+
+    try {
+      // eslint-disable-next-line radix
+      const parsedChainId = parseInt(rpc.chainId.toString());
+      // eslint-disable-next-line radix
+      const parsedTargetChainId = parseInt(chainId.toString());
+
+      if (Number.isNaN(parsedChainId) || Number.isNaN(parsedTargetChainId)) {
+        return false;
+      }
+
+      return parsedChainId === parsedTargetChainId;
+    }
+    catch (error) {
+      return false;
+    }
+  });
+}
 
 const supportedChains = [
   'ETHEREUM',
@@ -239,6 +287,22 @@ const walletLink = new WalletLinkConnector({
   appName: 'CharmVerse.io',
   supportedChainIds
 });
+
+/**
+ *
+ * @param chainId
+ * @returns The native crypto of a chain. If the chain is not found, returns an empty list
+ */
+export function getCryptos (chainId: number): Array<string | CryptoCurrency> {
+  const chain = getChainById(chainId);
+
+  if (!chain) {
+    return [];
+  }
+
+  return [chain.nativeCurrency.symbol];
+
+}
 
 export function getChainExplorerLink (chainId: string | number, transactionId: string): string {
 
