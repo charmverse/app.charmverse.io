@@ -86,7 +86,8 @@ export function PageContainer ({ children }: { children: React.ReactNode }) {
 export function PageLayout ({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
   const [user] = useUser();
-  const { currentPage } = usePages();
+  const { currentPageId, pages } = usePages();
+  const currentPage = pages[currentPageId];
 
   const handleDrawerOpen = () => {
     setOpen(true);

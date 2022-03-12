@@ -602,7 +602,7 @@ export default function PageNavigation ({
   space,
   rootPageIds
 }: NavProps) {
-  const { pages, currentPage, setPages, addPageAndRedirect } = usePages();
+  const { pages, currentPageId, setPages, addPageAndRedirect } = usePages();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
 
   const mappedItems = useMemo(() => {
@@ -637,8 +637,6 @@ export default function PageNavigation ({
             index: page.index,
             parentId: page.parentId
           };
-          // _page.index = page.index;
-          // _page.parentId = parentId;
         }
       });
       return { ..._pages };
@@ -669,13 +667,14 @@ export default function PageNavigation ({
   };
 
   useEffect(() => {
+    const currentPage = pages[currentPageId];
     // expand the parent of the active page
     if (currentPage?.parentId && !isFavorites) {
       if (!expanded.includes(currentPage.parentId)) {
         setExpanded(expanded.concat(currentPage.parentId));
       }
     }
-  }, [currentPage, isFavorites]);
+  }, [currentPageId, pages, isFavorites]);
 
   function onNodeToggle (event: SyntheticEvent, nodeIds: string[]) {
     setExpanded(nodeIds);
@@ -686,7 +685,7 @@ export default function PageNavigation ({
       setPages={setPages}
       expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
-      selected={currentPage?.id || null}
+      selected={currentPageId || null}
       onNodeToggle={onNodeToggle}
       aria-label='items navigator'
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}

@@ -1,7 +1,6 @@
 import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
-import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
@@ -11,9 +10,9 @@ import { useUser } from './useUser';
 
 type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
 type IContext = {
-  currentPage: Page | null,
+  currentPageId: string,
   pages: Record<string, Page>,
-  setCurrentPage: Dispatch<SetStateAction<Page | null>>,
+  setCurrentPageId: Dispatch<SetStateAction<string>>,
   setPages: Dispatch<SetStateAction<Record<string, Page>>>,
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
@@ -22,9 +21,9 @@ type IContext = {
 };
 
 export const PagesContext = createContext<Readonly<IContext>>({
-  currentPage: null,
+  currentPageId: '',
   pages: {},
-  setCurrentPage: () => undefined,
+  setCurrentPageId: () => '',
   setPages: () => undefined,
   isEditing: true,
   setIsEditing: () => { },
@@ -36,7 +35,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [isEditing, setIsEditing] = useState(false);
   const [space] = useCurrentSpace();
   const [pages, setPages] = useState<Record<string, Page>>({});
-  const [currentPage, setCurrentPage] = useState<Page | null>(null);
+  const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const intl = useIntl();
   const [user] = useUser();
@@ -101,15 +100,15 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   };
 
   const value: IContext = useMemo(() => ({
-    currentPage,
+    currentPageId,
     isEditing,
     setIsEditing,
     pages,
-    setCurrentPage,
+    setCurrentPageId,
     setPages,
     addPage,
     addPageAndRedirect
-  }), [currentPage, isEditing, router, pages, user]);
+  }), [currentPageId, isEditing, router, pages, user]);
 
   return (
     <PagesContext.Provider value={value}>
