@@ -8,11 +8,6 @@ const config = {
         source: '/:domain/settings',
         destination: '/:domain/settings/account',
         permanent: true
-      },
-      {
-        source: '/',
-        destination: '/login',
-        permanent: true
       }
     ];
   },

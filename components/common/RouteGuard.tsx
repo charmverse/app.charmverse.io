@@ -10,7 +10,7 @@ import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 
 // Pages shared to the public that don't require user login
-const publicPages = ['/login', '/invite', '/share'];
+const publicPages = ['/', '/invite', '/share'];
 // Pages to create a user account but require a wallet connected
 const walletRequiredPages = ['/signup', '/invite', '/join'];
 
@@ -77,9 +77,10 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
     const path = url.split('?')[0];
     const spaceDomain = path.split('/')[1];
-
+    console.log('isSpaceDomain(spaceDomain)', isSpaceDomain(spaceDomain), !spaces.some(s => s.domain === spaceDomain));
     // condition: public page
-    if (publicPages.some(basePath => path.startsWith(basePath))) {
+    if (publicPages.some(basePath => path === basePath)) {
+      console.log('public page');
       return { authorized: true };
     }
     // condition: wallet not connected
@@ -88,7 +89,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return {
         authorized: false,
         redirect: {
-          pathname: '/login',
+          pathname: '/',
           query: { returnUrl: router.asPath }
         }
       };
@@ -117,7 +118,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return {
         authorized: false,
         redirect: {
-          pathname: '/signup',
+          pathname: '/join',
           query: { domain: spaceDomain, returnUrl: router.asPath }
         }
       };
