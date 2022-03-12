@@ -25,7 +25,7 @@ const LinkBox = styled(Box)`
 
 export default function ShareButton ({ headerHeight }: { headerHeight: number }) {
 
-  const { currentPage, setPages } = usePages();
+  const { currentPageId, pages, setPages } = usePages();
   const router = useRouter();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [copied, setCopied] = useState<boolean>(false);
@@ -33,11 +33,12 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
   const [shareLink, setShareLink] = useState<null | string>(null);
 
   useEffect(() => {
+    const currentPage = pages[currentPageId];
     if (currentPage) {
       setIsPublic(currentPage.isPublic);
 
     }
-  }, [currentPage]);
+  }, [currentPageId, pages]);
 
   useEffect(() => {
     updateShareLink();
@@ -49,31 +50,32 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
   }
 
   async function togglePublic () {
-    const updatedPage = await charmClient.togglePagePublicAccess(currentPage!.id, !isPublic);
+    const updatedPage = await charmClient.togglePagePublicAccess(currentPageId, !isPublic);
     setIsPublic(updatedPage.isPublic);
     const updates = { isPublic: updatedPage.isPublic };
     setPages(_pages => ({
       ..._pages,
-      [currentPage!.id]: {
-        ..._pages[currentPage!.id],
+      [currentPageId]: {
+        ..._pages[currentPageId],
         ...updates
       }
     }));
   }
 
   async function updateShareLink () {
+    const currentPage = pages[currentPageId];
     if (isPublic === false) {
       setShareLink(null);
     }
     else if (currentPage?.type === 'page') {
-      const shareLinkToSet = (currentPage && typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${currentPage.id}` : '';
+      const shareLinkToSet = (typeof window !== 'undefined')
+        ? `${window.location.origin}/share/${currentPageId}` : '';
       setShareLink(shareLinkToSet);
     }
     else if (currentPage?.type === 'board') {
       const viewIdToProvide = router.query.viewId;
-      const shareLinkToSet = (currentPage && typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${currentPage.id}?viewId=${viewIdToProvide}` : '';
+      const shareLinkToSet = (typeof window !== 'undefined')
+        ? `${window.location.origin}/share/${currentPageId}?viewId=${viewIdToProvide}` : '';
       setShareLink(shareLinkToSet);
     }
   }

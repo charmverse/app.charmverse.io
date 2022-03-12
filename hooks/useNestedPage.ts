@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 import { usePages } from './usePages';
 
 export default function useNestedPage () {
-  const { currentPage, addPage, pages } = usePages();
+  const { currentPageId, addPage, pages } = usePages();
   const view = useEditorViewContext();
 
   const addNestedPage = useCallback(async (pageId?: string) => {
@@ -14,7 +14,7 @@ export default function useNestedPage () {
     // Creating a new page
     if (!pageId) {
       page = await addPage({
-        parentId: currentPage?.id
+        parentId: currentPageId
       });
     }
     else {
@@ -27,7 +27,7 @@ export default function useNestedPage () {
         id: page.id
       }));
     });
-  }, [currentPage, addPage, view]);
+  }, [currentPageId, addPage, view]);
 
   return {
     addNestedPage
