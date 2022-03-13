@@ -13,6 +13,34 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(importFromNotion);
 
+function convertRichText (richTexts: any[]) {
+  return richTexts.map((richText: any) => {
+    const marks: {type: string, attrs?: Record<string, any>}[] = [];
+    ['bold', 'italic', 'underline', 'code'].forEach(format => {
+      if (richText.annotations[format]) {
+        marks.push({ type: format });
+      }
+    });
+
+    if (richText.annotations.strikethrough) {
+      marks.push({ type: 'strike' });
+    }
+
+    if (richText.href) {
+      marks.push({ type: 'link',
+        attrs: {
+          href: richText.href
+        } });
+    }
+
+    return {
+      type: 'text',
+      text: richText.plain_text,
+      marks
+    };
+  });
+}
+
 async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>) {
   const blockId = process.env.NOTION_PAGE_ID!;
   const userId = req.session.user.id;
@@ -38,12 +66,7 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
         attrs: {
           level: parseInt(level, 10)
         },
-        content: [
-          {
-            type: 'text',
-            text: result[result.type].rich_text[0].plain_text
-          }
-        ]
+        content: convertRichText(result[result.type].rich_text)
       });
     }
   });

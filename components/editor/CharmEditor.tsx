@@ -149,6 +149,7 @@ function CharmEditor (
       new Plugin({
         view: () => ({
           update: (view, prevState) => {
+            console.log(view.state.doc);
             if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
               onPageContentChange({
                 doc: view.state.doc.toJSON() as PageContent,
@@ -254,6 +255,7 @@ function CharmEditor (
       postEditorComponents={<Placeholder />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
+
         switch (props.node.type.name) {
           case 'quote':
             return <Quote {...props}>{NodeViewChildren}</Quote>;
