@@ -23,7 +23,7 @@ export const
 
 const name = 'iframe';
 
-function extractEmbedLink (url: string) {
+export function extractEmbedLink (url: string) {
   const isYoutubeLink = url.match(/(?:https:\/\/www.youtube.com\/watch\?v=(.*)|https:\/\/youtu.be\/(.*))/);
   const isIframeEmbed = url.startsWith('<iframe ');
   let embedUrl = url;

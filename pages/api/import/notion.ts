@@ -7,6 +7,7 @@ import nc from 'next-connect';
 import { Client } from '@notionhq/client';
 import { BlockNode, CalloutNode, ListItemNode, PageContent, TableNode, TableRowNode, TextContent, TextMark } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
+import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, extractEmbedLink } from 'components/editor/ResizableIframe';
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
@@ -1021,6 +1022,19 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
         (parentNode as PageContent).content?.push(calloutNode);
         blocksRecord[block.id].children.forEach((childId) => {
           populateDoc(calloutNode, blocksRecord[childId]);
+        });
+        break;
+      }
+
+      case 'video': {
+        (parentNode as PageContent).content?.push({
+          type: 'iframe',
+          attrs: {
+            src: block.video.type === 'external' ? extractEmbedLink(block.video.external.url) : null,
+            type: 'video',
+            width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
+            height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
+          }
         });
         break;
       }
