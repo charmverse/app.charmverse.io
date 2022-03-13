@@ -5,12 +5,12 @@ import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
 import charmClient from 'charmClient';
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, useEffect } from 'react';
 import ImageSelector from './ImageSelector';
 import Resizable from './Resizable';
 
-const MAX_IMAGE_WIDTH = 750;
-const MIN_IMAGE_WIDTH = 100;
+export const MAX_IMAGE_WIDTH = 750;
+export const MIN_IMAGE_WIDTH = 100;
 
 const StyledEmptyImageContainer = styled(Box)`
   display: flex;
@@ -143,6 +143,19 @@ function imagePromise (url: string): Promise<HTMLImageElement> {
 
 export function ResizableImage ({ onResizeStop, node, updateAttrs, selected }:
   NodeViewProps & {onResizeStop?: (view: EditorView) => void }) {
+
+  // Set the image aspect ratio on first load
+  useEffect(() => {
+    async function main () {
+      if (node.attrs.src) {
+        const image = await imagePromise(node.attrs.src);
+        updateAttrs({
+          aspectRatio: image.width / image.height
+        });
+      }
+    }
+    main();
+  }, [node.attrs.src]);
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {

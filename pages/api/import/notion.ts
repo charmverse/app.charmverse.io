@@ -8,6 +8,7 @@ import { Client } from '@notionhq/client';
 import { BlockNode, CalloutNode, ListItemNode, PageContent, TableNode, TableRowNode, TextContent, TextMark } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, extractEmbedLink } from 'components/editor/ResizableIframe';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/editor/ResizableImage';
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
@@ -1034,6 +1035,25 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
             type: 'video',
             width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
             height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
+          }
+        });
+        break;
+      }
+
+      case 'divider': {
+        (parentNode as PageContent).content?.push({
+          type: 'horizontalRule'
+        });
+        break;
+      }
+
+      case 'image': {
+        (parentNode as PageContent).content?.push({
+          type: 'image',
+          attrs: {
+            src: block.image.type === 'external' ? block.image.external.url : null,
+            size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
+            aspectRatio: 1
           }
         });
         break;
