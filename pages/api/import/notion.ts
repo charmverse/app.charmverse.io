@@ -5,8 +5,8 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { Client } from '@notionhq/client';
-import { PageContent, TableNode, TableRowNode, TextContent, TextMark } from 'models';
-import { ListBlockChildrenParameters, ListBlockChildrenResponse } from '@notionhq/client/build/src/api-endpoints';
+import { BlockNode, ListItemNode, PageContent, TableNode, TableRowNode, TextContent, TextMark } from 'models';
+import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
@@ -852,10 +852,12 @@ function convertRichText (richTexts: RichTextItemResponse[]): TextContent[] {
   });
 }
 
-interface SecondLevelChildBlockResponse {
+interface ChildBlockListResponse {
   request: ListBlockChildrenParameters,
   results: BlockObjectResponse[]
 }
+
+type BlockWithChildren = BlockObjectResponse & {children: string[]};
 
 async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>) {
   const blockId = process.env.NOTION_PAGE_ID!;
@@ -865,100 +867,121 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
     page_id: blockId
   }) as unknown as GetPageResponse;
 
-  const blockChildrenResponse = await notion.blocks.children.list({
-    block_id: blockId,
-    page_size: 100
-  }) as unknown as {results: BlockObjectResponse[]};
-
+  const blocksRecord: Record<string, BlockWithChildren> = {};
+  const blocks: BlockWithChildren[] = [];
   const pageContent: PageContent = {
     type: 'doc',
     content: []
   };
 
-  const blocksRecord: Record<string, BlockObjectResponse & {children: string[]}> = {};
-  const blocks: BlockObjectResponse[] = [];
+  // Array to store parameters for further requests to retrieve children blocks
+  let blockChildrenRequests: ListBlockChildrenParameters[] = [{
+    block_id: blockId,
+    page_size: 100
+  }];
 
-  // Array to store parameters for further requests
-  const blockChildrenRequests: ListBlockChildrenParameters[] = [];
+  for (let depth = 0; depth < 10; depth++) {
+    if (blockChildrenRequests.length !== 0) {
+      // eslint-disable-next-line
+      const childBlockListResponses = (await Promise.all<ChildBlockListResponse>(
+        blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
+          notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
+            results: response.results as BlockObjectResponse[],
+            request: blockChildrenRequest
+          })));
+        }))
+      ));
 
-  blockChildrenResponse.results.forEach((result) => {
-    // If its a table we need to get its children content
-    if (result.type === 'table' && result.has_children) {
-      blockChildrenRequests.push({
-        block_id: result.id,
-        page_size: 100
+      blockChildrenRequests = [];
+
+      // eslint-disable-next-line
+      childBlockListResponses.forEach((childBlockListResponse) => {
+        childBlockListResponse.results.forEach((block) => {
+          const blockWithChildren = {
+            ...block,
+            children: []
+          };
+          blocksRecord[block.id] = blockWithChildren;
+          if (depth !== 0) {
+            blocksRecord[childBlockListResponse.request.block_id].children.push(block.id);
+          }
+          else {
+            // Only push the top level blocks to the array
+            blocks.push(blockWithChildren);
+          }
+
+          if (block.type.match(/(table|bulleted_list_item|callout|numbered_list_item)/) && block.has_children) {
+            blockChildrenRequests.push({
+              block_id: block.id,
+              page_size: 100
+            });
+          }
+        });
       });
     }
+    else {
+      break;
+    }
+  }
 
-    const blockWithChildren = {
-      ...result,
-      children: []
-    };
-    blocksRecord[result.id] = blockWithChildren;
-    blocks.push(blockWithChildren);
-  });
-
-  const secondLevelChildBlockResponses = (await Promise.all<SecondLevelChildBlockResponse>(
-    blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
-      notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
-        results: response.results as BlockObjectResponse[],
-        request: blockChildrenRequest
-      })));
-    }))
-  ));
-
-  secondLevelChildBlockResponses.forEach((secondLevelChildBlockResponse) => {
-    secondLevelChildBlockResponse.results.forEach((result) => {
-      const blockWithChildren = {
-        ...result,
-        children: []
-      };
-      blocksRecord[result.id] = blockWithChildren;
-      blocks.push(blockWithChildren);
-      blocksRecord[secondLevelChildBlockResponse.request.block_id].children.push(result.id);
-    });
-  });
-
-  blocks.forEach((result) => {
-    if (result.type === 'heading_1') {
-      pageContent.content?.push({
+  function populateDoc (parentNode: BlockNode, block: BlockWithChildren) {
+    if (block.type === 'heading_1') {
+      (parentNode as PageContent).content?.push({
         type: 'heading',
         attrs: {
           level: 1
         },
-        content: convertRichText(result.heading_1.rich_text)
+        content: convertRichText(block.heading_1.rich_text)
       });
     }
-    else if (result.type === 'heading_2') {
-      pageContent.content?.push({
+    else if (block.type === 'heading_2') {
+      (parentNode as PageContent).content?.push({
         type: 'heading',
         attrs: {
           level: 2
         },
-        content: convertRichText(result.heading_2.rich_text)
+        content: convertRichText(block.heading_2.rich_text)
       });
     }
-    else if (result.type === 'heading_3') {
-      pageContent.content?.push({
+    else if (block.type === 'heading_3') {
+      (parentNode as PageContent).content?.push({
         type: 'heading',
         attrs: {
           level: 3
         },
-        content: convertRichText(result.heading_3.rich_text)
+        content: convertRichText(block.heading_3.rich_text)
       });
     }
-    else if (result.type === 'paragraph') {
-      pageContent.content?.push({
+    else if (block.type === 'paragraph') {
+      (parentNode as PageContent).content?.push({
         type: 'paragraph',
-        content: convertRichText(result[result.type].rich_text)
+        content: convertRichText(block[block.type].rich_text)
       });
     }
-    else if (result.type === 'table') {
+    else if (block.type === 'bulleted_list_item') {
+      const listItemNode: ListItemNode = {
+        type: 'listItem',
+        content: [{
+          type: 'paragraph',
+          content: convertRichText(block.bulleted_list_item.rich_text)
+        }]
+      };
+
+      (parentNode as PageContent).content?.push({
+        type: 'bulletList',
+        content: [listItemNode]
+      });
+
+      blocksRecord[block.id].children.forEach((childId) => {
+        populateDoc(listItemNode, blocksRecord[childId]);
+      });
+    }
+    else if (block.type === 'table') {
       const tableNode: TableNode = {
         type: 'table',
         content: []
       };
-      blocksRecord[result.id].children?.forEach((rowId: string, rowIndex: number) => {
+      blocksRecord[block.id].children.forEach((rowId, rowIndex) => {
         const row = blocksRecord[rowId];
         if (row.type === 'table_row') {
           const content: TableRowNode['content'] = [];
@@ -974,8 +997,12 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
           });
         }
       });
-      pageContent.content?.push(tableNode);
+      (parentNode as PageContent).content?.push(tableNode);
     }
+  }
+
+  blocks.forEach(block => {
+    populateDoc(pageContent, block);
   });
 
   // If there was no content in the notion page only then add an empty paragraph

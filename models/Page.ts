@@ -43,9 +43,28 @@ export interface TableNode {
   content: TableRowNode[]
 }
 
+export interface ParagraphNode {
+  type: 'paragraph',
+  content: (ParagraphNode | TextContent)[]
+}
+
+export interface ListItemNode {
+  type: 'listItem',
+  // eslint-disable-next-line
+  content: (ParagraphNode | BulletListNode)[]
+}
+
+export interface BulletListNode {
+  type: 'bulletList',
+  content: ListItemNode[]
+}
+
 export interface PageContent {
   [key: string]: any,
   type: string,
-  content?: (PageContent | TextContent)[],
+  content?: (PageContent | TextContent | TableNode | BulletListNode)[],
   attrs?: Record<string, any>
 }
+
+export type BlockNode = TableHeaderNode | TableCellNode | TableRowNode | TableNode |
+  ParagraphNode | ListItemNode | BulletListNode | PageContent;
