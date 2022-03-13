@@ -7,7 +7,7 @@ import nc from 'next-connect';
 import { Client } from '@notionhq/client';
 import { BlockNode, CalloutNode, CodeNode, ListItemNode, PageContent, TableNode, TableRowNode, TextContent, TextMark } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
-import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, extractEmbedLink } from 'components/editor/ResizableIframe';
+import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, extractEmbedLink, MIN_EMBED_HEIGHT } from 'components/editor/ResizableIframe';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/editor/ResizableImage';
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
@@ -1049,6 +1049,21 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
             type: 'video',
             width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
             height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
+          }
+        });
+        break;
+      }
+
+      case 'embed':
+      case 'bookmark':
+      {
+        (parentNode as PageContent).content?.push({
+          type: 'iframe',
+          attrs: {
+            src: extractEmbedLink(block.type === 'bookmark' ? block.bookmark.url : block.embed.url),
+            type: 'embed',
+            width: MAX_EMBED_WIDTH,
+            height: MIN_EMBED_HEIGHT
           }
         });
         break;

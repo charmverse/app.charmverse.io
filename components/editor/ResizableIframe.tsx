@@ -166,7 +166,6 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
   NodeViewProps & { onResizeStop?: (view: EditorView) => void }) {
   const theme = useTheme();
   const [height, setHeight] = useState(node.attrs.height);
-  const [width, setWidth] = useState(node.attrs.width);
   const view = useEditorViewContext();
 
   // If there are no source for the node, return the image select component
