@@ -12,14 +12,35 @@ export interface PagePermission {
   level: 'full_access' | 'editor' | 'view_comment' | 'view';
 }
 
-interface TextContent {
-  text: string
-  type: 'text'
-}
-
-interface PageMark {
+export interface TextMark {
   type: string
   attrs?: Record<string, any>
+}
+
+export interface TextContent {
+  text: string
+  type: 'text'
+  marks?: TextMark[]
+}
+
+export interface TableHeaderNode {
+  type: 'table_header',
+  content: TextContent[]
+}
+
+export interface TableCellNode {
+  type: 'table_cell',
+  content: TextContent[]
+}
+
+export interface TableRowNode {
+  type: 'table_row',
+  content: (TableHeaderNode | TableCellNode)[]
+}
+
+export interface TableNode {
+  type: 'table'
+  content: TableRowNode[]
 }
 
 export interface PageContent {
@@ -27,5 +48,4 @@ export interface PageContent {
   type: string,
   content?: (PageContent | TextContent)[],
   attrs?: Record<string, any>
-  marks?: PageMark[]
 }
