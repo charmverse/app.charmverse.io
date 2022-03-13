@@ -61,6 +61,9 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     const page = await charmClient.getPublicPage(publicPageId);
     setTitleState(page.title);
     setCurrentPageId(page.id);
+    setPages({
+      [page.id]: page
+    });
   }
 
   useEffect(() => {
