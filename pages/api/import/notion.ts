@@ -925,79 +925,95 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
   }
 
   function populateDoc (parentNode: BlockNode, block: BlockWithChildren) {
-    if (block.type === 'heading_1') {
-      (parentNode as PageContent).content?.push({
-        type: 'heading',
-        attrs: {
-          level: 1
-        },
-        content: convertRichText(block.heading_1.rich_text)
-      });
-    }
-    else if (block.type === 'heading_2') {
-      (parentNode as PageContent).content?.push({
-        type: 'heading',
-        attrs: {
-          level: 2
-        },
-        content: convertRichText(block.heading_2.rich_text)
-      });
-    }
-    else if (block.type === 'heading_3') {
-      (parentNode as PageContent).content?.push({
-        type: 'heading',
-        attrs: {
-          level: 3
-        },
-        content: convertRichText(block.heading_3.rich_text)
-      });
-    }
-    else if (block.type === 'paragraph') {
-      (parentNode as PageContent).content?.push({
-        type: 'paragraph',
-        content: convertRichText(block[block.type].rich_text)
-      });
-    }
-    else if (block.type === 'bulleted_list_item') {
-      const listItemNode: ListItemNode = {
-        type: 'listItem',
-        content: [{
+    switch (block.type) {
+      case 'heading_1': {
+        (parentNode as PageContent).content?.push({
+          type: 'heading',
+          attrs: {
+            level: 1
+          },
+          content: convertRichText(block.heading_1.rich_text)
+        });
+        break;
+      }
+
+      case 'heading_2': {
+        (parentNode as PageContent).content?.push({
+          type: 'heading',
+          attrs: {
+            level: 2
+          },
+          content: convertRichText(block.heading_2.rich_text)
+        });
+        break;
+      }
+
+      case 'heading_3': {
+        (parentNode as PageContent).content?.push({
+          type: 'heading',
+          attrs: {
+            level: 2
+          },
+          content: convertRichText(block.heading_3.rich_text)
+        });
+        break;
+      }
+
+      case 'paragraph': {
+        (parentNode as PageContent).content?.push({
           type: 'paragraph',
-          content: convertRichText(block.bulleted_list_item.rich_text)
-        }]
-      };
+          content: convertRichText(block[block.type].rich_text)
+        });
+        break;
+      }
 
-      (parentNode as PageContent).content?.push({
-        type: 'bulletList',
-        content: [listItemNode]
-      });
+      case 'bulleted_list_item': {
+        const listItemNode: ListItemNode = {
+          type: 'listItem',
+          content: [{
+            type: 'paragraph',
+            content: convertRichText(block.bulleted_list_item.rich_text)
+          }]
+        };
 
-      blocksRecord[block.id].children.forEach((childId) => {
-        populateDoc(listItemNode, blocksRecord[childId]);
-      });
-    }
-    else if (block.type === 'table') {
-      const tableNode: TableNode = {
-        type: 'table',
-        content: []
-      };
-      blocksRecord[block.id].children.forEach((rowId, rowIndex) => {
-        const row = blocksRecord[rowId];
-        if (row.type === 'table_row') {
-          const content: TableRowNode['content'] = [];
-          tableNode.content.push({
-            type: 'table_row',
-            content
-          });
-          row.table_row.cells.forEach((cell) => {
-            content.push({
-              type: rowIndex === 0 ? 'table_header' : 'table_cell',
-              content: convertRichText(cell)
+        (parentNode as PageContent).content?.push({
+          type: 'bulletList',
+          content: [listItemNode]
+        });
+
+        blocksRecord[block.id].children.forEach((childId) => {
+          populateDoc(listItemNode, blocksRecord[childId]);
+        });
+        break;
+      }
+
+      case 'table': {
+        const tableNode: TableNode = {
+          type: 'table',
+          content: []
+        };
+        blocksRecord[block.id].children.forEach((rowId, rowIndex) => {
+          const row = blocksRecord[rowId];
+          if (row.type === 'table_row') {
+            const content: TableRowNode['content'] = [];
+            tableNode.content.push({
+              type: 'table_row',
+              content
             });
-          });
-        }
-      });
-      (parentNode as PageContent).content?.push(tableNode);
+            row.table_row.cells.forEach((cell) => {
+              content.push({
+                type: rowIndex === 0 ? 'table_header' : 'table_cell',
+                content: convertRichText(cell)
+              });
+            });
+          }
+        });
+        (parentNode as PageContent).content?.push(tableNode);
+        break;
+      }
+      default: {
+        break;
+      }
     }
   }
 
