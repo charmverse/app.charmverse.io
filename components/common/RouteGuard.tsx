@@ -10,7 +10,7 @@ import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 
 // Pages shared to the public that don't require user login
-const publicPages = ['/', '/invite', '/share'];
+const publicPages = ['/', 'invite', 'share'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
 
@@ -65,10 +65,18 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
     const path = url.split('?')[0];
+
+    const firstPathSegment = path.split('/').filter(pathElem => {
+      // Only get segments that evaluate to some value
+      return pathElem;
+    })[0] ?? '/';
+
     const spaceDomain = path.split('/')[1];
 
+    console.log(firstPathSegment);
+
     // condition: public page
-    if (publicPages.some(basePath => path === basePath)) {
+    if (publicPages.some(basePath => firstPathSegment === basePath)) {
       return { authorized: true };
     }
     // condition: wallet not connected
