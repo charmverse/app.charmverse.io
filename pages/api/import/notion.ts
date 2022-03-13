@@ -910,7 +910,7 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
             blocks.push(blockWithChildren);
           }
 
-          if (block.type.match(/(table|bulleted_list_item|callout|numbered_list_item)/) && block.has_children) {
+          if (block.type.match(/(table|bulleted_list_item|callout|numbered_list_item|to_do)/) && block.has_children) {
             blockChildrenRequests.push({
               block_id: block.id,
               page_size: 100
@@ -967,17 +967,35 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
         break;
       }
 
-      case 'bulleted_list_item': {
+      case 'bulleted_list_item':
+      case 'numbered_list_item':
+      case 'to_do':
+      {
+        let richText: RichTextItemResponse[] = [];
+
+        if (block.type === 'bulleted_list_item') {
+          richText = block.bulleted_list_item.rich_text;
+        }
+        else if (block.type === 'numbered_list_item') {
+          richText = block.numbered_list_item.rich_text;
+        }
+        else if (block.type === 'to_do') {
+          richText = block.to_do.rich_text;
+        }
+
         const listItemNode: ListItemNode = {
           type: 'listItem',
           content: [{
             type: 'paragraph',
-            content: convertRichText(block.bulleted_list_item.rich_text)
-          }]
+            content: convertRichText(richText)
+          }],
+          attrs: {
+            todoChecked: block.type === 'to_do' ? block.to_do.checked : null
+          }
         };
 
         (parentNode as PageContent).content?.push({
-          type: 'bulletList',
+          type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
           content: [listItemNode]
         });
 

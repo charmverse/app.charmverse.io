@@ -49,6 +49,7 @@ export interface ParagraphNode {
 }
 
 export interface ListItemNode {
+  attrs: {todoChecked?: null | boolean}
   type: 'listItem',
   // eslint-disable-next-line
   content: (ParagraphNode | BulletListNode)[]
@@ -57,14 +58,22 @@ export interface ListItemNode {
 export interface BulletListNode {
   type: 'bulletList',
   content: ListItemNode[]
+  attrs?: {tight?: boolean}
+}
+
+export interface OrderedListNode {
+  type: 'orderedList',
+  content: ListItemNode[]
+  attrs?: {tight?: boolean}
 }
 
 export interface PageContent {
   [key: string]: any,
   type: string,
-  content?: (PageContent | TextContent | TableNode | BulletListNode)[],
+  // eslint-disable-next-line
+  content?: BlockNode[],
   attrs?: Record<string, any>
 }
 
 export type BlockNode = TableHeaderNode | TableCellNode | TableRowNode | TableNode |
-  ParagraphNode | ListItemNode | BulletListNode | PageContent;
+  ParagraphNode | ListItemNode | BulletListNode | PageContent | OrderedListNode;
