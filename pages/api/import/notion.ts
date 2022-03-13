@@ -6,6 +6,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { Client } from '@notionhq/client';
 import { PageContent } from 'models';
+import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
@@ -58,7 +59,46 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
     content: []
   };
 
+  const blocksRecord: Record<string, any> = {};
+  const blocks: any[] = [];
+
+  // Array to store parameters for further requests
+  const blockChildrenRequests: ListBlockChildrenParameters[] = [];
+
   blockChildrenResponse.results.forEach((result: any) => {
+    // If its a table we need to get its children content
+    if (result.type === 'table' && result.has_children) {
+      blockChildrenRequests.push({
+        block_id: result.id,
+        page_size: 100
+      });
+    }
+
+    blocksRecord[result.id] = result;
+    blocks.push(result);
+  });
+
+  (await Promise.all(
+    blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
+      notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
+        response,
+        request: blockChildrenRequest
+      })));
+    }))
+  )).forEach((_blockChildrenResponse: any) => {
+    _blockChildrenResponse.response.results.forEach((result: any) => {
+      blocksRecord[result.id] = result;
+      blocks.push(result);
+      if (!blocksRecord[_blockChildrenResponse.request.block_id].children) {
+        blocksRecord[_blockChildrenResponse.request.block_id].children = [result.id];
+      }
+      else {
+        blocksRecord[_blockChildrenResponse.request.block_id].children.push(result.id);
+      }
+    });
+  });
+
+  blocks.forEach((result: any) => {
     if (result.type.startsWith('heading')) {
       const [, level] = result.type.split('_');
       pageContent.content?.push({
@@ -69,8 +109,38 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
         content: convertRichText(result[result.type].rich_text)
       });
     }
+    else if (result.type === 'paragraph') {
+      pageContent.content?.push({
+        type: 'paragraph',
+        content: convertRichText(result[result.type].rich_text)
+      });
+    }
+    else if (result.type === 'table') {
+      const tableNode: any = {
+        type: 'table',
+        content: []
+      };
+      blocksRecord[result.id].children?.forEach((rowId: any, rowIndex: number) => {
+        const row = blocksRecord[rowId];
+        if (row.type === 'table_row') {
+          const content: any[] = [];
+          tableNode.content.push({
+            type: 'table_row',
+            content
+          });
+          row.table_row.cells.forEach((cell: any) => {
+            content.push({
+              type: rowIndex === 0 ? 'table_header' : 'table_cell',
+              content: convertRichText(cell)
+            });
+          });
+        }
+      });
+      pageContent.content?.push(tableNode);
+    }
   });
 
+  // If there was no content in the notion page only then add an empty paragraph
   if (pageContent.content?.length === 0) {
     pageContent.content?.push({
       type: 'paragraph',
