@@ -103,7 +103,6 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
 BlocksEditorPage.getLayout = (page: ReactElement) => {
   return (
     <PageLayout>
-      <h2>EDITOR</h2>
       {page}
     </PageLayout>
   );
