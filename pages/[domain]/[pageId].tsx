@@ -72,7 +72,6 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     }
     else if (pageId) {
       const pageByPath = pages[pageId] || Object.values(pages).find(page => page.path === pageId);
-      console.log('set current page', pageByPath?.title);
       if (pageByPath) {
         setTitleState(pageByPath.title);
         setCurrentPageId(pageByPath.id);

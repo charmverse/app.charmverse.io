@@ -1,4 +1,5 @@
 import { Page, Prisma } from '@prisma/client';
+import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { addBoardClicked } from 'components/databases/focalboard/src/components/sidebar/sidebarAddBoardMenu';
 import { useRouter } from 'next/router';
@@ -39,6 +40,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const router = useRouter();
   const intl = useIntl();
   const [user] = useUser();
+
+  const { data } = useSWR(() => space ? `pages/${space?.id}` : null, () => charmClient.getPages(space!.id));
 
   useEffect(() => {
     if (space) {
