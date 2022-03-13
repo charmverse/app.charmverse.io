@@ -321,6 +321,17 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 label='Bounties'
               />
             </Box>
+            <Box sx={{ ml: 1 }}>
+              <Button
+                onClick={() => {
+
+                }}
+                variant='text'
+                startIcon={<BountyIcon fontSize='small' />}
+              >
+                Import from notion
+              </Button>
+            </Box>
           </ScrollingContainer>
           <SidebarFooter>
             {user && (
