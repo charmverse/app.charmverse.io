@@ -5,7 +5,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { Client } from '@notionhq/client';
-import { BlockNode, CalloutNode, ListItemNode, PageContent, TableNode, TableRowNode, TextContent, TextMark } from 'models';
+import { BlockNode, CalloutNode, CodeNode, ListItemNode, PageContent, TableNode, TableRowNode, TextContent, TextMark } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, extractEmbedLink } from 'components/editor/ResizableIframe';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/editor/ResizableImage';
@@ -1057,6 +1057,20 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
       case 'divider': {
         (parentNode as PageContent).content?.push({
           type: 'horizontalRule'
+        });
+        break;
+      }
+
+      case 'code': {
+        (parentNode as PageContent).content?.push({
+          type: 'codeBlock',
+          content: [{
+            type: 'text',
+            text: block.code.rich_text[0].plain_text
+          }],
+          attrs: {
+            language: block.code.language
+          }
         });
         break;
       }

@@ -7,7 +7,7 @@ export const PATH_BLACKLIST = ['settings'];
 export type PageType = 'page' | 'board';
 
 // eslint-disable-next-line
-export type BlockNode = TableHeaderNode | TableCellNode | TableRowNode | TableNode |
+export type BlockNode = TableHeaderNode | TableCellNode | TableRowNode | TableNode | CodeNode |
 // eslint-disable-next-line
 ParagraphNode | ListItemNode | BulletListNode | PageContent | OrderedListNode | QuoteNode;
 
@@ -90,4 +90,12 @@ export interface PageContent {
   type: string,
   content?: BlockNode[],
   attrs?: Record<string, any>
+}
+
+export interface CodeNode {
+  type: 'codeBlock',
+  content: TextContent[],
+  attrs: {
+    language: string
+  }
 }
