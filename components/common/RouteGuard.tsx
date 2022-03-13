@@ -27,6 +27,8 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
 
   // console.log('isLoading', isLoading, { isReactLoading, isWalletLoading, isUserLoading, isSpacesLoaded });
 
+  console.log('|RouteGuard rerenderd');
+
   useEffect(() => {
     // wait to listen to events until data is loaded
     if (isLoading) {
@@ -48,11 +50,21 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     authCheckAndRedirect(router.asPath);
 
     // on route change start - hide page content by setting authorized to false
-    const hideContent = () => setAuthorized(false);
-    router.events.on('routeChangeStart', hideContent);
+    const hideContent = () => {
+      console.log('Hiding content');
+      setAuthorized(false);
+    };
+    router.events.on('routeChangeStart', () => {
+      console.log('Navigation start');
+      hideContent();
+    });
 
     // on route change complete - run auth check
-    router.events.on('routeChangeComplete', authCheckAndRedirect);
+    router.events.on('routeChangeComplete', () => {
+
+      console.log('Navigation complete, auth: ', authorized);
+      authCheckAndRedirect(router.asPath);
+    });
 
     // unsubscribe from events in useEffect return function
     // eslint-disable-next-line consistent-return
@@ -125,7 +137,16 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }
 
   if (isLoading) {
-    return null;
+    return (<h1>LOADING</h1>);
   }
-  return <span>{authorized ? children : null}</span>;
+  return (
+    <span>
+      {authorized ? (
+        <>
+          <h1>CHILDREN</h1>
+          {children}
+        </>
+      ) : <h1>FORBIDDEN</h1>}
+    </span>
+  );
 }
