@@ -67,6 +67,15 @@ export interface OrderedListNode {
   attrs?: {tight?: boolean}
 }
 
+export interface CalloutNode {
+  type: 'blockquote',
+  // eslint-disable-next-line
+  content?: BlockNode[],
+  attrs?: {
+    emoji: string | null
+  }
+}
+
 export interface PageContent {
   [key: string]: any,
   type: string,

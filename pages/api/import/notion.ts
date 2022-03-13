@@ -5,7 +5,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { Client } from '@notionhq/client';
-import { BlockNode, ListItemNode, PageContent, TableNode, TableRowNode, TextContent, TextMark } from 'models';
+import { BlockNode, CalloutNode, ListItemNode, PageContent, TableNode, TableRowNode, TextContent, TextMark } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
@@ -1001,6 +1001,26 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
 
         blocksRecord[block.id].children.forEach((childId) => {
           populateDoc(listItemNode, blocksRecord[childId]);
+        });
+        break;
+      }
+
+      case 'callout': {
+        const calloutNode: CalloutNode = {
+          type: 'blockquote',
+          attrs: {
+            emoji: block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null
+          },
+          content: [
+            {
+              type: 'paragraph',
+              content: convertRichText(block[block.type].rich_text)
+            }
+          ]
+        };
+        (parentNode as PageContent).content?.push(calloutNode);
+        blocksRecord[block.id].children.forEach((childId) => {
+          populateDoc(calloutNode, blocksRecord[childId]);
         });
         break;
       }
