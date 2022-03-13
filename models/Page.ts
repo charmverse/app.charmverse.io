@@ -6,6 +6,11 @@ export const PATH_BLACKLIST = ['settings'];
 
 export type PageType = 'page' | 'board';
 
+// eslint-disable-next-line
+export type BlockNode = TableHeaderNode | TableCellNode | TableRowNode | TableNode |
+// eslint-disable-next-line
+ParagraphNode | ListItemNode | BulletListNode | PageContent | OrderedListNode | QuoteNode;
+
 export interface PagePermission {
   pageId: string;
   userId: string;
@@ -69,20 +74,20 @@ export interface OrderedListNode {
 
 export interface CalloutNode {
   type: 'blockquote',
-  // eslint-disable-next-line
   content?: BlockNode[],
   attrs?: {
     emoji: string | null
   }
 }
 
+export interface QuoteNode {
+  type: 'quote',
+  content: BlockNode[]
+}
+
 export interface PageContent {
   [key: string]: any,
   type: string,
-  // eslint-disable-next-line
   content?: BlockNode[],
   attrs?: Record<string, any>
 }
-
-export type BlockNode = TableHeaderNode | TableCellNode | TableRowNode | TableNode |
-  ParagraphNode | ListItemNode | BulletListNode | PageContent | OrderedListNode;

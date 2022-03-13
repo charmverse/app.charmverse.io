@@ -861,6 +861,8 @@ interface ChildBlockListResponse {
 
 type BlockWithChildren = BlockObjectResponse & {children: string[]};
 
+const NodesWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
+
 async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>) {
   const blockId = process.env.NOTION_PAGE_ID!;
   const userId = req.session.user.id;
@@ -912,7 +914,7 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
             blocks.push(blockWithChildren);
           }
 
-          if (block.type.match(/(table|bulleted_list_item|callout|numbered_list_item|to_do)/) && block.has_children) {
+          if (block.type.match(NodesWithChildrenRegex) && block.has_children) {
             blockChildrenRequests.push({
               block_id: block.id,
               page_size: 100
@@ -1007,16 +1009,28 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
         break;
       }
 
-      case 'callout': {
+      case 'callout':
+      case 'quote': {
+        let richText: RichTextItemResponse[] = [];
+        let emoji: string | null = null;
+
+        if (block.type === 'callout') {
+          richText = block.callout.rich_text;
+          emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
+        }
+        else if (block.type === 'quote') {
+          richText = block.quote.rich_text;
+        }
+
         const calloutNode: CalloutNode = {
-          type: 'blockquote',
+          type: block.type as any,
           attrs: {
-            emoji: block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null
+            emoji
           },
           content: [
             {
               type: 'paragraph',
-              content: convertRichText(block[block.type].rich_text)
+              content: convertRichText(richText)
             }
           ]
         };
