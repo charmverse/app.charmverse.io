@@ -323,8 +323,15 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             </Box>
             <Box sx={{ ml: 1 }}>
               <Button
-                onClick={() => {
-
+                onClick={async () => {
+                  if (space) {
+                    const createdPage = await charmClient.importFromNotion({ spaceId: space.id });
+                    setPages({
+                      ...pages,
+                      [createdPage.id]: createdPage
+                    });
+                    router.push(`/${space.domain}/${createdPage.path}`);
+                  }
                 }}
                 variant='text'
                 startIcon={<BountyIcon fontSize='small' />}

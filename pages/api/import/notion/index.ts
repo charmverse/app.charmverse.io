@@ -14,11 +14,12 @@ handler.use(requireUser).post(importFromNotion);
 
 async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>) {
   const blockId = process.env.NOTION_PAGE_ID!;
-  const { id } = req.session.user;
+  const userId = req.session.user.id;
   const { spaceId } = req.body as {spaceId: string};
   const response = await notion.pages.retrieve({
     page_id: blockId
   }) as any;
+  const id = Math.random().toString().replace('0.', '');
 
   const pageToCreate: Prisma.PageCreateInput = {
     content: {
@@ -32,11 +33,11 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
     createdAt: new Date(),
     author: {
       connect: {
-        id
+        id: userId
       }
     },
     updatedAt: new Date(),
-    updatedBy: id,
+    updatedBy: userId,
     path: `page-${id}`,
     space: {
       connect: {

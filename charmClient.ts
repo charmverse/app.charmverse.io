@@ -130,6 +130,11 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
+  // Notion Import
+  importFromNotion ({ spaceId }: {spaceId: string}) {
+    return http.POST<Page>('/api/import/notion', { spaceId });
+  }
+
   // FocalBoard
 
   // TODO: we shouldnt have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
