@@ -66,11 +66,13 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     });
   }
 
+  const pagesLoaded = Object.keys(pages).length > 0;
+
   useEffect(() => {
     if (publicShare === true && pageId) {
       loadPublicPage(pageId as string);
     }
-    else if (pageId) {
+    else if (pageId && pagesLoaded) {
       const pageByPath = pages[pageId] || Object.values(pages).find(page => page.path === pageId);
       if (pageByPath) {
         setTitleState(pageByPath.title);
@@ -80,7 +82,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
         setPageNotFound(true);
       }
     }
-  }, [pageId, Object.keys(pages).length > 0]);
+  }, [pageId, pagesLoaded]);
 
   const currentPage = pages[currentPageId];
 
