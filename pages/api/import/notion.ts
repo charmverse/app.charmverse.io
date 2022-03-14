@@ -6,7 +6,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { Client } from '@notionhq/client';
 import { BlockNode, CalloutNode, CodeNode, ListItemNode, PageContent, TableNode, TableRowNode, TextContent, TextMark } from 'models';
-import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
+import { ListBlockChildrenParameters, ListBlockChildrenResponse } from '@notionhq/client/build/src/api-endpoints';
 import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, extractEmbedLink, MIN_EMBED_HEIGHT } from 'components/editor/ResizableIframe';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/editor/ResizableImage';
 
@@ -856,12 +856,13 @@ function convertRichText (richTexts: RichTextItemResponse[]): TextContent[] {
 
 interface ChildBlockListResponse {
   request: ListBlockChildrenParameters,
-  results: BlockObjectResponse[]
+  results: BlockObjectResponse[],
+  next_cursor: string | null
 }
 
 type BlockWithChildren = BlockObjectResponse & {children: string[]};
 
-const NodesWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
+const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
 
 async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>) {
   const blockId = process.env.NOTION_PAGE_ID!;
@@ -884,17 +885,39 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
     page_size: 100
   }];
 
+  async function getChildBlockListResponses () {
+    // eslint-disable-next-line
+    const childBlockListResponses = (await Promise.all<ChildBlockListResponse>(
+      blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
+        notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
+          results: response.results as BlockObjectResponse[],
+          request: blockChildrenRequest,
+          next_cursor: response.next_cursor
+        })));
+      }))
+    ));
+
+    // Check if the response has next_cursor to fetch more blocks
+    blockChildrenRequests = childBlockListResponses.filter(
+      (childBlockListResponse) => childBlockListResponse.next_cursor
+    ).map((response) => ({
+      block_id: response.request.block_id,
+      page_size: 100,
+      start_cursor: response.next_cursor ?? undefined
+    }));
+
+    return childBlockListResponses;
+  }
+
   for (let depth = 0; depth < 10; depth++) {
     if (blockChildrenRequests.length !== 0) {
       // eslint-disable-next-line
-      const childBlockListResponses = (await Promise.all<ChildBlockListResponse>(
-        blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
-          notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
-            results: response.results as BlockObjectResponse[],
-            request: blockChildrenRequest
-          })));
-        }))
-      ));
+      const childBlockListResponses = await getChildBlockListResponses();
+
+      while (blockChildrenRequests.length !== 0) {
+        // eslint-disable-next-line
+        childBlockListResponses.push(...await getChildBlockListResponses());
+      }
 
       blockChildrenRequests = [];
 
@@ -914,7 +937,7 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
             blocks.push(blockWithChildren);
           }
 
-          if (block.type.match(NodesWithChildrenRegex) && block.has_children) {
+          if (block.type.match(BlocksWithChildrenRegex) && block.has_children) {
             blockChildrenRequests.push({
               block_id: block.id,
               page_size: 100
@@ -1023,7 +1046,7 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
         }
 
         const calloutNode: CalloutNode = {
-          type: block.type as any,
+          type: block.type === 'callout' ? 'blockquote' : 'quote' as any,
           attrs: {
             emoji
           },
