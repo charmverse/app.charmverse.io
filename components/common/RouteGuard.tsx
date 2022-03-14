@@ -130,7 +130,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }
 
   if (isLoading) {
-    return <h1>Loading</h1>;
+    return null;
   }
   return (
     <span>
