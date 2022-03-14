@@ -10,6 +10,7 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
+import ErrorPage from 'components/common/errors/ErrorPage';
 
 /**
  * @viewId - Enforce a specific view inside the nested blocks editor
@@ -66,11 +67,13 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     });
   }
 
+  const pagesLoaded = Object.keys(pages).length > 0;
+
   useEffect(() => {
     if (publicShare === true && pageId) {
       loadPublicPage(pageId as string);
     }
-    else if (pageId) {
+    else if (pageId && pagesLoaded) {
       const pageByPath = pages[pageId] || Object.values(pages).find(page => page.path === pageId);
       if (pageByPath) {
         setTitleState(pageByPath.title);
@@ -80,15 +83,14 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
         setPageNotFound(true);
       }
     }
-  }, [pageId, Object.keys(pages).length > 0]);
+  }, [pageId, pagesLoaded]);
 
   const currentPage = pages[currentPageId];
 
-  if (!currentPage && pageNotFound === true && space) {
-    router.push(`/${space.domain}`);
+  if (pageNotFound) {
+    return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
-
-  if (!currentPage) {
+  else if (!currentPage) {
     return null;
   }
   else if (currentPage.type === 'board') {
