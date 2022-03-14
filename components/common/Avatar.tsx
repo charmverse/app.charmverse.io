@@ -16,7 +16,7 @@ const SizeStyleMap: Record<'small' | 'medium', React.CSSProperties> = {
   }
 };
 const StyledAvatar = styled(Avatar)`
-  color: white;
+  color: white !important; // override CSS from Chip avatar
   font-weight: 500;
 `;
 

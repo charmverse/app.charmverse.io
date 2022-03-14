@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import Chip from '@mui/material/Chip';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import { Box, CircularProgress } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import Avatar from 'components/common/Avatar';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
@@ -17,6 +20,7 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
+import getDisplayName from 'lib/users/getDisplayName';
 import ShareButton from './ShareButton';
 
 export const headerHeight = 56;
@@ -102,18 +106,30 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
               <ShareButton headerHeight={headerHeight} />
 
               <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
-                <IconButton sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
+                <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
                 </IconButton>
               </Tooltip>
             </>
           )}
           {/** dark mode toggle */}
-          <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
-            <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+          <IconButton size='small' sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+            <MoreHorizIcon />
+          </IconButton>
+          {/** dark mode toggle */}
+          {/* <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
+            <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
               {theme.palette.mode === 'dark' ? <Brightness7Icon color='secondary' /> : <Brightness4Icon color='secondary' />}
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
+          <Box display='inline'>
+            {user && (
+              <Chip
+                avatar={<Avatar name={getDisplayName(user)} />}
+                label={getDisplayName(user)}
+              />
+            )}
+          </Box>
         </Box>
       </Box>
     </StyledToolbar>
