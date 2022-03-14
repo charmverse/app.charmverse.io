@@ -17,7 +17,7 @@ export default function LoginPage () {
   const [, setTitleState] = usePageTitle();
   const [user, setUser, isUserLoaded] = useUser();
   const [spaces, setSpaces, isSpacesLoaded] = useSpaces();
-  const [isLoaded, setIsLoaded] = useState(false); // capture isLoaded state to prevent render on route change
+  const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
 
   const isDataLoaded = triedEager && isSpacesLoaded && isUserLoaded;
 
@@ -42,12 +42,12 @@ export default function LoginPage () {
         }
       }
       else {
-        setIsLoaded(true);
+        setShowLogin(true);
       }
     }
   }, [account, isDataLoaded]);
 
-  if (!isLoaded) {
+  if (!showLogin) {
     return null;
   }
 
