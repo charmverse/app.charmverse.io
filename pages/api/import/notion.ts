@@ -864,10 +864,15 @@ type BlockWithChildren = BlockObjectResponse & {children: string[]};
 
 const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
 
-async function importFromNotion (req: NextApiRequest, res: NextApiResponse<{root: Page, pages: Page[]}>) {
+async function importFromNotion (req: NextApiRequest, res: NextApiResponse<{error: string} |
+  {root: Page, pages: Page[]}>) {
   const blockId = process.env.NOTION_PAGE_ID!;
   const userId = req.session.user.id;
   const { spaceId } = req.body as {spaceId: string};
+
+  const blockRetrieveResponse = await notion.blocks.retrieve({
+    block_id: blockId
+  }) as BlockObjectResponse;
 
   const createdPages: Record<string, Page> = {};
   const linkedPages: Record<string, string> = {};
@@ -1243,12 +1248,24 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<{root
     return page;
   }
 
-  await createPage(blockId);
+  if (blockRetrieveResponse.type === 'child_page') {
+    await createPage(blockId);
 
-  return res.status(200).json({
-    root: createdPages[blockId],
-    pages: Object.values(createdPages)
-  });
+    return res.status(200).json({
+      root: createdPages[blockId],
+      pages: Object.values(createdPages)
+    });
+  }
+  else if (blockRetrieveResponse.type === 'child_database') {
+    return res.status(400).json({
+      error: 'The block is neither a page nor a database.'
+    });
+  }
+  else {
+    return res.status(400).json({
+      error: 'The block is neither a page nor a database.'
+    });
+  }
 }
 
 export default withSessionRoute(handler);
