@@ -12,6 +12,7 @@ import { IWorkspace } from 'components/databases/focalboard/src/blocks/workspace
 import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
+import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -388,6 +389,10 @@ class CharmClient {
     Promise<{ error?: string, success?: boolean, space: Space }> {
 
     return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
+  }
+
+  getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
+    return http.GET('/api/tokens/metadata', { chainId, contractAddress });
   }
 }
 
