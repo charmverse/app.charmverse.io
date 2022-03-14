@@ -25,7 +25,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isReactLoading = !router.isReady;
   const isLoading = isUserLoading || isWalletLoading || isReactLoading || !isSpacesLoaded;
 
-  console.log('isLoading', isLoading, { isReactLoading, isWalletLoading, isUserLoading, isSpacesLoaded });
+  // console.log('isLoading', isLoading, { isReactLoading, isWalletLoading, isUserLoading, isSpacesLoaded });
 
   useEffect(() => {
     // wait to listen to events until data is loaded
