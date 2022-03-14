@@ -126,6 +126,10 @@ const SidebarHeader = styled.div(({ theme }) => ({
       duration: theme.transitions.duration.enteringScreen
     })
   },
+  '&:hover .MuiTypography-root': {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
   '&:hover .MuiIconButton-root': {
     opacity: 1
   },
@@ -322,18 +326,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               />
             </Box>
           </ScrollingContainer>
-          <SidebarFooter>
-            {user && (
-            <Box display='flex' alignItems='center'>
-              <Avatar name={getDisplayName(user)} />
-              <Box pl={1}>
-                <Typography color='secondary'>
-                  <strong>{getDisplayName(user)}</strong>
-                </Typography>
-              </Box>
-            </Box>
-            )}
-          </SidebarFooter>
         </Box>
       )}
     </SidebarContainer>
