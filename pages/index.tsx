@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
-import { BaseLayout } from 'components/common/base-layout/getLayout';
+import getLayout from 'components/common/base-layout/getLayout';
 import LoginPageContent from 'components/login/LoginPageContent';
 import { usePageTitle } from 'hooks/usePageTitle';
 import Footer from 'components/login/Footer';
@@ -52,9 +52,11 @@ export default function LoginPage () {
   }
 
   return (
-    <BaseLayout>
-      <LoginPageContent account={account} />
-      <Footer />
-    </BaseLayout>
+    getLayout(
+      <>
+        <LoginPageContent account={account} />
+        <Footer />
+      </>
+    )
   );
 }
