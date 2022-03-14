@@ -864,104 +864,19 @@ type BlockWithChildren = BlockObjectResponse & {children: string[]};
 
 const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
 
-async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>) {
+async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page[]>) {
   const blockId = process.env.NOTION_PAGE_ID!;
   const userId = req.session.user.id;
   const { spaceId } = req.body as {spaceId: string};
-  const pageResponse = await notion.pages.retrieve({
-    page_id: blockId
-  }) as unknown as GetPageResponse;
 
-  const blocksRecord: Record<string, BlockWithChildren> = {};
-  const blocks: BlockWithChildren[] = [];
-  const pageContent: PageContent = {
-    type: 'doc',
-    content: []
-  };
+  const createdPages: Record<string, Page> = {};
+  const linkedPages: Record<string, string> = {};
 
-  // Array to store parameters for further requests to retrieve children blocks
-  let blockChildrenRequests: ListBlockChildrenParameters[] = [{
-    block_id: blockId,
-    page_size: 100
-  }];
-
-  async function getChildBlockListResponses () {
-    // eslint-disable-next-line
-    const childBlockListResponses = (await Promise.all<ChildBlockListResponse>(
-      blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
-        notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
-          results: response.results as BlockObjectResponse[],
-          // Request contains the block_id, which is used to detect the parent of this group of child blocks
-          request: blockChildrenRequest,
-          next_cursor: response.next_cursor
-        })));
-      }))
-    ));
-
-    blockChildrenRequests = [];
-
-    childBlockListResponses.forEach(childBlockListResponse => {
-      // If next_cursor exist then this block contains more child blocks
-      if (childBlockListResponse.next_cursor) {
-        blockChildrenRequests.push({
-          block_id: childBlockListResponse.request.block_id,
-          page_size: 100,
-          start_cursor: childBlockListResponse.next_cursor ?? undefined
-        });
-      }
-    });
-
-    return childBlockListResponses;
-  }
-
-  // Fetch 5 level of nested content
-  for (let depth = 0; depth < 5; depth++) {
-    if (blockChildrenRequests.length !== 0) {
-      // eslint-disable-next-line
-      const childBlockListResponses = await getChildBlockListResponses();
-
-      // If the block has more child to be fetch, fetch them using the cursor
-      while (blockChildrenRequests.length !== 0) {
-        // eslint-disable-next-line
-        childBlockListResponses.push(...await getChildBlockListResponses());
-      }
-
-      // Now that all child content has been fetched, we need to check if any of the child block has children or not
-      blockChildrenRequests = [];
-
-      // Go through each of the block and add them to the record
-      // eslint-disable-next-line
-      childBlockListResponses.forEach((childBlockListResponse) => {
-        childBlockListResponse.results.forEach((block) => {
-          const blockWithChildren = {
-            ...block,
-            children: []
-          };
-          blocksRecord[block.id] = blockWithChildren;
-          if (depth !== 0) {
-            blocksRecord[childBlockListResponse.request.block_id].children.push(block.id);
-          }
-          else {
-            // Only push the top level blocks to the array
-            blocks.push(blockWithChildren);
-          }
-
-          // If the block has children then we need to fetch them as well
-          if (block.type.match(BlocksWithChildrenRegex) && block.has_children) {
-            blockChildrenRequests.push({
-              block_id: block.id,
-              page_size: 100
-            });
-          }
-        });
-      });
-    }
-    else {
-      break;
-    }
-  }
-
-  function populateDoc (parentNode: BlockNode, block: BlockWithChildren) {
+  async function populateDoc (
+    parentNode: BlockNode,
+    block: BlockWithChildren,
+    blocksRecord: Record<string, BlockWithChildren>
+  ) {
     switch (block.type) {
       case 'heading_1': {
         (parentNode as PageContent).content?.push({
@@ -1004,6 +919,24 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
         break;
       }
 
+      case 'link_to_page': {
+        // TODO: Link could also be created for a database
+        const linkedPageId = block[block.type].type === 'page_id' ? (block[block.type] as any).page_id : null;
+        // If the pages hasn't been created already, only then create it
+        if (linkedPageId && !linkedPages[linkedPageId]) {
+          const createdPage = await createPage(linkedPageId);
+          linkedPages[linkedPageId] = createdPage.id;
+        }
+
+        (parentNode as PageContent).content?.push({
+          type: 'page',
+          attrs: {
+            id: linkedPages[linkedPageId]
+          }
+        });
+        break;
+      }
+
       case 'bulleted_list_item':
       case 'numbered_list_item':
       case 'to_do':
@@ -1036,9 +969,11 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
           content: [listItemNode]
         });
 
-        blocksRecord[block.id].children.forEach((childId) => {
-          populateDoc(listItemNode, blocksRecord[childId]);
-        });
+        for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
+          const childId = blocksRecord[block.id].children[index];
+          // eslint-disable-next-line
+          await populateDoc(listItemNode, blocksRecord[childId], blocksRecord);
+        }
         break;
       }
 
@@ -1068,9 +1003,11 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
           ]
         };
         (parentNode as PageContent).content?.push(calloutNode);
-        blocksRecord[block.id].children.forEach((childId) => {
-          populateDoc(calloutNode, blocksRecord[childId]);
-        });
+        for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
+          const childId = blocksRecord[block.id].children[index];
+          // eslint-disable-next-line
+          await populateDoc(calloutNode, blocksRecord[childId], blocksRecord);
+        }
         break;
       }
 
@@ -1165,46 +1102,150 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
     }
   }
 
-  blocks.forEach(block => {
-    populateDoc(pageContent, block);
-  });
+  async function createPage (pageId: string) {
+    // eslint-disable-next-line
+    const pageResponse = await notion.pages.retrieve({
+      page_id: pageId
+    }) as unknown as GetPageResponse;
 
-  // If there was no content in the notion page only then add an empty paragraph
-  if (pageContent.content?.length === 0) {
-    pageContent.content?.push({
-      type: 'paragraph',
+    const blocksRecord: Record<string, BlockWithChildren> = {};
+    const blocks: BlockWithChildren[] = [];
+    const pageContent: PageContent = {
+      type: 'doc',
       content: []
-    });
+    };
+
+    // Array to store parameters for further requests to retrieve children blocks
+    let blockChildrenRequests: ListBlockChildrenParameters[] = [{
+      block_id: pageId,
+      page_size: 100
+    }];
+
+    async function getChildBlockListResponses () {
+      // eslint-disable-next-line
+        const childBlockListResponses = (await Promise.all<ChildBlockListResponse>(
+        blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
+          notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
+            results: response.results as BlockObjectResponse[],
+            // Request contains the block_id, which is used to detect the parent of this group of child blocks
+            request: blockChildrenRequest,
+            next_cursor: response.next_cursor
+          })));
+        }))
+      ));
+
+      blockChildrenRequests = [];
+
+      childBlockListResponses.forEach(childBlockListResponse => {
+        // If next_cursor exist then this block contains more child blocks
+        if (childBlockListResponse.next_cursor) {
+          blockChildrenRequests.push({
+            block_id: childBlockListResponse.request.block_id,
+            page_size: 100,
+            start_cursor: childBlockListResponse.next_cursor ?? undefined
+          });
+        }
+      });
+
+      return childBlockListResponses;
+    }
+
+    // Fetch 5 level of nested content
+    for (let depth = 0; depth < 5; depth++) {
+      if (blockChildrenRequests.length !== 0) {
+        // eslint-disable-next-line
+          const childBlockListResponses = await getChildBlockListResponses();
+
+        // If the block has more child to be fetch, fetch them using the cursor
+        while (blockChildrenRequests.length !== 0) {
+          // eslint-disable-next-line
+            childBlockListResponses.push(...await getChildBlockListResponses());
+        }
+
+        // Now that all child content has been fetched, we need to check if any of the child block has children or not
+        blockChildrenRequests = [];
+
+        // Go through each of the block and add them to the record
+        // eslint-disable-next-line
+          childBlockListResponses.forEach((childBlockListResponse) => {
+          childBlockListResponse.results.forEach((block) => {
+            const blockWithChildren = {
+              ...block,
+              children: []
+            };
+            blocksRecord[block.id] = blockWithChildren;
+            if (depth !== 0) {
+              blocksRecord[childBlockListResponse.request.block_id].children.push(block.id);
+            }
+            else {
+              // Only push the top level blocks to the array
+              blocks.push(blockWithChildren);
+            }
+
+            // If the block has children then we need to fetch them as well
+            if (block.type.match(BlocksWithChildrenRegex) && block.has_children) {
+              blockChildrenRequests.push({
+                block_id: block.id,
+                page_size: 100
+              });
+            }
+          });
+        });
+      }
+      else {
+        break;
+      }
+    }
+
+    for (let index = 0; index < blocks.length; index++) {
+      const block = blocks[index];
+      // eslint-disable-next-line
+      await populateDoc(pageContent, block, blocksRecord);
+    }
+
+    // If there was no content in the notion page only then add an empty paragraph
+    if (pageContent.content?.length === 0) {
+      pageContent.content?.push({
+        type: 'paragraph',
+        content: []
+      });
+    }
+
+    const id = Math.random().toString().replace('0.', '');
+
+    const pageToCreate: Prisma.PageCreateInput = {
+      content: pageContent,
+      // TODO: Generate content text
+      contentText: '',
+      createdAt: new Date(),
+      author: {
+        connect: {
+          id: userId
+        }
+      },
+      updatedAt: new Date(),
+      updatedBy: userId,
+      path: `page-${id}`,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
+      icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
+      title: pageResponse.properties.title.type === 'title' ? pageResponse.properties.title.title.reduce((prev, cur) => prev + cur.plain_text, '') : pageResponse.properties.title.rich_text.reduce((prev, cur) => prev + cur.plain_text, ''),
+      type: 'page'
+    };
+
+    // eslint-disable-next-line
+    const page = await prisma.page.create({ data: pageToCreate });
+    createdPages[pageId] = page;
+    return page;
   }
 
-  const id = Math.random().toString().replace('0.', '');
+  await createPage(blockId);
 
-  const pageToCreate: Prisma.PageCreateInput = {
-    content: pageContent,
-    contentText: '',
-    createdAt: new Date(),
-    author: {
-      connect: {
-        id: userId
-      }
-    },
-    updatedAt: new Date(),
-    updatedBy: userId,
-    path: `page-${id}`,
-    space: {
-      connect: {
-        id: spaceId
-      }
-    },
-    headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
-    icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
-    title: pageResponse.properties.title.type === 'title' ? pageResponse.properties.title.title.reduce((prev, cur) => prev + cur.plain_text, '') : pageResponse.properties.title.rich_text.reduce((prev, cur) => prev + cur.plain_text, ''),
-    type: 'page'
-  };
-
-  const createdPage = await prisma.page.create({ data: pageToCreate });
-
-  return res.status(200).json(createdPage);
+  return res.status(200).json(Object.values(createdPages));
 }
 
 export default withSessionRoute(handler);
