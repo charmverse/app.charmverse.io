@@ -864,7 +864,7 @@ type BlockWithChildren = BlockObjectResponse & {children: string[]};
 
 const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
 
-async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page[]>) {
+async function importFromNotion (req: NextApiRequest, res: NextApiResponse<{root: Page, pages: Page[]}>) {
   const blockId = process.env.NOTION_PAGE_ID!;
   const userId = req.session.user.id;
   const { spaceId } = req.body as {spaceId: string};
@@ -1245,7 +1245,10 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page[
 
   await createPage(blockId);
 
-  return res.status(200).json(Object.values(createdPages));
+  return res.status(200).json({
+    root: createdPages[blockId],
+    pages: Object.values(createdPages)
+  });
 }
 
 export default withSessionRoute(handler);

@@ -132,7 +132,7 @@ class CharmClient {
 
   // Notion Import
   importFromNotion ({ spaceId }: {spaceId: string}) {
-    return http.POST<Page>('/api/import/notion', { spaceId });
+    return http.POST<{root: Page, pages: Page[]}>('/api/import/notion', { spaceId });
   }
 
   // FocalBoard

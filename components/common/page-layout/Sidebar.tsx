@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Prisma } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import mutator from 'components/databases/focalboard/src//mutator';
 import { getSortedBoards } from 'components/databases/focalboard/src/store/boards';
@@ -325,12 +325,16 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               <Button
                 onClick={async () => {
                   if (space) {
-                    const createdPage = await charmClient.importFromNotion({ spaceId: space.id });
+                    const { pages: createdPages, root } = await charmClient.importFromNotion({ spaceId: space.id });
+                    const createdPagesRecord: Record<string, Page> = {};
+                    createdPages.forEach(createdPage => {
+                      createdPagesRecord[createdPage.id] = createdPage;
+                    });
                     setPages({
                       ...pages,
-                      [createdPage.id]: createdPage
+                      ...createdPagesRecord
                     });
-                    router.push(`/${space.domain}/${createdPage.path}`);
+                    router.push(`/${space.domain}/${root.path}`);
                   }
                 }}
                 variant='text'
