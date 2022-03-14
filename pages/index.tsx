@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
 import getBaseLayout from 'components/common/base-layout/getLayout';
@@ -17,8 +17,9 @@ export default function LoginPage () {
   const [, setTitleState] = usePageTitle();
   const [user, setUser, isUserLoaded] = useUser();
   const [spaces, setSpaces, isSpacesLoaded] = useSpaces();
+  const [isLoaded, setIsLoaded] = useState(false); // capture isLoaded state to prevent render on route change
 
-  const isLoading = !triedEager || !isSpacesLoaded || !isUserLoaded;
+  const isDataLoaded = triedEager && isSpacesLoaded && isUserLoaded;
 
   useEffect(() => {
     setTitleState('Welcome');
@@ -27,24 +28,26 @@ export default function LoginPage () {
   useEffect(() => {
 
     // redirect user once wallet is connected
-    if (account) {
-      if (typeof router.query.returnUrl === 'string') {
-        router.push(router.query.returnUrl);
-      }
-      else if (!isLoading) {
-        console.log('spaces', isSpacesLoaded, spaces);
-        if (spaces.length > 0) {
+    if (isDataLoaded) {
+      // redirect once account exists (user has connected wallet)
+      if (account) {
+        if (typeof router.query.returnUrl === 'string') {
+          router.push(router.query.returnUrl);
+        }
+        else if (spaces.length > 0) {
           router.push(`/${spaces[0]!.domain}`);
         }
         else {
           router.push('/signup');
         }
       }
+      else {
+        setIsLoaded(true);
+      }
     }
+  }, [account, isDataLoaded]);
 
-  }, [account, isLoading]);
-
-  if (isLoading) {
+  if (!isLoaded) {
     return null;
   }
 
