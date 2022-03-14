@@ -20,6 +20,7 @@ import { useState, useEffect } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
 import { ITokenMetadataRequest } from 'lib/tokens/tokenData';
+import Image from 'next/image';
 
 import { isValidChainAddress } from 'lib/tokens/validation';
 
@@ -35,7 +36,8 @@ export const schema = yup.object({
   contractAddress: yup.string().required().test('verifyContractFormat', 'Invalid contract address', (value) => {
     return isValidChainAddress(value as string);
   }),
-  tokenSymbol: yup.string().required()
+  tokenSymbol: yup.string().required(),
+  tokenLogo: yup.string()
 });
 
 type FormValues = yup.InferType<typeof schema>
@@ -75,6 +77,7 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
       // Remove the current token as the contract address is being modified
       else if (name === 'contractAddress' && !isValidChainAddress(contractAddress as string)) {
         setValue('tokenSymbol', null as any);
+        setValue('tokenLogo', null as any);
       }
     });
     return () => newContractAddress.unsubscribe();
@@ -85,9 +88,13 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
       const tokenData = await charmClient.getTokenMetaData(tokenInfo);
       setValue('tokenSymbol', tokenData.symbol);
       trigger('tokenSymbol');
+      setValue('tokenLogo', tokenData.logo ?? undefined);
+      trigger('tokenLogo');
       setAllowManualSymbolInput(false);
     }
     catch (error) {
+      setValue('tokenLogo', null as any);
+      setValue('tokenSymbol', null as any);
       setAllowManualSymbolInput(true);
     }
   }
@@ -143,9 +150,8 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
               )
             }
           </Grid>
-          <Grid container item>
-            <Grid item xs>
-              {
+          <Grid item xs>
+            {
                 allowManualSymbolInput === true && !errors.contractAddress && (
                   <>
                     <InputLabel>
@@ -159,16 +165,35 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
                   </>
                 )
               }
-              {
+            {
                 allowManualSymbolInput === false && values.tokenSymbol && (
                   <p>{`Token symbol: ${values.tokenSymbol}`}</p>
                 )
               }
+          </Grid>
 
-            </Grid>
+          <Grid item xs>
+            {
+                allowManualSymbolInput === true && !errors.contractAddress && (
+                  <>
+                    <InputLabel>
+                      Token logo
+                    </InputLabel>
+                    <Input
+                      {...register('tokenLogo')}
+                      type='text'
+                    />
+                  </>
+                )
+              }
+            {
+                allowManualSymbolInput === false && values.tokenLogo && (
+                  <img alt='Crypto logo' src={values.tokenLogo} />
+                )
+              }
           </Grid>
           <Grid item>
-            <Button disabled={!isValid}>Set payment token</Button>
+            <Button disabled={!isValid}>Set payment method</Button>
           </Grid>
         </Grid>
       </form>
