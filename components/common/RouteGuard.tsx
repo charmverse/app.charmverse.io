@@ -94,11 +94,15 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     // condition: user not loaded
     else if (!user) {
       console.log('[RouteGuard]: user not loaded');
-      let _user = await charmClient.login(account);
-      if (!_user) {
-        _user = await charmClient.createUser({ address: account });
+      try {
+        const _user = await charmClient.login(account);
+        return { authorized: false, user: _user };
       }
-      return { authorized: false, user: _user };
+      catch (error) {
+        const _user = await charmClient.createUser({ address: account });
+        return { authorized: false, user: _user };
+      }
+
     }
     // condition: user switches to a new/unknown address
     else if (!user.addresses.includes(account)) {
