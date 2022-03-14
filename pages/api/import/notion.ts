@@ -891,36 +891,45 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
       blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
         notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
           results: response.results as BlockObjectResponse[],
+          // Request contains the block_id, which is used to detect the parent of this group of child blocks
           request: blockChildrenRequest,
           next_cursor: response.next_cursor
         })));
       }))
     ));
 
-    // Check if the response has next_cursor to fetch more blocks
-    blockChildrenRequests = childBlockListResponses.filter(
-      (childBlockListResponse) => childBlockListResponse.next_cursor
-    ).map((response) => ({
-      block_id: response.request.block_id,
-      page_size: 100,
-      start_cursor: response.next_cursor ?? undefined
-    }));
+    blockChildrenRequests = [];
+
+    childBlockListResponses.forEach(childBlockListResponse => {
+      // If next_cursor exist then this block contains more child blocks
+      if (childBlockListResponse.next_cursor) {
+        blockChildrenRequests.push({
+          block_id: childBlockListResponse.request.block_id,
+          page_size: 100,
+          start_cursor: childBlockListResponse.next_cursor ?? undefined
+        });
+      }
+    });
 
     return childBlockListResponses;
   }
 
-  for (let depth = 0; depth < 10; depth++) {
+  // Fetch 5 level of nested content
+  for (let depth = 0; depth < 5; depth++) {
     if (blockChildrenRequests.length !== 0) {
       // eslint-disable-next-line
       const childBlockListResponses = await getChildBlockListResponses();
 
+      // If the block has more child to be fetch, fetch them using the cursor
       while (blockChildrenRequests.length !== 0) {
         // eslint-disable-next-line
         childBlockListResponses.push(...await getChildBlockListResponses());
       }
 
+      // Now that all child content has been fetched, we need to check if any of the child block has children or not
       blockChildrenRequests = [];
 
+      // Go through each of the block and add them to the record
       // eslint-disable-next-line
       childBlockListResponses.forEach((childBlockListResponse) => {
         childBlockListResponse.results.forEach((block) => {
@@ -937,6 +946,7 @@ async function importFromNotion (req: NextApiRequest, res: NextApiResponse<Page>
             blocks.push(blockWithChildren);
           }
 
+          // If the block has children then we need to fetch them as well
           if (block.type.match(BlocksWithChildrenRegex) && block.has_children) {
             blockChildrenRequests.push({
               block_id: block.id,
