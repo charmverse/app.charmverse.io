@@ -21,7 +21,7 @@ handler.get((req, res) => {
     redirect: req.query.redirect,
     spaceId: req.query.spaceId
   }));
-  const oauthUrl = `${notionUrl}&state=${state}&redirect_uri=${encodeURIComponent(`${req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}` : `https://${req.headers.host}`}/api/notion/callback` as string)}`;
+  const oauthUrl = `${notionUrl}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/notion/callback` : 'https://app.charmverse.io/api/notion/callback')}`;
   res.send({ redirectUrl: oauthUrl });
 });
 
