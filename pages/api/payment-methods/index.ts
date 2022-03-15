@@ -7,6 +7,7 @@ import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } 
 import { withSessionRoute } from 'lib/session/withSession';
 import { IEventToLog, postToDiscord } from 'lib/logs/notifyDiscord';
 import { IApiError } from 'lib/utilities/errors';
+import { isValidChainAddress } from 'lib/tokens/validation';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -31,6 +32,12 @@ async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<Pay
 async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<PaymentMethod | IApiError>) {
 
   const { chainId, contractAddress, tokenSymbol, tokenLogo, spaceId } = req.body as PaymentMethod;
+
+  if (!isValidChainAddress(contractAddress)) {
+    return res.status(400).json({
+      message: 'Contract address is invalid'
+    });
+  }
 
   const existingPaymentMethod = await prisma.paymentMethod.findFirst({
     where: {
