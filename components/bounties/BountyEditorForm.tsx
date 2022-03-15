@@ -241,6 +241,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               </InputLabel>
               <InputSearchCrypto
                 cryptoList={availableCryptos}
+                defaultValue={bounty?.rewardToken}
                 onChange={newToken => {
                   setValue('rewardToken', newToken);
                 }}
