@@ -1091,7 +1091,9 @@ async function populateDoc (
   }
 }
 
-// TODO: If two pages references the each other, we might get stuck in an infinite loop
+// IMPORTANT: Situations when infinite loop might occur
+// TODO: If two pages references each other
+// TODO: If a child references a parent page
 
 async function importFromWorkspace ({ accessToken, userId, spaceId }:
   { accessToken: string, spaceId: string, userId: string }) {
@@ -1128,11 +1130,13 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse;
     if (block.object === 'page') {
-      await createPage(block.id);
+      await createPage([[block.id, null]]);
     }
   }
 
-  async function createPage (pageId: string) {
+  // Array of tuple, [notion block id, charmverse block id]
+  async function createPage (pageIds: [string, string | null][]) {
+    const [pageId] = pageIds[pageIds.length - 1];
     // The page might be recursively created via a link_to_page block
     if (createdPages[pageId]) return createdPages[pageId];
 
@@ -1233,15 +1237,27 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       await populateDoc(pageContent, block, blocksRecord, async (linkedPageId, parentNode) => {
         // If the linked page hasn't been created, only then proceed,
         // Make sure its not referencing itself otherwise an infinite loop will occur
-        if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== pageId) {
-          const createdPage = await createPage(linkedPageId);
+        // Also make sure the linked page id is not its parent
+        const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
+
+        if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== pageId && !parentAsLinkedPage) {
+          const createdPage = await createPage([...pageIds, [linkedPageId, createdPageId]]);
           linkedPages[linkedPageId] = createdPage.id;
+        }
+
+        let id = linkedPages[linkedPageId];
+
+        if (linkedPageId === pageId) {
+          id = createdPageId;
+        }
+        else if (parentAsLinkedPage) {
+          id = parentAsLinkedPage[1]!;
         }
 
         (parentNode as PageContent).content?.push({
           type: 'page',
           attrs: {
-            id: linkedPageId !== pageId ? linkedPages[linkedPageId] : createdPageId
+            id
           }
         });
       });

@@ -330,23 +330,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                     account: user?.addresses[0] ?? ''
                   });
                   window.location.replace(redirectUrl);
-                  // if (space) {
-                  //   const { pages: createdPages, root } = await charmClient.importFromNotion({ spaceId: space.id });
-                  //   const createdPagesRecord: Record<string, Page> = {};
-                  //   createdPages.forEach(createdPage => {
-                  //     createdPagesRecord[createdPage.id] = createdPage;
-                  //   });
-                  //   setPages({
-                  //     ...pages,
-                  //     ...createdPagesRecord
-                  //   });
-                  //   router.push(`/${space.domain}/${root.path}`);
-                  // }
                 }}
                 variant='text'
                 startIcon={<BountyIcon fontSize='small' />}
               >
-                Connect To Notion
+                Import From Notion
               </Button>
             </Box>
           </ScrollingContainer>
