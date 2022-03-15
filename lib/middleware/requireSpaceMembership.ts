@@ -10,7 +10,7 @@ export async function requireSpaceMembership (req: NextApiRequest, res: NextApiR
     return res.status(401).send({ error: 'Please log in' });
   }
 
-  const spaceId = req.query.spaceId ?? req.body.spaceId;
+  const spaceId = req.query?.spaceId ?? req.body?.spaceId;
 
   if (!spaceId) {
     return res.status(400).json({
