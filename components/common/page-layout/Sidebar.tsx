@@ -326,7 +326,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 onClick={async () => {
                   const { redirectUrl } = await charmClient.notionLogin({
                     spaceId: space.id,
-                    redirect: `${window.location.origin}/api/notion/callback`,
+                    redirect: window.location.href,
                     account: user?.addresses[0] ?? ''
                   });
                   window.location.replace(redirectUrl);
@@ -346,7 +346,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 variant='text'
                 startIcon={<BountyIcon fontSize='small' />}
               >
-                Import from notion
+                Connect To Notion
               </Button>
             </Box>
           </ScrollingContainer>

@@ -29,7 +29,7 @@ handler.get(async (req, res) => {
     res.status(400).send('Invalid state');
     return;
   }
-  const encodedToken = btoa(`${process.env.NOTION_OAUTH_CLIENT_ID}:${process.env.NOTION_OAUTH_SECRET}`);
+  const encodedToken = Buffer.from(`${process.env.NOTION_OAUTH_CLIENT_ID}:${process.env.NOTION_OAUTH_SECRET}`, 'base64').toString();
   const token = await http.POST<{owner: {user: {id: string, person: {email: string}}}}>('https://api.notion.com/v1/oauth/token', {
     grant_type: 'authorization_code',
     // redirect_uri: redirectUri,
@@ -45,6 +45,8 @@ handler.get(async (req, res) => {
   const userEmail = token.owner.user.person.email;
   console.log('wallet address', state.account);
   console.log({ userEmail, userId });
+
+  console.log({ token });
 
   const cookies = new Cookies(req, res);
   cookies.set('notion-user', userId, {
