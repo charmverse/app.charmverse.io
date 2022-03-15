@@ -1,18 +1,16 @@
+import DeleteIcon from '@mui/icons-material/Delete';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
-import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import { PaymentMethod } from '@prisma/client';
 import { StyledRow } from 'components/settings/TokenGatesTable';
-import { getDisplayName } from 'lib/users';
-import { PaymentMethodMap } from 'hooks/usePaymentMethods';
 import { getChainById, getChainExplorerLink } from 'connectors';
+import { PaymentMethodMap } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
 import { CompositeDeletePaymentMethod } from './CompositeDeletePaymentMethodModal';
 
