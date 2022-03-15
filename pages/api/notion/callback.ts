@@ -48,6 +48,8 @@ handler.get(async (req, res) => {
 
   console.log({ token });
 
+  console.log(await notion.search({}));
+
   const cookies = new Cookies(req, res);
   cookies.set('notion-user', userId, {
     httpOnly: false,

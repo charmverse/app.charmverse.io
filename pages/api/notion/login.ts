@@ -10,7 +10,6 @@ const handler = nc({
 });
 
 handler.get((req, res) => {
-
   if (!req.query.redirect) {
     return res.status(400).json('Missing redirect');
   }
@@ -22,7 +21,7 @@ handler.get((req, res) => {
     redirect: req.query.redirect,
     spaceId: req.query.spaceId
   }));
-  const oauthUrl = `${notionUrl}&state=${state}&redirect_uri=${encodeURIComponent(`${req.headers.origin}/api/notion/callback` as string)}`;
+  const oauthUrl = `${notionUrl}&state=${state}&redirect_uri=${encodeURIComponent(`${req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}` : `https://${req.headers.host}`}/api/notion/callback` as string)}`;
   res.send({ redirectUrl: oauthUrl });
 });
 
