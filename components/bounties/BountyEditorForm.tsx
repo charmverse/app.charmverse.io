@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import { Bounty, Bounty as IBounty } from '@prisma/client';
-import charmClient from 'charmClient';
+import charmClient, { PopulatedBounty } from 'charmClient';
 import Button from 'components/common/Button';
 import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
@@ -24,7 +24,7 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 export type FormMode = 'create' | 'update';
 
 interface IBountyEditorInput {
-  onSubmit: (bounty: Bounty) => any,
+  onSubmit: (bounty: PopulatedBounty) => any,
   mode?: FormMode
   bounty?: Partial<Bounty>
 }
@@ -93,8 +93,6 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     refreshCryptoList(defaultChainId);
   }, []);
 
-  const values = watch();
-
   async function submitted (value: IBounty) {
 
     if (mode === 'create') {
@@ -103,8 +101,9 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
       value.description = value.description ?? '';
       value.descriptionNodes = value.descriptionNodes ?? '';
       const createdBounty = await charmClient.createBounty(value);
-      setBounties([...bounties, createdBounty]);
-      onSubmit(createdBounty);
+      const populatedBounty = { ...createdBounty, applications: [] };
+      setBounties([...bounties, populatedBounty]);
+      onSubmit(populatedBounty);
     }
     else if (bounty?.id && mode === 'update') {
       const updates = {

@@ -1,10 +1,15 @@
 import { Button, Grid, Typography } from '@mui/material';
 import { Bounty as IBounty, BountyStatus } from '@prisma/client';
+import { ethers } from 'ethers';
 import BountyModal from 'components/bounties/BountyModal';
 import { BountiesContext } from 'hooks/useBounties';
 import { useContext, useState } from 'react';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
+import { eToNumber } from 'lib/utilities/numbers';
+import { isTruthy } from 'lib/utilities/types';
 import { BountyCard } from './BountyCard';
+import MultiPayButton from './MultiPaymentButton';
 
 const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete'];
 
@@ -20,6 +25,19 @@ export function BountyList () {
   function bountyCreated () {
     setDisplayBountyDialog(false);
   }
+
+  const transactions: MetaTransactionData[] = bounties.map(bounty => {
+    const app = bounty.applications.find(application => application.createdBy === bounty.assignee);
+    if (!app) return null;
+    const value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
+    return {
+      to: app.walletAddress,
+      value,
+      data: '0x',
+      origin: 'CharmVerse Bounty'
+    };
+  }).filter(isTruthy);
+
   return (
     <Grid container>
 
@@ -42,6 +60,7 @@ export function BountyList () {
 
         <Grid item xs={8}>
           <h1>Bounty list</h1>
+          <MultiPayButton transactions={transactions} />
         </Grid>
 
         <Grid item xs={4}>

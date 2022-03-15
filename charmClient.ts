@@ -16,6 +16,10 @@ import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
+export interface PopulatedBounty extends Bounty {
+  applications: Application[];
+}
+
 //
 // CharmClient is the client interface to the server APIs
 //
@@ -269,8 +273,8 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (spaceId: string): Promise<Bounty []> {
-    return http.GET<Bounty[]>('/api/bounties', { spaceId });
+  listBounties (spaceId: string): Promise<PopulatedBounty[]> {
+    return http.GET('/api/bounties', { spaceId });
   }
 
   async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
