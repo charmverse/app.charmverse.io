@@ -10,13 +10,13 @@ const SizeStyleMap: Record<'small' | 'medium', React.CSSProperties> = {
     fontSize: '1.25rem'
   },
   small: {
-    height: 25,
-    width: 25,
-    fontSize: '1rem'
+    height: 24,
+    width: 24,
+    fontSize: '1rem !important'
   }
 };
 const StyledAvatar = styled(Avatar)`
-  color: white;
+  color: white !important; // override CSS from Chip avatar
   font-weight: 500;
 `;
 

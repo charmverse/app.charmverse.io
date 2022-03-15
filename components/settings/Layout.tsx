@@ -13,7 +13,6 @@ import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import { PageLayout } from '../common/page-layout';
 
 const SETTINGS_TABS = [
-  { icon: <AccountIcon fontSize='small' />, path: 'account', label: 'My account' },
   { icon: <SettingsIcon fontSize='small' />, path: 'workspace', label: 'Workspace' },
   { icon: <PersonIcon fontSize='small' />, path: 'contributors', label: 'Contributors' },
   { icon: <LockIcon fontSize='small' />, path: 'token-gates', label: 'Token Gates' },
