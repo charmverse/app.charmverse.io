@@ -42,6 +42,7 @@
     "@fullcalendar/daygrid": "^5.10.1",
     "@fullcalendar/interaction": "^5.10.1",
     "@fullcalendar/react": "^5.10.1",
+    "@gnosis.pm/safe-core-sdk-types": "^1.0.0",
     "@hookform/resolvers": "^2.8.8",
     "@mattermost/compass-icons": "^0.1.21",
     "@metamask/onboarding": "^1.0.1",
