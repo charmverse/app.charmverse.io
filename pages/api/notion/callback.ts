@@ -913,7 +913,12 @@ async function populateDoc (
       });
       break;
     }
-
+    case 'child_page': {
+      const linkedPageId = block.id;
+      // If the pages hasn't been created already, only then create it
+      await onLinkToPage(linkedPageId, parentNode);
+      break;
+    }
     case 'link_to_page': {
       // TODO: Link could also be created for a database
       const linkedPageId = block[block.type].type === 'page_id' ? (block[block.type] as any).page_id : null;
@@ -1085,6 +1090,8 @@ async function populateDoc (
   }
 }
 
+// TODO: If two pages references the each other, we might get stuck in an infinite loop
+
 async function importFromWorkspace ({ accessToken, userId, spaceId }:
   { accessToken: string, spaceId: string, userId: string }) {
   const notion = new Client({
@@ -1111,7 +1118,6 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   const createdPages: Record<string, Page> = {};
   const linkedPages: Record<string, string> = {};
 
-  // TODO: Make it work for nested pages
   // This loop would decrease the amount of api requests made
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse;
