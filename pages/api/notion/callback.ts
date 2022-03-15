@@ -1098,6 +1098,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
 
   const searchResults = searchResult.results;
 
+  // While there are more pages the integration has access to
   while (searchResult.has_more && searchResult.next_cursor) {
     // eslint-disable-next-line
     searchResult = await notion.search({
@@ -1128,8 +1129,11 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   for (let index = 0; index < rootPages.length; index++) {
     const rootPage = rootPages[index];
     if (rootPage.object === 'page') {
-      // eslint-disable-next-line
-      await createPage(rootPage.id);
+      // The page might be recursively created via a link_to_page block
+      if (!createdPages[rootPage.id]) {
+        // eslint-disable-next-line
+        await createPage(rootPage.id);
+      }
     }
   }
 
@@ -1232,8 +1236,9 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       const block = blocks[index];
       // eslint-disable-next-line
       await populateDoc(pageContent, block, blocksRecord, async (linkedPageId, parentNode) => {
+        // If the linked page hasn't been created, only then proceed
         if (linkedPageId && !linkedPages[linkedPageId]) {
-          const createdPage = await createPage(linkedPageId);
+          const createdPage = createdPages[linkedPageId] ?? await createPage(linkedPageId);
           linkedPages[linkedPageId] = createdPage.id;
         }
 
