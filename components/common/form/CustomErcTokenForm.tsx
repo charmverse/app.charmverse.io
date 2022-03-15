@@ -34,7 +34,8 @@ export const schema = yup.object({
   }),
   tokenSymbol: yup.string().required(),
   tokenName: yup.string().required(),
-  tokenLogo: yup.string()
+  tokenLogo: yup.string(),
+  tokenDecimals: yup.number()
 });
 
 type FormValues = yup.InferType<typeof schema>
@@ -49,6 +50,7 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
     watch,
     getValues,
     trigger,
+    reset,
     formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -62,8 +64,10 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
   const [,, refreshPaymentMethods] = usePaymentMethods();
   const [space] = useCurrentSpace();
 
-  const [allowManualSymbolInput, setAllowManualSymbolInput] = useState(false);
+  const [allowManualInput, setAllowManualInput] = useState(false);
   const [formError, setFormError] = useState<IUserError | null>(null);
+  // Checks if we could load the logo
+  const [logoLoadSuccess, setLogoLoadSuccess] = useState(false);
 
   useEffect(() => {
     const newContractAddress = watch(({ contractAddress, chainId }, { value, name }) => {
@@ -89,12 +93,16 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
       trigger('tokenLogo');
       setValue('tokenName', tokenData.name ?? undefined);
       trigger('tokenName');
-      setAllowManualSymbolInput(false);
+      setValue('tokenDecimals', tokenData.decimals ?? undefined);
+      trigger('tokenDecimals');
+      setAllowManualInput(false);
     }
     catch (error) {
       setValue('tokenLogo', null as any);
       setValue('tokenSymbol', null as any);
-      setAllowManualSymbolInput(true);
+      setValue('tokenName', null as any);
+      setValue('tokenDecimals', null as any);
+      setAllowManualInput(true);
     }
   }
 
@@ -102,12 +110,15 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
 
   function setChainId (_chainId: number) {
     setValue('chainId', _chainId);
-    setValue('tokenSymbol', null as any);
   }
 
   async function addPaymentMethod (paymentMethod: Partial<PaymentMethod>) {
     setFormError(null);
     paymentMethod.spaceId = space?.id;
+    if (!logoLoadSuccess) {
+      delete paymentMethod.tokenLogo;
+    }
+
     try {
       const createdPaymentMethod = await charmClient.createPaymentMethod(paymentMethod);
       refreshPaymentMethods();
@@ -121,6 +132,9 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
     }
 
   }
+
+  // Only checks the format, not if we can load the logo
+  const validTokenLogoAddressFormat = !!values.tokenLogo && !errors.tokenLogo;
 
   return (
     <div>
@@ -154,60 +168,97 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
               )
             }
             {
-              !(errors?.contractAddress) && allowManualSymbolInput && (
+              !(errors?.contractAddress) && allowManualInput && (
               <Alert severity='warning'>
                 We couldn't find data about this token. You can enter its symbol below
               </Alert>
               )
             }
           </Grid>
-          <Grid item xs>
-            {
-                allowManualSymbolInput === true && !errors.contractAddress && (
-                  <>
+          {
+            values.contractAddress && !errors.contractAddress && (
+              <>
+                <Grid item container xs>
+                  <Grid item xs={6} sx={{ pr: 2 }}>
                     <InputLabel>
                       Token symbol
                     </InputLabel>
                     <Input
+                      readOnly={!allowManualInput}
                       {...register('tokenSymbol')}
                       type='text'
-                      fullWidth
                     />
-                  </>
-                )
-              }
-            {
-                allowManualSymbolInput === false && values.tokenSymbol && (
-                  <p>{`Token symbol: ${values.tokenSymbol}`}</p>
-                )
-              }
-            {
-                allowManualSymbolInput === false && values.tokenName && (
-                  <p>{`Token name: ${values.tokenName}`}</p>
-                )
-              }
-          </Grid>
+                  </Grid>
 
-          <Grid item xs>
-            {
-                allowManualSymbolInput === true && !errors.contractAddress && (
-                  <>
+                  <Grid item xs={6} sx={{ pl: 2 }}>
+                    <InputLabel>
+                      Token decimals
+                    </InputLabel>
+                    <Input
+                      {...register('tokenDecimals')}
+                      type='number'
+                      readOnly={!allowManualInput}
+                      inputProps={{
+                        step: 1,
+                        min: 1,
+                        max: 18,
+                        readonly: !allowManualInput
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid item xs>
+                  <InputLabel>
+                    Token name
+                  </InputLabel>
+                  <Input
+                    {...register('tokenName')}
+                    type='text'
+                    fullWidth
+                    readOnly={!allowManualInput}
+                  />
+                </Grid>
+
+                <Grid item container xs>
+                  <Grid item xs={validTokenLogoAddressFormat ? 8 : 12}>
                     <InputLabel>
                       Token logo
                     </InputLabel>
                     <Input
                       {...register('tokenLogo')}
                       type='text'
+                      fullWidth
                     />
-                  </>
-                )
-              }
-            {
-                allowManualSymbolInput === false && values.tokenLogo && (
-                  <img alt='Crypto logo' src={values.tokenLogo} />
-                )
-              }
-          </Grid>
+                    {
+              (errors?.tokenLogo || (validTokenLogoAddressFormat && !logoLoadSuccess)) && (
+              <Alert severity='error'>
+                Invalid token logo url
+              </Alert>
+              )
+            }
+                  </Grid>
+                  {
+              validTokenLogoAddressFormat && (
+                <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'center', alignContent: 'center', verticalAlign: 'center' }}>
+                  <img
+                    alt=''
+                    style={{ maxHeight: '50px' }}
+                    src={values.tokenLogo}
+                    onError={(error) => {
+                      setLogoLoadSuccess(false);
+                    }}
+                    onLoad={() => {
+                      setLogoLoadSuccess(true);
+                    }}
+                  />
+                </Grid>
+              )
+            }
+                </Grid>
+
+              </>
+            )
+          }
           {
             formError && (
               <Grid item xs>
@@ -218,7 +269,7 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
             )
           }
           <Grid item>
-            <Button type='submit' disabled={!isValid}>Set payment method</Button>
+            <Button type='submit' disabled={!isValid}>Create payment method</Button>
           </Grid>
         </Grid>
       </form>

@@ -14,7 +14,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser)
   .use(requireSpaceMembership)
   .get(listPaymentMethods)
-  .use(requireKeys<PaymentMethod>(['chainId', 'contractAddress', 'spaceId', 'tokenSymbol', 'tokenName'], 'body'))
+  .use(requireKeys<PaymentMethod>(['chainId', 'contractAddress', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals'], 'body'))
   .post(createPaymentMethod);
 
 async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<PaymentMethod [] | IApiError>) {
@@ -31,7 +31,15 @@ async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<Pay
 
 async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<PaymentMethod | IApiError>) {
 
-  const { chainId, contractAddress, tokenSymbol, tokenLogo, spaceId, tokenName } = req.body as PaymentMethod;
+  const {
+    chainId,
+    contractAddress,
+    tokenSymbol,
+    tokenLogo,
+    spaceId,
+    tokenName,
+    tokenDecimals
+  } = req.body as PaymentMethod;
 
   if (!isValidChainAddress(contractAddress)) {
     return res.status(400).json({
@@ -59,6 +67,7 @@ async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<Pa
     tokenSymbol,
     tokenName,
     tokenLogo,
+    tokenDecimals,
     createdBy: req.session.user.id,
     space: {
       connect: {
