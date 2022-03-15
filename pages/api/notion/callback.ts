@@ -1091,10 +1091,6 @@ async function populateDoc (
   }
 }
 
-// IMPORTANT: Situations when infinite loop might occur
-// TODO: If two pages references each other
-// TODO: If a child references a parent page
-
 async function importFromWorkspace ({ accessToken, userId, spaceId }:
   { accessToken: string, spaceId: string, userId: string }) {
   const notion = new Client({
@@ -1130,20 +1126,19 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse;
     if (block.object === 'page') {
-      await createPage([[block.id, null]]);
+      const createdPageId = v4();
+      await createPage([[block.id, createdPageId]]);
     }
   }
 
   // Array of tuple, [notion block id, charmverse block id]
-  async function createPage (pageIds: [string, string | null][]) {
-    const [pageId] = pageIds[pageIds.length - 1];
+  async function createPage (pageIds: [string, string][]) {
+    const [blockId, createdPageId] = pageIds[pageIds.length - 1];
     // The page might be recursively created via a link_to_page block
-    if (createdPages[pageId]) return createdPages[pageId];
+    if (createdPages[blockId]) return createdPages[blockId];
 
-    const createdPageId = v4();
-
-    const pageResponse = searchResultRecord[pageId] ?? await notion.pages.retrieve({
-      page_id: pageId
+    const pageResponse = searchResultRecord[blockId] ?? await notion.pages.retrieve({
+      page_id: blockId
     }) as unknown as GetPageResponse;
 
     const blocksRecord: Record<string, BlockWithChildren> = {};
@@ -1155,7 +1150,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
 
     // Array to store parameters for further requests to retrieve children blocks
     let blockChildrenRequests: ListBlockChildrenParameters[] = [{
-      block_id: pageId,
+      block_id: blockId,
       page_size: 100
     }];
 
@@ -1240,18 +1235,18 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
         // Also make sure the linked page id is not its parent
         const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
 
-        if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== pageId && !parentAsLinkedPage) {
-          const createdPage = await createPage([...pageIds, [linkedPageId, createdPageId]]);
+        if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== blockId && !parentAsLinkedPage) {
+          const createdPage = await createPage([...pageIds, [linkedPageId, v4()]]);
           linkedPages[linkedPageId] = createdPage.id;
         }
 
         let id = linkedPages[linkedPageId];
 
-        if (linkedPageId === pageId) {
+        if (linkedPageId === blockId) {
           id = createdPageId;
         }
         else if (parentAsLinkedPage) {
-          id = parentAsLinkedPage[1]!;
+          id = parentAsLinkedPage[1];
         }
 
         (parentNode as PageContent).content?.push({
@@ -1300,12 +1295,14 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
 
     // eslint-disable-next-line
     const page = await prisma.page.create({ data: pageToCreate });
-    createdPages[pageId] = page;
+    createdPages[blockId] = page;
     return page;
   }
 
+  // Update parent id for all pages
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse;
+    // Check if its a nested page
     if (block.object === 'page' && block.parent.type === 'page_id') {
       createdPages[block.id] = await prisma.page.update({ where: {
         id: createdPages[block.id].id!
