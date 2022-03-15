@@ -285,7 +285,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           <Box mb={2}>
             <SidebarLink
               active={router.pathname.startsWith('/[domain]/settings')}
-              href={`/${space.domain}/settings/account`}
+              href={`/${space.domain}/settings/workspace`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
               label='Settings & Members'
             />
