@@ -865,248 +865,267 @@ type BlockWithChildren = BlockObjectResponse & { children: string[] };
 
 const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
 
-async function importFromNotion ({ notion, blockId, userId, spaceId }:
-  { notion: Client, spaceId: string, userId: string, blockId: string }) {
-  const blockRetrieveResponse = await notion.blocks.retrieve({
-    block_id: blockId
-  }) as BlockObjectResponse;
+async function populateDoc (
+  parentNode: BlockNode,
+  block: BlockWithChildren,
+  blocksRecord: Record<string, BlockWithChildren>,
+  onLinkToPage: (linkedPageId: string, parentNode: BlockNode) => Promise<void>
+) {
+  switch (block.type) {
+    case 'heading_1': {
+      (parentNode as PageContent).content?.push({
+        type: 'heading',
+        attrs: {
+          level: 1
+        },
+        content: convertRichText(block.heading_1.rich_text)
+      });
+      break;
+    }
+
+    case 'heading_2': {
+      (parentNode as PageContent).content?.push({
+        type: 'heading',
+        attrs: {
+          level: 2
+        },
+        content: convertRichText(block.heading_2.rich_text)
+      });
+      break;
+    }
+
+    case 'heading_3': {
+      (parentNode as PageContent).content?.push({
+        type: 'heading',
+        attrs: {
+          level: 2
+        },
+        content: convertRichText(block.heading_3.rich_text)
+      });
+      break;
+    }
+
+    case 'paragraph': {
+      (parentNode as PageContent).content?.push({
+        type: 'paragraph',
+        content: convertRichText(block[block.type].rich_text)
+      });
+      break;
+    }
+
+    case 'link_to_page': {
+      // TODO: Link could also be created for a database
+      const linkedPageId = block[block.type].type === 'page_id' ? (block[block.type] as any).page_id : null;
+      // If the pages hasn't been created already, only then create it
+      await onLinkToPage(linkedPageId, parentNode);
+      break;
+    }
+
+    case 'bulleted_list_item':
+    case 'numbered_list_item':
+    case 'to_do':
+    {
+      let richText: RichTextItemResponse[] = [];
+
+      if (block.type === 'bulleted_list_item') {
+        richText = block.bulleted_list_item.rich_text;
+      }
+      else if (block.type === 'numbered_list_item') {
+        richText = block.numbered_list_item.rich_text;
+      }
+      else if (block.type === 'to_do') {
+        richText = block.to_do.rich_text;
+      }
+
+      const listItemNode: ListItemNode = {
+        type: 'listItem',
+        content: [{
+          type: 'paragraph',
+          content: convertRichText(richText)
+        }],
+        attrs: {
+          todoChecked: block.type === 'to_do' ? block.to_do.checked : null
+        }
+      };
+
+      (parentNode as PageContent).content?.push({
+        type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
+        content: [listItemNode]
+      });
+
+      for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
+        const childId = blocksRecord[block.id].children[index];
+        // eslint-disable-next-line
+          await populateDoc(listItemNode, blocksRecord[childId], blocksRecord, onLinkToPage);
+      }
+      break;
+    }
+
+    case 'callout':
+    case 'quote': {
+      let richText: RichTextItemResponse[] = [];
+      let emoji: string | null = null;
+
+      if (block.type === 'callout') {
+        richText = block.callout.rich_text;
+        emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
+      }
+      else if (block.type === 'quote') {
+        richText = block.quote.rich_text;
+      }
+
+      const calloutNode: CalloutNode = {
+        type: block.type === 'callout' ? 'blockquote' : 'quote' as any,
+        attrs: {
+          emoji
+        },
+        content: [
+          {
+            type: 'paragraph',
+            content: convertRichText(richText)
+          }
+        ]
+      };
+      (parentNode as PageContent).content?.push(calloutNode);
+      for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
+        const childId = blocksRecord[block.id].children[index];
+        // eslint-disable-next-line
+        await populateDoc(calloutNode, blocksRecord[childId], blocksRecord, onLinkToPage);
+      }
+      break;
+    }
+
+    case 'video': {
+      (parentNode as PageContent).content?.push({
+        type: 'iframe',
+        attrs: {
+          src: block.video.type === 'external' ? extractEmbedLink(block.video.external.url) : null,
+          type: 'video',
+          width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
+          height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
+        }
+      });
+      break;
+    }
+
+    case 'embed':
+    case 'bookmark':
+    {
+      (parentNode as PageContent).content?.push({
+        type: 'iframe',
+        attrs: {
+          src: extractEmbedLink(block.type === 'bookmark' ? block.bookmark.url : block.embed.url),
+          type: 'embed',
+          width: MAX_EMBED_WIDTH,
+          height: MIN_EMBED_HEIGHT
+        }
+      });
+      break;
+    }
+
+    case 'divider': {
+      (parentNode as PageContent).content?.push({
+        type: 'horizontalRule'
+      });
+      break;
+    }
+
+    case 'code': {
+      (parentNode as PageContent).content?.push({
+        type: 'codeBlock',
+        content: [{
+          type: 'text',
+          text: block.code.rich_text[0].plain_text
+        }],
+        attrs: {
+          language: block.code.language
+        }
+      });
+      break;
+    }
+
+    case 'image': {
+      (parentNode as PageContent).content?.push({
+        type: 'image',
+        attrs: {
+          src: block.image.type === 'external' ? block.image.external.url : null,
+          size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
+          aspectRatio: 1
+        }
+      });
+      break;
+    }
+
+    case 'table': {
+      const tableNode: TableNode = {
+        type: 'table',
+        content: []
+      };
+      blocksRecord[block.id].children.forEach((rowId, rowIndex) => {
+        const row = blocksRecord[rowId];
+        if (row.type === 'table_row') {
+          const content: TableRowNode['content'] = [];
+          tableNode.content.push({
+            type: 'table_row',
+            content
+          });
+          row.table_row.cells.forEach((cell) => {
+            content.push({
+              type: rowIndex === 0 ? 'table_header' : 'table_cell',
+              content: convertRichText(cell)
+            });
+          });
+        }
+      });
+      (parentNode as PageContent).content?.push(tableNode);
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+}
+
+async function importFromWorkspace ({ accessToken, userId, spaceId }:
+  { accessToken: string, spaceId: string, userId: string }) {
+  const notion = new Client({
+    auth: accessToken
+  });
+
+  // TODO: Paginate request
+  const searchResult = await notion.search({
+    page_size: 100
+  });
+
+  const searchResultRecord: Record<string, GetPageResponse> = {};
+  const rootPages: GetPageResponse[] = [];
+
+  // TODO: Make it work for nested pages
+  // eslint-disable-next-line
+  for (let index = 0; index < searchResult.results.length; index++) {
+    const result = searchResult.results[index] as GetPageResponse;
+    searchResultRecord[result.id] = result;
+    // Get all the root pages first
+    if (result.object === 'page' && result.parent.type === 'workspace') {
+      // eslint-disable-next-line
+      rootPages.push(result)
+    }
+  }
 
   const createdPages: Record<string, Page> = {};
   const linkedPages: Record<string, string> = {};
 
-  async function populateDoc (
-    parentNode: BlockNode,
-    block: BlockWithChildren,
-    blocksRecord: Record<string, BlockWithChildren>
-  ) {
-    switch (block.type) {
-      case 'heading_1': {
-        (parentNode as PageContent).content?.push({
-          type: 'heading',
-          attrs: {
-            level: 1
-          },
-          content: convertRichText(block.heading_1.rich_text)
-        });
-        break;
-      }
-
-      case 'heading_2': {
-        (parentNode as PageContent).content?.push({
-          type: 'heading',
-          attrs: {
-            level: 2
-          },
-          content: convertRichText(block.heading_2.rich_text)
-        });
-        break;
-      }
-
-      case 'heading_3': {
-        (parentNode as PageContent).content?.push({
-          type: 'heading',
-          attrs: {
-            level: 2
-          },
-          content: convertRichText(block.heading_3.rich_text)
-        });
-        break;
-      }
-
-      case 'paragraph': {
-        (parentNode as PageContent).content?.push({
-          type: 'paragraph',
-          content: convertRichText(block[block.type].rich_text)
-        });
-        break;
-      }
-
-      case 'link_to_page': {
-        // TODO: Link could also be created for a database
-        const linkedPageId = block[block.type].type === 'page_id' ? (block[block.type] as any).page_id : null;
-        // If the pages hasn't been created already, only then create it
-        if (linkedPageId && !linkedPages[linkedPageId]) {
-          const createdPage = await createPage(linkedPageId);
-          linkedPages[linkedPageId] = createdPage.id;
-        }
-
-        (parentNode as PageContent).content?.push({
-          type: 'page',
-          attrs: {
-            id: linkedPages[linkedPageId]
-          }
-        });
-        break;
-      }
-
-      case 'bulleted_list_item':
-      case 'numbered_list_item':
-      case 'to_do':
-      {
-        let richText: RichTextItemResponse[] = [];
-
-        if (block.type === 'bulleted_list_item') {
-          richText = block.bulleted_list_item.rich_text;
-        }
-        else if (block.type === 'numbered_list_item') {
-          richText = block.numbered_list_item.rich_text;
-        }
-        else if (block.type === 'to_do') {
-          richText = block.to_do.rich_text;
-        }
-
-        const listItemNode: ListItemNode = {
-          type: 'listItem',
-          content: [{
-            type: 'paragraph',
-            content: convertRichText(richText)
-          }],
-          attrs: {
-            todoChecked: block.type === 'to_do' ? block.to_do.checked : null
-          }
-        };
-
-        (parentNode as PageContent).content?.push({
-          type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
-          content: [listItemNode]
-        });
-
-        for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
-          const childId = blocksRecord[block.id].children[index];
-          // eslint-disable-next-line
-            await populateDoc(listItemNode, blocksRecord[childId], blocksRecord);
-        }
-        break;
-      }
-
-      case 'callout':
-      case 'quote': {
-        let richText: RichTextItemResponse[] = [];
-        let emoji: string | null = null;
-
-        if (block.type === 'callout') {
-          richText = block.callout.rich_text;
-          emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
-        }
-        else if (block.type === 'quote') {
-          richText = block.quote.rich_text;
-        }
-
-        const calloutNode: CalloutNode = {
-          type: block.type === 'callout' ? 'blockquote' : 'quote' as any,
-          attrs: {
-            emoji
-          },
-          content: [
-            {
-              type: 'paragraph',
-              content: convertRichText(richText)
-            }
-          ]
-        };
-        (parentNode as PageContent).content?.push(calloutNode);
-        for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
-          const childId = blocksRecord[block.id].children[index];
-          // eslint-disable-next-line
-          await populateDoc(calloutNode, blocksRecord[childId], blocksRecord);
-        }
-        break;
-      }
-
-      case 'video': {
-        (parentNode as PageContent).content?.push({
-          type: 'iframe',
-          attrs: {
-            src: block.video.type === 'external' ? extractEmbedLink(block.video.external.url) : null,
-            type: 'video',
-            width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
-            height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
-          }
-        });
-        break;
-      }
-
-      case 'embed':
-      case 'bookmark':
-      {
-        (parentNode as PageContent).content?.push({
-          type: 'iframe',
-          attrs: {
-            src: extractEmbedLink(block.type === 'bookmark' ? block.bookmark.url : block.embed.url),
-            type: 'embed',
-            width: MAX_EMBED_WIDTH,
-            height: MIN_EMBED_HEIGHT
-          }
-        });
-        break;
-      }
-
-      case 'divider': {
-        (parentNode as PageContent).content?.push({
-          type: 'horizontalRule'
-        });
-        break;
-      }
-
-      case 'code': {
-        (parentNode as PageContent).content?.push({
-          type: 'codeBlock',
-          content: [{
-            type: 'text',
-            text: block.code.rich_text[0].plain_text
-          }],
-          attrs: {
-            language: block.code.language
-          }
-        });
-        break;
-      }
-
-      case 'image': {
-        (parentNode as PageContent).content?.push({
-          type: 'image',
-          attrs: {
-            src: block.image.type === 'external' ? block.image.external.url : null,
-            size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
-            aspectRatio: 1
-          }
-        });
-        break;
-      }
-
-      case 'table': {
-        const tableNode: TableNode = {
-          type: 'table',
-          content: []
-        };
-        blocksRecord[block.id].children.forEach((rowId, rowIndex) => {
-          const row = blocksRecord[rowId];
-          if (row.type === 'table_row') {
-            const content: TableRowNode['content'] = [];
-            tableNode.content.push({
-              type: 'table_row',
-              content
-            });
-            row.table_row.cells.forEach((cell) => {
-              content.push({
-                type: rowIndex === 0 ? 'table_header' : 'table_cell',
-                content: convertRichText(cell)
-              });
-            });
-          }
-        });
-        (parentNode as PageContent).content?.push(tableNode);
-        break;
-      }
-      default: {
-        break;
-      }
+  for (let index = 0; index < rootPages.length; index++) {
+    const rootPage = rootPages[index];
+    if (rootPage.object === 'page') {
+      // eslint-disable-next-line
+      await createPage(rootPage.id);
     }
   }
 
   async function createPage (pageId: string) {
     // eslint-disable-next-line
-    const pageResponse = await notion.pages.retrieve({
+    const pageResponse = searchResultRecord[pageId] ?? await notion.pages.retrieve({
       page_id: pageId
     }) as unknown as GetPageResponse;
 
@@ -1202,7 +1221,19 @@ async function importFromNotion ({ notion, blockId, userId, spaceId }:
     for (let index = 0; index < blocks.length; index++) {
       const block = blocks[index];
       // eslint-disable-next-line
-      await populateDoc(pageContent, block, blocksRecord);
+      await populateDoc(pageContent, block, blocksRecord, async (linkedPageId, parentNode) => {
+        if (linkedPageId && !linkedPages[linkedPageId]) {
+          const createdPage = await createPage(linkedPageId);
+          linkedPages[linkedPageId] = createdPage.id;
+        }
+
+        (parentNode as PageContent).content?.push({
+          type: 'page',
+          attrs: {
+            id: linkedPages[linkedPageId]
+          }
+        });
+      });
     }
 
     // If there was no content in the notion page only then add an empty paragraph
@@ -1244,10 +1275,6 @@ async function importFromNotion ({ notion, blockId, userId, spaceId }:
     createdPages[pageId] = page;
     return page;
   }
-
-  if (blockRetrieveResponse.type === 'child_page') {
-    await createPage(blockId);
-  }
 }
 
 handler.get(async (req, res) => {
@@ -1284,30 +1311,12 @@ handler.get(async (req, res) => {
     }
   });
   const userId = token.owner.user.id;
-  const notion = new Client({
-    auth: token.access_token
-  });
 
-  // TODO: Paginate request
-  const searchResult = await notion.search({
-    page_size: 100
+  await importFromWorkspace({
+    accessToken: token.access_token,
+    spaceId: state.spaceId,
+    userId: state.userId
   });
-
-  // TODO: Make it work for nested pages
-  // eslint-disable-next-line
-  for (let index = 0; index < searchResult.results.length; index++) {
-    const result = searchResult.results[index] as GetPageResponse;
-    // Root pages
-    if (result.object === 'page' && result.parent.type === 'workspace') {
-      // eslint-disable-next-line
-      await importFromNotion({
-        blockId: result.id,
-        notion,
-        spaceId: state.spaceId,
-        userId: state.userId
-      });
-    }
-  }
 
   const cookies = new Cookies(req, res);
   cookies.set('notion-user', userId, {
