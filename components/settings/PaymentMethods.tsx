@@ -14,10 +14,9 @@ export default function PaymentMethodList ({ isAdmin = true }) {
 
   const [paymentMethods, setPaymentMethods] = usePaymentMethods();
 
-  async function addPaymentMethod (paymentMethod: Partial<PaymentMethod>) {
+  async function paymentMethodAdded (paymentMethod: Partial<PaymentMethod>) {
     setModalOpen(false);
-    const _paymentMethod = await charmClient.createPaymentMethod(paymentMethod);
-    console.log(_paymentMethod);
+
   }
 
   console.log('Available payment methods', paymentMethods);
@@ -25,7 +24,7 @@ export default function PaymentMethodList ({ isAdmin = true }) {
   return (
     <>
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <CustomErcTokenForm onSubmit={addPaymentMethod} />
+        <CustomErcTokenForm onSubmit={paymentMethodAdded} />
       </Modal>
 
       <Legend>

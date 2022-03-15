@@ -6,9 +6,13 @@ import { useCurrentSpace } from './useCurrentSpace';
 
 type PaymentMethodMap = Record<number, PaymentMethod []>
 
-type IContext = [paymentMethods: PaymentMethodMap, setPaymentMethods: (paymentMethodMap: PaymentMethodMap) => void]
+type IContext = [
+  paymentMethods: PaymentMethodMap,
+  setPaymentMethods: (paymentMethodMap: PaymentMethodMap) => void,
+  refreshPaymentMethods: () => void
+]
 
-export const PaymentMethodsContext = createContext<Readonly<IContext>>([{}, () => undefined]);
+export const PaymentMethodsContext = createContext<Readonly<IContext>>([{}, () => undefined, () => {}]);
 
 export function PaymentMethodsProvider ({ children }: { children: ReactNode }) {
 
@@ -16,6 +20,10 @@ export function PaymentMethodsProvider ({ children }: { children: ReactNode }) {
   const [space] = useCurrentSpace();
 
   useEffect(() => {
+    refreshPaymentMethods();
+  }, [space]);
+
+  function refreshPaymentMethods () {
     if (space) {
       charmClient.listPaymentMethods(space.id)
         .then(_paymentMethods => {
@@ -30,9 +38,11 @@ export function PaymentMethodsProvider ({ children }: { children: ReactNode }) {
         })
         .catch(() => {});
     }
-  }, [space]);
+  }
 
-  const value = useMemo(() => [paymentMethods, setPaymentMethods] as const, [paymentMethods, space]);
+  const value = useMemo(() => {
+    return [paymentMethods, setPaymentMethods, refreshPaymentMethods] as const;
+  }, [paymentMethods, space]);
 
   return (
     <PaymentMethodsContext.Provider value={value}>

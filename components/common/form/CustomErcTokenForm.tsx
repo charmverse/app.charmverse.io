@@ -3,31 +3,27 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
-import { Bounty, Bounty as IBounty } from '@prisma/client';
+import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
-import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
-import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/editor/CharmEditor';
-import { getChainById, getCryptos } from 'connectors';
+import { getCryptos } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
-import { PageContent } from 'models';
-import { CryptoCurrency } from 'models/Currency';
-import { useState, useEffect } from 'react';
-import { useForm, UseFormWatch } from 'react-hook-form';
-import * as yup from 'yup';
 import { ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import Image from 'next/image';
-
 import { isValidChainAddress } from 'lib/tokens/validation';
+import { IUserError } from 'lib/utilities/errors';
+import { CryptoCurrency } from 'models/Currency';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 export type FormMode = 'create' | 'update';
 
 interface Props {
-  onSubmit: (bounty: Bounty) => any,
+  onSubmit: (paymentMethod: Partial<PaymentMethod>) => any,
   defaultChainId?: number
 }
 
@@ -62,13 +58,17 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
     resolver: yupResolver(schema)
   });
 
+  const [paymentMethods, setPaymentMethods, refreshPaymentMethods] = usePaymentMethods();
+
   const [space] = useCurrentSpace();
   const [user] = useUser();
 
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>(getCryptos(defaultChainId));
   const [allowManualSymbolInput, setAllowManualSymbolInput] = useState(false);
+  const [formError, setFormError] = useState<IUserError | null>(null);
 
   useEffect(() => {
+    console.log('event');
     const newContractAddress = watch(({ contractAddress, chainId }, { value, name }) => {
 
       if ((name === 'contractAddress' || name === 'chainId') && isValidChainAddress(contractAddress as string)) {
@@ -101,19 +101,31 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
 
   const values = watch();
 
-  async function submitted (value: any) {
-
-    console.log('Adding payment method', value);
-  }
-
   function setChainId (_chainId: number) {
     setValue('chainId', _chainId);
     setValue('tokenSymbol', null as any);
   }
 
+  async function addPaymentMethod (paymentMethod: Partial<PaymentMethod>) {
+    setFormError(null);
+    paymentMethod.spaceId = space?.id;
+    try {
+      const createdPaymentMethod = await charmClient.createPaymentMethod(paymentMethod);
+      refreshPaymentMethods();
+      onSubmit(createdPaymentMethod);
+    }
+    catch (error: any) {
+      setFormError({
+        message: error.message,
+        severity: error.severity ?? 'error'
+      });
+    }
+
+  }
+
   return (
     <div>
-      <form onSubmit={handleSubmit(formValue => submitted(formValue))} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form onSubmit={handleSubmit(addPaymentMethod)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
         <Grid container direction='column' spacing={3}>
 
           <Grid item xs>
@@ -192,8 +204,17 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
                 )
               }
           </Grid>
+          {
+            formError && (
+              <Grid item xs>
+                <Alert severity={formError.severity}>
+                  {formError.message}
+                </Alert>
+              </Grid>
+            )
+          }
           <Grid item>
-            <Button disabled={!isValid}>Set payment method</Button>
+            <Button type='submit' disabled={!isValid}>Set payment method</Button>
           </Grid>
         </Grid>
       </form>
