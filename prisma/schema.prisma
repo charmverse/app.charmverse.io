@@ -228,5 +228,6 @@ model PaymentMethod {
   contractAddress String
   tokenName       String
   tokenSymbol     String
+  tokenDecimals   Int
   tokenLogo       String?
 }
