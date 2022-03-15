@@ -1092,7 +1092,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   });
 
   let searchResult = await notion.search({
-    page_size: 1
+    page_size: 100
   });
 
   const searchResults = searchResult.results;
@@ -1100,7 +1100,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   // While there are more pages the integration has access to
   while (searchResult.has_more && searchResult.next_cursor) {
     searchResult = await notion.search({
-      page_size: 1,
+      page_size: 100,
       start_cursor: searchResult.next_cursor
     });
     searchResults.push(...searchResult.results);
@@ -1112,6 +1112,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   const linkedPages: Record<string, string> = {};
 
   // TODO: Make it work for nested pages
+  // This loop would decrease the amount of api requests made
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse;
     searchResultRecord[block.id] = block;
@@ -1120,22 +1121,13 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse;
     if (block.object === 'page') {
-      // Root page
-      if (block.parent.type === 'workspace') {
-        await createPage(block.id);
-      }
-      else if (block.parent.type === 'page_id') {
-        const parentPage = await createPage(block.parent.page_id);
-        await createPage(block.id, parentPage.id);
-      }
+      await createPage(block.id);
     }
   }
 
-  async function createPage (pageId: string, parentId?: string) {
+  async function createPage (pageId: string) {
     // The page might be recursively created via a link_to_page block
     if (createdPages[pageId]) return createdPages[pageId];
-
-    console.log({ pageId, parentId, createdPages });
 
     const pageResponse = searchResultRecord[pageId] ?? await notion.pages.retrieve({
       page_id: pageId
@@ -1265,7 +1257,6 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
           id: userId
         }
       },
-      parentId,
       updatedAt: new Date(),
       updatedBy: userId,
       path: `page-${id}`,
@@ -1284,6 +1275,18 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     const page = await prisma.page.create({ data: pageToCreate });
     createdPages[pageId] = page;
     return page;
+  }
+
+  for (let index = 0; index < searchResults.length; index++) {
+    const block = searchResults[index] as GetPageResponse;
+    if (block.object === 'page' && block.parent.type === 'page_id') {
+      createdPages[block.id] = await prisma.page.update({ where: {
+        id: createdPages[block.id].id!
+      },
+      data: {
+        parentId: createdPages[block.parent.page_id].id
+      } });
+    }
   }
 }
 
