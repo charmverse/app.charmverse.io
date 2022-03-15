@@ -53,7 +53,7 @@ export default function WalletConnection () {
                 <CopyableAddress
                   address={account}
                   decimals={5}
-                  sx={{ fontSize: ensName ? 16 : 20, fontWeight: 'normal', background: 'transparent !important', color: 'inherit', p: 0 }}
+                  sx={{ fontSize: ensName ? 16 : 20, fontWeight: 'normal', p: 0 }}
                 />
               ) : <div></div>}
             </Grid>

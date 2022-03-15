@@ -38,7 +38,7 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
       <DialogTitle onClose={onClose}>Account</DialogTitle>
       <Stack mb={9} direction='row' spacing='4' alignItems='center'>
         <Avatar name={account} />
-        <CopyableAddress address={account!} decimals={5} />
+        <CopyableAddress address={account!} decimals={5} sx={{ fontSize: 24 }} />
       </Stack>
       <Stack
         direction='row'
