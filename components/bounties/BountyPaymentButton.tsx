@@ -5,13 +5,13 @@ import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getChainById, RPC } from 'connectors';
+import { isValidChainAddress } from 'lib/tokens/validation';
 import ERC20ABI from '../../abis/ERC20ABI.json';
 
 interface Props {
   receiver: string;
   amount: string;
-  tokenSymbol: string;
-  tokenContractAddress?: string;
+  tokenSymbolOrAddress: string;
   tokenDecimals?: number;
   chainIdToUse: number
   onSuccess?: (txId: string, chainId: number) => void;
@@ -88,8 +88,7 @@ export default function BountyPaymentButton ({
   receiver,
   amount,
   chainIdToUse,
-  tokenSymbol = 'ETH',
-  tokenContractAddress = '',
+  tokenSymbolOrAddress,
   tokenDecimals = 18,
   onSuccess = (tx: string, chainId: number) => {},
   onError = () => {},
@@ -129,7 +128,7 @@ export default function BountyPaymentButton ({
 
       const signer = await library.getSigner(account);
 
-      if (chainToUse.nativeCurrency.symbol === tokenSymbol) {
+      if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
         console.log('Executing transaction');
         console.log('Receiver', receiver);
         const tx = await signer.sendTransaction({
@@ -139,8 +138,8 @@ export default function BountyPaymentButton ({
 
         onSuccess(tx.hash, chainToUse.chainId);
       }
-      else if (tokenContractAddress) {
-        const tokenContract = new ethers.Contract(tokenContractAddress, ERC20ABI, signer);
+      else if (isValidChainAddress(tokenSymbolOrAddress)) {
+        const tokenContract = new ethers.Contract(tokenSymbolOrAddress, ERC20ABI, signer);
         const parsedTokenAmount = ethers.utils.parseUnits(amount, tokenDecimals);
 
         // get allowance
@@ -156,7 +155,7 @@ export default function BountyPaymentButton ({
         onSuccess(tx.hash, chainToUse!.chainId);
       }
       else {
-        onError('Token contract address required');
+        onError('Please provide a valid contract address', 'error');
       }
     }
     catch (err: any) {
