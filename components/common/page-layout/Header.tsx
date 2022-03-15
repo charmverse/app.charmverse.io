@@ -21,6 +21,7 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 import getDisplayName from 'lib/users/getDisplayName';
+import Account from './Account';
 import ShareButton from './ShareButton';
 
 export const headerHeight = 56;
@@ -100,7 +101,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
             </Box>
           )}
         </Box>
-        <Box>
+        <Box display='flex' alignItems='center'>
           {isPage && (
             <>
               <ShareButton headerHeight={headerHeight} />
@@ -112,24 +113,18 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
               </Tooltip>
             </>
           )}
-          {/** dark mode toggle */}
-          <IconButton size='small' sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+          {/** context menu */}
+          {/* <IconButton size='small' sx={{ mx: 1 }} color='inherit'>
             <MoreHorizIcon />
-          </IconButton>
+          </IconButton> */}
           {/** dark mode toggle */}
-          {/* <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
+          <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
             <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
               {theme.palette.mode === 'dark' ? <Brightness7Icon color='secondary' /> : <Brightness4Icon color='secondary' />}
             </IconButton>
-          </Tooltip> */}
-          <Box display='inline'>
-            {user && (
-              <Chip
-                avatar={<Avatar name={getDisplayName(user)} />}
-                label={getDisplayName(user)}
-              />
-            )}
-          </Box>
+          </Tooltip>
+          {/** user account */}
+          <Account />
         </Box>
       </Box>
     </StyledToolbar>
