@@ -6,7 +6,7 @@ const config = {
     return [
       {
         source: '/:domain/settings',
-        destination: '/:domain/settings/account',
+        destination: '/:domain/settings/workspace',
         permanent: false
       },
       // temporary redirect to fix the old redirect from '/' to '/login'

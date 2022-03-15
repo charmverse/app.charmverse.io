@@ -126,6 +126,10 @@ const SidebarHeader = styled.div(({ theme }) => ({
       duration: theme.transitions.duration.enteringScreen
     })
   },
+  '&:hover .MuiTypography-root': {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
   '&:hover .MuiIconButton-root': {
     opacity: 1
   },
@@ -281,7 +285,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           <Box mb={2}>
             <SidebarLink
               active={router.pathname.startsWith('/[domain]/settings')}
-              href={`/${space.domain}/settings/account`}
+              href={`/${space.domain}/settings/workspace`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
               label='Settings & Members'
             />
@@ -322,18 +326,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               />
             </Box>
           </ScrollingContainer>
-          <SidebarFooter>
-            {user && (
-            <Box display='flex' alignItems='center'>
-              <Avatar name={getDisplayName(user)} />
-              <Box pl={1}>
-                <Typography color='secondary'>
-                  <strong>{getDisplayName(user)}</strong>
-                </Typography>
-              </Box>
-            </Box>
-            )}
-          </SidebarFooter>
         </Box>
       )}
     </SidebarContainer>
