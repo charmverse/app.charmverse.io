@@ -3,6 +3,8 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { Client } from '@notionhq/client';
 import * as http from 'adapters/http';
+import { TextContent } from 'models';
+import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 
 const handler = nc({
   onError,
@@ -16,7 +18,12 @@ handler.get(async (req, res) => {
     res.redirect('/');
     return;
   }
-  let state: any = {};
+  let state: {
+    account: string,
+    redirect: string
+    spaceId: string
+    userId: string
+  } = {} as any;
   try {
     state = JSON.parse(decodeURIComponent(req.query.state as string));
   }
@@ -38,9 +45,14 @@ handler.get(async (req, res) => {
     }
   });
   const userId = token.owner.user.id;
-  // const notion = new Client({
-  //   auth: token.access_token
-  // });
+  const notion = new Client({
+    auth: token.access_token
+  });
+
+  // TODO: Paginate request
+  const searchResult = await notion.search({
+    page_size: 100
+  });
 
   const cookies = new Cookies(req, res);
   cookies.set('notion-user', userId, {
