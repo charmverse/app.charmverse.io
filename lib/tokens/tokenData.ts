@@ -73,12 +73,14 @@ export function getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRe
  */
 export function getPaymentMethod (
   paymentMethods: PaymentMethodMap,
-  contractAddress: string,
+  contractAddressOrId: string,
   chainId?: number
 ): PaymentMethod | undefined {
 
   if (chainId) {
-    return paymentMethods[chainId]?.find(paymentMethod => paymentMethod.contractAddress === contractAddress);
+    return paymentMethods[chainId]?.find(paymentMethod => (
+      paymentMethod.contractAddress === contractAddressOrId || paymentMethod.id === contractAddressOrId
+    ));
   }
 
   const flattenedChainMethods: PaymentMethod [] = Object.values(paymentMethods)
@@ -87,7 +89,9 @@ export function getPaymentMethod (
       return _paymentMethods;
     }, []);
 
-  return flattenedChainMethods.find(_paymentMethod => _paymentMethod.contractAddress === contractAddress);
+  return flattenedChainMethods.find(paymentMethod => (
+    paymentMethod.contractAddress === contractAddressOrId || paymentMethod.id === contractAddressOrId
+  ));
 
 }
 
