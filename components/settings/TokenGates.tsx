@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import useSWR from 'swr';
+import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { ShareModal } from 'lit-modal-vite';
 import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
@@ -9,6 +10,7 @@ import { TokenGate } from '@prisma/client';
 import charmClient from 'charmClient';
 import BackDrop from '@mui/material/Backdrop';
 import Portal from '@mui/material/Portal';
+import { ErrorModal } from 'components/common/Modal';
 import Legend from './Legend';
 import Button from '../common/Button';
 import TokenGatesTable from './TokenGatesTable';
@@ -23,6 +25,8 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
 
   const { data, mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
   const popupState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
+  const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
+  const [apiError, setApiError] = useState<string>('');
 
   const spaceResourceId: ResourceId = {
     baseUrl: 'https://app.charmverse.io',
@@ -32,9 +36,16 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
     extraData: ''
   };
 
-  async function onSubmit (conditions: ConditionsModalResult) {
-    await saveTokenGate(conditions);
-    popupState.close();
+  function onSubmit (conditions: ConditionsModalResult) {
+    setApiError('');
+    saveTokenGate(conditions)
+      .then(() => {
+        popupState.close();
+      })
+      .catch(error => {
+        setApiError(error.message || error);
+        errorPopupState.open();
+      });
   }
 
   async function saveTokenGate (conditions: Partial<SigningConditions>) {
@@ -52,7 +63,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
     const authSig = await checkAndSignAuthMessage({
       chain
     });
-    const success = await litClient?.saveSigningCondition({
+    await litClient!.saveSigningCondition({
       ...conditions,
       authSig,
       chain,
@@ -106,6 +117,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
           </div>
         </BackDrop>
       </Portal>
+      <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
     </>
   );
 }

@@ -10,11 +10,8 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-const Content = styled.div`
-  text-align: center;
-`;
-
 const StyledBolt = styled(Bolt)`
+  margin: 0 auto;
   position: relative;
   left: -15px;
 `;
@@ -24,15 +21,15 @@ const Text = styled(Typography)`
   font-weight: 700;
 `;
 
-export default function ErrorPage () {
+export default function ErrorPage ({ message = 'Sorry! there was an error' }: { message?: string }) {
   return (
     <Container>
-      <Content>
+      <div>
         <StyledBolt />
         <Text sx={{ mt: 3 }}>
-          Sorry! there was an error
+          {message}
         </Text>
-      </Content>
+      </div>
     </Container>
   );
 }
