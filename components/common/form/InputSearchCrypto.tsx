@@ -67,23 +67,29 @@ export function InputSearchCrypto ({
         return (
           <Box component='li' sx={{ '& > img': { mr: 2, flexShrink: 0 }, display: 'flex', gap: 1 }} {...props}>
             {
+
               tokenInfo.tokenLogo && (
-                tokenInfo.isContract ? (
-                  <img
-                    loading='lazy'
-                    width='20px'
-                    height='20px'
-                    src={tokenInfo.tokenLogo}
-                    alt='Crypto logo'
-                  />
-                ) : (
-                  <Image
-                    loading='lazy'
-                    width='20px'
-                    height='20px'
-                    src={tokenInfo.tokenLogo}
-                  />
-                )
+                <Box component='span'>
+                  {
+                    tokenInfo.isContract ? (
+                      <img
+                        loading='lazy'
+                        width='20px'
+                        height='20px'
+                        src={tokenInfo.tokenLogo}
+                        alt='Crypto logo'
+                      />
+                    ) : (
+                      <Image
+                        loading='lazy'
+                        width='20px'
+                        height='20px'
+                        src={tokenInfo.tokenLogo}
+                      />
+                    )
+                  }
+                </Box>
+
               )
             }
 
