@@ -9,11 +9,13 @@ import { Modal, DialogTitle } from 'components/common/Modal';
 import { injected, walletConnect, walletLink } from 'connectors';
 import { useContext } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+import useENSName from 'hooks/useENSName';
 // import AccountConnections from './components/AccountConnections';
 
 function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const { account, connector } = useWeb3React();
   const { openWalletSelectorModal } = useContext(Web3Connection);
+  const ENSName = useENSName(account);
 
   const handleWalletProviderSwitch = () => {
     openWalletSelectorModal();
@@ -37,7 +39,7 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
     <Modal open={isOpen} onClose={onClose}>
       <DialogTitle onClose={onClose}>Account</DialogTitle>
       <Stack mb={9} direction='row' spacing='4' alignItems='center'>
-        <Avatar name={account} />
+        <Avatar name={ENSName || account} />
         <CopyableAddress address={account!} decimals={5} sx={{ fontSize: 24 }} />
       </Stack>
       <Stack

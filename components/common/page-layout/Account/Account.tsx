@@ -1,12 +1,7 @@
 
 import ButtonGroup from '@mui/material/ButtonGroup';
-import Card from '@mui/material/Card';
 import { alpha } from '@mui/system';
-import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import Chip from '@mui/material/Chip';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
 import Button from 'components/common/Button';
 import SvgIcon from '@mui/material/SvgIcon';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
