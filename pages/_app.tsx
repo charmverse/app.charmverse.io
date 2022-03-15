@@ -137,7 +137,6 @@ import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { ColorModeContext } from 'context/color-mode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
-import { DatabaseBlocksProvider } from 'hooks/useDatabaseBlocks';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PagesProvider } from 'hooks/usePages';
@@ -305,13 +304,11 @@ function DataProviders ({ children }: { children: ReactNode }) {
         <PagesProvider>
           <BountiesProvider>
             <PaymentMethodsProvider>
-              <DatabaseBlocksProvider>
-                <PageTitleProvider>
-                  <FocalboardViewsProvider>
-                    {children}
-                  </FocalboardViewsProvider>
-                </PageTitleProvider>
-              </DatabaseBlocksProvider>
+              <PageTitleProvider>
+                <FocalboardViewsProvider>
+                  {children}
+                </FocalboardViewsProvider>
+              </PageTitleProvider>
             </PaymentMethodsProvider>
           </BountiesProvider>
         </PagesProvider>
