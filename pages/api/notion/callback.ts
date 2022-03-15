@@ -10,6 +10,7 @@ import { Prisma } from '@prisma/client';
 import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'components/editor/ResizableIframe';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/editor/ResizableImage';
 import { prisma } from 'db';
+import { v4 } from 'uuid';
 
 const handler = nc({
   onError,
@@ -1135,6 +1136,8 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     // The page might be recursively created via a link_to_page block
     if (createdPages[pageId]) return createdPages[pageId];
 
+    const createdPageId = v4();
+
     const pageResponse = searchResultRecord[pageId] ?? await notion.pages.retrieve({
       page_id: pageId
     }) as unknown as GetPageResponse;
@@ -1228,16 +1231,17 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     for (let index = 0; index < blocks.length; index++) {
       const block = blocks[index];
       await populateDoc(pageContent, block, blocksRecord, async (linkedPageId, parentNode) => {
-        // If the linked page hasn't been created, only then proceed
-        if (linkedPageId && !linkedPages[linkedPageId]) {
-          const createdPage = createdPages[linkedPageId] ?? await createPage(linkedPageId);
+        // If the linked page hasn't been created, only then proceed,
+        // Make sure its not referencing itself otherwise an infinite loop will occur
+        if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== pageId) {
+          const createdPage = await createPage(linkedPageId);
           linkedPages[linkedPageId] = createdPage.id;
         }
 
         (parentNode as PageContent).content?.push({
           type: 'page',
           attrs: {
-            id: linkedPages[linkedPageId]
+            id: linkedPageId !== pageId ? linkedPages[linkedPageId] : createdPageId
           }
         });
       });
@@ -1254,6 +1258,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     const id = Math.random().toString().replace('0.', '');
 
     const pageToCreate: Prisma.PageCreateInput = {
+      id: createdPageId,
       content: pageContent,
       // TODO: Generate content text
       contentText: '',
