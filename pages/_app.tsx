@@ -136,6 +136,7 @@ import FocalBoardPortal from 'components/databases/FocalBoardPortal';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { ColorModeContext } from 'context/color-mode';
 import { BountiesProvider } from 'hooks/useBounties';
+import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
 import { DatabaseBlocksProvider } from 'hooks/useDatabaseBlocks';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -303,13 +304,15 @@ function DataProviders ({ children }: { children: ReactNode }) {
       <SpacesProvider>
         <PagesProvider>
           <BountiesProvider>
-            <DatabaseBlocksProvider>
-              <PageTitleProvider>
-                <FocalboardViewsProvider>
-                  {children}
-                </FocalboardViewsProvider>
-              </PageTitleProvider>
-            </DatabaseBlocksProvider>
+            <PaymentMethodsProvider>
+              <DatabaseBlocksProvider>
+                <PageTitleProvider>
+                  <FocalboardViewsProvider>
+                    {children}
+                  </FocalboardViewsProvider>
+                </PageTitleProvider>
+              </DatabaseBlocksProvider>
+            </PaymentMethodsProvider>
           </BountiesProvider>
         </PagesProvider>
       </SpacesProvider>
