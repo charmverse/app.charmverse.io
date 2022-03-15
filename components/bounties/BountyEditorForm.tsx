@@ -87,17 +87,13 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
   const [user] = useUser();
   const [paymentMethods] = usePaymentMethods();
 
-  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>(getCryptos(defaultChainId));
+  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
 
   useEffect(() => {
-    if (bounty?.chainId) {
-      refreshCryptoList(bounty.chainId);
-    }
+    refreshCryptoList(defaultChainId);
   }, []);
 
   const values = watch();
-
-  console.log('Form Values', values);
 
   async function submitted (value: IBounty) {
 
