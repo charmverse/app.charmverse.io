@@ -27,3 +27,8 @@ div[role="presentation"] {
 .bangle-nv-container {
   position: relative;
 }
+
+// make sure tooltips always appear, on Account page it falls behind our custom modal
+.MuiTooltip-popper {
+  z-index: 9999999 !important;
+}

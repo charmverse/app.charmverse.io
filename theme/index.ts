@@ -216,6 +216,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           disableRipple: true
         }
       },
+      MuiButtonGroup: {
+        defaultProps: {
+          disableRipple: true
+        }
+      },
       MuiButton: {
         defaultProps: {
           variant: 'contained'
