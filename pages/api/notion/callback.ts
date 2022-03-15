@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import Cookies from 'cookies';
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
@@ -955,8 +956,7 @@ async function populateDoc (
 
       for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
         const childId = blocksRecord[block.id].children[index];
-        // eslint-disable-next-line
-          await populateDoc(listItemNode, blocksRecord[childId], blocksRecord, onLinkToPage);
+        await populateDoc(listItemNode, blocksRecord[childId], blocksRecord, onLinkToPage);
       }
       break;
     }
@@ -989,7 +989,6 @@ async function populateDoc (
       (parentNode as PageContent).content?.push(calloutNode);
       for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
         const childId = blocksRecord[block.id].children[index];
-        // eslint-disable-next-line
         await populateDoc(calloutNode, blocksRecord[childId], blocksRecord, onLinkToPage);
       }
       break;
@@ -1100,7 +1099,6 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
 
   // While there are more pages the integration has access to
   while (searchResult.has_more && searchResult.next_cursor) {
-    // eslint-disable-next-line
     searchResult = await notion.search({
       page_size: 1,
       start_cursor: searchResult.next_cursor
@@ -1109,36 +1107,36 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   }
 
   const searchResultRecord: Record<string, GetPageResponse> = {};
-  const rootPages: GetPageResponse[] = [];
-
-  // TODO: Make it work for nested pages
-  // eslint-disable-next-line
-  for (let index = 0; index < searchResults.length; index++) {
-    const result = searchResults[index] as GetPageResponse;
-    searchResultRecord[result.id] = result;
-    // Get all the root pages first
-    if (result.object === 'page' && result.parent.type === 'workspace') {
-      // eslint-disable-next-line
-      rootPages.push(result)
-    }
-  }
 
   const createdPages: Record<string, Page> = {};
   const linkedPages: Record<string, string> = {};
 
-  for (let index = 0; index < rootPages.length; index++) {
-    const rootPage = rootPages[index];
-    if (rootPage.object === 'page') {
-      // The page might be recursively created via a link_to_page block
-      if (!createdPages[rootPage.id]) {
-        // eslint-disable-next-line
-        await createPage(rootPage.id);
+  // TODO: Make it work for nested pages
+  for (let index = 0; index < searchResults.length; index++) {
+    const block = searchResults[index] as GetPageResponse;
+    searchResultRecord[block.id] = block;
+  }
+
+  for (let index = 0; index < searchResults.length; index++) {
+    const block = searchResults[index] as GetPageResponse;
+    if (block.object === 'page') {
+      // Root page
+      if (block.parent.type === 'workspace') {
+        await createPage(block.id);
+      }
+      else if (block.parent.type === 'page_id') {
+        const parentPage = await createPage(block.parent.page_id);
+        await createPage(block.id, parentPage.id);
       }
     }
   }
 
-  async function createPage (pageId: string) {
-    // eslint-disable-next-line
+  async function createPage (pageId: string, parentId?: string) {
+    // The page might be recursively created via a link_to_page block
+    if (createdPages[pageId]) return createdPages[pageId];
+
+    console.log({ pageId, parentId, createdPages });
+
     const pageResponse = searchResultRecord[pageId] ?? await notion.pages.retrieve({
       page_id: pageId
     }) as unknown as GetPageResponse;
@@ -1157,7 +1155,6 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     }];
 
     async function getChildBlockListResponses () {
-      // eslint-disable-next-line
       const childBlockListResponses = (await Promise.all<ChildBlockListResponse>(
         blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
           notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
@@ -1188,12 +1185,10 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     // Fetch 5 level of nested content
     for (let depth = 0; depth < 5; depth++) {
       if (blockChildrenRequests.length !== 0) {
-        // eslint-disable-next-line
         const childBlockListResponses = await getChildBlockListResponses();
 
         // If the block has more child to be fetch, fetch them using the cursor
         while (blockChildrenRequests.length !== 0) {
-          // eslint-disable-next-line
           childBlockListResponses.push(...await getChildBlockListResponses());
         }
 
@@ -1234,7 +1229,6 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
 
     for (let index = 0; index < blocks.length; index++) {
       const block = blocks[index];
-      // eslint-disable-next-line
       await populateDoc(pageContent, block, blocksRecord, async (linkedPageId, parentNode) => {
         // If the linked page hasn't been created, only then proceed
         if (linkedPageId && !linkedPages[linkedPageId]) {
@@ -1271,6 +1265,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
           id: userId
         }
       },
+      parentId,
       updatedAt: new Date(),
       updatedBy: userId,
       path: `page-${id}`,
