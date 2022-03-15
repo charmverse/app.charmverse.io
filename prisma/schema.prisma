@@ -226,6 +226,7 @@ model PaymentMethod {
   space           Space       @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   chainId         Int
   contractAddress String
+  tokenName       String
   tokenSymbol     String
   tokenLogo       String?
 }

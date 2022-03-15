@@ -12,6 +12,8 @@ import { BOUNTY_LABELS } from 'models/Bounty';
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { getTokenInfo } from 'lib/tokens/tokenData';
 import { BountyStatusColours } from './BountyCard';
 
 /**
@@ -30,9 +32,11 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
   const [space] = useCurrentSpace();
   const theme = useTheme();
 
-  const bountyLink = `/${space!.domain}/bounty/${bounty.id}`;
+  const [paymentMethods] = usePaymentMethods();
 
-  const imageLogo = CryptoLogoPaths[bounty.rewardToken as CryptoCurrency];
+  const tokenInfo = getTokenInfo(paymentMethods, bounty.rewardToken);
+
+  const bountyLink = `/${space!.domain}/bounty/${bounty.id}`;
 
   const transactionInfo = (bounty as BountyWithDetails).transactions?.[0];
 
@@ -60,12 +64,12 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
                 }}
               >
                 {
-            imageLogo !== undefined && (
+            tokenInfo.tokenLogo && (
               <Image
                 loading='lazy'
                 width={25}
                 height={25}
-                src={imageLogo}
+                src={tokenInfo.tokenLogo}
               />
             )
           }
@@ -90,7 +94,7 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
                   opacity: 0.75
                 }}
               >
-                {bounty.rewardToken}
+                {tokenInfo.tokenSymbol}
               </Box>
               {
           hideLink === false && (

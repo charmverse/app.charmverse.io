@@ -33,6 +33,7 @@ export const schema = yup.object({
     return isValidChainAddress(value as string);
   }),
   tokenSymbol: yup.string().required(),
+  tokenName: yup.string().required(),
   tokenLogo: yup.string()
 });
 
@@ -86,6 +87,8 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
       trigger('tokenSymbol');
       setValue('tokenLogo', tokenData.logo ?? undefined);
       trigger('tokenLogo');
+      setValue('tokenName', tokenData.name ?? undefined);
+      trigger('tokenName');
       setAllowManualSymbolInput(false);
     }
     catch (error) {
@@ -176,6 +179,11 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
             {
                 allowManualSymbolInput === false && values.tokenSymbol && (
                   <p>{`Token symbol: ${values.tokenSymbol}`}</p>
+                )
+              }
+            {
+                allowManualSymbolInput === false && values.tokenName && (
+                  <p>{`Token name: ${values.tokenName}`}</p>
                 )
               }
           </Grid>

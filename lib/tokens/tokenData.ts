@@ -15,6 +15,9 @@ export interface ITokenMetadata {
   logo?: string
 }
 
+/**
+ * Call external provider to get information about a specific cryptocurrency
+ */
 export function getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
   return new Promise((resolve, reject) => {
 
@@ -103,7 +106,7 @@ export function getTokenInfo (paymentMethods: PaymentMethodMap, symbolOrAddress:
 
   const tokenSymbol = isContractAddress ? (contractDetails?.tokenSymbol ?? symbolOrAddress) : symbolOrAddress;
 
-  const tokenName = isContractAddress ? (contractDetails?.tokenSymbol ?? '') : CryptoCurrencyList[symbolOrAddress as CryptoCurrency];
+  const tokenName = isContractAddress ? (contractDetails?.tokenName ?? '') : CryptoCurrencyList[symbolOrAddress as CryptoCurrency];
 
   const tokenInfo: Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & {isContract: boolean} = {
     tokenName,
