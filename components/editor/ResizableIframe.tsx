@@ -136,7 +136,8 @@ function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { type: '
         backgroundColor: theme.palette.background.light,
         p: 2,
         display: 'flex',
-        borderRadius: theme.spacing(0.5)
+        borderRadius: theme.spacing(0.5),
+        my: 0.5
       }}
       {...rest}
     >

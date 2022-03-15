@@ -135,6 +135,10 @@ class CharmClient {
     return http.POST<{root: Page, pages: Page[]}>('/api/import/notion', { spaceId });
   }
 
+  notionLogin (query: {redirect: string, spaceId: string, account: string}) {
+    return http.GET<{redirectUrl: string}>('/api/import/notion/login', query);
+  }
+
   // FocalBoard
 
   // TODO: we shouldnt have to ask the server for the current space, but it will take time to pass spaceId through focalboard!

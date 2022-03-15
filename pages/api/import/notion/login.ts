@@ -2,9 +2,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 
 const notionClientId = process.env.NOTION_OAUTH_CLIENT_ID as string;
-const host = 'http://localhost:3000';
-export const redirectUri = `${host}/api/notion/callback`;
-const notionUrl = `https://api.notion.com/v1/oauth/authorize?owner=user&client_id=${notionClientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}`;
+const notionUrl = `https://api.notion.com/v1/oauth/authorize?owner=user&client_id=${notionClientId}&response_type=code`;
 
 const handler = nc({
   onError,
@@ -23,8 +21,9 @@ handler.get((req, res) => {
     redirect: req.query.redirect,
     spaceId: req.query.spaceId
   }));
-  const oauthUrl = `${notionUrl}&state=${state}`;
-  res.redirect(oauthUrl);
+  const oauthUrl = `${notionUrl}&state=${state}&redirect_uri=${encodeURIComponent(req.query.redirect as string)}`;
+  console.log({ oauthUrl });
+  res.send({ redirectUrl: oauthUrl });
 });
 
 export default handler;

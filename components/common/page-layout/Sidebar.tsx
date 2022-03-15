@@ -324,18 +324,24 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             <Box sx={{ ml: 1 }}>
               <Button
                 onClick={async () => {
-                  if (space) {
-                    const { pages: createdPages, root } = await charmClient.importFromNotion({ spaceId: space.id });
-                    const createdPagesRecord: Record<string, Page> = {};
-                    createdPages.forEach(createdPage => {
-                      createdPagesRecord[createdPage.id] = createdPage;
-                    });
-                    setPages({
-                      ...pages,
-                      ...createdPagesRecord
-                    });
-                    router.push(`/${space.domain}/${root.path}`);
-                  }
+                  const { redirectUrl } = await charmClient.notionLogin({
+                    spaceId: space.id,
+                    redirect: `${window.location.origin}/api/notion/callback`,
+                    account: user?.addresses[0] ?? ''
+                  });
+                  window.location.replace(redirectUrl);
+                  // if (space) {
+                  //   const { pages: createdPages, root } = await charmClient.importFromNotion({ spaceId: space.id });
+                  //   const createdPagesRecord: Record<string, Page> = {};
+                  //   createdPages.forEach(createdPage => {
+                  //     createdPagesRecord[createdPage.id] = createdPage;
+                  //   });
+                  //   setPages({
+                  //     ...pages,
+                  //     ...createdPagesRecord
+                  //   });
+                  //   router.push(`/${space.domain}/${root.path}`);
+                  // }
                 }}
                 variant='text'
                 startIcon={<BountyIcon fontSize='small' />}
