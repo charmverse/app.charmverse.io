@@ -21,6 +21,9 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
   const bounties = await prisma.bounty.findMany({
     where: {
       spaceId
+    },
+    include: {
+      applications: true
     }
   });
   return res.status(200).json(bounties);
