@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -393,6 +393,14 @@ class CharmClient {
 
   getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
     return http.GET('/api/tokens/metadata', { chainId, contractAddress });
+  }
+
+  createPaymentMethod (paymentMethod: Partial<PaymentMethod>): Promise<PaymentMethod> {
+    return http.POST('/api/payment-methods', paymentMethod);
+  }
+
+  listPaymentMethods (spaceId: string): Promise<PaymentMethod []> {
+    return http.GET('/api/payment-methods', { spaceId });
   }
 }
 
