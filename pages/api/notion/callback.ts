@@ -1092,18 +1092,28 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     auth: accessToken
   });
 
-  // TODO: Paginate request
-  const searchResult = await notion.search({
-    page_size: 100
+  let searchResult = await notion.search({
+    page_size: 1
   });
+
+  const searchResults = searchResult.results;
+
+  while (searchResult.has_more && searchResult.next_cursor) {
+    // eslint-disable-next-line
+    searchResult = await notion.search({
+      page_size: 1,
+      start_cursor: searchResult.next_cursor
+    });
+    searchResults.push(...searchResult.results);
+  }
 
   const searchResultRecord: Record<string, GetPageResponse> = {};
   const rootPages: GetPageResponse[] = [];
 
   // TODO: Make it work for nested pages
   // eslint-disable-next-line
-  for (let index = 0; index < searchResult.results.length; index++) {
-    const result = searchResult.results[index] as GetPageResponse;
+  for (let index = 0; index < searchResults.length; index++) {
+    const result = searchResults[index] as GetPageResponse;
     searchResultRecord[result.id] = result;
     // Get all the root pages first
     if (result.object === 'page' && result.parent.type === 'workspace') {
@@ -1300,7 +1310,7 @@ handler.get(async (req, res) => {
   }
   const encodedToken = Buffer.from(`${process.env.NOTION_OAUTH_CLIENT_ID}:${process.env.NOTION_OAUTH_SECRET}`).toString('base64');
 
-  const token = await http.POST<{ access_token: string, owner: { user: { id: string, person: { email: string } } } }>('https://api.notion.com/v1/oauth/token', {
+  const token = await http.POST<{ workspace_name: string, workspace_icon: string, access_token: string, owner: { user: { id: string, person: { email: string } } } }>('https://api.notion.com/v1/oauth/token', {
     grant_type: 'authorization_code',
     redirect_uri: req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/notion/callback` : 'https://app.charmverse.io/api/notion/callback',
     code: tempAuthCode
