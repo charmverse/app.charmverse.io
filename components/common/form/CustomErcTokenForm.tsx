@@ -58,17 +58,13 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
     resolver: yupResolver(schema)
   });
 
-  const [paymentMethods, setPaymentMethods, refreshPaymentMethods] = usePaymentMethods();
-
+  const [,, refreshPaymentMethods] = usePaymentMethods();
   const [space] = useCurrentSpace();
-  const [user] = useUser();
 
-  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>(getCryptos(defaultChainId));
   const [allowManualSymbolInput, setAllowManualSymbolInput] = useState(false);
   const [formError, setFormError] = useState<IUserError | null>(null);
 
   useEffect(() => {
-    console.log('event');
     const newContractAddress = watch(({ contractAddress, chainId }, { value, name }) => {
 
       if ((name === 'contractAddress' || name === 'chainId') && isValidChainAddress(contractAddress as string)) {

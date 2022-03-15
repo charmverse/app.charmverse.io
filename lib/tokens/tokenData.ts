@@ -1,4 +1,7 @@
 import * as http from 'adapters/http';
+import { PaymentMethodMap } from 'hooks/usePaymentMethods';
+import { PaymentMethod } from '@prisma/client';
+import { CryptoLogoPaths, CryptoCurrency, CryptoCurrencyList } from 'models/Currency';
 
 export interface ITokenMetadataRequest {
   chainId: number,
@@ -59,4 +62,55 @@ export function getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRe
       reject(error);
     });
   });
+}
+
+/**
+ * Utility function for finding a specific method within a payment method map
+ * @param paymentMethods Call this function from a component that can access the usePaymentMethods hook which provides available methods to search through
+ */
+export function getPaymentMethod (
+  paymentMethods: PaymentMethodMap,
+  contractAddress: string,
+  chainId?: number
+): PaymentMethod | undefined {
+
+  if (chainId) {
+    return paymentMethods[chainId]?.find(paymentMethod => paymentMethod.contractAddress === contractAddress);
+  }
+
+  const flattenedChainMethods: PaymentMethod [] = Object.values(paymentMethods)
+    .reduce((_paymentMethods, chainPaymentMethods) => {
+      _paymentMethods.push(...chainPaymentMethods);
+      return _paymentMethods;
+    }, []);
+
+  return flattenedChainMethods.find(_paymentMethod => _paymentMethod.contractAddress === contractAddress);
+
+}
+
+/**
+ * Returns a standardised shape for either a contract address, or a native currency
+ * @param paymentMethods Call this function from a component that can access the usePaymentMethods hook which provides available methods to search through
+ */
+export function getTokenInfo (paymentMethods: PaymentMethodMap, symbolOrAddress: string): Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & {isContract: boolean} {
+  const isContractAddress = symbolOrAddress.includes('0x');
+
+  const contractDetails = isContractAddress ? getPaymentMethod(paymentMethods, symbolOrAddress) : undefined;
+
+  const tokenLogo = isContractAddress
+    ? contractDetails?.tokenLogo
+    : CryptoLogoPaths[symbolOrAddress as CryptoCurrency];
+
+  const tokenSymbol = isContractAddress ? (contractDetails?.tokenSymbol ?? symbolOrAddress) : symbolOrAddress;
+
+  const tokenName = isContractAddress ? (contractDetails?.tokenSymbol ?? '') : CryptoCurrencyList[symbolOrAddress as CryptoCurrency];
+
+  const tokenInfo: Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & {isContract: boolean} = {
+    tokenName,
+    tokenSymbol,
+    tokenLogo: tokenLogo as string,
+    isContract: isContractAddress
+  };
+
+  return tokenInfo;
 }

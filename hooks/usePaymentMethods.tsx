@@ -4,15 +4,19 @@ import { createContext, useEffect, useState, useMemo, ReactNode, useContext } fr
 import charmClient from 'charmClient';
 import { useCurrentSpace } from './useCurrentSpace';
 
-type PaymentMethodMap = Record<number, PaymentMethod []>
+export type PaymentMethodMap = Record<number, PaymentMethod []>
 
 type IContext = [
   paymentMethods: PaymentMethodMap,
   setPaymentMethods: (paymentMethodMap: PaymentMethodMap) => void,
-  refreshPaymentMethods: () => void
+  refreshPaymentMethods: () => void,
 ]
 
-export const PaymentMethodsContext = createContext<Readonly<IContext>>([{}, () => undefined, () => {}]);
+export const PaymentMethodsContext = createContext<Readonly<IContext>>([
+  {},
+  () => undefined,
+  () => {}
+]);
 
 export function PaymentMethodsProvider ({ children }: { children: ReactNode }) {
 
