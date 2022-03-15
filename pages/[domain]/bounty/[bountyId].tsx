@@ -316,25 +316,25 @@ export default function BountyDetails () {
                     </Typography>
                   </Box>
                   {
-                    isReviewer === true && (
+                    (isReviewer || isAdmin) && (
                       <Box sx={{
                         display: 'flex',
                         gap: 1
                       }}
                       >
-                        {bounty.status === 'review' && (
+                        {bounty.status === 'review' && isReviewer && (
                           <Box flexDirection='column' gap={1} display='flex'>
                             <Button onClick={markAsComplete}>Mark as complete</Button>
                             <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
                           </Box>
                         )}
                         {
-                          (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
+                          bounty.status === 'complete' && (
                             <Box>
                               <BountyPaymentButton
                                 receiver={walletAddressForPayment!}
                                 amount={eToNumber(bounty.rewardAmount)}
-                                tokenSymbol={bounty.rewardToken}
+                                tokenSymbolOrAddress={bounty.rewardToken}
                                 onSuccess={recordPaymentSuccess}
                                 onError={onError}
                                 chainIdToUse={bounty.chainId!}
