@@ -1,14 +1,14 @@
-import PaymentMethodList from 'components/settings/PaymentMethods';
+import PaymentMethodList from 'components/settings/payment-methods/WidgetPaymentMethods';
 import SettingsLayout from 'components/settings/Layout';
 import { ReactElement } from 'react';
 
-export default function PaymentMethods () {
+export default function PagePaymentMethods () {
   return (
     <PaymentMethodList />
   );
 }
 
-PaymentMethods.getLayout = (page: ReactElement) => {
+PagePaymentMethods.getLayout = (page: ReactElement) => {
   return (
     <SettingsLayout>
       {page}

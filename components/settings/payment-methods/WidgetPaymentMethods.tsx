@@ -9,8 +9,9 @@ import { getChainById } from 'connectors';
 import { Modal } from 'components/common/Modal';
 import { CustomErcTokenForm } from 'components/common/form/CustomErcTokenForm';
 import charmClient from 'charmClient';
-import Legend from './Legend';
-import Button from '../common/Button';
+import Legend from '../Legend';
+import Button from '../../common/Button';
+import { CompositePaymentMethodList } from './CompositePaymentMethodList';
 
 export default function PaymentMethodList ({ isAdmin = true }) {
 
@@ -81,49 +82,7 @@ export default function PaymentMethodList ({ isAdmin = true }) {
         )}
       </Legend>
 
-      <Box>
-        {
-          (Object.entries(paymentMethods).map(chain => {
-
-            const chainDetails = getChainById(chain[0]);
-
-            const chainPaymentMethods = chain[1];
-
-            return (
-              <Box key={chain[0]} sx={{ mb: 2 }}>
-                <Typography variant='h2'>{chainDetails?.chainName}</Typography>
-
-                {
-                  chainPaymentMethods.map(paymentMethod => {
-                    return (
-                      <Box width='100%' sx={{ display: 'flex' }}>
-
-                        <Box component='span' sx={{ pr: 1 }}>
-                          {paymentMethod.tokenSymbol}
-                        </Box>
-
-                        {
-                          paymentMethod.tokenLogo && (
-                            <Box component='span'>
-
-                              <img width='25x' height='25px' alt='Crypto logo' src={paymentMethod.tokenLogo} />
-                            </Box>
-                          )
-                        }
-
-                        {paymentMethod.contractAddress}
-                        <DeleteIcon onClick={() => setPaymentMethodToDelete(paymentMethod)} sx={{ fill: 'red' }}></DeleteIcon>
-                        ;
-                      </Box>
-                    );
-                  })
-                }
-
-              </Box>
-            );
-          }))
-        }
-      </Box>
+      <CompositePaymentMethodList paymentMethods={paymentMethods} />
     </>
   );
 }
