@@ -1094,10 +1094,9 @@ async function populateDoc (
       });
       break;
     }
-    case 'child_page': {
-      const linkedPageId = block.id;
-      // If the pages hasn't been created already, only then create it
-      await onLinkToPage(linkedPageId, parentNode);
+    case 'child_page':
+    case 'child_database': {
+      await onLinkToPage(block.id, parentNode);
       break;
     }
     // TODO: child_database support
@@ -1570,15 +1569,24 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     }
 
     for (let index = 0; index < blocks.length; index++) {
-      const block = blocks[index];
+      let block = blocks[index];
+      // If its a database, we need to fetch more information from api
+      if (block.type === 'child_database') {
+        block = await notion.databases.retrieve({
+          database_id: block.id
+        }) as any;
+      }
       await populateDoc(pageContent, block, blocksRecord, async (linkedPageId, parentNode) => {
         // If the linked page hasn't been created, only then proceed,
-        // Make sure its not referencing itself otherwise an infinite loop will occur
-        // Also make sure the linked page id is not its parent
         const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
 
+        // Make sure its not referencing itself otherwise an infinite loop will occur
+        // Also make sure the linked page id is not its parent
         if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== blockId && !parentAsLinkedPage) {
-          const createdPage = await createPage([...pageIds, [linkedPageId, v4()]]);
+          const createdPage = block.type === 'child_database' ? await createDatabase(block as any, {
+            spaceId,
+            userId
+          }) : await createPage([...pageIds, [linkedPageId, v4()]]);
           linkedPages[linkedPageId] = createdPage!.id;
         }
 
@@ -1609,7 +1617,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       });
     }
 
-    if (pageResponse.parent.type === 'page_id') {
+    if (pageResponse.parent.type === 'page_id' || pageResponse.parent.type === 'workspace') {
       const title = (pageResponse.properties.title as any)[pageResponse.properties.title.type].reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
       const createdPage = await createPrismaPage({
         content: pageContent,
