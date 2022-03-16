@@ -126,7 +126,7 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
     }
     catch (error: any) {
       setFormError({
-        message: error.message,
+        message: error.message || error.error || (typeof error === 'object' ? JSON.stringify(error) : error),
         severity: error.severity ?? 'error'
       });
     }
