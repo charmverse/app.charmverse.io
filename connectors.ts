@@ -347,8 +347,11 @@ export function getChainExplorerLink (chainId: string | number, transactionOrCon
     case '4':
       return `https://rinkeby.etherscan.io/${endpoint}/${transactionOrContractId}`;
 
+    case '80001':
+      return `https://mumbai.polygonscan.com/${endpoint}/${transactionOrContractId}`;
+
     default:
-      throw new Error('Chain is unsupported');
+      return '';
   }
 }
 
