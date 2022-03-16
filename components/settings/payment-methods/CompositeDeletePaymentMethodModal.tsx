@@ -1,18 +1,12 @@
-import { useState } from 'react';
-import { PaymentMethod } from '@prisma/client';
-import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
-import DeleteIcon from '@mui/icons-material/Delete';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { getChainById } from 'connectors';
-import { Modal, ModalProps, DialogTitle } from 'components/common/Modal';
-import { CustomErcTokenForm } from 'components/settings/payment-methods/CompositeErc20PaymentMethodForm';
 import charmClient from 'charmClient';
+import { DialogTitle, Modal, ModalProps } from 'components/common/Modal';
+import { useBounties } from 'hooks/useBounties';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getPaymentMethod } from 'lib/tokens/tokenData';
-import Legend from '../Legend';
 import Button from '../../common/Button';
-import { CompositePaymentMethodList } from './CompositePaymentMethodList';
 
 type IProps = Pick<ModalProps, 'onClose' | 'open'> & {
   paymentMethodIdToDelete: string,
@@ -25,6 +19,7 @@ export function CompositeDeletePaymentMethod ({
 }: IProps) {
 
   const [paymentMethods, _, refreshPaymentMethods] = usePaymentMethods();
+  const { bounties } = useBounties();
 
   const methodToDelete = getPaymentMethod(paymentMethods, paymentMethodIdToDelete);
 
@@ -35,6 +30,10 @@ export function CompositeDeletePaymentMethod ({
     refreshPaymentMethods();
     onClose();
   }
+
+  const usedByBounty = methodToDelete ? !!bounties.find(bounty => {
+    return bounty.rewardToken === methodToDelete.contractAddress;
+  }) : false;
 
   return (
     <Modal
@@ -51,9 +50,24 @@ export function CompositeDeletePaymentMethod ({
             </Typography>
           )
         }
+
       {
           methodToDelete && (
             <>
+
+              {
+                usedByBounty && (
+                  <Alert severity='warning' sx={{ mb: 1 }}>
+                    <Box component='p' sx={{ mb: 1 }}>
+                      This payment method has been used by a bounty in this workspace.
+                    </Box>
+                    <Box component='p'>
+                      If you delete this payment method, token information will not show in the bounty.
+                    </Box>
+
+                  </Alert>
+                )
+              }
 
               <Typography>
                 {
