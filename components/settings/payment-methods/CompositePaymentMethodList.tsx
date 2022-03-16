@@ -12,6 +12,7 @@ import { getChainById, getChainExplorerLink } from 'connectors';
 import { PaymentMethodMap } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { useState } from 'react';
+import { ElementDeleteIcon } from 'components/elements/ElementDeleteIcon';
 import { CompositeDeletePaymentMethod } from './CompositeDeletePaymentMethodModal';
 
 interface IProps {
@@ -107,12 +108,7 @@ export function CompositePaymentMethodList ({ paymentMethods }: IProps) {
 
                 {
                 isAdmin && (
-                  <DeleteIcon
-                    onClick={() => {
-                      setPaymentMethodIdToDelete(row.contractAddress);
-                    }}
-                    fontSize='small'
-                  />
+                  <ElementDeleteIcon clicked={() => setPaymentMethodIdToDelete(row.contractAddress)} />
                 )
               }
               </TableCell>
