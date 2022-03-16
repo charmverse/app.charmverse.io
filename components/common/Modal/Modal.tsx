@@ -33,7 +33,7 @@ const CloseButton = styled(IconButton)`
   padding: 0;
 `;
 
-type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose'> & { size?: ModalSize, children: any, onClose: () => void };
+export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose'> & { size?: ModalSize, children: any, onClose: () => void };
 
 export function Modal ({ children, size, ...props }: ModalProps) {
   return (

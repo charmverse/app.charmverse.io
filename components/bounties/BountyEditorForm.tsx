@@ -19,6 +19,7 @@ import { CryptoCurrency } from 'models/Currency';
 import { useState, useEffect } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 
 export type FormMode = 'create' | 'update';
 
@@ -84,13 +85,12 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
   const [space] = useCurrentSpace();
   const [user] = useUser();
+  const [paymentMethods] = usePaymentMethods();
 
-  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>(getCryptos(defaultChainId));
+  const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
 
   useEffect(() => {
-    if (bounty?.chainId) {
-      refreshCryptoList(bounty.chainId);
-    }
+    refreshCryptoList(defaultChainId);
   }, []);
 
   const values = watch();
@@ -144,8 +144,22 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     const selectedChain = getChainById(chainId);
 
     if (selectedChain) {
-      setAvailableCryptos([selectedChain.nativeCurrency.symbol]);
-      setValue('rewardToken', selectedChain.nativeCurrency.symbol);
+
+      const nativeCurrency = selectedChain.nativeCurrency.symbol;
+
+      const cryptosToDisplay = [nativeCurrency];
+
+      // Add custom payment methods
+      if (paymentMethods[chainId]) {
+
+        const contractAddresses = paymentMethods[chainId].map(method => {
+          return method.contractAddress;
+        });
+        cryptosToDisplay.push(...contractAddresses);
+      }
+
+      setAvailableCryptos(cryptosToDisplay);
+      setValue('rewardToken', nativeCurrency);
     }
   }
 
@@ -223,6 +237,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               </InputLabel>
               <InputSearchCrypto
                 cryptoList={availableCryptos}
+                defaultValue={bounty?.rewardToken}
                 onChange={newToken => {
                   setValue('rewardToken', newToken);
                 }}
