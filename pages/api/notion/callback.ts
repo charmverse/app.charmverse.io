@@ -1091,6 +1091,57 @@ async function populateDoc (
   }
 }
 
+async function createPrismaPage ({
+  pageId,
+  content,
+  headerImage,
+  icon,
+  spaceId,
+  title,
+  type,
+  userId
+}: {
+  pageId: string,
+  content: PageContent
+  userId: string
+  spaceId: string
+  headerImage: string | null
+  icon: string | null
+  title: string
+  type: Prisma.PageCreateInput['type']
+}) {
+  const id = Math.random().toString().replace('0.', '');
+
+  const pageToCreate: Prisma.PageCreateInput = {
+    id: pageId,
+    content,
+    // TODO: Generate content text
+    contentText: '',
+    createdAt: new Date(),
+    author: {
+      connect: {
+        id: userId
+      }
+    },
+    updatedAt: new Date(),
+    updatedBy: userId,
+    path: `page-${id}`,
+    space: {
+      connect: {
+        id: spaceId
+      }
+    },
+    headerImage,
+    icon,
+    title,
+    type
+  };
+
+  // eslint-disable-next-line
+  const page = await prisma.page.create({ data: pageToCreate });
+  return page;
+}
+
 async function importFromWorkspace ({ accessToken, userId, spaceId }:
   { accessToken: string, spaceId: string, userId: string }) {
   const notion = new Client({
@@ -1126,9 +1177,9 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse;
     if (block.object === 'page') {
-      const createdPageId = v4();
-      await createPage([[block.id, createdPageId]]);
+      await createPage([[block.id, v4()]]);
     }
+    // TODO: Support for database blocks
   }
 
   // Array of tuple, [notion block id, charmverse block id]
@@ -1266,42 +1317,25 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       });
     }
 
-    const id = Math.random().toString().replace('0.', '');
-
-    const pageToCreate: Prisma.PageCreateInput = {
-      id: createdPageId,
+    const createdPage = await createPrismaPage({
       content: pageContent,
-      // TODO: Generate content text
-      contentText: '',
-      createdAt: new Date(),
-      author: {
-        connect: {
-          id: userId
-        }
-      },
-      updatedAt: new Date(),
-      updatedBy: userId,
-      path: `page-${id}`,
-      space: {
-        connect: {
-          id: spaceId
-        }
-      },
       headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
       icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
       title: pageResponse.properties.title.type === 'title' ? pageResponse.properties.title.title.reduce((prev, cur) => prev + cur.plain_text, '') : pageResponse.properties.title.rich_text.reduce((prev, cur) => prev + cur.plain_text, ''),
-      type: 'page'
-    };
+      type: 'page',
+      pageId: createdPageId,
+      spaceId,
+      userId
+    });
 
-    // eslint-disable-next-line
-    const page = await prisma.page.create({ data: pageToCreate });
-    createdPages[blockId] = page;
-    return page;
+    createdPages[blockId] = createdPage;
+    return createdPage;
   }
 
   // Update parent id for all pages
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse;
+    // TODO: A page could be part of a database as well
     // Check if its a nested page
     if (block.object === 'page' && block.parent.type === 'page_id') {
       createdPages[block.id] = await prisma.page.update({ where: {
