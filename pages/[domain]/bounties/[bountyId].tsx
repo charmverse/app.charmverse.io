@@ -349,7 +349,11 @@ export default function BountyDetails () {
               ) : <Typography variant='body2'>No reviewer assigned</Typography>}
 
               {paymentError && (
-                <Alert sx={{ mt: 2 }} severity={paymentError.severity}>{paymentError.message}</Alert>
+                <Alert sx={{ mt: 2, whiteSpace: 'pre' }} severity={paymentError.severity}>
+                  <Box component='div' whiteSpace='normal' sx={{ display: 'inline' }}>
+                    {paymentError.message}
+                  </Box>
+                </Alert>
               )}
             </Card>
           </Grid>
