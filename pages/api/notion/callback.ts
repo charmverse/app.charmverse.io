@@ -1050,7 +1050,15 @@ async function populateDoc (
   parentNode: BlockNode,
   block: BlockWithChildren,
   blocksRecord: Record<string, BlockWithChildren>,
-  onLinkToPage: (linkedPageId: string, parentNode: BlockNode) => Promise<void>
+  {
+    onLinkToPage,
+    onChildDatabase,
+    onChildPage
+  }: {
+    onLinkToPage: (pageLink: string, parentNode: BlockNode) => Promise<void>,
+    onChildDatabase: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>,
+    onChildPage: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>
+  }
 ) {
 
   switch (block.type) {
@@ -1094,17 +1102,19 @@ async function populateDoc (
       });
       break;
     }
-    case 'child_page':
-    case 'child_database': {
-      await onLinkToPage(block.id, parentNode);
+
+    case 'link_to_page': {
+      await onLinkToPage((block[block.type] as any)[block[block.type].type] as string, parentNode);
       break;
     }
-    // TODO: child_database support
-    case 'link_to_page': {
-      // TODO: Link could also be created for a database
-      const linkedPageId = block[block.type].type === 'page_id' ? (block[block.type] as any).page_id : null;
-      // If the pages hasn't been created already, only then create it
-      await onLinkToPage(linkedPageId, parentNode);
+
+    case 'child_database': {
+      await onChildDatabase(block, parentNode);
+      break;
+    }
+
+    case 'child_page': {
+      await onChildPage(block, parentNode);
       break;
     }
 
@@ -1142,7 +1152,11 @@ async function populateDoc (
 
       for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
         const childId = blocksRecord[block.id].children[index];
-        await populateDoc(listItemNode, blocksRecord[childId], blocksRecord, onLinkToPage);
+        await populateDoc(listItemNode, blocksRecord[childId], blocksRecord, {
+          onLinkToPage,
+          onChildDatabase,
+          onChildPage
+        });
       }
       break;
     }
@@ -1175,7 +1189,11 @@ async function populateDoc (
       (parentNode as PageContent).content?.push(calloutNode);
       for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
         const childId = blocksRecord[block.id].children[index];
-        await populateDoc(calloutNode, blocksRecord[childId], blocksRecord, onLinkToPage);
+        await populateDoc(calloutNode, blocksRecord[childId], blocksRecord, {
+          onLinkToPage,
+          onChildDatabase,
+          onChildPage
+        });
       }
       break;
     }
@@ -1569,43 +1587,61 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     }
 
     for (let index = 0; index < blocks.length; index++) {
-      let block = blocks[index];
-      // If its a database, we need to fetch more information from api
-      if (block.type === 'child_database') {
-        block = await notion.databases.retrieve({
-          database_id: block.id
-        }) as any;
-      }
-      await populateDoc(pageContent, block, blocksRecord, async (linkedPageId, parentNode) => {
-        // If the linked page hasn't been created, only then proceed,
-        const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
-
-        // Make sure its not referencing itself otherwise an infinite loop will occur
-        // Also make sure the linked page id is not its parent
-        if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== blockId && !parentAsLinkedPage) {
-          const createdPage = block.type === 'child_database' ? await createDatabase(block as any, {
+      await populateDoc(pageContent, blocks[index], blocksRecord, {
+        onChildDatabase: async (block, parentNode) => {
+          // If its a database, we need to fetch more information from api
+          createdPages[block.id] = await createDatabase(await notion.databases.retrieve({
+            database_id: block.id
+          }) as any, {
             spaceId,
             userId
-          }) : await createPage([...pageIds, [linkedPageId, v4()]]);
-          linkedPages[linkedPageId] = createdPage!.id;
-        }
+          });
 
-        let id = linkedPages[linkedPageId];
+          (parentNode as PageContent).content?.push({
+            type: 'page',
+            attrs: {
+              id: createdPages[block.id].id
+            }
+          });
+        },
+        onChildPage: async (block, parentNode) => {
+          createdPages[block.id] = await createPage([...pageIds, [block.id, v4()]]);
+          (parentNode as PageContent).content?.push({
+            type: 'page',
+            attrs: {
+              id: createdPages[block.id].id
+            }
+          });
+        },
+        onLinkToPage: async (linkedPageId, parentNode) => {
+          // If the pages hasn't been created already, only then create it
+          // Find the parent its linking
+          const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
 
-        // If its linking itself
-        if (linkedPageId === blockId) {
-          id = createdPageId;
-        }
-        else if (parentAsLinkedPage) {
-          id = parentAsLinkedPage[1];
-        }
-
-        (parentNode as PageContent).content?.push({
-          type: 'page',
-          attrs: {
-            id
+          // Make sure its not referencing itself otherwise an infinite loop will occur
+          // Also make sure the linked page id is not its parent
+          if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== blockId && !parentAsLinkedPage) {
+            const createdPage = await createPage([...pageIds, [linkedPageId, v4()]]);
+            linkedPages[linkedPageId] = createdPage.id;
           }
-        });
+
+          let id = linkedPages[linkedPageId];
+
+          // If its linking itself
+          if (linkedPageId === blockId) {
+            id = createdPageId;
+          }
+          else if (parentAsLinkedPage) {
+            id = parentAsLinkedPage[1];
+          }
+
+          (parentNode as PageContent).content?.push({
+            type: 'page',
+            attrs: {
+              id
+            }
+          });
+        }
       });
     }
 
@@ -1683,13 +1719,15 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
         }]
       });
     }
+
+    return createdPages[blockId];
   }
 
-  // Update parent id for all pages
+  // Update parent id for all nested pages
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
-    // Check if its a nested page
-    if (block.object === 'page') {
+    if (block.object === 'page' || block.object === 'database') {
+      // Check if its a nested page
       if (block.parent.type === 'page_id') {
         createdPages[block.id] = await prisma.page.update({
           where: {
@@ -1701,8 +1739,8 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
         });
       }
     }
-    // TODO: Link child_database with its parent page
   }
+
 }
 
 handler.get(async (req, res) => {
