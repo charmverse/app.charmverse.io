@@ -11,7 +11,7 @@ import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO,
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/editor/ResizableImage';
 import { prisma } from 'db';
 import { v4 } from 'uuid';
-import { createBoard } from 'components/databases/focalboard/src/blocks/board';
+import { createBoard, IPropertyTemplate, PropertyType } from 'components/databases/focalboard/src/blocks/board';
 import { createBoardView } from 'components/databases/focalboard/src/blocks/boardView';
 import { createCard } from 'components/databases/focalboard/src/blocks/card';
 import { createCharmTextBlock } from 'components/databases/focalboard/src/blocks/charmBlock';
@@ -1271,6 +1271,30 @@ async function populateDoc (
   }
 }
 
+function convertPropertyType (propertyType: string): PropertyType | null {
+  switch (propertyType) {
+    case 'email':
+    case 'number':
+    case 'url':
+    case 'select':
+    case 'checkbox':
+    case 'phone':
+    case 'date':
+      return propertyType;
+    case 'multi_select':
+      return 'multiSelect';
+    case 'rich_text':
+      return 'text';
+    case 'created_time':
+      return 'createdTime';
+    case 'updated_time':
+      return 'updatedTime';
+    default: {
+      return null;
+    }
+  }
+}
+
 async function createPrismaPage ({
   pageId,
   content,
@@ -1370,17 +1394,42 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   async function createDatabase (block: GetDatabaseResponse) {
     if (!createdPages[block.id]) {
       const title = (block as any).title.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
+      const cardProperties: IPropertyTemplate[] = [];
+      const databaseProperties = Object.values(block.properties);
+      databaseProperties.forEach(property => {
+        const focalboardPropertyType = convertPropertyType(property.type);
+        if (focalboardPropertyType) {
+          const cardProperty: IPropertyTemplate = {
+            id: v4(),
+            name: property.name,
+            options: [],
+            type: focalboardPropertyType
+          };
+          cardProperties.push(cardProperty);
+          if (property.type === 'select' || property.type === 'multi_select') {
+            (property as any)[property.type].options.forEach((option: {id: string, name: string, color: string}) => {
+              cardProperty.options.push({
+                value: option.name,
+                color: `propColor${option.color.charAt(0).toUpperCase() + option.color.slice(1)}`,
+                id: option.id
+              });
+            });
+          }
+        }
+      });
+
       const board = createBoard(undefined, false);
       board.title = title;
       board.fields.icon = block.icon?.type === 'emoji' ? block.icon.emoji : '';
       board.fields.headerImage = block.cover?.type === 'external' ? block.cover.external.url : null;
       board.rootId = board.id;
+      board.fields.cardProperties = cardProperties;
+
       const view = createBoardView();
       view.fields.viewType = 'board';
       view.parentId = board.id;
       view.rootId = board.rootId;
       view.title = 'Board view';
-      // TODO: Focalboard cards
       // TODO: Carry over database properties filter and sort
       const newBlocks = [board, view].map(_block => ({
         ..._block,
@@ -1623,7 +1672,6 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
   // Update parent id for all pages
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse;
-    // TODO: Parent of a page could be database
     // Check if its a nested page
     if (block.object === 'page') {
       if (block.parent.type === 'page_id') {
