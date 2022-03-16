@@ -1709,6 +1709,25 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
         else if (property.type === 'rich_text') {
           cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
         }
+        else if (property.type === 'select') {
+          // eslint-disable-next-line
+          cardProperties[focalboardPropertyRecord[property.id]] = property[property.type]?.id;
+        }
+        else if (property.type === 'multi_select') {
+          // eslint-disable-next-line
+          cardProperties[focalboardPropertyRecord[property.id]] = property[property.type]?.map((multiSelect: {id: string}) => multiSelect.id);
+        }
+        else if (property.type === 'date') {
+          const dateValue: {from?: number, to?: number} = {};
+          if (property[property.type]?.start) {
+            dateValue.from = (new Date(property[property.type].start)).getTime();
+          }
+
+          if (property[property.type]?.end) {
+            dateValue.to = (new Date(property[property.type].end)).getTime();
+          }
+          cardProperties[focalboardPropertyRecord[property.id]] = JSON.stringify(dateValue);
+        }
       });
 
       await prisma.block.createMany({
