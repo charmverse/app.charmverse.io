@@ -46,16 +46,16 @@ export function BountyList () {
 
         <Grid item xs={8}>
           <h1>Bounty list</h1>
-          <MultiPaymentModal />
         </Grid>
 
-        <Grid item xs={4}>
+        <Grid item xs={4} container justifyContent='flex-end'>
+          <MultiPaymentModal />
           <Button
+            sx={{ ml: 1 }}
             variant='outlined'
             onClick={() => {
               setDisplayBountyDialog(true);
             }}
-            sx={{ margin: 'auto', float: 'right' }}
           >
             Create Bounty
           </Button>

@@ -3,6 +3,7 @@ import { useWeb3React } from '@web3-react/core';
 import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import { getChainById } from 'connectors';
+import { safeRequestAnimationFrame } from 'components/editor/@bangle.io/lib/utils';
 import useGnosisSafe from './hooks/useGnosisSafe';
 
 export interface MultiPaymentResult {
@@ -24,7 +25,6 @@ export default function MultiPaymentButton ({ chainId, safeAddress, transactions
   if (!network?.gnosisUrl) {
     throw new Error(`Invalid network: ${chainId}`);
   }
-
   async function makePayment () {
     if (!safe) return;
     const safeTransaction = await safe.createTransaction(transactions);

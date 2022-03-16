@@ -39,15 +39,16 @@ async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<Pa
     tokenLogo,
     spaceId,
     tokenName,
-    tokenDecimals
+    tokenDecimals,
+    walletType
   } = req.body as PaymentMethod;
 
-  if (contractAddress && !isValidChainAddress(contractAddress)) {
+  if (walletType === 'metamask' && !(contractAddress && isValidChainAddress(contractAddress))) {
     return res.status(400).json({
       message: 'Contract address is invalid'
     });
   }
-  if (gnosisSafeAddress && !isValidChainAddress(gnosisSafeAddress)) {
+  if (walletType === 'gnosis' && !(gnosisSafeAddress && isValidChainAddress(gnosisSafeAddress))) {
     return res.status(400).json({
       message: 'Safe address is invalid'
     });
@@ -62,6 +63,7 @@ async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<Pa
     tokenDecimals,
     gnosisSafeAddress,
     createdBy: req.session.user.id,
+    walletType,
     space: {
       connect: {
         id: spaceId

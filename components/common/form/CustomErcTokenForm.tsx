@@ -152,7 +152,7 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
 
   // Only checks the format, not if we can load the logo
   const validTokenLogoAddressFormat = !!values.tokenLogo && !errors.tokenLogo;
-
+  console.log(errors, values);
   return (
     <div>
       {/* @ts-ignore */}

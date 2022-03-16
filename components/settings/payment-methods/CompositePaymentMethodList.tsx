@@ -97,7 +97,7 @@ export function CompositePaymentMethodList ({ paymentMethods }: IProps) {
               </TableCell>
               <TableCell width={200} sx={{ px: 0 }}>
                 <Typography>
-                  <a href={getChainExplorerLink(row.chainId, row.contractAddress, 'token')} target='_blank' rel='noreferrer'>
+                  <a href={getChainExplorerLink(row.chainId, row.contractAddress || row.gnosisSafeAddress!, 'token')} target='_blank' rel='noreferrer'>
                     <LaunchIcon sx={{ mr: 1 }} />
                   </a>
                   <strong>{getChainById(row.chainId)?.chainName}</strong>

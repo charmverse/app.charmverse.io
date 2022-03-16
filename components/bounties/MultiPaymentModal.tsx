@@ -1,7 +1,8 @@
 
 import { ethers } from 'ethers';
-import { Modal } from 'components/common/Modal';
+import { Modal, DialogTitle } from 'components/common/Modal';
 import Button from 'components/common/Button';
+import Box from '@mui/material/Box';
 import charmClient, { PopulatedBounty } from 'charmClient';
 import { bindTrigger, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
@@ -59,12 +60,17 @@ export default function MultiPaymentModal () {
   return (
     <>
       <Button {...bindTrigger(popupState)}>
-        Batch Payments ({bountiesReady.length})
+        Batch Payment ({bountiesReady.length})
       </Button>
       <Modal {...bindPopover(popupState)}>
-        {bountiesReady.map(bounty => (
-          bounty.title
-        ))}
+        <DialogTitle onClose={popupState.close}>Batch Payments</DialogTitle>
+        <Box py={2}>
+          <ul>
+            {bountiesReady.map(bounty => (
+              <li>{bounty.title}</li>
+            ))}
+          </ul>
+        </Box>
         <MultiPaymentButton
           chainId={bountiesReady[0].chainId}
           safeAddress={safeAddress}

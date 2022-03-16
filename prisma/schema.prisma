@@ -230,7 +230,7 @@ model PaymentMethod {
   space             Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   chainId           Int
   gnosisSafeAddress String?
-  contractAddress   String
+  contractAddress   String?
   tokenName         String
   tokenSymbol       String
   tokenDecimals     Int
