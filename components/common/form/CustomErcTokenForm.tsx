@@ -2,6 +2,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
+import TextField from '@mui/material/TextField';
+import Progress from '@mui/material/CircularProgress';
 import InputLabel from '@mui/material/InputLabel';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
@@ -41,7 +43,8 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
-  const { setBounties, bounties } = useBounties();
+
+  const [loadingToken, setLoadingToken] = useState(false);
 
   const {
     register,
@@ -56,7 +59,9 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
     mode: 'onChange',
     defaultValues: {
       // TBC till we agree on Prisma migration
-      chainId: defaultChainId as any
+      chainId: defaultChainId as any,
+      tokenDecimals: 18
+      // Default for an ERC20 token
     },
     resolver: yupResolver(schema)
   });
@@ -85,6 +90,7 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
   }, [watch]);
 
   async function loadToken (tokenInfo: ITokenMetadataRequest) {
+    setLoadingToken(true);
     try {
       const tokenData = await charmClient.getTokenMetaData(tokenInfo);
       setValue('tokenSymbol', tokenData.symbol);
@@ -96,6 +102,7 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
       setValue('tokenDecimals', tokenData.decimals ?? undefined);
       trigger('tokenDecimals');
       setAllowManualInput(false);
+      setLoadingToken(false);
     }
     catch (error) {
       setValue('tokenLogo', null as any);
@@ -103,6 +110,7 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
       setValue('tokenName', null as any);
       setValue('tokenDecimals', null as any);
       setAllowManualInput(true);
+      setLoadingToken(false);
     }
   }
 
@@ -155,38 +163,42 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
             <InputLabel>
               Contract address
             </InputLabel>
-            <Input
+            <TextField
               {...register('contractAddress')}
               type='text'
               fullWidth
+              error={!!errors.contractAddress?.message}
+              helperText={errors.contractAddress?.message}
             />
             {
-              errors?.contractAddress && (
-              <Alert severity='error'>
-                {errors.contractAddress.message}
-              </Alert>
-              )
-            }
-            {
-              !(errors?.contractAddress) && allowManualInput && (
-              <Alert severity='warning'>
-                We couldn't find data about this token. You can enter its symbol below
-              </Alert>
+              !(errors?.contractAddress) && allowManualInput && !loadingToken && (
+                <Alert severity='info'>
+                  We couldn't find data about this token. Enter its details below, or select a different blockchain.
+                </Alert>
               )
             }
           </Grid>
+
           {
-            values.contractAddress && !errors.contractAddress && (
+            loadingToken && <Progress />
+          }
+
+          {
+            values.contractAddress && !errors.contractAddress && !loadingToken && (
               <>
                 <Grid item container xs>
                   <Grid item xs={6} sx={{ pr: 2 }}>
                     <InputLabel>
                       Token symbol
                     </InputLabel>
-                    <Input
-                      readOnly={!allowManualInput}
+                    <TextField
+                      InputProps={{
+                        readOnly: !allowManualInput
+                      }}
                       {...register('tokenSymbol')}
                       type='text'
+                      error={!!errors.tokenSymbol?.message}
+                      helperText={errors.tokenSymbol?.message}
                     />
                   </Grid>
 
@@ -197,12 +209,12 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
                     <Input
                       {...register('tokenDecimals')}
                       type='number'
-                      readOnly={!allowManualInput}
+                      inputMode='numeric'
                       inputProps={{
                         step: 1,
                         min: 1,
                         max: 18,
-                        readonly: !allowManualInput
+                        disabled: !allowManualInput
                       }}
                     />
                   </Grid>
@@ -211,11 +223,15 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
                   <InputLabel>
                     Token name
                   </InputLabel>
-                  <Input
+                  <TextField
                     {...register('tokenName')}
                     type='text'
                     fullWidth
-                    readOnly={!allowManualInput}
+                    InputProps={{
+                      readOnly: !allowManualInput
+                    }}
+                    error={!!errors.tokenName?.message}
+                    helperText={errors.tokenName?.message}
                   />
                 </Grid>
 
@@ -224,10 +240,12 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
                     <InputLabel>
                       Token logo
                     </InputLabel>
-                    <Input
+                    <TextField
                       {...register('tokenLogo')}
                       type='text'
                       fullWidth
+                      error={!!errors.tokenLogo?.message}
+                      helperText={errors.tokenLogo?.message}
                     />
                     {
               (errors?.tokenLogo || (validTokenLogoAddressFormat && !logoLoadSuccess)) && (
