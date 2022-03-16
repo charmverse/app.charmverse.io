@@ -1449,8 +1449,12 @@ async function createDatabase (block: GetDatabaseResponse, {
   return createdPage;
 }
 
-async function importFromWorkspace ({ accessToken, userId, spaceId }:
-  { accessToken: string, spaceId: string, userId: string }) {
+async function importFromWorkspace ({ workspaceName, workspaceIcon, accessToken, userId, spaceId }:
+  { accessToken: string, spaceId: string, userId: string,
+    workspaceName: string,
+    workspaceIcon: string
+  }) {
+
   const notion = new Client({
     auth: accessToken
   });
@@ -1766,6 +1770,24 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     return createdPages[blockId];
   }
 
+  const workspacePageId = v4();
+  const workspacePage = await createPrismaPage({
+    content: {
+      type: 'doc',
+      content: [{
+        type: 'paragraph',
+        content: []
+      }]
+    },
+    headerImage: null,
+    icon: workspaceIcon,
+    pageId: workspacePageId,
+    spaceId,
+    title: workspaceName,
+    type: 'page',
+    userId
+  });
+
   // Update parent id for all nested pages
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
@@ -1778,6 +1800,17 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
           },
           data: {
             parentId: createdPages[block.parent.page_id].id
+          }
+        });
+      }
+      else if (block.parent.type === 'workspace') {
+        // Place root pages/databases inside workspace pace
+        createdPages[block.id] = await prisma.page.update({
+          where: {
+            id: createdPages[block.id].id!
+          },
+          data: {
+            parentId: workspacePageId
           }
         });
       }
@@ -1823,7 +1856,9 @@ handler.get(async (req, res) => {
   await importFromWorkspace({
     accessToken: token.access_token,
     spaceId: state.spaceId,
-    userId: state.userId
+    userId: state.userId,
+    workspaceName: token.workspace_name,
+    workspaceIcon: token.workspace_icon
   });
   const cookies = new Cookies(req, res);
   cookies.set('notion-user', userId, {
