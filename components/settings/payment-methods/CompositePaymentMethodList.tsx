@@ -108,7 +108,7 @@ export function CompositePaymentMethodList ({ paymentMethods }: IProps) {
 
                 {
                 isAdmin && (
-                  <ElementDeleteIcon clicked={() => setPaymentMethodIdToDelete(row.contractAddress)} />
+                  <ElementDeleteIcon clicked={() => setPaymentMethodIdToDelete(row.id)} />
                 )
               }
               </TableCell>
