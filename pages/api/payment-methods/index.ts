@@ -14,7 +14,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser)
   .use(requireSpaceMembership)
   .get(listPaymentMethods)
-  .use(requireKeys<PaymentMethod>(['chainId', 'contractAddress', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals'], 'body'))
+  .use(requireKeys<PaymentMethod>(['chainId', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals', 'walletType'], 'body'))
   .post(createPaymentMethod);
 
 async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<PaymentMethod [] | IApiError>) {
@@ -34,6 +34,7 @@ async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<Pa
   const {
     chainId,
     contractAddress,
+    gnosisSafeAddress,
     tokenSymbol,
     tokenLogo,
     spaceId,
@@ -41,23 +42,14 @@ async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<Pa
     tokenDecimals
   } = req.body as PaymentMethod;
 
-  if (!isValidChainAddress(contractAddress)) {
+  if (contractAddress && !isValidChainAddress(contractAddress)) {
     return res.status(400).json({
       message: 'Contract address is invalid'
     });
   }
-
-  const existingPaymentMethod = await prisma.paymentMethod.findFirst({
-    where: {
-      chainId,
-      contractAddress,
-      spaceId
-    }
-  });
-
-  if (existingPaymentMethod) {
+  if (gnosisSafeAddress && !isValidChainAddress(gnosisSafeAddress)) {
     return res.status(400).json({
-      message: 'This payment method already exists'
+      message: 'Safe address is invalid'
     });
   }
 
@@ -68,6 +60,7 @@ async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<Pa
     tokenName,
     tokenLogo,
     tokenDecimals,
+    gnosisSafeAddress,
     createdBy: req.session.user.id,
     space: {
       connect: {

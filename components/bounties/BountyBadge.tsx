@@ -40,7 +40,7 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
 
   const transactionInfo = (bounty as BountyWithDetails).transactions?.[0];
 
-  const chainName = getChainById(bounty?.chainId as number)?.chainName ?? '';
+  const chainName = bounty ? getChainById(bounty.chainId)?.chainName : '';
 
   return (
     <Grid container direction='column' alignItems='center'>

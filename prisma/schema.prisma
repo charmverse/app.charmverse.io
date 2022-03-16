@@ -29,22 +29,22 @@ enum Role {
 }
 
 model Space {
-  id             String       @id @default(uuid()) @db.Uuid
+  id             String          @id @default(uuid()) @db.Uuid
   deletedAt      DateTime?
-  createdAt      DateTime     @default(now())
-  author         User         @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdBy      String       @db.Uuid
+  createdAt      DateTime        @default(now())
+  author         User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy      String          @db.Uuid
   updatedAt      DateTime
-  updatedBy      String       @db.Uuid
+  updatedBy      String          @db.Uuid
   name           String
-  domain         String       @unique
+  domain         String          @unique
   permissions    SpaceRole[]
   pages          Page[]
   blocks         Block[]
   inviteLinks    InviteLink[]
   bounties       Bounty[]
   TokenGate      TokenGate[]
-  paymentMethods PaymentMethod []
+  paymentMethods PaymentMethod[]
 }
 
 model Page {
@@ -173,7 +173,7 @@ model Bounty {
   descriptionNodes Json
   reviewer         String?       @db.Uuid
   assignee         String?       @db.Uuid
-  chainId          Int?       
+  chainId          Int
   rewardAmount     Float
   rewardToken      String
   status           BountyStatus  @default(open)
@@ -217,17 +217,23 @@ model TokenGate {
   spaceRoles SpaceRole[]
 }
 
+enum WalletType {
+  metamask
+  gnosis
+}
 
 model PaymentMethod {
-  id              String      @id @default(uuid()) @db.Uuid
-  createdAt       DateTime    @default(now())
-  createdBy       String      @db.Uuid()
-  spaceId         String      @db.Uuid
-  space           Space       @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  chainId         Int
-  contractAddress String
-  tokenName       String
-  tokenSymbol     String
-  tokenDecimals   Int
-  tokenLogo       String?
+  id                String     @id @default(uuid()) @db.Uuid
+  createdAt         DateTime   @default(now())
+  createdBy         String     @db.Uuid()
+  spaceId           String     @db.Uuid
+  space             Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  chainId           Int
+  gnosisSafeAddress String?
+  contractAddress   String
+  tokenName         String
+  tokenSymbol       String
+  tokenDecimals     Int
+  tokenLogo         String?
+  walletType        WalletType @default(metamask)
 }

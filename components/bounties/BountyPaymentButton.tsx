@@ -129,8 +129,6 @@ export default function BountyPaymentButton ({
       const signer = await library.getSigner(account);
 
       if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
-        console.log('Executing transaction');
-        console.log('Receiver', receiver);
         const tx = await signer.sendTransaction({
           to: receiver,
           value: ethers.utils.parseEther(amount)

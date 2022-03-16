@@ -1,43 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { useWeb3React } from '@web3-react/core';
-import { BigNumber } from '@ethersproject/bignumber';
-import { getChainById, RPC } from 'connectors';
-import Safe from '@gnosis.pm/safe-core-sdk';
 import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
-import { useSafeAppConnection, SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react';
+import { getChainById } from 'connectors';
 import useGnosisSafe from './hooks/useGnosisSafe';
 
-const safeAddress = '0xE7faB335A404a09ACcE83Ae5F08723d8e5c69b58';
-const transactionServiceUrl = 'https://safe-transaction.rinkeby.gnosis.io';
-
-// const safeMultisigConnector = new SafeAppConnector();
+export interface MultiPaymentResult {
+  transactions: MetaTransactionData[];
+  txHash: string;
+}
 
 interface Props {
+  chainId: number,
+  onSuccess: (result: MultiPaymentResult) => void;
+  safeAddress: string;
   transactions: MetaTransactionData[];
 }
 
-export default function MultiPayButton ({ transactions }: Props) {
+export default function MultiPaymentButton ({ chainId, safeAddress, transactions, onSuccess }: Props) {
   const { account } = useWeb3React();
   const safe = useGnosisSafe({ safeAddress });
+  const network = getChainById(chainId);
+  if (!network?.gnosisUrl) {
+    throw new Error(`Invalid network: ${chainId}`);
+  }
 
   async function makePayment () {
     if (!safe) return;
     const safeTransaction = await safe.createTransaction(transactions);
     await safe.signTransaction(safeTransaction);
-    const safeTxHash = await safe.getTransactionHash(safeTransaction);
-    const safeService = new SafeServiceClient(transactionServiceUrl);
+    const txHash = await safe.getTransactionHash(safeTransaction);
+    const safeService = new SafeServiceClient(network!.gnosisUrl!);
     await safeService.proposeTransaction({
       safeAddress,
       safeTransaction,
-      safeTxHash,
+      safeTxHash: txHash,
       senderAddress: account!,
       origin
     });
-    const { results } = await safeService.getPendingTransactions(safeAddress);
-    console.log('pending transactions', results);
+    onSuccess({ transactions, txHash });
   }
 
   return (

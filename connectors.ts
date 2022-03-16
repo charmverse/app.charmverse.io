@@ -20,19 +20,20 @@ enum Chains {
 }
 
 export interface IChainDetails {
-  chainId: number,
-  chainName: string,
+  chainId: number;
+  chainName: string;
   nativeCurrency: {
-  name: string,
-  symbol: string,
-  decimals: number,
-  address: string,
-  logoURI: string
-  },
-  rpcUrls: readonly string [],
-  blockExplorerUrls: readonly string [],
-  iconUrls: readonly string [],
-  testnet?: boolean
+    name: string;
+    symbol: string;
+    decimals: number;
+    address: string;
+    logoURI: string;
+  };
+  rpcUrls: readonly string [];
+  blockExplorerUrls: readonly string [];
+  gnosisUrl?: string;
+  iconUrls: readonly string [];
+  testnet?: boolean;
 }
 
 const RPC: Record<string, IChainDetails> = {
@@ -48,6 +49,7 @@ const RPC: Record<string, IChainDetails> = {
         'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     blockExplorerUrls: ['https://etherscan.io'],
+    gnosisUrl: 'https://safe-transaction.mainnet.gnosis.io',
     iconUrls: ['/networkLogos/ethereum.svg'],
     rpcUrls: ['https://main-light.eth.linkpool.io']
   },
@@ -64,6 +66,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://bsc-dataseed.binance.org'],
     blockExplorerUrls: ['https://bscscan.com'],
+    gnosisUrl: 'https://safe-transaction.bsc.gnosis.io',
     iconUrls: ['/networkLogos/bsc.svg']
   },
   POLYGON: {
@@ -79,6 +82,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://polygon-rpc.com'],
     blockExplorerUrls: ['https://polygonscan.com'],
+    gnosisUrl: 'https://safe-transaction.polygon.gnosis.io',
     iconUrls: ['/networkLogos/polygon.svg']
   },
   AVALANCHE: {
@@ -94,6 +98,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
     blockExplorerUrls: ['https://snowtrace.io'],
+    gnosisUrl: 'https://safe-transaction.avalanche.gnosis.io',
     iconUrls: ['/networkLogos/avalanche.svg']
   },
   XDAI: {
@@ -109,6 +114,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://rpc.xdaichain.com'],
     blockExplorerUrls: ['https://blockscout.com/poa/xdai'],
+    gnosisUrl: 'https://safe-transaction.xdai.gnosis.io',
     iconUrls: ['/networkLogos/xdai.svg']
   },
   FANTOM: {
@@ -139,6 +145,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://arb1.arbitrum.io/rpc'],
     blockExplorerUrls: ['https://arbiscan.io'],
+    gnosisUrl: 'https://safe-transaction.arbitrum.gnosis.io',
     iconUrls: ['/networkLogos/arbitrum.svg']
   },
   CELO: {
@@ -169,6 +176,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://api.harmony.one'],
     blockExplorerUrls: ['https://explorer.harmony.one'],
+    gnosisUrl: 'https://safe-transaction.rinkeby.gnosis.io',
     iconUrls: ['/networkLogos/harmony.svg']
   },
   GOERLI: {
@@ -184,6 +192,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
+    gnosisUrl: 'https://safe-transaction.goerli.gnosis.io',
     iconUrls: ['/networkLogos/ethereum.svg'],
     testnet: true
   },
@@ -199,6 +208,7 @@ const RPC: Record<string, IChainDetails> = {
         'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     blockExplorerUrls: ['https://rinkeby-explorer.arbitrum.io/#/'],
+    gnosisUrl: 'https://safe-transaction.rinkeby.gnosis.io',
     iconUrls: ['/networkLogos/ethereum.svg'],
     rpcUrls: ['https://rinkeby-light.eth.linkpool.io/'],
     testnet: true
@@ -216,6 +226,7 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://rpc-mumbai.matic.today'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
+    gnosisUrl: 'https://safe-transaction.rinkeby.gnosis.io',
     iconUrls: ['/networkLogos/polygon.svg'],
     testnet: true
   }
@@ -229,25 +240,8 @@ export const CryptoCurrencies = uniqueValues<CryptoCurrency>(RPCList.map(chain =
   return chain.nativeCurrency.symbol as CryptoCurrency;
 }));
 
-export function getChainById (chainId: string | number): IChainDetails | undefined {
-  return RPCList.find(rpc => {
-
-    try {
-      // eslint-disable-next-line radix
-      const parsedChainId = parseInt(rpc.chainId.toString());
-      // eslint-disable-next-line radix
-      const parsedTargetChainId = parseInt(chainId.toString());
-
-      if (Number.isNaN(parsedChainId) || Number.isNaN(parsedTargetChainId)) {
-        return false;
-      }
-
-      return parsedChainId === parsedTargetChainId;
-    }
-    catch (error) {
-      return false;
-    }
-  });
+export function getChainById (chainId: number): IChainDetails | undefined {
+  return RPCList.find(rpc => rpc.chainId === chainId);
 }
 
 const supportedChains = [
