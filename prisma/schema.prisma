@@ -202,7 +202,7 @@ model Transaction {
   transactionId String
   chainId       String
   bountyId      String   @db.Uuid()
-  bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: SetDefault)
+  bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
 }
 
 model TokenGate {
