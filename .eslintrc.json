@@ -83,6 +83,7 @@
     "padded-blocks": "off",
     "prefer-destructuring": "off",
     "prefer-promise-reject-errors": "off",
+    "radix": "off",
     "react/destructuring-assignment": "off",
     "react/jsx-boolean-value": "off",
     "react/jsx-filename-extension": [

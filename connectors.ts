@@ -304,49 +304,54 @@ export function getCryptos (chainId: number): Array<string | CryptoCurrency> {
 
 }
 
-export function getChainExplorerLink (chainId: string | number, transactionId: string): string {
+export function getChainExplorerLink (chainId: string | number, transactionOrContractId: string, endpoint: 'transaction' | 'token' = 'transaction'): string {
 
   chainId = chainId.toString();
+
+  const path = endpoint === 'transaction' ? 'tx' : 'token';
 
   switch (chainId) {
 
     case '1':
-      return `https://etherscan.io/tx/${transactionId}`;
+      return `https://etherscan.io/${path}/${transactionOrContractId}`;
 
     case '0x38':
     case '56':
-      return `https://bscscan.com/tx/${transactionId}`;
+      return `https://bscscan.com/${path}/${transactionOrContractId}`;
 
     case '0x89':
     case '137':
-      return `https://polygonscan.com/tx/${transactionId}`;
+      return `https://polygonscan.com/${path}/${transactionOrContractId}`;
 
     case '43114':
-      return `https://snowtrace.io/tx/${transactionId}`;
+      return `https://snowtrace.io/${path}/${transactionOrContractId}`;
 
     case '100':
-      return `https://explorer.poa.network/xdai/mainnet/tx/${transactionId}`;
+      return `https://explorer.poa.network/xdai/mainnet/${path}/${transactionOrContractId}`;
 
     case '250':
-      return `https://ftmscan.com/tx/${transactionId}`;
+      return `https://ftmscan.com/${path}/${transactionOrContractId}`;
 
     case '42161':
-      return `https://arbiscan.io/tx/${transactionId}`;
+      return `https://arbiscan.io/${path}/${transactionOrContractId}`;
 
     case '42220':
-      return `https://explorer.celo.org/tx/${transactionId}`;
+      return `https://explorer.celo.org/${path}/${transactionOrContractId}`;
 
     case '1666600000':
-      return `https://explorer.harmony.one/tx/${transactionId}`;
+      return `https://explorer.harmony.one/${path}/${transactionOrContractId}`;
 
     case '5':
-      return `https://goerli.etherscan.io/tx/${transactionId}`;
+      return `https://goerli.etherscan.io/${path}/${transactionOrContractId}`;
 
     case '4':
-      return `https://rinkeby.etherscan.io/tx/${transactionId}`;
+      return `https://rinkeby.etherscan.io/${path}/${transactionOrContractId}`;
+
+    case '80001':
+      return `https://mumbai.polygonscan.com/${path}/${transactionOrContractId}`;
 
     default:
-      throw new Error('Chain is unsupported');
+      return '';
   }
 }
 

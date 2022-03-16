@@ -316,25 +316,25 @@ export default function BountyDetails () {
                     </Typography>
                   </Box>
                   {
-                    isReviewer === true && (
+                    (isReviewer || isAdmin) && (
                       <Box sx={{
                         display: 'flex',
                         gap: 1
                       }}
                       >
-                        {bounty.status === 'review' && (
+                        {bounty.status === 'review' && isReviewer && (
                           <Box flexDirection='column' gap={1} display='flex'>
                             <Button onClick={markAsComplete}>Mark as complete</Button>
                             <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
                           </Box>
                         )}
                         {
-                          (bounty.status === 'complete' && (isReviewer || isAdmin)) && (
+                          bounty.status === 'complete' && (
                             <Box>
                               <BountyPaymentButton
                                 receiver={walletAddressForPayment!}
                                 amount={eToNumber(bounty.rewardAmount)}
-                                tokenSymbol={bounty.rewardToken}
+                                tokenSymbolOrAddress={bounty.rewardToken}
                                 onSuccess={recordPaymentSuccess}
                                 onError={onError}
                                 chainIdToUse={bounty.chainId!}
@@ -349,7 +349,11 @@ export default function BountyDetails () {
               ) : <Typography variant='body2'>No reviewer assigned</Typography>}
 
               {paymentError && (
-                <Alert sx={{ mt: 2 }} severity={paymentError.severity}>{paymentError.message}</Alert>
+                <Alert sx={{ mt: 2, display: 'flex', '& .MuiAlert-message': { minWidth: '0px' } }} severity={paymentError.severity}>
+                  <Box component='div' sx={{ display: 'inline', wordWrap: 'break-word' }}>
+                    {paymentError.message}
+                  </Box>
+                </Alert>
               )}
             </Card>
           </Grid>
