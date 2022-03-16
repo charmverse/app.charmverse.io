@@ -1045,6 +1045,7 @@ type BlockWithChildren = BlockObjectResponse & { children: string[] };
 
 const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
 
+// TODO: Transfer card properties
 async function populateDoc (
   parentNode: BlockNode,
   block: BlockWithChildren,
@@ -1349,6 +1350,82 @@ async function createPrismaPage ({
   return page;
 }
 
+async function createDatabase (block: GetDatabaseResponse, {
+  spaceId,
+  userId
+}: {spaceId: string, userId: string}) {
+  const title = (block as any).title.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
+  const cardProperties: IPropertyTemplate[] = [];
+  const databaseProperties = Object.values(block.properties);
+  databaseProperties.forEach(property => {
+    const focalboardPropertyType = convertPropertyType(property.type);
+    if (focalboardPropertyType) {
+      const cardProperty: IPropertyTemplate = {
+        id: v4(),
+        name: property.name,
+        options: [],
+        type: focalboardPropertyType
+      };
+      cardProperties.push(cardProperty);
+      if (property.type === 'select' || property.type === 'multi_select') {
+        (property as any)[property.type].options.forEach((option: {id: string, name: string, color: string}) => {
+          cardProperty.options.push({
+            value: option.name,
+            color: `propColor${option.color.charAt(0).toUpperCase() + option.color.slice(1)}`,
+            id: option.id
+          });
+        });
+      }
+    }
+  });
+
+  const board = createBoard(undefined, false);
+  board.title = title;
+  board.fields.icon = block.icon?.type === 'emoji' ? block.icon.emoji : '';
+  board.fields.headerImage = block.cover?.type === 'external' ? block.cover.external.url : null;
+  board.rootId = board.id;
+  board.fields.cardProperties = cardProperties;
+
+  const view = createBoardView();
+  view.fields.viewType = 'board';
+  view.parentId = board.id;
+  view.rootId = board.rootId;
+  view.title = 'Board view';
+  const newBlocks = [board, view].map(_block => ({
+    ..._block,
+    fields: _block.fields as any,
+    spaceId,
+    createdBy: userId,
+    updatedBy: userId,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: null
+  }));
+  await prisma.block.createMany({
+    data: newBlocks
+  });
+
+  const createdPage = await createPrismaPage({
+    content: {
+      type: 'doc',
+      content: [{
+        type: 'paragraph',
+        content: []
+      }]
+    },
+    headerImage: block.cover?.type === 'external' ? block.cover.external.url : null,
+    icon: block.icon?.type === 'emoji' ? block.icon.emoji : null,
+    title,
+    type: 'board',
+    pageId: v4(),
+    spaceId,
+    userId,
+    boardId: board.id
+  });
+
+  return createdPage;
+}
+
 async function importFromWorkspace ({ accessToken, userId, spaceId }:
   { accessToken: string, spaceId: string, userId: string }) {
   const notion = new Client({
@@ -1387,86 +1464,13 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       await createPage([[block.id, v4()]]);
     }
     else if (block.object === 'database') {
-      await createDatabase(block as GetDatabaseResponse);
+      if (!createdPages[block.id]) {
+        createdPages[block.id] = await createDatabase(block as GetDatabaseResponse, {
+          spaceId,
+          userId
+        });
+      }
     }
-  }
-
-  async function createDatabase (block: GetDatabaseResponse) {
-    if (!createdPages[block.id]) {
-      const title = (block as any).title.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
-      const cardProperties: IPropertyTemplate[] = [];
-      const databaseProperties = Object.values(block.properties);
-      databaseProperties.forEach(property => {
-        const focalboardPropertyType = convertPropertyType(property.type);
-        if (focalboardPropertyType) {
-          const cardProperty: IPropertyTemplate = {
-            id: v4(),
-            name: property.name,
-            options: [],
-            type: focalboardPropertyType
-          };
-          cardProperties.push(cardProperty);
-          if (property.type === 'select' || property.type === 'multi_select') {
-            (property as any)[property.type].options.forEach((option: {id: string, name: string, color: string}) => {
-              cardProperty.options.push({
-                value: option.name,
-                color: `propColor${option.color.charAt(0).toUpperCase() + option.color.slice(1)}`,
-                id: option.id
-              });
-            });
-          }
-        }
-      });
-
-      const board = createBoard(undefined, false);
-      board.title = title;
-      board.fields.icon = block.icon?.type === 'emoji' ? block.icon.emoji : '';
-      board.fields.headerImage = block.cover?.type === 'external' ? block.cover.external.url : null;
-      board.rootId = board.id;
-      board.fields.cardProperties = cardProperties;
-
-      const view = createBoardView();
-      view.fields.viewType = 'board';
-      view.parentId = board.id;
-      view.rootId = board.rootId;
-      view.title = 'Board view';
-      // TODO: Carry over database properties filter and sort
-      const newBlocks = [board, view].map(_block => ({
-        ..._block,
-        fields: _block.fields as any,
-        spaceId,
-        createdBy: userId,
-        updatedBy: userId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        deletedAt: null
-      }));
-      await prisma.block.createMany({
-        data: newBlocks
-      });
-
-      const createdPage = await createPrismaPage({
-        content: {
-          type: 'doc',
-          content: [{
-            type: 'paragraph',
-            content: []
-          }]
-        },
-        headerImage: block.cover?.type === 'external' ? block.cover.external.url : null,
-        icon: block.icon?.type === 'emoji' ? block.icon.emoji : null,
-        title,
-        type: 'board',
-        pageId: v4(),
-        spaceId,
-        userId,
-        boardId: board.id
-      });
-
-      createdPages[block.id] = createdPage;
-      return createdPage;
-    }
-    return createdPages[block.id];
   }
 
   // Array of tuple, [notion block id, charmverse block id]
@@ -1623,7 +1627,11 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     }
     else if (pageResponse.parent.type === 'database_id') {
       // The database must be created before the cards can be added
-      const database = await createDatabase(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
+      // eslint-disable-next-line
+      const database = createdPages[pageResponse.parent.database_id] ?? await createDatabase(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse, {
+        spaceId,
+        userId
+      });
       const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title')!;
       const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
 
@@ -1671,7 +1679,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
 
   // Update parent id for all pages
   for (let index = 0; index < searchResults.length; index++) {
-    const block = searchResults[index] as GetPageResponse;
+    const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
     // Check if its a nested page
     if (block.object === 'page') {
       if (block.parent.type === 'page_id') {
@@ -1685,6 +1693,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
         });
       }
     }
+    // TODO: Link child_database with its parent page
   }
 }
 
