@@ -349,8 +349,8 @@ export default function BountyDetails () {
               ) : <Typography variant='body2'>No reviewer assigned</Typography>}
 
               {paymentError && (
-                <Alert sx={{ mt: 2, whiteSpace: 'pre' }} severity={paymentError.severity}>
-                  <Box component='div' whiteSpace='normal' sx={{ display: 'inline' }}>
+                <Alert sx={{ mt: 2, display: 'flex', '& .MuiAlert-message': { minWidth: '0px' } }} severity={paymentError.severity}>
+                  <Box component='div' sx={{ display: 'inline', wordWrap: 'break-word' }}>
                     {paymentError.message}
                   </Box>
                 </Alert>
