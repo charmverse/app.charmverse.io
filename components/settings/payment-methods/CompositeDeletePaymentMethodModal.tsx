@@ -10,8 +10,10 @@ import { Modal, ModalProps, DialogTitle } from 'components/common/Modal';
 import { CustomErcTokenForm } from 'components/common/form/CustomErcTokenForm';
 import charmClient from 'charmClient';
 import { getPaymentMethod } from 'lib/tokens/tokenData';
+import Alert from '@mui/material/Alert';
+import { useBounties } from 'hooks/useBounties';
+import Button from 'components/common/Button';
 import Legend from '../Legend';
-import Button from '../../common/Button';
 import { CompositePaymentMethodList } from './CompositePaymentMethodList';
 
 type IProps = Pick<ModalProps, 'onClose' | 'open'> & {
@@ -25,6 +27,7 @@ export function CompositeDeletePaymentMethod ({
 }: IProps) {
 
   const [paymentMethods, _, refreshPaymentMethods] = usePaymentMethods();
+  const { bounties } = useBounties();
 
   const methodToDelete = getPaymentMethod(paymentMethods, paymentMethodIdToDelete);
 
@@ -35,6 +38,10 @@ export function CompositeDeletePaymentMethod ({
     refreshPaymentMethods();
     onClose();
   }
+
+  const usedByBounty = methodToDelete ? !!bounties.find(bounty => {
+    return bounty.rewardToken === methodToDelete.contractAddress;
+  }) : false;
 
   return (
     <Modal
@@ -54,6 +61,20 @@ export function CompositeDeletePaymentMethod ({
       {
           methodToDelete && (
             <>
+
+              {
+                usedByBounty && (
+                  <Alert severity='warning' sx={{ mb: 1 }}>
+                    <Box component='p' sx={{ mb: 1 }}>
+                      This payment method has been used by a bounty in this workspace.
+                    </Box>
+                    <Box component='p'>
+                      If you delete this payment method, token information will not show in the bounty.
+                    </Box>
+
+                  </Alert>
+                )
+              }
 
               <Typography>
                 {

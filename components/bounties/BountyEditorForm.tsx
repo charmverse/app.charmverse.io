@@ -18,6 +18,7 @@ import { PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
 import { useState, useEffect } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
+import { isTruthy } from 'lib/utilities/types';
 import * as yup from 'yup';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 
@@ -153,7 +154,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
         const contractAddresses = paymentMethods[chainId].map(method => {
           return method.contractAddress;
-        });
+        }).filter(isTruthy);
         cryptosToDisplay.push(...contractAddresses);
       }
 

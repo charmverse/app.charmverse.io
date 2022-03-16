@@ -36,7 +36,7 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
 
   const tokenInfo = getTokenInfo(paymentMethods, bounty.rewardToken);
 
-  const bountyLink = `/${space!.domain}/bounty/${bounty.id}`;
+  const bountyLink = `/${space!.domain}/bounties/${bounty.id}`;
 
   const transactionInfo = (bounty as BountyWithDetails).transactions?.[0];
 
@@ -65,12 +65,20 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
               >
                 {
             tokenInfo.tokenLogo && (
-              <Image
-                loading='lazy'
-                width={25}
-                height={25}
-                src={tokenInfo.tokenLogo}
-              />
+              <Box component='span' sx={{ width: '25px', height: '25px' }}>
+                {
+                  (tokenInfo.isContract ? (
+                    <img alt='' width='100%' height='100%' src={tokenInfo.tokenLogo} />
+                  ) : (
+                    <Image
+                      loading='lazy'
+                      width='100%'
+                      height='100%'
+                      src={tokenInfo.tokenLogo}
+                    />
+                  ))
+                }
+              </Box>
             )
           }
               </Box>

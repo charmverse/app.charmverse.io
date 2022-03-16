@@ -12,6 +12,8 @@ import { getChainById, getChainExplorerLink } from 'connectors';
 import { PaymentMethodMap } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { useState } from 'react';
+import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
+import Link from 'components/common/Link';
 import { CompositeDeletePaymentMethod } from './CompositeDeletePaymentMethodModal';
 
 interface IProps {
@@ -97,22 +99,20 @@ export function CompositePaymentMethodList ({ paymentMethods }: IProps) {
               </TableCell>
               <TableCell width={200} sx={{ px: 0 }}>
                 <Typography>
-                  <a href={getChainExplorerLink(row.chainId, row.contractAddress || row.gnosisSafeAddress!, 'token')} target='_blank' rel='noreferrer'>
-                    <LaunchIcon sx={{ mr: 1 }} />
-                  </a>
-                  <strong>{getChainById(row.chainId)?.chainName}</strong>
+                  {row.contractAddress ? (
+                    <Link href={getChainExplorerLink(row.chainId, row.contractAddress, 'token')} external>
+                      {getChainById(row.chainId)?.chainName}
+                    </Link>
+                  ) : (
+                    getChainById(row.chainId)?.chainName
+                  )}
                 </Typography>
               </TableCell>
               <TableCell width={150} sx={{ px: 0 }} align='center'>
 
                 {
                 isAdmin && (
-                  <DeleteIcon
-                    onClick={() => {
-                      setPaymentMethodIdToDelete(row.contractAddress);
-                    }}
-                    fontSize='small'
-                  />
+                  <ElementDeleteIcon clicked={() => setPaymentMethodIdToDelete(row.id)} />
                 )
               }
               </TableCell>
