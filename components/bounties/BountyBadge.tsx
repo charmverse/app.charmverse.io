@@ -36,7 +36,7 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
 
   const tokenInfo = getTokenInfo(paymentMethods, bounty.rewardToken);
 
-  const bountyLink = `/${space!.domain}/bounty/${bounty.id}`;
+  const bountyLink = `/${space!.domain}/bounties/${bounty.id}`;
 
   const transactionInfo = (bounty as BountyWithDetails).transactions?.[0];
 
