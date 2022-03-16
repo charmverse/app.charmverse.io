@@ -1045,7 +1045,6 @@ type BlockWithChildren = BlockObjectResponse & { children: string[] };
 
 const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
 
-// TODO: Transfer card properties
 async function populateDoc (
   parentNode: BlockNode,
   block: BlockWithChildren,
@@ -1707,42 +1706,48 @@ async function importFromWorkspace ({ workspaceName, workspaceIcon, accessToken,
       const cardProperties: Record<string, any> = {};
 
       Object.values(pageResponse.properties).forEach(property => {
-        if (property.type.match(/(email|number|url|checkbox|phone_number)/)) {
-          cardProperties[focalboardPropertyRecord[property.id]] = property[property.type];
-        }
-        else if (property.type === 'rich_text') {
-          cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
-        }
-        else if (property.type === 'select') {
-          // eslint-disable-next-line
-          cardProperties[focalboardPropertyRecord[property.id]] = property[property.type]?.id;
-        }
-        else if (property.type === 'multi_select') {
-          // eslint-disable-next-line
-          cardProperties[focalboardPropertyRecord[property.id]] = property[property.type]?.map((multiSelect: {id: string}) => multiSelect.id);
-        }
-        else if (property.type === 'date') {
-          const dateValue: {from?: number, to?: number} = {};
-          if (property[property.type]?.start) {
-            dateValue.from = (new Date(property[property.type].start)).getTime();
+        if (property[property.type]) {
+          if (property.type.match(/(email|number|url|checkbox|phone_number)/)) {
+            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type];
           }
+          else if (property.type === 'rich_text') {
+            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
+          }
+          else if (property.type === 'select') {
+            // eslint-disable-next-line
+            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].id;
+          }
+          else if (property.type === 'multi_select') {
+            // eslint-disable-next-line
+            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].map((multiSelect: {id: string}) => multiSelect.id);
+          }
+          else if (property.type === 'date') {
+            const dateValue: {from?: number, to?: number} = {};
+            if (property[property.type].start) {
+              dateValue.from = (new Date(property[property.type].start)).getTime();
+            }
 
-          if (property[property.type]?.end) {
-            dateValue.to = (new Date(property[property.type].end)).getTime();
+            if (property[property.type].end) {
+              dateValue.to = (new Date(property[property.type].end)).getTime();
+            }
+            cardProperties[focalboardPropertyRecord[property.id]] = JSON.stringify(dateValue);
           }
-          cardProperties[focalboardPropertyRecord[property.id]] = JSON.stringify(dateValue);
         }
       });
+
+      const commonBlockData = {
+        deletedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        spaceId,
+        createdBy: userId,
+        updatedBy: userId
+      };
 
       await prisma.block.createMany({
         data: [{
           ...charmTextBlock,
-          deletedAt: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          spaceId,
-          createdBy: userId,
-          updatedBy: userId,
+          ...commonBlockData,
           rootId: database.boardId!
         }, {
           ...createCard({
@@ -1757,12 +1762,7 @@ async function importFromWorkspace ({ workspaceName, workspaceIcon, accessToken,
               properties: cardProperties
             }
           }),
-          deletedAt: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          spaceId,
-          createdBy: userId,
-          updatedBy: userId
+          ...commonBlockData
         }]
       });
     }
@@ -1771,7 +1771,7 @@ async function importFromWorkspace ({ workspaceName, workspaceIcon, accessToken,
   }
 
   const workspacePageId = v4();
-  const workspacePage = await createPrismaPage({
+  await createPrismaPage({
     content: {
       type: 'doc',
       content: [{
