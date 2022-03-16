@@ -9,28 +9,25 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { StyledRow } from 'components/settings/TokenGatesTable';
 import { getChainById, getChainExplorerLink } from 'connectors';
-import { PaymentMethodMap } from 'hooks/usePaymentMethods';
+import { PaymentMethod } from '@prisma/client';
 import { useUser } from 'hooks/useUser';
 import { useState } from 'react';
 import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
 import Link from 'components/common/Link';
-import { CompositeDeletePaymentMethod } from './CompositeDeletePaymentMethodModal';
+import CompositeDeletePaymentMethod from './DeletePaymentMethodModal';
 
 interface IProps {
-  paymentMethods: PaymentMethodMap
+  paymentMethods: PaymentMethod[]
 }
 
-export function CompositePaymentMethodList ({ paymentMethods }: IProps) {
+export default function CompositePaymentMethodList ({ paymentMethods }: IProps) {
 
   const [user] = useUser();
   const [paymentMethodIdToDelete, setPaymentMethodIdToDelete] = useState<string | null>(null);
 
   const isAdmin = user?.spaceRoles.some(spaceRole => spaceRole.role === 'admin') === true;
 
-  const flattenedPaymentMethods = Object.values(paymentMethods).reduce((list, chainPaymentMethods) => {
-    list.push(...chainPaymentMethods);
-    return list;
-  }, [])
+  const sortedMethods = [...paymentMethods]
     .sort((methodA, methodB) => {
       if (methodA.chainId < methodB.chainId) {
         return -1;
@@ -48,7 +45,7 @@ export function CompositePaymentMethodList ({ paymentMethods }: IProps) {
     <>
       <CompositeDeletePaymentMethod
         open={paymentMethodIdToDelete !== null}
-        paymentMethodIdToDelete={paymentMethodIdToDelete as string}
+        paymentMethodIdToDelete={paymentMethodIdToDelete}
         onClose={() => {
           setPaymentMethodIdToDelete(null);
         }}
@@ -67,7 +64,7 @@ export function CompositePaymentMethodList ({ paymentMethods }: IProps) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {flattenedPaymentMethods.map((row) => (
+          {sortedMethods.map((row) => (
             <StyledRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
 
               <TableCell width={100}>

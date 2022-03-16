@@ -8,7 +8,6 @@ import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getChainById, RPC } from 'connectors';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { getPaymentMethod } from 'lib/tokens/tokenData';
 import ERC20ABI from '../../abis/ERC20ABI.json';
 
 interface Props {
@@ -142,7 +141,10 @@ export default function BountyPaymentButton ({
       else if (isValidChainAddress(tokenSymbolOrAddress)) {
         const tokenContract = new ethers.Contract(tokenSymbolOrAddress, ERC20ABI, signer);
 
-        let tokenDecimals = getPaymentMethod(paymentMethods, tokenSymbolOrAddress)?.tokenDecimals;
+        const paymentMethod = paymentMethods.find(method => (
+          method.contractAddress === tokenSymbolOrAddress || method.id === tokenSymbolOrAddress
+        ));
+        let tokenDecimals = paymentMethod?.tokenDecimals;
 
         if (typeof tokenDecimals !== 'number') {
           try {

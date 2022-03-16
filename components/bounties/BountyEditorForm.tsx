@@ -152,9 +152,12 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
       // Add custom payment methods
       if (paymentMethods[chainId]) {
 
-        const contractAddresses = paymentMethods[chainId].map(method => {
-          return method.contractAddress;
-        }).filter(isTruthy);
+        const contractAddresses = paymentMethods
+          .filter(method => method.chainId === chainId)
+          .map(method => {
+            return method.contractAddress;
+          })
+          .filter(isTruthy);
         cryptosToDisplay.push(...contractAddresses);
       }
 

@@ -1,26 +1,23 @@
-import { useRouter } from 'next/router';
 import { PaymentMethod } from '@prisma/client';
-import { createContext, useEffect, useState, useMemo, ReactNode, useContext } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from './useCurrentSpace';
 
-export type PaymentMethodMap = Record<number, PaymentMethod []>
-
 type IContext = [
-  paymentMethods: PaymentMethodMap,
-  setPaymentMethods: (paymentMethodMap: PaymentMethodMap) => void,
+  paymentMethods: PaymentMethod[],
+  setPaymentMethods: Dispatch<SetStateAction<PaymentMethod[]>>,
   refreshPaymentMethods: () => void,
 ]
 
 export const PaymentMethodsContext = createContext<Readonly<IContext>>([
-  {},
+  [],
   () => undefined,
   () => {}
 ]);
 
 export function PaymentMethodsProvider ({ children }: { children: ReactNode }) {
 
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethodMap>({});
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [space] = useCurrentSpace();
 
   useEffect(() => {
@@ -31,14 +28,7 @@ export function PaymentMethodsProvider ({ children }: { children: ReactNode }) {
     if (space) {
       charmClient.listPaymentMethods(space.id)
         .then(_paymentMethods => {
-          const methodsMappedToChain: PaymentMethodMap = _paymentMethods.reduce((map, paymentMethod) => {
-            if (!map[paymentMethod.chainId]) {
-              map[paymentMethod.chainId] = [];
-            }
-            map[paymentMethod.chainId].push(paymentMethod);
-            return map;
-          }, {} as PaymentMethodMap);
-          setPaymentMethods(methodsMappedToChain);
+          setPaymentMethods(_paymentMethods);
         })
         .catch(() => {});
     }

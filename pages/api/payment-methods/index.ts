@@ -5,7 +5,6 @@ import { Prisma, Page, PaymentMethod } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { IEventToLog, postToDiscord } from 'lib/logs/notifyDiscord';
 import { IApiError } from 'lib/utilities/errors';
 import { isValidChainAddress } from 'lib/tokens/validation';
 

@@ -18,8 +18,7 @@ export default function MultiPaymentModal () {
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
   const [paymentMethods] = usePaymentMethods();
 
-  const paymentMethodList = Object.values(paymentMethods).reduce((acc, methods) => [...acc, ...methods], []);
-  const gnosisPayment = paymentMethodList.find(p => p.walletType === 'gnosis');
+  const gnosisPayment = paymentMethods.find(p => p.walletType === 'gnosis');
   const safeAddress = gnosisPayment?.gnosisSafeAddress;
   const bountiesReady = bounties.filter(bounty => bounty.chainId === gnosisPayment?.chainId && bounty.status === 'complete');
 
