@@ -1531,6 +1531,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
 
         let id = linkedPages[linkedPageId];
 
+        // If its linking itself
         if (linkedPageId === blockId) {
           id = createdPageId;
         }
@@ -1571,8 +1572,8 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       createdPages[blockId] = createdPage;
       return createdPage;
     }
-    // TODO: Focalboard cards, these are not regular pages
     else if (pageResponse.parent.type === 'database_id') {
+      // The database must be created before the cards can be added
       const database = await createDatabase(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
       const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title')!;
       const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
@@ -1582,14 +1583,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       const charmTextBlock = createCharmTextBlock({
         parentId: cardId,
         fields: {
-          // TODO: Card content
-          content: {
-            type: 'doc',
-            content: [{
-              type: 'paragraph',
-              content: []
-            }]
-          }
+          content: pageContent
         }
       });
 
@@ -1611,7 +1605,8 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
             rootId: database.boardId!,
             fields: {
               icon: emoji,
-              contentOrder: [charmTextBlock.id]
+              contentOrder: [charmTextBlock.id],
+              headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null
             }
           }),
           deletedAt: null,
