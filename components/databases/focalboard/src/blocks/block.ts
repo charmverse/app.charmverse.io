@@ -20,7 +20,7 @@ interface BlockPatch {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updatedFields?: Record<string, any>
     deletedFields?: string[]
-    deleteAt?: number
+    deletedAt?: number
 }
 
 interface Block {

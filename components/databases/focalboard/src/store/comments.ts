@@ -15,7 +15,7 @@ const commentsSlice = createSlice({
     reducers: {
         updateComments: (state, action: PayloadAction<CommentBlock[]>) => {
             for (const comment of action.payload) {
-                if (comment.deleteAt === 0) {
+                if (comment.deletedAt === 0) {
                     state.comments[comment.id] = comment
                 } else {
                     delete state.comments[comment.id]
