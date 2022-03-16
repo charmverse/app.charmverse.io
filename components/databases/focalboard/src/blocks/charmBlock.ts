@@ -7,7 +7,7 @@ export type CharmTextBlock = ContentBlock & {
     type: 'charm_text'
 }
 
-function createCharmTextBlock(block?: Block): CharmTextBlock {
+function createCharmTextBlock(block?: Partial<Block>): CharmTextBlock {
     return {
         ...createBlock(block),
         type: 'charm_text',

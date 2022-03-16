@@ -42,7 +42,7 @@ interface Block {
     deletedAt: number | null
 }
 
-function createBlock(block?: Block): Block {
+function createBlock(block?: Partial<Block>): Block {
     const now = Date.now()
     return {
         id: block?.id || Utils.createGuid(Utils.blockTypeToIDType(block?.type)),
