@@ -1,5 +1,5 @@
 import { PaymentMethod } from '@prisma/client';
-import { CustomErcTokenForm } from 'components/common/form/CustomErcTokenForm';
+import { CustomErcTokenForm } from 'components/settings/payment-methods/CompositeErc20PaymentMethodForm';
 import { Modal } from 'components/common/Modal';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useState } from 'react';

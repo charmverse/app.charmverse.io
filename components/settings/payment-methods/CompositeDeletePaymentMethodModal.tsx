@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getChainById } from 'connectors';
 import { Modal, ModalProps, DialogTitle } from 'components/common/Modal';
-import { CustomErcTokenForm } from 'components/common/form/CustomErcTokenForm';
+import { CustomErcTokenForm } from 'components/settings/payment-methods/CompositeErc20PaymentMethodForm';
 import charmClient from 'charmClient';
 import { getPaymentMethod } from 'lib/tokens/tokenData';
 import Legend from '../Legend';
