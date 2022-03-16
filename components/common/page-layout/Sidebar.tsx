@@ -321,22 +321,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 label='Bounties'
               />
             </Box>
-            <Box sx={{ ml: 1 }}>
-              <Button
-                onClick={async () => {
-                  const { redirectUrl } = await charmClient.notionLogin({
-                    spaceId: space.id,
-                    redirect: window.location.href,
-                    account: user?.addresses[0] ?? ''
-                  });
-                  window.location.replace(redirectUrl);
-                }}
-                variant='text'
-                startIcon={<BountyIcon fontSize='small' />}
-              >
-                Import From Notion
-              </Button>
-            </Box>
           </ScrollingContainer>
           <SidebarFooter>
             {user && (
