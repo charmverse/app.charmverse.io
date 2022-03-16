@@ -11,6 +11,8 @@ import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO,
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/editor/ResizableImage';
 import { prisma } from 'db';
 import { v4 } from 'uuid';
+import { createBoard } from 'components/databases/focalboard/src/blocks/board';
+import { createBoardView } from 'components/databases/focalboard/src/blocks/boardView';
 
 const handler = nc({
   onError,
@@ -35,6 +37,180 @@ type RichTextItemResponse = {
   };
   plain_text: string;
   href: string | null;
+};
+
+type GetDatabaseResponse = {
+  title: Array<RichTextItemResponse>;
+  icon: {
+      type: 'emoji';
+      emoji: string;
+  } | null | {
+      type: 'external';
+      external: {
+          url: string;
+      };
+  } | null | {
+      type: 'file';
+      file: {
+          url: string;
+          expiry_time: string;
+      };
+  } | null;
+  cover: {
+      type: 'external';
+      external: {
+          url: string;
+      };
+  } | null | {
+      type: 'file';
+      file: {
+          url: string;
+          expiry_time: string;
+      };
+  } | null;
+  properties: Record<string, {
+      type: 'number';
+      number: {
+          format: string;
+      };
+      id: string;
+      name: string;
+  } | {
+      type: 'formula';
+      formula: {
+          expression: string;
+      };
+      id: string;
+      name: string;
+  } | {
+      type: 'select';
+      select: {
+          options: Array<{
+              name: string;
+              id?: string;
+              color?: string;
+          }>;
+      };
+      id: string;
+      name: string;
+  } | {
+      type: 'multi_select';
+      multi_select: {
+          options: Array<{
+              name: string;
+              id?: string;
+              color?: string;
+          }>;
+      };
+      id: string;
+      name: string;
+  } | {
+      type: 'relation';
+      relation: {
+          database_id: string;
+          synced_property_id: string;
+          synced_property_name: string;
+      };
+      id: string;
+      name: string;
+  } | {
+      type: 'rollup';
+      rollup: {
+          rollup_property_name: string;
+          relation_property_name: string;
+          rollup_property_id: string;
+          relation_property_id: string;
+          function: string;
+      };
+      id: string;
+      name: string;
+  } | {
+      type: 'title';
+      title: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'rich_text';
+      rich_text: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'url';
+      url: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'people';
+      people: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'files';
+      files: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'email';
+      email: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'phone_number';
+      phone_number: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'date';
+      date: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'checkbox';
+      checkbox: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'created_by';
+      created_by: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'created_time';
+      created_time: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'last_edited_by';
+      last_edited_by: Record<string, never>;
+      id: string;
+      name: string;
+  } | {
+      type: 'last_edited_time';
+      last_edited_time: Record<string, never>;
+      id: string;
+      name: string;
+  }>;
+  parent: {
+      type: 'page_id';
+      page_id: string;
+  } | {
+      type: 'workspace';
+      workspace: true;
+  };
+  created_by: {
+      id: string;
+      object: 'user';
+  };
+  last_edited_by: {
+      id: string;
+      object: 'user';
+  };
+  id: string;
+  object: 'database';
+  created_time: string;
+  last_edited_time: string;
+  archived: boolean;
+  url: string;
 };
 
 type GetPageResponse = {
@@ -873,6 +1049,7 @@ async function populateDoc (
   blocksRecord: Record<string, BlockWithChildren>,
   onLinkToPage: (linkedPageId: string, parentNode: BlockNode) => Promise<void>
 ) {
+
   switch (block.type) {
     case 'heading_1': {
       (parentNode as PageContent).content?.push({
@@ -920,6 +1097,7 @@ async function populateDoc (
       await onLinkToPage(linkedPageId, parentNode);
       break;
     }
+    // TODO: child_database support
     case 'link_to_page': {
       // TODO: Link could also be created for a database
       const linkedPageId = block[block.type].type === 'page_id' ? (block[block.type] as any).page_id : null;
@@ -1099,7 +1277,8 @@ async function createPrismaPage ({
   spaceId,
   title,
   type,
-  userId
+  userId,
+  boardId
 }: {
   pageId: string,
   content: PageContent
@@ -1108,7 +1287,8 @@ async function createPrismaPage ({
   headerImage: string | null
   icon: string | null
   title: string
-  type: Prisma.PageCreateInput['type']
+  type: Prisma.PageCreateInput['type'],
+  boardId?: string | null
 }) {
   const id = Math.random().toString().replace('0.', '');
 
@@ -1134,7 +1314,8 @@ async function createPrismaPage ({
     headerImage,
     icon,
     title,
-    type
+    type,
+    boardId
   };
 
   // eslint-disable-next-line
@@ -1163,23 +1344,76 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
     searchResults.push(...searchResult.results);
   }
 
-  const searchResultRecord: Record<string, GetPageResponse> = {};
+  const searchResultRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
 
   const createdPages: Record<string, Page> = {};
   const linkedPages: Record<string, string> = {};
 
   // This loop would decrease the amount of api requests made
   for (let index = 0; index < searchResults.length; index++) {
-    const block = searchResults[index] as GetPageResponse;
+    const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
     searchResultRecord[block.id] = block;
   }
 
   for (let index = 0; index < searchResults.length; index++) {
-    const block = searchResults[index] as GetPageResponse;
+    const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
     if (block.object === 'page') {
       await createPage([[block.id, v4()]]);
     }
-    // TODO: Support for database blocks
+    else if (block.object === 'database') {
+      await createDatabase(block as GetDatabaseResponse);
+    }
+  }
+
+  async function createDatabase (block: GetDatabaseResponse) {
+    if (!createdPages[block.id]) {
+      const title = (block as any).title.reduce((prev: string, cur: {plain_text: string}) => prev + cur.plain_text, '');
+      const board = createBoard(undefined, false);
+      board.title = title;
+      board.fields.icon = block.icon?.type === 'emoji' ? block.icon.emoji : '';
+      board.fields.headerImage = block.cover?.type === 'external' ? block.cover.external.url : null;
+      board.rootId = board.id;
+      const view = createBoardView();
+      view.fields.viewType = 'board';
+      view.parentId = board.id;
+      view.rootId = board.rootId;
+      view.title = 'Board view';
+      // TODO: Focalboard cards
+      // TODO: Carry over database properties filter and sort
+      const newBlocks = [board, view].map(_block => ({
+        ..._block,
+        fields: _block.fields as any,
+        spaceId,
+        createdBy: userId,
+        updatedBy: userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null
+      }));
+      await prisma.block.createMany({
+        data: newBlocks
+      });
+
+      const createdPage = await createPrismaPage({
+        content: {
+          type: 'doc',
+          content: [{
+            type: 'paragraph',
+            content: []
+          }]
+        },
+        headerImage: block.cover?.type === 'external' ? block.cover.external.url : null,
+        icon: block.icon?.type === 'emoji' ? block.icon.emoji : null,
+        title,
+        type: 'board',
+        pageId: v4(),
+        spaceId,
+        userId,
+        boardId: board.id
+      });
+
+      createdPages[block.id] = createdPage;
+    }
   }
 
   // Array of tuple, [notion block id, charmverse block id]
@@ -1288,7 +1522,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
 
         if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== blockId && !parentAsLinkedPage) {
           const createdPage = await createPage([...pageIds, [linkedPageId, v4()]]);
-          linkedPages[linkedPageId] = createdPage.id;
+          linkedPages[linkedPageId] = createdPage!.id;
         }
 
         let id = linkedPages[linkedPageId];
@@ -1317,25 +1551,37 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       });
     }
 
-    const createdPage = await createPrismaPage({
-      content: pageContent,
-      headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
-      icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
-      title: pageResponse.properties.title.type === 'title' ? pageResponse.properties.title.title.reduce((prev, cur) => prev + cur.plain_text, '') : pageResponse.properties.title.rich_text.reduce((prev, cur) => prev + cur.plain_text, ''),
-      type: 'page',
-      pageId: createdPageId,
-      spaceId,
-      userId
-    });
+    let title = '';
 
-    createdPages[blockId] = createdPage;
-    return createdPage;
+    if (pageResponse.parent.type === 'page_id') {
+      title = (pageResponse.properties.title as any)[pageResponse.properties.title.type].reduce((prev: string, cur: {plain_text: string}) => prev + cur.plain_text, '');
+      const createdPage = await createPrismaPage({
+        content: pageContent,
+        headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
+        icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
+        title,
+        type: 'page',
+        pageId: createdPageId,
+        spaceId,
+        userId
+      });
+
+      createdPages[blockId] = createdPage;
+      return createdPage;
+    }
+    // TODO: Focalboard cards, these are not regular pages
+    else if (pageResponse.parent.type === 'database_id') {
+      const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title');
+      if (titleProperty) {
+        title = titleProperty.title.reduce((prev: string, cur: {plain_text: string}) => prev + cur.plain_text, '');
+      }
+    }
   }
 
   // Update parent id for all pages
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse;
-    // TODO: A page could be part of a database as well
+    // TODO: Parent of a page could be database
     // Check if its a nested page
     if (block.object === 'page' && block.parent.type === 'page_id') {
       createdPages[block.id] = await prisma.page.update({ where: {
@@ -1388,7 +1634,6 @@ handler.get(async (req, res) => {
     spaceId: state.spaceId,
     userId: state.userId
   });
-
   const cookies = new Cookies(req, res);
   cookies.set('notion-user', userId, {
     httpOnly: false,

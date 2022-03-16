@@ -39,7 +39,7 @@ interface Block {
 
     createdAt: number
     updatedAt: number
-    deleteAt: number
+    deletedAt: number | null
 }
 
 function createBlock(block?: Block): Block {
@@ -57,7 +57,7 @@ function createBlock(block?: Block): Block {
         title: block?.title || '',
         createdAt: block?.createdAt || now,
         updatedAt: block?.updatedAt || now,
-        deleteAt: block?.deleteAt || 0,
+        deletedAt: block?.deletedAt || null,
     }
 }
 
