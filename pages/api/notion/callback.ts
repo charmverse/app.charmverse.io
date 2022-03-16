@@ -11,7 +11,7 @@ import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO,
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/editor/ResizableImage';
 import { prisma } from 'db';
 import { v4 } from 'uuid';
-import { createBoard, IPropertyTemplate, PropertyType } from 'components/databases/focalboard/src/blocks/board';
+import { Board, createBoard, IPropertyTemplate, PropertyType } from 'components/databases/focalboard/src/blocks/board';
 import { createBoardView } from 'components/databases/focalboard/src/blocks/boardView';
 import { createCard } from 'components/databases/focalboard/src/blocks/card';
 import { createCharmTextBlock } from 'components/databases/focalboard/src/blocks/charmBlock';
@@ -1296,7 +1296,6 @@ function convertPropertyType (propertyType: string): PropertyType | null {
     case 'url':
     case 'select':
     case 'checkbox':
-    case 'phone':
     case 'date':
       return propertyType;
     case 'multi_select':
@@ -1307,6 +1306,8 @@ function convertPropertyType (propertyType: string): PropertyType | null {
       return 'createdTime';
     case 'updated_time':
       return 'updatedTime';
+    case 'phone_number':
+      return 'phone';
     default: {
       return null;
     }
@@ -1369,10 +1370,15 @@ async function createPrismaPage ({
 
 async function createDatabase (block: GetDatabaseResponse, {
   spaceId,
-  userId
-}: {spaceId: string, userId: string}) {
+  userId,
+  focalboardRecord
+}: {focalboardRecord: Record<string, Record<string, string>>, spaceId: string, userId: string}) {
   const title = (block as any).title.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
   const cardProperties: IPropertyTemplate[] = [];
+
+  const board = createBoard(undefined, false);
+  focalboardRecord[board.id] = {};
+
   const databaseProperties = Object.values(block.properties);
   databaseProperties.forEach(property => {
     const focalboardPropertyType = convertPropertyType(property.type);
@@ -1383,6 +1389,8 @@ async function createDatabase (block: GetDatabaseResponse, {
         options: [],
         type: focalboardPropertyType
       };
+
+      focalboardRecord[board.id][property.id] = cardProperty.id;
       cardProperties.push(cardProperty);
       if (property.type === 'select' || property.type === 'multi_select') {
         (property as any)[property.type].options.forEach((option: {id: string, name: string, color: string}) => {
@@ -1396,13 +1404,11 @@ async function createDatabase (block: GetDatabaseResponse, {
     }
   });
 
-  const board = createBoard(undefined, false);
   board.title = title;
   board.fields.icon = block.icon?.type === 'emoji' ? block.icon.emoji : '';
   board.fields.headerImage = block.cover?.type === 'external' ? block.cover.external.url : null;
   board.rootId = board.id;
   board.fields.cardProperties = cardProperties;
-
   const view = createBoardView();
   view.fields.viewType = 'board';
   view.parentId = board.id;
@@ -1468,6 +1474,7 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
 
   const createdPages: Record<string, Page> = {};
   const linkedPages: Record<string, string> = {};
+  const focalboardRecord: Record<string, Record<string, string>> = {};
 
   // This loop would decrease the amount of api requests made
   for (let index = 0; index < searchResults.length; index++) {
@@ -1484,7 +1491,8 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       if (!createdPages[block.id]) {
         createdPages[block.id] = await createDatabase(block as GetDatabaseResponse, {
           spaceId,
-          userId
+          userId,
+          focalboardRecord
         });
       }
     }
@@ -1594,7 +1602,8 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
             database_id: block.id
           }) as any, {
             spaceId,
-            userId
+            userId,
+            focalboardRecord
           });
 
           (parentNode as PageContent).content?.push({
@@ -1674,7 +1683,8 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       // eslint-disable-next-line
       const database = createdPages[pageResponse.parent.database_id] ?? await createDatabase(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse, {
         spaceId,
-        userId
+        userId,
+        focalboardRecord
       });
       const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title')!;
       const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
@@ -1685,6 +1695,19 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
         parentId: cardId,
         fields: {
           content: pageContent
+        }
+      });
+
+      const focalboardPropertyRecord = focalboardRecord[database.boardId!];
+
+      const cardProperties: Record<string, any> = {};
+
+      Object.values(pageResponse.properties).forEach(property => {
+        if (property.type.match(/(email|number|url|checkbox|phone_number)/)) {
+          cardProperties[focalboardPropertyRecord[property.id]] = property[property.type];
+        }
+        else if (property.type === 'rich_text') {
+          cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
         }
       });
 
@@ -1707,7 +1730,8 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
             fields: {
               icon: emoji,
               contentOrder: [charmTextBlock.id],
-              headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null
+              headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
+              properties: cardProperties
             }
           }),
           deletedAt: null,
@@ -1740,7 +1764,6 @@ async function importFromWorkspace ({ accessToken, userId, spaceId }:
       }
     }
   }
-
 }
 
 handler.get(async (req, res) => {
