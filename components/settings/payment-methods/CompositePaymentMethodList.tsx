@@ -13,6 +13,7 @@ import { PaymentMethodMap } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { useState } from 'react';
 import { ElementDeleteIcon } from 'components/elements/ElementDeleteIcon';
+import Link from 'components/common/Link';
 import { CompositeDeletePaymentMethod } from './CompositeDeletePaymentMethodModal';
 
 interface IProps {
@@ -98,10 +99,9 @@ export function CompositePaymentMethodList ({ paymentMethods }: IProps) {
               </TableCell>
               <TableCell width={200} sx={{ px: 0 }}>
                 <Typography>
-                  <a href={getChainExplorerLink(row.chainId, row.contractAddress, 'token')} target='_blank' rel='noreferrer'>
-                    <LaunchIcon sx={{ mr: 1 }} />
-                  </a>
-                  <strong>{getChainById(row.chainId)?.chainName}</strong>
+                  <Link href={getChainExplorerLink(row.chainId, row.contractAddress, 'token')} external>
+                    {getChainById(row.chainId)?.chainName}
+                  </Link>
                 </Typography>
               </TableCell>
               <TableCell width={150} sx={{ px: 0 }} align='center'>
