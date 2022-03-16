@@ -8,7 +8,7 @@ import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useWeb3React } from '@web3-react/core';
 import useENSName from 'hooks/useENSName';
-import CopyableAddress from './CopyableAddress';
+import CopyableAddress from '../common/CopyableAddress';
 
 export default function WalletConnection () {
 
@@ -53,7 +53,7 @@ export default function WalletConnection () {
                 <CopyableAddress
                   address={account}
                   decimals={5}
-                  sx={{ fontSize: ensName ? 16 : 20, fontWeight: 'normal', background: 'transparent !important', color: 'inherit', p: 0 }}
+                  sx={{ fontSize: ensName ? 16 : 20, fontWeight: 'normal', p: 0 }}
                 />
               ) : <div></div>}
             </Grid>

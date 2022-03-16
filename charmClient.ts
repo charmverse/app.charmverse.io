@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -12,6 +12,7 @@ import { IWorkspace } from 'components/databases/focalboard/src/blocks/workspace
 import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
+import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -388,6 +389,22 @@ class CharmClient {
     Promise<{ error?: string, success?: boolean, space: Space }> {
 
     return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
+  }
+
+  getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
+    return http.GET('/api/tokens/metadata', { chainId, contractAddress });
+  }
+
+  createPaymentMethod (paymentMethod: Partial<PaymentMethod>): Promise<PaymentMethod> {
+    return http.POST('/api/payment-methods', paymentMethod);
+  }
+
+  listPaymentMethods (spaceId: string): Promise<PaymentMethod []> {
+    return http.GET('/api/payment-methods', { spaceId });
+  }
+
+  deletePaymentMethod (paymentMethodId: string): Promise<PaymentMethod[]> {
+    return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 }
 

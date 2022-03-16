@@ -1,17 +1,20 @@
 import React from 'react';
 import { AlertColor } from '@mui/material/Alert';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import charmClient from 'charmClient';
 import Button from '@mui/material/Button';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getChainById, RPC } from 'connectors';
+import { isValidChainAddress } from 'lib/tokens/validation';
+import { getPaymentMethod } from 'lib/tokens/tokenData';
 import ERC20ABI from '../../abis/ERC20ABI.json';
 
 interface Props {
   receiver: string;
   amount: string;
-  tokenSymbol: string;
-  tokenContractAddress?: string;
+  tokenSymbolOrAddress: string;
   tokenDecimals?: number;
   chainIdToUse: number
   onSuccess?: (txId: string, chainId: number) => void;
@@ -88,14 +91,15 @@ export default function BountyPaymentButton ({
   receiver,
   amount,
   chainIdToUse,
-  tokenSymbol = 'ETH',
-  tokenContractAddress = '',
-  tokenDecimals = 18,
+  tokenSymbolOrAddress,
+  tokenDecimals,
   onSuccess = (tx: string, chainId: number) => {},
   onError = () => {},
   children = 'Make a payment'
 }: Props) {
   const { account, library, chainId, activate } = useWeb3React();
+
+  const [paymentMethods] = usePaymentMethods();
 
   const makePayment = async () => {
 
@@ -129,7 +133,7 @@ export default function BountyPaymentButton ({
 
       const signer = await library.getSigner(account);
 
-      if (chainToUse.nativeCurrency.symbol === tokenSymbol) {
+      if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
         console.log('Executing transaction');
         console.log('Receiver', receiver);
         const tx = await signer.sendTransaction({
@@ -139,8 +143,28 @@ export default function BountyPaymentButton ({
 
         onSuccess(tx.hash, chainToUse.chainId);
       }
-      else if (tokenContractAddress) {
-        const tokenContract = new ethers.Contract(tokenContractAddress, ERC20ABI, signer);
+      else if (isValidChainAddress(tokenSymbolOrAddress)) {
+        const tokenContract = new ethers.Contract(tokenSymbolOrAddress, ERC20ABI, signer);
+
+        tokenDecimals = tokenDecimals ?? (
+          getPaymentMethod(paymentMethods, tokenSymbolOrAddress)?.tokenDecimals
+        );
+
+        // Some tokens have 0 decimals, but 0 evaluates to a falsy
+        if (tokenDecimals !== 0 && !tokenDecimals) {
+          try {
+            const tokenInfo = await charmClient.getTokenMetaData({
+              chainId: chainToUse!.chainId,
+              contractAddress: tokenSymbolOrAddress
+            });
+            tokenDecimals = tokenInfo.decimals;
+          }
+          catch (error) {
+            onError(`Token information is missing. Please go to payment methods to configure this payment method using contract address ${tokenSymbolOrAddress} on ${chainToUse.chainName}`);
+            return;
+          }
+        }
+
         const parsedTokenAmount = ethers.utils.parseUnits(amount, tokenDecimals);
 
         // get allowance
@@ -156,7 +180,7 @@ export default function BountyPaymentButton ({
         onSuccess(tx.hash, chainToUse!.chainId);
       }
       else {
-        onError('Token contract address required');
+        onError('Please provide a valid contract address', 'error');
       }
     }
     catch (err: any) {

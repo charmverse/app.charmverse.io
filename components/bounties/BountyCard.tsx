@@ -23,7 +23,7 @@ export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
 
 export function BountyCard ({ truncate = true, bounty }: IBountyInput) {
   const [space] = useCurrentSpace();
-  const bountyUrl = `/${space!.domain}/bounty/${bounty.id}`;
+  const bountyUrl = `/${space!.domain}/bounties/${bounty.id}`;
 
   return (
     <Card

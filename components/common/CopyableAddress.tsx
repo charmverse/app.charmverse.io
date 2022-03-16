@@ -2,7 +2,13 @@ import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Tooltip from '@mui/material/Tooltip';
 import { shortenHex } from 'lib/utilities/strings';
-import Button from '../common/Button';
+import styled from '@emotion/styled';
+import Button from './Button';
+
+const StyledButton = styled(Button)`
+  color: inherit;
+  background: transparent !important;
+`;
 
 type Props = {
   address: string
@@ -27,9 +33,9 @@ export default function CopyableAddress ({ address, decimals = 3, ...rest }: Pro
     >
       <span>
         <CopyToClipboard text={address} onCopy={onCopy}>
-          <Button onClick={onCopy} variant='text' {...rest}>
+          <StyledButton onClick={onCopy} variant='text' {...rest}>
             {shortenHex(address, decimals)}
-          </Button>
+          </StyledButton>
         </CopyToClipboard>
       </span>
     </Tooltip>
