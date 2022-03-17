@@ -1,6 +1,7 @@
 import fetch from 'adapters/http/fetch';
 import { getTimeDifference } from 'lib/utilities/dates';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
+import { IError } from 'lib/utilities/errors';
 
 const CoinMarketCapCryptoMapping: Record<CryptoCurrency, number> = {
   AVAX: 5805,
@@ -16,6 +17,9 @@ const CoinMarketCapCryptoMapping: Record<CryptoCurrency, number> = {
 class PricingCache {
 
   private cmcApiToken: string;
+
+  // Cache any other crypto for half a hour
+  private defaultCacheDurationInSeconds = 0;
 
   private cacheDurationInSeconds: Record<CryptoCurrency, number> = {
     AVAX: 60,
@@ -45,10 +49,12 @@ class PricingCache {
       if (cachedQuote === null) {
         this.getPricing(base, quote)
           .then(freshQuote => {
+            console.log('API Quote', freshQuote);
             this.cacheQuote(freshQuote);
             resolve(freshQuote);
           })
           .catch(error => {
+            console.log('API Quote ERROR', error);
             reject(error);
           });
       }
@@ -73,7 +79,7 @@ class PricingCache {
 
     const diff = getTimeDifference(Date.now(), 'second', cachedQuote.receivedOn);
 
-    if (diff < this.cacheDurationInSeconds[base]) {
+    if (diff < (this.cacheDurationInSeconds[base] ?? this.defaultCacheDurationInSeconds)) {
       return cachedQuote;
     }
 
@@ -94,6 +100,10 @@ class PricingCache {
 
     return fetch(`https://min-api.cryptocompare.com/data/price?fsym=${base}&tsyms=${quote}`)
       .then(data => {
+
+        if (!data.quote) {
+          throw new Error('No valid price');
+        }
 
         const pairQuote: IPairQuote = {
           base,
@@ -116,6 +126,11 @@ class PricingCache {
         .then(data => {
 
           const quotedPrice = data.data[cmcCryptoCurrencyId.toString()].quote[quote].price;
+
+          if (!quotedPrice) {
+            reject(new Error('No price found'));
+            return;
+          }
 
           const pairQuote: IPairQuote = {
             base,
