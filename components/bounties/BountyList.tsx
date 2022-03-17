@@ -1,8 +1,9 @@
+import { useMemo, useContext, useState } from 'react';
+import { CSVLink, CSVDownload } from 'react-csv';
 import { Button, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import BountyModal from 'components/bounties/BountyModal';
 import { BountiesContext } from 'hooks/useBounties';
-import { useContext, useState } from 'react';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { BountyCard } from './BountyCard';
 import MultiPaymentModal from './MultiPaymentModal';
@@ -19,6 +20,27 @@ export function BountyList () {
   sortedBounties = sortedBounties.filter(bounty => {
     return bounty.status !== 'paid';
   });
+
+  const csvData = useMemo(() => {
+    const completedBounties = sortedBounties.filter(bounty => bounty.status === BountyStatus.complete);
+    if (!completedBounties.length) {
+      return [];
+    }
+
+    // Gnosis Safe Airdrop compatible format
+    // receiver: Ethereum address of transfer receiver.
+    // token_address: Ethereum address of ERC20 token to be transferred.
+    // amount: the amount of token to be transferred.
+    // More information: https://github.com/bh2smith/safe-airdrop
+    return [
+      ['token_address', 'receiver', 'amount'],
+      ...completedBounties.map((bounty, _index) => [
+        bounty.applications[0].walletAddress,
+        bounty.assignee,
+        bounty.rewardAmount
+      ])
+    ];
+  }, [sortedBounties]);
 
   function bountyCreated () {
     setDisplayBountyDialog(false);
@@ -49,6 +71,19 @@ export function BountyList () {
         </Grid>
 
         <Grid item xs={4} container justifyContent='flex-end'>
+          { !!csvData.length
+          && (
+          <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv'>
+            <Button
+              onClick={(event: Event) => {
+                event.stopPropagation();
+                return false;
+              }}
+            >
+              Export to CSV
+            </Button>
+          </CSVLink>
+          )}
           <MultiPaymentModal />
           <Button
             sx={{ ml: 1 }}
