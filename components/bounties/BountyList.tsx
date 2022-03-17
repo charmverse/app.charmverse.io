@@ -35,8 +35,8 @@ export function BountyList () {
     return [
       ['token_address', 'receiver', 'amount'],
       ...completedBounties.map((bounty, _index) => [
-        bounty.applications[0].walletAddress,
-        bounty.assignee,
+        bounty.rewardToken.startsWith('0x') ? bounty.rewardToken : '', // for native token it should be empty
+        bounty.applications.find(application => application.createdBy === bounty.assignee)?.walletAddress,
         bounty.rewardAmount
       ])
     ];
