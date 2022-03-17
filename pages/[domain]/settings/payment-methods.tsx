@@ -1,4 +1,4 @@
-import PaymentMethodList from 'components/settings/payment-methods/WidgetPaymentMethods';
+import PaymentMethodList from 'components/settings/PaymentMethods/PaymentMethods';
 import SettingsLayout from 'components/settings/Layout';
 import { ReactElement } from 'react';
 

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { RPCList } from 'connectors';
 import { prisma } from 'db';
 
