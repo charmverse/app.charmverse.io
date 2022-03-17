@@ -112,7 +112,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
         console.log('Received quote', quote);
 
         setError(null);
-        setPrice({ ...quote, receivedOn: Date.now() });
+        setPrice({ ...quote, receivedOn: quote.receivedOn ?? Date.now() });
         setLoadingState(false);
       })
       .catch(() => {
