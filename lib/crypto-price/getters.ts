@@ -32,21 +32,14 @@ class PricingCache {
   getQuote (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
     return new Promise((resolve, reject) => {
 
-      console.log('START API -----------------');
-
       const cachedQuote = this.loadFromCache(base, quote);
-
-      console.log('Base', base, 'Cached', cachedQuote);
-
       if (cachedQuote === null) {
         this.getPricing(base, quote)
           .then(freshQuote => {
-            console.log('API Quote', freshQuote);
             this.cacheQuote(freshQuote);
             resolve(freshQuote);
           })
           .catch(error => {
-            console.error('API Quote ERROR', error);
             reject(error);
           });
       }

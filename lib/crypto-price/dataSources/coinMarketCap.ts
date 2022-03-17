@@ -25,9 +25,6 @@ export function getPriceFromCoinMarketCap (
       headers: { 'X-CMC_PRO_API_KEY': apiToken }
     })
       .then(data => {
-
-        console.log('CMC', data);
-
         const quotedPrice = data.data[cmcCryptoCurrencyId.toString()].quote[quote].price;
 
         if (!quotedPrice) {
