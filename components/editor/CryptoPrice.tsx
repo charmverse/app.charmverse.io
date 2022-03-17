@@ -106,10 +106,11 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
 
   function refreshPrice () {
     setLoadingState(true);
-    charmClient.getPricing(baseCurrency, quoteCurrency)
-      .then((quote) => {
 
-        console.log('Received quote', quote);
+    const symbol = getTokenInfo(paymentMethods, baseCurrency).tokenSymbol as CryptoCurrency;
+
+    charmClient.getPricing(symbol, quoteCurrency)
+      .then((quote) => {
 
         setError(null);
         setPrice({ ...quote, receivedOn: quote.receivedOn ?? Date.now() });
