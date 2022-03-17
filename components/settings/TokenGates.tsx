@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { ShareModal } from 'lit-modal-vite';
-import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
+import { ResourceId, checkAndSignAuthMessage, SigningConditions, AccessControlCondition } from 'lit-js-sdk';
 import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { TokenGate } from '@prisma/client';
@@ -28,14 +28,6 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
 
-  const spaceResourceId: ResourceId = {
-    baseUrl: 'https://app.charmverse.io',
-    path: `${Math.random()}`,
-    orgId: spaceId,
-    role: 'member',
-    extraData: ''
-  };
-
   function onSubmit (conditions: ConditionsModalResult) {
     setApiError('');
     saveTokenGate(conditions)
@@ -49,7 +41,13 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   }
 
   async function saveTokenGate (conditions: Partial<SigningConditions>) {
-    const chain = conditions.accessControlConditions![0].chain;
+    // a top-level chain is required for litClient but its not actually used since each condition can be on different chains
+    const chain = (conditions.accessControlConditions![0] as AccessControlCondition[])[0]?.chain
+      || (conditions.accessControlConditions![0] as AccessControlCondition).chain
+       || 'ethereum';
+    if (!chain) {
+      throw new Error('No chain found in access conditions');
+    }
     const tokenGateId = uuid();
     const resourceId: ResourceId = {
       baseUrl: 'https://app.charmverse.io',

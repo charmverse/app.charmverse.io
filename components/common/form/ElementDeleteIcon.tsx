@@ -1,8 +1,3 @@
-import { ComponentProps, ReactNode } from 'react';
-import styled from '@emotion/styled';
-import MuiModal from '@mui/material/Modal';
-import MuiDialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
 import ButtonChip from 'components/common/ButtonChip';
