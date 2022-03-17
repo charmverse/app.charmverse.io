@@ -3,6 +3,7 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
 import { Bounty, Bounty as IBounty } from '@prisma/client';
 import charmClient, { PopulatedBounty } from 'charmClient';
 import Button from 'components/common/Button';
@@ -219,7 +220,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Reward amount
               </InputLabel>
-              <Input
+              <TextField
                 {...register('rewardAmount', {
                   valueAsNumber: true
                 })}

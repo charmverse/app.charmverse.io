@@ -1,5 +1,5 @@
 import { PaymentMethod } from '@prisma/client';
-import CustomErcTokenForm from 'components/settings/PaymentMethods/components/CustomErcTokenForm';
+import CustomErcTokenForm from 'components/settings/PaymentMethods/components/PaymentMethodForm';
 import { Modal } from 'components/common/Modal';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useState } from 'react';
@@ -20,7 +20,7 @@ export default function PaymentMethods ({ isAdmin = true }) {
 
   return (
     <>
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+      <Modal title='Add a payment method' open={modalOpen} onClose={() => setModalOpen(false)} size='500px'>
         <CustomErcTokenForm onSubmit={paymentMethodAdded} />
       </Modal>
 

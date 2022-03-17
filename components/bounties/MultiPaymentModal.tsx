@@ -61,7 +61,7 @@ export default function MultiPaymentModal () {
       <Button {...bindTrigger(popupState)}>
         Batch Payment ({bountiesReady.length})
       </Button>
-      <Modal {...bindPopover(popupState)}>
+      <Modal {...bindPopover(popupState)} size='fluid'>
         <DialogTitle onClose={popupState.close}>Batch Payments</DialogTitle>
         <Box py={2}>
           <ul>

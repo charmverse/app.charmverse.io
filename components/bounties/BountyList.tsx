@@ -45,7 +45,7 @@ export function BountyList () {
         }
 
         <Grid item xs={8}>
-          <h1>Bounty list</h1>
+          <Typography variant='h1'>Bounty list</Typography>
         </Grid>
 
         <Grid item xs={4} container justifyContent='flex-end'>

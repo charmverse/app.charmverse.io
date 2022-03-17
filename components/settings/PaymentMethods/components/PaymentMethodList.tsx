@@ -6,19 +6,22 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
 import { StyledRow } from 'components/settings/TokenGatesTable';
 import { getChainById, getChainExplorerLink } from 'connectors';
 import { PaymentMethod } from '@prisma/client';
 import { useUser } from 'hooks/useUser';
 import { useState } from 'react';
 import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
+import { shortenHex } from 'lib/utilities/strings';
 import Link from 'components/common/Link';
 import CompositeDeletePaymentMethod from './DeletePaymentMethodModal';
 
 interface IProps {
   paymentMethods: PaymentMethod[]
 }
+
+const getGnosisSafeUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address}/balances`;
 
 export default function CompositePaymentMethodList ({ paymentMethods }: IProps) {
 
@@ -54,58 +57,58 @@ export default function CompositePaymentMethodList ({ paymentMethods }: IProps) 
       <Table size='small' aria-label='simple table'>
         <TableHead>
           <TableRow>
-
-            <TableCell>Symbol</TableCell>
+            <TableCell sx={{ px: 0 }}>Token</TableCell>
             <TableCell>{/* Logo */}</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell sx={{ px: 0 }}>Blockchain</TableCell>
-
+            <TableCell>Blockchain</TableCell>
+            <TableCell>Wallet Type</TableCell>
             <TableCell>{/* Delete */}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {sortedMethods.map((row) => (
             <StyledRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-
-              <TableCell width={100}>
-                <Typography>
-                  {row.tokenSymbol}
-                </Typography>
+              <TableCell sx={{ px: 0 }}>
+                {row.contractAddress ? (
+                  <Tooltip arrow placement='top' title={`Contract address: ${shortenHex(row.contractAddress)}`}>
+                    <span>
+                      <Link href={getChainExplorerLink(row.chainId, row.contractAddress, 'token')} external target='_blank'>
+                        {row.tokenName} ({row.tokenSymbol})
+                      </Link>
+                    </span>
+                  </Tooltip>
+                ) : (
+                  `${row.tokenName} (${row.tokenSymbol})`
+                )}
               </TableCell>
-              <TableCell width={80}>
+              <TableCell width={25}>
                 {
-                row.tokenLogo && (
-                  <img
-                    alt=''
-                    style={{ maxHeight: '50px' }}
-                    src={row.tokenLogo as string}
-                  />
-                )
-              }
+                  row.tokenLogo && (
+                    <img
+                      style={{ maxWidth: '100%' }}
+                      src={row.tokenLogo as string}
+                    />
+                  )
+                }
               </TableCell>
-              <TableCell width={300}>
-                <Box component='span' sx={{ display: 'inline' }}>
-
-                  <Typography>
-                    {row.tokenName}
-
-                  </Typography>
-
-                </Box>
-
+              <TableCell>
+                {getChainById(row.chainId)?.chainName}
               </TableCell>
-              <TableCell width={200} sx={{ px: 0 }}>
-                <Typography>
-                  {row.contractAddress ? (
-                    <Link href={getChainExplorerLink(row.chainId, row.contractAddress, 'token')} external>
-                      {getChainById(row.chainId)?.chainName}
-                    </Link>
+              <TableCell>
+                {
+                  row.gnosisSafeAddress ? (
+                    <Tooltip arrow placement='top' title={`Safe address: ${shortenHex(row.gnosisSafeAddress)}`}>
+                      <span>
+                        <Link href={getGnosisSafeUrl(row.gnosisSafeAddress)} external target='_blank'>
+                          Gnosis Safe
+                        </Link>
+                      </span>
+                    </Tooltip>
                   ) : (
-                    getChainById(row.chainId)?.chainName
-                  )}
-                </Typography>
+                    'MetaMask'
+                  )
+                }
               </TableCell>
-              <TableCell width={150} sx={{ px: 0 }} align='center'>
+              <TableCell width={150} sx={{ px: 0 }} align='right'>
 
                 {
                 isAdmin && (
