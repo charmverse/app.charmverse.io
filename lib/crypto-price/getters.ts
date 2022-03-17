@@ -101,7 +101,7 @@ class PricingCache {
     return fetch(`https://min-api.cryptocompare.com/data/price?fsym=${base}&tsyms=${quote}`)
       .then(data => {
 
-        if (!data.quote) {
+        if (!data[quote]) {
           throw new Error('No valid price');
         }
 
