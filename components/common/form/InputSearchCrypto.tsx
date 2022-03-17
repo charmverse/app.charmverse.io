@@ -17,21 +17,19 @@ export interface IInputSearchCryptoProps {
 
 export function InputSearchCrypto ({
   onChange = () => {},
-  defaultValue,
+  defaultValue = '',
   cryptoList = CryptoCurrencies
 }: IInputSearchCryptoProps) {
 
-  const valueToDisplay = defaultValue ?? (cryptoList[0] ?? '');
-
   const [inputValue, setInputValue] = useState('');
 
-  const [value, setValue] = useState(valueToDisplay);
+  const [value, setValue] = useState(defaultValue);
 
   const [paymentMethods] = usePaymentMethods();
 
   useEffect(() => {
-    setInputValue(valueToDisplay);
-    setValue(valueToDisplay);
+    setInputValue(defaultValue);
+    setValue(defaultValue);
   }, [cryptoList]);
 
   function emitValue (received: string) {
