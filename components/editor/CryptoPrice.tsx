@@ -74,7 +74,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   const [cryptoList, setCryptoList] = useState<string []>([]);
 
   useEffect(() => {
-    const baseCurrencies: string [] = CryptoCurrencies.slice();
+    const baseCurrencies: string[] = CryptoCurrencies.slice();
 
     if (paymentMethods) {
       Object.entries(paymentMethods)
