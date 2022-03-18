@@ -150,17 +150,13 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
       const cryptosToDisplay = [nativeCurrency];
 
-      // Add custom payment methods
-      if (paymentMethods[chainId]) {
-
-        const contractAddresses = paymentMethods
-          .filter(method => method.chainId === chainId)
-          .map(method => {
-            return method.contractAddress;
-          })
-          .filter(isTruthy);
-        cryptosToDisplay.push(...contractAddresses);
-      }
+      const contractAddresses = paymentMethods
+        .filter(method => method.chainId === chainId)
+        .map(method => {
+          return method.contractAddress;
+        })
+        .filter(isTruthy);
+      cryptosToDisplay.push(...contractAddresses);
 
       setAvailableCryptos(cryptosToDisplay);
       setValue('rewardToken', nativeCurrency);
