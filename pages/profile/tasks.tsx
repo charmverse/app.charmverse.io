@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 import Box from '@mui/material/Box';
 import { PageLayout } from 'components/common/page-layout';
 import { setTitle } from 'hooks/usePageTitle';
-import { ProfileHeader, Task, TasksList } from 'components/profile';
+import { ProfileHeader, Task, TasksList, TaskType } from 'components/profile';
 
 const tasks: Task[] = [{
   id: '2a2b16ba-2a0e-458f-a6cd-24af8745dcf7',
@@ -17,16 +17,28 @@ const tasks: Task[] = [{
     name: 'Bounty',
     url: 'https://app.charmverse.io/'
   }],
-  type: 'Multisig',
+  type: TaskType.multisig,
+  workspace: 'Bankless'
+}, {
+  id: '4d74b96c-3126-483f-8641-961dff09706e',
+  date: new Date(),
+  description: 'Send 0.5 ETH',
+  links: [{
+    id: '874e80f6-4c31-44a0-a0a6-ebb96bb93b9a',
+    name: 'Gnosis',
+    url: 'https://gnosis-safe.io/app/'
+  }],
+  type: TaskType.multisig,
   workspace: 'Bankless'
 }];
+
 export default function TasksPage () {
 
   setTitle('Tasks');
 
   return (
     <Box py={3} px='80px'>
-      <ProfileHeader />
+      <ProfileHeader name='Bill Murray' profileImageURL='http://www.fillmurray.com/200/300' />
       <TasksList tasks={tasks} />
     </Box>
   );

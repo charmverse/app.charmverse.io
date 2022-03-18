@@ -7,10 +7,17 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import bounties from 'pages/api/bounties';
 
-const StyledTableHead = styled(TableHead)`
+const StyledTableCell = styled(TableCell)`
   font-weight: 700;
+  border-bottom: 1px solid #000;
 `;
+
+export enum TaskType {
+  bounty = 'Bounty',
+  multisig = 'Multisig',
+}
 
 export type Link = {id: string; name: string; url:string;};
 
@@ -19,7 +26,7 @@ export type Task = {
   date: Date;
   description: string;
   links: Link[];
-  type: string;
+  type: TaskType;
   workspace: string;
 };
 
@@ -34,15 +41,15 @@ export function TasksList ({ tasks }: TasksListProps) {
 
   return (
     <Table size='small' aria-label='simple table'>
-      <StyledTableHead>
+      <TableHead>
         <TableRow>
-          <TableCell sx={{ px: 0 }}>Date</TableCell>
-          <TableCell>My Tasks</TableCell>
-          <TableCell>Type</TableCell>
-          <TableCell>Workspace</TableCell>
-          <TableCell></TableCell>
+          <StyledTableCell sx={{ px: 0 }}>Date</StyledTableCell>
+          <StyledTableCell>My Tasks</StyledTableCell>
+          <StyledTableCell>Type</StyledTableCell>
+          <StyledTableCell>Workspace</StyledTableCell>
+          <StyledTableCell></StyledTableCell>
         </TableRow>
-      </StyledTableHead>
+      </TableHead>
       <TableBody>
         {
           tasks.map((task: Task, _taskIndex: number) => (
