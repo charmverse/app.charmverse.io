@@ -1,7 +1,7 @@
 import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
 import fetch from 'adapters/http/fetch';
 
-const CoinMarketCapCryptoMapping: Record<CryptoCurrency, number> = {
+const CoinMarketCapCryptoMapping: Record<CryptoCurrency | string, number> = {
   AVAX: 5805,
   BNB: 1839,
   CELO: 5567,
@@ -15,12 +15,18 @@ const CoinMarketCapCryptoMapping: Record<CryptoCurrency, number> = {
 const apiServiceToken = process.env.CMC_API_TOKEN!;
 
 export function getPriceFromCoinMarketCap (
-  base: CryptoCurrency,
+  base: CryptoCurrency | string,
   quote: FiatCurrency,
   apiToken = apiServiceToken
 ): Promise<IPairQuote> {
   return new Promise((resolve, reject) => {
     const cmcCryptoCurrencyId = CoinMarketCapCryptoMapping[base];
+
+    if (!cmcCryptoCurrencyId) {
+      reject(new Error('Currency not supported'));
+      return;
+    }
+
     fetch(`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${cmcCryptoCurrencyId}&convert=${quote}`, {
       headers: { 'X-CMC_PRO_API_KEY': apiToken }
     })

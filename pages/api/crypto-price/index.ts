@@ -16,7 +16,7 @@ handler.use(requireUserOrSharePage).get(getPrice);
 async function getPrice (req: NextApiRequest, res: NextApiResponse<any>) {
   const { base, quote } = req.query;
 
-  const priceQuote = await pricingGetter.getQuote(base as CryptoCurrency, quote as FiatCurrency);
+  const priceQuote = await pricingGetter.getQuote(base as string, quote as FiatCurrency);
 
   return res.status(200).json(priceQuote);
 }

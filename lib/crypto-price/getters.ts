@@ -9,7 +9,7 @@ class PricingCache {
   // Cache any other crypto for half a hour
   private defaultCacheDurationInSeconds = 0;
 
-  private cacheDurationInSeconds: Record<CryptoCurrency, number> = {
+  private cacheDurationInSeconds: Record<CryptoCurrency | string, number> = {
     AVAX: 60,
     BNB: 60,
     CELO: 60,
@@ -29,7 +29,13 @@ class PricingCache {
     this.cache = [];
   }
 
-  getQuote (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
+  /**
+   *
+   * @param base
+   * @param quote
+   * @returns
+   */
+  getQuote (base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote> {
     return new Promise((resolve, reject) => {
 
       const cachedQuote = this.loadFromCache(base, quote);
@@ -51,7 +57,7 @@ class PricingCache {
   }
 
   // Loads an item from cache and deletes it if necessary
-  private loadFromCache (base: CryptoCurrency, quote: FiatCurrency): IPairQuote | null {
+  private loadFromCache (base: CryptoCurrency | string, quote: FiatCurrency): IPairQuote | null {
     const cachedQuoteIndex = this.cache.findIndex(item => {
       return item.quote === quote && item.base === base;
     });
@@ -77,7 +83,7 @@ class PricingCache {
     this.cache.push(pairQuote);
   }
 
-  private getPricing (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
+  private getPricing (base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote> {
 
     if (base === 'XDAI') {
       return getPriceFromCoinMarketCap(base, quote);

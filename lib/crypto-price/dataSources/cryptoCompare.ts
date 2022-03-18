@@ -3,7 +3,7 @@ import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
 import fetch from 'adapters/http/fetch';
 
 export function getPriceFromCryptoCompare (
-  base: CryptoCurrency,
+  base: CryptoCurrency | string,
   quote: FiatCurrency
 ) {
 
