@@ -11,6 +11,7 @@ import type { UrlObject } from 'url';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share'];
+const accountPages = ['profile'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
 
@@ -112,6 +113,10 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         _user = await charmClient.createUser({ address: account });
       }
       return { authorized: false, user: _user };
+    }
+    // condition: user accesses account pages (profile, tasks)
+    else if (accountPages.some(basePath => firstPathSegment === basePath)) {
+      return { authorized: true };
     }
     // condition: trying to access a space without access
     else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
