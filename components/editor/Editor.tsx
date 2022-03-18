@@ -23,7 +23,7 @@ export const Container = styled(Box)<{ top: number }>`
   width: 860px;
   max-width: 100%;
   margin: 0 auto 5px;
-  padding: 0 20px 0 80px;
+  padding: 0 80px;
   position: relative;
   top: ${({ top }) => top}px;
   padding-bottom: ${({ theme }) => theme.spacing(5)};
