@@ -350,7 +350,7 @@ class CharmClient {
     return http.POST('/api/transactions', details);
   }
 
-  async getPricing (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
+  async getPricing (base: string, quote: FiatCurrency): Promise<IPairQuote> {
 
     const data = await http.GET<IPairQuote>('/api/crypto-price', { base, quote });
 
