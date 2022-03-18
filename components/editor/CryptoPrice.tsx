@@ -72,14 +72,15 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
 
   const [paymentMethods] = usePaymentMethods();
 
-  const cryptoList = (CryptoCurrencies as string []).concat(
-    paymentMethods?.filter(method => {
+  const customCryptoContractAddresses = paymentMethods
+    .filter(method => {
       const chainId = method.chainId;
       const chain = getChainById(chainId);
       return chain?.testnet !== true && isTruthy(method.contractAddress);
     })
-      .map(method => method.contractAddress)
-  );
+    .map(method => method.contractAddress) as string[];
+
+  const cryptoList = (CryptoCurrencies as string []).concat(customCryptoContractAddresses);
 
   useEffect(() => {
     // Load the price automatically on the initial render, or if a currency was changed
