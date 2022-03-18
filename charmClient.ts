@@ -359,7 +359,8 @@ class CharmClient {
 
   // AWS
   uploadToS3 (file: File): Promise<{ token: any, bucket: string, key: string, region: string }> {
-    const filename = encodeURIComponent(file.name);
+    const extension = file.name.split('.').pop() || ''; // lowercase the extension to simplify possible values
+    const filename = encodeURIComponent(file.name.replace(extension, extension.toLowerCase()));
     return http.GET('/api/aws/s3-upload', { filename });
   }
 
