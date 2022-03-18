@@ -2,7 +2,7 @@
 
 import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod } from '@prisma/client';
 import * as http from 'adapters/http';
-import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
+import { Contributor, LoggedInUser, BountyWithDetails, Task } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { getDisplayName } from 'lib/users';
@@ -409,6 +409,11 @@ class CharmClient {
 
   deletePaymentMethod (paymentMethodId: string): Promise<PaymentMethod[]> {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
+  }
+
+  // Tasks
+  listTasks (): Promise<Task[]> {
+    return http.GET('/api/tasks');
   }
 }
 
