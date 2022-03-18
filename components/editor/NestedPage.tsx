@@ -240,7 +240,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
         isEditorEmpty ? <InsertDriveFileOutlinedIcon /> : <DescriptionOutlinedIcon />
       )}
       <Link
-        href={`/${(space!).domain}/${node.attrs.path}`}
+        href={`/${space?.domain}/${node.attrs.path}`}
         passHref
       >
         <Box fontWeight={600} component='div' width='100%'>

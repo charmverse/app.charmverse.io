@@ -4,13 +4,18 @@ import Button from 'components/common/Button';
 import Autorenew from '@mui/icons-material/Autorenew';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
 import { formatMoney } from 'lib/utilities/formatting';
 import { RelativeTime } from 'components/common/RelativeTime';
 import charmClient from 'charmClient';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { CryptoCurrencies, getChainById, RPCList } from 'connectors';
+import { getTokenInfo } from 'lib/tokens/tokenData';
+import { isTruthy } from 'lib/utilities/types';
+
 /**
  * Simple utility as the Crypto Price component allows selecting the base or quote
  */
@@ -65,6 +70,18 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   const [selectionList, setSelectionList] = useState<null | OptionListName>(null);
   const [error, setError] = useState<null | string>(null);
 
+  const [paymentMethods] = usePaymentMethods();
+
+  const customCryptoContractAddresses = paymentMethods
+    .filter(method => {
+      const chainId = method.chainId;
+      const chain = getChainById(chainId);
+      return chain?.testnet !== true && isTruthy(method.contractAddress);
+    })
+    .map(method => method.contractAddress) as string[];
+
+  const cryptoList = (CryptoCurrencies as string []).concat(customCryptoContractAddresses);
+
   useEffect(() => {
     // Load the price automatically on the initial render, or if a currency was changed
     if (error === null && baseCurrency && quoteCurrency) {
@@ -74,10 +91,14 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
 
   function refreshPrice () {
     setLoadingState(true);
-    charmClient.getPricing(baseCurrency, quoteCurrency)
+
+    const symbol = getTokenInfo(paymentMethods, baseCurrency).tokenSymbol;
+
+    charmClient.getPricing(symbol, quoteCurrency)
       .then((quote) => {
+
         setError(null);
-        setPrice({ ...quote, receivedOn: Date.now() });
+        setPrice({ ...quote, receivedOn: quote.receivedOn ?? Date.now() });
         setLoadingState(false);
       })
       .catch(() => {
@@ -127,7 +148,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
       {(baseCurrency === null) && (
         <CardContent>
           <Box pt={1}>
-            <InputSearchCrypto onChange={changeBaseCurrency} />
+            <InputSearchCrypto cryptoList={cryptoList} onChange={changeBaseCurrency} />
           </Box>
         </CardContent>
       )}
@@ -138,14 +159,14 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
               active={selectionList === 'base'}
               onClick={() => toggleSelectionList('base')}
             >
-              {baseCurrency}
+              {getTokenInfo(paymentMethods, baseCurrency)?.tokenSymbol}
             </StyledButton>
             <Typography component='span' color='secondary'>/</Typography>
             <StyledButton
               active={selectionList === 'quote'}
               onClick={() => toggleSelectionList('quote')}
             >
-              {quoteCurrency}
+              {getTokenInfo(paymentMethods, quoteCurrency)?.tokenSymbol}
             </StyledButton>
             <IconButton size='small' onClick={() => refreshPrice()} sx={{ float: 'right' }}>
               <Autorenew color='secondary' fontSize='small' />
@@ -154,7 +175,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
 
           {(selectionList === 'base') && (
             <Box pt={1}>
-              <InputSearchCrypto onChange={changeBaseCurrency} />
+              <InputSearchCrypto cryptoList={cryptoList} onChange={changeBaseCurrency} />
             </Box>
           )}
 
