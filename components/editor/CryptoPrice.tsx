@@ -73,12 +73,11 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   const [paymentMethods] = usePaymentMethods();
 
   const cryptoList = (CryptoCurrencies as string []).concat(
-    paymentMethods
-      .filter(method => {
-        const chainId = method.chainId;
-        const chain = getChainById(chainId);
-        return chain?.testnet !== true && isTruthy(method.contractAddress);
-      })
+    paymentMethods?.filter(method => {
+      const chainId = method.chainId;
+      const chain = getChainById(chainId);
+      return chain?.testnet !== true && isTruthy(method.contractAddress);
+    })
       .map(method => method.contractAddress)
   );
 
