@@ -27,7 +27,7 @@ import { hideSuggestionsTooltip, referenceElement } from './@bangle.dev/tooltip/
 const name = 'page';
 export const NestedPagePluginKey = new PluginKey('suggest_tooltip');
 
-const NestedPageContainer = styled(props => <div {...props} />)`
+const NestedPageContainer = styled((props: any) => <div {...props} />)`
   align-items: center;
   cursor: pointer;
   display: flex;
