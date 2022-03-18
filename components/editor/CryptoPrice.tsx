@@ -14,6 +14,7 @@ import charmClient from 'charmClient';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { CryptoCurrencies, getChainById, RPCList } from 'connectors';
 import { getTokenInfo } from 'lib/tokens/tokenData';
+import { isTruthy } from 'lib/utilities/types';
 
 /**
  * Simple utility as the Crypto Price component allows selecting the base or quote
@@ -71,31 +72,15 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
 
   const [paymentMethods] = usePaymentMethods();
 
-  const [cryptoList, setCryptoList] = useState<string []>([]);
-
-  useEffect(() => {
-    const baseCurrencies: string[] = CryptoCurrencies.slice();
-
-    if (paymentMethods) {
-      Object.entries(paymentMethods)
-        .forEach(chainAndPaymentMethod => {
-
-          const chainId = chainAndPaymentMethod[0];
-
-          const targetChain = getChainById(chainId);
-
-          if (targetChain && targetChain.testnet !== true) {
-            const paymentMethodList = chainAndPaymentMethod[1];
-            paymentMethodList.forEach(paymentMethod => {
-              baseCurrencies.push(paymentMethod.contractAddress);
-            });
-          }
-
-        });
-    }
-
-    setCryptoList(baseCurrencies);
-  }, [paymentMethods]);
+  const cryptoList = (CryptoCurrencies as string []).concat(
+    paymentMethods
+      .filter(method => {
+        const chainId = method.chainId;
+        const chain = getChainById(chainId);
+        return chain?.testnet !== true && isTruthy(method.contractAddress);
+      })
+      .map(method => method.contractAddress)
+  );
 
   useEffect(() => {
     // Load the price automatically on the initial render, or if a currency was changed
