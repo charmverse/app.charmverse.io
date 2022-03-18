@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Chip from '@mui/material/Chip';
@@ -21,6 +21,7 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 import getDisplayName from 'lib/users/getDisplayName';
+import { EditorViewContext } from '@bangle.dev/react';
 import Account from './Account';
 import ShareButton from './ShareButton';
 
@@ -54,6 +55,10 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
       : await charmClient.favoritePage(pageId);
     setUser(newUser);
   }
+
+  const view = useContext(EditorViewContext);
+
+  console.log('View', view);
 
   return (
     <StyledToolbar variant='dense'>
@@ -113,6 +118,9 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
               </Tooltip>
             </>
           )}
+
+          <Typography>Export to MD</Typography>
+
           {/** context menu */}
           {/* <IconButton size='small' sx={{ mx: 1 }} color='inherit'>
             <MoreHorizIcon />
