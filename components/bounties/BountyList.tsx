@@ -76,7 +76,7 @@ export function BountyList () {
           && (
           <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv'>
             <Button
-              onClick={(event: Event) => {
+              onClick={(event) => {
                 event.stopPropagation();
                 return false;
               }}
