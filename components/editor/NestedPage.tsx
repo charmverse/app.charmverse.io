@@ -249,6 +249,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
           sx={{ padding: '3px 12px' }}
           onClick={() => {
             const pos = getPos();
+            TextSelection.create(view.state.doc, pos - 1, pos + 1);
             view.dispatch(view.state.tr.setSelection(
               TextSelection.create(view.state.doc, pos - 1, pos + 1)
             ));
