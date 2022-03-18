@@ -1,6 +1,5 @@
 import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
-import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Box from '@mui/material/Box';
@@ -11,7 +10,6 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
-import { getChainExplorerLink } from 'connectors';
 import { ApplicationEditorForm } from 'components/bounties/ApplicationEditorForm';
 import { BountyApplicantList } from 'components/bounties/BountyApplicantList';
 import { BountyBadge } from 'components/bounties/BountyBadge';
@@ -32,9 +30,6 @@ import { eToNumber } from 'lib/utilities/numbers';
 import { BountyWithDetails, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
-import { shortenHex } from 'lib/utilities/strings';
-import { humanFriendlyDate } from 'lib/utilities/dates';
-import Link from 'next/link';
 
 export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 

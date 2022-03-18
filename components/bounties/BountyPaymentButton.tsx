@@ -8,14 +8,12 @@ import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getChainById, RPC } from 'connectors';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { getPaymentMethod } from 'lib/tokens/tokenData';
 import ERC20ABI from '../../abis/ERC20ABI.json';
 
 interface Props {
   receiver: string;
   amount: string;
   tokenSymbolOrAddress: string;
-  tokenDecimals?: number;
   chainIdToUse: number
   onSuccess?: (txId: string, chainId: number) => void;
   onError?: (err: any, severity?: AlertColor) => void;
@@ -92,12 +90,11 @@ export default function BountyPaymentButton ({
   amount,
   chainIdToUse,
   tokenSymbolOrAddress,
-  tokenDecimals,
   onSuccess = (tx: string, chainId: number) => {},
   onError = () => {},
   children = 'Make a payment'
 }: Props) {
-  const { account, library, chainId, activate } = useWeb3React();
+  const { account, library, chainId } = useWeb3React();
 
   const [paymentMethods] = usePaymentMethods();
 
@@ -134,8 +131,6 @@ export default function BountyPaymentButton ({
       const signer = await library.getSigner(account);
 
       if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
-        console.log('Executing transaction');
-        console.log('Receiver', receiver);
         const tx = await signer.sendTransaction({
           to: receiver,
           value: ethers.utils.parseEther(amount)
@@ -146,12 +141,12 @@ export default function BountyPaymentButton ({
       else if (isValidChainAddress(tokenSymbolOrAddress)) {
         const tokenContract = new ethers.Contract(tokenSymbolOrAddress, ERC20ABI, signer);
 
-        tokenDecimals = tokenDecimals ?? (
-          getPaymentMethod(paymentMethods, tokenSymbolOrAddress)?.tokenDecimals
-        );
+        const paymentMethod = paymentMethods.find(method => (
+          method.contractAddress === tokenSymbolOrAddress || method.id === tokenSymbolOrAddress
+        ));
+        let tokenDecimals = paymentMethod?.tokenDecimals;
 
-        // Some tokens have 0 decimals, but 0 evaluates to a falsy
-        if (tokenDecimals !== 0 && !tokenDecimals) {
+        if (typeof tokenDecimals !== 'number') {
           try {
             const tokenInfo = await charmClient.getTokenMetaData({
               chainId: chainToUse!.chainId,

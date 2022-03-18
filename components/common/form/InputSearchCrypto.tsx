@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { UseFormRegister } from 'react-hook-form';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { ITokenMetadata, getPaymentMethod, getTokenInfo } from 'lib/tokens/tokenData';
+import { ITokenMetadata, getTokenInfo } from 'lib/tokens/tokenData';
 import { PaymentMethod } from '@prisma/client';
 
 export interface IInputSearchCryptoProps {
