@@ -92,7 +92,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   function refreshPrice () {
     setLoadingState(true);
 
-    const symbol = getTokenInfo(paymentMethods, baseCurrency).tokenSymbol as CryptoCurrency;
+    const symbol = getTokenInfo(paymentMethods, baseCurrency).tokenSymbol;
 
     charmClient.getPricing(symbol, quoteCurrency)
       .then((quote) => {
