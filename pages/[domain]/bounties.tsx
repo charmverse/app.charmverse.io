@@ -9,20 +9,8 @@ export default function BountyPage () {
   setTitle('Bounties');
 
   return (
-    <Box p={3}>
-
+    <Box py={3} px='80px'>
       <BountyList />
-      {
-        /*
-        <BountyProvider>
-        <BountyContainer />
-      </BountyProvider>
-
-              <SuggestionProvider>
-        <SuggestionContainer />
-      </SuggestionProvider>
-         */
-      }
     </Box>
   );
 

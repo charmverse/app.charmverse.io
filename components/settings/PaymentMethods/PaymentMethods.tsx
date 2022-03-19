@@ -1,13 +1,14 @@
 import { PaymentMethod } from '@prisma/client';
-import { CustomErcTokenForm } from 'components/settings/payment-methods/CompositeErc20PaymentMethodForm';
+import CustomErcTokenForm from 'components/settings/PaymentMethods/components/PaymentMethodForm';
 import { Modal } from 'components/common/Modal';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useState } from 'react';
-import Button from '../../common/Button';
+import Button from 'components/common/Button';
+import Typography from '@mui/material/Typography';
 import Legend from '../Legend';
-import { CompositePaymentMethodList } from './CompositePaymentMethodList';
+import PaymentMethodList from './components/PaymentMethodList';
 
-export default function PaymentMethodList ({ isAdmin = true }) {
+export default function PaymentMethods ({ isAdmin = true }) {
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -19,7 +20,7 @@ export default function PaymentMethodList ({ isAdmin = true }) {
 
   return (
     <>
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+      <Modal title='Add a payment method' open={modalOpen} onClose={() => setModalOpen(false)} size='500px'>
         <CustomErcTokenForm onSubmit={paymentMethodAdded} />
       </Modal>
 
@@ -35,8 +36,8 @@ export default function PaymentMethodList ({ isAdmin = true }) {
         </Button>
         )}
       </Legend>
-
-      <CompositePaymentMethodList paymentMethods={paymentMethods} />
+      {paymentMethods.length > 0 && <PaymentMethodList paymentMethods={paymentMethods} />}
+      {paymentMethods.length === 0 && <Typography color='secondary'>No payment methods yet</Typography>}
     </>
   );
 }

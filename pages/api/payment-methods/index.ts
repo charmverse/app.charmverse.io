@@ -5,7 +5,6 @@ import { Prisma, Page, PaymentMethod } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { IEventToLog, postToDiscord } from 'lib/logs/notifyDiscord';
 import { IApiError } from 'lib/utilities/errors';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
@@ -14,7 +13,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser)
   .use(requireSpaceMembership)
   .get(listPaymentMethods)
-  .use(requireKeys<PaymentMethod>(['chainId', 'contractAddress', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals'], 'body'))
+  .use(requireKeys<PaymentMethod>(['chainId', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals', 'walletType'], 'body'))
   .post(createPaymentMethod);
 
 async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<PaymentMethod [] | IApiError>) {
@@ -34,30 +33,23 @@ async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<Pa
   const {
     chainId,
     contractAddress,
+    gnosisSafeAddress,
     tokenSymbol,
     tokenLogo,
     spaceId,
     tokenName,
-    tokenDecimals
+    tokenDecimals,
+    walletType
   } = req.body as PaymentMethod;
 
-  if (!isValidChainAddress(contractAddress)) {
+  if (walletType === 'metamask' && !(contractAddress && isValidChainAddress(contractAddress))) {
     return res.status(400).json({
       message: 'Contract address is invalid'
     });
   }
-
-  const existingPaymentMethod = await prisma.paymentMethod.findFirst({
-    where: {
-      chainId,
-      contractAddress,
-      spaceId
-    }
-  });
-
-  if (existingPaymentMethod) {
+  if (walletType === 'gnosis' && !(gnosisSafeAddress && isValidChainAddress(gnosisSafeAddress))) {
     return res.status(400).json({
-      message: 'This payment method already exists'
+      message: 'Safe address is invalid'
     });
   }
 
@@ -68,7 +60,9 @@ async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<Pa
     tokenName,
     tokenLogo,
     tokenDecimals,
+    gnosisSafeAddress,
     createdBy: req.session.user.id,
+    walletType,
     space: {
       connect: {
         id: spaceId

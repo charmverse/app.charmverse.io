@@ -4,12 +4,15 @@ import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import TextField from '@mui/material/TextField';
 import Progress from '@mui/material/CircularProgress';
+import Typography from '@mui/material/Typography';
 import InputLabel from '@mui/material/InputLabel';
-import { PaymentMethod } from '@prisma/client';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import { PaymentMethod, WalletType } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
-import { getCryptos } from 'connectors';
+import { getCryptos, getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -31,18 +34,22 @@ interface Props {
 
 export const schema = yup.object({
   chainId: yup.number().required('Please select a chain'),
-  contractAddress: yup.string().required().test('verifyContractFormat', 'Invalid contract address', (value) => {
-    return isValidChainAddress(value as string);
+  contractAddress: yup.string().nullable(true).test('verifyContractFormat', 'Invalid contract address', (value) => {
+    return !value || isValidChainAddress(value);
   }),
-  tokenSymbol: yup.string().required(),
-  tokenName: yup.string().required(),
-  tokenLogo: yup.string(),
-  tokenDecimals: yup.number()
+  gnosisSafeAddress: yup.string().test('verifyContractFormat', 'Invalid contract address', (value) => {
+    return !value || isValidChainAddress(value);
+  }),
+  tokenSymbol: yup.string().nullable(true),
+  tokenName: yup.string().nullable(true),
+  tokenLogo: yup.string().nullable(true),
+  tokenDecimals: yup.number().nullable(true),
+  walletType: yup.mixed<WalletType>().required().oneOf(['metamask', 'gnosis'])
 });
 
 type FormValues = yup.InferType<typeof schema>
 
-export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
+export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
 
   const [loadingToken, setLoadingToken] = useState(false);
 
@@ -59,9 +66,9 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
     mode: 'onChange',
     defaultValues: {
       // TBC till we agree on Prisma migration
-      chainId: defaultChainId as any,
-      tokenDecimals: 18
+      chainId: defaultChainId,
       // Default for an ERC20 token
+      tokenDecimals: 18
     },
     resolver: yupResolver(schema)
   });
@@ -74,20 +81,37 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
   // Checks if we could load the logo
   const [logoLoadSuccess, setLogoLoadSuccess] = useState(false);
 
-  useEffect(() => {
-    const newContractAddress = watch(({ contractAddress, chainId }, { value, name }) => {
+  const values = watch();
 
-      if ((name === 'contractAddress' || name === 'chainId') && isValidChainAddress(contractAddress as string)) {
-        loadToken({ chainId: chainId as number, contractAddress: contractAddress as string });
-      }
-      // Remove the current token as the contract address is being modified
-      else if (name === 'contractAddress' && !isValidChainAddress(contractAddress as string)) {
-        setValue('tokenSymbol', null as any);
-        setValue('tokenLogo', null as any);
+  useEffect(() => {
+    const newContractAddress = watch(({ contractAddress, chainId, walletType }, { value, name }) => {
+
+      if (walletType === 'metamask') {
+        if ((name === 'contractAddress' || name === 'chainId') && isValidChainAddress(contractAddress as string)) {
+          loadToken({ chainId: chainId as number, contractAddress: contractAddress as string });
+        }
+        // Remove the current token as the contract address is being modified
+        else if (name === 'contractAddress' && !isValidChainAddress(contractAddress as string)) {
+          setValue('tokenSymbol', null);
+          setValue('tokenLogo', null);
+        }
       }
     });
     return () => newContractAddress.unsubscribe();
   }, [watch]);
+
+  useEffect(() => {
+    if (values.gnosisSafeAddress) {
+      const chain = getChainById(values.chainId);
+      if (chain) {
+        setValue('tokenSymbol', chain.nativeCurrency.symbol);
+        setValue('tokenName', chain.nativeCurrency.name);
+        setValue('tokenDecimals', chain.nativeCurrency.decimals);
+        setValue('tokenLogo', null);
+        setValue('contractAddress', null);
+      }
+    }
+  }, [values.chainId, values.gnosisSafeAddress]);
 
   async function loadToken (tokenInfo: ITokenMetadataRequest) {
     setLoadingToken(true);
@@ -105,16 +129,14 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
       setLoadingToken(false);
     }
     catch (error) {
-      setValue('tokenLogo', null as any);
-      setValue('tokenSymbol', null as any);
-      setValue('tokenName', null as any);
-      setValue('tokenDecimals', null as any);
+      setValue('tokenLogo', null);
+      setValue('tokenSymbol', null);
+      setValue('tokenName', null);
+      setValue('tokenDecimals', null);
       setAllowManualInput(true);
       setLoadingToken(false);
     }
   }
-
-  const values = watch();
 
   function setChainId (_chainId: number) {
     setValue('chainId', _chainId);
@@ -146,12 +168,33 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
 
   return (
     <div>
+      {/* @ts-ignore */}
       <form onSubmit={handleSubmit(addPaymentMethod)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
         <Grid container direction='column' spacing={3}>
 
           <Grid item xs>
             <InputLabel>
-              Which chain is your custom token on?
+              Wallet Type
+            </InputLabel>
+            <Select
+              {...register('walletType')}
+              displayEmpty
+              fullWidth
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <Typography color='secondary'>Select a wallet type</Typography>;
+                }
+                return selected === 'metamask' ? 'Metamask' : 'Gnosis Safe';
+              }}
+            >
+              <MenuItem value='metamask'>Metamask</MenuItem>
+              <MenuItem value='gnosis'>Gnosis Safe</MenuItem>
+            </Select>
+          </Grid>
+
+          <Grid item xs>
+            <InputLabel>
+              Blockchain
             </InputLabel>
             <InputBlockchainSearch
               defaultChainId={defaultChainId}
@@ -159,29 +202,42 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
             />
           </Grid>
 
-          <Grid item xs>
-            <InputLabel>
-              Contract address
-            </InputLabel>
-            <TextField
-              {...register('contractAddress')}
-              type='text'
-              fullWidth
-              error={!!errors.contractAddress?.message}
-              helperText={errors.contractAddress?.message}
-            />
-            {
-              !(errors?.contractAddress) && allowManualInput && !loadingToken && (
-                <Alert severity='info'>
-                  We couldn't find data about this token. Enter its details below, or select a different blockchain.
-                </Alert>
-              )
-            }
-          </Grid>
+          {values.walletType === 'gnosis' && (
+            <Grid item xs>
+              <TextField
+                {...register('gnosisSafeAddress')}
+                fullWidth
+                placeholder='Enter Gnosis Safe address'
+                error={!!errors.gnosisSafeAddress?.message}
+                helperText={errors.gnosisSafeAddress?.message}
+              />
+            </Grid>
+          )}
 
-          {
-            loadingToken && <Progress />
-          }
+          {values.walletType === 'metamask' && (
+            <Grid item xs>
+              <InputLabel>
+                Contract address
+              </InputLabel>
+              <TextField
+                {...register('contractAddress')}
+                type='text'
+                fullWidth
+                error={!!errors.contractAddress?.message}
+                helperText={errors.contractAddress?.message}
+                InputProps={{
+                  endAdornment: loadingToken && <Progress color='inherit' size='1em' />
+                }}
+              />
+              {
+                !(errors?.contractAddress) && allowManualInput && !loadingToken && (
+                  <Alert severity='info'>
+                    We couldn't find data about this token. Enter its details below, or select a different blockchain.
+                  </Alert>
+                )
+              }
+            </Grid>
+          )}
 
           {
             values.contractAddress && !errors.contractAddress && !loadingToken && (
@@ -206,7 +262,7 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
                     <InputLabel>
                       Token decimals
                     </InputLabel>
-                    <Input
+                    <TextField
                       {...register('tokenDecimals')}
                       type='number'
                       inputMode='numeric'
@@ -238,7 +294,7 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
                 <Grid item container xs>
                   <Grid item xs={validTokenLogoAddressFormat ? 8 : 12}>
                     <InputLabel>
-                      Token logo
+                      Token logo URL
                     </InputLabel>
                     <TextField
                       {...register('tokenLogo')}
@@ -246,34 +302,34 @@ export function CustomErcTokenForm ({ onSubmit, defaultChainId = 1 }: Props) {
                       fullWidth
                       error={!!errors.tokenLogo?.message}
                       helperText={errors.tokenLogo?.message}
+                      placeholder='https://app.charmverse.io/favicon.png'
                     />
                     {
-              (errors?.tokenLogo || (validTokenLogoAddressFormat && !logoLoadSuccess)) && (
-              <Alert severity='error'>
-                Invalid token logo url
-              </Alert>
-              )
-            }
+                      (errors?.tokenLogo || (validTokenLogoAddressFormat && !logoLoadSuccess)) && (
+                      <Alert severity='error'>
+                        Invalid token logo url
+                      </Alert>
+                      )
+                    }
                   </Grid>
                   {
-              validTokenLogoAddressFormat && (
-                <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'center', alignContent: 'center', verticalAlign: 'center' }}>
-                  <img
-                    alt=''
-                    style={{ maxHeight: '50px' }}
-                    src={values.tokenLogo}
-                    onError={(error) => {
-                      setLogoLoadSuccess(false);
-                    }}
-                    onLoad={() => {
-                      setLogoLoadSuccess(true);
-                    }}
-                  />
+                    validTokenLogoAddressFormat && (
+                      <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'center', alignContent: 'center', verticalAlign: 'center' }}>
+                        <img
+                          alt=''
+                          style={{ maxHeight: '50px' }}
+                          src={values.tokenLogo!}
+                          onError={(error) => {
+                            setLogoLoadSuccess(false);
+                          }}
+                          onLoad={() => {
+                            setLogoLoadSuccess(true);
+                          }}
+                        />
+                      </Grid>
+                    )
+                  }
                 </Grid>
-              )
-            }
-                </Grid>
-
               </>
             )
           }

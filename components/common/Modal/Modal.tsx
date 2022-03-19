@@ -5,14 +5,16 @@ import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
-type ModalSize = 'large' | 'fluid' | 'small';
+type ModalSize = 'large' | 'fluid' | 'small' | string;
 
-const ModalContainer = styled.div<{ size?: ModalSize }>`
+const defaultSize = '400px';
+
+const ModalContainer = styled.div<{ size: ModalSize }>`
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: ${({ size }) => size === 'large' ? '670px' : size === 'fluid' ? 'auto' : '400px'};
+  width: ${({ size }) => size === 'large' ? '670px' : size === 'fluid' ? 'auto' : size};
   background-color: ${({ theme }) => theme.palette.background.paper};
   border-radius: ${({ theme }) => theme.spacing(1)};
   box-shadow: ${({ theme }) => theme.shadows[15]};
@@ -33,16 +35,19 @@ const CloseButton = styled(IconButton)`
   padding: 0;
 `;
 
-export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose'> & { size?: ModalSize, children: any, onClose: () => void };
+export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose'> & {
+  size?: ModalSize,
+  children: any,
+  title?: string,
+  onClose: () => void
+};
 
-export function Modal ({ children, size, ...props }: ModalProps) {
+export function Modal ({ children, size = defaultSize, title, ...props }: ModalProps) {
   return (
     <MuiModal {...props}>
       <div>
         <ModalContainer size={size}>
-          {/* <CloseButton onClick={props.onClose}>
-            <CloseIcon color='secondary' />
-          </CloseButton> */}
+          {title && <DialogTitle onClose={props.onClose}>{title}</DialogTitle>}
           {children}
         </ModalContainer>
       </div>

@@ -23,6 +23,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "@next/next/no-img-element": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
     "brace-style": [
@@ -97,6 +98,7 @@
       }
     ],
     "react/jsx-no-bind": "off",
+    "react/jsx-one-expression-per-line": "off",
     "react/jsx-props-no-spreading": "off",
     "react/no-unescaped-entities": "off",
     "react/prop-types": "off",
@@ -110,6 +112,7 @@
     ],
     "no-bitwise": "warn",
     "no-undef": "off",
+    "jsx-a11y/alt-text": "off",
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/no-noninteractive-element-interactions": "off",
     "no-shadow": "off",

@@ -16,6 +16,10 @@ import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
+export interface PopulatedBounty extends Bounty {
+  applications: Application[];
+}
+
 //
 // CharmClient is the client interface to the server APIs
 //
@@ -273,8 +277,8 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (spaceId: string): Promise<Bounty []> {
-    return http.GET<Bounty[]>('/api/bounties', { spaceId });
+  listBounties (spaceId: string): Promise<PopulatedBounty[]> {
+    return http.GET('/api/bounties', { spaceId });
   }
 
   async createBounty (bounty: Partial<Bounty>): Promise<Bounty> {
@@ -350,7 +354,7 @@ class CharmClient {
     return http.POST('/api/transactions', details);
   }
 
-  async getPricing (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
+  async getPricing (base: string, quote: FiatCurrency): Promise<IPairQuote> {
 
     const data = await http.GET<IPairQuote>('/api/crypto-price', { base, quote });
 
@@ -359,7 +363,8 @@ class CharmClient {
 
   // AWS
   uploadToS3 (file: File): Promise<{ token: any, bucket: string, key: string, region: string }> {
-    const filename = encodeURIComponent(file.name);
+    const extension = file.name.split('.').pop() || ''; // lowercase the extension to simplify possible values
+    const filename = encodeURIComponent(file.name.replace(extension, extension.toLowerCase()));
     return http.GET('/api/aws/s3-upload', { filename });
   }
 

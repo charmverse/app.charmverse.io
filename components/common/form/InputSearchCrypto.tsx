@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { UseFormRegister } from 'react-hook-form';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { ITokenMetadata, getPaymentMethod, getTokenInfo } from 'lib/tokens/tokenData';
+import { ITokenMetadata, getTokenInfo } from 'lib/tokens/tokenData';
 import { PaymentMethod } from '@prisma/client';
 
 export interface IInputSearchCryptoProps {
@@ -17,21 +17,19 @@ export interface IInputSearchCryptoProps {
 
 export function InputSearchCrypto ({
   onChange = () => {},
-  defaultValue,
+  defaultValue = '',
   cryptoList = CryptoCurrencies
 }: IInputSearchCryptoProps) {
 
-  const valueToDisplay = defaultValue ?? (cryptoList[0] ?? '');
-
   const [inputValue, setInputValue] = useState('');
 
-  const [value, setValue] = useState(valueToDisplay);
+  const [value, setValue] = useState(defaultValue);
 
   const [paymentMethods] = usePaymentMethods();
 
   useEffect(() => {
-    setInputValue(valueToDisplay);
-    setValue(valueToDisplay);
+    setInputValue(defaultValue);
+    setValue(defaultValue);
   }, [cryptoList]);
 
   function emitValue (received: string) {

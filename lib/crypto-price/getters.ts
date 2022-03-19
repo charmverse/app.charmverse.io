@@ -1,23 +1,15 @@
 import fetch from 'adapters/http/fetch';
 import { getTimeDifference } from 'lib/utilities/dates';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
-
-const CoinMarketCapCryptoMapping: Record<CryptoCurrency, number> = {
-  AVAX: 5805,
-  BNB: 1839,
-  CELO: 5567,
-  ETH: 1027,
-  FTM: 3513,
-  MATIC: 3890,
-  ONE: 3945,
-  XDAI: 8635
-};
+import { IError } from 'lib/utilities/errors';
+import { getPriceFromCoinMarketCap, getPriceFromCryptoCompare } from './dataSources';
 
 class PricingCache {
 
-  private cmcApiToken: string;
+  // Cache any other crypto for half a hour
+  private defaultCacheDurationInSeconds = 0;
 
-  private cacheDurationInSeconds: Record<CryptoCurrency, number> = {
+  private cacheDurationInSeconds: Record<CryptoCurrency | string, number> = {
     AVAX: 60,
     BNB: 60,
     CELO: 60,
@@ -35,13 +27,18 @@ class PricingCache {
 
   constructor () {
     this.cache = [];
-    this.cmcApiToken = process.env.CMC_API_TOKEN!;
   }
 
-  getQuote (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
+  /**
+   *
+   * @param base
+   * @param quote
+   * @returns
+   */
+  getQuote (base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote> {
     return new Promise((resolve, reject) => {
-      const cachedQuote = this.loadFromCache(base, quote);
 
+      const cachedQuote = this.loadFromCache(base, quote);
       if (cachedQuote === null) {
         this.getPricing(base, quote)
           .then(freshQuote => {
@@ -60,7 +57,7 @@ class PricingCache {
   }
 
   // Loads an item from cache and deletes it if necessary
-  private loadFromCache (base: CryptoCurrency, quote: FiatCurrency): IPairQuote | null {
+  private loadFromCache (base: CryptoCurrency | string, quote: FiatCurrency): IPairQuote | null {
     const cachedQuoteIndex = this.cache.findIndex(item => {
       return item.quote === quote && item.base === base;
     });
@@ -73,7 +70,7 @@ class PricingCache {
 
     const diff = getTimeDifference(Date.now(), 'second', cachedQuote.receivedOn);
 
-    if (diff < this.cacheDurationInSeconds[base]) {
+    if (diff < (this.cacheDurationInSeconds[base] ?? this.defaultCacheDurationInSeconds)) {
       return cachedQuote;
     }
 
@@ -86,52 +83,15 @@ class PricingCache {
     this.cache.push(pairQuote);
   }
 
-  private getPricing (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
+  private getPricing (base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote> {
 
     if (base === 'XDAI') {
-      return this.getPriceFromCoinMarketCap(base, quote);
+      return getPriceFromCoinMarketCap(base, quote);
     }
 
-    return fetch(`https://min-api.cryptocompare.com/data/price?fsym=${base}&tsyms=${quote}`)
-      .then(data => {
-
-        const pairQuote: IPairQuote = {
-          base,
-          quote,
-          amount: data[quote],
-          receivedOn: Date.now()
-        };
-
-        return pairQuote;
-      });
-
+    return getPriceFromCryptoCompare(base, quote);
   }
 
-  private getPriceFromCoinMarketCap (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
-    return new Promise((resolve, reject) => {
-      const cmcCryptoCurrencyId = CoinMarketCapCryptoMapping[base];
-      fetch(`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${cmcCryptoCurrencyId}&convert=${quote}`, {
-        headers: { 'X-CMC_PRO_API_KEY': this.cmcApiToken }
-      })
-        .then(data => {
-
-          const quotedPrice = data.data[cmcCryptoCurrencyId.toString()].quote[quote].price;
-
-          const pairQuote: IPairQuote = {
-            base,
-            quote,
-            amount: quotedPrice,
-            receivedOn: Date.now()
-          };
-
-          resolve(pairQuote);
-
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  }
 }
 
 export const pricingGetter = new PricingCache();

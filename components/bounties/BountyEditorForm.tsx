@@ -3,8 +3,9 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
 import { Bounty, Bounty as IBounty } from '@prisma/client';
-import charmClient from 'charmClient';
+import charmClient, { PopulatedBounty } from 'charmClient';
 import Button from 'components/common/Button';
 import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
@@ -18,13 +19,14 @@ import { PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
 import { useState, useEffect } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
+import { isTruthy } from 'lib/utilities/types';
 import * as yup from 'yup';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 
 export type FormMode = 'create' | 'update';
 
 interface IBountyEditorInput {
-  onSubmit: (bounty: Bounty) => any,
+  onSubmit: (bounty: PopulatedBounty) => any,
   mode?: FormMode
   bounty?: Partial<Bounty>
 }
@@ -93,8 +95,6 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     refreshCryptoList(defaultChainId);
   }, []);
 
-  const values = watch();
-
   async function submitted (value: IBounty) {
 
     if (mode === 'create') {
@@ -103,8 +103,9 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
       value.description = value.description ?? '';
       value.descriptionNodes = value.descriptionNodes ?? '';
       const createdBounty = await charmClient.createBounty(value);
-      setBounties([...bounties, createdBounty]);
-      onSubmit(createdBounty);
+      const populatedBounty = { ...createdBounty, applications: [] };
+      setBounties([...bounties, populatedBounty]);
+      onSubmit(populatedBounty);
     }
     else if (bounty?.id && mode === 'update') {
       const updates = {
@@ -149,14 +150,13 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
       const cryptosToDisplay = [nativeCurrency];
 
-      // Add custom payment methods
-      if (paymentMethods[chainId]) {
-
-        const contractAddresses = paymentMethods[chainId].map(method => {
+      const contractAddresses = paymentMethods
+        .filter(method => method.chainId === chainId)
+        .map(method => {
           return method.contractAddress;
-        });
-        cryptosToDisplay.push(...contractAddresses);
-      }
+        })
+        .filter(isTruthy);
+      cryptosToDisplay.push(...contractAddresses);
 
       setAvailableCryptos(cryptosToDisplay);
       setValue('rewardToken', nativeCurrency);
@@ -216,7 +216,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Reward amount
               </InputLabel>
-              <Input
+              <TextField
                 {...register('rewardAmount', {
                   valueAsNumber: true
                 })}
