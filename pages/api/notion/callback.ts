@@ -1,4 +1,3 @@
-import Cookies from 'cookies';
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import * as http from 'adapters/http';
@@ -27,7 +26,7 @@ handler.get(async (req, res) => {
   }
   catch (e) {
     console.error('Error parsing state notion callback', e);
-    res.status(400).send('Invalid state');
+    res.status(400).send({ error: 'Invalid state' });
     return;
   }
   const encodedToken = Buffer.from(`${process.env.NOTION_OAUTH_CLIENT_ID}:${process.env.NOTION_OAUTH_SECRET}`).toString('base64');
@@ -50,11 +49,6 @@ handler.get(async (req, res) => {
     userId: state.userId,
     workspaceName: token.workspace_name,
     workspaceIcon: token.workspace_icon
-  });
-  const cookies = new Cookies(req, res);
-  cookies.set('notion-user', userId, {
-    httpOnly: false,
-    path: '/'
   });
   res.redirect(state.redirect);
 });
