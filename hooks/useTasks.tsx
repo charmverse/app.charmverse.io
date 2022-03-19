@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import charmClient from 'charmClient';
 import { Task } from 'models';
 
@@ -12,7 +12,7 @@ export function useTasks () {
     };
 
     getTasks();
-  });
+  }, []);
 
   return tasks;
 }
