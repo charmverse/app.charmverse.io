@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import Cookies from 'cookies';
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';

@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { Client } from '@notionhq/client';
 import { BlockNode, CalloutNode, ListItemNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
