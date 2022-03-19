@@ -12,6 +12,8 @@ export function useTasks () {
     };
 
     getTasks();
+
+    return () => setTasks([]);
   }, []);
 
   return tasks;
