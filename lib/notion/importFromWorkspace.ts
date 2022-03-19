@@ -770,7 +770,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         createdBy: userId,
         updatedBy: userId
       };
-
+      console.log('charmTextBlock', charmTextBlock);
       await prisma.block.createMany({
         data: [{
           ...charmTextBlock,

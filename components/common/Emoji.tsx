@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
-import { ComponentProps } from 'react';
+import { ComponentProps, ReactNode } from 'react';
 
 export const Emoji = styled(Box)`
   /* font family taken from Notion */
@@ -10,8 +10,8 @@ export const Emoji = styled(Box)`
   user-select: none;
   cursor: pointer;
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  width: 100px;
-  height: 100px;
+  width: 78px;
+  height: 78px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,11 +24,20 @@ export const Emoji = styled(Box)`
   }
 `;
 
-export default function EmojiCon ({ children, ...props }: ComponentProps<typeof Emoji>) {
-  if (typeof children === 'string' && children.startsWith('http')) {
-    return <Emoji {...props}><img src={children} /></Emoji>;
+type ImgSize = 'large' | 'small';
+
+const EmojiImg = styled.img<{ size: ImgSize }>`
+  border-radius: ${({ size }) => size === 'large' ? '6px' : '3px'};
+  height: ${({ size }) => size === 'large' ? '100%' : '18px'};
+  width: auto;
+  max-width: ${({ size }) => size === 'large' ? '100%' : '18px'};
+`;
+
+export default function EmojiCon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
+  if (typeof icon === 'string' && icon.startsWith('http')) {
+    return <Emoji {...props}><EmojiImg size={size} src={icon} /></Emoji>;
   }
   return (
-    <Emoji {...props}>{children}</Emoji>
+    <Emoji {...props}>{icon}</Emoji>
   );
 }
