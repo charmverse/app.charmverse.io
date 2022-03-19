@@ -395,12 +395,16 @@ async function createPrismaPage ({
   return page;
 }
 
+function convertToPlainText (chunks: {plain_text: string}[]) {
+  return chunks.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
+}
+
 async function createDatabase (block: GetDatabaseResponse, {
   spaceId,
   userId,
   focalboardRecord
 }: {focalboardRecord: Record<string, Record<string, string>>, spaceId: string, userId: string}) {
-  const title = (block as any).title.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
+  const title = convertToPlainText((block as any).title);
   const cardProperties: IPropertyTemplate[] = [];
 
   const board = createBoard(undefined, false);
@@ -691,7 +695,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
 
     if (pageResponse.parent.type === 'page_id' || pageResponse.parent.type === 'workspace') {
-      const title = (pageResponse.properties.title as any)[pageResponse.properties.title.type].reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
+      const title = convertToPlainText((pageResponse.properties.title as any)[pageResponse.properties.title.type]);
       const createdPage = await createPrismaPage({
         content: pageContent,
         headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
@@ -716,7 +720,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title')!;
       const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
 
-      const title = titleProperty.title.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
+      const title = convertToPlainText(titleProperty.title);
       const cardId = v4();
       const charmTextBlock = createCharmTextBlock({
         parentId: cardId,
@@ -735,8 +739,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             cardProperties[focalboardPropertyRecord[property.id]] = property[property.type];
           }
           else if (property.type === 'rich_text') {
-            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type]
-              .reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
+            cardProperties[focalboardPropertyRecord[property.id]] = convertToPlainText(property[property.type]);
           }
           else if (property.type === 'select') {
             cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].id;
@@ -819,7 +822,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         });
       }
       else if (block.parent.type === 'workspace') {
-        // Place root pages/databases inside workspace pace
+        // Place root pages/databases inside workspace page
         createdPages[block.id] = await prisma.page.update({
           where: {
             id: createdPages[block.id].id!
