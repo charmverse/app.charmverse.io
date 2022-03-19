@@ -331,24 +331,30 @@ function convertPropertyType (propertyType: string): PropertyType | null {
 }
 
 async function createPrismaPage ({
-  pageId,
-  content,
-  headerImage,
+  pageId = v4(),
+  content = {
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: []
+    }]
+  },
+  headerImage = null,
   icon,
   spaceId,
   title,
-  type,
+  type = 'page',
   userId,
   boardId
 }: {
-  pageId: string,
-  content: PageContent
+  pageId?: string,
+  content?: PageContent
   userId: string
   spaceId: string
-  headerImage: string | null
+  headerImage?: string | null
   icon: string | null
   title: string
-  type: Prisma.PageCreateInput['type'],
+  type?: Prisma.PageCreateInput['type'],
   boardId?: string | null
 }) {
   const id = Math.random().toString().replace('0.', '');
@@ -445,18 +451,10 @@ async function createDatabase (block: GetDatabaseResponse, {
   });
 
   const createdPage = await createPrismaPage({
-    content: {
-      type: 'doc',
-      content: [{
-        type: 'paragraph',
-        content: []
-      }]
-    },
     headerImage: block.cover?.type === 'external' ? block.cover.external.url : null,
     icon: block.icon?.type === 'emoji' ? block.icon.emoji : null,
     title,
     type: 'board',
-    pageId: v4(),
     spaceId,
     userId,
     boardId: board.id
@@ -689,7 +687,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
         icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
         title,
-        type: 'page',
         pageId: createdPageId,
         spaceId,
         userId
@@ -789,19 +786,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
   const workspacePageId = v4();
   await createPrismaPage({
-    content: {
-      type: 'doc',
-      content: [{
-        type: 'paragraph',
-        content: []
-      }]
-    },
-    headerImage: null,
     icon: workspaceIcon,
     pageId: workspacePageId,
     spaceId,
     title: workspaceName,
-    type: 'page',
     userId
   });
 
