@@ -5,6 +5,7 @@ import { ComponentProps } from 'react';
 export const Emoji = styled(Box)`
   /* font family taken from Notion */
   font-family: "Apple Color Emoji", "Segoe UI Emoji", NotoColorEmoji, "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", EmojiSymbols;
+  overflow: hidden;
   white-space: nowrap;
   user-select: none;
   cursor: pointer;
@@ -17,13 +18,16 @@ export const Emoji = styled(Box)`
   position: relative;
   z-index: 1;
   border-radius: 4px;
-  
+
   &:hover {
     background-color: ${({ theme }) => theme.palette.background.light};
   }
 `;
 
 export default function EmojiCon ({ children, ...props }: ComponentProps<typeof Emoji>) {
+  if (typeof children === 'string' && children.startsWith('http')) {
+    return <Emoji {...props}><img src={children} /></Emoji>;
+  }
   return (
     <Emoji {...props}>{children}</Emoji>
   );
