@@ -1,6 +1,6 @@
 import { useMemo, useContext, useState } from 'react';
 import { CSVLink, CSVDownload } from 'react-csv';
-import { Button, Grid, Typography } from '@mui/material';
+import { Box, Button, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import BountyModal from 'components/bounties/BountyModal';
 import { BountiesContext } from 'hooks/useBounties';
@@ -48,30 +48,11 @@ export function BountyList () {
   }
 
   return (
-    <Grid container>
+    <>
 
-      <Grid item container xs alignItems='center' mb={3}>
-
-        {
-          /**
-           * Remove later to its own popup modal
-           */
-          displayBountyDialog === true && (
-            <BountyModal
-              onSubmit={bountyCreated}
-              open={displayBountyDialog}
-              onClose={() => {
-                setDisplayBountyDialog(false);
-              }}
-            />
-          )
-        }
-
-        <Grid item xs={8}>
-          <Typography variant='h1'>Bounty list</Typography>
-        </Grid>
-
-        <Grid item xs={4} container justifyContent='flex-end'>
+      <Box display='flex' justifyContent='space-between' mb={3}>
+        <Typography variant='h1'>Bounty list</Typography>
+        <Box display='flex' justifyContent='flex-end'>
           { !!csvData.length
           && (
             <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv'>
@@ -90,9 +71,8 @@ export function BountyList () {
           >
             Create Bounty
           </Button>
-        </Grid>
-
-      </Grid>
+        </Box>
+      </Box>
 
       <Grid container sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
         {
@@ -103,6 +83,20 @@ export function BountyList () {
             })
         }
       </Grid>
-    </Grid>
+      {
+        /**
+         * Remove later to its own popup modal
+         */
+        displayBountyDialog === true && (
+          <BountyModal
+            onSubmit={bountyCreated}
+            open={displayBountyDialog}
+            onClose={() => {
+              setDisplayBountyDialog(false);
+            }}
+          />
+        )
+      }
+    </>
   );
 }
