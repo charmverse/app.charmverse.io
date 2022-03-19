@@ -80,7 +80,7 @@ const GalleryCard = React.memo((props: Props) => {
           }
           else if (item.type === 'image') {
             if (item.attrs?.src) {
-                galleryImageUrl = item.attrs?.src
+                galleryImageUrl = item.attrs.src
                 break;
               }
           }
