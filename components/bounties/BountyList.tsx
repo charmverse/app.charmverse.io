@@ -74,16 +74,11 @@ export function BountyList () {
         <Grid item xs={4} container justifyContent='flex-end'>
           { !!csvData.length
           && (
-          <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv'>
-            <Button
-              onClick={(event) => {
-                event.stopPropagation();
-                return false;
-              }}
-            >
-              Export to CSV
-            </Button>
-          </CSVLink>
+            <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv'>
+              <Button>
+                Export to CSV
+              </Button>
+            </CSVLink>
           )}
           <MultiPaymentModal />
           <Button
