@@ -135,6 +135,10 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
+  notionLogin (query: {redirect: string, spaceId: string, account: string}) {
+    return http.GET<{redirectUrl: string}>('/api/notion/login', query);
+  }
+
   // FocalBoard
 
   // TODO: we shouldnt have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
@@ -190,7 +194,7 @@ class CharmClient {
   private blockToFBBlock (block: Block): FBBlock {
     return {
       ...block,
-      deleteAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,
+      deletedAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,
       createdAt: new Date(block.createdAt).getTime(),
       updatedAt: new Date(block.updatedAt).getTime(),
       type: block.type as FBBlock['type'],
@@ -207,7 +211,7 @@ class CharmClient {
       type: fbBlock.type,
       title: fbBlock.title,
       fields: fbBlock.fields,
-      deletedAt: fbBlock.deleteAt === 0 ? null : new Date(fbBlock.deleteAt),
+      deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
       createdAt: (!fbBlock.createdAt || fbBlock.createdAt === 0) ? new Date() : new Date(fbBlock.createdAt),
       updatedAt: (!fbBlock.updatedAt || fbBlock.updatedAt === 0) ? new Date() : new Date(fbBlock.updatedAt)
     };
@@ -233,7 +237,7 @@ class CharmClient {
   async deleteBlock (blockId: string, updater: BlockUpdater): Promise<void> {
     const deletedBlock = await http.DELETE<Block>(`/api/blocks/${blockId}`);
     const fbBlock = this.blockToFBBlock(deletedBlock);
-    fbBlock.deleteAt = new Date().getTime();
+    fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
   }
 

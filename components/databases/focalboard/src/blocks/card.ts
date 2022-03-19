@@ -14,7 +14,7 @@ type Card = Block & {
     fields: CardFields
 }
 
-function createCard(block?: Block): Card {
+function createCard(block?: Partial<Block>): Card {
     const contentOrder: Array<string|string[]> = []
     const contentIds = block?.fields?.contentOrder?.filter((id: any) => id !== null)
 
@@ -31,11 +31,11 @@ function createCard(block?: Block): Card {
         ...createBlock(block),
         type: 'card',
         fields: {
-            icon: block?.fields.icon || '',
-            properties: {...(block?.fields.properties || {})},
+            icon: block?.fields?.icon || '',
+            properties: {...(block?.fields?.properties || {})},
             contentOrder,
-            isTemplate: block?.fields.isTemplate || false,
-            headerImage: block?.fields.headerImage || null,
+            isTemplate: block?.fields?.isTemplate || false,
+            headerImage: block?.fields?.headerImage || null,
         },
     }
 }

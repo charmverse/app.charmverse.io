@@ -17,10 +17,10 @@ import store from './focalboard/src/store';
 export const publishIncrementalUpdate = async (blocks: Block[]) => {
   store.dispatch((dispatch) => {
     batch(() => {
-      dispatch(updateBoards(blocks.filter((b: Block) => b.type === 'board' || b.deleteAt !== 0) as Board[]));
-      dispatch(updateViews(blocks.filter((b: Block) => b.type === 'view' || b.deleteAt !== 0) as BoardView[]));
-      dispatch(updateCards(blocks.filter((b: Block) => b.type === 'card' || b.deleteAt !== 0) as Card[]));
-      dispatch(updateComments(blocks.filter((b: Block) => b.type === 'comment' || b.deleteAt !== 0) as CommentBlock[]));
+      dispatch(updateBoards(blocks.filter((b: Block) => b.type === 'board' || b.deletedAt !== 0) as Board[]));
+      dispatch(updateViews(blocks.filter((b: Block) => b.type === 'view' || b.deletedAt !== 0) as BoardView[]));
+      dispatch(updateCards(blocks.filter((b: Block) => b.type === 'card' || b.deletedAt !== 0) as Card[]));
+      dispatch(updateComments(blocks.filter((b: Block) => b.type === 'comment' || b.deletedAt !== 0) as CommentBlock[]));
       dispatch(updateContents(blocks.filter((b: Block) => b.type !== 'card' && b.type !== 'view' && b.type !== 'board' && b.type !== 'comment') as ContentBlock[]));
     });
   });

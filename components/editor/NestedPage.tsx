@@ -53,9 +53,6 @@ export function nestedPageSpec (): RawSpecs {
     schema: {
       inline: false,
       attrs: {
-        path: {
-          default: null
-        },
         // This property is used to reference the page
         id: {
           default: null
@@ -232,7 +229,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
         isEditorEmpty ? <InsertDriveFileOutlinedIcon /> : <DescriptionOutlinedIcon />
       )}
       <Link
-        href={`/${space?.domain}/${node.attrs.path}`}
+        href={`/${(space)?.domain}/${nestedPage?.path}`}
         passHref
       >
         <Box fontWeight={600} component='div' width='100%'>
@@ -280,7 +277,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
           sx={{ padding: '3px 12px' }}
           onClick={() => {
             // eslint-disable-next-line
-            navigator.clipboard.writeText(`${location.origin}/${space?.domain}/${node.attrs.path}`);
+            navigator.clipboard.writeText(`${location.origin}/${space?.domain}/${nestedPage?.path}`);
             showMessage('Link copied');
           }}
         >

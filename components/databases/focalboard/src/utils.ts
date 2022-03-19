@@ -36,7 +36,6 @@ enum IDType {
 
 class Utils {
     static createGuid(idType: IDType): string {
-        const data = Utils.randomArray(16)
         return uuid(); //idType + Utils.base32encode(data, false)
     }
 

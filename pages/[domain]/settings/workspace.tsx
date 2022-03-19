@@ -15,6 +15,11 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
+import { Box, Typography } from '@mui/material';
+import { useUser } from 'hooks/useUser';
+import { useTheme } from '@emotion/react';
+import NotionIcon from 'public/images/notion_logo.svg';
+import SvgIcon from '@mui/material/SvgIcon';
 
 export default function WorkspaceSettings () {
 
@@ -22,6 +27,8 @@ export default function WorkspaceSettings () {
   const router = useRouter();
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
+  const [user] = useUser();
+  const theme = useTheme();
 
   const {
     register,
@@ -94,6 +101,30 @@ export default function WorkspaceSettings () {
           </Grid>
         </Grid>
       </form>
+      <Legend>Import</Legend>
+      <Box sx={{ ml: 1 }}>
+        <Button
+          sx={{
+            color: 'currentcolor'
+          }}
+          onClick={async () => {
+            const { redirectUrl } = await charmClient.notionLogin({
+              spaceId: space!.id,
+              redirect: window.location.href,
+              account: user?.addresses[0] ?? ''
+            });
+            window.location.replace(redirectUrl);
+          }}
+          variant='outlined'
+          startIcon={(
+            <SvgIcon>
+              <NotionIcon />
+            </SvgIcon>
+          )}
+        >
+          Import pages from Notion
+        </Button>
+      </Box>
     </>
   );
 

@@ -23,7 +23,7 @@ export const
 
 const name = 'iframe';
 
-function extractEmbedLink (url: string) {
+export function extractEmbedLink (url: string) {
   const isYoutubeLink = url.match(/(?:https:\/\/www.youtube.com\/watch\?v=(.*)|https:\/\/youtu.be\/(.*))/);
   const isIframeEmbed = url.startsWith('<iframe ');
   let embedUrl = url;
@@ -136,7 +136,8 @@ function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { type: '
         backgroundColor: theme.palette.background.light,
         p: 2,
         display: 'flex',
-        borderRadius: theme.spacing(0.5)
+        borderRadius: theme.spacing(0.5),
+        my: 0.5
       }}
       {...rest}
     >
@@ -166,7 +167,6 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
   NodeViewProps & { onResizeStop?: (view: EditorView) => void }) {
   const theme = useTheme();
   const [height, setHeight] = useState(node.attrs.height);
-  const [width, setWidth] = useState(node.attrs.width);
   const view = useEditorViewContext();
 
   // If there are no source for the node, return the image select component
