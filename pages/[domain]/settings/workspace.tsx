@@ -18,7 +18,8 @@ import charmClient from 'charmClient';
 import { Box, Typography } from '@mui/material';
 import { useUser } from 'hooks/useUser';
 import { useTheme } from '@emotion/react';
-import Image from 'next/image';
+import NotionIcon from 'public/images/notion_logo.svg';
+import SvgIcon from '@mui/material/SvgIcon';
 
 export default function WorkspaceSettings () {
 
@@ -103,6 +104,9 @@ export default function WorkspaceSettings () {
       <Legend>Import</Legend>
       <Box sx={{ ml: 1 }}>
         <Button
+          sx={{
+            color: 'currentcolor'
+          }}
           onClick={async () => {
             const { redirectUrl } = await charmClient.notionLogin({
               spaceId: space!.id,
@@ -113,12 +117,9 @@ export default function WorkspaceSettings () {
           }}
           variant='outlined'
           startIcon={(
-            <Image
-              loading='lazy'
-              width={25}
-              height={25}
-              src='/appLogos/notion.svg'
-            />
+            <SvgIcon>
+              <NotionIcon />
+            </SvgIcon>
           )}
         >
           Import pages from Notion
