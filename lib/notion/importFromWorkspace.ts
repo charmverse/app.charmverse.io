@@ -12,6 +12,11 @@ import { createCard } from 'components/databases/focalboard/src/blocks/card';
 import { createCharmTextBlock } from 'components/databases/focalboard/src/blocks/charmBlock';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
+// Limit the highest number of pages that can be imported
+const IMPORTED_PAGES_LIMIT = 1000; const
+  BLOCKS_FETCHED_PER_REQUEST = 100; const
+  MAX_CHILD_BLOCK_DEPTH = 5;
+
 function convertRichText (richTexts: RichTextItemResponse[]): TextContent[] {
   return richTexts.map((richText) => {
     const marks: { type: string, attrs?: Record<string, string> }[] = [];
@@ -474,15 +479,15 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   });
 
   let searchResult = await notion.search({
-    page_size: 100
+    page_size: BLOCKS_FETCHED_PER_REQUEST
   });
 
   const searchResults = searchResult.results;
 
   // While there are more pages the integration has access to
-  while (searchResult.has_more && searchResult.next_cursor) {
+  while (searchResult.has_more && searchResult.next_cursor && searchResults.length < IMPORTED_PAGES_LIMIT) {
     searchResult = await notion.search({
-      page_size: 100,
+      page_size: BLOCKS_FETCHED_PER_REQUEST,
       start_cursor: searchResult.next_cursor
     });
     searchResults.push(...searchResult.results);
@@ -506,6 +511,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       await createPage([[block.id, v4()]]);
     }
     else if (block.object === 'database') {
+      // Only create the database if it hasn't been created already
       if (!createdPages[block.id]) {
         createdPages[block.id] = await createDatabase(block as GetDatabaseResponse, {
           spaceId,
@@ -522,12 +528,16 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     // The page might be recursively created via a link_to_page block
     if (createdPages[blockId]) return createdPages[blockId];
 
+    // If the page doesn't exist in the cache fetch it
     const pageResponse = searchResultRecord[blockId] ?? await notion.pages.retrieve({
       page_id: blockId
     }) as unknown as GetPageResponse;
 
+    // Store all the blocks of a page, including nested ones
     const blocksRecord: Record<string, BlockWithChildren> = {};
+    // An array to keep track of the first level children of a page
     const blocks: BlockWithChildren[] = [];
+    // Page content, this will be filled with charmverse specific blocks
     const pageContent: PageContent = {
       type: 'doc',
       content: []
@@ -536,7 +546,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     // Array to store parameters for further requests to retrieve children blocks
     let blockChildrenRequests: ListBlockChildrenParameters[] = [{
       block_id: blockId,
-      page_size: 100
+      page_size: BLOCKS_FETCHED_PER_REQUEST
     }];
 
     async function getChildBlockListResponses () {
@@ -558,7 +568,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         if (childBlockListResponse.next_cursor) {
           blockChildrenRequests.push({
             block_id: childBlockListResponse.request.block_id,
-            page_size: 100,
+            page_size: BLOCKS_FETCHED_PER_REQUEST,
             start_cursor: childBlockListResponse.next_cursor ?? undefined
           });
         }
@@ -567,8 +577,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       return childBlockListResponses;
     }
 
-    // Fetch 5 level of nested content
-    for (let depth = 0; depth < 5; depth++) {
+    for (let depth = 0; depth < MAX_CHILD_BLOCK_DEPTH; depth++) {
       if (blockChildrenRequests.length !== 0) {
         const childBlockListResponses = await getChildBlockListResponses();
 
@@ -590,6 +599,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             };
             blocksRecord[block.id] = blockWithChildren;
             if (depth !== 0) {
+              // Add the current block to the its parent's `children` array
               blocksRecord[childBlockListResponse.request.block_id].children.push(block.id);
             }
             else {
@@ -601,7 +611,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             if (block.type.match(BlocksWithChildrenRegex) && block.has_children) {
               blockChildrenRequests.push({
                 block_id: block.id,
-                page_size: 100
+                page_size: BLOCKS_FETCHED_PER_REQUEST
               });
             }
           });
@@ -725,15 +735,15 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             cardProperties[focalboardPropertyRecord[property.id]] = property[property.type];
           }
           else if (property.type === 'rich_text') {
-            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
+            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type]
+              .reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
           }
           else if (property.type === 'select') {
-            // eslint-disable-next-line
             cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].id;
           }
           else if (property.type === 'multi_select') {
-            // eslint-disable-next-line
-            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].map((multiSelect: {id: string}) => multiSelect.id);
+            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type]
+              .map((multiSelect: {id: string}) => multiSelect.id);
           }
           else if (property.type === 'date') {
             const dateValue: {from?: number, to?: number} = {};
