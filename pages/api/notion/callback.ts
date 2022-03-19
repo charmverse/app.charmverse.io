@@ -41,7 +41,6 @@ handler.get(async (req, res) => {
       'Content-Type': 'application/json'
     }
   });
-  const userId = token.owner.user.id;
 
   await importFromWorkspace({
     accessToken: token.access_token,
