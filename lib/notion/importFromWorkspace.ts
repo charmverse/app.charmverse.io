@@ -797,10 +797,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     return createdPages[blockId];
   }
 
-  const workspacePageId = v4();
-  await createPrismaPage({
+  const workspacePage = await createPrismaPage({
     icon: workspaceIcon,
-    pageId: workspacePageId,
     spaceId,
     title: workspaceName,
     userId
@@ -828,7 +826,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             id: createdPages[block.id].id!
           },
           data: {
-            parentId: workspacePageId
+            parentId: workspacePage.id
           }
         });
       }
