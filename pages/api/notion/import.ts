@@ -34,26 +34,30 @@ handler.get(async (req: NextApiRequest, res) => {
 
   const encodedToken = Buffer.from(`${process.env.NOTION_OAUTH_CLIENT_ID}:${process.env.NOTION_OAUTH_SECRET}`).toString('base64');
 
-  const token = await http.POST<{ workspace_name: string, workspace_icon: string, access_token: string, owner: { user: { id: string, person: { email: string } } } }>('https://api.notion.com/v1/oauth/token', {
-    grant_type: 'authorization_code',
-    redirect_uri: req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/notion/callback` : 'https://app.charmverse.io/api/notion/callback',
-    code: tempAuthCode
-  }, {
-    headers: {
-      Authorization: `Basic ${encodedToken}`,
-      'Content-Type': 'application/json'
-    }
-  });
+  try {
+    const token = await http.POST<{ workspace_name: string, workspace_icon: string, access_token: string, owner: { user: { id: string, person: { email: string } } } }>('https://api.notion.com/v1/oauth/token', {
+      grant_type: 'authorization_code',
+      redirect_uri: req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/notion/callback` : 'https://app.charmverse.io/api/notion/callback',
+      code: tempAuthCode
+    }, {
+      headers: {
+        Authorization: `Basic ${encodedToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    await importFromWorkspace({
+      accessToken: token.access_token,
+      spaceId: state.spaceId,
+      userId: state.userId,
+      workspaceName: token.workspace_name,
+      workspaceIcon: token.workspace_icon
+    });
+    res.status(200).send({ error: null });
 
-  await importFromWorkspace({
-    accessToken: token.access_token,
-    spaceId: state.spaceId,
-    userId: state.userId,
-    workspaceName: token.workspace_name,
-    workspaceIcon: token.workspace_icon
-  });
-
-  res.status(200).send({ status: 'success' });
+  }
+  catch (err) {
+    res.status(400).send({ error: 'Invalid code' });
+  }
 });
 
 export default handler;

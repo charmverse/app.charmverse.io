@@ -20,6 +20,9 @@ import { useUser } from 'hooks/useUser';
 import NotionIcon from 'public/images/notion_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
 import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar from 'components/common/Snackbar';
+import useSnackbar from 'hooks/useSnackbar';
+import useSWR from 'swr';
 
 export default function WorkspaceSettings () {
 
@@ -28,20 +31,41 @@ export default function WorkspaceSettings () {
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
   const [user] = useUser();
+  const { message, handleClose, isOpen: isSnackbarOpen, showMessage, severity, setSeverity } = useSnackbar();
 
   const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
 
+  const { data, error } = useSWR('import/notion', async () => {
+    return charmClient.importFromNotion({ state: router.query.state as string });
+  }, {
+    isPaused: () => (!router.query.state || isImportingFromNotion),
+    shouldRetryOnError: false
+  });
+
   useEffect(() => {
-    async function importWorkspace () {
-      const state = router.query.state as string;
-      if (state && !isImportingFromNotion) {
-        setIsImportingFromNotion(true);
-        await charmClient.importFromNotion({ state });
-        window.location.href = `${window.location.origin}/${router.query.domain}/settings/workspace`;
-      }
+    if (router.query.state) {
+      setIsImportingFromNotion(true);
     }
-    importWorkspace();
-  }, [router.query]);
+  }, [router.query.state]);
+
+  useEffect(() => {
+    if (data && data.error === null) {
+      setSeverity('info');
+      showMessage('Successfully imported');
+      setTimeout(() => {
+        setIsImportingFromNotion(false);
+        window.location.href = `${window.location.origin}/${router.query.domain}/settings/workspace`;
+      }, 1500);
+    }
+    else if (error) {
+      showMessage(error.error);
+      setSeverity('error');
+      setIsImportingFromNotion(false);
+    }
+    else if (!router.query.state) {
+      setIsImportingFromNotion(false);
+    }
+  }, [data, error]);
 
   const {
     register,
@@ -141,9 +165,9 @@ export default function WorkspaceSettings () {
           {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
         </Button>
       </Box>
+      <Snackbar severity={severity} handleClose={handleClose} isOpen={isSnackbarOpen} message={message ?? ''} />
     </>
   );
-
 }
 
 WorkspaceSettings.getLayout = (page: ReactElement) => {

@@ -142,7 +142,7 @@ class CharmClient {
   importFromNotion (query: {
     state: string
   }) {
-    return http.GET('/api/notion/import', query);
+    return http.GET<{error: string | null}>('/api/notion/import', query);
   }
 
   // FocalBoard
