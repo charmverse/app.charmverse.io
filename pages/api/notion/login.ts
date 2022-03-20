@@ -17,6 +17,7 @@ async function login (req: NextApiRequest, res: NextApiResponse) {
   if (!req.query.redirect) {
     return res.status(400).json('Missing redirect');
   }
+
   if (!req.query.spaceId) {
     return res.status(400).json('Missing space id');
   }

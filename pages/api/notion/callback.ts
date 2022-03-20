@@ -1,6 +1,5 @@
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
-import * as http from 'adapters/http';
 
 const handler = nc({
   onError,
@@ -14,8 +13,6 @@ handler.get(async (req, res) => {
     res.redirect('/');
     return;
   }
-
-  console.log(req.query.state);
 
   let state: {
     account: string,
@@ -32,7 +29,7 @@ handler.get(async (req, res) => {
     return;
   }
 
-  res.redirect(`${state.redirect}?code=${tempAuthCode}`);
+  res.redirect(`${state.redirect}?state=${encodeURIComponent(JSON.stringify({ ...state, code: tempAuthCode }))}`);
 });
 
 export default handler;

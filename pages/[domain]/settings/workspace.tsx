@@ -31,21 +31,17 @@ export default function WorkspaceSettings () {
 
   const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
 
-  let code: string | null = null;
-  if (router.query) {
-    try {
-      code = (router.query as any).code;
-    }
-    catch (e) {
-      console.error("Couldn't parse code", e);
-    }
-  }
-
   useEffect(() => {
-    if (code) {
-      setIsImportingFromNotion(true);
+    async function importWorkspace () {
+      const state = router.query.state as string;
+      if (state && !isImportingFromNotion) {
+        setIsImportingFromNotion(true);
+        await charmClient.importFromNotion({ state });
+        window.location.href = `${window.location.origin}/${router.query.domain}/settings/workspace`;
+      }
     }
-  }, [code]);
+    importWorkspace();
+  }, [router.query]);
 
   const {
     register,
