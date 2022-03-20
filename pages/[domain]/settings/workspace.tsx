@@ -1,5 +1,5 @@
 import SettingsLayout from 'components/settings/Layout';
-import { ReactElement } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
@@ -15,11 +15,11 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { useUser } from 'hooks/useUser';
-import { useTheme } from '@emotion/react';
 import NotionIcon from 'public/images/notion_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function WorkspaceSettings () {
 
@@ -28,7 +28,24 @@ export default function WorkspaceSettings () {
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
   const [user] = useUser();
-  const theme = useTheme();
+
+  const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
+
+  let code: string | null = null;
+  if (router.query) {
+    try {
+      code = (router.query as any).code;
+    }
+    catch (e) {
+      console.error("Couldn't parse code", e);
+    }
+  }
+
+  useEffect(() => {
+    if (code) {
+      setIsImportingFromNotion(true);
+    }
+  }, [code]);
 
   const {
     register,
@@ -107,6 +124,7 @@ export default function WorkspaceSettings () {
           sx={{
             color: 'currentcolor'
           }}
+          disabled={isImportingFromNotion}
           onClick={async () => {
             const { redirectUrl } = await charmClient.notionLogin({
               spaceId: space!.id,
@@ -117,12 +135,14 @@ export default function WorkspaceSettings () {
           }}
           variant='outlined'
           startIcon={(
-            <SvgIcon>
-              <NotionIcon />
-            </SvgIcon>
+            isImportingFromNotion ? <CircularProgress size={20} /> : (
+              <SvgIcon>
+                <NotionIcon />
+              </SvgIcon>
+            )
           )}
         >
-          Import pages from Notion
+          {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
         </Button>
       </Box>
     </>
