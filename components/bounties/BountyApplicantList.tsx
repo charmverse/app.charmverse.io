@@ -100,36 +100,39 @@ export function BountyApplicantList ({ applications, bounty, bountyReassigned = 
         </TableHead>
         {applications.length !== 0 && (
           <TableBody>
-            {applications.map((application, applicationIndex) => (
-              <TableRow
-                key={application.id}
-                sx={{ backgroundColor: applicationIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell size='small'>
-                  {getDisplayName(getContributor(application.createdBy))}
-                </TableCell>
-                <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
-                <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
-                <TableCell>
-                  {
-                  displayAssignmentButton(application) === true && (
-                    <Button onClick={() => {
-                      assignBounty(application.createdBy);
-                    }}
-                    >
-                      Assign
-                    </Button>
-                  )
-                }
-                  {
-                  bounty.assignee === application.createdBy && (
-                    <Chip label='Assigned' color={BountyStatusColours.assigned} />
-                  )
-                }
-                </TableCell>
+            {applications.map((application, applicationIndex) => {
+              const appliedContributor = getContributor(application.createdBy);
+              return (
+                <TableRow
+                  key={application.id}
+                  sx={{ backgroundColor: applicationIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell size='small'>
+                    {(appliedContributor?.discord) ? `${(appliedContributor?.discord as any)?.username}#${(appliedContributor?.discord as any)?.discriminator}` : getDisplayName(appliedContributor)}
+                  </TableCell>
+                  <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
+                  <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
+                  <TableCell>
+                    {
+                    displayAssignmentButton(application) === true && (
+                      <Button onClick={() => {
+                        assignBounty(application.createdBy);
+                      }}
+                      >
+                        Assign
+                      </Button>
+                    )
+                  }
+                    {
+                    bounty.assignee === application.createdBy && (
+                      <Chip label='Assigned' color={BountyStatusColours.assigned} />
+                    )
+                  }
+                  </TableCell>
 
-              </TableRow>
-            ))}
+                </TableRow>
+              );
+            })}
           </TableBody>
         )}
 

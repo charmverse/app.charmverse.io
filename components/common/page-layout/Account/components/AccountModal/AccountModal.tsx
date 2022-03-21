@@ -53,13 +53,15 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
 
   const connectedWithDiscord = Boolean(user?.discord);
 
+  const discordUsername = discordData ? `${discordData?.username}#${discordData?.discriminator}` : null;
+
   return (
     <Modal open={isOpen} onClose={onClose}>
       <DialogTitle onClose={onClose}>Account</DialogTitle>
       <Stack mb={9} direction='row' spacing='4' alignItems='center'>
-        <Avatar name={ENSName || account} avatar={discordData?.avatar ? `https://cdn.discordapp.com/avatars/${discordData.id}/${discordData.avatar}.png` : null} />
+        <Avatar name={ENSName || discordUsername || account} avatar={discordData?.avatar ? `https://cdn.discordapp.com/avatars/${discordData.id}/${discordData.avatar}.png` : null} />
         <CopyableAddress address={account!} decimals={5} sx={{ fontSize: 24 }} />
-        {discordData && <DiscordUserName variant='subtitle2'>{discordData?.username}#{discordData?.discriminator}</DiscordUserName>}
+        {discordData && <DiscordUserName variant='subtitle2'>{discordUsername}</DiscordUserName>}
       </Stack>
       <Stack
         direction='row'

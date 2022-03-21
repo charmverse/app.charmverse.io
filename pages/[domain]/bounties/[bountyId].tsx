@@ -65,10 +65,10 @@ export default function BountyDetails () {
 
   const reviewerUser = (bounty?.reviewer && getContributor(bounty.reviewer)) || undefined;
   const reviewerENSName = useENSName(reviewerUser?.addresses[0]);
-  const reviewerName = isReviewer ? 'You' : reviewerENSName || getDisplayName(reviewerUser);
+  const reviewerName = isReviewer ? 'You' : reviewerENSName || reviewerUser?.discord ? `${(reviewerUser?.discord as any).username}#${(reviewerUser?.discord as any).discriminator}` : getDisplayName(reviewerUser);
   const assigneeUser = (bounty?.assignee && getContributor(bounty.assignee)) || undefined;
   const assigneeENSName = useENSName(assigneeUser?.addresses[0]);
-  const assigneeName = isAssignee ? 'You' : assigneeENSName || getDisplayName(assigneeUser);
+  const assigneeName = isAssignee ? 'You' : assigneeENSName || assigneeUser?.discord ? `${(assigneeUser?.discord as any).username}#${(assigneeUser?.discord as any).discriminator}` : getDisplayName(assigneeUser);
 
   const CharmEditorMemoized = useMemo(() => {
     // Only show the editor if the description exist
@@ -305,7 +305,7 @@ export default function BountyDetails () {
                     justifyContent: 'space-between' }}
                 >
                   <Box display='flex' alignItems='center' gap={1}>
-                    <Avatar name={reviewerENSName || getDisplayName(reviewerUser)} />
+                    <Avatar avatar={(reviewerUser.discord as any)?.avatar ? `https://cdn.discordapp.com/avatars/${(reviewerUser.discord as any).id}/${(reviewerUser.discord as any).avatar}.png` : null} name={reviewerENSName || getDisplayName(reviewerUser)} />
                     <Typography variant='h6' component='span'>
                       {reviewerName}
                     </Typography>
@@ -388,7 +388,7 @@ export default function BountyDetails () {
                     <>
                       {assigneeName && (
                         <Box display='flex' alignItems='center'>
-                          <Avatar name={assigneeENSName || getDisplayName(assigneeUser)} />
+                          <Avatar avatar={(assigneeUser?.discord as any)?.avatar ? `https://cdn.discordapp.com/avatars/${(assigneeUser?.discord as any).id}/${(assigneeUser?.discord as any).avatar}.png` : null} name={reviewerENSName || getDisplayName(reviewerUser)} />
                           <Typography variant='h6' component='span' sx={{ pl: 2 }}>
                             {assigneeName}
                           </Typography>
