@@ -1,4 +1,3 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { User } from '@prisma/client';
