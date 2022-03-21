@@ -100,7 +100,8 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   }
 
   function addPageIcon () {
-    const icon = emojis[randomIntFromInterval(0, emojis.length - 1)];
+    const emojiOptions = [...emojis[0]];
+    const icon = emojiOptions[randomIntFromInterval(0, emojiOptions.length - 1)];
     setPage({ icon });
   }
 
