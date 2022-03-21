@@ -46,13 +46,13 @@ export function DELETE<T> (
 
 export function POST<T> (
   requestURL: string,
-  data: Params = {},
-  { headers = {}, noHeaders }: { headers?: any, noHeaders?: boolean } = {}
+  data: Params | string = {},
+  { headers = {}, noHeaders, skipStringifying }: { headers?: any, noHeaders?: boolean, skipStringifying?: boolean } = {}
 ): Promise<T> {
   return fetch(
     requestURL,
     {
-      body: JSON.stringify(data),
+      body: !skipStringifying ? JSON.stringify(data) : data as string,
       method: 'POST',
       headers: noHeaders ? undefined : new Headers({
         Accept: 'application/json',
