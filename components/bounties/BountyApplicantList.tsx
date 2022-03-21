@@ -16,11 +16,16 @@ import { useUser } from 'hooks/useUser';
 import { useContributors } from 'hooks/useContributors';
 import { getDisplayName } from 'lib/users';
 import { humanFriendlyDate } from 'lib/utilities/dates';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
+/**
+ * @updateApplication callback to parent [bountyId] page that implements application update logic
+ */
 export interface IBountyApplicantListProps {
   bounty: Bounty,
   bountyReassigned?: () => any
   applications: Application[]
+  updateApplication?: () => void
 }
 
 function createData (id: string, message: string, date: string) {
@@ -44,7 +49,12 @@ function moveUserApplicationToFirstRow (applications: Application [], user: User
 
 }
 
-export function BountyApplicantList ({ applications, bounty, bountyReassigned = () => {} }: IBountyApplicantListProps) {
+export function BountyApplicantList ({
+  applications,
+  bounty,
+  bountyReassigned = () => {},
+  updateApplication = () => {}
+}: IBountyApplicantListProps) {
   const [user] = useUser();
   const [space] = useCurrentSpace();
   const [contributors] = useContributors();
@@ -131,11 +141,13 @@ export function BountyApplicantList ({ applications, bounty, bountyReassigned = 
                 <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
                 <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
                 <TableCell>
+
                   {
                   displayAssignmentButton(application) === true && (
-                    <Button onClick={() => {
-                      assignBounty(application.createdBy);
-                    }}
+                    <Button
+                      onClick={() => {
+                        assignBounty(application.createdBy);
+                      }}
                     >
                       Assign
                     </Button>
@@ -146,6 +158,20 @@ export function BountyApplicantList ({ applications, bounty, bountyReassigned = 
                     <Chip label='Assigned' color={BountyStatusColours.assigned} />
                   )
                 }
+
+                  {
+                    application.createdBy === user?.id && (
+                      <Button
+                        color='secondary'
+                        variant='outlined'
+                        sx={{ ml: 2 }}
+                        onClick={updateApplication}
+                      >
+                        <Box component='span' sx={{ pr: 1 }}>Edit</Box>
+                        <EditOutlinedIcon />
+                      </Button>
+                    )
+                  }
                 </TableCell>
 
               </TableRow>

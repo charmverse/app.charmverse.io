@@ -1,7 +1,6 @@
 import EditIcon from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Box from '@mui/material/Box';
 import Alert, { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
@@ -370,14 +369,6 @@ export default function BountyDetails () {
                         <Typography variant='h6' component='span'>
                           You
                         </Typography>
-
-                        <Button
-                          sx={{ mt: 2 }}
-                          onClick={toggleApplicationDialog}
-                        >
-                          <Box sx={{ pr: 1 }}>Edit your payment details</Box>
-                          <EditOutlinedIcon />
-                        </Button>
                       </Box>
 
                       {bounty.status === 'assigned' && (
@@ -398,13 +389,6 @@ export default function BountyDetails () {
                         isApplicant ? (
                           <Box>
                             <Typography>You've applied to this bounty.</Typography>
-                            <Button
-                              sx={{ mt: 2 }}
-                              onClick={toggleApplicationDialog}
-                            >
-                              <Box sx={{ pr: 1 }}>Edit your application</Box>
-                              <EditOutlinedIcon />
-                            </Button>
                           </Box>
                         ) : (
                           <Button onClick={toggleApplicationDialog}>Apply now</Button>
@@ -420,7 +404,14 @@ export default function BountyDetails () {
       </Box>
 
       {
-        bounty && (<BountyApplicantList applications={applications} bounty={bounty} bountyReassigned={loadBounty} />)
+        bounty && (
+        <BountyApplicantList
+          applications={applications}
+          bounty={bounty}
+          bountyReassigned={loadBounty}
+          updateApplication={toggleApplicationDialog}
+        />
+        )
       }
     </Container>
   );
