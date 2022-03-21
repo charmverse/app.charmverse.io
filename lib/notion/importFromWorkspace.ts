@@ -496,6 +496,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     });
     searchResults.push(...searchResult.results);
   }
+  console.log('searchResult', searchResults);
 
   const searchResultRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
 
