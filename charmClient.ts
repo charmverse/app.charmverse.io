@@ -135,14 +135,12 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
-  notionLogin (query: {redirect: string, spaceId: string, account: string}) {
+  notionLogin (query: { redirect: string }) {
     return http.GET<{redirectUrl: string}>('/api/notion/login', query);
   }
 
-  importFromNotion (query: {
-    state: string
-  }) {
-    return http.GET<{error: string | null}>('/api/notion/import', query);
+  importFromNotion (params: { code: string, spaceId: string }) {
+    return http.POST('/api/notion/import', params);
   }
 
   // FocalBoard

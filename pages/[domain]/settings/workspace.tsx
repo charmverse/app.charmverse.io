@@ -1,6 +1,7 @@
 import SettingsLayout from 'components/settings/Layout';
 import { ReactElement, useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
+import Alert from '@mui/material/Alert';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
 import Button from 'components/common/Button';
@@ -22,50 +23,42 @@ import SvgIcon from '@mui/material/SvgIcon';
 import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from 'components/common/Snackbar';
 import useSnackbar from 'hooks/useSnackbar';
-import useSWR from 'swr';
+import { useSWRConfig } from 'swr';
 
 export default function WorkspaceSettings () {
 
   setTitle('Workspace Options');
   const router = useRouter();
+  const { mutate } = useSWRConfig();
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
   const [user] = useUser();
-  const { message, handleClose, isOpen: isSnackbarOpen, showMessage, severity, setSeverity } = useSnackbar();
+  const [notionError, setNotionError] = useState<string | null>(null);
+  const { message, handleClose, isOpen: isSnackbarOpen, showMessage } = useSnackbar();
 
   const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
 
-  const { data, error } = useSWR('import/notion', async () => {
-    return charmClient.importFromNotion({ state: router.query.state as string });
-  }, {
-    isPaused: () => (!router.query.state || isImportingFromNotion),
-    shouldRetryOnError: false
-  });
-
   useEffect(() => {
-    if (router.query.state) {
+    if (space && typeof router.query.code === 'string') {
       setIsImportingFromNotion(true);
+      setNotionError(null);
+      charmClient.importFromNotion({
+        code: router.query.code,
+        spaceId: space.id
+      })
+        .then(() => {
+          setIsImportingFromNotion(false);
+          showMessage('Successfully imported');
+          mutate(`pages/${space.id}`);
+          console.log('router', router);
+          router.replace(router.asPath, undefined, { shallow: true });
+        })
+        .catch(error => {
+          setIsImportingFromNotion(false);
+          setNotionError(error.error || 'There was an error, please try again');
+        });
     }
-  }, [router.query.state]);
-
-  useEffect(() => {
-    if (data && data.error === null) {
-      setSeverity('info');
-      showMessage('Successfully imported');
-      setTimeout(() => {
-        setIsImportingFromNotion(false);
-        window.location.href = `${window.location.origin}/${router.query.domain}/settings/workspace`;
-      }, 1500);
-    }
-    else if (error) {
-      showMessage(error.error);
-      setSeverity('error');
-      setIsImportingFromNotion(false);
-    }
-    else if (!router.query.state) {
-      setIsImportingFromNotion(false);
-    }
-  }, [data, error]);
+  }, [Boolean(space)]);
 
   const {
     register,
@@ -141,21 +134,11 @@ export default function WorkspaceSettings () {
       <Legend>Import</Legend>
       <Box sx={{ ml: 1 }}>
         <Button
-          sx={{
-            color: 'currentcolor'
-          }}
           disabled={isImportingFromNotion}
-          onClick={async () => {
-            const { redirectUrl } = await charmClient.notionLogin({
-              spaceId: space!.id,
-              redirect: window.location.href,
-              account: user?.addresses[0] ?? ''
-            });
-            window.location.replace(redirectUrl);
-          }}
+          href={`/api/notion/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
           variant='outlined'
           startIcon={(
-            <SvgIcon>
+            <SvgIcon sx={{ color: 'text.primary' }}>
               <NotionIcon />
             </SvgIcon>
           )}
@@ -165,8 +148,13 @@ export default function WorkspaceSettings () {
         >
           {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
         </Button>
+        {notionError && (
+          <Alert severity='error' sx={{ mt: 2 }}>
+            {notionError}
+          </Alert>
+        )}
       </Box>
-      <Snackbar severity={severity} handleClose={handleClose} isOpen={isSnackbarOpen} message={message ?? ''} />
+      <Snackbar severity='info' handleClose={handleClose} isOpen={isSnackbarOpen} message={message ?? ''} />
     </>
   );
 }
