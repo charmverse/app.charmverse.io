@@ -14,6 +14,7 @@ import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
 import { DiscordUser } from 'models/User';
 import styled from '@emotion/styled';
+import getUserAvatar from 'lib/users/getUserAvatar';
 // import AccountConnections from './components/AccountConnections';
 
 const DiscordUserName = styled(Typography)`
@@ -59,7 +60,7 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
     <Modal open={isOpen} onClose={onClose}>
       <DialogTitle onClose={onClose}>Account</DialogTitle>
       <Stack mb={9} direction='row' spacing='4' alignItems='center'>
-        <Avatar name={ENSName || discordUsername || account} avatar={discordData?.avatar ? `https://cdn.discordapp.com/avatars/${discordData.id}/${discordData.avatar}.png` : null} />
+        <Avatar name={ENSName || discordUsername || account} avatar={getUserAvatar(user)} />
         <CopyableAddress address={account!} decimals={5} sx={{ fontSize: 24 }} />
         {discordData && <DiscordUserName variant='subtitle2'>{discordUsername}</DiscordUserName>}
       </Stack>

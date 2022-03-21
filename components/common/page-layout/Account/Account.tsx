@@ -17,6 +17,7 @@ import AccountModal from 'components/common/page-layout/Account/components/Accou
 import NetworkModal from 'components/common/page-layout/Account/components/NetworkModal';
 import styled from '@emotion/styled';
 import { DiscordUser } from 'models';
+import getUserAvatar from 'lib/users/getUserAvatar';
 
 const AccountCard = styled.div`
   display: inline-flex;
@@ -105,7 +106,7 @@ function Account (): JSX.Element {
         </Tooltip>
         <AccountButton
           onClick={accountModalState.open}
-          endIcon={<Avatar avatar={discordData?.avatar ? `https://cdn.discordapp.com/avatars/${discordData.id}/${discordData.avatar}.png` : null} name={ENSName || account} size='small' />}
+          endIcon={<Avatar avatar={getUserAvatar(user)} name={ENSName || account} size='small' />}
         >
           {ENSName || (discordData)?.username || `${shortenHex(account, 3)}`}
         </AccountButton>

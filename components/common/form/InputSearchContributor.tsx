@@ -5,6 +5,7 @@ import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
 import { HTMLAttributes } from 'react';
+import getUserAvatar from 'lib/users/getUserAvatar';
 
 export interface IInputSearchContributorProps {
   onChange?: (id: string) => any
@@ -65,11 +66,10 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
 
 export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contributor, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement>) {
   const ensName = useENSName(user.addresses[0]);
-  const discordData = (user?.discord as unknown as DiscordUser);
 
   return (
     <Box component='li' display='flex' gap={1} {...props}>
-      <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={discordData?.avatar ? `https://cdn.discordapp.com/avatars/${discordData.id}/${discordData.avatar}.png` : null} />
+      <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={getUserAvatar(user)} />
       <Typography>{ensName || getDisplayName(user)}</Typography>
     </Box>
   );
