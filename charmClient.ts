@@ -139,6 +139,10 @@ class CharmClient {
     return http.GET<{redirectUrl: string}>('/api/notion/login', query);
   }
 
+  discordLogin () {
+    return http.GET<{redirectUrl: string}>('/api/discord/login');
+  }
+
   // FocalBoard
 
   // TODO: we shouldnt have to ask the server for the current space, but it will take time to pass spaceId through focalboard!

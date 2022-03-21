@@ -10,6 +10,7 @@ import { injected, walletConnect, walletLink } from 'connectors';
 import { useContext } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import useENSName from 'hooks/useENSName';
+import charmClient from 'charmClient';
 // import AccountConnections from './components/AccountConnections';
 
 function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
@@ -46,13 +47,33 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
         direction='row'
         alignItems='center'
         justifyContent='space-between'
-        mb='-1'
+        my={1}
       >
         <Typography color='secondary'>
           {`Connected with ${connectorName(connector)}`}
         </Typography>
         <Button size='small' variant='outlined' onClick={handleWalletProviderSwitch}>
           Switch
+        </Button>
+      </Stack>
+      <Stack
+        direction='row'
+        alignItems='center'
+        justifyContent='space-between'
+        my={1}
+      >
+        <Typography color='secondary'>
+          Connect with Discord
+        </Typography>
+        <Button
+          size='small'
+          variant='outlined'
+          onClick={async () => {
+            const { redirectUrl } = await charmClient.discordLogin();
+            window.location.replace(redirectUrl);
+          }}
+        >
+          Connect
         </Button>
       </Stack>
     </Modal>
