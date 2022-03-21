@@ -50,8 +50,8 @@ export default function WorkspaceSettings () {
           setIsImportingFromNotion(false);
           showMessage('Successfully imported');
           mutate(`pages/${space.id}`);
-          console.log('router', router);
-          router.replace(router.asPath, undefined, { shallow: true });
+          const baseUrl = `${router.asPath.split('?')[0]}?success=true`;
+          router.replace(baseUrl, undefined, { shallow: true });
         })
         .catch(error => {
           setIsImportingFromNotion(false);
@@ -59,6 +59,12 @@ export default function WorkspaceSettings () {
         });
     }
   }, [Boolean(space)]);
+
+  useEffect(() => {
+    if (router.query.success) {
+      showMessage('Notion workspace successfully imported');
+    }
+  }, [router.query.success]);
 
   const {
     register,

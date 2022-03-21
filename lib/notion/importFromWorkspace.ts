@@ -496,7 +496,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     });
     searchResults.push(...searchResult.results);
   }
-  console.log('searchResult', searchResults);
 
   const searchResultRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
 
@@ -809,21 +808,21 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
     if (block.object === 'page' || block.object === 'database') {
       // Check if its a nested page
-      if (block.parent.type === 'page_id') {
+      if (block.parent.type === 'page_id' && createdPages[block.parent.page_id]) {
         createdPages[block.id] = await prisma.page.update({
           where: {
-            id: createdPages[block.id].id!
+            id: createdPages[block.id].id
           },
           data: {
             parentId: createdPages[block.parent.page_id].id
           }
         });
       }
-      else if (block.parent.type === 'workspace') {
+      else if (block.parent.type === 'page_id' || block.parent.type === 'workspace') {
         // Place root pages/databases inside workspace page
         createdPages[block.id] = await prisma.page.update({
           where: {
-            id: createdPages[block.id].id!
+            id: createdPages[block.id].id
           },
           data: {
             parentId: workspacePage.id

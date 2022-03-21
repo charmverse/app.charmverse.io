@@ -12,6 +12,7 @@ handler.get(async (req, res) => {
     res.status(400).send('Error or missing code from Notion OAuth');
     return;
   }
+  console.log('req.query', req.query);
 
   let redirect: string;
   try {
