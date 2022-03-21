@@ -16,6 +16,7 @@ import useENSName from 'hooks/useENSName';
 import AccountModal from 'components/common/page-layout/Account/components/AccountModal';
 import NetworkModal from 'components/common/page-layout/Account/components/NetworkModal';
 import styled from '@emotion/styled';
+import { DiscordUser } from 'models';
 
 const AccountCard = styled.div`
   display: inline-flex;
@@ -56,6 +57,8 @@ function Account (): JSX.Element {
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
   const [user] = useUser();
   const linkedAddressesCount = user?.addresses.length ?? 0;
+
+  const discordData = (user?.discord as unknown as DiscordUser);
 
   if (typeof window === 'undefined') {
     return (
@@ -103,9 +106,9 @@ function Account (): JSX.Element {
         </Tooltip>
         <AccountButton
           onClick={accountModalState.open}
-          endIcon={<Avatar name={ENSName || account} size='small' />}
+          endIcon={<Avatar avatar={discordData?.avatar ? `https://cdn.discordapp.com/avatars/${discordData.id}/${discordData.avatar}.png` : null} name={ENSName || account} size='small' />}
         >
-          {ENSName || `${shortenHex(account, 3)}`}
+          {ENSName || (discordData)?.username || `${shortenHex(account, 3)}`}
         </AccountButton>
       </StyledButtonGroup>
 

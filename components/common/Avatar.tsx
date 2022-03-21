@@ -15,18 +15,20 @@ const SizeStyleMap: Record<'small' | 'medium', React.CSSProperties> = {
     fontSize: '1rem !important'
   }
 };
+
 const StyledAvatar = styled(Avatar)`
   color: white !important; // override CSS from Chip avatar
   font-weight: 500;
 `;
 
-export default function InitialAvatar ({ className, name, variant, size = 'medium' }: { className?: string, name?: string | null, variant?: 'circular' | 'rounded' | 'square', size?: 'small' | 'medium' }) {
+export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium' }: { className?: string, avatar?: string | null, name?: string | null, variant?: 'circular' | 'rounded' | 'square', size?: 'small' | 'medium' }) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
   return (
     <StyledAvatar
       className={className}
       sx={{ backgroundColor: stringToColor(nameStr), ...SizeStyleMap[size] }}
       variant={variant}
+      src={avatar ?? undefined}
     >
       {nameStr.charAt(0).toUpperCase()}
     </StyledAvatar>
