@@ -299,9 +299,9 @@ export default function BountyDetails () {
             spacing={2}
           >
             <Grid item xs={6}>
-              <Card sx={{ height: '100%', p: 1, pl: 3 }} variant='outlined'>
-                <CardHeader subheader='Reviewer' sx={{ p: 1, pt: 0 }} />
-                <CardContent sx={{ minHeight: '70px', p: 1 }}>
+              <Card sx={{ height: '100%', p: 2 }} variant='outlined'>
+                <CardHeader subheader='Reviewer' sx={{ pt: 0 }} />
+                <CardContent sx={{ minHeight: '70px', pt: 0.5, pb: 0.5 }}>
                   <Box
                     component='div'
                     sx={{ display: 'flex',
@@ -323,7 +323,7 @@ export default function BountyDetails () {
 
                   </Box>
                 </CardContent>
-                <CardActions sx={{ pt: 0.5, pb: 0.5 }}>
+                <CardActions sx={{ pt: 0.5 }}>
 
                   <Box flexDirection='row' gap={1} display='flex'>
                     {/* Assign reviewer */}
@@ -366,9 +366,9 @@ export default function BountyDetails () {
             </Grid>
 
             <Grid item xs={6}>
-              <Card sx={{ height: '100%', p: 1, pl: 3 }} variant='outlined'>
-                <CardHeader subheader='Assignee' sx={{ p: 1, pt: 0 }} />
-                <CardContent sx={{ minHeight: '70px', p: 1 }}>
+              <Card sx={{ height: '100%', p: 2 }} variant='outlined'>
+                <CardHeader subheader='Assignee' sx={{ pt: 0 }} />
+                <CardContent sx={{ minHeight: '70px', pt: 0.5, pb: 0.5 }}>
                   <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
                     {assigneeName && (
                     <>
