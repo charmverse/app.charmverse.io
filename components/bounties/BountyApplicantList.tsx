@@ -8,7 +8,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { Application, Bounty } from '@prisma/client';
+import { Application, Bounty, User } from '@prisma/client';
 import charmClient from 'charmClient';
 import { BountyStatusColours } from 'components/bounties/BountyCard';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -25,6 +25,23 @@ export interface IBountyApplicantListProps {
 
 function createData (id: string, message: string, date: string) {
   return { id, message, date };
+}
+
+function moveUserApplicationToFirstRow (applications: Application [], user: User): Application [] {
+  const userApplicationIndex = applications.findIndex(app => {
+    return app.createdBy === user?.id;
+  });
+
+  if (userApplicationIndex > 0) {
+
+    const userApplication = applications[userApplicationIndex];
+
+    applications.splice(userApplicationIndex);
+    applications.splice(0, 0, userApplication);
+  }
+
+  return applications;
+
 }
 
 export function BountyApplicantList ({ applications, bounty, bountyReassigned = () => {} }: IBountyApplicantListProps) {
@@ -69,22 +86,6 @@ export function BountyApplicantList ({ applications, bounty, bountyReassigned = 
   // Set min height large enough
   const minHeight = applicationsMade === 0 ? undefined : Math.min(300, (100 * applicationsMade));
 
-  function moveUserApplicationToFirstRow () {
-    const userApplicationIndex = applications.findIndex(app => {
-      return app.createdBy === user?.id;
-    });
-
-    if (userApplicationIndex > 0) {
-
-      const userApplication = applications[userApplicationIndex];
-
-      applications.splice(userApplicationIndex);
-      applications.splice(0, 0, userApplication);
-    }
-  }
-
-  moveUserApplicationToFirstRow();
-
   return (
     <Box component='div' sx={{ minHeight: `${minHeight}px`, marginBottom: '15px', maxHeight: '70vh', overflowY: 'auto' }}>
       <Table stickyHeader={true} sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
@@ -116,13 +117,16 @@ export function BountyApplicantList ({ applications, bounty, bountyReassigned = 
         </TableHead>
         {applications.length !== 0 && (
           <TableBody>
-            {applications.map((application, applicationIndex) => (
+            {moveUserApplicationToFirstRow(applications, user!).map((application, applicationIndex) => (
               <TableRow
                 key={application.id}
                 sx={{ backgroundColor: applicationIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell size='small'>
-                  {getDisplayName(getContributor(application.createdBy))}
+                  {
+                    application.createdBy === user?.id ? 'You'
+                      : getDisplayName(getContributor(application.createdBy))
+                  }
                 </TableCell>
                 <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
                 <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
