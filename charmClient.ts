@@ -139,8 +139,8 @@ class CharmClient {
     return http.GET<{redirectUrl: string}>('/api/notion/login', query);
   }
 
-  discordLogin () {
-    return http.GET<{redirectUrl: string}>('/api/discord/login');
+  discordLogin (query: {href: string}) {
+    return http.GET<{redirectUrl: string}>('/api/discord/login', query);
   }
 
   // FocalBoard

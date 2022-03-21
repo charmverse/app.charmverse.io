@@ -14,8 +14,12 @@ const handler = nc({
 handler.use(requireUser).get(login);
 
 async function login (req: NextApiRequest, res: NextApiResponse) {
-  // TODO: Add state query params
-  const oauthUrl = `${discordUrl}&redirect_uri=${encodeURIComponent(req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
+  // TODO: Add state query params to counteract CSRF
+  const state = encodeURIComponent(JSON.stringify({
+    href: req.query.href
+  }));
+
+  const oauthUrl = `${discordUrl}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
   res.send({ redirectUrl: oauthUrl });
 }
 

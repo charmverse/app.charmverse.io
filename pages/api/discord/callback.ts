@@ -20,6 +20,18 @@ handler.get(async (req, res) => {
     return;
   }
 
+  let state: {
+    href: string,
+  } = {} as any;
+  try {
+    state = JSON.parse(decodeURIComponent(req.query.state as string));
+  }
+  catch (e) {
+    console.error('Error parsing discord state', e);
+    res.status(400).send({ error: 'Invalid state' });
+    return;
+  }
+
   const params = new URLSearchParams();
   params.append('client_id', DISCORD_OAUTH_CLIENT_ID);
   params.append('client_secret', DISCORD_OAUTH_CLIENT_SECRET);
@@ -36,13 +48,13 @@ handler.get(async (req, res) => {
 
   const cookies = new Cookies(req, res);
   cookies.set('discord-access-token', token.access_token, {
-    httpOnly: false,
-    path: '/'
+    sameSite: 'lax'
   });
   cookies.set('discord-refresh-token', token.refresh_token, {
-    httpOnly: false,
-    path: '/'
+    sameSite: 'lax'
   });
+
+  res.redirect(state.href);
 });
 
 export default handler;

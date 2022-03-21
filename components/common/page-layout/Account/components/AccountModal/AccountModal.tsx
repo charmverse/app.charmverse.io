@@ -69,7 +69,9 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
           size='small'
           variant='outlined'
           onClick={async () => {
-            const { redirectUrl } = await charmClient.discordLogin();
+            const { redirectUrl } = await charmClient.discordLogin({
+              href: window.location.href
+            });
             window.location.replace(redirectUrl);
           }}
         >
