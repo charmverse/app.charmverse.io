@@ -1,6 +1,7 @@
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import * as http from 'adapters/http';
+import Cookies from 'cookies';
 
 const handler = nc({
   onError,
@@ -31,11 +32,17 @@ handler.get(async (req, res) => {
       'Content-Type': 'application/x-www-form-urlencoded'
     },
     skipStringifying: true
+  }) as {access_token: string, expires_in: number, refresh_token: string, scope: string, token_type: string};
+
+  const cookies = new Cookies(req, res);
+  cookies.set('discord-access-token', token.access_token, {
+    httpOnly: false,
+    path: '/'
   });
-
-  console.log(token);
-
-  res.status(200).json({ status: 'success' });
+  cookies.set('discord-refresh-token', token.refresh_token, {
+    httpOnly: false,
+    path: '/'
+  });
 });
 
 export default handler;
