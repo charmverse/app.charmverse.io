@@ -33,19 +33,22 @@ function createData (id: string, message: string, date: string) {
 }
 
 function moveUserApplicationToFirstRow (applications: Application [], user: User): Application [] {
-  const userApplicationIndex = applications.findIndex(app => {
+
+  const copiedApps = applications.slice();
+
+  const userApplicationIndex = copiedApps.findIndex(app => {
     return app.createdBy === user?.id;
   });
 
   if (userApplicationIndex > 0) {
 
-    const userApplication = applications[userApplicationIndex];
+    const userApplication = copiedApps[userApplicationIndex];
 
-    applications.splice(userApplicationIndex);
-    applications.splice(0, 0, userApplication);
+    copiedApps.splice(userApplicationIndex, 1);
+    copiedApps.splice(0, 0, userApplication);
   }
 
-  return applications;
+  return copiedApps;
 
 }
 
@@ -107,6 +110,8 @@ export function BountyApplicantList ({
     minHeight = `${minHeight}px`;
   }
 
+  const sortedApplications = moveUserApplicationToFirstRow(applications, user!);
+
   return (
     <Box component='div' sx={{ minHeight, maxHeight, mb: 2, overflowY: 'auto' }}>
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
@@ -139,7 +144,7 @@ export function BountyApplicantList ({
         </TableHead>
         {applications.length !== 0 && (
           <TableBody>
-            {moveUserApplicationToFirstRow(applications, user!).map((application, applicationIndex) => (
+            {sortedApplications.map((application, applicationIndex) => (
               <TableRow
                 key={application.id}
                 sx={{ backgroundColor: applicationIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
