@@ -1,7 +1,5 @@
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
-import * as http from 'adapters/http';
-import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
 
 const handler = nc({
   onError,
@@ -11,45 +9,24 @@ const handler = nc({
 handler.get(async (req, res) => {
   const tempAuthCode = req.query.code;
   if (req.query.error || !tempAuthCode) {
-    console.log('Error or missing code from Notion OAuth. Response query:', req.query);
-    res.redirect('/');
+    res.status(400).send('Error or missing code from Notion OAuth');
     return;
   }
-  let state: {
-    account: string,
-    redirect: string
-    spaceId: string
-    userId: string
-  } = {} as any;
+  console.log('req.query', req.query);
+
+  let redirect: string;
   try {
-    state = JSON.parse(decodeURIComponent(req.query.state as string));
+    const state = JSON.parse(decodeURIComponent(req.query.state as string));
+    redirect = state.redirect;
   }
   catch (e) {
     console.error('Error parsing state notion callback', e);
-    res.status(400).send({ error: 'Invalid state' });
+    // TODO: Error page
+    res.status(400).send('Invalid callback state');
     return;
   }
-  const encodedToken = Buffer.from(`${process.env.NOTION_OAUTH_CLIENT_ID}:${process.env.NOTION_OAUTH_SECRET}`).toString('base64');
 
-  const token = await http.POST<{ workspace_name: string, workspace_icon: string, access_token: string, owner: { user: { id: string, person: { email: string } } } }>('https://api.notion.com/v1/oauth/token', {
-    grant_type: 'authorization_code',
-    redirect_uri: req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/notion/callback` : 'https://app.charmverse.io/api/notion/callback',
-    code: tempAuthCode
-  }, {
-    headers: {
-      Authorization: `Basic ${encodedToken}`,
-      'Content-Type': 'application/json'
-    }
-  });
-
-  await importFromWorkspace({
-    accessToken: token.access_token,
-    spaceId: state.spaceId,
-    userId: state.userId,
-    workspaceName: token.workspace_name,
-    workspaceIcon: token.workspace_icon
-  });
-  res.redirect(state.redirect);
+  res.redirect(`${redirect}?code=${tempAuthCode}`);
 });
 
 export default handler;
