@@ -155,11 +155,12 @@ export default function WorkspaceSettings () {
           }}
           variant='outlined'
           startIcon={(
-            isImportingFromNotion ? <CircularProgress size={20} /> : (
-              <SvgIcon>
-                <NotionIcon />
-              </SvgIcon>
-            )
+            <SvgIcon>
+              <NotionIcon />
+            </SvgIcon>
+          )}
+          endIcon={(
+            isImportingFromNotion && <CircularProgress size={20} />
           )}
         >
           {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
