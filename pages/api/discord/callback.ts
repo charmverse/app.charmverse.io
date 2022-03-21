@@ -1,7 +1,8 @@
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import * as http from 'adapters/http';
-import { DiscordUser } from 'hooks/useDiscordUser';
+import { prisma } from 'db';
+import { DiscordUser } from 'models/User';
 
 const handler = nc({
   onError,
@@ -22,6 +23,7 @@ handler.get(async (req, res) => {
 
   let state: {
     href: string,
+    userId: string
   } = {} as any;
   try {
     state = JSON.parse(decodeURIComponent(req.query.state as string));
@@ -30,6 +32,10 @@ handler.get(async (req, res) => {
     console.error('Error parsing discord state', e);
     res.status(400).send({ error: 'Invalid state' });
     return;
+  }
+
+  if (!state.userId) {
+    res.status(400).send({ error: 'Invalid state' });
   }
 
   const params = new URLSearchParams();
@@ -49,6 +55,15 @@ handler.get(async (req, res) => {
   const discordAccount = await http.GET<DiscordUser>('https://discord.com/api/v8/users/@me', undefined, {
     headers: {
       Authorization: `Bearer ${token.access_token}`
+    }
+  });
+
+  await prisma.user.update({
+    where: {
+      id: state.userId
+    },
+    data: {
+      discord: discordAccount as any
     }
   });
 

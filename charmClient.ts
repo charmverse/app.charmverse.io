@@ -13,7 +13,6 @@ import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
-import { DiscordUser } from 'hooks/useDiscordUser';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -35,10 +34,6 @@ class CharmClient {
 
   async logout () {
     await http.POST('/api/session/logout');
-  }
-
-  getDiscordUser () {
-    return http.GET<DiscordUser>('/api/discord/me');
   }
 
   getUser () {

@@ -169,7 +169,6 @@ import {
 import 'theme/lit-modal/styles.scss';
 import { setTheme as setLitProtocolTheme } from 'theme/lit-modal/theme';
 import 'theme/styles.scss';
-import { DiscordUserProvider } from 'hooks/useDiscordUser';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -307,9 +306,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
             <PaymentMethodsProvider>
               <PageTitleProvider>
                 <FocalboardViewsProvider>
-                  <DiscordUserProvider>
-                    {children}
-                  </DiscordUserProvider>
+                  {children}
                 </FocalboardViewsProvider>
               </PageTitleProvider>
             </PaymentMethodsProvider>
