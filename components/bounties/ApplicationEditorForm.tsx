@@ -10,6 +10,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import { isValidChainAddress } from 'lib/tokens/validation';
 import { FormMode } from './BountyEditorForm';
 
 interface IApplicationFormProps {
@@ -20,7 +21,10 @@ interface IApplicationFormProps {
 }
 
 export const schema = yup.object({
-  walletAddress: yup.string().required('Please provide a valid wallet address.'),
+  walletAddress: yup.string().required('Please provide a valid wallet address.')
+    .test('verifyContractFormat', 'Invalid wallet address', (value) => {
+      return !value || isValidChainAddress(value);
+    }),
   message: yup.string().required('Please enter a proposal.')
 });
 

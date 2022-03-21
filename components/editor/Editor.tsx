@@ -3,6 +3,7 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
 import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
+import { ScrollableWindow } from 'components/common/page-layout/ScrollableWindow';
 import { BlockIcons } from 'components/databases/focalboard/src/blockIcons';
 import EmojiPicker from 'components/databases/focalboard/src/widgets/emojiPicker';
 import DeleteIcon from 'components/databases/focalboard/src/widgets/icons/delete';
@@ -27,11 +28,6 @@ export const Container = styled(Box)<{ top: number }>`
   position: relative;
   top: ${({ top }) => top}px;
   padding-bottom: ${({ theme }) => theme.spacing(5)};
-`;
-
-const ScrollableWindow = styled.div`
-  flex-grow: 1;
-  overflow: auto;
 `;
 
 const PageControlItem = styled(ListItemButton)`
