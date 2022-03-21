@@ -9,27 +9,24 @@ const handler = nc({
 handler.get(async (req, res) => {
   const tempAuthCode = req.query.code;
   if (req.query.error || !tempAuthCode) {
-    console.log('Error or missing code from Notion OAuth. Response query:', req.query);
-    res.redirect('/');
+    res.status(400).send('Error or missing code from Notion OAuth');
     return;
   }
+  console.log('req.query', req.query);
 
-  let state: {
-    account: string,
-    redirect: string
-    spaceId: string
-    userId: string
-  } = {} as any;
+  let redirect: string;
   try {
-    state = JSON.parse(decodeURIComponent(req.query.state as string));
+    const state = JSON.parse(decodeURIComponent(req.query.state as string));
+    redirect = state.redirect;
   }
   catch (e) {
     console.error('Error parsing state notion callback', e);
-    res.status(400).send({ error: 'Invalid state' });
+    // TODO: Error page
+    res.status(400).send('Invalid callback state');
     return;
   }
 
-  res.redirect(`${state.redirect}?state=${encodeURIComponent(JSON.stringify({ ...state, code: tempAuthCode }))}`);
+  res.redirect(`${redirect}?code=${tempAuthCode}`);
 });
 
 export default handler;
