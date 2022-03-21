@@ -93,23 +93,35 @@ export function BountyApplicantList ({
 
   const applicationsMade = applications.length;
 
-  // Set min height large enough
-  const minHeight = applicationsMade === 0 ? undefined : Math.min(300, (100 * applicationsMade));
+  let maxHeight: null | number | string = 400;
+
+  let minHeight: null | number | string = applicationsMade === 0 ? 100 : 100 * applicationsMade;
+
+  // Ensure table only starts scrolling once we've received more than a few applications
+  if (minHeight > maxHeight) {
+    minHeight = null;
+    maxHeight = `${maxHeight}px`;
+  }
+  else {
+    // We don't need to change maxHeight to null as minHeight always overrides maxHeight
+    minHeight = `${minHeight}px`;
+  }
 
   return (
-    <Box component='div' sx={{ minHeight: `${minHeight}px`, marginBottom: '15px', maxHeight: '70vh', overflowY: 'auto' }}>
-      <Table stickyHeader={true} sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
+    <Box component='div' sx={{ minHeight, maxHeight, mb: 2, overflowY: 'auto' }}>
+      <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
         <TableHead sx={{
           background: theme.palette.background.dark,
           '& .MuiTableCell-head': {
             fontSize: 18
           },
-          '& .MuiTableCell-root': {
-            background: 'inherit'
-          }
+          '.MuiTableCell-root': {
+            background: theme.palette.settingsHeader.background
+          },
+          zIndex: 9000
         }}
         >
-          <TableRow>
+          <TableRow sx={{ }}>
             <TableCell>
               <Box sx={{
                 display: 'flex',
