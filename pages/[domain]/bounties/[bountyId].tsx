@@ -5,6 +5,10 @@ import Box from '@mui/material/Box';
 import Alert, { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import CardHeader from '@mui/material/CardHeader';
+
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Application, Bounty } from '@prisma/client';
@@ -294,110 +298,107 @@ export default function BountyDetails () {
         >
           <Grid item xs={6}>
             <Card sx={{ height: '100%', p: 3 }} variant='outlined'>
-              <Typography variant='body2' color='secondary' mb={2}>Reviewer</Typography>
-              {reviewerUser ? (
+              <CardHeader subheader='Reviewer' />
+              <CardContent sx={{ minHeight: '80px' }}>
                 <Box
                   component='div'
                   sx={{ display: 'flex',
                     gap: 1,
                     alignItems: 'center',
-                    justifyContent: 'space-between' }}
+                    justifyContent: 'flex-start' }}
                 >
-                  <Box display='flex' alignItems='center' gap={1}>
-                    <Avatar name={reviewerENSName || getDisplayName(reviewerUser)} />
-                    <Typography variant='h6' component='span'>
-                      {reviewerName}
-                    </Typography>
-                  </Box>
                   {
-                    (isReviewer || isAdmin) && (
-                      <Box sx={{
-                        display: 'flex',
-                        gap: 1
-                      }}
-                      >
-                        {bounty.status === 'review' && isReviewer && (
-                          <Box flexDirection='column' gap={1} display='flex'>
-                            <Button onClick={markAsComplete}>Mark as complete</Button>
-                            <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
+              reviewerUser ? (
+                <>
+                  <Avatar name={reviewerENSName || getDisplayName(reviewerUser)} />
+                  <Typography variant='h6' component='span'>
+                    {reviewerName}
+                  </Typography>
+                </>
+              ) : <Typography variant='body2'>No reviewer assigned</Typography>
+
+              }
+
+                </Box>
+              </CardContent>
+              <CardActions>
+
+                <Box flexDirection='row' gap={1} display='flex'>
+                  {/* Assign reviewer */}
+                  {!reviewerUser && isAdmin && (
+                    <Button color='secondary' variant='outlined' onClick={toggleBountyEditDialog}>Assign reviewer</Button>
+                  )}
+                  {/* Review completed work */}
+                  {bounty.status === 'review' && isReviewer && (
+                    <>
+                      <Button onClick={markAsComplete}>Mark as complete</Button>
+                      <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
+                    </>
+                  )}
+                  {/* Proceed with payment */}
+                  {
+                    bounty.status === 'complete' && (
+                      <Box>
+                        <BountyPaymentButton
+                          receiver={walletAddressForPayment!}
+                          amount={eToNumber(bounty.rewardAmount)}
+                          tokenSymbolOrAddress={bounty.rewardToken}
+                          onSuccess={recordPaymentSuccess}
+                          onError={onError}
+                          chainIdToUse={bounty.chainId!}
+                        />
+                        {paymentError && (
+                        <Alert sx={{ mt: 2, display: 'flex', '& .MuiAlert-message': { minWidth: '0px' } }} severity={paymentError.severity}>
+                          <Box component='div' sx={{ display: 'inline', wordWrap: 'break-word' }}>
+                            {paymentError.message}
                           </Box>
+                        </Alert>
                         )}
-                        {
-                          bounty.status === 'complete' && (
-                            <Box>
-                              <BountyPaymentButton
-                                receiver={walletAddressForPayment!}
-                                amount={eToNumber(bounty.rewardAmount)}
-                                tokenSymbolOrAddress={bounty.rewardToken}
-                                onSuccess={recordPaymentSuccess}
-                                onError={onError}
-                                chainIdToUse={bounty.chainId!}
-                              />
-                            </Box>
-                          )
-                        }
                       </Box>
                     )
                   }
                 </Box>
-              ) : <Typography variant='body2'>No reviewer assigned</Typography>}
 
-              {paymentError && (
-                <Alert sx={{ mt: 2, display: 'flex', '& .MuiAlert-message': { minWidth: '0px' } }} severity={paymentError.severity}>
-                  <Box component='div' sx={{ display: 'inline', wordWrap: 'break-word' }}>
-                    {paymentError.message}
-                  </Box>
-                </Alert>
-              )}
+              </CardActions>
             </Card>
           </Grid>
 
           <Grid item xs={6}>
             <Card sx={{ height: '100%', p: 3 }} variant='outlined'>
-              <Typography variant='body2' color='secondary' mb={2}>Assignee</Typography>
-              <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'space-between' }}>
-                {
-                  isAssignee === true ? (
-                    <>
-                      <Box sx={{
-                        display: 'flex',
-                        gap: 1,
-                        alignItems: 'center'
-                      }}
-                      >
-                        <Avatar />
-                        <Typography variant='h6' component='span'>
-                          You
-                        </Typography>
-                      </Box>
+              <CardHeader subheader='Assignee' />
+              <CardContent sx={{ minHeight: '80px' }}>
+                <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
+                  {assigneeName && (
+                  <>
+                    <Avatar name={assigneeENSName || getDisplayName(assigneeUser)} />
+                    <Typography variant='h6' component='span' sx={{ pl: 2 }}>
+                      {assigneeName}
+                    </Typography>
+                  </>
+                  )}
+                  {!assigneeName && !isApplicant && (
 
-                      {bounty.status === 'assigned' && (
-                        <Button onClick={requestReview}>Request review</Button>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {assigneeName && (
-                        <Box display='flex' alignItems='center'>
-                          <Avatar name={assigneeENSName || getDisplayName(assigneeUser)} />
-                          <Typography variant='h6' component='span' sx={{ pl: 2 }}>
-                            {assigneeName}
-                          </Typography>
-                        </Box>
-                      )}
-                      {!assigneeName && (
-                        isApplicant ? (
-                          <Box>
-                            <Typography>You've applied to this bounty.</Typography>
-                          </Box>
-                        ) : (
-                          <Button onClick={toggleApplicationDialog}>Apply now</Button>
-                        )
-                      )}
-                    </>
-                  )
-                }
-              </Box>
+                    <Typography variant='body2'>Nobody has been assigned to this bounty yet</Typography>
+
+                  )}
+                  {!assigneeName && isApplicant && (
+                  <Box>
+                    <Typography variant='body2'>You've applied to this bounty.</Typography>
+                  </Box>
+                  )}
+
+                </Box>
+              </CardContent>
+              <CardActions>
+                <Box flexDirection='row' gap={1} display='flex'>
+                  { bounty.status === 'open' && !isApplicant && (
+                  <Button onClick={toggleApplicationDialog}>Apply now</Button>
+                  )}
+                  {isAssignee && bounty.status === 'assigned' && (
+                  <Button onClick={requestReview}>Request review</Button>
+                  )}
+                </Box>
+              </CardActions>
             </Card>
           </Grid>
         </Grid>
