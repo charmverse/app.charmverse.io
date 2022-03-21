@@ -7,7 +7,7 @@ import CopyableAddress from 'components/common/CopyableAddress';
 import Avatar from 'components/common/Avatar';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import useENSName from 'hooks/useENSName';
 import charmClient from 'charmClient';
@@ -21,12 +21,17 @@ const DiscordUserName = styled(Typography)`
   top: 4px;
 `;
 
+const StyledButton = styled(Button)`
+  width: 100px;
+`;
+
 function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const { account, connector } = useWeb3React();
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
-  const [user] = useUser();
+  const [user, setUser] = useUser();
   const discordData = (user?.discord as unknown as DiscordUser);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const handleWalletProviderSwitch = () => {
     openWalletSelectorModal();
@@ -46,6 +51,8 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
     }
   };
 
+  const connectedWithDiscord = Boolean(user?.discord);
+
   return (
     <Modal open={isOpen} onClose={onClose}>
       <DialogTitle onClose={onClose}>Account</DialogTitle>
@@ -63,9 +70,9 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
         <Typography color='secondary'>
           {`Connected with ${connectorName(connector)}`}
         </Typography>
-        <Button size='small' variant='outlined' onClick={handleWalletProviderSwitch}>
+        <StyledButton size='small' variant='outlined' onClick={handleWalletProviderSwitch}>
           Switch
-        </Button>
+        </StyledButton>
       </Stack>
       <Stack
         direction='row'
@@ -74,20 +81,35 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
         my={1}
       >
         <Typography color='secondary'>
-          {user!?.discord ? 'Connected with Discord' : 'Connect with Discord'}
+          {connectedWithDiscord ? 'Connected with Discord' : 'Connect with Discord'}
         </Typography>
-        <Button
+        <StyledButton
           size='small'
-          variant='outlined'
+          variant={connectedWithDiscord ? 'contained' : 'outlined'}
+          color={connectedWithDiscord ? 'error' : 'primary'}
+          disabled={isDisconnecting}
           onClick={async () => {
-            const { redirectUrl } = await charmClient.discordLogin({
-              href: window.location.href
-            });
-            window.location.replace(redirectUrl);
+            if (connectedWithDiscord) {
+              setIsDisconnecting(true);
+              try {
+                await charmClient.disconnectDiscord();
+                setUser({ ...user, discord: null });
+              }
+              catch (err) {
+                console.log('Error disconnecting from discord');
+              }
+              setIsDisconnecting(false);
+            }
+            else {
+              const { redirectUrl } = await charmClient.discordLogin({
+                href: window.location.href
+              });
+              window.location.replace(redirectUrl);
+            }
           }}
         >
-          {user!?.discord ? 'Disconnect' : 'Connect'}
-        </Button>
+          {connectedWithDiscord ? 'Disconnect' : 'Connect'}
+        </StyledButton>
       </Stack>
     </Modal>
   );
