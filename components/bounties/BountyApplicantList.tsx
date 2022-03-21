@@ -69,6 +69,22 @@ export function BountyApplicantList ({ applications, bounty, bountyReassigned = 
   // Set min height large enough
   const minHeight = applicationsMade === 0 ? undefined : Math.min(300, (100 * applicationsMade));
 
+  function moveUserApplicationToFirstRow () {
+    const userApplicationIndex = applications.findIndex(app => {
+      return app.createdBy === user?.id;
+    });
+
+    if (userApplicationIndex > 0) {
+
+      const userApplication = applications[userApplicationIndex];
+
+      applications.splice(userApplicationIndex);
+      applications.splice(0, 0, userApplication);
+    }
+  }
+
+  moveUserApplicationToFirstRow();
+
   return (
     <Box component='div' sx={{ minHeight: `${minHeight}px`, marginBottom: '15px', maxHeight: '70vh', overflowY: 'auto' }}>
       <Table stickyHeader={true} sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
