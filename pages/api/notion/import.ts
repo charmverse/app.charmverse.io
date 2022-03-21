@@ -47,7 +47,6 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse) {
       'Content-Type': 'application/json'
     }
   });
-  console.log(token);
   await importFromWorkspace({
     spaceId,
     userId: req.session.user.id,
