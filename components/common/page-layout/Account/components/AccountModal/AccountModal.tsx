@@ -53,7 +53,7 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
 
   const connectedWithDiscord = Boolean(user?.discord);
 
-  const discordUsername = discordData ? `${discordData?.username}#${discordData?.discriminator}` : null;
+  const discordUsername = discordData ? `${discordData?.username}` : null;
 
   return (
     <Modal open={isOpen} onClose={onClose}>

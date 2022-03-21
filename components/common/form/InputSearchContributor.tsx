@@ -47,7 +47,7 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
       sx={{ minWidth: 150 }}
       options={contributors}
       autoHighlight
-      getOptionLabel={user => user?.discord ? `${(user?.discord as any)?.username}#${(user?.discord as any)?.discriminator}` : getDisplayName(user)}
+      getOptionLabel={user => getDisplayName(user)}
       renderOption={(props, user) => (
         <ReviewerOption {...props} user={user} />
       )}
@@ -70,7 +70,7 @@ export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contribu
   return (
     <Box component='li' display='flex' gap={1} {...props}>
       <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={discordData?.avatar ? `https://cdn.discordapp.com/avatars/${discordData.id}/${discordData.avatar}.png` : null} />
-      <Typography>{ensName || discordData ? `${discordData.username}#${discordData.discriminator}` : getDisplayName(user)}</Typography>
+      <Typography>{ensName || getDisplayName(user)}</Typography>
     </Box>
   );
 }

@@ -65,10 +65,10 @@ export default function BountyDetails () {
 
   const reviewerUser = (bounty?.reviewer && getContributor(bounty.reviewer)) || undefined;
   const reviewerENSName = useENSName(reviewerUser?.addresses[0]);
-  const reviewerName = isReviewer ? 'You' : reviewerENSName || reviewerUser?.discord ? `${(reviewerUser?.discord as any).username}#${(reviewerUser?.discord as any).discriminator}` : getDisplayName(reviewerUser);
+  const reviewerName = isReviewer ? 'You' : reviewerENSName || getDisplayName(reviewerUser);
   const assigneeUser = (bounty?.assignee && getContributor(bounty.assignee)) || undefined;
   const assigneeENSName = useENSName(assigneeUser?.addresses[0]);
-  const assigneeName = isAssignee ? 'You' : assigneeENSName || assigneeUser?.discord ? `${(assigneeUser?.discord as any).username}#${(assigneeUser?.discord as any).discriminator}` : getDisplayName(assigneeUser);
+  const assigneeName = isAssignee ? 'You' : assigneeENSName || getDisplayName(assigneeUser);
 
   const CharmEditorMemoized = useMemo(() => {
     // Only show the editor if the description exist

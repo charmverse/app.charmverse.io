@@ -56,7 +56,6 @@ function Account (): JSX.Element {
   const accountModalState = usePopupState({ variant: 'popover', popupId: 'account-modal' });
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
   const [user] = useUser();
-  const linkedAddressesCount = user?.addresses.length ?? 0;
 
   const discordData = (user?.discord as unknown as DiscordUser);
 

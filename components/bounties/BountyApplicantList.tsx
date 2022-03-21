@@ -108,7 +108,7 @@ export function BountyApplicantList ({ applications, bounty, bountyReassigned = 
                   sx={{ backgroundColor: applicationIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell size='small'>
-                    {(appliedContributor?.discord) ? `${(appliedContributor?.discord as any)?.username}#${(appliedContributor?.discord as any)?.discriminator}` : getDisplayName(appliedContributor)}
+                    {getDisplayName(appliedContributor)}
                   </TableCell>
                   <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
                   <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
