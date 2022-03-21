@@ -1,7 +1,7 @@
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import * as http from 'adapters/http';
-import Cookies from 'cookies';
+import { DiscordUser } from 'hooks/useDiscordUser';
 
 const handler = nc({
   onError,
@@ -46,12 +46,10 @@ handler.get(async (req, res) => {
     skipStringifying: true
   }) as {access_token: string, expires_in: number, refresh_token: string, scope: string, token_type: string};
 
-  const cookies = new Cookies(req, res);
-  cookies.set('discord-access-token', token.access_token, {
-    sameSite: 'lax'
-  });
-  cookies.set('discord-refresh-token', token.refresh_token, {
-    sameSite: 'lax'
+  const discordAccount = await http.GET<DiscordUser>('https://discord.com/api/v8/users/@me', undefined, {
+    headers: {
+      Authorization: `Bearer ${token.access_token}`
+    }
   });
 
   res.redirect(state.href);
