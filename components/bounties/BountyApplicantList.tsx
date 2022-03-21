@@ -113,7 +113,7 @@ export function BountyApplicantList ({
   const sortedApplications = moveUserApplicationToFirstRow(applications, user!);
 
   return (
-    <Box component='div' sx={{ minHeight, maxHeight, mb: 2, overflowY: 'auto' }}>
+    <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
         <TableHead sx={{
           background: theme.palette.background.dark,
@@ -123,7 +123,7 @@ export function BountyApplicantList ({
           zIndex: 9000
         }}
         >
-          <TableRow sx={{ }}>
+          <TableRow>
             <TableCell>
               <Box sx={{
                 display: 'flex',
