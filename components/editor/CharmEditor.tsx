@@ -27,6 +27,7 @@ import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { CSSProperties, ReactNode } from 'react';
+import { useCurrentEditorState } from 'hooks/useCurrentEditorState';
 import { Callout, calloutSpec } from './Callout';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
@@ -46,7 +47,7 @@ export interface ICharmEditorOutput {
   rawText: string
 }
 
-const specRegistry = new SpecRegistry([
+export const specRegistry = new SpecRegistry([
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   {
     type: 'node',
@@ -61,6 +62,11 @@ const specRegistry = new SpecRegistry([
         }
       ],
       toDOM: (): DOMOutputSpecArray => ['p', 0]
+    },
+    markdown: {
+      toMarkdown: (state, node, parent, index) => {
+        console.log('Paragraph state', node);
+      }
     }
   },
   bold.spec(),
@@ -142,6 +148,8 @@ interface CharmEditorProps {
 function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
 ) {
+
+  const [, setCurrentEditorState] = useCurrentEditorState();
 
   const state = useEditorState({
     specRegistry,
@@ -239,6 +247,8 @@ function CharmEditor (
       color: 'transparent'
     }
   });
+
+  setCurrentEditorState(state);
 
   return (
     <StyledReactBangleEditor

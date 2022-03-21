@@ -80,6 +80,11 @@ export function iframeSpec (): RawSpecs {
   return {
     type: 'node',
     name,
+    markdown: {
+      toMarkdown: (state, node, parent, index) => {
+        console.log('iframe State', node);
+      }
+    },
     schema: {
       attrs: {
         src: {

@@ -6,7 +6,7 @@ import { useCurrentSpace } from './useCurrentSpace';
 
 type IContext = [
   editorState: BangleEditorState<any> | null,
-  setEditorState: Dispatch<SetStateAction<BangleEditorState<any>>>,
+  setEditorState: Dispatch<SetStateAction<BangleEditorState<any> | null>>,
 ]
 
 export const EditorStateContext = createContext<Readonly<IContext>>([
@@ -29,4 +29,4 @@ export function EditorStateProvider ({ children }: { children: ReactNode }) {
   );
 }
 
-export const usePaymentMethods = () => useContext(EditorStateContext);
+export const useCurrentEditorState = () => useContext(EditorStateContext);
