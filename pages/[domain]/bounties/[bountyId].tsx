@@ -299,9 +299,9 @@ export default function BountyDetails () {
             spacing={2}
           >
             <Grid item xs={6}>
-              <Card sx={{ height: '100%', p: 3 }} variant='outlined'>
-                <CardHeader subheader='Reviewer' />
-                <CardContent sx={{ minHeight: '80px' }}>
+              <Card sx={{ height: '100%', p: 1, pl: 3 }} variant='outlined'>
+                <CardHeader subheader='Reviewer' sx={{ p: 1, pt: 0 }} />
+                <CardContent sx={{ minHeight: '70px', p: 1 }}>
                   <Box
                     component='div'
                     sx={{ display: 'flex',
@@ -313,7 +313,7 @@ export default function BountyDetails () {
               reviewerUser ? (
                 <>
                   <Avatar name={reviewerENSName || getDisplayName(reviewerUser)} />
-                  <Typography variant='h6' component='span'>
+                  <Typography variant='h6' component='span' sx={{ pl: 0.5 }}>
                     {reviewerName}
                   </Typography>
                 </>
@@ -323,7 +323,7 @@ export default function BountyDetails () {
 
                   </Box>
                 </CardContent>
-                <CardActions>
+                <CardActions sx={{ pt: 0.5, pb: 0.5 }}>
 
                   <Box flexDirection='row' gap={1} display='flex'>
                     {/* Assign reviewer */}
@@ -366,14 +366,14 @@ export default function BountyDetails () {
             </Grid>
 
             <Grid item xs={6}>
-              <Card sx={{ height: '100%', p: 3 }} variant='outlined'>
-                <CardHeader subheader='Assignee' />
-                <CardContent sx={{ minHeight: '80px' }}>
+              <Card sx={{ height: '100%', p: 1, pl: 3 }} variant='outlined'>
+                <CardHeader subheader='Assignee' sx={{ p: 1, pt: 0 }} />
+                <CardContent sx={{ minHeight: '70px', p: 1 }}>
                   <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
                     {assigneeName && (
                     <>
                       <Avatar name={assigneeENSName || getDisplayName(assigneeUser)} />
-                      <Typography variant='h6' component='span' sx={{ pl: 2 }}>
+                      <Typography variant='h6' component='span' sx={{ pl: 0.5 }}>
                         {assigneeName}
                       </Typography>
                     </>
@@ -391,7 +391,7 @@ export default function BountyDetails () {
 
                   </Box>
                 </CardContent>
-                <CardActions>
+                <CardActions sx={{ pt: 0.5, pb: 0.5 }}>
                   <Box flexDirection='row' gap={1} display='flex'>
                     { bounty.status === 'open' && !isApplicant && (
                     <Button onClick={toggleApplicationDialog}>Apply now</Button>
