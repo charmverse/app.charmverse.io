@@ -28,6 +28,10 @@ div[role="presentation"] {
   position: relative;
 }
 
+blockquote .bangle-nv-child-container {
+  width: 100%;
+}
+
 // make sure tooltips always appear, on Account page it falls behind our custom modal
 .MuiTooltip-popper {
   z-index: 9999999 !important;

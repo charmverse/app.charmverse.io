@@ -1,4 +1,5 @@
 import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
+import styled from '@emotion/styled';
 import { Schema, Plugin, DOMOutputSpec, TextSelection, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { createTooltipDOM, SuggestTooltipRenderOpts, tooltipPlacement } from '@bangle.dev/tooltip';
@@ -19,15 +20,31 @@ import useSnackbar from 'hooks/useSnackbar';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { Page, PageContent } from 'models';
 import Link from 'next/link';
-import contributors from 'pages/[domain]/settings/contributors';
 import { useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { hideSuggestionsTooltip, referenceElement } from './@bangle.dev/tooltip/suggest-tooltip';
-import { replaceSuggestionMarkWith } from './@bangle.io/js-lib/inline-palette';
-import { selectMention, mentionSuggestKey } from './Mention';
 
 const name = 'page';
 export const NestedPagePluginKey = new PluginKey('suggest_tooltip');
+
+const NestedPageContainer = styled((props: any) => <div {...props} />)`
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(0.5)};
+  padding: 3px 3px 3px 2px;
+  position: relative;
+  transition: background 20ms ease-in 0s;
+  &:hover {
+    background-color: ${({ theme }) => theme.palette.background.light};
+  }
+  .actions-menu {
+    opacity: 0;
+  }
+  &:hover .actions-menu {
+    opacity: 1;
+  }
+`;
 
 export function nestedPageSpec (): RawSpecs {
   return {
@@ -36,9 +53,6 @@ export function nestedPageSpec (): RawSpecs {
     schema: {
       inline: false,
       attrs: {
-        path: {
-          default: null
-        },
         // This property is used to reference the page
         id: {
           default: null
@@ -197,7 +211,6 @@ export function NestedPagesList () {
 }
 
 export function NestedPage ({ node, getPos, view }: NodeViewProps) {
-  const theme = useTheme();
   const [space] = useCurrentSpace();
   const { pages } = usePages();
   const { addNestedPage } = useNestedPage();
@@ -210,37 +223,13 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
   const isEditorEmpty = docContent && (docContent.length <= 1
   && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
 
-  const transition = theme.transitions.create(['background-color'], {
-    duration: theme.transitions.duration.short,
-    easing: theme.transitions.easing.easeInOut
-  });
-
   return (
-    <Box
-      display='flex'
-      alignItems='center'
-      gap={0.5}
-      px={1}
-      py={1}
-      borderRadius={1}
-      sx={{
-        cursor: 'pointer',
-        transition,
-        position: 'relative',
-        '&:hover': {
-          backgroundColor: theme.palette.background.light,
-          transition
-        },
-        '&:hover .actions-menu': {
-          opacity: 1
-        }
-      }}
-    >
+    <NestedPageContainer>
       {nestedPage?.icon ? <div>{nestedPage.icon}</div> : (
         isEditorEmpty ? <InsertDriveFileOutlinedIcon /> : <DescriptionOutlinedIcon />
       )}
       <Link
-        href={`/${(space!).domain}/${node.attrs.path}`}
+        href={`/${(space)?.domain}/${nestedPage?.path}`}
         passHref
       >
         <Box fontWeight={600} component='div' width='100%'>
@@ -257,6 +246,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
           sx={{ padding: '3px 12px' }}
           onClick={() => {
             const pos = getPos();
+            TextSelection.create(view.state.doc, pos - 1, pos + 1);
             view.dispatch(view.state.tr.setSelection(
               TextSelection.create(view.state.doc, pos - 1, pos + 1)
             ));
@@ -287,7 +277,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
           sx={{ padding: '3px 12px' }}
           onClick={() => {
             // eslint-disable-next-line
-            navigator.clipboard.writeText(`${location.origin}/${space?.domain}/${node.attrs.path}`);
+            navigator.clipboard.writeText(`${location.origin}/${space?.domain}/${nestedPage?.path}`);
             showMessage('Link copied');
           }}
         >
@@ -301,6 +291,6 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
         </MenuItem>
       </Menu>
       <Snackbar severity='info' handleClose={handleClose} isOpen={isSnackbarOpen} message={message ?? ''} />
-    </Box>
+    </NestedPageContainer>
   );
 }

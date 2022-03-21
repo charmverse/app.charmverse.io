@@ -294,7 +294,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                 <Grid item container xs>
                   <Grid item xs={validTokenLogoAddressFormat ? 8 : 12}>
                     <InputLabel>
-                      Token logo
+                      Token logo URL
                     </InputLabel>
                     <TextField
                       {...register('tokenLogo')}
@@ -302,6 +302,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                       fullWidth
                       error={!!errors.tokenLogo?.message}
                       helperText={errors.tokenLogo?.message}
+                      placeholder='https://app.charmverse.io/favicon.png'
                     />
                     {
                       (errors?.tokenLogo || (validTokenLogoAddressFormat && !logoLoadSuccess)) && (

@@ -37,7 +37,7 @@ export type FiatCurrency = keyof typeof FiatCurrencyList;
 export type Currency = CryptoCurrency | FiatCurrency;
 
 export interface ICurrencyPair {
-  base: CryptoCurrency;
+  base: CryptoCurrency | string;
   quote: FiatCurrency;
 }
 

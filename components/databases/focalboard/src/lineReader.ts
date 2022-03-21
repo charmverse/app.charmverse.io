@@ -38,7 +38,6 @@ class LineReader {
                 const result = decoder.decode(buffer.slice(0, newlineIndex))
                 buffer = buffer.slice(newlineIndex + 1)
 
-                // eslint-disable-next-line no-await-in-loop
                 await callback(result, false)
                 newlineIndex = LineReader.arrayBufferIndexOf(buffer, newlineChar)
             }

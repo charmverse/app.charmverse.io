@@ -20,7 +20,7 @@ interface BlockPatch {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updatedFields?: Record<string, any>
     deletedFields?: string[]
-    deleteAt?: number
+    deletedAt?: number
 }
 
 interface Block {
@@ -39,10 +39,10 @@ interface Block {
 
     createdAt: number
     updatedAt: number
-    deleteAt: number
+    deletedAt: number | null
 }
 
-function createBlock(block?: Block): Block {
+function createBlock(block?: Partial<Block>): Block {
     const now = Date.now()
     return {
         id: block?.id || Utils.createGuid(Utils.blockTypeToIDType(block?.type)),
@@ -57,7 +57,7 @@ function createBlock(block?: Block): Block {
         title: block?.title || '',
         createdAt: block?.createdAt || now,
         updatedAt: block?.updatedAt || now,
-        deleteAt: block?.deleteAt || 0,
+        deletedAt: block?.deletedAt || null,
     }
 }
 

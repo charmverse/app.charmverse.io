@@ -183,9 +183,7 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
   return (
     <PageAnchor onClick={stopPropagation}>
       {labelIcon && (
-        <StyledPageIcon {...bindTrigger(popupState)}>
-          {labelIcon}
-        </StyledPageIcon>
+        <StyledPageIcon icon={labelIcon} {...bindTrigger(popupState)} />
       )}
       <Link passHref href={href}>
         <PageTitle isempty={isempty ? 1 : 0}>
@@ -234,25 +232,23 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
 );
 
 export function PageIcon ({ isEditorEmpty, pageType }: {pageType: Page['type'], isEditorEmpty: boolean}) {
-  let Icon: null | ReactNode = null;
+  let icon: null | ReactNode = null;
   if (pageType === 'board') {
-    Icon = (<StyledDatabaseIcon />);
+    icon = (<StyledDatabaseIcon />);
   }
   else if (isEditorEmpty) {
-    Icon = (
+    icon = (
       <InsertDriveFileOutlinedIcon />
     );
   }
   else {
-    Icon = (
+    icon = (
       <DescriptionOutlinedIcon />
     );
   }
 
   return (
-    <StyledPageIcon>
-      {Icon}
-    </StyledPageIcon>
+    <StyledPageIcon icon={icon} />
   );
 }
 

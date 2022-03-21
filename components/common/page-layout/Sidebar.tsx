@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Prisma } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import mutator from 'components/databases/focalboard/src//mutator';
 import { getSortedBoards } from 'components/databases/focalboard/src/store/boards';
