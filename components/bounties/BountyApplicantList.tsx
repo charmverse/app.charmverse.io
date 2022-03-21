@@ -117,9 +117,6 @@ export function BountyApplicantList ({
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
         <TableHead sx={{
           background: theme.palette.background.dark,
-          '& .MuiTableCell-head': {
-            fontSize: 18
-          },
           '.MuiTableCell-root': {
             background: theme.palette.settingsHeader.background
           },
@@ -157,11 +154,25 @@ export function BountyApplicantList ({
                 </TableCell>
                 <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
                 <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
-                <TableCell>
+                <TableCell align='right' sx={{ gap: 2 }}>
+
+                  {
+                    application.createdBy === user?.id && (
+                      <Button
+                        color='secondary'
+                        variant='outlined'
+                        onClick={updateApplication}
+                        endIcon={<EditOutlinedIcon fontSize='small' />}
+                      >
+                        Edit
+                      </Button>
+                    )
+                  }
 
                   {
                   displayAssignmentButton(application) === true && (
                     <Button
+                      sx={{ ml: 2 }}
                       onClick={() => {
                         assignBounty(application.createdBy);
                       }}
@@ -172,23 +183,10 @@ export function BountyApplicantList ({
                 }
                   {
                   bounty.assignee === application.createdBy && (
-                    <Chip label='Assigned' color={BountyStatusColours.assigned} />
+                    <Chip sx={{ ml: 2 }} label='Assigned' color={BountyStatusColours.assigned} />
                   )
                 }
 
-                  {
-                    application.createdBy === user?.id && (
-                      <Button
-                        color='secondary'
-                        variant='outlined'
-                        sx={{ ml: 2 }}
-                        onClick={updateApplication}
-                      >
-                        <Box component='span' sx={{ pr: 1 }}>Edit</Box>
-                        <EditOutlinedIcon />
-                      </Button>
-                    )
-                  }
                 </TableCell>
 
               </TableRow>
