@@ -9,11 +9,11 @@ import DeleteIcon from 'components/databases/focalboard/src/widgets/icons/delete
 import EmojiIcon from 'components/databases/focalboard/src/widgets/icons/emoji';
 import Menu from 'components/databases/focalboard/src/widgets/menu';
 import MenuWrapper from 'components/databases/focalboard/src/widgets/menuWrapper';
-import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page, PageContent } from 'models';
 import { ChangeEvent } from 'react';
 import { useIntl } from 'react-intl';
+import emojis from './emoji.json';
 import PageIcon from '../common/Emoji';
 import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
@@ -100,7 +100,7 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   }
 
   function addPageIcon () {
-    const icon = gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji;
+    const icon = emojis[randomIntFromInterval(0, emojis.length - 1)];
     setPage({ icon });
   }
 
