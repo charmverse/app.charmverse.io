@@ -1,14 +1,19 @@
 
-import { Application, Prisma } from '@prisma/client';
+import { Application, Bounty, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { requireKeys } from 'lib/middleware/requireKeys';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { IApiError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getApplications).post(createApplication);
+handler.use(requireUser)
+  .get(getApplications)
+  .use(requireKeys<Application>(['bountyId', 'createdBy'], 'body'))
+  .post(createApplication);
 
 async function getApplications (req: NextApiRequest, res: NextApiResponse<Application[]>) {
   const { bountyId } = req.query;
@@ -27,24 +32,21 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
   return res.status(200).json(applications);
 }
 
-async function createApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
+async function createApplication (req: NextApiRequest, res: NextApiResponse<Application | IApiError>) {
   const data = req.body as Application;
   const ApplicationToCreate = { ...data } as any;
 
-  if (data.createdBy) {
-    (ApplicationToCreate as Prisma.ApplicationCreateInput).applicant = { connect: { id: data.createdBy } };
-    delete ApplicationToCreate.createdBy;
-  }
-  else {
-    return res.status(400).json({ error: 'Please provide an applicant' } as any);
-  }
+  const existingProposal = await prisma.application.findFirst({
+    where: {
+      bountyId: data.bountyId,
+      createdBy: data.createdBy
+    }
+  });
 
-  if (data.bountyId) {
-    (ApplicationToCreate as Prisma.ApplicationCreateInput).bounty = { connect: { id: data.bountyId } };
-    delete ApplicationToCreate.bountyId;
-  }
-  else {
-    return res.status(400).json({ error: 'The proposal should be linked to a bounty' } as any);
+  if (existingProposal) {
+    return res.status(400).json(<IApiError>{
+      message: 'This user has already applied to this bounty'
+    });
   }
 
   const proposal = await prisma.application.create({ data: ApplicationToCreate });
