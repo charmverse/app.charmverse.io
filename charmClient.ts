@@ -135,6 +135,14 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
+  notionLogin (query: { redirect: string }) {
+    return http.GET<{redirectUrl: string}>('/api/notion/login', query);
+  }
+
+  importFromNotion (params: { code: string, spaceId: string }) {
+    return http.POST('/api/notion/import', params);
+  }
+
   // FocalBoard
 
   // TODO: we shouldnt have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
@@ -190,7 +198,7 @@ class CharmClient {
   private blockToFBBlock (block: Block): FBBlock {
     return {
       ...block,
-      deleteAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,
+      deletedAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,
       createdAt: new Date(block.createdAt).getTime(),
       updatedAt: new Date(block.updatedAt).getTime(),
       type: block.type as FBBlock['type'],
@@ -207,7 +215,7 @@ class CharmClient {
       type: fbBlock.type,
       title: fbBlock.title,
       fields: fbBlock.fields,
-      deletedAt: fbBlock.deleteAt === 0 ? null : new Date(fbBlock.deleteAt),
+      deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
       createdAt: (!fbBlock.createdAt || fbBlock.createdAt === 0) ? new Date() : new Date(fbBlock.createdAt),
       updatedAt: (!fbBlock.updatedAt || fbBlock.updatedAt === 0) ? new Date() : new Date(fbBlock.updatedAt)
     };
@@ -233,7 +241,7 @@ class CharmClient {
   async deleteBlock (blockId: string, updater: BlockUpdater): Promise<void> {
     const deletedBlock = await http.DELETE<Block>(`/api/blocks/${blockId}`);
     const fbBlock = this.blockToFBBlock(deletedBlock);
-    fbBlock.deleteAt = new Date().getTime();
+    fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
   }
 
@@ -350,7 +358,7 @@ class CharmClient {
     return http.POST('/api/transactions', details);
   }
 
-  async getPricing (base: CryptoCurrency, quote: FiatCurrency): Promise<IPairQuote> {
+  async getPricing (base: string, quote: FiatCurrency): Promise<IPairQuote> {
 
     const data = await http.GET<IPairQuote>('/api/crypto-price', { base, quote });
 
@@ -359,7 +367,8 @@ class CharmClient {
 
   // AWS
   uploadToS3 (file: File): Promise<{ token: any, bucket: string, key: string, region: string }> {
-    const filename = encodeURIComponent(file.name);
+    const extension = file.name.split('.').pop() || ''; // lowercase the extension to simplify possible values
+    const filename = encodeURIComponent(file.name.replace(extension, extension.toLowerCase()));
     return http.GET('/api/aws/s3-upload', { filename });
   }
 

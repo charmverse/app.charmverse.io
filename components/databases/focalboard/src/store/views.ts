@@ -21,7 +21,7 @@ const viewsSlice = createSlice({
         },
         updateViews: (state, action: PayloadAction<BoardView[]>) => {
             for (const view of action.payload) {
-                if (view.deleteAt === 0) {
+                if (view.deletedAt === 0) {
                     state.views[view.id] = view
                 } else {
                     delete state.views[view.id]

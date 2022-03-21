@@ -321,9 +321,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
           rafCommandExec(view!, (state, dispatch) => {
             return insertNode(state, dispatch, state.schema.nodes.codeBlock.create(
               { language: "Javascript" },
-              Fragment.fromArray([
-                state.schema.text("console.log('Hello World');")
-              ])
+              Fragment.fromArray([])
             ))
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(

@@ -24,7 +24,7 @@ const boardsSlice = createSlice({
         },
         updateBoards: (state, action: PayloadAction<Board[]>) => {
             for (const board of action.payload) {
-                if (board.deleteAt !== 0) {
+                if (board.deletedAt !== 0) {
                     delete state.boards[board.id]
                     delete state.templates[board.id]
                 } else if (board.fields.isTemplate) {

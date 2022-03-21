@@ -23,7 +23,6 @@ export default function useNestedPage () {
 
     rafCommandExec(view!, (state, dispatch) => {
       return insertNode(state, dispatch, state.schema.nodes.page.create({
-        path: page.path,
         id: page.id
       }));
     });

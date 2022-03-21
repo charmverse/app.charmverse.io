@@ -58,7 +58,10 @@ export default function MultiPaymentModal () {
 
   return (
     <>
-      <Button {...bindTrigger(popupState)}>
+      <Button
+        {...bindTrigger(popupState)}
+        sx={{ ml: 1 }}
+      >
         Batch Payment ({bountiesReady.length})
       </Button>
       <Modal {...bindPopover(popupState)} size='fluid'>

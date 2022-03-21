@@ -254,6 +254,7 @@ function CharmEditor (
       postEditorComponents={<Placeholder />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
+
         switch (props.node.type.name) {
           case 'quote':
             return <Quote {...props}>{NodeViewChildren}</Quote>;

@@ -138,7 +138,6 @@ class UndoManager {
         const currentGroupId = command.groupId
         if (currentGroupId) {
             do {
-                // eslint-disable-next-line no-await-in-loop
                 await this.execute(command, 'undo')
                 this.index -= 1
                 command = this.commands[this.index]
@@ -167,7 +166,6 @@ class UndoManager {
         const currentGroupId = command.groupId
         if (currentGroupId) {
             do {
-                // eslint-disable-next-line no-await-in-loop
                 await this.execute(command, 'redo')
                 this.index += 1
                 command = this.commands[this.index + 1]

@@ -80,6 +80,7 @@
         "functions": false
       }
     ],
+    "no-await-in-loop": "off",
     "object-curly-newline": "off",
     "padded-blocks": "off",
     "prefer-destructuring": "off",

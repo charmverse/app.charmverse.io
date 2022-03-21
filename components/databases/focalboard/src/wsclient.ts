@@ -36,7 +36,7 @@ export interface Subscription {
     subscriberType: string
     notifiedAt?: number
     createdAt?: number
-    deleteAt?: number
+    deletedAt?: number
 }
 
 export const ACTION_UPDATE_BLOCK = 'UPDATE_BLOCK'
@@ -342,7 +342,7 @@ class WSClient {
             return
         }
 
-        const handler = message.subscription.deleteAt ? this.onUnfollowBlock : this.onFollowBlock
+        const handler = message.subscription.deletedAt ? this.onUnfollowBlock : this.onFollowBlock
         handler(this, message.subscription)
     }
 
