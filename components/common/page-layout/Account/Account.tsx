@@ -55,7 +55,6 @@ function Account (): JSX.Element {
   const accountModalState = usePopupState({ variant: 'popover', popupId: 'account-modal' });
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
   const [user] = useUser();
-  const linkedAddressesCount = user?.addresses.length ?? 0;
 
   if (typeof window === 'undefined') {
     return (
@@ -103,9 +102,9 @@ function Account (): JSX.Element {
         </Tooltip>
         <AccountButton
           onClick={accountModalState.open}
-          endIcon={<Avatar name={ENSName || account} size='small' />}
+          endIcon={<Avatar avatar={user?.avatar} name={ENSName || account} size='small' />}
         >
-          {ENSName || `${shortenHex(account, 3)}`}
+          {ENSName || user?.username || `${shortenHex(account, 3)}`}
         </AccountButton>
       </StyledButtonGroup>
 

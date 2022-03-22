@@ -25,7 +25,8 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
     },
     include: {
       favorites: true,
-      spaceRoles: true
+      spaceRoles: true,
+      discordUser: true
     }
   });
 
@@ -61,7 +62,8 @@ async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     },
     include: {
       favorites: true,
-      spaceRoles: true
+      spaceRoles: true,
+      discordUser: true
     }
   });
   if (!profile) {

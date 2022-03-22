@@ -148,52 +148,48 @@ export function BountyApplicantList ({
               >
                 <TableCell size='small'>
                   {
-                    application.createdBy === user?.id ? 'You'
-                      : getDisplayName(getContributor(application.createdBy))
-                  }
+                      application.createdBy === user?.id ? 'You'
+                        : getDisplayName(getContributor(application.createdBy))
+                    }
                 </TableCell>
                 <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
                 <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
                 <TableCell align='right' sx={{ gap: 2 }}>
+                  {
+                      application.createdBy === user?.id && (
+                        <Button
+                          color='secondary'
+                          variant='outlined'
+                          onClick={updateApplication}
+                          endIcon={<EditOutlinedIcon fontSize='small' />}
+                        >
+                          Edit
+                        </Button>
+                      )
+                    }
 
                   {
-                    application.createdBy === user?.id && (
+                    displayAssignmentButton(application) === true && (
                       <Button
-                        color='secondary'
-                        variant='outlined'
-                        onClick={updateApplication}
-                        endIcon={<EditOutlinedIcon fontSize='small' />}
+                        sx={{ ml: 2 }}
+                        onClick={() => {
+                          assignBounty(application.createdBy);
+                        }}
                       >
-                        Edit
+                        Assign
                       </Button>
                     )
                   }
-
                   {
-                  displayAssignmentButton(application) === true && (
-                    <Button
-                      sx={{ ml: 2 }}
-                      onClick={() => {
-                        assignBounty(application.createdBy);
-                      }}
-                    >
-                      Assign
-                    </Button>
-                  )
-                }
-                  {
-                  bounty.assignee === application.createdBy && (
-                    <Chip sx={{ ml: 2 }} label='Assigned' color={BountyStatusColours.assigned} />
-                  )
-                }
-
+                    bounty.assignee === application.createdBy && (
+                      <Chip sx={{ ml: 2 }} label='Assigned' color={BountyStatusColours.assigned} />
+                    )
+                  }
                 </TableCell>
-
               </TableRow>
             ))}
           </TableBody>
         )}
-
       </Table>
       {applications.length === 0 && (
       <Box

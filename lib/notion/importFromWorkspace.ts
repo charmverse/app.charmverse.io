@@ -79,234 +79,245 @@ async function populateDoc (
     onLinkToPage: (pageLink: string, parentNode: BlockNode) => Promise<void>,
     onChildDatabase: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>,
     onChildPage: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>
-  }
+  },
+  parentInfo: [string, number][]
 ) {
-
-  switch (block.type) {
-    case 'heading_1': {
-      (parentNode as PageContent).content?.push({
-        type: 'heading',
-        attrs: {
-          level: 1
-        },
-        content: convertRichText(block.heading_1.rich_text)
-      });
-      break;
-    }
-
-    case 'heading_2': {
-      (parentNode as PageContent).content?.push({
-        type: 'heading',
-        attrs: {
-          level: 2
-        },
-        content: convertRichText(block.heading_2.rich_text)
-      });
-      break;
-    }
-
-    case 'heading_3': {
-      (parentNode as PageContent).content?.push({
-        type: 'heading',
-        attrs: {
-          level: 2
-        },
-        content: convertRichText(block.heading_3.rich_text)
-      });
-      break;
-    }
-
-    case 'paragraph': {
-      (parentNode as PageContent).content?.push({
-        type: 'paragraph',
-        content: convertRichText(block[block.type].rich_text)
-      });
-      break;
-    }
-
-    case 'link_to_page': {
-      await onLinkToPage((block[block.type] as any)[block[block.type].type] as string, parentNode);
-      break;
-    }
-
-    case 'child_database': {
-      await onChildDatabase(block, parentNode);
-      break;
-    }
-
-    case 'child_page': {
-      await onChildPage(block, parentNode);
-      break;
-    }
-
-    case 'bulleted_list_item':
-    case 'numbered_list_item':
-    case 'to_do':
-    {
-      let richText: RichTextItemResponse[] = [];
-
-      if (block.type === 'bulleted_list_item') {
-        richText = block.bulleted_list_item.rich_text;
-      }
-      else if (block.type === 'numbered_list_item') {
-        richText = block.numbered_list_item.rich_text;
-      }
-      else if (block.type === 'to_do') {
-        richText = block.to_do.rich_text;
-      }
-
-      const listItemNode: ListItemNode = {
-        type: 'listItem',
-        content: [{
-          type: 'paragraph',
-          content: convertRichText(richText)
-        }],
-        attrs: {
-          todoChecked: block.type === 'to_do' ? block.to_do.checked : null
-        }
-      };
-
-      (parentNode as PageContent).content?.push({
-        type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
-        content: [listItemNode]
-      });
-
-      for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
-        const childId = blocksRecord[block.id].children[index];
-        await populateDoc(listItemNode, blocksRecord[childId], blocksRecord, {
-          onLinkToPage,
-          onChildDatabase,
-          onChildPage
+  try {
+    switch (block.type) {
+      case 'heading_1': {
+        (parentNode as PageContent).content?.push({
+          type: 'heading',
+          attrs: {
+            level: 1
+          },
+          content: convertRichText(block.heading_1.rich_text)
         });
-      }
-      break;
-    }
-
-    case 'callout':
-    case 'quote': {
-      let richText: RichTextItemResponse[] = [];
-      let emoji: string | null = null;
-
-      if (block.type === 'callout') {
-        richText = block.callout.rich_text;
-        emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
-      }
-      else if (block.type === 'quote') {
-        richText = block.quote.rich_text;
+        break;
       }
 
-      const calloutNode: CalloutNode = {
-        type: block.type === 'callout' ? 'blockquote' : 'quote' as any,
-        attrs: {
-          emoji
-        },
-        content: [
-          {
+      case 'heading_2': {
+        (parentNode as PageContent).content?.push({
+          type: 'heading',
+          attrs: {
+            level: 2
+          },
+          content: convertRichText(block.heading_2.rich_text)
+        });
+        break;
+      }
+
+      case 'heading_3': {
+        (parentNode as PageContent).content?.push({
+          type: 'heading',
+          attrs: {
+            level: 2
+          },
+          content: convertRichText(block.heading_3.rich_text)
+        });
+        break;
+      }
+
+      case 'paragraph': {
+        (parentNode as PageContent).content?.push({
+          type: 'paragraph',
+          content: convertRichText(block[block.type].rich_text)
+        });
+        break;
+      }
+
+      case 'link_to_page': {
+        await onLinkToPage((block[block.type] as any)[block[block.type].type] as string, parentNode);
+        break;
+      }
+
+      case 'child_database': {
+        await onChildDatabase(block, parentNode);
+        break;
+      }
+
+      case 'child_page': {
+        await onChildPage(block, parentNode);
+        break;
+      }
+
+      case 'bulleted_list_item':
+      case 'numbered_list_item':
+      case 'to_do':
+      {
+        let richText: RichTextItemResponse[] = [];
+
+        if (block.type === 'bulleted_list_item') {
+          richText = block.bulleted_list_item.rich_text;
+        }
+        else if (block.type === 'numbered_list_item') {
+          richText = block.numbered_list_item.rich_text;
+        }
+        else if (block.type === 'to_do') {
+          richText = block.to_do.rich_text;
+        }
+
+        const listItemNode: ListItemNode = {
+          type: 'listItem',
+          content: [{
             type: 'paragraph',
             content: convertRichText(richText)
+          }],
+          attrs: {
+            todoChecked: block.type === 'to_do' ? block.to_do.checked : null
           }
-        ]
-      };
-      (parentNode as PageContent).content?.push(calloutNode);
-      for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
-        const childId = blocksRecord[block.id].children[index];
-        await populateDoc(calloutNode, blocksRecord[childId], blocksRecord, {
-          onLinkToPage,
-          onChildDatabase,
-          onChildPage
+        };
+
+        (parentNode as PageContent).content?.push({
+          type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
+          content: [listItemNode]
         });
+
+        for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
+          const childId = blocksRecord[block.id].children[index];
+          await populateDoc(listItemNode, blocksRecord[childId], blocksRecord, {
+            onLinkToPage,
+            onChildDatabase,
+            onChildPage
+          }, [...parentInfo, [blocksRecord[childId].type, index]]);
+        }
+        break;
       }
-      break;
-    }
 
-    case 'video': {
-      (parentNode as PageContent).content?.push({
-        type: 'iframe',
-        attrs: {
-          src: block.video.type === 'external' ? extractEmbedLink(block.video.external.url) : null,
-          type: 'video',
-          width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
-          height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
+      case 'callout':
+      case 'quote': {
+        let richText: RichTextItemResponse[] = [];
+        let emoji: string | null = null;
+
+        if (block.type === 'callout') {
+          richText = block.callout.rich_text;
+          emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
         }
-      });
-      break;
-    }
-
-    case 'embed':
-    case 'bookmark':
-    {
-      (parentNode as PageContent).content?.push({
-        type: 'iframe',
-        attrs: {
-          src: extractEmbedLink(block.type === 'bookmark' ? block.bookmark.url : block.embed.url),
-          type: 'embed',
-          width: MAX_EMBED_WIDTH,
-          height: MIN_EMBED_HEIGHT
+        else if (block.type === 'quote') {
+          richText = block.quote.rich_text;
         }
-      });
-      break;
-    }
 
-    case 'divider': {
-      (parentNode as PageContent).content?.push({
-        type: 'horizontalRule'
-      });
-      break;
-    }
-
-    case 'code': {
-      (parentNode as PageContent).content?.push({
-        type: 'codeBlock',
-        content: [{
-          type: 'text',
-          text: block.code.rich_text[0].plain_text
-        }],
-        attrs: {
-          language: block.code.language
+        const calloutNode: CalloutNode = {
+          type: block.type === 'callout' ? 'blockquote' : 'quote' as any,
+          attrs: {
+            emoji
+          },
+          content: [
+            {
+              type: 'paragraph',
+              content: convertRichText(richText)
+            }
+          ]
+        };
+        (parentNode as PageContent).content?.push(calloutNode);
+        for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
+          const childId = blocksRecord[block.id].children[index];
+          await populateDoc(calloutNode, blocksRecord[childId], blocksRecord, {
+            onLinkToPage,
+            onChildDatabase,
+            onChildPage
+          }, [...parentInfo, [blocksRecord[childId].type, index]]);
         }
-      });
-      break;
-    }
+        break;
+      }
 
-    case 'image': {
-      (parentNode as PageContent).content?.push({
-        type: 'image',
-        attrs: {
-          src: block.image.type === 'external' ? block.image.external.url : null,
-          size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
-          aspectRatio: 1
-        }
-      });
-      break;
-    }
+      case 'video': {
+        (parentNode as PageContent).content?.push({
+          type: 'iframe',
+          attrs: {
+            src: block.video.type === 'external' ? extractEmbedLink(block.video.external.url) : null,
+            type: 'video',
+            width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
+            height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
+          }
+        });
+        break;
+      }
 
-    case 'table': {
-      const tableNode: TableNode = {
-        type: 'table',
-        content: []
-      };
-      blocksRecord[block.id].children.forEach((rowId, rowIndex) => {
-        const row = blocksRecord[rowId];
-        if (row.type === 'table_row') {
-          const content: TableRowNode['content'] = [];
-          tableNode.content.push({
-            type: 'table_row',
-            content
-          });
-          row.table_row.cells.forEach((cell) => {
-            content.push({
-              type: rowIndex === 0 ? 'table_header' : 'table_cell',
-              content: convertRichText(cell)
+      case 'embed':
+      case 'bookmark':
+      {
+        (parentNode as PageContent).content?.push({
+          type: 'iframe',
+          attrs: {
+            src: extractEmbedLink(block.type === 'bookmark' ? block.bookmark.url : block.embed.url),
+            type: 'embed',
+            width: MAX_EMBED_WIDTH,
+            height: MIN_EMBED_HEIGHT
+          }
+        });
+        break;
+      }
+
+      case 'divider': {
+        (parentNode as PageContent).content?.push({
+          type: 'horizontalRule'
+        });
+        break;
+      }
+
+      case 'code': {
+        (parentNode as PageContent).content?.push({
+          type: 'codeBlock',
+          content: [{
+            type: 'text',
+            text: block.code.rich_text[0].plain_text
+          }],
+          attrs: {
+            language: block.code.language
+          }
+        });
+        break;
+      }
+
+      case 'image': {
+        (parentNode as PageContent).content?.push({
+          type: 'image',
+          attrs: {
+            src: block.image.type === 'external' ? block.image.external.url : null,
+            size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
+            aspectRatio: 1
+          }
+        });
+        break;
+      }
+
+      case 'table': {
+        const tableNode: TableNode = {
+          type: 'table',
+          content: []
+        };
+        blocksRecord[block.id].children.forEach((rowId, rowIndex) => {
+          const row = blocksRecord[rowId];
+          if (row.type === 'table_row') {
+            const content: TableRowNode['content'] = [];
+            tableNode.content.push({
+              type: 'table_row',
+              content
             });
-          });
-        }
-      });
-      (parentNode as PageContent).content?.push(tableNode);
-      break;
+            row.table_row.cells.forEach((cell) => {
+              content.push({
+                type: rowIndex === 0 ? 'table_header' : 'table_cell',
+                content: convertRichText(cell)
+              });
+            });
+          }
+        });
+        (parentNode as PageContent).content?.push(tableNode);
+        break;
+      }
+      default: {
+        break;
+      }
     }
-    default: {
-      break;
+  }
+  catch (err: any) {
+    const errorTrails = [];
+    if (err.message.startsWith('[BLOCK]')) {
+      const errorMessageWithoutPrefix = err.message.replace('[BLOCK]: ', '');
+      const errorMessageData = JSON.parse(errorMessageWithoutPrefix);
+      errorTrails.push(...errorMessageData);
     }
+    throw new Error(`[BLOCK]: ${JSON.stringify([parentInfo[parentInfo.length - 1], ...errorTrails])}`);
   }
 }
 
@@ -472,6 +483,21 @@ async function createDatabase (block: GetDatabaseResponse, {
   return createdPage;
 }
 
+function constructErrorMessage (err: any, block: GetPageResponse | GetDatabaseResponse) {
+  let blocks: [string, number][] = [];
+  if (err.message.startsWith('[BLOCK]: ')) {
+    const errorStringWithoutPrefix = err.message.replace('[BLOCK]: ', '');
+    blocks = JSON.parse(errorStringWithoutPrefix) as [string, number][];
+  }
+  // Adding [IMPORT] to error message to differentiate between errors related to import
+  throw new Error(`[IMPORT]: ${JSON.stringify({
+    pageId: block.id,
+    type: block.object,
+    title: block.object === 'page' ? convertToPlainText((block.properties.title as any)[block.properties.title.type]) : convertToPlainText((block.title)),
+    blocks
+  })}`);
+}
+
 export async function importFromWorkspace ({ workspaceName, workspaceIcon, accessToken, userId, spaceId }:
   { accessToken: string, spaceId: string, userId: string,
     workspaceName: string,
@@ -511,18 +537,23 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
-    if (block.object === 'page') {
-      await createPage([[block.id, v4()]]);
-    }
-    else if (block.object === 'database') {
-      // Only create the database if it hasn't been created already
-      if (!createdPages[block.id]) {
-        createdPages[block.id] = await createDatabase(block as GetDatabaseResponse, {
-          spaceId,
-          userId,
-          focalboardRecord
-        });
+    try {
+      if (block.object === 'page') {
+        await createPage([[block.id, v4()]]);
       }
+      else if (block.object === 'database') {
+        // Only create the database if it hasn't been created already
+        if (!createdPages[block.id]) {
+          createdPages[block.id] = await createDatabase(block as GetDatabaseResponse, {
+            spaceId,
+            userId,
+            focalboardRecord
+          });
+        }
+      }
+    }
+    catch (err) {
+      constructErrorMessage(err, block);
     }
   }
 
@@ -683,7 +714,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             }
           });
         }
-      });
+      }, [[blocks[index].type, index]]);
     }
 
     // If there was no content in the notion page only then add an empty paragraph

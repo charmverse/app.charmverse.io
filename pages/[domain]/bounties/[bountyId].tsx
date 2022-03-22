@@ -312,7 +312,7 @@ export default function BountyDetails () {
                     {
               reviewerUser ? (
                 <>
-                  <Avatar name={reviewerENSName || getDisplayName(reviewerUser)} />
+                  <Avatar avatar={reviewerUser.avatar} name={reviewerENSName || getDisplayName(reviewerUser)} />
                   <Typography variant='h6' component='span' sx={{ pl: 0.5 }}>
                     {reviewerName}
                   </Typography>
@@ -372,7 +372,7 @@ export default function BountyDetails () {
                   <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
                     {assigneeName && (
                     <>
-                      <Avatar name={assigneeENSName || getDisplayName(assigneeUser)} />
+                      <Avatar avatar={assigneeUser?.avatar} name={assigneeENSName || getDisplayName(assigneeUser)} />
                       <Typography variant='h6' component='span' sx={{ pl: 0.5 }}>
                         {assigneeName}
                       </Typography>
