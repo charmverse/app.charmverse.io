@@ -83,20 +83,21 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     }
   }, [pageId, pagesLoaded]);
 
+  // memoize the page to avoid re-rendering unless certain fields are changed
   const currentPage = pages[currentPageId];
   const memoizedCurrentPage = useMemo(
     () => pages[currentPageId],
-    [currentPage?.id, currentPage?.headerImage, currentPage?.icon, currentPage?.title]
+    [currentPageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title]
   );
 
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
-  else if (!currentPage) {
+  else if (!memoizedCurrentPage) {
     return null;
   }
   else if (currentPage.type === 'board') {
-    return <DatabaseEditor page={currentPage} setPage={setPage} readonly={publicShare} />;
+    return <DatabaseEditor page={memoizedCurrentPage} setPage={setPage} readonly={publicShare} />;
   }
   else {
     return <Editor page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare} />;
