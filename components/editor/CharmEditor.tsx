@@ -17,7 +17,7 @@ import {
 } from '@bangle.dev/base-components';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
-import { useEditorState } from '@bangle.dev/react';
+import { useEditorState, EditorViewContext } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
@@ -26,8 +26,7 @@ import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { CSSProperties, ReactNode, useEffect, useRef } from 'react';
-import { useCurrentEditorView } from 'hooks/useCurrentEditorView';
+import { CSSProperties, ReactNode, useEffect, useRef, useContext } from 'react';
 import { Callout, calloutSpec } from './Callout';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
@@ -85,6 +84,107 @@ export const specRegistry = new SpecRegistry([
   quoteSpec() // OK
 ]);
 
+export function charmEditorPlugins (
+  {
+    onPageContentChange,
+    readOnly
+  } :
+  {
+    readOnly?: boolean, onPageContentChange?: (content: ICharmEditorOutput) => void
+  } = {}
+) {
+  return () => [
+    new Plugin({
+      view: () => ({
+        update: (view, prevState) => {
+
+          if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
+            onPageContentChange({
+              doc: view.state.doc.toJSON() as PageContent,
+              rawText: view.state.doc.textContent as string
+            });
+          }
+        }
+      })
+
+    }),
+    nestedPagePlugins({
+      tooltipRenderOpts: {
+        placement: 'bottom'
+      }
+    }),
+    imagePlugins(),
+    inlinePalettePlugins(),
+    bold.plugins(),
+    bulletList.plugins(),
+    code.plugins(),
+    codeBlock.plugins(),
+    hardBreak.plugins(),
+    heading.plugins(),
+    horizontalRule.plugins(),
+    italic.plugins(),
+    link.plugins(),
+    listItem.plugins(),
+    orderedList.plugins(),
+    paragraph.plugins(),
+    strike.plugins(),
+    underline.plugins(),
+    emojiPlugins(),
+    mentionPlugins(),
+    columnResizing,
+    floatingMenuPlugin(readOnly),
+    blockquote.plugins(),
+    NodeView.createPlugin({
+      name: 'blockquote',
+      containerDOM: ['blockquote'],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'codeBlock',
+      containerDOM: ['pre'],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'columnLayout',
+      containerDOM: ['div'],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'columnBlock',
+      containerDOM: ['div'],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'image',
+      containerDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'cryptoPrice',
+      containerDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'iframe',
+      containerDOM: ['div', { class: 'iframe-container' }]
+    }),
+    NodeView.createPlugin({
+      name: 'page',
+      containerDOM: ['div', { class: 'page-container' }]
+    }),
+    NodeView.createPlugin({
+      name: 'quote',
+      containerDOM: ['blockquote', { class: 'charm-quote' }],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'mention',
+      containerDOM: ['span', { class: 'mention-value' }]
+    })
+  // TODO: Pasting iframe or image link shouldn't create those blocks for now
+  // iframePlugin,
+  // pasteImagePlugin
+  ];
+}
+
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
   position: relative;
   /** DONT REMOVE THIS STYLING */
@@ -135,107 +235,9 @@ function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
 ) {
 
-  const [currentEditorView, setCurrentEditorView] = useCurrentEditorView();
-
   const state = useEditorState({
     specRegistry,
-    plugins: () => [
-      new Plugin({
-        view: () => ({
-          update: (view, prevState) => {
-
-            if (!currentEditorView && view) {
-              setCurrentEditorView(view);
-            }
-
-            if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
-              onPageContentChange({
-                doc: view.state.doc.toJSON() as PageContent,
-                rawText: view.state.doc.textContent as string
-              });
-            }
-          },
-          destroy: () => {
-            setCurrentEditorView(null);
-          }
-        })
-
-      }),
-      nestedPagePlugins({
-        tooltipRenderOpts: {
-          placement: 'bottom'
-        }
-      }),
-      imagePlugins(),
-      inlinePalettePlugins(),
-      bold.plugins(),
-      bulletList.plugins(),
-      code.plugins(),
-      codeBlock.plugins(),
-      hardBreak.plugins(),
-      heading.plugins(),
-      horizontalRule.plugins(),
-      italic.plugins(),
-      link.plugins(),
-      listItem.plugins(),
-      orderedList.plugins(),
-      paragraph.plugins(),
-      strike.plugins(),
-      underline.plugins(),
-      emojiPlugins(),
-      mentionPlugins(),
-      columnResizing,
-      floatingMenuPlugin(readOnly),
-      blockquote.plugins(),
-      NodeView.createPlugin({
-        name: 'blockquote',
-        containerDOM: ['blockquote'],
-        contentDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'codeBlock',
-        containerDOM: ['pre'],
-        contentDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'columnLayout',
-        containerDOM: ['div'],
-        contentDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'columnBlock',
-        containerDOM: ['div'],
-        contentDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'image',
-        containerDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'cryptoPrice',
-        containerDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'iframe',
-        containerDOM: ['div', { class: 'iframe-container' }]
-      }),
-      NodeView.createPlugin({
-        name: 'page',
-        containerDOM: ['div', { class: 'page-container' }]
-      }),
-      NodeView.createPlugin({
-        name: 'quote',
-        containerDOM: ['blockquote', { class: 'charm-quote' }],
-        contentDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'mention',
-        containerDOM: ['span', { class: 'mention-value' }]
-      })
-      // TODO: Pasting iframe or image link shouldn't create those blocks for now
-      // iframePlugin,
-      // pasteImagePlugin
-    ],
+    plugins: charmEditorPlugins({ onPageContentChange, readOnly }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components
     dropCursorOpts: {

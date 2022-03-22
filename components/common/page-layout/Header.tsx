@@ -1,4 +1,5 @@
 import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
+import { BangleEditorState } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -20,12 +21,13 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import { specRegistry } from 'components/editor/CharmEditor';
+import { specRegistry, charmEditorPlugins } from 'components/editor/CharmEditor';
+import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
 import { useColorMode } from 'context/color-mode';
-import { useCurrentEditorView } from 'hooks/useCurrentEditorView';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
+import { PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import Account from './Account';
@@ -46,7 +48,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const { pages, currentPageId, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
-  const [currentEditorView] = useCurrentEditorView();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
@@ -70,11 +71,17 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
 
   function generateMarkdown () {
 
-    if (currentEditorView && currentPage) {
+    if (currentPage && currentPage.type === 'page') {
 
       const serializer = markdownSerializer(specRegistry);
 
-      let markdown = serializer.serialize(currentEditorView.state.doc);
+      const state = new BangleEditorState({
+        specRegistry,
+        plugins: charmEditorPlugins(),
+        initialValue: currentPage.content ? Node.fromJSON(specRegistry.schema, currentPage.content as PageContent) : ''
+      });
+
+      let markdown = serializer.serialize(state.pmState.doc);
 
       if (currentPage.title) {
         const pageTitleAsMarkdown = `# ${currentPage.title}`;
