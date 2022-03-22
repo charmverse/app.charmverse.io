@@ -6,7 +6,13 @@
   z-index: 99999;
 }
 
+.lsm-top-modal-overlay {
+  background: transparent;
+  pointer-events: none; // disable overlay since we're using our own
+}
+
 .lsm-top-modal {
+  pointer-events: auto;
   box-sizing: content-box;
   border: 0 none;
   border-radius: 8px;
