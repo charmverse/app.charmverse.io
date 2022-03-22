@@ -1,40 +1,32 @@
-import { useState, useContext, useRef, createRef } from 'react';
+import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import Chip from '@mui/material/Chip';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import GetAppIcon from '@mui/icons-material/GetApp';
 import MenuIcon from '@mui/icons-material/Menu';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import { Box, CircularProgress } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import Avatar from 'components/common/Avatar';
-import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import Popover from '@mui/material/Popover';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import GetAppIcon from '@mui/icons-material/GetApp';
+import Popover from '@mui/material/Popover';
+import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
+import { specRegistry } from 'components/editor/CharmEditor';
 import { useColorMode } from 'context/color-mode';
+import { useCurrentEditorView } from 'hooks/useCurrentEditorView';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
-import { useCurrentEditorView } from 'hooks/useCurrentEditorView';
 import { useRouter } from 'next/router';
-import getDisplayName from 'lib/users/getDisplayName';
-import { EditorViewContext } from '@bangle.dev/react';
-import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
-import { BangleEditor, BangleEditorState } from '@bangle.dev/core';
-import { specRegistry } from 'components/editor/CharmEditor';
-
-import { EditorView } from '@bangle.dev/pm';
+import { useRef, useState } from 'react';
 import Account from './Account';
 import ShareButton from './ShareButton';
 
@@ -81,14 +73,26 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
 
   function generateMarkdown () {
 
-    if (currentEditorView) {
+    if (currentEditorView && currentPage) {
       const parser = markdownParser(specRegistry);
 
       const serializer = markdownSerializer(specRegistry);
       console.log(serializer);
       const md = serializer.serialize(currentEditorView.state.doc);
 
-      console.log('Markdown\r\n', md);
+      const data = new Blob([md], { type: 'text/plain' });
+
+      const linkElement = document.createElement('a');
+
+      linkElement.download = `${currentPage.title}.md`;
+
+      const downloadLink = URL.createObjectURL(data);
+
+      linkElement.href = downloadLink;
+
+      linkElement.click();
+
+      URL.revokeObjectURL(downloadLink);
     }
 
   }
@@ -173,7 +177,11 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
                 }}
               >
                 <List dense>
-                  <ListItemButton onClick={generateMarkdown}>
+                  <ListItemButton onClick={() => {
+                    generateMarkdown();
+                    setPageMenuOpen(false);
+                  }}
+                  >
                     <ListItemIcon>
                       <GetAppIcon fontSize='small' />
                     </ListItemIcon>
