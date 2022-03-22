@@ -51,6 +51,26 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
 
   const connectedWithDiscord = Boolean(user?.discordUser);
 
+  async function connectWithDiscord () {
+    if (connectedWithDiscord) {
+      setIsDisconnecting(true);
+      try {
+        await charmClient.disconnectDiscord();
+        setUser({ ...user, discordUser: null });
+      }
+      catch (err) {
+        console.log('Error disconnecting from discord');
+      }
+      setIsDisconnecting(false);
+    }
+    else {
+      const { redirectUrl } = await charmClient.discordLogin({
+        href: window.location.href
+      });
+      window.location.replace(redirectUrl);
+    }
+  }
+
   return (
     <Modal open={isOpen} onClose={onClose}>
       <DialogTitle onClose={onClose}>Account</DialogTitle>
@@ -86,25 +106,7 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
           variant={connectedWithDiscord ? 'contained' : 'outlined'}
           color={connectedWithDiscord ? 'error' : 'primary'}
           disabled={isDisconnecting}
-          onClick={async () => {
-            if (connectedWithDiscord) {
-              setIsDisconnecting(true);
-              try {
-                await charmClient.disconnectDiscord();
-                setUser({ ...user, discordUser: null });
-              }
-              catch (err) {
-                console.log('Error disconnecting from discord');
-              }
-              setIsDisconnecting(false);
-            }
-            else {
-              const { redirectUrl } = await charmClient.discordLogin({
-                href: window.location.href
-              });
-              window.location.replace(redirectUrl);
-            }
-          }}
+          onClick={connectWithDiscord}
         >
           {connectedWithDiscord ? 'Disconnect' : 'Connect'}
         </StyledButton>
