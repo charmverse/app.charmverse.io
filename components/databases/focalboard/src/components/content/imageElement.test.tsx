@@ -36,7 +36,7 @@ describe('components/content/ImageElement', () => {
         createdBy: 'test-user-id',
         createdAt: 0,
         updatedAt: 0,
-        deleteAt: 0,
+        deletedAt: 0,
     }
 
     test('should match snapshot', async () => {

@@ -90,7 +90,7 @@ const CardDetail = (props: Props): JSX.Element|null => {
     return (
         <>
             {card.fields.headerImage && <Box width={"100%"} mb={2}>
-              <PageBanner focalBoard image={card.fields.headerImage} setImage={(headerImage) => {
+              <PageBanner focalBoard headerImage={card.fields.headerImage} setPage={({ headerImage }) => {
                 setRandomHeaderImage(headerImage!)
               }} />
             </Box>}
