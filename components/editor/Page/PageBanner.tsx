@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { ListItem, Typography } from '@mui/material';
@@ -12,7 +13,7 @@ const StyledPageBanner = styled(Box)<{focalBoard?: boolean}>`
   justify-content: center;
   position: relative;
   width: 100%;
-  
+
   img {
     width: 100%;
     object-fit: cover;
@@ -47,14 +48,24 @@ export const PageCoverGalleryImageGroups = {
   ]
 };
 
-export default function PageBanner ({ focalBoard, image, setImage }:
-  { image: string, setImage: (_: string | null) => void, focalBoard?: boolean }) {
+interface PageBannerProps {
+  focalBoard?: boolean;
+  headerImage: string;
+  setPage: (page: { headerImage: string | null }) => void;
+}
+
+function PageBanner ({ focalBoard, headerImage, setPage }: PageBannerProps) {
+
   const theme = useTheme();
+
+  function setImage (_headerImage: string | null) {
+    setPage({ headerImage: _headerImage });
+  }
 
   return (
     <StyledPageBanner focalBoard={focalBoard}>
       {/* eslint-disable-next-line */}
-      <img src={image} alt='Page Banner' />
+      <img src={headerImage} alt='Page Banner' />
       <Box
         sx={{
           background: theme.palette.background.light,
@@ -69,15 +80,11 @@ export default function PageBanner ({ focalBoard, image, setImage }:
           tabs={[[
             'Gallery',
             <ImageSelectorGallery
-              onImageClick={(imageSrc) => {
-                setImage(imageSrc);
-              }}
+              onImageClick={setImage}
               items={PageCoverGalleryImageGroups}
             />
           ]]}
-          onImageSelect={(imageSrc) => {
-            setImage(imageSrc);
-          }}
+          onImageSelect={setImage}
         >
           <ListItem
             button
@@ -106,9 +113,7 @@ export default function PageBanner ({ focalBoard, image, setImage }:
         >
           <Typography
             variant='subtitle1'
-            onClick={() => {
-              setImage(null);
-            }}
+            onClick={() => setImage(null)}
           >
             Remove
           </Typography>
@@ -117,3 +122,5 @@ export default function PageBanner ({ focalBoard, image, setImage }:
     </StyledPageBanner>
   );
 }
+
+export default memo(PageBanner);

@@ -110,7 +110,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
     <StyledToolbar variant='dense'>
       <IconButton
         color='inherit'
-        aria-label='open drawer'
         onClick={openSidebar}
         edge='start'
         sx={{
@@ -166,8 +165,8 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
           )}
 
           {isPage && isExportablePage && (
-            <Box sx={{ ml: 1 }} component='div' ref={pageMenuAnchor}>
-              <IconButton>
+            <Box sx={{ ml: 1 }} ref={pageMenuAnchor}>
+              <IconButton size='small'>
                 <MoreHorizIcon
                   onClick={() => {
                     setPageMenuOpen(!pageMenuOpen);

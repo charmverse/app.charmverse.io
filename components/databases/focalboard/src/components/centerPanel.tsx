@@ -144,7 +144,7 @@ class CenterPanel extends React.Component<Props, State> {
                         />
                     </RootPortal>}
                 {board.fields.headerImage && <Box className='PageBanner' width={"100%"} mb={2}>
-                  <PageBanner focalBoard image={board.fields.headerImage} setImage={(headerImage) => {
+                  <PageBanner focalBoard headerImage={board.fields.headerImage} setPage={({ headerImage }) => {
                     this.setRandomHeaderImage(board, headerImage!)
                   }} />
                 </Box>}
