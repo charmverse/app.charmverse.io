@@ -58,7 +58,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
 
   const isPage = router.route.includes('pageId');
 
-  const isExportablePage = (currentPage as Page).type === 'page';
+  const isExportablePage = (currentPage as Page)?.type === 'page';
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
