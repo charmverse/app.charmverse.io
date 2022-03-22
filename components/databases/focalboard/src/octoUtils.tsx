@@ -105,7 +105,7 @@ class OctoUtils {
     static mergeBlocks(blocks: readonly Block[], updatedBlocks: readonly Block[]): Block[] {
         const updatedBlockIds = updatedBlocks.map((o) => o.id)
         const newBlocks = blocks.filter((o) => !updatedBlockIds.includes(o.id))
-        const updatedAndNotDeletedBlocks = updatedBlocks.filter((o) => o.deleteAt === 0)
+        const updatedAndNotDeletedBlocks = updatedBlocks.filter((o) => o.deletedAt === 0)
         newBlocks.push(...updatedAndNotDeletedBlocks)
         return newBlocks
     }

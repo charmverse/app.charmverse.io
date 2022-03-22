@@ -1,8 +1,9 @@
-import { SnackbarProps } from '@mui/material';
+import { AlertColor, SnackbarProps } from '@mui/material';
 import { useState } from 'react';
 
 export default function useSnackbar () {
   const [isOpen, setIsOpen] = useState(false);
+  const [severity, setSeverity] = useState<AlertColor>('info');
   const [message, setMessage] = useState<null | string>(null);
 
   const handleClick = () => {
@@ -24,6 +25,8 @@ export default function useSnackbar () {
       handleClick();
       setMessage(msg);
     },
-    message
+    message,
+    severity,
+    setSeverity
   };
 }

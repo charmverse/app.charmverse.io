@@ -35,10 +35,20 @@ type Board = Block & {
     fields: BoardFields
 }
 
-function createBoard(block?: Block): Board {
-    let cardProperties: IPropertyTemplate[] = []
+function createBoard(block?: Block, addDefaultProperty?: boolean): Board {
+    addDefaultProperty = addDefaultProperty ?? true  
+    const cardProperties: IPropertyTemplate[] = block?.fields.cardProperties.map((o: IPropertyTemplate) => {
+        return {
+            id: o.id,
+            name: o.name,
+            type: o.type,
+            options: o.options ? o.options.map((option) => ({...option})) : [],
+        }
+    }) ?? []
+
     const selectProperties = cardProperties.find((o) => o.type === 'select')
-    if (!selectProperties) {
+
+    if (!selectProperties && addDefaultProperty) {
         const property: IPropertyTemplate = {
             id: Utils.createGuid(IDType.BlockID),
             name: 'Status',
@@ -58,18 +68,6 @@ function createBoard(block?: Block): Board {
             }],
         }
         cardProperties.push(property)
-    }
-
-    if (block?.fields.cardProperties) {
-        // Deep clone of card properties and their options
-        cardProperties = block?.fields.cardProperties.map((o: IPropertyTemplate) => {
-            return {
-                id: o.id,
-                name: o.name,
-                type: o.type,
-                options: o.options ? o.options.map((option) => ({...option})) : [],
-            }
-        })
     }
 
     return {

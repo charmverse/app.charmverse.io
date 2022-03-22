@@ -3,18 +3,19 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
 import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
+import { ScrollableWindow } from 'components/common/page-layout/ScrollableWindow';
 import { BlockIcons } from 'components/databases/focalboard/src/blockIcons';
 import EmojiPicker from 'components/databases/focalboard/src/widgets/emojiPicker';
 import DeleteIcon from 'components/databases/focalboard/src/widgets/icons/delete';
 import EmojiIcon from 'components/databases/focalboard/src/widgets/icons/emoji';
 import Menu from 'components/databases/focalboard/src/widgets/menu';
 import MenuWrapper from 'components/databases/focalboard/src/widgets/menuWrapper';
-import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page, PageContent } from 'models';
 import { ChangeEvent } from 'react';
 import { useIntl } from 'react-intl';
-import { Emoji } from '../common/Emoji';
+import emojis from './emoji.json';
+import PageIcon from '../common/Emoji';
 import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
 import PageTitle from './Page/PageTitle';
@@ -23,15 +24,10 @@ export const Container = styled(Box)<{ top: number }>`
   width: 860px;
   max-width: 100%;
   margin: 0 auto 5px;
-  padding: 0 20px 0 80px;
+  padding: 0 80px;
   position: relative;
   top: ${({ top }) => top}px;
   padding-bottom: ${({ theme }) => theme.spacing(5)};
-`;
-
-const ScrollableWindow = styled.div`
-  flex-grow: 1;
-  overflow: auto;
 `;
 
 const PageControlItem = styled(ListItemButton)`
@@ -100,7 +96,8 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   }
 
   function addPageIcon () {
-    const icon = gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji;
+    const emojiOptions = [...emojis[0]];
+    const icon = emojiOptions[randomIntFromInterval(0, emojiOptions.length - 1)];
     setPage({ icon });
   }
 
@@ -129,7 +126,7 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
           <EditorHeader>
             {page?.icon && (
               <MenuWrapper>
-                <Emoji sx={{ fontSize: 78 }}>{page.icon}</Emoji>
+                <PageIcon sx={{ fontSize: 78 }} size='large' icon={page.icon} />
                 <Menu>
                   <Menu.Text
                     id='random'

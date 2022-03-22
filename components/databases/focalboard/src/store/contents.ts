@@ -16,7 +16,7 @@ const contentsSlice = createSlice({
     reducers: {
         updateContents: (state, action: PayloadAction<ContentBlock[]>) => {
             for (const content of action.payload) {
-                if (content.deleteAt === 0) {
+                if (content.deletedAt === 0) {
                     state.contents[content.id] = content
                 } else {
                     delete state.contents[content.id]

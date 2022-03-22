@@ -44,7 +44,7 @@ const cardsSlice = createSlice({
         },
         updateCards: (state, action: PayloadAction<Card[]>) => {
             for (const card of action.payload) {
-                if (card.deleteAt !== 0) {
+                if (card.deletedAt !== 0) {
                     delete state.cards[card.id]
                     delete state.templates[card.id]
                 } else if (card.fields.isTemplate) {

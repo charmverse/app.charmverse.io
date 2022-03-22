@@ -80,7 +80,7 @@ export default function CompositePaymentMethodList ({ paymentMethods }: IProps) 
                   `${row.tokenName} (${row.tokenSymbol})`
                 )}
               </TableCell>
-              <TableCell width={25}>
+              <TableCell width={54}>
                 {
                   row.tokenLogo && (
                     <img
