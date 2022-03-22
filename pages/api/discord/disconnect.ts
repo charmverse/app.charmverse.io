@@ -12,12 +12,9 @@ const handler = nc({
 handler.use(requireUser).post(disconnectDiscord);
 
 async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
-  await prisma.user.update({
+  await prisma.discordUser.delete({
     where: {
-      id: req.session.user.id
-    },
-    data: {
-      discord: {}
+      userId: req.session.user.id
     }
   });
 

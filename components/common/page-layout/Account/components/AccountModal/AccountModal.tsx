@@ -91,7 +91,7 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
               setIsDisconnecting(true);
               try {
                 await charmClient.disconnectDiscord();
-                setUser({ ...user, discord: null });
+                setUser({ ...user, discordUser: null });
               }
               catch (err) {
                 console.log('Error disconnecting from discord');
