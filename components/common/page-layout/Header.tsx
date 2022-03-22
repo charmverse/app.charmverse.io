@@ -18,6 +18,7 @@ import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import { specRegistry } from 'components/editor/CharmEditor';
 import { useColorMode } from 'context/color-mode';
@@ -55,6 +56,8 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');
+
+  const isExportablePage = (currentPage as Page).type === 'page';
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -155,7 +158,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
             </>
           )}
 
-          {isPage && (
+          {isPage && isExportablePage && (
             <Box sx={{ ml: 1 }} component='div' ref={pageMenuAnchor}>
               <MoreHorizIcon
                 fontSize='medium'
