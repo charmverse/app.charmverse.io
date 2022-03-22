@@ -135,7 +135,7 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
-  notionLogin (query: {redirect: string, spaceId: string, account: string}) {
+  notionLogin (query: { redirect: string }) {
     return http.GET<{redirectUrl: string}>('/api/notion/login', query);
   }
 
@@ -145,6 +145,10 @@ class CharmClient {
 
   disconnectDiscord () {
     return http.POST('/api/discord/disconnect');
+  }
+
+  importFromNotion (params: { code: string, spaceId: string }) {
+    return http.POST('/api/notion/import', params);
   }
 
   // FocalBoard

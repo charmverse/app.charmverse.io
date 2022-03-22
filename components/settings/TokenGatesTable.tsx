@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { humanizeAccessControlConditions, Chain, checkAndSignAuthMessage, ALL_LIT_CHAINS } from 'lit-js-sdk';
+import { humanizeAccessControlConditions, Chain, AccessControlCondition, SigningConditions, checkAndSignAuthMessage, ALL_LIT_CHAINS } from 'lit-js-sdk';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -114,5 +114,11 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
 }
 
 function getChain (tokenGate: TokenGate): Chain {
-  return (tokenGate.conditions as any)!.accessControlConditions![0].chain;
+  return getChainFromConditions(tokenGate.conditions as any);
+}
+
+export function getChainFromConditions (conditions: Partial<SigningConditions>): Chain {
+  return (conditions.accessControlConditions?.[0] as AccessControlCondition[])[0]?.chain
+    || (conditions.accessControlConditions?.[0] as AccessControlCondition).chain
+    || 'ethereum';
 }

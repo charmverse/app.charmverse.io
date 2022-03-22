@@ -3,17 +3,18 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
 import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
+import { ScrollableWindow } from 'components/common/page-layout/ScrollableWindow';
 import { BlockIcons } from 'components/databases/focalboard/src/blockIcons';
 import EmojiPicker from 'components/databases/focalboard/src/widgets/emojiPicker';
 import DeleteIcon from 'components/databases/focalboard/src/widgets/icons/delete';
 import EmojiIcon from 'components/databases/focalboard/src/widgets/icons/emoji';
 import Menu from 'components/databases/focalboard/src/widgets/menu';
 import MenuWrapper from 'components/databases/focalboard/src/widgets/menuWrapper';
-import gemojiData from 'emoji-lookup-data/data/gemoji.json';
 import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page, PageContent } from 'models';
 import { ChangeEvent } from 'react';
 import { useIntl } from 'react-intl';
+import emojis from './emoji.json';
 import PageIcon from '../common/Emoji';
 import CharmEditor, { ICharmEditorOutput } from './CharmEditor';
 import PageBanner, { PageCoverGalleryImageGroups } from './Page/PageBanner';
@@ -27,11 +28,6 @@ export const Container = styled(Box)<{ top: number }>`
   position: relative;
   top: ${({ top }) => top}px;
   padding-bottom: ${({ theme }) => theme.spacing(5)};
-`;
-
-const ScrollableWindow = styled.div`
-  flex-grow: 1;
-  overflow: auto;
 `;
 
 const PageControlItem = styled(ListItemButton)`
@@ -100,7 +96,8 @@ export function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   }
 
   function addPageIcon () {
-    const icon = gemojiData[randomIntFromInterval(0, gemojiData.length - 1)].emoji;
+    const emojiOptions = [...emojis[0]];
+    const icon = emojiOptions[randomIntFromInterval(0, emojiOptions.length - 1)];
     setPage({ icon });
   }
 
