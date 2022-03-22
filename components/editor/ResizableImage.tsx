@@ -127,6 +127,9 @@ export function imageSpec (): RawSpecs {
       toDOM: ((node: Node) => {
         return ['img', node.attrs];
       }) as any
+    },
+    markdown: {
+      toMarkdown: () => null
     }
   };
 }

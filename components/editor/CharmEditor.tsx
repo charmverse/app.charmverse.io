@@ -26,8 +26,8 @@ import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { CSSProperties, ReactNode } from 'react';
-import { useCurrentEditorState } from 'hooks/useCurrentEditorState';
+import { CSSProperties, ReactNode, useEffect, useRef } from 'react';
+import { useCurrentEditorView } from 'hooks/useCurrentEditorView';
 import { Callout, calloutSpec } from './Callout';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
@@ -48,55 +48,41 @@ export interface ICharmEditorOutput {
 }
 
 export const specRegistry = new SpecRegistry([
+  // Comments to the right of each spec show if it supports markdown export
+  // OK => Component exports markdown
+  // ?? => Could not test component or identify it
+  // NO => Not supported
+  //
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
-  {
-    type: 'node',
-    name: 'paragraph',
-    schema: {
-      content: 'inline*',
-      group: 'block',
-      draggable: false,
-      parseDOM: [
-        {
-          tag: 'p'
-        }
-      ],
-      toDOM: (): DOMOutputSpecArray => ['p', 0]
-    },
-    markdown: {
-      toMarkdown: (state, node, parent, index) => {
-        console.log('Paragraph state', node);
-      }
-    }
-  },
-  bold.spec(),
-  bulletList.spec(),
-  hardBreak.spec(),
-  horizontalRule.spec(),
-  italic.spec(),
-  link.spec(),
-  listItem.spec(),
-  orderedList.spec(),
-  strike.spec(),
-  underline.spec(),
-  emojiSpecs(),
-  mentionSpecs(),
-  code.spec(),
-  codeBlock.spec(),
-  iframeSpec(),
-  heading.spec(),
-  inlinePaletteSpecs(),
-  table,
-  tableCell,
-  tableHeader,
-  tableRow,
-  calloutSpec(),
-  cryptoPriceSpec(),
-  imageSpec(),
-  columnLayoutSpec(),
-  columnBlockSpec(),
-  nestedPageSpec(),
-  quoteSpec()
+  paragraph.spec(), // OK
+  bold.spec(), // OK
+  bulletList.spec(), // OK
+  hardBreak.spec(), // ??
+  horizontalRule.spec(), // OK
+  italic.spec(), // OK
+  link.spec(), // OK
+  listItem.spec(), // ?? Could be the actual items for bullet list
+  orderedList.spec(), // OK
+  strike.spec(), // OK
+  underline.spec(), // OK
+  emojiSpecs(), // ??
+  mentionSpecs(), // NO
+  code.spec(), // OK
+  codeBlock.spec(), // OK
+  iframeSpec(), // OK
+  heading.spec(), // OK
+  inlinePaletteSpecs(), // ??
+  table, // OK
+  tableCell, // OK
+  tableHeader, // OK
+  tableRow, // OK
+  calloutSpec(), // OK
+  cryptoPriceSpec(), // NO
+  imageSpec(), // NO
+  columnLayoutSpec(), // NO
+  columnBlockSpec(), // NO ?? ==> Need to clarify how it fits into layout
+  nestedPageSpec(), // NO
+  quoteSpec() // OK
 ]);
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
@@ -149,7 +135,13 @@ function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
 ) {
 
-  const [, setCurrentEditorState] = useCurrentEditorState();
+  const [currentEditorView, setCurrentEditorView] = useCurrentEditorView();
+
+  const renders = useRef(0);
+
+  renders.current += 1;
+
+  console.log('Charm editor renders', renders.current);
 
   const state = useEditorState({
     specRegistry,
@@ -158,13 +150,21 @@ function CharmEditor (
         view: () => ({
           update: (view, prevState) => {
             if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
+
+              if (!currentEditorView) {
+                setCurrentEditorView(view);
+              }
               onPageContentChange({
                 doc: view.state.doc.toJSON() as PageContent,
                 rawText: view.state.doc.textContent as string
               });
             }
+          },
+          destroy: () => {
+            setCurrentEditorView(null);
           }
         })
+
       }),
       nestedPagePlugins({
         tooltipRenderOpts: {
@@ -247,8 +247,6 @@ function CharmEditor (
       color: 'transparent'
     }
   });
-
-  setCurrentEditorState(state);
 
   return (
     <StyledReactBangleEditor

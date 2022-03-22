@@ -110,6 +110,9 @@ export function mentionSpecs (): RawSpecs {
         toDOM: (): DOMOutputSpec => {
           return ['span', { class: 'mention-value' }];
         }
+      },
+      markdown: {
+        toMarkdown: () => undefined
       }
     },
     {

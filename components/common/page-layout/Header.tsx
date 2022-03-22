@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useRef } from 'react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Chip from '@mui/material/Chip';
@@ -19,7 +19,7 @@ import { useColorMode } from 'context/color-mode';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
-import { useCurrentEditorState } from 'hooks/useCurrentEditorState';
+import { useCurrentEditorView } from 'hooks/useCurrentEditorView';
 import { useRouter } from 'next/router';
 import getDisplayName from 'lib/users/getDisplayName';
 import { EditorViewContext } from '@bangle.dev/react';
@@ -27,6 +27,7 @@ import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
 import { BangleEditor, BangleEditorState } from '@bangle.dev/core';
 import { specRegistry } from 'components/editor/CharmEditor';
 
+import { EditorView } from '@bangle.dev/pm';
 import Account from './Account';
 import ShareButton from './ShareButton';
 
@@ -45,7 +46,13 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const { pages, currentPageId, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
-  const [currentEditorState] = useCurrentEditorState();
+  const [currentEditorView] = useCurrentEditorView();
+
+  const renders = useRef(0);
+
+  renders.current += 1;
+
+  console.log('Header renders', renders.current);
 
   const currentPage = currentPageId && pages[currentPageId];
 
@@ -62,17 +69,21 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
     setUser(newUser);
   }
 
-  function generateMarkdown (editorState: BangleEditorState<any>) {
-    const parser = markdownParser(specRegistry);
+  function generateMarkdown () {
 
-    const serializer = markdownSerializer(specRegistry);
-    console.log(serializer);
-    const md = serializer.serialize(editorState.pmState.doc);
+    if (currentEditorView) {
+      const parser = markdownParser(specRegistry);
 
-    console.log('Markdown', md);
+      const serializer = markdownSerializer(specRegistry);
+      console.log(serializer);
+      const md = serializer.serialize(currentEditorView.state.doc);
+
+      console.log('Markdown\r\n', md);
+    }
+
   }
 
-  console.log('View', currentEditorState);
+  console.log('View', currentEditorView);
 
   return (
     <StyledToolbar variant='dense'>
@@ -131,7 +142,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
                 </IconButton>
               </Tooltip>
 
-              <Typography onClick={() => generateMarkdown(currentEditorState)}>Export to MD</Typography>
+              <Typography onClick={generateMarkdown}>Export to MD</Typography>
             </>
           )}
 
