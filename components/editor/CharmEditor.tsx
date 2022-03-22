@@ -61,7 +61,7 @@ export const specRegistry = new SpecRegistry([
   horizontalRule.spec(), // OK
   italic.spec(), // OK
   link.spec(), // OK
-  listItem.spec(), // ?? Could be the actual items for bullet list
+  listItem.spec(), // OK
   orderedList.spec(), // OK
   strike.spec(), // OK
   underline.spec(), // OK
@@ -78,7 +78,7 @@ export const specRegistry = new SpecRegistry([
   tableRow, // OK
   calloutSpec(), // OK
   cryptoPriceSpec(), // NO
-  imageSpec(), // NO
+  imageSpec(), // OK
   columnLayoutSpec(), // NO
   columnBlockSpec(), // NO ?? ==> Need to clarify how it fits into layout
   nestedPageSpec(), // NO
