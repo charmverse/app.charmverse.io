@@ -13,7 +13,7 @@ import Portal from '@mui/material/Portal';
 import { ErrorModal } from 'components/common/Modal';
 import Legend from './Legend';
 import Button from '../common/Button';
-import TokenGatesTable from './TokenGatesTable';
+import TokenGatesTable, { getChainFromConditions } from './TokenGatesTable';
 
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
 
@@ -42,9 +42,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
 
   async function saveTokenGate (conditions: Partial<SigningConditions>) {
     // a top-level chain is required for litClient but its not actually used since each condition can be on different chains
-    const chain = (conditions.accessControlConditions![0] as AccessControlCondition[])[0]?.chain
-      || (conditions.accessControlConditions![0] as AccessControlCondition).chain
-       || 'ethereum';
+    const chain = getChainFromConditions(conditions);
     if (!chain) {
       throw new Error('No chain found in access conditions');
     }
@@ -58,6 +56,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         tokenGateId
       })
     };
+
     const authSig = await checkAndSignAuthMessage({
       chain
     });
