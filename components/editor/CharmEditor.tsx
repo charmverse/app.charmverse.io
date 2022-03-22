@@ -57,7 +57,7 @@ export const specRegistry = new SpecRegistry([
   paragraph.spec(), // OK
   bold.spec(), // OK
   bulletList.spec(), // OK
-  hardBreak.spec(), // ??
+  hardBreak.spec(), // OK
   horizontalRule.spec(), // OK
   italic.spec(), // OK
   link.spec(), // OK
@@ -71,7 +71,7 @@ export const specRegistry = new SpecRegistry([
   codeBlock.spec(), // OK
   iframeSpec(), // OK
   heading.spec(), // OK
-  inlinePaletteSpecs(), // ??
+  inlinePaletteSpecs(), // Not required
   table, // OK
   tableCell, // OK
   tableHeader, // OK
