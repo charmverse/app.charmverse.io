@@ -7,15 +7,29 @@ import CopyableAddress from 'components/common/CopyableAddress';
 import Avatar from 'components/common/Avatar';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import useENSName from 'hooks/useENSName';
+import charmClient from 'charmClient';
+import { useUser } from 'hooks/useUser';
+import styled from '@emotion/styled';
 // import AccountConnections from './components/AccountConnections';
+
+const DiscordUserName = styled(Typography)`
+  position: relative;
+  top: 4px;
+`;
+
+const StyledButton = styled(Button)`
+  width: 100px;
+`;
 
 function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const { account, connector } = useWeb3React();
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
+  const [user, setUser] = useUser();
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const handleWalletProviderSwitch = () => {
     openWalletSelectorModal();
@@ -35,25 +49,67 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
     }
   };
 
+  const connectedWithDiscord = Boolean(user?.discordUser);
+
+  async function connectWithDiscord () {
+    if (connectedWithDiscord) {
+      setIsDisconnecting(true);
+      try {
+        await charmClient.disconnectDiscord();
+        setUser({ ...user, discordUser: null });
+      }
+      catch (err) {
+        console.log('Error disconnecting from discord');
+      }
+      setIsDisconnecting(false);
+    }
+    else {
+      const { redirectUrl } = await charmClient.discordLogin({
+        href: window.location.href
+      });
+      window.location.replace(redirectUrl);
+    }
+  }
+
   return (
     <Modal open={isOpen} onClose={onClose}>
       <DialogTitle onClose={onClose}>Account</DialogTitle>
       <Stack mb={9} direction='row' spacing='4' alignItems='center'>
-        <Avatar name={ENSName || account} />
+        <Avatar name={ENSName || user?.username || account} avatar={user?.avatar} />
         <CopyableAddress address={account!} decimals={5} sx={{ fontSize: 24 }} />
+        {connectedWithDiscord && <DiscordUserName variant='subtitle2'>{user?.username}</DiscordUserName>}
       </Stack>
       <Stack
         direction='row'
         alignItems='center'
         justifyContent='space-between'
-        mb='-1'
+        my={1}
       >
         <Typography color='secondary'>
           {`Connected with ${connectorName(connector)}`}
         </Typography>
-        <Button size='small' variant='outlined' onClick={handleWalletProviderSwitch}>
+        <StyledButton size='small' variant='outlined' onClick={handleWalletProviderSwitch}>
           Switch
-        </Button>
+        </StyledButton>
+      </Stack>
+      <Stack
+        direction='row'
+        alignItems='center'
+        justifyContent='space-between'
+        my={1}
+      >
+        <Typography color='secondary'>
+          {connectedWithDiscord ? 'Connected with Discord' : 'Connect with Discord'}
+        </Typography>
+        <StyledButton
+          size='small'
+          variant={connectedWithDiscord ? 'contained' : 'outlined'}
+          color={connectedWithDiscord ? 'error' : 'primary'}
+          disabled={isDisconnecting}
+          onClick={connectWithDiscord}
+        >
+          {connectedWithDiscord ? 'Disconnect' : 'Connect'}
+        </StyledButton>
       </Stack>
     </Modal>
   );

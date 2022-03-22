@@ -1,9 +1,10 @@
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, BoxProps, TextField, Typography } from '@mui/material';
 import { useContributors } from 'hooks/useContributors';
 import { Contributor } from 'models';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
+import { HTMLAttributes } from 'react';
 
 export interface IInputSearchContributorProps {
   onChange?: (id: string) => any
@@ -62,11 +63,12 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
   );
 }
 
-function ReviewerOption ({ user, ...props }: { user: Contributor } & any) {
+export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contributor, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement>) {
   const ensName = useENSName(user.addresses[0]);
+
   return (
     <Box component='li' display='flex' gap={1} {...props}>
-      <Avatar name={ensName || getDisplayName(user)} />
+      <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={user.avatar} />
       <Typography>{ensName || getDisplayName(user)}</Typography>
     </Box>
   );

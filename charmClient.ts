@@ -11,7 +11,7 @@ import { IUser, UserWorkspace } from 'components/databases/focalboard/src/user';
 import { IWorkspace } from 'components/databases/focalboard/src/blocks/workspace';
 import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
-import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
+import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -104,11 +104,11 @@ class CharmClient {
   }
 
   favoritePage (pageId: string) {
-    return http.POST('/api/profile/favorites', { pageId });
+    return http.POST<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
 
   unfavoritePage (pageId: string) {
-    return http.DELETE('/api/profile/favorites', { pageId });
+    return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
 
   getPublicPage (pageId: string) {
@@ -137,6 +137,14 @@ class CharmClient {
 
   notionLogin (query: { redirect: string }) {
     return http.GET<{redirectUrl: string}>('/api/notion/login', query);
+  }
+
+  discordLogin (query: {href: string}) {
+    return http.GET<{redirectUrl: string}>('/api/discord/login', query);
+  }
+
+  disconnectDiscord () {
+    return http.POST('/api/discord/disconnect');
   }
 
   importFromNotion (params: { code: string, spaceId: string }) {

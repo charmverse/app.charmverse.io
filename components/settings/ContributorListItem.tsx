@@ -74,7 +74,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
   return (
     <StyledRow pb={2} mb={2}>
       <Box display='flex' alignItems='center'>
-        <Avatar name={ensName || getDisplayName(contributor)} />
+        <Avatar name={ensName || getDisplayName(contributor)} avatar={contributor?.avatar} />
         <Box pl={2}>
           <Typography variant='body1'><strong>{ensName || getDisplayName(contributor)}</strong></Typography>
           {ensName && <Typography variant='body2'>{getDisplayName(contributor)}</Typography>}
