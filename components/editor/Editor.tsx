@@ -37,11 +37,6 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     setPage({ content: content.doc, contentText: content.rawText });
   }, [setPage]);
 
-  // we only need to provide page content the first time
-  const pageContent = useMemo(() => {
-    return page.content as PageContent;
-  }, [page.id]);
-
   return (
     <ScrollableWindow>
       {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
@@ -50,7 +45,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
       >
         <CharmEditor
           key={page.id}
-          content={pageContent}
+          content={page.content as PageContent}
           onPageContentChange={updatePageContent}
           readOnly={readOnly}
         >
