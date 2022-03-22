@@ -76,7 +76,7 @@
     "immutable": "^4.0.0",
     "iron-session": "^6.0.5",
     "lit-js-sdk": "^1.1.139",
-    "lit-modal-vite": "^0.0.64",
+    "lit-share-modal": "^0.1.20",
     "lodash": "^4.17.21",
     "luxon": "^2.3.1",
     "marked": "^4.0.12",

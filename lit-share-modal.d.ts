@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-declare module 'lit-modal-vite' {
+declare module 'lit-share-modal' {
 
   export type ConditionsModalResult = Pick<SigningConditions, 'accessControlConditions' | 'permanant'>;
 
