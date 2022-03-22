@@ -2,12 +2,19 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import * as http from 'adapters/http';
 import { prisma } from 'db';
-import { DiscordUser } from 'models/User';
 
 const handler = nc({
   onError,
   onNoMatch
 });
+
+interface DiscordApiUserResponse {
+  id: string
+  username: string
+  discriminator: string
+  avatar?: string
+  verified?: boolean
+}
 
 const DISCORD_OAUTH_TOKEN_ENDPOINT = 'https://discord.com/api/v8/oauth2/token';
 const DISCORD_OAUTH_CLIENT_ID = process.env.DISCORD_OAUTH_CLIENT_ID as string;
@@ -52,7 +59,7 @@ handler.get(async (req, res) => {
     skipStringifying: true
   }) as {access_token: string, expires_in: number, refresh_token: string, scope: string, token_type: string};
 
-  const discordAccount = await http.GET<DiscordUser>('https://discord.com/api/v8/users/@me', undefined, {
+  const discordAccount = await http.GET<DiscordApiUserResponse>('https://discord.com/api/v8/users/@me', undefined, {
     headers: {
       Authorization: `Bearer ${token.access_token}`
     }
@@ -63,7 +70,22 @@ handler.get(async (req, res) => {
       id: state.userId
     },
     data: {
-      discord: discordAccount as any
+      username: discordAccount.username,
+      avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
+    }
+  });
+
+  const { id, ...rest } = discordAccount;
+
+  await prisma.discordUser.create({
+    data: {
+      account: rest as any,
+      discordId: id,
+      user: {
+        connect: {
+          id: state.userId
+        }
+      }
     }
   });
 

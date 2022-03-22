@@ -12,9 +12,7 @@ import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import useENSName from 'hooks/useENSName';
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
-import { DiscordUser } from 'models/User';
 import styled from '@emotion/styled';
-import getUserAvatar from 'lib/users/getUserAvatar';
 // import AccountConnections from './components/AccountConnections';
 
 const DiscordUserName = styled(Typography)`
@@ -31,7 +29,6 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
   const [user, setUser] = useUser();
-  const discordData = (user?.discord as unknown as DiscordUser);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const handleWalletProviderSwitch = () => {
@@ -52,17 +49,15 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
     }
   };
 
-  const connectedWithDiscord = Boolean(user?.discord);
-
-  const discordUsername = discordData ? `${discordData?.username}` : null;
+  const connectedWithDiscord = Boolean(user?.discordUser);
 
   return (
     <Modal open={isOpen} onClose={onClose}>
       <DialogTitle onClose={onClose}>Account</DialogTitle>
       <Stack mb={9} direction='row' spacing='4' alignItems='center'>
-        <Avatar name={ENSName || discordUsername || account} avatar={getUserAvatar(user)} />
+        <Avatar name={ENSName || user?.username || account} avatar={user?.avatar} />
         <CopyableAddress address={account!} decimals={5} sx={{ fontSize: 24 }} />
-        {discordData && <DiscordUserName variant='subtitle2'>{discordUsername}</DiscordUserName>}
+        {connectedWithDiscord && <DiscordUserName variant='subtitle2'>{user?.username}</DiscordUserName>}
       </Stack>
       <Stack
         direction='row'

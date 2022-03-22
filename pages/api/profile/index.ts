@@ -61,7 +61,8 @@ async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     },
     include: {
       favorites: true,
-      spaceRoles: true
+      spaceRoles: true,
+      discordUser: true
     }
   });
   if (!profile) {

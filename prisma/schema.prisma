@@ -93,20 +93,31 @@ model Block {
 }
 
 model User {
-  id                    String           @id @default(uuid()) @db.Uuid
-  createdAt             DateTime         @default(now())
-  updatedAt             DateTime         @default(now())
-  addresses             String[]
-  spaceRoles            SpaceRole[]
-  favorites             FavoritePage[]
-  pagePermissions       PagePermission[]
-  pages                 Page[]
-  blocks                Block[]
-  spaces                Space[]
-  inviteLinks           InviteLink[]
-  bounties              Bounty[]
-  applications          Application[]
-  discord               Json?
+  id              String           @id @default(uuid()) @db.Uuid
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now())
+  addresses       String[]
+  spaceRoles      SpaceRole[]
+  favorites       FavoritePage[]
+  pagePermissions PagePermission[]
+  pages           Page[]
+  blocks          Block[]
+  spaces          Space[]
+  inviteLinks     InviteLink[]
+  bounties        Bounty[]
+  applications    Application[]
+  username        String?
+  avatar          String?
+  discordUser     DiscordUser?
+}
+
+model DiscordUser {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  userId    String   @db.Uuid@unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  discordId String   @id
+  account   Json
 }
 
 model FavoritePage {

@@ -16,8 +16,6 @@ import useENSName from 'hooks/useENSName';
 import AccountModal from 'components/common/page-layout/Account/components/AccountModal';
 import NetworkModal from 'components/common/page-layout/Account/components/NetworkModal';
 import styled from '@emotion/styled';
-import { DiscordUser } from 'models';
-import getUserAvatar from 'lib/users/getUserAvatar';
 
 const AccountCard = styled.div`
   display: inline-flex;
@@ -57,8 +55,6 @@ function Account (): JSX.Element {
   const accountModalState = usePopupState({ variant: 'popover', popupId: 'account-modal' });
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
   const [user] = useUser();
-
-  const discordData = (user?.discord as unknown as DiscordUser);
 
   if (typeof window === 'undefined') {
     return (
@@ -106,9 +102,9 @@ function Account (): JSX.Element {
         </Tooltip>
         <AccountButton
           onClick={accountModalState.open}
-          endIcon={<Avatar avatar={getUserAvatar(user)} name={ENSName || account} size='small' />}
+          endIcon={<Avatar avatar={user?.avatar} name={ENSName || account} size='small' />}
         >
-          {ENSName || (discordData)?.username || `${shortenHex(account, 3)}`}
+          {ENSName || user?.username || `${shortenHex(account, 3)}`}
         </AccountButton>
       </StyledButtonGroup>
 

@@ -1,11 +1,10 @@
 import { Autocomplete, Box, BoxProps, TextField, Typography } from '@mui/material';
 import { useContributors } from 'hooks/useContributors';
-import { Contributor, DiscordUser } from 'models';
+import { Contributor } from 'models';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
 import { HTMLAttributes } from 'react';
-import getUserAvatar from 'lib/users/getUserAvatar';
 
 export interface IInputSearchContributorProps {
   onChange?: (id: string) => any
@@ -69,7 +68,7 @@ export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contribu
 
   return (
     <Box component='li' display='flex' gap={1} {...props}>
-      <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={getUserAvatar(user)} />
+      <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={user.avatar} />
       <Typography>{ensName || getDisplayName(user)}</Typography>
     </Box>
   );
