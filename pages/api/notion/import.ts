@@ -64,9 +64,10 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse) {
         const errorData = JSON.parse(errorStringWithoutPrefix) as {
           pageId: string,
           type: 'page' | 'database',
-          title: string
+          title: string,
+          blocks: [string, number][]
         };
-        res.status(400).json({ error: `Error importing ${errorData.type} named ${errorData.title} with id ${errorData.pageId}` });
+        res.status(400).json({ error: `Error importing ${errorData.type} named ${errorData.title} with id ${errorData.pageId}. Location: ${errorData.blocks.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}` });
       }
       else {
         res.status(400).json({ error: 'Something went wrong!' });
