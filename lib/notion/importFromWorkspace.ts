@@ -512,16 +512,36 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
     if (block.object === 'page') {
-      await createPage([[block.id, v4()]]);
+      try {
+        await createPage([[block.id, v4()]]);
+      }
+      catch (_) {
+        // Adding [IMPORT] to error message to differentiate between errors related to import
+        throw new Error(`[IMPORT]: ${JSON.stringify({
+          pageId: block.id,
+          type: 'page',
+          title: convertToPlainText((block.properties.title as any)[block.properties.title.type])
+        })}`);
+      }
     }
     else if (block.object === 'database') {
-      // Only create the database if it hasn't been created already
-      if (!createdPages[block.id]) {
-        createdPages[block.id] = await createDatabase(block as GetDatabaseResponse, {
-          spaceId,
-          userId,
-          focalboardRecord
-        });
+      try {
+        // Only create the database if it hasn't been created already
+        if (!createdPages[block.id]) {
+          createdPages[block.id] = await createDatabase(block as GetDatabaseResponse, {
+            spaceId,
+            userId,
+            focalboardRecord
+          });
+        }
+      }
+      catch (_) {
+        // Adding [IMPORT] to error message to differentiate between errors related to import
+        throw new Error(`[IMPORT]: ${JSON.stringify({
+          pageId: block.id,
+          type: 'database',
+          title: convertToPlainText((block.title))
+        })}`);
       }
     }
   }
