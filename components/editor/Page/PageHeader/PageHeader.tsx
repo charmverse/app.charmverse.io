@@ -63,7 +63,6 @@ interface PageMetaFieldsProps {
 }
 
 function PageMetaFields ({ headerImage, icon, readOnly, setPage, title }: PageMetaFieldsProps) {
-  console.log('children update');
   const intl = useIntl();
 
   function addPageIcon () {

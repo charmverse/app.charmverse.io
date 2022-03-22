@@ -39,7 +39,6 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   // we only need to provide page content the first time
   const pageContent = useMemo(() => {
-    console.log('use memo page');
     return page.content as PageContent;
   }, [page.id]);
 

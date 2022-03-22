@@ -143,8 +143,6 @@ function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
 ) {
 
-  console.log('render charm editor');
-
   const state = useEditorState({
     specRegistry,
     plugins: () => [
