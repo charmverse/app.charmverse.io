@@ -43,6 +43,9 @@ export function cryptoPriceSpec () {
       toDOM: (): DOMOutputSpec => {
         return ['div.cryptoPrice', 0];
       }
+    },
+    markdown: {
+      toMarkdown: () => null
     }
   };
   return spec;

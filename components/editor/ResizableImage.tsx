@@ -127,6 +127,20 @@ export function imageSpec (): RawSpecs {
       toDOM: ((node: Node) => {
         return ['img', node.attrs];
       }) as any
+    },
+    markdown: {
+      toMarkdown: (state, node) => {
+
+        const { src } = node.attrs;
+
+        if (src) {
+          const toWrite = `![](${src})`;
+          state.text(toWrite, false);
+          state.ensureNewLine();
+        }
+
+        console.log('Image node', node);
+      }
     }
   };
 }
