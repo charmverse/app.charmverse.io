@@ -80,6 +80,27 @@ export function iframeSpec (): RawSpecs {
   return {
     type: 'node',
     name,
+    markdown: {
+      toMarkdown: (state, node, parent, index) => {
+
+        // eslint-disable-next-line prefer-const
+        let { height, width, src } = node.attrs;
+
+        if (height && width && src) {
+          height = parseInt(height);
+          width = parseInt(width);
+
+          const attributesToWrite = ` width=${width}px height=${height}px src=${src} `;
+
+          const toRender = `\r\n<iframe ${attributesToWrite}></iframe>\r\n\r\n\r\n`;
+
+          // Ensure markdown html will be separated by newlines
+          state.ensureNewLine();
+          state.text(toRender);
+          state.ensureNewLine();
+        }
+      }
+    },
     schema: {
       attrs: {
         src: {

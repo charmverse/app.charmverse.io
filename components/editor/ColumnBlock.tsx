@@ -22,6 +22,9 @@ function specFactory (): RawSpecs {
       toDOM: (): DOMOutputSpec => {
         return ['div', 0];
       }
+    },
+    markdown: {
+      toMarkdown: () => null
     }
   };
 }

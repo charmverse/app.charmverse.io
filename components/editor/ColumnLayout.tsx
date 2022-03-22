@@ -20,6 +20,9 @@ function specFactory (): RawSpecs {
       toDOM: (): DOMOutputSpec => {
         return ['div', { class: 'column-layout' }];
       }
+    },
+    markdown: {
+      toMarkdown: () => null
     }
   };
 }

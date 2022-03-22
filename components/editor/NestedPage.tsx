@@ -64,6 +64,9 @@ export function nestedPageSpec (): RawSpecs {
       toDOM: (): DOMOutputSpec => {
         return ['div', { class: 'page' }];
       }
+    },
+    markdown: {
+      toMarkdown: () => null
     }
   };
 }

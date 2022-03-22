@@ -46,6 +46,7 @@ interface PageTitleProps {
 
 export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps) {
   const view = useContext(EditorViewContext);
+
   if (readOnly) {
     return <StyledReadOnlyTitle>{value}</StyledReadOnlyTitle>;
   }
