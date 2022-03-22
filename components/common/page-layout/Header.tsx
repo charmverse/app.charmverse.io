@@ -68,17 +68,22 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   function generateMarkdown () {
 
     if (currentEditorView && currentPage) {
-      const parser = markdownParser(specRegistry);
 
       const serializer = markdownSerializer(specRegistry);
-      console.log(serializer);
-      const md = serializer.serialize(currentEditorView.state.doc);
 
-      const data = new Blob([md], { type: 'text/plain' });
+      let markdown = serializer.serialize(currentEditorView.state.doc);
+
+      if (currentPage.title) {
+        const pageTitleAsMarkdown = `# ${currentPage.title}`;
+
+        markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
+      }
+
+      const data = new Blob([markdown], { type: 'text/plain' });
 
       const linkElement = document.createElement('a');
 
-      linkElement.download = `${currentPage.title}.md`;
+      linkElement.download = `${currentPage.title || 'page'}.md`;
 
       const downloadLink = URL.createObjectURL(data);
 
