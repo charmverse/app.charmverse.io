@@ -25,7 +25,8 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
     },
     include: {
       favorites: true,
-      spaceRoles: true
+      spaceRoles: true,
+      discordUser: true
     }
   });
 

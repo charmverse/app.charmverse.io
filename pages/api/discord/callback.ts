@@ -65,16 +65,6 @@ handler.get(async (req, res) => {
     }
   });
 
-  await prisma.user.update({
-    where: {
-      id: state.userId
-    },
-    data: {
-      username: discordAccount.username,
-      avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
-    }
-  });
-
   const { id, ...rest } = discordAccount;
 
   await prisma.discordUser.create({
@@ -86,6 +76,16 @@ handler.get(async (req, res) => {
           id: state.userId
         }
       }
+    }
+  });
+
+  await prisma.user.update({
+    where: {
+      id: state.userId
+    },
+    data: {
+      username: discordAccount.username,
+      avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
     }
   });
 

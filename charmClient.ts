@@ -104,11 +104,11 @@ class CharmClient {
   }
 
   favoritePage (pageId: string) {
-    return http.POST('/api/profile/favorites', { pageId });
+    return http.POST<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
 
   unfavoritePage (pageId: string) {
-    return http.DELETE('/api/profile/favorites', { pageId });
+    return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
 
   getPublicPage (pageId: string) {
