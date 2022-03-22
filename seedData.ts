@@ -39,7 +39,8 @@ function MockUser (partial: Partial<PopulatedUser>): PopulatedUser {
     spaceRoles: [],
     createdAt: new Date(),
     updatedAt: new Date(),
-    discord: null,
+    username: null,
+    avatar: null,
     ...partial
   };
 }
