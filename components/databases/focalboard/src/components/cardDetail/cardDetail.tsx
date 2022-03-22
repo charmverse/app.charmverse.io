@@ -100,7 +100,7 @@ const CardDetail = (props: Props): JSX.Element|null => {
                     size='l'
                     readonly={props.readonly}
                 />
-                
+
                 <Box display={"flex"} gap={1} width={"100%"}>
                   {!props.readonly && !card.fields.icon &&
                       <div className='add-buttons'>

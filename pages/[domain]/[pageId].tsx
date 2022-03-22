@@ -2,14 +2,13 @@ import { Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import { PageLayout } from 'components/common/page-layout';
 import { DatabaseEditor } from 'components/databases';
-import { Editor } from 'components/editor';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import Editor from 'components/editor';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useMemo, useState } from 'react';
+import { ReactElement, useEffect, useMemo, useState, useCallback } from 'react';
 import ErrorPage from 'components/common/errors/ErrorPage';
 
 /**
@@ -26,7 +25,6 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   const pageId = router.query.pageId as string;
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
-  const [space] = useCurrentSpace();
 
   const debouncedPageUpdate = useMemo(() => {
     return debouncePromise((input: Prisma.PageUpdateInput) => {
@@ -35,7 +33,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     }, 500);
   }, []);
 
-  async function setPage (updates: Partial<Page>) {
+  const setPage = useCallback(async (updates: Partial<Page>) => {
     if (!currentPageId || publicShare === true) {
       return;
     }
@@ -56,7 +54,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
       .finally(() => {
         setIsEditing(false);
       });
-  }
+  }, [currentPageId, publicShare]);
 
   async function loadPublicPage (publicPageId: string) {
     const page = await charmClient.getPublicPage(publicPageId);
@@ -86,6 +84,10 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   }, [pageId, pagesLoaded]);
 
   const currentPage = pages[currentPageId];
+  const memoizedCurrentPage = useMemo(
+    () => pages[currentPageId],
+    [currentPage?.id, currentPage?.headerImage, currentPage?.icon, currentPage?.title]
+  );
 
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
@@ -97,7 +99,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     return <DatabaseEditor page={currentPage} setPage={setPage} readonly={publicShare} />;
   }
   else {
-    return <Editor page={currentPage} setPage={setPage} readOnly={publicShare} />;
+    return <Editor page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare} />;
   }
 }
 

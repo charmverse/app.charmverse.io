@@ -12,7 +12,7 @@ import { useUser } from './useUser';
 type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
 type IContext = {
   currentPageId: string,
-  pages: Record<string, Page>,
+  pages: Record<string, Page | undefined>,
   setCurrentPageId: Dispatch<SetStateAction<string>>,
   setPages: Dispatch<SetStateAction<Record<string, Page>>>,
   isEditing: boolean

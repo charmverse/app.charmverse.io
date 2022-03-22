@@ -26,7 +26,7 @@ import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { CSSProperties, ReactNode } from 'react';
+import { CSSProperties, ReactNode, memo } from 'react';
 import { Callout, calloutSpec } from './Callout';
 import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
@@ -142,6 +142,8 @@ interface CharmEditorProps {
 function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
 ) {
+
+  console.log('render charm editor');
 
   const state = useEditorState({
     specRegistry,
@@ -361,10 +363,8 @@ function CharmEditor (
   );
 }
 
-export default function CharmEditorSafe (props: CharmEditorProps) {
-  return (
-    <ErrorBoundary>
-      <CharmEditor {...props} />
-    </ErrorBoundary>
-  );
-}
+export default memo((props: CharmEditorProps) => (
+  <ErrorBoundary>
+    <CharmEditor {...props} />
+  </ErrorBoundary>
+));
