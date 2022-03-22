@@ -1,4 +1,3 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { User } from '@prisma/client';
@@ -21,7 +20,8 @@ async function authenticate (req: NextApiRequest, res: NextApiResponse<LoggedInU
     },
     include: {
       favorites: true,
-      spaceRoles: true
+      spaceRoles: true,
+      discordUser: true
     }
   });
 

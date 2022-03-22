@@ -59,10 +59,10 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   async function toggleFavorite () {
     if (!currentPage || !user) return;
     const pageId = currentPage.id;
-    const newUser = isFavorite
+    const updatedFields = isFavorite
       ? await charmClient.unfavoritePage(pageId)
       : await charmClient.favoritePage(pageId);
-    setUser(newUser);
+    setUser({ ...user, ...updatedFields });
   }
 
   function generateMarkdown () {

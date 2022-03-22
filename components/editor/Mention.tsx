@@ -6,6 +6,7 @@ import { useTheme } from '@emotion/react';
 import { Box, ClickAwayListener, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import Avatar from 'components/common/Avatar';
+import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import * as suggestTooltip from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from 'components/editor/@bangle.dev/tooltip/suggest-tooltip';
 import { useContributors } from 'hooks/useContributors';
@@ -188,7 +189,13 @@ export function MentionSuggest () {
               onClick={() => onSelectMention(contributor.id, 'user')}
               key={contributor.id}
             >
-              <ContributorMenuOption user={contributor} />
+              <ReviewerOption
+                style={{
+                  alignItems: 'center'
+                }}
+                user={contributor}
+                avatarSize='small'
+              />
             </MenuItem>
           ))}
         </Box>
@@ -197,18 +204,6 @@ export function MentionSuggest () {
     );
   }
   return null;
-}
-
-function ContributorMenuOption ({ user }: {user: Contributor}) {
-  const ensName = useENSName(user.addresses[0]);
-  return (
-    <Box display='flex' alignItems='center' gap={1}>
-      <Avatar name={ensName || getDisplayName(user)} size='small' />
-      <Typography>
-        {ensName || getDisplayName(user)}
-      </Typography>
-    </Box>
-  );
 }
 
 export function Mention ({ node }: NodeViewProps) {
