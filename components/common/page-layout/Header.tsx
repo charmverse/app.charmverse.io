@@ -1,4 +1,4 @@
-import { useState, useContext, useRef } from 'react';
+import { useState, useContext, useRef, createRef } from 'react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Chip from '@mui/material/Chip';
@@ -14,6 +14,13 @@ import Avatar from 'components/common/Avatar';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Popover from '@mui/material/Popover';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import GetAppIcon from '@mui/icons-material/GetApp';
 import charmClient from 'charmClient';
 import { useColorMode } from 'context/color-mode';
 import { usePages } from 'hooks/usePages';
@@ -47,6 +54,9 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const [user, setUser] = useUser();
   const theme = useTheme();
   const [currentEditorView] = useCurrentEditorView();
+  const [pageMenuOpen, setPageMenuOpen] = useState(false);
+  const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
+  const pageMenuAnchor = useRef();
 
   const renders = useRef(0);
 
@@ -141,9 +151,37 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
                 </IconButton>
               </Tooltip>
-
-              <Typography onClick={generateMarkdown}>Export to MD</Typography>
             </>
+          )}
+
+          {isPage && (
+            <Box sx={{ ml: 1 }} component='div' ref={pageMenuAnchor}>
+              <MoreHorizIcon
+                fontSize='medium'
+                onClick={() => {
+                  setPageMenuOpen(!pageMenuOpen);
+                  setPageMenuAnchorElement(pageMenuAnchor.current!);
+                }}
+              />
+              <Popover
+                anchorEl={pageMenuAnchorElement}
+                open={pageMenuOpen}
+                onClose={() => setPageMenuOpen(false)}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left'
+                }}
+              >
+                <List dense>
+                  <ListItemButton onClick={generateMarkdown}>
+                    <ListItemIcon>
+                      <GetAppIcon fontSize='small' />
+                    </ListItemIcon>
+                    <ListItemText primary='Export to markdown' />
+                  </ListItemButton>
+                </List>
+              </Popover>
+            </Box>
           )}
 
           {/** context menu */}
