@@ -7,63 +7,115 @@
 }
 
 .lsm-top-modal {
+  box-sizing: content-box;
   border: 0 none;
   border-radius: 8px;
   box-shadow: 0px 8px 9px -5px rgba(0,0,0,0.2),0px 15px 22px 2px rgba(0,0,0,0.14),0px 6px 28px 5px rgba(0,0,0,0.12); // from Modal.tsx output
-  height: auto;
-  max-height: 90%;
-  overflow-y: auto;
-
-  header {
-    font-weight: bold;
-    padding: 0 24px;
-    text-transform: capitalize;
-    button img {
-      filter: var( --charm-button-filter );
+  // height: auto;
+  // max-height: 90%;
+  //overflow-y: auto;
+  input {
+    outline: 0 none;
+    &:active, &:focus {
+      border-color: var( --charm-lit-primary );
     }
   }
 
-  .lms-choose-access-button:last-child {
+  // select dropdown items
+  .lsm-reusable-select-option {
+    border-width: 2px !important;
+    border-color: transparent;
+
+    &:hover {
+      background-color: #fafafa;
+    }
+
+    &.lsm-border-2 {
+      border-color: var( --charm-lit-primary );
+    }
+  }
+
+  header {
+    h3 {
+      font-weight: bold;
+    }
+    button {
+      background: transparent;
+    }
+    button img {
+     // filter: var( --charm-button-filter );
+    }
+  }
+
+  .lsm-choose-access-button:last-child {
     margin-bottom: 24px;
   }
 
   // header when selecting a blockchain
-  .lms-fixed.lms-top-0.lms-left-0.lms-w-full.lms-py-4.lms-bg-brand-4.lms-text-white.lms-h-14 {
+  .lsm-fixed.lsm-top-0.lsm-left-0.lsm-w-full.lsm-py-4.lsm-bg-brand-4.lsm-text-white.lsm-h-14 {
     background-color: var( --charm-lit-color-light );
     color: var( --charm-lit-text-color );
     font-weight: bold;
   }
 
   // footer content on first view
-  .lms-flex.lms-justify-center.lms-mt-8.lms-mx-auto.lms-items-center.lms-cursor-pointer {
+  .lsm-flex.lsm-justify-center.lsm-mt-8.lsm-mx-auto.lsm-items-center.lsm-cursor-pointer {
     margin-bottom: 24px;
+  }
+
+  .lsm-reusable-select-button:hover {
+    border-width: 1px;
+    border-color: var( --charm-lit-primary );
+  }
+
+  // selection page (first page)
+  .lsm-items-center {
+    button:hover {
+      background-color: #fafafa;
+      border-width: 1px;
+      border-color: var( --charm-lit-primary );
+    }
   }
 
 }
 
 // utility classes
 
-.lms-bg-white {
+.lsm-font-segoe {
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.lsm-border {
+  border-style: solid;
+  &:hover {
+    border-width: 1px;
+  }
+}
+
+.lsm-bg-white {
   background-color: var( --charm-lit-color-white );
 }
-.lms-bg-brand-light, .lms-bg-brand-20 {
+.lsm-bg-brand-light, .lsm-bg-brand-20 {
   background-color: var( --charm-lit-color-light );
 }
-.lms-border-brand-4 {
+.lsm-border-brand-4 {
   border-color: var( --charm-lit-brand-4 );
 }
-.lms-text-brand-4 {
+.lsm-text-brand-4 {
   color: var( --charm-lit-brand-4 );
+  &:hover {
+    color: var( --charm-lit-primary );
+  }
 }
-.lms-bg-brand-4 {
+.lsm-bg-brand-4 {
   background-color: var( --charm-lit-brand-4 );
 }
-button.lms-bg-brand-4 {
+button.lsm-bg-brand-4 {
   background-color: var( --charm-lit-primary );
 }
-button.disabled\:lms-bg-gray:disabled {
+button.disabled\:lsm-bg-gray:disabled {
   background-color: var( --charm-lit-color-gray );
 }
-.lms-bg-brand-2 {
+.lsm-bg-brand-2 {
   background-color: var( --charm-lit-brand-2 );
 }
