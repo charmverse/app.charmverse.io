@@ -129,7 +129,18 @@ export function imageSpec (): RawSpecs {
       }) as any
     },
     markdown: {
-      toMarkdown: () => null
+      toMarkdown: (state, node) => {
+
+        const { src } = node.attrs;
+
+        if (src) {
+          const toWrite = `![](${src})`;
+          state.text(toWrite, false);
+          state.ensureNewLine();
+        }
+
+        console.log('Image node', node);
+      }
     }
   };
 }
