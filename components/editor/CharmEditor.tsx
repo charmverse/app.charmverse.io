@@ -137,23 +137,18 @@ function CharmEditor (
 
   const [currentEditorView, setCurrentEditorView] = useCurrentEditorView();
 
-  const renders = useRef(0);
-
-  renders.current += 1;
-
-  console.log('Charm editor renders', renders.current);
-
   const state = useEditorState({
     specRegistry,
     plugins: () => [
       new Plugin({
         view: () => ({
           update: (view, prevState) => {
-            if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
 
-              if (!currentEditorView) {
-                setCurrentEditorView(view);
-              }
+            if (!currentEditorView && view) {
+              setCurrentEditorView(view);
+            }
+
+            if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
               onPageContentChange({
                 doc: view.state.doc.toJSON() as PageContent,
                 rawText: view.state.doc.textContent as string

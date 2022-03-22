@@ -50,12 +50,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
 
-  const renders = useRef(0);
-
-  renders.current += 1;
-
-  console.log('Header renders', renders.current);
-
   const currentPage = currentPageId && pages[currentPageId];
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
@@ -96,8 +90,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
     }
 
   }
-
-  console.log('View', currentEditorView);
 
   return (
     <StyledToolbar variant='dense'>
