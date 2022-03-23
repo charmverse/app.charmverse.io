@@ -15,6 +15,7 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
+import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
 import { useEditorState, EditorViewContext } from '@bangle.dev/react';
@@ -98,7 +99,7 @@ export function charmEditorPlugins (
   return () => [
     new Plugin({
       view: () => ({
-        update: (view, prevState) => {
+        update: debounce((view, prevState) => {
 
           if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
             onPageContentChange({
@@ -106,7 +107,7 @@ export function charmEditorPlugins (
               rawText: view.state.doc.textContent as string
             });
           }
-        }
+        }, 100)
       })
 
     }),
