@@ -4,6 +4,7 @@ import React, {useCallback} from 'react'
 
 import {FormattedMessage} from 'react-intl'
 import {useDragLayer, useDrop} from 'react-dnd'
+import useEfficientDragLayer from 'hooks/useEffecientDragLayer'
 
 import {IPropertyOption, IPropertyTemplate, Board, BoardGroup} from '../../blocks/board'
 import {createBoardView, BoardView} from '../../blocks/boardView'
@@ -40,7 +41,7 @@ const Table = (props: Props): JSX.Element => {
     const isManualSort = activeView.fields.sortOptions?.length === 0
     const dispatch = useAppDispatch()
 
-    const {offset, resizingColumn} = useDragLayer((monitor) => {
+    const {offset, resizingColumn} = useEfficientDragLayer((monitor) => {
         if (monitor.getItemType() === 'horizontalGrip') {
             return {
                 offset: monitor.getDifferenceFromInitialOffset()?.x || 0,
@@ -231,6 +232,8 @@ const Table = (props: Props): JSX.Element => {
                         selectedCardIds={props.selectedCardIds}
                         readonly={props.readonly}
                         cardIdToFocusOnRender={props.cardIdToFocusOnRender}
+                        offset={offset}
+                        resizingColumn={resizingColumn}
                         showCard={props.showCard}
                         addCard={props.addCard}
                         onCardClicked={props.onCardClicked}
