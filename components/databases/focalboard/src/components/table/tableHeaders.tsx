@@ -3,13 +3,19 @@
 import React, {useCallback, useMemo} from 'react'
 
 import {FormattedMessage, useIntl} from 'react-intl'
+import AddIcon from '@mui/icons-material/Add'
+import IconButton from '@mui/material/IconButton'
 
 import {IPropertyTemplate, Board} from '../../blocks/board'
 import {createBoardView, BoardView, ISortOption} from '../../blocks/boardView'
 import {Card} from '../../blocks/card'
 import {Constants} from '../../constants'
 import mutator from '../../mutator'
-import {Utils} from '../../utils'
+import Button from '../../widgets/buttons/button'
+import MenuWrapper from '../../widgets/menuWrapper'
+import Menu from '../../widgets/menu'
+import PropertyMenu, {PropertyTypes, typeDisplayName} from '../../widgets/propertyMenu'
+import {IDType, Utils} from '../../utils'
 
 import {OctoUtils} from '../../octoUtils'
 
@@ -173,6 +179,29 @@ const TableHeaders = (props: Props): JSX.Element => {
                 className='octo-table-cell header-cell'
                 style={{ flexGrow: 1, borderRight: '0 none' }}
             >
+
+                {!props.readonly &&
+                    <MenuWrapper>
+                        <Button>
+                            <AddIcon fontSize='small' />
+                        </Button>
+                        <Menu>
+                            <PropertyTypes
+                                label={intl.formatMessage({id: 'PropertyMenu.selectType', defaultMessage: 'Select property type'})}
+                                onTypeSelected={async (type) => {
+                                    const template: IPropertyTemplate = {
+                                        id: Utils.createGuid(IDType.BlockID),
+                                        name: typeDisplayName(intl, type),
+                                        type,
+                                        options: [],
+                                    }
+                                    const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template)
+                                    //setNewTemplateId(templateId)
+                                }}
+                            />
+                        </Menu>
+                    </MenuWrapper>
+                }
             </div>
         </div>
     )

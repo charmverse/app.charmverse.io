@@ -196,6 +196,20 @@
             .Label {
                 color: rgba(var(--center-channel-color-rgb), 0.6);
             }
+            // styles for action column
+            &:last-child {
+                border: 0;
+                padding: 0;
+                .MenuWrapper {
+                    width: 100%;
+                }
+                .Button {
+                    border-radius: 0;
+                    width: 100%;
+                    height: 100%;
+                    justify-content: flex-start;
+                }
+            }
         }
     }
 
