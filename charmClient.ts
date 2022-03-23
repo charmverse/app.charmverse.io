@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod, Role } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -426,6 +426,10 @@ class CharmClient {
 
   deletePaymentMethod (paymentMethodId: string): Promise<PaymentMethod[]> {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
+  }
+
+  createRole (role: Partial<Role>): Promise<Role> {
+    return http.POST('/api/roles', role);
   }
 }
 
