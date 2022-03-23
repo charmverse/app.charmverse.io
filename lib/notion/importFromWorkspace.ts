@@ -456,7 +456,9 @@ async function createDatabase (block: GetDatabaseResponse, {
     spaceId,
     createdBy: userId,
     updatedBy: userId,
-    deletedAt: null
+    deletedAt: null,
+    createdAt: new Date(),
+    updatedAt: new Date()
   };
 
   return {
@@ -481,9 +483,9 @@ async function createDatabase (block: GetDatabaseResponse, {
     }
   } as {
     focalboardPropertiesRecord: Record<string, string>,
-    board: Board,
-    view: BoardView,
-    page: Prisma.PageCreateInput & {userId: string, spaceId: string, pageId: string, content: PageContent}
+    board: Prisma.BlockCreateManyInput,
+    view: Prisma.BlockCreateManyInput,
+    page: PageCreatePartialInput
   };
 }
 
@@ -540,8 +542,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
   const linkedPages: Record<string, string> = {};
   const focalboardRecord: Record<string, {
-    board: Board,
-    view: BoardView,
+    board: Prisma.BlockCreateManyInput,
+    view: Prisma.BlockCreateManyInput,
     properties: Record<string, string>
   }> = {};
 
@@ -777,7 +779,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       // eslint-disable-next-line
 
       await createDatabaseAndPopulateCache(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
-
       const database = createdPages[pageResponse.parent.database_id];
       const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title')!;
       const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
@@ -868,17 +869,33 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     pageId: v4()
   });
 
+  async function createCharmversePage (block: GetPageResponse | GetDatabaseResponse, parentId: string) {
+    await createPrismaPage({
+      ...createdPages[block.id],
+      parentId
+    });
+
+    if (block.object === 'database') {
+      const databasePage = createdPages[block.id];
+      const { board, view } = focalboardRecord[databasePage.boardId!];
+      await prisma.block.createMany({
+        data: [
+          view,
+          board
+        ]
+      });
+    }
+  }
+
   // Update parent id for all nested pages
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
     if (block.object === 'page' || block.object === 'database') {
-      // Check if its a nested page
+      // Nested pages and databases
       if (block.parent.type === 'page_id' && createdPages[block.parent.page_id]) {
-        await createPrismaPage({
-          ...createdPages[block.id],
-          parentId: createdPages[block.parent.page_id].pageId
-        });
+        createCharmversePage(block, createdPages[block.parent.page_id].pageId);
       }
+      // Focalboard cards
       else if (block.parent.type === 'database_id' && createdPages[block.parent.database_id]) {
         const { card, charmText } = createdCards[block.id];
         await prisma.block.createMany({
@@ -888,11 +905,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           ]
         });
       }
+      // Top level pages and databases
       else if (block.parent.type === 'workspace') {
-        await createPrismaPage({
-          ...createdPages[block.id],
-          parentId: workspacePage.id
-        });
+        createCharmversePage(block, workspacePage.id);
       }
     }
   }
