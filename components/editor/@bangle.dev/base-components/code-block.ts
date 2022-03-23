@@ -108,8 +108,6 @@ function pluginsFactory({
               filter(
                 queryIsCodeActiveBlock(),
                 (state: EditorState, dispatch?: Function, view?: EditorView) => {
-                  console.log('state', state);
-                  console.log('dispatch', dispatch);
                   if (dispatch) {
                     dispatch(state.tr.insertText('\t'));
                     view?.focus();

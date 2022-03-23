@@ -66,7 +66,7 @@ export const floatingMenuPlugin = (readonly?: boolean) => {
       }
       if (state.selection.empty
         || (state.selection as NodeSelection)?.node?.type?.name.match(
-          /(image)|(cryptoPrice)|(iframe)|(page)|(mention)|(tabIndent)/
+          /(image)|(cryptoPrice)|(iframe)|(page)|(mention)|(tabIndent)|(codeBlock)/
         )) {
         return null;
       }

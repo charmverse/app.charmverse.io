@@ -205,6 +205,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
     border-radius: ${({ theme }) => theme.spacing(0.5)};
     background-color: ${({ theme }) => theme.palette.code.background};
     font-size: 85%;
+    tab-size: 4;
   }
 
   hr {
