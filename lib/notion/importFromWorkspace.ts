@@ -7,9 +7,9 @@ import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/editor/ResizableIma
 import { prisma } from 'db';
 import { v4 } from 'uuid';
 import { Board, createBoard, IPropertyTemplate, PropertyType } from 'components/databases/focalboard/src/blocks/board';
-import { createBoardView } from 'components/databases/focalboard/src/blocks/boardView';
-import { createCard } from 'components/databases/focalboard/src/blocks/card';
-import { createCharmTextBlock } from 'components/databases/focalboard/src/blocks/charmBlock';
+import { BoardView, createBoardView } from 'components/databases/focalboard/src/blocks/boardView';
+import { Card, createCard } from 'components/databases/focalboard/src/blocks/card';
+import { CharmTextBlock, createCharmTextBlock } from 'components/databases/focalboard/src/blocks/charmBlock';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
@@ -346,8 +346,11 @@ function convertPropertyType (propertyType: string): PropertyType | null {
   }
 }
 
+type PageCreatePartialInput = Partial<Prisma.PageCreateInput> &
+  {userId: string, spaceId: string, pageId: string, title: string};
+
 async function createPrismaPage ({
-  pageId = v4(),
+  pageId,
   content = {
     type: 'doc',
     content: [{
@@ -363,18 +366,7 @@ async function createPrismaPage ({
   userId,
   boardId,
   parentId
-}: {
-  pageId?: string,
-  content?: PageContent
-  userId: string
-  spaceId: string
-  headerImage?: string | null
-  icon: string | null
-  title: string
-  type?: Prisma.PageCreateInput['type'],
-  boardId?: string | null,
-  parentId?: string | null
-}) {
+}: PageCreatePartialInput) {
   const id = Math.random().toString().replace('0.', '');
 
   const pageToCreate: Prisma.PageCreateInput = {
@@ -415,14 +407,14 @@ function convertToPlainText (chunks: {plain_text: string}[]) {
 
 async function createDatabase (block: GetDatabaseResponse, {
   spaceId,
-  userId,
-  focalboardRecord
-}: {focalboardRecord: Record<string, Record<string, string>>, spaceId: string, userId: string}) {
+  userId
+}: {spaceId: string, userId: string}) {
   const title = convertToPlainText((block as any).title);
   const cardProperties: IPropertyTemplate[] = [];
 
   const board = createBoard(undefined, false);
-  focalboardRecord[board.id] = {};
+
+  const focalboardPropertiesRecord : Record<string, string> = {};
 
   const databaseProperties = Object.values(block.properties);
   databaseProperties.forEach(property => {
@@ -435,7 +427,7 @@ async function createDatabase (block: GetDatabaseResponse, {
         type: focalboardPropertyType
       };
 
-      focalboardRecord[board.id][property.id] = cardProperty.id;
+      focalboardPropertiesRecord[property.id] = cardProperty.id;
       cardProperties.push(cardProperty);
       if (property.type === 'select' || property.type === 'multi_select') {
         (property as any)[property.type].options.forEach((option: {id: string, name: string, color: string}) => {
@@ -459,31 +451,40 @@ async function createDatabase (block: GetDatabaseResponse, {
   view.parentId = board.id;
   view.rootId = board.rootId;
   view.title = 'Board view';
-  const newBlocks = [board, view].map(_block => ({
-    ..._block,
-    fields: _block.fields as any,
+
+  const commonBlockData = {
     spaceId,
     createdBy: userId,
     updatedBy: userId,
-    createdAt: new Date(),
-    updatedAt: new Date(),
     deletedAt: null
-  }));
-  await prisma.block.createMany({
-    data: newBlocks
-  });
+  };
 
-  const createdPage = await createPrismaPage({
-    headerImage: block.cover?.type === 'external' ? block.cover.external.url : null,
-    icon: block.icon?.type === 'emoji' ? block.icon.emoji : null,
-    title,
-    type: 'board',
-    spaceId,
-    userId,
-    boardId: board.id
-  });
-
-  return createdPage;
+  return {
+    board: {
+      ...board,
+      ...commonBlockData
+    },
+    view: {
+      ...view,
+      ...commonBlockData
+    },
+    focalboardPropertiesRecord,
+    page: {
+      headerImage: block.cover?.type === 'external' ? block.cover.external.url : null,
+      icon: block.icon?.type === 'emoji' ? block.icon.emoji : null,
+      title,
+      type: 'board',
+      spaceId,
+      userId,
+      boardId: board.id,
+      pageId: v4()
+    }
+  } as {
+    focalboardPropertiesRecord: Record<string, string>,
+    board: Board,
+    view: BoardView,
+    page: Prisma.PageCreateInput & {userId: string, spaceId: string, pageId: string, content: PageContent}
+  };
 }
 
 function constructErrorMessage (err: any, block: GetPageResponse | GetDatabaseResponse) {
@@ -530,19 +531,19 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   // Store all the pages/databases the integration fetched in a record
   const searchResultRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
 
-  const createdPages: Record<string, {
-    pageId: string,
-    content: PageContent
-    userId: string
-    spaceId: string
-    headerImage: string | null
-    icon: string | null
-    title: string
-    type: Prisma.PageCreateInput['type'],
-    boardId: string | null
+  const createdPages: Record<string, PageCreatePartialInput> = {};
+
+  const createdCards: Record<string, {
+    charmText: Prisma.BlockCreateManyInput,
+    card: Prisma.BlockCreateManyInput
   }> = {};
+
   const linkedPages: Record<string, string> = {};
-  const focalboardRecord: Record<string, Record<string, string>> = {};
+  const focalboardRecord: Record<string, {
+    board: Board,
+    view: BoardView,
+    properties: Record<string, string>
+  }> = {};
 
   // This loop would ideally decrease the amount of api requests made to fetch a page/database
   for (let index = 0; index < searchResults.length; index++) {
@@ -556,20 +557,32 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       if (block.object === 'page') {
         await createPage([[block.id, v4()]]);
       }
-      // else if (block.object === 'database') {
-      //   // Only create the database if it hasn't been created already
-      //   if (!createdPages[block.id]) {
-      //     createdPages[block.id] = await createDatabase(block as GetDatabaseResponse, {
-      //       spaceId,
-      //       userId,
-      //       focalboardRecord
-      //     });
-      //   }
-      // }
+      else if (block.object === 'database') {
+        await createDatabaseAndPopulateCache(block);
+      }
     }
     catch (err) {
       constructErrorMessage(err, block);
     }
+  }
+
+  async function createDatabaseAndPopulateCache (block: GetDatabaseResponse) {
+    // Only create the database if it hasn't been created already
+    if (!createdPages[block.id]) {
+      const { board, focalboardPropertiesRecord, page, view } = await createDatabase(block as GetDatabaseResponse, {
+        spaceId,
+        userId
+      });
+
+      focalboardRecord[board.id] = {
+        board,
+        view,
+        properties: focalboardPropertiesRecord
+      };
+      createdPages[block.id] = page as any;
+    }
+
+    return createdPages[block.id];
   }
 
   // Array of tuple, [notion block id, charmverse block id]
@@ -683,20 +696,16 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       await populateDoc(pageContent, blocks[index], blocksRecord, {
         onChildDatabase: async (block, parentNode) => {
           // If its a database, we need to fetch more information from api
-          // createdPages[block.id] = await createDatabase(await notion.databases.retrieve({
-          //   database_id: block.id
-          // }) as any, {
-          //   spaceId,
-          //   userId,
-          //   focalboardRecord
-          // });
+          createdPages[block.id] = await createDatabaseAndPopulateCache(await notion.databases.retrieve({
+            database_id: block.id
+          }) as any);
 
-          // (parentNode as PageContent).content?.push({
-          //   type: 'page',
-          //   attrs: {
-          //     id: createdPages[block.id].id
-          //   }
-          // });
+          (parentNode as PageContent).content?.push({
+            type: 'page',
+            attrs: {
+              id: createdPages[block.id].pageId
+            }
+          });
         },
         onChildPage: async (block, parentNode) => {
           createdPages[block.id] = await createPage([...pageIds, [block.id, v4()]]);
@@ -766,11 +775,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     else if (pageResponse.parent.type === 'database_id') {
       // The database must be created before the cards can be added
       // eslint-disable-next-line
-      const database = createdPages[pageResponse.parent.database_id] ?? await createDatabase(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse, {
-        spaceId,
-        userId,
-        focalboardRecord
-      });
+
+      await createDatabaseAndPopulateCache(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
+
+      const database = createdPages[pageResponse.parent.database_id];
       const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title')!;
       const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
 
@@ -783,23 +791,23 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         }
       });
 
-      const focalboardPropertyRecord = focalboardRecord[database.boardId!];
+      const { properties } = focalboardRecord[database.boardId!];
 
       const cardProperties: Record<string, any> = {};
 
       Object.values(pageResponse.properties).forEach(property => {
         if (property[property.type]) {
           if (property.type.match(/(email|number|url|checkbox|phone_number)/)) {
-            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type];
+            cardProperties[properties[property.id]] = property[property.type];
           }
           else if (property.type === 'rich_text') {
-            cardProperties[focalboardPropertyRecord[property.id]] = convertToPlainText(property[property.type]);
+            cardProperties[properties[property.id]] = convertToPlainText(property[property.type]);
           }
           else if (property.type === 'select') {
-            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type].id;
+            cardProperties[properties[property.id]] = property[property.type].id;
           }
           else if (property.type === 'multi_select') {
-            cardProperties[focalboardPropertyRecord[property.id]] = property[property.type]
+            cardProperties[properties[property.id]] = property[property.type]
               .map((multiSelect: {id: string}) => multiSelect.id);
           }
           else if (property.type === 'date') {
@@ -811,25 +819,27 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             if (property[property.type].end) {
               dateValue.to = (new Date(property[property.type].end)).getTime();
             }
-            cardProperties[focalboardPropertyRecord[property.id]] = JSON.stringify(dateValue);
+            cardProperties[properties[property.id]] = JSON.stringify(dateValue);
           }
         }
       });
 
       const commonBlockData = {
         deletedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
         spaceId,
         createdBy: userId,
-        updatedBy: userId
+        updatedBy: userId,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
-      await prisma.block.createMany({
-        data: [{
+
+      createdCards[notionPageId] = {
+        charmText: {
           ...charmTextBlock,
           ...commonBlockData,
           rootId: database.boardId!
-        }, {
+        },
+        card: {
           ...createCard({
             title,
             id: cardId,
@@ -843,8 +853,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             }
           }),
           ...commonBlockData
-        }]
-      });
+        }
+      };
     }
 
     return createdPages[notionPageId];
@@ -854,7 +864,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     icon: workspaceIcon,
     spaceId,
     title: workspaceName,
-    userId
+    userId,
+    pageId: v4()
   });
 
   // Update parent id for all nested pages
@@ -866,6 +877,15 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         await createPrismaPage({
           ...createdPages[block.id],
           parentId: createdPages[block.parent.page_id].pageId
+        });
+      }
+      else if (block.parent.type === 'database_id' && createdPages[block.parent.database_id]) {
+        const { card, charmText } = createdCards[block.id];
+        await prisma.block.createMany({
+          data: [
+            card,
+            charmText
+          ]
         });
       }
       else if (block.parent.type === 'workspace') {
