@@ -41,6 +41,7 @@ import { Quote, quoteSpec } from './Quote';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
 import { imageSpec, ResizableImage } from './ResizableImage';
 import * as tabIndent from './tabIndent';
+import DocumentEnd from './DocumentEnd';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -185,6 +186,7 @@ export function charmEditorPlugins (
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
   position: relative;
+
   /** DONT REMOVE THIS STYLING */
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
   left: -50px;
@@ -354,6 +356,7 @@ function CharmEditor (
       {EmojiSuggest}
       {InlinePalette}
       {children}
+      <DocumentEnd />
     </StyledReactBangleEditor>
   );
 }

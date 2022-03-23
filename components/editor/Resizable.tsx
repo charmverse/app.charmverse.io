@@ -25,12 +25,7 @@ export default function Resizable (props: ResizableProps) {
   const view = useEditorViewContext();
 
   return (
-    <Box style={{
-      margin: theme.spacing(3, 0),
-      display: 'flex',
-      flexDirection: 'column'
-    }}
-    >
+    <Box display='flex' flexDirection='column'>
       <BlockAligner
         onDelete={onDelete}
         size={size}
