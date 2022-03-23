@@ -921,24 +921,34 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   const importedPages: Record<string, Page> = {};
 
   async function createCharmversePage (block: GetPageResponse | GetDatabaseResponse, parentId: string) {
-    const createdPage = await createPrismaPage({
-      ...createdPages[block.id],
-      parentId
-    });
+    try {
+      if (block.id === '0f0af796-f159-4182-ad91-78589e331755') {
+        throw new Error();
+      }
+      const createdPage = await createPrismaPage({
+        ...createdPages[block.id],
+        parentId
+      });
 
-    if (block.object === 'database') {
-      const databasePage = createdPages[block.id];
-      if (databasePage) {
-        const { board, view } = focalboardRecord[databasePage.boardId!];
-        await prisma.block.createMany({
-          data: [
-            view,
-            board
-          ]
-        });
+      if (block.object === 'database') {
+        const databasePage = createdPages[block.id];
+        if (databasePage) {
+          const { board, view } = focalboardRecord[databasePage.boardId!];
+          await prisma.block.createMany({
+            data: [
+              view,
+              board
+            ]
+          });
+        }
+      }
+      importedPages[createdPage.id] = createdPage;
+    }
+    catch (_) {
+      if (!failedImportsRecord[block.id]) {
+        populateFailedImportRecord([], searchResultRecord[block.id]);
       }
     }
-    importedPages[createdPage.id] = createdPage;
   }
 
   let createdPageIds = searchResults.map(_searchResult => _searchResult.id);
@@ -952,8 +962,13 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         if (!createdPagesSet.has(block.parent.page_id)) {
           await createCharmversePageFromNotionPage(searchResultRecord[block.parent.page_id]);
         }
+        let parentId = workspacePage.id;
+        // If the parent was created successfully
+        if (!failedImportsRecord[block.parent.page_id]) {
+          parentId = createdPages[block.parent.page_id]?.pageId;
+        }
         // If its a linked page we dont create the parent, so the would be the workspace page
-        await createCharmversePage(block, createdPages[block.parent.page_id]?.pageId ?? workspacePage.id);
+        await createCharmversePage(block, parentId);
       }
       // Focalboard cards
       else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
