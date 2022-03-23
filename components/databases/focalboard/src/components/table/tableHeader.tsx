@@ -31,14 +31,13 @@ type Props = {
     onAutoSizeColumn: (columnID: string, headerWidth: number) => void
 }
 
-const TableHeader = React.memo((props: Props): JSX.Element => {
+const TableHeader = (props: Props): JSX.Element => {
     const [isDragging, isOver, columnRef] = useSortable('column', props.template, !props.readonly, props.onDrop)
-
     const columnWidth = (templateId: string): number => {
         return Math.max(Constants.minColumnWidth, (props.activeView.fields.columnWidths[templateId] || 0) + props.offset)
     }
 
-    const onAutoSizeColumn = (templateId: string) => {
+    const onAutoSizeColumn = React.useCallback((templateId: string) => {
         let width = Constants.minColumnWidth
         if (columnRef.current) {
             const {fontDescriptor, padding} = Utils.getFontAndPaddingFromCell(columnRef.current)
@@ -46,7 +45,7 @@ const TableHeader = React.memo((props: Props): JSX.Element => {
             width = textWidth + padding
         }
         props.onAutoSizeColumn(templateId, width)
-    }
+    }, [])
 
     let className = 'octo-table-cell header-cell'
     if (isOver) {
@@ -59,20 +58,11 @@ const TableHeader = React.memo((props: Props): JSX.Element => {
             style={{overflow: 'unset', width: columnWidth(props.template.id), opacity: isDragging ? 0.5 : 1}}
             ref={props.template.id === Constants.titleColumnId ? () => null : columnRef}
         >
-            <MenuWrapper disabled={props.readonly}>
                 <Label>
                     {props.name}
                     {props.sorted === 'up' && <SortUpIcon/>}
                     {props.sorted === 'down' && <SortDownIcon/>}
                 </Label>
-                <TableHeaderMenu
-                    board={props.board}
-                    activeView={props.activeView}
-                    views={props.views}
-                    cards={props.cards}
-                    templateId={props.template.id}
-                />
-            </MenuWrapper>
 
             <div className='octo-spacer'/>
 
@@ -84,6 +74,6 @@ const TableHeader = React.memo((props: Props): JSX.Element => {
             }
         </div>
     )
-})
+}
 
-export default TableHeader
+export default React.memo(TableHeader)

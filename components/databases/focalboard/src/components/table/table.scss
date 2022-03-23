@@ -1,7 +1,7 @@
 .Table {
     margin-top: 16px;
     padding-bottom: 0 !important;
-    overflow: auto;
+    overflow: visible;
     position: relative;
     flex: 1;
 
@@ -169,7 +169,6 @@
     .octo-table-body {
         display: flex;
         flex-direction: column;
-        width: fit-content;
     }
 
     .octo-table-header,
@@ -189,7 +188,6 @@
         top: -2px;
         z-index: 1;
         background: rgb(var(--center-channel-bg-rgb));
-        width: fit-content;
 
         .octo-table-cell {
             color: rgba(var(--center-channel-color-rgb), 0.6);
@@ -202,7 +200,6 @@
     }
 
     .table-row-container {
-        width: fit-content;
 
         .octo-table-cell {
             align-items: center;

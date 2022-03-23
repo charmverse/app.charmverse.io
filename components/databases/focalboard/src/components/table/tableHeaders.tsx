@@ -117,7 +117,7 @@ const TableHeaders = (props: Props): JSX.Element => {
         // Move template to new index
         const destIndex = container ? activeView.fields.visiblePropertyIds.indexOf(container.id) : 0
         await mutator.changeViewVisiblePropertiesOrder(activeView, template, destIndex >= 0 ? destIndex : 0)
-    }, [activeView.fields.visiblePropertyIds])
+    }, [])
 
     const titleSortOption = activeView.fields.sortOptions?.find((o) => o.propertyId === Constants.titleColumnId)
     let titleSorted: 'up' | 'down' | 'none' = 'none'
@@ -131,12 +131,7 @@ const TableHeaders = (props: Props): JSX.Element => {
             id='mainBoardHeader'
         >
             <TableHeader
-                name={
-                    <FormattedMessage
-                        id='TableComponent.name'
-                        defaultMessage='Name'
-                    />
-                }
+                name={'Title'}
                 sorted={titleSorted}
                 readonly={props.readonly}
                 board={board}
@@ -173,6 +168,12 @@ const TableHeaders = (props: Props): JSX.Element => {
                     />
                 )
             })}
+            {/* empty column for actions */}
+            <div
+                className='octo-table-cell header-cell'
+                style={{ flexGrow: 1, borderRight: '0 none' }}
+            >
+            </div>
         </div>
     )
 }

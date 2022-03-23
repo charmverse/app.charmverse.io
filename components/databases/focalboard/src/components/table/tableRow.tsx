@@ -147,6 +147,12 @@ const TableRow = React.memo((props: Props) => {
                     </div>
                 )
             })}
+            {/* empty column for actions on header row */}
+            <div
+                className='octo-table-cell'
+                style={{ flexGrow: 1, borderRight: '0 none' }}
+            >
+            </div>
         </div>
     )
 })
