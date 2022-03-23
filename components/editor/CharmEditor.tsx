@@ -89,19 +89,19 @@ export const specRegistry = new SpecRegistry([
 
 export function charmEditorPlugins (
   {
-    onPageContentChange,
+    onContentChange,
     readOnly
   } :
   {
-    readOnly?: boolean, onPageContentChange?: (view: EditorView) => void
+    readOnly?: boolean, onContentChange?: (view: EditorView) => void
   } = {}
 ) {
   return () => [
     new Plugin({
       view: () => ({
         update: (view, prevState) => {
-          if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
-            onPageContentChange(view);
+          if (onContentChange && !view.state.doc.eq(prevState.doc)) {
+            onContentChange(view);
           }
         }
       })
@@ -223,24 +223,24 @@ export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 interface CharmEditorProps {
   content?: PageContent;
   children?: ReactNode;
-  onPageContentChange?: UpdatePageContent;
+  onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
 }
 
 function CharmEditor (
-  { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
+  { content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
 ) {
 
   const [isEmpty, setIsEmpty] = useState(false);
 
-  const debouncedUpdate = onPageContentChange ? debounce((view: EditorView) => {
+  const debouncedUpdate = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
-    onPageContentChange({ doc, rawText });
+    onContentChange({ doc, rawText });
   }, 100) : undefined;
 
-  function _onPageContentChange (view: EditorView) {
+  function _onContentChange (view: EditorView) {
     // @ts-ignore missing types from the @bangle.dev/react package
     const docContent: { content: { size: number } }[] = view.state.doc.content.content;
     const _isEmpty = docContent.length <= 1
@@ -254,7 +254,7 @@ function CharmEditor (
   const state = useEditorState({
     specRegistry,
     plugins: charmEditorPlugins({
-      onPageContentChange: _onPageContentChange,
+      onContentChange: _onContentChange,
       readOnly
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
