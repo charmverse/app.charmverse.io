@@ -16,9 +16,10 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
-import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
-import { useEditorState, EditorViewContext } from '@bangle.dev/react';
+import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
+import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
+import { useState, CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/editor/@bangle.dev/base-components/image';
@@ -27,7 +28,6 @@ import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { CSSProperties, ReactNode, memo } from 'react';
 import { Callout, calloutSpec } from './Callout';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
@@ -89,25 +89,21 @@ export const specRegistry = new SpecRegistry([
 
 export function charmEditorPlugins (
   {
-    onPageContentChange,
+    onContentChange,
     readOnly
   } :
   {
-    readOnly?: boolean, onPageContentChange?: (content: ICharmEditorOutput) => void
+    readOnly?: boolean, onContentChange?: (view: EditorView) => void
   } = {}
 ) {
   return () => [
     new Plugin({
       view: () => ({
-        update: debounce((view, prevState) => {
-
-          if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
-            onPageContentChange({
-              doc: view.state.doc.toJSON() as PageContent,
-              rawText: view.state.doc.textContent as string
-            });
+        update: (view, prevState) => {
+          if (onContentChange && !view.state.doc.eq(prevState.doc)) {
+            onContentChange(view);
           }
-        }, 100)
+        }
       })
 
     }),
@@ -227,18 +223,43 @@ export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 interface CharmEditorProps {
   content?: PageContent;
   children?: ReactNode;
-  onPageContentChange?: UpdatePageContent;
+  onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
 }
 
 function CharmEditor (
-  { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
+  { content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
 ) {
+
+  // check empty state of page on first load
+  const _isEmpty = !content.content || (content.content.length <= 1
+    && (!content[0] || content[0].content.length === 0));
+  const [isEmpty, setIsEmpty] = useState(_isEmpty);
+
+  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
+    const doc = view.state.doc.toJSON() as PageContent;
+    const rawText = view.state.doc.textContent as string;
+    onContentChange({ doc, rawText });
+  }, 100) : undefined;
+
+  function _onContentChange (view: EditorView) {
+    // @ts-ignore missing types from the @bangle.dev/react package
+    const docContent: { content: { size: number } }[] = view.state.doc.content.content;
+    const __isEmpty = docContent.length <= 1
+      && (!docContent[0] || docContent[0].content.size === 0);
+    setIsEmpty(__isEmpty);
+    if (onContentChangeDebounced) {
+      onContentChangeDebounced(view);
+    }
+  }
 
   const state = useEditorState({
     specRegistry,
-    plugins: charmEditorPlugins({ onPageContentChange, readOnly }),
+    plugins: charmEditorPlugins({
+      onContentChange: _onContentChange,
+      readOnly
+    }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components
     dropCursorOpts: {
@@ -257,7 +278,7 @@ function CharmEditor (
         editable: () => !readOnly
       }}
       // Components that should be placed after the editor component
-      postEditorComponents={<Placeholder />}
+      postEditorComponents={<Placeholder show={isEmpty} />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
 
@@ -302,12 +323,9 @@ function CharmEditor (
             return (
               <ResizableImage
                 onResizeStop={(view) => {
-                  if (onPageContentChange) {
+                  if (onContentChangeDebounced) {
                     // Save the current image size on the backend after we are done resizing
-                    onPageContentChange({
-                      doc: view.state.doc.toJSON() as PageContent,
-                      rawText: view.state.doc.textContent as string
-                    });
+                    onContentChangeDebounced(view);
                   }
                 }}
                 {...props}
@@ -318,12 +336,9 @@ function CharmEditor (
             return (
               <ResizableIframe
                 onResizeStop={(view) => {
-                  if (onPageContentChange) {
+                  if (onContentChangeDebounced) {
                     // Save the current embed size on the backend after we are done resizing
-                    onPageContentChange({
-                      doc: view.state.doc.toJSON() as PageContent,
-                      rawText: view.state.doc.textContent as string
-                    });
+                    onContentChangeDebounced(view);
                   }
                 }}
                 {...props}

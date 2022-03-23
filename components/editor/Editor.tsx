@@ -46,7 +46,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
         <CharmEditor
           key={page.id}
           content={page.content as PageContent}
-          onPageContentChange={updatePageContent}
+          onContentChange={updatePageContent}
           readOnly={readOnly}
         >
           <PageHeader

@@ -1,26 +1,21 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import { alpha, Box, useTheme } from '@mui/material';
-import { useMemo } from 'react';
+import { alpha } from '@mui/material';
+import styled from '@emotion/styled';
+import { useEffect } from 'react';
 
-export default function PlaceHolder () {
+const StyledPlaceholder = styled.div`
+  top: -2em;
+  position: relative;
+  color: ${({ theme }) => alpha(theme.palette.text.secondary, 0.5)};
+  // Place it beneath the actual editor
+  z-index: -20;
+`;
+
+export default function PlaceHolder ({ show }: { show: boolean }) {
   const view = useEditorViewContext();
-  const theme = useTheme();
-  const color = useMemo(() => alpha(theme.palette.text.secondary, 0.35), [theme]);
-  // @ts-ignore missing types from the @bangle.dev/react package
-  const docContent: { content: { size: number } }[] = view.state.doc.content.content;
-  const isEmpty = docContent.length <= 1
-  && (!docContent[0] || docContent[0].content.size === 0);
-  // Only show placeholder if the editor content is empty
-  return isEmpty ? (
-    <Box sx={{
-      top: '-2em',
-      position: 'relative',
-      color,
-      // Place it beneath the actual editor
-      zIndex: -20
-    }}
-    >
+  return show ? (
+    <StyledPlaceholder>
       Type '/' for commands
-    </Box>
+    </StyledPlaceholder>
   ) : null;
 }
