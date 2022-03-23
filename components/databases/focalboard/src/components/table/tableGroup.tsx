@@ -80,6 +80,8 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
                 readonly={props.readonly}
                 cardIdToFocusOnRender={props.cardIdToFocusOnRender}
                 showCard={props.showCard}
+                resizingColumn={''}
+                offset={0}
                 addCard={props.addCard}
                 onCardClicked={props.onCardClicked}
                 onDrop={props.onDropToCard}
