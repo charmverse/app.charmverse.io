@@ -4,6 +4,8 @@ import * as http from 'adapters/http';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
 import { withSessionRoute } from 'lib/session/withSession';
+import { Page } from '@prisma/client';
+import { FailedImportsError } from 'pages/[domain]/settings/workspace';
 
 const handler = nc({
   onError,
@@ -26,7 +28,10 @@ interface NotionApiResponse {
   }
 }
 
-async function importNotion (req: NextApiRequest, res: NextApiResponse) {
+async function importNotion (req: NextApiRequest, res: NextApiResponse<{
+  failedImports: FailedImportsError[],
+  importedPages: Record<string, Page>
+} | {error: string}>) {
 
   const spaceId = req.body.spaceId as string;
   const tempAuthCode = req.body.code;
@@ -48,7 +53,7 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse) {
         'Content-Type': 'application/json'
       }
     });
-    const failedImports = await importFromWorkspace({
+    const { failedImports, importedPages } = await importFromWorkspace({
       spaceId,
       userId: req.session.user.id,
       accessToken: token.access_token,
@@ -56,12 +61,11 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse) {
       workspaceIcon: token.workspace_icon
     });
 
-    if (failedImports.length === 0) {
-      res.status(200).end();
-    }
-    else {
-      res.status(400).json({ failedImports });
-    }
+    res.status(200).json({
+      failedImports,
+      importedPages
+    });
+
   }
   catch (err: any) {
     console.log('Error', err);

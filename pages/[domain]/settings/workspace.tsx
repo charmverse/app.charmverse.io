@@ -24,8 +24,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from 'components/common/Snackbar';
 import useSnackbar from 'hooks/useSnackbar';
 import { useSWRConfig } from 'swr';
+import { usePages } from 'hooks/usePages';
 
-interface FailedImportsError {
+export interface FailedImportsError {
   pageId: string,
   type: 'page' | 'database',
   title: string,
@@ -38,38 +39,37 @@ export default function WorkspaceSettings () {
   const { mutate } = useSWRConfig();
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
-  const [notionError, setNotionError] = useState<string | null>(null);
+  const [notionFailedImports, setNotionFailedImports] = useState<FailedImportsError[]>([]);
   const { message, handleClose, isOpen: isSnackbarOpen, showMessage } = useSnackbar();
-
+  const { setPages } = usePages();
+  const [notionImportError, setNotionImportError] = useState<string | null>(null);
   const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
 
   useEffect(() => {
     if (space && typeof router.query.code === 'string') {
       setIsImportingFromNotion(true);
-      setNotionError(null);
+      setNotionFailedImports([]);
       charmClient.importFromNotion({
         code: router.query.code,
         spaceId: space.id
       })
-        .then(() => {
+        .then(({ failedImports, importedPages }) => {
           setIsImportingFromNotion(false);
           showMessage('Successfully imported');
           mutate(`pages/${space.id}`);
-          const baseUrl = `${router.asPath.split('?')[0]}?success=true`;
-          router.replace(baseUrl, undefined, { shallow: true });
+          showMessage('Notion workspace successfully imported');
+          setNotionFailedImports(failedImports);
+          setPages((pages) => ({
+            ...pages,
+            ...importedPages
+          }));
         })
-        .catch((error: {error: string, failedImports: FailedImportsError[]}) => {
+        .catch((err) => {
           setIsImportingFromNotion(false);
-          setNotionError(error.error || JSON.stringify(error.failedImports) || 'There was an error, please try again');
+          setNotionImportError(err.message ?? err.error ?? 'Something went wrong. Please try again');
         });
     }
   }, [Boolean(space)]);
-
-  useEffect(() => {
-    if (router.query.success) {
-      showMessage('Notion workspace successfully imported');
-    }
-  }, [router.query.success]);
 
   const {
     register,
@@ -159,10 +159,37 @@ export default function WorkspaceSettings () {
         >
           {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
         </Button>
-        {notionError && (
+        {notionFailedImports.length !== 0 && (
           <Alert severity='error' sx={{ mt: 2 }}>
-            {notionError}
+            Pages that failed to import
+            {notionFailedImports.map(failedImport => (
+              <div>
+                <Box sx={{
+                  display: 'flex',
+                  gap: 1
+                }}
+                >
+                  <span>Type: {failedImport.type}</span>
+                  <span>Title: {failedImport.title}</span>
+                  <span>Id: {failedImport.pageId}</span>
+
+                </Box>
+                <div>
+                  Blocks that failed to import for the page
+                  {failedImport.blocks.map((blockTrails, blockTrailsIndex) => (
+                    <div>
+                      {blockTrailsIndex + 1}. {blockTrails.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </Alert>
+        )}
+        {notionImportError && (
+        <Alert severity='error' sx={{ mt: 2 }}>
+          {notionImportError}
+        </Alert>
         )}
       </Box>
       <Snackbar severity='info' handleClose={handleClose} isOpen={isSnackbarOpen} message={message ?? ''} />

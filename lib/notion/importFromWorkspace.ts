@@ -918,8 +918,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     pageId: v4()
   });
 
+  const importedPages: Record<string, Page> = {};
+
   async function createCharmversePage (block: GetPageResponse | GetDatabaseResponse, parentId: string) {
-    await createPrismaPage({
+    const createdPage = await createPrismaPage({
       ...createdPages[block.id],
       parentId
     });
@@ -936,6 +938,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         });
       }
     }
+    importedPages[createdPage.id] = createdPage;
   }
 
   let createdPageIds = searchResults.map(_searchResult => _searchResult.id);
@@ -978,5 +981,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     await createCharmversePageFromNotionPage(searchResultRecord[createdPageIds[0]]);
   }
 
-  return Object.values(failedImportsRecord);
+  return {
+    failedImports: Object.values(failedImportsRecord),
+    importedPages
+  };
 }
