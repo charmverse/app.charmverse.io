@@ -40,6 +40,7 @@ import Placeholder from './Placeholder';
 import { Quote, quoteSpec } from './Quote';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
 import { imageSpec, ResizableImage } from './ResizableImage';
+import * as keybindings from './keybindings';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -178,7 +179,9 @@ export function charmEditorPlugins (
     NodeView.createPlugin({
       name: 'mention',
       containerDOM: ['span', { class: 'mention-value' }]
-    })
+    }),
+
+    keybindings.plugins()
   // TODO: Pasting iframe or image link shouldn't create those blocks for now
   // iframePlugin,
   // pasteImagePlugin
