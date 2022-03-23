@@ -237,7 +237,7 @@ function CharmEditor (
     && (!content[0] || content[0].content.length === 0));
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
-  const debouncedUpdate = onContentChange ? debounce((view: EditorView) => {
+  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
     onContentChange({ doc, rawText });
@@ -249,8 +249,8 @@ function CharmEditor (
     const __isEmpty = docContent.length <= 1
       && (!docContent[0] || docContent[0].content.size === 0);
     setIsEmpty(__isEmpty);
-    if (debouncedUpdate) {
-      debouncedUpdate(view);
+    if (onContentChangeDebounced) {
+      onContentChangeDebounced(view);
     }
   }
 
@@ -323,9 +323,9 @@ function CharmEditor (
             return (
               <ResizableImage
                 onResizeStop={(view) => {
-                  if (debouncedUpdate) {
+                  if (onContentChangeDebounced) {
                     // Save the current image size on the backend after we are done resizing
-                    debouncedUpdate(view);
+                    onContentChangeDebounced(view);
                   }
                 }}
                 {...props}
@@ -336,9 +336,9 @@ function CharmEditor (
             return (
               <ResizableIframe
                 onResizeStop={(view) => {
-                  if (debouncedUpdate) {
+                  if (onContentChangeDebounced) {
                     // Save the current embed size on the backend after we are done resizing
-                    debouncedUpdate(view);
+                    onContentChangeDebounced(view);
                   }
                 }}
                 {...props}
