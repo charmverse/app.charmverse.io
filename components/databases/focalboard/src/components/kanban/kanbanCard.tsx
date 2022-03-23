@@ -137,8 +137,11 @@ const KanbanCard = React.memo((props: Props) => {
                             onClick={() => {
                                 let cardLink = window.location.href
 
-                                if (!cardLink.includes(card.id)) {
-                                    cardLink += `/${card.id}`
+                                const queryString = new URLSearchParams(window.location.search)
+                                if (queryString.get('cardId') !== card.id) {
+                                    const newUrl = new URL(window.location.toString())
+                                    newUrl.searchParams.set('cardId', card.id)
+                                    cardLink = newUrl.toString()
                                 }
 
                                 Utils.copyTextToClipboard(cardLink)
