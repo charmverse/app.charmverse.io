@@ -312,12 +312,14 @@ async function populateDoc (
   }
   catch (err: any) {
     const errorTrails = [];
-    if (err.message.startsWith('[BLOCK]')) {
-      const errorMessageWithoutPrefix = err.message.replace('[BLOCK]: ', '');
-      const errorMessageData = JSON.parse(errorMessageWithoutPrefix);
+    try {
+      const errorMessageData = JSON.parse(err.message);
       errorTrails.push(...errorMessageData);
     }
-    // throw new Error(`[BLOCK]: ${JSON.stringify([parentInfo[parentInfo.length - 1], ...errorTrails])}`);
+    catch (_) {
+      //
+    }
+    throw new Error(JSON.stringify([parentInfo[parentInfo.length - 1], ...errorTrails]));
   }
 }
 
@@ -495,12 +497,12 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     workspaceIcon: string
   }) {
 
-  const failedImports: {
+  const failedImportsRecord: Record<string, {
     pageId: string,
     type: 'page' | 'database',
     title: string,
-    blocks: [string, number][]
-  }[] = [];
+    blocks: [string, number][][]
+  }> = {};
 
   const notion = new Client({
     auth: accessToken
@@ -539,6 +541,29 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     properties: Record<string, string>
   }> = {};
 
+  function populateFailedImportRecord (
+    failedImportBlocks: [string, number][][],
+    block: GetPageResponse | GetDatabaseResponse
+  ) {
+    let title = '';
+    if (block.object === 'database') {
+      title = convertToPlainText((block.title));
+    }
+    else if (block.parent.type === 'database_id') {
+      // Database pages
+      title = convertToPlainText((Object.values(block.properties).find(property => property.type === 'title') as any).title);
+    }
+    else {
+      title = convertToPlainText((block.properties.title as any)[block.properties.title.type]);
+    }
+    failedImportsRecord[block.id] = {
+      pageId: block.id,
+      type: block.object,
+      title,
+      blocks: failedImportBlocks
+    };
+  }
+
   // This loop would ideally decrease the amount of api requests made to fetch a page/database
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
@@ -546,39 +571,21 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   }
 
   for (let index = 0; index < searchResults.length; index++) {
-    const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
+    const failedImportBlocks: [string, number][][] = [];
+    const notionPage = searchResults[index] as GetPageResponse | GetDatabaseResponse;
     try {
-      if (block.object === 'page') {
-        await createPage([[block.id, v4()]]);
+      if (notionPage.object === 'page') {
+        await createPage([[notionPage.id, v4()]], failedImportBlocks);
       }
-      else if (block.object === 'database') {
-        await createDatabaseAndPopulateCache(block);
+      else if (notionPage.object === 'database') {
+        await createDatabaseAndPopulateCache(notionPage);
+      }
+      if (failedImportBlocks.length !== 0) {
+        throw new Error();
       }
     }
     catch (err: any) {
-      let blocks: [string, number][] = [];
-      if (err.message.startsWith('[BLOCK]: ')) {
-        const errorStringWithoutPrefix = err.message.replace('[BLOCK]: ', '');
-        blocks = JSON.parse(errorStringWithoutPrefix) as [string, number][];
-      }
-
-      let title = '';
-      if (block.object === 'database') {
-        title = convertToPlainText((block.title));
-      }
-      else if (block.parent.type === 'database_id') {
-        // Database pages
-        title = convertToPlainText((Object.values(block.properties).find(property => property.type === 'title') as any).title);
-      }
-      else {
-        title = convertToPlainText((block.properties.title as any)[block.properties.title.type]);
-      }
-      failedImports.push({
-        pageId: block.id,
-        type: block.object,
-        title,
-        blocks
-      });
+      populateFailedImportRecord(failedImportBlocks, notionPage);
     }
   }
 
@@ -602,7 +609,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   }
 
   // Array of tuple, [notion block id, charmverse block id]
-  async function createPage (pageIds: [string, string][]) {
+  async function createPage (pageIds: [string, string][], failedImportBlocks: Array<[string, number][]>) {
     // The last item of the pageIds is the notion block id and the optimistic charmverse page id
     const [notionPageId, createdPageId] = pageIds[pageIds.length - 1];
     // The page might have been recursively created via a link_to_page block
@@ -709,61 +716,89 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
 
     for (let index = 0; index < blocks.length; index++) {
-      await populateDoc(pageContent, blocks[index], blocksRecord, {
-        onChildDatabase: async (block, parentNode) => {
-          // If its a database, we need to fetch more information from api
-          createdPages[block.id] = await createDatabaseAndPopulateCache(await notion.databases.retrieve({
-            database_id: block.id
-          }) as any);
+      try {
+        await populateDoc(pageContent, blocks[index], blocksRecord, {
+          onChildDatabase: async (block, parentNode) => {
+            // If its a database, we need to fetch more information from api
+            createdPages[block.id] = await createDatabaseAndPopulateCache(await notion.databases.retrieve({
+              database_id: block.id
+            }) as any);
 
-          (parentNode as PageContent).content?.push({
-            type: 'page',
-            attrs: {
-              id: createdPages[block.id].pageId
+            (parentNode as PageContent).content?.push({
+              type: 'page',
+              attrs: {
+                id: createdPages[block.id].pageId
+              }
+            });
+          },
+          onChildPage: async (block, parentNode) => {
+            const _failedImportBlocks: [string, number][][] = [];
+            try {
+              createdPages[block.id] = await createPage([...pageIds, [block.id, v4()]], _failedImportBlocks);
+              (parentNode as PageContent).content?.push({
+                type: 'page',
+                attrs: {
+                  id: createdPages[block.id].pageId
+                }
+              });
+              if (_failedImportBlocks.length !== 0) {
+                throw new Error();
+              }
             }
-          });
-        },
-        onChildPage: async (block, parentNode) => {
-          createdPages[block.id] = await createPage([...pageIds, [block.id, v4()]]);
-          (parentNode as PageContent).content?.push({
-            type: 'page',
-            attrs: {
-              id: createdPages[block.id].pageId
+            catch (_) {
+              populateFailedImportRecord(_failedImportBlocks, searchResultRecord[block.id]);
             }
-          });
-        },
-        onLinkToPage: async (linkedPageId, parentNode) => {
-          // If the pages hasn't been created already, only then create it
-          // Find the parent its linking
-          const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
+          },
+          onLinkToPage: async (linkedPageId, parentNode) => {
+            // If the pages hasn't been created already, only then create it
+            // Find the parent its linking
+            const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
 
-          // Make sure its not referencing itself otherwise an infinite loop will occur
-          // Also make sure the linked page id is not its parent
-          if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== notionPageId && !parentAsLinkedPage) {
-            const createdPage = await createPage([...pageIds, [linkedPageId, v4()]]);
-            linkedPages[linkedPageId] = createdPage.pageId;
-          }
-
-          let id = linkedPages[linkedPageId];
-
-          // If its linking itself
-          if (linkedPageId === notionPageId) {
-            id = createdPageId;
-          }
-          else if (parentAsLinkedPage) {
-            id = parentAsLinkedPage[1];
-          }
-
-          (parentNode as PageContent).content?.push({
-            type: 'page',
-            attrs: {
-              id
+            // Make sure its not referencing itself otherwise an infinite loop will occur
+            // Also make sure the linked page id is not its parent
+            if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== notionPageId && !parentAsLinkedPage) {
+              const _failedImportBlocks: [string, number][][] = [];
+              try {
+                const createdPage = await createPage([...pageIds, [linkedPageId, v4()]], _failedImportBlocks);
+                linkedPages[linkedPageId] = createdPage.pageId;
+                if (_failedImportBlocks.length !== 0) {
+                  throw new Error();
+                }
+              }
+              catch (_) {
+                populateFailedImportRecord(_failedImportBlocks, searchResultRecord[linkedPageId]);
+              }
             }
-          });
+
+            let id = linkedPages[linkedPageId];
+
+            // If its linking itself
+            if (linkedPageId === notionPageId) {
+              id = createdPageId;
+            }
+            else if (parentAsLinkedPage) {
+              id = parentAsLinkedPage[1];
+            }
+
+            (parentNode as PageContent).content?.push({
+              type: 'page',
+              attrs: {
+                id
+              }
+            });
+          }
+        }, [[blocks[index].type, index]]);
+      }
+      catch (err: any) {
+        try {
+          const failedBlocks = JSON.parse(err.message);
+          failedImportBlocks.push(failedBlocks);
         }
-      }, [[blocks[index].type, index]]);
+        catch (_err) {
+          //
+        }
+      }
     }
-
     // If there was no content in the notion page only then add an empty paragraph
     if (pageContent.content?.length === 0) {
       pageContent.content?.push({
@@ -908,8 +943,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
     if (block.object === 'page' || block.object === 'database') {
       // Nested pages and databases
-      if (block.parent.type === 'page_id' && createdPages[block.parent.page_id]) {
-        createCharmversePage(block, createdPages[block.parent.page_id].pageId);
+      if (block.parent.type === 'page_id') {
+        // If its a linked page we dont create the parent, so the would be the workspace page
+        createCharmversePage(block, createdPages[block.parent.page_id]?.pageId ?? workspacePage.id);
       }
       // Focalboard cards
       else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
@@ -928,5 +964,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
   }
 
-  return failedImports;
+  console.log({ failedImportsRecord });
+
+  return Object.values(failedImportsRecord);
 }

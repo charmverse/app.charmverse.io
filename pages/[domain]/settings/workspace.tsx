@@ -25,6 +25,12 @@ import Snackbar from 'components/common/Snackbar';
 import useSnackbar from 'hooks/useSnackbar';
 import { useSWRConfig } from 'swr';
 
+interface FailedImportsError {
+  pageId: string,
+  type: 'page' | 'database',
+  title: string,
+  blocks: [string, number][][]
+}
 export default function WorkspaceSettings () {
 
   setTitle('Workspace Options');
@@ -32,7 +38,6 @@ export default function WorkspaceSettings () {
   const { mutate } = useSWRConfig();
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
-  const [user] = useUser();
   const [notionError, setNotionError] = useState<string | null>(null);
   const { message, handleClose, isOpen: isSnackbarOpen, showMessage } = useSnackbar();
 
@@ -53,9 +58,9 @@ export default function WorkspaceSettings () {
           const baseUrl = `${router.asPath.split('?')[0]}?success=true`;
           router.replace(baseUrl, undefined, { shallow: true });
         })
-        .catch(error => {
+        .catch((error: {error: string, failedImports: FailedImportsError[]}) => {
           setIsImportingFromNotion(false);
-          setNotionError(error.error || 'There was an error, please try again');
+          setNotionError(error.error || JSON.stringify(error.failedImports) || 'There was an error, please try again');
         });
     }
   }, [Boolean(space)]);
