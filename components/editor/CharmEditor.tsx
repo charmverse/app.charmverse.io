@@ -40,6 +40,7 @@ import Placeholder from './Placeholder';
 import { Quote, quoteSpec } from './Quote';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
 import { imageSpec, ResizableImage } from './ResizableImage';
+import * as tabIndent from './tabIndent';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -81,7 +82,8 @@ export const specRegistry = new SpecRegistry([
   columnLayoutSpec(), // NO
   columnBlockSpec(), // NO ?? ==> Need to clarify how it fits into layout
   nestedPageSpec(), // NO
-  quoteSpec() // OK
+  quoteSpec(), // OK
+  tabIndent.spec()
 ]);
 
 export function charmEditorPlugins (
@@ -178,7 +180,8 @@ export function charmEditorPlugins (
     NodeView.createPlugin({
       name: 'mention',
       containerDOM: ['span', { class: 'mention-value' }]
-    })
+    }),
+    tabIndent.plugins()
   // TODO: Pasting iframe or image link shouldn't create those blocks for now
   // iframePlugin,
   // pasteImagePlugin
