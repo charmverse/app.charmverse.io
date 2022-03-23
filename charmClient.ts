@@ -431,6 +431,22 @@ class CharmClient {
   createRole (role: Partial<Role>): Promise<Role> {
     return http.POST('/api/roles', role);
   }
+
+  deleteRole (roleToDelete: {roleId: string, spaceId: string}): Promise<Role> {
+    return http.DELETE('/api/roles', roleToDelete);
+  }
+
+  listRoles (spaceId: string): Promise<Role []> {
+    return http.GET('/api/roles', { spaceId });
+  }
+
+  assignRole (data: {spaceId: string, roleId: string, userId: string}): Promise<Role []> {
+    return http.POST('/api/roles/assignment', data);
+  }
+
+  unassignRole (data: {spaceId: string, roleId: string, userId: string}): Promise<Role []> {
+    return http.DELETE('/api/roles/assignment', data);
+  }
 }
 
 const charmClient = new CharmClient();
