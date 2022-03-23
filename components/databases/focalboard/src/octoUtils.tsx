@@ -122,7 +122,7 @@ class OctoUtils {
             idMap[block.id] = newBlock.id
             return newBlock
         })
-        console.log('blocks',  blocks, sourceBlockId);
+
         const newSourceBlockId = idMap[sourceBlockId]
 
         // Determine the new rootId if needed
