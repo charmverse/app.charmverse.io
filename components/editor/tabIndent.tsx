@@ -1,17 +1,6 @@
 import { RawPlugins, RawSpecs } from '@bangle.dev/core';
 import { Command, DOMOutputSpec, keymap, sinkListItem, liftListItem } from '@bangle.dev/pm';
 
-const indentListItem: Command = (state, dispatch) => {
-  const type = state.schema.nodes.listItem;
-  console.log('indent');
-  return sinkListItem(type)(state, dispatch);
-};
-
-const undentListItem: Command = (state, dispatch) => {
-  const type = state.schema.nodes.listItem;
-  return liftListItem(type)(state, dispatch);
-};
-
 const name = 'tabIndent';
 
 export function spec (): RawSpecs {
@@ -25,19 +14,6 @@ export function spec (): RawSpecs {
       toDOM: (): DOMOutputSpec => ['span', { className: 'tab', style: 'white-space:pre' }, '\t'],
       attrs: {}
     }
-    // markdown: {
-    //   toMarkdown (state: MarkdownSerializerState, node: Node) {
-    //     state.render(node, '  ', () => '  ');
-    //   },
-    //   parseMarkdown: {
-    //     bullet_list: {
-    //       block: name,
-    //       getAttrs: (_: any, tokens: Token[], i: number) => {
-    //         return { tight: listIsTight(tokens, i) };
-    //       }
-    //     }
-    //   }
-    // }
   };
 }
 
