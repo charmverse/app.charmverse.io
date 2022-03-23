@@ -317,7 +317,7 @@ async function populateDoc (
       const errorMessageData = JSON.parse(errorMessageWithoutPrefix);
       errorTrails.push(...errorMessageData);
     }
-    throw new Error(`[BLOCK]: ${JSON.stringify([parentInfo[parentInfo.length - 1], ...errorTrails])}`);
+    // throw new Error(`[BLOCK]: ${JSON.stringify([parentInfo[parentInfo.length - 1], ...errorTrails])}`);
   }
 }
 
@@ -489,26 +489,18 @@ async function createDatabase (block: GetDatabaseResponse, {
   };
 }
 
-function constructErrorMessage (err: any, block: GetPageResponse | GetDatabaseResponse) {
-  let blocks: [string, number][] = [];
-  if (err.message.startsWith('[BLOCK]: ')) {
-    const errorStringWithoutPrefix = err.message.replace('[BLOCK]: ', '');
-    blocks = JSON.parse(errorStringWithoutPrefix) as [string, number][];
-  }
-  // Adding [IMPORT] to error message to differentiate between errors related to import
-  throw new Error(`[IMPORT]: ${JSON.stringify({
-    pageId: block.id,
-    type: block.object,
-    title: block.object === 'page' ? convertToPlainText((block.properties.title as any)[block.properties.title.type]) : convertToPlainText((block.title)),
-    blocks
-  })}`);
-}
-
 export async function importFromWorkspace ({ workspaceName, workspaceIcon, accessToken, userId, spaceId }:
   { accessToken: string, spaceId: string, userId: string,
     workspaceName: string,
     workspaceIcon: string
   }) {
+
+  const failedImports: {
+    pageId: string,
+    type: 'page' | 'database',
+    title: string,
+    blocks: [string, number][]
+  }[] = [];
 
   const notion = new Client({
     auth: accessToken
@@ -563,8 +555,30 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         await createDatabaseAndPopulateCache(block);
       }
     }
-    catch (err) {
-      constructErrorMessage(err, block);
+    catch (err: any) {
+      let blocks: [string, number][] = [];
+      if (err.message.startsWith('[BLOCK]: ')) {
+        const errorStringWithoutPrefix = err.message.replace('[BLOCK]: ', '');
+        blocks = JSON.parse(errorStringWithoutPrefix) as [string, number][];
+      }
+
+      let title = '';
+      if (block.object === 'database') {
+        title = convertToPlainText((block.title));
+      }
+      else if (block.parent.type === 'database_id') {
+        // Database pages
+        title = convertToPlainText((Object.values(block.properties).find(property => property.type === 'title') as any).title);
+      }
+      else {
+        title = convertToPlainText((block.properties.title as any)[block.properties.title.type]);
+      }
+      failedImports.push({
+        pageId: block.id,
+        type: block.object,
+        title,
+        blocks
+      });
     }
   }
 
@@ -877,13 +891,15 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
     if (block.object === 'database') {
       const databasePage = createdPages[block.id];
-      const { board, view } = focalboardRecord[databasePage.boardId!];
-      await prisma.block.createMany({
-        data: [
-          view,
-          board
-        ]
-      });
+      if (databasePage) {
+        const { board, view } = focalboardRecord[databasePage.boardId!];
+        await prisma.block.createMany({
+          data: [
+            view,
+            board
+          ]
+        });
+      }
     }
   }
 
@@ -896,7 +912,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         createCharmversePage(block, createdPages[block.parent.page_id].pageId);
       }
       // Focalboard cards
-      else if (block.parent.type === 'database_id' && createdPages[block.parent.database_id]) {
+      else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
         const { card, charmText } = createdCards[block.id];
         await prisma.block.createMany({
           data: [
@@ -911,4 +927,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       }
     }
   }
+
+  return failedImports;
 }

@@ -48,33 +48,24 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse) {
         'Content-Type': 'application/json'
       }
     });
-    try {
-      await importFromWorkspace({
-        spaceId,
-        userId: req.session.user.id,
-        accessToken: token.access_token,
-        workspaceName: token.workspace_name,
-        workspaceIcon: token.workspace_icon
-      });
+    const failedImports = await importFromWorkspace({
+      spaceId,
+      userId: req.session.user.id,
+      accessToken: token.access_token,
+      workspaceName: token.workspace_name,
+      workspaceIcon: token.workspace_icon
+    });
+
+    if (failedImports.length === 0) {
       res.status(200).end();
     }
-    catch (err: any) {
-      if (err.message.startsWith('[IMPORT]')) {
-        const errorStringWithoutPrefix = err.message.replace('[IMPORT]: ', '');
-        const errorData = JSON.parse(errorStringWithoutPrefix) as {
-          pageId: string,
-          type: 'page' | 'database',
-          title: string,
-          blocks: [string, number][]
-        };
-        res.status(400).json({ error: `Error importing ${errorData.type} named ${errorData.title} with id ${errorData.pageId}. Location: ${errorData.blocks.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}` });
-      }
-      else {
-        res.status(400).json({ error: 'Something went wrong!' });
-      }
+    else {
+      res.status(400).json({ failedImports });
     }
   }
   catch (err: any) {
+    console.log('Error', err);
+
     if (err.error === 'invalid_grant' || err.error === 'invalid_request') {
       res.status(400).json({ error: 'Invalid code. Please try importing again' });
     }
