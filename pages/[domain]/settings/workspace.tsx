@@ -161,29 +161,34 @@ export default function WorkspaceSettings () {
         </Button>
         {notionFailedImports.length !== 0 && (
           <Alert severity='error' sx={{ mt: 2 }}>
-            Pages that failed to import
-            {notionFailedImports.map(failedImport => (
-              <div>
-                <Box sx={{
-                  display: 'flex',
-                  gap: 1
-                }}
-                >
-                  <span>Type: {failedImport.type}</span>
-                  <span>Title: {failedImport.title}</span>
-                  <span>Id: {failedImport.pageId}</span>
-
-                </Box>
+            <Box sx={{
+              display: 'flex', gap: 2, flexDirection: 'column'
+            }}
+            >
+              Pages that failed to import
+              {notionFailedImports.map(failedImport => (
                 <div>
-                  Blocks that failed to import for the page
-                  {failedImport.blocks.map((blockTrails, blockTrailsIndex) => (
-                    <div>
-                      {blockTrailsIndex + 1}. {blockTrails.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}
-                    </div>
-                  ))}
+                  <Box sx={{
+                    display: 'flex',
+                    gap: 1
+                  }}
+                  >
+                    <span>Type: {failedImport.type}</span>
+                    <span>Title: {failedImport.title}</span>
+                    <span>Id: {failedImport.pageId}</span>
+
+                  </Box>
+                  <div>
+                    Blocks that failed to import for the page
+                    {failedImport.blocks.map((blockTrails, blockTrailsIndex) => (
+                      <div>
+                        {blockTrailsIndex + 1}. {blockTrails.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </Box>
           </Alert>
         )}
         {notionImportError && (

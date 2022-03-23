@@ -922,9 +922,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
   async function createCharmversePage (block: GetPageResponse | GetDatabaseResponse, parentId: string) {
     try {
-      if (block.id === '0f0af796-f159-4182-ad91-78589e331755') {
-        throw new Error();
-      }
       const createdPage = await createPrismaPage({
         ...createdPages[block.id],
         parentId
@@ -975,13 +972,16 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         if (!createdPagesSet.has(block.parent.database_id)) {
           await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
         }
-        const { card, charmText } = createdCards[block.id];
-        await prisma.block.createMany({
-          data: [
-            card,
-            charmText
-          ]
-        });
+        // Make sure the database page has not failed to be created, otherwise no cards will be added
+        if (!searchResultRecord[block.parent.database_id]) {
+          const { card, charmText } = createdCards[block.id];
+          await prisma.block.createMany({
+            data: [
+              card,
+              charmText
+            ]
+          });
+        }
       }
       // Top level pages and databases
       else if (block.parent.type === 'workspace') {
