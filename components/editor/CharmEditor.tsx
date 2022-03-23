@@ -16,9 +16,10 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
-import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
-import { useEditorState, EditorViewContext } from '@bangle.dev/react';
+import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
+import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
+import { useState, CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/editor/@bangle.dev/base-components/image';
@@ -27,7 +28,6 @@ import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { CSSProperties, ReactNode, memo } from 'react';
 import { Callout, calloutSpec } from './Callout';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
@@ -93,21 +93,17 @@ export function charmEditorPlugins (
     readOnly
   } :
   {
-    readOnly?: boolean, onPageContentChange?: (content: ICharmEditorOutput) => void
+    readOnly?: boolean, onPageContentChange?: (view: EditorView) => void
   } = {}
 ) {
   return () => [
     new Plugin({
       view: () => ({
-        update: debounce((view, prevState) => {
-
+        update: (view, prevState) => {
           if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
-            onPageContentChange({
-              doc: view.state.doc.toJSON() as PageContent,
-              rawText: view.state.doc.textContent as string
-            });
+            onPageContentChange(view);
           }
-        }, 100)
+        }
       })
 
     }),
@@ -236,9 +232,31 @@ function CharmEditor (
   { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
 ) {
 
+  const [isEmpty, setIsEmpty] = useState(false);
+
+  const debouncedUpdate = onPageContentChange ? debounce((view: EditorView) => {
+    const doc = view.state.doc.toJSON() as PageContent;
+    const rawText = view.state.doc.textContent as string;
+    onPageContentChange({ doc, rawText });
+  }, 100) : undefined;
+
+  function _onPageContentChange (view: EditorView) {
+    // @ts-ignore missing types from the @bangle.dev/react package
+    const docContent: { content: { size: number } }[] = view.state.doc.content.content;
+    const _isEmpty = docContent.length <= 1
+      && (!docContent[0] || docContent[0].content.size === 0);
+    setIsEmpty(_isEmpty);
+    if (debouncedUpdate) {
+      debouncedUpdate(view);
+    }
+  }
+
   const state = useEditorState({
     specRegistry,
-    plugins: charmEditorPlugins({ onPageContentChange, readOnly }),
+    plugins: charmEditorPlugins({
+      onPageContentChange: _onPageContentChange,
+      readOnly
+    }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components
     dropCursorOpts: {
@@ -257,7 +275,7 @@ function CharmEditor (
         editable: () => !readOnly
       }}
       // Components that should be placed after the editor component
-      postEditorComponents={<Placeholder />}
+      postEditorComponents={<Placeholder show={isEmpty} />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
 
@@ -302,12 +320,9 @@ function CharmEditor (
             return (
               <ResizableImage
                 onResizeStop={(view) => {
-                  if (onPageContentChange) {
+                  if (debouncedUpdate) {
                     // Save the current image size on the backend after we are done resizing
-                    onPageContentChange({
-                      doc: view.state.doc.toJSON() as PageContent,
-                      rawText: view.state.doc.textContent as string
-                    });
+                    debouncedUpdate(view);
                   }
                 }}
                 {...props}
@@ -318,12 +333,9 @@ function CharmEditor (
             return (
               <ResizableIframe
                 onResizeStop={(view) => {
-                  if (onPageContentChange) {
+                  if (debouncedUpdate) {
                     // Save the current embed size on the backend after we are done resizing
-                    onPageContentChange({
-                      doc: view.state.doc.toJSON() as PageContent,
-                      rawText: view.state.doc.textContent as string
-                    });
+                    debouncedUpdate(view);
                   }
                 }}
                 {...props}
