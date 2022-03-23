@@ -361,7 +361,8 @@ async function createPrismaPage ({
   title,
   type = 'page',
   userId,
-  boardId
+  boardId,
+  parentId
 }: {
   pageId?: string,
   content?: PageContent
@@ -371,7 +372,8 @@ async function createPrismaPage ({
   icon: string | null
   title: string
   type?: Prisma.PageCreateInput['type'],
-  boardId?: string | null
+  boardId?: string | null,
+  parentId?: string | null
 }) {
   const id = Math.random().toString().replace('0.', '');
 
@@ -398,7 +400,8 @@ async function createPrismaPage ({
     icon,
     title,
     type,
-    boardId
+    boardId,
+    parentId
   };
 
   // eslint-disable-next-line
@@ -512,6 +515,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     page_size: BLOCKS_FETCHED_PER_REQUEST
   });
 
+  // Store all the blocks the integration has access to
   const searchResults = searchResult.results;
 
   // While there are more pages the integration has access to
@@ -523,13 +527,24 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     searchResults.push(...searchResult.results);
   }
 
+  // Store all the pages/databases the integration fetched in a record
   const searchResultRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
 
-  const createdPages: Record<string, Page> = {};
+  const createdPages: Record<string, {
+    pageId: string,
+    content: PageContent
+    userId: string
+    spaceId: string
+    headerImage: string | null
+    icon: string | null
+    title: string
+    type: Prisma.PageCreateInput['type'],
+    boardId: string | null
+  }> = {};
   const linkedPages: Record<string, string> = {};
   const focalboardRecord: Record<string, Record<string, string>> = {};
 
-  // This loop would decrease the amount of api requests made
+  // This loop would ideally decrease the amount of api requests made to fetch a page/database
   for (let index = 0; index < searchResults.length; index++) {
     const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
     searchResultRecord[block.id] = block;
@@ -541,16 +556,16 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       if (block.object === 'page') {
         await createPage([[block.id, v4()]]);
       }
-      else if (block.object === 'database') {
-        // Only create the database if it hasn't been created already
-        if (!createdPages[block.id]) {
-          createdPages[block.id] = await createDatabase(block as GetDatabaseResponse, {
-            spaceId,
-            userId,
-            focalboardRecord
-          });
-        }
-      }
+      // else if (block.object === 'database') {
+      //   // Only create the database if it hasn't been created already
+      //   if (!createdPages[block.id]) {
+      //     createdPages[block.id] = await createDatabase(block as GetDatabaseResponse, {
+      //       spaceId,
+      //       userId,
+      //       focalboardRecord
+      //     });
+      //   }
+      // }
     }
     catch (err) {
       constructErrorMessage(err, block);
@@ -559,13 +574,14 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
   // Array of tuple, [notion block id, charmverse block id]
   async function createPage (pageIds: [string, string][]) {
-    const [blockId, createdPageId] = pageIds[pageIds.length - 1];
-    // The page might be recursively created via a link_to_page block
-    if (createdPages[blockId]) return createdPages[blockId];
+    // The last item of the pageIds is the notion block id and the optimistic charmverse page id
+    const [notionPageId, createdPageId] = pageIds[pageIds.length - 1];
+    // The page might have been recursively created via a link_to_page block
+    if (createdPages[notionPageId]) return createdPages[notionPageId];
 
     // If the page doesn't exist in the cache fetch it
-    const pageResponse = searchResultRecord[blockId] ?? await notion.pages.retrieve({
-      page_id: blockId
+    const pageResponse = searchResultRecord[notionPageId] ?? await notion.pages.retrieve({
+      page_id: notionPageId
     }) as unknown as GetPageResponse;
 
     // Store all the blocks of a page, including nested ones
@@ -580,7 +596,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
     // Array to store parameters for further requests to retrieve children blocks
     let blockChildrenRequests: ListBlockChildrenParameters[] = [{
-      block_id: blockId,
+      block_id: notionPageId,
       page_size: BLOCKS_FETCHED_PER_REQUEST
     }];
 
@@ -596,15 +612,17 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         }))
       ));
 
+      // Reset the requests as they've all been fetched
       blockChildrenRequests = [];
 
       childBlockListResponses.forEach(childBlockListResponse => {
         // If next_cursor exist then this block contains more child blocks
         if (childBlockListResponse.next_cursor) {
           blockChildrenRequests.push({
+            // Using the request.block_id to get the block's parent id
             block_id: childBlockListResponse.request.block_id,
             page_size: BLOCKS_FETCHED_PER_REQUEST,
-            start_cursor: childBlockListResponse.next_cursor ?? undefined
+            start_cursor: childBlockListResponse.next_cursor
           });
         }
       });
@@ -612,18 +630,22 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       return childBlockListResponses;
     }
 
+    // We allow a maximum of `MAX_CHILD_BLOCK_DEPTH` level of nested contents
+    // Blocks like callout, quote, all forms of list allow other blocks to be nested inside them
     for (let depth = 0; depth < MAX_CHILD_BLOCK_DEPTH; depth++) {
+      // While there are more children to be fetched
       if (blockChildrenRequests.length !== 0) {
         const childBlockListResponses = await getChildBlockListResponses();
 
-        // If the block has more child to be fetch, fetch them using the cursor
+        // If the block has more child to be fetch, this will be true
         while (blockChildrenRequests.length !== 0) {
           childBlockListResponses.push(...await getChildBlockListResponses());
         }
 
-        // Now that all child content has been fetched, we need to check if any of the child block has children or not
+        // Reset the requests as they've all been fetched
         blockChildrenRequests = [];
 
+        // Now that all child content has been fetched, we need to check if any of the child block has children or not
         // Go through each of the block and add them to the record
         // eslint-disable-next-line
         childBlockListResponses.forEach((childBlockListResponse) => {
@@ -634,7 +656,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             };
             blocksRecord[block.id] = blockWithChildren;
             if (depth !== 0) {
-              // Add the current block to the its parent's `children` array
+              // Add the current block's id to its parent's `children` array
               blocksRecord[childBlockListResponse.request.block_id].children.push(block.id);
             }
             else {
@@ -661,27 +683,27 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       await populateDoc(pageContent, blocks[index], blocksRecord, {
         onChildDatabase: async (block, parentNode) => {
           // If its a database, we need to fetch more information from api
-          createdPages[block.id] = await createDatabase(await notion.databases.retrieve({
-            database_id: block.id
-          }) as any, {
-            spaceId,
-            userId,
-            focalboardRecord
-          });
+          // createdPages[block.id] = await createDatabase(await notion.databases.retrieve({
+          //   database_id: block.id
+          // }) as any, {
+          //   spaceId,
+          //   userId,
+          //   focalboardRecord
+          // });
 
-          (parentNode as PageContent).content?.push({
-            type: 'page',
-            attrs: {
-              id: createdPages[block.id].id
-            }
-          });
+          // (parentNode as PageContent).content?.push({
+          //   type: 'page',
+          //   attrs: {
+          //     id: createdPages[block.id].id
+          //   }
+          // });
         },
         onChildPage: async (block, parentNode) => {
           createdPages[block.id] = await createPage([...pageIds, [block.id, v4()]]);
           (parentNode as PageContent).content?.push({
             type: 'page',
             attrs: {
-              id: createdPages[block.id].id
+              id: createdPages[block.id].pageId
             }
           });
         },
@@ -692,15 +714,15 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
           // Make sure its not referencing itself otherwise an infinite loop will occur
           // Also make sure the linked page id is not its parent
-          if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== blockId && !parentAsLinkedPage) {
+          if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== notionPageId && !parentAsLinkedPage) {
             const createdPage = await createPage([...pageIds, [linkedPageId, v4()]]);
-            linkedPages[linkedPageId] = createdPage.id;
+            linkedPages[linkedPageId] = createdPage.pageId;
           }
 
           let id = linkedPages[linkedPageId];
 
           // If its linking itself
-          if (linkedPageId === blockId) {
+          if (linkedPageId === notionPageId) {
             id = createdPageId;
           }
           else if (parentAsLinkedPage) {
@@ -724,10 +746,12 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         content: []
       });
     }
-
+    // Regular pages including databases
     if (pageResponse.parent.type === 'page_id' || pageResponse.parent.type === 'workspace') {
       const title = convertToPlainText((pageResponse.properties.title as any)[pageResponse.properties.title.type]);
-      const createdPage = await createPrismaPage({
+      createdPages[notionPageId] = {
+        boardId: null,
+        type: 'page',
         content: pageContent,
         headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
         icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
@@ -735,11 +759,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         pageId: createdPageId,
         spaceId,
         userId
-      });
-
-      createdPages[blockId] = createdPage;
-      return createdPage;
+      };
+      return createdPages[notionPageId];
     }
+    // Focalboard cards
     else if (pageResponse.parent.type === 'database_id') {
       // The database must be created before the cards can be added
       // eslint-disable-next-line
@@ -824,7 +847,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       });
     }
 
-    return createdPages[blockId];
+    return createdPages[notionPageId];
   }
 
   const workspacePage = await createPrismaPage({
@@ -840,24 +863,15 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     if (block.object === 'page' || block.object === 'database') {
       // Check if its a nested page
       if (block.parent.type === 'page_id' && createdPages[block.parent.page_id]) {
-        createdPages[block.id] = await prisma.page.update({
-          where: {
-            id: createdPages[block.id].id
-          },
-          data: {
-            parentId: createdPages[block.parent.page_id].id
-          }
+        await createPrismaPage({
+          ...createdPages[block.id],
+          parentId: createdPages[block.parent.page_id].pageId
         });
       }
-      else if (block.parent.type === 'page_id' || block.parent.type === 'workspace') {
-        // Place root pages/databases inside workspace page
-        createdPages[block.id] = await prisma.page.update({
-          where: {
-            id: createdPages[block.id].id
-          },
-          data: {
-            parentId: workspacePage.id
-          }
+      else if (block.parent.type === 'workspace') {
+        await createPrismaPage({
+          ...createdPages[block.id],
+          parentId: workspacePage.id
         });
       }
     }
