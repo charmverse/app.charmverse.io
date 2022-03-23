@@ -198,12 +198,16 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 
   code {
-    display: block;
-    padding: ${({ theme }) => theme.spacing(2)};
     border-radius: ${({ theme }) => theme.spacing(0.5)};
     background-color: ${({ theme }) => theme.palette.code.background};
+    color: ${({ theme }) => theme.palette.code.color};
     font-size: 85%;
     tab-size: 4;
+  }
+  pre code {
+    color: inherit;
+    display: block;
+    padding: ${({ theme }) => theme.spacing(2)};
   }
 
   hr {
