@@ -13,6 +13,9 @@ export function spec (): RawSpecs {
       parseDOM: [{ tag: 'span.tab' }],
       toDOM: (): DOMOutputSpec => ['span', { className: 'tab', style: 'white-space:pre' }, '\t'],
       attrs: {}
+    },
+    markdown: {
+      toMarkdown: () => null
     }
   };
 }
