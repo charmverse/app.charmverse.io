@@ -140,11 +140,6 @@ export function charmEditorPlugins (
       containerDOM: ['blockquote'],
       contentDOM: ['div']
     }),
-    // NodeView.createPlugin({
-    //   name: 'codeBlock',
-    //   containerDOM: ['pre'],
-    //   contentDOM: ['div']
-    // }),
     NodeView.createPlugin({
       name: 'columnLayout',
       containerDOM: ['div'],
