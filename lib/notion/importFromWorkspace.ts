@@ -938,17 +938,25 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
   }
 
-  // Update parent id for all nested pages
-  for (let index = 0; index < searchResults.length; index++) {
-    const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
+  let createdPageIds = searchResults.map(_searchResult => _searchResult.id);
+  const createdPagesSet: Set<string> = new Set();
+
+  async function createCharmversePageFromNotionPage (block: GetPageResponse | GetDatabaseResponse) {
     if (block.object === 'page' || block.object === 'database') {
       // Nested pages and databases
       if (block.parent.type === 'page_id') {
+        // Create its parent first
+        if (!createdPagesSet.has(block.parent.page_id)) {
+          await createCharmversePageFromNotionPage(searchResultRecord[block.parent.page_id]);
+        }
         // If its a linked page we dont create the parent, so the would be the workspace page
-        createCharmversePage(block, createdPages[block.parent.page_id]?.pageId ?? workspacePage.id);
+        await createCharmversePage(block, createdPages[block.parent.page_id]?.pageId ?? workspacePage.id);
       }
       // Focalboard cards
       else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
+        if (!createdPagesSet.has(block.parent.database_id)) {
+          await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
+        }
         const { card, charmText } = createdCards[block.id];
         await prisma.block.createMany({
           data: [
@@ -959,12 +967,16 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       }
       // Top level pages and databases
       else if (block.parent.type === 'workspace') {
-        createCharmversePage(block, workspacePage.id);
+        await createCharmversePage(block, workspacePage.id);
       }
     }
+    createdPageIds = createdPageIds.filter(createdPageId => createdPageId !== block.id);
+    createdPagesSet.add(block.id);
   }
 
-  console.log({ failedImportsRecord });
+  while (createdPageIds.length !== 0) {
+    await createCharmversePageFromNotionPage(searchResultRecord[createdPageIds[0]]);
+  }
 
   return Object.values(failedImportsRecord);
 }
