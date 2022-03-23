@@ -10,7 +10,7 @@ import PageHeader from './Page/PageHeader';
 export const Container = styled(Box)<{ top: number }>`
   width: 860px;
   max-width: 100%;
-  margin: 0 auto 5px;
+  margin: 0 auto ${({ top }) => top + 100}px;
   padding: 0 80px;
   position: relative;
   top: ${({ top }) => top}px;
