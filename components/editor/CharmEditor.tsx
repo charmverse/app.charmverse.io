@@ -232,7 +232,10 @@ function CharmEditor (
   { content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
 ) {
 
-  const [isEmpty, setIsEmpty] = useState(false);
+  // check empty state of page on first load
+  const _isEmpty = !content.content || (content.content.length <= 1
+    && (!content[0] || content[0].content.length === 0));
+  const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
   const debouncedUpdate = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
@@ -243,9 +246,9 @@ function CharmEditor (
   function _onContentChange (view: EditorView) {
     // @ts-ignore missing types from the @bangle.dev/react package
     const docContent: { content: { size: number } }[] = view.state.doc.content.content;
-    const _isEmpty = docContent.length <= 1
+    const __isEmpty = docContent.length <= 1
       && (!docContent[0] || docContent[0].content.size === 0);
-    setIsEmpty(_isEmpty);
+    setIsEmpty(__isEmpty);
     if (debouncedUpdate) {
       debouncedUpdate(view);
     }
