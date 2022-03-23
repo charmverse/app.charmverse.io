@@ -26,7 +26,6 @@ export function plugins (): RawPlugins {
       // 'Shift-Tab': undentListItem,
       Tab: (state, dispatch) => {
         if (dispatch) {
-          console.log('create tab', state.tr);
           dispatch(state.tr.replaceSelectionWith(state.schema.nodes.tabIndent.create()).scrollIntoView());
         }
         return true;

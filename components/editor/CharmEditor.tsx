@@ -3,7 +3,6 @@ import {
   bold,
   bulletList,
   code,
-  codeBlock,
   hardBreak,
   heading,
   horizontalRule,
@@ -22,13 +21,13 @@ import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/editor/@bangle.dev/base-components/image';
+import * as codeBlock from 'components/editor/@bangle.dev/base-components/code-block';
 import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev/react/ReactEditor';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { CSSProperties, ReactNode, memo } from 'react';
 import { Callout, calloutSpec } from './Callout';
-import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
@@ -141,11 +140,11 @@ export function charmEditorPlugins (
       containerDOM: ['blockquote'],
       contentDOM: ['div']
     }),
-    NodeView.createPlugin({
-      name: 'codeBlock',
-      containerDOM: ['pre'],
-      contentDOM: ['div']
-    }),
+    // NodeView.createPlugin({
+    //   name: 'codeBlock',
+    //   containerDOM: ['pre'],
+    //   contentDOM: ['div']
+    // }),
     NodeView.createPlugin({
       name: 'columnLayout',
       containerDOM: ['div'],
@@ -201,11 +200,11 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 
   code {
-    padding: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
+    display: block;
+    padding: ${({ theme }) => theme.spacing(2)};
     border-radius: ${({ theme }) => theme.spacing(0.5)};
     background-color: ${({ theme }) => theme.palette.code.background};
     font-size: 85%;
-    color: ${({ theme }) => theme.palette.code.color};
   }
 
   hr {
@@ -298,13 +297,6 @@ function CharmEditor (
               <Callout {...props}>
                 {NodeViewChildren}
               </Callout>
-            );
-          }
-          case 'codeBlock': {
-            return (
-              <Code>
-                {NodeViewChildren}
-              </Code>
             );
           }
           case 'image': {
