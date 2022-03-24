@@ -25,7 +25,7 @@ handler.use(requireUser)
 async function updateContributor (req: NextApiRequest, res: NextApiResponse) {
   await prisma.spaceRole.update({
     where: {
-      spaceId_userId: {
+      spaceUser: {
         userId: req.query.userId as string,
         spaceId: req.query.id as string
       }
@@ -40,7 +40,7 @@ async function updateContributor (req: NextApiRequest, res: NextApiResponse) {
 async function deleteContributor (req: NextApiRequest, res: NextApiResponse) {
   await prisma.spaceRole.delete({
     where: {
-      spaceId_userId: {
+      spaceUser: {
         userId: req.query.userId as string,
         spaceId: req.query.id as string
       }

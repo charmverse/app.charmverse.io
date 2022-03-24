@@ -1,5 +1,6 @@
-import { markdownParser, markdownSerializer } from '@bangle.dev/markdown';
 import { BangleEditorState } from '@bangle.dev/core';
+import { markdownSerializer } from '@bangle.dev/markdown';
+import { Node } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -21,8 +22,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import { specRegistry, charmEditorPlugins } from 'components/editor/CharmEditor';
-import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
+import { charmEditorPlugins, specRegistry } from 'components/editor/CharmEditor';
 import { useColorMode } from 'context/color-mode';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
