@@ -67,29 +67,42 @@ handler.get(async (req, res) => {
 
   const { id, ...rest } = discordAccount;
 
-  await prisma.discordUser.create({
-    data: {
-      account: rest as any,
-      discordId: id,
-      user: {
-        connect: {
-          id: state.userId
+  const url = new URL(state.href);
+
+  try {
+    await prisma.discordUser.create({
+      data: {
+        account: rest as any,
+        discordId: id,
+        user: {
+          connect: {
+            id: state.userId
+          }
         }
       }
-    }
-  });
+    });
 
-  await prisma.user.update({
-    where: {
-      id: state.userId
-    },
-    data: {
-      username: discordAccount.username,
-      avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
+    await prisma.user.update({
+      where: {
+        id: state.userId
+      },
+      data: {
+        username: discordAccount.username,
+        avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
+      }
+    });
+    // Remove discord=failed query parameter otherwise the failed modal will be shown
+    if (url.searchParams.has('discord')) {
+      url.searchParams.delete('discord');
     }
-  });
-
-  res.redirect(state.href);
+  }
+  catch (_) {
+    // If the discord user is already connected to a charmverse account this code will be run
+    if (!url.searchParams.has('discord')) {
+      url.searchParams.append('discord', 'failed');
+    }
+  }
+  res.redirect(url.href);
 });
 
 export default handler;
