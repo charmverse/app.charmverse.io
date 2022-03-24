@@ -3,7 +3,6 @@ import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import Snackbar from 'components/common/Snackbar';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { uploadToS3 } from 'lib/aws/uploadToS3';
 import { ReactNode, useState } from 'react';
 
@@ -79,6 +78,7 @@ export default function ImageSelector (props: ImageSelectorProps) {
   )}
     >
       {children}
+      <Snackbar />
     </PopperPopup>
   );
 }

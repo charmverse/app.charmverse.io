@@ -19,7 +19,7 @@ async function login (req: NextApiRequest, res: NextApiResponse) {
   const cookies = new Cookies(req, res);
   const nonce = `${crypto.randomBytes(16).toString('base64')}+++`;
   const state = encodeURIComponent(JSON.stringify({
-    href: req.query.href,
+    redirect: req.query.redirect,
     userId: req.session.user.id,
     nonce
   }));

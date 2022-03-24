@@ -31,7 +31,7 @@ handler.get(async (req, res) => {
   const nonce = req.cookies.oauth_secret;
 
   let state: {
-    href: string,
+    redirect: string,
     userId: string,
     nonce: string
   } = {} as any;
@@ -47,7 +47,7 @@ handler.get(async (req, res) => {
     return;
   }
 
-  const url = new URL(state.href);
+  const url = new URL(state.redirect);
 
   // Remove discord=fail|success query parameter otherwise it query params would be duplicated
   if (url.searchParams.has('discord')) {
