@@ -22,7 +22,10 @@ export default function ContributorSettings () {
   return (
     <>
       <InviteLinkList isAdmin={isAdmin} spaceId={space.id} />
-      <RoleAssignment />
+      {/*
+            <RoleAssignment />
+      */}
+
       <ContributorList isAdmin={isAdmin} spaceId={space.id} spaceOwner={space.createdBy} />
     </>
   );
