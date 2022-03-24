@@ -28,21 +28,36 @@ handler.get(async (req, res) => {
     return;
   }
 
+  const nonce = req.cookies.oauth_secret;
+
   let state: {
     href: string,
-    userId: string
+    userId: string,
+    nonce: string
   } = {} as any;
   try {
     state = JSON.parse(decodeURIComponent(req.query.state as string));
   }
   catch (e) {
     console.error('Error parsing discord state', e);
-    res.status(400).send({ error: 'Invalid state' });
+    // This is a rare case when we cant parse the state
+    // That means we dont have access to the redirect url
+    // Send user to the production app
+    res.redirect('https://app.charmverse.io');
     return;
   }
 
-  if (!state.userId) {
-    res.status(400).send({ error: 'Invalid state' });
+  const url = new URL(state.href);
+
+  // Remove discord=fail|success query parameter otherwise it query params would be duplicated
+  if (url.searchParams.has('discord')) {
+    url.searchParams.delete('discord');
+  }
+
+  if (!state.userId || state.nonce !== nonce) {
+    url.searchParams.append('discord', '2');
+    res.redirect(url.href);
+    return;
   }
 
   const params = new URLSearchParams();
@@ -67,13 +82,6 @@ handler.get(async (req, res) => {
 
   const { id, ...rest } = discordAccount;
 
-  const url = new URL(state.href);
-
-  // Remove discord=fail|success query parameter otherwise it query params would be duplicated
-  if (url.searchParams.has('discord')) {
-    url.searchParams.delete('discord');
-  }
-
   try {
     await prisma.discordUser.create({
       data: {
@@ -96,12 +104,12 @@ handler.get(async (req, res) => {
         avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
       }
     });
-    url.searchParams.append('discord', 'success');
+    url.searchParams.append('discord', '0');
   }
   catch (_) {
     // If the discord user is already connected to a charmverse account this code will be run
     // Add discord=fail to query parameter to show fail ux after redirecting
-    url.searchParams.append('discord', 'fail');
+    url.searchParams.append('discord', '1');
   }
   res.redirect(url.href);
 });

@@ -5,7 +5,6 @@ import { prisma } from 'db';
  * Allow an endpoint to be consumed if it originates from a share page
  */
 export async function requireSpaceMembership (req: NextApiRequest, res: NextApiResponse, next: Function) {
-
   if (!req.session.user) {
     return res.status(401).send({ error: 'Please log in' });
   }
