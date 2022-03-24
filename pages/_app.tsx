@@ -166,8 +166,8 @@ import {
   darkTheme,
   lightTheme
 } from 'theme/focalboard/theme';
-import 'theme/lit-modal/styles.scss';
-import { setTheme as setLitProtocolTheme } from 'theme/lit-modal/theme';
+import 'theme/lit-share-modal/lit-share-modal.scss';
+import { setTheme as setLitProtocolTheme } from 'theme/lit-share-modal/theme';
 import 'theme/styles.scss';
 import Snackbar from 'components/common/Snackbar';
 import { SnackbarProvider, useSnackbar } from 'hooks/useSnackbar';
