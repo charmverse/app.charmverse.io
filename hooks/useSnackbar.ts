@@ -21,8 +21,11 @@ export default function useSnackbar () {
   return {
     isOpen,
     handleClose,
-    showMessage: (msg: string) => {
+    showMessage: (msg: string, newSeverity?: AlertColor) => {
       handleClick();
+      if (newSeverity) {
+        setSeverity(newSeverity);
+      }
       setMessage(msg);
     },
     message,

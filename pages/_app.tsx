@@ -169,6 +169,8 @@ import {
 import 'theme/lit-modal/styles.scss';
 import { setTheme as setLitProtocolTheme } from 'theme/lit-modal/theme';
 import 'theme/styles.scss';
+import Snackbar from 'components/common/Snackbar';
+import useSnackbar from 'hooks/useSnackbar';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -183,6 +185,7 @@ type AppPropsWithLayout = AppProps & {
 export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? (page => page);
+  const { severity, message, handleClose, isOpen, showMessage } = useSnackbar();
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -231,9 +234,22 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   // wait for router to be ready, as we rely on the URL to know what space to load
   const router = useRouter();
+
+  // We might get redirected after connection with discord, so check the query param if it has a discord field
+  // It can either be fail or success
+  useEffect(() => {
+    if (router.query.discord === 'fail') {
+      showMessage('Failed to login to discord. Another Charmverse account is already connected with it.', 'error');
+    }
+    else if (router.query.discord === 'success') {
+      showMessage('Successfully connected with discord', 'info');
+    }
+  }, [router.query.discord]);
+
   if (!router.isReady) {
     return null;
   }
+
   return (
     <CacheProvider value={createCache({ key: 'app' })}>
       <ColorModeContext.Provider value={colorMode}>
@@ -259,6 +275,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                       <RouteGuard>
                         <ErrorBoundary>
                           {getLayout(<Component {...pageProps} />)}
+                          <Snackbar severity={severity} handleClose={handleClose} isOpen={isOpen} message={message ?? ''} />
                         </ErrorBoundary>
                       </RouteGuard>
                     </DataProviders>

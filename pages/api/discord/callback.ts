@@ -91,15 +91,16 @@ handler.get(async (req, res) => {
         avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
       }
     });
-    // Remove discord=failed query parameter otherwise the failed modal will be shown
+    // Remove discord=fail query parameter otherwise the fail ux will be shown
     if (url.searchParams.has('discord')) {
       url.searchParams.delete('discord');
     }
   }
   catch (_) {
     // If the discord user is already connected to a charmverse account this code will be run
+    // Add discord=fail to query parameter to show fail ux after redirecting
     if (!url.searchParams.has('discord')) {
-      url.searchParams.append('discord', 'failed');
+      url.searchParams.append('discord', 'fail');
     }
   }
   res.redirect(url.href);
