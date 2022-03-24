@@ -55,7 +55,7 @@ handler.get(async (req, res) => {
   }
 
   if (!state.userId || state.nonce !== nonce) {
-    url.searchParams.append('discord', '2');
+    url.searchParams.append('discord', '3');
     res.redirect(url.href);
     return;
   }
@@ -104,12 +104,12 @@ handler.get(async (req, res) => {
         avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
       }
     });
-    url.searchParams.append('discord', '0');
+    url.searchParams.append('discord', '1');
   }
   catch (_) {
     // If the discord user is already connected to a charmverse account this code will be run
     // Add discord=fail to query parameter to show fail ux after redirecting
-    url.searchParams.append('discord', '1');
+    url.searchParams.append('discord', '2');
   }
   res.redirect(url.href);
 });
