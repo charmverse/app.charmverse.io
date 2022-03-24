@@ -13,6 +13,7 @@ import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
+import { IPermissionTest } from 'lib/permissions/pages';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -456,6 +457,13 @@ class CharmClient {
 
   unassignRole (data: {spaceId: string, roleId: string, userId: string}): Promise<Role []> {
     return http.DELETE('/api/roles/assignment', data);
+  }
+
+  /**
+   * @T The interface for the specific set of permissions queried for
+   */
+  queryPermissions<T> (entity: 'page', request: IPermissionTest, permissions: Array<keyof T>): Promise<Role []> {
+    return http.POST('/api/permissions/query', data);
   }
 }
 

@@ -33,7 +33,8 @@ model Space {
   updatedBy      String          @db.Uuid
   name           String
   domain         String          @unique
-  permissions    SpaceRole[]
+  spaceRoles     SpaceRole[]
+  permissions    PagePermission[]
   pages          Page[]
   blocks         Block[]
   inviteLinks    InviteLink[]
@@ -95,7 +96,7 @@ model User {
   addresses       String[]
   spaceRoles      SpaceRole[]
   favorites       FavoritePage[]
-  pagePermissions PagePermission[]
+  permissions     PagePermission[]
   pages           Page[]
   blocks          Block[]
   spaces          Space[]
@@ -121,16 +122,6 @@ model FavoritePage {
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@unique([pageId, userId])
-}
-
-model PagePermission {
-  level  PermissionLevel
-  pageId String          @db.Uuid
-  page   Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  userId String          @db.Uuid
-  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([pageId, userId])
 }
@@ -258,6 +249,7 @@ model Role {
   spaceId           String            @db.Uuid
   space             Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   spaceRolesToRole  SpaceRoleToRole []
+  permissions       PagePermission []
 
   @@unique([spaceId, name])
 }
@@ -271,4 +263,45 @@ model SpaceRoleToRole {
   role              Role           @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([spaceRoleId, roleId])
+}
+
+enum PagePermissionLevel {
+  full_access
+  editor
+  view_comment
+  view
+}
+
+
+model PagePermission {
+  id       String         @id @default(uuid()) @db.Uuid
+  // Ways a permission can be accessed (pick one)
+  spaceId  String?
+  space    Space?         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId   String?
+  user     User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId   String?        
+  role     Role?          @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  // Resource being accessed (pick one)
+  pageId   String
+  page     Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  permissionLevel PagePermissionLevel
+  // Scope of access
+  // edit or read means you can access all atributes
+  // editAttributes specifies which attributes you can modify
+  read              Boolean @default(false)
+  delete            Boolean @default(false)
+  edit_index        Boolean @default(false)
+  edit_title        Boolean @default(false)
+  edit_content      Boolean @default(false)
+  edit_contentText  Boolean @default(false)
+  edit_headerImage  Boolean @default(false)
+  edit_icon         Boolean @default(false)
+  edit_isPublic     Boolean @default(false)
+  edit_path         Boolean @default(false)
+  edit_parentId     Boolean @default(false)
+
+
+  @@unique([userId, pageId])
+  @@unique([roleId, pageId])
 }
