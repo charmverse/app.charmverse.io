@@ -69,6 +69,11 @@ handler.get(async (req, res) => {
 
   const url = new URL(state.href);
 
+  // Remove discord=fail|success query parameter otherwise it query params would be duplicated
+  if (url.searchParams.has('discord')) {
+    url.searchParams.delete('discord');
+  }
+
   try {
     await prisma.discordUser.create({
       data: {
@@ -91,17 +96,12 @@ handler.get(async (req, res) => {
         avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
       }
     });
-    // Remove discord=fail query parameter otherwise the fail ux will be shown
-    if (url.searchParams.has('discord')) {
-      url.searchParams.delete('discord');
-    }
+    url.searchParams.append('discord', 'success');
   }
   catch (_) {
     // If the discord user is already connected to a charmverse account this code will be run
     // Add discord=fail to query parameter to show fail ux after redirecting
-    if (!url.searchParams.has('discord')) {
-      url.searchParams.append('discord', 'fail');
-    }
+    url.searchParams.append('discord', 'fail');
   }
   res.redirect(url.href);
 });
