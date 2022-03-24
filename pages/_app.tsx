@@ -239,7 +239,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   // It can either be fail or success
   useEffect(() => {
     if (router.query.discord === 'fail') {
-      showMessage('Failed to login to discord. Another Charmverse account is already connected with it.', 'error');
+      showMessage('Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.', 'error');
     }
     else if (router.query.discord === 'success') {
       showMessage('Successfully connected with discord', 'info');
