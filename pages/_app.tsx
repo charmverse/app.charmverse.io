@@ -170,7 +170,7 @@ import 'theme/lit-modal/styles.scss';
 import { setTheme as setLitProtocolTheme } from 'theme/lit-modal/theme';
 import 'theme/styles.scss';
 import Snackbar from 'components/common/Snackbar';
-import useSnackbar from 'hooks/useSnackbar';
+import { SnackbarProvider, useSnackbar } from 'hooks/useSnackbar';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -182,10 +182,31 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout
 }
 
+function DiscordConnectionSnackbar () {
+  const router = useRouter();
+  const { showMessage } = useSnackbar();
+  // We might get redirected after connection with discord, so check the query param if it has a discord field
+  // It can either be fail or success
+  useEffect(() => {
+    // Already connected account error
+    if (router.query.discord === '2') {
+      showMessage('Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.', 'error');
+    }
+    // Invalid state error
+    else if (router.query.discord === '3') {
+      showMessage('An error occurred. Please try again', 'error');
+    }
+    else if (router.query.discord === '1') {
+      showMessage('Successfully connected with discord', 'info');
+    }
+  }, [router.query.discord]);
+
+  return null;
+}
+
 export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? (page => page);
-  const { severity, message, handleClose, isOpen, showMessage } = useSnackbar();
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -235,22 +256,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   // wait for router to be ready, as we rely on the URL to know what space to load
   const router = useRouter();
 
-  // We might get redirected after connection with discord, so check the query param if it has a discord field
-  // It can either be fail or success
-  useEffect(() => {
-    // Already connected account error
-    if (router.query.discord === '2') {
-      showMessage('Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.', 'error');
-    }
-    // Invalid state error
-    else if (router.query.discord === '3') {
-      showMessage('An error occurred. Please try again', 'error');
-    }
-    else if (router.query.discord === '1') {
-      showMessage('Successfully connected with discord', 'info');
-    }
-  }, [router.query.discord]);
-
   if (!router.isReady) {
     return null;
   }
@@ -265,24 +270,27 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                 <ReduxProvider store={store}>
                   <FocalBoardProviders>
                     <DataProviders>
-                      <TitleContext.Consumer>
-                        {([title]) => (
-                          <Head>
-                            <title>
-                              {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-                            </title>
-                            {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
-                            <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                          </Head>
-                        )}
-                      </TitleContext.Consumer>
-                      <CssBaseline enableColorScheme={true} />
-                      <RouteGuard>
-                        <ErrorBoundary>
-                          {getLayout(<Component {...pageProps} />)}
-                          <Snackbar severity={severity} handleClose={handleClose} isOpen={isOpen} message={message ?? ''} />
-                        </ErrorBoundary>
-                      </RouteGuard>
+                      <SnackbarProvider>
+                        <TitleContext.Consumer>
+                          {([title]) => (
+                            <Head>
+                              <title>
+                                {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+                              </title>
+                              {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
+                              <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+                            </Head>
+                          )}
+                        </TitleContext.Consumer>
+                        <CssBaseline enableColorScheme={true} />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            <DiscordConnectionSnackbar />
+                            {getLayout(<Component {...pageProps} />)}
+                            <Snackbar />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </SnackbarProvider>
                     </DataProviders>
                   </FocalBoardProviders>
                   {/** include the root portal for focalboard's popup */}

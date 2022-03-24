@@ -16,7 +16,7 @@ import Snackbar from 'components/common/Snackbar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useNestedPage from 'hooks/useNestedPage';
 import { usePages } from 'hooks/usePages';
-import useSnackbar from 'hooks/useSnackbar';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { Page, PageContent } from 'models';
 import Link from 'next/link';
@@ -217,7 +217,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
   const [space] = useCurrentSpace();
   const { pages } = usePages();
   const { addNestedPage } = useNestedPage();
-  const { message, handleClose, isOpen: isSnackbarOpen, showMessage } = useSnackbar();
+  const { showMessage } = useSnackbar();
   const nestedPage = pages[node.attrs.id];
   const popupState = usePopupState({ variant: 'popover', popupId: 'nested-page' });
 
@@ -293,7 +293,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Copy Link</Typography>
         </MenuItem>
       </Menu>
-      <Snackbar severity='info' handleClose={handleClose} isOpen={isSnackbarOpen} message={message ?? ''} />
+      <Snackbar />
     </NestedPageContainer>
   );
 }

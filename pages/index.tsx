@@ -8,8 +8,6 @@ import Footer from 'components/login/Footer';
 import { useSpaces } from 'hooks/useSpaces';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useUser } from 'hooks/useUser';
-import useSnackbar from 'hooks/useSnackbar';
-import Snackbar from 'components/common/Snackbar';
 
 export default function LoginPage () {
 

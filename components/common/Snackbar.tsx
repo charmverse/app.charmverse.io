@@ -1,6 +1,7 @@
 import MuiAlert, { AlertColor, AlertProps } from '@mui/material/Alert';
 import Snackbar, { SnackbarProps } from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
+import { useSnackbar } from 'hooks/useSnackbar';
 import * as React from 'react';
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
@@ -9,14 +10,12 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
 
 interface CustomizedSnackbarProps {
   autoHideDuration?: number
-  message: string
-  isOpen: boolean
-  handleClose: SnackbarProps['onClose']
-  severity?: AlertColor
 }
 
 export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
-  const { severity = 'success', isOpen, handleClose, message, autoHideDuration = 5000 } = props;
+  const { severity, message, handleClose, isOpen, showMessage } = useSnackbar();
+
+  const { autoHideDuration = 5000 } = props;
   return (
     <Stack spacing={2} sx={{ width: '100%' }}>
       <Snackbar open={isOpen} autoHideDuration={autoHideDuration} onClose={handleClose}>
