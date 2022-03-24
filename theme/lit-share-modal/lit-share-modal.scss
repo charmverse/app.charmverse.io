@@ -20,6 +20,19 @@
   // height: auto;
   // max-height: 90%;
   //overflow-y: auto;
+
+  button span {
+    font-size: 1rem;
+  }
+
+  button.lsm-bg-white {
+    &:hover {
+      background-color: var( --charm-lit-color-light );
+      border-width: 1px;
+      border-color: var( --charm-lit-primary );
+    }
+  }
+
   input {
     outline: 0 none;
     &:active, &:focus {
@@ -27,18 +40,8 @@
     }
   }
 
-  // select dropdown items
-  .lsm-reusable-select-option {
-    border-width: 2px !important;
-    border-color: transparent;
-
-    &:hover {
-      background-color: #fafafa;
-    }
-
-    &.lsm-border-2 {
-      border-color: var( --charm-lit-primary );
-    }
+  .lsm-border-brand-5:hover {
+    border-color: var( --charm-lit-primary );
   }
 
   header {
@@ -49,8 +52,13 @@
       background: transparent;
     }
     button img {
-     // filter: var( --charm-button-filter );
+      filter: var( --charm-button-filter );
     }
+  }
+
+  // header title
+  .lsm-text-title-gray {
+    color: inherit;
   }
 
   .lsm-choose-access-button:last-child {
@@ -58,10 +66,27 @@
   }
 
   // header when selecting a blockchain
-  .lsm-fixed.lsm-top-0.lsm-left-0.lsm-w-full.lsm-py-4.lsm-bg-brand-4.lsm-text-white.lsm-h-14 {
+  .lsm-reusable-select-title {
     background-color: var( --charm-lit-color-light );
     color: var( --charm-lit-text-color );
     font-weight: bold;
+    h3 {
+      color: var( --charm-lit-text-color );
+    }
+  }
+  // for full-page selects: blockchain and top tokens
+  .lsm-reusable-select-option {
+    background-color: var( --charm-lit-color-white );
+    border-width: 3px;
+    border-color: transparent;
+    transition: none;
+    &:hover {
+      background-color: var( --charm-lit-color-light );
+    }
+    &.lsm-border-brand-5 {
+      background-color: var( --charm-lit-color-white );
+      border-color: var( --charm-lit-primary );
+    }
   }
 
   // footer content on first view
@@ -77,12 +102,40 @@
   // selection page (first page)
   .lsm-items-center {
     button:hover {
-      background-color: #fafafa;
+      background-color: var( --charm-lit-color-light );
       border-width: 1px;
       border-color: var( --charm-lit-primary );
     }
   }
 
+}
+
+// select dropdown for tokens
+.lsm-token-select__control {
+  outline: 0 none;
+  background-color: var( --charm-lit-color-light ) !important;
+  border-width: 1px;
+  &.lsm-token-select__control--menu-is-open {
+    border-color: var( --charm-lit-primary ) !important;
+  }
+  .lsm-token-select__single-value {
+    color: var( --charm-lit-text-color ) !important;
+  }
+}
+.lsm-token-select__menu-portal {
+  > * > * {
+    background-color: var( --charm-lit-color-white );
+  }
+  // a row
+  .lsm-z-100 {
+    background-color: var( --charm-lit-color-white );
+    .lsm-text-secondary {
+      color: var( --charm-lit-color-gray );
+    }
+    &:hover {
+      background-color: var( --charm-lit-color-light );
+    }
+  }
 }
 
 // utility classes
@@ -100,6 +153,9 @@
 
 .lsm-bg-white {
   background-color: var( --charm-lit-color-white );
+}
+.lsm-text-black {
+  color: var( --charm-lit-text-color );
 }
 .lsm-bg-brand-light, .lsm-bg-brand-20 {
   background-color: var( --charm-lit-color-light );
