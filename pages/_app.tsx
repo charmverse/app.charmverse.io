@@ -182,28 +182,6 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout
 }
 
-function DiscordConnectionSnackbar () {
-  const router = useRouter();
-  const { showMessage } = useSnackbar();
-  // We might get redirected after connection with discord, so check the query param if it has a discord field
-  // It can either be fail or success
-  useEffect(() => {
-    // Already connected account error
-    if (router.query.discord === '2') {
-      showMessage('Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.', 'error');
-    }
-    // Invalid state error
-    else if (router.query.discord === '3') {
-      showMessage('An error occurred. Please try again', 'error');
-    }
-    else if (router.query.discord === '1') {
-      showMessage('Successfully connected with discord', 'info');
-    }
-  }, [router.query.discord]);
-
-  return null;
-}
-
 export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? (page => page);
@@ -285,7 +263,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                         <CssBaseline enableColorScheme={true} />
                         <RouteGuard>
                           <ErrorBoundary>
-                            <DiscordConnectionSnackbar />
                             {getLayout(<Component {...pageProps} />)}
                             <Snackbar />
                           </ErrorBoundary>
