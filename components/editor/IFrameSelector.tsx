@@ -3,7 +3,6 @@ import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import Snackbar from 'components/common/Snackbar';
-import useSnackbar from 'hooks/useSnackbar';
 import { ReactNode, useState } from 'react';
 
 interface IFrameSelectorProps {
@@ -14,7 +13,6 @@ interface IFrameSelectorProps {
 }
 
 export default function IFrameSelector (props: IFrameSelectorProps) {
-  const { message, handleClose, isOpen } = useSnackbar();
   const [embedLink, setEmbedLink] = useState('');
   const { type, tabs = [], children, onIFrameSelect } = props;
 
@@ -56,7 +54,7 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
   )}
     >
       {children}
-      <Snackbar severity='error' handleClose={handleClose} isOpen={isOpen} message={message ?? ''} />
+      <Snackbar />
     </PopperPopup>
   );
 }

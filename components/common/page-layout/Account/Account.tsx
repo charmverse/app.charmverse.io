@@ -10,12 +10,14 @@ import Avatar from 'components/common/Avatar';
 import { useUser } from 'hooks/useUser';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { Chains, RPC } from 'connectors';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
 import AccountModal from 'components/common/page-layout/Account/components/AccountModal';
 import NetworkModal from 'components/common/page-layout/Account/components/NetworkModal';
 import styled from '@emotion/styled';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useRouter } from 'next/router';
 
 const AccountCard = styled.div`
   display: inline-flex;
@@ -51,6 +53,24 @@ function Account (): JSX.Element {
   const { error, account, chainId } = useWeb3React();
   const { openWalletSelectorModal, triedEager, openNetworkModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
+
+  const router = useRouter();
+  const { showMessage } = useSnackbar();
+  // We might get redirected after connection with discord, so check the query param if it has a discord field
+  // It can either be fail or success
+  useEffect(() => {
+    // Already connected account error
+    if (router.query.discord === '2') {
+      showMessage('Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.', 'error');
+    }
+    // Invalid state error
+    else if (router.query.discord === '3') {
+      showMessage('An error occurred. Please try again', 'error');
+    }
+    else if (router.query.discord === '1') {
+      showMessage('Successfully connected with discord', 'info');
+    }
+  }, [router.query.discord]);
 
   const accountModalState = usePopupState({ variant: 'popover', popupId: 'account-modal' });
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
