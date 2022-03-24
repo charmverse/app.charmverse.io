@@ -127,6 +127,20 @@ export function imageSpec (): RawSpecs {
       toDOM: ((node: Node) => {
         return ['img', node.attrs];
       }) as any
+    },
+    markdown: {
+      toMarkdown: (state, node) => {
+
+        const { src } = node.attrs;
+
+        if (src) {
+          const toWrite = `![](${src})`;
+          state.text(toWrite, false);
+          state.ensureNewLine();
+        }
+
+        console.log('Image node', node);
+      }
     }
   };
 }
@@ -160,18 +174,16 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs, selected }:
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return (
-      <Box my={1}>
-        <ImageSelector onImageSelect={async (imageSrc) => {
-          const image = await imagePromise(imageSrc);
-          updateAttrs({
-            src: imageSrc,
-            aspectRatio: image.width / image.height
-          });
-        }}
-        >
-          <EmptyImageContainer isSelected={selected} />
-        </ImageSelector>
-      </Box>
+      <ImageSelector onImageSelect={async (imageSrc) => {
+        const image = await imagePromise(imageSrc);
+        updateAttrs({
+          src: imageSrc,
+          aspectRatio: image.width / image.height
+        });
+      }}
+      >
+        <EmptyImageContainer isSelected={selected} />
+      </ImageSelector>
     );
   }
 

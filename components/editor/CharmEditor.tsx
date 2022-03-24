@@ -3,7 +3,6 @@ import {
   bold,
   bulletList,
   code,
-  codeBlock,
   hardBreak,
   heading,
   horizontalRule,
@@ -15,20 +14,21 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
+import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
-import { columnResizing, DOMOutputSpecArray, Node } from '@bangle.dev/pm';
+import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
+import { useState, CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/editor/@bangle.dev/base-components/image';
+import * as codeBlock from 'components/editor/@bangle.dev/base-components/code-block';
 import { BangleEditor as ReactBangleEditor } from 'components/editor/@bangle.dev/react/ReactEditor';
 import FloatingMenu, { floatingMenuPlugin } from 'components/editor/FloatingMenu';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
-import { CSSProperties, ReactNode } from 'react';
 import { Callout, calloutSpec } from './Callout';
-import { Code } from './Code';
 import ColumnBlock, { spec as columnBlockSpec } from './ColumnBlock';
 import ColumnLayout, { spec as columnLayoutSpec } from './ColumnLayout';
 import { CryptoPrice, cryptoPriceSpec } from './CryptoPrice';
@@ -40,61 +40,149 @@ import Placeholder from './Placeholder';
 import { Quote, quoteSpec } from './Quote';
 import ResizableIframe, { iframeSpec } from './ResizableIframe';
 import { imageSpec, ResizableImage } from './ResizableImage';
+import * as tabIndent from './tabIndent';
+import DocumentEnd from './DocumentEnd';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
 }
 
-const specRegistry = new SpecRegistry([
+export const specRegistry = new SpecRegistry([
+  // Comments to the right of each spec show if it supports markdown export
+  // OK => Component exports markdown
+  // ?? => Could not test component or identify it
+  // NO => Not supported
+  //
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
-  {
-    type: 'node',
-    name: 'paragraph',
-    schema: {
-      content: 'inline*',
-      group: 'block',
-      draggable: false,
-      parseDOM: [
-        {
-          tag: 'p'
-        }
-      ],
-      toDOM: (): DOMOutputSpecArray => ['p', 0]
-    }
-  },
-  bold.spec(),
-  bulletList.spec(),
-  hardBreak.spec(),
-  horizontalRule.spec(),
-  italic.spec(),
-  link.spec(),
-  listItem.spec(),
-  orderedList.spec(),
-  strike.spec(),
-  underline.spec(),
-  emojiSpecs(),
-  mentionSpecs(),
-  code.spec(),
-  codeBlock.spec(),
-  iframeSpec(),
-  heading.spec(),
-  inlinePaletteSpecs(),
-  table,
-  tableCell,
-  tableHeader,
-  tableRow,
-  calloutSpec(),
-  cryptoPriceSpec(),
-  imageSpec(),
-  columnLayoutSpec(),
-  columnBlockSpec(),
-  nestedPageSpec(),
-  quoteSpec()
+  paragraph.spec(), // OK
+  bold.spec(), // OK
+  bulletList.spec(), // OK
+  hardBreak.spec(), // OK
+  horizontalRule.spec(), // OK
+  italic.spec(), // OK
+  link.spec(), // OK
+  listItem.spec(), // OK
+  orderedList.spec(), // OK
+  strike.spec(), // OK
+  underline.spec(), // OK
+  emojiSpecs(), // ??
+  mentionSpecs(), // NO
+  code.spec(), // OK
+  codeBlock.spec(), // OK
+  iframeSpec(), // OK
+  heading.spec(), // OK
+  inlinePaletteSpecs(), // Not required
+  table, // OK
+  tableCell, // OK
+  tableHeader, // OK
+  tableRow, // OK
+  calloutSpec(), // OK
+  cryptoPriceSpec(), // NO
+  imageSpec(), // OK
+  columnLayoutSpec(), // NO
+  columnBlockSpec(), // NO ?? ==> Need to clarify how it fits into layout
+  nestedPageSpec(), // NO
+  quoteSpec(), // OK
+  tabIndent.spec()
 ]);
+
+export function charmEditorPlugins (
+  {
+    onContentChange,
+    readOnly
+  } :
+  {
+    readOnly?: boolean, onContentChange?: (view: EditorView) => void
+  } = {}
+) {
+  return () => [
+    new Plugin({
+      view: () => ({
+        update: (view, prevState) => {
+          if (onContentChange && !view.state.doc.eq(prevState.doc)) {
+            onContentChange(view);
+          }
+        }
+      })
+
+    }),
+    nestedPagePlugins({
+      tooltipRenderOpts: {
+        placement: 'bottom'
+      }
+    }),
+    imagePlugins(),
+    inlinePalettePlugins(),
+    bold.plugins(),
+    bulletList.plugins(),
+    code.plugins(),
+    codeBlock.plugins(),
+    hardBreak.plugins(),
+    heading.plugins(),
+    horizontalRule.plugins(),
+    italic.plugins(),
+    link.plugins(),
+    listItem.plugins(),
+    orderedList.plugins(),
+    paragraph.plugins(),
+    strike.plugins(),
+    underline.plugins(),
+    emojiPlugins(),
+    mentionPlugins(),
+    columnResizing,
+    floatingMenuPlugin(readOnly),
+    blockquote.plugins(),
+    NodeView.createPlugin({
+      name: 'blockquote',
+      containerDOM: ['blockquote'],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'columnLayout',
+      containerDOM: ['div'],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'columnBlock',
+      containerDOM: ['div'],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'image',
+      containerDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'cryptoPrice',
+      containerDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'iframe',
+      containerDOM: ['div', { class: 'iframe-container' }]
+    }),
+    NodeView.createPlugin({
+      name: 'page',
+      containerDOM: ['div', { class: 'page-container' }]
+    }),
+    NodeView.createPlugin({
+      name: 'quote',
+      containerDOM: ['blockquote', { class: 'charm-quote' }],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'mention',
+      containerDOM: ['span', { class: 'mention-value' }]
+    }),
+    tabIndent.plugins()
+  // TODO: Pasting iframe or image link shouldn't create those blocks for now
+  // iframePlugin,
+  // pasteImagePlugin
+  ];
+}
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
   position: relative;
+
   /** DONT REMOVE THIS STYLING */
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
   left: -50px;
@@ -106,11 +194,16 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 
   code {
-    padding: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
     border-radius: ${({ theme }) => theme.spacing(0.5)};
     background-color: ${({ theme }) => theme.palette.code.background};
-    font-size: 85%;
     color: ${({ theme }) => theme.palette.code.color};
+    font-size: 85%;
+    tab-size: 4;
+  }
+  pre code {
+    color: inherit;
+    display: block;
+    padding: ${({ theme }) => theme.spacing(2)};
   }
 
   hr {
@@ -134,105 +227,45 @@ export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 interface CharmEditorProps {
   content?: PageContent;
   children?: ReactNode;
-  onPageContentChange?: UpdatePageContent;
+  onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
 }
 
 function CharmEditor (
-  { content = defaultContent, children, onPageContentChange, style, readOnly = false }: CharmEditorProps
+  { content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
 ) {
+
+  // check empty state of page on first load
+  const _isEmpty = !content.content
+    || content.content.length === 0
+    || !content.content[0].content?.length;
+  console.log('content', content, _isEmpty);
+  const [isEmpty, setIsEmpty] = useState(_isEmpty);
+
+  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
+    const doc = view.state.doc.toJSON() as PageContent;
+    const rawText = view.state.doc.textContent as string;
+    onContentChange({ doc, rawText });
+  }, 100) : undefined;
+
+  function _onContentChange (view: EditorView) {
+    // @ts-ignore missing types from the @bangle.dev/react package
+    const docContent: { content: { size: number } }[] = view.state.doc.content.content;
+    const __isEmpty = docContent.length <= 1
+      && (!docContent[0] || docContent[0].content.size === 0);
+    setIsEmpty(__isEmpty);
+    if (onContentChangeDebounced) {
+      onContentChangeDebounced(view);
+    }
+  }
 
   const state = useEditorState({
     specRegistry,
-    plugins: () => [
-      new Plugin({
-        view: () => ({
-          update: (view, prevState) => {
-            if (onPageContentChange && !view.state.doc.eq(prevState.doc)) {
-              onPageContentChange({
-                doc: view.state.doc.toJSON() as PageContent,
-                rawText: view.state.doc.textContent as string
-              });
-            }
-          }
-        })
-      }),
-      nestedPagePlugins({
-        tooltipRenderOpts: {
-          placement: 'bottom'
-        }
-      }),
-      imagePlugins(),
-      inlinePalettePlugins(),
-      bold.plugins(),
-      bulletList.plugins(),
-      code.plugins(),
-      codeBlock.plugins(),
-      hardBreak.plugins(),
-      heading.plugins(),
-      horizontalRule.plugins(),
-      italic.plugins(),
-      link.plugins(),
-      listItem.plugins(),
-      orderedList.plugins(),
-      paragraph.plugins(),
-      strike.plugins(),
-      underline.plugins(),
-      emojiPlugins(),
-      mentionPlugins(),
-      columnResizing,
-      floatingMenuPlugin(readOnly),
-      blockquote.plugins(),
-      NodeView.createPlugin({
-        name: 'blockquote',
-        containerDOM: ['blockquote'],
-        contentDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'codeBlock',
-        containerDOM: ['pre'],
-        contentDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'columnLayout',
-        containerDOM: ['div'],
-        contentDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'columnBlock',
-        containerDOM: ['div'],
-        contentDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'image',
-        containerDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'cryptoPrice',
-        containerDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'iframe',
-        containerDOM: ['div', { class: 'iframe-container' }]
-      }),
-      NodeView.createPlugin({
-        name: 'page',
-        containerDOM: ['div', { class: 'page-container' }]
-      }),
-      NodeView.createPlugin({
-        name: 'quote',
-        containerDOM: ['blockquote', { class: 'charm-quote' }],
-        contentDOM: ['div']
-      }),
-      NodeView.createPlugin({
-        name: 'mention',
-        containerDOM: ['span', { class: 'mention-value' }]
-      })
-      // TODO: Pasting iframe or image link shouldn't create those blocks for now
-      // iframePlugin,
-      // pasteImagePlugin
-    ],
+    plugins: charmEditorPlugins({
+      onContentChange: _onContentChange,
+      readOnly
+    }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components
     dropCursorOpts: {
@@ -251,7 +284,7 @@ function CharmEditor (
         editable: () => !readOnly
       }}
       // Components that should be placed after the editor component
-      postEditorComponents={<Placeholder />}
+      postEditorComponents={<Placeholder show={isEmpty} />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
 
@@ -292,23 +325,13 @@ function CharmEditor (
               </Callout>
             );
           }
-          case 'codeBlock': {
-            return (
-              <Code>
-                {NodeViewChildren}
-              </Code>
-            );
-          }
           case 'image': {
             return (
               <ResizableImage
                 onResizeStop={(view) => {
-                  if (onPageContentChange) {
+                  if (onContentChangeDebounced) {
                     // Save the current image size on the backend after we are done resizing
-                    onPageContentChange({
-                      doc: view.state.doc.toJSON() as PageContent,
-                      rawText: view.state.doc.textContent as string
-                    });
+                    onContentChangeDebounced(view);
                   }
                 }}
                 {...props}
@@ -319,12 +342,9 @@ function CharmEditor (
             return (
               <ResizableIframe
                 onResizeStop={(view) => {
-                  if (onPageContentChange) {
+                  if (onContentChangeDebounced) {
                     // Save the current embed size on the backend after we are done resizing
-                    onPageContentChange({
-                      doc: view.state.doc.toJSON() as PageContent,
-                      rawText: view.state.doc.textContent as string
-                    });
+                    onContentChangeDebounced(view);
                   }
                 }}
                 {...props}
@@ -357,14 +377,13 @@ function CharmEditor (
       {EmojiSuggest}
       {InlinePalette}
       {children}
+      <DocumentEnd />
     </StyledReactBangleEditor>
   );
 }
 
-export default function CharmEditorSafe (props: CharmEditorProps) {
-  return (
-    <ErrorBoundary>
-      <CharmEditor {...props} />
-    </ErrorBoundary>
-  );
-}
+export default memo((props: CharmEditorProps) => (
+  <ErrorBoundary>
+    <CharmEditor {...props} />
+  </ErrorBoundary>
+));

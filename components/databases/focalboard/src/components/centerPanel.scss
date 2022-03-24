@@ -51,6 +51,8 @@
     > .container-container {
         padding: 0 0 180px 1px;
         margin-left: 80px;
+        padding-right: 80px;
+        min-width: fit-content;
 
         // @media (max-width: 768px) {
         //     margin-left: 0;

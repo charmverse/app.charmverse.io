@@ -45,8 +45,8 @@ type FormValues = yup.InferType<typeof schema>
 
 // This component was created to localize the state change of CharmEditor
 // Otherwise watching inside its parent would've caused the whole component tree to rerender
-function FormDescription ({ onPageContentChange, content, watch }:
-  {content?: PageContent, onPageContentChange: UpdatePageContent, watch: UseFormWatch<FormValues>}) {
+function FormDescription ({ onContentChange, content, watch }:
+  {content?: PageContent, onContentChange: UpdatePageContent, watch: UseFormWatch<FormValues>}) {
   watch(['description', 'descriptionNodes']);
 
   return (
@@ -56,7 +56,7 @@ function FormDescription ({ onPageContentChange, content, watch }:
       </InputLabel>
       <CharmEditor
         content={content}
-        onPageContentChange={onPageContentChange}
+        onContentChange={onContentChange}
       />
     </Grid>
   );
@@ -187,7 +187,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
           <FormDescription
             watch={watch}
             content={bounty?.descriptionNodes as PageContent}
-            onPageContentChange={(pageContent) => {
+            onContentChange={(pageContent) => {
               setRichContent(pageContent);
             }}
           />

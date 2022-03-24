@@ -1,27 +1,35 @@
-import { useState, useContext } from 'react';
+import { BangleEditorState } from '@bangle.dev/core';
+import { markdownSerializer } from '@bangle.dev/markdown';
+import { Node } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import Chip from '@mui/material/Chip';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import GetAppIcon from '@mui/icons-material/GetApp';
 import MenuIcon from '@mui/icons-material/Menu';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import { Box, CircularProgress } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import Avatar from 'components/common/Avatar';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
+import { charmEditorPlugins, specRegistry } from 'components/editor/CharmEditor';
 import { useColorMode } from 'context/color-mode';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
+import { PageContent } from 'models';
 import { useRouter } from 'next/router';
-import getDisplayName from 'lib/users/getDisplayName';
-import { EditorViewContext } from '@bangle.dev/react';
+import { useRef, useState } from 'react';
 import Account from './Account';
 import ShareButton from './ShareButton';
 
@@ -40,12 +48,17 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const { pages, currentPageId, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
+  const [pageMenuOpen, setPageMenuOpen] = useState(false);
+  const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
+  const pageMenuAnchor = useRef();
 
   const currentPage = currentPageId && pages[currentPageId];
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');
+
+  const isExportablePage = (currentPage as Page)?.type === 'page';
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -56,15 +69,47 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
     setUser({ ...user, ...updatedFields });
   }
 
-  const view = useContext(EditorViewContext);
+  function generateMarkdown () {
 
-  console.log('View', view);
+    if (currentPage && currentPage.type === 'page') {
+
+      const serializer = markdownSerializer(specRegistry);
+
+      const state = new BangleEditorState({
+        specRegistry,
+        plugins: charmEditorPlugins(),
+        initialValue: currentPage.content ? Node.fromJSON(specRegistry.schema, currentPage.content as PageContent) : ''
+      });
+
+      let markdown = serializer.serialize(state.pmState.doc);
+
+      if (currentPage.title) {
+        const pageTitleAsMarkdown = `# ${currentPage.title}`;
+
+        markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
+      }
+
+      const data = new Blob([markdown], { type: 'text/plain' });
+
+      const linkElement = document.createElement('a');
+
+      linkElement.download = `${currentPage.title || 'page'}.md`;
+
+      const downloadLink = URL.createObjectURL(data);
+
+      linkElement.href = downloadLink;
+
+      linkElement.click();
+
+      URL.revokeObjectURL(downloadLink);
+    }
+
+  }
 
   return (
     <StyledToolbar variant='dense'>
       <IconButton
         color='inherit'
-        aria-label='open drawer'
         onClick={openSidebar}
         edge='start'
         sx={{
@@ -119,7 +164,40 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
             </>
           )}
 
-          <Typography>Export to MD</Typography>
+          {isPage && isExportablePage && (
+            <Box sx={{ ml: 1 }} ref={pageMenuAnchor}>
+              <IconButton size='small'>
+                <MoreHorizIcon
+                  onClick={() => {
+                    setPageMenuOpen(!pageMenuOpen);
+                    setPageMenuAnchorElement(pageMenuAnchor.current!);
+                  }}
+                />
+              </IconButton>
+              <Popover
+                anchorEl={pageMenuAnchorElement}
+                open={pageMenuOpen}
+                onClose={() => setPageMenuOpen(false)}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left'
+                }}
+              >
+                <List dense>
+                  <ListItemButton onClick={() => {
+                    generateMarkdown();
+                    setPageMenuOpen(false);
+                  }}
+                  >
+                    <ListItemIcon>
+                      <GetAppIcon fontSize='small' />
+                    </ListItemIcon>
+                    <ListItemText primary='Export to markdown' />
+                  </ListItemButton>
+                </List>
+              </Popover>
+            </Box>
+          )}
 
           {/** context menu */}
           {/* <IconButton size='small' sx={{ mx: 1 }} color='inherit'>
