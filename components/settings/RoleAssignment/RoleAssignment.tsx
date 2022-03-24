@@ -11,8 +11,8 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import charmClient from 'charmClient';
-import { Role } from '@prisma/client';
+import charmClient, { ListSpaceRolesResponse } from 'charmClient';
+import { Role, User } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { Typography } from '@mui/material';
 import { getDisplayName } from 'lib/users';
@@ -28,7 +28,7 @@ export default function RoleAssignment () {
 
   const [space] = useCurrentSpace();
 
-  const [roles, setRoles] = useState<Role []>([]);
+  const [roles, setRoles] = useState<ListSpaceRolesResponse[]>([]);
 
   useEffect(() => {
     listRoles();
@@ -53,9 +53,8 @@ export default function RoleAssignment () {
     listRoles();
   }
 
-  async function deleteRole (role: Partial<Role>) {
-    role.spaceId = space?.id;
-    await charmClient.deleteRole({ roleId: role.id, spaceId: role.spaceId });
+  async function deleteRole (roleId: string) {
+    await charmClient.deleteRole({ roleId, spaceId: space!.id });
     listRoles();
   }
 
@@ -145,13 +144,13 @@ export default function RoleAssignment () {
 
                   <Typography variant='h2'>{role.name}
                     <ElementDeleteIcon clicked={() => {
-                      deleteRole({ id: role.id });
+                      deleteRole(role.id);
                     }}
                     />
                   </Typography>
 
                   {
-                    (role as any).spaceRolesToRole?.map(spaceRoleToRole => {
+                    (role).spaceRolesToRole?.map(spaceRoleToRole => {
                       return (
                         <p>{getDisplayName(spaceRoleToRole?.spaceRole?.user)}
                           <ElementDeleteIcon

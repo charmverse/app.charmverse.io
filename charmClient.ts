@@ -16,6 +16,16 @@ import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
+export type ListSpaceRolesResponse = {
+  id: string;
+  name: string;
+  spaceRolesToRole: {
+      spaceRole: {
+          user: User;
+      };
+  }[];
+}
+
 export interface PopulatedBounty extends Bounty {
   applications: Application[];
 }
@@ -436,7 +446,7 @@ class CharmClient {
     return http.DELETE('/api/roles', roleToDelete);
   }
 
-  listRoles (spaceId: string): Promise<Role []> {
+  listRoles (spaceId: string): Promise<ListSpaceRolesResponse[]> {
     return http.GET('/api/roles', { spaceId });
   }
 

@@ -54,7 +54,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
       else if (spaceRole.tokenGateId || spaceRole.role !== 'admin') {
         await prisma.spaceRole.update({
           where: {
-            spaceId_userId: {
+            spaceUser: {
               spaceId: spaceRole.spaceId,
               userId: spaceRole.userId
             }

@@ -1,11 +1,10 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Prisma, Role, SpaceRoleToRole } from '@prisma/client';
+import { Prisma, Role, SpaceRoleToRole, User } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { IEventToLog, postToDiscord } from 'lib/logs/notifyDiscord';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { IApiError } from 'lib/utilities/errors';
 
@@ -18,7 +17,17 @@ handler.use(requireUser)
   .use(requireKeys<Role>(['spaceId', 'name'], 'body'))
   .post(createRole);
 
-async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<Partial<Role> [] | IApiError>) {
+type ListSpaceRolesResponse = {
+  id: string;
+  name: string;
+  spaceRolesToRole: {
+      spaceRole: {
+          user: User;
+      };
+  }[];
+}[]
+
+async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse | IApiError>) {
   const { spaceId } = req.query;
 
   if (!spaceId) {
