@@ -1,10 +1,17 @@
 import { Page, PagePermission, PagePermissionLevel } from '@prisma/client';
 import { prisma } from 'db';
-import { IPermissionRequestIdentifiers } from './interfaces';
 
 // export type IPagePermission = IEntityPermission<Page> & {pageId: string}
 
 export type IPagePermissionFlags = Omit<PagePermission, 'id' | 'spaceId' | 'userId' | 'roleId' | 'pageId' | 'permissionLevel'>
+
+export interface IPagePermissionRequest {
+  userId: string,
+  spaceId: string,
+  pageId: string
+}
+
+export type IPagePermissionToAdd = Pick<PagePermission, 'spaceId' | 'userId' | 'roleId' | 'pageId' | 'permissionLevel'>
 
 const PermissionLevelTitle: Record<keyof typeof PagePermissionLevel, string> = {
   full_access: 'Edit, delete and share',
@@ -27,7 +34,7 @@ const permissionDescriptions: Record<keyof IPagePermissionFlags, string> = {
   edit_title: 'edit page title'
 };
 
-const permissionTemplates: Record<keyof typeof PagePermissionLevel, Partial<IPagePermissionFlags>> = {
+export const permissionTemplates: Record<keyof typeof PagePermissionLevel, Partial<IPagePermissionFlags>> = {
   full_access: {
     delete: true,
     read: true,
@@ -58,9 +65,8 @@ const permissionTemplates: Record<keyof typeof PagePermissionLevel, Partial<IPag
 };
 
 export async function evaluatePagePermission (
-  request: IPermissionRequestIdentifiers,
-  requiredPermissions: Array<keyof IPagePermissionFlags>
-): Promise<boolean> {
+  request: IPagePermissionRequest
+): Promise<IPagePermissionFlags> {
 
   // Get roles
   // Get permissions for role
@@ -78,13 +84,13 @@ export async function evaluatePagePermission (
     }
   });
 
-  console.log('Found user roles');
+  console.log('Found user roles', roles);
 
   const permissions = await prisma.pagePermission.findMany({
     where: {}
   });
 
-  return true;
+  return permissions[0];
 
 }
 
