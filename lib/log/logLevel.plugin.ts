@@ -24,7 +24,7 @@ export function apply (log: Logger) {
 
         // post errors to Discord
         if (methodName === 'error') {
-          sendErrorToDiscord(message, opt)
+          sendErrorToDiscord(ERRORS_WEBHOOK, message, opt)
             .catch(err => {
               console.error('Error posting to discord', err);
             });
@@ -37,7 +37,7 @@ export function apply (log: Logger) {
   return log;
 }
 
-function sendErrorToDiscord (message: any, opt: any) {
+function sendErrorToDiscord (webhook: string, message: any, opt: any) {
   let fields: { name: string, value?: string }[] = [];
   if (opt instanceof Error) {
     fields = [
@@ -52,7 +52,7 @@ function sendErrorToDiscord (message: any, opt: any) {
     })
       .slice(0, 5); // add a sane max # of fields just in case
   }
-  return http.POST(ERRORS_WEBHOOK, {
+  return http.POST(webhook, {
     embeds: [{
       color: 14362664, // #db2828
       description: message,
