@@ -3,7 +3,7 @@ import { useWeb3React } from '@web3-react/core';
 import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import { getChainById } from 'connectors';
-import { safeRequestAnimationFrame } from 'components/editor/@bangle.io/lib/utils';
+import { safeRequestAnimationFrame } from 'components/common/CharmEditor/components/@bangle.io/lib/utils';
 import useGnosisSafe from './hooks/useGnosisSafe';
 
 export interface MultiPaymentResult {

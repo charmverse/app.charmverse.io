@@ -1,5 +1,5 @@
 import BlocksEditorPage from 'pages/[domain]/[pageId]';
-import { PageContainer } from 'components/common/page-layout/PageLayout';
+import PageContainer from 'components/common/PageLayout/components/PageContainer';
 
 export default function PublicPage () {
 
