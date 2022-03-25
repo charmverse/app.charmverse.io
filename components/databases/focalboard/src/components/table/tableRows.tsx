@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 import React from 'react'
 import {useDragLayer} from 'react-dnd'
+import useEfficientDragLayer from 'hooks/useEffecientDragLayer'
 
 import {Card} from '../../blocks/card'
 import {Board} from '../../blocks/board'
@@ -15,6 +16,8 @@ type Props = {
     activeView: BoardView
     columnRefs: Map<string, React.RefObject<HTMLDivElement>>
     cards: readonly Card[]
+    offset: number,
+    resizingColumn: string,
     selectedCardIds: string[]
     readonly: boolean
     cardIdToFocusOnRender: string
@@ -26,19 +29,6 @@ type Props = {
 
 const TableRows = (props: Props): JSX.Element => {
     const {board, cards, activeView} = props
-
-    const {offset, resizingColumn} = useDragLayer((monitor) => {
-        if (monitor.getItemType() === 'horizontalGrip') {
-            return {
-                offset: monitor.getDifferenceFromInitialOffset()?.x || 0,
-                resizingColumn: monitor.getItem()?.id,
-            }
-        }
-        return {
-            offset: 0,
-            resizingColumn: '',
-        }
-    })
 
     return (
         <>
@@ -62,8 +52,8 @@ const TableRows = (props: Props): JSX.Element => {
                         showCard={props.showCard}
                         readonly={props.readonly}
                         onDrop={props.onDrop}
-                        offset={offset}
-                        resizingColumn={resizingColumn}
+                        offset={props.offset}
+                        resizingColumn={props.resizingColumn}
                         columnRefs={props.columnRefs}
                     />)
 

@@ -1,6 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { ExternalProvider } from '@ethersproject/providers';
 import { Chains, RPC, Blockchain } from 'connectors';
+import log from 'lib/log';
 
 type WindowType = Window & typeof globalThis & { ethereum: ExternalProvider }
 
@@ -29,7 +30,7 @@ const requestNetworkChange = (targetNetwork: Blockchain, callback?: () => void) 
         });
       }
       catch (addError) {
-        console.error('Failed to add network to MetaMask');
+        log.warn('Failed to add network to MetaMask');
       }
     }
     // handle other "switch" errors

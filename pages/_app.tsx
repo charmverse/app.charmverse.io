@@ -166,9 +166,11 @@ import {
   darkTheme,
   lightTheme
 } from 'theme/focalboard/theme';
-import 'theme/lit-modal/styles.scss';
-import { setTheme as setLitProtocolTheme } from 'theme/lit-modal/theme';
+import 'theme/lit-share-modal/lit-share-modal.scss';
+import { setTheme as setLitProtocolTheme } from 'theme/lit-share-modal/theme';
 import 'theme/styles.scss';
+import Snackbar from 'components/common/Snackbar';
+import { SnackbarProvider, useSnackbar } from 'hooks/useSnackbar';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -231,9 +233,11 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   // wait for router to be ready, as we rely on the URL to know what space to load
   const router = useRouter();
+
   if (!router.isReady) {
     return null;
   }
+
   return (
     <CacheProvider value={createCache({ key: 'app' })}>
       <ColorModeContext.Provider value={colorMode}>
@@ -244,23 +248,26 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                 <ReduxProvider store={store}>
                   <FocalBoardProviders>
                     <DataProviders>
-                      <TitleContext.Consumer>
-                        {([title]) => (
-                          <Head>
-                            <title>
-                              {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-                            </title>
-                            {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
-                            <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                          </Head>
-                        )}
-                      </TitleContext.Consumer>
-                      <CssBaseline enableColorScheme={true} />
-                      <RouteGuard>
-                        <ErrorBoundary>
-                          {getLayout(<Component {...pageProps} />)}
-                        </ErrorBoundary>
-                      </RouteGuard>
+                      <SnackbarProvider>
+                        <TitleContext.Consumer>
+                          {([title]) => (
+                            <Head>
+                              <title>
+                                {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+                              </title>
+                              {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
+                              <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+                            </Head>
+                          )}
+                        </TitleContext.Consumer>
+                        <CssBaseline enableColorScheme={true} />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            {getLayout(<Component {...pageProps} />)}
+                            <Snackbar />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </SnackbarProvider>
                     </DataProviders>
                   </FocalBoardProviders>
                   {/** include the root portal for focalboard's popup */}

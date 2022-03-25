@@ -4,7 +4,7 @@ import { Node, ResolvedPos } from '@bangle.dev/pm';
 import { FloatingMenu, floatingMenu } from '@bangle.dev/react-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
 import Snackbar from 'components/common/Snackbar';
-import useSnackbar from 'hooks/useSnackbar';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { NodeSelection } from 'prosemirror-state';
 import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
@@ -14,7 +14,7 @@ import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 const menuKey = new PluginKey('menuKey');
 
 export default function FloatingMenuComponent () {
-  const { message, handleClose, isOpen, showMessage } = useSnackbar();
+  const { showMessage } = useSnackbar();
 
   return (
     <>
@@ -52,7 +52,7 @@ export default function FloatingMenuComponent () {
           return null;
         }}
       />
-      <Snackbar severity='info' handleClose={handleClose} isOpen={isOpen} message={message ?? ''} />
+      <Snackbar />
     </>
   );
 }
@@ -66,7 +66,7 @@ export const floatingMenuPlugin = (readonly?: boolean) => {
       }
       if (state.selection.empty
         || (state.selection as NodeSelection)?.node?.type?.name.match(
-          /(image)|(cryptoPrice)|(iframe)|(page)|(mention)/
+          /(image)|(cryptoPrice)|(iframe)|(page)|(mention)|(tabIndent)|(codeBlock)/
         )) {
         return null;
       }

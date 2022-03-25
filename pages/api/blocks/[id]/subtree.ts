@@ -14,18 +14,22 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.get(getBlockSubtree);
 
 async function getBlockSubtree (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
-  const boardId = req.query.id as string;
+  const blockId = req.query.id as string;
   const publicPage = await prisma.page.findFirst({
     where: {
-      boardId
+      boardId: blockId
     }
   });
-  if (!publicPage || !publicPage.isPublic) {
+  if (!req.session.user && !publicPage?.isPublic) {
     return res.status(404).json({ error: 'page not found' });
   }
   const blocks = await prisma.block.findMany({
     where: {
-      rootId: boardId
+      OR: [
+        { id: blockId },
+        { rootId: blockId },
+        { parentId: blockId }
+      ]
     }
   });
   return res.status(200).json(blocks);

@@ -11,6 +11,7 @@ import {createBoardView} from './blocks/boardView'
 import {createCard} from './blocks/card'
 import {createCommentBlock} from './blocks/commentBlock'
 import {IAppWindow} from './types'
+import log from 'lib/log';
 
 declare let window: IAppWindow
 
@@ -303,14 +304,14 @@ class Utils {
         const name = Object.keys(valueObject)[0]
         const value = valueObject[name]
         if (!value) {
-            Utils.logError(`ASSERT VALUE [${name}]`)
+            log.error(`ASSERT VALUE [${name}]`)
         }
     }
 
     static assert(condition: any, tag = ''): void {
         /// #!if ENV !== "production"
         if (!condition) {
-            Utils.logError(`ASSERT [${tag ?? new Error().stack}]`)
+            log.error(`ASSERT [${tag ?? new Error().stack}]`)
         }
 
         /// #!endif
@@ -334,18 +335,16 @@ class Utils {
 
     static logError(message: string): void {
         /// #!if ENV !== "production"
-        const timestamp = (Date.now() / 1000).toFixed(2)
         // eslint-disable-next-line no-console
-        console.error(`[${timestamp}] ${message}`)
+        log.error(message)
 
         /// #!endif
     }
 
     static logWarn(message: string): void {
         /// #!if ENV !== "production"
-        const timestamp = (Date.now() / 1000).toFixed(2)
         // eslint-disable-next-line no-console
-        console.warn(`[${timestamp}] ${message}`)
+        log.warn(message)
 
         /// #!endif
     }

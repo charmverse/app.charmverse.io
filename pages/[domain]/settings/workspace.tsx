@@ -22,7 +22,7 @@ import NotionIcon from 'public/images/notion_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
 import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from 'components/common/Snackbar';
-import useSnackbar from 'hooks/useSnackbar';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useSWRConfig } from 'swr';
 import { usePages } from 'hooks/usePages';
 
@@ -40,9 +40,10 @@ export default function WorkspaceSettings () {
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
   const [notionFailedImports, setNotionFailedImports] = useState<FailedImportsError[]>([]);
-  const { message, handleClose, isOpen: isSnackbarOpen, showMessage } = useSnackbar();
   const { setPages } = usePages();
   const [notionImportError, setNotionImportError] = useState<string | null>(null);
+  const { showMessage } = useSnackbar();
+
   const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
 
   useEffect(() => {
@@ -198,7 +199,7 @@ export default function WorkspaceSettings () {
         </Alert>
         )}
       </Box>
-      <Snackbar severity='info' handleClose={handleClose} isOpen={isSnackbarOpen} message={message ?? ''} />
+      <Snackbar />
     </>
   );
 }

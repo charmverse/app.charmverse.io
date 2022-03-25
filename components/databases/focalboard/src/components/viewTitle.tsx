@@ -124,7 +124,7 @@ const ViewTitle = React.memo((props: Props) => {
 
             {board.fields.showDescription &&
                 <div className='description'>
-                    <CharmEditor content={board.fields.description} onPageContentChange={(content: ICharmEditorOutput) => {
+                    <CharmEditor content={board.fields.description} onContentChange={(content: ICharmEditorOutput) => {
                       onDescriptionChange(content.doc)
                     }} />
                 </div>

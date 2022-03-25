@@ -1,5 +1,6 @@
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
+import log from 'lib/log';
 
 const handler = nc({
   onError,
@@ -18,7 +19,7 @@ handler.get(async (req, res) => {
     redirect = state.redirect;
   }
   catch (e) {
-    console.error('Error parsing state notion callback', e);
+    log.warn('Error parsing state notion callback', e);
     // TODO: Error page
     res.status(400).send('Invalid callback state');
     return;

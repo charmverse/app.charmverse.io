@@ -5,6 +5,7 @@ import { verifyJwt } from 'lit-js-sdk';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import log from 'lib/log';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -27,9 +28,8 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const result = await verifyJwt({ jwt });
-    console.log('verifyJwt result', result);
     if (!result.verified) {
-      console.error('Could not verify wallet', { userId: user.id, result });
+      log.warn('Could not verify wallet', { userId: user.id, result });
       throw new Error('This wallet could not be verified');
     }
     if (req.body.commit) {
@@ -54,7 +54,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
       else if (spaceRole.tokenGateId || spaceRole.role !== 'admin') {
         await prisma.spaceRole.update({
           where: {
-            spaceId_userId: {
+            spaceUser: {
               spaceId: spaceRole.spaceId,
               userId: spaceRole.userId
             }
