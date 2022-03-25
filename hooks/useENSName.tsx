@@ -2,7 +2,7 @@ import type { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import useSWRImmutable from 'swr/immutable';
 
-export const fetchENSName = async (_: any, library: Web3Provider, address: string) => library.lookupAddress(address);
+const fetchENSName = (_: any, library: Web3Provider, address: string) => library.lookupAddress(address);
 
 const useENSName = (account: string | null | undefined): string | null | undefined => {
   const { library, chainId } = useWeb3React<Web3Provider>();

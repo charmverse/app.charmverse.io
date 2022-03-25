@@ -70,7 +70,7 @@ export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contribu
   const ensName = useENSName(user.addresses[0]);
   return (
     <Box component='li' display='flex' gap={1} {...props}>
-      <Avatar size={avatarSize} name={getDisplayName(user)} avatar={user.avatar} />
+      <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={user.avatar} />
       <Typography>{ensName || getDisplayName(user)}</Typography>
     </Box>
   );
