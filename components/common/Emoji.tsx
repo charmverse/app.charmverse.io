@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
-import { ComponentProps, ReactNode } from 'react';
+import { ComponentProps, ReactNode, memo } from 'react';
+import twemoji from 'twemoji';
 
-export const Emoji = styled(Box)`
+type ImgSize = 'large' | 'small';
+
+export const Emoji = styled.div<{ size: ImgSize }>`
   /* font family taken from Notion */
   font-family: "Apple Color Emoji", "Segoe UI Emoji", NotoColorEmoji, "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", EmojiSymbols;
   overflow: hidden;
@@ -22,22 +24,40 @@ export const Emoji = styled(Box)`
   &:hover {
     background-color: ${({ theme }) => theme.palette.background.light};
   }
+  span {
+    height: 100%;
+    width: 100%;
+  }
+  img {
+    border-radius: ${({ size }) => size === 'large' ? '6px' : '3px'};
+    height: ${({ size }) => size === 'large' ? '100%' : '18px'};
+    width: auto;
+    max-width: ${({ size }) => size === 'large' ? '100%' : '18px'};
+  }
 `;
 
-type ImgSize = 'large' | 'small';
-
-const EmojiImg = styled.img<{ size: ImgSize }>`
-  border-radius: ${({ size }) => size === 'large' ? '6px' : '3px'};
-  height: ${({ size }) => size === 'large' ? '100%' : '18px'};
-  width: auto;
-  max-width: ${({ size }) => size === 'large' ? '100%' : '18px'};
-`;
-
-export default function EmojiCon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
+function EmojiCon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
+  let iconContent: string | ReactNode = icon;
   if (typeof icon === 'string' && icon.startsWith('http')) {
-    return <Emoji {...props}><EmojiImg size={size} src={icon} /></Emoji>;
+    iconContent = <img src={icon} />;
+  }
+  else if (typeof icon === 'string') {
+    iconContent = (
+      <span
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          // @ts-ignore
+          __html: twemoji.parse(icon, {
+            folder: 'svg',
+            ext: '.svg'
+          })
+        }}
+      />
+    );
   }
   return (
-    <Emoji {...props}>{icon}</Emoji>
+    <Emoji size={size} {...props}>{iconContent}</Emoji>
   );
 }
+
+export default memo(EmojiCon);
