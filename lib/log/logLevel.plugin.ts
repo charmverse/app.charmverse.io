@@ -48,7 +48,7 @@ function sendErrorToDiscord (webhook: string, message: any, opt: any) {
   }
   else if (opt) {
     fields = Object.entries<any>(opt).map(([name, _value]) => {
-      const value = typeof _value === 'string' ? _value.slice(0, 500) : _value?.toString();
+      const value = typeof _value === 'string' ? _value.slice(0, 500) : JSON.stringify(_value || {});
       return { name, value };
     })
       .slice(0, 5); // add a sane max # of fields just in case
