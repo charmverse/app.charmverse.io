@@ -268,12 +268,26 @@ img.ProseMirror-separator {
   li:first-child {
     padding-top: 0;
   }
+}
+// nested list styles
+ul li {
   li {
     list-style-type: circle;
     li {
       list-style-type: square;
       li {
         list-style-type: disc;
+      }
+    }
+  }
+}
+ol li {
+  li {
+    list-style-type: lower-alpha;
+    li {
+      list-style-type: lower-roman;
+      li {
+        list-style-type: circle;
       }
     }
   }
