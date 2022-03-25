@@ -1,8 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import ImageIcon from '@mui/icons-material/Image'
-import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor'
-import { PageCoverGalleryImageGroups } from 'components/editor/Page/PageBanner'
+import CharmEditor, { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor'
+import { PageCoverGalleryImageGroups } from 'components/pageId/PageEditor/components/PageBanner'
 import { randomIntFromInterval } from 'lib/utilities/random'
 import { Page, PageContent } from 'models'
 import React, { useCallback, useState } from 'react'

@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
-import { PageLayout } from 'components/common/page-layout';
+import PageLayout from 'components/common/PageLayout';
 import { DatabaseEditor } from 'components/databases';
-import Editor from 'components/editor';
+import PageEditor from 'components/pageId/PageEditor';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -101,7 +101,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     return <DatabaseEditor page={memoizedCurrentPage} setPage={setPage} readonly={publicShare} />;
   }
   else {
-    return <Editor page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare} />;
+    return <PageEditor page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare} />;
   }
 }
 

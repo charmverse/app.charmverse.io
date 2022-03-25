@@ -10,7 +10,7 @@ import Button from 'components/common/Button';
 import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/editor/CharmEditor';
+import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
 import { getChainById, getCryptos } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import CharmEditor, { ICharmEditorOutput } from 'components/editor/CharmEditor'
+import CharmEditor, { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor'
 import { PageContent } from 'models'
 import React from 'react'
 import { IntlShape } from 'react-intl'

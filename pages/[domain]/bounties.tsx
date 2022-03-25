@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import { BountyList } from 'components/bounties/BountyList';
-import { PageLayout } from 'components/common/page-layout';
+import PageLayout from 'components/common/PageLayout';
 import { setTitle } from 'hooks/usePageTitle';
 import { ReactElement } from 'react';
 
