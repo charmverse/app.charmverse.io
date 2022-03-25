@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod, Role } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod, Role, PagePermission } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -14,6 +14,7 @@ import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import { IPagePermissionRequest, IPagePermissionToAdd, IPagePermissionFlags } from 'lib/permissions/pages';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -459,11 +460,23 @@ class CharmClient {
     return http.DELETE('/api/roles/assignment', data);
   }
 
+  listPermissions (pageId: string): Promise<IPagePermissionFlags> {
+    return http.GET('/api/permissions/query', { pageId });
+  }
+
   /**
-   * @T The interface for the specific set of permissions queried for
+   * Get full set of permissions for a specific user, role or space
    */
-  queryPermissions<T> (entity: 'page', request: IPermissionTest, permissions: Array<keyof T>): Promise<Role []> {
-    return http.POST('/api/permissions/query', data);
+  queryPermissions (request: IPagePermissionRequest): Promise<IPagePermissionFlags> {
+    return http.POST('/api/permissions/query', request);
+  }
+
+  createPermission (permission: IPagePermissionToAdd): Promise<boolean> {
+    return http.POST('/api/permissions/query', permission);
+  }
+
+  deletePermission (permissionId: string): Promise<boolean> {
+    return http.DELETE('/api/permissions/query', { permissionId });
   }
 }
 

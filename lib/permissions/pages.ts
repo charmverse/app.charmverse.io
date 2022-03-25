@@ -5,7 +5,11 @@ import { prisma } from 'db';
 
 export type IPagePermissionFlags = Omit<PagePermission, 'id' | 'spaceId' | 'userId' | 'roleId' | 'pageId' | 'permissionLevel'>
 
-export interface IPagePermissionRequest {
+export interface IPagePermissionListRequest {
+  pageId: string
+}
+
+export interface IPagePermissionRequest extends IPagePermissionListRequest {
   userId: string,
   spaceId: string,
   pageId: string
