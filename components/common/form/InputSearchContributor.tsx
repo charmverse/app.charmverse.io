@@ -1,12 +1,13 @@
-import { Autocomplete, AutocompleteRenderInputParams, Box, BoxProps, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { useContributors } from 'hooks/useContributors';
 import { Contributor } from 'models';
-import useENSName, { useEnsNameRecord } from 'hooks/useENSName';
+import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
-import { HTMLAttributes, useEffect } from 'react';
+import { HTMLAttributes } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
+import { useSWRConfig } from 'swr';
 
 export interface IInputSearchContributorProps {
   onChange?: (id: string) => any
@@ -16,16 +17,13 @@ export interface IInputSearchContributorProps {
 export function InputSearchContributor ({ onChange = () => {}, defaultValue }: IInputSearchContributorProps) {
   const [contributors] = useContributors();
   const { chainId } = useWeb3React<Web3Provider>();
-  const {
-    ensNameRecord
-  } = useEnsNameRecord();
-
   const preselectedContributor = contributors.find(contributor => {
     return contributor.id === defaultValue;
   });
 
-  function emitValue (selectedUser: Contributor) {
+  const { cache } = useSWRConfig();
 
+  function emitValue (selectedUser: Contributor) {
     if (selectedUser === null) {
       return;
     }
@@ -52,7 +50,7 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
       sx={{ minWidth: 150 }}
       options={contributors}
       autoHighlight
-      getOptionLabel={(user) => ensNameRecord[`${chainId!}.${user.addresses[0]}`] ?? getDisplayName(user)}
+      getOptionLabel={(user) => cache.get(`@"ENS",102~,"${user.addresses[0]}",${chainId},`) ?? getDisplayName(user)}
       renderOption={(props, user) => (
         <ReviewerOption {...props} user={user} />
       )}
