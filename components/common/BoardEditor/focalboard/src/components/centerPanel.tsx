@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 /* eslint-disable max-lines */
 import { Box } from '@mui/system'
-import PageBanner, { PageCoverGalleryImageGroups } from 'components/[pageId]/DocumentView/components/PageBanner'
+import PageBanner, { PageCoverGalleryImageGroups } from 'components/[pageId]/DocumentPageView/components/PageBanner'
 import { randomIntFromInterval } from 'lib/utilities/random'
 import { Page } from 'models'
 import React from 'react'
