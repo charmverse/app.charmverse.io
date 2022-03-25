@@ -27,7 +27,7 @@ import { useSWRConfig } from 'swr';
 import log from 'lib/log';
 
 export default function WorkspaceSettings () {
-  log.error('discord test!', new Error('error arg'));
+
   setTitle('Workspace Options');
   const router = useRouter();
   const { mutate } = useSWRConfig();
