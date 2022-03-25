@@ -460,7 +460,7 @@ class CharmClient {
     return http.DELETE('/api/roles/assignment', data);
   }
 
-  listPermissions (pageId: string): Promise<IPagePermissionFlags> {
+  listPermissions (pageId: string): Promise<Array<PagePermission & {role: Role, user: User, space: Space }>> {
     return http.GET('/api/permissions/query', { pageId });
   }
 

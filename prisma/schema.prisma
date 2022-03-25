@@ -272,18 +272,17 @@ enum PagePermissionLevel {
   view
 }
 
-
 model PagePermission {
   id       String         @id @default(uuid()) @db.Uuid
   // Ways a permission can be accessed (pick one)
-  userId   String?        @db.Uuid()
+  userId   String?        @db.Uuid
   user     User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  spaceId  String?        @db.Uuid()
+  spaceId  String?        @db.Uuid
   space    Space?         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  roleId   String?        @db.Uuid()
+  roleId   String?        @db.Uuid
   role     Role?          @relation(fields: [roleId], references: [id], onDelete: Cascade)
   // Resource being accessed (pick one)
-  pageId   String         @db.Uuid()
+  pageId   String         @db.Uuid
   page     Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
   permissionLevel PagePermissionLevel
   // Scope of access

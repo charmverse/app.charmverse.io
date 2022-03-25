@@ -1,4 +1,4 @@
-import { Page, PagePermission, PagePermissionLevel } from '@prisma/client';
+import { Prisma, Page, PagePermission, PagePermissionLevel } from '@prisma/client';
 import { prisma } from 'db';
 
 // export type IPagePermission = IEntityPermission<Page> & {pageId: string}
@@ -11,20 +11,19 @@ export interface IPagePermissionListRequest {
 
 export interface IPagePermissionRequest extends IPagePermissionListRequest {
   userId: string,
-  spaceId: string,
   pageId: string
 }
 
 export type IPagePermissionToAdd = Pick<PagePermission, 'spaceId' | 'userId' | 'roleId' | 'pageId' | 'permissionLevel'>
 
-const PermissionLevelTitle: Record<keyof typeof PagePermissionLevel, string> = {
+export const PermissionLevelTitle: Record<keyof typeof PagePermissionLevel, string> = {
   full_access: 'Edit, delete and share',
   editor: 'Edit page',
   view_comment: 'View and comment',
   view: 'View'
 };
 
-const permissionDescriptions: Record<keyof IPagePermissionFlags, string> = {
+export const permissionDescriptions: Record<keyof IPagePermissionFlags, string> = {
   delete: 'delete page',
   read: 'view page',
   edit_content: 'edit page content',
@@ -37,6 +36,46 @@ const permissionDescriptions: Record<keyof IPagePermissionFlags, string> = {
   edit_path: 'edit path',
   edit_title: 'edit page title'
 };
+
+export class AllowedPagePermissions implements IPagePermissionFlags {
+
+  read: boolean;
+
+  delete: boolean;
+
+  edit_index: boolean;
+
+  edit_title: boolean;
+
+  edit_content: boolean;
+
+  edit_contentText: boolean;
+
+  edit_headerImage: boolean;
+
+  edit_icon: boolean;
+
+  edit_isPublic: boolean;
+
+  edit_path: boolean;
+
+  edit_parentId: boolean;
+
+  constructor (permissions: Partial<IPagePermissionFlags> = {}) {
+    this.read = permissions.read ?? false;
+    this.delete = permissions.delete ?? false;
+    this.edit_index = permissions.edit_index ?? false;
+    this.edit_title = permissions.edit_title ?? false;
+    this.edit_content = permissions.edit_content ?? false;
+    this.edit_contentText = permissions.edit_contentText ?? false;
+    this.edit_headerImage = permissions.edit_headerImage ?? false;
+    this.edit_icon = permissions.edit_icon ?? false;
+    this.edit_isPublic = permissions.edit_isPublic ?? false;
+    this.edit_path = permissions.edit_path ?? false;
+    this.edit_parentId = permissions.edit_parentId ?? false;
+  }
+
+}
 
 export const permissionTemplates: Record<keyof typeof PagePermissionLevel, Partial<IPagePermissionFlags>> = {
   full_access: {
@@ -67,34 +106,4 @@ export const permissionTemplates: Record<keyof typeof PagePermissionLevel, Parti
     read: true
   }
 };
-
-export async function evaluatePagePermission (
-  request: IPagePermissionRequest
-): Promise<IPagePermissionFlags> {
-
-  // Get roles
-  // Get permissions for role
-
-  const roles = await prisma.role.findMany({
-    where: {
-      spaceRolesToRole: {
-        some: {
-          spaceRole: {
-            userId: request.userId,
-            spaceId: request.spaceId
-          }
-        }
-      }
-    }
-  });
-
-  console.log('Found user roles', roles);
-
-  const permissions = await prisma.pagePermission.findMany({
-    where: {}
-  });
-
-  return permissions[0];
-
-}
 

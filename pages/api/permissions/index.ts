@@ -7,7 +7,8 @@ import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } 
 import { withSessionRoute } from 'lib/session/withSession';
 import { IApiError } from 'lib/utilities/errors';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { evaluatePagePermission, permissionTemplates, IPagePermissionFlags } from 'lib/permissions/pages';
+import { permissionTemplates, IPagePermissionFlags } from 'lib/permissions/pages';
+import { evaluatePagePermission } from 'lib/permissions/page-permission-evaluation';
 import { } from 'lib/permissions/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 

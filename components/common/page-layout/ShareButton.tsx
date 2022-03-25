@@ -12,6 +12,9 @@ import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { PagePermission, Role, User, Space } from '@prisma/client';
+import { getDisplayName } from 'lib/users';
+import { PermissionLevelTitle, permissionDescriptions } from 'lib/permissions/pages';
 
 const StyledInput = styled(Input)`
   border: 1px solid ${({ theme }) => theme.palette.divider};
@@ -32,12 +35,22 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
   const [isPublic, setIsPublic] = useState(false);
   const [shareLink, setShareLink] = useState<null | string>(null);
 
+  const [pagePermissions, setPagePermissions] = useState<
+    Array<PagePermission & {role: Role, user: User, space: Space } >
+    >([]);
+
   useEffect(() => {
     const currentPage = pages[currentPageId];
     if (currentPage) {
       setIsPublic(currentPage.isPublic);
 
+      charmClient.listPermissions(currentPage.id)
+        .then(permissionSet => {
+          setPagePermissions(permissionSet);
+        });
+
     }
+
   }, [currentPageId, pages]);
 
   useEffect(() => {
@@ -80,6 +93,35 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
     }
   }
 
+  const permissionOrder = ['space', 'role', 'user'];
+
+  const sortedPermissions = pagePermissions.map(permission => {
+
+    const permissionSource = permission.user ? 'user' : permission.role ? 'role' : 'space';
+
+    const permissionDisplayName = permissionSource === 'user' ? getDisplayName(permission.user) : permissionSource === 'role' ? permission.role.name : `${permission.space.name} members`;
+
+    return {
+      ...permission,
+      permissionSource,
+      displayName: permissionDisplayName
+    };
+  }).sort((a, b) => {
+
+    const aPermission = permissionOrder.indexOf(a.permissionSource);
+    const bPermission = permissionOrder.indexOf(b.permissionSource);
+
+    if (aPermission < bPermission) {
+      return -1;
+    }
+    else if (aPermission > bPermission) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  });
+
   // We'll need to modify this
 
   return (
@@ -111,6 +153,20 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
           }
         }}
       >
+        <Box>
+          {
+              sortedPermissions.map(permission => {
+                return (
+                  <Box key={permission.displayName}>
+                    {permission.displayName}
+
+                    {PermissionLevelTitle[permission.permissionLevel]}
+                  </Box>
+                );
+              })
+            }
+        </Box>
+
         <Box
           display='flex'
           justifyContent='space-between'
@@ -118,8 +174,11 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
           onChange={togglePublic}
           padding={1}
         >
+
           <Box>
+
             <Typography>Share to web</Typography>
+
             <Typography variant='body2' color='secondary'>
               {isPublic
                 ? 'Anyone with the link can view'

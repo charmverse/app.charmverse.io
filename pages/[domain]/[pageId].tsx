@@ -11,6 +11,10 @@ import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState, useCallback } from 'react';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import log from 'lib/log';
+import { IPagePermissionFlags } from 'lib/permissions/pages';
+import { isTruthy } from 'lib/utilities/types';
+import { useUser } from 'hooks/useUser';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 /**
  * @viewId - Enforce a specific view inside the nested blocks editor
@@ -26,6 +30,11 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   const pageId = router.query.pageId as string;
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
+
+  const [user] = useUser();
+  const [space] = useCurrentSpace();
+
+  const [pagePermissions, setPagePermissions] = useState<Partial<IPagePermissionFlags>>({});
 
   const debouncedPageUpdate = useMemo(() => {
     return debouncePromise((input: Prisma.PageUpdateInput) => {
@@ -91,6 +100,22 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     [currentPageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title]
   );
 
+  useEffect(() => {
+    console.log('Use effect fired');
+    if (user && memoizedCurrentPage) {
+      charmClient.queryPermissions({
+        userId: user.id,
+        pageId: memoizedCurrentPage.id
+      } as any)
+        .then(permissions => {
+          console.log('Found permissions', permissions);
+          setPagePermissions(permissions);
+        });
+    }
+  }, [user, memoizedCurrentPage]);
+
+  const canEdit = !publicShare && pagePermissions?.edit_content === true;
+
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
@@ -101,7 +126,13 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     return <DatabaseEditor page={memoizedCurrentPage} setPage={setPage} readonly={publicShare} />;
   }
   else {
-    return <Editor page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare} />;
+    return (
+      <Editor
+        page={memoizedCurrentPage}
+        setPage={setPage}
+        readOnly={!canEdit}
+      />
+    );
   }
 }
 
