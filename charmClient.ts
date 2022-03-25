@@ -13,6 +13,7 @@ import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
+import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -158,7 +159,7 @@ class CharmClient {
   }
 
   importFromNotion (params: { code: string, spaceId: string }) {
-    return http.POST('/api/notion/import', params);
+    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', params);
   }
 
   // FocalBoard

@@ -8,7 +8,7 @@ const StyledActionsMenu = styled(Box)`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  right: 5px;
+  right: 2.5px;
   width: 26px;
   height: 26px;
   border-radius: 2px;
@@ -16,6 +16,9 @@ const StyledActionsMenu = styled(Box)`
     background: ${({ theme }) => theme.palette.action.hover};
   }
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 interface ActionsMenuProps {
