@@ -10,7 +10,7 @@ const useENSName = (account: string | null | undefined): string | null | undefin
 
   const { data } = useSWRImmutable(
     shouldFetch ? ['ENS', library, account, chainId] : null,
-    async () => account === '0xb1b9FFF08F3827875F91ddE929036a65f2A5d27d' ? 'devorein.eth' : fetchENSName('', library!, account!)
+    fetchENSName
   );
 
   return data;
