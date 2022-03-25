@@ -13,7 +13,7 @@ import IFrameSelector from './IFrameSelector';
 import Resizable from './Resizable';
 import VerticalResizer from './VerticalResizer';
 
-export const MAX_EMBED_WIDTH = 900;
+export const MAX_EMBED_WIDTH = 700;
 export const
   MIN_EMBED_WIDTH = 100;
 export const MAX_EMBED_HEIGHT = 2500;
@@ -252,7 +252,9 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
       initialSize={node.attrs.width}
       maxWidth={MAX_EMBED_WIDTH}
       minWidth={MIN_EMBED_WIDTH}
-      updateAttrs={updateAttrs}
+      updateAttrs={args => {
+        updateAttrs({ width: args.size });
+      }}
       onDelete={onDelete}
       onResizeStop={onResizeStop}
     >

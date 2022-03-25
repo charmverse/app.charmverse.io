@@ -194,11 +194,14 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 
   code {
-    border-radius: ${({ theme }) => theme.spacing(0.5)};
+    border-radius: 2px !important;
     background-color: ${({ theme }) => theme.palette.code.background};
     color: ${({ theme }) => theme.palette.code.color};
+    display: inline-block;
     font-size: 85%;
+    height: 100%;
     tab-size: 4;
+    caret-color: black;
   }
   pre code {
     color: inherit;

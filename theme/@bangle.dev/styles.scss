@@ -258,8 +258,25 @@ img.ProseMirror-separator {
   margin-top: 1rem;
 }
 
+.bangle-editor ul p, .bangle-editor ol p {
+  padding-bottom: 3px;
+  padding-top: 3px;
+}
+
 .bangle-editor li {
   position: relative;
+  li:first-child {
+    padding-top: 0;
+  }
+  li {
+    list-style-type: circle;
+    li {
+      list-style-type: square;
+      li {
+        list-style-type: disc;
+      }
+    }
+  }
 }
 
 .bangle-editor li > span {
