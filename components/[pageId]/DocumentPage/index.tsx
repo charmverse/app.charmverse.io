@@ -1,3 +1,3 @@
-import PageEditor from './DocumentPage.tsx';
+import DocumentPage from './DocumentPage';
 
-export default PageEditor;
+export default DocumentPage;

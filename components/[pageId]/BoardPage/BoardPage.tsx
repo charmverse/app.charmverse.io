@@ -25,7 +25,7 @@ interface Props {
   setPage: (p: Partial<Page>) => void;
 }
 
-export function DatabaseEditor ({ page, setPage, readonly }: Props) {
+export default function BoardPage ({ page, setPage, readonly }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const cards = useAppSelector(getCurrentViewCardsSortedFilteredAndGrouped);
