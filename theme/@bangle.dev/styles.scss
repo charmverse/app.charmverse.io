@@ -258,8 +258,39 @@ img.ProseMirror-separator {
   margin-top: 1rem;
 }
 
+.bangle-editor ul p, .bangle-editor ol p {
+  padding-bottom: 3px;
+  padding-top: 3px;
+}
+
 .bangle-editor li {
   position: relative;
+  li:first-child {
+    padding-top: 0;
+  }
+}
+// nested list styles
+ul li {
+  li {
+    list-style-type: circle;
+    li {
+      list-style-type: square;
+      li {
+        list-style-type: disc;
+      }
+    }
+  }
+}
+ol li {
+  li {
+    list-style-type: lower-alpha;
+    li {
+      list-style-type: lower-roman;
+      li {
+        list-style-type: circle;
+      }
+    }
+  }
 }
 
 .bangle-editor li > span {
@@ -338,9 +369,9 @@ img.ProseMirror-separator {
   padding-left: 1.5rem;
 }
 
-.bangle-editor > ul {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+.bangle-editor ul, .bangle-editor ol {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 /** Component-Styling-END */

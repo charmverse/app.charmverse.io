@@ -195,7 +195,9 @@ export function NestedPagesList () {
                   <PageTitle
                     isempty={page.title.length === 0 ? 1 : 0}
                     sx={{
-                      fontWeight: 'bold'
+                      fontWeight: 'bold',
+                      height: 26,
+                      lineHeight: 26
                     }}
                   >
                     {page.title.length !== 0 ? page.title : 'Untitled'}
