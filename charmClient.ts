@@ -159,7 +159,7 @@ class CharmClient {
   }
 
   importFromNotion (params: { code: string, spaceId: string }) {
-    return http.POST<{failedImports: FailedImportsError[], importedPages: Record<string, Page>}>('/api/notion/import', params);
+    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', params);
   }
 
   // FocalBoard

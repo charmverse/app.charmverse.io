@@ -998,8 +998,5 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     await createCharmversePageFromNotionPage(searchResultRecord[createdPageIds[0]]);
   }
 
-  return {
-    failedImports: Object.values(failedImportsRecord),
-    importedPages
-  };
+  return Object.values(failedImportsRecord);
 }

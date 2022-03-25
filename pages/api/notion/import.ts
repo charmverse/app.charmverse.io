@@ -30,7 +30,6 @@ interface NotionApiResponse {
 
 async function importNotion (req: NextApiRequest, res: NextApiResponse<{
   failedImports: FailedImportsError[],
-  importedPages: Record<string, Page>
 } | {error: string}>) {
 
   const spaceId = req.body.spaceId as string;
@@ -53,7 +52,7 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse<{
         'Content-Type': 'application/json'
       }
     });
-    const { failedImports, importedPages } = await importFromWorkspace({
+    const failedImports = await importFromWorkspace({
       spaceId,
       userId: req.session.user.id,
       accessToken: token.access_token,
@@ -62,8 +61,7 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse<{
     });
 
     res.status(200).json({
-      failedImports,
-      importedPages
+      failedImports
     });
 
   }
