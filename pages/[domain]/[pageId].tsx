@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import PageLayout from 'components/common/PageLayout';
-import { DatabaseEditor } from 'components/[pageId]/BoardPageView';
-import PageEditor from 'components/[pageId]/DocumentPageView';
+import { DatabaseEditor } from 'components/[pageId]/BoardPage';
+import PageEditor from 'components/[pageId]/DocumentPage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import debouncePromise from 'lib/utilities/debouncePromise';
