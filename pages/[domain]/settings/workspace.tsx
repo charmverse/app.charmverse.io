@@ -24,7 +24,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from 'components/common/Snackbar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSWRConfig } from 'swr';
-import log from 'lib/log';
 
 export default function WorkspaceSettings () {
 
