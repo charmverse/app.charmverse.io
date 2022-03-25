@@ -29,7 +29,7 @@ import Link from 'next/link';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
-import EmojiCon from '../Emoji';
+import EmojiIcon from '../Emoji';
 import NewPageMenu, { StyledDatabaseIcon } from '../NewPageMenu';
 
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
@@ -67,6 +67,7 @@ export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
       color: 'inherit'
     },
     [`& .${treeItemClasses.iconContainer}`]: {
+      marginRight: 0,
       width: '28px'
     },
     [`& .${treeItemClasses.iconContainer} svg`]: {
@@ -135,7 +136,7 @@ const PageAnchor = styled.a`
   }
 `;
 
-const StyledPageIcon = styled(EmojiCon)`
+const StyledPageIcon = styled(EmojiIcon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
@@ -231,25 +232,20 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
-export function PageIcon ({ isEditorEmpty, pageType }: {pageType: Page['type'], isEditorEmpty: boolean}) {
-  let icon: null | ReactNode = null;
+export function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode, pageType: Page['type'], isEditorEmpty: boolean}) {
+
+  if (icon) {
+    return <StyledPageIcon icon={icon} />;
+  }
   if (pageType === 'board') {
-    icon = (<StyledDatabaseIcon />);
+    return <StyledPageIcon icon={<StyledDatabaseIcon />} />;
   }
   else if (isEditorEmpty) {
-    icon = (
-      <InsertDriveFileOutlinedIcon />
-    );
+    return <StyledPageIcon icon={<InsertDriveFileOutlinedIcon />} />;
   }
   else {
-    icon = (
-      <DescriptionOutlinedIcon />
-    );
+    return <StyledPageIcon icon={<DescriptionOutlinedIcon />} />;
   }
-
-  return (
-    <StyledPageIcon icon={icon} />
-  );
 }
 
 // eslint-disable-next-line react/function-component-definition

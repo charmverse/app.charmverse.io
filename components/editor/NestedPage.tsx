@@ -31,7 +31,6 @@ const NestedPageContainer = styled((props: any) => <div {...props} />)`
   align-items: center;
   cursor: pointer;
   display: flex;
-  gap: ${({ theme }) => theme.spacing(0.5)};
   padding: 3px 3px 3px 2px;
   position: relative;
   transition: background 20ms ease-in 0s;
@@ -191,7 +190,7 @@ export function NestedPagesList () {
               >
                 <>
                   <div>
-                    {page.icon ?? <PageIcon isEditorEmpty={Boolean(isEditorEmpty)} pageType={page.type} />}
+                    <PageIcon icon={page.icon} isEditorEmpty={Boolean(isEditorEmpty)} pageType={page.type} />
                   </div>
                   <PageTitle
                     isempty={page.title.length === 0 ? 1 : 0}
@@ -223,14 +222,16 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
 
   const docContent = ((nestedPage?.content) as PageContent)?.content;
 
-  const isEditorEmpty = docContent && (docContent.length <= 1
-  && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
+  const isEditorEmpty = Boolean(
+    docContent && (docContent.length <= 1
+    && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0))
+  );
 
   return (
     <NestedPageContainer>
-      {nestedPage?.icon ? <div>{nestedPage.icon}</div> : (
-        isEditorEmpty ? <InsertDriveFileOutlinedIcon /> : <DescriptionOutlinedIcon />
-      )}
+      <div>
+        <PageIcon isEditorEmpty={isEditorEmpty} icon={nestedPage.icon} pageType={nestedPage.type} />
+      </div>
       <Link
         href={`/${(space)?.domain}/${nestedPage?.path}`}
         passHref

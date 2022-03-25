@@ -9,6 +9,7 @@ import Head from 'next/head';
 import * as React from 'react';
 import Header, { headerHeight } from './Header';
 import Sidebar from './Sidebar';
+import Favicon from './Favicon';
 
 const drawerWidth = 300;
 
@@ -100,9 +101,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Head>
-        {currentPage?.icon
-          ? <link rel='icon' type='image/svg+xml' href={`data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${currentPage?.icon || ''}</text></svg>`} />
-          : <link rel='icon' type='image/png' href='/favicon.png' />}
+        <Favicon pageIcon={currentPage?.icon} />
       </Head>
       <Box sx={{ display: 'flex', height: '100%' }}>
         <AppBar position='fixed' open={open}>
