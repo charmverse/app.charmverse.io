@@ -1,4 +1,4 @@
-import _log, { Logger } from 'loglevel';
+import _log, { LogLevelDesc, Logger } from 'loglevel';
 import { DateTime } from 'luxon';
 import * as http from 'adapters/http';
 
@@ -9,7 +9,7 @@ const originalFactory = _log.methodFactory;
 export function apply (log: Logger) {
 
   const isProduction = process.env.NODE_ENV === 'production';
-  const defaultLevel = isProduction ? 'error' : 'debug';
+  const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || (isProduction ? 'error' : 'debug');
   log.setDefaultLevel(defaultLevel);
 
   // add timestamps and send errors to Slack channel in production
