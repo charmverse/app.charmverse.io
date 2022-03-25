@@ -67,6 +67,7 @@ export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
       color: 'inherit'
     },
     [`& .${treeItemClasses.iconContainer}`]: {
+      marginRight: 0,
       width: '28px'
     },
     [`& .${treeItemClasses.iconContainer} svg`]: {
