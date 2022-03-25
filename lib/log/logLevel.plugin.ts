@@ -8,7 +8,7 @@ const originalFactory = _log.methodFactory;
 
 export function apply (log: Logger) {
 
-  const isProduction = true; // process.env.NODE_ENV === 'production';
+  const isProduction = process.env.NODE_ENV === 'production';
   const defaultLevel = isProduction ? 'error' : 'debug';
   log.setDefaultLevel(defaultLevel);
 
