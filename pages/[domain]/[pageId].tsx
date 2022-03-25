@@ -10,7 +10,7 @@ import { Page } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState, useCallback } from 'react';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import {} from 'lib/';
+import log from 'lib/log';
 
 /**
  * @viewId - Enforce a specific view inside the nested blocks editor
@@ -50,7 +50,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     }
     debouncedPageUpdate({ id: currentPageId, ...updates } as Prisma.PageUpdateInput)
       .catch((err: any) => {
-        console.error('Error saving page', err);
+        log.error('Error saving page', err);
       })
       .finally(() => {
         setIsEditing(false);

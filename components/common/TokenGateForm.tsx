@@ -20,6 +20,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
 import { useRouter } from 'next/router';
+import log from 'lib/log';
 
 interface Props {
   onSubmit: (values: Space) => void;
@@ -120,7 +121,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
       setError(result.error);
     }
     else {
-      console.error('Unhandled response from token gate', result);
+      log.error('Unhandled response from token gate', result);
     }
   }
 

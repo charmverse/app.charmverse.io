@@ -2,6 +2,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import * as http from 'adapters/http';
 import { prisma } from 'db';
+import log from 'lib/log';
 
 const handler = nc({
   onError,
@@ -23,7 +24,7 @@ const DISCORD_OAUTH_CLIENT_SECRET = process.env.DISCORD_OAUTH_CLIENT_SECRET as s
 handler.get(async (req, res) => {
   const tempAuthCode = req.query.code as string;
   if (req.query.error || !tempAuthCode) {
-    console.log('Error or missing code from Discord OAuth. Response query:', req.query);
+    log.warn('Error or missing code from Discord OAuth. Response query:', req.query);
     res.redirect('/');
     return;
   }
@@ -39,7 +40,7 @@ handler.get(async (req, res) => {
     state = JSON.parse(decodeURIComponent(req.query.state as string));
   }
   catch (e) {
-    console.error('Error parsing discord state', e);
+    log.warn('Error parsing discord state', e);
     // This is a rare case when we cant parse the state
     // That means we dont have access to the redirect url
     // Send user to the production app

@@ -4,6 +4,8 @@ import * as http from 'adapters/http';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
 import { withSessionRoute } from 'lib/session/withSession';
+import { Page } from '@prisma/client';
+import { FailedImportsError } from 'pages/[domain]/settings/workspace';
 
 const handler = nc({
   onError,
@@ -26,7 +28,9 @@ interface NotionApiResponse {
   }
 }
 
-async function importNotion (req: NextApiRequest, res: NextApiResponse) {
+async function importNotion (req: NextApiRequest, res: NextApiResponse<{
+  failedImports: FailedImportsError[],
+} | {error: string}>) {
 
   const spaceId = req.body.spaceId as string;
   const tempAuthCode = req.body.code;
@@ -48,33 +52,22 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse) {
         'Content-Type': 'application/json'
       }
     });
-    try {
-      await importFromWorkspace({
-        spaceId,
-        userId: req.session.user.id,
-        accessToken: token.access_token,
-        workspaceName: token.workspace_name,
-        workspaceIcon: token.workspace_icon
-      });
-      res.status(200).end();
-    }
-    catch (err: any) {
-      if (err.message.startsWith('[IMPORT]')) {
-        const errorStringWithoutPrefix = err.message.replace('[IMPORT]: ', '');
-        const errorData = JSON.parse(errorStringWithoutPrefix) as {
-          pageId: string,
-          type: 'page' | 'database',
-          title: string,
-          blocks: [string, number][]
-        };
-        res.status(400).json({ error: `Error importing ${errorData.type} named ${errorData.title} with id ${errorData.pageId}. Location: ${errorData.blocks.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}` });
-      }
-      else {
-        res.status(400).json({ error: 'Something went wrong!' });
-      }
-    }
+    const failedImports = await importFromWorkspace({
+      spaceId,
+      userId: req.session.user.id,
+      accessToken: token.access_token,
+      workspaceName: token.workspace_name,
+      workspaceIcon: token.workspace_icon
+    });
+
+    res.status(200).json({
+      failedImports
+    });
+
   }
   catch (err: any) {
+    console.log('Error', err);
+
     if (err.error === 'invalid_grant' || err.error === 'invalid_request') {
       res.status(400).json({ error: 'Invalid code. Please try importing again' });
     }

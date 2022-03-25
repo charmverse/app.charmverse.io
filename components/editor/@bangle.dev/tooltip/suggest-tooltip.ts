@@ -12,6 +12,7 @@ import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placeme
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import { emojiSuggestKey } from "components/editor/EmojiSuggest";
+import log from 'lib/log';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -441,7 +442,7 @@ export function replaceSuggestMarkWith(
             ? state.schema.text(maybeNode)
             : Node.fromJSON(state.schema, maybeNode);
       } catch (e) {
-        console.error(e);
+        log.error('suggest-tooltip error', e);
         return tr;
       }
 

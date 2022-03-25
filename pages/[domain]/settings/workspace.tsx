@@ -17,7 +17,6 @@ import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
 import { Box } from '@mui/material';
-import { useUser } from 'hooks/useUser';
 import NotionIcon from 'public/images/notion_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -25,6 +24,12 @@ import Snackbar from 'components/common/Snackbar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSWRConfig } from 'swr';
 
+export interface FailedImportsError {
+  pageId: string,
+  type: 'page' | 'database',
+  title: string,
+  blocks: [string, number][][]
+}
 export default function WorkspaceSettings () {
 
   setTitle('Workspace Options');
@@ -32,8 +37,8 @@ export default function WorkspaceSettings () {
   const { mutate } = useSWRConfig();
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
-  const [user] = useUser();
-  const [notionError, setNotionError] = useState<string | null>(null);
+  const [notionFailedImports, setNotionFailedImports] = useState<FailedImportsError[]>([]);
+  const [notionImportError, setNotionImportError] = useState<string | null>(null);
   const { showMessage } = useSnackbar();
 
   const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
@@ -41,30 +46,24 @@ export default function WorkspaceSettings () {
   useEffect(() => {
     if (space && typeof router.query.code === 'string') {
       setIsImportingFromNotion(true);
-      setNotionError(null);
+      setNotionFailedImports([]);
       charmClient.importFromNotion({
         code: router.query.code,
         spaceId: space.id
       })
-        .then(() => {
+        .then(({ failedImports }) => {
           setIsImportingFromNotion(false);
           showMessage('Successfully imported');
           mutate(`pages/${space.id}`);
-          const baseUrl = `${router.asPath.split('?')[0]}?success=true`;
-          router.replace(baseUrl, undefined, { shallow: true });
+          showMessage('Notion workspace successfully imported');
+          setNotionFailedImports(failedImports);
         })
-        .catch(error => {
+        .catch((err) => {
           setIsImportingFromNotion(false);
-          setNotionError(error.error || 'There was an error, please try again');
+          setNotionImportError(err.message ?? err.error ?? 'Something went wrong. Please try again');
         });
     }
   }, [Boolean(space)]);
-
-  useEffect(() => {
-    if (router.query.success) {
-      showMessage('Notion workspace successfully imported');
-    }
-  }, [router.query.success]);
 
   const {
     register,
@@ -154,10 +153,43 @@ export default function WorkspaceSettings () {
         >
           {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
         </Button>
-        {notionError && (
-          <Alert severity='error' sx={{ mt: 2 }}>
-            {notionError}
+        {notionFailedImports.length !== 0 && (
+          <Alert severity='warning' sx={{ mt: 2 }}>
+            <Box sx={{
+              display: 'flex', gap: 2, flexDirection: 'column'
+            }}
+            >
+              Pages where we encountered issues
+              {notionFailedImports.map(failedImport => (
+                <div>
+                  <Box sx={{
+                    display: 'flex',
+                    gap: 1
+                  }}
+                  >
+                    <span>Type: {failedImport.type}</span>
+                    <span>Title: {failedImport.title}</span>
+                    <span>Id: {failedImport.pageId}</span>
+                  </Box>
+                  {failedImport.blocks.length !== 0 ? (
+                    <div>
+                      Blocks that failed to import for the page
+                      {failedImport.blocks.map((blockTrails, blockTrailsIndex) => (
+                        <div>
+                          {blockTrailsIndex + 1}. {blockTrails.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </Box>
           </Alert>
+        )}
+        {notionImportError && (
+        <Alert severity='error' sx={{ mt: 2 }}>
+          {notionImportError}
+        </Alert>
         )}
       </Box>
       <Snackbar />

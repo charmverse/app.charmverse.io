@@ -5,7 +5,7 @@ import { Prisma, Role, SpaceRole, SpaceRoleToRole } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { IEventToLog, postToDiscord } from 'lib/logs/notifyDiscord';
+import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { IApiError } from 'lib/utilities/errors';
 
