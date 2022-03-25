@@ -29,7 +29,7 @@ import Link from 'next/link';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
-import EmojiCon from '../Emoji';
+import EmojiIcon from '../Emoji';
 import NewPageMenu, { StyledDatabaseIcon } from '../NewPageMenu';
 
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
@@ -135,7 +135,7 @@ const PageAnchor = styled.a`
   }
 `;
 
-const StyledPageIcon = styled(EmojiCon)`
+const StyledPageIcon = styled(EmojiIcon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;

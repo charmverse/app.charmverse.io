@@ -55,7 +55,7 @@ export function getNonMacEmojiImage (emoji: string): string | null {
   return match ? match[1] : null;
 }
 
-function EmojiCon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
+function EmojiIcon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
 
   let iconContent: string | ReactNode = icon;
   if (typeof icon === 'string' && icon.startsWith('http')) {
@@ -72,4 +72,4 @@ function EmojiCon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emo
   );
 }
 
-export default memo(EmojiCon);
+export default memo(EmojiIcon);
