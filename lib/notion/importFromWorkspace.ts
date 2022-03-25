@@ -975,7 +975,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
         }
         // Make sure the database page has not failed to be created, otherwise no cards will be added
-        if (!searchResultRecord[block.parent.database_id]) {
+        if (!failedImportsRecord[block.parent.database_id]) {
           const { card, charmText } = createdCards[block.id];
           await prisma.block.createMany({
             data: [

@@ -171,16 +171,16 @@ export default function WorkspaceSettings () {
                     <span>Title: {failedImport.title}</span>
                     <span>Id: {failedImport.pageId}</span>
                   </Box>
-                  {failedImport.blocks.length && (
-                  <div>
-                    Blocks that failed to import for the page
-                    {failedImport.blocks.map((blockTrails, blockTrailsIndex) => (
-                      <div>
-                        {blockTrailsIndex + 1}. {blockTrails.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}
-                      </div>
-                    ))}
-                  </div>
-                  )}
+                  {failedImport.blocks.length !== 0 ? (
+                    <div>
+                      Blocks that failed to import for the page
+                      {failedImport.blocks.map((blockTrails, blockTrailsIndex) => (
+                        <div>
+                          {blockTrailsIndex + 1}. {blockTrails.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </Box>
