@@ -54,7 +54,7 @@ const EditorHeader = styled.div`
   }
 `;
 
-interface PageMetaFieldsProps {
+interface PageHeaderProps {
   headerImage: string | null,
   icon: string | null;
   readOnly: boolean;
@@ -62,7 +62,7 @@ interface PageMetaFieldsProps {
   setPage: (p: Partial<Page>) => void;
 }
 
-function PageMetaFields ({ headerImage, icon, readOnly, setPage, title }: PageMetaFieldsProps) {
+function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeaderProps) {
   const intl = useIntl();
 
   function addPageIcon () {
@@ -89,7 +89,7 @@ function PageMetaFields ({ headerImage, icon, readOnly, setPage, title }: PageMe
       <EditorHeader>
         {icon && (
         <MenuWrapper>
-          <PageIcon sx={{ fontSize: 78 }} size='large' icon={icon} />
+          <PageIcon size='large' icon={icon} />
           <Menu>
             <Menu.Text
               id='random'
@@ -150,4 +150,4 @@ function PageMetaFields ({ headerImage, icon, readOnly, setPage, title }: PageMe
   );
 }
 
-export default memo(PageMetaFields);
+export default memo(PageHeader);
