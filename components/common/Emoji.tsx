@@ -28,6 +28,9 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
   span {
     height: 100%;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   img {
     border-radius: ${({ size }) => size === 'large' ? '6px' : '3px'};
