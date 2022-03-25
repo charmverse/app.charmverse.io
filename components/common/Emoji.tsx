@@ -4,7 +4,7 @@ import twemoji from 'twemoji';
 
 type ImgSize = 'large' | 'small';
 
-export const Emoji = styled.div<{ size: ImgSize }>`
+export const Emoji = styled.div<{ size?: ImgSize }>`
   /* font family taken from Notion */
   font-family: "Apple Color Emoji", "Segoe UI Emoji", NotoColorEmoji, "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", EmojiSymbols;
   overflow: hidden;
