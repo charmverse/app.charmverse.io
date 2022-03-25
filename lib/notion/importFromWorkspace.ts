@@ -961,7 +961,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         }
         let parentId = workspacePage.id;
         // If the parent was created successfully
-        if (!failedImportsRecord[block.parent.page_id]) {
+        // Or if we failed to import some blocks from the parent (partial success)
+        if (!failedImportsRecord[block.parent.page_id]
+          || (failedImportsRecord[block.parent.page_id].blocks.length !== 0)) {
           parentId = createdPages[block.parent.page_id]?.pageId;
         }
         // If its a linked page we dont create the parent, so the would be the workspace page

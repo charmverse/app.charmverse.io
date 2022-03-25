@@ -17,14 +17,12 @@ import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
 import { Box } from '@mui/material';
-import { useUser } from 'hooks/useUser';
 import NotionIcon from 'public/images/notion_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
 import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from 'components/common/Snackbar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSWRConfig } from 'swr';
-import { usePages } from 'hooks/usePages';
 
 export interface FailedImportsError {
   pageId: string,
@@ -40,7 +38,6 @@ export default function WorkspaceSettings () {
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
   const [notionFailedImports, setNotionFailedImports] = useState<FailedImportsError[]>([]);
-  const { setPages } = usePages();
   const [notionImportError, setNotionImportError] = useState<string | null>(null);
   const { showMessage } = useSnackbar();
 
@@ -54,16 +51,12 @@ export default function WorkspaceSettings () {
         code: router.query.code,
         spaceId: space.id
       })
-        .then(({ failedImports, importedPages }) => {
+        .then(({ failedImports }) => {
           setIsImportingFromNotion(false);
           showMessage('Successfully imported');
           mutate(`pages/${space.id}`);
           showMessage('Notion workspace successfully imported');
           setNotionFailedImports(failedImports);
-          setPages((pages) => ({
-            ...pages,
-            ...importedPages
-          }));
         })
         .catch((err) => {
           setIsImportingFromNotion(false);
@@ -166,7 +159,7 @@ export default function WorkspaceSettings () {
               display: 'flex', gap: 2, flexDirection: 'column'
             }}
             >
-              Pages that failed to import
+              Pages where we encountered issues
               {notionFailedImports.map(failedImport => (
                 <div>
                   <Box sx={{
