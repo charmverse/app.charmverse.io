@@ -22,7 +22,7 @@ import Avatar from 'components/common/Avatar';
 import { Modal } from 'components/common/Modal';
 import PageLayout from 'components/common/PageLayout';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPageView';
+import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useBounties } from 'hooks/useBounties';
