@@ -1,19 +1,38 @@
 import type { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
-import { useRef } from 'react';
+import { createContext, ReactNode, useContext, useMemo, useRef } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 export const fetchENSName = async (_: any, library: Web3Provider, address: string) => library.lookupAddress(address);
 
-export const useEnsNameRecord = () => {
+type IContext = {
+  setEnsNameRecord: (key: string, value: string | null) => void
+  ensNameRecord: Record<string, string | null>
+}
+
+export const EnsNamesRecordContext = createContext<IContext>({
+  setEnsNameRecord: () => null,
+  ensNameRecord: {}
+});
+
+export function EnsNamesRecordProvider ({ children }: {children: ReactNode}) {
   const ref = useRef<Record<string, string | null>>({});
-  return {
-    setEnsNameRecord: (key: string, value: string | null) => {
-      ref.current[key] = value;
+
+  const value: IContext = useMemo(() => ({
+    setEnsNameRecord: (key: string, _value: string | null) => {
+      ref.current[key] = _value;
     },
     ensNameRecord: ref.current
-  };
-};
+  }), [ref]);
+
+  return (
+    <EnsNamesRecordContext.Provider value={value}>
+      {children}
+    </EnsNamesRecordContext.Provider>
+  );
+}
+
+export const useEnsNameRecord = () => useContext(EnsNamesRecordContext);
 
 const useENSName = (account: string | null | undefined): string | null | undefined => {
   const { library, chainId } = useWeb3React<Web3Provider>();
@@ -23,7 +42,7 @@ const useENSName = (account: string | null | undefined): string | null | undefin
   const { data } = useSWRImmutable(
     shouldFetch ? ['ENS', library!, account, chainId] : null,
     async () => {
-      const ensName = account === '0xb1b9FFF08F3827875F91ddE929036a65f2A5d27d' ? 'devorein.eth' : await fetchENSName('', library!, account!);
+      const ensName = await fetchENSName('', library!, account!);
       setEnsNameRecord(`${chainId!}.${account!}`, ensName);
       return ensName;
     }

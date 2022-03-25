@@ -171,6 +171,7 @@ import { setTheme as setLitProtocolTheme } from 'theme/lit-share-modal/theme';
 import 'theme/styles.scss';
 import Snackbar from 'components/common/Snackbar';
 import { SnackbarProvider, useSnackbar } from 'hooks/useSnackbar';
+import { EnsNamesRecordProvider } from 'hooks/useENSName';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -313,7 +314,9 @@ function DataProviders ({ children }: { children: ReactNode }) {
             <PaymentMethodsProvider>
               <PageTitleProvider>
                 <FocalboardViewsProvider>
-                  {children}
+                  <EnsNamesRecordProvider>
+                    {children}
+                  </EnsNamesRecordProvider>
                 </FocalboardViewsProvider>
               </PageTitleProvider>
             </PaymentMethodsProvider>
