@@ -7,6 +7,7 @@ type ImgSize = 'large' | 'small';
 export const Emoji = styled.div<{ size?: ImgSize }>`
   /* font family taken from Notion */
   font-family: "Apple Color Emoji", "Segoe UI Emoji", NotoColorEmoji, "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", EmojiSymbols;
+  font-size: ${({ size }) => size === 'large' ? '78px' : 'inherit'};
   overflow: hidden;
   white-space: nowrap;
   user-select: none;
@@ -37,11 +38,15 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
 `;
 
 function EmojiCon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
+
   let iconContent: string | ReactNode = icon;
+
+  // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
   if (typeof icon === 'string' && icon.startsWith('http')) {
     iconContent = <img src={icon} />;
   }
-  else if (typeof icon === 'string') {
+  else if (!isMac && typeof icon === 'string') {
     iconContent = (
       <span
         // eslint-disable-next-line react/no-danger
