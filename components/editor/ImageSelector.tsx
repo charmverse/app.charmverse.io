@@ -78,7 +78,6 @@ export default function ImageSelector (props: ImageSelectorProps) {
   )}
     >
       {children}
-      <Snackbar />
     </PopperPopup>
   );
 }
