@@ -1,0 +1,62 @@
+import _log, { Logger } from 'loglevel';
+import { DateTime } from 'luxon';
+import * as http from 'adapters/http';
+
+const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
+const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
+const originalFactory = _log.methodFactory;
+
+export function apply (log: Logger) {
+
+  const isProduction = true; // process.env.NODE_ENV === 'production';
+  const defaultLevel = isProduction ? 'error' : 'debug';
+  log.setDefaultLevel(defaultLevel);
+
+  // add timestamps and send errors to Slack channel in production
+  if (isProduction && ERRORS_WEBHOOK) {
+
+    log.methodFactory = (methodName, logLevel, loggerName) => {
+      const rawMethod = originalFactory(methodName, logLevel, loggerName);
+      return (message, opt) => {
+
+        const timestamp = DateTime.local().toFormat(TIMESTAMP_FORMAT);
+        rawMethod(`[${timestamp}] ${methodName}: ${message}`, opt);
+
+        // post errors to Discord
+        if (methodName === 'error') {
+          sendErrorToDiscord(message, opt)
+            .catch(err => {
+              console.error('Error posting to discord', err);
+            });
+        }
+      };
+    };
+
+    log.setLevel(log.getLevel()); // Be sure to call setLevel method in order to apply plugin
+  }
+  return log;
+}
+
+function sendErrorToDiscord (message: any, opt: any) {
+  let fields: { name: string, value?: string }[] = [];
+  if (opt instanceof Error) {
+    fields = [
+      { name: 'Error', value: opt.message },
+      { name: 'Stacktrace', value: opt.stack?.slice(0, 500) }
+    ];
+  }
+  else if (opt) {
+    fields = Object.entries<any>(opt).map(([name, _value]) => {
+      const value = typeof _value === 'string' ? _value.slice(0, 500) : _value?.toString();
+      return { name, value };
+    })
+      .slice(0, 5); // add a sane max # of fields just in case
+  }
+  return http.POST(ERRORS_WEBHOOK, {
+    embeds: [{
+      color: 14362664, // #db2828
+      description: message,
+      fields
+    }]
+  });
+}

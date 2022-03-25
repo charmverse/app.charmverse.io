@@ -24,9 +24,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from 'components/common/Snackbar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSWRConfig } from 'swr';
+import log from 'lib/log';
 
 export default function WorkspaceSettings () {
-
+  log.error('discord test!', new Error('error arg'));
   setTitle('Workspace Options');
   const router = useRouter();
   const { mutate } = useSWRConfig();
