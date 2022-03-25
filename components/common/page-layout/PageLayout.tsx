@@ -101,7 +101,7 @@ export function PageLayout ({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Head>
-        <Favicon icon={currentPage?.icon} />
+        <Favicon pageIcon={currentPage?.icon} />
       </Head>
       <Box sx={{ display: 'flex', height: '100%' }}>
         <AppBar position='fixed' open={open}>
