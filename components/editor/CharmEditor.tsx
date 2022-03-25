@@ -240,7 +240,7 @@ function CharmEditor (
   const _isEmpty = !content.content
     || content.content.length === 0
     || !content.content[0].content?.length;
-  console.log('content', content, _isEmpty);
+
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
