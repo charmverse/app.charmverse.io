@@ -52,7 +52,7 @@ export function getTwitterEmoji (emoji: string): string | null {
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
   if (isMac) return null;
 
-  // @ts-ignore
+  // @ts-ignore - library type is incorrect
   const html = twemoji.parse(emoji, {
     folder: 'svg',
     ext: '.svg'
