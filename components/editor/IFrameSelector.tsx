@@ -54,7 +54,6 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
   )}
     >
       {children}
-      <Snackbar />
     </PopperPopup>
   );
 }

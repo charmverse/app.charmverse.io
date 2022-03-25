@@ -294,7 +294,6 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Copy Link</Typography>
         </MenuItem>
       </Menu>
-      <Snackbar />
     </NestedPageContainer>
   );
 }

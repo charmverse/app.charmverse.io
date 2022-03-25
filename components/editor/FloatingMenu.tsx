@@ -17,43 +17,40 @@ export default function FloatingMenuComponent () {
   const { showMessage } = useSnackbar();
 
   return (
-    <>
-      <FloatingMenu
-        menuKey={menuKey}
-        renderMenuType={({ type }) => {
-          if (type === 'defaultMenu') {
-            return (
-              <Menu>
-                <MenuGroup>
-                  <BoldButton />
-                  <ItalicButton />
-                  <CodeButton />
-                  <StrikeButton />
-                  <UnderlineButton />
-                  <FloatingLinkButton menuKey={menuKey} />
-                </MenuGroup>
-                <MenuGroup isLastGroup>
-                  <ParagraphButton />
-                  <CalloutButton />
-                  <HeadingButton level={1} />
-                  <HeadingButton level={2} />
-                  <HeadingButton level={3} />
-                </MenuGroup>
-              </Menu>
-            );
-          }
-          if (type === 'linkSubMenu') {
-            return (
-              <Menu>
-                <LinkSubMenu showMessage={showMessage} />
-              </Menu>
-            );
-          }
-          return null;
-        }}
-      />
-      <Snackbar />
-    </>
+    <FloatingMenu
+      menuKey={menuKey}
+      renderMenuType={({ type }) => {
+        if (type === 'defaultMenu') {
+          return (
+            <Menu>
+              <MenuGroup>
+                <BoldButton />
+                <ItalicButton />
+                <CodeButton />
+                <StrikeButton />
+                <UnderlineButton />
+                <FloatingLinkButton menuKey={menuKey} />
+              </MenuGroup>
+              <MenuGroup isLastGroup>
+                <ParagraphButton />
+                <CalloutButton />
+                <HeadingButton level={1} />
+                <HeadingButton level={2} />
+                <HeadingButton level={3} />
+              </MenuGroup>
+            </Menu>
+          );
+        }
+        if (type === 'linkSubMenu') {
+          return (
+            <Menu>
+              <LinkSubMenu showMessage={showMessage} />
+            </Menu>
+          );
+        }
+        return null;
+      }}
+    />
   );
 }
 
