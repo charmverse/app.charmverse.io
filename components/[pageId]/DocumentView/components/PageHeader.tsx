@@ -15,7 +15,6 @@ import { Page } from 'models';
 import { ChangeEvent, memo } from 'react';
 import { useIntl } from 'react-intl';
 import PageIcon from 'components/common/Emoji';
-import emojis from './emoji.json';
 import { PageCoverGalleryImageGroups } from './PageBanner';
 import PageTitle from './PageTitle';
 
