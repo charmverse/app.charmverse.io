@@ -5,7 +5,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { SpaceRole } from '@prisma/client';
-import { IEventToLog, postToDiscord } from 'lib/logs/notifyDiscord';
+import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
