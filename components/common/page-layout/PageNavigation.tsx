@@ -231,25 +231,20 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
-export function PageIcon ({ isEditorEmpty, pageType }: {pageType: Page['type'], isEditorEmpty: boolean}) {
-  let icon: null | ReactNode = null;
+export function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode, pageType: Page['type'], isEditorEmpty: boolean}) {
+
+  if (icon) {
+    return <StyledPageIcon icon={icon} />;
+  }
   if (pageType === 'board') {
-    icon = (<StyledDatabaseIcon />);
+    return <StyledPageIcon icon={<StyledDatabaseIcon />} />;
   }
   else if (isEditorEmpty) {
-    icon = (
-      <InsertDriveFileOutlinedIcon />
-    );
+    return <StyledPageIcon icon={<InsertDriveFileOutlinedIcon />} />;
   }
   else {
-    icon = (
-      <DescriptionOutlinedIcon />
-    );
+    return <StyledPageIcon icon={<DescriptionOutlinedIcon />} />;
   }
-
-  return (
-    <StyledPageIcon icon={icon} />
-  );
 }
 
 // eslint-disable-next-line react/function-component-definition

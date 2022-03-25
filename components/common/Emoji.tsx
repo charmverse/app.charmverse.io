@@ -21,10 +21,15 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
   position: relative;
   z-index: 1;
   border-radius: 4px;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.background.light};
-  }
+  ${({ onClick, theme }) => {
+    if (onClick) {
+      return `
+        &:hover {
+          background-color: ${theme.palette.background.light};
+        }
+      `;
+    }
+  }}
   span {
     height: 100%;
     width: 100%;
