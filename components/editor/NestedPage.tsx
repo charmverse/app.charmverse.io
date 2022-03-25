@@ -44,7 +44,6 @@ const NestedPageContainer = styled((props: any) => <div {...props} />)`
   &:hover .actions-menu {
     opacity: 1;
   }
-  margin: ${({ theme }) => theme.spacing(1, 0)};
 `;
 
 export function nestedPageSpec (): RawSpecs {

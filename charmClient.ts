@@ -13,7 +13,7 @@ import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
-import { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 

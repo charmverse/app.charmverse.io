@@ -160,7 +160,7 @@ export default function WorkspaceSettings () {
           {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
         </Button>
         {notionFailedImports.length !== 0 && (
-          <Alert severity='error' sx={{ mt: 2 }}>
+          <Alert severity='warning' sx={{ mt: 2 }}>
             <Box sx={{
               display: 'flex', gap: 2, flexDirection: 'column'
             }}
@@ -176,8 +176,8 @@ export default function WorkspaceSettings () {
                     <span>Type: {failedImport.type}</span>
                     <span>Title: {failedImport.title}</span>
                     <span>Id: {failedImport.pageId}</span>
-
                   </Box>
+                  {failedImport.blocks.length && (
                   <div>
                     Blocks that failed to import for the page
                     {failedImport.blocks.map((blockTrails, blockTrailsIndex) => (
@@ -186,6 +186,7 @@ export default function WorkspaceSettings () {
                       </div>
                     ))}
                   </div>
+                  )}
                 </div>
               ))}
             </Box>
