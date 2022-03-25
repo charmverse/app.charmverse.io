@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import { getEmojiDataFromNative, Emoji as EmojiMart } from 'emoji-mart';
 import { ComponentProps, ReactNode } from 'react';
+import data from 'emoji-mart/data/all.json';
 
 export const Emoji = styled(Box)`
   /* font family taken from Notion */
@@ -36,6 +38,11 @@ const EmojiImg = styled.img<{ size: ImgSize }>`
 export default function EmojiCon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
   if (typeof icon === 'string' && icon.startsWith('http')) {
     return <Emoji {...props}><EmojiImg size={size} src={icon} /></Emoji>;
+  }
+  if (typeof icon === 'string') {
+    const emojiData = getEmojiDataFromNative(icon, 'apple', data);
+    const fontSize = size === 'large' ? 78 : 18;
+    return <Emoji {...props}><EmojiMart emoji={emojiData || ''} size={fontSize} /></Emoji>;
   }
   return (
     <Emoji {...props}>{icon}</Emoji>
