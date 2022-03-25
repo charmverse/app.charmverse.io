@@ -40,28 +40,32 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
   }
 `;
 
-function EmojiCon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
-
-  let iconContent: string | ReactNode = icon;
+export function getNonMacEmojiImage (emoji: string): string | null {
 
   // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  if (isMac) return null;
+
+  // @ts-ignore
+  const html = twemoji.parse(emoji, {
+    folder: 'svg',
+    ext: '.svg'
+  }) as string;
+  const match = /<img.*?src="(.*?)"/.exec(html);
+  return match ? match[1] : null;
+}
+
+function EmojiCon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
+
+  let iconContent: string | ReactNode = icon;
   if (typeof icon === 'string' && icon.startsWith('http')) {
     iconContent = <img src={icon} />;
   }
-  else if (!isMac && typeof icon === 'string') {
-    iconContent = (
-      <span
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{
-          // @ts-ignore
-          __html: twemoji.parse(icon, {
-            folder: 'svg',
-            ext: '.svg'
-          })
-        }}
-      />
-    );
+  else if (typeof icon === 'string') {
+    const twemojiImage = getNonMacEmojiImage(icon);
+    if (twemojiImage) {
+      iconContent = <img src={twemojiImage} />;
+    }
   }
   return (
     <Emoji size={size} {...props}>{iconContent}</Emoji>
