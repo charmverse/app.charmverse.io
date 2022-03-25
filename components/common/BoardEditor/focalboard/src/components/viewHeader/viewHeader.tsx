@@ -3,7 +3,7 @@
 import React, {useState, useEffect} from 'react'
 import {FormattedMessage} from 'react-intl'
 
-import ViewMenu from '../../components/viewMenu'
+import ViewMenu from '../viewMenu'
 import mutator from '../../mutator'
 import {Board, IPropertyTemplate} from '../../blocks/board'
 import {BoardView} from '../../blocks/boardView'

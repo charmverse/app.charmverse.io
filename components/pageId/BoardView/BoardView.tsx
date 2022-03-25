@@ -3,16 +3,16 @@ import { Page } from 'models';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import CenterPanel from './focalboard/src/components/centerPanel';
-import { sendFlashMessage } from './focalboard/src/components/flashMessages';
-import mutator from './focalboard/src/mutator';
-import { getCurrentBoard, setCurrent as setCurrentBoard } from './focalboard/src/store/boards';
-import { getCurrentViewCardsSortedFilteredAndGrouped } from './focalboard/src/store/cards';
-import { getClientConfig } from './focalboard/src/store/clientConfig';
-import { useAppDispatch, useAppSelector } from './focalboard/src/store/hooks';
-import { initialLoad, initialReadOnlyLoad } from './focalboard/src/store/initialLoad';
-import { getCurrentBoardViews, getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, setCurrent as setCurrentView } from './focalboard/src/store/views';
-import { Utils } from './focalboard/src/utils';
+import CenterPanel from '../../common/BoardEditor/focalboard/src/components/centerPanel';
+import { sendFlashMessage } from '../../common/BoardEditor/focalboard/src/components/flashMessages';
+import mutator from '../../common/BoardEditor/focalboard/src/mutator';
+import { getCurrentBoard, setCurrent as setCurrentBoard } from '../../common/BoardEditor/focalboard/src/store/boards';
+import { getCurrentViewCardsSortedFilteredAndGrouped } from '../../common/BoardEditor/focalboard/src/store/cards';
+import { getClientConfig } from '../../common/BoardEditor/focalboard/src/store/clientConfig';
+import { useAppDispatch, useAppSelector } from '../../common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad, initialReadOnlyLoad } from '../../common/BoardEditor/focalboard/src/store/initialLoad';
+import { getCurrentBoardViews, getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, setCurrent as setCurrentView } from '../../common/BoardEditor/focalboard/src/store/views';
+import { Utils } from '../../common/BoardEditor/focalboard/src/utils';
 
 /**
  *

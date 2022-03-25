@@ -5,7 +5,7 @@ import {useIntl, IntlShape} from 'react-intl'
 
 import {PropertyType} from '../blocks/board'
 import {Utils} from '../utils'
-import Menu from '../widgets/menu'
+import Menu from './menu'
 
 type Props = {
     propertyId: string

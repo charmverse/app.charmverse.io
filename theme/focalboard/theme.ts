@@ -3,7 +3,7 @@ import {
   Theme,
   darkTheme as originalDarkTheme,
   lightTheme as originalLightTheme
-} from 'components/databases/focalboard/src/theme';
+} from 'components/common/BoardEditor/focalboard/src/theme';
 
 import { darkModeColors, lightModeColors, BrandColorScheme } from 'theme/colors';
 

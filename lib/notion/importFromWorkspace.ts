@@ -6,10 +6,10 @@ import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO,
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/common/CharmEditor/components/ResizableImage';
 import { prisma } from 'db';
 import { v4 } from 'uuid';
-import { Board, createBoard, IPropertyTemplate, PropertyType } from 'components/databases/focalboard/src/blocks/board';
-import { BoardView, createBoardView } from 'components/databases/focalboard/src/blocks/boardView';
-import { Card, createCard } from 'components/databases/focalboard/src/blocks/card';
-import { CharmTextBlock, createCharmTextBlock } from 'components/databases/focalboard/src/blocks/charmBlock';
+import { Board, createBoard, IPropertyTemplate, PropertyType } from 'components/common/BoardEditor/focalboard/src/blocks/board';
+import { BoardView, createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
+import { Card, createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
+import { CharmTextBlock, createCharmTextBlock } from 'components/common/BoardEditor/focalboard/src/blocks/charmBlock';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported

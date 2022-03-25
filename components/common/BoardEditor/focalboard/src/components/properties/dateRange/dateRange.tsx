@@ -11,8 +11,8 @@ import Editable from '../../../widgets/editable'
 import SwitchOption from '../../../widgets/menu/switchOption'
 import Button from '../../../widgets/buttons/button'
 
-import Modal from '../../../components/modal'
-import ModalWrapper from '../../../components/modalWrapper'
+import Modal from '../../modal'
+import ModalWrapper from '../../modalWrapper'
 
 import 'react-day-picker/lib/style.css'
 import {Utils} from '../../../utils'

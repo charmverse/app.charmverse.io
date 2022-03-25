@@ -10,7 +10,7 @@ import {ISharing} from '../blocks/sharing'
 import client from '../octoClient'
 
 import {Utils, IDType} from '../utils'
-import {sendFlashMessage} from '../components/flashMessages'
+import {sendFlashMessage} from './flashMessages'
 
 import Button from '../widgets/buttons/button'
 import Switch from '../widgets/switch'

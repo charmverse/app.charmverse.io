@@ -3,20 +3,21 @@ import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import ImageIcon from '@mui/icons-material/Image';
-import { BlockIcons } from 'components/databases/focalboard/src/blockIcons';
-import EmojiPicker from 'components/databases/focalboard/src/widgets/emojiPicker';
-import DeleteIcon from 'components/databases/focalboard/src/widgets/icons/delete';
-import EmojiIcon from 'components/databases/focalboard/src/widgets/icons/emoji';
-import Menu from 'components/databases/focalboard/src/widgets/menu';
-import MenuWrapper from 'components/databases/focalboard/src/widgets/menuWrapper';
+import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
+import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import DeleteIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/delete';
+import EmojiIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/emoji';
+import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
+import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
+import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page } from 'models';
 import { ChangeEvent, memo } from 'react';
 import { useIntl } from 'react-intl';
 import PageIcon from 'components/common/Emoji';
 import emojis from './emoji.json';
-import { PageCoverGalleryImageGroups } from '../PageBanner';
-import PageTitle from './components/PageTitle';
+import { PageCoverGalleryImageGroups } from './PageBanner';
+import PageTitle from './PageTitle';
 
 const PageControlItem = styled(ListItemButton)`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
@@ -66,8 +67,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
   const intl = useIntl();
 
   function addPageIcon () {
-    const emojiOptions = [...emojis[0]];
-    const _icon = emojiOptions[randomIntFromInterval(0, emojiOptions.length - 1)];
+    const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
     setPage({ icon: _icon });
   }
 

@@ -1,9 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import '../content/textElement'
-import '../content/imageElement'
-import '../content/dividerElement'
-import '../content/checkboxElement'
+import './textElement'
+import './imageElement'
+import './dividerElement'
+import './checkboxElement'
 
 import {contentBlockTypes} from '../../blocks/block'
 

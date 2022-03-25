@@ -10,7 +10,7 @@ import '@testing-library/jest-dom'
 
 import {wrapIntl} from '../../../testUtils'
 
-import DateRange from '../dateRange/dateRange'
+import DateRange from './dateRange'
 
 // create Dates for specific days for this year.
 const June15 = new Date(Date.UTC(new Date().getFullYear(), 5, 15, 12))
