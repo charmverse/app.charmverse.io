@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { getNonMacEmojiImage } from 'components/common/Emoji';
+import { getTwitterEmoji } from 'components/common/Emoji';
 
 function Favicon ({ pageIcon }: { pageIcon?: string | null }) {
 
@@ -9,7 +9,7 @@ function Favicon ({ pageIcon }: { pageIcon?: string | null }) {
   };
 
   if (pageIcon) {
-    const emojiImage = getNonMacEmojiImage(pageIcon);
+    const emojiImage = getTwitterEmoji(pageIcon);
     favicon.type = 'image/svg+xml';
     if (emojiImage) {
       favicon.url = emojiImage;

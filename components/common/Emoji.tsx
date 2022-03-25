@@ -45,7 +45,8 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
   }
 `;
 
-export function getNonMacEmojiImage (emoji: string): string | null {
+// Use system font for Mac OS, but Twitter emojis for everyone else
+export function getTwitterEmoji (emoji: string): string | null {
 
   // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -67,7 +68,7 @@ function EmojiIcon ({ icon, size = 'small', ...props }: ComponentProps<typeof Em
     iconContent = <img src={icon} />;
   }
   else if (typeof icon === 'string') {
-    const twemojiImage = getNonMacEmojiImage(icon);
+    const twemojiImage = getTwitterEmoji(icon);
     if (twemojiImage) {
       iconContent = <img src={twemojiImage} />;
     }
