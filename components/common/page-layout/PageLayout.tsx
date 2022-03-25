@@ -88,7 +88,7 @@ function Favicon ({ icon }: { icon?: string | null }) {
       favicon.url = emojiImage;
     }
     else {
-      favicon.url = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2210 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${currentPage.icon}</text></svg>`;
+      favicon.url = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2210 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${icon}</text></svg>`;
     }
   }
   return (
