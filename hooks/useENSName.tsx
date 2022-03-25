@@ -6,7 +6,6 @@ const fetchENSName = (_: any, library: Web3Provider, address: string) => library
 
 const useENSName = (account: string | null | undefined): string | null | undefined => {
   const { library, chainId } = useWeb3React<Web3Provider>();
-
   const shouldFetch = Boolean(library && account);
 
   const { data } = useSWRImmutable(
