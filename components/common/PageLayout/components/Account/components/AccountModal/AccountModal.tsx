@@ -65,7 +65,8 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
     }
     else {
       const { redirectUrl } = await charmClient.discordLogin({
-        redirect: window.location.href
+        redirect: window.location.href,
+        type: 'connect'
       });
       window.location.replace(redirectUrl);
     }

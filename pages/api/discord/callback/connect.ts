@@ -66,7 +66,7 @@ handler.get(async (req, res) => {
   params.append('client_secret', DISCORD_OAUTH_CLIENT_SECRET);
   params.append('grant_type', 'authorization_code');
   params.append('code', tempAuthCode);
-  params.append('redirect_uri', req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
+  params.append('redirect_uri', req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback/connect` : 'https://app.charmverse.io/api/discord/callback/connect');
 
   const token = await http.POST(DISCORD_OAUTH_TOKEN_ENDPOINT, params, {
     headers: {

@@ -150,7 +150,7 @@ class CharmClient {
     return http.GET<{redirectUrl: string}>('/api/notion/login', query);
   }
 
-  discordLogin (query: {redirect: string}) {
+  discordLogin (query: {redirect: string, type: 'connect' | 'roles'}) {
     return http.GET<{redirectUrl: string}>('/api/discord/login', query);
   }
 
