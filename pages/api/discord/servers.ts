@@ -1,4 +1,4 @@
-export interface DiscordUserGuild {
+export interface DiscordUserServer {
   id: string
   name: string
   icon: string

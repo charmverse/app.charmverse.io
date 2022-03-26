@@ -14,9 +14,11 @@ handler.get(async (req, res) => {
     return;
   }
   let redirect: string;
+  let type: 'connect' | 'server' = 'connect';
   try {
     const state = JSON.parse(decodeURIComponent(req.query.state as string));
     redirect = state.redirect;
+    type = state.type;
   }
   catch (e) {
     log.warn('Error parsing state discord callback', e);
@@ -25,7 +27,7 @@ handler.get(async (req, res) => {
     return;
   }
 
-  res.redirect(`${redirect}?code=${tempAuthCode}&discord=1`);
+  res.redirect(`${redirect}?code=${tempAuthCode}&discord=1&type=${type}`);
 });
 
 export default handler;

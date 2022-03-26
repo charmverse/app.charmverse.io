@@ -20,7 +20,8 @@ async function login (req: NextApiRequest, res: NextApiResponse) {
   };
   const state = encodeURIComponent(JSON.stringify({
     redirect: query.redirect,
-    userId: req.session.user.id
+    userId: req.session.user.id,
+    type: query.type
   }));
 
   const callback = query.type === 'connect' ? '/connect' : '';

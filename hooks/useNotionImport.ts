@@ -24,7 +24,6 @@ export default function useNotionImport () {
       })
         .then(({ failedImports }) => {
           setIsImportingFromNotion(false);
-          showMessage('Successfully imported');
           mutate(`pages/${space.id}`);
           setNotionFailedImports(failedImports);
           showMessage('Notion workspace successfully imported');

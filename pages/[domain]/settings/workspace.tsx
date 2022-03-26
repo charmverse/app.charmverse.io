@@ -21,10 +21,8 @@ import NotionIcon from 'public/images/notion_logo.svg';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
 import CircularProgress from '@mui/material/CircularProgress';
-import Snackbar from 'components/common/Snackbar';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useSWRConfig } from 'swr';
 import useNotionImport from 'hooks/useNotionImport';
+import useDiscordServers from 'hooks/useDiscordServers';
 
 export interface FailedImportsError {
   pageId: string,
@@ -43,6 +41,12 @@ export default function WorkspaceSettings () {
     notionFailedImports,
     notionImportError
   } = useNotionImport();
+
+  const {
+    discordServers
+  } = useDiscordServers();
+
+  console.log({ discordServers });
 
   const {
     register,
@@ -137,7 +141,7 @@ export default function WorkspaceSettings () {
           href={`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
           variant='outlined'
           startIcon={(
-            <SvgIcon viewBox='0 -5 70 70' sx={{ color: 'text.primary' }}>
+            <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>
               <DiscordIcon />
             </SvgIcon>
           )}
@@ -177,12 +181,12 @@ export default function WorkspaceSettings () {
             </Box>
           </Alert>
         )}
-        {notionImportError && (
+      </Box>
+      {notionImportError && (
         <Alert severity='error' sx={{ mt: 2 }}>
           {notionImportError}
         </Alert>
-        )}
-      </Box>
+      )}
     </>
   );
 }

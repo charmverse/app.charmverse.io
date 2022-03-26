@@ -14,6 +14,7 @@ import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import { DiscordUserServer } from 'pages/api/discord/servers';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -150,8 +151,12 @@ class CharmClient {
     return http.POST('/api/discord/disconnect');
   }
 
-  importFromNotion (params: { code: string, spaceId: string }) {
-    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', params);
+  importFromNotion (payload: { code: string, spaceId: string }) {
+    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
+  }
+
+  listDiscordServers (payload: {code: string, spaceId: string}) {
+    return http.POST<DiscordUserServer[]>('/api/discord/servers', payload);
   }
 
   // FocalBoard
