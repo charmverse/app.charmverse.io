@@ -146,14 +146,6 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
-  notionLogin (query: { redirect: string }) {
-    return http.GET<{redirectUrl: string}>('/api/notion/login', query);
-  }
-
-  discordLogin (query: {redirect: string, type: 'connect' | 'roles'}) {
-    return http.GET<{redirectUrl: string}>('/api/discord/login', query);
-  }
-
   disconnectDiscord () {
     return http.POST('/api/discord/disconnect');
   }

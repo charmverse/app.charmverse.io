@@ -64,11 +64,7 @@ function AccountModal ({ isOpen, onClose }: { isOpen: boolean, onClose: () => vo
       setIsDisconnecting(false);
     }
     else {
-      const { redirectUrl } = await charmClient.discordLogin({
-        redirect: window.location.href,
-        type: 'connect'
-      });
-      window.location.replace(redirectUrl);
+      window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
     }
   }
 

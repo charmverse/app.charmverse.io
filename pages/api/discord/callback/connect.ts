@@ -29,12 +29,9 @@ handler.get(async (req, res) => {
     return;
   }
 
-  const nonce = req.cookies.oauth_secret;
-
   let state: {
     redirect: string,
     userId: string,
-    nonce: string
   } = {} as any;
   try {
     state = JSON.parse(decodeURIComponent(req.query.state as string));
@@ -55,7 +52,7 @@ handler.get(async (req, res) => {
     url.searchParams.delete('discord');
   }
 
-  if (!state.userId || state.nonce !== nonce) {
+  if (!state.userId) {
     url.searchParams.append('discord', '3');
     res.redirect(url.href);
     return;
