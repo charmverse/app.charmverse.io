@@ -11,12 +11,12 @@ export default function useDiscordServers () {
   const [isLoading, setIsLoading] = useState(false);
   const [space] = useCurrentSpace();
   const [discordServers, setDiscordServers] = useState<DiscordUserServer[]>([]);
-
+  const isListingDiscordServers = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'server';
   useEffect(() => {
-    if (space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'server') {
+    if (isListingDiscordServers) {
       setIsLoading(true);
       charmClient.listDiscordServers({
-        code: router.query.code,
+        code: router.query.code as string,
         spaceId: space.id
       })
         .then(({ servers }) => {
@@ -34,6 +34,7 @@ export default function useDiscordServers () {
   return {
     isLoading,
     discordError,
-    discordServers
+    discordServers,
+    isListingDiscordServers
   };
 }

@@ -23,6 +23,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import CircularProgress from '@mui/material/CircularProgress';
 import useNotionImport from 'hooks/useNotionImport';
 import useDiscordServers from 'hooks/useDiscordServers';
+import DiscordServersModal from 'components/common/DiscordServersModal';
 
 export interface FailedImportsError {
   pageId: string,
@@ -35,6 +36,7 @@ export default function WorkspaceSettings () {
   const router = useRouter();
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
+  const [isDiscordServersModalOpen, setIsDiscordServersModalOpen] = useState(false);
 
   const {
     isImportingFromNotion,
@@ -43,8 +45,16 @@ export default function WorkspaceSettings () {
   } = useNotionImport();
 
   const {
-    discordServers
+    discordServers,
+    isListingDiscordServers,
+    isLoading
   } = useDiscordServers();
+
+  useEffect(() => {
+    if (!isLoading && isListingDiscordServers) {
+      setIsDiscordServersModalOpen(true);
+    }
+  }, [isLoading, isListingDiscordServers]);
 
   const {
     register,
@@ -143,9 +153,19 @@ export default function WorkspaceSettings () {
               <DiscordIcon />
             </SvgIcon>
           )}
+          endIcon={(
+            isLoading && <CircularProgress size={20} />
+          )}
         >
-          Import roles
+          Connect Discord server
         </Button>
+        <DiscordServersModal
+          isOpen={isDiscordServersModalOpen}
+          discordServers={discordServers}
+          onClose={() => {
+            setIsDiscordServersModalOpen(false);
+          }}
+        />
         {notionFailedImports.length !== 0 && (
           <Alert severity='warning' sx={{ mt: 2 }}>
             <Box sx={{
