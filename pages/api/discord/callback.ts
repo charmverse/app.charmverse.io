@@ -10,7 +10,7 @@ const handler = nc({
 handler.get(async (req, res) => {
   const tempAuthCode = req.query.code;
   if (req.query.error || !tempAuthCode) {
-    res.status(400).send('Error or missing code from Notion OAuth');
+    res.status(400).send('Error or missing code from Discord OAuth');
     return;
   }
   let redirect: string;
@@ -19,13 +19,13 @@ handler.get(async (req, res) => {
     redirect = state.redirect;
   }
   catch (e) {
-    log.warn('Error parsing state notion callback', e);
+    log.warn('Error parsing state discord callback', e);
     // TODO: Error page
     res.status(400).send('Invalid callback state');
     return;
   }
 
-  res.redirect(`${redirect}?code=${tempAuthCode}&notion=1`);
+  res.redirect(`${redirect}?code=${tempAuthCode}&discord=1`);
 });
 
 export default handler;

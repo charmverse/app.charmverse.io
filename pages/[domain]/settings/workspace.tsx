@@ -45,7 +45,7 @@ export default function WorkspaceSettings () {
   const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
 
   useEffect(() => {
-    if (space && typeof router.query.code === 'string') {
+    if (space && typeof router.query.code === 'string' && router.query.notion === '1') {
       setIsImportingFromNotion(true);
       setNotionFailedImports([]);
       charmClient.importFromNotion({
@@ -156,7 +156,7 @@ export default function WorkspaceSettings () {
         </Button>
         <Button
           disabled={isImportingFromNotion}
-          href={`/api/discord/servers?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
+          href={`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
           variant='outlined'
           startIcon={(
             <SvgIcon viewBox='0 -5 70 70' sx={{ color: 'text.primary' }}>
