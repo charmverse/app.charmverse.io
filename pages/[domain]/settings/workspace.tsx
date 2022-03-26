@@ -46,8 +46,6 @@ export default function WorkspaceSettings () {
     discordServers
   } = useDiscordServers();
 
-  console.log({ discordServers });
-
   const {
     register,
     handleSubmit,

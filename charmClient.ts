@@ -156,7 +156,7 @@ class CharmClient {
   }
 
   listDiscordServers (payload: {code: string, spaceId: string}) {
-    return http.POST<DiscordUserServer[]>('/api/discord/servers', payload);
+    return http.POST<{servers: DiscordUserServer[]}>('/api/discord/servers', payload);
   }
 
   // FocalBoard

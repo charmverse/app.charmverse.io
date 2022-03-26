@@ -19,9 +19,9 @@ export default function useDiscordServers () {
         code: router.query.code,
         spaceId: space.id
       })
-        .then((_discordServers) => {
+        .then(({ servers }) => {
           setIsLoading(false);
-          setDiscordServers(_discordServers);
+          setDiscordServers(servers);
           showMessage('Successfully imported');
         })
         .catch((err) => {
