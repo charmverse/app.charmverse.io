@@ -18,6 +18,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
 import { Box } from '@mui/material';
 import NotionIcon from 'public/images/notion_logo.svg';
+import DiscordIcon from 'public/images/discord_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
 import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from 'components/common/Snackbar';
@@ -137,7 +138,7 @@ export default function WorkspaceSettings () {
         </Grid>
       </form>
       <Legend>Import</Legend>
-      <Box sx={{ ml: 1 }}>
+      <Box sx={{ ml: 1 }} display='flex' gap={1}>
         <Button
           disabled={isImportingFromNotion}
           href={`/api/notion/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
@@ -152,6 +153,18 @@ export default function WorkspaceSettings () {
           )}
         >
           {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
+        </Button>
+        <Button
+          disabled={isImportingFromNotion}
+          href={`/api/discord/servers?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
+          variant='outlined'
+          startIcon={(
+            <SvgIcon viewBox='0 -5 70 70' sx={{ color: 'text.primary' }}>
+              <DiscordIcon />
+            </SvgIcon>
+          )}
+        >
+          Import roles
         </Button>
         {notionFailedImports.length !== 0 && (
           <Alert severity='warning' sx={{ mt: 2 }}>
