@@ -11,12 +11,11 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import charmClient, { ListSpaceRolesResponse } from 'charmClient';
-import { Role, User } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { Typography } from '@mui/material';
 import { getDisplayName } from 'lib/users';
 import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
+import useRoles from 'hooks/useRoles';
 
 export const schema = yup.object({
   name: yup.string().required('Please provide a valid role name')
@@ -25,10 +24,14 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 export default function RoleAssignment () {
-
-  const [space] = useCurrentSpace();
-
-  const [roles, setRoles] = useState<ListSpaceRolesResponse[]>([]);
+  const {
+    assignRole,
+    createRole,
+    deleteRole,
+    listRoles,
+    unassignRole,
+    roles
+  } = useRoles();
 
   useEffect(() => {
     listRoles();
@@ -37,58 +40,11 @@ export default function RoleAssignment () {
   const {
     register,
     handleSubmit,
-    setValue,
-    watch,
-    trigger,
-    formState: { errors, touchedFields, isValid, isValidating, isSubmitting }
+    formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema)
   });
-
-  async function createRole (role: Partial<Role>) {
-    role.spaceId = space?.id;
-    const createdRole = await charmClient.createRole(role);
-    console.log('Created new role', createdRole);
-    listRoles();
-  }
-
-  async function deleteRole (roleId: string) {
-    await charmClient.deleteRole({ roleId, spaceId: space!.id });
-    listRoles();
-  }
-
-  async function listRoles () {
-    if (space) {
-      const rolesInSpace = await charmClient.listRoles(space.id);
-      setRoles(rolesInSpace);
-      console.log('Roles and members', rolesInSpace);
-    }
-  }
-
-  async function assignRole (userId: string, roleId: string) {
-    if (space) {
-      await charmClient.assignRole({
-        roleId,
-        userId,
-        spaceId: space.id
-      });
-      listRoles();
-    }
-
-  }
-
-  async function unassignRole (userId: string, roleId: string) {
-    if (space) {
-      await charmClient.unassignRole({
-        roleId,
-        userId,
-        spaceId: space.id
-      });
-      listRoles();
-    }
-
-  }
 
   return (
     <>
@@ -105,7 +61,6 @@ export default function RoleAssignment () {
           style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}
         >
           <Grid container direction='column' spacing={3}>
-
             <Grid item>
               <InputLabel>
                 Role name
@@ -119,65 +74,61 @@ export default function RoleAssignment () {
                 fullWidth
               />
               {
-              errors?.name && (
-              <Alert severity='error'>
-                {errors.name.message}
-              </Alert>
-              )
-            }
-
+                errors?.name && (
+                  <Alert severity='error'>
+                    {errors.name.message}
+                  </Alert>
+                )
+              }
             </Grid>
-
             <Grid item>
               <Button disabled={!isValid} type='submit'>Create role</Button>
             </Grid>
-
           </Grid>
 
         </form>
       </div>
       <Box>
         {
-            roles.map(role => {
-              return (
-                <Box key={role.id}>
+          roles.map(role => {
+            return (
+              <Box key={role.id}>
 
-                  <Typography variant='h2'>{role.name}
-                    <ElementDeleteIcon clicked={() => {
-                      deleteRole(role.id);
-                    }}
-                    />
-                  </Typography>
-
-                  {
-                    (role).spaceRolesToRole?.map(spaceRoleToRole => {
-                      return (
-                        <p>{getDisplayName(spaceRoleToRole?.spaceRole?.user)}
-                          <ElementDeleteIcon
-                            clicked={() => {
-                              unassignRole(spaceRoleToRole?.spaceRole?.user?.id, role.id);
-                            }}
-                          />
-                        </p>
-                      );
-                    })
-                  }
-
-                  <Box>
-
-                  </Box>
-
-                  <br />
-                  <InputSearchContributor onChange={(userId) => {
-                    assignRole(userId, role.id);
+                <Typography variant='h2'>{role.name}
+                  <ElementDeleteIcon clicked={() => {
+                    deleteRole(role.id);
                   }}
                   />
+                </Typography>
+
+                {
+                  (role).spaceRolesToRole?.map(spaceRoleToRole => {
+                    return (
+                      <p>{getDisplayName(spaceRoleToRole?.spaceRole?.user)}
+                        <ElementDeleteIcon
+                          clicked={() => {
+                            unassignRole(spaceRoleToRole?.spaceRole?.user?.id, role.id);
+                          }}
+                        />
+                      </p>
+                    );
+                  })
+                }
+
+                <Box>
+
                 </Box>
-              );
-            })
-          }
+
+                <br />
+                <InputSearchContributor onChange={(userId) => {
+                  assignRole(userId, role.id);
+                }}
+                />
+              </Box>
+            );
+          })
+        }
       </Box>
     </>
   );
-
 }
