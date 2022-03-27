@@ -10,7 +10,7 @@ const handler = nc({
   onNoMatch
 });
 
-interface DiscordApiUserResponse {
+export interface DiscordUser {
   id: string
   username: string
   discriminator: string
@@ -58,7 +58,7 @@ handler.get(async (req, res) => {
   }
 
   const token = await getDiscordToken(tempAuthCode, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback/connect` : 'https://app.charmverse.io/api/discord/callback/connect');
-  const discordAccount = await http.GET<DiscordApiUserResponse>('https://discord.com/api/v8/users/@me', undefined, {
+  const discordAccount = await http.GET<DiscordUser>('https://discord.com/api/v8/users/@me', undefined, {
     headers: {
       Authorization: `Bearer ${token.access_token}`
     }

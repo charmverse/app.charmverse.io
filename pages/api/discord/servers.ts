@@ -30,8 +30,6 @@ handler.post(async (req, res) => {
     return;
   }
 
-  console.log(req.session);
-
   try {
     const token = await getDiscordToken(tempAuthCode, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
     const discordUserServers = await http.GET<DiscordUserServer[]>('https://discord.com/api/v8/users/@me/guilds', undefined, {
