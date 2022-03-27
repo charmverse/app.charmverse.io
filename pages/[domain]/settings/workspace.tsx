@@ -24,6 +24,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import useNotionImport from 'hooks/useNotionImport';
 import useDiscordServers from 'hooks/useDiscordServers';
 import DiscordServersModal from 'components/common/DiscordServersModal';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 export interface FailedImportsError {
   pageId: string,
@@ -37,7 +38,6 @@ export default function WorkspaceSettings () {
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
   const [isDiscordServersModalOpen, setIsDiscordServersModalOpen] = useState(false);
-
   const {
     isImportingFromNotion,
     notionFailedImports,
@@ -47,14 +47,18 @@ export default function WorkspaceSettings () {
   const {
     discordServers,
     isListingDiscordServers,
-    isLoading
+    isLoading,
+    discordError
   } = useDiscordServers();
 
   useEffect(() => {
-    if (!isLoading && isListingDiscordServers) {
+    if (!isLoading && isListingDiscordServers && !discordError) {
       setIsDiscordServersModalOpen(true);
     }
-  }, [isLoading, isListingDiscordServers]);
+    else {
+      setIsDiscordServersModalOpen(false);
+    }
+  }, [isLoading, discordError, isListingDiscordServers]);
 
   const {
     register,
@@ -144,22 +148,25 @@ export default function WorkspaceSettings () {
         >
           {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
         </Button>
-        <Button
-          disabled={isImportingFromNotion}
-          href={`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
-          variant='outlined'
-          startIcon={(
-            <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>
-              <DiscordIcon />
-            </SvgIcon>
-          )}
-          endIcon={(
-            isLoading && <CircularProgress size={20} />
-          )}
-        >
-          Import roles from Discord server
-        </Button>
+        <Box display='flex' gap={1}>
+          <Button
+            disabled={isImportingFromNotion}
+            href={`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
+            variant='outlined'
+            startIcon={(
+              <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>
+                <DiscordIcon />
+              </SvgIcon>
+            )}
+            endIcon={(
+              isLoading && <CircularProgress size={20} />
+            )}
+          >
+            Import roles from Discord server
+          </Button>
+        </Box>
         <DiscordServersModal
+          isFetching={isLoading}
           isOpen={isDiscordServersModalOpen}
           discordServers={discordServers}
           onClose={() => {

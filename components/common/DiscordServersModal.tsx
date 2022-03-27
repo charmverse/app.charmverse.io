@@ -1,14 +1,14 @@
 
 import { Modal } from 'components/common/Modal';
 import { DiscordUserServer } from 'pages/api/discord/servers';
-import { Avatar, ListItemAvatar, List, ListItemText, ListItemButton } from '@mui/material';
+import { Avatar, ListItemAvatar, List, ListItemText, ListItemButton, Typography } from '@mui/material';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import charmClient from 'charmClient';
 import { useMemo, useState } from 'react';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-function DiscordServersModal ({ discordServers, onClose, isOpen }:
-  { discordServers: DiscordUserServer[], isOpen: boolean, onClose: () => void }) {
+function DiscordServersModal ({ isFetching, discordServers, onClose, isOpen }:
+  { discordServers: DiscordUserServer[], isFetching: boolean, isOpen: boolean, onClose: () => void }) {
   const [currentSpace, setCurrentSpace] = useCurrentSpace();
   const [isConnectingServer, setIsConnectingServer] = useState(false);
   const {
@@ -22,13 +22,14 @@ function DiscordServersModal ({ discordServers, onClose, isOpen }:
       open={isOpen}
       onClose={onClose}
     >
-      <List sx={{
-        maxHeight: 500,
-        overflow: 'auto',
-        pr: 2
-      }}
-      >
-        {
+      {isFetching ? <Typography variant='h5'>Fetching servers</Typography> : (
+        <List sx={{
+          maxHeight: 500,
+          overflow: 'auto',
+          pr: 2
+        }}
+        >
+          {
           sortedServers.map(discordServer => (
             <ListItemButton
               disabled={isConnectingServer}
@@ -60,7 +61,8 @@ function DiscordServersModal ({ discordServers, onClose, isOpen }:
             </ListItemButton>
           ))
 }
-      </List>
+        </List>
+      )}
     </Modal>
   ) : null;
 }

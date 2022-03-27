@@ -59,16 +59,19 @@ function Account (): JSX.Element {
   // We might get redirected after connection with discord, so check the query param if it has a discord field
   // It can either be fail or success
   useEffect(() => {
-    // Already connected account error
-    if (router.query.discord === '2') {
-      showMessage('Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.', 'error');
-    }
-    // Invalid state error
-    else if (router.query.discord === '3') {
-      showMessage('An error occurred. Please try again', 'error');
-    }
-    else if (router.query.discord === '1') {
-      showMessage('Successfully connected with discord', 'info');
+    // Connection with discord
+    if (router.query.type === 'connect') {
+      // Already connected account error
+      if (router.query.discord === '2') {
+        showMessage('Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.', 'error');
+      }
+      // Invalid state error
+      else if (router.query.discord === '3') {
+        showMessage('An error occurred. Please try again', 'error');
+      }
+      else if (router.query.discord === '1') {
+        showMessage('Successfully connected with discord', 'info');
+      }
     }
   }, [router.query.discord]);
 

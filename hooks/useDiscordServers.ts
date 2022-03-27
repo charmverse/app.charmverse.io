@@ -6,7 +6,7 @@ import { useCurrentSpace } from './useCurrentSpace';
 import { useSnackbar } from './useSnackbar';
 
 export default function useDiscordServers () {
-  const [discordError, setNotionImportError] = useState<string | null>(null);
+  const [discordError, setDiscordError] = useState<string | null>(null);
   const { showMessage } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
   const [space] = useCurrentSpace();
@@ -22,11 +22,13 @@ export default function useDiscordServers () {
         .then(({ servers }) => {
           setIsLoading(false);
           setDiscordServers(servers);
-          showMessage('Successfully imported');
+          showMessage('Successfully fetched servers');
         })
         .catch((err) => {
           setIsLoading(false);
-          setNotionImportError(err.message ?? err.error ?? 'Something went wrong. Please try again');
+          const errorMessage = err.message ?? err.error ?? 'Something went wrong. Please try again';
+          showMessage(errorMessage, 'error');
+          setDiscordError(errorMessage);
         });
     }
   }, [Boolean(space)]);
