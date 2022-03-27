@@ -1,9 +1,10 @@
-import nc from 'next-connect';
-import { onError, onNoMatch } from 'lib/middleware';
 import log from 'lib/log';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
 import * as http from 'adapters/http';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import nc from 'next-connect';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc({
   onError,
@@ -33,7 +34,7 @@ export interface DiscordServerRole {
   }[]
 }
 
-handler.post(async (req: NextApiRequest, res: NextApiResponse) => {
+async function importRoles (req: NextApiRequest, res: NextApiResponse) {
   const { spaceId, guildId } = req.body as ImportRolesPayload;
   try {
     await prisma.space.update({
@@ -51,7 +52,31 @@ handler.post(async (req: NextApiRequest, res: NextApiResponse) => {
       }
     });
 
-    console.log({ discordServerRoles });
+    for (const discordServerRole of discordServerRoles) {
+      if (discordServerRole.name !== '@everyone') {
+        const existingRole = await prisma.role.findFirst({
+          where: {
+            name: discordServerRole.name,
+            spaceId
+          }
+        });
+
+        // Only create the role if it doesn't already exist
+        if (!existingRole) {
+          await prisma.role.create({
+            data: {
+              name: discordServerRole.name,
+              space: {
+                connect: {
+                  id: spaceId
+                }
+              },
+              createdBy: req.session.user?.id
+            }
+          });
+        }
+      }
+    }
 
     res.status(200).end();
   }
@@ -59,6 +84,8 @@ handler.post(async (req: NextApiRequest, res: NextApiResponse) => {
     log.warn('Failed to connect workspace with discord server', err);
     res.status(500).end();
   }
-});
+}
 
-export default handler;
+handler.use(requireUser).post(importRoles);
+
+export default withSessionRoute(handler);

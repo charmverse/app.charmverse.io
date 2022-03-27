@@ -1,9 +1,10 @@
 import nc from 'next-connect';
-import { onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import * as http from 'adapters/http';
 import { prisma } from 'db';
 import log from 'lib/log';
 import { getDiscordToken } from 'lib/discord/getDiscordToken';
+import { withSessionRoute } from 'lib/session/withSession';
 
 export interface DiscordUserServer {
   id: string
@@ -19,6 +20,8 @@ const handler = nc({
   onNoMatch
 });
 
+handler.use(requireUser);
+
 handler.post(async (req, res) => {
   const tempAuthCode = req.body.code as string;
   if (!tempAuthCode) {
@@ -26,6 +29,8 @@ handler.post(async (req, res) => {
     res.redirect('/');
     return;
   }
+
+  console.log(req.session);
 
   try {
     const token = await getDiscordToken(tempAuthCode, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
@@ -41,4 +46,5 @@ handler.post(async (req, res) => {
   }
 });
 
-export default handler;
+export default withSessionRoute(handler);
+
