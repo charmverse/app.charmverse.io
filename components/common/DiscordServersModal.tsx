@@ -32,6 +32,7 @@ function DiscordServersModal ({ isFetching, discordServers, onClose, isOpen }:
           {
           sortedServers.map(discordServer => (
             <ListItemButton
+              key={discordServer.id}
               disabled={isConnectingServer}
               onClick={async () => {
                 try {

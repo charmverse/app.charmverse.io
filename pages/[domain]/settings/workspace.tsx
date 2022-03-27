@@ -16,7 +16,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import NotionIcon from 'public/images/notion_logo.svg';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -95,6 +95,7 @@ export default function WorkspaceSettings () {
     }
   }
 
+  const connectedWithDiscord = space?.discordServerId;
   return (
     <>
       <Legend>Space Details</Legend>
@@ -148,10 +149,21 @@ export default function WorkspaceSettings () {
         >
           {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
         </Button>
-        <Box display='flex' gap={1}>
+        <Box display='flex' gap={1} alignItems='center'>
           <Button
             disabled={isImportingFromNotion}
-            href={`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
+            onClick={async () => {
+              if (connectedWithDiscord) {
+                const discordServerRoles = await charmClient.listDiscordServerRoles({
+                  spaceId: space.id
+                });
+
+                console.log(discordServerRoles);
+              }
+              else {
+                window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`);
+              }
+            }}
             variant='outlined'
             startIcon={(
               <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>
@@ -162,8 +174,9 @@ export default function WorkspaceSettings () {
               isLoading && <CircularProgress size={20} />
             )}
           >
-            Import roles from Discord server
+            {connectedWithDiscord ? 'Import roles' : 'Connect Server'}
           </Button>
+          {connectedWithDiscord && <Typography variant='subtitle2'>GUILD ID: {connectedWithDiscord}</Typography>}
         </Box>
         <DiscordServersModal
           isFetching={isLoading}
