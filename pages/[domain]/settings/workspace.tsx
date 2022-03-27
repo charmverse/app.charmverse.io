@@ -157,7 +157,7 @@ export default function WorkspaceSettings () {
             isLoading && <CircularProgress size={20} />
           )}
         >
-          Connect Discord server
+          Import roles from Discord server
         </Button>
         <DiscordServersModal
           isOpen={isDiscordServersModalOpen}
