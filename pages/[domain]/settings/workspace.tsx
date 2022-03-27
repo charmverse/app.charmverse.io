@@ -152,18 +152,7 @@ export default function WorkspaceSettings () {
         <Box display='flex' gap={1} alignItems='center'>
           <Button
             disabled={isImportingFromNotion}
-            onClick={async () => {
-              if (connectedWithDiscord) {
-                const discordServerRoles = await charmClient.listDiscordServerRoles({
-                  spaceId: space.id
-                });
-
-                console.log(discordServerRoles);
-              }
-              else {
-                window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`);
-              }
-            }}
+            href={`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
             variant='outlined'
             startIcon={(
               <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>
@@ -174,7 +163,7 @@ export default function WorkspaceSettings () {
               isLoading && <CircularProgress size={20} />
             )}
           >
-            {connectedWithDiscord ? 'Import roles' : 'Connect Server'}
+            Import Roles
           </Button>
           {connectedWithDiscord && <Typography variant='subtitle2'>GUILD ID: {connectedWithDiscord}</Typography>}
         </Box>

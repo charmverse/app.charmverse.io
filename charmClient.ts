@@ -15,8 +15,7 @@ import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
 import { DiscordUserServer } from 'pages/api/discord/servers';
-import { ConnectServerPayload } from 'pages/api/discord/connectServer';
-import { DiscordServerRole } from 'pages/api/discord/roles';
+import { DiscordServerRole, ImportRolesPayload } from 'pages/api/discord/importRoles';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -161,12 +160,8 @@ class CharmClient {
     return http.POST<{servers: DiscordUserServer[]}>('/api/discord/servers', payload);
   }
 
-  listDiscordServerRoles (params: {spaceId: string}) {
-    return http.GET<{roles: DiscordServerRole[]}>('/api/discord/roles', params);
-  }
-
-  connectDiscordServer (payload: ConnectServerPayload) {
-    return http.POST('/api/discord/connectServer', payload);
+  importRolesFromServer (payload: ImportRolesPayload) {
+    return http.POST('/api/discord/importRoles', payload);
   }
 
   // FocalBoard

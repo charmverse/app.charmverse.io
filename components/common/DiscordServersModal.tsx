@@ -37,10 +37,11 @@ function DiscordServersModal ({ isFetching, discordServers, onClose, isOpen }:
               onClick={async () => {
                 try {
                   setIsConnectingServer(true);
-                  await charmClient.connectDiscordServer({
+                  await charmClient.importRolesFromServer({
                     guildId: discordServer.id,
                     spaceId: currentSpace.id
                   });
+
                   setCurrentSpace({
                     ...currentSpace,
                     discordServerId: discordServer.id
