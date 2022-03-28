@@ -174,9 +174,9 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
           }
         });
         // IMPORTANT: Remove this from production !!! THIS IS ONLY FOR TESTING PURPOSE
-        if (discordServerRole.name === 'error') {
-          throw new Error();
-        }
+        // if (discordServerRole.name === 'error') {
+        //   throw new Error();
+        // }
 
         // Only create the role if it doesn't already exist
         if (!existingRole) {

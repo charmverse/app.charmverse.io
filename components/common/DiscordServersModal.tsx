@@ -2,15 +2,18 @@
 import { Modal } from 'components/common/Modal';
 import { DiscordUserServer } from 'pages/api/discord/servers';
 import { Avatar, ListItemAvatar, List, ListItemText, ListItemButton, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
-function DiscordServersModal ({ isFetching, discordServers, onImportingDiscordRoles, onClose, isOpen }:
+function DiscordServersModal (
   {
-    discordServers: DiscordUserServer[], isFetching: boolean, isOpen: boolean,
-    onImportingDiscordRoles: (guildId: string) => Promise<void>, onClose: () => void
-  }) {
-  const [isConnectingServer, setIsConnectingServer] = useState(false);
-
+    isImportRolesFromServerLoading, isListDiscordServersLoading,
+    discordServers, onImportingDiscordRoles, onClose, isOpen
+  }:
+  {
+    isImportRolesFromServerLoading: boolean, discordServers: DiscordUserServer[], isListDiscordServersLoading: boolean,
+    isOpen: boolean, onImportingDiscordRoles: (guildId: string) => Promise<void>, onClose: () => void
+  }
+) {
   const sortedServers = useMemo(() => discordServers
     .sort((discordServerA, discordServerB) => discordServerA.name < discordServerB.name ? -1 : 1), [discordServers]);
   return (
@@ -28,7 +31,7 @@ function DiscordServersModal ({ isFetching, discordServers, onImportingDiscordRo
         Your Servers
         <Typography variant='subtitle2'>Click on any of them to start importing roles</Typography>
       </Typography>
-      {isFetching ? <Typography variant='h5'>Fetching servers</Typography> : (
+      {isListDiscordServersLoading ? <Typography variant='h5'>Fetching servers</Typography> : (
         <List sx={{
           maxHeight: 500,
           overflow: 'auto',
@@ -39,10 +42,10 @@ function DiscordServersModal ({ isFetching, discordServers, onImportingDiscordRo
             sortedServers.map(discordServer => (
               <ListItemButton
                 key={discordServer.id}
-                disabled={isConnectingServer}
+                disabled={isImportRolesFromServerLoading}
                 onClick={async () => {
                   await onImportingDiscordRoles(discordServer.id);
-                  setIsConnectingServer(false);
+                  onClose();
                 }}
               >
                 <ListItemAvatar>

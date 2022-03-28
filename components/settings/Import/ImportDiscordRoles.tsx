@@ -1,4 +1,4 @@
-import { Button, SvgIcon, CircularProgress } from '@mui/material';
+import { Button, SvgIcon, CircularProgress, Alert } from '@mui/material';
 import { Box } from '@mui/system';
 import DiscordServersModal from 'components/common/DiscordServersModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -14,12 +14,18 @@ export default function ImportDiscordRoles () {
     isListingDiscordServers,
     discordError,
     importRolesFromServer,
-    isListDiscordServersLoading
+    isListDiscordServersLoading,
+    isImportRolesFromServerLoading,
+    importRolesFromServerError
   } = useDiscordServers();
   const [user] = useUser();
   const [space] = useCurrentSpace();
 
   useEffect(() => {
+    // If we've fetched list of servers
+    // If we are listing discord servers
+    // If there were no errors while fetching list of servers
+    // Show the discord servers modal
     if (!isListDiscordServersLoading && isListingDiscordServers && !discordError) {
       setIsDiscordServersModalOpen(true);
     }
@@ -59,14 +65,40 @@ export default function ImportDiscordRoles () {
         </Button>
       </Box>
       <DiscordServersModal
-        isFetching={isListDiscordServersLoading}
+        isListDiscordServersLoading={isListDiscordServersLoading}
         isOpen={isDiscordServersModalOpen}
         discordServers={discordServers}
+        isImportRolesFromServerLoading={isImportRolesFromServerLoading}
         onClose={() => {
           setIsDiscordServersModalOpen(false);
         }}
         onImportingDiscordRoles={(guildId) => importRolesFromServer(guildId)}
       />
+      {importRolesFromServerError && (typeof importRolesFromServerError !== 'string' ? importRolesFromServerError?.length !== 0 && (
+        <Alert severity='warning' sx={{ mt: 2 }}>
+          <Box sx={{
+            display: 'flex', gap: 2, flexDirection: 'column'
+          }}
+          >
+            Error faced during importing roles
+            {importRolesFromServerError?.map(failedImport => (
+              <div>
+                <Box sx={{
+                  display: 'flex',
+                  gap: 1
+                }}
+                >
+                  <span>{failedImport.action === 'assign' ? `Failed to assign ${failedImport.roles.join(',')} to user ${failedImport.username}` : `Failed to create role ${failedImport.role}`}</span>
+                </Box>
+              </div>
+            ))}
+          </Box>
+        </Alert>
+      ) : (
+        <Alert severity='error' sx={{ mt: 2 }}>
+          {discordError}
+        </Alert>
+      ))}
     </>
   );
 }

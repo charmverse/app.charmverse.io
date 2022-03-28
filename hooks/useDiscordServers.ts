@@ -1,5 +1,6 @@
 import charmClient from 'charmClient';
 import router from 'next/router';
+import { ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { DiscordUserServer } from 'pages/api/discord/servers';
 import { useState, useEffect } from 'react';
 import { useCurrentSpace } from './useCurrentSpace';
@@ -13,6 +14,7 @@ export default function useDiscordServers () {
   const [discordServers, setDiscordServers] = useState<DiscordUserServer[]>([]);
   const isListingDiscordServers = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'server';
   const [isImportRolesFromServerLoading, setIsImportRolesFromServerLoading] = useState<boolean>(false);
+  const [importRolesFromServerError, setImportRolesFromServerError] = useState<ImportRolesResponse['error'] | null>(null);
   const [currentSpace, setCurrentSpace] = useCurrentSpace();
 
   useEffect(() => {
@@ -54,6 +56,7 @@ export default function useDiscordServers () {
         // Partial success with some errors
         if (importRolesFromServerResponse.error && importRolesFromServerResponse.error.length !== 0) {
           showMessage('Imported discord roles with errors. Check alert for more information', 'info');
+          setImportRolesFromServerError(importRolesFromServerResponse.error);
         }
         else {
           showMessage('Successfully imported discord roles', 'success');
@@ -62,7 +65,7 @@ export default function useDiscordServers () {
       }
       catch (err: any) {
         // Major failure while trying to import discord server role
-        showMessage(err.message, 'error');
+        setDiscordError(err.error ?? err.message ?? 'Something went wrong. Please try again');
       }
     }
   }
@@ -73,6 +76,7 @@ export default function useDiscordServers () {
     discordError,
     discordServers,
     isListingDiscordServers,
-    importRolesFromServer
+    importRolesFromServer,
+    importRolesFromServerError
   };
 }
