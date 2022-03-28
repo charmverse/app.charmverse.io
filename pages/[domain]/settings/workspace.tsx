@@ -165,7 +165,6 @@ export default function WorkspaceSettings () {
           >
             Import Roles
           </Button>
-          {connectedWithDiscord && <Typography variant='subtitle2'>GUILD ID: {connectedWithDiscord}</Typography>}
         </Box>
         <DiscordServersModal
           isFetching={isLoading}

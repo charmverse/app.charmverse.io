@@ -16,6 +16,7 @@ export interface DiscordUser {
   discriminator: string
   avatar?: string
   verified?: boolean
+  bot?: boolean
 }
 
 // TODO: Add nonce for oauth state
