@@ -42,6 +42,7 @@ function DiscordServersModal ({ isFetching, discordServers, onClose, isOpen }:
                     spaceId: currentSpace.id
                   });
 
+                  // If the import was successful the workspace has been connected with the discord server
                   setCurrentSpace({
                     ...currentSpace,
                     discordServerId: discordServer.id

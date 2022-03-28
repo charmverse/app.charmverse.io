@@ -18,7 +18,6 @@ const discordBotToken = process.env.DISCORD_BOT_TOKEN as string;
 export interface ImportRolesPayload {
   spaceId: string,
   guildId: string,
-  discordUserId: string
 }
 
 export interface DiscordServerRole {
@@ -167,6 +166,9 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
             spaceId
           }
         });
+        if (discordServerRole.name === 'error') {
+          throw new Error();
+        }
 
         // Only create the role if it doesn't already exist
         if (!existingRole) {
