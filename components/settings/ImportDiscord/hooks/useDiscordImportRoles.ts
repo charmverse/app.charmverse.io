@@ -3,8 +3,8 @@ import router from 'next/router';
 import { ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { DiscordUserServer } from 'pages/api/discord/listServers';
 import { useState, useEffect } from 'react';
-import { useCurrentSpace } from './useCurrentSpace';
-import { useSnackbar } from './useSnackbar';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 export default function useDiscordImportRoles () {
   const { showMessage } = useSnackbar();
@@ -14,7 +14,7 @@ export default function useDiscordImportRoles () {
   const [discordServers, setDiscordServers] = useState<DiscordUserServer[]>([]);
   const [isImportRolesFromServerLoading, setIsImportRolesFromServerLoading] = useState<boolean>(false);
   const [importRolesFromServerError, setImportRolesFromServerError] = useState<ImportRolesResponse['error'] | null>(null);
-  const [currentSpace, setCurrentSpace] = useCurrentSpace();
+  const [currentSpace] = useCurrentSpace();
 
   // Are we making a request for listing discord servers of current user
   const isListingDiscordServers = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'server';
@@ -29,13 +29,10 @@ export default function useDiscordImportRoles () {
         .then(({ servers }) => {
           setIsListDiscordServersLoading(false);
           setDiscordServers(servers);
-          showMessage('Successfully fetched servers');
         })
         .catch((err) => {
           setIsListDiscordServersLoading(false);
-          const errorMessage = err.message ?? err.error ?? 'Something went wrong. Please try again';
-          showMessage(errorMessage, 'error');
-          setListDiscordServersError(errorMessage);
+          setListDiscordServersError(err.error);
         });
     }
   }, [Boolean(space)]);
@@ -49,15 +46,8 @@ export default function useDiscordImportRoles () {
           spaceId: currentSpace.id
         });
 
-        // If the import was successful the workspace has been connected with the discord server
-        setCurrentSpace({
-          ...currentSpace,
-          discordServerId: guildId
-        });
-
         // Partial success with some errors
         if (importRolesFromServerResponse.error && importRolesFromServerResponse.error.length !== 0) {
-          showMessage('Imported discord roles with errors. Check alert for more information', 'info');
           setImportRolesFromServerError(importRolesFromServerResponse.error);
         }
         else {

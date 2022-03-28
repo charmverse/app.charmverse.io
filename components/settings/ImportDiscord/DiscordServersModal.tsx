@@ -9,34 +9,24 @@ function DiscordServersModal (
     isImportRolesFromServerLoading, isListDiscordServersLoading,
     discordServers, onImportingDiscordRoles, onClose, isOpen
   }:
-  {
-    isImportRolesFromServerLoading: boolean, discordServers: DiscordUserServer[], isListDiscordServersLoading: boolean,
-    isOpen: boolean, onImportingDiscordRoles: (guildId: string) => Promise<void>, onClose: () => void
-  }
+    {
+      isImportRolesFromServerLoading: boolean, discordServers: DiscordUserServer[], isListDiscordServersLoading: boolean,
+      isOpen: boolean, onImportingDiscordRoles: (guildId: string) => Promise<void>, onClose: () => void
+    }
 ) {
   const sortedServers = useMemo(() => discordServers
     .sort((discordServerA, discordServerB) => discordServerA.name < discordServerB.name ? -1 : 1), [discordServers]);
   return (
     <Modal
       open={isOpen}
+      title='Your Discord Servers'
       onClose={onClose}
     >
-      <Typography
-        variant='h6'
-        sx={{
-          textTransform: 'uppercase'
-        }}
-        mb={1}
-        component='div'
-      >
-        Your Servers
-        <Typography variant='subtitle2'>Click on any of them to start importing roles</Typography>
-      </Typography>
+      <Typography variant='subtitle2'>Select a server to start importing roles</Typography>
       {isListDiscordServersLoading ? <Typography variant='h5'>Fetching servers</Typography> : (
         <List sx={{
-          maxHeight: 500,
-          overflow: 'auto',
-          pr: 2
+          maxHeight: 600,
+          overflow: 'auto'
         }}
         >
           {

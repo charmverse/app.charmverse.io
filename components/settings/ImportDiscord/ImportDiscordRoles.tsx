@@ -1,8 +1,8 @@
 import { Button, SvgIcon, CircularProgress, Alert } from '@mui/material';
 import { Box } from '@mui/system';
-import DiscordServersModal from 'components/common/DiscordServersModal';
+import DiscordServersModal from 'components/settings/ImportDiscord/DiscordServersModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useDiscordImportRoles from 'hooks/useDiscordImportRoles';
+import useDiscordImportRoles from 'components/settings/ImportDiscord/hooks/useDiscordImportRoles';
 import { useUser } from 'hooks/useUser';
 import { useState, useEffect } from 'react';
 import DiscordIcon from 'public/images/discord_logo.svg';
@@ -58,12 +58,12 @@ export default function ImportDiscordRoles () {
             <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>
               <DiscordIcon />
             </SvgIcon>
-        )}
+          )}
           endIcon={(
-          isListDiscordServersLoading && <CircularProgress size={20} />
-        )}
+            isListDiscordServersLoading && <CircularProgress size={20} />
+          )}
         >
-          Import Roles
+          Import roles from Discord
         </Button>
       </Box>
       <DiscordServersModal
@@ -77,12 +77,12 @@ export default function ImportDiscordRoles () {
         onImportingDiscordRoles={(guildId) => importRolesFromServer(guildId)}
       />
       {importRolesFromServerError && (typeof importRolesFromServerError !== 'string' ? importRolesFromServerError?.length !== 0 && (
-        <Alert severity='warning' sx={{ mt: 2 }}>
+        <Alert severity='error' sx={{ mt: 2 }}>
           <Box sx={{
             display: 'flex', gap: 2, flexDirection: 'column'
           }}
           >
-            Error faced during importing
+            Error faced during import:
             {importRolesFromServerError?.map(failedImport => (
               <div>
                 <Box sx={{

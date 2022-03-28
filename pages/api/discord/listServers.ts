@@ -22,11 +22,10 @@ const handler = nc({
 
 handler.use(requireUser);
 
-handler.post(async (req, res) => {
-  const tempAuthCode = req.body.code as string;
+handler.get(async (req, res) => {
+  const tempAuthCode = req.query.code as string;
   if (!tempAuthCode) {
-    log.warn('Error or missing code from Discord OAuth. Response query:', req.query);
-    res.redirect('/');
+    res.status(400).json({ error: 'Missing auth code' });
     return;
   }
 

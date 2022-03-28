@@ -6,9 +6,10 @@ import { getDiscordToken } from 'lib/discord/getDiscordToken';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
-import { createRolesFromDiscord } from 'lib/role/createRolesFromDiscord';
-import { assignRolesFromDiscord } from 'lib/role/assignRolesFromDiscord';
-import { Prisma, DiscordUser as PrismaDiscordUser } from '@prisma/client';
+import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
+import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
+import { DiscordUser as PrismaDiscordUser } from '@prisma/client';
+import log from 'lib/log';
 import { DiscordGuildMember, DiscordServerRole } from './importRoles';
 
 const handler = nc({
@@ -92,7 +93,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
         const discordServerRolesResponse = await handleDiscordResponse<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${charmverseSpace.discordServerId}/roles`);
         if (discordServerRolesResponse.status === 'success') {
           const discordServerRoles = discordServerRolesResponse.data;
-          const { rolesRecord } = await createRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
+          const rolesRecord = await findOrCreateRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
           const guildMemberResponse = await handleDiscordResponse<DiscordGuildMember>(`https://discord.com/api/v8/guilds/${charmverseSpace.discordServerId}/members/${id}`);
 
           if (guildMemberResponse.status === 'success') {
@@ -108,14 +109,15 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
       });
     }
     catch (err) {
-      console.log(err);
+      log.warn('Error while connecting to Discord', error);
       // If the discord user is already connected to a charmverse account this code will be run
       res.status(400).json({
         error: 'Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.'
       });
     }
   }
-  catch (_) {
+  catch (error) {
+    log.warn('Error while connecting to Discord', error);
     res.status(400).json({
       error: 'Invalid token'
     });

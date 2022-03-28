@@ -1,7 +1,6 @@
 import SettingsLayout from 'components/settings/Layout';
 import { ReactElement } from 'react';
 import Grid from '@mui/material/Grid';
-import Alert from '@mui/material/Alert';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
 import Button from 'components/common/Button';
@@ -17,7 +16,7 @@ import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
 import { Box, Typography } from '@mui/material';
-import ImportDiscordRoles from 'components/settings/Import/ImportDiscordRoles';
+import ImportDiscordRoles from 'components/settings/ImportDiscord/ImportDiscordRoles';
 import ImportNotionWorkspace from 'components/settings/Import/ImportNotionWorkspace';
 
 export interface FailedImportsError {

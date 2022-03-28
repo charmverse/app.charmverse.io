@@ -5,16 +5,14 @@ import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/mid
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
-import { createRolesFromDiscord } from 'lib/role/createRolesFromDiscord';
-import { assignRolesFromDiscord } from 'lib/role/assignRolesFromDiscord';
+import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
+import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import { DiscordUser } from './connect';
 
 const handler = nc({
   onError,
   onNoMatch
 });
-
-const discordBotToken = process.env.DISCORD_BOT_TOKEN as string;
 
 export interface ImportRolesPayload {
   spaceId: string,
@@ -62,7 +60,6 @@ export type ImportRolesResponse = {
 
 async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse>) {
   const { spaceId, guildId } = req.body as ImportRolesPayload;
-  const importErrors: ImportRolesResponse['error'] = [];
 
   if (!spaceId || !guildId) {
     res.status(400).json({
@@ -87,12 +84,6 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     });
     return;
   }
-
-  const discordApiHeaders: any = {
-    headers: {
-      Authorization: `Bot ${discordBotToken}`
-    }
-  };
 
   try {
     await prisma.space.update({
@@ -150,26 +141,9 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     return;
   }
 
-  const { rolesRecord, failedRoles } = await createRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
-  failedRoles.forEach(role => {
-    importErrors.push({
-      action: 'create',
-      role
-    });
-  });
+  await findOrCreateRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
 
-  const failedRoleAssignments = await assignRolesFromDiscord(rolesRecord, discordGuildMembers, spaceId);
-
-  failedRoleAssignments.forEach(failedRoleAssignment => {
-    importErrors.push({
-      action: 'assign',
-      ...failedRoleAssignment
-    });
-  });
-
-  res.status(200).json({
-    error: importErrors
-  });
+  res.status(200).json({ success: true });
 }
 
 handler.use(requireUser).use(requireSpaceMembership('admin')).post(importRoles);

@@ -162,7 +162,7 @@ class CharmClient {
   }
 
   listDiscordServers (payload: {code: string, spaceId: string}) {
-    return http.POST<{servers: DiscordUserServer[]}>('/api/discord/listServers', payload);
+    return http.GET<{servers: DiscordUserServer[]}>('/api/discord/listServers', payload);
   }
 
   importRolesFromServer (payload: ImportRolesPayload) {
