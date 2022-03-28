@@ -273,6 +273,17 @@ enum PagePermissionLevel {
   custom
 }
 
+// Not used in database, but indicates the permission columns
+// Defined here to minimuse risk of these getting out of sync
+enum PageOperations {
+  read
+  delete
+  edit_position
+  edit_content
+  edit_isPublic
+  edit_path
+}
+
 model PagePermission {
   id       String         @id @default(uuid()) @db.Uuid
   // Ways a permission can be accessed (pick one)
@@ -287,14 +298,8 @@ model PagePermission {
   page     Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
   permissionLevel PagePermissionLevel
   // Scope of access
-  // edit or read means you can access all atributes
-  // editAttributes specifies which attributes you can modify
-  read              Boolean @default(false)
-  delete            Boolean @default(false)
-  edit_position     Boolean @default(false)
-  edit_content      Boolean @default(false)
-  edit_isPublic     Boolean @default(false)
-  edit_path         Boolean @default(false)
+  // We only need to store true values
+  permissions PageOperations[]
 
 
   @@unique([userId, pageId])
