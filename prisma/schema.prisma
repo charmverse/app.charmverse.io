@@ -270,6 +270,7 @@ enum PagePermissionLevel {
   editor
   view_comment
   view
+  custom
 }
 
 model PagePermission {
@@ -290,15 +291,10 @@ model PagePermission {
   // editAttributes specifies which attributes you can modify
   read              Boolean @default(false)
   delete            Boolean @default(false)
-  edit_index        Boolean @default(false)
-  edit_title        Boolean @default(false)
+  edit_position     Boolean @default(false)
   edit_content      Boolean @default(false)
-  edit_contentText  Boolean @default(false)
-  edit_headerImage  Boolean @default(false)
-  edit_icon         Boolean @default(false)
   edit_isPublic     Boolean @default(false)
   edit_path         Boolean @default(false)
-  edit_parentId     Boolean @default(false)
 
 
   @@unique([userId, pageId])

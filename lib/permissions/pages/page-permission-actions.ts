@@ -1,6 +1,6 @@
 import { Prisma, Page, PagePermission, PagePermissionLevel } from '@prisma/client';
 import { prisma } from 'db';
-import { IPagePermissionListRequest, IPagePermissionRequest, IPagePermissionFlags, AllowedPagePermissions } from './pages';
+import { IPagePermissionListRequest, IPagePermissionRequest, IPagePermissionFlags, AllowedPagePermissions } from './page-permission-mapping';
 
 export async function evaluatePagePermission (
   request: IPagePermissionRequest
