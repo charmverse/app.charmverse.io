@@ -6,7 +6,7 @@ import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
 import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
-import { DiscordUser } from './connect';
+import { DiscordAccount } from './connect';
 
 const handler = nc({
   onError,
@@ -35,7 +35,7 @@ export interface DiscordServerRole {
 }
 
 export interface DiscordGuildMember {
-  user?: DiscordUser
+  user?: DiscordAccount
   nick?: string
   avatar?: string
   roles: string[]
