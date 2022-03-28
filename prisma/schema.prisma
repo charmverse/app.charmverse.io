@@ -33,7 +33,7 @@ model Space {
   updatedBy      String          @db.Uuid
   name           String
   domain         String          @unique
-  permissions    SpaceRole[]
+  spaceRoles    SpaceRole[]
   pages          Page[]
   blocks         Block[]
   inviteLinks    InviteLink[]
