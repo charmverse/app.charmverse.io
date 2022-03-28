@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 async function setSpaceRoleIds (): Promise<any> {
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
-      id: null
+      id: undefined
     }
   });
 
@@ -31,8 +31,9 @@ async function setSpaceRoleIds (): Promise<any> {
 
 }
 
+/*
 setSpaceRoleIds()
   .then(() => {
     console.log('Success!');
   });
-
+*/
