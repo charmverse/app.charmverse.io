@@ -136,7 +136,7 @@ model PagePermission {
 }
 
 model SpaceRole {
-  id                     String?    @unique @default(uuid()) @db.Uuid
+  id                     String     @id @default(uuid()) @db.Uuid
   role                   String     @default("contributor")
   isAdmin                Boolean    @default(false)
   spaceId                String     @db.Uuid
