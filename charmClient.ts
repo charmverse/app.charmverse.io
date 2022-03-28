@@ -170,7 +170,7 @@ class CharmClient {
 
   // FocalBoard
 
-  // TODO: we shouldnt have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
+  // TODO: we shouldn't have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
 
   async getWorkspace (): Promise<IWorkspace> {
     const space = await http.GET<Space>('/api/spaces/current');

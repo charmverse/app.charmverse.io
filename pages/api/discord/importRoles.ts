@@ -6,6 +6,7 @@ import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/mid
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Role } from '@prisma/client';
+import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
 import { DiscordUser } from './connect';
 
 const handler = nc({
@@ -112,38 +113,31 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
   const discordServerRoles: DiscordServerRole[] = [];
   const discordGuildMembers: DiscordGuildMember[] = [];
 
-  try {
-    discordServerRoles.push(...await http.GET<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`, undefined, discordApiHeaders));
+  const discordServerRolesResponse = await handleDiscordResponse<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`);
 
-    let lastUserId = '0';
-    let fetchedDiscordGuildMembers = await http.GET<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100`, undefined, discordApiHeaders);
-
-    discordGuildMembers.push(...fetchedDiscordGuildMembers);
-    while (fetchedDiscordGuildMembers.length !== 0) {
-      lastUserId = fetchedDiscordGuildMembers[fetchedDiscordGuildMembers.length - 1].user?.id!;
-      fetchedDiscordGuildMembers = await http.GET<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100&after=${lastUserId}`, undefined, discordApiHeaders);
-      discordGuildMembers.push(...fetchedDiscordGuildMembers);
-    }
+  if (discordServerRolesResponse.status === 'success') {
+    discordServerRoles.push(...discordServerRolesResponse.data);
   }
-  catch (err: any) {
-    // The bot token is invalid
-    if (err.code === 0) {
-      log.warn('Bot is unauthorized due to invalid token', err);
-      res.status(500).json({ error: 'Something went wrong. Please try again' });
-      return;
-    }
-    // Charmverse bot hasn't been added to server
-    else if (err.code === 50001) {
-      res.status(400).json({ error: 'Please add Charmverse bot to your server' });
-      return;
-    }
-    // Guild doesn't exist
-    else if (err.code === 10004) {
-      res.status(400).json({ error: "Unknown guild. Please make sure you're importing from the correct guild" });
-      return;
+  else {
+    res.status(discordServerRolesResponse.status).json({ error: discordServerRolesResponse.error });
+    return;
+  }
+
+  let lastUserId = '0';
+  let discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100`);
+
+  // eslint-disable-next-line
+  while (true) {
+    if (discordGuildMembersResponse.status === 'success') {
+      if (discordGuildMembersResponse.data.length === 0) {
+        break;
+      }
+      discordGuildMembers.push(...discordGuildMembersResponse.data);
+      lastUserId = discordGuildMembersResponse.data[discordGuildMembersResponse.data.length - 1].user?.id!;
+      discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100&after=${lastUserId}`);
     }
     else {
-      res.status(500).json({ error: 'Something went wrong. Please try again' });
+      res.status(discordGuildMembersResponse.status).json({ error: discordGuildMembersResponse.error });
       return;
     }
   }

@@ -40,7 +40,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     }
   }, [user, ensName]);
 
-  const value = useMemo(() => [user, setUser, isLoaded] as const, [user, isLoaded]);
+  const value = useMemo(() => [user, setUser, isLoaded] as any, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>

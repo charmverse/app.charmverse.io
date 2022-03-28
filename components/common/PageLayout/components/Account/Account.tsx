@@ -83,7 +83,7 @@ function Account (): JSX.Element {
         code: router.query.code as string,
         spaceId: space.id
       }).then((discordUser) => {
-        setUser({ ...user, discordUser });
+        setUser({ ...user, username: (discordUser.account as any)?.username, avatar: `https://cdn.discordapp.com/avatars/${(discordUser.account as any).id}/${(discordUser.account as any).avatar}.png`, discordUser });
         showMessage('Successfully connected with discord', 'info');
         postConnect();
       }).catch((err) => {

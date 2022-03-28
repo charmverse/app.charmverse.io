@@ -20,18 +20,23 @@ export interface DiscordUser {
   bot?: boolean
 }
 
+export interface ConnectDiscordPayload {
+  code: string
+  spaceId: string
+}
+
 // TODO: Add nonce for oauth state
 async function connectDiscord (req: NextApiRequest, res: NextApiResponse) {
-  const tempAuthCode = req.body.code as string;
-  if (!tempAuthCode) {
+  const { code, spaceId } = req.body as ConnectDiscordPayload;
+  if (!code || !spaceId) {
     res.status(400).json({
-      error: 'An error occurred. Please try again'
+      error: 'Invalid parameters'
     });
     return;
   }
 
   try {
-    const token = await getDiscordToken(tempAuthCode, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
+    const token = await getDiscordToken(code, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
     const discordAccount = await http.GET<DiscordUser>('https://discord.com/api/v8/users/@me', undefined, {
       headers: {
         Authorization: `Bearer ${token.access_token}`
@@ -39,6 +44,13 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse) {
     });
     const { id, ...rest } = discordAccount;
     const userId = req.session.user.id;
+
+    // Get the discord guild attached with the spaceId
+    const charmverseSpace = await prisma.space.findUnique({
+      where: {
+        id: spaceId
+      }
+    });
 
     try {
       const discordUser = await prisma.discordUser.create({
