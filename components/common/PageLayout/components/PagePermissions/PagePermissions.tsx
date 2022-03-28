@@ -1,10 +1,10 @@
 import Box from '@mui/material/Box';
-import { PagePermission } from '@prisma/client';
-import { IPagePermissionWithAssignee, IPagePermissionWithNestedSpaceRole } from 'lib/permissions/pages/page-permission-interfaces';
+import charmClient from 'charmClient';
+import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { PagePermissionLevelTitle } from 'lib/permissions/pages/page-permission-mapping';
 import { getDisplayName } from 'lib/users/getDisplayName';
 import { useEffect, useState } from 'react';
-import { PermissionLevelTitle } from 'lib/permissions/pages/page-permission-mapping';
-import charmClient from 'charmClient';
+import { AddPagePermissionsForm } from './AddPagePermissionsForm';
 
 const permissionDisplayOrder = ['space', 'role', 'user'];
 
@@ -60,6 +60,8 @@ export function PagePermissions ({ pageId }: IProps) {
     <Box>
       Page Permissions
 
+      <AddPagePermissionsForm pageId={pageId} />
+
       <Box>
         {
               sortedPermissions.map(permission => {
@@ -67,7 +69,7 @@ export function PagePermissions ({ pageId }: IProps) {
                   <Box key={permission.displayName}>
                     {permission.displayName}
 
-                    {PermissionLevelTitle[permission.permissionLevel]}
+                    {PagePermissionLevelTitle[permission.permissionLevel]}
                   </Box>
                 );
               })

@@ -14,9 +14,9 @@ import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { PagePermission, Role, User, Space } from '@prisma/client';
 import { getDisplayName } from 'lib/users';
-import { PermissionLevelTitle, permissionDescriptions } from 'lib/permissions/pages/page-permission-mapping';
+import { PagePermissionLevelTitle, permissionDescriptions } from 'lib/permissions/pages/page-permission-mapping';
 import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
-import { PagePermissions } from './PagePermissions';
+import { PagePermissions } from './PagePermissions/PagePermissions';
 
 const StyledInput = styled(Input)`
   border: 1px solid ${({ theme }) => theme.palette.divider};
