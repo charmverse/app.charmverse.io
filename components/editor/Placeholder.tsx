@@ -1,5 +1,7 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import { alpha, Box, useTheme } from '@mui/material';
+import { Box } from '@mui/material';
+import { useTheme } from '@emotion/react';
+import { alpha } from '@mui/system';
 import { useMemo } from 'react';
 
 export default function PlaceHolder () {
