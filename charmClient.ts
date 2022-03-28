@@ -2,7 +2,7 @@
 
 import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User } from '@prisma/client';
 import * as http from 'adapters/http';
-import { IPagePermissionFlags, IPagePermissionUserRequest } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
 import { BountyWithDetails, Contributor, LoggedInUser } from 'models';
@@ -460,10 +460,6 @@ class CharmClient {
     return http.DELETE('/api/roles/assignment', data);
   }
 
-  listPagePermissions (pageId: string): Promise<Array<PagePermission & {role: Role, user: User, space: Space }>> {
-    return http.GET('/api/permissions/query', { pageId });
-  }
-
   /**
    * Get full set of permissions for a specific user on a certain page
    */
@@ -471,12 +467,16 @@ class CharmClient {
     return http.POST('/api/permissions/query', request);
   }
 
+  listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
+    return http.GET('/api/permissions', { pageId });
+  }
+
   createPermission (permission: PagePermission): Promise<boolean> {
-    return http.POST('/api/permissions/query', permission);
+    return http.POST('/api/permissions', permission);
   }
 
   deletePermission (permissionId: string): Promise<boolean> {
-    return http.DELETE('/api/permissions/query', { permissionId });
+    return http.DELETE('/api/permissions', { permissionId });
   }
 }
 

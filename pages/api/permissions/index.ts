@@ -19,7 +19,7 @@ handler.use(requireUser)
 
 async function findPagePermissions (req: NextApiRequest, res: NextApiResponse<IPagePermissionWithAssignee []>) {
 
-  const { pageId } = req.body as IPagePermissionRequest;
+  const { pageId } = req.query as any as IPagePermissionRequest;
 
   const permissions = await listPagePermissions(pageId);
 
