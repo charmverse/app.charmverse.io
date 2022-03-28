@@ -7,7 +7,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
 import { createRolesFromDiscord } from 'lib/role/createRolesFromDiscord';
-import { DiscordServerRole } from './importRoles';
+import { assignRolesFromDiscord } from 'lib/role/assignRolesFromDiscord';
+import { Prisma, DiscordUser as PrismaDiscordUser } from '@prisma/client';
+import { DiscordGuildMember, DiscordServerRole } from './importRoles';
 
 const handler = nc({
   onError,
@@ -28,8 +30,14 @@ export interface ConnectDiscordPayload {
   spaceId: string
 }
 
+export interface ConnectDiscordResponse {
+  discordUser: PrismaDiscordUser,
+  avatar: string | null,
+  username: string | null
+}
+
 // TODO: Add nonce for oauth state
-async function connectDiscord (req: NextApiRequest, res: NextApiResponse) {
+async function connectDiscord (req: NextApiRequest, res: NextApiResponse<ConnectDiscordResponse | {error: string}>) {
   const { code, spaceId } = req.body as ConnectDiscordPayload;
   if (!code || !spaceId) {
     res.status(400).json({
@@ -47,24 +55,6 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse) {
     });
     const { id, ...rest } = discordAccount;
     const userId = req.session.user.id;
-
-    // Get the discord guild attached with the spaceId
-    const charmverseSpace = await prisma.space.findUnique({
-      where: {
-        id: spaceId
-      }
-    });
-
-    // If the workspace is connected with a discord server
-    if (charmverseSpace?.discordServerId) {
-      const discordServerRolesResponse = await handleDiscordResponse<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`);
-
-      if (discordServerRolesResponse.status === 'success') {
-        const discordServerRoles = discordServerRolesResponse.data;
-        const { rolesRecord } = await createRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
-
-      }
-    }
 
     try {
       const discordUser = await prisma.discordUser.create({
@@ -88,8 +78,33 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse) {
           avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
         }
       });
+
+      // Get the discord guild attached with the spaceId
+      const charmverseSpace = await prisma.space.findUnique({
+        where: {
+          id: spaceId
+        }
+      });
+
+      // If the workspace is connected with a discord server
+      if (charmverseSpace?.discordServerId) {
+        // Get all the roles from the discord server
+        const discordServerRolesResponse = await handleDiscordResponse<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${charmverseSpace.discordServerId}/roles`);
+        if (discordServerRolesResponse.status === 'success') {
+          const discordServerRoles = discordServerRolesResponse.data;
+          const { rolesRecord } = await createRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
+          const guildMemberResponse = await handleDiscordResponse<DiscordGuildMember>(`https://discord.com/api/v8/guilds/${charmverseSpace.discordServerId}/members/${id}`);
+
+          if (guildMemberResponse.status === 'success') {
+            await assignRolesFromDiscord(rolesRecord, [guildMemberResponse.data], spaceId);
+          }
+        }
+      }
+
       res.status(200).json({
-        discordUser
+        discordUser,
+        avatar: rest.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : null,
+        username: rest.username
       });
     }
     catch (err) {

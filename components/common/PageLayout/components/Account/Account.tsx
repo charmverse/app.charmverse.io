@@ -77,13 +77,13 @@ function Account (): JSX.Element {
   // It can either be fail or success
   useEffect(() => {
     // Connection with discord
-    if (isConnectingToDiscord) {
+    if (isConnectingToDiscord && user) {
       setIsConnectDiscordLoading(true);
       charmClient.connectDiscord({
         code: router.query.code as string,
         spaceId: space.id
-      }).then((discordUser) => {
-        setUser({ ...user, username: (discordUser.account as any)?.username, avatar: `https://cdn.discordapp.com/avatars/${(discordUser.account as any).id}/${(discordUser.account as any).avatar}.png`, discordUser });
+      }).then(({ discordUser, username, avatar }) => {
+        setUser({ ...user, username: username ?? user.username, avatar: avatar ?? user.avatar, discordUser });
         showMessage('Successfully connected with discord', 'info');
         postConnect();
       }).catch((err) => {

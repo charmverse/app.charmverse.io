@@ -16,6 +16,7 @@ import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
 import { DiscordUserServer } from 'pages/api/discord/listServers';
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
+import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -157,7 +158,7 @@ class CharmClient {
   }
 
   connectDiscord (payload: {code: string, spaceId: string}) {
-    return http.POST<DiscordUser>('/api/discord/connect', payload);
+    return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
   }
 
   listDiscordServers (payload: {code: string, spaceId: string}) {

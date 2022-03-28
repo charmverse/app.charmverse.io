@@ -40,6 +40,13 @@ export async function handleDiscordResponse<Response> (endpoint: string): Promis
         error: "Unknown guild. Please make sure you're importing from the correct guild"
       };
     }
+    // Unknown user
+    else if (err.code === 10013) {
+      return {
+        status: 400,
+        error: "Unknown user. User doesn't exist in the guild"
+      };
+    }
     else {
       return {
         status: 500,
