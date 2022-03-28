@@ -16,7 +16,7 @@ export default function ImportDiscordRoles () {
     discordError
   } = useDiscordServers();
   const [user] = useUser();
-  const [space, setSpace] = useCurrentSpace();
+  const [space] = useCurrentSpace();
 
   useEffect(() => {
     if (!isLoading && isListingDiscordServers && !discordError) {

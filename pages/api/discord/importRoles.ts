@@ -109,14 +109,21 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     return;
   }
 
-  let discordServerRoles: DiscordServerRole[] = [];
-  let discordGuildMembers: DiscordGuildMember[] = [];
+  const discordServerRoles: DiscordServerRole[] = [];
+  const discordGuildMembers: DiscordGuildMember[] = [];
 
   try {
-    discordServerRoles = await http.GET<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`, undefined, discordApiHeaders);
+    discordServerRoles.push(...await http.GET<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`, undefined, discordApiHeaders));
 
-    // TODO: Support Pagination
-    discordGuildMembers = await http.GET<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100`, undefined, discordApiHeaders);
+    let lastUserId = '0';
+    let fetchedDiscordGuildMembers = await http.GET<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100`, undefined, discordApiHeaders);
+
+    discordGuildMembers.push(...fetchedDiscordGuildMembers);
+    while (fetchedDiscordGuildMembers.length !== 0) {
+      lastUserId = fetchedDiscordGuildMembers[fetchedDiscordGuildMembers.length - 1].user?.id!;
+      fetchedDiscordGuildMembers = await http.GET<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100&after=${lastUserId}`, undefined, discordApiHeaders);
+      discordGuildMembers.push(...fetchedDiscordGuildMembers);
+    }
   }
   catch (err: any) {
     // The bot token is invalid
@@ -166,6 +173,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
             spaceId
           }
         });
+        // IMPORTANT: Remove this from production !!! THIS IS ONLY FOR TESTING PURPOSE
         if (discordServerRole.name === 'error') {
           throw new Error();
         }
