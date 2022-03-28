@@ -29,11 +29,11 @@ export function AddPagePermissionsForm ({ pageId }: Props) {
 
   const [contributors] = useContributors();
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee []>([]);
+  const [permissionLevelToAssign, setPermissionLevelToAssign] = useState<PagePermissionLevelType>();
 
   const [selectedUserIds, setSelectedUserIds] = useState<string []>([]);
 
   const userIdsToHide = pagePermissions.filter(permission => {
-    console.log('Inside filtering loop');
     return permission.user;
   }).map(permission => permission.id);
 
@@ -61,7 +61,24 @@ export function AddPagePermissionsForm ({ pageId }: Props) {
   */
 
   function addContributorToPermissions (userId: string) {
-    setSelectedUserIds([...selectedUserIds, userId]);
+
+    const userIdsToAddPermissionsFor = [...selectedUserIds];
+
+    if (userIdsToAddPermissionsFor.indexOf(userId) === -1) {
+      userIdsToAddPermissionsFor.push(userId);
+      setSelectedUserIds(userIdsToAddPermissionsFor);
+    }
+
+  }
+
+  function createUserPermissions () {
+    selectedUserIds.forEach(userId => {
+      charmClient.createPermission({
+        pageId,
+        userId,
+        permissionLevel: permissionLevelToAssign!
+      });
+    });
   }
 
   console.log('To hide', userIdsToHide);
@@ -88,7 +105,7 @@ export function AddPagePermissionsForm ({ pageId }: Props) {
           })
         )
       }
-      <form onSubmit={handleSubmit(formValue => submitted(formValue))} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form onSubmit={handleSubmit(createUserPermissions)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InputSearchContributor
@@ -102,12 +119,14 @@ export function AddPagePermissionsForm ({ pageId }: Props) {
 
           <Grid item>
             <InputEnumToOptions
+              onChange={(newAccessLevel) => setPermissionLevelToAssign(newAccessLevel as PagePermissionLevelType)}
               keyAndLabel={PagePermissionLevelTitle}
+              defaultValue={permissionLevelToAssign ?? 'full_access'}
             />
           </Grid>
 
           <Grid item>
-            <Button type='submit'>Add permissions</Button>
+            <Button type='submit' disabled={!permissionLevelToAssign}>Add permissions</Button>
           </Grid>
         </Grid>
       </form>
