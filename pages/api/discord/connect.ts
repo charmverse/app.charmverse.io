@@ -41,7 +41,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse) {
     const userId = req.session.user.id;
 
     try {
-      await prisma.discordUser.create({
+      const discordUser = await prisma.discordUser.create({
         data: {
           account: rest as any,
           discordId: id,
@@ -62,9 +62,12 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse) {
           avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
         }
       });
-      res.status(200).end();
+      res.status(200).json({
+        discordUser
+      });
     }
-    catch (_) {
+    catch (err) {
+      console.log(err);
       // If the discord user is already connected to a charmverse account this code will be run
       res.status(400).json({
         error: 'Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.'

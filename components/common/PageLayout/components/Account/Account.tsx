@@ -63,12 +63,15 @@ function Account (): JSX.Element {
   const [isConnectDiscordLoading, setIsConnectDiscordLoading] = useState(false);
   const accountModalState = usePopupState({ variant: 'popover', popupId: 'account-modal' });
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
-  const [user] = useUser();
+  const [user, setUser] = useUser();
 
   function postConnect () {
     setIsConnectDiscordLoading(false);
     accountModalState.close();
-    router.push(window.location.href.split('?')[0]);
+    // Clean up the routes
+    setTimeout(() => {
+      router.push(window.location.href.split('?')[0]);
+    }, 2500);
   }
   // We might get redirected after connection with discord, so check the query param if it has a discord field
   // It can either be fail or success
@@ -79,7 +82,8 @@ function Account (): JSX.Element {
       charmClient.connectDiscord({
         code: router.query.code as string,
         spaceId: space.id
-      }).then(() => {
+      }).then((discordUser) => {
+        setUser({ ...user, discordUser });
         showMessage('Successfully connected with discord', 'info');
         postConnect();
       }).catch((err) => {

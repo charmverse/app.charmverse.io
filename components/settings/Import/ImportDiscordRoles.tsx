@@ -45,7 +45,9 @@ export default function ImportDiscordRoles () {
         alignItems='center'
       >
         <Button
-          disabled={(isListDiscordServersLoading && isListingDiscordServers) || !isCurrentUserAdmin}
+          disabled={
+            (isListDiscordServersLoading && isListingDiscordServers) || !isCurrentUserAdmin || !user?.discordUser
+          }
           onClick={() => {
             if (isCurrentUserAdmin) {
               window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`);

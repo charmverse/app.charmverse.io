@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod, Role } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod, Role, DiscordUser } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -157,7 +157,7 @@ class CharmClient {
   }
 
   connectDiscord (payload: {code: string, spaceId: string}) {
-    return http.POST('/api/discord/connect', payload);
+    return http.POST<DiscordUser>('/api/discord/connect', payload);
   }
 
   listDiscordServers (payload: {code: string, spaceId: string}) {
