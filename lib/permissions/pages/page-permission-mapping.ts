@@ -1,8 +1,8 @@
 import { PageOperations, PagePermissionLevel } from '@prisma/client';
 import { PageOperationType } from './page-permission-interfaces';
 
-export const PermissionLevelTitle: Record<keyof typeof PagePermissionLevel, string> = {
-  full_access: 'Edit, delete and share',
+export const PagePermissionLevelTitle: Record<keyof typeof PagePermissionLevel, string> = {
+  full_access: 'Full access',
   editor: 'Edit page',
   view_comment: 'View and comment',
   view: 'View',
