@@ -27,6 +27,7 @@ function DiscordServersModal (
           textTransform: 'uppercase'
         }}
         mb={1}
+        component='div'
       >
         Your Servers
         <Typography variant='subtitle2'>Click on any of them to start importing roles</Typography>
@@ -49,7 +50,7 @@ function DiscordServersModal (
                 }}
               >
                 <ListItemAvatar>
-                  <Avatar src={`https://cdn.discordapp.com/icons/${discordServer.id}/${discordServer.icon}.png`} />
+                  <Avatar src={discordServer.icon ? `https://cdn.discordapp.com/icons/${discordServer.id}/${discordServer.icon}.png` : undefined} />
                 </ListItemAvatar>
                 <ListItemText primary={discordServer.name} />
               </ListItemButton>

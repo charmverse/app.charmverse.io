@@ -7,15 +7,17 @@ import { useCurrentSpace } from './useCurrentSpace';
 import { useSnackbar } from './useSnackbar';
 
 export default function useDiscordServers () {
-  const [discordError, setDiscordError] = useState<string | null>(null);
   const { showMessage } = useSnackbar();
   const [isListDiscordServersLoading, setIsListDiscordServersLoading] = useState(false);
+  const [listDiscordServersError, setListDiscordServersError] = useState<string | null>(null);
   const [space] = useCurrentSpace();
   const [discordServers, setDiscordServers] = useState<DiscordUserServer[]>([]);
-  const isListingDiscordServers = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'server';
   const [isImportRolesFromServerLoading, setIsImportRolesFromServerLoading] = useState<boolean>(false);
   const [importRolesFromServerError, setImportRolesFromServerError] = useState<ImportRolesResponse['error'] | null>(null);
   const [currentSpace, setCurrentSpace] = useCurrentSpace();
+
+  // Are we making a request for listing discord servers of current user
+  const isListingDiscordServers = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'server';
 
   useEffect(() => {
     if (isListingDiscordServers) {
@@ -33,7 +35,7 @@ export default function useDiscordServers () {
           setIsListDiscordServersLoading(false);
           const errorMessage = err.message ?? err.error ?? 'Something went wrong. Please try again';
           showMessage(errorMessage, 'error');
-          setDiscordError(errorMessage);
+          setListDiscordServersError(errorMessage);
         });
     }
   }, [Boolean(space)]);
@@ -65,7 +67,7 @@ export default function useDiscordServers () {
       }
       catch (err: any) {
         // Major failure while trying to import discord server role
-        setDiscordError(err.error ?? err.message ?? 'Something went wrong. Please try again');
+        setImportRolesFromServerError(err.error ?? err.message ?? 'Something went wrong. Please try again');
       }
     }
   }
@@ -73,7 +75,7 @@ export default function useDiscordServers () {
   return {
     isListDiscordServersLoading,
     isImportRolesFromServerLoading,
-    discordError,
+    listDiscordServersError,
     discordServers,
     isListingDiscordServers,
     importRolesFromServer,

@@ -12,7 +12,7 @@ export default function ImportDiscordRoles () {
   const {
     discordServers,
     isListingDiscordServers,
-    discordError,
+    listDiscordServersError,
     importRolesFromServer,
     isListDiscordServersLoading,
     isImportRolesFromServerLoading,
@@ -26,13 +26,13 @@ export default function ImportDiscordRoles () {
     // If we are listing discord servers
     // If there were no errors while fetching list of servers
     // Show the discord servers modal
-    if (!isListDiscordServersLoading && isListingDiscordServers && !discordError) {
+    if (!isListDiscordServersLoading && isListingDiscordServers && !listDiscordServersError) {
       setIsDiscordServersModalOpen(true);
     }
     else {
       setIsDiscordServersModalOpen(false);
     }
-  }, [isListDiscordServersLoading, discordError, isListingDiscordServers]);
+  }, [isListDiscordServersLoading, listDiscordServersError, isListingDiscordServers]);
 
   const isCurrentUserAdmin = (user?.spaceRoles
     .find(spaceRole => spaceRole.spaceId === space?.id)?.role === 'admin');
@@ -80,7 +80,7 @@ export default function ImportDiscordRoles () {
             display: 'flex', gap: 2, flexDirection: 'column'
           }}
           >
-            Error faced during importing roles
+            Error faced during importing
             {importRolesFromServerError?.map(failedImport => (
               <div>
                 <Box sx={{
@@ -96,7 +96,7 @@ export default function ImportDiscordRoles () {
         </Alert>
       ) : (
         <Alert severity='error' sx={{ mt: 2 }}>
-          {discordError}
+          {importRolesFromServerError}
         </Alert>
       ))}
     </>
