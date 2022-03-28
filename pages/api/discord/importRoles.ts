@@ -2,7 +2,7 @@ import log from 'lib/log';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
 import * as http from 'adapters/http';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Role } from '@prisma/client';
@@ -60,6 +60,13 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
   const { spaceId, guildId } = req.body as ImportRolesPayload;
   const importErrors: ImportRolesResponse['error'] = [];
 
+  if (!spaceId || !guildId) {
+    res.status(400).json({
+      error: 'Missing parameters'
+    });
+    return;
+  }
+
   try {
     await prisma.space.update({
       where: {
@@ -70,6 +77,10 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
       }
     });
 
+    // TODO: Handle invalid token
+    // TODO: Handle when the bot is not in the server
+    // TODO: Handle when the bot doesn't have the right permissions
+    // TODO: Handle when the guild doesn't exist
     const discordServerRoles = await http.GET<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`, undefined, {
       headers: {
         Authorization: `Bot ${discordBotToken}`
@@ -193,7 +204,9 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
       }
     }
 
-    res.status(200).end();
+    res.status(200).json({
+      error: importErrors
+    });
   }
   catch (err) {
     log.warn('Failed to connect workspace with discord server', err);
@@ -201,6 +214,6 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
   }
 }
 
-handler.use(requireUser).post(importRoles);
+handler.use(requireUser).use(requireSpaceMembership('admin')).post(importRoles);
 
 export default withSessionRoute(handler);
