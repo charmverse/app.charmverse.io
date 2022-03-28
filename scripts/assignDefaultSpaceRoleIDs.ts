@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { RPCList } from 'connectors';
 import { prisma } from 'db';
 import { v4 as uuid } from 'uuid';
 
