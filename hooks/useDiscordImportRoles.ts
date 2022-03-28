@@ -1,7 +1,7 @@
 import charmClient from 'charmClient';
 import router from 'next/router';
 import { ImportRolesResponse } from 'pages/api/discord/importRoles';
-import { DiscordUserServer } from 'pages/api/discord/servers';
+import { DiscordUserServer } from 'pages/api/discord/listServers';
 import { useState, useEffect } from 'react';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useSnackbar } from './useSnackbar';

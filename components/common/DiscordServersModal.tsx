@@ -1,6 +1,6 @@
 
 import { Modal } from 'components/common/Modal';
-import { DiscordUserServer } from 'pages/api/discord/servers';
+import { DiscordUserServer } from 'pages/api/discord/listServers';
 import { Avatar, ListItemAvatar, List, ListItemText, ListItemButton, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
