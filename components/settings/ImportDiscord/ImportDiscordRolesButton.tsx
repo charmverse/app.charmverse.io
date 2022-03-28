@@ -2,22 +2,21 @@ import { Button, SvgIcon, CircularProgress, Alert } from '@mui/material';
 import { Box } from '@mui/system';
 import DiscordServersModal from 'components/settings/ImportDiscord/DiscordServersModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useDiscordImportRoles from 'components/settings/ImportDiscord/hooks/useDiscordImportRoles';
+import useImportRoles from 'components/settings/ImportDiscord/hooks/useImportRoles';
 import { useUser } from 'hooks/useUser';
 import { useState, useEffect } from 'react';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
-export default function ImportDiscordRoles () {
+export default function ImportDiscordRolesButton () {
   const [isDiscordServersModalOpen, setIsDiscordServersModalOpen] = useState(false);
   const {
     discordServers,
     isListingDiscordServers,
-    listDiscordServersError,
+    responseError,
     importRolesFromServer,
     isListDiscordServersLoading,
-    isImportRolesFromServerLoading,
-    importRolesFromServerError
-  } = useDiscordImportRoles();
+    isImportRolesFromServerLoading
+  } = useImportRoles();
   const [user] = useUser();
   const [space] = useCurrentSpace();
 
@@ -26,19 +25,24 @@ export default function ImportDiscordRoles () {
     // If we are listing discord servers
     // If there were no errors while fetching list of servers
     // Show the discord servers modal
-    if (!isListDiscordServersLoading && isListingDiscordServers && !listDiscordServersError) {
+    if (!isListDiscordServersLoading && isListingDiscordServers && !responseError) {
       setIsDiscordServersModalOpen(true);
     }
     else {
       setIsDiscordServersModalOpen(false);
     }
-  }, [isListDiscordServersLoading, listDiscordServersError, isListingDiscordServers]);
+  }, [isListDiscordServersLoading, responseError, isListingDiscordServers]);
 
   const isCurrentUserAdmin = (user?.spaceRoles
     .find(spaceRole => spaceRole.spaceId === space?.id)?.role === 'admin');
 
+  async function selectServer (guildId: string) {
+    await importRolesFromServer(guildId);
+    setIsDiscordServersModalOpen(false);
+  }
+
   return (
-    <div>
+    <>
       <Box
         display='flex'
         gap={1}
@@ -74,33 +78,13 @@ export default function ImportDiscordRoles () {
         onClose={() => {
           setIsDiscordServersModalOpen(false);
         }}
-        onImportingDiscordRoles={(guildId) => importRolesFromServer(guildId)}
+        onSelect={selectServer}
       />
-      {importRolesFromServerError && (typeof importRolesFromServerError !== 'string' ? importRolesFromServerError?.length !== 0 && (
+      {responseError && (
         <Alert severity='error' sx={{ mt: 2 }}>
-          <Box sx={{
-            display: 'flex', gap: 2, flexDirection: 'column'
-          }}
-          >
-            Error faced during import:
-            {importRolesFromServerError?.map(failedImport => (
-              <div>
-                <Box sx={{
-                  display: 'flex',
-                  gap: 1
-                }}
-                >
-                  <span>{failedImport.action === 'assign' ? `Failed to assign ${failedImport.roles.join(',')} to user ${failedImport.username}` : `Failed to create role ${failedImport.role}`}</span>
-                </Box>
-              </div>
-            ))}
-          </Box>
+          {responseError}
         </Alert>
-      ) : (
-        <Alert severity='error' sx={{ mt: 2 }}>
-          {importRolesFromServerError}
-        </Alert>
-      ))}
-    </div>
+      )}
+    </>
   );
 }

@@ -16,7 +16,7 @@ import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
 import { Box, Typography } from '@mui/material';
-import ImportDiscordRoles from 'components/settings/ImportDiscord/ImportDiscordRoles';
+import ImportDiscordRoles from 'components/settings/ImportDiscord/ImportDiscordRolesButton';
 import ImportNotionWorkspace from 'components/settings/Import/ImportNotionWorkspace';
 
 export interface FailedImportsError {

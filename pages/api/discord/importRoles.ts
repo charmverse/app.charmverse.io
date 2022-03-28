@@ -6,7 +6,6 @@ import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
 import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
-import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import { DiscordUser } from './connect';
 
 const handler = nc({
@@ -47,18 +46,9 @@ export interface DiscordGuildMember {
   permissions?: string
 }
 
-export type ImportRolesResponse = {
-  error?: ({
-    action: 'create',
-    role: string
-  } | {
-    action: 'assign',
-    username: string,
-    roles: string[]
-  })[] | string
-}
+export type ImportRolesResponse = { importedRoleCount: number };
 
-async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse>) {
+async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse | { error: string }>) {
   const { spaceId, guildId } = req.body as ImportRolesPayload;
 
   if (!spaceId || !guildId) {
@@ -143,7 +133,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
 
   await findOrCreateRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
 
-  res.status(200).json({ success: true });
+  res.status(200).json({ importedRoleCount: discordServerRoles.length });
 }
 
 handler.use(requireUser).use(requireSpaceMembership('admin')).post(importRoles);

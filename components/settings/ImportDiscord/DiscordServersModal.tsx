@@ -7,11 +7,11 @@ import { useMemo } from 'react';
 function DiscordServersModal (
   {
     isImportRolesFromServerLoading, isListDiscordServersLoading,
-    discordServers, onImportingDiscordRoles, onClose, isOpen
+    discordServers, onSelect, onClose, isOpen
   }:
     {
       isImportRolesFromServerLoading: boolean, discordServers: DiscordUserServer[], isListDiscordServersLoading: boolean,
-      isOpen: boolean, onImportingDiscordRoles: (guildId: string) => Promise<void>, onClose: () => void
+      isOpen: boolean, onSelect: (guildId: string) => void, onClose: () => void
     }
 ) {
   const sortedServers = useMemo(() => discordServers
@@ -19,7 +19,7 @@ function DiscordServersModal (
   return (
     <Modal
       open={isOpen}
-      title='Your Discord Servers'
+      title='Select a Discord Server'
       onClose={onClose}
     >
       <Typography variant='subtitle2'>Select a server to start importing roles</Typography>
@@ -34,10 +34,7 @@ function DiscordServersModal (
               <ListItemButton
                 key={discordServer.id}
                 disabled={isImportRolesFromServerLoading}
-                onClick={async () => {
-                  await onImportingDiscordRoles(discordServer.id);
-                  onClose();
-                }}
+                onClick={() => onSelect(discordServer.id)}
               >
                 <ListItemAvatar>
                   <Avatar src={discordServer.icon ? `https://cdn.discordapp.com/icons/${discordServer.id}/${discordServer.icon}.png` : undefined} />
