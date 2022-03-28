@@ -49,7 +49,7 @@ export interface DiscordGuildMember {
 }
 
 export type ImportRolesResponse = {
-  error: ({
+  error?: ({
     action: 'create',
     role: string
   } | {

@@ -2,26 +2,32 @@
 import { Modal } from 'components/common/Modal';
 import { DiscordUserServer } from 'pages/api/discord/servers';
 import { Avatar, ListItemAvatar, List, ListItemText, ListItemButton, Typography } from '@mui/material';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import charmClient from 'charmClient';
 import { useMemo, useState } from 'react';
-import { useSnackbar } from 'hooks/useSnackbar';
 
-function DiscordServersModal ({ isFetching, discordServers, onClose, isOpen }:
-  { discordServers: DiscordUserServer[], isFetching: boolean, isOpen: boolean, onClose: () => void }) {
-  const [currentSpace, setCurrentSpace] = useCurrentSpace();
+function DiscordServersModal ({ isFetching, discordServers, onImportingDiscordRoles, onClose, isOpen }:
+  {
+    discordServers: DiscordUserServer[], isFetching: boolean, isOpen: boolean,
+    onImportingDiscordRoles: (guildId: string) => Promise<void>, onClose: () => void
+  }) {
   const [isConnectingServer, setIsConnectingServer] = useState(false);
-  const {
-    showMessage
-  } = useSnackbar();
 
   const sortedServers = useMemo(() => discordServers
     .sort((discordServerA, discordServerB) => discordServerA.name < discordServerB.name ? -1 : 1), [discordServers]);
-  return currentSpace ? (
+  return (
     <Modal
       open={isOpen}
       onClose={onClose}
     >
+      <Typography
+        variant='h6'
+        sx={{
+          textTransform: 'uppercase'
+        }}
+        mb={1}
+      >
+        Your Servers
+        <Typography variant='subtitle2'>Click on any of them to start importing roles</Typography>
+      </Typography>
       {isFetching ? <Typography variant='h5'>Fetching servers</Typography> : (
         <List sx={{
           maxHeight: 500,
@@ -30,44 +36,26 @@ function DiscordServersModal ({ isFetching, discordServers, onClose, isOpen }:
         }}
         >
           {
-          sortedServers.map(discordServer => (
-            <ListItemButton
-              key={discordServer.id}
-              disabled={isConnectingServer}
-              onClick={async () => {
-                try {
-                  setIsConnectingServer(true);
-                  await charmClient.importRolesFromServer({
-                    guildId: discordServer.id,
-                    spaceId: currentSpace.id
-                  });
-
-                  // If the import was successful the workspace has been connected with the discord server
-                  setCurrentSpace({
-                    ...currentSpace,
-                    discordServerId: discordServer.id
-                  });
-                  showMessage(`Successfully connected to ${discordServer.name}`);
-                  onClose();
-                }
-                catch (_) {
-                  showMessage(`Couldn't connect to ${discordServer.name}. Please try again.`, 'error');
-                }
-                setIsConnectingServer(false);
-              }}
-            >
-              <ListItemAvatar>
-                <Avatar src={`https://cdn.discordapp.com/icons/${discordServer.id}/${discordServer.icon}.png`}>
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={discordServer.name} />
-            </ListItemButton>
-          ))
-}
+            sortedServers.map(discordServer => (
+              <ListItemButton
+                key={discordServer.id}
+                disabled={isConnectingServer}
+                onClick={async () => {
+                  await onImportingDiscordRoles(discordServer.id);
+                  setIsConnectingServer(false);
+                }}
+              >
+                <ListItemAvatar>
+                  <Avatar src={`https://cdn.discordapp.com/icons/${discordServer.id}/${discordServer.icon}.png`} />
+                </ListItemAvatar>
+                <ListItemText primary={discordServer.name} />
+              </ListItemButton>
+            ))
+          }
         </List>
       )}
     </Modal>
-  ) : null;
+  );
 }
 
 export default DiscordServersModal;

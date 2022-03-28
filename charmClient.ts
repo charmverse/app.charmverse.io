@@ -15,7 +15,7 @@ import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
 import { DiscordUserServer } from 'pages/api/discord/servers';
-import { ImportRolesPayload } from 'pages/api/discord/importRoles';
+import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -161,7 +161,7 @@ class CharmClient {
   }
 
   importRolesFromServer (payload: ImportRolesPayload) {
-    return http.POST('/api/discord/importRoles', payload);
+    return http.POST<ImportRolesResponse>('/api/discord/importRoles', payload);
   }
 
   // FocalBoard

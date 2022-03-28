@@ -12,20 +12,21 @@ export default function ImportDiscordRoles () {
   const {
     discordServers,
     isListingDiscordServers,
-    isLoading,
-    discordError
+    discordError,
+    importRolesFromServer,
+    isListDiscordServersLoading
   } = useDiscordServers();
   const [user] = useUser();
   const [space] = useCurrentSpace();
 
   useEffect(() => {
-    if (!isLoading && isListingDiscordServers && !discordError) {
+    if (!isListDiscordServersLoading && isListingDiscordServers && !discordError) {
       setIsDiscordServersModalOpen(true);
     }
     else {
       setIsDiscordServersModalOpen(false);
     }
-  }, [isLoading, discordError, isListingDiscordServers]);
+  }, [isListDiscordServersLoading, discordError, isListingDiscordServers]);
 
   const isCurrentUserAdmin = (user?.spaceRoles
     .find(spaceRole => spaceRole.spaceId === space?.id)?.role === 'admin');
@@ -38,7 +39,7 @@ export default function ImportDiscordRoles () {
         alignItems='center'
       >
         <Button
-          disabled={(isLoading && isListingDiscordServers) || !isCurrentUserAdmin}
+          disabled={(isListDiscordServersLoading && isListingDiscordServers) || !isCurrentUserAdmin}
           onClick={() => {
             if (isCurrentUserAdmin) {
               window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`);
@@ -51,19 +52,20 @@ export default function ImportDiscordRoles () {
             </SvgIcon>
         )}
           endIcon={(
-          isLoading && <CircularProgress size={20} />
+          isListDiscordServersLoading && <CircularProgress size={20} />
         )}
         >
           Import Roles
         </Button>
       </Box>
       <DiscordServersModal
-        isFetching={isLoading}
+        isFetching={isListDiscordServersLoading}
         isOpen={isDiscordServersModalOpen}
         discordServers={discordServers}
         onClose={() => {
           setIsDiscordServersModalOpen(false);
         }}
+        onImportingDiscordRoles={(guildId) => importRolesFromServer(guildId)}
       />
     </>
   );
