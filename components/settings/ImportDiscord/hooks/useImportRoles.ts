@@ -21,8 +21,7 @@ export default function useImportRoles () {
     if (isListingDiscordServers) {
       setIsListDiscordServersLoading(true);
       charmClient.listDiscordServers({
-        code: router.query.code as string,
-        spaceId: space.id
+        code: router.query.code as string
       })
         .then(({ servers }) => {
           setDiscordServers(servers);

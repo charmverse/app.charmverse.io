@@ -161,7 +161,7 @@ class CharmClient {
     return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
   }
 
-  listDiscordServers (payload: {code: string, spaceId: string}) {
+  listDiscordServers (payload: { code: string }) {
     return http.GET<{servers: DiscordUserServer[]}>('/api/discord/listServers', payload);
   }
 
