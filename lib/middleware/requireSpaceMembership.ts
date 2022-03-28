@@ -45,11 +45,10 @@ export function requireSpaceMembership (role?: SpaceRole['role']) {
 
     if (!spaceRole) {
       return res.status(401).send({
-        message: 'You do not have access to this space'
+        message: role ? `Your are not ${role === 'admin' ? 'an' : 'a'} ${role} of this space` : 'You do not have access to this space'
       });
     }
     else {
-
       next();
     }
   };

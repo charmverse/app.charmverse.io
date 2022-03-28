@@ -56,17 +56,39 @@ export type ImportRolesResponse = {
   }[] | string
 }
 
-// TODO: Discord member list pagination
 async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse>) {
-  const { spaceId, guildId, discordUserId } = req.body as ImportRolesPayload;
+  const { spaceId, guildId } = req.body as ImportRolesPayload;
   const importErrors: ImportRolesResponse['error'] = [];
 
-  if (!spaceId || !guildId || !discordUserId) {
+  if (!spaceId || !guildId) {
     res.status(400).json({
       error: 'Missing parameters'
     });
     return;
   }
+
+  const userId = req.session.user.id;
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId
+    },
+    include: {
+      discordUser: true
+    }
+  });
+
+  if (!user?.discordUser) {
+    res.status(401).json({
+      error: 'You must have discord connected'
+    });
+    return;
+  }
+
+  const discordApiHeaders: any = {
+    headers: {
+      Authorization: `Bot ${discordBotToken}`
+    }
+  };
 
   try {
     await prisma.space.update({
@@ -85,13 +107,13 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
   }
 
   let discordServerRoles: DiscordServerRole[] = [];
-  // TODO: Handle when the bot doesn't have the right permissions
+  let discordGuildMembers: DiscordGuildMember[] = [];
+
   try {
-    discordServerRoles = await http.GET<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`, undefined, {
-      headers: {
-        Authorization: `Bot ${discordBotToken}`
-      }
-    });
+    discordServerRoles = await http.GET<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`, undefined, discordApiHeaders);
+
+    // TODO: Support Pagination
+    discordGuildMembers = await http.GET<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100`, undefined, discordApiHeaders);
   }
   catch (err: any) {
     // The bot token is invalid
@@ -102,18 +124,26 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     }
     // Charmverse bot hasn't been added to server
     else if (err.code === 50001) {
-      res.status(500).json({ error: 'Please add Charmverse bot to your server' });
+      res.status(400).json({ error: 'Please add Charmverse bot to your server' });
       return;
     }
     // Guild doesn't exist
     else if (err.code === 10004) {
-      res.status(500).json({ error: "Unknown guild. Please make sure you're importing from the correct guild" });
+      res.status(400).json({ error: "Unknown guild. Please make sure you're importing from the correct guild" });
       return;
     }
     else {
       res.status(500).json({ error: 'Something went wrong. Please try again' });
       return;
     }
+  }
+
+  const discordMember = discordGuildMembers.find(guildMember => guildMember.user?.id === user.discordUser!.userId);
+  if (!discordMember) {
+    res.status(401).json({
+      error: 'You are not part of the guild'
+    });
+    return;
   }
 
   const rolesRecord: Record<string, { discord: DiscordServerRole, charmverse: Role | null }> = {};
@@ -126,6 +156,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
         charmverse: null
       };
       try {
+        // First check if a role with the same name already exist in the workspace
         const existingRole = await prisma.role.findFirst({
           where: {
             name: discordServerRole.name,
@@ -160,78 +191,72 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     }
   }
 
-  const discordGuildMembers = await http.GET<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100`, undefined, {
-    headers: {
-      Authorization: `Bot ${discordBotToken}`
-    }
-  });
+  // for (const discordGuildMember of discordGuildMembers) {
+  //   try {
+  //     if (discordGuildMember.user) {
+  //       // Find the charmverse user whose discord id matches with the guild member
+  //       const charmverseUser = await prisma.user.findFirst({
+  //         where: {
+  //           discordUser: {
+  //             discordId: discordGuildMember.user.id
+  //           }
+  //         }
+  //       });
 
-  for (const discordGuildMember of discordGuildMembers) {
-    try {
-      if (discordGuildMember.user) {
-        // Find the charmverse user whose discord id matches with the guild member
-        const charmverseUser = await prisma.user.findFirst({
-          where: {
-            discordUser: {
-              discordId: discordGuildMember.user.id
-            }
-          }
-        });
+  //       // Some user might not have connected with discord
+  //       if (charmverseUser) {
+  //         // Check if the user has a role in the current space, this is to ensure that the user belongs to this space
+  //         const charmverseUserSpaceRole = await prisma.spaceRole.findFirst({
+  //           where: {
+  //             spaceId,
+  //             userId: charmverseUser.id
+  //           }
+  //         });
 
-        // Some user might not have connected with discord
-        if (charmverseUser) {
-          // Check if the user has a role in the current space, this is to ensure that the user belongs to this space
-          const charmverseUserSpaceRole = await prisma.spaceRole.findFirst({
-            where: {
-              spaceId,
-              userId: charmverseUser.id
-            }
-          });
-
-          // If the user is a part of the workspace assign the role to that user
-          if (charmverseUserSpaceRole) {
-            // Loop through all the roles the discord user has
-            for (const role of discordGuildMember.roles) {
-              const roleInRecord = rolesRecord[role];
-              // If the role was created/fetched successfully
-              if (roleInRecord?.charmverse) {
-                // Check if the user already has the same role
-                const charmverseUserExistingRole = await prisma.spaceRoleToRole.findFirst({
-                  where: {
-                    roleId: roleInRecord.charmverse.id,
-                    spaceRoleId: charmverseUserSpaceRole.id!
-                  }
-                });
-                  // Only assign the role if the role wasn't already assigned to the charmverse user
-                if (!charmverseUserExistingRole) {
-                  await prisma.spaceRoleToRole.create({
-                    data: {
-                      role: {
-                        connect: {
-                          id: roleInRecord.charmverse.id
-                        }
-                      },
-                      spaceRole: {
-                        connect: {
-                          id: charmverseUserSpaceRole.id!
-                        }
-                      }
-                    }
-                  });
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    catch (_) {
-      importErrors.push({
-        action: 'assign',
-        target: discordGuildMember.user?.username ?? 'N/A'
-      });
-    }
-  }
+  //         // If the user is a part of the workspace assign the role to that user
+  //         if (charmverseUserSpaceRole) {
+  //           // Loop through all the roles the discord user has
+  //           for (const role of discordGuildMember.roles) {
+  //             const roleInRecord = rolesRecord[role];
+  //             // If the role was created/fetched successfully
+  //             if (roleInRecord?.charmverse) {
+  //               // Check if the user already has the same role
+  //               const charmverseUserExistingRole = await prisma.spaceRoleToRole.findFirst({
+  //                 where: {
+  //                   roleId: roleInRecord.charmverse.id,
+  //                   spaceRoleId: charmverseUserSpaceRole.id!
+  //                 }
+  //               });
+  //                 // Only assign the role if the role wasn't already assigned to the charmverse user
+  //               if (!charmverseUserExistingRole) {
+  //                 await prisma.spaceRoleToRole.create({
+  //                   data: {
+  //                     role: {
+  //                       connect: {
+  //                         id: roleInRecord.charmverse.id
+  //                       }
+  //                     },
+  //                     spaceRole: {
+  //                       connect: {
+  //                         id: charmverseUserSpaceRole.id!
+  //                       }
+  //                     }
+  //                   }
+  //                 });
+  //               }
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   catch (_) {
+  //     importErrors.push({
+  //       action: 'assign',
+  //       target: discordGuildMember.user?.username ?? 'N/A'
+  //     });
+  //   }
+  // }
 
   res.status(200).json({
     error: importErrors
