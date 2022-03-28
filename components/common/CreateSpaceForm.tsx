@@ -72,7 +72,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         createdAt: new Date(),
         updatedAt: new Date(),
         updatedBy: user!.id,
-        permissions: {
+        spaceRoles: {
           create: [{
             role: 'admin',
             user: {
