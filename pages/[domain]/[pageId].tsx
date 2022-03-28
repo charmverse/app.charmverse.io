@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
-import { PageLayout } from 'components/common/page-layout';
-import { DatabaseEditor } from 'components/databases';
-import Editor from 'components/editor';
+import PageLayout from 'components/common/PageLayout';
+import BoardPage from 'components/[pageId]/BoardPage';
+import DocumentPage from 'components/[pageId]/DocumentPage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState, useCallback } from 'react';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import log from 'lib/log';
-import { IPagePermissionFlags } from 'lib/permissions/pages';
+import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import { isTruthy } from 'lib/utilities/types';
 import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -103,7 +103,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   useEffect(() => {
     console.log('Use effect fired');
     if (user && memoizedCurrentPage) {
-      charmClient.queryPermissions({
+      charmClient.computeUserPagePermissions({
         userId: user.id,
         pageId: memoizedCurrentPage.id
       } as any)
@@ -123,16 +123,10 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     return null;
   }
   else if (currentPage.type === 'board') {
-    return <DatabaseEditor page={memoizedCurrentPage} setPage={setPage} readonly={publicShare} />;
+    return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={publicShare} />;
   }
   else {
-    return (
-      <Editor
-        page={memoizedCurrentPage}
-        setPage={setPage}
-        readOnly={!canEdit}
-      />
-    );
+    return <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare} />;
   }
 }
 

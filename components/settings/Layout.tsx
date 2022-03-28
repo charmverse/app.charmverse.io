@@ -10,7 +10,7 @@ import SettingsIcon from '@mui/icons-material/WorkOutline';
 import PersonIcon from '@mui/icons-material/Group';
 import LockIcon from '@mui/icons-material/LockOpen';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
-import { PageLayout } from '../common/page-layout';
+import PageLayout from 'components/common/PageLayout';
 
 const SETTINGS_TABS = [
   { icon: <SettingsIcon fontSize='small' />, path: 'workspace', label: 'Workspace' },

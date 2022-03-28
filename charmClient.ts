@@ -2,18 +2,18 @@
 
 import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User } from '@prisma/client';
 import * as http from 'adapters/http';
-import { Block as FBBlock, BlockPatch } from 'components/databases/focalboard/src/blocks/block';
-import { IWorkspace } from 'components/databases/focalboard/src/blocks/workspace';
-import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
-import { IUser, UserWorkspace } from 'components/databases/focalboard/src/user';
 import { IPagePermissionFlags, IPagePermissionUserRequest } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
 import { BountyWithDetails, Contributor, LoggedInUser } from 'models';
-import { FiatCurrency, IPairQuote } from 'models/Currency';
-import type { ServerBlockFields } from 'pages/api/blocks';
-import { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
+import type { ServerBlockFields } from 'pages/api/blocks';
+import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
+import { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
+import { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
+import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
+import { InviteLinkPopulated } from 'pages/api/invites/index';
+import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;

@@ -1,4 +1,4 @@
-import getBaseLayout from 'components/common/base-layout/getLayout';
+import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import SignupForm from 'components/signup/SignupForm';
 
 export default function LoginPage () {

@@ -1,7 +1,7 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
 import { Page } from '@prisma/client';
-import { insertNode } from 'components/editor/@bangle.io/extensions/inline-command-palette/use-editor-items';
+import { insertNode } from 'components/common/CharmEditor/components/@bangle.io/extensions/inline-command-palette/use-editor-items';
 import { useCallback } from 'react';
 import { usePages } from './usePages';
 

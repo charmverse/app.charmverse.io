@@ -1,0 +1,470 @@
+// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+// See LICENSE.txt for license information.
+/* eslint-disable max-lines */
+import { Box } from '@mui/system'
+import PageBanner, { PageCoverGalleryImageGroups } from 'components/[pageId]/DocumentPage/components/PageBanner'
+import { randomIntFromInterval } from 'lib/utilities/random'
+import { Page } from 'models'
+import React from 'react'
+import Hotkeys from 'react-hot-keys'
+import { injectIntl, IntlShape } from 'react-intl'
+import { connect } from 'react-redux'
+import { BlockIcons } from '../blockIcons'
+import { Block } from '../blocks/block'
+import { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../blocks/board'
+import { BoardView } from '../blocks/boardView'
+import { Card, createCard } from '../blocks/card'
+import { createCharmTextBlock } from '../blocks/charmBlock'
+import { CardFilter } from '../cardFilter'
+import { ClientConfig } from '../config/clientConfig'
+import mutator from '../mutator'
+import { addCard, addTemplate } from '../store/cards'
+import { updateView } from '../store/views'
+import { UserSettings } from '../userSettings'
+import { Utils } from '../utils'
+import CalendarFullView from './calendar/fullCalendar'
+import CardDialog from './cardDialog'
+import Gallery from './gallery/gallery'
+import Kanban from './kanban/kanban'
+import RootPortal from './rootPortal'
+import Table from './table/table'
+import ViewHeader from './viewHeader/viewHeader'
+import ViewTitle from './viewTitle'
+
+type Props = {
+    clientConfig?: ClientConfig
+    board: Board
+    cards: Card[]
+    activeView: BoardView
+    views: BoardView[]
+    groupByProperty?: IPropertyTemplate
+    dateDisplayProperty?: IPropertyTemplate
+    intl: IntlShape
+    readonly: boolean
+    addCard: (card: Card) => void
+    setPage: (p: Partial<Page>) => void
+    updateView: (view: BoardView) => void
+    addTemplate: (template: Card) => void
+    shownCardId?: string
+    showCard: (cardId?: string) => void
+    showShared: boolean
+}
+
+type State = {
+    selectedCardIds: string[]
+    cardIdToFocusOnRender: string
+}
+
+class CenterPanel extends React.Component<Props, State> {
+    private backgroundRef = React.createRef<HTMLDivElement>()
+
+    private keydownHandler = (keyName: string, e: KeyboardEvent) => {
+        if (e.target !== document.body || this.props.readonly) {
+            return
+        }
+
+        if (keyName === 'esc') {
+            if (this.state.selectedCardIds.length > 0) {
+                this.setState({selectedCardIds: []})
+                e.stopPropagation()
+            }
+        }
+
+        if (this.state.selectedCardIds.length > 0) {
+            if (keyName === 'del' || keyName === 'backspace') {
+                // Backspace or Del: Delete selected cards
+                this.deleteSelectedCards()
+                e.stopPropagation()
+            }
+
+            // TODO: Might need a different hotkey, as Cmd+D is save bookmark on Chrome
+            if (keyName === 'ctrl+d') {
+                // CTRL+D: Duplicate selected cards
+                this.duplicateSelectedCards()
+                e.stopPropagation()
+                e.preventDefault()
+            }
+        }
+    }
+
+    componentDidMount(): void {
+        // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.ViewBoard, {board: this.props.board.id, view: this.props.activeView.id, viewType: this.props.activeView.fields.viewType})
+    }
+
+    constructor(props: Props) {
+        super(props)
+        this.state = {
+            selectedCardIds: [],
+            cardIdToFocusOnRender: '',
+        }
+    }
+
+    shouldComponentUpdate(): boolean {
+        return true
+    }
+
+    componentDidUpdate(): void {
+        // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.ViewBoard, {board: this.props.board.id, view: this.props.activeView.id, viewType: this.props.activeView.fields.viewType})
+    }
+
+    setRandomHeaderImage(board: Board, headerImage?: string | null) {
+      const newHeaderImage = headerImage ?? PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
+      // Null is passed if we want to remove the image
+      mutator.changeHeaderImage(board.id, board.fields.headerImage, headerImage !== null ? newHeaderImage : null)
+    }
+
+    render(): JSX.Element {
+        const {groupByProperty, activeView, board, views, cards} = this.props
+        const {visible: visibleGroups, hidden: hiddenGroups} = this.getVisibleAndHiddenGroups(cards, activeView.fields.visibleOptionIds, activeView.fields.hiddenOptionIds, groupByProperty)
+
+        return (
+            <div
+                className='BoardComponent'
+                ref={this.backgroundRef}
+                onClick={(e) => {
+                    this.backgroundClicked(e)
+                }}
+            >
+                <Hotkeys
+                    keyName='ctrl+d,del,esc,backspace'
+                    onKeyDown={this.keydownHandler}
+                />
+                {this.props.shownCardId &&
+                    <RootPortal>
+                        <CardDialog
+                            board={board}
+                            activeView={activeView}
+                            views={views}
+                            cards={cards}
+                            key={this.props.shownCardId}
+                            cardId={this.props.shownCardId}
+                            onClose={() => this.showCard(undefined)}
+                            showCard={(cardId) => this.showCard(cardId)}
+                            readonly={this.props.readonly}
+                        />
+                    </RootPortal>}
+                {board.fields.headerImage && <Box className='PageBanner' width={"100%"} mb={2}>
+                  <PageBanner focalBoard headerImage={board.fields.headerImage} setPage={({ headerImage }) => {
+                    this.setRandomHeaderImage(board, headerImage!)
+                  }} />
+                </Box>}
+                <div className='top-head'>
+                    <ViewTitle
+                        key={board.id + board.title}
+                        board={board}
+                        readonly={this.props.readonly}
+                        setPage={this.props.setPage}
+                    />
+                    <ViewHeader
+                        board={this.props.board}
+                        activeView={this.props.activeView}
+                        cards={this.props.cards}
+                        views={this.props.views}
+                        groupByProperty={this.props.groupByProperty}
+                        dateDisplayProperty={this.props.dateDisplayProperty}
+                        addCard={() => this.addCard('', true)}
+                        addCardFromTemplate={this.addCardFromTemplate}
+                        addCardTemplate={this.addCardTemplate}
+                        editCardTemplate={this.editCardTemplate}
+                        readonly={this.props.readonly}
+                        showShared={this.props.showShared}
+                    />
+                </div>
+
+                <div className='container-container'>
+                    {activeView.fields.viewType === 'board' &&
+                    <Kanban
+                        board={this.props.board}
+                        activeView={this.props.activeView}
+                        cards={this.props.cards}
+                        groupByProperty={this.props.groupByProperty}
+                        visibleGroups={visibleGroups}
+                        hiddenGroups={hiddenGroups}
+                        selectedCardIds={this.state.selectedCardIds}
+                        readonly={this.props.readonly}
+                        onCardClicked={this.cardClicked}
+                        addCard={this.addCard}
+                        showCard={this.showCard}
+                    />}
+                    {activeView.fields.viewType === 'table' &&
+                        <Table
+                            board={this.props.board}
+                            activeView={this.props.activeView}
+                            cards={this.props.cards}
+                            groupByProperty={this.props.groupByProperty}
+                            views={this.props.views}
+                            visibleGroups={visibleGroups}
+                            selectedCardIds={this.state.selectedCardIds}
+                            readonly={this.props.readonly}
+                            cardIdToFocusOnRender={this.state.cardIdToFocusOnRender}
+                            showCard={this.showCard}
+                            addCard={this.addCard}
+                            onCardClicked={this.cardClicked}
+                        />}
+                    {activeView.fields.viewType === 'calendar' &&
+                        <CalendarFullView
+                            board={this.props.board}
+                            cards={this.props.cards}
+                            activeView={this.props.activeView}
+                            readonly={this.props.readonly}
+                            dateDisplayProperty={this.props.dateDisplayProperty}
+                            showCard={this.showCard}
+                            addCard={(properties: Record<string, string>) => {
+                                this.addCard('', true, properties)
+                            }}
+                        />}
+
+                    {activeView.fields.viewType === 'gallery' &&
+                        <Gallery
+                            board={this.props.board}
+                            cards={this.props.cards}
+                            activeView={this.props.activeView}
+                            readonly={this.props.readonly}
+                            onCardClicked={this.cardClicked}
+                            selectedCardIds={this.state.selectedCardIds}
+                            addCard={(show) => this.addCard('', show)}
+                        />}
+                </div>
+            </div>
+        )
+    }
+
+    private backgroundClicked(e: React.MouseEvent) {
+        if (this.state.selectedCardIds.length > 0) {
+            this.setState({selectedCardIds: []})
+            e.stopPropagation()
+        }
+    }
+
+    private addCardFromTemplate = async (cardTemplateId: string) => {
+        const {activeView, board} = this.props
+
+        mutator.performAsUndoGroup(async () => {
+            const [, newCardId] = await mutator.duplicateCard(
+                cardTemplateId,
+                board,
+                this.props.intl.formatMessage({id: 'Mutator.new-card-from-template', defaultMessage: 'new card from template'}),
+                false,
+                async (cardId) => {
+                    this.props.updateView({...activeView, fields: {...activeView.fields, cardOrder: [...activeView.fields.cardOrder, cardId]}})
+                    // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCardViaTemplate, {board: this.props.board.id, view: this.props.activeView.id, card: cardId, cardTemplateId})
+                    this.showCard(cardId)
+                },
+                async () => {
+                    this.showCard(undefined)
+                },
+            )
+            await mutator.changeViewCardOrder(activeView, [...activeView.fields.cardOrder, newCardId], 'add-card')
+        })
+    }
+
+    addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = false): Promise<void> => {
+        const {activeView, board, groupByProperty} = this.props
+
+        const card = createCard()
+
+        // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCard, {board: board.id, view: activeView.id, card: card.id})
+
+        card.parentId = board.id
+        card.rootId = board.rootId
+        const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(activeView.fields.filter, board.fields.cardProperties)
+        if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
+            if (groupByOptionId) {
+                propertiesThatMeetFilters[groupByProperty.id] = groupByOptionId
+            } else {
+                delete propertiesThatMeetFilters[groupByProperty.id]
+            }
+        }
+        card.fields.properties = {...card.fields.properties, ...properties, ...propertiesThatMeetFilters}
+        if (!card.fields.icon && UserSettings.prefillRandomIcons) {
+            card.fields.icon = BlockIcons.shared.randomIcon()
+        }
+
+        const charmTextBlock = createCharmTextBlock()
+        charmTextBlock.parentId = card.id
+        charmTextBlock.rootId = card.rootId
+        card.fields.contentOrder = [charmTextBlock.id];
+
+        mutator.performAsUndoGroup(async () => {
+            const newCardOrder = insertLast ? [...activeView.fields.cardOrder, card.id] : [card.id, ...activeView.fields.cardOrder]
+            // update view order first so that when we add the block it appears in the right spot
+            await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card')
+
+            await mutator.insertBlock(
+                card,
+                'add card',
+                async (block: Block) => {
+                    await mutator.insertBlock(charmTextBlock, 'add card description')
+                    if (show) {
+                        console.log('add card', this.props.addCard.toString());
+                        this.props.addCard(createCard(block))
+                        this.props.updateView({...activeView, fields: {...activeView.fields, cardOrder: newCardOrder}})
+                        this.showCard(block.id)
+                    } else {
+                        // Focus on this card's title inline on next render
+                        this.setState({cardIdToFocusOnRender: card.id})
+                        setTimeout(() => this.setState({cardIdToFocusOnRender: ''}), 100)
+                    }
+                },
+                async () => {
+                    this.showCard(undefined)
+                },
+            )
+        })
+    }
+
+    private addCardTemplate = async () => {
+        const {board, activeView} = this.props
+
+        const cardTemplate = createCard()
+        cardTemplate.fields.isTemplate = true
+        cardTemplate.parentId = board.id
+        cardTemplate.rootId = board.rootId
+
+        await mutator.insertBlock(
+            cardTemplate,
+            'add card template',
+            async (newBlock: Block) => {
+                const newTemplate = createCard(newBlock)
+                // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCardTemplate, {board: board.id, view: activeView.id, card: newTemplate.id})
+                this.props.addTemplate(newTemplate)
+                this.showCard(newTemplate.id)
+            }, async () => {
+                this.showCard(undefined)
+            },
+        )
+    }
+
+    private editCardTemplate = (cardTemplateId: string) => {
+        this.showCard(cardTemplateId)
+    }
+
+    cardClicked = (e: React.MouseEvent, card: Card): void => {
+        const {activeView, cards} = this.props
+
+        if (e.shiftKey) {
+            let selectedCardIds = this.state.selectedCardIds.slice()
+            if (selectedCardIds.length > 0 && (e.metaKey || e.ctrlKey)) {
+                // Cmd+Shift+Click: Extend the selection
+                const orderedCardIds = cards.map((o) => o.id)
+                const lastCardId = selectedCardIds[selectedCardIds.length - 1]
+                const srcIndex = orderedCardIds.indexOf(lastCardId)
+                const destIndex = orderedCardIds.indexOf(card.id)
+                const newCardIds = (srcIndex < destIndex) ? orderedCardIds.slice(srcIndex, destIndex + 1) : orderedCardIds.slice(destIndex, srcIndex + 1)
+                for (const newCardId of newCardIds) {
+                    if (!selectedCardIds.includes(newCardId)) {
+                        selectedCardIds.push(newCardId)
+                    }
+                }
+                this.setState({selectedCardIds})
+            } else {
+                // Shift+Click: add to selection
+                if (selectedCardIds.includes(card.id)) {
+                    selectedCardIds = selectedCardIds.filter((o) => o !== card.id)
+                } else {
+                    selectedCardIds.push(card.id)
+                }
+                this.setState({selectedCardIds})
+            }
+        } else if (activeView.fields.viewType === 'board' || activeView.fields.viewType === 'gallery') {
+            this.showCard(card.id)
+        }
+
+        e.stopPropagation()
+    }
+
+    private showCard = (cardId?: string) => {
+        this.setState({selectedCardIds: []})
+        this.props.showCard(cardId)
+    }
+
+    private async deleteSelectedCards() {
+        const {selectedCardIds} = this.state
+        if (selectedCardIds.length < 1) {
+            return
+        }
+
+        mutator.performAsUndoGroup(async () => {
+            for (const cardId of selectedCardIds) {
+                const card = this.props.cards.find((o) => o.id === cardId)
+                if (card) {
+                    mutator.deleteBlock(card, selectedCardIds.length > 1 ? `delete ${selectedCardIds.length} cards` : 'delete card')
+                } else {
+                    Utils.assertFailure(`Selected card not found: ${cardId}`)
+                }
+            }
+        })
+
+        this.setState({selectedCardIds: []})
+    }
+
+    private async duplicateSelectedCards() {
+        const {board} = this.props
+        const {selectedCardIds} = this.state
+        if (selectedCardIds.length < 1) {
+            return
+        }
+
+        mutator.performAsUndoGroup(async () => {
+            for (const cardId of selectedCardIds) {
+                const card = this.props.cards.find((o) => o.id === cardId)
+                if (card) {
+                    mutator.duplicateCard(cardId, board)
+                } else {
+                    Utils.assertFailure(`Selected card not found: ${cardId}`)
+                }
+            }
+        })
+
+        this.setState({selectedCardIds: []})
+    }
+    private groupCardsByOptions(cards: Card[], optionIds: string[], groupByProperty?: IPropertyTemplate): BoardGroup[] {
+        const groups = []
+        for (const optionId of optionIds) {
+            if (optionId) {
+                const option = groupByProperty?.options.find((o) => o.id === optionId)
+                if (option) {
+                    const c = cards.filter((o) => optionId === o.fields.properties[groupByProperty!.id])
+                    const group: BoardGroup = {
+                        option,
+                        cards: c,
+                    }
+                    groups.push(group)
+                }
+            } else {
+                // Empty group
+                const emptyGroupCards = cards.filter((card) => {
+                    const groupByOptionId = card.fields.properties[groupByProperty?.id || '']
+                    return !groupByOptionId || !groupByProperty?.options.find((option) => option.id === groupByOptionId)
+                })
+                const group: BoardGroup = {
+                    option: {id: '', value: `No ${groupByProperty?.name}`, color: ''},
+                    cards: emptyGroupCards,
+                }
+                groups.push(group)
+            }
+        }
+        return groups
+    }
+
+    private getVisibleAndHiddenGroups(cards: Card[], visibleOptionIds: string[], hiddenOptionIds: string[], groupByProperty?: IPropertyTemplate): {visible: BoardGroup[], hidden: BoardGroup[]} {
+        let unassignedOptionIds: string[] = []
+        if (groupByProperty) {
+            unassignedOptionIds = groupByProperty.options.
+                filter((o: IPropertyOption) => !visibleOptionIds.includes(o.id) && !hiddenOptionIds.includes(o.id)).
+                map((o: IPropertyOption) => o.id)
+        }
+        const allVisibleOptionIds = [...visibleOptionIds, ...unassignedOptionIds]
+
+        // If the empty group positon is not explicitly specified, make it the first visible column
+        if (!allVisibleOptionIds.includes('') && !hiddenOptionIds.includes('')) {
+            allVisibleOptionIds.unshift('')
+        }
+
+        const visibleGroups = this.groupCardsByOptions(cards, allVisibleOptionIds, groupByProperty)
+        const hiddenGroups = this.groupCardsByOptions(cards, hiddenOptionIds, groupByProperty)
+        return {visible: visibleGroups, hidden: hiddenGroups}
+    }
+}
+
+export default connect(undefined, {addCard, addTemplate, updateView})(injectIntl(CenterPanel))

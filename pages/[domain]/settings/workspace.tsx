@@ -55,8 +55,8 @@ export default function WorkspaceSettings () {
           setIsImportingFromNotion(false);
           showMessage('Successfully imported');
           mutate(`pages/${space.id}`);
-          showMessage('Notion workspace successfully imported');
           setNotionFailedImports(failedImports);
+          showMessage('Notion workspace successfully imported');
         })
         .catch((err) => {
           setIsImportingFromNotion(false);
@@ -192,7 +192,6 @@ export default function WorkspaceSettings () {
         </Alert>
         )}
       </Box>
-      <Snackbar />
     </>
   );
 }
