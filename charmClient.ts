@@ -148,12 +148,16 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
+  importFromNotion (payload: { code: string, spaceId: string }) {
+    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
+  }
+
   disconnectDiscord () {
     return http.POST('/api/discord/disconnect');
   }
 
-  importFromNotion (payload: { code: string, spaceId: string }) {
-    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
+  connectDiscord (payload: {code: string, spaceId: string}) {
+    return http.POST('/api/discord/connect', payload);
   }
 
   listDiscordServers (payload: {code: string, spaceId: string}) {

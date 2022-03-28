@@ -10,7 +10,7 @@ import Avatar from 'components/common/Avatar';
 import { useUser } from 'hooks/useUser';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { Chains, RPC } from 'connectors';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
 import AccountModal from 'components/common/PageLayout/components/Account/components/AccountModal';
@@ -18,6 +18,8 @@ import NetworkModal from 'components/common/PageLayout/components/Account/compon
 import styled from '@emotion/styled';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useRouter } from 'next/router';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import charmClient from 'charmClient';
 
 const AccountCard = styled.div`
   display: inline-flex;
@@ -53,31 +55,45 @@ function Account (): JSX.Element {
   const { error, account, chainId } = useWeb3React();
   const { openWalletSelectorModal, triedEager, openNetworkModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
+  const [space] = useCurrentSpace();
 
   const router = useRouter();
   const { showMessage } = useSnackbar();
+  const isConnectingToDiscord = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'connect';
+  const [isConnectDiscordLoading, setIsConnectDiscordLoading] = useState(false);
+  const accountModalState = usePopupState({ variant: 'popover', popupId: 'account-modal' });
+  const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
+  const [user] = useUser();
+
+  function postConnect () {
+    setIsConnectDiscordLoading(false);
+    accountModalState.close();
+    router.push(window.location.href.split('?')[0]);
+  }
   // We might get redirected after connection with discord, so check the query param if it has a discord field
   // It can either be fail or success
   useEffect(() => {
     // Connection with discord
-    if (router.query.type === 'connect') {
-      // Already connected account error
-      if (router.query.discord === '2') {
-        showMessage('Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.', 'error');
-      }
-      // Invalid state error
-      else if (router.query.discord === '3') {
-        showMessage('An error occurred. Please try again', 'error');
-      }
-      else if (router.query.discord === '1') {
+    if (isConnectingToDiscord) {
+      setIsConnectDiscordLoading(true);
+      charmClient.connectDiscord({
+        code: router.query.code as string,
+        spaceId: space.id
+      }).then(() => {
         showMessage('Successfully connected with discord', 'info');
-      }
+        postConnect();
+      }).catch((err) => {
+        showMessage(err.error, 'error');
+        postConnect();
+      });
     }
-  }, [router.query.discord]);
+  }, []);
 
-  const accountModalState = usePopupState({ variant: 'popover', popupId: 'account-modal' });
-  const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
-  const [user] = useUser();
+  useEffect(() => {
+    if (isConnectDiscordLoading) {
+      accountModalState.open();
+    }
+  }, [isConnectDiscordLoading]);
 
   if (typeof window === 'undefined') {
     return (
@@ -130,8 +146,11 @@ function Account (): JSX.Element {
           {ENSName || user?.username || `${shortenHex(account, 3)}`}
         </AccountButton>
       </StyledButtonGroup>
-
-      <AccountModal isOpen={accountModalState.isOpen} onClose={accountModalState.close} />
+      <AccountModal
+        isConnectDiscordLoading={isConnectDiscordLoading}
+        isOpen={accountModalState.isOpen}
+        onClose={accountModalState.close}
+      />
       <NetworkModal isOpen={networkModalState.isOpen} onClose={networkModalState.close} />
     </AccountCard>
   );

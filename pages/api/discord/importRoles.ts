@@ -6,7 +6,7 @@ import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/mid
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Role } from '@prisma/client';
-import { DiscordUser } from './callback/connect';
+import { DiscordUser } from './connect';
 
 const handler = nc({
   onError,
