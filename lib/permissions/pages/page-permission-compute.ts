@@ -1,13 +1,13 @@
 import { PageOperations, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { IPagePermissionFlags, IPagePermissionRequest, IPagePermissionWithNestedSpaceRole, PageOperationType } from './page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionUserRequest, IPagePermissionWithNestedSpaceRole, PageOperationType } from './page-permission-interfaces';
 import { permissionTemplates } from './page-permission-mapping';
 
 /**
  * Nested query to get the space role for a user who is requesting a page
  */
-function permissionWithSpaceRoleQuery (request: IPagePermissionRequest): Prisma.PagePermissionFindFirstArgs {
+function permissionWithSpaceRoleQuery (request: IPagePermissionUserRequest): Prisma.PagePermissionFindFirstArgs {
   return {
     where: {
       pageId: request.pageId,
@@ -38,7 +38,7 @@ function permissionWithSpaceRoleQuery (request: IPagePermissionRequest): Prisma.
 /**
  * Get all permissions applicable to a user for a specific page
  */
-function permissionsQuery (request: IPagePermissionRequest): Prisma.PagePermissionFindManyArgs {
+function permissionsQuery (request: IPagePermissionUserRequest): Prisma.PagePermissionFindManyArgs {
   return {
     where: {
       OR: [
@@ -74,7 +74,7 @@ function permissionsQuery (request: IPagePermissionRequest): Prisma.PagePermissi
   };
 }
 
-export async function computeUserPagePermissions (request: IPagePermissionRequest): Promise<IPagePermissionFlags> {
+export async function computeUserPagePermissions (request: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
 
   const permissionWithSpaceRoleAndPermissions = await Promise.all([
     // eslint-disable-next-line max-len

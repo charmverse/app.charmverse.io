@@ -1,67 +1,93 @@
-import { Prisma, Page, PagePermission, PagePermissionLevel } from '@prisma/client';
+import { PagePermission, PagePermissionLevel, Prisma, Role, Space, User } from '@prisma/client';
 import { prisma } from 'db';
-import { IPagePermissionListRequest, IPagePermissionRequest, IPagePermissionFlags, AllowedPagePermissions } from './page-permission-mapping';
+import { isTruthy } from 'lib/utilities/types';
+import { AllowedPagePermissions } from './available-page-permissions.class';
+import { IPagePermissionWithAssignee } from './page-permission-interfaces';
 
-export async function evaluatePagePermission (
-  request: IPagePermissionRequest
-): Promise<IPagePermissionFlags> {
-
-  // Get roles
-  // Get permissions for role
-
-  console.log('Received request', request);
-
+export async function listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
   const permissions = await prisma.pagePermission.findMany({
     where: {
-      OR: [
-
-        {
-          userId: request.userId,
-          pageId: request.pageId
-        },
-        {
-          role: {
-            spaceRolesToRole: {
-              some: {
-                spaceRole: {
-                  userId: request.userId
-                }
-              }
-            }
-          },
-          pageId: request.pageId
-        },
-        {
-          space: {
-            spaceRoles: {
-              some: {
-                userId: request.userId
-              }
-            }
-          },
-          pageId: request.pageId
-        }
-      ]
+      pageId
+    },
+    include: {
+      role: true,
+      space: true,
+      user: true
     }
   });
 
-  console.log('PERMISSIONS', permissions.length, permissions);
+  return permissions;
+}
 
-  const computedPermission = new AllowedPagePermissions();
+export async function createPagePermission (permission: PagePermission) {
+  const permissionLevel = permission.permissionLevel;
 
-  if (permissions.length > 0) {
-    // Iterate through all existing permission sets to see if at least one of them provides a permission to the user
-    (Object.keys(computedPermission) as Array<keyof IPagePermissionFlags>).forEach(permissionName => {
-
-      const hasPermission = permissions.find(existingPermissionSet => {
-        return existingPermissionSet[permissionName] === true;
-      }) !== undefined;
-
-      computedPermission[permissionName] = hasPermission;
-
-    });
+  if (!isTruthy(permissionLevel) || !isTruthy(PagePermissionLevel[permissionLevel])) {
+    throw {
+      error: 'Please provide a valid permission level'
+    };
   }
 
-  return computedPermission;
+  // We only need to store permissions in the database for the custom level.
+  // For permission groups, we can simply load the template for that group when evaluating permissions
+  const permissionsToAssign = permission.permissionLevel === 'custom' ? permission.permissions : [];
 
+  const permissionToCreate = {
+    permissionLevel: permission.permissionLevel,
+    permissions: permissionsToAssign,
+    page: {
+      connect: {
+        id: permission.pageId
+      }
+    }
+
+  } as Prisma.PagePermissionCreateInput;
+
+  // Ensure only 1 group at a time is linked to this permission
+  if (permission.userId) {
+    permissionToCreate.user = {
+      connect: {
+        id: permission.userId
+      }
+    };
+  }
+  else if (permission.roleId) {
+    permissionToCreate.role = {
+      connect: {
+        id: permission.roleId
+      }
+    };
+  }
+  else if (permission.spaceId) {
+    permissionToCreate.space = {
+      connect: {
+        id: permission.spaceId
+      }
+    };
+  }
+  else {
+    throw {
+      error: 'Permissions must be linked to a user, role or space'
+    };
+
+  }
+
+  const createdPermission = await prisma.pagePermission.create({ data: permissionToCreate });
+
+  return createdPermission;
+}
+
+export async function deletePagePermission (permissionId: string) {
+
+  if (!isTruthy(permissionId)) {
+    throw {
+      error: 'Please provide a valid permission ID'
+    };
+  }
+
+  await prisma.pagePermission.delete({ where: {
+    id: permissionId
+  } });
+
+  return true;
 }
