@@ -168,9 +168,7 @@ export default function WorkspaceSettings () {
             </Alert>
           )}
         </div>
-        <div>
-          <ImportDiscordRoles />
-        </div>
+        <ImportDiscordRoles />
       </Box>
     </>
   );

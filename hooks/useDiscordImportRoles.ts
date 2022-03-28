@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useSnackbar } from './useSnackbar';
 
-export default function useDiscordServers () {
+export default function useDiscordImportRoles () {
   const { showMessage } = useSnackbar();
   const [isListDiscordServersLoading, setIsListDiscordServersLoading] = useState(false);
   const [listDiscordServersError, setListDiscordServersError] = useState<string | null>(null);

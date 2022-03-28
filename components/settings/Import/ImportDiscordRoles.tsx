@@ -2,7 +2,7 @@ import { Button, SvgIcon, CircularProgress, Alert } from '@mui/material';
 import { Box } from '@mui/system';
 import DiscordServersModal from 'components/common/DiscordServersModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useDiscordServers from 'hooks/useDiscordServers';
+import useDiscordImportRoles from 'hooks/useDiscordImportRoles';
 import { useUser } from 'hooks/useUser';
 import { useState, useEffect } from 'react';
 import DiscordIcon from 'public/images/discord_logo.svg';
@@ -17,7 +17,7 @@ export default function ImportDiscordRoles () {
     isListDiscordServersLoading,
     isImportRolesFromServerLoading,
     importRolesFromServerError
-  } = useDiscordServers();
+  } = useDiscordImportRoles();
   const [user] = useUser();
   const [space] = useCurrentSpace();
 
@@ -38,7 +38,7 @@ export default function ImportDiscordRoles () {
     .find(spaceRole => spaceRole.spaceId === space?.id)?.role === 'admin');
 
   return (
-    <>
+    <div>
       <Box
         display='flex'
         gap={1}
@@ -99,6 +99,6 @@ export default function ImportDiscordRoles () {
           {importRolesFromServerError}
         </Alert>
       ))}
-    </>
+    </div>
   );
 }
