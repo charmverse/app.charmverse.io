@@ -11,8 +11,8 @@ import charmClient from 'charmClient';
 import BackDrop from '@mui/material/Backdrop';
 import Portal from '@mui/material/Portal';
 import { ErrorModal } from 'components/common/Modal';
-import Legend from './Legend';
-import Button from '../common/Button';
+import Button from 'components/common/Button';
+import Legend from '../Legend';
 import TokenGatesTable, { getChainFromConditions } from './TokenGatesTable';
 
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html

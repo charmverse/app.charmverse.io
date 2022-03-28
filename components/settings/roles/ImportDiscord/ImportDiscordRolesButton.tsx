@@ -1,8 +1,8 @@
 import { Button, SvgIcon, CircularProgress, Alert } from '@mui/material';
 import { Box } from '@mui/system';
-import DiscordServersModal from 'components/settings/ImportDiscord/DiscordServersModal';
+import DiscordServersModal from 'components/settings/roles/ImportDiscord/DiscordServersModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useImportRoles from 'components/settings/ImportDiscord/hooks/useImportRoles';
+import useImportRoles from 'components/settings/roles/ImportDiscord/hooks/useImportRoles';
 import { useUser } from 'hooks/useUser';
 import { useState, useEffect } from 'react';
 import DiscordIcon from 'public/images/discord_logo.svg';

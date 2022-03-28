@@ -37,6 +37,7 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/api/pages/[id]",
-    "components/[pageId]/DocumentPage/DocumentPagetsx"
+    "components/[pageId]/DocumentPage/DocumentPagetsx",
+    "components/settings/tabs.tsz"
   ]
 }

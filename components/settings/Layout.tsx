@@ -5,19 +5,8 @@ import styled from '@emotion/styled';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-import AccountIcon from '@mui/icons-material/AccountCircle';
-import SettingsIcon from '@mui/icons-material/WorkOutline';
-import PersonIcon from '@mui/icons-material/Group';
-import LockIcon from '@mui/icons-material/LockOpen';
-import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import PageLayout from 'components/common/PageLayout';
-
-const SETTINGS_TABS = [
-  { icon: <SettingsIcon fontSize='small' />, path: 'workspace', label: 'Workspace' },
-  { icon: <PersonIcon fontSize='small' />, path: 'contributors', label: 'Contributors' },
-  { icon: <LockIcon fontSize='small' />, path: 'token-gates', label: 'Token Gates' },
-  { icon: <PaymentsOutlinedIcon fontSize='small' />, path: 'payment-methods', label: 'Payment Methods' }
-];
+import { SETTINGS_TABS } from './pages';
 
 const ScrollableWindow = styled.div`
   flex-grow: 1;

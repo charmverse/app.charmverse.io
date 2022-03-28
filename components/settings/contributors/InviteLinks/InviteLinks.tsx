@@ -5,9 +5,9 @@ import Legend from 'components/settings/Legend';
 import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
-import InvitesTable from 'components/inviteLinks/InviteLinksTable';
-import InviteForm, { FormValues as InviteLinkFormValues } from 'components/inviteLinks/InviteLinkForm';
+import InviteForm, { FormValues as InviteLinkFormValues } from 'components/settings/contributors/InviteLinks/InviteLinkForm';
 import charmClient from 'charmClient';
+import InvitesTable from './InviteLinksTable';
 
 export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
 

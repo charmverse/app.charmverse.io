@@ -2,7 +2,7 @@ import { Contributor } from 'models';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import charmClient from 'charmClient';
-import Legend from './Legend';
+import Legend from '../Legend';
 import ContributorListItem, { RoleAction } from './ContributorListItem';
 
 interface Props {
