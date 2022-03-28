@@ -115,10 +115,6 @@ export default function RoleAssignment () {
                   })
                 }
 
-                <Box>
-
-                </Box>
-
                 <br />
                 <InputSearchContributor onChange={(userId) => {
                   assignRole(userId, role.id);
