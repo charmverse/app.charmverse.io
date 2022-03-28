@@ -1,5 +1,5 @@
 import SettingsLayout from 'components/settings/Layout';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement } from 'react';
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
 import TextField from '@mui/material/TextField';
@@ -18,14 +18,10 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
 import { Box, Typography } from '@mui/material';
 import NotionIcon from 'public/images/notion_logo.svg';
-import DiscordIcon from 'public/images/discord_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
 import CircularProgress from '@mui/material/CircularProgress';
 import useNotionImport from 'hooks/useNotionImport';
-import useDiscordServers from 'hooks/useDiscordServers';
-import DiscordServersModal from 'components/common/DiscordServersModal';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
+import ImportDiscordRoles from 'components/settings/Import/ImportDiscordRoles';
 
 export interface FailedImportsError {
   pageId: string,
@@ -38,29 +34,11 @@ export default function WorkspaceSettings () {
   const router = useRouter();
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
-  const [isDiscordServersModalOpen, setIsDiscordServersModalOpen] = useState(false);
   const {
     isImportingFromNotion,
     notionFailedImports,
     notionImportError
   } = useNotionImport();
-  const [user] = useUser();
-
-  const {
-    discordServers,
-    isListingDiscordServers,
-    isLoading,
-    discordError
-  } = useDiscordServers();
-
-  useEffect(() => {
-    if (!isLoading && isListingDiscordServers && !discordError) {
-      setIsDiscordServersModalOpen(true);
-    }
-    else {
-      setIsDiscordServersModalOpen(false);
-    }
-  }, [isLoading, discordError, isListingDiscordServers]);
 
   const {
     register,
@@ -96,9 +74,6 @@ export default function WorkspaceSettings () {
       window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
     }
   }
-
-  const isCurrentUserAdmin = (user?.spaceRoles
-    .find(spaceRole => spaceRole.spaceId === space?.id)?.role === 'admin');
 
   return (
     <>
@@ -153,39 +128,7 @@ export default function WorkspaceSettings () {
         >
           {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
         </Button>
-        <Box
-          display='flex'
-          gap={1}
-          alignItems='center'
-        >
-          <Button
-            disabled={isImportingFromNotion || !isCurrentUserAdmin}
-            onClick={() => {
-              if (isCurrentUserAdmin) {
-                window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`);
-              }
-            }}
-            variant='outlined'
-            startIcon={(
-              <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>
-                <DiscordIcon />
-              </SvgIcon>
-            )}
-            endIcon={(
-              isLoading && <CircularProgress size={20} />
-            )}
-          >
-            Import Roles
-          </Button>
-        </Box>
-        <DiscordServersModal
-          isFetching={isLoading}
-          isOpen={isDiscordServersModalOpen}
-          discordServers={discordServers}
-          onClose={() => {
-            setIsDiscordServersModalOpen(false);
-          }}
-        />
+        <ImportDiscordRoles />
         {notionFailedImports.length !== 0 && (
           <Alert severity='warning' sx={{ mt: 2 }}>
             <Box sx={{
