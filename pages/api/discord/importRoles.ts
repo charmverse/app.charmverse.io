@@ -1,12 +1,12 @@
 import log from 'lib/log';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
-import * as http from 'adapters/http';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Role } from '@prisma/client';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
+import { createRolesFromDiscord } from 'lib/role/createRolesFromDiscord';
 import { DiscordUser } from './connect';
 
 const handler = nc({
@@ -150,54 +150,13 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     return;
   }
 
-  const rolesRecord: Record<string, { discord: DiscordServerRole, charmverse: Role | null }> = {};
-  // Create all of the discord roles fist
-  for (const discordServerRole of discordServerRoles) {
-    // Skip the @everyone role, this is assigned to all the members of the workspace
-    if (discordServerRole.name !== '@everyone') {
-      rolesRecord[discordServerRole.id] = {
-        discord: discordServerRole,
-        charmverse: null
-      };
-      try {
-        // First check if a role with the same name already exist in the workspace
-        const existingRole = await prisma.role.findFirst({
-          where: {
-            name: discordServerRole.name,
-            spaceId
-          }
-        });
-        // IMPORTANT: Remove this from production !!! THIS IS ONLY FOR TESTING PURPOSE
-        // if (discordServerRole.name === 'error') {
-        //   throw new Error();
-        // }
-
-        // Only create the role if it doesn't already exist
-        if (!existingRole) {
-          rolesRecord[discordServerRole.id].charmverse = await prisma.role.create({
-            data: {
-              name: discordServerRole.name,
-              space: {
-                connect: {
-                  id: spaceId
-                }
-              },
-              createdBy: req.session.user?.id
-            }
-          });
-        }
-        else {
-          rolesRecord[discordServerRole.id].charmverse = existingRole;
-        }
-      }
-      catch (_) {
-        importErrors.push({
-          action: 'create',
-          role: discordServerRole.name
-        });
-      }
-    }
-  }
+  const { rolesRecord, failedRoles } = await createRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
+  failedRoles.forEach(role => {
+    importErrors.push({
+      action: 'create',
+      role
+    });
+  });
 
   for (const discordGuildMember of discordGuildMembers) {
     const unassignedRoles: string[] = [];

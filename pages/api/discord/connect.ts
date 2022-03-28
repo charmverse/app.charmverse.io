@@ -5,6 +5,9 @@ import { prisma } from 'db';
 import { getDiscordToken } from 'lib/discord/getDiscordToken';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
+import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
+import { createRolesFromDiscord } from 'lib/role/createRolesFromDiscord';
+import { DiscordServerRole } from './importRoles';
 
 const handler = nc({
   onError,
@@ -51,6 +54,17 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse) {
         id: spaceId
       }
     });
+
+    // If the workspace is connected with a discord server
+    if (charmverseSpace?.discordServerId) {
+      const discordServerRolesResponse = await handleDiscordResponse<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`);
+
+      if (discordServerRolesResponse.status === 'success') {
+        const discordServerRoles = discordServerRolesResponse.data;
+        const { rolesRecord } = await createRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
+
+      }
+    }
 
     try {
       const discordUser = await prisma.discordUser.create({
