@@ -36,7 +36,7 @@ handler.get(async (req, res) => {
         Authorization: `Bearer ${token.access_token}`
       }
     });
-    res.status(200).send({ servers: discordUserServers });
+    res.status(200).send(discordUserServers);
   }
   catch (err) {
     res.status(500).send({ error: 'Invalid token' });

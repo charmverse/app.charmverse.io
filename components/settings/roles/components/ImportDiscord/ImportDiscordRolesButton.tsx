@@ -1,5 +1,6 @@
 import { SvgIcon } from '@mui/material';
 import { useRouter } from 'next/router';
+import useSWRImmutable from 'swr/immutable';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { DiscordUserServer } from 'pages/api/discord/listServers';
 import { useUser } from 'hooks/useUser';
@@ -19,10 +20,11 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
   const [user] = useUser();
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // See lib/discord/handleDiscordResponse.ts for the case when we return the error that will be used here
-  const [discordErrorFix, setDiscordErrorFix] = useState<{error: string, redirectLink: string} | null>(null);
-  const [discordServers, setDiscordServers] = useState<DiscordUserServer[]>([]);
   const shouldRequestServers = currentSpace && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'server';
+  const { data: discordServers, error } = useSWRImmutable(
+    shouldRequestServers ? 'discord-servers' : null,
+    () => charmClient.listDiscordServers({ code: router.query.code as string })
+  );
 
   useEffect(() => {
 
@@ -36,28 +38,18 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
   }, [router.query]);
 
   useEffect(() => {
-    if (shouldRequestServers) {
-      charmClient.listDiscordServers({
-        code: router.query.code as string
-      })
-        .then(({ servers }) => {
-          setDiscordServers(servers);
-          setIsModalOpen(true);
-        })
-        .catch((error: any) => {
-          showMessage(error.error ?? 'Something went wrong. Please try again', 'error');
-        });
+    if (discordServers && discordServers.length > 0) {
+      setIsModalOpen(true);
     }
     else {
       setIsModalOpen(false);
     }
-  }, [shouldRequestServers]);
+  }, [discordServers]);
 
   const isCurrentUserAdmin = (user?.spaceRoles
     .find(spaceRole => spaceRole.spaceId === currentSpace?.id)?.role === 'admin');
 
   async function selectServer (guildId: string) {
-    setDiscordErrorFix(null);
 
     if (!currentSpace) return;
     charmClient.importRolesFromDiscordServer({
@@ -68,15 +60,10 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
         showMessage(`Successfully imported ${result.importedRoleCount} discord roles`, 'success');
         onUpdate();
       })
-      .catch(error => {
-        if (error.error && error.redirectLink) {
-          setDiscordErrorFix(error);
-        }
-        else {
+      .catch(_error => {
         // Major failure while trying to import discord server role
-          showMessage(error.error ?? 'Something went wrong. Please try again', 'error');
-        }
-
+        showMessage(_error.error ?? 'Something went wrong. Please try again', 'error');
+        console.log('show error', _error);
       })
       .finally(() => {
         setIsModalOpen(false);
@@ -93,6 +80,7 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
         external
         href={`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
         variant='outlined'
+        loading={shouldRequestServers && !discordServers}
         startIcon={(
           <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>
             <DiscordIcon />
@@ -101,21 +89,10 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
       >
         Import roles
       </Button>
-      {
-        discordErrorFix && (
-          <Alert severity='info'>
-            <Link href={discordErrorFix.redirectLink} external target='_blank'>
-              {
-                discordErrorFix.error
-              }
-            </Link>
-          </Alert>
-        )
-      }
 
       <DiscordServersModal
         isOpen={isModalOpen}
-        discordServers={discordServers}
+        discordServers={discordServers || []}
         onClose={() => {
           setIsModalOpen(false);
         }}

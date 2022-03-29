@@ -8,7 +8,6 @@ import ImportDiscordRoles from 'components/settings/roles/components/ImportDisco
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
@@ -22,7 +21,6 @@ type FormValues = yup.InferType<typeof schema>
 export default function RoleSettings () {
   const {
     assignRoles,
-    createRole,
     deleteRole,
     listRoles,
     unassignRole,
@@ -34,15 +32,6 @@ export default function RoleSettings () {
   useEffect(() => {
     listRoles();
   }, []);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid }
-  } = useForm<FormValues>({
-    mode: 'onChange',
-    resolver: yupResolver(schema)
-  });
 
   return (
     <>

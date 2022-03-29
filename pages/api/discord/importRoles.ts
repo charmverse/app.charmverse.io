@@ -59,16 +59,6 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     return;
   }
 
-  const userId = req.session.user.id;
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId
-    },
-    include: {
-      discordUser: true
-    }
-  });
-
   await prisma.space.update({
     where: {
       id: spaceId
