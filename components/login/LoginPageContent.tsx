@@ -6,13 +6,7 @@ import Image from 'components/common/Image';
 import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import useSWRImmutable from 'swr/immutable';
 import splashImage from 'public/images/artwork/world.png';
-import { useRouter } from 'next/router';
-import charmClient from 'charmClient';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
-import { useSpaces } from 'hooks/useSpaces';
 
 export const Container = styled(Box)`
   max-width: 100%;
@@ -24,36 +18,11 @@ export const Container = styled(Box)`
 // 1. New user, dont have a charmverse account, clicks on Connect Discord
 // 2. User who have connected with their wallet before but haven't created any workspace and discord connected
 // 3. Old user who have some charmverse workspace and discord connected
-// 4. Old user who have some charmverse workspace and but not discord connected
+// 4. Old user who have some charmverse workspace and not discord connected
+// 5. Disconnect your wallet, you wont be logged out if you have discord connected
+// 6. Disconnect your wallet, you will be logged out if you dont have discord connected
 
 export default function LoginPageContent ({ account }: { account: string | null | undefined }) {
-  const router = useRouter();
-
-  const isCreatingAccountWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
-  const { showMessage } = useSnackbar();
-  const [user, setUser, , setIsLoaded] = useUser();
-  const [spaces] = useSpaces();
-
-  useSWRImmutable(isCreatingAccountWithDiscord ? [router.query.code, router.query.discord, router.query.type] : null, async () => {
-    charmClient.loginWithDiscord({
-      code: router.query.code as string
-    }).then((loggedInUser) => {
-      setUser(loggedInUser);
-      setIsLoaded(true);
-    }).catch(err => {
-      showMessage(err.message ?? err.error ?? 'Something went wrong', 'error');
-      setTimeout(() => {
-        router.push('/');
-      }, 1000);
-    });
-  });
-
-  useEffect(() => {
-    if (spaces.length !== 0 && user) {
-      router.push(`/${spaces[0].domain}`);
-    }
-  }, [spaces && user]);
-
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
 
   return (

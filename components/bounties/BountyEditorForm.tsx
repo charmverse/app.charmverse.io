@@ -96,7 +96,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
   }, []);
 
   async function submitted (value: IBounty) {
-
+    console.log({ user });
     if (mode === 'create') {
       value.spaceId = space!.id;
       value.createdBy = user!.id;
