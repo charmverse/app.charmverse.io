@@ -2,17 +2,25 @@
 import { Modal } from 'components/common/Modal';
 import { DiscordUserServer } from 'pages/api/discord/listServers';
 import { Avatar, ListItemAvatar, List, ListItemText, ListItemButton, Typography } from '@mui/material';
-import { useMemo } from 'react';
+import { useState } from 'react';
 
 interface Props {
   discordServers: DiscordUserServer[]
-  isOpen: boolean, onSelect: (guildId: string) => void, onClose: () => void
+  isOpen: boolean,
+  onSelect: (guildId: string) => void,
+  onClose: () => void
 }
 
 function DiscordServersModal ({ discordServers, onSelect, onClose, isOpen }: Props) {
 
+  const [isDisabled, setIsDisabled] = useState(false);
   const sortedServers = discordServers
     .sort((discordServerA, discordServerB) => discordServerA.name < discordServerB.name ? -1 : 1);
+
+  function selectServer (guildId: string) {
+    setIsDisabled(true);
+    onSelect(guildId);
+  }
 
   return (
     <Modal
@@ -30,7 +38,8 @@ function DiscordServersModal ({ discordServers, onSelect, onClose, isOpen }: Pro
             sortedServers.map(discordServer => (
               <ListItemButton
                 key={discordServer.id}
-                onClick={() => onSelect(discordServer.id)}
+                onClick={() => selectServer(discordServer.id)}
+                disabled={isDisabled}
               >
                 <ListItemAvatar>
                   <Avatar src={discordServer.icon ? `https://cdn.discordapp.com/icons/${discordServer.id}/${discordServer.icon}.png` : undefined} />
