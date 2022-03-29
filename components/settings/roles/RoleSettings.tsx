@@ -69,7 +69,16 @@ export default function RoleSettings () {
 
       </Modal>
 
-      {roles.map(role => <RoleRow assignRoles={assignRoles} unassignRole={unassignRole} deleteRole={deleteRole} role={role} key={role.id} />)}
+      {roles.map(role => (
+        <RoleRow
+          assignRoles={assignRoles}
+          unassignRole={unassignRole}
+          deleteRole={deleteRole}
+          refreshRoles={listRoles}
+          role={role}
+          key={role.id}
+        />
+      ))}
     </>
   );
 }

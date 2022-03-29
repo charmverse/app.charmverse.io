@@ -18,21 +18,18 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 interface Props {
-  submitted?: (value: Pick<Role, 'name'>) => void
-  role?: Pick<Role, 'name'>
+  submitted?: (value: Partial<Role>) => void
+  role?: Partial<Role>
   mode: 'create' | 'edit'
 }
 
-export default function RoleForm ({ role, mode = 'create', submitted = () => {} }: Props) {
+export default function RoleForm ({ role = {}, mode = 'create', submitted = () => {} }: Props) {
 
   const [formError, setFormError] = useState<IError | null>(null);
 
   const {
-    assignRoles,
     createRole,
-    deleteRole,
-    listRoles,
-    unassignRole,
+    updateRole,
     roles
   } = useRoles();
 
@@ -53,12 +50,20 @@ export default function RoleForm ({ role, mode = 'create', submitted = () => {} 
       onSubmit={handleSubmit(formValue => {
         setFormError(null);
         if (mode === 'edit') {
-          console.log('editing role', formValue);
+          updateRole({
+            ...role,
+            ...formValue
+          }).then((updatedRole) => {
+            submitted(updatedRole);
+          })
+            .catch(error => {
+              setFormError(error);
+            });
         }
         else {
           createRole(formValue)
-            .then(() => {
-              submitted(formValue);
+            .then((newRole) => {
+              submitted(newRole);
             })
             .catch(error => {
               setFormError(error);
@@ -98,7 +103,7 @@ export default function RoleForm ({ role, mode = 'create', submitted = () => {} 
           )
         }
         <Grid item>
-          <Button disabled={!isValid} type='submit'>Create role</Button>
+          <Button disabled={!isValid} type='submit'>{mode === 'edit' ? 'Rename role' : 'Create role'}</Button>
         </Grid>
 
       </Grid>
