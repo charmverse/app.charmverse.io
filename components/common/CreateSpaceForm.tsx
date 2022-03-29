@@ -14,6 +14,7 @@ import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
 import { DOMAIN_BLACKLIST } from 'lib/spaces';
 import charmClient from 'charmClient';
+import log from 'lib/log';
 
 export const schema = yup.object({
   id: yup.string(),
@@ -71,7 +72,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         createdAt: new Date(),
         updatedAt: new Date(),
         updatedBy: user!.id,
-        permissions: {
+        spaceRoles: {
           create: [{
             role: 'admin',
             user: {
@@ -85,7 +86,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
       });
     }
     catch (err) {
-      console.error(err);
+      log.error('Error creating space', err);
       setSaveError((err as Error).message || err);
     }
   }

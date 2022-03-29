@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { postToDiscord } from 'lib/logs/notifyDiscord';
+import { postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { LoggedInUser } from 'models';

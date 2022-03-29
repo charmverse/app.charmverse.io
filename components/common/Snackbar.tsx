@@ -1,27 +1,37 @@
 import MuiAlert, { AlertColor, AlertProps } from '@mui/material/Alert';
 import Snackbar, { SnackbarProps } from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
-import * as React from 'react';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useRouter } from 'next/router';
+import { forwardRef, useEffect } from 'react';
 
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
+const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
 
 interface CustomizedSnackbarProps {
   autoHideDuration?: number
-  message: string
-  isOpen: boolean
-  handleClose: SnackbarProps['onClose']
-  severity?: AlertColor
+  severity?: AlertColor,
+  message?: string,
+  handleClose?: SnackbarProps['onClose'],
+  isOpen?: boolean
 }
 
 export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
-  const { severity = 'success', isOpen, handleClose, message, autoHideDuration = 5000 } = props;
+  const { setIsOpen, severity, message, handleClose, isOpen } = useSnackbar();
+
+  // Close the snackbar if we change url
+  useEffect(() => {
+    setIsOpen(false);
+  }, [window.location.href]);
+
+  const { handleClose: handleCloseProp, isOpen: isOpenProp,
+    message: messageProp, severity: severityProp, autoHideDuration = 5000 } = props;
   return (
     <Stack spacing={2} sx={{ width: '100%' }}>
-      <Snackbar open={isOpen} autoHideDuration={autoHideDuration} onClose={handleClose}>
-        <Alert onClose={handleClose as any} severity={severity} sx={{ width: '100%' }}>
-          {message}
+      <Snackbar open={isOpenProp ?? isOpen} autoHideDuration={autoHideDuration} onClose={handleClose}>
+        <Alert onClose={handleCloseProp ?? handleClose as any} severity={severityProp ?? severity} sx={{ width: '100%' }}>
+          {messageProp ?? message}
         </Alert>
       </Snackbar>
     </Stack>

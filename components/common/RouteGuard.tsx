@@ -8,6 +8,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { isSpaceDomain } from 'lib/spaces';
 import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share'];
@@ -24,7 +25,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isWalletLoading = (!triedEager && !account);
   const isReactLoading = !router.isReady;
   const isLoading = isUserLoading || isWalletLoading || isReactLoading || !isSpacesLoaded;
-
+  const { setIsOpen } = useSnackbar();
   // console.log('isLoading', isLoading, { isReactLoading, isWalletLoading, isUserLoading, isSpacesLoaded });
 
   useEffect(() => {
@@ -49,7 +50,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
 
     // on route change start - hide page content by setting authorized to false
     const hideContent = () => {
-
       setAuthorized(false);
     };
     router.events.on('routeChangeStart', hideContent);

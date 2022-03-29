@@ -1,20 +1,31 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod, Role } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { getDisplayName } from 'lib/users';
-import { Block as FBBlock, BlockPatch } from 'components/databases/focalboard/src/blocks/block';
-import { IUser, UserWorkspace } from 'components/databases/focalboard/src/user';
-import { IWorkspace } from 'components/databases/focalboard/src/blocks/workspace';
-import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
+import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
+import { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
+import { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
+import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
+import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
+
+export type ListSpaceRolesResponse = {
+  id: string;
+  name: string;
+  spaceRolesToRole: {
+      spaceRole: {
+          user: User;
+      };
+  }[];
+}
 
 export interface PopulatedBounty extends Bounty {
   applications: Application[];
@@ -139,7 +150,7 @@ class CharmClient {
     return http.GET<{redirectUrl: string}>('/api/notion/login', query);
   }
 
-  discordLogin (query: {href: string}) {
+  discordLogin (query: {redirect: string}) {
     return http.GET<{redirectUrl: string}>('/api/discord/login', query);
   }
 
@@ -148,7 +159,7 @@ class CharmClient {
   }
 
   importFromNotion (params: { code: string, spaceId: string }) {
-    return http.POST('/api/notion/import', params);
+    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', params);
   }
 
   // FocalBoard
@@ -426,6 +437,26 @@ class CharmClient {
 
   deletePaymentMethod (paymentMethodId: string): Promise<PaymentMethod[]> {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
+  }
+
+  createRole (role: Partial<Role>): Promise<Role> {
+    return http.POST('/api/roles', role);
+  }
+
+  deleteRole (roleToDelete: {roleId: string, spaceId: string}): Promise<Role> {
+    return http.DELETE('/api/roles', roleToDelete);
+  }
+
+  listRoles (spaceId: string): Promise<ListSpaceRolesResponse[]> {
+    return http.GET('/api/roles', { spaceId });
+  }
+
+  assignRole (data: {spaceId: string, roleId: string, userId: string}): Promise<Role []> {
+    return http.POST('/api/roles/assignment', data);
+  }
+
+  unassignRole (data: {spaceId: string, roleId: string, userId: string}): Promise<Role []> {
+    return http.DELETE('/api/roles/assignment', data);
   }
 }
 

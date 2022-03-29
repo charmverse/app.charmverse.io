@@ -1,0 +1,13 @@
+.HorizontalGrip {
+    width: 5px;
+    cursor: ew-resize;
+    flex-shrink: 0;
+    margin-top: -8px;
+    margin-bottom: -8px;
+    margin-right: -2px;
+    z-index: 1;
+
+    &:hover {
+        background-color: rgba(90, 192, 255, 0.7);
+    }
+}

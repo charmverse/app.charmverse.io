@@ -1,7 +1,7 @@
 
 import { Bounty, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { IEventToLog, postToDiscord } from 'lib/logs/notifyDiscord';
+import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
-import getBaseLayout from 'components/common/base-layout/getLayout';
+import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import TokenGateForm from 'components/common/TokenGateForm';
 import Button from 'components/common/Button';
 import { useSpaces } from 'hooks/useSpaces';
