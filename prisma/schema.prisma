@@ -24,23 +24,24 @@ enum PermissionLevel {
 }
 
 model Space {
-  id             String          @id @default(uuid()) @db.Uuid
-  deletedAt      DateTime?
-  createdAt      DateTime        @default(now())
-  author         User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdBy      String          @db.Uuid
-  updatedAt      DateTime
-  updatedBy      String          @db.Uuid
-  name           String
-  domain         String          @unique
-  spaceRoles     SpaceRole[]
-  pages          Page[]
-  blocks         Block[]
-  inviteLinks    InviteLink[]
-  bounties       Bounty[]
-  TokenGate      TokenGate[]
-  paymentMethods PaymentMethod[]
-  roles          Role[]
+  id              String          @id @default(uuid()) @db.Uuid
+  deletedAt       DateTime?
+  createdAt       DateTime        @default(now())
+  author          User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy       String          @db.Uuid
+  updatedAt       DateTime
+  updatedBy       String          @db.Uuid
+  name            String
+  domain          String          @unique
+  discordServerId String?
+  spaceRoles      SpaceRole[]
+  pages           Page[]
+  blocks          Block[]
+  inviteLinks     InviteLink[]
+  bounties        Bounty[]
+  TokenGate       TokenGate[]
+  paymentMethods  PaymentMethod[]
+  roles           Role[]
 }
 
 model Page {
