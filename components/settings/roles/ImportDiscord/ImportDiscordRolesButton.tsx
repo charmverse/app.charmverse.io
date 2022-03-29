@@ -56,6 +56,8 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
       })
       .finally(() => {
         setIsModalOpen(false);
+        // Remove extra query parameters and fetch the roles
+        router.push(window.location.href.split('?')[0]);
       });
   }
 
