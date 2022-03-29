@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import ImportDiscordRoles from './components/ImportDiscord/ImportDiscordRolesButton';
 import RoleRow from './components/RoleRow';
+import RoleForm from './components/RoleForm';
 
 export const schema = yup.object({
   name: yup.string().required('Please provide a valid role name')
@@ -58,40 +59,14 @@ export default function RoleSettings () {
       </Legend>
 
       <Modal {...bindPopover(popupState)} title='Add a role'>
-        <form
-          onSubmit={handleSubmit(formValue => {
-            createRole(formValue);
+        <RoleForm
+          mode='create'
+          submitted={() => {
             popupState.close();
-          })}
-          style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}
-        >
-          <Grid container direction='column' spacing={3}>
-            <Grid item>
-              <InputLabel>
-                Role name
-              </InputLabel>
-              <TextField
-                {...register('name')}
-                autoFocus
-                placeholder='Bounty manager'
-                variant='outlined'
-                type='text'
-                fullWidth
-              />
-              {
-                errors?.name && (
-                  <Alert severity='error'>
-                    {errors.name.message}
-                  </Alert>
-                )
-              }
-            </Grid>
-            <Grid item>
-              <Button disabled={!isValid} type='submit'>Create role</Button>
-            </Grid>
-          </Grid>
+            listRoles();
+          }}
+        />
 
-        </form>
       </Modal>
 
       {roles.map(role => <RoleRow assignRoles={assignRoles} unassignRole={unassignRole} deleteRole={deleteRole} role={role} key={role.id} />)}
