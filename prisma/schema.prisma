@@ -136,17 +136,6 @@ model PagePermission {
 }
 
 model SpaceRole {
-  <<<<<<< HEAD
-  id                     String?           @unique @default(uuid()) @db.Uuid
-  role                   String            @default("contributor")
-  isAdmin                Boolean           @default(false)
-  spaceId                String            @db.Uuid
-  space                  Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  userId                 String            @db.Uuid
-  user                   User              @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  tokenGateId            String?           @db.Uuid
-  tokenGate              TokenGate?        @relation(fields: [tokenGateId], references: [id])
-  =======
   id                     String            @id @default(uuid()) @db.Uuid
   role                   String            @default("contributor")
   isAdmin                Boolean           @default(false)
@@ -156,7 +145,6 @@ model SpaceRole {
   user                   User              @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   tokenGateId            String?           @db.Uuid
   tokenGate              TokenGate?        @relation(fields: [tokenGateId], references: [id])
-  >>>>>>> main
   tokenGateConnectedDate DateTime?
   spaceRoleToRole        SpaceRoleToRole[]
 
