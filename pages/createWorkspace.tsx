@@ -18,8 +18,6 @@ export default function CreateSpace () {
 
   async function addSpace (newSpace: Prisma.SpaceCreateInput) {
 
-    console.log('Sending values', newSpace);
-
     const space = await charmClient.createSpace(newSpace);
     setSpaces([...spaces, space]);
     // refresh user permissions
