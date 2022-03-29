@@ -5,14 +5,16 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { InputEnumToOptions } from 'components/common/form/InputEnumToOptions';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
+import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import { useContributors } from 'hooks/useContributors';
 import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { PagePermissionLevelTitle } from 'lib/permissions/pages/page-permission-mapping';
 import { getDisplayName } from 'lib/users';
 import { filterObjectKeys } from 'lib/utilities/objects';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import useRoles from 'components/settings/roles/hooks/useRoles';
 
 export const schema = yup.object({
   id: yup.string(),
@@ -31,15 +33,29 @@ interface Props {
 export function AddPagePermissionsForm ({ pageId, existingPermissions = [], permissionsAdded = () => {} }: Props) {
 
   const [contributors] = useContributors();
+
+  const { roles, listRoles } = useRoles();
+
   const [permissionLevelToAssign, setPermissionLevelToAssign] = useState<PagePermissionLevelType>('full_access');
 
   const [selectedUserIds, setSelectedUserIds] = useState<string []>([]);
+  const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
+
+  useEffect(() => {
+    listRoles();
+  }, []);
 
   const userIdsToHide = existingPermissions.filter(permission => {
     return permission.user;
   }).map(permission => permission.user!.id);
 
   userIdsToHide.push(...(selectedUserIds));
+
+  const roleIdsToHide = existingPermissions.filter(permission => {
+    return permission.role;
+  }).map(permission => permission.role!.id);
+
+  roleIdsToHide.push(...selectedRoleIds);
 
   const {
     handleSubmit
@@ -89,6 +105,20 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
                   filter={{
                     mode: 'exclude',
                     userIds: userIdsToHide
+                  }}
+                />
+              </Grid>
+            )
+          }
+
+          {
+            roleIdsToHide.length < roles.length && (
+              <Grid item>
+                <InputSearchRoleMultiple
+                  onChange={setSelectedRoleIds}
+                  filter={{
+                    mode: 'exclude',
+                    userIds: roleIdsToHide
                   }}
                 />
               </Grid>
