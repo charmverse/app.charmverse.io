@@ -62,9 +62,14 @@ export default function LoginPageContent ({ account }: { account: string | null 
             <Typography sx={{ fontSize: 20, mb: 6 }}>
               Tasks, docs, bounties, and more
             </Typography>
-            <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
-              Connect Wallet
-            </PrimaryButton>
+            <Box display='flex' gap={1}>
+              <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
+                Connect Wallet
+              </PrimaryButton>
+              <PrimaryButton size='large' loading={!triedEager} href={`/api/discord/login?redirect=${window.location.href}&type=login`}>
+                Connect Discord
+              </PrimaryButton>
+            </Box>
           </Box>
         </Grid>
         <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>

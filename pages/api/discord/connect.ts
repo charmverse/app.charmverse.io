@@ -2,14 +2,13 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import * as http from 'adapters/http';
 import { prisma } from 'db';
-import { getDiscordToken } from 'lib/discord/getDiscordToken';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
-import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
 import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import { DiscordUser } from '@prisma/client';
 import log from 'lib/log';
+import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import { DiscordGuildMember, DiscordServerRole } from './importRoles';
 
 const handler = nc({
@@ -50,12 +49,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   let discordAccount: DiscordAccount;
 
   try {
-    const token = await getDiscordToken(code, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
-    discordAccount = await http.GET<DiscordAccount>('https://discord.com/api/v8/users/@me', undefined, {
-      headers: {
-        Authorization: `Bearer ${token.access_token}`
-      }
-    });
+    discordAccount = await getDiscordAccount(code, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
   }
   catch (error) {
     log.warn('Error while connecting to Discord', error);

@@ -16,7 +16,7 @@ handler.use(requireUser).get(login);
 async function login (req: NextApiRequest, res: NextApiResponse) {
   const query = req.query as {
     redirect: string,
-    type: 'connect' | 'server'
+    type: 'connect' | 'server' | 'login'
   };
   const state = encodeURIComponent(JSON.stringify({
     redirect: query.redirect,
@@ -24,7 +24,7 @@ async function login (req: NextApiRequest, res: NextApiResponse) {
     type: query.type
   }));
 
-  const oauthUrl = `${discordUrl}&${query.type === 'connect' ? '&scope=identify' : '&scope=guilds'}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
+  const oauthUrl = `${discordUrl}${query.type === 'server' ? '&scope=guilds' : '&scope=identify'}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
   res.redirect(oauthUrl);
 }
 

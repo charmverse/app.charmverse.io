@@ -74,8 +74,7 @@ async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUse
 
 export default withSessionRoute(handler);
 
-async function logSignup () {
-
+export async function logSignup () {
   postToDiscord({
     funnelStage: 'acquisition',
     eventType: 'create_user',
