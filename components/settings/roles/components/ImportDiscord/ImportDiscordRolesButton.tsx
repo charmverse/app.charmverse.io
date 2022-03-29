@@ -91,7 +91,7 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
     <>
       <Button
         external
-        href={`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
+        href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
         variant='outlined'
         startIcon={(
           <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>

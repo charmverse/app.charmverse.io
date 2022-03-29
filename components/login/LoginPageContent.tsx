@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -8,6 +8,8 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 
 import splashImage from 'public/images/artwork/world.png';
+import { useRouter } from 'next/router';
+import charmClient from 'charmClient';
 
 export const Container = styled(Box)`
   max-width: 100%;
@@ -16,6 +18,22 @@ export const Container = styled(Box)`
 `;
 
 export default function LoginPageContent ({ account }: { account: string | null | undefined }) {
+  const router = useRouter();
+
+  const isCreatingAccountWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
+
+  useEffect(() => {
+    if (isCreatingAccountWithDiscord) {
+      // TODO: Handle then and catch
+      charmClient.loginWithDiscord({
+        code: router.query.code as string
+      }).finally(() => {
+        setTimeout(() => {
+          router.push('/');
+        }, 1000);
+      });
+    }
+  }, [router]);
 
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
 
@@ -66,7 +84,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
               <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
                 Connect Wallet
               </PrimaryButton>
-              <PrimaryButton size='large' loading={!triedEager} href={`/api/discord/login?redirect=${window.location.href}&type=login`}>
+              <PrimaryButton size='large' loading={!triedEager} href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
                 Connect Discord
               </PrimaryButton>
             </Box>

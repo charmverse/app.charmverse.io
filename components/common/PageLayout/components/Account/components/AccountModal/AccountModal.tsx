@@ -67,7 +67,7 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
         setIsDisconnecting(false);
       }
       else {
-        window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
+        window.location.replace(`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
       }
     }
   }
