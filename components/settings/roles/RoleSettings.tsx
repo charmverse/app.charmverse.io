@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import Legend from 'components/settings/Legend';
-import ImportDiscordRoles from 'components/settings/roles/components/ImportDiscord/ImportDiscordRolesButton';
+import ImportDiscordRoles from 'components/settings/roles/components/ImportDiscordRolesButton';
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import RoleForm from './components/RoleForm';
