@@ -62,7 +62,7 @@ export default function RoleSettings () {
     <>
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
         Roles
-        <Box display='flex' gap={1}>
+        <Box component='span' display='flex' gap={1}>
           <ImportDiscordRoles onUpdate={listRoles} />
           <Button {...bindTrigger(popupState)}>Add a role</Button>
         </Box>
