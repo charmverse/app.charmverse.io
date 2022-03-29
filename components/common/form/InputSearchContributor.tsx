@@ -9,7 +9,29 @@ import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
 
-function InputSearchContributorBase ({ defaultValue, ...props }: Partial<ComponentProps<typeof Autocomplete>>) {
+interface IContributorsFilter {
+  mode: 'include' | 'exclude',
+  userIds: string []
+}
+
+function filterContributors (contributors: Contributor [], filter: IContributorsFilter): Contributor [] {
+  if (filter.mode === 'exclude') {
+    return contributors.filter(contributor => {
+      const shouldInclude = filter.userIds.indexOf(contributor.id) === -1;
+      return shouldInclude;
+    });
+  }
+  else {
+    return contributors.filter(contributor => {
+      const shouldInclude = filter.userIds.indexOf(contributor.id) > -1;
+      return shouldInclude;
+    });
+  }
+}
+
+function InputSearchContributorBase ({
+  defaultValue, disableCloseOnSelect = false, filter, ...props
+}: Partial<ComponentProps<typeof Autocomplete>> & {filter?: IContributorsFilter}) {
   const [contributors] = useContributors();
   const { chainId } = useWeb3React<Web3Provider>();
   const defaultContributor = typeof defaultValue === 'string' ? contributors.find(contributor => {
@@ -18,13 +40,16 @@ function InputSearchContributorBase ({ defaultValue, ...props }: Partial<Compone
 
   const { cache } = useSWRConfig();
 
+  const filteredContributors = filter ? filterContributors(contributors, filter) : contributors;
+
   return (
     <Autocomplete<Contributor>
       defaultValue={defaultContributor}
       loading={contributors.length === 0}
       sx={{ minWidth: 150 }}
+      disableCloseOnSelect={disableCloseOnSelect}
       // @ts-ignore - not sure why this fails
-      options={contributors}
+      options={filteredContributors}
       autoHighlight
       getOptionLabel={(user) => cache.get(`@"ENS",102~,"${user.addresses[0]}",${chainId},`) ?? getDisplayName(user)}
       renderOption={(_props, user) => (
@@ -61,14 +86,25 @@ export function InputSearchContributor (props: IInputSearchContributorProps) {
 interface IInputSearchContributorMultipleProps {
   onChange: (id: string[]) => void
   defaultValue?: string[]
+  filter?: IContributorsFilter
 }
 
-export function InputSearchContributorMultiple ({ onChange, ...props }: IInputSearchContributorMultipleProps) {
+export function InputSearchContributorMultiple ({ onChange, filter, ...props }: IInputSearchContributorMultipleProps) {
   function emitValue (users: Contributor[]) {
     console.log('change!', users);
     onChange(users.map(user => user.id));
   }
-  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor[])} multiple />;
+
+  console.log('Filter', filter);
+  return (
+    <InputSearchContributorBase
+      {...props}
+      onChange={(e, value) => emitValue(value as Contributor[])}
+      multiple
+      disableCloseOnSelect={true}
+      filter={filter}
+    />
+  );
 }
 
 export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contributor, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement>) {
