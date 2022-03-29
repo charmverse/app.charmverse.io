@@ -111,7 +111,7 @@ export default function CompositePaymentMethodList ({ paymentMethods }: IProps) 
 
                 {
                 isAdmin && (
-                  <ElementDeleteIcon clicked={() => setPaymentMethodIdToDelete(row.id)} />
+                  <ElementDeleteIcon onClick={() => setPaymentMethodIdToDelete(row.id)} />
                 )
               }
               </TableCell>

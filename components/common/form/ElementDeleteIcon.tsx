@@ -3,13 +3,14 @@ import Tooltip from '@mui/material/Tooltip';
 import ButtonChip from 'components/common/ButtonChip';
 
 interface Props {
-  clicked: () => void
+  onClick: () => void;
+  tooltip?: string;
 }
 
-export function ElementDeleteIcon ({ clicked }: Props) {
+export function ElementDeleteIcon ({ onClick, tooltip = 'Delete' }: Props) {
 
   return (
-    <Tooltip arrow placement='top' title='Delete'>
+    <Tooltip arrow placement='top' title={tooltip}>
       <ButtonChip
         className='row-actions'
         icon={<DeleteIcon />}
@@ -19,7 +20,7 @@ export function ElementDeleteIcon ({ clicked }: Props) {
         variant='outlined'
         onClick={(e) => {
           e.stopPropagation();
-          clicked();
+          onClick();
         }}
       />
     </Tooltip>
