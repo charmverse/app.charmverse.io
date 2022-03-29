@@ -3,7 +3,7 @@ import { ReactElement } from 'react';
 import { setTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import TokenGateList from 'components/settings/TokenGates';
+import TokenGateList from 'components/settings/token-gates/TokenGates';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 export default function ContributorSettings () {

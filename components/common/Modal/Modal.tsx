@@ -70,3 +70,5 @@ export function DialogTitle ({ children, onClose }: { children: ReactNode, onClo
 
 // TODO: add special theme for alert dialogs
 export const Alert = Modal;
+
+export default Modal;

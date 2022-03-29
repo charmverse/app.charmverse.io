@@ -5,16 +5,14 @@ import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/mid
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
-import { createRolesFromDiscord } from 'lib/role/createRolesFromDiscord';
-import { assignRolesFromDiscord } from 'lib/role/assignRolesFromDiscord';
-import { DiscordUser } from './connect';
+import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
+import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
+import { DiscordAccount } from './connect';
 
 const handler = nc({
   onError,
   onNoMatch
 });
-
-const discordBotToken = process.env.DISCORD_BOT_TOKEN as string;
 
 export interface ImportRolesPayload {
   spaceId: string,
@@ -38,7 +36,7 @@ export interface DiscordServerRole {
 }
 
 export interface DiscordGuildMember {
-  user?: DiscordUser
+  user?: DiscordAccount
   nick?: string
   avatar?: string
   roles: string[]
@@ -49,20 +47,10 @@ export interface DiscordGuildMember {
   permissions?: string
 }
 
-export type ImportRolesResponse = {
-  error?: ({
-    action: 'create',
-    role: string
-  } | {
-    action: 'assign',
-    username: string,
-    roles: string[]
-  })[] | string
-}
+export type ImportRolesResponse = { importedRoleCount: number };
 
-async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse>) {
+async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse | { error: string }>) {
   const { spaceId, guildId } = req.body as ImportRolesPayload;
-  const importErrors: ImportRolesResponse['error'] = [];
 
   if (!spaceId || !guildId) {
     res.status(400).json({
@@ -81,34 +69,14 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     }
   });
 
-  if (!user?.discordUser) {
-    res.status(401).json({
-      error: 'You must have discord connected'
-    });
-    return;
-  }
-
-  const discordApiHeaders: any = {
-    headers: {
-      Authorization: `Bot ${discordBotToken}`
+  await prisma.space.update({
+    where: {
+      id: spaceId
+    },
+    data: {
+      discordServerId: guildId
     }
-  };
-
-  try {
-    await prisma.space.update({
-      where: {
-        id: spaceId
-      },
-      data: {
-        discordServerId: guildId
-      }
-    });
-  }
-  catch (err) {
-    log.warn('Failed to connect workspace with discord server', err);
-    res.status(500).json({ error: 'Failed to connect workspace with discord server' });
-    return;
-  }
+  });
 
   const discordServerRoles: DiscordServerRole[] = [];
   const discordGuildMembers: DiscordGuildMember[] = [];
@@ -126,50 +94,20 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
   let lastUserId = '0';
   let discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100`);
 
-  // eslint-disable-next-line
-  while (true) {
-    if (discordGuildMembersResponse.status === 'success') {
-      if (discordGuildMembersResponse.data.length === 0) {
-        break;
-      }
-      discordGuildMembers.push(...discordGuildMembersResponse.data);
-      lastUserId = discordGuildMembersResponse.data[discordGuildMembersResponse.data.length - 1].user?.id!;
-      discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100&after=${lastUserId}`);
-    }
-    else {
-      res.status(discordGuildMembersResponse.status).json({ error: discordGuildMembersResponse.error });
-      return;
-    }
+  while (discordGuildMembersResponse.status === 'success' && discordGuildMembersResponse.data.length > 0) {
+    discordGuildMembers.push(...discordGuildMembersResponse.data);
+    lastUserId = discordGuildMembersResponse.data[discordGuildMembersResponse.data.length - 1].user?.id!;
+    discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100&after=${lastUserId}`);
   }
 
-  const discordMember = discordGuildMembers.find(guildMember => guildMember.user?.id === user.discordUser!.discordId);
-  if (!discordMember) {
-    res.status(401).json({
-      error: 'You are not part of the guild'
-    });
-    return;
+  if (discordGuildMembersResponse.status !== 'success') {
+    res.status(discordGuildMembersResponse.status).json({ error: discordGuildMembersResponse.error });
   }
-
-  const { rolesRecord, failedRoles } = await createRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
-  failedRoles.forEach(role => {
-    importErrors.push({
-      action: 'create',
-      role
-    });
-  });
-
-  const failedRoleAssignments = await assignRolesFromDiscord(rolesRecord, discordGuildMembers, spaceId);
-
-  failedRoleAssignments.forEach(failedRoleAssignment => {
-    importErrors.push({
-      action: 'assign',
-      ...failedRoleAssignment
-    });
-  });
-
-  res.status(200).json({
-    error: importErrors
-  });
+  else {
+    const rolesRecord = await findOrCreateRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
+    await assignRolesFromDiscord(rolesRecord, discordGuildMembers, spaceId);
+    res.status(200).json({ importedRoleCount: discordServerRoles.length });
+  }
 }
 
 handler.use(requireUser).use(requireSpaceMembership('admin')).post(importRoles);

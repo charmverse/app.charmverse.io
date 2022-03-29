@@ -1,14 +1,13 @@
 import SettingsLayout from 'components/settings/Layout';
 import { ReactElement } from 'react';
 import Grid from '@mui/material/Grid';
-import Alert from '@mui/material/Alert';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
 import Button from 'components/common/Button';
 import PrimaryButton from 'components/common/PrimaryButton';
-import FieldLabel from 'components/settings/FieldLabel';
+import FieldLabel from 'components/common/form/FieldLabel';
 import Legend from 'components/settings/Legend';
-import Avatar from 'components/settings/LargeAvatar';
+import Avatar from 'components/settings/workspace/LargeAvatar';
 import { setTitle } from 'hooks/usePageTitle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FormValues, schema } from 'components/common/CreateSpaceForm';
@@ -17,8 +16,7 @@ import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
 import { Box, Typography } from '@mui/material';
-import ImportDiscordRoles from 'components/settings/Import/ImportDiscordRoles';
-import ImportNotionWorkspace from 'components/settings/Import/ImportNotionWorkspace';
+import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 
 export interface FailedImportsError {
   pageId: string,
@@ -103,10 +101,9 @@ export default function WorkspaceSettings () {
           </Grid>
         </Grid>
       </form>
-      <Legend>Import</Legend>
+      <Legend>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ImportNotionWorkspace />
-        <ImportDiscordRoles />
       </Box>
     </>
   );

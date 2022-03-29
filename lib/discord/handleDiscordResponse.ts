@@ -18,9 +18,9 @@ export async function handleDiscordResponse<Response> (endpoint: string): Promis
     };
   }
   catch (err: any) {
+    log.warn('Error from Discord', err);
     // The bot token is invalid
     if (err.code === 0) {
-      log.warn('Bot is unauthorized due to invalid token', err);
       return {
         status: 500,
         error: 'Something went wrong. Please try again'
@@ -37,14 +37,14 @@ export async function handleDiscordResponse<Response> (endpoint: string): Promis
     else if (err.code === 10004) {
       return {
         status: 400,
-        error: "Unknown guild. Please make sure you're importing from the correct guild"
+        error: 'Unknown guild. Please make sure you\'re importing from the correct guild'
       };
     }
     // Unknown user
     else if (err.code === 10013) {
       return {
         status: 400,
-        error: "Unknown user. User doesn't exist in the guild"
+        error: 'Unknown user. User doesn\'t exist in the guild'
       };
     }
     else {

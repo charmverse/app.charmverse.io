@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client';
 import charmClient, { ListSpaceRolesResponse } from 'charmClient';
 import { useState } from 'react';
-import { useCurrentSpace } from './useCurrentSpace';
+import { useCurrentSpace } from '../../../../hooks/useCurrentSpace';
 
 export default function useRoles () {
   const [space] = useCurrentSpace();
