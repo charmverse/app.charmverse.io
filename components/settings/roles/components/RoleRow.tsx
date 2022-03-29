@@ -80,7 +80,7 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
       </Box>
       <Divider />
 
-      {contributors.map(contributor => <RoleMemberRow contributor={contributor} onRemove={removeMember} />)}
+      {contributors.map(contributor => <RoleMemberRow key={contributor.id} contributor={contributor} onRemove={removeMember} />)}
 
       <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
 

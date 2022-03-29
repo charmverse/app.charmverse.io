@@ -14,7 +14,6 @@ import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
-import { DiscordUserServer } from 'pages/api/discord/listServers';
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 
@@ -159,10 +158,6 @@ class CharmClient {
 
   connectDiscord (payload: {code: string, spaceId: string}) {
     return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
-  }
-
-  listDiscordServers (payload: { code: string }) {
-    return http.GET<DiscordUserServer[]>('/api/discord/listServers', payload);
   }
 
   importRolesFromDiscordServer (payload: ImportRolesPayload) {

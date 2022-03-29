@@ -1,44 +1,31 @@
 import { Role } from '@prisma/client';
 import charmClient, { ListSpaceRolesResponse } from 'charmClient';
 import { useState } from 'react';
+import useSWR, { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 export default function useRoles () {
   const [space] = useCurrentSpace();
-  const [roles, setRoles] = useState<ListSpaceRolesResponse[]>([]);
 
-  async function listRoles () {
-    if (space) {
-      const rolesInSpace = await charmClient.listRoles(space.id);
-      setRoles(rolesInSpace);
-    }
-  }
+  const { data: roles } = useSWR(() => space ? `roles/${space.id}` : null, () => charmClient.listRoles(space!.id));
 
   async function createRole (role: Partial<Role>): Promise<Role> {
     role.spaceId = space?.id;
     const createdRole = await charmClient.createRole(role);
-    setRoles([...roles, {
-      ...createdRole,
-      // Initially no user is attached to a role, so its safe to keep it empty
-      spaceRolesToRole: []
-    }]);
+    refreshRoles();
     return createdRole;
   }
 
   async function updateRole (role: Partial<Role>): Promise<Role> {
     role.spaceId = space?.id;
     const updatedRole = await charmClient.updateRole(role);
-    setRoles([...roles, {
-      ...updatedRole,
-      // Initially no user is attached to a role, so its safe to keep it empty
-      spaceRolesToRole: []
-    }]);
+    refreshRoles();
     return updatedRole;
   }
 
   async function deleteRole (roleId: string) {
     await charmClient.deleteRole({ roleId, spaceId: space!.id });
-    setRoles(roles.filter(role => role.id !== roleId));
+    refreshRoles();
   }
 
   async function assignRoles (roleId: string, userIds: string[]) {
@@ -48,8 +35,7 @@ export default function useRoles () {
         userId,
         spaceId: space.id
       })));
-      // TODO: Remove this listRoles and add required data directly to state
-      listRoles();
+      refreshRoles();
     }
   }
 
@@ -60,17 +46,23 @@ export default function useRoles () {
         userId,
         spaceId: space.id
       });
-      listRoles();
+      refreshRoles();
+    }
+  }
+
+  function refreshRoles () {
+    if (space) {
+      mutate(`roles/${space.id}`);
     }
   }
 
   return {
-    listRoles,
     createRole,
     updateRole,
     deleteRole,
     assignRoles,
     unassignRole,
+    refreshRoles,
     roles
   };
 }
