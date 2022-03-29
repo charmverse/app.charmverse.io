@@ -14,7 +14,7 @@ export default function useRoles () {
     }
   }
 
-  async function createRole (role: Partial<Role>) {
+  async function createRole (role: Partial<Role>): Promise<Role> {
     role.spaceId = space?.id;
     const createdRole = await charmClient.createRole(role);
     setRoles([...roles, {
@@ -22,6 +22,18 @@ export default function useRoles () {
       // Initially no user is attached to a role, so its safe to keep it empty
       spaceRolesToRole: []
     }]);
+    return createdRole;
+  }
+
+  async function updateRole (role: Partial<Role>): Promise<Role> {
+    role.spaceId = space?.id;
+    const updatedRole = await charmClient.updateRole(role);
+    setRoles([...roles, {
+      ...updatedRole,
+      // Initially no user is attached to a role, so its safe to keep it empty
+      spaceRolesToRole: []
+    }]);
+    return updatedRole;
   }
 
   async function deleteRole (roleId: string) {
@@ -55,6 +67,7 @@ export default function useRoles () {
   return {
     listRoles,
     createRole,
+    updateRole,
     deleteRole,
     assignRoles,
     unassignRole,
