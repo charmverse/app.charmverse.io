@@ -16,7 +16,7 @@ export const Container = styled(Box)`
 
 // Handle cases
 // 1. New user, dont have a charmverse account, clicks on Connect Discord
-// 2. User who have connected with their wallet before but haven't created any workspace and discord connected
+// 2. User who have connected with their wallet before but dont have any workspace and discord connected
 // 3. Old user who have some charmverse workspace and discord connected
 // 4. Old user who have some charmverse workspace and not discord connected
 // 5. Disconnect your wallet, you wont be logged out if you have discord connected

@@ -60,6 +60,35 @@ async function loginWithDiscord (req: NextApiRequest, res: NextApiResponse<Logge
       return res.status(200).json(charmverseUser);
     }
   }
+  else {
+    const newUser = await prisma.user.create({
+      data: {
+        username: discordAccount.username,
+        avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
+      }
+    });
+
+    const { id, ...rest } = discordAccount;
+    const createdDiscordUser = await prisma.discordUser.create({
+      data: {
+        account: rest as any,
+        discordId: id,
+        user: {
+          connect: {
+            id: newUser.id
+          }
+        }
+      }
+    });
+
+    return {
+      ...newUser,
+      discordUser: createdDiscordUser,
+      // Newly created users dont have any access to spaces
+      spaceRoles: [],
+      favorites: []
+    };
+  }
 
   return res.status(404).json({ error: "User doesn't exist" });
 }
