@@ -25,6 +25,17 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
   const shouldRequestServers = currentSpace && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'server';
 
   useEffect(() => {
+
+    const serverConnectFailed = router.query.discord === '2' && router.query.type === 'server';
+
+    console.log('Use effect called', serverConnectFailed, router.query);
+    if (serverConnectFailed) {
+      showMessage('Failed to connect to Discord', 'warning');
+    }
+
+  }, [router.query]);
+
+  useEffect(() => {
     if (shouldRequestServers) {
       charmClient.listDiscordServers({
         code: router.query.code as string
