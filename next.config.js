@@ -1,6 +1,17 @@
 
 const config = {
   poweredByHeader: false,
+  swcMinify: true, // opt-in to using the Next.js compiler for minification. This is 7x faster than Terser
+  experimental: {
+    modularizeImports: {
+      '@mui/material': {
+        transform: '@mui/material/{{member}}'
+      },
+      '@mui/icons-material': {
+        transform: '@mui/icons-material/{{member}}'
+      }
+    }
+  },
   webpack5: true,
   async redirects () {
     return [
