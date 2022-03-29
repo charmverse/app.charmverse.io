@@ -13,6 +13,7 @@ export const spaces: Space[] = [
 
 function MockSpace (partial: Partial<Space>): Space {
   return {
+    discordServerId: null,
     id: uuid(),
     domain: '',
     name: '',

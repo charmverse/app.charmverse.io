@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
-import FieldLabel from 'components/settings/FieldLabel';
+import FieldLabel from 'components/common/form/FieldLabel';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 

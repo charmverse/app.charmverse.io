@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import styled from '@emotion/styled';
 import Table from '@mui/material/Table';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Countdown from 'react-countdown';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Close';
@@ -16,7 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import ButtonChip from 'components/common/ButtonChip';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
-import { StyledRow } from 'components/settings/TokenGatesTable';
+import TableRow from 'components/common/Table/TableRow';
 
 interface Props {
   isAdmin: boolean;
@@ -46,7 +44,7 @@ export default function InvitesTable (props: Props) {
       </TableHead>
       <TableBody>
         {props.invites.map((row) => (
-          <StyledRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+          <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
             <TableCell sx={{ px: 0 }}>
               <Typography><strong>{getDisplayName(row.author)}</strong></Typography>
             </TableCell>
@@ -85,7 +83,7 @@ export default function InvitesTable (props: Props) {
               </Tooltip>
               )}
             </TableCell>
-          </StyledRow>
+          </TableRow>
         ))}
       </TableBody>
     </Table>

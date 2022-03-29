@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { humanizeAccessControlConditions, Chain, AccessControlCondition, SigningConditions, checkAndSignAuthMessage, ALL_LIT_CHAINS } from 'lit-js-sdk';
-import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { TokenGate } from '@prisma/client';
@@ -9,23 +8,13 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import DeleteIcon from '@mui/icons-material/Close';
 import ButtonChip from 'components/common/ButtonChip';
 import Tooltip from '@mui/material/Tooltip';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
-
-export const StyledRow = styled(TableRow)`
-  .row-actions {
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-  }
-  &:hover .row-actions {
-    opacity: 1;
-  }
-`;
+import TableRow from 'components/common/Table/TableRow';
 
 interface Props {
   tokenGates: TokenGate[];
@@ -78,7 +67,7 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
       </TableHead>
       <TableBody>
         {tokenGates.map((row, index) => (
-          <StyledRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+          <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
             <TableCell sx={{ px: 0 }}>
               <Typography>{descriptions[index]}</Typography>
             </TableCell>
@@ -106,7 +95,7 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
                 </Tooltip>
               )}
             </TableCell>
-          </StyledRow>
+          </TableRow>
         ))}
       </TableBody>
     </Table>

@@ -12,7 +12,7 @@ import { IApiError } from 'lib/utilities/errors';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireSpaceMembership)
+  .use(requireSpaceMembership())
   .use(requireKeys<SpaceRoleToRole & SpaceRole>(['spaceId', 'roleId', 'userId'], 'body'))
   .post(assignRole)
   .delete(removeRole);

@@ -25,7 +25,7 @@ handler.get(async (req, res) => {
     return;
   }
 
-  res.redirect(`${redirect}?code=${tempAuthCode}`);
+  res.redirect(`${redirect}?code=${tempAuthCode}&notion=1`);
 });
 
 export default handler;

@@ -24,23 +24,24 @@ enum PermissionLevel {
 }
 
 model Space {
-  id             String          @id @default(uuid()) @db.Uuid
-  deletedAt      DateTime?
-  createdAt      DateTime        @default(now())
-  author         User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdBy      String          @db.Uuid
-  updatedAt      DateTime
-  updatedBy      String          @db.Uuid
-  name           String
-  domain         String          @unique
-  spaceRoles    SpaceRole[]
-  pages          Page[]
-  blocks         Block[]
-  inviteLinks    InviteLink[]
-  bounties       Bounty[]
-  TokenGate      TokenGate[]
-  paymentMethods PaymentMethod[]
-  roles          Role[]
+  id              String          @id @default(uuid()) @db.Uuid
+  deletedAt       DateTime?
+  createdAt       DateTime        @default(now())
+  author          User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy       String          @db.Uuid
+  updatedAt       DateTime
+  updatedBy       String          @db.Uuid
+  name            String
+  domain          String          @unique
+  discordServerId String?
+  spaceRoles      SpaceRole[]
+  pages           Page[]
+  blocks          Block[]
+  inviteLinks     InviteLink[]
+  bounties        Bounty[]
+  TokenGate       TokenGate[]
+  paymentMethods  PaymentMethod[]
+  roles           Role[]
 }
 
 model Page {
@@ -136,18 +137,18 @@ model PagePermission {
 }
 
 model SpaceRole {
-  id                     String     @id @default(uuid()) @db.Uuid
-  role                   String     @default("contributor")
-  isAdmin                Boolean    @default(false)
-  spaceId                String     @db.Uuid
-  space                  Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  userId                 String     @db.Uuid
-  user                   User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  tokenGateId            String?    @db.Uuid
-  tokenGate              TokenGate? @relation(fields: [tokenGateId], references: [id])
+  id                     String            @id @default(uuid()) @db.Uuid
+  role                   String            @default("contributor")
+  isAdmin                Boolean           @default(false)
+  spaceId                String            @db.Uuid
+  space                  Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId                 String            @db.Uuid
+  user                   User              @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tokenGateId            String?           @db.Uuid
+  tokenGate              TokenGate?        @relation(fields: [tokenGateId], references: [id])
   tokenGateConnectedDate DateTime?
-  spaceRoleToRole        SpaceRoleToRole []
-  
+  spaceRoleToRole        SpaceRoleToRole[]
+
   @@unique([spaceId, userId], name: "spaceUser")
 }
 
@@ -249,26 +250,25 @@ model PaymentMethod {
   walletType        WalletType @default(metamask)
 }
 
-
 model Role {
-  id                String            @id @default(uuid()) @db.Uuid
-  createdAt         DateTime          @default(now())
-  createdBy         String            @db.Uuid()
-  name              String     
-  spaceId           String            @db.Uuid
-  space             Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  spaceRolesToRole  SpaceRoleToRole []
+  id               String            @id @default(uuid()) @db.Uuid
+  createdAt        DateTime          @default(now())
+  createdBy        String            @db.Uuid()
+  name             String
+  spaceId          String            @db.Uuid
+  space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  spaceRolesToRole SpaceRoleToRole[]
 
   @@unique([spaceId, name])
 }
 
 model SpaceRoleToRole {
-  id                String         @id @default(uuid()) @db.Uuid
-  createdAt         DateTime       @default(now())
-  spaceRoleId       String         @db.Uuid
-  spaceRole         SpaceRole      @relation(fields: [spaceRoleId], references: [id], onDelete: Cascade)
-  roleId            String         @db.Uuid
-  role              Role           @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  id          String    @id @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  spaceRoleId String    @db.Uuid
+  spaceRole   SpaceRole @relation(fields: [spaceRoleId], references: [id], onDelete: Cascade)
+  roleId      String    @db.Uuid
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([spaceRoleId, roleId])
 }

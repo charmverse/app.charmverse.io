@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod, Role } from '@prisma/client';
+import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod, Role, DiscordUser } from '@prisma/client';
 import * as http from 'adapters/http';
 import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -14,6 +14,9 @@ import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import { DiscordUserServer } from 'pages/api/discord/listServers';
+import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
+import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -146,25 +149,29 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
-  notionLogin (query: { redirect: string }) {
-    return http.GET<{redirectUrl: string}>('/api/notion/login', query);
-  }
-
-  discordLogin (query: {redirect: string}) {
-    return http.GET<{redirectUrl: string}>('/api/discord/login', query);
+  importFromNotion (payload: { code: string, spaceId: string }) {
+    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
   }
 
   disconnectDiscord () {
     return http.POST('/api/discord/disconnect');
   }
 
-  importFromNotion (params: { code: string, spaceId: string }) {
-    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', params);
+  connectDiscord (payload: {code: string, spaceId: string}) {
+    return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
+  }
+
+  listDiscordServers (payload: { code: string }) {
+    return http.GET<{servers: DiscordUserServer[]}>('/api/discord/listServers', payload);
+  }
+
+  importRolesFromDiscordServer (payload: ImportRolesPayload) {
+    return http.POST<ImportRolesResponse>('/api/discord/importRoles', payload);
   }
 
   // FocalBoard
 
-  // TODO: we shouldnt have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
+  // TODO: we shouldn't have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
 
   async getWorkspace (): Promise<IWorkspace> {
     const space = await http.GET<Space>('/api/spaces/current');
