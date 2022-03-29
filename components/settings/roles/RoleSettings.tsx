@@ -1,21 +1,17 @@
 
-import Legend from 'components/settings/Legend';
-import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { usePopupState, bindPopover, bindTrigger } from 'material-ui-popup-state/hooks';
-import * as yup from 'yup';
 import Box from '@mui/material/Box';
-import Modal from 'components/common/Modal';
-import Grid from '@mui/material/Grid';
-import InputLabel from '@mui/material/InputLabel';
-import TextField from '@mui/material/TextField';
-import Alert from '@mui/material/Alert';
 import Button from 'components/common/Button';
-import { useEffect, useState } from 'react';
+import Modal from 'components/common/Modal';
+import Legend from 'components/settings/Legend';
+import ImportDiscordRoles from 'components/settings/roles/components/ImportDiscord/ImportDiscordRolesButton';
 import useRoles from 'components/settings/roles/hooks/useRoles';
-import ImportDiscordRoles from './components/ImportDiscord/ImportDiscordRolesButton';
-import RoleRow from './components/RoleRow';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 import RoleForm from './components/RoleForm';
+import RoleRow from './components/RoleRow';
 
 export const schema = yup.object({
   name: yup.string().required('Please provide a valid role name')
