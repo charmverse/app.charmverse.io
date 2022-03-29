@@ -25,7 +25,7 @@ function DiscordServersModal ({ discordServers, onSelect, onClose, isOpen }: Pro
   return (
     <Modal
       open={isOpen}
-      title='Select a Discord Server'
+      title='Import roles from Discord'
       onClose={onClose}
     >
       <Typography variant='subtitle2'>Select a server to start importing roles</Typography>

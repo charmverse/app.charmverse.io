@@ -36,7 +36,14 @@ handler.get(async (req, res) => {
         Authorization: `Bearer ${token.access_token}`
       }
     });
-    res.status(200).send(discordUserServers);
+    const botServers = await http.GET<DiscordUserServer[]>('https://discord.com/api/v8/users/@me/guilds', undefined, {
+      headers: {
+        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`
+      }
+    });
+    const accessibleServers = discordUserServers.filter(server => botServers.some(botServer => botServer.id === server.id));
+    // console.log('discordUserServers', discordUserServers);
+    res.status(200).send(accessibleServers);
   }
   catch (err) {
     res.status(500).send({ error: 'Invalid token' });
