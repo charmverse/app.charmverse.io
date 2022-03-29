@@ -23,10 +23,8 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const [spaces, _, isSpacesLoaded] = useSpaces();
   const isUserLoading = !!(account && !isUserLoaded);
   const isWalletLoading = (!triedEager && !account);
-  const isReactLoading = !router.isReady;
-  const isLoading = isUserLoading || isWalletLoading || isReactLoading || !isSpacesLoaded;
-  const { setIsOpen } = useSnackbar();
-  // console.log('isLoading', isLoading, { isReactLoading, isWalletLoading, isUserLoading, isSpacesLoaded });
+  const isRouterLoading = !router.isReady;
+  const isLoading = isUserLoading || isWalletLoading || isRouterLoading || !isSpacesLoaded;
 
   useEffect(() => {
     // wait to listen to events until data is loaded
@@ -80,8 +78,8 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
       return { authorized: true };
     }
-    // condition: wallet not connected
-    else if (!account) {
+    // condition: wallet not connected and user is not connected with discord
+    else if (!account && (user && !user.discordUser)) {
       console.log('[RouteGuard]: redirect to login');
       return {
         authorized: false,
@@ -92,7 +90,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       };
     }
     // condition: user not loaded
-    else if (!user) {
+    else if (!user && account) {
       console.log('[RouteGuard]: user not loaded');
       try {
         const _user = await charmClient.login(account);
@@ -102,10 +100,9 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         const _user = await charmClient.createUser({ address: account });
         return { authorized: false, user: _user };
       }
-
     }
     // condition: user switches to a new/unknown address
-    else if (!user.addresses.includes(account)) {
+    else if (user && account && !user.addresses.includes(account)) {
       console.log('[RouteGuard]: unknown address');
       let _user = await charmClient.login(account).catch(err => null);
       if (!_user) {
