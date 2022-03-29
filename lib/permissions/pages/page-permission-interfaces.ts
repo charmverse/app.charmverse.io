@@ -27,6 +27,8 @@ export interface IPagePermissionUserRequest extends IPagePermissionRequest {
  */
 export type IPagePermissionToCreate = Pick<PagePermission, 'pageId' | 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions' | 'userId' | 'spaceId' | 'roleId'>>
 
+export type IPagePermissionUpdate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions'>>
+
 export interface IPagePermissionToDelete {
   permissionId: string
 }

@@ -2,7 +2,7 @@
 
 import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, DiscordUser } from '@prisma/client';
 import * as http from 'adapters/http';
-import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
 import { BountyWithDetails, Contributor, LoggedInUser } from 'models';
@@ -484,6 +484,10 @@ class CharmClient {
 
   createPermission (permission: IPagePermissionToCreate): Promise<boolean> {
     return http.POST('/api/permissions', permission);
+  }
+
+  updatePermission (permissionId: string, permission: IPagePermissionUpdate): Promise<boolean> {
+    return http.PUT(`/api/permissions/${permissionId}`, permission);
   }
 
   deletePermission (permissionId: string): Promise<boolean> {

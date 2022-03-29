@@ -2,7 +2,7 @@ import { PagePermission, PagePermissionLevel, Prisma, Role, Space, User } from '
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { IPagePermissionWithAssignee } from './page-permission-interfaces';
+import { IPagePermissionUpdate, IPagePermissionWithAssignee } from './page-permission-interfaces';
 
 export async function listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
   const permissions = await prisma.pagePermission.findMany({
@@ -75,6 +75,37 @@ export async function createPagePermission (permission: PagePermission) {
   const createdPermission = await prisma.pagePermission.create({ data: permissionToCreate });
 
   return createdPermission;
+}
+
+/**
+ * Update a page permission using its ID
+ */
+export async function updatePagePermission (permissionId: string, permission: IPagePermissionUpdate) {
+  const permissionLevel = permission.permissionLevel;
+
+  if (!isTruthy(permissionLevel) || !isTruthy(PagePermissionLevel[permissionLevel])) {
+    throw {
+      error: 'Please provide a valid permission level'
+    };
+  }
+
+  // We only need to store permissions in the database for the custom level.
+  // For permission groups, we can simply load the template for that group when evaluating permissions
+  const permissionsToAssign = permission.permissionLevel === 'custom' ? permission.permissions : [];
+
+  const permissionUpdateContent = {
+    permissionLevel: permission.permissionLevel,
+    permissions: permissionsToAssign
+  } as Prisma.PagePermissionUpdateInput;
+
+  const updatedPermission = await prisma.pagePermission.update({
+    where: {
+      id: permissionId
+    },
+    data: permissionUpdateContent
+  });
+
+  return updatedPermission;
 }
 
 export async function deletePagePermission (permissionId: string) {
