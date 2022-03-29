@@ -59,16 +59,6 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     return;
   }
 
-  const userId = req.session.user.id;
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId
-    },
-    include: {
-      discordUser: true
-    }
-  });
-
   await prisma.space.update({
     where: {
       id: spaceId
@@ -80,7 +70,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
 
   const discordServerRoles: DiscordServerRole[] = [];
   const discordGuildMembers: DiscordGuildMember[] = [];
-
+  console.log('retrieve roles', guildId);
   const discordServerRolesResponse = await handleDiscordResponse<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`);
 
   if (discordServerRolesResponse.status === 'success') {
