@@ -3,7 +3,9 @@ import log from 'lib/log';
 
 const discordBotToken = process.env.DISCORD_BOT_TOKEN as string;
 
-export async function handleDiscordResponse<Response> (endpoint: string): Promise<{status: number, error: string} | {status: 'success', data: Response}> {
+const discordClientId = process.env.DISCORD_OAUTH_CLIENT_ID as string;
+
+export async function handleDiscordResponse<Response> (endpoint: string): Promise<{status: number, error: string, redirectLink?: string} | {status: 'success', data: Response}> {
   const discordApiHeaders: any = {
     headers: {
       Authorization: `Bot ${discordBotToken}`
@@ -30,7 +32,8 @@ export async function handleDiscordResponse<Response> (endpoint: string): Promis
     else if (err.code === 50001) {
       return {
         status: 400,
-        error: 'Please add Charmverse bot to your server'
+        error: 'Use this link to add Charmverse bot to your server',
+        redirectLink: `https://discord.com/oauth2/authorize?scope=bot&client_id=${discordClientId}&permissions=0`
       };
     }
     // Guild doesn't exist
