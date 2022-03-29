@@ -32,8 +32,7 @@ export async function handleDiscordResponse<Response> (endpoint: string): Promis
     else if (err.code === 50001) {
       return {
         status: 400,
-        error: 'Use this link to add Charmverse bot to your server',
-        redirectLink: `https://discord.com/oauth2/authorize?scope=bot&client_id=${discordClientId}&permissions=0`
+        error: 'CharmBerse does not have access to the server'
       };
     }
     // Guild doesn't exist
