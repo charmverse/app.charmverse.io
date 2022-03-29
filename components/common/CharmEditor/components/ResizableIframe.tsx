@@ -50,8 +50,6 @@ export function extractEmbedLink (url: string) {
     embedUrl = url.slice(indexOfFirstQuote + 1, indexOfLastQuote);
   }
 
-  console.log(embedUrl);
-
   return embedUrl;
 }
 
