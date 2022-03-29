@@ -70,7 +70,8 @@ function InputSearchContributorBase ({
 
 interface IInputSearchContributorProps {
   onChange: (id: string) => void
-  defaultValue?: string
+  defaultValue?: string,
+  filter?: IContributorsFilter
 }
 
 export function InputSearchContributor (props: IInputSearchContributorProps) {
