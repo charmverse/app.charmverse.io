@@ -29,17 +29,6 @@ export default function useRoles () {
     setRoles(roles.filter(role => role.id !== roleId));
   }
 
-  async function assignRole (roleId: string, userId: string) {
-    if (space) {
-      await charmClient.assignRole({
-        roleId,
-        userId,
-        spaceId: space.id
-      });
-      // TODO: Remove this listRoles and add required data directly to state
-      listRoles();
-    }
-  }
   async function assignRoles (roleId: string, userIds: string[]) {
     if (space) {
       await Promise.all(userIds.map(userId => charmClient.assignRole({
@@ -67,7 +56,6 @@ export default function useRoles () {
     listRoles,
     createRole,
     deleteRole,
-    assignRole,
     assignRoles,
     unassignRole,
     roles
