@@ -161,6 +161,10 @@ class CharmClient {
     return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
   }
 
+  createAccountWithDiscord (payload: {code: string}) {
+    return http.POST<ConnectDiscordResponse>('/api/discord/createAccount', payload);
+  }
+
   listDiscordServers (payload: { code: string }) {
     return http.GET<{servers: DiscordUserServer[]}>('/api/discord/listServers', payload);
   }
