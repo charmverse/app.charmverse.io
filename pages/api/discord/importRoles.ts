@@ -87,7 +87,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     discordServerRoles.push(...discordServerRolesResponse.data);
   }
   else {
-    res.status(discordServerRolesResponse.status).json({ error: discordServerRolesResponse.error });
+    res.status(discordServerRolesResponse.status).json(discordServerRolesResponse);
     return;
   }
 

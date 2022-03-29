@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client';
 import charmClient, { ListSpaceRolesResponse } from 'charmClient';
 import { useState } from 'react';
-import { useCurrentSpace } from '../../../../hooks/useCurrentSpace';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 export default function useRoles () {
   const [space] = useCurrentSpace();
@@ -14,7 +14,7 @@ export default function useRoles () {
     }
   }
 
-  async function createRole (role: Partial<Role>) {
+  async function createRole (role: Partial<Role>): Promise<Role> {
     role.spaceId = space?.id;
     const createdRole = await charmClient.createRole(role);
     setRoles([...roles, {
@@ -22,6 +22,18 @@ export default function useRoles () {
       // Initially no user is attached to a role, so its safe to keep it empty
       spaceRolesToRole: []
     }]);
+    return createdRole;
+  }
+
+  async function updateRole (role: Partial<Role>): Promise<Role> {
+    role.spaceId = space?.id;
+    const updatedRole = await charmClient.updateRole(role);
+    setRoles([...roles, {
+      ...updatedRole,
+      // Initially no user is attached to a role, so its safe to keep it empty
+      spaceRolesToRole: []
+    }]);
+    return updatedRole;
   }
 
   async function deleteRole (roleId: string) {
@@ -29,19 +41,19 @@ export default function useRoles () {
     setRoles(roles.filter(role => role.id !== roleId));
   }
 
-  async function assignRole (userId: string, roleId: string) {
+  async function assignRoles (roleId: string, userIds: string[]) {
     if (space) {
-      await charmClient.assignRole({
+      await Promise.all(userIds.map(userId => charmClient.assignRole({
         roleId,
         userId,
         spaceId: space.id
-      });
+      })));
       // TODO: Remove this listRoles and add required data directly to state
       listRoles();
     }
   }
 
-  async function unassignRole (userId: string, roleId: string) {
+  async function unassignRole (roleId: string, userId: string) {
     if (space) {
       await charmClient.unassignRole({
         roleId,
@@ -55,8 +67,9 @@ export default function useRoles () {
   return {
     listRoles,
     createRole,
+    updateRole,
     deleteRole,
-    assignRole,
+    assignRoles,
     unassignRole,
     roles
   };

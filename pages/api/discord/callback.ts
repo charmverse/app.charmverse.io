@@ -8,22 +8,27 @@ const handler = nc({
 });
 
 handler.get(async (req, res) => {
-  const tempAuthCode = req.query.code;
-  if (req.query.error || !tempAuthCode) {
-    res.status(400).send('Error or missing code from Discord OAuth');
+
+  const state = JSON.parse(decodeURIComponent(req.query.state as string));
+  const redirect = state?.redirect;
+  const type: 'connect' | 'server' = state.type ?? 'connect';
+
+  if (!redirect || !type) {
+
+    const error = { error: 'Invalid state in discord callback' };
+
+    log.warn('Error parsing state discord callback', error);
+    // TODO: Error page
+    res.status(400).send(error);
     return;
   }
-  let redirect: string;
-  let type: 'connect' | 'server' = 'connect';
-  try {
-    const state = JSON.parse(decodeURIComponent(req.query.state as string));
-    redirect = state.redirect;
-    type = state.type;
-  }
-  catch (e) {
-    log.warn('Error parsing state discord callback', e);
-    // TODO: Error page
-    res.status(400).send('Invalid callback state');
+
+  const tempAuthCode = req.query.code;
+  if (req.query.error || !tempAuthCode) {
+
+    res.redirect(
+      `${redirect}?discord=2&type=${type}`
+    );
     return;
   }
 

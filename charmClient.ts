@@ -450,6 +450,10 @@ class CharmClient {
     return http.POST('/api/roles', role);
   }
 
+  updateRole (role: Partial<Role>): Promise<Role> {
+    return http.PUT(`/api/roles/${role.id}`, role);
+  }
+
   deleteRole (roleToDelete: {roleId: string, spaceId: string}): Promise<Role> {
     return http.DELETE('/api/roles', roleToDelete);
   }

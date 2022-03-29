@@ -60,10 +60,17 @@ function Account (): JSX.Element {
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const isConnectingToDiscord = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'connect';
+  const discordConnectFailed = space && router.query.discord === '2' && router.query.type === 'connect';
   const [isConnectDiscordLoading, setIsConnectDiscordLoading] = useState(false);
   const accountModalState = usePopupState({ variant: 'popover', popupId: 'account-modal' });
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
   const [user, setUser] = useUser();
+
+  useEffect(() => {
+    if (discordConnectFailed === true) {
+      showMessage('Failed to connect to discord');
+    }
+  }, [discordConnectFailed]);
 
   function postConnect () {
     setIsConnectDiscordLoading(false);
