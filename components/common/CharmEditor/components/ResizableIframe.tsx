@@ -24,14 +24,25 @@ export const
 const name = 'iframe';
 
 export function extractEmbedLink (url: string) {
-  const isYoutubeLink = url.match(/(?:https:\/\/www.youtube.com\/watch\?v=(.*)|https:\/\/youtu.be\/(.*))/);
   const isIframeEmbed = url.startsWith('<iframe ');
   let embedUrl = url;
 
-  if (isYoutubeLink) {
-    /* eslint-disable-next-line */
-    embedUrl = `https://www.youtube.com/embed/${isYoutubeLink[1] ?? isYoutubeLink[2]}`;
+  const isRegularYTLink = url.includes('youtube');
+  const isSharedYTLink = url.includes('youtu.be');
+  if (isRegularYTLink || isSharedYTLink) {
+    const { pathname, search } = new URL(url);
+    const urlSearchParams = new URLSearchParams(search);
+    if (isRegularYTLink) {
+      embedUrl = `https://www.youtube.com/embed/${urlSearchParams.get('v')}`;
+    }
+    else if (isSharedYTLink) {
+      embedUrl = `https://www.youtube.com/embed${pathname}`;
+    }
+    if (urlSearchParams.has('t')) {
+      embedUrl += `?start=${urlSearchParams.get('t')}`;
+    }
   }
+
   else if (isIframeEmbed) {
     const indexOfSrc = url.indexOf('src');
     const indexOfFirstQuote = url.indexOf('"', indexOfSrc);
