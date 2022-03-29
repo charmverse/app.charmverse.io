@@ -4,12 +4,13 @@ import Grid from '@mui/material/Grid';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { InputEnumToOptions } from 'components/common/form/InputEnumToOptions';
-import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
+import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { useContributors } from 'hooks/useContributors';
-import { PagePermissionLevelTitle } from 'lib/permissions/pages/page-permission-mapping';
 import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
+import { PagePermissionLevelTitle } from 'lib/permissions/pages/page-permission-mapping';
 import { getDisplayName } from 'lib/users';
-import { useEffect, useState } from 'react';
+import { filterObjectKeys } from 'lib/utilities/objects';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -23,19 +24,20 @@ type FormValues = yup.InferType<typeof schema> & {type: 'role' | 'user', permiss
 
 interface Props {
   pageId: string
+  existingPermissions: IPagePermissionWithAssignee []
+  permissionsAdded?: () => any
 }
 
-export function AddPagePermissionsForm ({ pageId }: Props) {
+export function AddPagePermissionsForm ({ pageId, existingPermissions = [], permissionsAdded = () => {} }: Props) {
 
   const [contributors] = useContributors();
-  const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee []>([]);
-  const [permissionLevelToAssign, setPermissionLevelToAssign] = useState<PagePermissionLevelType>();
+  const [permissionLevelToAssign, setPermissionLevelToAssign] = useState<PagePermissionLevelType>('full_access');
 
   const [selectedUserIds, setSelectedUserIds] = useState<string []>([]);
 
-  const userIdsToHide = pagePermissions.filter(permission => {
+  const userIdsToHide = existingPermissions.filter(permission => {
     return permission.user;
-  }).map(permission => permission.id);
+  }).map(permission => permission.user!.id);
 
   userIdsToHide.push(...(selectedUserIds));
 
@@ -43,42 +45,14 @@ export function AddPagePermissionsForm ({ pageId }: Props) {
     handleSubmit
   } = useForm<FormValues>();
 
-  useEffect(() => {
-    refreshPagePermissions();
-  }, [pageId]);
-
-  function refreshPagePermissions () {
-    charmClient.listPagePermissions(pageId)
-      .then(foundPagePermissions => {
-        console.log('Found permissions', foundPagePermissions);
-        setPagePermissions(foundPagePermissions);
-      });
-  }
-
-  /*
-  async function submitted (value: FormValues) {
-  }
-  */
-
-  function addContributorToPermissions (userId: string) {
-
-    const userIdsToAddPermissionsFor = [...selectedUserIds];
-
-    if (userIdsToAddPermissionsFor.indexOf(userId) === -1) {
-      userIdsToAddPermissionsFor.push(userId);
-      setSelectedUserIds(userIdsToAddPermissionsFor);
-    }
-
-  }
-
   function createUserPermissions () {
-    selectedUserIds.forEach(userId => {
-      charmClient.createPermission({
+    Promise.all(selectedUserIds.map(userId => {
+      return charmClient.createPermission({
         pageId,
         userId,
         permissionLevel: permissionLevelToAssign!
       });
-    });
+    })).then(() => permissionsAdded());
   }
 
   console.log('To hide', userIdsToHide);
@@ -107,26 +81,30 @@ export function AddPagePermissionsForm ({ pageId }: Props) {
       }
       <form onSubmit={handleSubmit(createUserPermissions)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
         <Grid container direction='column' spacing={3}>
-          <Grid item>
-            <InputSearchContributor
-              onChange={addContributorToPermissions}
-              filter={{
-                mode: 'exclude',
-                userIds: userIdsToHide
-              }}
-            />
-          </Grid>
+          {
+            userIdsToHide.length < contributors.length && (
+              <Grid item>
+                <InputSearchContributorMultiple
+                  onChange={setSelectedUserIds}
+                  filter={{
+                    mode: 'exclude',
+                    userIds: userIdsToHide
+                  }}
+                />
+              </Grid>
+            )
+          }
 
           <Grid item>
             <InputEnumToOptions
               onChange={(newAccessLevel) => setPermissionLevelToAssign(newAccessLevel as PagePermissionLevelType)}
-              keyAndLabel={PagePermissionLevelTitle}
-              defaultValue={permissionLevelToAssign ?? 'full_access'}
+              keyAndLabel={filterObjectKeys(PagePermissionLevelTitle, 'exclude', ['custom'])}
+              defaultValue={permissionLevelToAssign}
             />
           </Grid>
 
           <Grid item>
-            <Button type='submit' disabled={!permissionLevelToAssign}>Add permissions</Button>
+            <Button type='submit' disabled={!permissionLevelToAssign || (selectedUserIds.length === 0)}>Add permissions</Button>
           </Grid>
         </Grid>
       </form>
