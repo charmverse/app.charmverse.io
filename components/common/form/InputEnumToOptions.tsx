@@ -33,7 +33,7 @@ export function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, 
       <Select
         labelId='selection'
         id='selection'
-        value={defaultValue}
+        defaultValue={defaultValue}
         onChange={(ev, _ev) => {
           onChange(ev.target.value);
         }}
