@@ -33,7 +33,7 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-export default function RoleAssignment () {
+export default function RoleSettings () {
   const {
     assignRoles,
     createRole,

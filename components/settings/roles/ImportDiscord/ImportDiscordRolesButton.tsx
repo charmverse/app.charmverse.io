@@ -49,6 +49,7 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
     })
       .then(result => {
         showMessage(`Successfully imported ${result.importedRoleCount} discord roles`, 'success');
+        onUpdate();
       })
       .catch(error => {
         // Major failure while trying to import discord server role
