@@ -4,7 +4,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const discordClientId = process.env.DISCORD_OAUTH_CLIENT_ID as string;
-const discordUrl = `https://discord.com/api/oauth2/authorize?prompt=consent&client_id=${discordClientId}&response_type=code`;
+const discordUrl = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&response_type=code`;
 
 const handler = nc({
   onError,
@@ -24,7 +24,7 @@ async function login (req: NextApiRequest, res: NextApiResponse) {
     type: query.type
   }));
 
-  const oauthUrl = `${discordUrl}${query.type === 'connect' ? '&scope=identify' : '&scope=guilds&scope=bot'}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
+  const oauthUrl = `${discordUrl}${query.type === 'connect' ? '&scope=identify' : '&permissions=0&scope=guilds%20bot'}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
   res.redirect(oauthUrl);
 }
 
