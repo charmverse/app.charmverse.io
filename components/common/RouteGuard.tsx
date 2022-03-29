@@ -105,7 +105,8 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       }
     }
     // condition: user switches to a new/unknown address
-    else if (user && account && !user.addresses.includes(account)) {
+    // Users created via discord will have user.addresses === 0
+    else if (user && account && (user.addresses.length !== 0 && !user.addresses.includes(account))) {
       console.log('[RouteGuard]: unknown address');
       let _user = await charmClient.login(account).catch(err => null);
       if (!_user) {

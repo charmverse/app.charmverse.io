@@ -81,13 +81,16 @@ async function loginWithDiscord (req: NextApiRequest, res: NextApiResponse<Logge
       }
     });
 
-    return {
+    req.session.user = newUser;
+    await req.session.save();
+
+    return res.status(200).json({
       ...newUser,
       discordUser: createdDiscordUser,
       // Newly created users dont have any access to spaces
       spaceRoles: [],
       favorites: []
-    };
+    });
   }
 
   return res.status(404).json({ error: "User doesn't exist" });

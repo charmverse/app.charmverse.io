@@ -13,6 +13,7 @@ import useENSName from 'hooks/useENSName';
 
 import gatesImage from 'public/images/artwork/gates.png';
 import rocketImage from 'public/images/artwork/rocket.png';
+import { useUser } from 'hooks/useUser';
 
 export const Content = styled(Box)`
   max-width: 100%;
@@ -45,6 +46,7 @@ export default function SignupPageContent () {
   const { account } = useWeb3React();
   const ensName = useENSName(account);
   const router = useRouter();
+  const [user] = useUser();
 
   async function createWorkspace () {
     router.push('/createWorkspace');
@@ -54,7 +56,7 @@ export default function SignupPageContent () {
     router.push('/join');
   }
 
-  const welcomeMessage = `Welcome, ${account ? ensName || shortenHex(account) : ''}!`;
+  const welcomeMessage = `Welcome, ${account ? ensName || shortenHex(account) : user?.username ?? ''}!`;
 
   return (
     <Content px={3}>

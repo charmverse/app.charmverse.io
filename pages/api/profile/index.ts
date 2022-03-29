@@ -55,7 +55,6 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
 }
 
 async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-
   const profile = await prisma.user.findUnique({
     where: {
       id: req.session.user.id
