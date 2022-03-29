@@ -16,7 +16,6 @@ import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
 import { Box, Typography } from '@mui/material';
-import ImportDiscordRoles from 'components/settings/roles/ImportDiscord/ImportDiscordRolesButton';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 
 export interface FailedImportsError {
@@ -102,10 +101,9 @@ export default function WorkspaceSettings () {
           </Grid>
         </Grid>
       </form>
-      <Legend>Import</Legend>
+      <Legend>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ImportNotionWorkspace />
-        <ImportDiscordRoles />
       </Box>
     </>
   );

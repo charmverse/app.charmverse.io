@@ -2,20 +2,24 @@
 import Legend from 'components/settings/Legend';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { usePopupState, bindPopover, bindTrigger } from 'material-ui-popup-state/hooks';
 import * as yup from 'yup';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import Modal from 'components/common/Modal';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useEffect, useState } from 'react';
 import { Typography } from '@mui/material';
 import { getDisplayName } from 'lib/users';
 import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
-import useRoles from 'hooks/useRoles';
+import useRoles from 'components/settings/roles/hooks/useRoles';
+import { ListSpaceRolesResponse } from 'charmClient';
+import ImportDiscordRoles from './ImportDiscord/ImportDiscordRolesButton';
 
 export const schema = yup.object({
   name: yup.string().required('Please provide a valid role name')
@@ -33,6 +37,8 @@ export default function RoleAssignment () {
     roles
   } = useRoles();
 
+  const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
+
   useEffect(() => {
     listRoles();
   }, []);
@@ -48,15 +54,19 @@ export default function RoleAssignment () {
 
   return (
     <>
-      <Legend>
-        Role Assignment
+      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        Roles
+        <Box display='flex' gap={1}>
+          <ImportDiscordRoles onUpdate={listRoles} />
+          <Button {...bindTrigger(popupState)}>Add a role</Button>
+        </Box>
       </Legend>
 
-      <div>
+      <Modal {...bindPopover(popupState)} title='Add a role'>
         <form
           onSubmit={handleSubmit(formValue => {
             createRole(formValue);
-            console.log(formValue);
+            popupState.close();
           })}
           style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}
         >
@@ -87,44 +97,20 @@ export default function RoleAssignment () {
           </Grid>
 
         </form>
-      </div>
-      <Box>
-        {
-          roles.map(role => {
-            return (
-              <Box key={role.id}>
-
-                <Typography variant='h2'>{role.name}
-                  <ElementDeleteIcon clicked={() => {
-                    deleteRole(role.id);
-                  }}
-                  />
-                </Typography>
-
-                {
-                  (role).spaceRolesToRole?.map(spaceRoleToRole => {
-                    return (
-                      <p>{getDisplayName(spaceRoleToRole?.spaceRole?.user)}
-                        <ElementDeleteIcon
-                          clicked={() => {
-                            unassignRole(spaceRoleToRole?.spaceRole?.user?.id, role.id);
-                          }}
-                        />
-                      </p>
-                    );
-                  })
-                }
-
-                <br />
-                <InputSearchContributor onChange={(userId) => {
-                  assignRole(userId, role.id);
-                }}
-                />
-              </Box>
-            );
-          })
-        }
-      </Box>
+      </Modal>
+      {roles.map(role => <Role role={role} key={role.id} />)}
     </>
+  );
+}
+
+function Role ({ role }: { role: ListSpaceRolesResponse }) {
+  return (
+    <Box mb={3}>
+      <Typography variant='h6'>
+        {role.name}
+      </Typography>
+      <Divider />
+      {role.spaceRolesToRole.length === 0 && (<Typography>No users</Typography>)}
+    </Box>
   );
 }
