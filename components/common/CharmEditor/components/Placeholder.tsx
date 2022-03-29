@@ -1,6 +1,7 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import { alpha } from '@mui/system';
+import { alpha } from '@mui/material';
 import styled from '@emotion/styled';
+import { useEffect } from 'react';
 
 const StyledPlaceholder = styled.div`
   top: -2em;
