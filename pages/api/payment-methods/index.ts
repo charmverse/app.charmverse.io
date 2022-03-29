@@ -11,7 +11,7 @@ import { isValidChainAddress } from 'lib/tokens/validation';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireSpaceMembership)
+  .use(requireSpaceMembership())
   .get(listPaymentMethods)
   .use(requireKeys<PaymentMethod>(['chainId', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals', 'walletType'], 'body'))
   .post(createPaymentMethod);

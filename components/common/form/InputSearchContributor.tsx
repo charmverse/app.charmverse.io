@@ -4,87 +4,31 @@ import { Contributor } from 'models';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
-import { HTMLAttributes, useEffect, useMemo, useState } from 'react';
+import { HTMLAttributes, ComponentProps } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
 
-/**
- * @filter Use this to exclude certain users or only include certain users in this field's inputs
- */
-export interface IInputSearchContributorProps {
-  onChange?: (id: string) => any
-  defaultValue?: string,
-  filter?: {
-    mode: 'include' | 'exclude',
-    userIds: string []
-  }
-}
-
-export function InputSearchContributor ({ onChange = () => {}, defaultValue, filter }: IInputSearchContributorProps) {
+function InputSearchContributorBase ({ defaultValue, ...props }: Partial<ComponentProps<typeof Autocomplete>>) {
   const [contributors] = useContributors();
   const { chainId } = useWeb3React<Web3Provider>();
-
-  const [filteredContributors, setFilteredContributors] = useState<Contributor[]>([]);
-
-  useEffect(() => {
-
-    if (filter?.mode === 'include') {
-      const filtered = contributors.filter(contributor => {
-        const userShouldBeIncluded = filter.userIds.indexOf(contributor.id) > -1;
-        return userShouldBeIncluded;
-      });
-      setFilteredContributors(filtered);
-    }
-    else if (filter?.mode === 'exclude') {
-      const filtered = contributors.filter(contributor => {
-        return filter.userIds.indexOf(contributor.id) === -1;
-      });
-      setFilteredContributors(filtered);
-    }
-    else {
-      setFilteredContributors(contributors ?? []);
-    }
-  }, [contributors, filter]);
-
-  const preselectedContributor = filteredContributors.find(contributor => {
+  const defaultContributor = typeof defaultValue === 'string' ? contributors.find(contributor => {
     return contributor.id === defaultValue;
-  });
+  }) : undefined;
 
   const { cache } = useSWRConfig();
 
-  function emitValue (selectedUser: Contributor) {
-    if (selectedUser === null) {
-      return;
-    }
-
-    const matchingContributor = filteredContributors.find(contributor => {
-      return contributor.id === selectedUser.id;
-    });
-
-    if (matchingContributor) {
-      onChange(matchingContributor.id);
-    }
-  }
-
-  if (filteredContributors.length === 0) {
-    return null;
-  }
-
-  console.log('Available contributors', filteredContributors);
-
   return (
-    <Autocomplete
-      defaultValue={preselectedContributor}
-      onChange={(_, value) => {
-        emitValue(value as any);
-      }}
+    <Autocomplete<Contributor>
+      defaultValue={defaultContributor}
+      loading={contributors.length === 0}
       sx={{ minWidth: 150 }}
-      options={filteredContributors}
+      // @ts-ignore - not sure why this fails
+      options={contributors}
       autoHighlight
       getOptionLabel={(user) => cache.get(`@"ENS",102~,"${user.addresses[0]}",${chainId},`) ?? getDisplayName(user)}
-      renderOption={(props, user) => (
-        <ReviewerOption {...props} user={user} />
+      renderOption={(_props, user) => (
+        <ReviewerOption {..._props} user={user} />
       )}
       renderInput={(params) => (
         <TextField
@@ -94,8 +38,37 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue, fil
           }}
         />
       )}
+      {...props}
     />
   );
+}
+
+interface IInputSearchContributorProps {
+  onChange: (id: string) => void
+  defaultValue?: string
+}
+
+export function InputSearchContributor (props: IInputSearchContributorProps) {
+  function emitValue (selectedUser: Contributor) {
+    if (selectedUser) {
+      props.onChange(selectedUser.id);
+    }
+  }
+
+  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor)} multiple />;
+}
+
+interface IInputSearchContributorMultipleProps {
+  onChange: (id: string[]) => void
+  defaultValue?: string[]
+}
+
+export function InputSearchContributorMultiple ({ onChange, ...props }: IInputSearchContributorMultipleProps) {
+  function emitValue (users: Contributor[]) {
+    console.log('change!', users);
+    onChange(users.map(user => user.id));
+  }
+  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor[])} multiple />;
 }
 
 export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contributor, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement>) {

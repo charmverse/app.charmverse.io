@@ -256,6 +256,13 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
+      MuiListItemButton: {
+        styleOverrides: {
+          root: {
+            padding: '8px'
+          }
+        }
+      },
       MuiPaper: {
         styleOverrides: {
           root: {

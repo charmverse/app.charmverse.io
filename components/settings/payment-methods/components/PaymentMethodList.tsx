@@ -5,9 +5,8 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
-import { StyledRow } from 'components/settings/TokenGatesTable';
+import TableRow from 'components/common/Table/TableRow';
 import { getChainById, getChainExplorerLink } from 'connectors';
 import { PaymentMethod } from '@prisma/client';
 import { useUser } from 'hooks/useUser';
@@ -66,7 +65,7 @@ export default function CompositePaymentMethodList ({ paymentMethods }: IProps) 
         </TableHead>
         <TableBody>
           {sortedMethods.map((row) => (
-            <StyledRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+            <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell sx={{ px: 0 }}>
                 {row.contractAddress ? (
                   <Tooltip arrow placement='top' title={`Contract address: ${shortenHex(row.contractAddress)}`}>
@@ -112,11 +111,11 @@ export default function CompositePaymentMethodList ({ paymentMethods }: IProps) 
 
                 {
                 isAdmin && (
-                  <ElementDeleteIcon clicked={() => setPaymentMethodIdToDelete(row.id)} />
+                  <ElementDeleteIcon onClick={() => setPaymentMethodIdToDelete(row.id)} />
                 )
               }
               </TableCell>
-            </StyledRow>
+            </TableRow>
           ))}
         </TableBody>
       </Table>

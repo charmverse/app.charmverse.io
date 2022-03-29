@@ -1,7 +1,7 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import { getInviteLink } from 'lib/invites';
-import InvitationPageContent from 'components/inviteLinks';
+import InviteLinkPage from 'components/invite/InviteLinkPage';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default function InvitationPage ({ error, invite }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  return <InvitationPageContent error={error} invite={invite} />;
+  return <InviteLinkPage error={error} invite={invite} />;
 }
 
 InvitationPage.getLayout = getBaseLayout;

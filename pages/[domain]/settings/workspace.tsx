@@ -1,14 +1,13 @@
 import SettingsLayout from 'components/settings/Layout';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement } from 'react';
 import Grid from '@mui/material/Grid';
-import Alert from '@mui/material/Alert';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
 import Button from 'components/common/Button';
 import PrimaryButton from 'components/common/PrimaryButton';
-import FieldLabel from 'components/settings/FieldLabel';
+import FieldLabel from 'components/common/form/FieldLabel';
 import Legend from 'components/settings/Legend';
-import Avatar from 'components/settings/LargeAvatar';
+import Avatar from 'components/settings/workspace/LargeAvatar';
 import { setTitle } from 'hooks/usePageTitle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FormValues, schema } from 'components/common/CreateSpaceForm';
@@ -16,13 +15,8 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
-import { Box } from '@mui/material';
-import NotionIcon from 'public/images/notion_logo.svg';
-import SvgIcon from '@mui/material/SvgIcon';
-import CircularProgress from '@mui/material/CircularProgress';
-import Snackbar from 'components/common/Snackbar';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useSWRConfig } from 'swr';
+import { Box, Typography } from '@mui/material';
+import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 
 export interface FailedImportsError {
   pageId: string,
@@ -31,39 +25,10 @@ export interface FailedImportsError {
   blocks: [string, number][][]
 }
 export default function WorkspaceSettings () {
-
   setTitle('Workspace Options');
   const router = useRouter();
-  const { mutate } = useSWRConfig();
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
-  const [notionFailedImports, setNotionFailedImports] = useState<FailedImportsError[]>([]);
-  const [notionImportError, setNotionImportError] = useState<string | null>(null);
-  const { showMessage } = useSnackbar();
-
-  const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
-
-  useEffect(() => {
-    if (space && typeof router.query.code === 'string') {
-      setIsImportingFromNotion(true);
-      setNotionFailedImports([]);
-      charmClient.importFromNotion({
-        code: router.query.code,
-        spaceId: space.id
-      })
-        .then(({ failedImports }) => {
-          setIsImportingFromNotion(false);
-          showMessage('Successfully imported');
-          mutate(`pages/${space.id}`);
-          setNotionFailedImports(failedImports);
-          showMessage('Notion workspace successfully imported');
-        })
-        .catch((err) => {
-          setIsImportingFromNotion(false);
-          setNotionImportError(err.message ?? err.error ?? 'Something went wrong. Please try again');
-        });
-    }
-  }, [Boolean(space)]);
 
   const {
     register,
@@ -136,61 +101,9 @@ export default function WorkspaceSettings () {
           </Grid>
         </Grid>
       </form>
-      <Legend>Import</Legend>
-      <Box sx={{ ml: 1 }}>
-        <Button
-          disabled={isImportingFromNotion}
-          href={`/api/notion/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
-          variant='outlined'
-          startIcon={(
-            <SvgIcon sx={{ color: 'text.primary' }}>
-              <NotionIcon />
-            </SvgIcon>
-          )}
-          endIcon={(
-            isImportingFromNotion && <CircularProgress size={20} />
-          )}
-        >
-          {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
-        </Button>
-        {notionFailedImports.length !== 0 && (
-          <Alert severity='warning' sx={{ mt: 2 }}>
-            <Box sx={{
-              display: 'flex', gap: 2, flexDirection: 'column'
-            }}
-            >
-              Pages where we encountered issues
-              {notionFailedImports.map(failedImport => (
-                <div>
-                  <Box sx={{
-                    display: 'flex',
-                    gap: 1
-                  }}
-                  >
-                    <span>Type: {failedImport.type}</span>
-                    <span>Title: {failedImport.title}</span>
-                    <span>Id: {failedImport.pageId}</span>
-                  </Box>
-                  {failedImport.blocks.length !== 0 ? (
-                    <div>
-                      Blocks that failed to import for the page
-                      {failedImport.blocks.map((blockTrails, blockTrailsIndex) => (
-                        <div>
-                          {blockTrailsIndex + 1}. {blockTrails.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              ))}
-            </Box>
-          </Alert>
-        )}
-        {notionImportError && (
-        <Alert severity='error' sx={{ mt: 2 }}>
-          {notionImportError}
-        </Alert>
-        )}
+      <Legend>Import Content</Legend>
+      <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
+        <ImportNotionWorkspace />
       </Box>
     </>
   );

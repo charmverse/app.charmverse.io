@@ -11,7 +11,7 @@ import { IApiError } from 'lib/utilities/errors';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireSpaceMembership)
+  .use(requireSpaceMembership())
   .get(listSpaceRoles)
   .delete(deleteRole)
   .use(requireKeys<Role>(['spaceId', 'name'], 'body'))

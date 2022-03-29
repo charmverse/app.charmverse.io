@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User } from '@prisma/client';
+import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, DiscordUser } from '@prisma/client';
 import * as http from 'adapters/http';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -15,6 +15,9 @@ import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtil
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import { DiscordUserServer } from 'pages/api/discord/listServers';
+import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
+import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -147,25 +150,29 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
-  notionLogin (query: { redirect: string }) {
-    return http.GET<{redirectUrl: string}>('/api/notion/login', query);
-  }
-
-  discordLogin (query: {redirect: string}) {
-    return http.GET<{redirectUrl: string}>('/api/discord/login', query);
+  importFromNotion (payload: { code: string, spaceId: string }) {
+    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
   }
 
   disconnectDiscord () {
     return http.POST('/api/discord/disconnect');
   }
 
-  importFromNotion (params: { code: string, spaceId: string }) {
-    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', params);
+  connectDiscord (payload: {code: string, spaceId: string}) {
+    return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
+  }
+
+  listDiscordServers (payload: { code: string }) {
+    return http.GET<{servers: DiscordUserServer[]}>('/api/discord/listServers', payload);
+  }
+
+  importRolesFromDiscordServer (payload: ImportRolesPayload) {
+    return http.POST<ImportRolesResponse>('/api/discord/importRoles', payload);
   }
 
   // FocalBoard
 
-  // TODO: we shouldnt have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
+  // TODO: we shouldn't have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
 
   async getWorkspace (): Promise<IWorkspace> {
     const space = await http.GET<Space>('/api/spaces/current');
@@ -442,6 +449,10 @@ class CharmClient {
 
   createRole (role: Partial<Role>): Promise<Role> {
     return http.POST('/api/roles', role);
+  }
+
+  updateRole (role: Partial<Role>): Promise<Role> {
+    return http.PUT(`/api/roles/${role.id}`, role);
   }
 
   deleteRole (roleToDelete: {roleId: string, spaceId: string}): Promise<Role> {

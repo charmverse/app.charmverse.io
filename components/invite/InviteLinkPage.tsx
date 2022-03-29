@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { useWeb3React } from '@web3-react/core';
-import WorkspaceAvatar from 'components/settings/LargeAvatar';
+import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { InviteLinkPopulated } from 'lib/invites';
 import PrimaryButton from 'components/common/PrimaryButton';

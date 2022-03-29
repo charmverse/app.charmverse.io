@@ -35,8 +35,6 @@
   ],
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    "pages/api/pages/[id]",
-    "components/[pageId]/DocumentPage/DocumentPagetsx"
+    "**/*.tsx"
   ]
 }
