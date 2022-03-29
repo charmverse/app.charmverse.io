@@ -1,6 +1,6 @@
 import { PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { useTheme } from '@mui/material';
+import { useTheme } from '@emotion/react';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { BaseEmoji, Picker } from 'emoji-mart';
 import { useCallback } from 'react';
