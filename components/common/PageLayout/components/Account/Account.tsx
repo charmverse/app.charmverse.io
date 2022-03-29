@@ -19,7 +19,6 @@ import styled from '@emotion/styled';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useRouter } from 'next/router';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useClearParams from 'hooks/useClearParams';
 import charmClient from 'charmClient';
 
 const AccountCard = styled.div`
