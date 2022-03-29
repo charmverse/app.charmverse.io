@@ -307,7 +307,7 @@ export function gettingStartedPageContent (): PageContent {
         type: 'iframe',
         attrs: {
           src: 'https://www.youtube.com/embed/LGgi6bFRRTw',
-          width: 800,
+          width: 700,
           height: 451.9774011299435,
           type: 'video'
         }
@@ -329,7 +329,7 @@ export function gettingStartedPageContent (): PageContent {
         type: 'iframe',
         attrs: {
           src: 'https://www.youtube.com/embed/sZjggbVYGMo',
-          width: 800,
+          width: 700,
           height: 451.9774011299435,
           type: 'video'
         }
