@@ -46,7 +46,6 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
       })
       .finally(() => {
         setIsLoading(false);
-        router.push(window.location.href.split('?')[0]);
       });
   }
 

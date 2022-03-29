@@ -1,6 +1,5 @@
 import { Role } from '@prisma/client';
-import charmClient, { ListSpaceRolesResponse } from 'charmClient';
-import { useState } from 'react';
+import charmClient from 'charmClient';
 import useSWR, { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 

@@ -12,7 +12,6 @@ handler.get(async (req, res) => {
   const state = JSON.parse(decodeURIComponent(req.query.state as string));
   const redirect = state?.redirect;
   const type: 'connect' | 'server' = state.type ?? 'connect';
-  console.log('query', req.query);
   if (!redirect || !type) {
 
     const error = { error: 'Invalid state in discord callback' };
