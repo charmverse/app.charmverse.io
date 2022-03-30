@@ -25,7 +25,7 @@ interface IBlocksEditorPage {
 
 export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditorPage) {
 
-  const { currentPageId, setIsEditing, pages, setPages, setCurrentPageId } = usePages();
+  const { currentPageId, setIsEditing, pages, setPages, setCurrentPageId, getPagePermissions } = usePages();
   const router = useRouter();
   const pageId = router.query.pageId as string;
   const [, setTitleState] = usePageTitle();
@@ -104,14 +104,8 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     setPagePermissions(null);
     console.log('Use effect fired');
     if (user && memoizedCurrentPage) {
-      charmClient.computeUserPagePermissions({
-        userId: user.id,
-        pageId: memoizedCurrentPage.id
-      } as any)
-        .then(permissions => {
-          console.log('Found permissions', permissions);
-          setPagePermissions(permissions);
-        });
+      const permissions = getPagePermissions(memoizedCurrentPage.id);
+      setPagePermissions(permissions);
     }
   }, [user, currentPageId]);
 

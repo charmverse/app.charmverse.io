@@ -32,7 +32,7 @@ const LinkBox = styled(Box)`
 
 export default function ShareButton ({ headerHeight }: { headerHeight: number }) {
 
-  const { currentPageId, pages, setPages } = usePages();
+  const { currentPageId, pages, setPages, getPagePermissions } = usePages();
   const router = useRouter();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [copied, setCopied] = useState<boolean>(false);
@@ -52,12 +52,8 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
   useEffect(() => {
     const currentPage = pages[currentPageId];
     if (currentPage && user) {
-      charmClient.computeUserPagePermissions({
-        pageId: currentPage.id,
-        userId: user.id
-      }).then(permissions => {
-        setPagePermissions(permissions);
-      });
+      const permissions = getPagePermissions(currentPageId);
+      setPagePermissions(permissions);
     }
 
   }, [currentPageId]);
@@ -183,8 +179,8 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
                 {/* PERMISSIONS */}
                 {/* Show the list of permissions */}
                 {
-            currentPageId && <PagePermissions pageId={currentPageId} />
-          }
+                   currentPageId && <PagePermissions pageId={currentPageId} />
+                }
 
                 {/* Show the list of permissions */}
                 {/* PERMISSIONS */}
