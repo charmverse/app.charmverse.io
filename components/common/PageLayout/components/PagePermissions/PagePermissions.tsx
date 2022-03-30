@@ -10,7 +10,7 @@ import { getDisplayName } from 'lib/users/getDisplayName';
 import { useEffect, useState } from 'react';
 import { InputEnumToOptions } from 'components/common/form/InputEnumToOptions';
 import { filterObjectKeys } from 'lib/utilities/objects';
-import { PagePermission } from '@prisma/client';
+import { PagePermission, PagePermissionLevel, Space } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -21,37 +21,43 @@ const permissionDisplayOrder = ['space', 'role', 'user'];
 
 /**
  * Orders permissions logically from space to role to user
- * @sideEffect Adds an empty permission for a space
+ * @sideEffect Removes the permission from currrent space from the list so it can be handled in its own row
  * @param pagePermissions
  */
-function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[]):
+function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[], space?: Space):
   (IPagePermissionWithAssignee & {displayName: string})[] {
-  return pagePermissions.map(permission => {
+  const sortedPermissions = pagePermissions
+    .filter(permission => {
+      return permission.spaceId !== space?.id;
+    })
+    .map(permission => {
 
-    const permissionSource = permission.user ? 'user' : permission.role ? 'role' : 'space';
+      const permissionSource = permission.user ? 'user' : permission.role ? 'role' : 'space';
 
-    const permissionDisplayName = permissionSource === 'user' ? getDisplayName(permission.user!) : permissionSource === 'role' ? permission.role!.name : `${permission.space!.name} members`;
+      const permissionDisplayName = permissionSource === 'user' ? getDisplayName(permission.user!) : permissionSource === 'role' ? permission.role!.name : `${permission.space!.name} members`;
 
-    return {
-      ...permission,
-      permissionSource,
-      displayName: permissionDisplayName
-    };
-  }).sort((a, b) => {
+      return {
+        ...permission,
+        permissionSource,
+        displayName: permissionDisplayName
+      };
+    }).sort((a, b) => {
 
-    const aPermission = permissionDisplayOrder.indexOf(a.permissionSource);
-    const bPermission = permissionDisplayOrder.indexOf(b.permissionSource);
+      const aPermission = permissionDisplayOrder.indexOf(a.permissionSource);
+      const bPermission = permissionDisplayOrder.indexOf(b.permissionSource);
 
-    if (aPermission < bPermission) {
-      return -1;
-    }
-    else if (aPermission > bPermission) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  });
+      if (aPermission < bPermission) {
+        return -1;
+      }
+      else if (aPermission > bPermission) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    });
+
+  return sortedPermissions;
 }
 
 interface IProps {
@@ -70,6 +76,11 @@ export function PagePermissions ({ pageId }: IProps) {
 
   const [selectedPermissionId, setSelectedPermissionId] = useState<string | null>(null);
 
+  const [spaceLevelPermission, setSpaceLevelPermission] = useState<IPagePermissionWithAssignee | null>(null);
+
+  // Only used on first run
+  const [permissionsLoaded, setPermissionsLoaded] = useState(false);
+
   useEffect(() => {
     refreshPermissions();
   }, [pageId]);
@@ -81,12 +92,38 @@ export function PagePermissions ({ pageId }: IProps) {
 
     charmClient.listPagePermissions(pageId)
       .then(permissionSet => {
+
+        const _spaceLevelPermission = permissionSet.find(permission => space && permission.spaceId === space?.id);
+
+        setSpaceLevelPermission(_spaceLevelPermission ?? null);
         setPagePermissions(permissionSet);
+        setPermissionsLoaded(true);
       });
   }
 
   async function updatePagePermissionLevel (permission: Pick<PagePermission, 'id' | 'permissionLevel'>) {
     await charmClient.updatePermission(permission.id, { permissionLevel: permission.permissionLevel });
+    await refreshPermissions();
+
+  }
+
+  async function updateSpacePagePermissionLevel (permissionLevel: PagePermissionLevelType | 'delete') {
+
+    if (permissionLevel === 'delete' && spaceLevelPermission) {
+      await charmClient.deletePermission(spaceLevelPermission.id);
+    }
+    else if (!spaceLevelPermission && space && permissionLevel !== 'delete') {
+      await charmClient.createPermission({
+        pageId,
+        permissionLevel,
+        spaceId: space.id
+      });
+    }
+    else if (spaceLevelPermission && permissionLevel !== 'delete') {
+      await charmClient.updatePermission(spaceLevelPermission.id, {
+        permissionLevel
+      });
+    }
     await refreshPermissions();
 
   }
@@ -98,17 +135,8 @@ export function PagePermissions ({ pageId }: IProps) {
       });
   }
 
-  const sortedPermissions = sortPagePermissions(pagePermissions);
+  const sortedPermissions = sortPagePermissions(pagePermissions, space);
 
-  /** TODO LATER
-  if (space) {
-    const spaceIsPresent = sortedPermissions.some(permission => permission.spaceId === space.id);
-
-    if (!spaceIsPresent) {
-
-    }
-  }
-   */
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
   return (
@@ -144,6 +172,52 @@ export function PagePermissions ({ pageId }: IProps) {
         )
       }
       <Box>
+
+        {
+
+        }
+        <Box display='flex'>
+          <Grid container direction='row' justifyContent='space-around' alignItems='center'>
+            <Grid item xs={6}>
+              {`${space?.name} members`}
+            </Grid>
+            <Grid item xs={3} sx={{ fontSize: '12px' }}>
+              {
+
+                selectedPermissionId === 'space' ? (
+                  <InputEnumToOptions
+                    onChange={(newAccessLevel) => {
+                      updateSpacePagePermissionLevel(newAccessLevel as PagePermissionLevel)
+                        .then(() => setSelectedPermissionId(null));
+                    }}
+                    keyAndLabel={filterObjectKeys(PagePermissionLevelTitle, 'exclude', ['custom'])}
+                    defaultValue={spaceLevelPermission?.permissionLevel}
+                  />
+                ) : (
+                  <Box onClick={() => {
+                    if (userPagePermissions?.grant_permissions === true) {
+                      setSelectedPermissionId('space');
+                    }
+
+                  }}
+                  >
+                    {spaceLevelPermission ? PagePermissionLevelTitle[spaceLevelPermission.permissionLevel] : (permissionsLoaded ? 'No access' : '')}
+                  </Box>
+                )
+              }
+
+            </Grid>
+            <Grid item xs={2} sx={{ fontSize: '10px' }}>
+              {
+                userPagePermissions?.grant_permissions === true && (<ElementDeleteIcon onClick={() => updateSpacePagePermissionLevel('delete')} />)
+              }
+
+            </Grid>
+
+          </Grid>
+
+        </Box>
+
         {
               sortedPermissions.map(permission => {
                 return (
