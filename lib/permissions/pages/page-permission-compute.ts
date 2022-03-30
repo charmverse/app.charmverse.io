@@ -26,7 +26,11 @@ function permissionWithSpaceRoleQuery (request: IPagePermissionUserRequest): Pri
         select: {
           space: {
             select: {
-              spaceRoles: true
+              spaceRoles: {
+                where: {
+                  userId: request.userId
+                }
+              }
             }
           }
         }
@@ -85,6 +89,13 @@ export async function computeUserPagePermissions (request: IPagePermissionUserRe
   // Check if user is a space admin so they gain full rights
   const foundSpaceRole = permissionWithSpaceRoleAndPermissions[0]?.page?.space?.spaceRoles?.[0];
 
+  /**
+   * Commented for our demo
+  console.log('Space roles list', permissionWithSpaceRoleAndPermissions[0]?.page?.space?.spaceRoles);
+  console.log('Full permissions list', permissionWithSpaceRoleAndPermissions[1]);
+
+  */
+
   if (foundSpaceRole && (foundSpaceRole.role === 'admin' || foundSpaceRole.isAdmin === true)) {
 
     const fullPermissions = Object.keys(PageOperations) as PageOperationType [];
@@ -103,6 +114,10 @@ export async function computeUserPagePermissions (request: IPagePermissionUserRe
 
     computedPermissions.addPermissions(permissionsToAdd);
   });
+
+  if (request.pageId === '843e00b2-58a2-486c-92f7-dbed93123c6b') {
+    console.log('Will provide these permissions', computedPermissions);
+  }
 
   return computedPermissions;
 
