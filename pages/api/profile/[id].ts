@@ -25,7 +25,10 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       addresses: [req.body.address]
     }
   });
-  return res.status(200).json(user);
+  return res.status(200).json({
+    ...user,
+    addresses: [req.body.address]
+  });
 }
 
 export default withSessionRoute(handler);

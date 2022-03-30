@@ -13,9 +13,8 @@ import useENSName from 'hooks/useENSName';
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useSpaces } from 'hooks/useSpaces';
 // import AccountConnections from './components/AccountConnections';
 
 const DiscordUserName = styled(Typography)`
@@ -80,12 +79,12 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
   return (
     <Modal open={isOpen} onClose={onClose}>
       <DialogTitle onClose={onClose}>Account</DialogTitle>
-      {account && (
-      <Stack mb={9} direction='row' spacing='4' alignItems='center'>
-        <Avatar name={ENSName || user?.username || account} avatar={user?.avatar} />
-        <CopyableAddress address={account} decimals={5} sx={{ fontSize: 24 }} />
-        {connectedWithDiscord && <DiscordUserName variant='subtitle2'>{user?.username}</DiscordUserName>}
-      </Stack>
+      {user && user?.addresses.length !== 0 && (
+        <Stack mb={2} direction='row' spacing='4' alignItems='center'>
+          <Avatar name={ENSName || user.username || user.addresses[0]} avatar={user.avatar} />
+          <CopyableAddress address={user.addresses[0]} decimals={5} sx={{ fontSize: 24 }} />
+          {connectedWithDiscord && <DiscordUserName variant='subtitle2'>{user.username}</DiscordUserName>}
+        </Stack>
       )}
       <Stack
         direction='row'
@@ -109,18 +108,23 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
         <Typography color='secondary'>
           {connectedWithDiscord ? 'Connected with Discord' : 'Connect with Discord'}
         </Typography>
-        <StyledButton
-          size='small'
-          variant='outlined'
-          color={connectedWithDiscord ? 'error' : 'primary'}
-          disabled={isLoginOut || isDisconnecting || isConnectDiscordLoading || user?.addresses.length === 0}
-          onClick={connectWithDiscord}
-          endIcon={(
-            isConnectDiscordLoading && <CircularProgress size={20} />
-          )}
-        >
-          {connectedWithDiscord ? 'Disconnect' : 'Connect'}
-        </StyledButton>
+        <Tooltip arrow placement='bottom' title={user?.addresses.length === 0 ? 'You must have at least one wallet address to disconnect from discord' : ''}>
+          {/** div is used to make sure the tooltip is rendered as disabled button doesn't allow tooltip */}
+          <div>
+            <StyledButton
+              size='small'
+              variant='outlined'
+              color={connectedWithDiscord ? 'error' : 'primary'}
+              disabled={isLoginOut || isDisconnecting || isConnectDiscordLoading || user?.addresses.length === 0}
+              onClick={connectWithDiscord}
+              endIcon={(
+                isConnectDiscordLoading && <CircularProgress size={20} />
+              )}
+            >
+              {connectedWithDiscord ? 'Disconnect' : 'Connect'}
+            </StyledButton>
+          </div>
+        </Tooltip>
       </Stack>
       <StyledButton
         size='medium'
