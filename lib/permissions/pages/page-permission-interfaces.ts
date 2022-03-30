@@ -33,6 +33,10 @@ export interface IPagePermissionToDelete {
   permissionId: string
 }
 
+export interface IPageWithPermissions extends Page {
+  permissions: PagePermission []
+}
+
 export interface IPageWithNestedSpaceRole extends Page {
   space: {
     spaceRoles: SpaceRole []

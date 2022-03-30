@@ -25,7 +25,15 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
     },
     include: {
       favorites: true,
-      spaceRoles: true,
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          }
+        }
+      },
       discordUser: true
     }
   });
@@ -42,13 +50,21 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
       },
       include: {
         favorites: true,
-        spaceRoles: true
+        spaceRoles: {
+          include: {
+            spaceRoleToRole: {
+              include: {
+                role: true
+              }
+            }
+          }
+        }
       }
     });
 
     logSignup();
 
-    req.session.user = newUser;
+    req.session.user = { ...newUser };
     await req.session.save();
     res.status(200).json(newUser);
   }
@@ -62,7 +78,15 @@ async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     },
     include: {
       favorites: true,
-      spaceRoles: true,
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          }
+        }
+      },
       discordUser: true
     }
   });

@@ -47,7 +47,10 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     where: {
       id: req.query.id as string
     },
-    data: req.body
+    data: req.body,
+    include: {
+      permissions: true
+    }
   });
   return res.status(200).json(space);
 }

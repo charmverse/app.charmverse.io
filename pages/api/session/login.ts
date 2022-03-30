@@ -20,8 +20,16 @@ async function authenticate (req: NextApiRequest, res: NextApiResponse<LoggedInU
     },
     include: {
       favorites: true,
-      spaceRoles: true,
-      discordUser: true
+      discordUser: true,
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          }
+        }
+      }
     }
   });
 
