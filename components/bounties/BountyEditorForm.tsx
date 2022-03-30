@@ -163,6 +163,8 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     }
   }
 
+  console.log(bounty?.reviewer!);
+
   return (
     <div>
       <form onSubmit={handleSubmit(formValue => submitted(formValue as IBounty))} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>

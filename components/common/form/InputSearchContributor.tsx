@@ -9,7 +9,8 @@ import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
 
-function InputSearchContributorBase ({ defaultValue, ...props }: Partial<ComponentProps<typeof Autocomplete>>) {
+function InputSearchContributorBase ({ defaultValue, ...props }:
+  Partial<ComponentProps<typeof Autocomplete>>) {
   const [contributors] = useContributors();
   const { chainId } = useWeb3React<Web3Provider>();
   const defaultContributor = typeof defaultValue === 'string' ? contributors.find(contributor => {
@@ -18,7 +19,10 @@ function InputSearchContributorBase ({ defaultValue, ...props }: Partial<Compone
 
   const { cache } = useSWRConfig();
 
-  return (
+  // Dont show the autocomplete if there are no contributors of the space
+  // It might seem unintuitive as there will always be an admin of a space
+  // But it fixes the MUI error when a component goes from uncontrolled to controlled
+  return contributors.length !== 0 ? (
     <Autocomplete<Contributor>
       defaultValue={defaultContributor}
       loading={contributors.length === 0}
@@ -40,7 +44,7 @@ function InputSearchContributorBase ({ defaultValue, ...props }: Partial<Compone
       )}
       {...props}
     />
-  );
+  ) : null;
 }
 
 interface IInputSearchContributorProps {
@@ -55,7 +59,7 @@ export function InputSearchContributor (props: IInputSearchContributorProps) {
     }
   }
 
-  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor)} multiple />;
+  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor)} />;
 }
 
 interface IInputSearchContributorMultipleProps {

@@ -8,9 +8,9 @@ import { useSpaces } from 'hooks/useSpaces';
 import { isSpaceDomain } from 'lib/spaces';
 import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
-import { useSnackbar } from 'hooks/useSnackbar';
 
 // TODO: Redirects the user back to / if they disconnect wallet
+// TODO: Calling login multiple times after successful discord oauth
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share'];
