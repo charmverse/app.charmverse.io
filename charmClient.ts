@@ -58,8 +58,8 @@ class CharmClient {
     });
   }
 
-  updateUser ({ userId, address }: { userId: string, address: string }) {
-    return http.PUT<LoggedInUser>(`/api/profile/${userId}`, {
+  updateUser ({ address }: { address: string }) {
+    return http.PUT<LoggedInUser>('/api/profile', {
       address
     });
   }

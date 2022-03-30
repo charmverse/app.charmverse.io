@@ -12,7 +12,8 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .post(createProfile)
   .use(requireUser)
-  .get(getProfile);
+  .get(getProfile)
+  .put(updateUser);
 
 async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
@@ -69,6 +70,26 @@ async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     return res.status(404).json({ error: 'No user found' });
   }
   return res.status(200).json(profile);
+}
+
+async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
+  const user = await prisma.user.update({
+    where: {
+      id: req.session.user.id
+    },
+    include: {
+      favorites: true,
+      spaceRoles: true,
+      discordUser: true
+    },
+    data: {
+      addresses: [req.body.address]
+    }
+  });
+  return res.status(200).json({
+    ...user,
+    addresses: [req.body.address]
+  });
 }
 
 export default withSessionRoute(handler);

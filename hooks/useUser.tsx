@@ -39,7 +39,6 @@ export function UserProvider ({ children }: { children: ReactNode }) {
           setIsLoaded(false);
           // No user is connected with this wallet address, so update the current user to have this address
           charmClient.updateUser({
-            userId: user.id,
             address: account
           }).then((_user) => {
             setUser(_user);
