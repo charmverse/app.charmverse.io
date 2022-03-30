@@ -10,7 +10,6 @@ import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 
 // TODO: Discord login for /invite route
-// TODO: Connect wallet with an existing user only adds address otherwise logs in as that user
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share'];
@@ -28,7 +27,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isRouterLoading = !router.isReady;
   const isLoading = isUserLoading || isWalletLoading || isRouterLoading || !isSpacesLoaded;
 
-  async function onWalletConnection (_account: string) {
+  async function onOnlyWallet (_account: string) {
     try {
       const _user = await charmClient.login(_account);
       return { authorized: false, user: _user };
@@ -37,6 +36,35 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       const _user = await charmClient.createUser({ address: _account });
       return { authorized: false, user: _user };
     }
+  }
+
+  async function onNoWalletOrUser (getUser: boolean) {
+    // After the discord import roles oauth flow we will be redirected to where we initiated the import /settings/roles or maybe some other url
+    // But since the user doesn't have a wallet connected, there is neither any user nor any address, so we will be redirected to the home page (/)
+    // So attempt to log the user back in using their session cookie, if we detect that they came from a discord oauth flow
+    // Also if the user is viewing individual bounty try to log them in as it removes the react state
+    if (getUser) {
+      try {
+        const loggedInUser = await charmClient.getUser();
+        return {
+          authorized: true,
+          user: loggedInUser as User
+        };
+      }
+      catch (__) {
+        // User might not be present in the session, but it shouldn't be the case if we are importing roles for discord
+        // As that means someone logged in and tried to import roles but dont have the session cookie store?
+        // Send them to home page to connect via their wallet or discord
+      }
+    }
+
+    return {
+      authorized: false,
+      redirect: {
+        pathname: '/',
+        query: { returnUrl: router.asPath }
+      }
+    };
   }
 
   useEffect(() => {
@@ -91,43 +119,18 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
       // Connected wallet in / route
       if (account && !user) {
-        return onWalletConnection(account);
+        return onOnlyWallet(account);
       }
       return { authorized: true };
     }
     // condition: wallet not connected and user is not connected with discord
     else if (!account && !user) {
-      // After the discord import roles oauth flow we will be redirected to where we initiated the import /settings/roles or maybe some other url
-      // But since the user doesn't have a wallet connected, there is neither any user nor any address, so we will be redirected to the home page (/)
-      // So attempt to log the user back in using their session cookie, if we detect that they came from a discord oauth flow
-      // Also if the user is viewing individual bounty try to log them in as it removes the react state
-      if (isImportingRolesFromDiscord || isViewingBountyDetails) {
-        try {
-          const loggedInUser = await charmClient.getUser();
-          return {
-            authorized: true,
-            user: loggedInUser as User
-          };
-        }
-        catch (__) {
-          // User might not be present in the session, but it shouldn't be the case if we are importing roles for discord
-          // As that means someone logged in and tried to import roles but dont have the session cookie store?
-          // Send them to home page to connect via their wallet or discord
-        }
-      }
-
-      return {
-        authorized: false,
-        redirect: {
-          pathname: '/',
-          query: { returnUrl: router.asPath }
-        }
-      };
+      return onNoWalletOrUser(isImportingRolesFromDiscord || isViewingBountyDetails);
     }
     // condition: user not loaded
     else if (!user && account) {
       console.log('[RouteGuard]: user not loaded');
-      return onWalletConnection(account);
+      return onOnlyWallet(account);
     }
     // condition: user switches to a new/unknown address
     // Users created via discord will have user.addresses === 0

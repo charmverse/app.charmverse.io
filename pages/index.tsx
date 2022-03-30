@@ -8,9 +8,7 @@ import Footer from 'components/login/Footer';
 import { useSpaces } from 'hooks/useSpaces';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useUser } from 'hooks/useUser';
-import charmClient from 'charmClient';
-import { useSnackbar } from 'hooks/useSnackbar';
-import useSWRImmutable from 'swr/immutable';
+import { useDiscordLogin } from 'hooks/useDiscordLogin';
 
 export default function LoginPage () {
   const { account } = useWeb3React();
@@ -26,23 +24,7 @@ export default function LoginPage () {
     setTitleState('Welcome');
   }, []);
 
-  const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
-  const { showMessage } = useSnackbar();
-
-  useSWRImmutable(isLogInWithDiscord ? [router.query.code, router.query.discord, router.query.type] : null, async () => {
-    charmClient.loginWithDiscord({
-      code: router.query.code as string
-    }).then((loggedInUser) => {
-      // This will fetch all the spaces of that user
-      setUser(loggedInUser);
-    }).catch(err => {
-      showMessage(err.message ?? err.error ?? 'Something went wrong', 'error');
-      // Remove the unnecessary query params
-      setTimeout(() => {
-        router.push('/');
-      }, 1000);
-    });
-  });
+  useDiscordLogin();
 
   function redirectUserAfterLogin () {
     if (typeof router.query.returnUrl === 'string') {

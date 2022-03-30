@@ -14,14 +14,6 @@ export const Container = styled(Box)`
   margin: 0 auto;
 `;
 
-// Handle cases
-// 1. New user, dont have a charmverse account, clicks on Connect Discord
-// 2. User who have connected with their wallet before but dont have any workspace and discord connected
-// 3. Old user who have some charmverse workspace and discord connected
-// 4. Old user who have some charmverse workspace and not discord connected
-// 5. Disconnect your wallet, you wont be logged out if you have discord connected
-// 6. Disconnect your wallet, you will be logged out if you dont have discord connected
-
 export default function LoginPageContent ({ account }: { account: string | null | undefined }) {
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
 
