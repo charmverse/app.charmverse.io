@@ -1,5 +1,5 @@
 
-import { PagePermission, PagePermissionLevel, SpaceRole, PageOperations as PageOperationEnum, Role, Space, User } from '@prisma/client';
+import { PagePermission, PagePermissionLevel, SpaceRole, PageOperations as PageOperationEnum, Role, Space, User, Page } from '@prisma/client';
 
 export type PageOperationType = keyof typeof PageOperationEnum
 
@@ -33,11 +33,9 @@ export interface IPagePermissionToDelete {
   permissionId: string
 }
 
-export interface IPagePermissionWithNestedSpaceRole extends PagePermission {
-  page: {
-    space: {
-      spaceRoles: SpaceRole []
-    }
+export interface IPageWithNestedSpaceRole extends Page {
+  space: {
+    spaceRoles: SpaceRole []
   }
 }
 

@@ -1,36 +1,23 @@
 import { PageOperations, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { IPagePermissionFlags, IPagePermissionUserRequest, IPagePermissionWithNestedSpaceRole, PageOperationType } from './page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionUserRequest, IPageWithNestedSpaceRole, PageOperationType } from './page-permission-interfaces';
 import { permissionTemplates } from './page-permission-mapping';
 
 /**
- * Nested query to get the space role for a user who is requesting a page
+ * Nested query to get the space role a user has in the space that owns this page
  */
-function permissionWithSpaceRoleQuery (request: IPagePermissionUserRequest): Prisma.PagePermissionFindFirstArgs {
+function pageWithSpaceRoleQuery (request: IPagePermissionUserRequest): Prisma.PageFindFirstArgs {
   return {
     where: {
-      pageId: request.pageId,
-      page: {
-        space: {
-          spaceRoles: {
-            some: {
-              userId: request.userId
-            }
-          }
-        }
-      }
+      id: request.pageId
     },
     select: {
-      page: {
+      space: {
         select: {
-          space: {
-            select: {
-              spaceRoles: {
-                where: {
-                  userId: request.userId
-                }
-              }
+          spaceRoles: {
+            where: {
+              userId: request.userId
             }
           }
         }
@@ -82,12 +69,12 @@ export async function computeUserPagePermissions (request: IPagePermissionUserRe
 
   const permissionWithSpaceRoleAndPermissions = await Promise.all([
     // eslint-disable-next-line max-len
-    prisma.pagePermission.findFirst(permissionWithSpaceRoleQuery(request)) as any as Promise<IPagePermissionWithNestedSpaceRole>,
+    prisma.page.findFirst(pageWithSpaceRoleQuery(request)) as any as Promise<IPageWithNestedSpaceRole>,
     prisma.pagePermission.findMany(permissionsQuery(request))
   ]);
 
   // Check if user is a space admin so they gain full rights
-  const foundSpaceRole = permissionWithSpaceRoleAndPermissions[0]?.page?.space?.spaceRoles?.[0];
+  const foundSpaceRole = permissionWithSpaceRoleAndPermissions[0]?.space?.spaceRoles?.[0];
 
   /**
    * Commented for our demo
@@ -122,3 +109,4 @@ export async function computeUserPagePermissions (request: IPagePermissionUserRe
   return computedPermissions;
 
 }
+
