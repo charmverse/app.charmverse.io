@@ -14,6 +14,9 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
   const pages = await prisma.page.findMany({
     where: {
       spaceId: req.query.id as string
+    },
+    include: {
+      permissions: true
     }
   });
   return res.status(200).json(pages);
