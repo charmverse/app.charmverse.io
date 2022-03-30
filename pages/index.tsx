@@ -18,6 +18,7 @@ export default function LoginPage () {
   const [user, setUser, isUserLoaded] = useUser();
   const [spaces, setSpaces, isSpacesLoaded] = useSpaces();
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
+  const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
 
   const isDataLoaded = triedEager && isSpacesLoaded && isUserLoaded;
   useEffect(() => {
@@ -60,7 +61,7 @@ export default function LoginPage () {
   }
 
   return (
-    getLayout(
+    isLogInWithDiscord ? null : getLayout(
       <>
         <LoginPageContent account={account} />
         <Footer />

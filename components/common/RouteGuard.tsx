@@ -26,6 +26,8 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
   const isLoading = isUserLoading || isWalletLoading || isRouterLoading || !isSpacesLoaded;
+  const isImportingRolesFromDiscord = router.query.guild_id && router.query.discord === '1' && router.query.type === 'server';
+  const isViewingBountyDetails = router.pathname === '/[domain]/bounties/[bountyId]';
 
   async function onOnlyWallet (_account: string) {
     try {
@@ -111,8 +113,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       // Only get segments that evaluate to some value
       return pathElem;
     })[0] ?? '/';
-    const isImportingRolesFromDiscord = router.query.guild_id && router.query.discord === '1' && router.query.type === 'server';
-    const isViewingBountyDetails = router.pathname === '/[domain]/bounties/[bountyId]';
 
     const spaceDomain = path.split('/')[1];
     // condition: public page
