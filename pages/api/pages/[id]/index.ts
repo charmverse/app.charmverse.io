@@ -3,12 +3,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { requirePagePermissions } from 'lib/permissions/pages/page-permissions-api';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(updatePage).delete(deletePage);
+handler.use(requireUser)
+  .put(updatePage)
+  .delete(requirePagePermissions(['delete'], deletePage));
 
 async function updatePage (req: NextApiRequest, res: NextApiResponse<Page>) {
 
