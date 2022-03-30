@@ -100,7 +100,7 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
         </Typography>
         <StyledButton
           size='small'
-          variant={connectedWithDiscord ? 'contained' : 'outlined'}
+          variant='outlined'
           color={connectedWithDiscord ? 'error' : 'primary'}
           disabled={isDisconnecting || isConnectDiscordLoading}
           onClick={connectedWithDiscord ? disconnectDiscord : connectDiscord}
