@@ -69,9 +69,9 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
             <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
               Connect Wallet
             </PrimaryButton>
-            <PrimaryButton size='large' loading={!triedEager} href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
+            {/* <PrimaryButton size='large' loading={!triedEager} href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
               Connect Discord
-            </PrimaryButton>
+            </PrimaryButton> */}
           </Box>
         )}
       </Card>

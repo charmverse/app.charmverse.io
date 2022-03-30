@@ -103,7 +103,7 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
         direction='row'
         alignItems='center'
         justifyContent='space-between'
-        my={1}
+        mb={3}
       >
         <Typography color='secondary'>
           {connectedWithDiscord ? 'Connected with Discord' : 'Connect with Discord'}

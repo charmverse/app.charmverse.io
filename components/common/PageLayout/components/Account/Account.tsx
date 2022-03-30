@@ -128,7 +128,7 @@ function Account (): JSX.Element {
     );
   }
 
-  const isConnectedWithWallet = account && chainId;
+  const isConnectedWithWallet = (account && chainId);
   return (
     <AccountCard>
       <StyledButtonGroup variant='contained' disableElevation>
@@ -143,9 +143,9 @@ function Account (): JSX.Element {
         )}
         <AccountButton
           onClick={accountModalState.open}
-          endIcon={<Avatar avatar={user?.avatar} name={ENSName || isConnectedWithWallet ? account : ''} size='small' />}
+          endIcon={<Avatar avatar={user?.avatar} name={ENSName ?? user?.addresses[0] ?? account ?? ''} size='small' />}
         >
-          {ENSName || user?.username || `${isConnectedWithWallet ? shortenHex(account, 3) : ''}`}
+          {ENSName || user?.username || `${user?.addresses.length !== 0 ? shortenHex(user?.addresses[0]!, 3) : ''}`}
         </AccountButton>
       </StyledButtonGroup>
       <AccountModal
