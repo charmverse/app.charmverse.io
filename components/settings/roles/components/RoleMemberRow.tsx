@@ -35,7 +35,7 @@ export default function ContributorRow ({ contributor, onRemove }: Props) {
   }
 
   return (
-    <StyledRow py={2} mb={2}>
+    <StyledRow py={2}>
       <Box display='flex' alignItems='center'>
         <Avatar name={ensName || getDisplayName(contributor)} avatar={contributor?.avatar} size='small' />
         <Box pl={2}>

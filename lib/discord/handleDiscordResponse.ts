@@ -3,17 +3,19 @@ import log from 'lib/log';
 
 const discordBotToken = process.env.DISCORD_BOT_TOKEN as string;
 
-const discordClientId = process.env.DISCORD_OAUTH_CLIENT_ID as string;
-
-export async function handleDiscordResponse<Response> (endpoint: string): Promise<{status: number, error: string, redirectLink?: string} | {status: 'success', data: Response}> {
+export async function authenticatedRequest<T> (endpoint: string) {
   const discordApiHeaders: any = {
     headers: {
       Authorization: `Bot ${discordBotToken}`
     }
   };
+  return http.GET<T>(endpoint, undefined, discordApiHeaders);
+}
+
+export async function handleDiscordResponse<T> (endpoint: string): Promise<{status: number, error: string, redirectLink?: string} | {status: 'success', data: T}> {
 
   try {
-    const response = await http.GET<Response>(endpoint, undefined, discordApiHeaders);
+    const response = await authenticatedRequest<T>(endpoint);
     return {
       status: 'success',
       data: response
@@ -32,8 +34,7 @@ export async function handleDiscordResponse<Response> (endpoint: string): Promis
     else if (err.code === 50001) {
       return {
         status: 400,
-        error: 'Use this link to add Charmverse bot to your server',
-        redirectLink: `https://discord.com/oauth2/authorize?scope=bot&client_id=${discordClientId}&permissions=0`
+        error: 'CharmBerse does not have access to the server'
       };
     }
     // Guild doesn't exist

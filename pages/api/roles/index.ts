@@ -37,6 +37,7 @@ async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpa
   }
 
   const roles = await prisma.role.findMany({
+    orderBy: { createdAt: 'asc' },
     where: {
       spaceId: spaceId as string
     },

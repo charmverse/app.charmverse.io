@@ -2,7 +2,7 @@ import fetch from './fetch';
 
 type Params = { [key: string]: any };
 
-export function GET<T> (
+export function GET<T = Response> (
   requestURL: string,
   data: Params = {},
   { headers = {} }: { headers?: any } = {}

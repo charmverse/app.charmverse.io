@@ -8,6 +8,9 @@ import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import { LoggedInUser } from 'models';
 import { DiscordAccount } from './connect';
 
+const discordClientId = process.env.DISCORD_OAUTH_CLIENT_ID as string;
+const discordUrl = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&response_type=code`;
+
 const handler = nc({
   onError,
   onNoMatch
@@ -96,6 +99,6 @@ async function loginWithDiscord (req: NextApiRequest, res: NextApiResponse<Logge
   return res.status(404).json({ error: "User doesn't exist" });
 }
 
-handler.use(requireUser).get(loginWithDiscord);
+handler.get(loginWithDiscord);
 
 export default withSessionRoute(handler);

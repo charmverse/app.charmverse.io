@@ -1,14 +1,13 @@
 import { useMemo, useContext, useState } from 'react';
 import { CSVLink, CSVDownload } from 'react-csv';
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
+import Button from 'components/common/Button';
 import BountyModal from 'components/bounties/BountyModal';
 import { BountiesContext } from 'hooks/useBounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { BountyCard } from './BountyCard';
 import MultiPaymentModal from './MultiPaymentModal';
-
-const safeAddress = '0xE7faB335A404a09ACcE83Ae5F08723d8e5c69b58';
 
 const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete'];
 

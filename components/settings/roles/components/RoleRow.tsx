@@ -18,6 +18,7 @@ import { useState } from 'react';
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import RoleMemberRow from './RoleMemberRow';
 import RoleForm from './RoleForm';
+import ConfirmDeleteModal from '../../../common/Modal/ConfirmDeleteModal';
 
 interface RoleRowProps {
   role: ListSpaceRolesResponse
@@ -31,6 +32,7 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
 
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
+  const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
   const [newMembers, setNewMembers] = useState<string[]>([]);
 
   function showMembersPopup () {
@@ -80,7 +82,7 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
       </Box>
       <Divider />
 
-      {contributors.map(contributor => <RoleMemberRow contributor={contributor} onRemove={removeMember} />)}
+      {contributors.map(contributor => <RoleMemberRow key={contributor.id} contributor={contributor} onRemove={removeMember} />)}
 
       <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
 
@@ -105,7 +107,7 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
         <MenuItem
           sx={{ padding: '3px 12px' }}
           onClick={() => {
-            deleteRole(role.id);
+            confirmDeletePopupState.open();
             menuState.close();
           }}
         >
@@ -123,6 +125,19 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
           </Grid>
         </Grid>
       </Modal>
+
+      <ConfirmDeleteModal
+        title='Delete role'
+        question={`Are you sure you want to delete the ${role.name} role?`}
+        buttonText={`Delete ${role.name}`}
+        onConfirm={() => {
+          deleteRole(role.id);
+          menuState.close();
+        }}
+        onClose={confirmDeletePopupState.close}
+        open={confirmDeletePopupState.isOpen}
+      />
+
     </Box>
   );
 }
