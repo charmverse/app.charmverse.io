@@ -14,6 +14,8 @@ import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
 import { CircularProgress } from '@mui/material';
+import { useRouter } from 'next/router';
+import { useSpaces } from 'hooks/useSpaces';
 // import AccountConnections from './components/AccountConnections';
 
 const DiscordUserName = styled(Typography)`
@@ -32,11 +34,14 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
   const ENSName = useENSName(account);
   const [user, setUser] = useUser();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [isLoginOut, setIsLoginOut] = useState(false);
 
   const handleWalletProviderSwitch = () => {
     openWalletSelectorModal();
     onClose();
   };
+
+  const router = useRouter();
 
   const connectorName = (c: any) => {
     switch (c) {
@@ -108,7 +113,7 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
           size='small'
           variant='outlined'
           color={connectedWithDiscord ? 'error' : 'primary'}
-          disabled={isDisconnecting || isConnectDiscordLoading || user?.addresses.length === 0}
+          disabled={isLoginOut || isDisconnecting || isConnectDiscordLoading || user?.addresses.length === 0}
           onClick={connectWithDiscord}
           endIcon={(
             isConnectDiscordLoading && <CircularProgress size={20} />
@@ -117,6 +122,24 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
           {connectedWithDiscord ? 'Disconnect' : 'Connect'}
         </StyledButton>
       </Stack>
+      <StyledButton
+        size='medium'
+        variant='outlined'
+        color='primary'
+        disabled={isLoginOut}
+        onClick={async () => {
+          setIsLoginOut(true);
+          await charmClient.logout();
+          setUser(null);
+          setIsLoginOut(true);
+          router.push('/');
+        }}
+        endIcon={(
+          isLoginOut && <CircularProgress size={20} />
+        )}
+      >
+        Logout
+      </StyledButton>
     </Modal>
   );
 }
