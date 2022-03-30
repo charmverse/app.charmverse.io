@@ -3,7 +3,7 @@ import { Role } from '@prisma/client';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
-import { HTMLAttributes, ComponentProps, useEffect } from 'react';
+import { HTMLAttributes, ComponentProps, useEffect, useState } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
@@ -35,29 +35,42 @@ function filterRoles (roles: ReducedRole [], filter: IRolesFilter): ReducedRole 
 function InputSearchRoleBase ({
   defaultValue, disableCloseOnSelect = false, filter, ...props
 }: Partial<ComponentProps<typeof Autocomplete>> & {filter?: IRolesFilter}) {
-  const { roles } = useRoles();
+  const { listRoles } = useRoles();
+
+  const [availableRoles, setAvailableRoles] = useState<ListSpaceRolesResponse[]>([]);
+
+  useEffect(() => {
+    listRoles().then(roles => {
+      setAvailableRoles(roles);
+    });
+  }, []);
+
   const { chainId } = useWeb3React<Web3Provider>();
-  const defaultRole = typeof defaultValue === 'string' ? roles.find(role => {
+  const defaultRole = typeof defaultValue === 'string' ? availableRoles.find(role => {
     return role.id === defaultValue;
   }) : undefined;
 
   const { cache } = useSWRConfig();
 
-  const filteredRoles = filter ? filterRoles(roles as any, filter) : roles;
+  const filteredRoles = filter ? filterRoles(availableRoles as any, filter) : availableRoles;
 
-  console.log('ROLES', filteredRoles, roles);
+  console.log('ROLES', filteredRoles);
 
   return (
     <Autocomplete<ReducedRole>
       defaultValue={defaultRole}
-      loading={roles.length === 0}
+      loading={availableRoles.length === 0}
       sx={{ minWidth: 150 }}
       disableCloseOnSelect={disableCloseOnSelect}
       // @ts-ignore - not sure why this fails
       options={filteredRoles}
       autoHighlight
       getOptionLabel={(role) => role.name}
-      renderOption={(_props, role) => role.name}
+      renderOption={(_props, role) => (
+        <Box {..._props as any}>
+          {role.name}
+        </Box>
+      )}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -93,9 +106,9 @@ interface IInputSearchRoleMultipleProps {
 }
 
 export function InputSearchRoleMultiple ({ onChange, filter, ...props }: IInputSearchRoleMultipleProps) {
-  function emitValue (users: ReducedRole[]) {
-    console.log('change!', users);
-    onChange(users.map(user => user.id));
+  function emitValue (roles: ReducedRole[]) {
+    console.log('change in roles!', roles);
+    onChange(roles.map(role => role.id));
   }
 
   console.log('Filter', filter);

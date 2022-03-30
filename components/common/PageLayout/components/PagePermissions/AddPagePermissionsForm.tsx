@@ -1,7 +1,7 @@
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import charmClient from 'charmClient';
+import charmClient, { ListSpaceRolesResponse } from 'charmClient';
 import Button from 'components/common/Button';
 import { InputEnumToOptions } from 'components/common/form/InputEnumToOptions';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
@@ -34,7 +34,9 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
 
   const [contributors] = useContributors();
 
-  const { roles, listRoles } = useRoles();
+  const { listRoles } = useRoles();
+
+  const [availableRoles, setAvailableRoles] = useState<ListSpaceRolesResponse[]>([]);
 
   const [permissionLevelToAssign, setPermissionLevelToAssign] = useState<PagePermissionLevelType>('full_access');
 
@@ -42,7 +44,10 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
   const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
 
   useEffect(() => {
-    listRoles();
+    listRoles()
+      .then(roles => {
+        setAvailableRoles(availableRoles);
+      });
   }, []);
 
   const userIdsToHide = existingPermissions.filter(permission => {
@@ -62,13 +67,22 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
   } = useForm<FormValues>();
 
   function createUserPermissions () {
-    Promise.all(selectedUserIds.map(userId => {
-      return charmClient.createPermission({
-        pageId,
-        userId,
-        permissionLevel: permissionLevelToAssign!
-      });
-    })).then(() => permissionsAdded());
+    Promise.all([
+      Promise.all(selectedUserIds.map(userId => {
+        return charmClient.createPermission({
+          pageId,
+          userId,
+          permissionLevel: permissionLevelToAssign!
+        });
+      })),
+      Promise.all(selectedRoleIds.map(roleId => {
+        return charmClient.createPermission({
+          pageId,
+          roleId,
+          permissionLevel: permissionLevelToAssign!
+        });
+      }))
+    ]).then(() => permissionsAdded());
   }
 
   console.log('To hide', userIdsToHide);
@@ -111,19 +125,15 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
             )
           }
 
-          {
-            roleIdsToHide.length < roles.length && (
-              <Grid item>
-                <InputSearchRoleMultiple
-                  onChange={setSelectedRoleIds}
-                  filter={{
-                    mode: 'exclude',
-                    userIds: roleIdsToHide
-                  }}
-                />
-              </Grid>
-            )
-          }
+          <Grid item>
+            <InputSearchRoleMultiple
+              onChange={setSelectedRoleIds}
+              filter={{
+                mode: 'exclude',
+                userIds: roleIdsToHide
+              }}
+            />
+          </Grid>
 
           <Grid item>
             <InputEnumToOptions
@@ -134,7 +144,7 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
           </Grid>
 
           <Grid item>
-            <Button type='submit' disabled={!permissionLevelToAssign || (selectedUserIds.length === 0)}>Add permissions</Button>
+            <Button type='submit' disabled={!permissionLevelToAssign || (selectedUserIds.length === 0 && selectedRoleIds.length === 0)}>Add permissions</Button>
           </Grid>
         </Grid>
       </form>

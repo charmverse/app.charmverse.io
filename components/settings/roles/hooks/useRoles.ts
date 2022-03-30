@@ -7,10 +7,14 @@ export default function useRoles () {
   const [space] = useCurrentSpace();
   const [roles, setRoles] = useState<ListSpaceRolesResponse[]>([]);
 
-  async function listRoles () {
+  async function listRoles (): Promise<ListSpaceRolesResponse []> {
     if (space) {
       const rolesInSpace = await charmClient.listRoles(space.id);
       setRoles(rolesInSpace);
+      return rolesInSpace;
+    }
+    else {
+      return [];
     }
   }
 
