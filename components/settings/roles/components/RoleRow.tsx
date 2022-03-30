@@ -8,6 +8,7 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
+import Chip from '@mui/material/Chip';
 import MenuItem from '@mui/material/MenuItem';
 import { ListSpaceRolesResponse } from 'charmClient';
 import Button from 'components/common/Button';
@@ -67,8 +68,8 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
     <Box mb={3}>
 
       <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Typography variant='h6'>
-          {role.name}
+        <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+          {role.name} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
         </Typography>
         <IconButton size='small' {...bindTrigger(menuState)}>
           <MoreHorizIcon />
