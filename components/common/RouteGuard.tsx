@@ -80,10 +80,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
     // condition: wallet not connected and user is not connected with discord
     else if (!account && !user) {
-      if (user) {
-        await charmClient.logout();
-      }
-      console.log('[RouteGuard]: redirect to login');
       return {
         authorized: false,
         redirect: {
