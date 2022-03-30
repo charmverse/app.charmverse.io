@@ -42,7 +42,16 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
       updatedBy: data.author.connect!.id!
     }]
   };
-  const space = await prisma.space.create({ data });
+  const space = await prisma.space.create({ data, include: { pages: true } });
+
+  await prisma.pagePermission.create({
+    data: {
+      permissionLevel: 'full_access',
+      spaceId: space.id,
+      pageId: space.pages[0].id
+    }
+  });
+
   logSpaceCreation(space);
   return res.status(200).json(space);
 }

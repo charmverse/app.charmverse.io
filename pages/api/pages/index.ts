@@ -14,6 +14,15 @@ handler.use(requireUser).post(createPage);
 async function createPage (req: NextApiRequest, res: NextApiResponse<Page>) {
   const data = req.body as Prisma.PageCreateInput;
   const page = await prisma.page.create({ data });
+  const pagePermission = await prisma.pagePermission.create({
+    data: {
+      permissionLevel: 'full_access',
+      spaceId: page.spaceId,
+      pageId: page.id
+    }
+  });
+
+  (page as any).permissions = [pagePermission];
   logFirstWorkspacePageCreation(page);
   logFirstUserPageCreation(page);
   return res.status(200).json(page);
