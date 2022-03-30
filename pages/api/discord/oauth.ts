@@ -24,7 +24,15 @@ async function login (req: NextApiRequest, res: NextApiResponse) {
     type: query.type
   }));
 
-  const oauthUrl = `${discordUrl}${query.type === 'server' ? '&scope=guilds' : '&scope=identify'}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
+  const discordQueryParams = [];
+  if (query.type.match(/(connect|login)/)) {
+    discordQueryParams.push(...['prompt=consent', 'scope=identify']);
+  }
+  else if (query.type === 'server') {
+    discordQueryParams.push(...['scope=guilds%20bot', 'permissions=0']);
+  }
+
+  const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
   res.redirect(oauthUrl);
 }
 

@@ -56,7 +56,7 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
   return (
     <Button
       external
-      href={`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
+      href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
       variant='outlined'
       loading={isLoading}
       startIcon={(
