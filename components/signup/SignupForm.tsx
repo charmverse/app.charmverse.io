@@ -56,7 +56,7 @@ export default function SignupPageContent () {
     router.push('/join');
   }
 
-  const welcomeMessage = `Welcome, ${account ? ensName || shortenHex(account) : user?.username ?? ''}!`;
+  const welcomeMessage = `Welcome, ${ensName || user?.username || (account ? shortenHex(account) : '')}!`;
 
   return (
     <Content px={3}>

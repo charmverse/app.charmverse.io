@@ -9,9 +9,9 @@ import { isSpaceDomain } from 'lib/spaces';
 import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 
-// TODO: Calling login multiple times after successful discord oauth
 // TODO: Discord login for /invite route
 // TODO: Connect wallet with an existing user only adds address
+// TODO: Update the user who owns the wallet address after changing wallet address
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share'];
@@ -28,6 +28,17 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
   const isLoading = isUserLoading || isWalletLoading || isRouterLoading || !isSpacesLoaded;
+
+  async function onWalletConnection (_account: string) {
+    try {
+      const _user = await charmClient.login(_account);
+      return { authorized: false, user: _user };
+    }
+    catch (error) {
+      const _user = await charmClient.createUser({ address: _account });
+      return { authorized: false, user: _user };
+    }
+  }
 
   useEffect(() => {
     // wait to listen to events until data is loaded
@@ -79,6 +90,9 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     const spaceDomain = path.split('/')[1];
     // condition: public page
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
+      if (account && !user) {
+        return onWalletConnection(account);
+      }
       return { authorized: true };
     }
     // condition: wallet not connected and user is not connected with discord
@@ -113,14 +127,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     // condition: user not loaded
     else if (!user && account) {
       console.log('[RouteGuard]: user not loaded');
-      try {
-        const _user = await charmClient.login(account);
-        return { authorized: false, user: _user };
-      }
-      catch (error) {
-        const _user = await charmClient.createUser({ address: account });
-        return { authorized: false, user: _user };
-      }
+      return onWalletConnection(account);
     }
     // condition: user switches to a new/unknown address
     // Users created via discord will have user.addresses === 0

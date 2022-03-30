@@ -22,7 +22,6 @@ export default function LoginPage () {
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
 
   const isDataLoaded = triedEager && isSpacesLoaded && isUserLoaded;
-
   useEffect(() => {
     setTitleState('Welcome');
   }, []);
@@ -58,7 +57,6 @@ export default function LoginPage () {
   }
 
   useEffect(() => {
-
     // redirect user once wallet is connected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
