@@ -16,6 +16,7 @@ import styled from '@emotion/styled';
 import { CircularProgress, Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 // import AccountConnections from './components/AccountConnections';
+import log from 'lib/log';
 
 const DiscordUserName = styled(Typography)`
   position: relative;
@@ -34,6 +35,8 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
   const [user, setUser] = useUser();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isLoginOut, setIsLoginOut] = useState(false);
+
+  const connectedWithDiscord = Boolean(user?.discordUser);
 
   const handleWalletProviderSwitch = () => {
     openWalletSelectorModal();
@@ -55,7 +58,9 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
     }
   };
 
-  const connectedWithDiscord = Boolean(user?.discordUser);
+  async function connectDiscord () {
+    window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
+  }
 
   async function connectWithDiscord () {
     if (!isConnectDiscordLoading) {
@@ -74,6 +79,7 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
         window.location.replace(`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
       }
     }
+    setIsDisconnecting(false);
   }
 
   return (
