@@ -1,5 +1,5 @@
 import { useMemo, useContext, useState } from 'react';
-import { CSVLink, CSVDownload } from 'react-csv';
+import { CSVLink } from 'react-csv';
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import Button from 'components/common/Button';
@@ -54,8 +54,8 @@ export function BountyList () {
         <Box display='flex' justifyContent='flex-end'>
           { !!csvData.length
           && (
-            <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv'>
-              <Button>
+            <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
+              <Button variant='outlined'>
                 Export to CSV
               </Button>
             </CSVLink>
@@ -63,7 +63,6 @@ export function BountyList () {
           <MultiPaymentModal />
           <Button
             sx={{ ml: 1 }}
-            variant='outlined'
             onClick={() => {
               setDisplayBountyDialog(true);
             }}
