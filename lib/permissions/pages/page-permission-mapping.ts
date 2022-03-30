@@ -17,7 +17,8 @@ export const permissionDescriptions: Record<PageOperationType, string> = {
   edit_content: 'edit page content',
   edit_position: 'reposition page',
   edit_isPublic: 'share page',
-  edit_path: 'edit page URL'
+  edit_path: 'edit page URL',
+  grant_permissions: 'manage page access'
 };
 
 export const permissionTemplates: Record<keyof typeof PagePermissionLevel, PageOperationType []> = {

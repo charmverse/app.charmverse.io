@@ -20,6 +20,8 @@ export class AllowedPagePermissions implements IPagePermissionFlags {
 
   edit_path: boolean = false;
 
+  grant_permissions: boolean = false;
+
   constructor (initialPermissions: PageOperationType [] | Partial<IPagePermissionFlags> = []) {
 
     this.addPermissions(initialPermissions);

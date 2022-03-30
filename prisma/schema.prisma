@@ -281,6 +281,7 @@ enum PageOperations {
   edit_content
   edit_isPublic
   edit_path
+  grant_permissions
 }
 
 model PagePermission {
@@ -301,7 +302,7 @@ model PagePermission {
   permissions PageOperations[]
 
 
-  @@unique([userId, pageId])
-  @@unique([roleId, pageId])
-  @@unique([spaceId, pageId])
+  @@unique([userId, pageId], name: "userId_PageId")
+  @@unique([roleId, pageId], name: "roleId_pageId")
+  @@unique([spaceId, pageId], name: "spaceId_pageId")
 }
