@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import Modal from 'components/common/Modal';
 import charmClient from 'charmClient';
-import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { PagePermissionLevelTitle } from 'lib/permissions/pages/page-permission-mapping';
 import { getDisplayName } from 'lib/users/getDisplayName';
 import { useEffect, useState } from 'react';
@@ -14,6 +14,7 @@ import { PagePermission } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { usePages } from 'hooks/usePages';
 import { AddPagePermissionsForm } from './AddPagePermissionsForm';
 
 const permissionDisplayOrder = ['space', 'role', 'user'];
@@ -63,6 +64,10 @@ export function PagePermissions ({ pageId }: IProps) {
 
   const [space] = useCurrentSpace();
 
+  const { getPagePermissions } = usePages();
+
+  const [userPagePermissions, setUserPagePermissions] = useState<null | IPagePermissionFlags>(null);
+
   const [selectedPermissionId, setSelectedPermissionId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -70,6 +75,10 @@ export function PagePermissions ({ pageId }: IProps) {
   }, [pageId]);
 
   function refreshPermissions () {
+
+    const userPermissions = getPagePermissions(pageId);
+    setUserPagePermissions(userPermissions);
+
     charmClient.listPagePermissions(pageId)
       .then(permissionSet => {
         setPagePermissions(permissionSet);
@@ -117,19 +126,23 @@ export function PagePermissions ({ pageId }: IProps) {
       </Modal>
 
       Page Permissions
-      <Grid container direction='row' alignItems='center' onClick={() => popupState.open()}>
-        <Grid item xs={9}>
-          <Input
-            type='text'
-            placeholder='Add people and roles'
-            readOnly
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <Button fullWidth>Invite</Button>
-        </Grid>
-      </Grid>
+      {
+        userPagePermissions?.grant_permissions === true && (
+          <Grid container direction='row' alignItems='center' onClick={() => popupState.open()}>
+            <Grid item xs={9}>
+              <Input
+                type='text'
+                placeholder='Add people and roles'
+                readOnly
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <Button fullWidth>Invite</Button>
+            </Grid>
+          </Grid>
+        )
+      }
       <Box>
         {
               sortedPermissions.map(permission => {
@@ -159,7 +172,13 @@ export function PagePermissions ({ pageId }: IProps) {
                               defaultValue={permission.permissionLevel}
                             />
                           ) : (
-                            <Box onClick={() => setSelectedPermissionId(permission.id)}>
+                            <Box onClick={() => {
+                              if (userPagePermissions?.grant_permissions === true) {
+                                setSelectedPermissionId(permission.id);
+                              }
+
+                            }}
+                            >
                               {PagePermissionLevelTitle[permission.permissionLevel]}
                             </Box>
                           )
@@ -167,7 +186,10 @@ export function PagePermissions ({ pageId }: IProps) {
 
                       </Grid>
                       <Grid item xs={2} sx={{ fontSize: '10px' }}>
-                        <ElementDeleteIcon onClick={() => deletePermission(permission.id)} />
+                        {
+                          userPagePermissions?.grant_permissions === true && (<ElementDeleteIcon onClick={() => deletePermission(permission.id)} />)
+                        }
+
                       </Grid>
 
                     </Grid>
