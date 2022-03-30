@@ -1,4 +1,4 @@
-import { PageOperations, Prisma } from '@prisma/client';
+import { Page, PageOperations, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { AllowedPagePermissions } from './available-page-permissions.class';
 import { IPagePermissionFlags, IPagePermissionUserRequest, IPageWithNestedSpaceRole, PageOperationType } from './page-permission-interfaces';
@@ -61,6 +61,9 @@ function permissionsQuery (request: IPagePermissionUserRequest): Prisma.PagePerm
           pageId: request.pageId
         }
       ]
+    },
+    include: {
+      page: true
     }
   };
 }
@@ -73,16 +76,12 @@ export async function computeUserPagePermissions (request: IPagePermissionUserRe
     prisma.pagePermission.findMany(permissionsQuery(request))
   ]);
 
-  // Check if user is a space admin so they gain full rights
+  const page = permissionWithSpaceRoleAndPermissions[0];
+
+  // Check if user is a space admin for this page so they gain full rights
   const foundSpaceRole = permissionWithSpaceRoleAndPermissions[0]?.space?.spaceRoles?.[0];
 
-  /**
-   * Commented for our demo
-  console.log('Space roles list', permissionWithSpaceRoleAndPermissions[0]?.page?.space?.spaceRoles);
-  console.log('Full permissions list', permissionWithSpaceRoleAndPermissions[1]);
-
-  */
-
+  // TODO DELETE LATER when we remove admin access to workspace
   if (foundSpaceRole && (foundSpaceRole.role === 'admin' || foundSpaceRole.isAdmin === true)) {
 
     const fullPermissions = Object.keys(PageOperations) as PageOperationType [];
@@ -93,6 +92,16 @@ export async function computeUserPagePermissions (request: IPagePermissionUserRe
   const permissions = permissionWithSpaceRoleAndPermissions[1];
 
   const computedPermissions = new AllowedPagePermissions();
+
+  // Apply space level permission
+  const spaceLevelPermission = permissions.find((permission) => {
+    return foundSpaceRole && foundSpaceRole.spaceId === (permission as any as {page: Page}).page?.spaceId;
+  });
+
+  if (spaceLevelPermission) {
+    console.log('Found a space permission');
+    computedPermissions.addPermissions(permissionTemplates[spaceLevelPermission.permissionLevel]);
+  }
 
   permissions.forEach(permission => {
 

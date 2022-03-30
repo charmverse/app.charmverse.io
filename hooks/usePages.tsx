@@ -126,7 +126,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
       // User gets permission via role or as an individual
       const shouldApplyPermission = (permission.userId && permission.userId === user?.id)
-        || (permission.roleId && applicableRoles.some(role => role.id === permission.roleId));
+        || (permission.roleId && applicableRoles.some(role => role.id === permission.roleId))
+        || (userSpaceRole && permission.spaceId === userSpaceRole.spaceId);
 
       if (shouldApplyPermission) {
 
