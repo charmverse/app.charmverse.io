@@ -27,6 +27,29 @@ export function UserProvider ({ children }: { children: ReactNode }) {
           setIsLoaded(true);
         });
     }
+    else if (account && user) {
+      // Dont continue if the user already have an address
+      if (user.addresses.length === 0) {
+        setIsLoaded(false);
+        charmClient.login(account).then(_user => {
+          // Another account is associated with this wallet address so set it as the new user
+          setUser(_user);
+          setIsLoaded(true);
+        }).catch(err => {
+          setIsLoaded(false);
+          // No user is connected with this wallet address, so update the current user to have this address
+          charmClient.updateUser({
+            userId: user.id,
+            address: account
+          }).then((_user) => {
+            setUser(_user);
+            setIsLoaded(true);
+          }).catch(() => {
+            setIsLoaded(true);
+          });
+        });
+      }
+    }
     // user disconnects their wallet
     else if (!account) {
       setIsLoaded(true);

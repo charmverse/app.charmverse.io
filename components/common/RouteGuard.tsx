@@ -10,8 +10,7 @@ import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 
 // TODO: Discord login for /invite route
-// TODO: Connect wallet with an existing user only adds address
-// TODO: Update the user who owns the wallet address after changing wallet address
+// TODO: Connect wallet with an existing user only adds address otherwise logs in as that user
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share'];
@@ -90,6 +89,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     const spaceDomain = path.split('/')[1];
     // condition: public page
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
+      // Connected wallet in / route
       if (account && !user) {
         return onWalletConnection(account);
       }
