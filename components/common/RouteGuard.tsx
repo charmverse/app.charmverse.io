@@ -10,6 +10,8 @@ import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 import { useSnackbar } from 'hooks/useSnackbar';
 
+// TODO: Redirects the user back to / if they disconnect wallet
+
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share'];
 
@@ -71,6 +73,8 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return pathElem;
     })[0] ?? '/';
     const isImportingRolesFromDiscord = router.query.guild_id && router.query.discord === '1' && router.query.type === 'server';
+    const isViewingBountyDetails = router.pathname === '/[domain]/bounties/[bountyId]';
+
     const spaceDomain = path.split('/')[1];
     // condition: public page
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
@@ -81,8 +85,8 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       // After the discord import roles oauth flow we will be redirected to where we initiated the import /settings/roles or maybe some other url
       // But since the user doesn't have a wallet connected, there is neither any user nor any address, so we will be redirected to the home page (/)
       // So attempt to log the user back in using their session cookie, if we detect that they came from a discord oauth flow
-      // TODO: Handle case when connecting to discord (maybe not required as the user logged in via their wallet?)
-      if (isImportingRolesFromDiscord) {
+      // Also if the user is viewing individual bounty try to log them in as it removes the react state
+      if (isImportingRolesFromDiscord || isViewingBountyDetails) {
         try {
           const loggedInUser = await charmClient.me();
           return {
@@ -93,6 +97,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         catch (__) {
           // User might not be present in the session, but it shouldn't be the case if we are importing roles for discord
           // As that means someone logged in and tried to import roles but dont have the session cookie store?
+          // Send them to home page to connect via their wallet or discord
         }
       }
 
@@ -127,7 +132,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return { authorized: false, user: _user };
     }
     // condition: trying to access a space without access
-    else if (user && spaces && spaces.length !== 0 && isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
+    else if (!isViewingBountyDetails && !isImportingRolesFromDiscord && isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
       console.log('[RouteGuard]: send to join workspace page');
       return {
         authorized: false,

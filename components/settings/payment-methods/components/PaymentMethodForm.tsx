@@ -343,7 +343,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
             )
           }
           <Grid item>
-            <Button type='submit' disabled={!isValid}>Create payment method</Button>
+            <Button type='submit' disabled={!isValid || getValues('contractAddress') === ''}>Create payment method</Button>
           </Grid>
         </Grid>
       </form>

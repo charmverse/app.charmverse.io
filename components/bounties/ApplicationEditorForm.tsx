@@ -35,9 +35,6 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
   const {
     register,
     handleSubmit,
-    setValue,
-    watch,
-    trigger,
     formState: { errors, touchedFields, isValid, isValidating, isSubmitting }
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -69,7 +66,6 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
     <div>
       <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
         <Grid container direction='column' spacing={3}>
-
           <Grid item>
             <InputLabel>
               Your proposal
