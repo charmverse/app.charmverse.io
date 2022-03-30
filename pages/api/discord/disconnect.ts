@@ -12,6 +12,17 @@ const handler = nc({
 handler.use(requireUser).post(disconnectDiscord);
 
 async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: req.session.user.id
+    }
+  });
+
+  if (user?.addresses.length === 0) {
+    return res.status(400).json({
+      error: 'You must have at least a single address'
+    });
+  }
   await prisma.discordUser.delete({
     where: {
       userId: req.session.user.id

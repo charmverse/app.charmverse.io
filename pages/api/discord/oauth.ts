@@ -11,7 +11,7 @@ const handler = nc({
   onNoMatch
 });
 
-handler.use(requireUser).get(login);
+handler.get(login);
 
 async function login (req: NextApiRequest, res: NextApiResponse) {
   const query = req.query as {
@@ -20,7 +20,6 @@ async function login (req: NextApiRequest, res: NextApiResponse) {
   };
   const state = encodeURIComponent(JSON.stringify({
     redirect: query.redirect,
-    userId: req.session.user.id,
     type: query.type
   }));
 

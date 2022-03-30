@@ -59,7 +59,6 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       }).finally(() => {
         setIsLoaded(true);
       });
-      setIsLoaded(true);
     }
   }, [account]);
 

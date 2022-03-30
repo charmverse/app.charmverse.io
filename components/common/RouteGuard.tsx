@@ -21,13 +21,11 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const { account } = useWeb3React();
   const [user, setUser, isUserLoaded, setIsUserLoaded] = useUser();
   const [spaces, _, isSpacesLoaded] = useSpaces();
-  const isUserLoading = !isUserLoaded;
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
-  const isLoading = isUserLoading || isWalletLoading || isRouterLoading || !isSpacesLoaded;
+  const isLoading = !isUserLoaded || isWalletLoading || isRouterLoading || !isSpacesLoaded;
   const isImportingRolesFromDiscord = router.query.guild_id && router.query.discord === '1' && router.query.type === 'server';
   const isViewingBountyDetails = router.pathname === '/[domain]/bounties/[bountyId]';
-
   async function onOnlyWallet (_account: string) {
     try {
       const _user = await charmClient.login(_account);
@@ -40,23 +38,13 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }
 
   async function onNoWalletOrUser () {
-    try {
-      setIsUserLoaded(false);
-      const loggedInUser = await charmClient.getUser();
-      return {
-        authorized: false,
-        user: loggedInUser as User
-      };
-    }
-    catch (__) {
-      return {
-        authorized: false,
-        redirect: {
-          pathname: '/',
-          query: { returnUrl: router.asPath }
-        }
-      };
-    }
+    return {
+      authorized: true,
+      redirect: {
+        pathname: '/',
+        query: { returnUrl: router.asPath }
+      }
+    };
   }
 
   useEffect(() => {
@@ -112,9 +100,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         return onOnlyWallet(account);
       }
 
-      if (!account && !user) {
-        return onNoWalletOrUser();
-      }
       return { authorized: true };
     }
     // condition: wallet not connected and user is not connected with discord

@@ -108,7 +108,7 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
           size='small'
           variant='outlined'
           color={connectedWithDiscord ? 'error' : 'primary'}
-          disabled={isDisconnecting || isConnectDiscordLoading}
+          disabled={isDisconnecting || isConnectDiscordLoading || user?.addresses.length === 0}
           onClick={connectWithDiscord}
           endIcon={(
             isConnectDiscordLoading && <CircularProgress size={20} />
