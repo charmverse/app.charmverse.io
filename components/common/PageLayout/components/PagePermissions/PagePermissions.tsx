@@ -1,4 +1,8 @@
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Input from '@mui/material/Input';
+import Modal from 'components/common/Modal';
 import charmClient from 'charmClient';
 import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { PagePermissionLevelTitle } from 'lib/permissions/pages/page-permission-mapping';
@@ -9,6 +13,7 @@ import { filterObjectKeys } from 'lib/utilities/objects';
 import { PagePermission } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { AddPagePermissionsForm } from './AddPagePermissionsForm';
 
 const permissionDisplayOrder = ['space', 'role', 'user'];
@@ -58,6 +63,8 @@ export function PagePermissions ({ pageId }: IProps) {
 
   const [space] = useCurrentSpace();
 
+  const [selectedPermissionId, setSelectedPermissionId] = useState<string | null>(null);
+
   useEffect(() => {
     refreshPermissions();
   }, [pageId]);
@@ -69,8 +76,10 @@ export function PagePermissions ({ pageId }: IProps) {
       });
   }
 
-  function updatePagePermissionLevel (permission: Pick<PagePermission, 'id' | 'permissionLevel'>) {
-    charmClient.updatePermission(permission.id, { permissionLevel: permission.permissionLevel });
+  async function updatePagePermissionLevel (permission: Pick<PagePermission, 'id' | 'permissionLevel'>) {
+    await charmClient.updatePermission(permission.id, { permissionLevel: permission.permissionLevel });
+    await refreshPermissions();
+
   }
 
   function deletePermission (permissionId: string) {
@@ -91,34 +100,77 @@ export function PagePermissions ({ pageId }: IProps) {
     }
   }
    */
+  const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
   return (
     <Box>
+
+      <Modal {...bindPopover(popupState)} title='Invite people to this page'>
+        <AddPagePermissionsForm
+          existingPermissions={pagePermissions}
+          pageId={pageId}
+          permissionsAdded={() => {
+            refreshPermissions();
+            popupState.close();
+          }}
+        />
+      </Modal>
+
       Page Permissions
-
-      <AddPagePermissionsForm existingPermissions={pagePermissions} pageId={pageId} permissionsAdded={refreshPermissions} />
-
+      <Grid container direction='row' alignItems='center' onClick={() => popupState.open()}>
+        <Grid item xs={9}>
+          <Input
+            type='text'
+            placeholder='Add people and roles'
+            readOnly
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <Button fullWidth>Invite</Button>
+        </Grid>
+      </Grid>
       <Box>
         {
               sortedPermissions.map(permission => {
                 return (
-                  <Box key={permission.displayName}>
-                    {permission.displayName}
+                  <Box display='flex' key={permission.displayName}>
+                    <Grid container direction='row' justifyContent='space-around' alignItems='center'>
+                      <Grid item xs={6}>
+                        {permission.displayName}
+                      </Grid>
+                      <Grid item xs={3} sx={{ fontSize: '12px' }}>
+                        {
+                          selectedPermissionId === permission.id ? (
+                            <InputEnumToOptions
+                              onChange={(newAccessLevel) => {
 
-                    <InputEnumToOptions
-                      onChange={(newAccessLevel) => {
-                        if (newAccessLevel !== permission.permissionLevel) {
-                          updatePagePermissionLevel({
-                            id: permission.id,
-                            permissionLevel: newAccessLevel as PagePermissionLevelType
-                          });
+                                if (newAccessLevel !== permission.permissionLevel) {
+                                  updatePagePermissionLevel({
+                                    id: permission.id,
+                                    permissionLevel: newAccessLevel as PagePermissionLevelType
+                                  }).then(() => setSelectedPermissionId(null));
+                                }
+                                else {
+                                  setSelectedPermissionId(null);
+                                }
+                              }}
+                              keyAndLabel={filterObjectKeys(PagePermissionLevelTitle, 'exclude', ['custom'])}
+                              defaultValue={permission.permissionLevel}
+                            />
+                          ) : (
+                            <Box onClick={() => setSelectedPermissionId(permission.id)}>
+                              {PagePermissionLevelTitle[permission.permissionLevel]}
+                            </Box>
+                          )
                         }
-                      }}
-                      keyAndLabel={filterObjectKeys(PagePermissionLevelTitle, 'exclude', ['custom'])}
-                      defaultValue={permission.permissionLevel}
-                    />
 
-                    <ElementDeleteIcon onClick={() => deletePermission(permission.id)} />
+                      </Grid>
+                      <Grid item xs={2} sx={{ fontSize: '10px' }}>
+                        <ElementDeleteIcon onClick={() => deletePermission(permission.id)} />
+                      </Grid>
+
+                    </Grid>
 
                   </Box>
                 );

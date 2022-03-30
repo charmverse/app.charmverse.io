@@ -117,15 +117,6 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
         }}
       >
 
-        {/* PERMISSIONS */}
-        {/* Show the list of permissions */}
-        {
-          currentPageId && <PagePermissions pageId={currentPageId} />
-        }
-
-        {/* Show the list of permissions */}
-        {/* PERMISSIONS */}
-
         <Box
           display='flex'
           justifyContent='space-between'
@@ -168,6 +159,15 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
             )
           }
         </Collapse>
+
+        {/* PERMISSIONS */}
+        {/* Show the list of permissions */}
+        {
+          currentPageId && <PagePermissions pageId={currentPageId} />
+        }
+
+        {/* Show the list of permissions */}
+        {/* PERMISSIONS */}
       </Popover>
     </>
   );

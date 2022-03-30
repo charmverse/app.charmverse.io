@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import charmClient, { ListSpaceRolesResponse } from 'charmClient';
 import Button from 'components/common/Button';
+import InputLabel from '@mui/material/InputLabel';
 import { InputEnumToOptions } from 'components/common/form/InputEnumToOptions';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
@@ -89,31 +90,31 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
 
   return (
     <div>
-      {
-        selectedUserIds?.length > 0 && (
-          selectedUserIds.map(userId => {
-
-            const user = contributors.find(contributor => contributor.id === userId);
-
-            if (user) {
-              return (
-                <Box key={userId}>
-                  {getDisplayName(user)}
-                </Box>
-              );
-            }
-            else {
-              return null;
-            }
-
-          })
-        )
-      }
       <form onSubmit={handleSubmit(createUserPermissions)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
         <Grid container direction='column' spacing={3}>
+
+          <Grid container item direction='row' justifyContent='space-between' alignItems='center'>
+            <Grid item xs={8}>
+              <InputEnumToOptions
+                onChange={(newAccessLevel) => setPermissionLevelToAssign(newAccessLevel as PagePermissionLevelType)}
+                keyAndLabel={filterObjectKeys(PagePermissionLevelTitle, 'exclude', ['custom'])}
+                defaultValue={permissionLevelToAssign}
+              />
+
+            </Grid>
+            <Grid item xs={4}>
+              <Button
+                fullWidth
+                type='submit'
+                disabled={!permissionLevelToAssign || (selectedUserIds.length === 0 && selectedRoleIds.length === 0)}
+              >Invite
+              </Button>
+            </Grid>
+          </Grid>
           {
             userIdsToHide.length < contributors.length && (
               <Grid item>
+                <InputLabel>Users</InputLabel>
                 <InputSearchContributorMultiple
                   onChange={setSelectedUserIds}
                   filter={{
@@ -126,6 +127,7 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
           }
 
           <Grid item>
+            <InputLabel>Roles</InputLabel>
             <InputSearchRoleMultiple
               onChange={setSelectedRoleIds}
               filter={{
@@ -133,18 +135,6 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
                 userIds: roleIdsToHide
               }}
             />
-          </Grid>
-
-          <Grid item>
-            <InputEnumToOptions
-              onChange={(newAccessLevel) => setPermissionLevelToAssign(newAccessLevel as PagePermissionLevelType)}
-              keyAndLabel={filterObjectKeys(PagePermissionLevelTitle, 'exclude', ['custom'])}
-              defaultValue={permissionLevelToAssign}
-            />
-          </Grid>
-
-          <Grid item>
-            <Button type='submit' disabled={!permissionLevelToAssign || (selectedUserIds.length === 0 && selectedRoleIds.length === 0)}>Add permissions</Button>
           </Grid>
         </Grid>
       </form>
