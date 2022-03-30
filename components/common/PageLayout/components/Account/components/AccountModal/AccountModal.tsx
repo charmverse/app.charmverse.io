@@ -75,11 +75,13 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
   return (
     <Modal open={isOpen} onClose={onClose}>
       <DialogTitle onClose={onClose}>Account</DialogTitle>
+      {account && (
       <Stack mb={9} direction='row' spacing='4' alignItems='center'>
         <Avatar name={ENSName || user?.username || account} avatar={user?.avatar} />
-        <CopyableAddress address={account!} decimals={5} sx={{ fontSize: 24 }} />
+        <CopyableAddress address={account} decimals={5} sx={{ fontSize: 24 }} />
         {connectedWithDiscord && <DiscordUserName variant='subtitle2'>{user?.username}</DiscordUserName>}
       </Stack>
+      )}
       <Stack
         direction='row'
         alignItems='center'
@@ -87,10 +89,10 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
         my={1}
       >
         <Typography color='secondary'>
-          {`Connected with ${connectorName(connector)}`}
+          {account ? `Connected with ${connectorName(connector)}` : 'Connect with Metamask'}
         </Typography>
         <StyledButton size='small' variant='outlined' onClick={handleWalletProviderSwitch}>
-          Switch
+          {account ? 'Switch' : 'Connect'}
         </StyledButton>
       </Stack>
       <Stack
@@ -104,7 +106,7 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
         </Typography>
         <StyledButton
           size='small'
-          variant={connectedWithDiscord ? 'contained' : 'outlined'}
+          variant='outlined'
           color={connectedWithDiscord ? 'error' : 'primary'}
           disabled={isDisconnecting || isConnectDiscordLoading}
           onClick={connectWithDiscord}

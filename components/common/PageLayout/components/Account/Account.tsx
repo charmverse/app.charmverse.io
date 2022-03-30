@@ -127,22 +127,26 @@ function Account (): JSX.Element {
       </AccountCard>
     );
   }
-  if (!account || !chainId) {
-    return (
-      <AccountCard>
-        <AccountButton
-          // leftIcon={<SignIn />}
-          isLoading={!triedEager}
-          onClick={openWalletSelectorModal}
-        >
-          Connect to a wallet
-        </AccountButton>
-      </AccountCard>
-    );
-  }
+
+  const isConnectedWithWallet = account && chainId;
+  // return (
+  //   <AccountCard>
+  //     <AccountButton
+  //       // leftIcon={<SignIn />}
+  //       isLoading={!triedEager}
+  //       onClick={openWalletSelectorModal}
+  //     >
+  //       Connect to a wallet
+  //     </AccountButton>
+  //   </AccountCard>
+  // );
+
+  console.log(isConnectedWithWallet);
+
   return (
     <AccountCard>
       <StyledButtonGroup variant='contained' disableElevation>
+        {isConnectedWithWallet && (
         <Tooltip title={RPC[Chains[chainId]].chainName} arrow>
           <NetworkButton onClick={networkModalState.open}>
             <SvgIcon component='object' sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -150,11 +154,12 @@ function Account (): JSX.Element {
             </SvgIcon>
           </NetworkButton>
         </Tooltip>
+        )}
         <AccountButton
           onClick={accountModalState.open}
-          endIcon={<Avatar avatar={user?.avatar} name={ENSName || account} size='small' />}
+          endIcon={<Avatar avatar={user?.avatar} name={ENSName || isConnectedWithWallet ? account : ''} size='small' />}
         >
-          {ENSName || user?.username || `${shortenHex(account, 3)}`}
+          {ENSName || user?.username || `${isConnectedWithWallet ? shortenHex(account, 3) : ''}`}
         </AccountButton>
       </StyledButtonGroup>
       <AccountModal
