@@ -18,7 +18,7 @@ function InputSearchContributorBase ({ defaultValue, ...props }: Partial<Compone
 
   const { cache } = useSWRConfig();
 
-  return (
+  return contributors.length !== 0 ? (
     <Autocomplete<Contributor>
       defaultValue={defaultContributor}
       loading={contributors.length === 0}
@@ -40,7 +40,7 @@ function InputSearchContributorBase ({ defaultValue, ...props }: Partial<Compone
       )}
       {...props}
     />
-  );
+  ) : null;
 }
 
 interface IInputSearchContributorProps {
@@ -55,7 +55,7 @@ export function InputSearchContributor (props: IInputSearchContributorProps) {
     }
   }
 
-  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor)} multiple />;
+  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor)} />;
 }
 
 interface IInputSearchContributorMultipleProps {
