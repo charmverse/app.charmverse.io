@@ -9,8 +9,9 @@ import { isSpaceDomain } from 'lib/spaces';
 import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 
-// TODO: Redirects the user back to / if they disconnect wallet
 // TODO: Calling login multiple times after successful discord oauth
+// TODO: Discord login for /invite route
+// TODO: Connect wallet with an existing user only adds address
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share'];
@@ -88,7 +89,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       // Also if the user is viewing individual bounty try to log them in as it removes the react state
       if (isImportingRolesFromDiscord || isViewingBountyDetails) {
         try {
-          const loggedInUser = await charmClient.me();
+          const loggedInUser = await charmClient.getUser();
           return {
             authorized: true,
             user: loggedInUser as User

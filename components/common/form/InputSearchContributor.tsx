@@ -21,6 +21,8 @@ function InputSearchContributorBase ({ defaultValue, ...props }:
 
   // Dont show the autocomplete if there are no contributors of the space
   // It might seem unintuitive as there will always be an admin of a space
+  // But it could be empty at first during load so the defaultContributor becomes undefined,
+  // Then when its loaded the defaultContributor is assigned the correct value but MUI throws an error
   // But it fixes the MUI error when a component goes from uncontrolled to controlled
   return contributors.length !== 0 ? (
     <Autocomplete<Contributor>
