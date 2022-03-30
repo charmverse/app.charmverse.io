@@ -15,14 +15,13 @@ import type { UrlObject } from 'url';
 const publicPages = ['/', 'invite', 'share'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
-
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
-  const [user, setUser, isUserLoaded] = useUser();
+  const [user, setUser, isUserLoaded, setIsUserLoaded] = useUser();
   const [spaces, _, isSpacesLoaded] = useSpaces();
-  const isUserLoading = !!(account && !isUserLoaded);
+  const isUserLoading = !isUserLoaded;
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
   const isLoading = isUserLoading || isWalletLoading || isRouterLoading || !isSpacesLoaded;
@@ -40,33 +39,24 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
   }
 
-  async function onNoWalletOrUser (getUser: boolean) {
-    // After the discord import roles oauth flow we will be redirected to where we initiated the import /settings/roles or maybe some other url
-    // But since the user doesn't have a wallet connected, there is neither any user nor any address, so we will be redirected to the home page (/)
-    // So attempt to log the user back in using their session cookie, if we detect that they came from a discord oauth flow
-    // Also if the user is viewing individual bounty try to log them in as it removes the react state
-    if (getUser) {
-      try {
-        const loggedInUser = await charmClient.getUser();
-        return {
-          authorized: true,
-          user: loggedInUser as User
-        };
-      }
-      catch (__) {
-        // User might not be present in the session, but it shouldn't be the case if we are importing roles for discord
-        // As that means someone logged in and tried to import roles but dont have the session cookie store?
-        // Send them to home page to connect via their wallet or discord
-      }
+  async function onNoWalletOrUser () {
+    try {
+      setIsUserLoaded(false);
+      const loggedInUser = await charmClient.getUser();
+      return {
+        authorized: false,
+        user: loggedInUser as User
+      };
     }
-
-    return {
-      authorized: false,
-      redirect: {
-        pathname: '/',
-        query: { returnUrl: router.asPath }
-      }
-    };
+    catch (__) {
+      return {
+        authorized: false,
+        redirect: {
+          pathname: '/',
+          query: { returnUrl: router.asPath }
+        }
+      };
+    }
   }
 
   useEffect(() => {
@@ -81,6 +71,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
           setAuthorized(result.authorized);
           if (result.user) {
             setUser(result.user);
+            setIsUserLoaded(true);
           }
           if (result.redirect) {
             router.push(result.redirect);
@@ -113,7 +104,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       // Only get segments that evaluate to some value
       return pathElem;
     })[0] ?? '/';
-
     const spaceDomain = path.split('/')[1];
     // condition: public page
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
@@ -121,11 +111,15 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       if (account && !user) {
         return onOnlyWallet(account);
       }
+
+      if (!account && !user) {
+        return onNoWalletOrUser();
+      }
       return { authorized: true };
     }
     // condition: wallet not connected and user is not connected with discord
     else if (!account && !user) {
-      return onNoWalletOrUser(isImportingRolesFromDiscord || isViewingBountyDetails);
+      return onNoWalletOrUser();
     }
     // condition: user not loaded
     else if (!user && account) {

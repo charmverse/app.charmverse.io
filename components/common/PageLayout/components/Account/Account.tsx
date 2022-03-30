@@ -129,20 +129,6 @@ function Account (): JSX.Element {
   }
 
   const isConnectedWithWallet = account && chainId;
-  // return (
-  //   <AccountCard>
-  //     <AccountButton
-  //       // leftIcon={<SignIn />}
-  //       isLoading={!triedEager}
-  //       onClick={openWalletSelectorModal}
-  //     >
-  //       Connect to a wallet
-  //     </AccountButton>
-  //   </AccountCard>
-  // );
-
-  console.log(isConnectedWithWallet);
-
   return (
     <AccountCard>
       <StyledButtonGroup variant='contained' disableElevation>
