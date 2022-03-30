@@ -6,6 +6,7 @@ import Input from '@mui/material/Input';
 import Popover from '@mui/material/Popover';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import Loader from 'components/common/Loader';
 import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -15,7 +16,8 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { PagePermission, Role, User, Space } from '@prisma/client';
 import { getDisplayName } from 'lib/users';
 import { PagePermissionLevelTitle, permissionDescriptions } from 'lib/permissions/pages/page-permission-mapping';
-import { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { useUser } from 'hooks/useUser';
 import { PagePermissions } from './PagePermissions/PagePermissions';
 
 const StyledInput = styled(Input)`
@@ -36,6 +38,8 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
   const [copied, setCopied] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState(false);
   const [shareLink, setShareLink] = useState<null | string>(null);
+  const [pagePermissions, setPagePermissions] = useState<null | IPagePermissionFlags>(null);
+  const [user] = useUser();
 
   useEffect(() => {
     const currentPage = pages[currentPageId];
@@ -44,6 +48,19 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
     }
 
   }, [currentPageId, pages]);
+
+  useEffect(() => {
+    const currentPage = pages[currentPageId];
+    if (currentPage && user) {
+      charmClient.computeUserPagePermissions({
+        pageId: currentPage.id,
+        userId: user.id
+      }).then(permissions => {
+        setPagePermissions(permissions);
+      });
+    }
+
+  }, [currentPageId]);
 
   useEffect(() => {
     updateShareLink();
@@ -116,58 +133,66 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
           }
         }}
       >
-
-        <Box
-          display='flex'
-          justifyContent='space-between'
-          alignItems='center'
-          onChange={togglePublic}
-          padding={1}
-        >
-
-          <Box>
-
-            <Typography>Share to web</Typography>
-
-            <Typography variant='body2' color='secondary'>
-              {isPublic
-                ? 'Anyone with the link can view'
-                : 'Publish and share link with anyone'}
-            </Typography>
-          </Box>
-          <Switch
-            checked={isPublic}
-          />
-        </Box>
-        <Collapse in={isPublic}>
-          {
-            shareLink && (
-            <LinkBox p={1}>
-              <StyledInput
-                fullWidth
-                disableUnderline
-                value={shareLink}
-                endAdornment={(
-                  <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                    <Button color='secondary' variant='text' size='small'>
-                      {copied ? 'Copied!' : 'Copy'}
-                    </Button>
-                  </CopyToClipboard>
-              )}
-              />
-            </LinkBox>
-            )
-          }
-        </Collapse>
-
-        {/* PERMISSIONS */}
-        {/* Show the list of permissions */}
         {
-          currentPageId && <PagePermissions pageId={currentPageId} />
-        }
+            !pagePermissions ? (<Loader />) : (
+              <>
+                <Box
+                  display='flex'
+                  justifyContent='space-between'
+                  alignItems='center'
+                  onChange={togglePublic}
+                  padding={1}
+                >
 
-        {/* Show the list of permissions */}
-        {/* PERMISSIONS */}
+                  <Box>
+
+                    <Typography>Share to web</Typography>
+
+                    <Typography variant='body2' color='secondary'>
+                      {isPublic
+                        ? 'Anyone with the link can view'
+                        : 'Publish and share link with anyone'}
+                    </Typography>
+                  </Box>
+                  <Switch
+                    checked={isPublic}
+                    disabled={pagePermissions.edit_isPublic !== true}
+                  />
+                </Box>
+                <Collapse in={isPublic}>
+                  {
+              shareLink && (
+              <LinkBox p={1}>
+                <StyledInput
+                  fullWidth
+                  disableUnderline
+                  value={shareLink}
+                  endAdornment={(
+                    <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                      <Button color='secondary' variant='text' size='small'>
+                        {copied ? 'Copied!' : 'Copy'}
+                      </Button>
+                    </CopyToClipboard>
+                )}
+                />
+              </LinkBox>
+              )
+            }
+                </Collapse>
+
+                {/* PERMISSIONS */}
+                {/* Show the list of permissions */}
+                {
+            currentPageId && <PagePermissions pageId={currentPageId} />
+          }
+
+                {/* Show the list of permissions */}
+                {/* PERMISSIONS */}
+              </>
+            )
+
+          }
+
       </Popover>
     </>
   );

@@ -34,7 +34,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   const [user] = useUser();
   const [space] = useCurrentSpace();
 
-  const [pagePermissions, setPagePermissions] = useState<Partial<IPagePermissionFlags>>({});
+  const [pagePermissions, setPagePermissions] = useState<Partial<IPagePermissionFlags> | null>(null);
 
   const debouncedPageUpdate = useMemo(() => {
     return debouncePromise((input: Prisma.PageUpdateInput) => {
@@ -101,6 +101,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   );
 
   useEffect(() => {
+    setPagePermissions(null);
     console.log('Use effect fired');
     if (user && memoizedCurrentPage) {
       charmClient.computeUserPagePermissions({
@@ -112,22 +113,26 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
           setPagePermissions(permissions);
         });
     }
-  }, [user, memoizedCurrentPage]);
-
-  const canEdit = !publicShare && pagePermissions?.edit_content === true;
+  }, [user, currentPageId]);
 
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
-  else if (!memoizedCurrentPage) {
+  else if (!memoizedCurrentPage || !pagePermissions) {
     return null;
   }
-  else if (currentPage.type === 'board') {
-    return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={publicShare} />;
+  else if (pagePermissions?.read === false) {
+    return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
   }
-  else {
-    return <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare} />;
+  else if (pagePermissions.read === true) {
+    if (currentPage.type === 'board') {
+      return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={publicShare || pagePermissions.edit_content !== true} />;
+    }
+    else {
+      return <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare || pagePermissions.edit_content !== true} />;
+    }
   }
+
 }
 
 BlocksEditorPage.getLayout = (page: ReactElement) => {
