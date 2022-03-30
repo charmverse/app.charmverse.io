@@ -2,21 +2,19 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { User } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.post(login);
+handler.use(requireUser).post(me);
 
-async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-  const { address } = req.body;
-  const user = await prisma.user.findFirst({
+async function me (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+  const userId = req.session.user.id;
+  const user = await prisma.user.findUnique({
     where: {
-      addresses: {
-        has: address
-      }
+      id: userId
     },
     include: {
       favorites: true,
@@ -26,11 +24,10 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
   });
 
   if (!user) {
-    return res.status(401).send({ error: 'No user has been associated with this wallet address' });
+    // This shouldn't happen, it means the session cookie is storing a user that no longer exist in the database
+    // Maybe the user got deleted, but its a very rare case
+    return res.status(401).send({ error: '' });
   }
-
-  req.session.user = user;
-  await req.session.save();
 
   return res.status(200).json(user);
 }

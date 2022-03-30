@@ -27,10 +27,10 @@ export default function LoginPage () {
     setTitleState('Welcome');
   }, []);
 
-  const isCreatingAccountWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
+  const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
   const { showMessage } = useSnackbar();
 
-  useSWRImmutable(isCreatingAccountWithDiscord ? [router.query.code, router.query.discord, router.query.type] : null, async () => {
+  useSWRImmutable(isLogInWithDiscord ? [router.query.code, router.query.discord, router.query.type] : null, async () => {
     charmClient.loginWithDiscord({
       code: router.query.code as string
     }).then((loggedInUser) => {

@@ -31,6 +31,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     if (isLoading) {
       return;
     }
+
     function authCheckAndRedirect (path: string) {
       authCheck(path)
         .then(result => {
@@ -43,7 +44,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
           }
         });
     }
-
     authCheckAndRedirect(router.asPath);
 
     // on route change start - hide page content by setting authorized to false
@@ -66,20 +66,36 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
     const path = url.split('?')[0];
-
     const firstPathSegment = path.split('/').filter(pathElem => {
       // Only get segments that evaluate to some value
       return pathElem;
     })[0] ?? '/';
-
+    const isImportingRolesFromDiscord = router.query.guild_id && router.query.discord === '1' && router.query.type === 'server';
     const spaceDomain = path.split('/')[1];
-
     // condition: public page
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
       return { authorized: true };
     }
     // condition: wallet not connected and user is not connected with discord
     else if (!account && !user) {
+      // After the discord import roles oauth flow we will be redirected to where we initiated the import /settings/roles or maybe some other url
+      // But since the user doesn't have a wallet connected, there is neither any user nor any address, so we will be redirected to the home page (/)
+      // So attempt to log the user back in using their session cookie, if we detect that they came from a discord oauth flow
+      // TODO: Handle case when connecting to discord (maybe not required as the user logged in via their wallet?)
+      if (isImportingRolesFromDiscord) {
+        try {
+          const loggedInUser = await charmClient.me();
+          return {
+            authorized: true,
+            user: loggedInUser as User
+          };
+        }
+        catch (__) {
+          // User might not be present in the session, but it shouldn't be the case if we are importing roles for discord
+          // As that means someone logged in and tried to import roles but dont have the session cookie store?
+        }
+      }
+
       return {
         authorized: false,
         redirect: {
@@ -111,7 +127,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return { authorized: false, user: _user };
     }
     // condition: trying to access a space without access
-    else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
+    else if (user && spaces && spaces.length !== 0 && isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
       console.log('[RouteGuard]: send to join workspace page');
       return {
         authorized: false,

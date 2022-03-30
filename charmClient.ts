@@ -38,6 +38,10 @@ export interface PopulatedBounty extends Bounty {
 //
 class CharmClient {
 
+  async me () {
+    return http.POST<LoggedInUser | null>('/api/session/me');
+  }
+
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
       address
