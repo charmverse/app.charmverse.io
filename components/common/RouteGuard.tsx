@@ -24,8 +24,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
   const isLoading = !isUserLoaded || isWalletLoading || isRouterLoading || !isSpacesLoaded;
-  const isImportingRolesFromDiscord = router.query.guild_id && router.query.discord === '1' && router.query.type === 'server';
-  const isViewingBountyDetails = router.pathname === '/[domain]/bounties/[bountyId]';
+
   async function onOnlyWallet (_account: string) {
     try {
       const _user = await charmClient.login(_account);
@@ -122,7 +121,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return { authorized: false, user: _user };
     }
     // condition: trying to access a space without access
-    else if (!isViewingBountyDetails && !isImportingRolesFromDiscord && isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
+    else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
       console.log('[RouteGuard]: send to join workspace page');
       return {
         authorized: false,
