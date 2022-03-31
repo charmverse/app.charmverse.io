@@ -176,12 +176,12 @@ function AccountModal ({ isOpen, onClose }:
       )}
       {/* user cant be logged out so long as tehir wallet is connected (TODO: fix!) */}
       {!account && (
-        <Box display='flex' justifyContent='flex-end' mt={3}>
+        <Box display='flex' justifyContent='flex-end' mt={2}>
           <StyledButton
             size='small'
             variant='outlined'
             color='secondary'
-            disabled={isLoginOut}
+            loading={isLoginOut}
             onClick={async () => {
               setIsLoginOut(true);
               await charmClient.logout();
@@ -189,9 +189,6 @@ function AccountModal ({ isOpen, onClose }:
               setIsLoginOut(true);
               router.push('/');
             }}
-            endIcon={(
-              isLoginOut && <CircularProgress size={20} />
-            )}
           >
             Logout
           </StyledButton>
