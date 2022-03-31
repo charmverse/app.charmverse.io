@@ -10,6 +10,7 @@ import { InviteLinkPopulated } from 'lib/invites';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
+import { useRouter } from 'next/router';
 
 const CenteredBox = styled.div`
   position: absolute;
@@ -23,15 +24,13 @@ const CenteredBox = styled.div`
 export default function InvitationPage ({ error, invite }: { error?: string, invite?: InviteLinkPopulated }) {
 
   const [user] = useUser();
-  const { account } = useWeb3React();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
 
+  const router = useRouter();
+
   async function joinSpace () {
-    if (!user) {
-      await charmClient.createUser({ address: account! });
-    }
     await charmClient.acceptInvite({ id: invite!.id });
-    window.location.href = `/${invite!.space.domain}`;
+    router.push(`/${invite!.space.domain}`);
   }
 
   if (error) {
@@ -59,14 +58,19 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
           <Typography gutterBottom>You've been invited to join</Typography>
           <Typography variant='h5'>{invite!.space.name}</Typography>
         </Box>
-        {account ? (
+        {user ? (
           <PrimaryButton fullWidth size='large' onClick={joinSpace}>
             Accept Invite
           </PrimaryButton>
         ) : (
-          <PrimaryButton fullWidth size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
-            Connect Wallet
-          </PrimaryButton>
+          <Box display='flex' gap={2}>
+            <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
+              Connect Wallet
+            </PrimaryButton>
+            {/* <PrimaryButton size='large' loading={!triedEager} href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
+              Connect Discord
+            </PrimaryButton> */}
+          </Box>
         )}
       </Card>
     </CenteredBox>

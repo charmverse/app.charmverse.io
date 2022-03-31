@@ -18,7 +18,6 @@ const modalTitles: Record<FormMode, string> = {
 
 export default function BountyModal (props: Props) {
   const { open, onClose, onSubmit, mode = 'create', bounty } = props;
-
   return (
     <Modal size='large' open={open} onClose={onClose} sx={{ margin: 'auto', maxHeight: '80vh' }}>
       <DialogTitle onClose={onClose}>{modalTitles[mode]}</DialogTitle>

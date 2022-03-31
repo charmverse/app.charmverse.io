@@ -394,7 +394,7 @@ export default function BountyDetails () {
                 <CardActions sx={{ pt: 0.5, pb: 0.5 }}>
                   <Box flexDirection='row' gap={1} display='flex'>
                     { bounty.status === 'open' && !isApplicant && (
-                    <Button onClick={toggleApplicationDialog}>Apply now</Button>
+                      <Button disabled={user?.addresses.length === 0} onClick={toggleApplicationDialog}>Apply now</Button>
                     )}
                     {isAssignee && bounty.status === 'assigned' && (
                     <Button onClick={requestReview}>Request review</Button>

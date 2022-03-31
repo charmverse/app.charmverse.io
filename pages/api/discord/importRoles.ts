@@ -7,7 +7,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
 import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
-import { DiscordAccount } from './connect';
+import { DiscordAccount } from 'lib/discord/loginByDiscord';
 
 const handler = nc({
   onError,

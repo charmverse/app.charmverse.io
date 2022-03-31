@@ -2,7 +2,6 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import * as http from 'adapters/http';
 import { prisma } from 'db';
-import { getDiscordToken } from 'lib/discord/getDiscordToken';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
@@ -10,21 +9,14 @@ import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import { DiscordUser } from '@prisma/client';
 import log from 'lib/log';
+import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import { DiscordAccount } from 'lib/discord/loginByDiscord';
 import { DiscordGuildMember, DiscordServerRole } from './importRoles';
 
 const handler = nc({
   onError,
   onNoMatch
 });
-
-export interface DiscordAccount {
-  id: string
-  username: string
-  discriminator: string
-  avatar?: string
-  verified?: boolean
-  bot?: boolean
-}
 
 export interface ConnectDiscordPayload {
   code: string
@@ -39,10 +31,10 @@ export interface ConnectDiscordResponse {
 
 // TODO: Add nonce for oauth state
 async function connectDiscord (req: NextApiRequest, res: NextApiResponse<ConnectDiscordResponse | {error: string}>) {
-  const { code, spaceId } = req.body as ConnectDiscordPayload;
-  if (!code || !spaceId) {
+  const { code } = req.body as ConnectDiscordPayload;
+  if (!code) {
     res.status(400).json({
-      error: 'Invalid parameters'
+      error: 'Missing code to connect'
     });
     return;
   }
@@ -50,12 +42,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   let discordAccount: DiscordAccount;
 
   try {
-    const token = await getDiscordToken(code, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
-    discordAccount = await http.GET<DiscordAccount>('https://discord.com/api/v8/users/@me', undefined, {
-      headers: {
-        Authorization: `Bearer ${token.access_token}`
-      }
-    });
+    discordAccount = await getDiscordAccount(code, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
   }
   catch (error) {
     log.warn('Error while connecting to Discord', error);
@@ -91,31 +78,40 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     return;
   }
 
-  await prisma.user.update({
+  const avatar = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
+
+  const updatedUser = await prisma.user.update({
     where: {
       id: userId
     },
     data: {
       username: discordAccount.username,
-      avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
+      avatar
     }
   });
 
   // Get the discord guild attached with the spaceId
-  const space = await prisma.space.findUnique({
+  const spaceRoles = await prisma.spaceRole.findMany({
     where: {
-      id: spaceId
+      userId: req.session.user.id
+    },
+    include: {
+      space: true
     }
   });
 
+  const spacesWithDiscord = spaceRoles
+    .map(role => role.space)
+    .filter(space => space.discordServerId);
+
   // If the workspace is connected with a discord server
-  if (space?.discordServerId) {
+  for (const space of spacesWithDiscord) {
     // Get all the roles from the discord server
     try {
       const discordServerRoles = await authenticatedRequest<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${space.discordServerId}/roles`);
-      const rolesRecord = await findOrCreateRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
+      const rolesRecord = await findOrCreateRolesFromDiscord(discordServerRoles, space.id, req.session.user.id);
       const guildMemberResponse = await authenticatedRequest<DiscordGuildMember>(`https://discord.com/api/v8/guilds/${space.discordServerId}/members/${id}`);
-      await assignRolesFromDiscord(rolesRecord, [guildMemberResponse], spaceId);
+      await assignRolesFromDiscord(rolesRecord, [guildMemberResponse], space.id);
     }
     catch (error) {
       log.warn('Could not add Discord roles to user on connect', error);
@@ -123,9 +119,8 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   }
 
   res.status(200).json({
-    discordUser,
-    avatar: rest.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : null,
-    username: rest.username
+    ...updatedUser,
+    discordUser
   });
 }
 

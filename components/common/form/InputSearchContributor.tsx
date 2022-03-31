@@ -9,7 +9,8 @@ import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
 
-function InputSearchContributorBase ({ defaultValue, ...props }: Partial<ComponentProps<typeof Autocomplete>>) {
+function InputSearchContributorBase ({ defaultValue, ...props }:
+  Partial<ComponentProps<typeof Autocomplete>>) {
   const [contributors] = useContributors();
   const { chainId } = useWeb3React<Web3Provider>();
   const defaultContributor = typeof defaultValue === 'string' ? contributors.find(contributor => {
