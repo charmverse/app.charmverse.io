@@ -24,7 +24,6 @@ const CenteredBox = styled.div`
 export default function InvitationPage ({ error, invite }: { error?: string, invite?: InviteLinkPopulated }) {
 
   const [user] = useUser();
-  const [spaces] = useSpaces();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
 
@@ -39,7 +38,7 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
   }
 
   const spaceRole = user?.spaceRoles.find(_spaceRole => _spaceRole.spaceId === invite?.spaceId);
-
+  // Check if the user already have access to this workspace
   if (spaceRole && invite) {
     window.location.href = `/${invite.space.domain}`;
     return null;
@@ -69,7 +68,7 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
           <Typography gutterBottom>You've been invited to join</Typography>
           <Typography variant='h5'>{invite.space.name}</Typography>
         </Box>
-        {account ? (
+        {(account || user) ? (
           <PrimaryButton fullWidth size='large' onClick={joinSpace}>
             Accept Invite
           </PrimaryButton>
