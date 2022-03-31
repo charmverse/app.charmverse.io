@@ -411,8 +411,7 @@ async function createPrismaPage ({
       create: [
         {
           permissionLevel: 'full_access',
-          spaceId,
-          pageId: id
+          spaceId
         }
       ]
     }
