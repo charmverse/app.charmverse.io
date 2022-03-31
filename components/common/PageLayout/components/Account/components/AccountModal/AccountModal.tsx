@@ -186,7 +186,6 @@ function AccountModal ({ isOpen, onClose }:
               setisLoggingOut(true);
               await charmClient.logout();
               setUser(null);
-              setisLoggingOut(true);
               router.push('/');
             }}
           >
