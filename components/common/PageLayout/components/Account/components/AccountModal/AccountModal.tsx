@@ -103,7 +103,7 @@ function AccountModal ({ isOpen, onClose }:
           setUser({ ...user, discordUser: null });
         }
         catch (err) {
-          console.log('Error disconnecting from discord');
+          log.warn('Error disconnecting from discord', err);
         }
         setIsDisconnecting(false);
       }
@@ -176,7 +176,7 @@ function AccountModal ({ isOpen, onClose }:
       )}
       <Box display='flex' justifyContent='flex-end' mt={3}>
         <StyledButton
-          size='medium'
+          size='small'
           variant='outlined'
           color='secondary'
           disabled={isLoginOut}
