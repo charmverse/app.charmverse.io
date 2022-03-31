@@ -31,7 +31,7 @@ interface Props {
 
 export default function AddPagePermissionsForm ({ pageId, existingPermissions = [], permissionsAdded = () => {} }: Props) {
 
-  const { listRoles } = useRoles();
+  const { roles } = useRoles();
 
   const [availableRoles, setAvailableRoles] = useState<ListSpaceRolesResponse[]>([]);
 
@@ -41,11 +41,12 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
   const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
 
   useEffect(() => {
-    listRoles()
-      .then(roles => {
-        setAvailableRoles(availableRoles);
-      });
-  }, []);
+
+    if (roles) {
+      setAvailableRoles(roles);
+    }
+
+  }, [roles]);
 
   const userIdsToHide = existingPermissions.filter(permission => {
     return permission.user;
@@ -117,16 +118,21 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
             />
           </Grid>
 
-          <Grid item>
-            <InputLabel>Roles</InputLabel>
-            <InputSearchRoleMultiple
-              onChange={setSelectedRoleIds}
-              filter={{
-                mode: 'exclude',
-                userIds: roleIdsToHide
-              }}
-            />
-          </Grid>
+          {
+            roleIdsToHide.length < availableRoles.length && (
+              <Grid item>
+                <InputLabel>Roles</InputLabel>
+                <InputSearchRoleMultiple
+                  onChange={setSelectedRoleIds}
+                  filter={{
+                    mode: 'exclude',
+                    userIds: roleIdsToHide
+                  }}
+                />
+              </Grid>
+            )
+          }
+
         </Grid>
       </form>
     </div>

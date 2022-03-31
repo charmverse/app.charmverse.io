@@ -74,10 +74,9 @@ function Account (): JSX.Element {
 
   function postConnect () {
     setIsConnectDiscordLoading(false);
-    accountModalState.close();
     // Clean up the routes
     setTimeout(() => {
-      router.push(window.location.href.split('?')[0]);
+      router.replace(window.location.href.split('?')[0], undefined, { shallow: true });
     }, 2500);
   }
   // We might get redirected after connection with discord, so check the query param if it has a discord field
@@ -91,7 +90,6 @@ function Account (): JSX.Element {
         spaceId: space.id
       }).then(({ discordUser, username, avatar }) => {
         setUser({ ...user, username: username ?? user.username, avatar: avatar ?? user.avatar, discordUser });
-        showMessage('Successfully connected with discord', 'info');
         postConnect();
       }).catch((err) => {
         showMessage(err.error, 'error');

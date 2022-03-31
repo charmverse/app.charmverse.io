@@ -28,8 +28,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   const updateContent = req.body as Page;
 
-  console.log('Page update', req.body);
-
   // eslint-disable-next-line eqeqeq
   if (updateContent.isPublic != undefined && permissions.edit_isPublic !== true) {
     return res.status(401).json({

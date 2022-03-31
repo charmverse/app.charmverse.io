@@ -54,7 +54,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }, [data]);
 
   const addPage: AddPageFn = React.useCallback(async (page) => {
-    const spaceId = space?.id!;
+    const spaceId = space?.id;
     const id = Math.random().toString().replace('0.', '');
     const pageProperties: Prisma.PageCreateInput = {
       content: {
@@ -126,7 +126,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
       // User gets permission via role or as an individual
       const shouldApplyPermission = (permission.userId && permission.userId === user?.id)
-        || (permission.roleId && applicableRoles.some(role => role.id === permission.roleId));
+        || (permission.roleId && applicableRoles.some(role => role.id === permission.roleId))
+        || (userSpaceRole && permission.spaceId === userSpaceRole.spaceId);
 
       if (shouldApplyPermission) {
 

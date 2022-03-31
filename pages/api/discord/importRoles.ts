@@ -59,16 +59,6 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     return;
   }
 
-  const userId = req.session.user.id;
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId
-    },
-    include: {
-      discordUser: true
-    }
-  });
-
   await prisma.space.update({
     where: {
       id: spaceId
@@ -96,7 +86,11 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
 
   while (discordGuildMembersResponse.status === 'success' && discordGuildMembersResponse.data.length > 0) {
     discordGuildMembers.push(...discordGuildMembersResponse.data);
-    lastUserId = discordGuildMembersResponse.data[discordGuildMembersResponse.data.length - 1].user?.id!;
+    const guildMember = discordGuildMembersResponse.data[discordGuildMembersResponse.data.length - 1];
+    if (!guildMember.user) {
+      throw new Error('Guild member does not have a user property');
+    }
+    lastUserId = guildMember.user.id;
     discordGuildMembersResponse = await handleDiscordResponse<DiscordGuildMember[]>(`https://discord.com/api/v8/guilds/${guildId}/members?limit=100&after=${lastUserId}`);
   }
 

@@ -12,7 +12,6 @@ handler.get(async (req, res) => {
   const state = JSON.parse(decodeURIComponent(req.query.state as string));
   const redirect = state?.redirect;
   const type: 'connect' | 'server' = state.type ?? 'connect';
-
   if (!redirect || !type) {
 
     const error = { error: 'Invalid state in discord callback' };
@@ -32,7 +31,7 @@ handler.get(async (req, res) => {
     return;
   }
 
-  res.redirect(`${redirect}?code=${tempAuthCode}&discord=1&type=${type}`);
+  res.redirect(`${redirect}?code=${tempAuthCode}&discord=1&type=${type}${req.query.guild_id ? `&guild_id=${req.query.guild_id}` : ''}`);
 });
 
 export default handler;

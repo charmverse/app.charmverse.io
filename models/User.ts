@@ -8,13 +8,13 @@ export interface Contributor extends User {
   role: Role;
 }
 
-interface INestedMemberships {
-  spaceRoleToRole: Array<SpaceRoleToRole & {role: RoleMembership}>
+interface NestedMemberships {
+  spaceRoleToRole: (SpaceRoleToRole & { role: RoleMembership })[]
 }
 
 export interface LoggedInUser extends User {
   favorites: FavoritePage[];
-  spaceRoles: (SpaceRole & INestedMemberships) []
+  spaceRoles: (SpaceRole & NestedMemberships)[]
   ensName?: string;
   discordUser?: DiscordUser | null
 

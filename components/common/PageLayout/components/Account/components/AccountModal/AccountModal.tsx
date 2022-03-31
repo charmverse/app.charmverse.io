@@ -13,8 +13,7 @@ import useENSName from 'hooks/useENSName';
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
-import { CircularProgress } from '@mui/material';
-// import AccountConnections from './components/AccountConnections';
+import log from 'lib/log';
 
 const DiscordUserName = styled(Typography)`
   position: relative;
@@ -32,6 +31,8 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
   const ENSName = useENSName(account);
   const [user, setUser] = useUser();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+
+  const connectedWithDiscord = Boolean(user?.discordUser);
 
   const handleWalletProviderSwitch = () => {
     openWalletSelectorModal();
@@ -51,25 +52,20 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
     }
   };
 
-  const connectedWithDiscord = Boolean(user?.discordUser);
+  async function connectDiscord () {
+    window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
+  }
 
-  async function connectWithDiscord () {
-    if (!isConnectDiscordLoading) {
-      if (connectedWithDiscord) {
-        setIsDisconnecting(true);
-        try {
-          await charmClient.disconnectDiscord();
-          setUser({ ...user, discordUser: null });
-        }
-        catch (err) {
-          console.log('Error disconnecting from discord');
-        }
-        setIsDisconnecting(false);
-      }
-      else {
-        window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
-      }
+  async function disconnectDiscord () {
+    setIsDisconnecting(true);
+    try {
+      await charmClient.disconnectDiscord();
+      setUser({ ...user, discordUser: null });
     }
+    catch (err) {
+      log.error('Error disconnecting from discord', err);
+    }
+    setIsDisconnecting(false);
   }
 
   return (
@@ -104,13 +100,11 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
         </Typography>
         <StyledButton
           size='small'
-          variant={connectedWithDiscord ? 'contained' : 'outlined'}
+          variant='outlined'
           color={connectedWithDiscord ? 'error' : 'primary'}
           disabled={isDisconnecting || isConnectDiscordLoading}
-          onClick={connectWithDiscord}
-          endIcon={(
-            isConnectDiscordLoading && <CircularProgress size={20} />
-          )}
+          onClick={connectedWithDiscord ? disconnectDiscord : connectDiscord}
+          loading={isConnectDiscordLoading}
         >
           {connectedWithDiscord ? 'Disconnect' : 'Connect'}
         </StyledButton>
