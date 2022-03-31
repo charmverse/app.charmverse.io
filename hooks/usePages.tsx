@@ -15,9 +15,9 @@ import { IPagePermissionFlags, IPageWithPermissions, PageOperationType } from '.
 type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
 type IContext = {
   currentPageId: string,
-  pages: Record<string, Page>,
+  pages: Record<string, Page | undefined>,
   setCurrentPageId: Dispatch<SetStateAction<string>>,
-  setPages: Dispatch<SetStateAction<Record<string, Page>>>,
+  setPages: Dispatch<SetStateAction<Record<string, Page | undefined>>>,
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   addPage: AddPageFn,
@@ -42,7 +42,7 @@ export const PagesContext = createContext<Readonly<IContext>>({
 export function PagesProvider ({ children }: { children: ReactNode }) {
   const [isEditing, setIsEditing] = useState(false);
   const [space] = useCurrentSpace();
-  const [pages, setPages] = useState<Record<string, Page>>({});
+  const [pages, setPages] = useState<Record<string, Page | undefined>>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const intl = useIntl();
