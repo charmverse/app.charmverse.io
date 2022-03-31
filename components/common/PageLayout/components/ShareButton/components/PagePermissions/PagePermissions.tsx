@@ -188,6 +188,45 @@ export default function PagePermissions ({ pageId }: Props) {
           />
         </div>
       )}
+
+      <Box display='flex'>
+        <Grid container direction='row' justifyContent='space-around' alignItems='center'>
+          <Grid item xs={6}>
+            {`${space?.name} members`}
+          </Grid>
+          <Grid item xs={3} sx={{ fontSize: '12px' }}>
+            {
+              selectedPermissionId === 'space' ? (
+                <InputEnumToOptions
+                  onChange={(newAccessLevel) => {
+                    updateSpacePagePermissionLevel(newAccessLevel as PagePermissionLevel)
+                      .then(() => setSelectedPermissionId(null));
+                  }}
+                  keyAndLabel={permissionsWithoutCustom}
+                  defaultValue={spaceLevelPermission?.permissionLevel}
+                />
+              ) : (
+                <Box onClick={() => {
+                  if (userPagePermissions?.grant_permissions === true) {
+                    setSelectedPermissionId('space');
+                  }
+                }}
+                >
+                  {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : (permissionsLoaded ? 'No access' : '')}
+                </Box>
+              )
+            }
+          </Grid>
+          <Grid item xs={2} sx={{ fontSize: '10px' }}>
+            {
+              userPagePermissions?.grant_permissions === true && (<ElementDeleteIcon onClick={() => updateSpacePagePermissionLevel('delete')} />)
+            }
+          </Grid>
+
+        </Grid>
+
+      </Box>
+
       {
         sortedPermissions.map(permission => {
           return (

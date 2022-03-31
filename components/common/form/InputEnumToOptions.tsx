@@ -23,6 +23,7 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
     }
   }, [defaultValue]);
 
+  console.log('value', defaultValue, value);
   return (
     <FormControl fullWidth>
       {
@@ -30,7 +31,7 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
       }
 
       <Select
-        value={defaultValue}
+        value={value}
         onChange={(ev) => {
           setValue(ev.target.value as string);
           onChange(ev.target.value as string);

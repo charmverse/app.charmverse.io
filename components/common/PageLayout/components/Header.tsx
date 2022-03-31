@@ -166,13 +166,14 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
 
           {isPage && isExportablePage && (
             <Box sx={{ ml: 1 }} ref={pageMenuAnchor}>
-              <IconButton size='small'>
-                <MoreHorizIcon
-                  onClick={() => {
-                    setPageMenuOpen(!pageMenuOpen);
-                    setPageMenuAnchorElement(pageMenuAnchor.current!);
-                  }}
-                />
+              <IconButton
+                size='small'
+                onClick={() => {
+                  setPageMenuOpen(!pageMenuOpen);
+                  setPageMenuAnchorElement(pageMenuAnchor.current || null);
+                }}
+              >
+                <MoreHorizIcon />
               </IconButton>
               <Popover
                 anchorEl={pageMenuAnchorElement}
