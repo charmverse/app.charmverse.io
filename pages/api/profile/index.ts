@@ -103,7 +103,15 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     },
     include: {
       favorites: true,
-      spaceRoles: true,
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          }
+        }
+      },
       discordUser: true
     },
     data: req.body
