@@ -95,7 +95,7 @@ function Account (): JSX.Element {
           onClick={accountModalState.open}
           endIcon={<Avatar avatar={user?.avatar} name={ENSName ?? user?.addresses[0] ?? account ?? ''} size='small' />}
         >
-          {ENSName || user?.username || `${user?.addresses.length !== 0 ? shortenHex(user?.addresses[0]!, 3) : ''}`}
+          {ENSName || user?.username || `${user?.addresses[0] ? shortenHex(user.addresses[0], 3) : ''}`}
         </AccountButton>
       </StyledButtonGroup>
       <AccountModal

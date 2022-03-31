@@ -18,8 +18,6 @@ export function useDiscordLogin () {
         .then((loggedInUser) => {
           // This will fetch all the spaces of that user
           setUser(loggedInUser);
-
-          router.push(window.location.href.split('?')[0], undefined, { shallow: true });
         })
         .catch(err => {
           showMessage(err.error ?? 'Something went wrong', 'error');
