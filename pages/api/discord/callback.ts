@@ -9,10 +9,10 @@ const handler = nc({
 
 handler.get(async (req, res) => {
   const state = JSON.parse(decodeURIComponent(req.query.state as string));
-  const redirect = state?.redirect;
+  const redirect = state?.redirect || '/';
   const type: 'connect' | 'server' | 'login' = state.type ?? 'connect';
 
-  if (!redirect || !type) {
+  if (!type) {
     const error = { error: 'Invalid state in discord callback' };
     log.warn('Error parsing state discord callback', error);
     // TODO: Error page

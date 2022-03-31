@@ -15,7 +15,7 @@ export const Container = styled(Box)`
   margin: 0 auto;
 `;
 
-export default function LoginPageContent ({ account }: { account: string | null | undefined }) {
+export default function LoginPageContent () {
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
 
   return (
@@ -66,7 +66,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
                 Connect Wallet
               </PrimaryButton>
               <Typography color='secondary' variant='body2'>or</Typography>
-              <Button variant='outlined' size='large' href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
+              <Button variant='outlined' size='large' href='/api/discord/oauth?type=login'>
                 Connect Discord
               </Button>
             </Box>
