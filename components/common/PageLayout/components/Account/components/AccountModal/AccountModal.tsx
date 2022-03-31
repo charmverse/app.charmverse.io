@@ -174,26 +174,29 @@ function AccountModal ({ isOpen, onClose }:
           {discordError}
         </Alert>
       )}
-      <Box display='flex' justifyContent='flex-end' mt={3}>
-        <StyledButton
-          size='small'
-          variant='outlined'
-          color='secondary'
-          disabled={isLoginOut}
-          onClick={async () => {
-            setIsLoginOut(true);
-            await charmClient.logout();
-            setUser(null);
-            setIsLoginOut(true);
-            router.push('/');
-          }}
-          endIcon={(
-            isLoginOut && <CircularProgress size={20} />
-          )}
-        >
-          Logout
-        </StyledButton>
-      </Box>
+      {/* user cant be logged out so long as tehir wallet is connected (TODO: fix!) */}
+      {!account && (
+        <Box display='flex' justifyContent='flex-end' mt={3}>
+          <StyledButton
+            size='small'
+            variant='outlined'
+            color='secondary'
+            disabled={isLoginOut}
+            onClick={async () => {
+              setIsLoginOut(true);
+              await charmClient.logout();
+              setUser(null);
+              setIsLoginOut(true);
+              router.push('/');
+            }}
+            endIcon={(
+              isLoginOut && <CircularProgress size={20} />
+            )}
+          >
+            Logout
+          </StyledButton>
+        </Box>
+      )}
     </Modal>
   );
 }
