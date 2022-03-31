@@ -2,12 +2,13 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
 import { IApiError } from 'lib/utilities/errors';
 import { Prisma, SpaceRole } from '@prisma/client';
+import { NextHandler } from 'next-connect';
 
 /**
  * Allow an endpoint to be consumed if it originates from a share page
  */
 export function requireSpaceMembership (role?: SpaceRole['role']) {
-  return async (req: NextApiRequest, res: NextApiResponse<IApiError>, next: Function) => {
+  return async (req: NextApiRequest, res: NextApiResponse<IApiError>, next: NextHandler) => {
 
     if (!req.session.user) {
       return res.status(401).send({ error: 'Please log in' } as any);

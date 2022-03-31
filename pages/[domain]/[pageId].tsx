@@ -11,6 +11,8 @@ import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState, useCallback } from 'react';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import log from 'lib/log';
+import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
+import { useUser } from 'hooks/useUser';
 
 /**
  * @viewId - Enforce a specific view inside the nested blocks editor
@@ -21,11 +23,15 @@ interface IBlocksEditorPage {
 
 export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditorPage) {
 
-  const { currentPageId, setIsEditing, pages, setPages, setCurrentPageId } = usePages();
+  const { currentPageId, setIsEditing, pages, setPages, setCurrentPageId, getPagePermissions } = usePages();
   const router = useRouter();
   const pageId = router.query.pageId as string;
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
+
+  const [user] = useUser();
+
+  const [pagePermissions, setPagePermissions] = useState<Partial<IPagePermissionFlags> | null>(null);
 
   const debouncedPageUpdate = useMemo(() => {
     return debouncePromise((input: Prisma.PageUpdateInput) => {
@@ -91,18 +97,33 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     [currentPageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title]
   );
 
+  useEffect(() => {
+    setPagePermissions(null);
+
+    if (user && memoizedCurrentPage) {
+      const permissions = getPagePermissions(memoizedCurrentPage.id);
+      setPagePermissions(permissions);
+    }
+  }, [user, currentPageId]);
+
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
-  else if (!memoizedCurrentPage) {
+  else if (!memoizedCurrentPage || !pagePermissions) {
     return null;
   }
-  else if (currentPage.type === 'board') {
-    return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={publicShare} />;
+  else if (pagePermissions?.read === false) {
+    return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
   }
-  else {
-    return <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare} />;
+  else if (pagePermissions.read === true) {
+    if (currentPage.type === 'board') {
+      return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={publicShare || pagePermissions.edit_content !== true} />;
+    }
+    else {
+      return <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare || pagePermissions.edit_content !== true} />;
+    }
   }
+  return null;
 }
 
 BlocksEditorPage.getLayout = (page: ReactElement) => {

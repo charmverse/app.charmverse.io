@@ -195,7 +195,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
             <InputLabel>
               Reviewer
             </InputLabel>
-            <InputSearchContributor defaultValue={bounty?.reviewer!} onChange={setReviewer} />
+            <InputSearchContributor defaultValue={bounty?.reviewer as string} onChange={setReviewer} />
           </Grid>
           <Grid container item>
             <Grid item xs>

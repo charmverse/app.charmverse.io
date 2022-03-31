@@ -6,6 +6,8 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
+import { computeUserPagePermissions } from '../permissions/pages/page-permission-compute';
+import { PageOperationType } from '../permissions/pages/page-permission-interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -14,15 +16,6 @@ handler.use(requireUser).post(createPage);
 async function createPage (req: NextApiRequest, res: NextApiResponse<Page>) {
   const data = req.body as Prisma.PageCreateInput;
   const page = await prisma.page.create({ data });
-  const pagePermission = await prisma.pagePermission.create({
-    data: {
-      permissionLevel: 'full_access',
-      spaceId: page.spaceId,
-      pageId: page.id
-    }
-  });
-
-  (page as any).permissions = [pagePermission];
   logFirstWorkspacePageCreation(page);
   logFirstUserPageCreation(page);
   return res.status(200).json(page);
@@ -96,4 +89,49 @@ async function logFirstUserPageCreation (page: Page) {
 
     postToDiscord(eventLog);
   }
+}
+
+/**
+ * Enforce page permissions on an API endpoint
+ * Requires a logged in user
+ */
+export function requirePagePermissions (
+  requiredPermissions: PageOperationType [],
+  routeHandler: (req: NextApiRequest, res: NextApiResponse<Page>) => any
+) {
+
+  return async function (req: NextApiRequest, res: NextApiResponse) {
+    const pageId = req.query.id as string ?? req.body.id as string;
+
+    if (!pageId) {
+      return res.status(400).send({
+        error: 'Please provide a valid page ID'
+      });
+    }
+
+    const userId = req.session?.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({
+        error: 'You must be logged in'
+      });
+    }
+
+    const permissionSet = await computeUserPagePermissions({
+      pageId,
+      userId
+    });
+
+    for (const permission of requiredPermissions) {
+      if (permissionSet[permission] !== true) {
+        return res.status(401).json({
+          error: 'You are not allowed to perform this action'
+        });
+      }
+    }
+
+    return routeHandler(req, res);
+
+  };
+
 }

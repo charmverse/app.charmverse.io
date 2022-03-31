@@ -26,7 +26,15 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     },
     include: {
       favorites: true,
-      spaceRoles: true,
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          }
+        }
+      },
       discordUser: true
     }
   });
@@ -43,13 +51,21 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       },
       include: {
         favorites: true,
-        spaceRoles: true
+        spaceRoles: {
+          include: {
+            spaceRoleToRole: {
+              include: {
+                role: true
+              }
+            }
+          }
+        }
       }
     });
 
     logSignup();
 
-    req.session.user = newUser;
+    req.session.user = { ...newUser };
     await req.session.save();
     res.status(200).json(newUser);
   }
@@ -62,7 +78,15 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
     },
     include: {
       favorites: true,
-      spaceRoles: true,
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          }
+        }
+      },
       discordUser: true
     }
   });
@@ -79,7 +103,15 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     },
     include: {
       favorites: true,
-      spaceRoles: true,
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          }
+        }
+      },
       discordUser: true
     },
     data: req.body

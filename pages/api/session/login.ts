@@ -20,8 +20,16 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
     },
     include: {
       favorites: true,
-      spaceRoles: true,
-      discordUser: true
+      discordUser: true,
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          }
+        }
+      }
     }
   });
 

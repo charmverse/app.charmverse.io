@@ -1,31 +1,57 @@
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, AutocompleteProps, Box, TextField, Typography } from '@mui/material';
 import { useContributors } from 'hooks/useContributors';
 import { Contributor } from 'models';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
-import { HTMLAttributes, ComponentProps } from 'react';
+import { HTMLAttributes, useState, useEffect } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
 
-function InputSearchContributorBase ({ defaultValue, ...props }:
-  Partial<ComponentProps<typeof Autocomplete>>) {
-  const [contributors] = useContributors();
+interface IContributorsFilter {
+  mode: 'include' | 'exclude',
+  userIds: string []
+}
+
+function filterContributors<T extends { id: string }> (contributors: T [], filter: IContributorsFilter): T[] {
+  if (filter.mode === 'exclude') {
+    return contributors.filter(contributor => {
+      const shouldInclude = filter.userIds.indexOf(contributor.id) === -1;
+      return shouldInclude;
+    });
+  }
+  else {
+    return contributors.filter(contributor => {
+      const shouldInclude = filter.userIds.indexOf(contributor.id) > -1;
+      return shouldInclude;
+    });
+  }
+}
+
+type BooleanField = boolean | undefined;
+
+interface Props extends Omit<AutocompleteProps<Contributor, BooleanField, BooleanField, BooleanField>, 'options' | 'renderInput'> {
+  filter?: IContributorsFilter;
+  options: Contributor[];
+}
+
+function InputSearchContributorBase ({ filter, options, placeholder, ...props }: Props) {
+
   const { chainId } = useWeb3React<Web3Provider>();
-  const defaultContributor = typeof defaultValue === 'string' ? contributors.find(contributor => {
-    return contributor.id === defaultValue;
-  }) : undefined;
 
   const { cache } = useSWRConfig();
 
-  return contributors.length !== 0 ? (
-    <Autocomplete<Contributor>
-      defaultValue={defaultContributor}
-      loading={contributors.length === 0}
+  const filteredOptions = filter ? filterContributors(options, filter) : options;
+
+  return (
+    <Autocomplete
+      {...props}
+      disabled={filteredOptions.length === 0}
+      loading={options.length === 0}
       sx={{ minWidth: 150 }}
       // @ts-ignore - not sure why this fails
-      options={contributors}
+      options={filteredOptions}
       autoHighlight
       getOptionLabel={(user) => cache.get(`@"ENS",102~,"${user.addresses[0]}",${chainId},`) ?? getDisplayName(user)}
       renderOption={(_props, user) => (
@@ -34,42 +60,90 @@ function InputSearchContributorBase ({ defaultValue, ...props }:
       renderInput={(params) => (
         <TextField
           {...params}
+          placeholder={placeholder}
           inputProps={{
             ...params.inputProps
           }}
         />
       )}
-      {...props}
     />
-  ) : null;
+  );
 }
 
 interface IInputSearchContributorProps {
   onChange: (id: string) => void
-  defaultValue?: string
+  defaultValue?: string,
+  filter?: IContributorsFilter
 }
 
-export function InputSearchContributor (props: IInputSearchContributorProps) {
+export function InputSearchContributor ({ defaultValue, onChange, ...props }: IInputSearchContributorProps) {
+
+  const [contributors] = useContributors();
+  const [value, setValue] = useState<Contributor | null>(null);
+
+  useEffect(() => {
+    if (defaultValue && !value) {
+      const contributor = contributors.find(c => c.id === defaultValue);
+      if (contributor) {
+        setValue(contributor);
+      }
+    }
+  }, [defaultValue, contributors]);
+
   function emitValue (selectedUser: Contributor) {
     if (selectedUser) {
-      props.onChange(selectedUser.id);
+      onChange(selectedUser.id);
     }
+    setValue(selectedUser);
   }
 
-  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor)} />;
+  return (
+    <InputSearchContributorBase
+      multiple
+      options={contributors}
+      onChange={(e, _value) => emitValue(_value as Contributor)}
+      placeholder='Select a user'
+      {...props}
+    />
+  );
 }
 
 interface IInputSearchContributorMultipleProps {
   onChange: (id: string[]) => void
   defaultValue?: string[]
+  filter?: IContributorsFilter
 }
 
-export function InputSearchContributorMultiple ({ onChange, ...props }: IInputSearchContributorMultipleProps) {
+export function InputSearchContributorMultiple ({ onChange, defaultValue, ...props }: IInputSearchContributorMultipleProps) {
+
+  const [contributors] = useContributors();
+  const [value, setValue] = useState<Contributor[]>([]);
+
   function emitValue (users: Contributor[]) {
-    console.log('change!', users);
     onChange(users.map(user => user.id));
+    setValue(users);
   }
-  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor[])} multiple />;
+
+  useEffect(() => {
+    if (defaultValue && value.length === 0) {
+      const defaultContributors = contributors.filter(contributor => {
+        return defaultValue.includes(contributor.id);
+      });
+      setValue(defaultContributors);
+    }
+  }, [defaultValue, contributors]);
+
+  return (
+    <InputSearchContributorBase
+      filterSelectedOptions
+      multiple
+      options={contributors}
+      placeholder='Select users'
+      value={value}
+      onChange={(e, _value) => emitValue(_value as Contributor[])}
+      {...props}
+    />
+  );
 }
 
 export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contributor, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement>) {

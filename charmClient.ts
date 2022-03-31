@@ -1,18 +1,19 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod, Role, DiscordUser } from '@prisma/client';
+import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, DiscordUser } from '@prisma/client';
 import * as http from 'adapters/http';
-import { Contributor, LoggedInUser, BountyWithDetails } from 'models';
+import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
+import { getDisplayName } from 'lib/users';
+import { BountyWithDetails, Contributor, LoggedInUser } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
-import { getDisplayName } from 'lib/users';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
 import { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
-import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
@@ -472,6 +473,29 @@ class CharmClient {
 
   unassignRole (data: {spaceId: string, roleId: string, userId: string}): Promise<Role []> {
     return http.DELETE('/api/roles/assignment', data);
+  }
+
+  /**
+   * Get full set of permissions for a specific user on a certain page
+   */
+  computeUserPagePermissions (request: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
+    return http.GET('/api/permissions/query', request);
+  }
+
+  listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
+    return http.GET('/api/permissions', { pageId });
+  }
+
+  createPermission (permission: IPagePermissionToCreate): Promise<boolean> {
+    return http.POST('/api/permissions', permission);
+  }
+
+  updatePermission (permissionId: string, permission: IPagePermissionUpdate): Promise<boolean> {
+    return http.PUT(`/api/permissions/${permissionId}`, permission);
+  }
+
+  deletePermission (permissionId: string): Promise<boolean> {
+    return http.DELETE('/api/permissions', { permissionId });
   }
 }
 

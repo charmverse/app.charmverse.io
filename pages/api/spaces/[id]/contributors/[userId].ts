@@ -1,6 +1,6 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
+import nc, { NextHandler } from 'next-connect';
 import { onError, onNoMatch, requireUser, hasAccessToSpace } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Role } from 'models';
@@ -8,7 +8,7 @@ import { prisma } from 'db';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-const requireAdmin = async (req: NextApiRequest, res: NextApiResponse, next: Function) => {
+const requireAdmin = async (req: NextApiRequest, res: NextApiResponse, next: NextHandler) => {
   const userId = req.session.user.id;
   const { error } = await hasAccessToSpace({ userId, spaceId: req.query.id as string, role: 'admin' });
   if (error) {

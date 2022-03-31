@@ -8,7 +8,8 @@
   "extends": [
     "plugin:react/recommended",
     "airbnb",
-    "plugin:@next/next/recommended"
+    "plugin:@next/next/recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -24,6 +25,11 @@
   ],
   "rules": {
     "@next/next/no-img-element": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-empty-interface": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
     "brace-style": [
@@ -40,6 +46,7 @@
     "import/extensions": "off",
     "import/no-unresolved": "off",
     "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
     "jsx-quotes": [
       "error",
       "prefer-single"
@@ -56,6 +63,7 @@
     "no-alert": "off",
     "no-confusing-arrow": "off",
     "no-else-return": "off",
+
     "no-multiple-empty-lines": [
       "error",
       {
@@ -81,6 +89,7 @@
       }
     ],
     "no-await-in-loop": "off",
+    "no-throw-literal": "off",
     "object-curly-newline": "off",
     "padded-blocks": "off",
     "prefer-destructuring": "off",
