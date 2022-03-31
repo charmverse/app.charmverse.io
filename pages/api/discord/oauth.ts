@@ -11,9 +11,9 @@ const handler = nc({
   onNoMatch
 });
 
-handler.get(login);
+handler.get(oauth);
 
-async function login (req: NextApiRequest, res: NextApiResponse) {
+async function oauth (req: NextApiRequest, res: NextApiResponse) {
   const query = req.query as {
     redirect: string,
     type: 'connect' | 'server' | 'login'

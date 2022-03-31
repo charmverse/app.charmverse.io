@@ -14,14 +14,6 @@ handler.get(async (req, res) => {
   const redirect = state?.redirect || '/';
   const type: 'connect' | 'server' | 'login' = state.type ?? 'connect';
 
-  if (!type) {
-    const error = { error: 'Invalid state in discord callback' };
-    log.warn('Error parsing state discord callback', error);
-    // TODO: Error page
-    res.status(400).send(error);
-    return;
-  }
-
   const tempAuthCode = req.query.code;
   if (req.query.error || typeof tempAuthCode !== 'string') {
     res.redirect(
@@ -43,6 +35,7 @@ handler.get(async (req, res) => {
       return;
     }
     await req.session.save();
+    return res.redirect(redirect);
   }
 
   // When login with discord ?returnUrl is passed after oauth flow, that messes up the whole url
