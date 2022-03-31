@@ -19,11 +19,11 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
-  const [user, setUser, isUserLoaded, setIsUserLoaded] = useUser();
+  const [user, setUser, isUserRequestComplete] = useUser();
   const [spaces, _, isSpacesLoaded] = useSpaces();
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
-  const isLoading = !isUserLoaded || isWalletLoading || isRouterLoading || !isSpacesLoaded;
+  const isLoading = !isUserRequestComplete || isWalletLoading || isRouterLoading || !isSpacesLoaded;
 
   async function onOnlyWallet (_account: string) {
     try {
@@ -58,13 +58,13 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
           setAuthorized(result.authorized);
           if (result.user) {
             setUser(result.user);
-            setIsUserLoaded(true);
           }
           if (result.redirect) {
             router.push(result.redirect);
           }
         });
     }
+
     authCheckAndRedirect(router.asPath);
 
     // on route change start - hide page content by setting authorized to false
@@ -94,11 +94,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     const spaceDomain = path.split('/')[1];
     // condition: public page
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
-      // Connected wallet in / route
-      if (account && !user) {
-        return onOnlyWallet(account);
-      }
-
       return { authorized: true };
     }
     // condition: wallet not connected and user is not connected with discord
