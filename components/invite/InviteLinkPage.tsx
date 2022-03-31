@@ -66,7 +66,7 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
             Accept Invite
           </PrimaryButton>
         ) : (
-          <Box display='flex' gap={1}>
+          <Box display='flex' gap={2}>
             <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
               Connect Wallet
             </PrimaryButton>
