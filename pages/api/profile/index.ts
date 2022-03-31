@@ -10,12 +10,12 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .post(createProfile)
+  .post(createUser)
   .use(requireUser)
-  .get(getProfile)
+  .get(getUser)
   .put(updateUser);
 
-async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
   const { address } = req.body;
   const user = await prisma.user.findFirst({
@@ -55,7 +55,7 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
   }
 }
 
-async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
   const profile = await prisma.user.findUnique({
     where: {
       id: req.session.user.id
@@ -82,9 +82,7 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       spaceRoles: true,
       discordUser: true
     },
-    data: {
-      addresses: [req.body.address]
-    }
+    data: req.body
   });
   return res.status(200).json({
     ...user,

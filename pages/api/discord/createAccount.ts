@@ -16,7 +16,7 @@ const handler = nc({
 
 export async function createAccountWithDiscord (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
   const { code } = req.body as {code: string};
-  const discordAccount = await getDiscordAccount(code as string, req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
+  const discordAccount = await getDiscordAccount(code as string, req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
   const newUser = await prisma.user.create({
     data: {
       username: discordAccount.username,

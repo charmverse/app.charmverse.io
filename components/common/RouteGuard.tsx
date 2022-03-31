@@ -8,6 +8,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { isSpaceDomain } from 'lib/spaces';
 import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
+import log from 'lib/log';
 
 // TODO: Discord login for /invite route
 
@@ -19,33 +20,11 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
-  const [user, setUser, isUserLoaded, setIsUserLoaded] = useUser();
+  const [user, setUser, isUserRequestComplete] = useUser();
   const [spaces, _, isSpacesLoaded] = useSpaces();
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
-  const isLoading = !isUserLoaded || isWalletLoading || isRouterLoading || !isSpacesLoaded;
-  const isImportingRolesFromDiscord = router.query.guild_id && router.query.discord === '1' && router.query.type === 'server';
-  const isViewingBountyDetails = router.pathname === '/[domain]/bounties/[bountyId]';
-  async function onOnlyWallet (_account: string) {
-    try {
-      const _user = await charmClient.login(_account);
-      return { authorized: false, user: _user };
-    }
-    catch (error) {
-      const _user = await charmClient.createUser({ address: _account });
-      return { authorized: false, user: _user };
-    }
-  }
-
-  async function onNoWalletOrUser () {
-    return {
-      authorized: true,
-      redirect: {
-        pathname: '/',
-        query: { returnUrl: router.asPath }
-      }
-    };
-  }
+  const isLoading = !isUserRequestComplete || isWalletLoading || isRouterLoading || !isSpacesLoaded;
 
   useEffect(() => {
     // wait to listen to events until data is loaded
@@ -53,19 +32,21 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return;
     }
 
-    function authCheckAndRedirect (path: string) {
-      authCheck(path)
-        .then(result => {
-          setAuthorized(result.authorized);
-          if (result.user) {
-            setUser(result.user);
-            setIsUserLoaded(true);
-          }
-          if (result.redirect) {
-            router.push(result.redirect);
-          }
-        });
+    async function authCheckAndRedirect (path: string) {
+
+      const result = await authCheck(path);
+
+      setAuthorized(result.authorized);
+
+      if (result.user) {
+        setUser(result.user);
+      }
+
+      if (result.redirect) {
+        router.push(result.redirect);
+      }
     }
+
     authCheckAndRedirect(router.asPath);
 
     // on route change start - hide page content by setting authorized to false
@@ -87,43 +68,65 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
 
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
+
     const path = url.split('?')[0];
+
     const firstPathSegment = path.split('/').filter(pathElem => {
       // Only get segments that evaluate to some value
       return pathElem;
     })[0] ?? '/';
+
     const spaceDomain = path.split('/')[1];
+
     // condition: public page
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
-      // Connected wallet in / route
-      if (account && !user) {
-        return onOnlyWallet(account);
-      }
-
       return { authorized: true };
     }
-    // condition: wallet not connected and user is not connected with discord
-    else if (!account && !user) {
-      return onNoWalletOrUser();
+    // condition: no user session and no wallet address
+    else if (!user && !account) {
+      log.info('[RouteGuard]: redirect to login');
+      return {
+        authorized: true,
+        redirect: {
+          pathname: '/',
+          query: { returnUrl: router.asPath }
+        }
+      };
     }
-    // condition: user not loaded
+    // condition: no session, but a wallet is connected
     else if (!user && account) {
-      console.log('[RouteGuard]: user not loaded');
-      return onOnlyWallet(account);
-    }
-    // condition: user switches to a new/unknown address
-    // Users created via discord will have user.addresses === 0
-    else if (user && account && (user.addresses.length !== 0 && !user.addresses.includes(account))) {
-      console.log('[RouteGuard]: unknown address');
-      let _user = await charmClient.login(account).catch(err => null);
-      if (!_user) {
-        _user = await charmClient.createUser({ address: account });
+      log.info('[RouteGuard]: log in user by wallet address');
+      const _user = await charmClient.login(account).catch(err => null);
+      if (_user) {
+        return { authorized: true, user: _user };
       }
-      return { authorized: false, user: _user };
+      else {
+        const __user = await charmClient.createUser({ address: account });
+        return { authorized: true, user: __user };
+      }
+    }
+    // condition: user connected but the wallet address is new
+    else if (user && account && !user.addresses.includes(account)) {
+      log.info('[RouteGuard]: unknown address');
+      const _user = await charmClient.login(account).catch(err => null);
+      // log in existing user
+      if (_user) {
+        return { authorized: true, user: _user };
+      }
+      // add the address to current profile
+      else if (user.addresses.length === 0) {
+        const __user = await charmClient.updateUser({ addresses: [account] });
+        return { authorized: true, user: __user };
+      }
+      // create a new user
+      else {
+        const __user = await charmClient.createUser({ address: account });
+        return { authorized: true, user: __user };
+      }
     }
     // condition: trying to access a space without access
-    else if (!isViewingBountyDetails && !isImportingRolesFromDiscord && isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
-      console.log('[RouteGuard]: send to join workspace page');
+    else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
+      log.info('[RouteGuard]: send to join workspace page');
       return {
         authorized: false,
         redirect: {

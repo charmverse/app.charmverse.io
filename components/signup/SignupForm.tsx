@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
-import { shortenHex } from 'lib/utilities/strings';
+import { getDisplayName } from 'lib/users';
 import useENSName from 'hooks/useENSName';
 
 import gatesImage from 'public/images/artwork/gates.png';
@@ -56,7 +56,7 @@ export default function SignupPageContent () {
     router.push('/join');
   }
 
-  const welcomeMessage = `Welcome, ${ensName || user?.username || (account ? shortenHex(account) : '')}!`;
+  const welcomeMessage = `Welcome, ${ensName || (user && getDisplayName(user))}!`;
 
   return (
     <Content px={3}>

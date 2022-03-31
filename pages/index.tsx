@@ -8,7 +8,6 @@ import Footer from 'components/login/Footer';
 import { useSpaces } from 'hooks/useSpaces';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useUser } from 'hooks/useUser';
-import { useDiscordLogin } from 'hooks/useDiscordLogin';
 
 export default function LoginPage () {
   const { account } = useWeb3React();
@@ -25,14 +24,12 @@ export default function LoginPage () {
     setTitleState('Welcome');
   }, []);
 
-  useDiscordLogin();
-
   function redirectUserAfterLogin () {
     if (typeof router.query.returnUrl === 'string') {
       router.push(router.query.returnUrl);
     }
     else if (spaces.length > 0) {
-      router.push(`/${spaces[0]!.domain}`);
+      router.push(`/${spaces[0].domain}`);
     }
     else {
       router.push('/signup');
@@ -43,11 +40,7 @@ export default function LoginPage () {
     // redirect user once wallet is connected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
-      if (account) {
-        redirectUserAfterLogin();
-      }
-      // User logged in via discord
-      else if (user) {
+      if (account || user) {
         redirectUserAfterLogin();
       }
       else {
@@ -63,7 +56,7 @@ export default function LoginPage () {
   return (
     isLogInWithDiscord ? null : getLayout(
       <>
-        <LoginPageContent account={account} />
+        <LoginPageContent />
         <Footer />
       </>
     )

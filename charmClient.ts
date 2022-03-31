@@ -58,9 +58,9 @@ class CharmClient {
     });
   }
 
-  updateUser ({ address }: { address: string }) {
+  updateUser ({ addresses }: { addresses?: string[] }) {
     return http.PUT<LoggedInUser>('/api/profile', {
-      address
+      addresses
     });
   }
 
@@ -157,15 +157,11 @@ class CharmClient {
     return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
   }
 
-  loginWithDiscord (params: {code: string}) {
-    return http.GET<LoggedInUser>('/api/discord/login', params);
-  }
-
   disconnectDiscord () {
     return http.POST('/api/discord/disconnect');
   }
 
-  connectDiscord (payload: {code: string, spaceId: string}) {
+  connectDiscord (payload: { code: string }) {
     return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
   }
 
