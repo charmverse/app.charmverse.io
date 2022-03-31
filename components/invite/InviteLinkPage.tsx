@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
@@ -10,17 +9,9 @@ import { InviteLinkPopulated } from 'lib/invites';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
+import { CenteredBox } from './components/CenteredBox';
 
-const CenteredBox = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 400px;
-  max-width: 100%;
-`;
-
-export default function InvitationPage ({ error, invite }: { error?: string, invite?: InviteLinkPopulated }) {
+export default function InvitationPage ({ invite }: { invite: InviteLinkPopulated }) {
 
   const [user] = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
@@ -30,26 +21,8 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
     if (!user && account) {
       await charmClient.createUser({ address: account });
     }
-    if (invite) {
-      await charmClient.acceptInvite({ id: invite.id });
-      window.location.href = `/${invite.space.domain}`;
-    }
-  }
-
-  if (error || !invite) {
-    return (
-      <CenteredBox>
-        <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-          <Box display='flex' flexDirection='column' alignItems='center' mb={3}>
-            <Typography variant='h5' gutterBottom><strong>Invite Invalid</strong></Typography>
-            <Typography align='center' color='danger'>This invite may be expired, or you might not have permission to join.</Typography>
-          </Box>
-          <PrimaryButton fullWidth size='large' href='/'>
-            Continue to CharmVerse
-          </PrimaryButton>
-        </Card>
-      </CenteredBox>
-    );
+    await charmClient.acceptInvite({ id: invite.id });
+    window.location.href = `/${invite.space.domain}`;
   }
 
   return (
