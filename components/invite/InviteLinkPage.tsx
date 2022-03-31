@@ -25,10 +25,13 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
 
   const [user] = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
-
+  const { account } = useWeb3React();
   const router = useRouter();
 
   async function joinSpace () {
+    if (!user) {
+      await charmClient.createUser({ address: account! });
+    }
     await charmClient.acceptInvite({ id: invite!.id });
     router.push(`/${invite!.space.domain}`);
   }
@@ -58,7 +61,7 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
           <Typography gutterBottom>You've been invited to join</Typography>
           <Typography variant='h5'>{invite!.space.name}</Typography>
         </Box>
-        {user ? (
+        {account ? (
           <PrimaryButton fullWidth size='large' onClick={joinSpace}>
             Accept Invite
           </PrimaryButton>
