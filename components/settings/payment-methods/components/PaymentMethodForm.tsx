@@ -58,7 +58,6 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     handleSubmit,
     setValue,
     watch,
-    getValues,
     trigger,
     reset,
     formState: { errors, isValid }
@@ -343,7 +342,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
             )
           }
           <Grid item>
-            <Button type='submit' disabled={!isValid || getValues('contractAddress') === ''}>Create payment method</Button>
+            <Button type='submit' disabled={!isValid || (values.contractAddress === '' && values.gnosisSafeAddress === '')}>Create payment method</Button>
           </Grid>
         </Grid>
       </form>
