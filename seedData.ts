@@ -48,7 +48,8 @@ function MockUser (partial: Partial<PopulatedUser>): PopulatedUser {
 
 export const activeUser: LoggedInUser = {
   ...users[0],
-  favorites: []
+  favorites: [],
+  spaceRoles: []
 };
 
 function MockPage (partial: Partial<Page>): Page {
