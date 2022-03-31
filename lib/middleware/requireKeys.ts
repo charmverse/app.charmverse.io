@@ -1,11 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { NextHandler } from 'next-connect';
 import { IApiError } from 'lib/utilities/errors';
 
 /**
  * Generates a request handler that checks for target keys
  */
 export function requireKeys<T> (keys: Array<keyof T>, location: 'body' | 'query') {
-  return (req: NextApiRequest, res: NextApiResponse<IApiError>, next: Function) => {
+  return (req: NextApiRequest, res: NextApiResponse<IApiError>, next: NextHandler) => {
 
     const toVerify = location === 'query' ? req.query : req.body;
 
