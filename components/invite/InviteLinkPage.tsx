@@ -10,7 +10,6 @@ import { InviteLinkPopulated } from 'lib/invites';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
-import { useDiscordLogin } from 'hooks/useDiscordLogin';
 import { useRouter } from 'next/router';
 
 const CenteredBox = styled.div`
@@ -26,8 +25,6 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
 
   const [user] = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
-
-  useDiscordLogin();
 
   const router = useRouter();
 

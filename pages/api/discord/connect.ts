@@ -10,21 +10,13 @@ import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import { DiscordUser } from '@prisma/client';
 import log from 'lib/log';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import { DiscordAccount } from 'lib/discord/loginByDiscord';
 import { DiscordGuildMember, DiscordServerRole } from './importRoles';
 
 const handler = nc({
   onError,
   onNoMatch
 });
-
-export interface DiscordAccount {
-  id: string
-  username: string
-  discriminator: string
-  avatar?: string
-  verified?: boolean
-  bot?: boolean
-}
 
 export interface ConnectDiscordPayload {
   code: string

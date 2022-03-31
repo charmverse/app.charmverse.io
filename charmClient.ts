@@ -157,10 +157,6 @@ class CharmClient {
     return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
   }
 
-  loginWithDiscord (params: {code: string}) {
-    return http.GET<LoggedInUser>('/api/discord/login', params);
-  }
-
   disconnectDiscord () {
     return http.POST('/api/discord/disconnect');
   }
