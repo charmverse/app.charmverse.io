@@ -161,14 +161,11 @@ export default function PagePermissions ({ pageId }: Props) {
   const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
-  console.log(sortedPermissions);
   return (
     <Box padding={1}>
 
-      <Typography gutterBottom>Page Permissions</Typography>
-
       {userPagePermissions?.grant_permissions === true && (
-        <div onClick={() => popupState.open()}>
+        <Box mb={1} onClick={() => popupState.open()}>
           <StyledInput
             placeholder='Add people and roles'
             fullWidth
@@ -179,7 +176,7 @@ export default function PagePermissions ({ pageId }: Props) {
               </InputAdornment>
             )}
           />
-        </div>
+        </Box>
       )}
 
       <Box display='flex' justifyContent='space-between' alignItems='center' py={0.5}>

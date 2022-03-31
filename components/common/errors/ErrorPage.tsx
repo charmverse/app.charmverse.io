@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 
 import Bolt from 'public/images/lightning_bolt.svg';
 
@@ -24,12 +25,12 @@ const Text = styled(Typography)`
 export default function ErrorPage ({ message = 'Sorry! there was an error' }: { message?: string }) {
   return (
     <Container>
-      <div>
+      <Box sx={{ textAlign: 'center' }}>
         <StyledBolt />
         <Text sx={{ mt: 3 }}>
           {message}
         </Text>
-      </div>
+      </Box>
     </Container>
   );
 }

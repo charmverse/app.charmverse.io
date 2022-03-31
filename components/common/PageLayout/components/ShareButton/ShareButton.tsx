@@ -2,6 +2,7 @@
 import Button from 'components/common/Button';
 import Popover from '@mui/material/Popover';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import Loader from 'components/common/Loader';
 import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
@@ -70,6 +71,7 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
             : (
               <>
                 <ShareToWeb pagePermissions={pagePermissions} />
+                <Divider />
                 {currentPageId && <PagePermissions pageId={currentPageId} />}
               </>
             )

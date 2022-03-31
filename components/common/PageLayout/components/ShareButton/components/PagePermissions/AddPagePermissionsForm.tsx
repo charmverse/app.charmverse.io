@@ -99,7 +99,7 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
               <Button
                 disableElevation
                 fullWidth
-                sx={{ height: '100%', py: 1 }}
+                sx={{ height: '100%', py: '10px', borderTopLeftRadius: '0px', borderBottomLeftRadius: '0px' }}
                 type='submit'
                 disabled={!permissionLevelToAssign || (selectedUserIds.length === 0 && selectedRoleIds.length === 0)}
               >
