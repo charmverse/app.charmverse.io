@@ -28,6 +28,7 @@
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
     "brace-style": [
@@ -61,6 +62,7 @@
     "no-alert": "off",
     "no-confusing-arrow": "off",
     "no-else-return": "off",
+
     "no-multiple-empty-lines": [
       "error",
       {
