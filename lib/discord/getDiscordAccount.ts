@@ -1,6 +1,6 @@
-import { DiscordAccount } from 'pages/api/discord/connect';
 import * as http from 'adapters/http';
 import { getDiscordToken } from './getDiscordToken';
+import { DiscordAccount } from './loginByDiscord';
 
 export async function getDiscordAccount (code: string, redirectUrl: string) {
   const token = await getDiscordToken(code, redirectUrl);
