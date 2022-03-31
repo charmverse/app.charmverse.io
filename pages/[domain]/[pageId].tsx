@@ -126,6 +126,9 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
       return <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare || pagePermissions.edit_content !== true} />;
     }
   }
+  else {
+    return null;
+  }
 
 }
 
