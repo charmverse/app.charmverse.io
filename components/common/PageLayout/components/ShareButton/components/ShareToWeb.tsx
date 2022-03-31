@@ -37,7 +37,7 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
     setPages(_pages => ({
       ..._pages,
       [currentPageId]: {
-        ..._pages[currentPageId],
+        ..._pages[currentPageId]!,
         ...updates
       }
     }));
