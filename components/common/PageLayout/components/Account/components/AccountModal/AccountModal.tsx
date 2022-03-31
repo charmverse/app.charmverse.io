@@ -1,21 +1,25 @@
 
 import { useWeb3React } from '@web3-react/core';
+import { useRouter } from 'next/router';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Button from 'components/common/Button';
 import CopyableAddress from 'components/common/CopyableAddress';
 import Avatar from 'components/common/Avatar';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import useENSName from 'hooks/useENSName';
-import charmClient from 'charmClient';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
 import { CircularProgress, Tooltip } from '@mui/material';
-import { useRouter } from 'next/router';
-// import AccountConnections from './components/AccountConnections';
+import charmClient from 'charmClient';
+
 import log from 'lib/log';
 
 const DiscordUserName = styled(Typography)`
@@ -27,25 +31,57 @@ const StyledButton = styled(Button)`
   width: 100px;
 `;
 
-function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
-  { isConnectDiscordLoading: boolean, isOpen: boolean, onClose: () => void }) {
+function AccountModal ({ isOpen, onClose }:
+  { isOpen: boolean, onClose: () => void }) {
   const { account, connector } = useWeb3React();
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
   const [user, setUser] = useUser();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isLoginOut, setIsLoginOut] = useState(false);
+  const [discordError, setDiscordError] = useState('');
+  const router = useRouter();
+  const [space] = useCurrentSpace();
+  const isConnectingToDiscord = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'connect';
+  const discordConnectFailed = space && router.query.discord === '2' && router.query.type === 'connect';
+  const [isConnectDiscordLoading, setIsConnectDiscordLoading] = useState(false);
+  const { showMessage } = useSnackbar();
 
   const connectedWithDiscord = Boolean(user?.discordUser);
+
+  useEffect(() => {
+    if (discordConnectFailed === true) {
+      showMessage('Failed to connect to discord');
+    }
+  }, [discordConnectFailed]);
+
+  // We might get redirected after connection with discord, so check the query param if it has a discord field
+  // It can either be fail or success
+  useEffect(() => {
+    // Connection with discord
+    if (isConnectingToDiscord && user) {
+      setIsConnectDiscordLoading(true);
+      charmClient.connectDiscord({
+        code: router.query.code as string
+      })
+        .then(updatedUserFields => {
+          setUser({ ...user, ...updatedUserFields });
+        })
+        .catch((err) => {
+          setDiscordError(err.error || 'Something went wrong. Please try again');
+        })
+        .finally(() => {
+          setIsConnectDiscordLoading(false);
+        });
+    }
+  }, []);
 
   const handleWalletProviderSwitch = () => {
     openWalletSelectorModal();
     onClose();
   };
 
-  const router = useRouter();
-
-  const connectorName = (c: any) => {
+  function connectorName (c: any) {
     switch (c) {
       case injected:
         return 'MetaMask';
@@ -56,10 +92,6 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
       default:
         return '';
     }
-  };
-
-  async function connectDiscord () {
-    window.location.replace(`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
   }
 
   async function connectWithDiscord () {
@@ -82,9 +114,14 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
     setIsDisconnecting(false);
   }
 
+  function _onClose () {
+    router.replace(window.location.href.split('?')[0], undefined, { shallow: true });
+    onClose();
+  }
+
   return (
-    <Modal open={isOpen} onClose={onClose}>
-      <DialogTitle onClose={onClose}>Account</DialogTitle>
+    <Modal open={isConnectingToDiscord || isOpen} onClose={_onClose}>
+      <DialogTitle onClose={_onClose}>Account</DialogTitle>
       {user && user?.addresses.length !== 0 && (
         <Stack mb={2} direction='row' spacing='4' alignItems='center'>
           <Avatar name={ENSName || user.username || user.addresses[0]} avatar={user.avatar} />
@@ -109,7 +146,7 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
         direction='row'
         alignItems='center'
         justifyContent='space-between'
-        mb={3}
+        my={1}
       >
         <Typography color='secondary'>
           {connectedWithDiscord ? 'Connected with Discord' : 'Connect with Discord'}
@@ -132,24 +169,31 @@ function AccountModal ({ isConnectDiscordLoading, isOpen, onClose }:
           </div>
         </Tooltip>
       </Stack>
-      <StyledButton
-        size='medium'
-        variant='outlined'
-        color='primary'
-        disabled={isLoginOut}
-        onClick={async () => {
-          setIsLoginOut(true);
-          await charmClient.logout();
-          setUser(null);
-          setIsLoginOut(true);
-          router.push('/');
-        }}
-        endIcon={(
-          isLoginOut && <CircularProgress size={20} />
-        )}
-      >
-        Logout
-      </StyledButton>
+      {discordError && (
+        <Alert severity='error'>
+          {discordError}
+        </Alert>
+      )}
+      <Box display='flex' justifyContent='flex-end' mt={3}>
+        <StyledButton
+          size='medium'
+          variant='outlined'
+          color='secondary'
+          disabled={isLoginOut}
+          onClick={async () => {
+            setIsLoginOut(true);
+            await charmClient.logout();
+            setUser(null);
+            setIsLoginOut(true);
+            router.push('/');
+          }}
+          endIcon={(
+            isLoginOut && <CircularProgress size={20} />
+          )}
+        >
+          Logout
+        </StyledButton>
+      </Box>
     </Modal>
   );
 }

@@ -26,7 +26,8 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
 
   const [user] = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
-  useDiscordLogin(true);
+
+  useDiscordLogin();
 
   const router = useRouter();
 

@@ -39,10 +39,10 @@ export interface ConnectDiscordResponse {
 
 // TODO: Add nonce for oauth state
 async function connectDiscord (req: NextApiRequest, res: NextApiResponse<ConnectDiscordResponse | {error: string}>) {
-  const { code, spaceId } = req.body as ConnectDiscordPayload;
-  if (!code || !spaceId) {
+  const { code } = req.body as ConnectDiscordPayload;
+  if (!code) {
     res.status(400).json({
-      error: 'Invalid parameters'
+      error: 'Missing code to connect'
     });
     return;
   }
@@ -86,31 +86,40 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     return;
   }
 
-  await prisma.user.update({
+  const avatar = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
+
+  const updatedUser = await prisma.user.update({
     where: {
       id: userId
     },
     data: {
       username: discordAccount.username,
-      avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
+      avatar
     }
   });
 
   // Get the discord guild attached with the spaceId
-  const space = await prisma.space.findUnique({
+  const spaceRoles = await prisma.spaceRole.findMany({
     where: {
-      id: spaceId
+      userId: req.session.user.id
+    },
+    include: {
+      space: true
     }
   });
 
+  const spacesWithDiscord = spaceRoles
+    .map(role => role.space)
+    .filter(space => space.discordServerId);
+
   // If the workspace is connected with a discord server
-  if (space?.discordServerId) {
+  for (const space of spacesWithDiscord) {
     // Get all the roles from the discord server
     try {
       const discordServerRoles = await authenticatedRequest<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${space.discordServerId}/roles`);
-      const rolesRecord = await findOrCreateRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
+      const rolesRecord = await findOrCreateRolesFromDiscord(discordServerRoles, space.id, req.session.user.id);
       const guildMemberResponse = await authenticatedRequest<DiscordGuildMember>(`https://discord.com/api/v8/guilds/${space.discordServerId}/members/${id}`);
-      await assignRolesFromDiscord(rolesRecord, [guildMemberResponse], spaceId);
+      await assignRolesFromDiscord(rolesRecord, [guildMemberResponse], space.id);
     }
     catch (error) {
       log.warn('Could not add Discord roles to user on connect', error);
@@ -118,9 +127,8 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   }
 
   res.status(200).json({
-    discordUser,
-    avatar: rest.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : null,
-    username: rest.username
+    ...updatedUser,
+    discordUser
   });
 }
 
