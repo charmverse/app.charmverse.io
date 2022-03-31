@@ -34,7 +34,7 @@ export async function handleDiscordResponse<T> (endpoint: string): Promise<{stat
     else if (err.code === 50001) {
       return {
         status: 400,
-        error: 'Charmverse does not have access to the server'
+        error: 'CharmVerse does not have access to the server'
       };
     }
     // Guild doesn't exist
