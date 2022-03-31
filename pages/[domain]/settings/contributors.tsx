@@ -3,7 +3,6 @@ import { ReactElement } from 'react';
 import { setTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import RoleAssignment from 'components/settings/roles/RoleSettings';
 import InviteLinkList from 'components/settings/contributors/InviteLinks/InviteLinks';
 import ContributorList from 'components/settings/contributors/ContributorList';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
@@ -22,7 +21,6 @@ export default function ContributorSettings () {
   return (
     <>
       <InviteLinkList isAdmin={isAdmin} spaceId={space.id} />
-
       <ContributorList isAdmin={isAdmin} spaceId={space.id} spaceOwner={space.createdBy} />
     </>
   );
