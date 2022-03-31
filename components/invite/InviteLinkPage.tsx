@@ -10,7 +10,6 @@ import { InviteLinkPopulated } from 'lib/invites';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
-import { useRouter } from 'next/router';
 
 const CenteredBox = styled.div`
   position: absolute;
@@ -26,14 +25,13 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
   const [user] = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
-  const router = useRouter();
 
   async function joinSpace () {
     if (!user) {
       await charmClient.createUser({ address: account! });
     }
     await charmClient.acceptInvite({ id: invite!.id });
-    router.push(`/${invite!.space.domain}`);
+    window.location.href = `/${invite!.space.domain}`;
   }
 
   if (error) {
