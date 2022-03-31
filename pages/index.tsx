@@ -40,7 +40,7 @@ export default function LoginPage () {
     // redirect user once wallet is connected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
-      if (user) {
+      if (account || user) {
         redirectUserAfterLogin();
       }
       else {
