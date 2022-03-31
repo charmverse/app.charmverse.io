@@ -107,12 +107,12 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     }
   }, [user, currentPageId]);
 
-  if (!currentPage || pageNotFound) {
+  if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
   // Handle public page
   else if (publicShare === true && memoizedCurrentPage) {
-    return currentPage.type === 'board' ? (
+    return currentPage?.type === 'board' ? (
       <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={true} />
     ) : (
       <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={true} />
@@ -127,7 +127,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
   }
   else if (pagePermissions.read === true) {
-    if (currentPage.type === 'board') {
+    if (currentPage?.type === 'board') {
       return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={pagePermissions.edit_content !== true} />;
     }
     else {
