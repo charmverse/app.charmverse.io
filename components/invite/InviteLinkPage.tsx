@@ -10,7 +10,6 @@ import { InviteLinkPopulated } from 'lib/invites';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
-import { useSpaces } from 'hooks/useSpaces';
 
 const CenteredBox = styled.div`
   position: absolute;
@@ -37,13 +36,7 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
     }
   }
 
-  const spaceRole = user?.spaceRoles.find(_spaceRole => _spaceRole.spaceId === invite?.spaceId);
-  // Check if the user already have access to this workspace
-  if (spaceRole && invite) {
-    window.location.href = `/${invite.space.domain}`;
-    return null;
-  }
-  if (error) {
+  if (error || !invite) {
     return (
       <CenteredBox>
         <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
@@ -58,7 +51,8 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
       </CenteredBox>
     );
   }
-  return invite ? (
+
+  return (
     <CenteredBox>
       <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box mb={3}>
@@ -77,12 +71,12 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
             <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
               Connect Wallet
             </PrimaryButton>
-            <PrimaryButton size='large' loading={!triedEager} href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
+            <PrimaryButton size='large' href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
               Connect Discord
             </PrimaryButton>
           </Box>
         )}
       </Card>
     </CenteredBox>
-  ) : null;
+  );
 }
