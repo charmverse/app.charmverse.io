@@ -150,7 +150,7 @@ export default function PagePermissions ({ pageId }: Props) {
       await charmClient.deletePermission(permission.id);
     }
     else if (permissionLevel !== permission.permissionLevel) {
-      await charmClient.updatePermission(permission.id, { permissionLevel: permission.permissionLevel });
+      await charmClient.updatePermission(permission.id, { permissionLevel });
     }
     await refreshPermissions();
     setSelectedPermissionId(null);
@@ -161,7 +161,6 @@ export default function PagePermissions ({ pageId }: Props) {
   const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
-  console.log('spaceLevelPermission', spaceLevelPermission);
   console.log(sortedPermissions);
   return (
     <Box padding={1}>
