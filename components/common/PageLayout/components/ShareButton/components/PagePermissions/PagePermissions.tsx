@@ -81,7 +81,7 @@ interface Props {
   pageId: string
 }
 
-export default function PagePermissions ({ pageId }: IProps) {
+export default function PagePermissions ({ pageId }: Props) {
 
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee []>([]);
   const [space] = useCurrentSpace();
