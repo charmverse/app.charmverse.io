@@ -35,18 +35,18 @@ function filterRoles (roles: ReducedRole [], filter: IRolesFilter): ReducedRole 
 function InputSearchRoleBase ({
   defaultValue, disableCloseOnSelect = false, filter, ...props
 }: Partial<ComponentProps<typeof Autocomplete>> & {filter?: IRolesFilter}) {
-  const { listRoles } = useRoles();
+  const { roles } = useRoles();
 
-  const [availableRoles, setAvailableRoles] = useState<ListSpaceRolesResponse[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<ListSpaceRolesResponse []>([]);
 
   useEffect(() => {
-    listRoles().then(roles => {
+    if (roles) {
       setAvailableRoles(roles);
-    });
-  }, []);
+    }
+  }, [roles]);
 
   const { chainId } = useWeb3React<Web3Provider>();
-  const defaultRole = typeof defaultValue === 'string' ? availableRoles.find(role => {
+  const defaultRole = typeof defaultValue === 'string' ? roles?.find(role => {
     return role.id === defaultValue;
   }) : undefined;
 
