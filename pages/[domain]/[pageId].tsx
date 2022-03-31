@@ -109,18 +109,28 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
+  // Handle public page
+  else if (publicShare === true && memoizedCurrentPage) {
+    return currentPage.type === 'board' ? (
+      <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={true} />
+    ) : (
+      <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={true} />
+    );
+  }
+  // Wait for permission load
   else if (!memoizedCurrentPage || !pagePermissions) {
     return null;
   }
-  else if (pagePermissions?.read === false) {
+  // Interpret page permission
+  else if (pagePermissions.read === false) {
     return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
   }
   else if (pagePermissions.read === true) {
     if (currentPage.type === 'board') {
-      return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={publicShare || pagePermissions.edit_content !== true} />;
+      return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={pagePermissions.edit_content !== true} />;
     }
     else {
-      return <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare || pagePermissions.edit_content !== true} />;
+      return <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={pagePermissions.edit_content !== true} />;
     }
   }
   return null;
