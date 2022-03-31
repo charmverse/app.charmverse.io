@@ -18,8 +18,7 @@ export interface IPagePermissionRequest {
  * Use for requesting permissions a user can exercise on a specific page
  */
 export interface IPagePermissionUserRequest extends IPagePermissionRequest {
-  userId: string,
-  pageId: string
+  userId: string;
 }
 
 /**

@@ -77,8 +77,8 @@ function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[]):
   });
 }
 
-interface IProps {
- pageId: string
+interface Props {
+  pageId: string
 }
 
 export default function PagePermissions ({ pageId }: IProps) {

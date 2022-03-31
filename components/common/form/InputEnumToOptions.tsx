@@ -26,12 +26,10 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
   return (
     <FormControl fullWidth>
       {
-        title && (<InputLabel id='demo-simple-select-label'>{title}</InputLabel>)
+        title && (<InputLabel>{title}</InputLabel>)
       }
 
       <Select
-        labelId='selection'
-        id='selection'
         value={defaultValue}
         onChange={(ev) => {
           setValue(ev.target.value as string);

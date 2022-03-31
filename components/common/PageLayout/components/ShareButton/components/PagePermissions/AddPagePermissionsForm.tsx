@@ -79,7 +79,7 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
   }
 
   const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
-  console.log('permissionsWithoutCustom', permissionsWithoutCustom);
+
   return (
     <div>
       <form onSubmit={handleSubmit(createUserPermissions)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>

@@ -4,7 +4,7 @@ import { Contributor } from 'models';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
-import { HTMLAttributes, ComponentProps, useState, useEffect } from 'react';
+import { HTMLAttributes, useState, useEffect } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
@@ -14,7 +14,7 @@ interface IContributorsFilter {
   userIds: string []
 }
 
-function filterContributors<T extends { id: string }> (contributors: T[], filter: IContributorsFilter): T[] {
+function filterContributors<T extends { id: string }> (contributors: T [], filter: IContributorsFilter): T[] {
   if (filter.mode === 'exclude') {
     return contributors.filter(contributor => {
       const shouldInclude = filter.userIds.indexOf(contributor.id) === -1;
