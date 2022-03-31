@@ -38,7 +38,7 @@ function AccountModal ({ isOpen, onClose }:
   const ENSName = useENSName(account);
   const [user, setUser] = useUser();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
-  const [isLoginOut, setIsLoginOut] = useState(false);
+  const [isLoggingOut, setisLoggingOut] = useState(false);
   const [discordError, setDiscordError] = useState('');
   const router = useRouter();
   const [space] = useCurrentSpace();
@@ -158,7 +158,7 @@ function AccountModal ({ isOpen, onClose }:
               size='small'
               variant='outlined'
               color={connectedWithDiscord ? 'error' : 'primary'}
-              disabled={isLoginOut || isDisconnecting || isConnectDiscordLoading || user?.addresses.length === 0}
+              disabled={isLoggingOut || isDisconnecting || isConnectDiscordLoading || user?.addresses.length === 0}
               onClick={connectWithDiscord}
               endIcon={(
                 isConnectDiscordLoading && <CircularProgress size={20} />
@@ -181,12 +181,12 @@ function AccountModal ({ isOpen, onClose }:
             size='small'
             variant='outlined'
             color='secondary'
-            loading={isLoginOut}
+            loading={isLoggingOut}
             onClick={async () => {
-              setIsLoginOut(true);
+              setisLoggingOut(true);
               await charmClient.logout();
               setUser(null);
-              setIsLoginOut(true);
+              setisLoggingOut(true);
               router.push('/');
             }}
           >
