@@ -23,6 +23,7 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import useRefState from 'hooks/useRefState';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { isTruthy } from 'lib/utilities/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { Page, PageContent } from 'models';
 import Link from 'next/link';
@@ -202,7 +203,7 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
             setPages(_pages => ({
               ..._pages,
               [pageId]: {
-                ..._pages[pageId],
+                ..._pages[pageId]!,
                 icon: emoji
               }
             }));
@@ -542,7 +543,7 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
 type TreeRootProps = {
   children: ReactNode,
   isFavorites?: boolean,
-  setPages: Dispatch<SetStateAction<Record<string, Page>>>
+  setPages: Dispatch<SetStateAction<Record<string, Page | undefined>>>
 } & ComponentProps<typeof TreeView>;
 
 function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) {
@@ -556,7 +557,7 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
       setPages(_pages => ({
         ..._pages,
         [item.id]: {
-          ..._pages[item.id],
+          ..._pages[item.id]!,
           parentId: null
         }
       }));
@@ -598,7 +599,7 @@ export default function PageNavigation ({
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
 
   const mappedItems = useMemo(() => {
-    const pagesArray = Object.keys(pages).map(pageId => pages[pageId]);
+    const pagesArray = Object.keys(pages).map(pageId => pages[pageId]).filter(isTruthy);
     return mapTree(pagesArray, 'parentId', rootPageIds);
   }, [pages, rootPageIds]);
 
@@ -610,7 +611,7 @@ export default function PageNavigation ({
     const parentId = containerItem.parentId;
     // console.log('onDropAdjacent:', droppedItem.title, 'to', containerItem.title);
     setPages(_pages => {
-      const siblings = Object.values(_pages).filter((page) => page.parentId === parentId && page.id !== droppedItem.id);
+      const siblings = Object.values(_pages).filter(isTruthy).filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
       const originIndex = siblings.findIndex((page) => page.id === containerItem.id);
       siblings.splice(originIndex, 0, droppedItem);
       siblings.forEach((page, _index) => {
@@ -625,7 +626,7 @@ export default function PageNavigation ({
       siblings.forEach(page => {
         if (_pages[page.id]) {
           _pages[page.id] = {
-            ..._pages[page.id],
+            ..._pages[page.id]!,
             index: page.index,
             parentId: page.parentId
           };
@@ -651,7 +652,7 @@ export default function PageNavigation ({
     setPages(_pages => ({
       ..._pages,
       [droppedItem.id]: {
-        ..._pages[droppedItem.id],
+        ..._pages[droppedItem.id]!,
         index,
         parentId
       }
@@ -685,7 +686,7 @@ export default function PageNavigation ({
       isFavorites={isFavorites}
       sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
     >
-      {mappedItems.map((item, index) => (
+      {mappedItems.map((item) => (
         <RenderDraggableNode
           key={item.id}
           item={item}

@@ -20,6 +20,7 @@ import { Page, PageContent } from 'models';
 import Link from 'next/link';
 import { useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { isTruthy } from 'lib/utilities/types';
 import { hideSuggestionsTooltip, referenceElement } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'page';
@@ -173,8 +174,8 @@ export function NestedPagesList () {
       }}
       >
         <Box>
-          {Object.values(pages).map(page => {
-            const docContent = ((page?.content) as PageContent)?.content;
+          {Object.values(pages).filter(isTruthy).map(page => {
+            const docContent = ((page.content) as PageContent)?.content;
             const isEditorEmpty = docContent && (docContent.length <= 1
               && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
 
@@ -230,16 +231,22 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
   return (
     <NestedPageContainer>
       <div>
-        <PageIcon isEditorEmpty={isEditorEmpty} icon={nestedPage.icon} pageType={nestedPage.type} />
+        {nestedPage && <PageIcon isEditorEmpty={isEditorEmpty} icon={nestedPage.icon} pageType={nestedPage.type} />}
       </div>
-      <Link
-        href={`/${(space)?.domain}/${nestedPage?.path}`}
-        passHref
-      >
+      {nestedPage ? (
+        <Link
+          href={`/${(space)?.domain}/${nestedPage?.path}`}
+          passHref
+        >
+          <Box fontWeight={600} component='div' width='100%'>
+            {nestedPage?.title || 'Untitled'}
+          </Box>
+        </Link>
+      ) : (
         <Box fontWeight={600} component='div' width='100%'>
-          {nestedPage?.title ? nestedPage.title : 'Untitled'}
+          Page not found
         </Box>
-      </Link>
+      )}
 
       <ActionsMenu {...bindTrigger(popupState)} />
 

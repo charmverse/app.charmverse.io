@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState, useCallback } from 'react';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import log from 'lib/log';
+import { isTruthy } from 'lib/utilities/types';
 import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import { useUser } from 'hooks/useUser';
 
@@ -47,7 +48,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     setPages((_pages) => ({
       ..._pages,
       [currentPageId]: {
-        ..._pages[currentPageId],
+        ..._pages[currentPageId]!,
         ...updates
       }
     }));
@@ -79,7 +80,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
       loadPublicPage(pageId as string);
     }
     else if (pageId && pagesLoaded) {
-      const pageByPath = pages[pageId] || Object.values(pages).find(page => page.path === pageId);
+      const pageByPath = pages[pageId] || Object.values(pages).filter(isTruthy).find(page => page.path === pageId);
       if (pageByPath) {
         setTitleState(pageByPath.title);
         setCurrentPageId(pageByPath.id);
@@ -106,7 +107,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     }
   }, [user, currentPageId]);
 
-  if (pageNotFound) {
+  if (!currentPage || pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
   // Handle public page

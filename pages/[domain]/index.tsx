@@ -11,8 +11,9 @@ export default function RedirectToMainPage () {
 
   useEffect(() => {
     const firstPageId = Object.keys(pages)[0];
-    if (firstPageId && space) {
-      router.push(`/${space.domain}/${pages[firstPageId].path}`);
+    const page = pages[firstPageId];
+    if (space && page) {
+      router.push(`/${space.domain}/${page.path}`);
     }
   }, [space, pages]);
 

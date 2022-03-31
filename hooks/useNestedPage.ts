@@ -10,7 +10,7 @@ export default function useNestedPage () {
   const view = useEditorViewContext();
 
   const addNestedPage = useCallback(async (pageId?: string) => {
-    let page: Page = null as any;
+    let page: Page | undefined;
     // Creating a new page
     if (!pageId) {
       page = await addPage({
@@ -21,7 +21,10 @@ export default function useNestedPage () {
       page = pages[pageId];
     }
 
-    rafCommandExec(view!, (state, dispatch) => {
+    rafCommandExec(view, (state, dispatch) => {
+      if (!page) {
+        return false;
+      }
       return insertNode(state, dispatch, state.schema.nodes.page.create({
         id: page.id
       }));
