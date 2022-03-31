@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client';
 import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'components/common/CharmEditor/components/ResizableIframe';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/common/CharmEditor/components/ResizableImage';
 import { prisma } from 'db';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { createBoard, IPropertyTemplate, PropertyType } from 'components/common/BoardEditor/focalboard/src/blocks/board';
 import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
@@ -349,11 +349,22 @@ function convertPropertyType (propertyType: string): PropertyType | null {
   }
 }
 
-type PageCreatePartialInput = Partial<Prisma.PageCreateInput> &
-  {userId: string, spaceId: string, pageId: string, title: string};
+type CreatePageInput = {
+  id: string;
+  content?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
+  headerImage?: string | null;
+  icon?: string | null;
+  spaceId: string;
+  title: string;
+  type?: Page['type'];
+  createdBy: string;
+  boardId?: string;
+  parentId?: string;
+}
+// &  {userId: string, spaceId: string, pageId: string, title: string};
 
 async function createPrismaPage ({
-  pageId,
+  id,
   content = {
     type: 'doc',
     content: [{
@@ -366,37 +377,45 @@ async function createPrismaPage ({
   spaceId,
   title,
   type = 'page',
-  userId,
+  createdBy,
   boardId,
   parentId
-}: PageCreatePartialInput) {
-  const id = Math.random().toString().replace('0.', '');
+}: CreatePageInput) {
 
   const pageToCreate: Prisma.PageCreateInput = {
-    id: pageId,
+    id,
     content,
     // TODO: Generate content text
     contentText: '',
     createdAt: new Date(),
     author: {
       connect: {
-        id: userId
+        id: createdBy
       }
     },
     updatedAt: new Date(),
-    updatedBy: userId,
+    updatedBy: createdBy,
     path: `page-${id}`,
     space: {
       connect: {
-        id: spaceId
+        id: spaceId || undefined
       }
     },
     headerImage,
     icon,
-    title,
+    title: title || '',
     type,
     boardId,
-    parentId
+    parentId,
+    permissions: {
+      create: [
+        {
+          permissionLevel: 'full_access',
+          spaceId,
+          pageId: id
+        }
+      ]
+    }
   };
 
   // eslint-disable-next-line
@@ -408,10 +427,17 @@ function convertToPlainText (chunks: {plain_text: string}[]) {
   return chunks.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
 }
 
+interface CreateDatabaseResult {
+  focalboardPropertiesRecord: Record<string, string>;
+  board: Prisma.BlockCreateManyInput;
+  view: Prisma.BlockCreateManyInput;
+  page: CreatePageInput;
+}
+
 async function createDatabase (block: GetDatabaseResponse, {
   spaceId,
   userId
-}: {spaceId: string, userId: string}) {
+}: {spaceId: string, userId: string}): Promise<CreateDatabaseResult> {
   const title = convertToPlainText((block as any).title);
   const cardProperties: IPropertyTemplate[] = [];
 
@@ -424,7 +450,7 @@ async function createDatabase (block: GetDatabaseResponse, {
     const focalboardPropertyType = convertPropertyType(property.type);
     if (focalboardPropertyType) {
       const cardProperty: IPropertyTemplate = {
-        id: v4(),
+        id: uuid(),
         name: property.name,
         options: [],
         type: focalboardPropertyType
@@ -480,15 +506,10 @@ async function createDatabase (block: GetDatabaseResponse, {
       title,
       type: 'board',
       spaceId,
-      userId,
+      createdBy: userId,
       boardId: board.id,
-      pageId: v4()
+      id: uuid()
     }
-  } as {
-    focalboardPropertiesRecord: Record<string, string>,
-    board: Prisma.BlockCreateManyInput,
-    view: Prisma.BlockCreateManyInput,
-    page: PageCreatePartialInput
   };
 }
 
@@ -528,7 +549,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   // Store all the pages/databases the integration fetched in a record
   const searchResultRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
 
-  const createdPages: Record<string, PageCreatePartialInput> = {};
+  const createdPages: Record<string, CreatePageInput> = {};
 
   const createdCards: Record<string, {
     charmText: Prisma.BlockCreateManyInput,
@@ -576,7 +597,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     const notionPage = searchResults[index] as GetPageResponse | GetDatabaseResponse;
     try {
       if (notionPage.object === 'page') {
-        await createPage([[notionPage.id, v4()]], failedImportBlocks);
+        await createPage([[notionPage.id, uuid()]], failedImportBlocks);
       }
       else if (notionPage.object === 'database') {
         await createDatabaseAndPopulateCache(notionPage);
@@ -731,18 +752,18 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             (parentNode as PageContent).content?.push({
               type: 'page',
               attrs: {
-                id: createdPages[block.id].pageId
+                id: createdPages[block.id].id
               }
             });
           },
           onChildPage: async (block, parentNode) => {
             const _failedImportBlocks: [string, number][][] = [];
             try {
-              createdPages[block.id] = await createPage([...pageIds, [block.id, v4()]], _failedImportBlocks);
+              createdPages[block.id] = await createPage([...pageIds, [block.id, uuid()]], _failedImportBlocks);
               (parentNode as PageContent).content?.push({
                 type: 'page',
                 attrs: {
-                  id: createdPages[block.id].pageId
+                  id: createdPages[block.id].id
                 }
               });
               if (_failedImportBlocks.length !== 0) {
@@ -763,8 +784,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== notionPageId && !parentAsLinkedPage) {
               const _failedImportBlocks: [string, number][][] = [];
               try {
-                const createdPage = await createPage([...pageIds, [linkedPageId, v4()]], _failedImportBlocks);
-                linkedPages[linkedPageId] = createdPage.pageId;
+                const createdPage = await createPage([...pageIds, [linkedPageId, uuid()]], _failedImportBlocks);
+                linkedPages[linkedPageId] = createdPage.id;
                 if (_failedImportBlocks.length !== 0) {
                   throw new Error();
                 }
@@ -814,15 +835,14 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     if (pageResponse.parent.type === 'page_id' || pageResponse.parent.type === 'workspace') {
       const title = convertToPlainText((pageResponse.properties.title as any)[pageResponse.properties.title.type]);
       createdPages[notionPageId] = {
-        boardId: null,
         type: 'page',
         content: pageContent,
         headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
         icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
         title,
-        pageId: createdPageId,
+        id: createdPageId,
         spaceId,
-        userId
+        createdBy: userId
       };
       return createdPages[notionPageId];
     }
@@ -837,7 +857,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
 
       const title = convertToPlainText(titleProperty.title);
-      const cardId = v4();
+      const cardId = uuid();
       const charmTextBlock = createCharmTextBlock({
         parentId: cardId,
         fields: {
@@ -915,11 +935,11 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   }
 
   const workspacePage = await createPrismaPage({
+    id: uuid(),
     icon: workspaceIcon,
     spaceId,
     title: workspaceName,
-    userId,
-    pageId: v4()
+    createdBy: userId
   });
 
   const importedPages: Record<string, Page> = {};
@@ -968,7 +988,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         // Or if we failed to import some blocks from the parent (partial success)
         if (!failedImportsRecord[block.parent.page_id]
           || (failedImportsRecord[block.parent.page_id].blocks.length !== 0)) {
-          parentId = createdPages[block.parent.page_id]?.pageId;
+          parentId = createdPages[block.parent.page_id]?.id;
         }
         // If its a linked page we dont create the parent, so the would be the workspace page
         await createCharmversePage(block, parentId);
