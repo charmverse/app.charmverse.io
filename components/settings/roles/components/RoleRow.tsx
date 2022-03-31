@@ -18,6 +18,7 @@ import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-p
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { useContributors } from 'hooks/useContributors';
 import RoleMemberRow from './RoleMemberRow';
 import RoleForm from './RoleForm';
 
@@ -41,6 +42,7 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
   const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
   const [newMembers, setNewMembers] = useState<string[]>([]);
+  const [contributors] = useContributors();
 
   function showMembersPopup () {
     setNewMembers([]);
@@ -56,13 +58,17 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
     userPopupState.close();
   }
 
-  const contributors = role.spaceRolesToRole.map(r => r.spaceRole.user);
+  const assignedContributors = role.spaceRolesToRole.map(r => r.spaceRole.user);
 
   function removeMember (userId: string) {
     unassignRole(role.id, userId);
   }
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
+
+  let userIdsToHide = role.spaceRolesToRole?.map(spaceRoleToRole => {
+    return spaceRoleToRole?.spaceRole?.user?.id;
+  }).filter(id => typeof id === 'string') ?? [];
 
   return (
     <Box mb={3}>
@@ -77,11 +83,26 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
       </Box>
       <Divider />
 
-      <ScrollableBox rows={contributors.length}>
-        {contributors.map(contributor => <RoleMemberRow key={contributor.id} contributor={contributor} onRemove={removeMember} />)}
+      <ScrollableBox rows={assignedContributors.length}>
+        {assignedContributors.map(contributor => (
+          <RoleMemberRow
+            key={contributor.id}
+            contributor={contributor}
+            onRemove={(userId) => {
+              removeMember(userId);
+              userIdsToHide = userIdsToHide.filter(id => id !== userId);
+            }}
+          />
+        ))}
       </ScrollableBox>
 
-      <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
+      {
+        assignedContributors.length < contributors.length ? (
+          <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
+        ) : (
+          <Typography variant='caption'>All space members have been added to this role</Typography>
+        )
+      }
 
       <Menu
         {...bindMenu(menuState)}
@@ -116,7 +137,7 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
       <Modal open={userPopupState.isOpen} onClose={userPopupState.close} title='Add members'>
         <Grid container direction='column' spacing={3}>
           <Grid item>
-            <InputSearchContributorMultiple onChange={onChangeNewMembers} />
+            <InputSearchContributorMultiple filter={{ mode: 'exclude', userIds: userIdsToHide }} onChange={onChangeNewMembers} />
           </Grid>
           <Grid item>
             <Button onClick={addMembers}>Add</Button>
