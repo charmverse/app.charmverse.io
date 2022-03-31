@@ -6,16 +6,17 @@ import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO,
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/common/CharmEditor/components/ResizableImage';
 import { prisma } from 'db';
 import { v4 } from 'uuid';
-import { Board, createBoard, IPropertyTemplate, PropertyType } from 'components/common/BoardEditor/focalboard/src/blocks/board';
-import { BoardView, createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
-import { Card, createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import { CharmTextBlock, createCharmTextBlock } from 'components/common/BoardEditor/focalboard/src/blocks/charmBlock';
+import { createBoard, IPropertyTemplate, PropertyType } from 'components/common/BoardEditor/focalboard/src/blocks/board';
+import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
+import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
+import { createCharmTextBlock } from 'components/common/BoardEditor/focalboard/src/blocks/charmBlock';
+import log from 'lib/log';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
 const IMPORTED_PAGES_LIMIT = 1000; const
   BLOCKS_FETCHED_PER_REQUEST = 100; const
-  MAX_CHILD_BLOCK_DEPTH = 5;
+  MAX_CHILD_BLOCK_DEPTH = 10;
 
 function convertRichText (richTexts: RichTextItemResponse[]): TextContent[] {
   return richTexts.map((richText) => {
@@ -671,6 +672,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     for (let depth = 0; depth < MAX_CHILD_BLOCK_DEPTH; depth++) {
       // While there are more children to be fetched
       if (blockChildrenRequests.length !== 0) {
+
+        log.debug(`[notion] - ${blockChildrenRequests.length} Requests for child blocks at depth: ${depth}`);
+
         const childBlockListResponses = await getChildBlockListResponses();
 
         // If the block has more child to be fetch, this will be true
