@@ -42,7 +42,7 @@ function InputSearchContributorBase ({
 
   const filteredContributors = filter ? filterContributors(contributors, filter) : contributors;
 
-  return (
+  return filteredContributors.length !== 0 ? (
     <Autocomplete<Contributor>
       defaultValue={defaultContributor}
       loading={contributors.length === 0}
@@ -65,7 +65,7 @@ function InputSearchContributorBase ({
       )}
       {...props}
     />
-  );
+  ) : null;
 }
 
 interface IInputSearchContributorProps {
@@ -81,7 +81,7 @@ export function InputSearchContributor (props: IInputSearchContributorProps) {
     }
   }
 
-  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor)} multiple />;
+  return <InputSearchContributorBase {...props} onChange={(e, value) => emitValue(value as Contributor)} />;
 }
 
 interface IInputSearchContributorMultipleProps {

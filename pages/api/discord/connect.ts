@@ -5,7 +5,7 @@ import { prisma } from 'db';
 import { getDiscordToken } from 'lib/discord/getDiscordToken';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
-import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
+import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
 import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import { DiscordUser } from '@prisma/client';
@@ -102,19 +102,19 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   });
 
   // Get the discord guild attached with the spaceId
-  const charmverseSpace = await prisma.space.findUnique({
+  const space = await prisma.space.findUnique({
     where: {
       id: spaceId
     }
   });
 
   // If the workspace is connected with a discord server
-  if (charmverseSpace?.discordServerId) {
+  if (space?.discordServerId) {
     // Get all the roles from the discord server
     try {
-      const discordServerRoles = await http.GET<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${charmverseSpace.discordServerId}/roles`);
+      const discordServerRoles = await authenticatedRequest<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${space.discordServerId}/roles`);
       const rolesRecord = await findOrCreateRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
-      const guildMemberResponse = await http.GET<DiscordGuildMember>(`https://discord.com/api/v8/guilds/${charmverseSpace.discordServerId}/members/${id}`);
+      const guildMemberResponse = await authenticatedRequest<DiscordGuildMember>(`https://discord.com/api/v8/guilds/${space.discordServerId}/members/${id}`);
       await assignRolesFromDiscord(rolesRecord, [guildMemberResponse], spaceId);
     }
     catch (error) {
