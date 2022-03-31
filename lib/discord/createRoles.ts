@@ -2,10 +2,16 @@ import { DiscordServerRole } from 'pages/api/discord/importRoles';
 import { prisma } from 'db';
 import { Role } from '@prisma/client';
 
-type RolesRecord = Record<string, { discord: DiscordServerRole, charmverse: Role }>;
+type RolesRecord = Record<string, { discord: DiscordServerRole, charmverse: Role | null }>;
 
 // Create charmverse roles from discord roles
-export async function findOrCreateRolesFromDiscord (discordServerRoles: DiscordServerRole[], spaceId: string, userId: string): Promise<RolesRecord> {
+export async function findOrCreateRolesFromDiscord (
+  discordServerRoles: DiscordServerRole[],
+  spaceId: string,
+  userId: string,
+  createRoles?: boolean
+): Promise<RolesRecord> {
+  createRoles = createRoles ?? true;
   const rolesRecord: RolesRecord = {};
   // Create all of the discord roles fist
   for (const discordServerRole of discordServerRoles) {
@@ -21,7 +27,7 @@ export async function findOrCreateRolesFromDiscord (discordServerRoles: DiscordS
       });
 
       // Only create the role if it doesn't already exist
-      if (!existingRole) {
+      if (!existingRole && createRoles) {
         charmVerseRole = await prisma.role.create({
           data: {
             name: discordServerRole.name,

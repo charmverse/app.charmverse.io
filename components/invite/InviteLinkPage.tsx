@@ -10,7 +10,6 @@ import { InviteLinkPopulated } from 'lib/invites';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
-import { useRouter } from 'next/router';
 
 const CenteredBox = styled.div`
   position: absolute;
@@ -25,12 +24,14 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
 
   const [user] = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
-
-  const router = useRouter();
+  const { account } = useWeb3React();
 
   async function joinSpace () {
+    if (!user) {
+      await charmClient.createUser({ address: account! });
+    }
     await charmClient.acceptInvite({ id: invite!.id });
-    router.push(`/${invite!.space.domain}`);
+    window.location.href = `/${invite!.space.domain}`;
   }
 
   if (error) {
@@ -58,7 +59,7 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
           <Typography gutterBottom>You've been invited to join</Typography>
           <Typography variant='h5'>{invite!.space.name}</Typography>
         </Box>
-        {user ? (
+        {account ? (
           <PrimaryButton fullWidth size='large' onClick={joinSpace}>
             Accept Invite
           </PrimaryButton>
