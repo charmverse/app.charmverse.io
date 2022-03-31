@@ -8,7 +8,8 @@
   "extends": [
     "plugin:react/recommended",
     "airbnb",
-    "plugin:@next/next/recommended"
+    "plugin:@next/next/recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -24,6 +25,9 @@
   ],
   "rules": {
     "@next/next/no-img-element": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-explicit-any": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
     "brace-style": [
@@ -40,6 +44,7 @@
     "import/extensions": "off",
     "import/no-unresolved": "off",
     "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
     "jsx-quotes": [
       "error",
       "prefer-single"

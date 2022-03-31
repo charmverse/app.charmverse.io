@@ -12,9 +12,7 @@ import { ReactElement, useEffect, useMemo, useState, useCallback } from 'react';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import log from 'lib/log';
 import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
-import { isTruthy } from 'lib/utilities/types';
 import { useUser } from 'hooks/useUser';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 /**
  * @viewId - Enforce a specific view inside the nested blocks editor
@@ -32,7 +30,6 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   const [pageNotFound, setPageNotFound] = useState(false);
 
   const [user] = useUser();
-  const [space] = useCurrentSpace();
 
   const [pagePermissions, setPagePermissions] = useState<Partial<IPagePermissionFlags> | null>(null);
 
@@ -102,7 +99,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
 
   useEffect(() => {
     setPagePermissions(null);
-    console.log('Use effect fired');
+
     if (user && memoizedCurrentPage) {
       const permissions = getPagePermissions(memoizedCurrentPage.id);
       setPagePermissions(permissions);
@@ -126,10 +123,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
       return <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={publicShare || pagePermissions.edit_content !== true} />;
     }
   }
-  else {
-    return null;
-  }
-
+  return null;
 }
 
 BlocksEditorPage.getLayout = (page: ReactElement) => {

@@ -470,7 +470,7 @@ class CharmClient {
    * Get full set of permissions for a specific user on a certain page
    */
   computeUserPagePermissions (request: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
-    return http.POST('/api/permissions/query', request);
+    return http.GET('/api/permissions/query', request);
   }
 
   listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {

@@ -4,14 +4,12 @@ import Grid from '@mui/material/Grid';
 import charmClient, { ListSpaceRolesResponse } from 'charmClient';
 import Button from 'components/common/Button';
 import InputLabel from '@mui/material/InputLabel';
-import { InputEnumToOptions } from 'components/common/form/InputEnumToOptions';
+import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import { useContributors } from 'hooks/useContributors';
 import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
-import { PagePermissionLevelTitle } from 'lib/permissions/pages/page-permission-mapping';
-import { getDisplayName } from 'lib/users';
-import { filterObjectKeys } from 'lib/utilities/objects';
+import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -31,9 +29,7 @@ interface Props {
   permissionsAdded?: () => any
 }
 
-export function AddPagePermissionsForm ({ pageId, existingPermissions = [], permissionsAdded = () => {} }: Props) {
-
-  const [contributors] = useContributors();
+export default function AddPagePermissionsForm ({ pageId, existingPermissions = [], permissionsAdded = () => {} }: Props) {
 
   const { roles } = useRoles();
 
@@ -56,13 +52,9 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
     return permission.user;
   }).map(permission => permission.user!.id);
 
-  userIdsToHide.push(...(selectedUserIds));
-
   const roleIdsToHide = existingPermissions.filter(permission => {
     return permission.role;
   }).map(permission => permission.role!.id);
-
-  roleIdsToHide.push(...selectedRoleIds);
 
   const {
     handleSubmit
@@ -70,24 +62,24 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
 
   function createUserPermissions () {
     Promise.all([
-      Promise.all(selectedUserIds.map(userId => {
+      ...selectedUserIds.map(userId => {
         return charmClient.createPermission({
           pageId,
           userId,
           permissionLevel: permissionLevelToAssign!
         });
-      })),
-      Promise.all(selectedRoleIds.map(roleId => {
+      }),
+      ...selectedRoleIds.map(roleId => {
         return charmClient.createPermission({
           pageId,
           roleId,
           permissionLevel: permissionLevelToAssign!
         });
-      }))
+      })
     ]).then(() => permissionsAdded());
   }
 
-  console.log('To hide', userIdsToHide);
+  const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
 
   return (
     <div>
@@ -98,34 +90,33 @@ export function AddPagePermissionsForm ({ pageId, existingPermissions = [], perm
             <Grid item xs={8}>
               <InputEnumToOptions
                 onChange={(newAccessLevel) => setPermissionLevelToAssign(newAccessLevel as PagePermissionLevelType)}
-                keyAndLabel={filterObjectKeys(PagePermissionLevelTitle, 'exclude', ['custom'])}
+                keyAndLabel={permissionsWithoutCustom}
                 defaultValue={permissionLevelToAssign}
               />
 
             </Grid>
             <Grid item xs={4}>
               <Button
+                disableElevation
                 fullWidth
+                sx={{ height: '100%', py: '10px', borderTopLeftRadius: '0px', borderBottomLeftRadius: '0px' }}
                 type='submit'
                 disabled={!permissionLevelToAssign || (selectedUserIds.length === 0 && selectedRoleIds.length === 0)}
-              >Invite
+              >
+                Invite
               </Button>
             </Grid>
           </Grid>
-          {
-            userIdsToHide.length < contributors.length && (
-              <Grid item>
-                <InputLabel>Users</InputLabel>
-                <InputSearchContributorMultiple
-                  onChange={setSelectedUserIds}
-                  filter={{
-                    mode: 'exclude',
-                    userIds: userIdsToHide
-                  }}
-                />
-              </Grid>
-            )
-          }
+          <Grid item>
+            <InputLabel>Users</InputLabel>
+            <InputSearchContributorMultiple
+              onChange={setSelectedUserIds}
+              filter={{
+                mode: 'exclude',
+                userIds: userIdsToHide
+              }}
+            />
+          </Grid>
 
           {
             roleIdsToHide.length < availableRoles.length && (

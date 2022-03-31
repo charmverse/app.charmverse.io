@@ -6,7 +6,7 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { gettingStartedPageContent } from 'seedData';
-import { postToDiscord, IDiscordMessage, IEventToLog } from 'lib/log/userEvents';
+import { postToDiscord, IEventToLog } from 'lib/log/userEvents';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

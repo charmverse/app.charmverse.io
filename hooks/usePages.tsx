@@ -54,7 +54,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }, [data]);
 
   const addPage: AddPageFn = React.useCallback(async (page) => {
-    const spaceId = space?.id!;
+    const spaceId = space?.id;
     const id = Math.random().toString().replace('0.', '');
     const pageProperties: Prisma.PageCreateInput = {
       content: {
