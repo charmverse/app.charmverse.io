@@ -66,7 +66,7 @@ export default function LoginPageContent ({ account }: { account: string | null 
                 Connect Wallet
               </PrimaryButton>
               <Typography color='secondary' variant='body2'>or</Typography>
-              <Button variant='outlined' size='large' loading={!triedEager} href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
+              <Button variant='outlined' size='large' href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
                 Connect Discord
               </Button>
             </Box>
