@@ -62,20 +62,20 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
 
   function createUserPermissions () {
     Promise.all([
-      Promise.all(selectedUserIds.map(userId => {
+      ...selectedUserIds.map(userId => {
         return charmClient.createPermission({
           pageId,
           userId,
           permissionLevel: permissionLevelToAssign!
         });
-      })),
-      Promise.all(selectedRoleIds.map(roleId => {
+      }),
+      ...selectedRoleIds.map(roleId => {
         return charmClient.createPermission({
           pageId,
           roleId,
           permissionLevel: permissionLevelToAssign!
         });
-      }))
+      })
     ]).then(() => permissionsAdded());
   }
 

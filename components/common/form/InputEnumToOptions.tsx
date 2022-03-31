@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { useEffect, useState } from 'react';
 
 export interface Props {
-  onChange?: (option: string | null) => void
+  onChange?: (option: string) => void
   defaultValue?: string,
   title?: string
   keyAndLabel: Record<string | any, string | number>
@@ -15,7 +15,7 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
 
   const options = Object.entries(keyAndLabel);
 
-  const [value, setValue] = useState<string | null>(null);
+  const [value, setValue] = useState<string | null>('');
 
   useEffect(() => {
     if (defaultValue && !value) {
@@ -23,7 +23,6 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
     }
   }, [defaultValue]);
 
-  console.log('value', defaultValue, value);
   return (
     <FormControl fullWidth>
       {
@@ -34,7 +33,9 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
         value={value}
         onChange={(ev) => {
           setValue(ev.target.value as string);
-          onChange(ev.target.value as string);
+          if (ev.target.value) {
+            onChange(ev.target.value as string);
+          }
         }}
       >
         {

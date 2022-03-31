@@ -17,6 +17,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { usePages } from 'hooks/usePages';
+import { updatePagePermission } from 'lib/permissions/pages/page-permission-actions';
 import AddPagePermissionsForm from './AddPagePermissionsForm';
 
 const permissionDisplayOrder = ['space', 'role', 'user'];
@@ -51,7 +52,7 @@ function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[], sp
   (IPagePermissionWithAssignee & {displayName: string})[] {
   const sortedPermissions = pagePermissions
     .filter(permission => {
-      return permission.spaceId !== space?.id;
+      return !permission.spaceId;
     })
     .map(permission => {
 
@@ -121,54 +122,47 @@ export default function PagePermissions ({ pageId }: Props) {
       });
   }
 
-  async function updatePagePermissionLevel (permission: Pick<PagePermission, 'id' | 'permissionLevel'>) {
-    await charmClient.updatePermission(permission.id, { permissionLevel: permission.permissionLevel });
-    await refreshPermissions();
-
-  }
-
   async function updateSpacePagePermissionLevel (permissionLevel: PagePermissionLevelType | 'delete') {
-
-    if (permissionLevel === 'delete' && spaceLevelPermission) {
-      await charmClient.deletePermission(spaceLevelPermission.id);
+    if (permissionLevel === 'delete') {
+      if (spaceLevelPermission) {
+        await charmClient.deletePermission(spaceLevelPermission.id);
+      }
     }
-    else if (!spaceLevelPermission && space && permissionLevel !== 'delete') {
+    else if (!spaceLevelPermission && space) {
       await charmClient.createPermission({
         pageId,
         permissionLevel,
         spaceId: space.id
       });
     }
-    else if (spaceLevelPermission && permissionLevel !== 'delete') {
+    else if (spaceLevelPermission) {
       await charmClient.updatePermission(spaceLevelPermission.id, {
         permissionLevel
       });
     }
     await refreshPermissions();
-
+    setSelectedPermissionId(null);
   }
 
-  function deletePermission (permissionId: string) {
-    charmClient.deletePermission(permissionId)
-      .then(() => {
-        refreshPermissions();
-      });
+  async function updatePagePermissionLevel (permission: IPagePermissionWithAssignee, permissionLevel: PagePermissionLevelType | 'delete') {
+
+    if (permissionLevel === 'delete') {
+      await charmClient.deletePermission(permission.id);
+    }
+    else if (permissionLevel !== permission.permissionLevel) {
+      await charmClient.updatePermission(permission.id, { permissionLevel: permission.permissionLevel });
+    }
+    await refreshPermissions();
+    setSelectedPermissionId(null);
   }
 
   const sortedPermissions = sortPagePermissions(pagePermissions);
 
-  /** TODO LATER
-   if (space) {
-     const spaceIsPresent = sortedPermissions.some(permission => permission.spaceId === space.id);
-
-    if (!spaceIsPresent) {
-
-    }
-  }
-    */
-
   const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
+  const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
+  console.log('spaceLevelPermission', spaceLevelPermission);
+  console.log(sortedPermissions);
   return (
     <Box padding={1}>
 
@@ -189,92 +183,64 @@ export default function PagePermissions ({ pageId }: Props) {
         </div>
       )}
 
-      <Box display='flex'>
-        <Grid container direction='row' justifyContent='space-around' alignItems='center'>
-          <Grid item xs={6}>
-            {`${space?.name} members`}
-          </Grid>
-          <Grid item xs={3} sx={{ fontSize: '12px' }}>
-            {
-              selectedPermissionId === 'space' ? (
-                <InputEnumToOptions
-                  onChange={(newAccessLevel) => {
-                    updateSpacePagePermissionLevel(newAccessLevel as PagePermissionLevel)
-                      .then(() => setSelectedPermissionId(null));
-                  }}
-                  keyAndLabel={permissionsWithoutCustom}
-                  defaultValue={spaceLevelPermission?.permissionLevel}
-                />
-              ) : (
-                <Box onClick={() => {
-                  if (userPagePermissions?.grant_permissions === true) {
-                    setSelectedPermissionId('space');
-                  }
-                }}
-                >
+      <Box display='flex' justifyContent='space-between' alignItems='center' py={0.5}>
+        <Typography variant='body2'>
+          Everyone at {space?.name}
+        </Typography>
+        <div style={{ width: '120px', textAlign: 'center' }}>
+          {
+            selectedPermissionId === 'space' ? (
+              <InputEnumToOptions
+                onChange={level => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
+                keyAndLabel={permissionsWithRemove}
+                defaultValue={spaceLevelPermission?.permissionLevel}
+              />
+            ) : (
+              <div onClick={() => {
+                if (userPagePermissions?.grant_permissions === true) {
+                  setSelectedPermissionId('space');
+                }
+              }}
+              >
+                <Typography color='secondary' variant='caption'>
                   {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : (permissionsLoaded ? 'No access' : '')}
-                </Box>
-              )
-            }
-          </Grid>
-          <Grid item xs={2} sx={{ fontSize: '10px' }}>
-            {
-              userPagePermissions?.grant_permissions === true && (<ElementDeleteIcon onClick={() => updateSpacePagePermissionLevel('delete')} />)
-            }
-          </Grid>
-
-        </Grid>
+                </Typography>
+              </div>
+            )
+          }
+        </div>
 
       </Box>
 
       {
         sortedPermissions.map(permission => {
           return (
-            <Box display='flex' key={permission.displayName}>
-              <Grid container direction='row' justifyContent='space-around' alignItems='center'>
-                <Grid item xs={6}>
-                  {permission.displayName}
-                </Grid>
-                <Grid item xs={3} sx={{ fontSize: '12px' }}>
-                  {
-                    selectedPermissionId === permission.id ? (
-                      <InputEnumToOptions
-                        onChange={(newAccessLevel) => {
-
-                          if (newAccessLevel !== permission.permissionLevel) {
-                            updatePagePermissionLevel({
-                              id: permission.id,
-                              permissionLevel: newAccessLevel as PagePermissionLevelType
-                            }).then(() => setSelectedPermissionId(null));
-                          }
-                          else {
-                            setSelectedPermissionId(null);
-                          }
-                        }}
-                        keyAndLabel={permissionsWithoutCustom}
-                        defaultValue={permission.permissionLevel}
-                      />
-                    ) : (
-                      <Box onClick={() => {
-                        if (userPagePermissions?.grant_permissions === true) {
-                          setSelectedPermissionId(permission.id);
-                        }
-                      }}
-                      >
+            <Box display='flex' justifyContent='space-between' alignItems='center' py={0.5} key={permission.displayName}>
+              <Typography variant='body2'>
+                {permission.displayName}
+              </Typography>
+              <div style={{ width: '120px', textAlign: 'center' }}>
+                {
+                  selectedPermissionId === permission.id ? (
+                    <InputEnumToOptions
+                      onChange={level => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
+                      keyAndLabel={permissionsWithRemove}
+                      defaultValue={permission.permissionLevel}
+                    />
+                  ) : (
+                    <div onClick={() => {
+                      if (userPagePermissions?.grant_permissions === true) {
+                        setSelectedPermissionId(permission.id);
+                      }
+                    }}
+                    >
+                      <Typography color='secondary' variant='caption'>
                         {permissionLevels[permission.permissionLevel]}
-                      </Box>
-                    )
-                  }
-
-                </Grid>
-                <Grid item xs={2} sx={{ fontSize: '10px' }}>
-                  {
-                    userPagePermissions?.grant_permissions === true && <ElementDeleteIcon onClick={() => deletePermission(permission.id)} />
-                  }
-                </Grid>
-
-              </Grid>
-
+                      </Typography>
+                    </div>
+                  )
+                }
+              </div>
             </Box>
           );
         })
