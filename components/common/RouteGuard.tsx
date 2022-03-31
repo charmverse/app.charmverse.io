@@ -8,42 +8,43 @@ import { useSpaces } from 'hooks/useSpaces';
 import { isSpaceDomain } from 'lib/spaces';
 import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
-import { useSnackbar } from 'hooks/useSnackbar';
+import log from 'lib/log';
+
+// TODO: Discord login for /invite route
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
-
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
   const { triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
-  const [user, setUser, isUserLoaded] = useUser();
+  const [user, setUser, isUserRequestComplete] = useUser();
   const [spaces, _, isSpacesLoaded] = useSpaces();
-  const isUserLoading = !!(account && !isUserLoaded);
   const isWalletLoading = (!triedEager && !account);
-  const isReactLoading = !router.isReady;
-  const isLoading = isUserLoading || isWalletLoading || isReactLoading || !isSpacesLoaded;
-  const { setIsOpen } = useSnackbar();
-  // console.log('isLoading', isLoading, { isReactLoading, isWalletLoading, isUserLoading, isSpacesLoaded });
+  const isRouterLoading = !router.isReady;
+  const isLoading = !isUserRequestComplete || isWalletLoading || isRouterLoading || !isSpacesLoaded;
 
   useEffect(() => {
     // wait to listen to events until data is loaded
     if (isLoading) {
       return;
     }
-    function authCheckAndRedirect (path: string) {
-      authCheck(path)
-        .then(result => {
-          setAuthorized(result.authorized);
-          if (result.user) {
-            setUser(result.user);
-          }
-          if (result.redirect) {
-            router.push(result.redirect);
-          }
-        });
+
+    async function authCheckAndRedirect (path: string) {
+
+      const result = await authCheck(path);
+
+      setAuthorized(result.authorized);
+
+      if (result.user) {
+        setUser(result.user);
+      }
+
+      if (result.redirect) {
+        router.push(result.redirect);
+      }
     }
 
     authCheckAndRedirect(router.asPath);
@@ -67,6 +68,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
 
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
+
     const path = url.split('?')[0];
 
     const firstPathSegment = path.split('/').filter(pathElem => {
@@ -80,42 +82,51 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
       return { authorized: true };
     }
-    // condition: wallet not connected
-    else if (!account) {
-      console.log('[RouteGuard]: redirect to login');
+    // condition: no user session and no wallet address
+    else if (!user && !account) {
+      log.info('[RouteGuard]: redirect to login');
       return {
-        authorized: false,
+        authorized: true,
         redirect: {
           pathname: '/',
           query: { returnUrl: router.asPath }
         }
       };
     }
-    // condition: user not loaded
-    else if (!user) {
-      console.log('[RouteGuard]: user not loaded');
-      try {
-        const _user = await charmClient.login(account);
-        return { authorized: false, user: _user };
+    // condition: no session, but a wallet is connected
+    else if (!user && account) {
+      log.info('[RouteGuard]: log in user by wallet address');
+      const _user = await charmClient.login(account).catch(err => null);
+      if (_user) {
+        return { authorized: true, user: _user };
       }
-      catch (error) {
-        const _user = await charmClient.createUser({ address: account });
-        return { authorized: false, user: _user };
+      else {
+        const __user = await charmClient.createUser({ address: account });
+        return { authorized: true, user: __user };
       }
-
     }
-    // condition: user switches to a new/unknown address
-    else if (!user.addresses.includes(account)) {
-      console.log('[RouteGuard]: unknown address');
-      let _user = await charmClient.login(account).catch(err => null);
-      if (!_user) {
-        _user = await charmClient.createUser({ address: account });
+    // condition: user connected but the wallet address is new
+    else if (user && account && !user.addresses.includes(account)) {
+      log.info('[RouteGuard]: unknown address');
+      const _user = await charmClient.login(account).catch(err => null);
+      // log in existing user
+      if (_user) {
+        return { authorized: true, user: _user };
       }
-      return { authorized: false, user: _user };
+      // add the address to current profile
+      else if (user.addresses.length === 0) {
+        const __user = await charmClient.updateUser({ addresses: [account] });
+        return { authorized: true, user: __user };
+      }
+      // create a new user
+      else {
+        const __user = await charmClient.createUser({ address: account });
+        return { authorized: true, user: __user };
+      }
     }
     // condition: trying to access a space without access
     else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
-      console.log('[RouteGuard]: send to join workspace page');
+      log.info('[RouteGuard]: send to join workspace page');
       return {
         authorized: false,
         redirect: {

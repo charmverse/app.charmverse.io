@@ -38,7 +38,7 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
     })
       .then(result => {
         showMessage(`Successfully imported ${result.importedRoleCount} discord roles`, 'success');
-        onUpdate();
+        router.replace(window.location.href.split('?')[0], undefined, { shallow: true });
       })
       .catch(_error => {
         // Major failure while trying to import discord server role
@@ -56,7 +56,7 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
   return (
     <Button
       external
-      href={`/api/discord/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
+      href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
       variant='outlined'
       loading={isLoading}
       startIcon={(

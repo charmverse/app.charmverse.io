@@ -4,9 +4,9 @@ import useENSName from 'hooks/useENSName';
 import { LoggedInUser } from 'models';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 
-type IContext = [user: LoggedInUser | null, setUser: (user: LoggedInUser | any) => void, isLoaded: boolean];
+type IContext = [user: LoggedInUser | null, setUser: (user: LoggedInUser | any) => void, isLoaded: boolean, setIsLoaded: (isLoaded: boolean) => void];
 
-export const UserContext = createContext<Readonly<IContext>>([null, () => undefined, false]);
+export const UserContext = createContext<Readonly<IContext>>([null, () => undefined, false, () => undefined]);
 
 export function UserProvider ({ children }: { children: ReactNode }) {
   const { account } = useWeb3React();
@@ -15,22 +15,16 @@ export function UserProvider ({ children }: { children: ReactNode }) {
   const ensName = useENSName(account);
 
   useEffect(() => {
-    if (account && !user) {
+    if (!user) {
       setIsLoaded(false);
+      // try retrieving the user from session
       charmClient.getUser()
         .then(_user => {
           setUser(_user);
-          setIsLoaded(true);
         })
-        .catch(err => {
-          // probably needs to log in
+        .finally(() => {
           setIsLoaded(true);
         });
-    }
-    else if (!account) {
-      // user disconnects their wallet
-      setUser(null);
-      setIsLoaded(true);
     }
   }, [account]);
 
@@ -40,7 +34,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     }
   }, [user, ensName]);
 
-  const value = useMemo(() => [user, setUser, isLoaded] as any, [user, isLoaded]);
+  const value = useMemo(() => [user, setUser, isLoaded, setIsLoaded] as IContext, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>

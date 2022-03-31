@@ -1,12 +1,12 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Image from 'components/common/Image';
 import styled from '@emotion/styled';
+import Button from 'components/common/Button';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-
 import splashImage from 'public/images/artwork/world.png';
 
 export const Container = styled(Box)`
@@ -15,9 +15,9 @@ export const Container = styled(Box)`
   margin: 0 auto;
 `;
 
-export default function LoginPageContent ({ account }: { account: string | null | undefined }) {
-
+export default function LoginPageContent () {
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+  const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
 
   return (
     <Container px={3}>
@@ -62,9 +62,15 @@ export default function LoginPageContent ({ account }: { account: string | null 
             <Typography sx={{ fontSize: 20, mb: 6 }}>
               Tasks, docs, bounties, and more
             </Typography>
-            <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
-              Connect Wallet
-            </PrimaryButton>
+            <Box display='flex' gap={2} alignItems='center'>
+              <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
+                Connect Wallet
+              </PrimaryButton>
+              <Typography color='secondary' variant='body2'>or</Typography>
+              <Button variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
+                Connect Discord
+              </Button>
+            </Box>
           </Box>
         </Grid>
         <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>

@@ -28,7 +28,7 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
     }
   }, [user?.id, isUserLoaded]);
 
-  const value = useMemo(() => [spaces, setSpaces, isLoaded] as const, [spaces, isLoaded]);
+  const value = useMemo(() => [spaces, setSpaces, isLoaded] as IContext, [spaces, isLoaded]);
 
   return (
     <SpacesContext.Provider value={value}>

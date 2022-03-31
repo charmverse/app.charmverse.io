@@ -10,11 +10,12 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .post(createProfile)
+  .post(createUser)
   .use(requireUser)
-  .get(getProfile);
+  .get(getUser)
+  .put(updateUser);
 
-async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
   const { address } = req.body;
   const user = await prisma.user.findFirst({
@@ -70,8 +71,7 @@ async function createProfile (req: NextApiRequest, res: NextApiResponse<LoggedIn
   }
 }
 
-async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-
+async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
   const profile = await prisma.user.findUnique({
     where: {
       id: req.session.user.id
@@ -96,10 +96,27 @@ async function getProfile (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   return res.status(200).json(profile);
 }
 
+async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
+  const user = await prisma.user.update({
+    where: {
+      id: req.session.user.id
+    },
+    include: {
+      favorites: true,
+      spaceRoles: true,
+      discordUser: true
+    },
+    data: req.body
+  });
+  return res.status(200).json({
+    ...user,
+    addresses: [req.body.address]
+  });
+}
+
 export default withSessionRoute(handler);
 
-async function logSignup () {
-
+export async function logSignup () {
   postToDiscord({
     funnelStage: 'acquisition',
     eventType: 'create_user',
