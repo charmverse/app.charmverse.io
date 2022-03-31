@@ -31,7 +31,7 @@ import { PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import Account from './Account';
-import ShareButton from './ShareButton';
+import ShareButton from './ShareButton/ShareButton';
 
 export const headerHeight = 56;
 

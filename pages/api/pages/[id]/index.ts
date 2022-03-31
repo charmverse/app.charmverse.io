@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { requirePagePermissions } from 'lib/permissions/pages/page-permissions-api';
+import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';

@@ -14,12 +14,12 @@ import { IPagePermissionUserRequest } from 'lib/permissions/pages/page-permissio
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireKeys<IPagePermissionUserRequest>(['pageId', 'userId'], 'body'))
-  .post(queryPagePermissions);
+  .use(requireKeys<IPagePermissionUserRequest>(['pageId', 'userId'], 'query'))
+  .get(queryPagePermissions);
 
 async function queryPagePermissions (req: NextApiRequest, res: NextApiResponse) {
 
-  const request = req.body as IPagePermissionUserRequest;
+  const request = req.query as unknown as IPagePermissionUserRequest;
 
   const userPermissions = await computeUserPagePermissions(request);
 

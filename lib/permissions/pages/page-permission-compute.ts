@@ -93,7 +93,7 @@ export async function computeUserPagePermissions (request: IPagePermissionUserRe
   const permissions = permissionWithSpaceRoleAndPermissions[1];
 
   const computedPermissions = new AllowedPagePermissions();
-
+  console.log(permissions);
   permissions.forEach(permission => {
 
     // Custom permissions are persisted to the database. Other permission groups are evaluated by the current mapping

@@ -6,8 +6,8 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
-import { computeUserPagePermissions } from './page-permission-compute';
-import { PageOperationType } from './page-permission-interfaces';
+import { computeUserPagePermissions } from '../permissions/pages/page-permission-compute';
+import { PageOperationType } from '../permissions/pages/page-permission-interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
