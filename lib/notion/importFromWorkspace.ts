@@ -14,9 +14,9 @@ import log from 'lib/log';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
-const IMPORTED_PAGES_LIMIT = 1000; const
-  BLOCKS_FETCHED_PER_REQUEST = 100; const
-  MAX_CHILD_BLOCK_DEPTH = 10;
+const IMPORTED_PAGES_LIMIT = 1000;
+const BLOCKS_FETCHED_PER_REQUEST = 100;
+const MAX_CHILD_BLOCK_DEPTH = 10;
 
 function convertRichText (richTexts: RichTextItemResponse[]): TextContent[] {
   return richTexts.map((richText) => {
