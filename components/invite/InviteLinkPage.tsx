@@ -10,6 +10,7 @@ import { InviteLinkPopulated } from 'lib/invites';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
+import { useSpaces } from 'hooks/useSpaces';
 
 const CenteredBox = styled.div`
   position: absolute;
@@ -23,17 +24,26 @@ const CenteredBox = styled.div`
 export default function InvitationPage ({ error, invite }: { error?: string, invite?: InviteLinkPopulated }) {
 
   const [user] = useUser();
+  const [spaces] = useSpaces();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
   const { account } = useWeb3React();
 
   async function joinSpace () {
-    if (!user) {
-      await charmClient.createUser({ address: account! });
+    if (!user && account) {
+      await charmClient.createUser({ address: account });
     }
-    await charmClient.acceptInvite({ id: invite!.id });
-    window.location.href = `/${invite!.space.domain}`;
+    if (invite) {
+      await charmClient.acceptInvite({ id: invite.id });
+      window.location.href = `/${invite.space.domain}`;
+    }
   }
 
+  const spaceRole = user?.spaceRoles.find(_spaceRole => _spaceRole.spaceId === invite?.spaceId);
+
+  if (spaceRole && invite) {
+    window.location.href = `/${invite.space.domain}`;
+    return null;
+  }
   if (error) {
     return (
       <CenteredBox>
@@ -49,15 +59,15 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
       </CenteredBox>
     );
   }
-  return (
+  return invite ? (
     <CenteredBox>
       <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box mb={3}>
-          <WorkspaceAvatar name={invite!.space.name} variant='rounded' />
+          <WorkspaceAvatar name={invite.space.name} variant='rounded' />
         </Box>
         <Box display='flex' flexDirection='column' alignItems='center' mb={3}>
           <Typography gutterBottom>You've been invited to join</Typography>
-          <Typography variant='h5'>{invite!.space.name}</Typography>
+          <Typography variant='h5'>{invite.space.name}</Typography>
         </Box>
         {account ? (
           <PrimaryButton fullWidth size='large' onClick={joinSpace}>
@@ -68,12 +78,12 @@ export default function InvitationPage ({ error, invite }: { error?: string, inv
             <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
               Connect Wallet
             </PrimaryButton>
-            {/* <PrimaryButton size='large' loading={!triedEager} href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
+            <PrimaryButton size='large' loading={!triedEager} href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
               Connect Discord
-            </PrimaryButton> */}
+            </PrimaryButton>
           </Box>
         )}
       </Card>
     </CenteredBox>
-  );
+  ) : null;
 }
