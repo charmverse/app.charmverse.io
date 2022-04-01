@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { BlockNode, CalloutNode, ListItemNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
+import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, ListItemNode, Page, PageContent, ParagraphNode, TableNode, TableRowNode, TextContent } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import { Prisma } from '@prisma/client';
 import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'components/common/CharmEditor/components/ResizableIframe';
@@ -66,7 +66,7 @@ interface ChildBlockListResponse {
 
 type BlockWithChildren = BlockObjectResponse & { children: string[] };
 
-const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
+const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
 
 async function populateDoc (
   parentNode: BlockNode,
@@ -115,6 +115,43 @@ async function populateDoc (
           },
           content: convertRichText(block.heading_3.rich_text)
         });
+        break;
+      }
+
+      case 'column_list': {
+        const columnLayoutNode: ColumnLayoutNode = {
+          type: 'columnLayout',
+          content: []
+        };
+
+        for (let index = 0; index < block.children.length; index++) {
+          const childId = block.children[index];
+          await populateDoc(columnLayoutNode, blocksRecord[childId], blocksRecord, {
+            onChildDatabase,
+            onChildPage,
+            onLinkToPage
+          }, [...parentInfo, [blocksRecord[childId].type, index]]);
+        }
+
+        (parentNode as PageContent).content?.push(columnLayoutNode);
+        break;
+      }
+
+      case 'column': {
+        const columnBlockNode: ColumnBlockNode = {
+          type: 'columnBlock',
+          content: []
+        };
+
+        for (let index = 0; index < block.children.length; index++) {
+          const childId = block.children[index];
+          await populateDoc(columnBlockNode, blocksRecord[childId], blocksRecord, {
+            onChildDatabase,
+            onChildPage,
+            onLinkToPage
+          }, [...parentInfo, [blocksRecord[childId].type, index]]);
+        }
+        (parentNode as PageContent).content?.push(columnBlockNode);
         break;
       }
 
@@ -738,6 +775,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         break;
       }
     }
+
+    console.log(JSON.stringify(blocksRecord, null, 2));
 
     for (let index = 0; index < blocks.length; index++) {
       try {

@@ -60,6 +60,17 @@ export interface ListItemNode {
   content: (ParagraphNode | BulletListNode)[]
 }
 
+export interface ColumnBlockNode {
+  type: 'columnBlock',
+  // eslint-disable-next-line
+  content: ParagraphNode[]
+}
+
+export interface ColumnLayoutNode {
+  type: 'columnLayout',
+  content: ColumnBlockNode[]
+}
+
 export interface BulletListNode {
   type: 'bulletList',
   content: ListItemNode[]
