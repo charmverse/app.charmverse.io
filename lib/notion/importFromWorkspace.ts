@@ -361,6 +361,7 @@ async function populateDoc (
       errorTrails.push(...errorMessageData);
     }
     catch (_) {
+      log.debug('Error when creating blocks for page', _);
       //
     }
     throw new Error(JSON.stringify([parentInfo[parentInfo.length - 1], ...errorTrails]));
@@ -813,6 +814,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               }
             }
             catch (_) {
+              log.debug('Error on creating child page', _);
               populateFailedImportRecord(_failedImportBlocks, searchResultRecord[block.id]);
             }
           },
@@ -833,6 +835,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
                 }
               }
               catch (_) {
+                log.debug('Error on creating link to page', _);
                 populateFailedImportRecord(_failedImportBlocks, searchResultRecord[linkedPageId]);
               }
             }
@@ -1008,6 +1011,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       importedPages[createdPage.id] = createdPage;
     }
     catch (_) {
+      log.debug('Error creating charmverse page', _);
       if (!failedImportsRecord[block.id]) {
         populateFailedImportRecord([], searchResultRecord[block.id]);
       }
@@ -1018,46 +1022,58 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   const createdPagesSet: Set<string> = new Set();
 
   async function createCharmversePageFromNotionPage (block: GetPageResponse | GetDatabaseResponse) {
-    if (block) {
-      if (block.object === 'page' || block.object === 'database') {
-        // Nested pages and databases
-        if (block.parent.type === 'page_id') {
-          // Create its parent first
-          if (!createdPagesSet.has(block.parent.page_id)) {
-            await createCharmversePageFromNotionPage(searchResultRecord[block.parent.page_id]);
+    try {
+      if (block) {
+        if (block.object === 'page' || block.object === 'database') {
+          // Nested pages and databases
+          if (block.parent.type === 'page_id') {
+            // Create its parent first
+            if (!createdPagesSet.has(block.parent.page_id) && searchResultRecord[block.parent.page_id]) {
+              await createCharmversePageFromNotionPage(searchResultRecord[block.parent.page_id]);
+            }
+            let parentId = workspacePage.id;
+            // If the parent was created successfully
+            // Or if we failed to import some blocks from the parent (partial success)
+            if ((!failedImportsRecord[block.parent.page_id]
+              || (failedImportsRecord[block.parent.page_id].blocks.length !== 0))
+              && searchResultRecord[block.parent.page_id]
+              && !createdCards[block.parent.page_id]) {
+              parentId = createdPages[block.parent.page_id]?.id;
+            }
+
+            if (!createdPagesSet.has(block.id)) {
+              // If its a linked page we dont create the parent, so the would be the workspace page
+              await createCharmversePage(block, parentId);
+            }
           }
-          let parentId = workspacePage.id;
-          // If the parent was created successfully
-          // Or if we failed to import some blocks from the parent (partial success)
-          if (!failedImportsRecord[block.parent.page_id]
-            || (failedImportsRecord[block.parent.page_id].blocks.length !== 0)) {
-            parentId = createdPages[block.parent.page_id]?.id;
+          // Focalboard cards
+          else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
+            if (!createdPagesSet.has(block.parent.database_id) && searchResultRecord[block.parent.database_id]) {
+              await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
+            }
+            // Make sure the database page has not failed to be created, otherwise no cards will be added
+            if (!failedImportsRecord[block.parent.database_id] && !createdPagesSet.has(block.id)) {
+              const { card, charmText } = createdCards[block.id];
+              await prisma.block.createMany({
+                data: [
+                  card,
+                  charmText
+                ]
+              });
+            }
           }
-          // If its a linked page we dont create the parent, so the would be the workspace page
-          await createCharmversePage(block, parentId);
+          // Top level pages and databases, make sure it hasn't been created already
+          else if (block.parent.type === 'workspace' && !createdPagesSet.has(block.id)) {
+            await createCharmversePage(block, workspacePage.id);
+          }
         }
-        // Focalboard cards
-        else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
-          if (!createdPagesSet.has(block.parent.database_id)) {
-            await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
-          }
-          // Make sure the database page has not failed to be created, otherwise no cards will be added
-          if (!failedImportsRecord[block.parent.database_id]) {
-            const { card, charmText } = createdCards[block.id];
-            await prisma.block.createMany({
-              data: [
-                card,
-                charmText
-              ]
-            });
-          }
-        }
-        // Top level pages and databases
-        else if (block.parent.type === 'workspace') {
-          await createCharmversePage(block, workspacePage.id);
-        }
+        createdPagesSet.add(block.id);
       }
-      createdPagesSet.add(block.id);
+    }
+    catch (_) {
+      log.debug('Error creating charmverse page 2', _);
+      // Sometimes we get duplicate id error when creating pages using uuid, try/catch block will help not break the whole thing down
+      //
     }
   }
 
