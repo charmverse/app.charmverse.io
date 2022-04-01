@@ -112,6 +112,12 @@
     }
 
     .octo-propertyname {
+        span {
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+        
         width: 150px;
         margin-right: 5px;
         color: rgba(var(--center-channel-color-rgb), 0.6);

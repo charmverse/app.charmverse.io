@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { BlockNode, CalloutNode, ListItemNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
+import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, ListItemNode, Page, PageContent, ParagraphNode, TableNode, TableRowNode, TextContent } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import { Prisma } from '@prisma/client';
 import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'components/common/CharmEditor/components/ResizableIframe';
@@ -19,7 +19,9 @@ const BLOCKS_FETCHED_PER_REQUEST = 100;
 const MAX_CHILD_BLOCK_DEPTH = 10;
 
 function convertRichText (richTexts: RichTextItemResponse[]): TextContent[] {
-  return richTexts.map((richText) => {
+  const textContents: TextContent[] = [];
+
+  richTexts.forEach((richText) => {
     const marks: { type: string, attrs?: Record<string, string> }[] = [];
     if (richText.annotations.strikethrough) {
       marks.push({ type: 'strike' });
@@ -50,12 +52,16 @@ function convertRichText (richTexts: RichTextItemResponse[]): TextContent[] {
       });
     }
 
-    return {
-      type: 'text',
-      text: richText.plain_text,
-      marks
-    };
+    if (richText.plain_text) {
+      textContents.push({
+        type: 'text',
+        text: richText.plain_text,
+        marks
+      });
+    }
   });
+
+  return textContents;
 }
 
 interface ChildBlockListResponse {
@@ -66,7 +72,7 @@ interface ChildBlockListResponse {
 
 type BlockWithChildren = BlockObjectResponse & { children: string[] };
 
-const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote)/;
+const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
 
 async function populateDoc (
   parentNode: BlockNode,
@@ -115,6 +121,43 @@ async function populateDoc (
           },
           content: convertRichText(block.heading_3.rich_text)
         });
+        break;
+      }
+
+      case 'column_list': {
+        const columnLayoutNode: ColumnLayoutNode = {
+          type: 'columnLayout',
+          content: []
+        };
+
+        for (let index = 0; index < block.children.length; index++) {
+          const childId = block.children[index];
+          await populateDoc(columnLayoutNode, blocksRecord[childId], blocksRecord, {
+            onChildDatabase,
+            onChildPage,
+            onLinkToPage
+          }, [...parentInfo, [blocksRecord[childId].type, index]]);
+        }
+
+        (parentNode as PageContent).content?.push(columnLayoutNode);
+        break;
+      }
+
+      case 'column': {
+        const columnBlockNode: ColumnBlockNode = {
+          type: 'columnBlock',
+          content: []
+        };
+
+        for (let index = 0; index < block.children.length; index++) {
+          const childId = block.children[index];
+          await populateDoc(columnBlockNode, blocksRecord[childId], blocksRecord, {
+            onChildDatabase,
+            onChildPage,
+            onLinkToPage
+          }, [...parentInfo, [blocksRecord[childId].type, index]]);
+        }
+        (parentNode as PageContent).content?.push(columnBlockNode);
         break;
       }
 
@@ -318,6 +361,7 @@ async function populateDoc (
       errorTrails.push(...errorMessageData);
     }
     catch (_) {
+      log.debug('Error when creating blocks for page', _);
       //
     }
     throw new Error(JSON.stringify([parentInfo[parentInfo.length - 1], ...errorTrails]));
@@ -770,6 +814,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               }
             }
             catch (_) {
+              log.debug('Error on creating child page', _);
               populateFailedImportRecord(_failedImportBlocks, searchResultRecord[block.id]);
             }
           },
@@ -790,6 +835,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
                 }
               }
               catch (_) {
+                log.debug('Error on creating link to page', _);
                 populateFailedImportRecord(_failedImportBlocks, searchResultRecord[linkedPageId]);
               }
             }
@@ -965,60 +1011,75 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       importedPages[createdPage.id] = createdPage;
     }
     catch (_) {
+      log.debug('Error creating charmverse page', _);
       if (!failedImportsRecord[block.id]) {
         populateFailedImportRecord([], searchResultRecord[block.id]);
       }
     }
   }
 
-  let createdPageIds = searchResults.map(_searchResult => _searchResult.id);
+  const createdPageIds = searchResults.map(_searchResult => _searchResult.id);
   const createdPagesSet: Set<string> = new Set();
 
   async function createCharmversePageFromNotionPage (block: GetPageResponse | GetDatabaseResponse) {
-    if (block.object === 'page' || block.object === 'database') {
-      // Nested pages and databases
-      if (block.parent.type === 'page_id') {
-        // Create its parent first
-        if (!createdPagesSet.has(block.parent.page_id)) {
-          await createCharmversePageFromNotionPage(searchResultRecord[block.parent.page_id]);
+    try {
+      if (block) {
+        if (block.object === 'page' || block.object === 'database') {
+          // Nested pages and databases
+          if (block.parent.type === 'page_id') {
+            // Create its parent first
+            if (!createdPagesSet.has(block.parent.page_id) && searchResultRecord[block.parent.page_id]) {
+              await createCharmversePageFromNotionPage(searchResultRecord[block.parent.page_id]);
+            }
+            let parentId = workspacePage.id;
+            // If the parent was created successfully
+            // Or if we failed to import some blocks from the parent (partial success)
+            if ((!failedImportsRecord[block.parent.page_id]
+              || (failedImportsRecord[block.parent.page_id].blocks.length !== 0))
+              && searchResultRecord[block.parent.page_id]
+              && !createdCards[block.parent.page_id]) {
+              parentId = createdPages[block.parent.page_id]?.id;
+            }
+
+            if (!createdPagesSet.has(block.id)) {
+              // If its a linked page we dont create the parent, so the would be the workspace page
+              await createCharmversePage(block, parentId);
+            }
+          }
+          // Focalboard cards
+          else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
+            if (!createdPagesSet.has(block.parent.database_id) && searchResultRecord[block.parent.database_id]) {
+              await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
+            }
+            // Make sure the database page has not failed to be created, otherwise no cards will be added
+            if (!failedImportsRecord[block.parent.database_id] && !createdPagesSet.has(block.id)) {
+              const { card, charmText } = createdCards[block.id];
+              await prisma.block.createMany({
+                data: [
+                  card,
+                  charmText
+                ]
+              });
+            }
+          }
+          // Top level pages and databases, make sure it hasn't been created already
+          else if (block.parent.type === 'workspace' && !createdPagesSet.has(block.id)) {
+            await createCharmversePage(block, workspacePage.id);
+          }
         }
-        let parentId = workspacePage.id;
-        // If the parent was created successfully
-        // Or if we failed to import some blocks from the parent (partial success)
-        if (!failedImportsRecord[block.parent.page_id]
-          || (failedImportsRecord[block.parent.page_id].blocks.length !== 0)) {
-          parentId = createdPages[block.parent.page_id]?.id;
-        }
-        // If its a linked page we dont create the parent, so the would be the workspace page
-        await createCharmversePage(block, parentId);
-      }
-      // Focalboard cards
-      else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
-        if (!createdPagesSet.has(block.parent.database_id)) {
-          await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
-        }
-        // Make sure the database page has not failed to be created, otherwise no cards will be added
-        if (!failedImportsRecord[block.parent.database_id]) {
-          const { card, charmText } = createdCards[block.id];
-          await prisma.block.createMany({
-            data: [
-              card,
-              charmText
-            ]
-          });
-        }
-      }
-      // Top level pages and databases
-      else if (block.parent.type === 'workspace') {
-        await createCharmversePage(block, workspacePage.id);
+        createdPagesSet.add(block.id);
       }
     }
-    createdPageIds = createdPageIds.filter(createdPageId => createdPageId !== block.id);
-    createdPagesSet.add(block.id);
+    catch (_) {
+      log.debug('Error creating charmverse page 2', _);
+      // Sometimes we get duplicate id error when creating pages using uuid, try/catch block will help not break the whole thing down
+      //
+    }
   }
 
-  while (createdPageIds.length !== 0) {
-    await createCharmversePageFromNotionPage(searchResultRecord[createdPageIds[0]]);
+  for (let index = 0; index < createdPageIds.length; index++) {
+    const createdPageId = createdPageIds[index];
+    await createCharmversePageFromNotionPage(searchResultRecord[createdPageId]);
   }
 
   return Object.values(failedImportsRecord);
