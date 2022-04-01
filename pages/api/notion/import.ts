@@ -34,6 +34,7 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse<{
 
   const spaceId = req.body.spaceId as string;
   const tempAuthCode = req.body.code;
+
   if (!spaceId || !tempAuthCode) {
     res.status(400).send({ error: 'Invalid code or space' });
     return;
