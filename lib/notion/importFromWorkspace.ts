@@ -19,7 +19,9 @@ const BLOCKS_FETCHED_PER_REQUEST = 100;
 const MAX_CHILD_BLOCK_DEPTH = 10;
 
 function convertRichText (richTexts: RichTextItemResponse[]): TextContent[] {
-  return richTexts.map((richText) => {
+  const textContents: TextContent[] = [];
+
+  richTexts.forEach((richText) => {
     const marks: { type: string, attrs?: Record<string, string> }[] = [];
     if (richText.annotations.strikethrough) {
       marks.push({ type: 'strike' });
@@ -50,12 +52,16 @@ function convertRichText (richTexts: RichTextItemResponse[]): TextContent[] {
       });
     }
 
-    return {
-      type: 'text',
-      text: richText.plain_text,
-      marks
-    };
+    if (richText.plain_text) {
+      textContents.push({
+        type: 'text',
+        text: richText.plain_text,
+        marks
+      });
+    }
   });
+
+  return textContents;
 }
 
 interface ChildBlockListResponse {
