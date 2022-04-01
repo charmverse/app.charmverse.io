@@ -69,10 +69,6 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
     }
   });
 
-  if (spaceId === 'eed82490-f0bd-4cf8-8651-775b666947e5') {
-    console.log('Pages found', pages.length);
-  }
-
   return res.status(200).json(pages);
 }
 
