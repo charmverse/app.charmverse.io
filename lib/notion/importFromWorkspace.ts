@@ -776,8 +776,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       }
     }
 
-    console.log(JSON.stringify(blocksRecord, null, 2));
-
     for (let index = 0; index < blocks.length; index++) {
       try {
         await populateDoc(pageContent, blocks[index], blocksRecord, {
