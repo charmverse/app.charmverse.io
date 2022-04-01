@@ -6,7 +6,7 @@ function transformResponse (response: Response) {
     const contentType = response.headers.get('content-type') as string;
     // necessary to capture the regular response for embedded blcoks
     if (contentType?.includes('application/json')) {
-      return response.json().then(json => Promise.reject(json));
+      return response.json().then(json => Promise.reject({ status: response.status, ...json }));
     }
     // Note: 401 if user is logged out
     return response.text().then(text => Promise.reject({ status: response.status, message: text }));
