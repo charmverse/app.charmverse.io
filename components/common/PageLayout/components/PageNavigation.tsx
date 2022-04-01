@@ -375,7 +375,6 @@ type NodeProps = {
 }
 
 function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage }: NodeProps) {
-
   const ref = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
@@ -472,6 +471,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
       key={item.id}
       nodeId={item.id}
+      id={item.id}
       label={item.title}
       href={`${pathPrefix}/${item.path}${item.type === 'board' && item.boardId && focalboardViewsRecord[item.boardId] ? `?viewId=${focalboardViewsRecord[item.boardId]}` : ''}`}
       isAdjacent={isAdjacentActive}
