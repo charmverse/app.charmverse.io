@@ -36,7 +36,7 @@ type Board = Block & {
 }
 
 function createBoard(block?: Block, addDefaultProperty?: boolean): Board {
-    addDefaultProperty = addDefaultProperty ?? true  
+    addDefaultProperty = addDefaultProperty ?? false
     const cardProperties: IPropertyTemplate[] = block?.fields.cardProperties.map((o: IPropertyTemplate) => {
         return {
             id: o.id,

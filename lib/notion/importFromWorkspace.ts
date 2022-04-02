@@ -484,7 +484,7 @@ async function createDatabase (block: GetDatabaseResponse, {
   const title = convertToPlainText((block as any).title);
   const cardProperties: IPropertyTemplate[] = [];
 
-  const board = createBoard(undefined, false);
+  const board = createBoard();
 
   const focalboardPropertiesRecord : Record<string, string> = {};
 
