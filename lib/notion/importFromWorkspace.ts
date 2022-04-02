@@ -515,7 +515,7 @@ async function createDatabase (block: GetDatabaseResponse, {
 
   board.title = title;
   board.fields.icon = block.icon?.type === 'emoji' ? block.icon.emoji : '';
-  board.fields.headerImage = block.cover?.type === 'external' ? block.cover.external.url : null;
+  board.fields.headerImage = block.cover?.type === 'external' ? block.cover.external.url : block.cover?.type === 'file' ? block.cover.file.url : null;
   board.rootId = board.id;
   board.fields.cardProperties = cardProperties;
   const view = createBoardView();
@@ -544,7 +544,7 @@ async function createDatabase (block: GetDatabaseResponse, {
     },
     focalboardPropertiesRecord,
     page: {
-      headerImage: block.cover?.type === 'external' ? block.cover.external.url : null,
+      headerImage: block.cover?.type === 'external' ? block.cover.external.url : block.cover?.type === 'file' ? block.cover?.file.url : null,
       icon: block.icon?.type === 'emoji' ? block.icon.emoji : null,
       title,
       type: 'board',
@@ -882,7 +882,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       createdPages[notionPageId] = {
         type: 'page',
         content: pageContent,
-        headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
+        headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover?.file.url : null,
         icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
         title,
         id: createdPageId,
@@ -967,7 +967,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             fields: {
               icon: emoji,
               contentOrder: [charmTextBlock.id],
-              headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : null,
+              headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover.file.url : null,
               properties: cardProperties
             }
           }),
