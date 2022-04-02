@@ -317,7 +317,7 @@ async function populateDoc (
         (parentNode as PageContent).content?.push({
           type: 'image',
           attrs: {
-            src: block.image.type === 'external' ? block.image.external.url : null,
+            src: block.image.type === 'external' ? block.image.external.url : block.image.type === 'file' ? block.image.file.url : null,
             size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
             aspectRatio: 1
           }

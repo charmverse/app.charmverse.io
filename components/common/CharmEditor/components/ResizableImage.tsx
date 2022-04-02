@@ -162,10 +162,15 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs, selected }:
   useEffect(() => {
     async function main () {
       if (node.attrs.src) {
-        const image = await imagePromise(node.attrs.src);
-        updateAttrs({
-          aspectRatio: image.width / image.height
-        });
+        try {
+          const image = await imagePromise(node.attrs.src);
+          updateAttrs({
+            aspectRatio: image.width / image.height
+          });
+        }
+        catch (_) {
+          //
+        }
       }
     }
     main();
