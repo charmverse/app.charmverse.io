@@ -23,7 +23,7 @@ export default function ImportNotionWorkspace () {
   const [space] = useCurrentSpace();
 
   useEffect(() => {
-    if (space && typeof router.query.code === 'string' && router.query.notion === '1') {
+    if (space && typeof router.query.code === 'string' && router.query.notion === '1' && !isImportingFromNotion) {
       setIsImportingFromNotion(true);
       setNotionFailedImports([]);
       setModalOpen(true);
