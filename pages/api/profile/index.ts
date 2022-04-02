@@ -40,7 +40,9 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   });
 
   if (user) {
-    req.session.user = user;
+    // strip out large fields so we dont break the cookie
+    const { discordUser, spaceRoles, ...userData } = user;
+    req.session.user = userData;
     await req.session.save();
     res.status(200).json(user);
   }
