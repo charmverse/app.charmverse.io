@@ -146,7 +146,7 @@ const StyledPageIcon = styled(EmojiIcon)`
   color: ${({ theme }) => theme.palette.secondary.light};
 `;
 
-export const PageTitle = styled(Typography)<{ isempty?: number }>`
+export const PageTitle = styled(Typography) <{ isempty?: number }>`
   color: inherit;
   display: flex;
   align-items: center;
@@ -235,7 +235,7 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
-export function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode, pageType: Page['type'], isEditorEmpty: boolean}) {
+export function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode, pageType: Page['type'], isEditorEmpty: boolean }) {
 
   if (icon) {
     return <StyledPageIcon icon={icon} />;
@@ -507,7 +507,15 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
           <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
             No pages inside
           </Typography>
-        ) : views.map(view => <PageTreeItem labelIcon={iconForViewType(view.fields.viewType)} label={view.title} href={`${pathPrefix}/${item.path}${item.type === 'board' ? `?viewId=${view.id}` : ''}`} id={view.id} />)}
+        ) : views.map(view => (
+          <PageTreeItem
+            key={view.id}
+            labelIcon={iconForViewType(view.fields.viewType)}
+            label={view.title}
+            href={`${pathPrefix}/${item.path}${item.type === 'board' ? `?viewId=${view.id}` : ''}`}
+            id={view.id}
+          />
+      ))}
     </PageTreeItem>
   );
 }
