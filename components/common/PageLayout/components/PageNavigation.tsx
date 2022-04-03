@@ -105,19 +105,6 @@ const AdjacentDropZone = styled.div`
   background-color: ${({ theme }) => theme.palette.primary.main};
 `;
 
-export const StyledIconButton = styled(IconButton)`
-  border-radius: 3px;
-  border: 1px solid ${({ theme }) => theme.palette.divider};
-  height: 16px;
-  width: 16px;
-  svg {
-    font-size: 16px;
-  }
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.action.hover};
-  }
-`;
-
 const PageAnchor = styled.a`
   color: inherit;
   text-decoration: none;
@@ -144,6 +131,11 @@ const StyledPageIcon = styled(EmojiIcon)`
   width: 24px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
+  // style focalboard icons;
+  .Icon {
+    height: 22px;
+    width: 22px;
+  }
 `;
 
 export const PageTitle = styled(Typography)<{ isempty?: number }>`
