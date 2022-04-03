@@ -62,7 +62,6 @@ export function getTwitterEmoji (emoji: string): string | null {
 }
 
 function EmojiIcon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
-  console.log('icon', icon);
   let iconContent: string | ReactNode = icon;
   if (typeof icon === 'string' && icon.startsWith('http')) {
     iconContent = <img src={icon} />;
