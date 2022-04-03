@@ -331,6 +331,7 @@ function CharmEditor (
           case 'image': {
             return (
               <ResizableImage
+                readOnly={readOnly}
                 onResizeStop={(view) => {
                   if (onContentChangeDebounced) {
                     // Save the current image size on the backend after we are done resizing
