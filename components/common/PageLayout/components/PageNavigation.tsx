@@ -441,7 +441,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
     drag(elt);
   }, [drag]);
 
-  const isActive = !isAdjacent && canDrop && isOverCurrent;
+  const isActive = !isAdjacent && canDrop && isOverCurrent && !item.boardId;
   const isAdjacentActive = isAdjacent && canDrop && isOverCurrent;
 
   function addSubPage (page: Partial<Page>) {
@@ -485,8 +485,8 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
         // borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
       }}
     >
-      {item.children?.length > 0
-        ? item.children.map((childItem, index) => (
+      {!item.boardId ? item.children?.length > 0
+        ? item.children.map((childItem) => (
           <RenderDraggableNode
             onDropAdjacent={onDropAdjacent}
             onDropChild={onDropChild}
@@ -501,7 +501,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
           <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
             No pages inside
           </Typography>
-        )}
+        ) : null}
     </PageTreeItem>
   );
 }
@@ -523,7 +523,8 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
   for (i = 0; i < tempItems.length; i += 1) {
     node = tempItems[i];
     const index = node[key] ? map[node[key]!] : -1;
-    if (node[key] && tempItems[index]) {
+    // Make sure its not a database page
+    if (node[key] && tempItems[index] && !tempItems[index].boardId) {
       tempItems[index].children.push(node);
       sortArrayByObjectProperty(tempItems[index].children, 'index');
     }
@@ -690,7 +691,11 @@ export default function PageNavigation ({
         <RenderDraggableNode
           key={item.id}
           item={item}
-          onDropChild={onDropChild}
+          onDropChild={(a, b) => {
+            if (!item.boardId) {
+              onDropChild(a, b);
+            }
+          }}
           onDropAdjacent={onDropAdjacent}
           pathPrefix={`/${space.domain}`}
           addPage={page => addPageAndRedirect(page)}
