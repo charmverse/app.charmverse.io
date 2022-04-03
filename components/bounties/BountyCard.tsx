@@ -3,9 +3,8 @@ import { Box, Card, CardActionArea, CardContent, CardHeader, Chip, Grid, Typogra
 import { Bounty as IBounty } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { fancyTrim } from 'lib/utilities/strings';
-import { BountyStatus, BOUNTY_LABELS as BountyLabels } from 'models/Bounty';
-import { useState } from 'react';
-import { BrandColors } from 'theme/colors';
+import { BountyStatus } from 'models/Bounty';
+import { BrandColor } from 'theme/colors';
 import { BountyBadge } from './BountyBadge';
 
 export interface IBountyInput {
@@ -13,7 +12,7 @@ export interface IBountyInput {
   truncate?: boolean
 }
 
-export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
+export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
   open: 'gray',
   assigned: 'blue',
   review: 'red',
@@ -23,7 +22,7 @@ export const BountyStatusColours: Record<BountyStatus, BrandColors> = {
 
 export function BountyCard ({ truncate = true, bounty }: IBountyInput) {
   const [space] = useCurrentSpace();
-  const bountyUrl = `/${space!.domain}/bounties/${bounty.id}`;
+  const bountyUrl = `/${space?.domain}/bounties/${bounty.id}`;
 
   return (
     <Card

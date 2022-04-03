@@ -1,4 +1,4 @@
-import { useTheme } from '@emotion/react';
+
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -9,7 +9,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import millify from 'millify';
 import { BountyWithDetails } from 'models';
 import { BOUNTY_LABELS } from 'models/Bounty';
-import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -20,15 +19,36 @@ import GradingIcon from '@mui/icons-material/Grading';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import PaidIcon from '@mui/icons-material/Paid';
 import { ReactNode } from 'react';
+import styled from '@emotion/styled';
 import { BountyStatusColours } from './BountyCard';
 
-export const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
+const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   open: <ModeStandbyIcon />,
   assigned: <AssignmentIndIcon />,
   review: <GradingIcon />,
   complete: <CheckCircleOutlineIcon />,
   paid: <PaidIcon />
 };
+
+const BountyStatusBox = styled.div<{ status: BountyStatus }>`
+  padding-left: ${({ theme }) => theme.spacing(1)};
+  padding-right: ${({ theme }) => theme.spacing(1)};
+  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
+  background-color: ${({ status, theme }) => {
+    // @ts-ignore
+    return theme.palette[BountyStatusColours[status]].main;
+  }};
+  text-align: center;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const BountyIcon = styled.span`
+  opacity: 0.5;
+  display: flex;
+`;
 
 /**
  * @hideLink used in the Bounty page so we don't show a link when we are already on the page
@@ -44,13 +64,12 @@ export interface IBountyBadgeProps {
 
 export function BountyBadge ({ truncate = false, bounty, direction = 'row', hideLink = false } : IBountyBadgeProps) {
   const [space] = useCurrentSpace();
-  const theme = useTheme();
 
   const [paymentMethods] = usePaymentMethods();
 
   const tokenInfo = getTokenInfo(paymentMethods, bounty.rewardToken);
 
-  const bountyLink = `/${space!.domain}/bounties/${bounty.id}`;
+  const bountyLink = `/${space?.domain}/bounties/${bounty.id}`;
 
   const transactionInfo = (bounty as BountyWithDetails).transactions?.[0];
 
@@ -143,8 +162,10 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
               </Typography>
             </Box>
           </Box>
-          <Box pl={1} pr={1} borderRadius={1} sx={{ background: theme.palette[BountyStatusColours[bounty.status]].main, textAlign: 'center', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            {BOUNTY_STATUS_ICONS[bounty.status]}
+          <BountyStatusBox status={bounty.status}>
+            <BountyIcon>
+              {BOUNTY_STATUS_ICONS[bounty.status]}
+            </BountyIcon>
             <Typography
               component='span'
               sx={{
@@ -156,7 +177,7 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
             >
               {BOUNTY_LABELS[bounty.status]}
             </Typography>
-          </Box>
+          </BountyStatusBox>
         </Box>
       </Grid>
       {

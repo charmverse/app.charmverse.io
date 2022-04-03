@@ -28,6 +28,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useBounties } from 'hooks/useBounties';
 import useENSName from 'hooks/useENSName';
 import { useUser } from 'hooks/useUser';
+import { usePageTitle } from 'hooks/usePageTitle';
 import { getDisplayName } from 'lib/users';
 import { eToNumber } from 'lib/utilities/numbers';
 import { BountyWithDetails, PageContent } from 'models';
@@ -39,6 +40,7 @@ export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 export default function BountyDetails () {
   const [space] = useCurrentSpace();
   const [applications, setApplications] = useState([] as Application []);
+  const [_, setPageTitle] = usePageTitle();
 
   const [user] = useUser();
   const [contributors] = useContributors();
@@ -91,6 +93,7 @@ export default function BountyDetails () {
     const applicationList = await charmClient.listApplications(foundBounty.id);
     setApplications(applicationList);
     setBounty(foundBounty);
+    setPageTitle(foundBounty.title);
   }
 
   function getContributor (userId: string) {
