@@ -57,15 +57,12 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
 
   }, [page.boardId, router.query.viewId, boardViews]);
 
+  // load initial data for readonly boards - otherwise its loaded in _app.tsx
   useEffect(() => {
-    let loadAction: any = initialLoad; /* eslint-disable-line @typescript-eslint/no-explicit-any */
-    let token = localStorage.getItem('focalboardSessionId') || '';
-    if (readonly) {
-      loadAction = initialReadOnlyLoad;
-      token = token || router.query.r as string || '';
+    if (readonly && page.boardId) {
+      dispatch(initialReadOnlyLoad(page.boardId));
     }
-    dispatch(loadAction(page.boardId));
-  }, [router.query.spaceId, readonly, router.query.pageId]);
+  }, [page.boardId]);
 
   useHotkeys('ctrl+z,cmd+z', () => {
     Utils.log('Undo');
