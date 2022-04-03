@@ -32,12 +32,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import NewPageMenu, { StyledDatabaseIcon } from 'components/common/NewPageMenu';
 import EmojiIcon from 'components/common/Emoji';
-import { Tooltip } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import { createCharmTextBlock } from 'components/common/BoardEditor/focalboard/src/blocks/charmBlock';
-import { useRouter } from 'next/router';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import AddNewCard from './AddNewCard';
 
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
@@ -274,8 +269,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
   } = props;
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const router = useRouter();
-  const [space] = useCurrentSpace();
+
   function showMenu (event: React.MouseEvent<HTMLElement>) {
     setAnchorEl(event.currentTarget);
     event.preventDefault();
@@ -326,28 +320,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
                 <MoreHorizIcon color='secondary' fontSize='small' />
               </IconButton>
               {addSubPage && pageType === 'board' ? (
-                <Tooltip disableInteractive title='Add a page inside' leaveDelay={0} placement='right' arrow>
-                  <StyledIconButton onClick={async () => {
-                    const card = createCard();
-                    const page = pages[pageId];
-                    if (page && page.boardId && space) {
-                      card.parentId = page.boardId;
-                      card.rootId = page.boardId;
-                      card.fields.properties = { ...card.fields.properties };
-
-                      const charmTextBlock = createCharmTextBlock();
-                      charmTextBlock.parentId = card.id;
-                      charmTextBlock.rootId = card.rootId;
-                      card.fields.contentOrder = [charmTextBlock.id];
-
-                      await charmClient.insertBlocks([card, charmTextBlock], () => null);
-                      router.push(`/${space.domain}/${page.path}?cardId=${card.id}`);
-                    }
-                  }}
-                  >
-                    <AddIcon color='secondary' />
-                  </StyledIconButton>
-                </Tooltip>
+                <AddNewCard pageId={pageId} />
               ) : (
                 <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} sx={{ marginLeft: '3px' }} />
               )}
