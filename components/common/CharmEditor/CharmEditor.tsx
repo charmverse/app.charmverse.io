@@ -345,6 +345,7 @@ function CharmEditor (
           case 'iframe': {
             return (
               <ResizableIframe
+                readOnly={readOnly}
                 onResizeStop={(view) => {
                   if (onContentChangeDebounced) {
                     // Save the current embed size on the backend after we are done resizing
