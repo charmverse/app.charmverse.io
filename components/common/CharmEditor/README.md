@@ -1,3 +1,0 @@
-# CharmEditor
-
-The CharmEditor 
