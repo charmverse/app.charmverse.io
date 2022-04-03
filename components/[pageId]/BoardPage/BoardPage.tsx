@@ -65,7 +65,6 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
       token = token || router.query.r as string || '';
     }
     dispatch(loadAction(page.boardId));
-
   }, [router.query.spaceId, readonly, router.query.pageId]);
 
   useHotkeys('ctrl+z,cmd+z', () => {

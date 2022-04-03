@@ -32,7 +32,9 @@ import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import NewPageMenu, { StyledDatabaseIcon } from 'components/common/NewPageMenu';
 import EmojiIcon from 'components/common/Emoji';
-
+import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
 export type MenuNode = Page & {
@@ -462,6 +464,10 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
   const isEmptyContent = docContent && (docContent.length <= 1
     && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
 
+  const viewsRecord = useAppSelector((state) => state.views.views);
+
+  const views = Object.values(viewsRecord).filter(view => view.parentId === item.boardId);
+
   return (
     <PageTreeItem
       data-handler-id={handlerId}
@@ -501,7 +507,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
           <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
             No pages inside
           </Typography>
-        ) : null}
+        ) : views.map(view => <PageTreeItem labelIcon={iconForViewType(view.fields.viewType)} label={view.title} href={`${pathPrefix}/${item.path}${item.type === 'board' ? `?viewId=${view.id}` : ''}`} id={view.id} />)}
     </PageTreeItem>
   );
 }

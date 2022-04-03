@@ -80,7 +80,6 @@ type Props = {
 
 const Kanban = (props: Props) => {
     const {board, activeView, cards, groupByProperty, visibleGroups, hiddenGroups} = props
-
     const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
 
     const propertyValues = groupByProperty?.options || []
