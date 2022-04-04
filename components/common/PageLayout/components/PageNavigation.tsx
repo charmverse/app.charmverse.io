@@ -34,6 +34,7 @@ import NewPageMenu, { StyledDatabaseIcon } from 'components/common/NewPageMenu';
 import EmojiIcon from 'components/common/Emoji';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
+import { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import AddNewCard from './AddNewCard';
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
@@ -349,21 +350,19 @@ const PageTreeItem = forwardRef((props: any, ref) => {
 interface BoardViewTreeItemProps {
   href: string;
   label: string;
-  labelIcon: string;
-  boardId: string;
-  pageId: string;
   nodeId: string;
+  viewType: IViewType;
 }
 
 const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((props, ref) => {
   const {
     href,
     label,
-    labelIcon,
-    boardId,
-    pageId,
+    viewType,
     nodeId
   } = props;
+
+  const labelIcon = iconForViewType(viewType);
 
   return (
     <StyledTreeItem
@@ -372,8 +371,6 @@ const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((pr
           href={href}
           label={label}
           labelIcon={labelIcon}
-          pageId={pageId}
-          boardId={boardId}
         />
       )}
       nodeId={nodeId}
@@ -540,10 +537,10 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       ) : views.map(view => (
         <BoardViewTreeItem
           key={view.id}
-          labelIcon={iconForViewType(view.fields.viewType)}
-          label={view.title}
           href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+          label={view.title}
           nodeId={view.id}
+          viewType={view.fields.viewType}
         />
       ))}
     </PageTreeItem>
