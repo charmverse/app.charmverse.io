@@ -12,6 +12,7 @@ import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 import { IPagePermissionFlags, IPageWithPermissions, PageOperationType } from '../lib/permissions/pages/page-permission-interfaces';
 
+export type LinkedPage = (Page & {children: Page[], parent: null | Page});
 type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
 type IContext = {
   currentPageId: string,
@@ -22,7 +23,8 @@ type IContext = {
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   addPage: AddPageFn,
   addPageAndRedirect: (page?: Partial<Page>) => void
-  getPagePermissions: (pageId: string) => IPagePermissionFlags
+  getPagePermissions: (pageId: string) => IPagePermissionFlags,
+  linkedPages: Record<string, LinkedPage>
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -36,7 +38,8 @@ export const PagesContext = createContext<Readonly<IContext>>({
   setIsEditing: () => { },
   addPage: null as any,
   addPageAndRedirect: null as any,
-  getPagePermissions: () => new AllowedPagePermissions()
+  getPagePermissions: () => new AllowedPagePermissions(),
+  linkedPages: {}
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
@@ -52,6 +55,35 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   useEffect(() => {
     setPages(data?.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
   }, [data]);
+
+  const linkedPages = useMemo(() => {
+    const _linkedPages: Record<string, LinkedPage> = {};
+    Object.values(pages as unknown as LinkedPage[]).forEach((page) => {
+      if (page) {
+        const updatedPage: LinkedPage = {
+          ...page
+        };
+
+        // If parentId exists, it wont exist for root pages
+        if (updatedPage.parentId && pages[updatedPage.parentId]) {
+          const parentPage = _linkedPages[updatedPage.parentId] ?? {
+            ...pages[updatedPage.parentId]
+          };
+
+          if (!parentPage.children) {
+            parentPage.children = [];
+          }
+          parentPage.children.push(page);
+          updatedPage.parent = parentPage;
+        }
+
+        updatedPage.children = [];
+        _linkedPages[page.id] = page;
+      }
+    });
+
+    return _linkedPages;
+  }, [pages]);
 
   const addPage: AddPageFn = React.useCallback(async (page) => {
     const spaceId = space?.id;
@@ -150,7 +182,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     setPages,
     addPage,
     addPageAndRedirect,
-    getPagePermissions
+    getPagePermissions,
+    linkedPages
   }), [currentPageId, isEditing, router, pages, user]);
 
   return (
