@@ -12,7 +12,7 @@ import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 import { IPagePermissionFlags, IPageWithPermissions, PageOperationType } from '../lib/permissions/pages/page-permission-interfaces';
 
-export type LinkedPage = (Page & {children: Page[], parent: null | Page});
+export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
 type IContext = {
   currentPageId: string,

@@ -25,12 +25,12 @@ import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import { charmEditorPlugins, specRegistry } from 'components/common/CharmEditor/CharmEditor';
 import { useColorMode } from 'context/color-mode';
-import { usePages } from 'hooks/usePages';
+import { LinkedPage, usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { PageContent } from 'models';
 import { useRouter } from 'next/router';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Account from './Account';
 import ShareButton from './ShareButton';
 
@@ -55,7 +55,7 @@ const BreadCrumb = styled.span`
   }
 `;
 
-function PageBreadcrumbs () {
+function BountyBreadcrumbs () {
   const router = useRouter();
   if (router.route === '/[domain]/bounties/[bountyId]') {
     return (
@@ -69,10 +69,38 @@ function PageBreadcrumbs () {
   return null;
 }
 
+function PageBreadcrumbs ({ pages }: {pages: Page[]}) {
+  const router = useRouter();
+  const trimTrails = pages.length > 3;
+  const trailsInfo = (trimTrails ? [pages[0], {
+    title: '...',
+    path: null
+  }, pages[pages.length - 2], pages[pages.length - 1]] : pages).map(page => ({
+    title: page.title,
+    path: page.path
+  }));
+
+  return (
+    <Box gap={1} display='flex'>
+      {trailsInfo.map((trailInfo, trailInfoIndex) => (
+        trailInfoIndex !== trailsInfo.length - 1 ? (
+          <>
+            {trailInfo.path ? (
+              <Link href={`/${router.query.domain}/${trailInfo.path}`}>
+                {trailInfo.title ?? 'Untitled'}
+              </Link>
+            ) : <div>{trailInfo.title ?? 'Untitled'}</div>}
+            <span>/</span>
+          </>
+        ) : <div>{trailInfo.title ?? 'Untitled'}</div>
+      ))}
+    </Box>
+  );
+}
+
 export default function Header ({ open, openSidebar }: { open: boolean, openSidebar: () => void }) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const [pageTitle] = usePageTitle();
   const { pages, linkedPages, currentPageId, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
@@ -80,7 +108,18 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
 
-  const currentPage = currentPageId && pages[currentPageId];
+  const currentPage = currentPageId ? pages[currentPageId] : undefined;
+
+  const currentPageChain = useMemo(() => {
+    const currentPageParentChain: Page[] = [];
+    let currentPageInChain: LinkedPage | null = linkedPages[currentPageId];
+    while (currentPageInChain) {
+      currentPageParentChain.push(currentPageInChain);
+      currentPageInChain = currentPageInChain.parent;
+    }
+    return currentPageParentChain.reverse();
+  }, [currentPageId]);
+
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');
@@ -162,8 +201,8 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         }}
         >
           <Typography noWrap component='div' sx={{ fontWeight: 500, maxWidth: 500, textOverflow: 'ellipsis' }}>
-            <PageBreadcrumbs />
-            {pageTitle}
+            <BountyBreadcrumbs />
+            <PageBreadcrumbs pages={currentPageChain} />
           </Typography>
           {isEditing && (
             <Box sx={{
