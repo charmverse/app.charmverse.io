@@ -199,12 +199,12 @@ const KanbanCard = React.memo((props: Props) => {
                         alignItems: 'center'
                       }}
                     >
-                      <Image
+                      {CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (<Image
                         loading='lazy'
                         width={15}
                         height={15}
                         src={CryptoLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
-                      />
+                      />)}
                     </Box>
                     <Box sx={{
                       display: "flex",

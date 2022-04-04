@@ -7,8 +7,7 @@ import React from 'react'
 export default function CalendarIcon(): JSX.Element {
     return (
         <svg
-            width='24'
-            height='24'
+            transform="scale(1)"
             viewBox='0 0 24 24'
             fill='currentColor'
             xmlns='http://www.w3.org/2000/svg'
