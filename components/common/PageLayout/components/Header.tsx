@@ -26,11 +26,10 @@ import charmClient from 'charmClient';
 import { charmEditorPlugins, specRegistry } from 'components/common/CharmEditor/CharmEditor';
 import { useColorMode } from 'context/color-mode';
 import { LinkedPage, usePages } from 'hooks/usePages';
-import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { PageContent } from 'models';
 import { useRouter } from 'next/router';
-import { useMemo, useRef, useState } from 'react';
+import { Fragment, useMemo, useRef, useState } from 'react';
 import Account from './Account';
 import ShareButton from './ShareButton';
 import { StyledPageIcon } from './PageNavigation';
@@ -76,11 +75,13 @@ function PageBreadcrumbs ({ pages }: {pages: Page[]}) {
   const trailsInfo = (trimTrails ? [pages[0], {
     title: '...',
     path: null,
-    icon: null
+    icon: null,
+    id: '123'
   }, pages[pages.length - 2], pages[pages.length - 1]] : pages).map(page => ({
     title: page.title,
     path: page.path,
-    icon: page.icon
+    icon: page.icon,
+    id: page.id
   }));
 
   return (
@@ -89,21 +90,21 @@ function PageBreadcrumbs ({ pages }: {pages: Page[]}) {
         const trailTitle = trailInfo.title ?? 'Untitled';
         const pageDeco = (
           <Box display='flex'>
-            {trailInfo.icon && <StyledPageIcon icon={<span>{trailInfo.icon}</span>} />}
+            {trailInfo.icon && <StyledPageIcon icon={trailInfo.icon} />}
             {trailTitle}
           </Box>
         );
 
         return trailInfoIndex !== trailsInfo.length - 1 ? (
-          <>
+          <Fragment key={trailInfo.id}>
             {trailInfo.path ? (
               <Link href={`/${router.query.domain}/${trailInfo.path}`}>
                 {pageDeco}
               </Link>
             ) : <div>{pageDeco}</div>}
             <span>/</span>
-          </>
-        ) : <div>{pageDeco}</div>;
+          </Fragment>
+        ) : <div key={trailInfo.id}>{pageDeco}</div>;
       })}
     </Box>
   );
@@ -129,7 +130,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
       currentPageInChain = currentPageInChain.parent;
     }
     return currentPageParentChain.reverse();
-  }, [currentPageId]);
+  }, [currentPage]);
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
