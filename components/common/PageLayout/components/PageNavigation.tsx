@@ -346,15 +346,24 @@ const PageTreeItem = forwardRef((props: any, ref) => {
   );
 });
 
-const BoardViewTreeItem = forwardRef((_props: any, ref) => {
+interface BoardViewTreeItemProps {
+  href: string;
+  label: string;
+  labelIcon: string;
+  boardId: string;
+  pageId: string;
+  nodeId: string;
+}
+
+const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((props, ref) => {
   const {
     href,
     label,
     labelIcon,
     boardId,
     pageId,
-    ...props
-  } = _props;
+    nodeId
+  } = props;
 
   return (
     <StyledTreeItem
@@ -367,10 +376,9 @@ const BoardViewTreeItem = forwardRef((_props: any, ref) => {
           boardId={boardId}
         />
       )}
-      ContentComponent={TreeItemComponent}
-      {...props}
-      TransitionProps={{ timeout: 50 }}
+      nodeId={nodeId}
       ref={ref}
+      TransitionProps={{ timeout: 50 }}
     />
   );
 });
