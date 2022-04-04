@@ -12,6 +12,7 @@ import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import { Box, CircularProgress } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import Link from 'components/common/Link';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -40,6 +41,33 @@ const StyledToolbar = styled(Toolbar)`
   height: ${headerHeight}px;
   min-height: ${headerHeight}px;
 `;
+
+const BreadCrumb = styled.span`
+  :after {
+    content: ' / ';
+    opacity: .5;
+    margin-left: .5em;
+    margin-right: .5em;
+  }
+  padding-right: 0em;
+  a {
+    color: inherit;
+  }
+`;
+
+function PageBreadcrumbs () {
+  const router = useRouter();
+  if (router.route === '/[domain]/bounties/[bountyId]') {
+    return (
+      <BreadCrumb>
+        <Link href={`/${router.query.domain}/bounties`}>
+          Bounties
+        </Link>
+      </BreadCrumb>
+    );
+  }
+  return null;
+}
 
 export default function Header ({ open, openSidebar }: { open: boolean, openSidebar: () => void }) {
   const router = useRouter();
@@ -135,6 +163,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         }}
         >
           <Typography noWrap component='div' sx={{ fontWeight: 500, maxWidth: 500, textOverflow: 'ellipsis' }}>
+            <PageBreadcrumbs />
             {pageTitle}
           </Typography>
           {isEditing && (

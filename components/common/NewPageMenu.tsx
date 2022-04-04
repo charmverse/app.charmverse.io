@@ -12,7 +12,7 @@ import { Page } from 'models';
 import { MouseEvent, useState } from 'react';
 import { greyColor2 } from 'theme/colors';
 
-const StyledIconButton = styled(IconButton)`
+export const StyledIconButton = styled(IconButton)`
   border-radius: 3px;
   border: 1px solid ${({ theme }) => theme.palette.divider};
   height: 16px;

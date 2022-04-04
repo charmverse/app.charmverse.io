@@ -15,7 +15,7 @@ import charmClient from 'charmClient';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { ApplicationEditorForm } from 'components/bounties/ApplicationEditorForm';
 import { BountyApplicantList } from 'components/bounties/BountyApplicantList';
-import { BountyBadge } from 'components/bounties/BountyBadge';
+import BountyStatusBadge from 'components/bounties/BountyStatusBadge';
 import BountyModal from 'components/bounties/BountyModal';
 import BountyPaymentButton from 'components/bounties/BountyPaymentButton';
 import Avatar from 'components/common/Avatar';
@@ -28,6 +28,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useBounties } from 'hooks/useBounties';
 import useENSName from 'hooks/useENSName';
 import { useUser } from 'hooks/useUser';
+import { usePageTitle } from 'hooks/usePageTitle';
 import { getDisplayName } from 'lib/users';
 import { eToNumber } from 'lib/utilities/numbers';
 import { BountyWithDetails, PageContent } from 'models';
@@ -39,6 +40,7 @@ export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
 export default function BountyDetails () {
   const [space] = useCurrentSpace();
   const [applications, setApplications] = useState([] as Application []);
+  const [_, setPageTitle] = usePageTitle();
 
   const [user] = useUser();
   const [contributors] = useContributors();
@@ -91,6 +93,7 @@ export default function BountyDetails () {
     const applicationList = await charmClient.listApplications(foundBounty.id);
     setApplications(applicationList);
     setBounty(foundBounty);
+    setPageTitle(foundBounty.title);
   }
 
   function getContributor (userId: string) {
@@ -212,32 +215,6 @@ export default function BountyDetails () {
     <ScrollableWindow>
 
       <Container top={20}>
-        <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
-
-        <Modal open={showApplicationDialog} onClose={toggleApplicationDialog}>
-          <ApplicationEditorForm
-            bountyId={bounty.id}
-            onSubmit={applicationSubmitted}
-            proposal={applicantProposal}
-            mode={applicantProposal ? 'update' : 'create'}
-          />
-        </Modal>
-
-        <Modal open={showBountyDeleteDialog} onClose={toggleBountyDeleteDialog}>
-
-          <Typography>
-            Are you sure you want to delete this bounty?
-          </Typography>
-
-          <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
-            <Button color='error' sx={{ mr: 2, fontWeight: 'bold' }} onClick={deleteBounty}>Delete bounty</Button>
-
-            {
-            bounty.status === 'open' && <Button color='secondary' onClick={toggleBountyDeleteDialog}>Cancel</Button>
-          }
-          </Box>
-
-        </Modal>
 
         <Box sx={{
           justifyContent: 'space-between',
@@ -245,10 +222,7 @@ export default function BountyDetails () {
           display: 'flex'
         }}
         >
-          <Box sx={{
-            flexGrow: 1
-          }}
-          >
+          <Box flexGrow={1}>
             <Typography
               variant='h1'
               sx={{
@@ -263,21 +237,21 @@ export default function BountyDetails () {
                 {bounty.title}
               </Box>
               {
-              viewerCanModifyBounty === true && (
-                <>
-                  <IconButton onClick={toggleBountyEditDialog}>
-                    <EditIcon fontSize='small' />
-                  </IconButton>
-                  {
-                    deleteableBounty === true && (
-                    <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
-                      <DeleteIcon fontSize='small' sx={{ color: 'red.main' }} />
+                viewerCanModifyBounty === true && (
+                  <>
+                    <IconButton onClick={toggleBountyEditDialog}>
+                      <EditIcon fontSize='small' />
                     </IconButton>
-                    )
-                  }
-                </>
-              )
-            }
+                    {
+                      deleteableBounty === true && (
+                      <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
+                        <DeleteIcon fontSize='small' sx={{ color: 'red.main' }} />
+                      </IconButton>
+                      )
+                    }
+                  </>
+                )
+              }
             </Typography>
           </Box>
           <Box sx={{
@@ -285,7 +259,7 @@ export default function BountyDetails () {
             alignItems: 'center'
           }}
           >
-            <BountyBadge bounty={bounty} hideLink={true} />
+            <BountyStatusBadge bounty={bounty} />
           </Box>
         </Box>
 
@@ -407,15 +381,41 @@ export default function BountyDetails () {
         </Box>
 
         {
-        bounty && (
-        <BountyApplicantList
-          applications={applications}
-          bounty={bounty}
-          bountyReassigned={loadBounty}
-          updateApplication={toggleApplicationDialog}
-        />
-        )
-      }
+          bounty && (
+            <BountyApplicantList
+              applications={applications}
+              bounty={bounty}
+              bountyReassigned={loadBounty}
+              updateApplication={toggleApplicationDialog}
+            />
+          )
+        }
+        <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
+
+        <Modal title='Bounty Application' size='large' open={showApplicationDialog} onClose={toggleApplicationDialog}>
+          <ApplicationEditorForm
+            bountyId={bounty.id}
+            onSubmit={applicationSubmitted}
+            proposal={applicantProposal}
+            mode={applicantProposal ? 'update' : 'create'}
+          />
+        </Modal>
+
+        <Modal open={showBountyDeleteDialog} onClose={toggleBountyDeleteDialog}>
+
+          <Typography>
+            Are you sure you want to delete this bounty?
+          </Typography>
+
+          <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
+            <Button color='error' sx={{ mr: 2, fontWeight: 'bold' }} onClick={deleteBounty}>Delete bounty</Button>
+
+            {
+            bounty.status === 'open' && <Button color='secondary' onClick={toggleBountyDeleteDialog}>Cancel</Button>
+          }
+          </Box>
+
+        </Modal>
       </Container>
     </ScrollableWindow>
   );

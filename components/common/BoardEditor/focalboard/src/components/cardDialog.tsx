@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, { useState } from 'react'
+import React, { ReactElement, ReactNode, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { Board } from '../blocks/board'
 import { BoardView } from '../blocks/boardView'
@@ -41,7 +41,7 @@ type Props = {
     readonly: boolean
 }
 
-const CardDialog = (props: Props): JSX.Element => {
+const CardDialog = (props: Props): JSX.Element | null => {
     const {board, activeView, cards, views} = props
     const card = useAppSelector(getCard(props.cardId))
     const contents = useAppSelector(getCardContents(props.cardId))
@@ -163,7 +163,7 @@ const CardDialog = (props: Props): JSX.Element => {
     const isFollowingCard = Boolean(followingCards.find((following) => following.blockId === props.cardId))
     const toolbar = followActionButton(isFollowingCard)
 
-    return (
+    return card ? (
         <>
             <Dialog
                 onClose={props.onClose}
@@ -201,7 +201,7 @@ const CardDialog = (props: Props): JSX.Element => {
 
             {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps}/>}
         </>
-    )
+    ) : null
 }
 
 export default CardDialog
