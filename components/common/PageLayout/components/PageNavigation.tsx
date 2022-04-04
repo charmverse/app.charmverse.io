@@ -218,7 +218,7 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
   );
 }
 
-const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent: boolean }>(
+const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent?: boolean }>(
   ({ isAdjacent, ...props }, ref) => (
     <div style={{ position: 'relative' }}>
       <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
@@ -249,7 +249,6 @@ const PageTreeItem = forwardRef((props: any, ref) => {
   const {
     addSubPage,
     deletePage,
-    color,
     href,
     isAdjacent,
     isEmptyContent,
@@ -269,7 +268,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     event.stopPropagation();
   }
 
-  function hideMenu (event: React.MouseEvent<HTMLElement>) {
+  function hideMenu () {
     setAnchorEl(null);
   }
 
@@ -297,24 +296,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     }
   }
 
-  return pageType === 'view' ? (
-    <StyledTreeItem
-      label={(
-        <PageLink
-          href={href}
-          label={label}
-          labelIcon={Icon}
-          pageId={pageId}
-          boardId={boardId}
-        />
-      )}
-      ContentComponent={TreeItemComponent}
-      ContentProps={{ isAdjacent }}
-      {...other}
-      TransitionProps={{ timeout: 50 }}
-      ref={ref}
-    />
-  ) : (
+  return (
     <>
       <StyledTreeItem
         label={(
@@ -361,6 +343,35 @@ const PageTreeItem = forwardRef((props: any, ref) => {
         </MenuItem>
       </Menu>
     </>
+  );
+});
+
+const BoardViewTreeItem = forwardRef((_props: any, ref) => {
+  const {
+    href,
+    label,
+    labelIcon,
+    boardId,
+    pageId,
+    ...props
+  } = _props;
+
+  return (
+    <StyledTreeItem
+      label={(
+        <PageLink
+          href={href}
+          label={label}
+          labelIcon={labelIcon}
+          pageId={pageId}
+          boardId={boardId}
+        />
+      )}
+      ContentComponent={TreeItemComponent}
+      {...props}
+      TransitionProps={{ timeout: 50 }}
+      ref={ref}
+    />
   );
 });
 
@@ -476,7 +487,6 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
     && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
 
   const viewsRecord = useAppSelector((state) => state.views.views);
-
   const views = Object.values(viewsRecord).filter(view => view.parentId === item.boardId);
 
   return (
@@ -486,7 +496,6 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
       ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
-      key={item.id}
       nodeId={item.id}
       id={item.id}
       label={item.title}
@@ -502,31 +511,32 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
         // borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
       }}
     >
-      {!item.boardId ? item.children?.length > 0
-        ? item.children.map((childItem) => (
-          <RenderDraggableNode
-            onDropAdjacent={onDropAdjacent}
-            onDropChild={onDropChild}
-            pathPrefix={pathPrefix}
-            key={childItem.id}
-            item={childItem}
-            addPage={addPage}
-            deletePage={deletePage}
-          />
-        ))
-        : (
-          <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
-            No pages inside
-          </Typography>
-        ) : views.map(view => (
-          <PageTreeItem
-            key={view.id}
-            labelIcon={iconForViewType(view.fields.viewType)}
-            label={view.title}
-            href={`${pathPrefix}/${item.path}${item.type === 'board' ? `?viewId=${view.id}` : ''}`}
-            id={view.id}
-            pageType='view'
-          />
+      {item.type === 'page' ? (
+        item.children.length > 0
+          ? item.children.map((childItem) => (
+            <RenderDraggableNode
+              onDropAdjacent={onDropAdjacent}
+              onDropChild={onDropChild}
+              pathPrefix={pathPrefix}
+              key={childItem.id}
+              item={childItem}
+              addPage={addPage}
+              deletePage={deletePage}
+            />
+          ))
+          : (
+            <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
+              No pages inside
+            </Typography>
+          )
+      ) : views.map(view => (
+        <BoardViewTreeItem
+          key={view.id}
+          labelIcon={iconForViewType(view.fields.viewType)}
+          label={view.title}
+          href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+          nodeId={view.id}
+        />
       ))}
     </PageTreeItem>
   );
