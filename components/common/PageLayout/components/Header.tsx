@@ -33,6 +33,7 @@ import { useRouter } from 'next/router';
 import { useMemo, useRef, useState } from 'react';
 import Account from './Account';
 import ShareButton from './ShareButton';
+import { StyledPageIcon } from './PageNavigation';
 
 export const headerHeight = 56;
 
@@ -74,26 +75,36 @@ function PageBreadcrumbs ({ pages }: {pages: Page[]}) {
   const trimTrails = pages.length > 3;
   const trailsInfo = (trimTrails ? [pages[0], {
     title: '...',
-    path: null
+    path: null,
+    icon: null
   }, pages[pages.length - 2], pages[pages.length - 1]] : pages).map(page => ({
     title: page.title,
-    path: page.path
+    path: page.path,
+    icon: page.icon
   }));
 
   return (
     <Box gap={1} display='flex'>
-      {trailsInfo.map((trailInfo, trailInfoIndex) => (
-        trailInfoIndex !== trailsInfo.length - 1 ? (
+      {trailsInfo.map((trailInfo, trailInfoIndex) => {
+        const trailTitle = trailInfo.title ?? 'Untitled';
+        const pageDeco = (
+          <Box display='flex'>
+            {trailInfo.icon && <StyledPageIcon icon={<span>{trailInfo.icon}</span>} />}
+            {trailTitle}
+          </Box>
+        );
+
+        return trailInfoIndex !== trailsInfo.length - 1 ? (
           <>
             {trailInfo.path ? (
               <Link href={`/${router.query.domain}/${trailInfo.path}`}>
-                {trailInfo.title ?? 'Untitled'}
+                {pageDeco}
               </Link>
-            ) : <div>{trailInfo.title ?? 'Untitled'}</div>}
+            ) : <div>{pageDeco}</div>}
             <span>/</span>
           </>
-        ) : <div>{trailInfo.title ?? 'Untitled'}</div>
-      ))}
+        ) : <div>{pageDeco}</div>;
+      })}
     </Box>
   );
 }
