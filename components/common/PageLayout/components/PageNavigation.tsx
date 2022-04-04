@@ -248,7 +248,6 @@ export function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode,
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
   const theme = useTheme();
-  const { pages } = usePages();
   const {
     addSubPage,
     deletePage,
@@ -300,7 +299,24 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     }
   }
 
-  return (
+  return pageType === 'view' ? (
+    <StyledTreeItem
+      label={(
+        <PageLink
+          href={href}
+          label={label}
+          labelIcon={Icon}
+          pageId={pageId}
+          boardId={boardId}
+        />
+      )}
+      ContentComponent={TreeItemComponent}
+      ContentProps={{ isAdjacent }}
+      {...other}
+      TransitionProps={{ timeout: 50 }}
+      ref={ref}
+    />
+  ) : (
     <>
       <StyledTreeItem
         label={(
@@ -511,6 +527,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
             label={view.title}
             href={`${pathPrefix}/${item.path}${item.type === 'board' ? `?viewId=${view.id}` : ''}`}
             id={view.id}
+            pageType='view'
           />
       ))}
     </PageTreeItem>

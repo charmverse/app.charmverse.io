@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { usePages } from 'hooks/usePages';
-import { StyledIconButton } from './PageNavigation';
+import { StyledIconButton } from 'components/common/NewPageMenu';
 
 export default function AddNewCard ({ pageId }: {pageId: string}) {
   const router = useRouter();
