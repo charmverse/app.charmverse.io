@@ -33,8 +33,8 @@ import { greyColor2 } from 'theme/colors';
 import NewPageMenu, { StyledDatabaseIcon } from 'components/common/NewPageMenu';
 import EmojiIcon from 'components/common/Emoji';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import TableRowsIcon from '@mui/icons-material/TableRows';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
+import AddNewCard from './AddNewCard';
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
 export type MenuNode = Page & {
@@ -297,7 +297,24 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     }
   }
 
-  return (
+  return pageType === 'view' ? (
+    <StyledTreeItem
+      label={(
+        <PageLink
+          href={href}
+          label={label}
+          labelIcon={Icon}
+          pageId={pageId}
+          boardId={boardId}
+        />
+      )}
+      ContentComponent={TreeItemComponent}
+      ContentProps={{ isAdjacent }}
+      {...other}
+      TransitionProps={{ timeout: 50 }}
+      ref={ref}
+    />
+  ) : (
     <>
       <StyledTreeItem
         label={(
@@ -312,7 +329,9 @@ const PageTreeItem = forwardRef((props: any, ref) => {
               <IconButton size='small' onClick={showMenu}>
                 <MoreHorizIcon color='secondary' fontSize='small' />
               </IconButton>
-              {addSubPage && (
+              {addSubPage && pageType === 'board' ? (
+                <AddNewCard pageId={pageId} />
+              ) : (
                 <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} sx={{ marginLeft: '3px' }} />
               )}
             </div>
@@ -506,6 +525,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
             label={view.title}
             href={`${pathPrefix}/${item.path}${item.type === 'board' ? `?viewId=${view.id}` : ''}`}
             id={view.id}
+            pageType='view'
           />
       ))}
     </PageTreeItem>

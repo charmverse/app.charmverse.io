@@ -1,14 +1,14 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React, {useState, useLayoutEffect} from 'react'
+import React, {useState, useLayoutEffect, ReactNode} from 'react'
 import ReactDOM from 'react-dom'
 
 type Props = {
     children: React.ReactNode
 }
 
-const RootPortal = React.memo((props: Props): JSX.Element => {
+const RootPortal = React.memo((props: Props) => {
     const [el] = useState(document.createElement('div'))
     const rootPortal = document.getElementById('focalboard-root-portal')
 

@@ -1,6 +1,4 @@
 import { BountyStatus as BountyStatusEnum, Bounty, Application, Transaction } from '@prisma/client';
-import { PageContent } from '.';
-import { CryptoCurrency } from './Currency';
 
 export type BountyStatus = keyof typeof BountyStatusEnum;
 

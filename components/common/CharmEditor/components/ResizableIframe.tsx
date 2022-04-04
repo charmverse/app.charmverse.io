@@ -157,13 +157,14 @@ const StyledEmptyIframeContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { type: 'video' | 'embed' }) {
+function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, type: 'video' | 'embed' }) {
   const theme = useTheme();
-  const { type, ...rest } = props;
+  const { type, readOnly, ...rest } = props;
   return (
     <ListItem
       button
       disableRipple
+      disabled={readOnly}
       sx={{
         backgroundColor: theme.palette.background.light,
         p: 2,
@@ -195,15 +196,15 @@ const StyledIFrame = styled(Box)`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
-  NodeViewProps & { onResizeStop?: (view: EditorView) => void }) {
+export default function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
+  NodeViewProps & { readOnly: boolean, onResizeStop?: (view: EditorView) => void }) {
   const theme = useTheme();
   const [height, setHeight] = useState(node.attrs.height);
   const view = useEditorViewContext();
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
-    return (
+    return readOnly ? <EmptyIframeContainer type={node.attrs.type} readOnly={readOnly} /> : (
       <IFrameSelector
         type={node.attrs.type}
         onIFrameSelect={(videoLink) => {
@@ -212,7 +213,7 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
           });
         }}
       >
-        <EmptyIframeContainer type={node.attrs.type} />
+        <EmptyIframeContainer type={node.attrs.type} readOnly={readOnly} />
       </IFrameSelector>
     );
   }
@@ -221,6 +222,14 @@ export default function ResizableIframe ({ node, updateAttrs, onResizeStop }:
     updateAttrs({
       src: null
     });
+  }
+
+  if (readOnly) {
+    return (
+      <StyledIFrame>
+        <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: node.attrs.size ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }} />
+      </StyledIFrame>
+    );
   }
 
   return node.attrs.type === 'embed' ? (

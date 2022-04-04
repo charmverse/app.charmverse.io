@@ -47,7 +47,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
       const newPath = generatePath(router.pathname, { ...router.query, boardId });
       router.replace({
         pathname: newPath,
-        query: { viewId: boardViews[0].id }
+        query: { viewId: boardViews[0].id, cardId: router.query.cardId }
       });
       return;
     }

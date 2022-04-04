@@ -11,7 +11,7 @@ import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
-import { getChainById, getCryptos } from 'connectors';
+import { getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
@@ -72,7 +72,6 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     handleSubmit,
     setValue,
     watch,
-    getValues,
     formState: { errors, isValid, isSubmitting }
   } = useForm<FormValues>({
     mode: 'onChange',

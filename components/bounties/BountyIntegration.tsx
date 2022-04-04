@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import { Box } from '@mui/system';
 import { useBounties } from 'hooks/useBounties';
 import { useState } from 'react';
-import { BountyBadge } from './BountyBadge';
+import BountyStatusBadge from './BountyStatusBadge';
 import BountyModal from './BountyModal';
 
 interface BountyIntegrationProps {
@@ -23,7 +23,7 @@ export function BountyIntegration (props: BountyIntegrationProps) {
       whiteSpace: 'nowrap'
     }}
     >
-      {linkedBounty ? <BountyBadge direction='column' bounty={linkedBounty} />
+      {linkedBounty ? <BountyStatusBadge layout='stacked' bounty={linkedBounty} />
         : props.readonly ? null : (
           <>
             <Button onClick={() => {
