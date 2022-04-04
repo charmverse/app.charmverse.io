@@ -403,10 +403,10 @@ type NodeProps = {
   pathPrefix: string;
   addPage?: (p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
-  selectedId: string | null;
+  selectedNodeId: string | null;
 }
 
-function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage, selectedId }: NodeProps) {
+function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage, selectedNodeId }: NodeProps) {
   const ref = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
@@ -497,7 +497,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
   const viewsRecord = useAppSelector((state) => state.views.views);
   const views = Object.values(viewsRecord).filter(view => view.parentId === item.boardId);
 
-  const hasSelectedChildView = views.some(view => view.id === selectedId);
+  const hasSelectedChildView = views.some(view => view.id === selectedNodeId);
 
   return (
     <PageTreeItem
@@ -532,7 +532,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
               key={childItem.id}
               item={childItem}
               addPage={addPage}
-              selectedId={selectedId}
+              selectedNodeId={selectedNodeId}
               deletePage={deletePage}
             />
           ))
@@ -723,11 +723,11 @@ export default function PageNavigation ({
     setExpanded(nodeIds);
   }
 
-  let selectedId: string | null = null;
+  let selectedNodeId: string | null = null;
   if (currentPageId) {
-    selectedId = currentPageId;
+    selectedNodeId = currentPageId;
     if (typeof router.query.viewId === 'string') {
-      selectedId = router.query.viewId;
+      selectedNodeId = router.query.viewId;
     }
   }
 
@@ -736,7 +736,7 @@ export default function PageNavigation ({
       setPages={setPages}
       expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
-      selected={selectedId}
+      selected={selectedNodeId}
       onNodeToggle={onNodeToggle}
       aria-label='items navigator'
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
@@ -756,7 +756,7 @@ export default function PageNavigation ({
           onDropAdjacent={onDropAdjacent}
           pathPrefix={`/${space.domain}`}
           // pass down so parent databases can highlight themselves
-          selectedId={selectedId}
+          selectedNodeId={selectedNodeId}
           addPage={page => addPageAndRedirect(page)}
           deletePage={deletePage}
         />
