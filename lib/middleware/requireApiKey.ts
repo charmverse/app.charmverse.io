@@ -1,41 +1,56 @@
+import { Space } from '@prisma/client';
+import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
-import { IApiError } from 'lib/utilities/errors';
-import { prisma } from 'db';
-import { User } from '@prisma/client';
 
-async function getUserFromApiKey (req: NextApiRequest): Promise<User> {
+async function getSpaceFromApiKey (req: NextApiRequest): Promise<Space> {
   const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? req.query.api_key as string;
-
-  console.log('Auth', req.headers.authorization);
-
-  console.log('Api key', apiKey);
 
   // Protect against api keys or nullish API Keys
   if (!apiKey || apiKey.length < 1) {
     throw new Error('Api key not found');
   }
 
-  const user = await prisma.user.findFirst({
+  const spaceToken = await prisma.spaceToken.findFirst({
     where: {
       token: apiKey
+    },
+    include: {
+      space: true
     }
   });
 
-  if (!user) {
+  if (!spaceToken) {
     throw new Error('Invalid API key');
   }
 
-  return user;
+  return spaceToken.space;
 }
 
 /**
- * Generates a request handler that checks for target keys
+ * Check for a valid space level API token, and ensure the operation is taking place only in the target space
  */
 export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
 
   try {
-    await getUserFromApiKey(req);
+    const space = await getSpaceFromApiKey(req);
+
+    const querySpaceId = req.query.spaceId;
+
+    if (querySpaceId && querySpaceId !== space.id) {
+      return res.status(401).send({
+        error: 'API Token does not have access to this space'
+      });
+    }
+
+    const bodySpaceId = req.body.spaceId;
+
+    if (bodySpaceId && bodySpaceId !== space.id) {
+      return res.status(401).send({
+        error: 'API Token does not have access to this space'
+      });
+    }
+
   }
   catch (error) {
     console.log('Found error', error);
