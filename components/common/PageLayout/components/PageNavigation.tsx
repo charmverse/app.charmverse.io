@@ -32,9 +32,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import NewPageMenu, { StyledDatabaseIcon } from 'components/common/NewPageMenu';
 import EmojiIcon from 'components/common/Emoji';
-
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import TableRowsIcon from '@mui/icons-material/TableRows';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import AddNewCard from './AddNewCard';
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js

@@ -13,6 +13,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Web3ReactProvider } from '@web3-react/core';
+import log from 'lib/log';
 import { LitProtocolProvider } from 'adapters/litProtocol/hooks/useLitProtocol';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import RouteGuard from 'components/common/RouteGuard';
@@ -307,11 +308,13 @@ function FocalBoardProviders ({ children }: { children: ReactNode }) {
 
 function DataProviders ({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
-
+  const router = useRouter();
   useEffect(() => {
-    const loadAction: any = initialLoad; /* eslint-disable-line @typescript-eslint/no-explicit-any */
-    dispatch(loadAction());
-  }, []);
+    log.debug('Load focalboard data');
+    if (router.query.domain) {
+      dispatch(initialLoad());
+    }
+  }, [router.query.domain]);
 
   return (
     <UserProvider>
