@@ -298,7 +298,6 @@ const PageTreeItem = forwardRef((props: any, ref) => {
       );
     }
   }
-  console.log(hasSelectedChildView);
 
   return (
     <>
