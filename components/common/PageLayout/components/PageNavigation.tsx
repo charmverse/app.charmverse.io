@@ -1,5 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -258,6 +259,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     boardId,
     pageType,
     pageId,
+    hasSelectedChildView,
     ...other
   } = props;
 
@@ -296,6 +298,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
       );
     }
   }
+  console.log(hasSelectedChildView);
 
   return (
     <>
@@ -321,7 +324,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
           </PageLink>
         )}
         ContentComponent={TreeItemComponent}
-        ContentProps={{ isAdjacent }}
+        ContentProps={{ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }}
         {...other}
         TransitionProps={{ timeout: 50 }}
         ref={ref}
@@ -401,9 +404,10 @@ type NodeProps = {
   pathPrefix: string;
   addPage?: (p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
+  selectedId: string | null;
 }
 
-function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage }: NodeProps) {
+function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage, selectedId }: NodeProps) {
   const ref = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
@@ -494,12 +498,15 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
   const viewsRecord = useAppSelector((state) => state.views.views);
   const views = Object.values(viewsRecord).filter(view => view.parentId === item.boardId);
 
+  const hasSelectedChildView = views.some(view => view.id === selectedId);
+
   return (
     <PageTreeItem
       data-handler-id={handlerId}
       pageId={item.id}
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
+      hasSelectedChildView={hasSelectedChildView}
       ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
       nodeId={item.id}
       id={item.id}
@@ -526,6 +533,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
               key={childItem.id}
               item={childItem}
               addPage={addPage}
+              selectedId={selectedId}
               deletePage={deletePage}
             />
           ))
@@ -637,6 +645,7 @@ export default function PageNavigation ({
   space,
   rootPageIds
 }: NavProps) {
+  const router = useRouter();
   const { pages, currentPageId, setPages, addPageAndRedirect } = usePages();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
 
@@ -715,12 +724,20 @@ export default function PageNavigation ({
     setExpanded(nodeIds);
   }
 
+  let selectedId: string | null = null;
+  if (currentPageId) {
+    selectedId = currentPageId;
+    if (typeof router.query.viewId === 'string') {
+      selectedId = router.query.viewId;
+    }
+  }
+
   return (
     <TreeRoot
       setPages={setPages}
       expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
-      selected={currentPageId || null}
+      selected={selectedId}
       onNodeToggle={onNodeToggle}
       aria-label='items navigator'
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
@@ -739,6 +756,8 @@ export default function PageNavigation ({
           }}
           onDropAdjacent={onDropAdjacent}
           pathPrefix={`/${space.domain}`}
+          // pass down so parent databases can highlight themselves
+          selectedId={selectedId}
           addPage={page => addPageAndRedirect(page)}
           deletePage={deletePage}
         />
