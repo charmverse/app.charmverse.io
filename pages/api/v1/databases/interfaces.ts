@@ -47,9 +47,5 @@ export interface ApiPage extends Pick<Page, 'id' | 'createdAt' | 'type' | 'title
 */
 
 export interface ApiBoard extends ApiPage {
-  type: 'board',
-  properties: {
-    type: string;
-    title: string
-  }
+  type: 'board'
 }
