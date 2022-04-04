@@ -3,7 +3,7 @@ import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import { Bounty } from '@prisma/client';
+import { Bounty, BountyStatus } from '@prisma/client';
 import { getChainExplorerLink, getChainById } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import millify from 'millify';
@@ -14,7 +14,21 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
+import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import GradingIcon from '@mui/icons-material/Grading';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import PaidIcon from '@mui/icons-material/Paid';
+import { ReactNode } from 'react';
 import { BountyStatusColours } from './BountyCard';
+
+export const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
+  open: <ModeStandbyIcon />,
+  assigned: <AssignmentIndIcon />,
+  review: <GradingIcon />,
+  complete: <CheckCircleOutlineIcon />,
+  paid: <PaidIcon />
+};
 
 /**
  * @hideLink used in the Bounty page so we don't show a link when we are already on the page
@@ -129,7 +143,8 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
               </Typography>
             </Box>
           </Box>
-          <Box p={0.5} borderRadius={1} sx={{ background: theme.palette[BountyStatusColours[bounty.status]].main, textAlign: 'center', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Box pl={1} pr={1} borderRadius={1} sx={{ background: theme.palette[BountyStatusColours[bounty.status]].main, textAlign: 'center', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            {BOUNTY_STATUS_ICONS[bounty.status]}
             <Typography
               component='span'
               sx={{
@@ -137,7 +152,7 @@ export function BountyBadge ({ truncate = false, bounty, direction = 'row', hide
                 fontWeight: 600
               }}
               variant='body1'
-              px={1}
+              pl={1}
             >
               {BOUNTY_LABELS[bounty.status]}
             </Typography>

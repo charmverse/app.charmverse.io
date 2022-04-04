@@ -53,15 +53,16 @@ function insertImageNode (state: EditorState, dispatch: DispatchFn, view: Editor
   }
 }
 
-function EmptyImageContainer ({ isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {isSelected?: boolean}) {
+function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & {readOnly: boolean, isSelected?: boolean}) {
   const theme = useTheme();
 
   return (
     <ListItem
       button
       disableRipple
+      disabled={readOnly}
       sx={{
-        backgroundColor: isSelected ? 'rgba(46, 170, 220, 0.2)' : theme.palette.background.light,
+        backgroundColor: (isSelected && !readOnly) ? 'rgba(46, 170, 220, 0.2)' : theme.palette.background.light,
         p: 2,
         display: 'flex',
         borderRadius: theme.spacing(0.5)
@@ -78,10 +79,10 @@ function EmptyImageContainer ({ isSelected, ...props }: HTMLAttributes<HTMLDivEl
   );
 }
 
-const StyledImage = styled.img`
+const StyledImage = styled.img<{height?: number}>`
   object-fit: contain;
   width: 100%;
-  height: 100%;
+  height: ${({ height }) => height ?? '100%'};
   user-select: none;
   &:hover {
     cursor: initial;
@@ -138,8 +139,6 @@ export function imageSpec (): RawSpecs {
           state.text(toWrite, false);
           state.ensureNewLine();
         }
-
-        console.log('Image node', node);
       }
     }
   };
@@ -155,9 +154,9 @@ function imagePromise (url: string): Promise<HTMLImageElement> {
   });
 }
 
-export function ResizableImage ({ onResizeStop, node, updateAttrs, selected }:
-  NodeViewProps & {onResizeStop?: (view: EditorView) => void }) {
-
+export function ResizableImage ({ readOnly, onResizeStop, node, updateAttrs, selected }:
+  NodeViewProps & {readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
+  readOnly = readOnly ?? false;
   // Set the image aspect ratio on first load
   useEffect(() => {
     async function main () {
@@ -173,7 +172,7 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs, selected }:
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
-    return (
+    return readOnly ? <EmptyImageContainer readOnly={readOnly} isSelected={selected} /> : (
       <ImageSelector onImageSelect={async (imageSrc) => {
         const image = await imagePromise(imageSrc);
         updateAttrs({
@@ -182,7 +181,7 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs, selected }:
         });
       }}
       >
-        <EmptyImageContainer isSelected={selected} />
+        <EmptyImageContainer readOnly={readOnly} isSelected={selected} />
       </ImageSelector>
     );
   }
@@ -199,7 +198,15 @@ export function ResizableImage ({ onResizeStop, node, updateAttrs, selected }:
     });
   }
 
-  return (
+  return readOnly ? (
+    <StyledImage
+      draggable={false}
+      src={node.attrs.src}
+      alt={node.attrs.alt}
+      width={node.attrs.size}
+      height={node.attrs.size / aspectRatio}
+    />
+  ) : (
     <Resizable
       aspectRatio={aspectRatio}
       initialSize={node.attrs.size}

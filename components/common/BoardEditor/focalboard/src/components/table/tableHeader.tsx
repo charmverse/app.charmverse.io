@@ -58,11 +58,20 @@ const TableHeader = (props: Props): JSX.Element => {
             style={{overflow: 'unset', width: columnWidth(props.template.id), opacity: isDragging ? 0.5 : 1}}
             ref={props.template.id === Constants.titleColumnId ? () => null : columnRef}
         >
+            <MenuWrapper disabled={props.readonly}>
                 <Label>
                     {props.name}
                     {props.sorted === 'up' && <SortUpIcon/>}
                     {props.sorted === 'down' && <SortDownIcon/>}
                 </Label>
+                <TableHeaderMenu
+                    board={props.board}
+                    activeView={props.activeView}
+                    views={props.views}
+                    cards={props.cards}
+                    templateId={props.template.id}
+                />
+            </MenuWrapper>
 
             <div className='octo-spacer'/>
 
