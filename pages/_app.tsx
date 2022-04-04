@@ -170,7 +170,8 @@ import 'theme/lit-share-modal/lit-share-modal.scss';
 import { setTheme as setLitProtocolTheme } from 'theme/lit-share-modal/theme';
 import 'theme/styles.scss';
 import Snackbar from 'components/common/Snackbar';
-import { SnackbarProvider, useSnackbar } from 'hooks/useSnackbar';
+import { SnackbarProvider } from 'hooks/useSnackbar';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -185,6 +186,7 @@ type AppPropsWithLayout = AppProps & {
 export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? (page => page);
+  const router = useRouter();
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -232,7 +234,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   }, [prefersDarkMode, savedDarkMode]);
 
   // wait for router to be ready, as we rely on the URL to know what space to load
-  const router = useRouter();
 
   if (!router.isReady) {
     return null;
@@ -305,6 +306,13 @@ function FocalBoardProviders ({ children }: { children: ReactNode }) {
 }
 
 function DataProviders ({ children }: { children: ReactNode }) {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const loadAction: any = initialLoad; /* eslint-disable-line @typescript-eslint/no-explicit-any */
+    dispatch(loadAction());
+  }, []);
+
   return (
     <UserProvider>
       <SpacesProvider>
