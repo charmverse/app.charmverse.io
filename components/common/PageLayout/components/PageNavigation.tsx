@@ -525,6 +525,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
             label={view.title}
             href={`${pathPrefix}/${item.path}${item.type === 'board' ? `?viewId=${view.id}` : ''}`}
             id={view.id}
+            nodeId={view.id}
             pageType='view'
           />
       ))}

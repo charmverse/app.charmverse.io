@@ -73,7 +73,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const router = useRouter();
   const colorMode = useColorMode();
   const [pageTitle] = usePageTitle();
-  const { pages, currentPageId, isEditing } = usePages();
+  const { pages, linkedPages, currentPageId, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -81,7 +81,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const pageMenuAnchor = useRef();
 
   const currentPage = currentPageId && pages[currentPageId];
-
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');

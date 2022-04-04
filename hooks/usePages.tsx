@@ -60,25 +60,29 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     const _linkedPages: Record<string, LinkedPage> = {};
     Object.values(pages as unknown as LinkedPage[]).forEach((page) => {
       if (page) {
-        const updatedPage: LinkedPage = {
-          ...page
+        const linkedPage: LinkedPage = _linkedPages[page.id] ?? {
+          ...page,
+          children: []
         };
 
         // If parentId exists, it wont exist for root pages
-        if (updatedPage.parentId && pages[updatedPage.parentId]) {
-          const parentPage = _linkedPages[updatedPage.parentId] ?? {
-            ...pages[updatedPage.parentId]
+        if (linkedPage.parentId && pages[linkedPage.parentId]) {
+          const parentPage = _linkedPages[linkedPage.parentId] ?? {
+            ...pages[linkedPage.parentId]
           };
 
           if (!parentPage.children) {
             parentPage.children = [];
           }
-          parentPage.children.push(page);
-          updatedPage.parent = parentPage;
+          parentPage.children.push(linkedPage);
+          linkedPage.parent = parentPage;
+          _linkedPages[linkedPage.parentId] = parentPage;
+        }
+        else {
+          linkedPage.parent = null;
         }
 
-        updatedPage.children = [];
-        _linkedPages[page.id] = page;
+        _linkedPages[page.id] = linkedPage;
       }
     });
 
