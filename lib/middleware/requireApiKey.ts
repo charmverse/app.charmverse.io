@@ -54,7 +54,7 @@ export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, 
   }
   catch (error) {
     console.log('Found error', error);
-    return res.status(401).send({ error: 'Please provide a valid user' });
+    return res.status(401).send({ error: 'Please provide a valid API token' });
   }
 
   next();
