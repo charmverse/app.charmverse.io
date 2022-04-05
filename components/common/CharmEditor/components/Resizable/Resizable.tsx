@@ -8,6 +8,7 @@ import HorizontalResizer from './HorizontalResizer';
 interface ResizableProps {
   initialSize: number;
   children: ReactNode;
+  aspectRatio?: number;
   minWidth: number;
   updateAttrs: NodeViewProps['updateAttrs'];
   onDelete: () => void;
@@ -15,7 +16,7 @@ interface ResizableProps {
 }
 
 function Resizable (props: ResizableProps) {
-  const { onResizeStop, updateAttrs, onDelete, initialSize = 100, children, minWidth } = props;
+  const { onResizeStop, updateAttrs, onDelete, initialSize = 100, aspectRatio, children, minWidth } = props;
   const [size, setSize] = useState(initialSize || 100);
   const view = useEditorViewContext();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -40,6 +41,7 @@ function Resizable (props: ResizableProps) {
     <BlockAligner ref={containerRef} onDelete={onDelete}>
       <HorizontalResizer
         onResizeStop={onResizeStopCallback}
+        height={aspectRatio && (size / aspectRatio)}
         width={size}
         minWidth={minWidth}
         maxWidth={maxWidth}

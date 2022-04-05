@@ -4,12 +4,13 @@ import ResizableHandle from './ResizableHandle';
 import ResizableContainer from './ResizableContainer';
 
 interface ResizerProps {
-  children: ReactNode
-  width: number
-  minWidth: number
-  maxWidth?: number
-  onResize?: ResizableProps['onResize']
-  onResizeStop?: ResizableProps['onResizeStop']
+  children: ReactNode;
+  height?: number;
+  width: number;
+  minWidth: number;
+  maxWidth?: number;
+  onResize?: ResizableProps['onResize'];
+  onResizeStop?: ResizableProps['onResizeStop'];
 }
 
 function Resizer (props: ResizerProps) {
@@ -19,8 +20,8 @@ function Resizer (props: ResizerProps) {
       <ResizableBox
         onResize={props.onResize}
         width={props.width}
-        // @ts-ignore give a garbage value to height
-        height=''
+        // @ts-ignore - HACK: give a garbage value to height so react-resizable will not try to calculate it
+        height={props.height || ''}
         resizeHandles={['w', 'e']}
         onResizeStop={props.onResizeStop}
         minConstraints={[props.minWidth, Infinity]}

@@ -258,6 +258,7 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
   else {
     return (
       <Resizable
+        aspectRatio={VIDEO_ASPECT_RATIO}
         initialSize={node.attrs.width}
         minWidth={MIN_EMBED_WIDTH}
         updateAttrs={args => {
