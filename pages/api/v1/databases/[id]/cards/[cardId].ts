@@ -39,7 +39,7 @@ async function getCard (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!card) {
-    return res.status(400).send({ error: 'Task not found' });
+    return res.status(404).send({ error: 'Card not found' });
   }
 
   const [board, cardPageContent] = await Promise.all([
@@ -69,7 +69,7 @@ async function getCard (req: NextApiRequest, res: NextApiResponse) {
     title: card.title,
     content: markdown,
     isTemplate: (card.fields as any).isTemplate === true,
-    properties: (card.fields as any).properties
+    cardProperties: (card.fields as any).properties
   };
 
   return res.status(200).json(cardToReturn);

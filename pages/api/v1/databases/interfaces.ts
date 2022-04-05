@@ -126,7 +126,7 @@ export interface BoardPage extends ApiPage {
  *        isTemplate:
  *          type: string
  *          example: false
- *        properties:
+ *        cardProperties:
  *          type: object
  *          example: {}
  */
@@ -138,6 +138,29 @@ export interface Card {
   content: string
   title: string
   isTemplate: boolean
-  properties: Record<string, string | number>
+  cardProperties: Record<string, string | number>
 }
 
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    CardQuery:
+ *      type: object
+ *      properties:
+ *        cardProperties:
+ *          type: object
+ *          properties:
+ *            Status:
+ *              type: string
+ *              example: Complete
+ *            Priority:
+ *              type: string
+ *              example: High
+ *
+ */
+export interface CardQuery {
+  cardProperties: Record<string, string | number>
+}
