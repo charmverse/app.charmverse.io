@@ -126,28 +126,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         width: '100%'
       }}
       >
-        <Box sx={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2
-        }}
-        >
-          <PageTitleWithBreadcrumbs />
-          {isEditing && (
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}
-            >
-              <CircularProgress size={12} />
-              <Typography variant='subtitle2'>
-                Saving
-              </Typography>
-            </Box>
-          )}
-        </Box>
+        <PageTitleWithBreadcrumbs />
         <Box display='flex' alignItems='center'>
           {isPage && (
             <>

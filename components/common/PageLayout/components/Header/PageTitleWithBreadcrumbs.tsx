@@ -1,7 +1,5 @@
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
-import Link from 'components/common/Link';
-import Typography from '@mui/material/Typography';
+import { Box, Link, Typography, CircularProgress } from '@mui/material';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
@@ -34,9 +32,16 @@ interface PageBreadCrumb {
   title: string;
 }
 
+/* <Box sx={{
+  flex: 1,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 2
+}}
+> */
 function WorkspacePageTitle () {
   const router = useRouter();
-  const { currentPageId, pages } = usePages();
+  const { currentPageId, pages, isEditing } = usePages();
 
   const currentPage = pages[currentPageId];
 
@@ -73,6 +78,19 @@ function WorkspacePageTitle () {
         <Box display='inline-flex'>
           {currentPage.icon && <StyledPageIcon icon={currentPage.icon} />}
           {currentPage.title || 'Untitled'}
+        </Box>
+      )}
+      {isEditing && (
+        <Box sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 1
+        }}
+        >
+          <CircularProgress size={12} />
+          <Typography variant='subtitle2'>
+            Saving
+          </Typography>
         </Box>
       )}
     </>
