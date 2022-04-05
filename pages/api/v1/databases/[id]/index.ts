@@ -4,7 +4,7 @@ import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { filterObjectKeys } from 'lib/utilities/objects';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { ApiBoard } from '../interfaces';
+import { BoardPage } from '../interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -43,11 +43,11 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).send({ error: 'Database not found' });
   }
 
-  const filteredDatabaseObject = filterObjectKeys(database as any as ApiBoard, 'include', ['id', 'createdAt', 'type', 'title', 'content', 'url']);
+  const filteredDatabaseObject = filterObjectKeys(database as any as BoardPage, 'include', ['id', 'createdAt', 'type', 'title', 'content', 'url']);
 
   const domain = process.env.DOMAIN;
 
-  filteredDatabaseObject.url = `https://${domain}/${database.space?.domain}/${database.path}`;
+  filteredDatabaseObject.url = `${domain}/${database.space?.domain}/${database.path}`;
 
   return res.status(200).json(filteredDatabaseObject);
 }

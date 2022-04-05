@@ -33,19 +33,17 @@ export interface ApiPage extends Pick<Page, 'id' | 'createdAt' | 'type' | 'title
  *        url:
  *          type: string
  *          example: https://app.charmverse.io/my-workspace/page-5985679461310778
-
  */
 
-/*
- *      example:
- *        id:
-*         createdAt:
-*         type: board
-*         title: Todo tracker
-*         content: string
-*         url: https://app.charmverse.io/page-5985679461310778
-*/
-
-export interface ApiBoard extends ApiPage {
+export interface BoardPage extends ApiPage {
   type: 'board'
+}
+
+export interface Card {
+  id: string
+  databaseId: string
+  content: string
+  title: string
+  isTemplate: boolean
+  properties: any
 }
