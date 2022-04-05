@@ -119,7 +119,7 @@ function PageBreadcrumbs ({ pages }: {pages: Page[]}) {
     id: '123'
   }, pages[pages.length - 2], pages[pages.length - 1]] : pages).map(page => ({
     title: page.title,
-    link: `/${router.query.domain}/${page.path}`,
+    link: page.path ? `/${router.query.domain}/${page.path}` : null,
     icon: page.icon,
     id: page.id
   }));
@@ -130,7 +130,7 @@ function PageBreadcrumbs ({ pages }: {pages: Page[]}) {
 export default function Header ({ open, openSidebar }: { open: boolean, openSidebar: () => void }) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, linkedPages, currentPageId, isEditing } = usePages();
+  const { pages, currentPageId, isEditing } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -141,13 +141,18 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
 
   const currentPageChain = useMemo(() => {
     const currentPageParentChain: Page[] = [];
-    let currentPageInChain: LinkedPage | null = linkedPages[currentPageId];
+    let currentPageInChain: Page | null | undefined = pages[currentPageId];
     while (currentPageInChain) {
       currentPageParentChain.push(currentPageInChain);
-      currentPageInChain = currentPageInChain.parent;
+      if (currentPageInChain.parentId) {
+        currentPageInChain = pages[currentPageInChain.parentId];
+      }
+      else {
+        currentPageInChain = null;
+      }
     }
     return currentPageParentChain.reverse();
-  }, [currentPage]);
+  }, [pages]);
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 

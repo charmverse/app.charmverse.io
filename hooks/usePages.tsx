@@ -24,7 +24,6 @@ type IContext = {
   addPage: AddPageFn,
   addPageAndRedirect: (page?: Partial<Page>) => void
   getPagePermissions: (pageId: string) => IPagePermissionFlags,
-  linkedPages: Record<string, LinkedPage>
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -38,8 +37,7 @@ export const PagesContext = createContext<Readonly<IContext>>({
   setIsEditing: () => { },
   addPage: null as any,
   addPageAndRedirect: null as any,
-  getPagePermissions: () => new AllowedPagePermissions(),
-  linkedPages: {}
+  getPagePermissions: () => new AllowedPagePermissions()
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
@@ -55,39 +53,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   useEffect(() => {
     setPages(data?.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
   }, [data]);
-
-  const linkedPages = useMemo(() => {
-    const _linkedPages: Record<string, LinkedPage> = {};
-    Object.values(pages as unknown as LinkedPage[]).forEach((page) => {
-      if (page) {
-        const linkedPage: LinkedPage = _linkedPages[page.id] ?? {
-          ...page,
-          children: []
-        };
-
-        // If parentId exists, it wont exist for root pages
-        if (linkedPage.parentId && pages[linkedPage.parentId]) {
-          const parentPage = _linkedPages[linkedPage.parentId] ?? {
-            ...pages[linkedPage.parentId]
-          };
-
-          if (!parentPage.children) {
-            parentPage.children = [];
-          }
-          parentPage.children.push(linkedPage);
-          linkedPage.parent = parentPage;
-          _linkedPages[linkedPage.parentId] = parentPage;
-        }
-        else {
-          linkedPage.parent = null;
-        }
-
-        _linkedPages[page.id] = linkedPage;
-      }
-    });
-
-    return _linkedPages;
-  }, [pages]);
 
   const addPage: AddPageFn = React.useCallback(async (page) => {
     const spaceId = space?.id;
@@ -186,8 +151,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     setPages,
     addPage,
     addPageAndRedirect,
-    getPagePermissions,
-    linkedPages
+    getPagePermissions
   }), [currentPageId, isEditing, router, pages, user]);
 
   return (
