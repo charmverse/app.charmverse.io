@@ -65,23 +65,28 @@ function BreadCrumbs ({ items }: {items: {
     <BreadCrumb>
       {items.map((item, itemIndex) => {
         const itemTitle = item.title ?? 'Untitled';
-        const pageDeco = (
+        const currentPageCrumb = (
           <Box display='flex'>
             {item.icon && <StyledPageIcon icon={item.icon} />}
             {itemTitle}
           </Box>
         );
 
-        return itemIndex !== items.length - 1 ? (
-          <Fragment key={item.id}>
-            {item.link ? (
-              <Link href={item.link}>
-                {pageDeco}
-              </Link>
-            ) : <div>{pageDeco}</div>}
-            <span className='breadcrumb-slash'>/</span>
-          </Fragment>
-        ) : <div key={item.id}>{pageDeco}</div>;
+        // Last item doesn't have any /
+        if (itemIndex !== items.length - 1) {
+          return (
+            <Fragment key={item.id}>
+              {item.link ? (
+                <Link href={item.link}>
+                  {currentPageCrumb}
+                </Link>
+              ) : <div>{currentPageCrumb}</div>}
+              <span className='breadcrumb-slash'>/</span>
+            </Fragment>
+          );
+        }
+
+        return <div key={item.id}>{currentPageCrumb}</div>;
       })}
     </BreadCrumb>
   );
@@ -112,19 +117,20 @@ function BountyBreadcrumbs () {
 function PageBreadcrumbs ({ pages }: {pages: Page[]}) {
   const router = useRouter();
   const trimTrails = pages.length > 3;
-  const breadcrumbItems = (trimTrails ? [pages[0], {
+  const collapsedCrumb = {
     title: '...',
     path: null,
     icon: null,
     id: '123'
-  }, pages[pages.length - 2], pages[pages.length - 1]] : pages).map(page => ({
+  };
+  const displayedCrumbs = (trimTrails ? [pages[0], collapsedCrumb, pages[pages.length - 2], pages[pages.length - 1]] : pages).map(page => ({
     title: page.title,
     link: page.path ? `/${router.query.domain}/${page.path}` : null,
     icon: page.icon,
     id: page.id
   }));
 
-  return <BreadCrumbs items={breadcrumbItems} />;
+  return <BreadCrumbs items={displayedCrumbs} />;
 }
 
 export default function Header ({ open, openSidebar }: { open: boolean, openSidebar: () => void }) {
