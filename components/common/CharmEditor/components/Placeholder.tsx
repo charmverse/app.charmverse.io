@@ -1,7 +1,6 @@
-import { useEditorViewContext } from '@bangle.dev/react';
+import { memo } from 'react';
 import { alpha } from '@mui/material';
 import styled from '@emotion/styled';
-import { useEffect } from 'react';
 
 const StyledPlaceholder = styled.div`
   top: -2em;
@@ -11,11 +10,12 @@ const StyledPlaceholder = styled.div`
   z-index: -20;
 `;
 
-export default function PlaceHolder ({ show }: { show: boolean }) {
-  const view = useEditorViewContext();
+function PlaceHolder ({ show }: { show: boolean }) {
   return show ? (
     <StyledPlaceholder>
       Type '/' for commands
     </StyledPlaceholder>
   ) : null;
 }
+
+export default memo(PlaceHolder);

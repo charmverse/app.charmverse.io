@@ -19,7 +19,7 @@ import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
-import { useState, CSSProperties, ReactNode, memo } from 'react';
+import { useState, CSSProperties, ReactNode, memo, useCallback } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -39,7 +39,7 @@ import { NestedPage, nestedPagePlugins, NestedPagesList, nestedPageSpec } from '
 import Placeholder from './components/Placeholder';
 import { Quote, quoteSpec } from './components/Quote';
 import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
-import { imageSpec, ResizableImage } from './components/ResizableImage';
+import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as tabIndent from './components/tabIndent';
 import DocumentEnd from './components/DocumentEnd';
 
@@ -112,7 +112,9 @@ export function charmEditorPlugins (
         placement: 'bottom'
       }
     }),
-    imagePlugins(),
+    imagePlugins({
+      handleDragAndDrop: false
+    }),
     inlinePalettePlugins(),
     bold.plugins(),
     bulletList.plugins(),
@@ -150,7 +152,7 @@ export function charmEditorPlugins (
     }),
     NodeView.createPlugin({
       name: 'image',
-      containerDOM: ['div']
+      containerDOM: ['div', { draggable: 'false' }]
     }),
     NodeView.createPlugin({
       name: 'cryptoPrice',
@@ -158,7 +160,7 @@ export function charmEditorPlugins (
     }),
     NodeView.createPlugin({
       name: 'iframe',
-      containerDOM: ['div', { class: 'iframe-container' }]
+      containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
     }),
     NodeView.createPlugin({
       name: 'page',
@@ -332,7 +334,7 @@ function CharmEditor (
             return (
               <ResizableImage
                 readOnly={readOnly}
-                onResizeStop={(view) => {
+                onResizeStop={(view: EditorView<any>) => {
                   if (onContentChangeDebounced) {
                     // Save the current image size on the backend after we are done resizing
                     onContentChangeDebounced(view);

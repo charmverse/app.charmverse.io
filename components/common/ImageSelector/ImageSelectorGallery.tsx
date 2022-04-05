@@ -42,7 +42,7 @@ const GalleryGroupImage = styled.div`
   }
 `;
 
-export function ImageSelectorGallery (props: ImageSelectorGalleryProps) {
+export default function ImageSelectorGallery (props: ImageSelectorGalleryProps) {
   const { items, onImageClick } = props;
   return (
     <div>

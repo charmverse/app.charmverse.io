@@ -26,6 +26,7 @@ export default function DocumentEnd () {
     // find out if last row is empty - https://discuss.prosemirror.net/t/detect-if-caret-is-on-an-empty-line/306
     const { head, empty } = tr.selection;
     const isLastRowEmpty = empty && view.state.doc.resolve(head).parent.content.size === 0;
+
     if (!isLastRowEmpty) {
       const event = new KeyboardEvent('keydown', {
         key: 'Enter',

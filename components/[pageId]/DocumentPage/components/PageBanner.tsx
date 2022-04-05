@@ -3,8 +3,8 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import ImageSelector from 'components/common/CharmEditor/components/ImageSelector';
-import { ImageSelectorGallery } from 'components/common/CharmEditor/components/ImageSelectorGallery';
+import ImageSelector from 'components/common/ImageSelector/ImageSelector';
+import { randomIntFromInterval } from 'lib/utilities/random';
 
 const StyledPageBanner = styled(Box)<{focalBoard?: boolean}>`
   display: flex;
@@ -32,7 +32,7 @@ const StyledPageBanner = styled(Box)<{focalBoard?: boolean}>`
   }
 `;
 
-export const PageCoverGalleryImageGroups = {
+const bannerImageGroups = {
   'Color & Gradient': [
     '/images/patterns/notion/gradients_2.png',
     '/images/patterns/notion/gradients_3.png',
@@ -47,6 +47,10 @@ export const PageCoverGalleryImageGroups = {
     '/images/patterns/notion/solid_yellow.png'
   ]
 };
+
+export function randomBannerImage () {
+  return bannerImageGroups['Color & Gradient'][randomIntFromInterval(0, bannerImageGroups['Color & Gradient'].length - 1)];
+}
 
 interface PageBannerProps {
   focalBoard?: boolean;
@@ -77,13 +81,7 @@ function PageBanner ({ focalBoard, headerImage, setPage }: PageBannerProps) {
         className='page-cover-controls'
       >
         <ImageSelector
-          tabs={[[
-            'Gallery',
-            <ImageSelectorGallery
-              onImageClick={setImage}
-              items={PageCoverGalleryImageGroups}
-            />
-          ]]}
+          galleryImages={bannerImageGroups}
           onImageSelect={setImage}
         >
           <ListItem

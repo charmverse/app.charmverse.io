@@ -7,19 +7,17 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { HTMLAttributes, useState } from 'react';
+import { HTMLAttributes, useState, memo } from 'react';
 import BlockAligner from './BlockAligner';
 import IFrameSelector from './IFrameSelector';
 import Resizable from './Resizable';
-import VerticalResizer from './VerticalResizer';
+import VerticalResizer from './Resizable/VerticalResizer';
 
 export const MAX_EMBED_WIDTH = 700;
-export const
-  MIN_EMBED_WIDTH = 100;
+export const MIN_EMBED_WIDTH = 100;
 export const MAX_EMBED_HEIGHT = 2500;
-export const MIN_EMBED_HEIGHT = 500;
-export const
-  VIDEO_ASPECT_RATIO = 1.77;
+export const MIN_EMBED_HEIGHT = 200;
+export const VIDEO_ASPECT_RATIO = 1.77;
 
 const name = 'iframe';
 
@@ -188,7 +186,6 @@ const StyledIFrame = styled(Box)`
   object-fit: contain;
   width: 100%;
   height: 100%;
-  min-height: 250px;
   user-select: none;
   &:hover {
     cursor: initial;
@@ -196,9 +193,8 @@ const StyledIFrame = styled(Box)`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-export default function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
+function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
   NodeViewProps & { readOnly: boolean, onResizeStop?: (view: EditorView) => void }) {
-  const theme = useTheme();
   const [height, setHeight] = useState(node.attrs.height);
   const view = useEditorViewContext();
 
@@ -232,17 +228,9 @@ export default function ResizableIframe ({ readOnly, node, updateAttrs, onResize
     );
   }
 
-  return node.attrs.type === 'embed' ? (
-    <Box style={{
-      margin: theme.spacing(3, 0),
-      display: 'flex',
-      flexDirection: 'column'
-    }}
-    >
-      <BlockAligner
-        onDelete={onDelete}
-        size={node.attrs.width}
-      >
+  if (node.attrs.type === 'embed') {
+    return (
+      <BlockAligner onDelete={onDelete}>
         <VerticalResizer
           onResizeStop={(_, data) => {
             updateAttrs({
@@ -265,22 +253,26 @@ export default function ResizableIframe ({ readOnly, node, updateAttrs, onResize
           </StyledIFrame>
         </VerticalResizer>
       </BlockAligner>
-    </Box>
-  ) : (
-    <Resizable
-      aspectRatio={VIDEO_ASPECT_RATIO}
-      initialSize={node.attrs.width}
-      maxWidth={MAX_EMBED_WIDTH}
-      minWidth={MIN_EMBED_WIDTH}
-      updateAttrs={args => {
-        updateAttrs({ width: args.size });
-      }}
-      onDelete={onDelete}
-      onResizeStop={onResizeStop}
-    >
-      <StyledIFrame>
-        <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
-      </StyledIFrame>
-    </Resizable>
-  );
+    );
+  }
+  else {
+    return (
+      <Resizable
+        aspectRatio={VIDEO_ASPECT_RATIO}
+        initialSize={node.attrs.width}
+        minWidth={MIN_EMBED_WIDTH}
+        updateAttrs={args => {
+          updateAttrs({ width: args.size });
+        }}
+        onDelete={onDelete}
+        onResizeStop={onResizeStop}
+      >
+        <StyledIFrame>
+          <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+        </StyledIFrame>
+      </Resizable>
+    );
+  }
 }
+
+export default memo(ResizableIframe);
