@@ -1,8 +1,7 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ListItem } from '@mui/material';
-import { ReactNode, memo } from 'react';
+import { ReactNode, memo, forwardRef } from 'react';
 
 interface BlockAlignerProps {
   children: ReactNode
@@ -30,7 +29,7 @@ const Controls = styled.div`
   transition: opacity 250ms ease-in-out;
 `;
 
-function BlockAligner (props: BlockAlignerProps) {
+const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
   const { children, onDelete } = props;
   return (
     <StyledBlockAligner
@@ -54,6 +53,6 @@ function BlockAligner (props: BlockAlignerProps) {
       </Controls>
     </StyledBlockAligner>
   );
-}
+});
 
 export default memo(BlockAligner);

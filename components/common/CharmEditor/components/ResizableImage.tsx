@@ -140,16 +140,6 @@ export function imageSpec (): RawSpecs {
   };
 }
 
-// Create a new image element using a promise, this makes it possible to get the width and height of the image
-function imagePromise (url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject();
-    img.src = url;
-  });
-}
-
 function ResizableImage ({ readOnly, onResizeStop, node, updateAttrs, selected }:
   NodeViewProps & {readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
   readOnly = readOnly ?? false;

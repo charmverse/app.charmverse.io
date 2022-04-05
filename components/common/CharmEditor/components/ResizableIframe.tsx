@@ -186,7 +186,6 @@ const StyledIFrame = styled(Box)`
   object-fit: contain;
   width: 100%;
   height: 100%;
-  min-height: 250px;
   user-select: none;
   &:hover {
     cursor: initial;
@@ -231,35 +230,29 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
 
   if (node.attrs.type === 'embed') {
     return (
-      <Box style={{
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-      >
-        <BlockAligner onDelete={onDelete}>
-          <VerticalResizer
-            onResizeStop={(_, data) => {
-              updateAttrs({
-                height: data.size.height
-              });
-              if (onResizeStop) {
-                onResizeStop(view);
-              }
-            }}
-            width={node.attrs.width}
-            height={height}
-            onResize={(_, data) => {
-              setHeight(data.size.height);
-            }}
-            maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
-            minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
-          >
-            <StyledIFrame>
-              <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
-            </StyledIFrame>
-          </VerticalResizer>
-        </BlockAligner>
-      </Box>
+      <BlockAligner onDelete={onDelete}>
+        <VerticalResizer
+          onResizeStop={(_, data) => {
+            updateAttrs({
+              height: data.size.height
+            });
+            if (onResizeStop) {
+              onResizeStop(view);
+            }
+          }}
+          width={node.attrs.width}
+          height={height}
+          onResize={(_, data) => {
+            setHeight(data.size.height);
+          }}
+          maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
+          minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
+        >
+          <StyledIFrame>
+            <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+          </StyledIFrame>
+        </VerticalResizer>
+      </BlockAligner>
     );
   }
   else {

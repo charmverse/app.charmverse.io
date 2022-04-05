@@ -2,7 +2,6 @@ import { NodeViewProps } from '@bangle.dev/core';
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { ReactNode, useCallback, useState, memo, useRef } from 'react';
-import styled from '@emotion/styled';
 import BlockAligner from '../BlockAligner';
 import HorizontalResizer from './HorizontalResizer';
 
@@ -14,12 +13,6 @@ interface ResizableProps {
   onDelete: () => void;
   onResizeStop?: (view: EditorView) => void;
 }
-
-const ResizeContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  max-width: 100%;
-`;
 
 function Resizable (props: ResizableProps) {
   const { onResizeStop, updateAttrs, onDelete, initialSize = 100, children, minWidth } = props;
@@ -44,19 +37,17 @@ function Resizable (props: ResizableProps) {
   }, []);
 
   return (
-    <ResizeContainer draggable='false' ref={containerRef}>
-      <BlockAligner onDelete={onDelete}>
-        <HorizontalResizer
-          onResizeStop={onResizeStopCallback}
-          width={size}
-          minWidth={minWidth}
-          maxWidth={maxWidth}
-          onResize={onResizeCallback}
-        >
-          {children}
-        </HorizontalResizer>
-      </BlockAligner>
-    </ResizeContainer>
+    <BlockAligner ref={containerRef} onDelete={onDelete}>
+      <HorizontalResizer
+        onResizeStop={onResizeStopCallback}
+        width={size}
+        minWidth={minWidth}
+        maxWidth={maxWidth}
+        onResize={onResizeCallback}
+      >
+        {children}
+      </HorizontalResizer>
+    </BlockAligner>
   );
 }
 

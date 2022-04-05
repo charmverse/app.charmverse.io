@@ -150,7 +150,7 @@ export function charmEditorPlugins (
     }),
     NodeView.createPlugin({
       name: 'image',
-      containerDOM: ['div']
+      containerDOM: ['div', { draggable: 'false' }]
     }),
     NodeView.createPlugin({
       name: 'cryptoPrice',
@@ -158,7 +158,7 @@ export function charmEditorPlugins (
     }),
     NodeView.createPlugin({
       name: 'iframe',
-      containerDOM: ['div', { class: 'iframe-container' }]
+      containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
     }),
     NodeView.createPlugin({
       name: 'page',

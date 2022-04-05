@@ -30,15 +30,15 @@ const StyledResizeHandle = styled(Box)`
   }
 
   &.react-resizable-handle-w {
-    left: 15px;
+    left: 10px;
   }
 
   &.react-resizable-handle-e {
-    right: 15px;
+    right: 10px;
   }
 
   &.react-resizable-handle-s {
-    bottom: 15px;
+    bottom: 10px;
   }
 `;
 
