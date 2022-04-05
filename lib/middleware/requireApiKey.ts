@@ -3,7 +3,11 @@ import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 
-async function getSpaceFromApiKey (req: NextApiRequest): Promise<Space> {
+/**
+ * @returns Space linked to API key in the request
+ * Throws if the API key or space do not exist
+ */
+export async function getSpaceFromApiKey (req: NextApiRequest): Promise<Space> {
   const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? req.query.api_key as string;
 
   // Protect against api keys or nullish API Keys
