@@ -72,7 +72,7 @@ function WorkspacePageTitle () {
               </PageTitleWrapper>
             </Link>
           ) : (
-            <PageTitleWrapper sx={{ }}>
+            <PageTitleWrapper>
               {crumb.title}
             </PageTitleWrapper>
           )}
