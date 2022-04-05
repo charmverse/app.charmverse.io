@@ -30,6 +30,7 @@ import { useUser } from 'hooks/useUser';
 import { PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { Fragment, useMemo, useRef, useState } from 'react';
+import { useBounties } from 'hooks/useBounties';
 import Account from './Account';
 import ShareButton from './ShareButton';
 import { StyledPageIcon } from './PageNavigation';
@@ -43,71 +44,87 @@ const StyledToolbar = styled(Toolbar)`
 `;
 
 const BreadCrumb = styled.span`
-  :after {
-    content: ' / ';
+  & .breadcrumb-slash {
     opacity: .5;
-    margin-left: .5em;
-    margin-right: .5em;
+    margin: 0em 0.5em;
   }
+  display: flex;
   padding-right: 0em;
   a {
     color: inherit;
   }
 `;
 
+function BreadCrumbs ({ items }: {items: {
+  link: null | string,
+  icon: string | null,
+  title: string,
+  id: string
+}[]}) {
+  return (
+    <BreadCrumb>
+      {items.map((item, itemIndex) => {
+        const itemTitle = item.title ?? 'Untitled';
+        const pageDeco = (
+          <Box display='flex'>
+            {item.icon && <StyledPageIcon icon={item.icon} />}
+            {itemTitle}
+          </Box>
+        );
+
+        return itemIndex !== items.length - 1 ? (
+          <Fragment key={item.id}>
+            {item.link ? (
+              <Link href={item.link}>
+                {pageDeco}
+              </Link>
+            ) : <div>{pageDeco}</div>}
+            <span className='breadcrumb-slash'>/</span>
+          </Fragment>
+        ) : <div key={item.id}>{pageDeco}</div>;
+      })}
+    </BreadCrumb>
+  );
+}
+
 function BountyBreadcrumbs () {
   const router = useRouter();
-  if (router.route === '/[domain]/bounties/[bountyId]') {
-    return (
-      <BreadCrumb>
-        <Link href={`/${router.query.domain}/bounties`}>
-          Bounties
-        </Link>
-      </BreadCrumb>
-    );
-  }
-  return null;
+  const bountyId = router.query.bountyId as string;
+  const { bounties } = useBounties();
+  const bounty = bounties.find(_bounty => _bounty.id === bountyId);
+
+  return (
+    <BreadCrumbs items={[{
+      icon: null,
+      id: 'bounties',
+      link: `/${router.query.domain}/bounties`,
+      title: 'Bounties'
+    }, {
+      icon: null,
+      id: router.query.bountyId as string,
+      link: null,
+      title: bounty?.title ?? `Bounty (${bountyId})`
+    }]}
+    />
+  );
 }
 
 function PageBreadcrumbs ({ pages }: {pages: Page[]}) {
   const router = useRouter();
   const trimTrails = pages.length > 3;
-  const trailsInfo = (trimTrails ? [pages[0], {
+  const breadcrumbItems = (trimTrails ? [pages[0], {
     title: '...',
     path: null,
     icon: null,
     id: '123'
   }, pages[pages.length - 2], pages[pages.length - 1]] : pages).map(page => ({
     title: page.title,
-    path: page.path,
+    link: `/${router.query.domain}/${page.path}`,
     icon: page.icon,
     id: page.id
   }));
 
-  return (
-    <Box gap={1} display='flex'>
-      {trailsInfo.map((trailInfo, trailInfoIndex) => {
-        const trailTitle = trailInfo.title ?? 'Untitled';
-        const pageDeco = (
-          <Box display='flex'>
-            {trailInfo.icon && <StyledPageIcon icon={trailInfo.icon} />}
-            {trailTitle}
-          </Box>
-        );
-
-        return trailInfoIndex !== trailsInfo.length - 1 ? (
-          <Fragment key={trailInfo.id}>
-            {trailInfo.path ? (
-              <Link href={`/${router.query.domain}/${trailInfo.path}`}>
-                {pageDeco}
-              </Link>
-            ) : <div>{pageDeco}</div>}
-            <span>/</span>
-          </Fragment>
-        ) : <div key={trailInfo.id}>{pageDeco}</div>;
-      })}
-    </Box>
-  );
+  return <BreadCrumbs items={breadcrumbItems} />;
 }
 
 export default function Header ({ open, openSidebar }: { open: boolean, openSidebar: () => void }) {
@@ -213,8 +230,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         }}
         >
           <Typography noWrap component='div' sx={{ fontWeight: 500, maxWidth: 500, textOverflow: 'ellipsis' }}>
-            <BountyBreadcrumbs />
-            <PageBreadcrumbs pages={currentPageChain} />
+            {router.route === '/[domain]/bounties/[bountyId]' ? <BountyBreadcrumbs /> : router.route === '/[domain]/[pageId]' ? <PageBreadcrumbs pages={currentPageChain} /> : null}
           </Typography>
           {isEditing && (
             <Box sx={{
