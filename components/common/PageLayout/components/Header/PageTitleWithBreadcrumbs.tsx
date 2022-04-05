@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { Box, Link, Typography, CircularProgress } from '@mui/material';
+import { Box, Typography, CircularProgress } from '@mui/material';
+import Link from 'components/common/Link';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
@@ -7,6 +8,7 @@ import { ReactNode } from 'react';
 import { StyledPageIcon } from '../PageNavigation';
 
 const BreadCrumb = styled.span`
+  display: inline-flex;
   :after {
     content: ' / ';
     opacity: .5;
@@ -18,9 +20,9 @@ const BreadCrumb = styled.span`
   }
 `;
 
-function PageTitleWrapper ({ children }: { children: ReactNode }) {
+function PageTitleWrapper ({ children, sx = {} }: { children: ReactNode, sx?: object }) {
   return (
-    <Typography noWrap component='div' sx={{ fontWeight: 500, maxWidth: 500, textOverflow: 'ellipsis' }}>
+    <Typography noWrap component='div' sx={{ fontWeight: 500, maxWidth: 500, textOverflow: 'ellipsis', ...sx }}>
       {children}
     </Typography>
   );
@@ -55,36 +57,46 @@ function WorkspacePageTitle () {
     }
   }
 
-  const displayedCrumbs = breadcrumbs.slice(0, 2);
-  const trimmedCrumbs = (displayedCrumbs.length < breadcrumbs.length);
+  const collapsedCrumb = {
+    title: '...',
+    path: null,
+    icon: null
+  };
+  const trimBreadcrumbs = breadcrumbs.length > 2;
+  const displayedCrumbs = trimBreadcrumbs
+    ? [breadcrumbs[0], collapsedCrumb, breadcrumbs[breadcrumbs.length - 1]]
+    : breadcrumbs;
+
   return (
-    <>
+    <Box display='flex'>
       {displayedCrumbs.map(crumb => (
         <BreadCrumb key={crumb.path}>
-          <Link href={`/${router.query.domain}/${crumb.path}`}>
-            <Box display='inline-flex'>
-              {crumb.icon && <StyledPageIcon icon={crumb.icon} />}
-              {crumb.title || 'Untitled'}
-            </Box>
-          </Link>
+          {crumb.path ? (
+            <Link href={`/${router.query.domain}/${crumb.path}`}>
+              <PageTitleWrapper sx={{ maxWidth: 160 }}>
+                {crumb.icon && <StyledPageIcon icon={crumb.icon} style={{ display: 'inline' }} />}
+                {crumb.title || 'Untitled'}
+              </PageTitleWrapper>
+            </Link>
+          ) : (
+            <PageTitleWrapper sx={{ }}>
+              {crumb.title}
+            </PageTitleWrapper>
+          )}
         </BreadCrumb>
       ))}
-      {trimmedCrumbs && (
-        <BreadCrumb>
-          <span className='breadcrumb-slash'>...</span>
-        </BreadCrumb>
-      )}
       {currentPage && (
-        <Box display='inline-flex'>
-          {currentPage.icon && <StyledPageIcon icon={currentPage.icon} />}
+        <PageTitleWrapper sx={{ maxWidth: 240 }}>
+          {currentPage.icon && <StyledPageIcon icon={currentPage.icon} style={{ display: 'inline' }} />}
           {currentPage.title || 'Untitled'}
-        </Box>
+        </PageTitleWrapper>
       )}
-      {isEditing && (
+      {true && (
         <Box sx={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 1
+          gap: 1,
+          ml: 2
         }}
         >
           <CircularProgress size={12} />
@@ -93,7 +105,7 @@ function WorkspacePageTitle () {
           </Typography>
         </Box>
       )}
-    </>
+    </Box>
   );
 }
 
