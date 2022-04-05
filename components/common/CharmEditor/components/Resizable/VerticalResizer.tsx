@@ -1,6 +1,6 @@
 import { ReactNode, memo } from 'react';
-import { ResizableBox, ResizableProps } from 'react-resizable';
-import ResizableHandle from './ResizableHandle';
+import { ResizableProps } from 'react-resizable';
+import ResizableBox from './ResizableBox';
 import ResizableContainer from './ResizableContainer';
 
 interface ResizerProps {
@@ -27,8 +27,6 @@ function VerticalResizer (props: ResizerProps) {
         minConstraints={minConstraints}
         maxConstraints={maxConstraints}
         onResizeStop={onResizeStop}
-        /* eslint-disable-next-line */
-        handle={(handleAxis: string, ref: React.Ref<unknown>) => <ResizableHandle ref={ref} className={`react-resizable-handle react-resizable-handle-${handleAxis}`} />}
       >
         {children}
       </ResizableBox>

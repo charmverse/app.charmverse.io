@@ -38,18 +38,20 @@ function Resizable (props: ResizableProps) {
   }, []);
 
   return (
-    <BlockAligner ref={containerRef} onDelete={onDelete}>
-      <HorizontalResizer
-        onResizeStop={onResizeStopCallback}
-        height={aspectRatio && (size / aspectRatio)}
-        width={size}
-        minWidth={minWidth}
-        maxWidth={maxWidth}
-        onResize={onResizeCallback}
-      >
-        {children}
-      </HorizontalResizer>
-    </BlockAligner>
+    <div ref={containerRef}>
+      <BlockAligner onDelete={onDelete}>
+        <HorizontalResizer
+          aspectRatio={aspectRatio}
+          onResizeStop={onResizeStopCallback}
+          width={size}
+          minWidth={minWidth}
+          maxWidth={maxWidth}
+          onResize={onResizeCallback}
+        >
+          {children}
+        </HorizontalResizer>
+      </BlockAligner>
+    </div>
   );
 }
 

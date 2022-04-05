@@ -1,11 +1,11 @@
 import { ReactNode, memo } from 'react';
-import { ResizableBox, ResizableProps } from 'react-resizable';
-import ResizableHandle from './ResizableHandle';
+import { ResizableProps } from 'react-resizable';
+import ResizableBox from './ResizableBox';
 import ResizableContainer from './ResizableContainer';
 
 interface ResizerProps {
   children: ReactNode;
-  height?: number;
+  aspectRatio?: number;
   width: number;
   minWidth: number;
   maxWidth?: number;
@@ -14,20 +14,20 @@ interface ResizerProps {
 }
 
 function Resizer (props: ResizerProps) {
-
+  const height = props.aspectRatio ? props.width / props.aspectRatio : 0;
+  console.log(props);
   return (
     <ResizableContainer>
       <ResizableBox
         onResize={props.onResize}
         width={props.width}
         // @ts-ignore - HACK: give a garbage value to height so react-resizable will not try to calculate it
-        height={props.height || ''}
+        height={height || ''}
         resizeHandles={['w', 'e']}
         onResizeStop={props.onResizeStop}
         minConstraints={[props.minWidth, Infinity]}
-        maxConstraints={props.maxWidth ? [props.maxWidth, Infinity] : undefined}
-        /* eslint-disable-next-line */
-        handle={(handleAxis: string, ref: React.Ref<unknown>) => <ResizableHandle ref={ref} className={`react-resizable-handle react-resizable-handle-${handleAxis}`} />}
+        maxConstraints={props.maxWidth ? [props.maxWidth, props.aspectRatio ? props.maxWidth / props.aspectRatio : Infinity] : undefined}
+        // handle={(handleAxis: string, ref: React.Ref<unknown>) => <ResizableHandle ref={ref} className={`react-resizable-handle react-resizable-handle-${handleAxis}`} />}
       >
         {props.children}
       </ResizableBox>

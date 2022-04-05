@@ -112,7 +112,9 @@ export function charmEditorPlugins (
         placement: 'bottom'
       }
     }),
-    imagePlugins(),
+    imagePlugins({
+      handleDragAndDrop: false
+    }),
     inlinePalettePlugins(),
     bold.plugins(),
     bulletList.plugins(),
