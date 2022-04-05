@@ -20,13 +20,10 @@ function VerticalResizer (props: ResizerProps) {
   return (
     <ResizableContainer>
       <ResizableBox
-        // @ts-ignore library type is wrong
-        style={{ display: 'inline-block', maxWidth: '100%' }}
         onResize={onResize}
         width={width}
         height={height}
         resizeHandles={['s']}
-        lockAspectRatio
         minConstraints={minConstraints}
         maxConstraints={maxConstraints}
         onResizeStop={onResizeStop}

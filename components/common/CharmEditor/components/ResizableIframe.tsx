@@ -16,7 +16,7 @@ import VerticalResizer from './Resizable/VerticalResizer';
 export const MAX_EMBED_WIDTH = 700;
 export const MIN_EMBED_WIDTH = 100;
 export const MAX_EMBED_HEIGHT = 2500;
-export const MIN_EMBED_HEIGHT = 500;
+export const MIN_EMBED_HEIGHT = 200;
 export const VIDEO_ASPECT_RATIO = 1.77;
 
 const name = 'iframe';
@@ -236,10 +236,7 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
         flexDirection: 'column'
       }}
       >
-        <BlockAligner
-          onDelete={onDelete}
-          size={node.attrs.width}
-        >
+        <BlockAligner onDelete={onDelete}>
           <VerticalResizer
             onResizeStop={(_, data) => {
               updateAttrs({
