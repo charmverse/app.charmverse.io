@@ -4,8 +4,7 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions'
 import ImageIcon from '@mui/icons-material/Image'
 import { Box } from '@mui/material'
 import { BountyIntegration } from 'components/bounties/BountyIntegration'
-import PageBanner, { PageCoverGalleryImageGroups } from 'components/[pageId]/DocumentPage/components/PageBanner'
-import { randomIntFromInterval } from 'lib/utilities/random'
+import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { BlockIcons } from '../../blockIcons'
@@ -78,7 +77,7 @@ const CardDetail = (props: Props): JSX.Element|null => {
     }, [card.id, card.fields.icon])
 
     const setRandomHeaderImage = useCallback((headerImage?: string | null) => {
-      const newHeaderImage = headerImage ?? PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
+      const newHeaderImage = headerImage ?? randomBannerImage()
       // Null is passed if we want to remove the image
       mutator.changeHeaderImage(card.id, card.fields.headerImage, headerImage !== null ? newHeaderImage : null)
   }, [card.id, card.fields.headerImage])

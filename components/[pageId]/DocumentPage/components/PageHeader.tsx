@@ -15,7 +15,7 @@ import { Page } from 'models';
 import { ChangeEvent, memo } from 'react';
 import { useIntl } from 'react-intl';
 import PageIcon from 'components/common/Emoji';
-import { PageCoverGalleryImageGroups } from './PageBanner';
+import { randomBannerImage } from './PageBanner';
 import PageTitle from './PageTitle';
 
 const PageControlItem = styled(ListItemButton)`
@@ -79,8 +79,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
   }
 
   function addPageHeader () {
-    const _headerImage = PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)];
-    setPage({ headerImage: _headerImage });
+    setPage({ headerImage: randomBannerImage() });
   }
 
   return (

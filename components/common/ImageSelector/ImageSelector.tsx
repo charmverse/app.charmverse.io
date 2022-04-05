@@ -2,19 +2,30 @@ import { Button, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
-import Snackbar from 'components/common/Snackbar';
 import { uploadToS3 } from 'lib/aws/uploadToS3';
 import { ReactNode, useState } from 'react';
+import ImageSelectorGallery from './ImageSelectorGallery';
 
 interface ImageSelectorProps {
   onImageSelect: (imageSrc: string) => void
   children: ReactNode
-  tabs?: [string, ReactNode][]
+  galleryImages?: { [category: string]: string[] }
 }
 
-export default function ImageSelector (props: ImageSelectorProps) {
+export default function ImageSelector ({ children, galleryImages, onImageSelect }: ImageSelectorProps) {
   const [embedLink, setEmbedLink] = useState('');
-  const { tabs = [], children, onImageSelect } = props;
+  const tabs: [string, ReactNode][] = [];
+
+  if (galleryImages) {
+    tabs.push([
+      'Gallery',
+      <ImageSelectorGallery
+        onImageClick={onImageSelect}
+        items={galleryImages}
+      />
+    ]);
+  }
+
   return (
     <PopperPopup popupContent={(
       <Box sx={{
