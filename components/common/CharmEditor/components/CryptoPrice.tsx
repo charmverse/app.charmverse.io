@@ -39,9 +39,9 @@ export function cryptoPriceSpec () {
         }
       },
       group: 'block',
-      parseDOM: [{ tag: 'div.cryptoPrice' }],
+      parseDOM: [{ tag: 'div.crypto-price' }],
       toDOM: (): DOMOutputSpec => {
-        return ['div.cryptoPrice', 0];
+        return ['div.crypto-price', 0];
       }
     },
     markdown: {

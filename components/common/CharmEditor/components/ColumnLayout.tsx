@@ -16,9 +16,9 @@ function specFactory (): RawSpecs {
       content: 'columnBlock*',
       group: 'block',
       draggable: false,
-      parseDOM: [{ tag: 'div' }],
+      parseDOM: [{ tag: 'div.charm-column-row' }],
       toDOM: (): DOMOutputSpec => {
-        return ['div', { class: 'column-layout' }];
+        return ['div', { class: 'charm-column-row' }];
       }
     },
     markdown: {
@@ -36,7 +36,7 @@ const StyledColumnLayout = styled(Box)<{colCount: number}>`
   & > .bangle-nv-child-container {
     height: 100%;
   }
-  
+
   & > .bangle-nv-child-container > .bangle-nv-content {
     display: grid;
     grid-template-columns: repeat(${({ colCount }) => colCount}, 1fr);

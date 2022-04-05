@@ -106,7 +106,7 @@ export function mentionSpecs (): RawSpecs {
         group: 'inline',
         draggable: true,
         atom: true,
-        parseDOM: [{ tag: 'span' }],
+        parseDOM: [{ tag: 'span.mention-value' }],
         toDOM: (): DOMOutputSpec => {
           return ['span', { class: 'mention-value' }];
         }
