@@ -64,7 +64,7 @@ function BreadCrumbs ({ items }: {items: {
   return (
     <BreadCrumb>
       {items.map((item, itemIndex) => {
-        const itemTitle = item.title ?? 'Untitled';
+        const itemTitle = item.title || 'Untitled';
         const currentPageCrumb = (
           <Box display='flex'>
             {item.icon && <StyledPageIcon icon={item.icon} />}
