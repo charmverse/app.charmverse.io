@@ -34,13 +34,6 @@ interface PageBreadCrumb {
   title: string;
 }
 
-/* <Box sx={{
-  flex: 1,
-  display: 'flex',
-  alignItems: 'center',
-  gap: 2
-}}
-> */
 function WorkspacePageTitle () {
   const router = useRouter();
   const { currentPageId, pages, isEditing } = usePages();
@@ -91,7 +84,7 @@ function WorkspacePageTitle () {
           {currentPage.title || 'Untitled'}
         </PageTitleWrapper>
       )}
-      {true && (
+      {isEditing && (
         <Box sx={{
           display: 'inline-flex',
           alignItems: 'center',
