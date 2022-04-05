@@ -1,5 +1,52 @@
 import { Page } from '@prisma/client';
 
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    CardProperty:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        name:
+ *          type: string
+ *          example: Status
+ *        type:
+ *          type: string
+ *          example: select
+ *        options:
+ *          required: false
+ *          type: array
+ *          items:
+ *            type: object
+ *            properties:
+*               id:
+*                 type: string
+*                 example: a6f7c9ac-d660-44ba-a64a-3198e012277f
+*               color:
+*                 type: string
+*                 example: propColorGreen
+*               value:
+*                 type: string
+*                 example: Complete
+*/
+
+export interface CardProperty {
+  id: string;
+  name: string
+  type: string
+  options: {
+    id: string
+    color: string
+    value: string
+  } []
+}
+
 export interface ApiPage extends Pick<Page, 'id' | 'createdAt' | 'type' | 'title' | 'content'> {
   url: string
 }
@@ -33,6 +80,12 @@ export interface ApiPage extends Pick<Page, 'id' | 'createdAt' | 'type' | 'title
  *        url:
  *          type: string
  *          example: https://app.charmverse.io/my-workspace/page-5985679461310778
+ *        schema:
+ *          type: array
+ *          items:
+ *            type: object
+ *            $ref: '#/components/schemas/CardProperty'
+ *
  */
 
 export interface BoardPage extends ApiPage {
@@ -85,5 +138,6 @@ export interface Card {
   content: string
   title: string
   isTemplate: boolean
-  properties: any
+  properties: Record<string, string | number>
 }
+

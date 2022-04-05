@@ -94,18 +94,20 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  * /databases/{databaseId}:
  *   post:
  *     summary: Search tasks in database
- *     description: To use your custom attributes, get the ID of each field property from the database endpoint and append it to filter ie. 'filter.abce33e-222e=abbbsjs-223783&filter.a772eb67f-222e=abbbeac89a-223783'
- *     parameters:
- *     - in: query
- *       name: filter.xxx
- *       schema:
- *         type: string
- *       required: false
- *     - in: query
- *       name: filter.yyy
- *       schema:
- *         type: string
- *       required: false
+ *     description: Get the available field names from the schema in the board. You can then query using its values.<br/><br/>The below example properties are only for illustrative purposes.
+ *     requestBody:
+ *       content:
+ *          application/json:
+ *             schema:
+ *                type: object
+ *                properties:
+ *                  Status:
+ *                    type: string
+ *                    required: false
+ *                    example: Complete
+ *                  Person:
+ *                    type: string
+ *                    example: 4ea4d01a-2dee-415a-92b7-09ac648f6d06
  *     responses:
  *       200:
  *         description: Summary of the database
@@ -115,7 +117,10 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  *                $ref: '#/components/schemas/Card'
  */
 async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
-  const { id } = req.query;
+
+  const searchQuery = req.body;
+
+  const { id } = searchQuery;
 
   const [board, cards] = await Promise.all([
     prisma.block.findFirst({
@@ -134,8 +139,8 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   const boardSchema: any[] = (board?.fields as any)?.cardProperties ?? [];
 
-  const applicableFilters = Object.keys(req.query).filter(key => {
-    return key.match('filter.') !== null;
+  const applicableFilters = Object.keys(searchQuery).filter(key => {
+    return boardSchema;
   })
     .map(filter => filter.replace('filter.', '').trim())
     .filter(filterKey => {
@@ -149,7 +154,7 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   if (applicableFilters.length > 0) {
     cardsToReturn = cardsToReturn.filter(card => {
       for (const filterKey of applicableFilters) {
-        const searchValue = req.query[`filter.${filterKey}`];
+        const searchValue = searchQuery[`filter.${filterKey}`];
         if ((card.fields as any).properties[filterKey] !== searchValue) {
           return false;
         }
@@ -158,6 +163,8 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     });
 
   }
+
+  console.log('Returned', cardsToReturn.length);
 
   return res.status(200).send(cardsToReturn);
 
