@@ -20,6 +20,16 @@ const BreadCrumb = styled.span`
   }
 `;
 
+const PageIcon = styled(StyledPageIcon)`
+  cursor: inherit;
+  display: inline;
+  // this is to vertically center images
+  img {
+    position: relative;
+    top: 3px;
+  }
+`;
+
 function PageTitleWrapper ({ children, sx = {} }: { children: ReactNode, sx?: object }) {
   return (
     <Typography noWrap component='div' sx={{ fontWeight: 500, maxWidth: 500, textOverflow: 'ellipsis', ...sx }}>
@@ -67,7 +77,7 @@ function WorkspacePageTitle () {
           {crumb.path ? (
             <Link href={`/${router.query.domain}/${crumb.path}`}>
               <PageTitleWrapper sx={{ maxWidth: 160 }}>
-                {crumb.icon && <StyledPageIcon icon={crumb.icon} style={{ display: 'inline' }} />}
+                {crumb.icon && <PageIcon icon={crumb.icon} />}
                 {crumb.title || 'Untitled'}
               </PageTitleWrapper>
             </Link>
@@ -80,7 +90,7 @@ function WorkspacePageTitle () {
       ))}
       {currentPage && (
         <PageTitleWrapper sx={{ maxWidth: 240 }}>
-          {currentPage.icon && <StyledPageIcon icon={currentPage.icon} style={{ display: 'inline' }} />}
+          {currentPage.icon && <PageIcon icon={currentPage.icon} />}
           {currentPage.title || 'Untitled'}
         </PageTitleWrapper>
       )}
