@@ -158,7 +158,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
       }
     }
     return currentPageParentChain.reverse();
-  }, [pages]);
+  }, [pages, currentPage]);
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
