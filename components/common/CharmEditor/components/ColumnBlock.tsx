@@ -18,9 +18,9 @@ function specFactory (): RawSpecs {
       content: 'block*',
       group: 'block',
       draggable: false,
-      parseDOM: [{ tag: 'div' }],
+      parseDOM: [{ tag: 'div.charm-column' }],
       toDOM: (): DOMOutputSpec => {
-        return ['div', 0];
+        return ['div.charm-column', 0];
       }
     },
     markdown: {
@@ -34,7 +34,7 @@ const StyledColumnBlock = styled(Box)`
   padding: ${({ theme }) => theme.spacing(1, 2)};
   position: relative;
   transition: background-color 250ms ease-in-out;
-  
+
   &:hover {
     transition: background-color 250ms ease-in-out;
     background-color: ${({ theme }) => theme.palette.background.light};

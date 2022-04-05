@@ -106,9 +106,9 @@ export function mentionSpecs (): RawSpecs {
         group: 'inline',
         draggable: true,
         atom: true,
-        parseDOM: [{ tag: 'span' }],
+        parseDOM: [{ tag: 'span.charm-mention-value' }],
         toDOM: (): DOMOutputSpec => {
-          return ['span', { class: 'mention-value' }];
+          return ['span', { class: 'charm-mention-value' }];
         }
       },
       markdown: {
