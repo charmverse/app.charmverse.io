@@ -1,12 +1,12 @@
 
-import { Block } from '@prisma/client';
+import { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey, getSpaceFromApiKey } from 'lib/middleware';
 import { filterObjectKeys } from 'lib/utilities/objects';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { validate } from 'uuid';
-import { BoardPage, CardProperty } from '../interfaces';
+import { BoardPage, CardProperty, CardQuery } from '../interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -73,7 +73,7 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
   console.log('Database', database, 'board', board);
 
   if (!database || !board) {
-    return res.status(400).send({ error: 'Database not found' });
+    return res.status(404).send({ error: 'Database not found' });
   }
 
   const filteredDatabaseObject = filterObjectKeys(database as any as BoardPage, 'include', ['id', 'createdAt', 'type', 'title', 'content', 'url']);
@@ -100,14 +100,7 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  *          application/json:
  *             schema:
  *                type: object
- *                properties:
- *                  Status:
- *                    type: string
- *                    required: false
- *                    example: Complete
- *                  Person:
- *                    type: string
- *                    example: 4ea4d01a-2dee-415a-92b7-09ac648f6d06
+ *                $ref: '#/components/schemas/CardQuery'
  *     responses:
  *       200:
  *         description: Summary of the database
@@ -118,58 +111,80 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  */
 async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
-  const searchQuery = req.body;
+  const searchQuery = req.body as CardQuery;
 
-  const { id } = searchQuery;
+  const { id } = req.query;
 
-  const [board, cards] = await Promise.all([
-    prisma.block.findFirst({
-      where: {
-        type: 'board',
-        id: id as string
+  const board = await prisma.block.findFirst({
+    where: {
+      type: 'board',
+      id: id as string
+    }
+  });
+
+  if (!board) {
+    return res.status(404).send({ error: 'Board not found' });
+  }
+
+  if (!searchQuery.cardProperties || typeof searchQuery.cardProperties !== 'object' || searchQuery.cardProperties instanceof Array) {
+    return res.status(400).send({
+      error: 'Request body should contain a cardProperties object'
+    });
+  }
+
+  const nestedJsonQuery: Prisma.NestedJsonFilter [] = [];
+
+  const queryProperties = Object.keys(searchQuery.cardProperties);
+
+  const boardSchema = (board.fields as any).cardProperties as CardProperty[];
+
+  for (const property of queryProperties) {
+    const propertySchema = boardSchema.find(cardProp => cardProp.name === property);
+
+    if (!propertySchema) {
+      return res.status(400).send({
+        error: `Field '${property}' does not exist on this database`
+      });
+    }
+
+    let searchValue = searchQuery.cardProperties[property];
+
+    if (propertySchema.type === 'select' || propertySchema.type === 'multiSelect') {
+      const matchedOption = propertySchema.options.find(option => option.value === searchValue);
+
+      if (!matchedOption) {
+        return res.status(400).send({
+          error: `Value '${searchValue}' is not a valid option for field ${propertySchema.name}`
+        });
       }
-    }),
-    prisma.block.findMany({
-      where: {
-        rootId: id as string,
-        type: 'card'
+      else {
+        searchValue = matchedOption.id;
       }
-    })
-  ]);
 
-  const boardSchema: CardProperty[] = (board?.fields as any)?.cardProperties ?? [];
+    }
 
-  const applicableProperties = Object.keys(searchQuery).map(key => {
-    return boardSchema.find(property => property.name === key);
-  })
-    .filter(property => property !== undefined) as CardProperty [];
-
-  let cardsToReturn = cards.slice();
-
-  if (applicableProperties.length > 0) {
-    cardsToReturn = cardsToReturn.filter(card => {
-      for (const cardProperty of applicableProperties) {
-
-        let searchValue = searchQuery[cardProperty?.name];
-
-        if (cardProperty.type === 'select' || cardProperty.type === 'multiSelect') {
-          searchValue = cardProperty.options?.find(option => option.value === searchValue)?.id;
-        }
-
-        // Focalboard stores select values with a uuid for the corresponding option
-
-        if ((card.fields as any).properties[cardProperty.id] !== searchValue) {
-          return false;
-        }
-      }
-      return true;
+    nestedJsonQuery.push({
+      path: ['properties', propertySchema.id],
+      equals: searchValue
     });
 
   }
 
-  console.log('Returned', cardsToReturn.length);
+  const cards = await prisma.block.findMany({
+    where: {
+      rootId: id as string,
+      type: 'card',
+      AND: nestedJsonQuery.map(nestedJson => {
+        return {
+          fields: nestedJson
+        };
+      })
+    }
+  });
 
-  return res.status(200).send(cardsToReturn);
+  console.log('Found cards', cards.length);
+
+  return res.status(200).send(cards);
 
 }
 
