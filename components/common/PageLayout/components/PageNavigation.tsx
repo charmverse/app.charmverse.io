@@ -128,7 +128,7 @@ const PageAnchor = styled.a`
   }
 `;
 
-const StyledPageIcon = styled(EmojiIcon)`
+export const StyledPageIcon = styled(EmojiIcon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
