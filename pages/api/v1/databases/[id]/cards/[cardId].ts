@@ -3,7 +3,8 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Card } from 'pages/api/v1/databases/interfaces';
+import { Card, CardProperty } from 'pages/api/v1/databases/interfaces';
+import { CardFromBlock } from 'pages/api/v1/databases/card.class';
 import { convertPageContentToMarkdown } from 'components/common/CharmEditor/CharmEditor';
 import { PageContent } from 'models';
 
@@ -30,47 +31,43 @@ async function getCard (req: NextApiRequest, res: NextApiResponse) {
 
   const { cardId, id } = req.query;
 
-  const card = await prisma.block.findFirst({
-    where: {
-      type: 'card',
-      id: cardId as string,
-      rootId: id as string
-    }
-  });
-
-  if (!card) {
-    return res.status(404).send({ error: 'Card not found' });
-  }
-
-  const [board, cardPageContent] = await Promise.all([
+  const [board, card] = await Promise.all([
     prisma.block.findFirst({
       where: {
         // Parameter only added for documentation purposes. All cards linked to a root board
         type: 'board',
-        id: card.rootId
+        id: id as string
       }
     }),
     prisma.block.findFirst({
       where: {
-        type: 'charm_text',
-        parentId: card.id
+        type: 'card',
+        id: cardId as string,
+        rootId: id as string
       }
-    }) as any
+    })
   ]);
+
+  if (!board) {
+    return res.status(404).send({ error: 'Board not found' });
+  }
+  if (!card) {
+    return res.status(404).send({ error: 'Card not found' });
+  }
+
+  const cardPageContent = await prisma.block.findFirst({
+    where: {
+      type: 'charm_text',
+      parentId: card.id
+    }
+  }) as any;
+
+  const boardSchema = (board.fields as any).cardProperties as CardProperty[];
 
   const markdown = '';
   // convertPageContentToMarkdown(cardPageContent, card.title);
 
-  const cardToReturn: Card = {
-    id: card.id,
-    createdAt: new Date(card.createdAt).toISOString(),
-    updatedAt: new Date(card.updatedAt).toISOString(),
-    databaseId: card.rootId,
-    title: card.title,
-    content: markdown,
-    isTemplate: (card.fields as any).isTemplate === true,
-    cardProperties: (card.fields as any).properties
-  };
+  const cardToReturn = new CardFromBlock(card, boardSchema);
 
   return res.status(200).json(cardToReturn);
 }

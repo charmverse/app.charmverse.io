@@ -6,6 +6,7 @@ import { filterObjectKeys } from 'lib/utilities/objects';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { validate } from 'uuid';
+import { CardFromBlock } from 'pages/api/v1/databases/card.class';
 import { BoardPage, CardProperty, CardQuery } from '../interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -170,7 +171,7 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   }
 
-  const cards = await prisma.block.findMany({
+  const cards = (await prisma.block.findMany({
     where: {
       rootId: id as string,
       type: 'card',
@@ -180,7 +181,7 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
         };
       })
     }
-  });
+  })).map(card => new CardFromBlock(card, boardSchema));
 
   console.log('Found cards', cards.length);
 
