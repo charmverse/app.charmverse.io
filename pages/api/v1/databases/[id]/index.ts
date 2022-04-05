@@ -6,7 +6,7 @@ import { filterObjectKeys } from 'lib/utilities/objects';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { validate } from 'uuid';
-import { BoardPage } from '../interfaces';
+import { BoardPage, CardProperty } from '../interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -137,25 +137,28 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     })
   ]);
 
-  const boardSchema: any[] = (board?.fields as any)?.cardProperties ?? [];
+  const boardSchema: CardProperty[] = (board?.fields as any)?.cardProperties ?? [];
 
-  const applicableFilters = Object.keys(searchQuery).filter(key => {
-    return boardSchema;
+  const applicableProperties = Object.keys(searchQuery).map(key => {
+    return boardSchema.find(property => property.name === key);
   })
-    .map(filter => filter.replace('filter.', '').trim())
-    .filter(filterKey => {
-      return boardSchema.find(property => property.id === filterKey);
-    });
+    .filter(property => property !== undefined) as CardProperty [];
 
   let cardsToReturn = cards.slice();
 
-  console.log('Found cards', cardsToReturn.length);
-
-  if (applicableFilters.length > 0) {
+  if (applicableProperties.length > 0) {
     cardsToReturn = cardsToReturn.filter(card => {
-      for (const filterKey of applicableFilters) {
-        const searchValue = searchQuery[`filter.${filterKey}`];
-        if ((card.fields as any).properties[filterKey] !== searchValue) {
+      for (const cardProperty of applicableProperties) {
+
+        let searchValue = searchQuery[cardProperty?.name];
+
+        if (cardProperty.type === 'select' || cardProperty.type === 'multiSelect') {
+          searchValue = cardProperty.options?.find(option => option.value === searchValue)?.id;
+        }
+
+        // Focalboard stores select values with a uuid for the corresponding option
+
+        if ((card.fields as any).properties[cardProperty.id] !== searchValue) {
           return false;
         }
       }
