@@ -35,7 +35,7 @@ interface TelegramUser {
   username: string
 }
 
-const DiscordUserName = styled(Typography)`
+const UserName = styled(Typography)`
   position: relative;
   top: 4px;
 `;
@@ -150,7 +150,7 @@ function AccountModal ({ isOpen, onClose }:
         <Stack mb={2} direction='row' spacing='4' alignItems='center'>
           <Avatar name={ENSName || user.username || user.addresses[0]} avatar={user.avatar} />
           <CopyableAddress address={user.addresses[0]} decimals={5} sx={{ fontSize: 24 }} />
-          {connectedWithDiscord && <DiscordUserName variant='subtitle2'>{user.username}</DiscordUserName>}
+          {user.username && <UserName variant='subtitle2'>{user.username}</UserName>}
         </Stack>
       )}
       <Stack
@@ -213,7 +213,7 @@ function AccountModal ({ isOpen, onClose }:
         >
           Connect
           <div style={{
-            visibility: 'hidden',
+            opacity: 0,
             width: '100%',
             position: 'absolute',
             height: '100%'
