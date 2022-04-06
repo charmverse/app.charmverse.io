@@ -27,8 +27,6 @@ export class CardFromBlock implements Card {
     this.updatedAt = new Date(block.createdAt).toISOString();
     this.databaseId = block.rootId;
     this.content = pageContent ? convertPageContentToMarkdown(pageContent) : '';
-    console.log('Converting content', pageContent);
-    console.log('As markdown', this.content);
     this.title = block.title;
     this.isTemplate = (block.fields as any).isTemplate === true;
     this.cardProperties = this.parseProperties((block.fields as any).properties, propertySchemas);

@@ -3,10 +3,10 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { CardFromBlock } from 'pages/api/v1/databases/card.class';
+import { CardFromBlock } from 'lib/blocks-api/card.class';
 import { v4 } from 'uuid';
-import { Card, CardProperty } from '../../interfaces';
-import { mapProperties } from '../mapProperties';
+import { Card, CardProperty } from 'lib/blocks-api/interfaces';
+import { mapProperties } from 'lib/blocks-api/mapProperties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
