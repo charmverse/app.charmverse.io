@@ -23,9 +23,7 @@ import charmClient from 'charmClient';
 import log from 'lib/log';
 import { LoggedInUser } from 'models';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { TelegramLoginButton } from './components/TelegramLoginButton';
-
-const TELEGRAM_BOT_ID = 5220052197;
+import TelegramLoginIframe, { loginWithTelegram } from './components/TelegramLoginIframe';
 
 const UserName = styled(Typography)`
   position: relative;
@@ -136,40 +134,22 @@ function AccountModal ({ isOpen, onClose }:
     }
   }
 
-  async function connectWithTelegram (telegramAccount: TelegramAccount) {
-    if (!connectedWithTelegram) {
-      setIsConnectingTelegram(true);
-      try {
-        const telegramUser = await charmClient.connectTelegram(telegramAccount);
-        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
+  function connectToTelegram () {
+    loginWithTelegram(async (telegramAccount: TelegramAccount) => {
+      if (telegramAccount) {
+        try {
+          const telegramUser = await charmClient.connectTelegram(telegramAccount);
+          setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
+        }
+        catch (err: any) {
+          setTelegramError(err.error || 'Something went wrong. Please try again');
+        }
       }
-      catch (err: any) {
-        setTelegramError(err.error || 'Something went wrong. Please try again');
+      else {
+        setTelegramError('Something went wrong. Please try again');
       }
       setIsConnectingTelegram(false);
-    }
-  }
-
-  function connectTelegram () {
-    // @ts-ignore - defined by the script: https://telegram.org/js/telegram-widget.js
-    window.Telegram.Login.auth(
-      { bot_id: TELEGRAM_BOT_ID, request_access: true },
-      async (telegramAccount: TelegramAccount, r) => {
-        if (telegramAccount) {
-          try {
-            const telegramUser = await charmClient.connectTelegram(telegramAccount);
-            setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
-          }
-          catch (err: any) {
-            setTelegramError(err.error || 'Something went wrong. Please try again');
-          }
-        }
-        else {
-          setTelegramError('Something went wrong. Please try again');
-        }
-        setIsConnectingTelegram(false);
-      }
-    );
+    });
 
   }
 
@@ -244,30 +224,11 @@ function AccountModal ({ isOpen, onClose }:
           color={connectedWithTelegram ? 'error' : 'primary'}
           disabled={isLoggingOut || isConnectingTelegram}
           loading={isConnectingTelegram}
-          onClick={() => connectedWithTelegram ? disconnectFromTelegram() : connectTelegram()}
+          onClick={() => connectedWithTelegram ? disconnectFromTelegram() : connectToTelegram()}
         >
-          {connectedWithTelegram ? (
-            <>Disconnect</>
-          ) : (
-            <>
-              Connect
-              <div style={{
-                cursor: 'pointer',
-                opacity: 0,
-                pointerEvents: 'none',
-                position: 'absolute',
-                height: '100%',
-                left: '-50px'
-              }}
-              >
-                <TelegramLoginButton
-                  dataOnauth={connectWithTelegram}
-                  botName='charm2_bot'
-                />
-              </div>
-            </>
-          )}
+          {connectedWithTelegram ? 'Disconnect' : 'Connect'}
         </StyledButton>
+        <TelegramLoginIframe />
       </Stack>
       {telegramError && (
         <Alert severity='error'>
