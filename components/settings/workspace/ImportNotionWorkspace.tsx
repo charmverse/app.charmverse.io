@@ -12,44 +12,50 @@ import { useRouter } from 'next/router';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
 
+interface NotionResponseState {
+  error?: string;
+  loading: boolean;
+  warning?: string;
+  failedImports?: FailedImportsError[];
+}
+
 export default function ImportNotionWorkspace () {
   const router = useRouter();
-  const [notionFailedImports, setNotionFailedImports] = useState<FailedImportsError[]>([]);
-  const [notionImportError, setNotionImportError] = useState<string | null>(null);
+  const [notionState, setNotionState] = useState<NotionResponseState>({ loading: false });
   const { showMessage } = useSnackbar();
-  const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const { mutate } = useSWRConfig();
   const [space] = useCurrentSpace();
 
   useEffect(() => {
-    if (space && typeof router.query.code === 'string' && router.query.notion === '1' && !isImportingFromNotion) {
-      setIsImportingFromNotion(true);
-      setNotionFailedImports([]);
+    if (space && typeof router.query.code === 'string' && router.query.notion === '1' && !notionState.loading) {
+      setNotionState({ failedImports: [], loading: true });
       setModalOpen(true);
       charmClient.importFromNotion({
         code: router.query.code,
         spaceId: space.id
       })
         .then(({ failedImports }) => {
-          setIsImportingFromNotion(false);
+          setNotionState({ failedImports, loading: false });
           mutate(`pages/${space.id}`);
-          if (failedImports.length > 0) {
-            setNotionFailedImports(failedImports);
-          }
-          else {
+          if (failedImports.length === 0) {
             showMessage('Notion workspace successfully imported');
             closeModal();
           }
         })
         .catch((err) => {
           if (err.status === 504) {
-            setNotionImportError('Timed out waiting for a response. Please come back later, it can take up to an hour if you are importing a lot of pages!');
+            setNotionState({
+              loading: false,
+              warning: 'It can take up to an hour to import large Notion spaces. Your data will appear on the left navigation when the import is completed.'
+            });
           }
           else {
-            setNotionImportError(err.message ?? err.error ?? 'Something went wrong. Please try again');
+            setNotionState({
+              loading: false,
+              error: err.message ?? err.error ?? 'Something went wrong. Please try again'
+            });
           }
-          setIsImportingFromNotion(false);
         });
     }
   }, [space]);
@@ -61,33 +67,32 @@ export default function ImportNotionWorkspace () {
   return (
     <div>
       <Button
-        disabled={isImportingFromNotion}
-        loading={isImportingFromNotion}
+        loading={notionState.loading}
         href={`/api/notion/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
         variant='outlined'
         startIcon={(
           <SvgIcon sx={{ color: 'text.primary' }}>
             <NotionIcon />
           </SvgIcon>
-      )}
+        )}
       >
-        {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
+        {notionState.loading ? 'Importing pages from Notion' : 'Import pages from Notion'}
       </Button>
       <Modal open={modalOpen} onClose={closeModal} size='fluid'>
         <Box display='flex' alignItems='center' gap={2} flexDirection='column'>
-          {!notionImportError && notionFailedImports.length === 0 && <CircularProgress size={20} />}
+          {notionState.loading && <CircularProgress size={20} />}
           <Typography sx={{ mb: 0 }}>
             Importing your files from Notion. This might take a few minutes...
           </Typography>
         </Box>
-        {notionFailedImports.length !== 0 && (
+        {notionState.failedImports && notionState.failedImports?.length !== 0 && (
           <Alert severity='warning' sx={{ mt: 2 }}>
             <Box sx={{
               display: 'flex', gap: 2, flexDirection: 'column'
             }}
             >
               Pages where we encountered issues
-              {notionFailedImports.map(failedImport => (
+              {notionState.failedImports.map(failedImport => (
                 <div>
                   <Box sx={{
                     display: 'flex',
@@ -113,9 +118,9 @@ export default function ImportNotionWorkspace () {
             </Box>
           </Alert>
         )}
-        {notionImportError && (
-          <Alert severity='error' sx={{ mt: 2 }}>
-            {notionImportError}
+        {(notionState.error || notionState.warning) && (
+          <Alert severity={notionState.error ? 'error' : 'warning'} sx={{ mt: 2 }}>
+            {notionState.error || notionState.warning}
           </Alert>
         )}
       </Modal>
