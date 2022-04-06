@@ -1,7 +1,7 @@
 import { generatePath } from 'lib/utilities/strings';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
-import { useMemo, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import { sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
@@ -118,9 +118,9 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
     // router.push({ pathname: newPath, query }, undefined, { scroll: false, shallow: true });
   }, [router.query.viewId]);
 
-  const viewsToProvide = useMemo(() => readonly ? boardViews.filter(view => {
+  const viewsToProvide = readonly ? boardViews.filter(view => {
     return view.id === activeView?.id;
-  }) : boardViews, [readonly, activeView, boardViews]);
+  }) : boardViews;
 
   if (board && activeView) {
     let property = groupByProperty;
@@ -155,7 +155,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
               activeView={activeView}
               views={viewsToProvide}
               cards={cards}
-              key={router.query.cardId}
+              key={shownCardId}
               cardId={shownCardId}
               onClose={() => showCard(undefined)}
               showCard={(cardId) => showCard(cardId)}

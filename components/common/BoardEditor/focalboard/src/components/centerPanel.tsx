@@ -353,7 +353,7 @@ class CenterPanel extends React.PureComponent<Props, State> {
     }
 
     private showCard = (cardId?: string) => {
-            this.setState({selectedCardIds: []})
+        this.setState({selectedCardIds: []})
         this.props.showCard(cardId)
     }
 

@@ -106,7 +106,7 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
       setPagePermissions(permissions);
     }
   }, [user, currentPageId]);
-  console.log('rerender pageId');
+
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
