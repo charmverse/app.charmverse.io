@@ -150,6 +150,9 @@ export interface Card {
  *    CardQuery:
  *      type: object
  *      properties:
+ *        title:
+ *          type: string
+ *          example: Review grants for next funding cycle
  *        cardProperties:
  *          type: object
  *          properties:
@@ -161,6 +164,19 @@ export interface Card {
  *              example: High
  *
  */
-export interface CardQuery {
-  cardProperties: Record<string, string | number>
+export type CardQuery = Partial<Pick<Card, 'title' | 'cardProperties' | 'content'>>
+
+/**
+ *
+ * @property cursor undefined if hasNext is false
+ */
+export interface PaginatedResponse<T> {
+  data: T[]
+  hasNext: boolean
+  cursor?: string
+}
+
+export type PaginatedQuery<T> = T & {
+  cursor?: string
+  limit?: number
 }

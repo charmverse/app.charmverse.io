@@ -7,7 +7,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { CardFromBlock } from 'pages/api/v1/databases/card.class';
 import { validate } from 'uuid';
-import { BoardPage, CardProperty, CardQuery, PaginatedQuery } from '../interfaces';
+import { BoardPage, CardProperty, CardQuery, PaginatedQuery, PaginatedResponse, Card } from '../interfaces';
 import { mapProperties } from './mapProperties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -183,9 +183,25 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     };
   }
 
-  const cards = (await prisma.block.findMany({
+  const prismaQueryWithCursor: Prisma.BlockFindManyArgs = {
     where: queryContent
-  }));
+  };
+
+  if (searchQuery.cursor) {
+    prismaQueryWithCursor.cursor = { id: searchQuery.cursor };
+    prismaQueryWithCursor.skip = 1;
+  }
+
+  const maxRecordsPerQuery = 100;
+
+  if (searchQuery.limit) {
+    prismaQueryWithCursor.take = Math.min(maxRecordsPerQuery, searchQuery.limit);
+  }
+  else {
+    prismaQueryWithCursor.take = maxRecordsPerQuery;
+  }
+
+  const cards = (await prisma.block.findMany(prismaQueryWithCursor));
 
   const cardsPageContent = await prisma.block.findMany({
     where: {
@@ -205,9 +221,39 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   });
 
+  let hasNext = false;
+  let cursor: string | undefined;
+
+  if (cardsWithContent.length > 0) {
+
+    const lastCardId = cards[cards.length - 1].id;
+
+    const remainingRecords = await prisma.block.count({
+      cursor: {
+        id: lastCardId
+      },
+      skip: 1,
+      where: {
+        parentId: id as string,
+        type: 'card'
+      }
+    });
+
+    if (remainingRecords > 0) {
+      hasNext = true;
+      cursor = lastCardId;
+    }
+  }
+
+  const paginatedResponse: PaginatedResponse<Card> = {
+    hasNext,
+    cursor,
+    data: cardsWithContent
+  };
+
   console.log('Found cards', cards.length);
 
-  return res.status(200).send(cardsWithContent);
+  return res.status(200).send(paginatedResponse);
 
 }
 export default handler;
