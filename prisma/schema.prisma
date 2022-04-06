@@ -89,10 +89,10 @@ model Block {
   id        String    @id @db.Uuid
   deletedAt DateTime?
   createdAt DateTime  @default(now())
-  createdBy String    @db.Uuid
-  user      User      @relation(fields: [createdBy], references: [id])
+  createdBy String?    @db.Uuid
+  user      User?      @relation(fields: [createdBy], references: [id])
   updatedAt DateTime  @default(now())
-  updatedBy String    @db.Uuid
+  updatedBy String?    @db.Uuid
   spaceId   String    @db.Uuid
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   parentId  String

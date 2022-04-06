@@ -28,8 +28,8 @@ interface Block {
     spaceId: string
     parentId: string
     rootId: string
-    createdBy: string
-    updatedBy: string
+    createdBy?: string | null
+    updatedBy?: string | null
 
     schema: number
     type: BlockTypes
