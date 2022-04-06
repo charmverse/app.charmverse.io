@@ -119,7 +119,9 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       discordUser: true,
       telegramUser: true
     },
-    data: req.body
+    data: {
+      addresses: req.body.addresses
+    }
   });
   return res.status(200).json(user);
 }

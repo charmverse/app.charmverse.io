@@ -60,8 +60,8 @@ class CharmClient {
     });
   }
 
-  updateUser (payload: { username?: string, avatar?: string, addresses?: string[] }) {
-    return http.PUT<LoggedInUser>('/api/profile', payload);
+  updateUser ({ addresses }: { addresses?: string[] }) {
+    return http.PUT<LoggedInUser>('/api/profile', addresses);
   }
 
   async createSpace (spaceOpts: Prisma.SpaceCreateInput) {
