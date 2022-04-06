@@ -1,13 +1,12 @@
 
 import { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireApiKey, getSpaceFromApiKey } from 'lib/middleware';
+import { getSpaceFromApiKey, onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { filterObjectKeys } from 'lib/utilities/objects';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { validate } from 'uuid';
 import { CardFromBlock } from 'pages/api/v1/databases/card.class';
-import fs from 'node:fs';
+import { validate } from 'uuid';
 import { BoardPage, CardProperty, CardQuery } from '../interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -87,6 +86,8 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
   console.log('BOARD', board);
 
   (filteredDatabaseObject as any).schema = (board as any).fields.cardProperties;
+  filteredDatabaseObject.id = board.id;
+  filteredDatabaseObject.content = '';
 
   return res.status(200).json(filteredDatabaseObject);
 }
@@ -207,5 +208,4 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).send(cardsWithContent);
 
 }
-
 export default handler;

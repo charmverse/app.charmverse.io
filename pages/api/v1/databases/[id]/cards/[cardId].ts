@@ -3,10 +3,8 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Card, CardProperty } from 'pages/api/v1/databases/interfaces';
 import { CardFromBlock } from 'pages/api/v1/databases/card.class';
-import { convertPageContentToMarkdown } from 'components/common/CharmEditor/CharmEditor';
-import { PageContent } from 'models';
+import { CardProperty } from 'pages/api/v1/databases/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
