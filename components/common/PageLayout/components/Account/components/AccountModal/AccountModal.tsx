@@ -21,8 +21,11 @@ import { CircularProgress, Tooltip } from '@mui/material';
 import charmClient from 'charmClient';
 
 import log from 'lib/log';
+import { LoggedInUser } from 'models';
+import { TelegramAccount } from 'pages/api/telegram/connect';
+import { TelegramLoginButton } from 'components/common/TelegramLoginButton';
 
-const DiscordUserName = styled(Typography)`
+const UserName = styled(Typography)`
   position: relative;
   top: 4px;
 `;
@@ -37,9 +40,11 @@ function AccountModal ({ isOpen, onClose }:
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
   const [user, setUser] = useUser();
-  const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [isDisconnectingDiscord, setIsDisconnectingDiscord] = useState(false);
+  const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
   const [isLoggingOut, setisLoggingOut] = useState(false);
   const [discordError, setDiscordError] = useState('');
+  const [telegramError, setTelegramError] = useState('');
   const router = useRouter();
   const [space] = useCurrentSpace();
   const isConnectingToDiscord = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'connect';
@@ -48,6 +53,7 @@ function AccountModal ({ isOpen, onClose }:
   const { showMessage } = useSnackbar();
 
   const connectedWithDiscord = Boolean(user?.discordUser);
+  const connectedWithTelegram = Boolean(user?.telegramUser);
 
   useEffect(() => {
     if (discordConnectFailed === true) {
@@ -97,7 +103,7 @@ function AccountModal ({ isOpen, onClose }:
   async function connectWithDiscord () {
     if (!isConnectDiscordLoading) {
       if (connectedWithDiscord) {
-        setIsDisconnecting(true);
+        setIsDisconnectingDiscord(true);
         try {
           await charmClient.disconnectDiscord();
           setUser({ ...user, discordUser: null });
@@ -105,13 +111,41 @@ function AccountModal ({ isOpen, onClose }:
         catch (err) {
           log.warn('Error disconnecting from discord', err);
         }
-        setIsDisconnecting(false);
+        setIsDisconnectingDiscord(false);
       }
       else {
         window.location.replace(`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
       }
     }
-    setIsDisconnecting(false);
+    setIsDisconnectingDiscord(false);
+  }
+
+  async function disconnectFromTelegram () {
+    if (connectedWithTelegram) {
+      setIsConnectingTelegram(true);
+      try {
+        await charmClient.disconnectTelegram();
+        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: null }));
+      }
+      catch (err: any) {
+        setTelegramError(err.error || 'Something went wrong. Please try again');
+      }
+      setIsConnectingTelegram(false);
+    }
+  }
+
+  async function connectWithTelegram (telegramAccount: TelegramAccount) {
+    if (!connectedWithTelegram) {
+      setIsConnectingTelegram(true);
+      try {
+        const telegramUser = await charmClient.connectTelegram(telegramAccount);
+        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
+      }
+      catch (err: any) {
+        setTelegramError(err.error || 'Something went wrong. Please try again');
+      }
+      setIsConnectingTelegram(false);
+    }
   }
 
   function _onClose () {
@@ -126,7 +160,7 @@ function AccountModal ({ isOpen, onClose }:
         <Stack mb={2} direction='row' spacing='4' alignItems='center'>
           <Avatar name={ENSName || user.username || user.addresses[0]} avatar={user.avatar} />
           <CopyableAddress address={user.addresses[0]} decimals={5} sx={{ fontSize: 24 }} />
-          {connectedWithDiscord && <DiscordUserName variant='subtitle2'>{user.username}</DiscordUserName>}
+          {user.username && <UserName variant='subtitle2'>{user.username}</UserName>}
         </Stack>
       )}
       <Stack
@@ -158,7 +192,7 @@ function AccountModal ({ isOpen, onClose }:
               size='small'
               variant='outlined'
               color={connectedWithDiscord ? 'error' : 'primary'}
-              disabled={isLoggingOut || isDisconnecting || isConnectDiscordLoading || user?.addresses.length === 0}
+              disabled={isLoggingOut || isDisconnectingDiscord || isConnectDiscordLoading || user?.addresses.length === 0}
               onClick={connectWithDiscord}
               endIcon={(
                 isConnectDiscordLoading && <CircularProgress size={20} />
@@ -169,12 +203,58 @@ function AccountModal ({ isOpen, onClose }:
           </div>
         </Tooltip>
       </Stack>
+      <Stack
+        direction='row'
+        alignItems='center'
+        justifyContent='space-between'
+        my={1}
+      >
+        <Typography color='secondary'>
+          {connectedWithTelegram ? 'Connected with Telegram' : 'Connect with Telegram'}
+        </Typography>
+        <StyledButton
+          size='small'
+          variant='outlined'
+          color={connectedWithTelegram ? 'error' : 'primary'}
+          disabled={isLoggingOut || isConnectingTelegram}
+          endIcon={(
+            isConnectingTelegram && <CircularProgress size={20} />
+          )}
+        >
+          {connectedWithTelegram ? (
+            <div onClick={disconnectFromTelegram}>
+              Disconnect
+            </div>
+          ) : (
+            <>
+              Connect
+              <div style={{
+                opacity: 0,
+                width: '100%',
+                position: 'absolute',
+                height: '100%'
+              }}
+              >
+                <TelegramLoginButton
+                  dataOnauth={connectWithTelegram}
+                  botName='CharmVerseBot'
+                />
+              </div>
+            </>
+          )}
+        </StyledButton>
+      </Stack>
+      {telegramError && (
+        <Alert severity='error'>
+          {telegramError}
+        </Alert>
+      )}
       {discordError && (
         <Alert severity='error'>
           {discordError}
         </Alert>
       )}
-      {/* user cant be logged out so long as tehir wallet is connected (TODO: fix!) */}
+      {/* user cant be logged out so long as their wallet is connected (TODO: fix!) */}
       {!account && (
         <Box display='flex' justifyContent='flex-end' mt={2}>
           <StyledButton
