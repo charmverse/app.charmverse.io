@@ -24,7 +24,7 @@ export default function ImportNotionWorkspace () {
 
   const notionCode = getCookie(AUTH_CODE_COOKIE);
   const notionError = getCookie(AUTH_ERROR_COOKIE);
-  console.log(notionCode);
+
   useEffect(() => {
     if (space && notionCode && !isImportingFromNotion) {
       setIsImportingFromNotion(true);
@@ -63,7 +63,7 @@ export default function ImportNotionWorkspace () {
     if (notionError) {
       deleteCookie(AUTH_ERROR_COOKIE);
       setModalOpen(true);
-      setNotionImportError(AUTH_ERROR_COOKIE);
+      setNotionImportError(notionError);
     }
   }, []);
 
