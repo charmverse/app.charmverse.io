@@ -33,7 +33,7 @@ export const getStaticProps: GetStaticProps = async ctx => {
 
 export default function ApiDoc ({ spec }: InferGetStaticPropsType<typeof getStaticProps>) {
 
-  return (<SwaggerUI spec={spec}>s</SwaggerUI>);
+  return (<SwaggerUI spec={spec}></SwaggerUI>);
 //  ;
 }
 

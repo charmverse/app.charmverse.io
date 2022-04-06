@@ -14,6 +14,30 @@ handler
   .use(requireKeys<Card>(['title', 'cardProperties'], 'body'))
   .post(createCard);
 
+/**
+ * @swagger
+ * /databases/{databaseId}/cards:
+ *   post:
+ *     summary: Create a new card in the database
+ *     description: Create a new card with a title and any set of values from the custom properties in your database.
+ *     requestBody:
+ *       content:
+ *          application/json:
+ *                schema:
+ *                   type: object
+ *                   properties:
+ *                    title:
+ *                      type: string
+ *                    cardProperties:
+ *                      type: object
+ *     responses:
+ *       200:
+ *         description: Summary of the database
+ *         content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Card'
+ */
 async function createCard (req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
