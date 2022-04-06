@@ -126,9 +126,9 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Board not found' });
   }
 
-  if (!searchQuery.cardProperties || typeof searchQuery.cardProperties !== 'object' || searchQuery.cardProperties instanceof Array) {
+  if (searchQuery.cardProperties && (typeof searchQuery.cardProperties !== 'object' || searchQuery.cardProperties instanceof Array)) {
     return res.status(400).send({
-      error: 'Request body should contain a cardProperties object'
+      error: 'Optional key cardProperties must be an object if provided'
     });
   }
 
@@ -137,7 +137,7 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   const boardSchema = (board.fields as any).cardProperties as CardProperty[];
 
   try {
-    const queryProperties: Record<string, string | number> = mapProperties(searchQuery.cardProperties, boardSchema);
+    const queryProperties: Record<string, string | number> = mapProperties(searchQuery.cardProperties ?? {}, boardSchema);
 
     Object.entries(queryProperties).forEach(queryItem => {
       nestedJsonQuery.push({
@@ -151,16 +151,25 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).send(error);
   }
 
+  const queryContent: Prisma.BlockWhereInput = {
+    rootId: id as string,
+    type: 'card',
+    AND: nestedJsonQuery.map(nestedJson => {
+      return {
+        fields: nestedJson
+      };
+    })
+  };
+
+  if (searchQuery.title) {
+    queryContent.title = {
+      contains: searchQuery.title,
+      mode: 'insensitive'
+    };
+  }
+
   const cards = (await prisma.block.findMany({
-    where: {
-      rootId: id as string,
-      type: 'card',
-      AND: nestedJsonQuery.map(nestedJson => {
-        return {
-          fields: nestedJson
-        };
-      })
-    }
+    where: queryContent
   }));
 
   const cardsPageContent = await prisma.block.findMany({
