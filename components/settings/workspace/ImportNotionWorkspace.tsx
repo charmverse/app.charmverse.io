@@ -58,6 +58,15 @@ export default function ImportNotionWorkspace () {
     }
   }, [space]);
 
+  // show errors from server
+  useEffect(() => {
+    if (notionError) {
+      deleteCookie(AUTH_ERROR_COOKIE);
+      setModalOpen(true);
+      setNotionImportError(AUTH_ERROR_COOKIE);
+    }
+  }, []);
+
   function closeModal () {
     setModalOpen(false);
   }
