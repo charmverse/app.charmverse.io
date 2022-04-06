@@ -37,23 +37,6 @@ export class TelegramLoginButton extends React.Component<Props> {
 
     const script = document.createElement('script');
     script.src = `https://telegram.org/js/telegram-widget.js?${widgetVersion}`;
-    script.setAttribute('data-telegram-login', botName);
-    script.setAttribute('data-size', buttonSize);
-    if (cornerRadius !== undefined) {
-      script.setAttribute('data-radius', `${cornerRadius}`);
-    }
-    script.setAttribute('data-request-access', requestAccess);
-    script.setAttribute('data-userpic', `${usePic}`);
-    script.setAttribute('data-lang', lang);
-    if (dataAuthUrl !== undefined) {
-      script.setAttribute('data-auth-url', dataAuthUrl);
-    }
-    else {
-      script.setAttribute(
-        'data-onauth',
-        'TelegramLoginWidget.dataOnauth(user)'
-      );
-    }
     script.async = true;
     this.instance?.appendChild(script);
   }

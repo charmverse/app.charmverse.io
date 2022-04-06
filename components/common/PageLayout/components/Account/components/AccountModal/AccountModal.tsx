@@ -23,7 +23,9 @@ import charmClient from 'charmClient';
 import log from 'lib/log';
 import { LoggedInUser } from 'models';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { TelegramLoginButton } from 'components/common/TelegramLoginButton';
+import { TelegramLoginButton } from './components/TelegramLoginButton';
+
+const TELEGRAM_BOT_ID = 5220052197;
 
 const UserName = styled(Typography)`
   position: relative;
@@ -148,6 +150,25 @@ function AccountModal ({ isOpen, onClose }:
     }
   }
 
+  function connectTelegram () {
+    // @ts-ignore - defined by the script: https://telegram.org/js/telegram-widget.js
+    window.Telegram.Login.auth(
+      { bot_id: TELEGRAM_BOT_ID, request_access: true },
+      async (telegramAccount: TelegramAccount) => {
+        if (telegramAccount) {
+          // authorization failed
+          const telegramUser = await charmClient.connectTelegram(telegramAccount);
+          setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
+        }
+        else {
+          setTelegramError('Something went wrong. Please try again');
+        }
+        setIsConnectingTelegram(false);
+      }
+    );
+
+  }
+
   function _onClose () {
     router.replace(window.location.href.split('?')[0], undefined, { shallow: true });
     onClose();
@@ -215,29 +236,29 @@ function AccountModal ({ isOpen, onClose }:
         <StyledButton
           size='small'
           variant='outlined'
+          sx={{ overflow: 'hidden' }}
           color={connectedWithTelegram ? 'error' : 'primary'}
           disabled={isLoggingOut || isConnectingTelegram}
-          endIcon={(
-            isConnectingTelegram && <CircularProgress size={20} />
-          )}
+          loading={isConnectingTelegram}
+          onClick={() => connectedWithTelegram ? disconnectFromTelegram() : connectTelegram()}
         >
           {connectedWithTelegram ? (
-            <div onClick={disconnectFromTelegram}>
-              Disconnect
-            </div>
+            <>Disconnect</>
           ) : (
             <>
               Connect
               <div style={{
+                cursor: 'pointer',
                 opacity: 0,
-                width: '100%',
+                pointerEvents: 'none',
                 position: 'absolute',
-                height: '100%'
+                height: '100%',
+                left: '-50px'
               }}
               >
                 <TelegramLoginButton
                   dataOnauth={connectWithTelegram}
-                  botName='CharmVerseBot'
+                  botName='charm2_bot'
                 />
               </div>
             </>
