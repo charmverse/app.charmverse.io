@@ -59,9 +59,9 @@ class CharmClient {
     });
   }
 
-  updateUser ({ addresses }: { addresses?: string[] }) {
+  updateUser (payload: { username?: string, avatar?: string, addresses?: string[] }) {
     return http.PUT<LoggedInUser>('/api/profile', {
-      addresses
+      payload
     });
   }
 

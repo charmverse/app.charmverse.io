@@ -19,8 +19,21 @@ import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
 import { CircularProgress, Tooltip } from '@mui/material';
 import charmClient from 'charmClient';
+// @ts-ignore
+import TelegramLoginButton from 'react-telegram-login';
 
 import log from 'lib/log';
+import { LoggedInUser } from 'models';
+
+interface TelegramUser {
+  auth_date: number
+  first_name: string
+  hash: string
+  id: number
+  last_name: string
+  photo_url: string
+  username: string
+}
 
 const DiscordUserName = styled(Typography)`
   position: relative;
@@ -167,6 +180,25 @@ function AccountModal ({ isOpen, onClose }:
               {connectedWithDiscord ? 'Disconnect' : 'Connect'}
             </StyledButton>
           </div>
+        </Tooltip>
+      </Stack>
+      <Stack
+        direction='row'
+        alignItems='center'
+        justifyContent='space-between'
+        my={1}
+      >
+        <Tooltip arrow placement='bottom' title={user?.addresses.length === 0 ? 'You must have at least one wallet address to disconnect from discord' : ''}>
+          <TelegramLoginButton
+            dataOnauth={async (telegramUser: TelegramUser) => {
+              await charmClient.updateUser({
+                username: telegramUser.username,
+                avatar: telegramUser.photo_url
+              });
+              setUser((_user: LoggedInUser) => ({ ..._user, username: telegramUser.username, avatar: telegramUser.photo_url }));
+            }}
+            botName='CharmverseBot'
+          />
         </Tooltip>
       </Stack>
       {discordError && (
