@@ -39,8 +39,6 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   const isValidUuid = validate(id as string);
 
-  console.log('Is valid UUID', isValidUuid);
-
   // eslint-disable-next-line prefer-const
   let [database, board] = await Promise.all([
     prisma.page.findFirst({
@@ -71,8 +69,6 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
       }
     }) as any as Block;
   }
-
-  console.log('Database', database, 'board', board);
 
   if (!database || !board) {
     return res.status(404).send({ error: 'Database not found' });
