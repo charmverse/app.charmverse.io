@@ -127,8 +127,15 @@ export interface BoardPage extends ApiPage {
  *          type: string
  *          example: false
  *        cardProperties:
- *          type: object
- *          example: {}
+ *           type: object
+ *           properties:
+ *              Status:
+ *                type: string
+ *                example: In Progress
+ *              Priority:
+ *                type: string
+ *                example: Medium
+ *
  */
 export interface Card {
   id: string
@@ -152,16 +159,20 @@ export interface Card {
  *      properties:
  *        title:
  *          type: string
- *          example: Review grants for next funding cycle
+ *          example: grants
+ *          required: false
  *        cardProperties:
  *          type: object
+ *          required: false
  *          properties:
  *            Status:
  *              type: string
  *              example: Complete
+ *              required: false
  *            Priority:
  *              type: string
  *              example: High
+ *              required: false
  *
  */
 export type CardQuery = Partial<Pick<Card, 'title' | 'cardProperties' | 'content'>>

@@ -72,17 +72,22 @@ async function getCard (req: NextApiRequest, res: NextApiResponse) {
 
 /**
  * @swagger
- * /databases/{databaseId}/card/{cardId}:
+ * /databases/{databaseId}/cards:
  *   patch:
- *     summary: Update an individual card
- *     description: Update a card's title or custom properties
+ *     summary: Update an existing card in the database
+ *     description: Update a card's title and / or its custom properties.
+ *     requestBody:
+ *       content:
+ *          application/json:
+ *                schema:
+ *                  $ref: '#/components/schemas/CardQuery'
  *     responses:
  *       200:
  *         description: Summary of the database
  *         content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/BoardPage'
+ *                $ref: '#/components/schemas/Card'
  */
 async function updateCard (req: NextApiRequest, res: NextApiResponse) {
 

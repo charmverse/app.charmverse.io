@@ -93,16 +93,21 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  * @swagger
  * /databases/{databaseId}:
  *   post:
- *     summary: Search tasks in database
- *     description: Get the available field names from the schema in the board. You can then query using its values.<br/><br/>The below example properties are only for illustrative purposes.
+ *     summary: Search cards in database
+ *     description: Get the available field names from the schema in the board. You can then query using its values.<br/><br/>The below example properties are only for illustrative purposes.<br/><br/>You can return up to 100 records per query
  *     requestBody:
  *       content:
  *          application/json:
  *             schema:
  *                type: object
  *                properties:
+ *                  limit:
+ *                    type: integer
+ *                    required: false
+ *                    example: 10
  *                  cursor:
  *                    type: string
+ *                    required: false
  *                    example: e63758e2-de17-48b2-9c74-5a40ea5be761
  *                  card:
  *                    type: object

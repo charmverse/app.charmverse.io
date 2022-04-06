@@ -24,13 +24,8 @@ handler
  *     requestBody:
  *       content:
  *          application/json:
- *                schema:
- *                   type: object
- *                   properties:
- *                    title:
- *                      type: string
- *                    cardProperties:
- *                      type: object
+ *             schema:
+ *                $ref: '#/components/schemas/CardQuery'
  *     responses:
  *       200:
  *         description: Summary of the database
