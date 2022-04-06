@@ -41,9 +41,8 @@ function AccountModal ({ isOpen, onClose }:
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
   const [user, setUser] = useUser();
-  const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [isDisconnectingDiscord, setIsDisconnectingDiscord] = useState(false);
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
-  const [isDisconnectingTelegram, setIsDisconnectingTelegram] = useState(false);
   const [isLoggingOut, setisLoggingOut] = useState(false);
   const [discordError, setDiscordError] = useState('');
   const [telegramError, setTelegramError] = useState('');
@@ -105,7 +104,7 @@ function AccountModal ({ isOpen, onClose }:
   async function connectWithDiscord () {
     if (!isConnectDiscordLoading) {
       if (connectedWithDiscord) {
-        setIsDisconnecting(true);
+        setIsDisconnectingDiscord(true);
         try {
           await charmClient.disconnectDiscord();
           setUser({ ...user, discordUser: null });
@@ -113,13 +112,27 @@ function AccountModal ({ isOpen, onClose }:
         catch (err) {
           log.warn('Error disconnecting from discord', err);
         }
-        setIsDisconnecting(false);
+        setIsDisconnectingDiscord(false);
       }
       else {
         window.location.replace(`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
       }
     }
-    setIsDisconnecting(false);
+    setIsDisconnectingDiscord(false);
+  }
+
+  async function disconnectFromTelegram () {
+    if (connectedWithTelegram) {
+      setIsConnectingTelegram(true);
+      try {
+        await charmClient.disconnectTelegram();
+        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: null }));
+      }
+      catch (err: any) {
+        setTelegramError(err.error || 'Something went wrong. Please try again');
+      }
+      setIsConnectingTelegram(false);
+    }
   }
 
   async function connectWithTelegram (telegramAccount: TelegramAccount) {
@@ -180,7 +193,7 @@ function AccountModal ({ isOpen, onClose }:
               size='small'
               variant='outlined'
               color={connectedWithDiscord ? 'error' : 'primary'}
-              disabled={isLoggingOut || isDisconnecting || isConnectDiscordLoading || user?.addresses.length === 0}
+              disabled={isLoggingOut || isDisconnectingDiscord || isConnectDiscordLoading || user?.addresses.length === 0}
               onClick={connectWithDiscord}
               endIcon={(
                 isConnectDiscordLoading && <CircularProgress size={20} />
@@ -204,13 +217,13 @@ function AccountModal ({ isOpen, onClose }:
           size='small'
           variant='outlined'
           color={connectedWithTelegram ? 'error' : 'primary'}
-          disabled={isLoggingOut || isConnectingTelegram || isDisconnectingTelegram}
+          disabled={isLoggingOut || isConnectingTelegram}
           endIcon={(
             isConnectingTelegram && <CircularProgress size={20} />
           )}
         >
           {connectedWithTelegram ? (
-            <div onClick={() => null}>
+            <div onClick={disconnectFromTelegram}>
               Disconnect
             </div>
           ) : (

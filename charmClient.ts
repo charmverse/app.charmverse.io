@@ -161,6 +161,10 @@ class CharmClient {
     return http.POST<TelegramUser>('/api/telegram/connect', telegramAccount);
   }
 
+  disconnectTelegram () {
+    return http.POST('/api/telegram/disconnect');
+  }
+
   disconnectDiscord () {
     return http.POST('/api/discord/disconnect');
   }
