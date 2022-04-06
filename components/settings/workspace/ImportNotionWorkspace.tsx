@@ -4,6 +4,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Alert, Box, Typography } from '@mui/material';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import CompleteIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Dangerous';
+import WarningIcon from '@mui/icons-material/HourglassBottom';
 import charmClient from 'charmClient';
 import { useSWRConfig } from 'swr';
 import { useState, useEffect } from 'react';
@@ -42,6 +45,10 @@ export default function ImportNotionWorkspace () {
             showMessage('Notion workspace successfully imported');
             closeModal();
           }
+          setNotionState({
+            loading: false,
+            warning: 'It can take up to an hour to import large Notion spaces. Your data will appear on the left navigation when the import is completed.'
+          });
         })
         .catch((err) => {
           if (err.status === 504) {
@@ -80,10 +87,38 @@ export default function ImportNotionWorkspace () {
       </Button>
       <Modal open={modalOpen} onClose={closeModal} size='fluid'>
         <Box display='flex' alignItems='center' gap={2} flexDirection='column'>
-          {notionState.loading && <CircularProgress size={20} />}
-          <Typography sx={{ mb: 0 }}>
-            Importing your files from Notion. This might take a few minutes...
-          </Typography>
+          {notionState.loading && (
+          <>
+            <CircularProgress size={30} />
+            <Typography sx={{ mb: 0 }}>
+              Importing your files from Notion. This might take a few minutes...
+            </Typography>
+          </>
+          )}
+          {!notionState.loading && notionState.failedImports && (
+          <>
+            <CompleteIcon color='success' />
+            <Typography sx={{ mb: 0 }}>
+              Import completed. Pages where we encountered issues are highlighted below.
+            </Typography>
+          </>
+          )}
+          {notionState.warning && (
+          <>
+            <WarningIcon color='secondary' fontSize='large' />
+            <Typography sx={{ mb: 0 }} align='center'>
+              {notionState.warning}
+            </Typography>
+          </>
+          )}
+          {notionState.error && (
+          <>
+            <ErrorIcon fontSize='large' color='error' />
+            <Typography sx={{ mb: 0 }} align='center'>
+              {notionState.error}
+            </Typography>
+          </>
+          )}
         </Box>
         {notionState.failedImports && notionState.failedImports?.length !== 0 && (
           <Alert severity='warning' sx={{ mt: 2 }}>
@@ -91,7 +126,6 @@ export default function ImportNotionWorkspace () {
               display: 'flex', gap: 2, flexDirection: 'column'
             }}
             >
-              Pages where we encountered issues
               {notionState.failedImports.map(failedImport => (
                 <div>
                   <Box sx={{
@@ -116,11 +150,6 @@ export default function ImportNotionWorkspace () {
                 </div>
               ))}
             </Box>
-          </Alert>
-        )}
-        {(notionState.error || notionState.warning) && (
-          <Alert severity={notionState.error ? 'error' : 'warning'} sx={{ mt: 2 }}>
-            {notionState.error || notionState.warning}
           </Alert>
         )}
       </Modal>
