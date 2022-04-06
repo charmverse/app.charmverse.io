@@ -7,7 +7,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { CardFromBlock } from 'pages/api/v1/databases/card.class';
 import { validate } from 'uuid';
-import { BoardPage, CardProperty, CardQuery } from '../interfaces';
+import { BoardPage, CardProperty, CardQuery, PaginatedQuery } from '../interfaces';
 import { mapProperties } from './mapProperties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -100,7 +100,13 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  *          application/json:
  *             schema:
  *                type: object
- *                $ref: '#/components/schemas/CardQuery'
+ *                properties:
+ *                  cursor:
+ *                    type: string
+ *                    example: e63758e2-de17-48b2-9c74-5a40ea5be761
+ *                  card:
+ *                    type: object
+ *                    $ref: '#/components/schemas/CardQuery'
  *     responses:
  *       200:
  *         description: Summary of the database
@@ -110,8 +116,6 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  *                $ref: '#/components/schemas/Card'
  */
 async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
-
-  const searchQuery = req.body as CardQuery;
 
   const { id } = req.query;
 
@@ -126,7 +130,18 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Board not found' });
   }
 
-  if (searchQuery.cardProperties && (typeof searchQuery.cardProperties !== 'object' || searchQuery.cardProperties instanceof Array)) {
+  const searchQuery = req.body as PaginatedQuery<{card: CardQuery}>;
+
+  // Early exit to inform user these should be nested
+  if ((searchQuery as any).title || (searchQuery as any).cardProperties) {
+    return res.status(400).json({
+      error: 'The query properties such as \'title\' or \'cardProperties\' for a card should be nested inside a \'card\' property in your request JSON'
+    });
+  }
+
+  const cardProperties = searchQuery.card?.cardProperties ?? {};
+
+  if (cardProperties && (typeof cardProperties !== 'object' || cardProperties instanceof Array)) {
     return res.status(400).send({
       error: 'Optional key cardProperties must be an object if provided'
     });
@@ -137,7 +152,7 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   const boardSchema = (board.fields as any).cardProperties as CardProperty[];
 
   try {
-    const queryProperties: Record<string, string | number> = mapProperties(searchQuery.cardProperties ?? {}, boardSchema);
+    const queryProperties: Record<string, string | number> = mapProperties(cardProperties, boardSchema);
 
     Object.entries(queryProperties).forEach(queryItem => {
       nestedJsonQuery.push({
@@ -161,9 +176,9 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     })
   };
 
-  if (searchQuery.title) {
+  if (searchQuery.card?.title) {
     queryContent.title = {
-      contains: searchQuery.title,
+      contains: searchQuery.card.title,
       mode: 'insensitive'
     };
   }
