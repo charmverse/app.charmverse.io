@@ -1,16 +1,19 @@
 
 import { prisma } from 'db';
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
+import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { CardFromBlock } from 'pages/api/v1/databases/card.class';
-import { CardProperty } from 'pages/api/v1/databases/interfaces';
+import { Card, CardProperty, CardQuery } from 'pages/api/v1/databases/interfaces';
+import { Prisma } from '@prisma/client';
+import { mapProperties } from '../mapProperties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireApiKey)
-  .get(getCard);
+  .get(getCard)
+  .patch(updateCard);
 
 /**
  * @swagger
@@ -63,6 +66,101 @@ async function getCard (req: NextApiRequest, res: NextApiResponse) {
   const boardSchema = (board.fields as any).cardProperties as CardProperty[];
 
   const cardToReturn = new CardFromBlock(card, boardSchema, (cardPageContent?.fields as any)?.content);
+
+  return res.status(200).json(cardToReturn);
+}
+
+/**
+ * @swagger
+ * /databases/{databaseId}/card/{cardId}:
+ *   patch:
+ *     summary: Update an individual card
+ *     description: Update a card's title or custom properties
+ *     responses:
+ *       200:
+ *         description: Summary of the database
+ *         content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/BoardPage'
+ */
+async function updateCard (req: NextApiRequest, res: NextApiResponse) {
+
+  const { cardId, id } = req.query;
+
+  const [board, card] = await Promise.all([
+    prisma.block.findFirst({
+      where: {
+        // Parameter only added for documentation purposes. All cards linked to a root board
+        type: 'board',
+        id: id as string
+      }
+    }),
+    prisma.block.findFirst({
+      where: {
+        type: 'card',
+        id: cardId as string,
+        rootId: id as string
+      }
+    })
+  ]);
+
+  if (!board) {
+    return res.status(404).send({ error: 'Board not found' });
+  }
+  if (!card) {
+    return res.status(404).send({ error: 'Card not found' });
+  }
+
+  const boardSchema: CardProperty [] = (board.fields as any).cardProperties;
+
+  const requestBodyUpdate = req.body as Pick<Card, 'cardProperties' | 'title'>;
+
+  const updateContent: Prisma.BlockUpdateInput = {
+  };
+
+  if (requestBodyUpdate.title) {
+    updateContent.title = requestBodyUpdate.title;
+  }
+
+  if (requestBodyUpdate.cardProperties) {
+    try {
+
+      const mappedProperties = mapProperties(requestBodyUpdate.cardProperties, boardSchema);
+
+      const newPropertySet = {
+        ...(card.fields as any).properties,
+        ...mappedProperties
+      };
+
+      const newFields = {
+        ...(card.fields as any),
+        properties: newPropertySet
+      };
+
+      updateContent.fields = newFields;
+
+    }
+    catch (error) {
+      return res.status(400).json(error);
+    }
+  }
+
+  const updatedCard = await prisma.block.update({
+    where: {
+      id: cardId as string
+    },
+    data: updateContent
+  });
+
+  const cardPageContent = await prisma.block.findFirst({
+    where: {
+      type: 'charm_text',
+      parentId: card.id
+    }
+  });
+
+  const cardToReturn = new CardFromBlock(updatedCard, boardSchema, (cardPageContent?.fields as any)?.content);
 
   return res.status(200).json(cardToReturn);
 }
