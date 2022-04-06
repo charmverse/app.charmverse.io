@@ -25,12 +25,13 @@ handler.get(async (req, res) => {
 
   // use cookies to pass response to frontend because they're easier to delete than query params
   const cookies = new Cookies(req, res);
-  if (req.query.error || typeof tempAuthCode !== 'string') {
+
+  if (typeof tempAuthCode === 'string') {
+    cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false });
+  }
+  else {
     log.warn('Error importing from notion', req.query);
     cookies.set(AUTH_ERROR_COOKIE, 'There was an error from Notion. Please try again', { httpOnly: false });
-  }
-  else if (typeof tempAuthCode === 'string') {
-    cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false });
   }
 
   res.redirect(redirect);
