@@ -237,7 +237,7 @@ function AccountModal ({ isOpen, onClose }:
               >
                 <TelegramLoginButton
                   dataOnauth={connectWithTelegram}
-                  botName='CharmverseTelBot'
+                  botName='CharmVerseBot'
                 />
               </div>
             </>
@@ -254,7 +254,7 @@ function AccountModal ({ isOpen, onClose }:
           {discordError}
         </Alert>
       )}
-      {/* user cant be logged out so long as tehir wallet is connected (TODO: fix!) */}
+      {/* user cant be logged out so long as their wallet is connected (TODO: fix!) */}
       {!account && (
         <Box display='flex' justifyContent='flex-end' mt={2}>
           <StyledButton
