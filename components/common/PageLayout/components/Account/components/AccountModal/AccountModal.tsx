@@ -51,6 +51,7 @@ function AccountModal ({ isOpen, onClose }:
   const ENSName = useENSName(account);
   const [user, setUser] = useUser();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
   const [isLoggingOut, setisLoggingOut] = useState(false);
   const [discordError, setDiscordError] = useState('');
   const router = useRouter();
@@ -127,6 +128,16 @@ function AccountModal ({ isOpen, onClose }:
     setIsDisconnecting(false);
   }
 
+  async function connectWithTelegram (telegramUser: TelegramUser) {
+    setIsConnectingTelegram(true);
+    await charmClient.updateUser({
+      username: telegramUser.username,
+      avatar: telegramUser.photo_url
+    });
+    setUser((_user: LoggedInUser) => ({ ..._user, username: telegramUser.username, avatar: telegramUser.photo_url }));
+    setIsConnectingTelegram(false);
+  }
+
   function _onClose () {
     router.replace(window.location.href.split('?')[0], undefined, { shallow: true });
     onClose();
@@ -188,18 +199,32 @@ function AccountModal ({ isOpen, onClose }:
         justifyContent='space-between'
         my={1}
       >
-        <Tooltip arrow placement='bottom' title={user?.addresses.length === 0 ? 'You must have at least one wallet address to disconnect from discord' : ''}>
-          <TelegramLoginButton
-            dataOnauth={async (telegramUser: TelegramUser) => {
-              await charmClient.updateUser({
-                username: telegramUser.username,
-                avatar: telegramUser.photo_url
-              });
-              setUser((_user: LoggedInUser) => ({ ..._user, username: telegramUser.username, avatar: telegramUser.photo_url }));
-            }}
-            botName='CharmverseBot'
-          />
-        </Tooltip>
+        <Typography color='secondary'>
+          Connect with Telegram
+        </Typography>
+        <StyledButton
+          size='small'
+          variant='outlined'
+          color='primary'
+          disabled={isLoggingOut || isConnectingTelegram}
+          endIcon={(
+            isConnectingTelegram && <CircularProgress size={20} />
+          )}
+        >
+          Connect
+          <div style={{
+            visibility: 'hidden',
+            width: '100%',
+            position: 'absolute',
+            height: '100%'
+          }}
+          >
+            <TelegramLoginButton
+              dataOnauth={connectWithTelegram}
+              botName='CharmverseBot'
+            />
+          </div>
+        </StyledButton>
       </Stack>
       {discordError && (
         <Alert severity='error'>
