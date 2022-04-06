@@ -80,8 +80,6 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   filteredDatabaseObject.url = `${domain}/${space.domain}/${database.path}`;
 
-  console.log('BOARD', board);
-
   (filteredDatabaseObject as any).schema = (board as any).fields.cardProperties;
   filteredDatabaseObject.id = board.id;
   filteredDatabaseObject.content = '';
@@ -135,10 +133,14 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   const { id } = req.query;
 
+  const space = await getSpaceFromApiKey(req);
+
   const board = await prisma.block.findFirst({
     where: {
       type: 'board',
-      id: id as string
+      id: id as string,
+      // This parameter is only added to ensure requests using the current API key only return data for that space
+      spaceId: space.id
     }
   });
 
@@ -269,8 +271,6 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     cursor,
     data: cardsWithContent
   };
-
-  console.log('Found cards', cards.length);
 
   return res.status(200).send(paginatedResponse);
 

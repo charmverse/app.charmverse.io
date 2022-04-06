@@ -1,12 +1,12 @@
 
+import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
+import { CardFromBlock } from 'lib/blocks-api/card.class';
+import { Card, CardProperty } from 'lib/blocks-api/interfaces';
+import { mapProperties } from 'lib/blocks-api/mapProperties';
+import { getSpaceFromApiKey, onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { CardFromBlock } from 'lib/blocks-api/card.class';
-import { Card, CardProperty, CardQuery } from 'lib/blocks-api/interfaces';
-import { Prisma } from '@prisma/client';
-import { mapProperties } from 'lib/blocks-api/mapProperties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -32,19 +32,23 @@ async function getCard (req: NextApiRequest, res: NextApiResponse) {
 
   const { cardId, id } = req.query;
 
+  const space = await getSpaceFromApiKey(req);
+
   const [board, card] = await Promise.all([
     prisma.block.findFirst({
       where: {
         // Parameter only added for documentation purposes. All cards linked to a root board
         type: 'board',
-        id: id as string
+        id: id as string,
+        spaceId: space.id
       }
     }),
     prisma.block.findFirst({
       where: {
         type: 'card',
         id: cardId as string,
-        rootId: id as string
+        rootId: id as string,
+        spaceId: space.id
       }
     })
   ]);
@@ -93,19 +97,23 @@ async function updateCard (req: NextApiRequest, res: NextApiResponse) {
 
   const { cardId, id } = req.query;
 
+  const space = await getSpaceFromApiKey(req);
+
   const [board, card] = await Promise.all([
     prisma.block.findFirst({
       where: {
         // Parameter only added for documentation purposes. All cards linked to a root board
         type: 'board',
-        id: id as string
+        id: id as string,
+        spaceId: space.id
       }
     }),
     prisma.block.findFirst({
       where: {
         type: 'card',
         id: cardId as string,
-        rootId: id as string
+        rootId: id as string,
+        spaceId: space.id
       }
     })
   ]);
