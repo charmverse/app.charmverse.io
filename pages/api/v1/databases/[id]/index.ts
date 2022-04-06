@@ -7,6 +7,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { validate } from 'uuid';
 import { CardFromBlock } from 'pages/api/v1/databases/card.class';
+import fs from 'node:fs';
 import { BoardPage, CardProperty, CardQuery } from '../interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -181,11 +182,29 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
         };
       })
     }
-  })).map(card => new CardFromBlock(card, boardSchema));
+  }));
+
+  const cardsPageContent = await prisma.block.findMany({
+    where: {
+      OR: cards.map(card => {
+        return {
+          parentId: card.id,
+          type: 'charm_text'
+        };
+      })
+    }
+  });
+
+  const cardsWithContent = cards.map(card => {
+    const cardPageData = cardsPageContent.find(page => page.parentId === card.id);
+
+    return new CardFromBlock(card, boardSchema, (cardPageData?.fields as any)?.content);
+
+  });
 
   console.log('Found cards', cards.length);
 
-  return res.status(200).send(cards);
+  return res.status(200).send(cardsWithContent);
 
 }
 
