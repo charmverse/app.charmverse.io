@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 /* eslint-disable max-lines */
 import { Box } from '@mui/system'
-import PageBanner, { PageCoverGalleryImageGroups } from 'components/[pageId]/DocumentPage/components/PageBanner'
+import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner'
 import { randomIntFromInterval } from 'lib/utilities/random'
 import { Page } from 'models'
 import React from 'react'
@@ -108,7 +108,7 @@ class CenterPanel extends React.Component<Props, State> {
     }
 
     setRandomHeaderImage(board: Board, headerImage?: string | null) {
-      const newHeaderImage = headerImage ?? PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
+      const newHeaderImage = headerImage ?? randomBannerImage()
       // Null is passed if we want to remove the image
       mutator.changeHeaderImage(board.id, board.fields.headerImage, headerImage !== null ? newHeaderImage : null)
     }

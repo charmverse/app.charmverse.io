@@ -1,7 +1,6 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
 import { ReactNode } from 'react';
 
 export const spec = specFactory;
@@ -16,9 +15,9 @@ function specFactory (): RawSpecs {
       content: 'columnBlock*',
       group: 'block',
       draggable: false,
-      parseDOM: [{ tag: 'div' }],
+      parseDOM: [{ tag: 'div.charm-column-row' }],
       toDOM: (): DOMOutputSpec => {
-        return ['div', { class: 'column-layout' }];
+        return ['div', { class: 'charm-column-row' }];
       }
     },
     markdown: {
@@ -26,21 +25,19 @@ function specFactory (): RawSpecs {
     }
   };
 }
-
-const StyledColumnLayout = styled(Box)<{colCount: number}>`
+// grid-template-columns: repeat(${({ colCount }) => `${colCount}, ${Math.floor(100 / colCount)}`}fr);
+const StyledColumnLayout = styled.div<{colCount: number}>`
   min-height: 60px;
-  border-radius: ${({ theme }) => theme.spacing(0.5)};
-  padding: ${({ theme }) => theme.spacing(1)};
-  margin: ${({ theme }) => theme.spacing(2, 0)};
 
   & > .bangle-nv-child-container {
     height: 100%;
   }
-  
+
   & > .bangle-nv-child-container > .bangle-nv-content {
     display: grid;
-    grid-template-columns: repeat(${({ colCount }) => colCount}, 1fr);
-    gap: ${({ theme }) => theme.spacing(1)};
+    gap: ${({ theme }) => theme.spacing(3)};
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
   }
 `;
 

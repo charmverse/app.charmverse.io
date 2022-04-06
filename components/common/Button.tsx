@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import NextLink from 'next/link';
 import MuiLink from '@mui/material/Link';
-import { ComponentProps, ElementType } from 'react';
+import { ComponentProps, ElementType, forwardRef } from 'react';
 
 const StyledButton = styled(Button)`
   white-space: nowrap;
@@ -24,11 +24,23 @@ export type InputProps<C extends ElementType> = ButtonProps
     loadingMessage?: string;
   };
 
-function PimpedButtonWithNextLink<C extends ElementType>
-({ href, external, children, target, ...props }: InputProps<C>) {
+export const PimpedButton = forwardRef<HTMLButtonElement, InputProps<ElementType>>((_props, ref) => {
+
+  const { children, loading, loadingMessage, ...props } = _props;
+
+  return (
+    <StyledButton ref={ref} disabled={loading} {...props}>
+      {(loading && loadingMessage) ? loadingMessage : children}
+      {loading && <StyledSpinner color='inherit' size={15} />}
+    </StyledButton>
+  );
+});
+
+const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<ElementType>>((_props, ref) => {
+  const { href, external, children, target, ...props } = _props;
   if (href) {
     if (external) {
-      return <PimpedButton href={href} {...props}>{children}</PimpedButton>;
+      return <PimpedButton ref={ref} href={href} {...props}>{children}</PimpedButton>;
     }
     return (
       <NextLink href={href} passHref>
@@ -41,17 +53,7 @@ function PimpedButtonWithNextLink<C extends ElementType>
     );
   }
 
-  return <PimpedButton {...props}>{children}</PimpedButton>;
-}
-
-export function PimpedButton<C extends ElementType> (props: InputProps<C>) {
-  const { children, loading, loadingMessage, ...rest } = props;
-  return (
-    <StyledButton disabled={loading} {...rest}>
-      {(loading && loadingMessage) ? loadingMessage : children}
-      {loading && <StyledSpinner color='inherit' size={15} />}
-    </StyledButton>
-  );
-}
+  return <PimpedButton ref={ref} {...props}>{children}</PimpedButton>;
+});
 
 export default PimpedButtonWithNextLink;

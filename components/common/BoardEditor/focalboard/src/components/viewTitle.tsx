@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import ImageIcon from '@mui/icons-material/Image'
 import CharmEditor, { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor'
-import { PageCoverGalleryImageGroups } from 'components/[pageId]/DocumentPage/components/PageBanner'
+import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner'
 import { randomIntFromInterval } from 'lib/utilities/random'
 import { Page, PageContent } from 'models'
 import React, { useCallback, useState } from 'react'
@@ -43,7 +43,7 @@ const ViewTitle = React.memo((props: Props) => {
         return newIcon
     }, [board.id, board.fields.icon])
     const setRandomHeaderImage = useCallback((headerImage?: string | null) => {
-      const newHeaderImage = headerImage ?? PageCoverGalleryImageGroups['Color & Gradient'][randomIntFromInterval(0, PageCoverGalleryImageGroups['Color & Gradient'].length - 1)]
+      const newHeaderImage = headerImage ?? randomBannerImage()
       // Null is passed if we want to remove the image
       mutator.changeHeaderImage(board.id, board.fields.headerImage, headerImage !== null ? newHeaderImage : null)
     }, [board.id, board.fields.headerImage])

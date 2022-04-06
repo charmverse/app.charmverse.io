@@ -5,9 +5,9 @@ import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
 import charmClient from 'charmClient';
-import { HTMLAttributes, useEffect } from 'react';
-import ImageSelector from './ImageSelector';
-import Resizable from './Resizable';
+import { HTMLAttributes, memo, useCallback } from 'react';
+import ImageSelector from 'components/common/ImageSelector/ImageSelector';
+import Resizable from './Resizable/Resizable';
 
 export const MAX_IMAGE_WIDTH = 750;
 export const MIN_IMAGE_WIDTH = 100;
@@ -64,8 +64,7 @@ function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes
       sx={{
         backgroundColor: (isSelected && !readOnly) ? 'rgba(46, 170, 220, 0.2)' : theme.palette.background.light,
         p: 2,
-        display: 'flex',
-        borderRadius: theme.spacing(0.5)
+        display: 'flex'
       }}
       {...props}
     >
@@ -79,15 +78,15 @@ function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes
   );
 }
 
-const StyledImage = styled.img<{height?: number}>`
+const StyledImage = styled.img`
   object-fit: contain;
+  max-width: 100%;
   width: 100%;
-  height: ${({ height }) => height ?? '100%'};
+  height: auto;
   user-select: none;
   &:hover {
     cursor: initial;
   }
-  border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
 export function imageSpec (): RawSpecs {
@@ -105,9 +104,6 @@ export function imageSpec (): RawSpecs {
         },
         alt: {
           default: null
-        },
-        aspectRatio: {
-          default: 1
         },
         size: {
           // Making sure default size is middle of max and min range
@@ -144,51 +140,31 @@ export function imageSpec (): RawSpecs {
   };
 }
 
-// Create a new image element using a promise, this makes it possible to get the width and height of the image
-function imagePromise (url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject();
-    img.src = url;
-  });
-}
-
-export function ResizableImage ({ readOnly, onResizeStop, node, updateAttrs, selected }:
+function ResizableImage ({ readOnly, onResizeStop, node, updateAttrs, selected }:
   NodeViewProps & {readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
   readOnly = readOnly ?? false;
-  // Set the image aspect ratio on first load
-  useEffect(() => {
-    async function main () {
-      if (node.attrs.src) {
-        const image = await imagePromise(node.attrs.src);
-        updateAttrs({
-          aspectRatio: image.width / image.height
-        });
-      }
-    }
-    main();
-  }, [node.attrs.src]);
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
-    return readOnly ? <EmptyImageContainer readOnly={readOnly} isSelected={selected} /> : (
-      <ImageSelector onImageSelect={async (imageSrc) => {
-        const image = await imagePromise(imageSrc);
-        updateAttrs({
-          src: imageSrc,
-          aspectRatio: image.width / image.height
-        });
-      }}
-      >
-        <EmptyImageContainer readOnly={readOnly} isSelected={selected} />
-      </ImageSelector>
-    );
+    if (readOnly) {
+      return <EmptyImageContainer readOnly={readOnly} isSelected={selected} />;
+    }
+    else {
+      return (
+        <ImageSelector onImageSelect={async (imageSrc) => {
+          // const image = await imagePromise(imageSrc);
+          updateAttrs({
+            src: imageSrc
+          });
+        }}
+        >
+          <EmptyImageContainer readOnly={readOnly} isSelected={selected} />
+        </ImageSelector>
+      );
+    }
   }
 
-  const { aspectRatio } = node.attrs as {aspectRatio: number};
-
-  function onDelete () {
+  const onDelete = useCallback(() => {
     if (node.attrs.src?.includes('s3.amazonaws.com')) {
       charmClient.deleteFromS3(node.attrs.src);
     }
@@ -196,31 +172,36 @@ export function ResizableImage ({ readOnly, onResizeStop, node, updateAttrs, sel
       src: null,
       aspectRatio: 1
     });
-  }
+  }, []);
 
-  return readOnly ? (
-    <StyledImage
-      draggable={false}
-      src={node.attrs.src}
-      alt={node.attrs.alt}
-      width={node.attrs.size}
-      height={node.attrs.size / aspectRatio}
-    />
-  ) : (
-    <Resizable
-      aspectRatio={aspectRatio}
-      initialSize={node.attrs.size}
-      maxWidth={MAX_IMAGE_WIDTH}
-      minWidth={MIN_IMAGE_WIDTH}
-      updateAttrs={updateAttrs}
-      onDelete={onDelete}
-      onResizeStop={onResizeStop}
-    >
+  if (readOnly) {
+    return (
       <StyledImage
         draggable={false}
         src={node.attrs.src}
         alt={node.attrs.alt}
+        width={node.attrs.size}
+        // height={node.attrs.size / aspectRatio}
       />
-    </Resizable>
-  );
+    );
+  }
+  else {
+    return (
+      <Resizable
+        initialSize={node.attrs.size}
+        minWidth={MIN_IMAGE_WIDTH}
+        updateAttrs={updateAttrs}
+        onDelete={onDelete}
+        onResizeStop={onResizeStop}
+      >
+        <StyledImage
+          draggable={false}
+          src={node.attrs.src}
+          alt={node.attrs.alt}
+        />
+      </Resizable>
+    );
+  }
 }
+
+export default memo(ResizableImage);

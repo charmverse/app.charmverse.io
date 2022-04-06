@@ -12,6 +12,7 @@ import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 import { IPagePermissionFlags, IPageWithPermissions, PageOperationType } from '../lib/permissions/pages/page-permission-interfaces';
 
+export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
 type IContext = {
   currentPageId: string,
@@ -22,7 +23,7 @@ type IContext = {
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   addPage: AddPageFn,
   addPageAndRedirect: (page?: Partial<Page>) => void
-  getPagePermissions: (pageId: string) => IPagePermissionFlags
+  getPagePermissions: (pageId: string) => IPagePermissionFlags,
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
