@@ -1,5 +1,7 @@
 
 import { Block } from '@prisma/client';
+import { convertPageContentToMarkdown } from 'components/common/CharmEditor/CharmEditor';
+import { PageContent } from 'models';
 import { Card, CardProperty } from './interfaces';
 
 export class CardFromBlock implements Card {
@@ -19,12 +21,14 @@ export class CardFromBlock implements Card {
 
   cardProperties: Record<string, string | number>;
 
-  constructor (block: Block, propertySchemas: CardProperty []) {
+  constructor (block: Block, propertySchemas: CardProperty [], pageContent?: PageContent) {
     this.id = block.id;
     this.createdAt = new Date(block.createdAt).toISOString();
     this.updatedAt = new Date(block.createdAt).toISOString();
     this.databaseId = block.rootId;
-    this.content = '';
+    this.content = pageContent ? convertPageContentToMarkdown(pageContent) : '';
+    console.log('Converting content', pageContent);
+    console.log('As markdown', this.content);
     this.title = block.title;
     this.isTemplate = (block.fields as any).isTemplate === true;
     this.cardProperties = this.parseProperties((block.fields as any).properties, propertySchemas);

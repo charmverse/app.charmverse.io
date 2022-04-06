@@ -60,14 +60,11 @@ async function getCard (req: NextApiRequest, res: NextApiResponse) {
       type: 'charm_text',
       parentId: card.id
     }
-  }) as any;
+  });
 
   const boardSchema = (board.fields as any).cardProperties as CardProperty[];
 
-  const markdown = '';
-  // convertPageContentToMarkdown(cardPageContent, card.title);
-
-  const cardToReturn = new CardFromBlock(card, boardSchema);
+  const cardToReturn = new CardFromBlock(card, boardSchema, (cardPageContent?.fields as any)?.content);
 
   return res.status(200).json(cardToReturn);
 }
