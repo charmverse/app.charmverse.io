@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import { CardFromBlock } from 'pages/api/v1/databases/card.class';
 import { v4 } from 'uuid';
 import { Card, CardProperty } from '../../interfaces';
+import { mapProperties } from '../mapProperties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -56,32 +57,14 @@ async function createCard (req: NextApiRequest, res: NextApiResponse) {
 
   const boardSchema = (board.fields as any).cardProperties as CardProperty [];
 
-  const propertiesToAdd: Record<string, string | number> = {};
+  let propertiesToAdd: Record<string, string | number> = {};
 
-  const requestBodyProps = Object.keys(cardProperties);
-
-  for (const property of requestBodyProps) {
-    const matchedSchema = boardSchema.find(schema => schema.name === property);
-
-    if (!matchedSchema) {
-      return res.status(400).send({ error: `Field ${property} does not exist in this database` });
-    }
-    let valueToAssign = cardProperties[property];
-
-    if (matchedSchema.type === 'select' || matchedSchema.type === 'multiSelect') {
-      const matchingOption = matchedSchema.options.find(option => option.value === valueToAssign);
-
-      if (!matchingOption) {
-        return res.status(400).send({ error: `Value '${valueToAssign}' is not a valid option for ${matchedSchema.type} field '${property}'`, options: matchedSchema.options.map(option => option.value) });
-      }
-      valueToAssign = matchingOption.id;
-    }
-
-    propertiesToAdd[matchedSchema.id] = valueToAssign;
-
+  try {
+    propertiesToAdd = mapProperties(cardProperties, boardSchema);
   }
-
-  const placeholderUserId = v4();
+  catch (error) {
+    return res.status(400).json(error);
+  }
 
   const pageId = v4();
 

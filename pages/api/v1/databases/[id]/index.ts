@@ -8,6 +8,7 @@ import nc from 'next-connect';
 import { CardFromBlock } from 'pages/api/v1/databases/card.class';
 import { validate } from 'uuid';
 import { BoardPage, CardProperty, CardQuery } from '../interfaces';
+import { mapProperties } from './mapProperties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -137,40 +138,21 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   const nestedJsonQuery: Prisma.NestedJsonFilter [] = [];
 
-  const queryProperties = Object.keys(searchQuery.cardProperties);
-
   const boardSchema = (board.fields as any).cardProperties as CardProperty[];
 
-  for (const property of queryProperties) {
-    const propertySchema = boardSchema.find(cardProp => cardProp.name === property);
+  try {
+    const queryProperties: Record<string, string | number> = mapProperties(searchQuery.cardProperties, boardSchema);
 
-    if (!propertySchema) {
-      return res.status(400).send({
-        error: `Field '${property}' does not exist on this database`
+    Object.entries(queryProperties).forEach(queryItem => {
+      nestedJsonQuery.push({
+        path: ['properties', queryItem[0]],
+        equals: queryItem[1]
       });
-    }
-
-    let searchValue = searchQuery.cardProperties[property];
-
-    if (propertySchema.type === 'select' || propertySchema.type === 'multiSelect') {
-      const matchedOption = propertySchema.options.find(option => option.value === searchValue);
-
-      if (!matchedOption) {
-        return res.status(400).send({
-          error: `Value '${searchValue}' is not a valid option for field ${propertySchema.name}`
-        });
-      }
-      else {
-        searchValue = matchedOption.id;
-      }
-
-    }
-
-    nestedJsonQuery.push({
-      path: ['properties', propertySchema.id],
-      equals: searchValue
     });
 
+  }
+  catch (error) {
+    return res.status(400).send(error);
   }
 
   const cards = (await prisma.block.findMany({
