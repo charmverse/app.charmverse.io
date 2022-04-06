@@ -24,16 +24,7 @@ import TelegramLoginButton from 'react-telegram-login';
 
 import log from 'lib/log';
 import { LoggedInUser } from 'models';
-
-interface TelegramUser {
-  auth_date: number
-  first_name: string
-  hash: string
-  id: number
-  last_name: string
-  photo_url: string
-  username: string
-}
+import { TelegramAccount } from 'pages/api/telegram/connect';
 
 const UserName = styled(Typography)`
   position: relative;
@@ -52,8 +43,10 @@ function AccountModal ({ isOpen, onClose }:
   const [user, setUser] = useUser();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
+  const [isDisconnectingTelegram, setIsDisconnectingTelegram] = useState(false);
   const [isLoggingOut, setisLoggingOut] = useState(false);
   const [discordError, setDiscordError] = useState('');
+  const [telegramError, setTelegramError] = useState('');
   const router = useRouter();
   const [space] = useCurrentSpace();
   const isConnectingToDiscord = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'connect';
@@ -62,6 +55,7 @@ function AccountModal ({ isOpen, onClose }:
   const { showMessage } = useSnackbar();
 
   const connectedWithDiscord = Boolean(user?.discordUser);
+  const connectedWithTelegram = Boolean(user?.telegramUser);
 
   useEffect(() => {
     if (discordConnectFailed === true) {
@@ -128,14 +122,18 @@ function AccountModal ({ isOpen, onClose }:
     setIsDisconnecting(false);
   }
 
-  async function connectWithTelegram (telegramUser: TelegramUser) {
-    setIsConnectingTelegram(true);
-    await charmClient.updateUser({
-      username: telegramUser.username,
-      avatar: telegramUser.photo_url
-    });
-    setUser((_user: LoggedInUser) => ({ ..._user, username: telegramUser.username, avatar: telegramUser.photo_url }));
-    setIsConnectingTelegram(false);
+  async function connectWithTelegram (telegramAccount: TelegramAccount) {
+    if (!connectedWithTelegram) {
+      setIsConnectingTelegram(true);
+      try {
+        const telegramUser = await charmClient.connectTelegram(telegramAccount);
+        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
+      }
+      catch (err: any) {
+        setTelegramError(err.error || 'Something went wrong. Please try again');
+      }
+      setIsConnectingTelegram(false);
+    }
   }
 
   function _onClose () {
@@ -200,32 +198,45 @@ function AccountModal ({ isOpen, onClose }:
         my={1}
       >
         <Typography color='secondary'>
-          Connect with Telegram
+          {connectedWithTelegram ? 'Connected with Telegram' : 'Connect with Telegram'}
         </Typography>
         <StyledButton
           size='small'
           variant='outlined'
-          color='primary'
-          disabled={isLoggingOut || isConnectingTelegram}
+          color={connectedWithTelegram ? 'error' : 'primary'}
+          disabled={isLoggingOut || isConnectingTelegram || isDisconnectingTelegram}
           endIcon={(
             isConnectingTelegram && <CircularProgress size={20} />
           )}
         >
-          Connect
-          <div style={{
-            opacity: 0,
-            width: '100%',
-            position: 'absolute',
-            height: '100%'
-          }}
-          >
-            <TelegramLoginButton
-              dataOnauth={connectWithTelegram}
-              botName='CharmverseBot'
-            />
-          </div>
+          {connectedWithTelegram ? (
+            <div onClick={() => null}>
+              Disconnect
+            </div>
+          ) : (
+            <>
+              Connect
+              <div style={{
+                opacity: 0,
+                width: '100%',
+                position: 'absolute',
+                height: '100%'
+              }}
+              >
+                <TelegramLoginButton
+                  dataOnauth={connectWithTelegram}
+                  botName='CharmverseBot'
+                />
+              </div>
+            </>
+          )}
         </StyledButton>
       </Stack>
+      {telegramError && (
+        <Alert severity='error'>
+          {telegramError}
+        </Alert>
+      )}
       {discordError && (
         <Alert severity='error'>
           {discordError}

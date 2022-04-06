@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, DiscordUser } from '@prisma/client';
+import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, DiscordUser, TelegramUser } from '@prisma/client';
 import * as http from 'adapters/http';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -17,6 +17,7 @@ import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
+import { TelegramAccount } from 'pages/api/telegram/connect';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -154,6 +155,10 @@ class CharmClient {
 
   importFromNotion (payload: { code: string, spaceId: string }) {
     return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
+  }
+
+  connectTelegram (telegramAccount: TelegramAccount) {
+    return http.POST<TelegramUser>('/api/telegram/connect', telegramAccount);
   }
 
   disconnectDiscord () {

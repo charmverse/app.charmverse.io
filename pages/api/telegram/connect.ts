@@ -40,6 +40,16 @@ async function connectTelegram (req: NextApiRequest, res: NextApiResponse<Telegr
         }
       }
     });
+
+    await prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        username: telegramAccount.username,
+        avatar: telegramAccount.photo_url
+      }
+    });
   }
   catch (error) {
     log.warn('Error while connecting to Telegram', error);
