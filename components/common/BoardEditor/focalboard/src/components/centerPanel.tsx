@@ -357,7 +357,9 @@ class CenterPanel extends React.Component<Props, State> {
     }
 
     private showCard = (cardId?: string) => {
-        this.setState({selectedCardIds: []})
+        if (this.state.selectedCardIds.length > 0) {
+            this.setState({selectedCardIds: []})
+        }
         this.props.showCard(cardId)
     }
 
