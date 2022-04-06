@@ -115,8 +115,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
     const newUrl = `${newPath}?${new URLSearchParams(query).toString()}`;
     silentlyUpdateURL(newUrl);
     setShownCardId(cardId);
-    // router.push({ pathname: newPath, query }, undefined, { scroll: false, shallow: true });
-  }, [router.query.viewId]);
+  }, [router.query]);
 
   const viewsToProvide = readonly ? boardViews.filter(view => {
     return view.id === activeView?.id;
