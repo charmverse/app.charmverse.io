@@ -238,7 +238,7 @@ function AccountModal ({ isOpen, onClose }:
               >
                 <TelegramLoginButton
                   dataOnauth={connectWithTelegram}
-                  botName='CharmverseBot'
+                  botName='CharmverseTelBot'
                 />
               </div>
             </>

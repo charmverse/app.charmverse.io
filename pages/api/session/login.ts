@@ -39,7 +39,7 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
   }
 
   // strip out large fields so we dont break the cookie
-  const { discordUser, spaceRoles, ...userData } = user;
+  const { discordUser, spaceRoles, telegramUser, ...userData } = user;
   req.session.user = userData;
   await req.session.save();
 
