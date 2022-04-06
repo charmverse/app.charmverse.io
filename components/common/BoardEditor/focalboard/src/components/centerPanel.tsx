@@ -52,7 +52,7 @@ type State = {
     cardIdToFocusOnRender: string
 }
 
-class CenterPanel extends React.PureComponent<Props, State> {
+class CenterPanel extends React.Component<Props, State> {
     private backgroundRef = React.createRef<HTMLDivElement>()
 
     private keydownHandler = (keyName: string, e: KeyboardEvent) => {
@@ -90,10 +90,14 @@ class CenterPanel extends React.PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props)
-            this.state = {
-                selectedCardIds: [],
-                cardIdToFocusOnRender: '',
-            }
+        this.state = {
+            selectedCardIds: [],
+            cardIdToFocusOnRender: '',
+        }
+    }
+
+    shouldComponentUpdate(): boolean {
+        return true
     }
 
     componentDidUpdate(): void {
