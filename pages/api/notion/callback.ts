@@ -29,7 +29,7 @@ handler.get(async (req, res) => {
     log.warn('Error importing from notion', req.query);
     cookies.set(AUTH_ERROR_COOKIE, 'There was an error from Notion. Please try again', { httpOnly: false });
   }
-  if (typeof tempAuthCode === 'string') {
+  else if (typeof tempAuthCode === 'string') {
     cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false });
   }
 
