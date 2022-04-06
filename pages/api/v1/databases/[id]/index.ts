@@ -166,7 +166,7 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).send(error);
   }
 
-  const queryContent: Prisma.BlockWhereInput = {
+  const prismaQueryContent: Prisma.BlockWhereInput = {
     rootId: id as string,
     type: 'card',
     AND: nestedJsonQuery.map(nestedJson => {
@@ -177,14 +177,17 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   };
 
   if (searchQuery.card?.title) {
-    queryContent.title = {
+    prismaQueryContent.title = {
       contains: searchQuery.card.title,
       mode: 'insensitive'
     };
   }
 
   const prismaQueryWithCursor: Prisma.BlockFindManyArgs = {
-    where: queryContent
+    where: prismaQueryContent,
+    orderBy: {
+      id: 'asc'
+    }
   };
 
   if (searchQuery.cursor) {
@@ -224,7 +227,7 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   let hasNext = false;
   let cursor: string | undefined;
 
-  if (cardsWithContent.length > 0) {
+  if (cards.length > 0) {
 
     const lastCardId = cards[cards.length - 1].id;
 
@@ -233,9 +236,9 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
         id: lastCardId
       },
       skip: 1,
-      where: {
-        parentId: id as string,
-        type: 'card'
+      where: prismaQueryContent,
+      orderBy: {
+        id: 'asc'
       }
     });
 
