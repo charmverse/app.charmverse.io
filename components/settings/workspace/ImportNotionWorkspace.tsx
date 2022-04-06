@@ -23,14 +23,14 @@ export default function ImportNotionWorkspace () {
   const [space] = useCurrentSpace();
 
   const notionCode = getCookie(AUTH_CODE_COOKIE);
-  const notionError = getCookie(AUTH_CODE_COOKIE);
+  const notionError = getCookie(AUTH_ERROR_COOKIE);
   console.log(notionCode);
   useEffect(() => {
     if (space && notionCode && !isImportingFromNotion) {
       setIsImportingFromNotion(true);
       setNotionFailedImports([]);
       setModalOpen(true);
-      deleteCookie(AUTH_ERROR_COOKIE);
+      deleteCookie(AUTH_CODE_COOKIE);
       charmClient.importFromNotion({
         code: notionCode,
         spaceId: space.id
