@@ -19,12 +19,11 @@ import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
 import { CircularProgress, Tooltip } from '@mui/material';
 import charmClient from 'charmClient';
-// @ts-ignore
-import TelegramLoginButton from 'react-telegram-login';
 
 import log from 'lib/log';
 import { LoggedInUser } from 'models';
 import { TelegramAccount } from 'pages/api/telegram/connect';
+import { TelegramLoginButton } from 'components/common/TelegramLoginButton';
 
 const UserName = styled(Typography)`
   position: relative;

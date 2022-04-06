@@ -109,7 +109,6 @@
     "react-redux": "^7.2.6",
     "react-resizable": "^3.0.4",
     "react-select": "^5.2.1",
-    "react-telegram-login": "^1.1.2",
     "reselect": "^4.0.0",
     "swr": "^1.2.1",
     "twemoji": "^14.0.1",
