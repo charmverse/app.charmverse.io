@@ -97,15 +97,15 @@ export default function ImportNotionWorkspace () {
           )}
           {!notionState.loading && notionState.failedImports && (
           <>
-            <CompleteIcon color='success' />
+            <CompleteIcon color='success' fontSize='large' />
             <Typography sx={{ mb: 0 }}>
-              Import completed. Pages where we encountered issues are highlighted below.
+              Import complete! Pages where we encountered issues are highlighted below.
             </Typography>
           </>
           )}
           {notionState.warning && (
           <>
-            <WarningIcon color='secondary' fontSize='large' />
+            <WarningIcon color='orange' fontSize='large' />
             <Typography sx={{ mb: 0 }} align='center'>
               {notionState.warning}
             </Typography>
@@ -113,7 +113,7 @@ export default function ImportNotionWorkspace () {
           )}
           {notionState.error && (
           <>
-            <ErrorIcon fontSize='large' color='error' />
+            <ErrorIcon color='error' fontSize='large' />
             <Typography sx={{ mb: 0 }} align='center'>
               {notionState.error}
             </Typography>
