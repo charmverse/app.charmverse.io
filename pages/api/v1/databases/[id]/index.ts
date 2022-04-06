@@ -118,7 +118,18 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  *         content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/Card'
+ *                type: object
+ *                properties:
+ *                  hasNext:
+ *                    type: boolean
+ *                    example: true
+ *                  cursor:
+ *                    type: string
+ *                    example: bb6b7e20-680a-4202-8e2a-49570aba02fa
+ *                  data:
+ *                    type: array
+ *                    items:
+ *                      $ref: '#/components/schemas/Card'
  */
 async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
