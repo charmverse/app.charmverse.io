@@ -154,11 +154,15 @@ function AccountModal ({ isOpen, onClose }:
     // @ts-ignore - defined by the script: https://telegram.org/js/telegram-widget.js
     window.Telegram.Login.auth(
       { bot_id: TELEGRAM_BOT_ID, request_access: true },
-      async (telegramAccount: TelegramAccount) => {
+      async (telegramAccount: TelegramAccount, r) => {
         if (telegramAccount) {
-          // authorization failed
-          const telegramUser = await charmClient.connectTelegram(telegramAccount);
-          setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
+          try {
+            const telegramUser = await charmClient.connectTelegram(telegramAccount);
+            setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
+          }
+          catch (err: any) {
+            setTelegramError(err.error || 'Something went wrong. Please try again');
+          }
         }
         else {
           setTelegramError('Something went wrong. Please try again');
