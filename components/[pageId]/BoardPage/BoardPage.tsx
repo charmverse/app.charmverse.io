@@ -1,18 +1,21 @@
 import { generatePath } from 'lib/utilities/strings';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import CenterPanel from '../../common/BoardEditor/focalboard/src/components/centerPanel';
-import { sendFlashMessage } from '../../common/BoardEditor/focalboard/src/components/flashMessages';
-import mutator from '../../common/BoardEditor/focalboard/src/mutator';
-import { getCurrentBoard, setCurrent as setCurrentBoard } from '../../common/BoardEditor/focalboard/src/store/boards';
-import { getCurrentViewCardsSortedFilteredAndGrouped } from '../../common/BoardEditor/focalboard/src/store/cards';
-import { getClientConfig } from '../../common/BoardEditor/focalboard/src/store/clientConfig';
-import { useAppDispatch, useAppSelector } from '../../common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad, initialReadOnlyLoad } from '../../common/BoardEditor/focalboard/src/store/initialLoad';
-import { getCurrentBoardViews, getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, setCurrent as setCurrentView } from '../../common/BoardEditor/focalboard/src/store/views';
-import { Utils } from '../../common/BoardEditor/focalboard/src/utils';
+import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
+import { sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { getCurrentViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad, initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { getCurrentBoardViews, getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
+import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
+import { silentlyUpdateURL } from 'lib/browser';
 
 /**
  *
@@ -35,6 +38,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
   const clientConfig = useAppSelector(getClientConfig);
   const dispatch = useAppDispatch();
+  const [shownCardId, setShownCardId] = useState(router.query.cardId);
 
   useEffect(() => {
     const boardId = page.boardId!;
@@ -47,7 +51,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
       const newPath = generatePath(router.pathname, { ...router.query, boardId });
       router.replace({
         pathname: newPath,
-        query: { viewId: boardViews[0].id, cardId: router.query.cardId }
+        query: { viewId: boardViews[0].id, cardId: shownCardId }
       });
       return;
     }
@@ -108,9 +112,15 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
     if (readonly) {
       query.r = Utils.getReadToken();
     }
+    const newUrl = `${newPath}?${new URLSearchParams(query).toString()}`;
+    silentlyUpdateURL(newUrl);
+    setShownCardId(cardId);
+    // router.push({ pathname: newPath, query }, undefined, { scroll: false, shallow: true });
+  }, [router.query.viewId]);
 
-    router.push({ pathname: newPath, query }, undefined, { shallow: true });
-  }, [router.query]);
+  const viewsToProvide = useMemo(() => readonly ? boardViews.filter(view => {
+    return view.id === activeView?.id;
+  }) : boardViews, [readonly, activeView, boardViews]);
 
   if (board && activeView) {
     let property = groupByProperty;
@@ -123,10 +133,6 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
       displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
     }
 
-    const viewsToProvide = readonly ? boardViews.filter(view => {
-      return view.id === activeView.id;
-    }) : boardViews;
-
     return (
       <div className='focalboard-body' style={{ flexGrow: 1 }}>
         <CenterPanel
@@ -135,7 +141,6 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
           board={board}
           setPage={setPage}
           cards={cards}
-          shownCardId={router.query.cardId as string}
           showCard={showCard}
           activeView={activeView}
           groupByProperty={property}
@@ -143,6 +148,21 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
           views={viewsToProvide}
           showShared={clientConfig?.enablePublicSharedBoards || false}
         />
+        {typeof shownCardId === 'string' && (
+          <RootPortal>
+            <CardDialog
+              board={board}
+              activeView={activeView}
+              views={viewsToProvide}
+              cards={cards}
+              key={router.query.cardId}
+              cardId={shownCardId}
+              onClose={() => showCard(undefined)}
+              showCard={(cardId) => showCard(cardId)}
+              readonly={!!readonly}
+            />
+          </RootPortal>
+        )}
       </div>
     );
   }
