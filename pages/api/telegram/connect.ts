@@ -32,7 +32,7 @@ async function connectTelegram (req: NextApiRequest, res: NextApiResponse<Telegr
     telegramUser = await prisma.telegramUser.create({
       data: {
         account: rest as any,
-        telegramId: String(id),
+        telegramId: id,
         user: {
           connect: {
             id: userId

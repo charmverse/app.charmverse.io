@@ -3,7 +3,7 @@ CREATE TABLE "TelegramUser" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" UUID NOT NULL,
-    "telegramId" TEXT NOT NULL,
+    "telegramId" INTEGER NOT NULL,
     "account" JSONB NOT NULL,
 
     CONSTRAINT "TelegramUser_pkey" PRIMARY KEY ("telegramId")

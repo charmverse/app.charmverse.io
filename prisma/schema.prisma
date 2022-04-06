@@ -115,7 +115,7 @@ model TelegramUser {
   updatedAt  DateTime @default(now())
   userId     String   @unique @db.Uuid
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  telegramId String   @id
+  telegramId Int   @id
   account    Json
 }
 
