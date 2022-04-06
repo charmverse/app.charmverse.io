@@ -1,6 +1,8 @@
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import log from 'lib/log';
+import Cookies from 'cookies';
+import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 
 const handler = nc({
   onError,
@@ -9,13 +11,9 @@ const handler = nc({
 
 handler.get(async (req, res) => {
   const tempAuthCode = req.query.code;
-  if (req.query.error || !tempAuthCode) {
-    res.status(400).send('Error or missing code from Notion OAuth');
-    return;
-  }
   let redirect: string;
   try {
-    const state = JSON.parse(decodeURIComponent(req.query.state as string));
+    const state = req.query.state ? JSON.parse(decodeURIComponent(req.query.state as string)) : {};
     redirect = state.redirect;
   }
   catch (e) {
@@ -25,7 +23,17 @@ handler.get(async (req, res) => {
     return;
   }
 
-  res.redirect(`${redirect}?code=${tempAuthCode}&notion=1`);
+  // use cookies to pass response to frontend because they're easier to delete than query params
+  const cookies = new Cookies(req, res);
+  if (req.query.error || typeof tempAuthCode !== 'string') {
+    log.warn('Error importing from notion', req.query);
+    cookies.set(AUTH_ERROR_COOKIE, 'There was an error from Notion. Please try again', { httpOnly: false });
+  }
+  if (typeof tempAuthCode === 'string') {
+    cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false });
+  }
+
+  res.redirect(redirect);
 });
 
 export default handler;
