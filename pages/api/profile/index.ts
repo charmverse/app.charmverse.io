@@ -35,7 +35,8 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
           }
         }
       },
-      discordUser: true
+      discordUser: true,
+      telegramUser: true
     }
   });
 
@@ -89,7 +90,8 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
           }
         }
       },
-      discordUser: true
+      discordUser: true,
+      telegramUser: true
     }
   });
   if (!profile) {
@@ -114,7 +116,8 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
           }
         }
       },
-      discordUser: true
+      discordUser: true,
+      telegramUser: true
     },
     data: req.body
   });

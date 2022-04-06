@@ -22,7 +22,8 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
         include: {
           favorites: true,
           spaceRoles: true,
-          discordUser: true
+          discordUser: true,
+          telegramUser: true
         }
       }
     }
@@ -50,7 +51,8 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
       include: {
         favorites: true,
         spaceRoles: true,
-        discordUser: true
+        discordUser: true,
+        telegramUser: true
       }
     });
 
