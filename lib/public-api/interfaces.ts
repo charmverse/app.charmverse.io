@@ -1,4 +1,4 @@
-import { Page } from '@prisma/client';
+import { Page as PrismaPage } from '@prisma/client';
 
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
@@ -6,7 +6,7 @@ import { Page } from '@prisma/client';
  * @swagger
  * components:
  *  schemas:
- *    CardProperty:
+ *    PageProperty:
  *      type: object
  *      properties:
  *        id:
@@ -36,7 +36,7 @@ import { Page } from '@prisma/client';
 *                 example: Complete
 */
 
-export interface CardProperty {
+export interface PageProperty {
   id: string;
   name: string
   type: string
@@ -53,7 +53,7 @@ export interface CardProperty {
  * @swagger
  * components:
  *  schemas:
- *    BoardPage:
+ *    DatabasePage:
  *      type: object
  *      properties:
  *        id:
@@ -81,10 +81,10 @@ export interface CardProperty {
  *          type: array
  *          items:
  *            type: object
- *            $ref: '#/components/schemas/CardProperty'
+ *            $ref: '#/components/schemas/PageProperty'
  *
  */
-export interface BoardPage extends Pick<Page, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'title'> {
+export interface DatabasePage extends Pick<PrismaPage, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'title'> {
   url: string
   type: 'board'
 }
@@ -93,14 +93,14 @@ export interface BoardPage extends Pick<Page, 'id' | 'createdAt' | 'updatedAt' |
  * @swagger
  *  components:
  *  schemas:
- *    CardContentFormats:
+ *    PageContentFormats:
  *      type: object
  *      properties:
  *        markdown:
  *          type: string
  *          example: Markdown content as a string
 */
-export interface CardContentFormats {
+export interface PageContentFormats {
   markdown: string;
 }
 
@@ -110,7 +110,7 @@ export interface CardContentFormats {
  * @swagger
  * components:
  *  schemas:
- *    Card:
+ *    Page:
  *      type: object
  *      properties:
  *        id:
@@ -135,7 +135,7 @@ export interface CardContentFormats {
  *          example: Finalise community guidelines
  *        content:
  *          type: object
- *          $ref: '#/components/schemas/CardContentFormats'
+ *          $ref: '#/components/schemas/PageContentFormats'
  *        isTemplate:
  *          type: string
  *          example: false
@@ -150,12 +150,12 @@ export interface CardContentFormats {
  *                example: Medium
  *
  */
-export interface Card {
+export interface Page {
   id: string
   createdAt: string
   updatedAt: string
   databaseId: string
-  content: CardContentFormats
+  content: PageContentFormats
   title: string
   isTemplate: boolean
   properties: Record<string, string | number>
@@ -167,7 +167,7 @@ export interface Card {
  * @swagger
  * components:
  *  schemas:
- *    CardQuery:
+ *    PageQuery:
  *      type: object
  *      properties:
  *        title:
@@ -188,7 +188,7 @@ export interface Card {
  *              required: false
  *
  */
-export type CardQuery = Partial<Pick<Card, 'title' | 'properties'>>
+export type PageQuery = Partial<Pick<Page, 'title' | 'properties'>>
 
 /**
  *

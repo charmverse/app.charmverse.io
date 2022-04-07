@@ -8,7 +8,7 @@ import 'swagger-ui-react/swagger-ui.css';
 export const getStaticProps: GetStaticProps = async ctx => {
   const spec: Record<string, any> = createSwaggerSpec({
     apiFolder: 'pages/api/v1',
-    schemaFolders: ['lib/blocks-api'],
+    schemaFolders: ['lib/public-api'],
     definition: {
       openapi: '3.0.0',
       info: {

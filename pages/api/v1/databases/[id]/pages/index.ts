@@ -3,38 +3,38 @@ import { prisma } from 'db';
 import { onError, onNoMatch, getSpaceFromApiKey, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { CardFromBlock } from 'lib/public-api/card.class';
+import { PageFromBlock } from 'lib/public-api/card.class';
 import { v4 } from 'uuid';
-import { Card, CardProperty } from 'lib/public-api/interfaces';
+import { Page, PageProperty } from 'lib/public-api/interfaces';
 import { mapProperties } from 'lib/public-api/mapProperties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireApiKey)
-  .use(requireKeys<Card>(['title', 'properties'], 'body'))
-  .post(createCard);
+  .use(requireKeys<Page>(['title', 'properties'], 'body'))
+  .post(createPage);
 
 /**
  * @swagger
- * /databases/{databaseId}/cards:
+ * /databases/{databaseId}/pages:
  *   post:
- *     summary: Create a new card in the database
- *     description: Create a new card with a title and any set of values from the custom properties in your database.
+ *     summary: Create a new page in the database
+ *     description: Create a new page with a title and any set of values from the custom properties in your database.
  *     requestBody:
  *       content:
  *          application/json:
  *             schema:
- *                $ref: '#/components/schemas/CardQuery'
+ *                $ref: '#/components/schemas/PageQuery'
  *     responses:
  *       200:
  *         description: Summary of the database
  *         content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/Card'
+ *                $ref: '#/components/schemas/Page'
  */
-async function createCard (req: NextApiRequest, res: NextApiResponse) {
+async function createPage (req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
   const space = await getSpaceFromApiKey(req);
@@ -53,7 +53,7 @@ async function createCard (req: NextApiRequest, res: NextApiResponse) {
 
   const { title, properties } = req.body;
 
-  const boardSchema = (board.fields as any).cardProperties as CardProperty [];
+  const boardSchema = (board.fields as any).cardProperties as PageProperty [];
 
   let propertiesToAdd: Record<string, string | number> = {};
 
@@ -111,7 +111,7 @@ async function createCard (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const card = new CardFromBlock(block, (board.fields as any).cardProperties);
+  const card = new PageFromBlock(block, (board.fields as any).cardProperties);
 
   return res.status(201).send(card);
 

@@ -2,9 +2,9 @@
 import { Block } from '@prisma/client';
 import { convertPageContentToMarkdown } from 'components/common/CharmEditor/CharmEditor';
 import { PageContent } from 'models';
-import { Card, CardProperty, CardContentFormats } from './interfaces';
+import { Page, PageProperty, PageContentFormats } from './interfaces';
 
-export class CardFromBlock implements Card {
+export class PageFromBlock implements Page {
   id: string;
 
   createdAt: string;
@@ -13,7 +13,7 @@ export class CardFromBlock implements Card {
 
   databaseId: string;
 
-  content: CardContentFormats;
+  content: PageContentFormats;
 
   title: string;
 
@@ -21,7 +21,7 @@ export class CardFromBlock implements Card {
 
   properties: Record<string, string | number>;
 
-  constructor (block: Block, propertySchemas: CardProperty [], pageContent?: PageContent) {
+  constructor (block: Block, propertySchemas: PageProperty [], pageContent?: PageContent) {
     this.id = block.id;
     this.createdAt = new Date(block.createdAt).toISOString();
     this.updatedAt = new Date(block.createdAt).toISOString();
@@ -39,7 +39,7 @@ export class CardFromBlock implements Card {
    * @param properties
    * @param propertySchemas
    */
-  private parseProperties (properties: Record<string, string | number>, propertySchemas: CardProperty []): Record<string, string | number> {
+  private parseProperties (properties: Record<string, string | number>, propertySchemas: PageProperty []): Record<string, string | number> {
     const values: any = Object.keys(properties).reduce((constructedObj, propertyId) => {
 
       const matchedSchema = propertySchemas.find(schema => schema.id === propertyId);

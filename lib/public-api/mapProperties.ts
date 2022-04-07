@@ -1,11 +1,11 @@
-import { CardProperty } from '../interfaces';
+import { PageProperty } from './interfaces';
 
 /**
  * Used for mapping human-friendly values to focalboard representation
  * @param props
  * @param cardPropertySchema Custom properties for cards are defined in a parent board
  */
-export function mapProperties (properties: Record<string, string | number>, cardPropertySchema: CardProperty []): Record<string, string | number> {
+export function mapProperties (properties: Record<string, string | number>, cardPropertySchema: PageProperty []): Record<string, string | number> {
 
   const keysToMap = Object.keys(properties);
 

@@ -1,8 +1,8 @@
 
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { CardFromBlock } from 'lib/public-api/card.class';
-import { Card, CardProperty } from 'lib/public-api/interfaces';
+import { PageFromBlock } from 'lib/public-api/card.class';
+import { Page, PageProperty } from 'lib/public-api/interfaces';
 import { mapProperties } from 'lib/public-api/mapProperties';
 import { getSpaceFromApiKey, onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -12,25 +12,25 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireApiKey)
-  .get(getCard)
-  .patch(updateCard);
+  .get(getPage)
+  .patch(updatePage);
 
 /**
  * @swagger
- * /databases/{databaseId}/card/{cardId}:
+ * /databases/{databaseId}/pages/{pageId}:
  *   get:
- *     summary: Find card by ID
+ *     summary: Find page by ID
  *     responses:
  *       200:
- *         description: Summary of the database
+ *         description: Page with content and properties
  *         content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/Card'
+ *                $ref: '#/components/schemas/Page'
  */
-async function getCard (req: NextApiRequest, res: NextApiResponse) {
+async function getPage (req: NextApiRequest, res: NextApiResponse) {
 
-  const { cardId, id } = req.query;
+  const { pageId, id } = req.query;
 
   const space = await getSpaceFromApiKey(req);
 
@@ -46,7 +46,7 @@ async function getCard (req: NextApiRequest, res: NextApiResponse) {
     prisma.block.findFirst({
       where: {
         type: 'card',
-        id: cardId as string,
+        id: pageId as string,
         rootId: id as string,
         spaceId: space.id
       }
@@ -57,7 +57,7 @@ async function getCard (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Board not found' });
   }
   if (!card) {
-    return res.status(404).send({ error: 'Card not found' });
+    return res.status(404).send({ error: 'Page not found' });
   }
 
   const cardPageContent = await prisma.block.findFirst({
@@ -67,35 +67,35 @@ async function getCard (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const boardSchema = (board.fields as any).cardProperties as CardProperty[];
+  const boardSchema = (board.fields as any).cardProperties as PageProperty[];
 
-  const cardToReturn = new CardFromBlock(card, boardSchema, (cardPageContent?.fields as any)?.content);
+  const cardToReturn = new PageFromBlock(card, boardSchema, (cardPageContent?.fields as any)?.content);
 
   return res.status(200).json(cardToReturn);
 }
 
 /**
  * @swagger
- * /databases/{databaseId}/cards:
+ * /databases/{databaseId}/pages:
  *   patch:
- *     summary: Update an existing card in the database
- *     description: Update a card's title and / or its custom properties.
+ *     summary: Update an existing page in the database
+ *     description: Update a page's title and / or its custom properties.
  *     requestBody:
  *       content:
  *          application/json:
  *                schema:
- *                  $ref: '#/components/schemas/CardQuery'
+ *                  $ref: '#/components/schemas/PageQuery'
  *     responses:
  *       200:
- *         description: Summary of the database
+ *         description: Returns the updated page
  *         content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/Card'
+ *                $ref: '#/components/schemas/Page'
  */
-async function updateCard (req: NextApiRequest, res: NextApiResponse) {
+async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
-  const { cardId, id } = req.query;
+  const { pageId, id } = req.query;
 
   const space = await getSpaceFromApiKey(req);
 
@@ -111,7 +111,7 @@ async function updateCard (req: NextApiRequest, res: NextApiResponse) {
     prisma.block.findFirst({
       where: {
         type: 'card',
-        id: cardId as string,
+        id: pageId as string,
         rootId: id as string,
         spaceId: space.id
       }
@@ -122,12 +122,12 @@ async function updateCard (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Board not found' });
   }
   if (!card) {
-    return res.status(404).send({ error: 'Card not found' });
+    return res.status(404).send({ error: 'Page not found' });
   }
 
-  const boardSchema: CardProperty [] = (board.fields as any).cardProperties;
+  const boardSchema: PageProperty [] = (board.fields as any).cardProperties;
 
-  const requestBodyUpdate = req.body as Pick<Card, 'properties' | 'title'>;
+  const requestBodyUpdate = req.body as Pick<Page, 'properties' | 'title'>;
 
   const updateContent: Prisma.BlockUpdateInput = {
   };
@@ -159,9 +159,9 @@ async function updateCard (req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const updatedCard = await prisma.block.update({
+  const updatedPage = await prisma.block.update({
     where: {
-      id: cardId as string
+      id: pageId as string
     },
     data: updateContent
   });
@@ -173,7 +173,7 @@ async function updateCard (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const cardToReturn = new CardFromBlock(updatedCard, boardSchema, (cardPageContent?.fields as any)?.content);
+  const cardToReturn = new PageFromBlock(updatedPage, boardSchema, (cardPageContent?.fields as any)?.content);
 
   return res.status(200).json(cardToReturn);
 }

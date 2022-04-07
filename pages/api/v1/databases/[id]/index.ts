@@ -5,9 +5,9 @@ import { getSpaceFromApiKey, onError, onNoMatch, requireApiKey } from 'lib/middl
 import { filterObjectKeys } from 'lib/utilities/objects';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { CardFromBlock } from 'lib/public-api/card.class';
+import { PageFromBlock } from 'lib/public-api/card.class';
 import { validate } from 'uuid';
-import { BoardPage, CardProperty, CardQuery, PaginatedQuery, PaginatedResponse, Card } from 'lib/public-api/interfaces';
+import { DatabasePage, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse, Page } from 'lib/public-api/interfaces';
 import { mapProperties } from 'lib/public-api/mapProperties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -22,14 +22,14 @@ handler
  * /databases/{databaseId}:
  *   get:
  *     summary: Find database by ID
- *     description: Use the ID of the board, or its path ie. 'getting-started'. <br /> <br />  The board object contains the schema for the custom properties assigned to cards.
+ *     description: Use the ID of the Database Page, or its path ie. 'getting-started'. <br /> <br />  The board object contains the schema for the custom properties assigned to pages inside it.
  *     responses:
  *       200:
  *         description: Summary of the database
  *         content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/BoardPage'
+ *                $ref: '#/components/schemas/DatabasePage'
  */
 async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
 
@@ -74,7 +74,7 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Database not found' });
   }
 
-  const filteredDatabaseObject = filterObjectKeys(database as any as BoardPage, 'include', ['id', 'createdAt', 'updatedAt', 'type', 'title', 'url']);
+  const filteredDatabaseObject = filterObjectKeys(database as any as DatabasePage, 'include', ['id', 'createdAt', 'updatedAt', 'type', 'title', 'url']);
 
   const domain = process.env.DOMAIN;
 
@@ -90,8 +90,8 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  * @swagger
  * /databases/{databaseId}:
  *   post:
- *     summary: Search cards in database
- *     description: Get the available field names from the schema in the board. You can then query using its values.<br/><br/>The below example properties are only for illustrative purposes.<br/><br/>You can return up to 100 records per query
+ *     summary: Search pages in database
+ *     description: Get the available field names from the schema in the board. You can then query using its values.<br/><br/>The example properties below are only for illustrative purposes.<br/><br/>You can return up to 100 records per query
  *     requestBody:
  *       content:
  *          application/json:
@@ -108,7 +108,7 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  *                    example: e63758e2-de17-48b2-9c74-5a40ea5be761
  *                  card:
  *                    type: object
- *                    $ref: '#/components/schemas/CardQuery'
+ *                    $ref: '#/components/schemas/PageQuery'
  *     responses:
  *       200:
  *         description: Summary of the database
@@ -126,7 +126,7 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  *                  data:
  *                    type: array
  *                    items:
- *                      $ref: '#/components/schemas/Card'
+ *                      $ref: '#/components/schemas/Page'
  */
 async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
@@ -147,9 +147,9 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Board not found' });
   }
 
-  const searchQuery = req.body as PaginatedQuery<{card: CardQuery}>;
+  const searchQuery = req.body as PaginatedQuery<{card: PageQuery}>;
 
-  const boardSchema = (board.fields as any).cardProperties as CardProperty[];
+  const boardSchema = (board.fields as any).cardProperties as PageProperty[];
 
   // Early exit to inform user these should be nested
   if ((searchQuery as any).title || (searchQuery as any).properties) {
@@ -245,7 +245,7 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   const cardsWithContent = cards.map(card => {
     const cardPageData = cardsPageContent.find(page => page.parentId === card.id);
 
-    return new CardFromBlock(card, boardSchema, (cardPageData?.fields as any)?.content);
+    return new PageFromBlock(card, boardSchema, (cardPageData?.fields as any)?.content);
 
   });
 
@@ -254,11 +254,11 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   if (cards.length > 0) {
 
-    const lastCardId = cards[cards.length - 1].id;
+    const lastPageId = cards[cards.length - 1].id;
 
     const remainingRecords = await prisma.block.count({
       cursor: {
-        id: lastCardId
+        id: lastPageId
       },
       skip: 1,
       where: prismaQueryContent,
@@ -269,11 +269,11 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
     if (remainingRecords > 0) {
       hasNext = true;
-      cursor = lastCardId;
+      cursor = lastPageId;
     }
   }
 
-  const paginatedResponse: PaginatedResponse<Card> = {
+  const paginatedResponse: PaginatedResponse<Page> = {
     hasNext,
     cursor,
     data: cardsWithContent
