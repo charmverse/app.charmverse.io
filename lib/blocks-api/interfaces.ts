@@ -47,10 +47,6 @@ export interface CardProperty {
   } []
 }
 
-export interface ApiPage extends Pick<Page, 'id' | 'createdAt' | 'type' | 'title' | 'content'> {
-  url: string
-}
-
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
  *
@@ -68,15 +64,16 @@ export interface ApiPage extends Pick<Page, 'id' | 'createdAt' | 'type' | 'title
  *          type: string
  *          format: date-time
  *          example: 2022-04-04T21:32:38.317Z
+ *        updatedAt:
+ *          type: string
+ *          format: date-time
+ *          example: 2022-04-04T21:32:38.317Z
  *        type:
  *          type: string
  *          example: board
  *        title:
  *          type: string
  *          example: Todo tracker
- *        content:
- *          type: string
- *          example: content
  *        url:
  *          type: string
  *          example: https://app.charmverse.io/my-workspace/page-5985679461310778
@@ -87,8 +84,8 @@ export interface ApiPage extends Pick<Page, 'id' | 'createdAt' | 'type' | 'title
  *            $ref: '#/components/schemas/CardProperty'
  *
  */
-
-export interface BoardPage extends ApiPage {
+export interface BoardPage extends Pick<Page, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'title'> {
+  url: string
   type: 'board'
 }
 

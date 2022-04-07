@@ -74,7 +74,7 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Database not found' });
   }
 
-  const filteredDatabaseObject = filterObjectKeys(database as any as BoardPage, 'include', ['id', 'createdAt', 'type', 'title', 'content', 'url']);
+  const filteredDatabaseObject = filterObjectKeys(database as any as BoardPage, 'include', ['id', 'createdAt', 'updatedAt', 'type', 'title', 'url']);
 
   const domain = process.env.DOMAIN;
 
@@ -82,7 +82,6 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   (filteredDatabaseObject as any).schema = (board as any).fields.cardProperties;
   filteredDatabaseObject.id = board.id;
-  filteredDatabaseObject.content = '';
 
   return res.status(200).json(filteredDatabaseObject);
 }
