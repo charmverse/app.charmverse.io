@@ -3,7 +3,7 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { v4 } from 'uuid';
+import { v4, validate } from 'uuid';
 import { Page, PageProperty, mapProperties, PageFromBlock, validateCreationData } from 'lib/public-api';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -37,6 +37,14 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
 
   const spaceId = req.authorizedSpaceId;
 
+  const isValidUuid = validate(id as string);
+
+  const domain = process.env.DOMAIN ?? 'https://app.charmverse.io';
+
+  if (!isValidUuid) {
+    return res.status(400).json({ error: `Please provide a valid database ID. Visit ${domain}/api-docs to find out how to get this` });
+  }
+
   const board = await prisma.block.findFirst({
     where: {
       type: 'board',
@@ -67,6 +75,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
     propertiesToAdd = mapProperties(properties, boardSchema);
   }
   catch (error) {
+    console.log('Success', boardSchema);
     return res.status(400).json(error);
   }
 
