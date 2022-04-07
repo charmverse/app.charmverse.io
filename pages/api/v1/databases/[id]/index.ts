@@ -45,38 +45,32 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
   const isValidUuid = validate(id as string);
 
   // eslint-disable-next-line prefer-const
-  let [database, board] = await Promise.all([
-    prisma.page.findFirst({
-      where: isValidUuid ? {
-        type: 'board',
-        boardId: id as string,
-        spaceId
-      } : {
-        type: 'board',
-        path: id as string,
-        spaceId
-      }
+  const database = await prisma.page.findFirst({
+    where: isValidUuid ? {
+      type: 'board',
+      boardId: id as string,
+      spaceId
+    } : {
+      type: 'board',
+      path: id as string,
+      spaceId
+    }
 
-    }),
-    isValidUuid ? prisma.block.findFirst({
-      where: {
-        type: 'board',
-        id: id as string
-      }
-    }) : null
-  ]);
+  });
 
-  if (!isValidUuid && database && database.boardId) {
-    board = await prisma.block.findFirst({
-      where: {
-        type: 'board',
-        id: database.boardId as string
-      }
-    }) as any as Block;
+  if (!database) {
+    return res.status(404).send({ error: 'Database not found' });
   }
 
-  if (!database || !board) {
-    return res.status(404).send({ error: 'Database not found' });
+  const board = await prisma.block.findFirst({
+    where: {
+      type: 'board',
+      id: database.boardId as string
+    }
+  }) as any as Block;
+
+  if (!board) {
+    return res.status(404).send({ error: 'Board not found' });
   }
 
   const filteredDatabaseObject = filterObjectKeys(database as any as DatabasePage, 'include', ['id', 'createdAt', 'updatedAt', 'type', 'title', 'url']);
