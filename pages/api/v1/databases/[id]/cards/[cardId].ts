@@ -1,9 +1,9 @@
 
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { CardFromBlock } from 'lib/blocks-api/card.class';
-import { Card, CardProperty } from 'lib/blocks-api/interfaces';
-import { mapProperties } from 'lib/blocks-api/mapProperties';
+import { CardFromBlock } from 'lib/public-api/card.class';
+import { Card, CardProperty } from 'lib/public-api/interfaces';
+import { mapProperties } from 'lib/public-api/mapProperties';
 import { getSpaceFromApiKey, onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

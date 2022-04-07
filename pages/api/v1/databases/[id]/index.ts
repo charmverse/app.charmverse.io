@@ -5,10 +5,10 @@ import { getSpaceFromApiKey, onError, onNoMatch, requireApiKey } from 'lib/middl
 import { filterObjectKeys } from 'lib/utilities/objects';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { CardFromBlock } from 'lib/blocks-api/card.class';
+import { CardFromBlock } from 'lib/public-api/card.class';
 import { validate } from 'uuid';
-import { BoardPage, CardProperty, CardQuery, PaginatedQuery, PaginatedResponse, Card } from 'lib/blocks-api/interfaces';
-import { mapProperties } from 'lib/blocks-api/mapProperties';
+import { BoardPage, CardProperty, CardQuery, PaginatedQuery, PaginatedResponse, Card } from 'lib/public-api/interfaces';
+import { mapProperties } from 'lib/public-api/mapProperties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
