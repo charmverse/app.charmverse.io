@@ -13,7 +13,7 @@ import log from 'lib/log';
 // TODO: Discord login for /invite route
 
 // Pages shared to the public that don't require user login
-const publicPages = ['/', 'invite', 'share', 'api-docs'];
+export const publicPages = ['/', 'invite', 'share', 'api-docs'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
   const router = useRouter();
