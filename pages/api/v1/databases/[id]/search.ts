@@ -12,6 +12,9 @@ handler
   .use(requireApiKey)
   .post(searchDatabase);
 
+// Limit the maximum size of a search query's results
+const maxRecordsPerQuery = 100;
+
 /**
  * @swagger
  * /databases/{databaseId}/search:
@@ -132,8 +135,6 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     prismaQueryWithCursor.cursor = { id: searchQuery.cursor };
     prismaQueryWithCursor.skip = 1;
   }
-
-  const maxRecordsPerQuery = 100;
 
   if (searchQuery.limit) {
     prismaQueryWithCursor.take = Math.min(maxRecordsPerQuery, searchQuery.limit);
