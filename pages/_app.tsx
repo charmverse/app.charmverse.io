@@ -13,6 +13,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Web3ReactProvider } from '@web3-react/core';
+import log from 'lib/log';
 import { LitProtocolProvider } from 'adapters/litProtocol/hooks/useLitProtocol';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import RouteGuard from 'components/common/RouteGuard';
@@ -170,7 +171,8 @@ import 'theme/lit-share-modal/lit-share-modal.scss';
 import { setTheme as setLitProtocolTheme } from 'theme/lit-share-modal/theme';
 import 'theme/styles.scss';
 import Snackbar from 'components/common/Snackbar';
-import { SnackbarProvider, useSnackbar } from 'hooks/useSnackbar';
+import { SnackbarProvider } from 'hooks/useSnackbar';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -185,6 +187,7 @@ type AppPropsWithLayout = AppProps & {
 export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? (page => page);
+  const router = useRouter();
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -232,7 +235,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   }, [prefersDarkMode, savedDarkMode]);
 
   // wait for router to be ready, as we rely on the URL to know what space to load
-  const router = useRouter();
 
   if (!router.isReady) {
     return null;
@@ -305,6 +307,15 @@ function FocalBoardProviders ({ children }: { children: ReactNode }) {
 }
 
 function DataProviders ({ children }: { children: ReactNode }) {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  useEffect(() => {
+    log.debug('Load focalboard data');
+    if (router.query.domain) {
+      dispatch(initialLoad());
+    }
+  }, [router.query.domain]);
+
   return (
     <UserProvider>
       <SpacesProvider>

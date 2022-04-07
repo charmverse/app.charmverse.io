@@ -10,7 +10,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
-import { Box, CircularProgress } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -19,19 +18,19 @@ import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import { charmEditorPlugins, specRegistry } from 'components/common/CharmEditor/CharmEditor';
 import { useColorMode } from 'context/color-mode';
 import { usePages } from 'hooks/usePages';
-import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
-import Account from './Account';
-import ShareButton from './ShareButton';
+import Account from '../Account';
+import ShareButton from '../ShareButton';
+import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
 
 export const headerHeight = 56;
 
@@ -44,15 +43,14 @@ const StyledToolbar = styled(Toolbar)`
 export default function Header ({ open, openSidebar }: { open: boolean, openSidebar: () => void }) {
   const router = useRouter();
   const colorMode = useColorMode();
-  const [pageTitle] = usePageTitle();
-  const { pages, currentPageId, isEditing } = usePages();
+  const { pages, currentPageId } = usePages();
   const [user, setUser] = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
 
-  const currentPage = currentPageId && pages[currentPageId];
+  const currentPage = currentPageId ? pages[currentPageId] : undefined;
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
@@ -127,30 +125,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
         width: '100%'
       }}
       >
-        <Box sx={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2
-        }}
-        >
-          <Typography noWrap component='div' sx={{ fontWeight: 500, maxWidth: 500, textOverflow: 'ellipsis' }}>
-            {pageTitle}
-          </Typography>
-          {isEditing && (
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}
-            >
-              <CircularProgress size={12} />
-              <Typography variant='subtitle2'>
-                Saving
-              </Typography>
-            </Box>
-          )}
-        </Box>
+        <PageTitleWithBreadcrumbs />
         <Box display='flex' alignItems='center'>
           {isPage && (
             <>
@@ -200,10 +175,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
             </Box>
           )}
 
-          {/** context menu */}
-          {/* <IconButton size='small' sx={{ mx: 1 }} color='inherit'>
-            <MoreHorizIcon />
-          </IconButton> */}
           {/** dark mode toggle */}
           <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
             <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>

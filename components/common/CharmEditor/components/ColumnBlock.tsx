@@ -1,10 +1,8 @@
 import type { RawSpecs } from '@bangle.dev/core';
-import {
-  DOMOutputSpec, Node
-} from '@bangle.dev/pm';
+import { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 
 export const spec = specFactory;
 
@@ -18,9 +16,9 @@ function specFactory (): RawSpecs {
       content: 'block*',
       group: 'block',
       draggable: false,
-      parseDOM: [{ tag: 'div' }],
+      parseDOM: [{ tag: 'div.charm-column' }],
       toDOM: (): DOMOutputSpec => {
-        return ['div', 0];
+        return ['div.charm-column', 0];
       }
     },
     markdown: {
@@ -29,12 +27,11 @@ function specFactory (): RawSpecs {
   };
 }
 
-const StyledColumnBlock = styled(Box)`
+const StyledColumnBlock = styled.div`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  padding: ${({ theme }) => theme.spacing(1, 2)};
   position: relative;
   transition: background-color 250ms ease-in-out;
-  
+
   &:hover {
     transition: background-color 250ms ease-in-out;
     background-color: ${({ theme }) => theme.palette.background.light};
@@ -43,12 +40,22 @@ const StyledColumnBlock = styled(Box)`
   & .bangle-nv-content p {
     overflow-wrap: anywhere;
   }
+
+  margin: 0 -4px;
+
+  > div {
+    padding: 0 4px;
+  }
 `;
 
-export default function ColumnBlock ({ children, node }: {node: Node, children: ReactNode}) {
+function ColumnBlock ({ children, node }: {node: Node, children: ReactNode}) {
   return (
     <StyledColumnBlock>
-      {children}
+      <div>
+        {children}
+      </div>
     </StyledColumnBlock>
   );
 }
+
+export default memo(ColumnBlock);

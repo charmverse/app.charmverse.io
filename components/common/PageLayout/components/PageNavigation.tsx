@@ -1,5 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -32,7 +33,10 @@ import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import NewPageMenu, { StyledDatabaseIcon } from 'components/common/NewPageMenu';
 import EmojiIcon from 'components/common/Emoji';
-
+import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
+import { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
+import AddNewCard from './AddNewCard';
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
 export type MenuNode = Page & {
@@ -103,19 +107,6 @@ const AdjacentDropZone = styled.div`
   background-color: ${({ theme }) => theme.palette.primary.main};
 `;
 
-export const StyledIconButton = styled(IconButton)`
-  border-radius: 3px;
-  border: 1px solid ${({ theme }) => theme.palette.divider};
-  height: 16px;
-  width: 16px;
-  svg {
-    font-size: 16px;
-  }
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.action.hover};
-  }
-`;
-
 const PageAnchor = styled.a`
   color: inherit;
   text-decoration: none;
@@ -137,14 +128,19 @@ const PageAnchor = styled.a`
   }
 `;
 
-const StyledPageIcon = styled(EmojiIcon)`
+export const StyledPageIcon = styled(EmojiIcon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
+  // style focalboard icons;
+  .Icon {
+    height: 22px;
+    width: 22px;
+  }
 `;
 
-export const PageTitle = styled(Typography)<{ isempty?: number }>`
+export const PageTitle = styled(Typography) <{ isempty?: number }>`
   color: inherit;
   display: flex;
   align-items: center;
@@ -224,7 +220,7 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
   );
 }
 
-const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent: boolean }>(
+const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent?: boolean }>(
   ({ isAdjacent, ...props }, ref) => (
     <div style={{ position: 'relative' }}>
       <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
@@ -233,7 +229,7 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
-export function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode, pageType: Page['type'], isEditorEmpty: boolean}) {
+export function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode, pageType: Page['type'], isEditorEmpty: boolean }) {
 
   if (icon) {
     return <StyledPageIcon icon={icon} />;
@@ -255,7 +251,6 @@ const PageTreeItem = forwardRef((props: any, ref) => {
   const {
     addSubPage,
     deletePage,
-    color,
     href,
     isAdjacent,
     isEmptyContent,
@@ -264,6 +259,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     boardId,
     pageType,
     pageId,
+    hasSelectedChildView,
     ...other
   } = props;
 
@@ -275,7 +271,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     event.stopPropagation();
   }
 
-  function hideMenu (event: React.MouseEvent<HTMLElement>) {
+  function hideMenu () {
     setAnchorEl(null);
   }
 
@@ -318,14 +314,16 @@ const PageTreeItem = forwardRef((props: any, ref) => {
               <IconButton size='small' onClick={showMenu}>
                 <MoreHorizIcon color='secondary' fontSize='small' />
               </IconButton>
-              {addSubPage && (
+              {addSubPage && pageType === 'board' ? (
+                <AddNewCard pageId={pageId} />
+              ) : (
                 <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} sx={{ marginLeft: '3px' }} />
               )}
             </div>
           </PageLink>
         )}
         ContentComponent={TreeItemComponent}
-        ContentProps={{ isAdjacent }}
+        ContentProps={{ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }}
         {...other}
         TransitionProps={{ timeout: 50 }}
         ref={ref}
@@ -351,6 +349,39 @@ const PageTreeItem = forwardRef((props: any, ref) => {
   );
 });
 
+interface BoardViewTreeItemProps {
+  href: string;
+  label: string;
+  nodeId: string;
+  viewType: IViewType;
+}
+
+const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((props, ref) => {
+  const {
+    href,
+    label,
+    viewType,
+    nodeId
+  } = props;
+
+  const labelIcon = iconForViewType(viewType);
+
+  return (
+    <StyledTreeItem
+      label={(
+        <PageLink
+          href={href}
+          label={label}
+          labelIcon={labelIcon}
+        />
+      )}
+      nodeId={nodeId}
+      ref={ref}
+      TransitionProps={{ timeout: 50 }}
+    />
+  );
+});
+
 // pulled from react-merge-refs
 function mergeRefs (refs: any) {
   return (value: any) => {
@@ -372,9 +403,10 @@ type NodeProps = {
   pathPrefix: string;
   addPage?: (p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
+  selectedNodeId: string | null;
 }
 
-function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage }: NodeProps) {
+function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage, selectedNodeId }: NodeProps) {
   const ref = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
@@ -441,7 +473,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
     drag(elt);
   }, [drag]);
 
-  const isActive = !isAdjacent && canDrop && isOverCurrent;
+  const isActive = !isAdjacent && canDrop && isOverCurrent && !item.boardId;
   const isAdjacentActive = isAdjacent && canDrop && isOverCurrent;
 
   function addSubPage (page: Partial<Page>) {
@@ -462,14 +494,19 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
   const isEmptyContent = docContent && (docContent.length <= 1
     && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
 
+  const viewsRecord = useAppSelector((state) => state.views.views);
+  const views = Object.values(viewsRecord).filter(view => view.parentId === item.boardId);
+
+  const hasSelectedChildView = views.some(view => view.id === selectedNodeId);
+
   return (
     <PageTreeItem
       data-handler-id={handlerId}
       pageId={item.id}
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
+      hasSelectedChildView={hasSelectedChildView}
       ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
-      key={item.id}
       nodeId={item.id}
       id={item.id}
       label={item.title}
@@ -485,23 +522,34 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
         // borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
       }}
     >
-      {item.children?.length > 0
-        ? item.children.map((childItem, index) => (
-          <RenderDraggableNode
-            onDropAdjacent={onDropAdjacent}
-            onDropChild={onDropChild}
-            pathPrefix={pathPrefix}
-            key={childItem.id}
-            item={childItem}
-            addPage={addPage}
-            deletePage={deletePage}
-          />
-        ))
-        : (
-          <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
-            No pages inside
-          </Typography>
-        )}
+      {item.type === 'page' ? (
+        item.children.length > 0
+          ? item.children.map((childItem) => (
+            <RenderDraggableNode
+              onDropAdjacent={onDropAdjacent}
+              onDropChild={onDropChild}
+              pathPrefix={pathPrefix}
+              key={childItem.id}
+              item={childItem}
+              addPage={addPage}
+              selectedNodeId={selectedNodeId}
+              deletePage={deletePage}
+            />
+          ))
+          : (
+            <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
+              No pages inside
+            </Typography>
+          )
+      ) : views.map(view => (
+        <BoardViewTreeItem
+          key={view.id}
+          href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+          label={view.title}
+          nodeId={view.id}
+          viewType={view.fields.viewType}
+        />
+      ))}
     </PageTreeItem>
   );
 }
@@ -523,7 +571,8 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
   for (i = 0; i < tempItems.length; i += 1) {
     node = tempItems[i];
     const index = node[key] ? map[node[key]!] : -1;
-    if (node[key] && tempItems[index]) {
+    // Make sure its not a database page
+    if (node[key] && tempItems[index] && !tempItems[index].boardId) {
       tempItems[index].children.push(node);
       sortArrayByObjectProperty(tempItems[index].children, 'index');
     }
@@ -595,6 +644,7 @@ export default function PageNavigation ({
   space,
   rootPageIds
 }: NavProps) {
+  const router = useRouter();
   const { pages, currentPageId, setPages, addPageAndRedirect } = usePages();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
 
@@ -673,12 +723,20 @@ export default function PageNavigation ({
     setExpanded(nodeIds);
   }
 
+  let selectedNodeId: string | null = null;
+  if (currentPageId) {
+    selectedNodeId = currentPageId;
+    if (typeof router.query.viewId === 'string') {
+      selectedNodeId = router.query.viewId;
+    }
+  }
+
   return (
     <TreeRoot
       setPages={setPages}
       expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
-      selected={currentPageId || null}
+      selected={selectedNodeId}
       onNodeToggle={onNodeToggle}
       aria-label='items navigator'
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
@@ -690,9 +748,15 @@ export default function PageNavigation ({
         <RenderDraggableNode
           key={item.id}
           item={item}
-          onDropChild={onDropChild}
+          onDropChild={(a, b) => {
+            if (!item.boardId) {
+              onDropChild(a, b);
+            }
+          }}
           onDropAdjacent={onDropAdjacent}
           pathPrefix={`/${space.domain}`}
+          // pass down so parent databases can highlight themselves
+          selectedNodeId={selectedNodeId}
           addPage={page => addPageAndRedirect(page)}
           deletePage={deletePage}
         />

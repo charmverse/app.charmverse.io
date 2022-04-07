@@ -99,10 +99,10 @@ export function InputSearchContributor ({ defaultValue, onChange, ...props }: II
 
   return (
     <InputSearchContributorBase
-      multiple
       options={contributors}
       onChange={(e, _value) => emitValue(_value as Contributor)}
       placeholder='Select a user'
+      value={value}
       {...props}
     />
   );

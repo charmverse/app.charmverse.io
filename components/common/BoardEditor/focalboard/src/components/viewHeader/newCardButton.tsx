@@ -23,7 +23,6 @@ type Props = {
 const NewCardButton = React.memo((props: Props): JSX.Element => {
     const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates)
     const currentView = useAppSelector(getCurrentView)
-    const intl = useIntl()
 
     return (
         <ButtonWithMenu

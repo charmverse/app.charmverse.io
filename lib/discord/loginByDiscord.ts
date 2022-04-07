@@ -1,11 +1,5 @@
-import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { prisma } from 'db';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { withSessionRoute } from 'lib/session/withSession';
-import log from 'lib/log';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
-import { LoggedInUser } from 'models';
 
 export interface DiscordAccount {
   id: string
@@ -28,7 +22,8 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
         include: {
           favorites: true,
           spaceRoles: true,
-          discordUser: true
+          discordUser: true,
+          telegramUser: true
         }
       }
     }
@@ -56,7 +51,8 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
       include: {
         favorites: true,
         spaceRoles: true,
-        discordUser: true
+        discordUser: true,
+        telegramUser: true
       }
     });
 

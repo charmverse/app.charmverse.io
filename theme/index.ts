@@ -4,7 +4,7 @@ import { darken } from '@mui/system';
 import {
   backgroundColor,
   backgroundColorDarkMode, backgroundDarkColor, backgroundDarkColorDarkMode, backgroundLightColor,
-  backgroundLightColorDarkMode, blueColor, BrandColors,
+  backgroundLightColorDarkMode, blueColor, BrandColor,
   darkBlueColor, darkModeColors, lightModeColors, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
   settingsHeaderBackgroundColorDarkMode
@@ -18,7 +18,7 @@ declare module '@emotion/react' {
 
 type FocalBoardColors = typeof darkThemeFocalBoard;
 
-interface CustomColors extends FocalBoardColors, Record<BrandColors, any> {
+interface CustomColors extends FocalBoardColors, Record<BrandColor, any> {
   settingsHeader: {
     background: string
   };
@@ -59,7 +59,7 @@ declare module '@mui/material/styles/createPalette' {
 
 // Extend color prop on components
 declare module '@mui/material/Chip' {
-  export interface ChipPropsColorOverrides extends Record<BrandColors, true> {
+  export interface ChipPropsColorOverrides extends Record<BrandColor, true> {
     facebook: true;
     twitter: true;
   }
@@ -277,14 +277,6 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       //     }
       //   }
       // },
-      MuiOutlinedInput: {
-        styleOverrides: {
-          input: {
-            padding: '10px 10px',
-            fontSize: 16
-          }
-        }
-      },
       MuiLink: {
         styleOverrides: {
           root: {

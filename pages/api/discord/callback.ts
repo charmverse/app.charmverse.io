@@ -25,7 +25,9 @@ handler.get(async (req, res) => {
   if (type === 'login') {
     try {
       const user = await loginByDiscord({ code: tempAuthCode, hostName: req.headers.host });
-      req.session.user = user;
+      // strip out large fields so we dont break the cookie
+      const { discordUser, spaceRoles, telegramUser, ...userData } = user;
+      req.session.user = userData;
     }
     catch (error) {
       log.warn('Error while connecting to Discord', error);

@@ -20,6 +20,7 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
     },
     include: {
       favorites: true,
+      telegramUser: true,
       discordUser: true,
       spaceRoles: {
         include: {
@@ -37,7 +38,9 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
     return res.status(401).send({ error: 'No user has been associated with this wallet address' });
   }
 
-  req.session.user = user;
+  // strip out large fields so we dont break the cookie
+  const { discordUser, spaceRoles, telegramUser, ...userData } = user;
+  req.session.user = userData;
   await req.session.save();
 
   return res.status(200).json(user);

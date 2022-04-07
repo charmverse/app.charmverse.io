@@ -2,11 +2,10 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import InputLabel from '@mui/material/InputLabel';
+import FieldLabel from 'components/common/form/FieldLabel';
 import TextField from '@mui/material/TextField';
 import { Application } from '@prisma/client';
 import charmClient from 'charmClient';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -56,7 +55,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
       onSubmit(createdApplication);
     }
     else if (mode === 'update') {
-      const updatedApplication = await charmClient.updateApplication(proposalToSave);
+      await charmClient.updateApplication(proposalToSave);
       onSubmit(proposalToSave);
     }
 
@@ -67,13 +66,14 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
       <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
-            <InputLabel>
+            <FieldLabel>
               Your proposal
-            </InputLabel>
+            </FieldLabel>
             <TextField
               {...register('message')}
               autoFocus
               placeholder={applicationExample}
+              minRows={5}
               multiline
               variant='outlined'
               type='text'
@@ -90,9 +90,9 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
           </Grid>
 
           <Grid item>
-            <InputLabel>
+            <FieldLabel>
               Address to get paid for this bounty
-            </InputLabel>
+            </FieldLabel>
             <TextField
               {...register('walletAddress')}
               defaultValue={walletAddress}

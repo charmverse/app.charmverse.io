@@ -10,8 +10,8 @@ export function spec (): RawSpecs {
     schema: {
       inline: true,
       group: 'inline',
-      parseDOM: [{ tag: 'span.tab' }],
-      toDOM: (): DOMOutputSpec => ['span', { className: 'tab', style: 'white-space:pre' }, '\t'],
+      parseDOM: [{ tag: 'span.charm-tab' }],
+      toDOM: (): DOMOutputSpec => ['span', { className: 'charm-tab', style: 'white-space:pre' }, '\t'],
       attrs: {}
     },
     markdown: {

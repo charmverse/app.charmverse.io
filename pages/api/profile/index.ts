@@ -35,12 +35,15 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
           }
         }
       },
-      discordUser: true
+      discordUser: true,
+      telegramUser: true
     }
   });
 
   if (user) {
-    req.session.user = user;
+    // strip out large fields so we dont break the cookie
+    const { discordUser, spaceRoles, telegramUser, ...userData } = user;
+    req.session.user = userData;
     await req.session.save();
     res.status(200).json(user);
   }
@@ -87,7 +90,8 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
           }
         }
       },
-      discordUser: true
+      discordUser: true,
+      telegramUser: true
     }
   });
   if (!profile) {
@@ -112,14 +116,14 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
           }
         }
       },
-      discordUser: true
+      discordUser: true,
+      telegramUser: true
     },
-    data: req.body
+    data: {
+      addresses: req.body.addresses
+    }
   });
-  return res.status(200).json({
-    ...user,
-    addresses: [req.body.address]
-  });
+  return res.status(200).json(user);
 }
 
 export default withSessionRoute(handler);
