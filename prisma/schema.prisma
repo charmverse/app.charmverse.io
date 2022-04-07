@@ -90,7 +90,7 @@ model Block {
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   createdBy String    @db.Uuid
-  user      User?      @relation(fields: [createdBy], references: [id])
+  user      User      @relation(fields: [createdBy], references: [id])
   updatedAt DateTime  @default(now())
   updatedBy String    @db.Uuid
   spaceId   String    @db.Uuid
@@ -119,6 +119,7 @@ model User {
   applications Application[]
   username     String?
   avatar       String?
+  isBot        Boolean?        @default(false)
   discordUser  DiscordUser?
   telegramUser TelegramUser?
 }

@@ -76,6 +76,12 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
     data: {
       id: v4(),
       type: 'card',
+      user: {
+        connect: {
+          id: req.botUser.id
+        }
+      },
+      updatedBy: req.botUser.id,
       rootId: id as string,
       parentId: id as string,
       title,
@@ -101,6 +107,12 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
   const page = await prisma.block.create({
     data: {
       id: pageId,
+      user: {
+        connect: {
+          id: req.botUser.id
+        }
+      },
+      updatedBy: req.botUser.id,
       type: 'charm_text',
       rootId: id as string,
       parentId: block.id,

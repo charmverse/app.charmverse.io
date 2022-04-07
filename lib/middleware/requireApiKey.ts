@@ -1,4 +1,4 @@
-import { Space } from '@prisma/client';
+import { Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
@@ -6,7 +6,42 @@ import { NextHandler } from 'next-connect';
 declare module 'http' {
   interface IncomingMessage {
     authorizedSpaceId: string
+    botUser: User
   }
+}
+
+/**
+ * Returns bot user for the space, and creates one if they do not exist
+ */
+export async function getBotUser (spaceId: string): Promise<User> {
+  let botUser = await prisma.user.findFirst({
+    where: {
+      isBot: true,
+      spaceRoles: {
+        some: {
+          spaceId
+        }
+      }
+    }
+  });
+
+  if (!botUser) {
+    botUser = await prisma.user.create({
+      data: {
+        username: 'Bot',
+        isBot: true
+      }
+    });
+
+    await prisma.spaceRole.create({
+      data: {
+        spaceId,
+        userId: botUser.id
+      }
+    });
+  }
+
+  return botUser;
 }
 
 /**
@@ -64,6 +99,11 @@ export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, 
     }
 
     req.authorizedSpaceId = space.id;
+
+    const botUser = await getBotUser(space.id);
+
+    req.botUser = botUser;
+
   }
   catch (error) {
     console.log('Found error', error);

@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { onError, onNoMatch, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, getBotUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
@@ -53,7 +53,10 @@ async function provisionToken (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
+  await getBotUser(spaceId);
+
   return res.status(200).json(spaceToken);
+
 }
 
 async function invalidateToken (req: NextApiRequest, res: NextApiResponse) {

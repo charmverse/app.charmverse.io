@@ -15,7 +15,7 @@ handler
 
 /**
  * @swagger
- * /databases/{databaseId}/pages/{pageId}:
+ * /pages/{pageId}:
  *   get:
  *     summary: Find page by ID
  *     responses:
@@ -28,34 +28,32 @@ handler
  */
 async function getPage (req: NextApiRequest, res: NextApiResponse) {
 
-  const { pageId, id } = req.query;
+  const { pageId } = req.query;
 
   const spaceId = req.authorizedSpaceId;
 
-  const [board, card] = await Promise.all([
-    prisma.block.findFirst({
-      where: {
-        // Parameter only added for documentation purposes. All cards linked to a root board
-        type: 'board',
-        id: id as string,
-        spaceId
-      }
-    }),
-    prisma.block.findFirst({
-      where: {
-        type: 'card',
-        id: pageId as string,
-        rootId: id as string,
-        spaceId
-      }
-    })
-  ]);
+  const card = await prisma.block.findFirst({
+    where: {
+      type: 'card',
+      id: pageId as string,
+      spaceId
+    }
+  });
+
+  if (!card) {
+    return res.status(404).send({ error: 'Page not found' });
+  }
+  const board = await prisma.block.findFirst({
+    where: {
+      // Parameter only added for documentation purposes. All cards linked to a root board
+      type: 'board',
+      id: card.rootId,
+      spaceId
+    }
+  });
 
   if (!board) {
     return res.status(404).send({ error: 'Board not found' });
-  }
-  if (!card) {
-    return res.status(404).send({ error: 'Page not found' });
   }
 
   const cardPageContent = await prisma.block.findFirst({
@@ -74,7 +72,7 @@ async function getPage (req: NextApiRequest, res: NextApiResponse) {
 
 /**
  * @swagger
- * /databases/{databaseId}/pages:
+ * /pages/{pageId}:
  *   patch:
  *     summary: Update an existing page in the database
  *     description: Update a page's title and / or its custom properties.
@@ -97,30 +95,28 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   const spaceId = req.authorizedSpaceId;
 
-  const [board, card] = await Promise.all([
-    prisma.block.findFirst({
-      where: {
-        // Parameter only added for documentation purposes. All cards linked to a root board
-        type: 'board',
-        id: id as string,
-        spaceId
-      }
-    }),
-    prisma.block.findFirst({
-      where: {
-        type: 'card',
-        id: pageId as string,
-        rootId: id as string,
-        spaceId
-      }
-    })
-  ]);
+  const card = await prisma.block.findFirst({
+    where: {
+      type: 'card',
+      id: pageId as string,
+      spaceId
+    }
+  });
+
+  if (!card) {
+    return res.status(404).send({ error: 'Page not found' });
+  }
+  const board = await prisma.block.findFirst({
+    where: {
+      // Parameter only added for documentation purposes. All cards linked to a root board
+      type: 'board',
+      id: card.rootId,
+      spaceId
+    }
+  });
 
   if (!board) {
     return res.status(404).send({ error: 'Board not found' });
-  }
-  if (!card) {
-    return res.status(404).send({ error: 'Page not found' });
   }
 
   const boardSchema: PageProperty [] = (board.fields as any).cardProperties;
@@ -163,6 +159,8 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json(error);
     }
   }
+  updateContent.updatedBy = req.botUser.id;
+  updateContent.updatedAt = new Date().toISOString();
 
   const updatedPage = await prisma.block.update({
     where: {
