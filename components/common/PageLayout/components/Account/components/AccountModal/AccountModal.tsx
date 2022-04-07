@@ -23,7 +23,7 @@ import charmClient from 'charmClient';
 import log from 'lib/log';
 import { LoggedInUser } from 'models';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { TelegramLoginButton } from 'components/common/TelegramLoginButton';
+import TelegramLoginIframe, { loginWithTelegram } from './components/TelegramLoginIframe';
 
 const UserName = styled(Typography)`
   position: relative;
@@ -134,18 +134,24 @@ function AccountModal ({ isOpen, onClose }:
     }
   }
 
-  async function connectWithTelegram (telegramAccount: TelegramAccount) {
-    if (!connectedWithTelegram) {
+  function connectToTelegram () {
+    loginWithTelegram(async (telegramAccount: TelegramAccount) => {
       setIsConnectingTelegram(true);
-      try {
-        const telegramUser = await charmClient.connectTelegram(telegramAccount);
-        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
+      if (telegramAccount) {
+        try {
+          const telegramUser = await charmClient.connectTelegram(telegramAccount);
+          setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
+        }
+        catch (err: any) {
+          setTelegramError(err.error || 'Something went wrong. Please try again');
+        }
       }
-      catch (err: any) {
-        setTelegramError(err.error || 'Something went wrong. Please try again');
+      else {
+        setTelegramError('Something went wrong. Please try again');
       }
       setIsConnectingTelegram(false);
-    }
+    });
+
   }
 
   function _onClose () {
@@ -215,34 +221,15 @@ function AccountModal ({ isOpen, onClose }:
         <StyledButton
           size='small'
           variant='outlined'
+          sx={{ overflow: 'hidden' }}
           color={connectedWithTelegram ? 'error' : 'primary'}
           disabled={isLoggingOut || isConnectingTelegram}
-          endIcon={(
-            isConnectingTelegram && <CircularProgress size={20} />
-          )}
+          loading={isConnectingTelegram}
+          onClick={() => connectedWithTelegram ? disconnectFromTelegram() : connectToTelegram()}
         >
-          {connectedWithTelegram ? (
-            <div onClick={disconnectFromTelegram}>
-              Disconnect
-            </div>
-          ) : (
-            <>
-              Connect
-              <div style={{
-                opacity: 0,
-                width: '100%',
-                position: 'absolute',
-                height: '100%'
-              }}
-              >
-                <TelegramLoginButton
-                  dataOnauth={connectWithTelegram}
-                  botName='CharmVerseBot'
-                />
-              </div>
-            </>
-          )}
+          {connectedWithTelegram ? 'Disconnect' : 'Connect'}
         </StyledButton>
+        <TelegramLoginIframe />
       </Stack>
       {telegramError && (
         <Alert severity='error'>

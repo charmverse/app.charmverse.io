@@ -109,3 +109,25 @@ function scrollIntoViewIfNeededPolyfill (
 export function silentlyUpdateURL (newUrl: string) {
   window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
 }
+
+export function getCookie (name: string): string {
+  const cookieMap = document.cookie.split(';').reduce<{ [key: string]: string }>((cookies, cookie) => {
+    const _name = cookie.trim().split('=')[0];
+    const value = cookie.trim().split('=')[1];
+    cookies[_name] = decodeURIComponent(value);
+    return cookies;
+  }, {});
+  return cookieMap[name];
+}
+
+// cookies reference: https://developer.mozilla.org/en-US/docs/Web/API/document/cookie
+export function setCookie (name: string, value: string, expiresInDays: number = 10 * 365) {
+  const expires = new Date();
+  expires.setDate(expires.getDate() + expiresInDays);
+  const domainString = window.location.hostname === 'localhost' ? '' : 'domain=charmverse.io; ';
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; ${domainString}path=/; SameSite=Lax; secure`;
+}
+
+export function deleteCookie (name: string) {
+  setCookie(name, '', 0);
+}
