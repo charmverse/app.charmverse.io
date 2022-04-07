@@ -136,6 +136,7 @@ function AccountModal ({ isOpen, onClose }:
 
   function connectToTelegram () {
     loginWithTelegram(async (telegramAccount: TelegramAccount) => {
+      setIsConnectingTelegram(true);
       if (telegramAccount) {
         try {
           const telegramUser = await charmClient.connectTelegram(telegramAccount);
