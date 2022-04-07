@@ -12,7 +12,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireApiKey)
-  .use(requireKeys<Card>(['title', 'cardProperties'], 'body'))
+  .use(requireKeys<Card>(['title', 'properties'], 'body'))
   .post(createCard);
 
 /**
@@ -51,14 +51,14 @@ async function createCard (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Database not found' });
   }
 
-  const { title, cardProperties } = req.body;
+  const { title, properties } = req.body;
 
   const boardSchema = (board.fields as any).cardProperties as CardProperty [];
 
   let propertiesToAdd: Record<string, string | number> = {};
 
   try {
-    propertiesToAdd = mapProperties(cardProperties, boardSchema);
+    propertiesToAdd = mapProperties(properties, boardSchema);
   }
   catch (error) {
     return res.status(400).json(error);

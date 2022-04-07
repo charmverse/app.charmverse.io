@@ -127,7 +127,7 @@ async function updateCard (req: NextApiRequest, res: NextApiResponse) {
 
   const boardSchema: CardProperty [] = (board.fields as any).cardProperties;
 
-  const requestBodyUpdate = req.body as Pick<Card, 'cardProperties' | 'title'>;
+  const requestBodyUpdate = req.body as Pick<Card, 'properties' | 'title'>;
 
   const updateContent: Prisma.BlockUpdateInput = {
   };
@@ -136,10 +136,10 @@ async function updateCard (req: NextApiRequest, res: NextApiResponse) {
     updateContent.title = requestBodyUpdate.title;
   }
 
-  if (requestBodyUpdate.cardProperties) {
+  if (requestBodyUpdate.properties) {
     try {
 
-      const mappedProperties = mapProperties(requestBodyUpdate.cardProperties, boardSchema);
+      const mappedProperties = mapProperties(requestBodyUpdate.properties, boardSchema);
 
       const newPropertySet = {
         ...(card.fields as any).properties,

@@ -19,7 +19,7 @@ export class CardFromBlock implements Card {
 
   isTemplate: boolean;
 
-  cardProperties: Record<string, string | number>;
+  properties: Record<string, string | number>;
 
   constructor (block: Block, propertySchemas: CardProperty [], pageContent?: PageContent) {
     this.id = block.id;
@@ -31,7 +31,7 @@ export class CardFromBlock implements Card {
     };
     this.title = block.title;
     this.isTemplate = (block.fields as any).isTemplate === true;
-    this.cardProperties = this.parseProperties((block.fields as any).properties, propertySchemas);
+    this.properties = this.parseProperties((block.fields as any).properties, propertySchemas);
   }
 
   /**

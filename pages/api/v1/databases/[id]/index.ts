@@ -149,14 +149,24 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   const searchQuery = req.body as PaginatedQuery<{card: CardQuery}>;
 
+  const boardSchema = (board.fields as any).cardProperties as CardProperty[];
+
   // Early exit to inform user these should be nested
-  if ((searchQuery as any).title || (searchQuery as any).cardProperties) {
+  if ((searchQuery as any).title || (searchQuery as any).properties) {
     return res.status(400).json({
-      error: 'The query properties such as \'title\' or \'cardProperties\' for a card should be nested inside a \'card\' property in your request JSON'
+      error: 'The query properties such as \'title\' or \'properties\' for a card should be nested inside a \'card\' property in your request JSON',
+      example: {
+        card: {
+          title: 'search title',
+          properties: {
+            Status: 'Completed'
+          }
+        }
+      }
     });
   }
 
-  const cardProperties = searchQuery.card?.cardProperties ?? {};
+  const cardProperties = searchQuery.card?.properties ?? {};
 
   if (cardProperties && (typeof cardProperties !== 'object' || cardProperties instanceof Array)) {
     return res.status(400).send({
@@ -165,8 +175,6 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   }
 
   const nestedJsonQuery: Prisma.NestedJsonFilter [] = [];
-
-  const boardSchema = (board.fields as any).cardProperties as CardProperty[];
 
   try {
     const queryProperties: Record<string, string | number> = mapProperties(cardProperties, boardSchema);

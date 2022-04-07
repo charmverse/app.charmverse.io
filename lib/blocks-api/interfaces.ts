@@ -139,7 +139,7 @@ export interface CardContentFormats {
  *        isTemplate:
  *          type: string
  *          example: false
- *        cardProperties:
+ *        properties:
  *           type: object
  *           properties:
  *              Status:
@@ -158,7 +158,7 @@ export interface Card {
   content: CardContentFormats
   title: string
   isTemplate: boolean
-  cardProperties: Record<string, string | number>
+  properties: Record<string, string | number>
 }
 
 /**
@@ -174,7 +174,7 @@ export interface Card {
  *          type: string
  *          example: grants
  *          required: false
- *        cardProperties:
+ *        properties:
  *          type: object
  *          required: false
  *          properties:
@@ -188,7 +188,7 @@ export interface Card {
  *              required: false
  *
  */
-export type CardQuery = Partial<Pick<Card, 'title' | 'cardProperties'>>
+export type CardQuery = Partial<Pick<Card, 'title' | 'properties'>>
 
 /**
  *
