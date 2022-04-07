@@ -579,8 +579,6 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
       sortArrayByObjectProperty(tempItems[index].children, 'index');
     }
     else if (!rootPageIds) {
-      // TODO: Page -> Board -> Page -> Page will be shown as its immediate parent is a regular page
-      // we should recursively visit all the parent and see if any one of them is a page or not
       const parentId = node?.[key];
       const isParentCard = parentId && pagesRecord[parentId!]?.cardId;
       const isParentBoard = parentId && pagesRecord[parentId!]?.boardId;
