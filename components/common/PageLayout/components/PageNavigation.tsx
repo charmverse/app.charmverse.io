@@ -31,11 +31,11 @@ import Link from 'next/link';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
-import NewPageMenu, { StyledDatabaseIcon } from 'components/common/NewPageMenu';
 import EmojiIcon from 'components/common/Emoji';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
+import NewPageMenu, { StyledDatabaseIcon } from './NewPageMenu';
 import AddNewCard from './AddNewCard';
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 

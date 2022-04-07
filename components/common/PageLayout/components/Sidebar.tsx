@@ -31,7 +31,7 @@ import { untitledPage } from 'seedData';
 import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
-import NewPageMenu from 'components/common/NewPageMenu';
+import NewPageMenu from 'components/common/PageLayout/components/NewPageMenu';
 import WorkspaceAvatar from 'components/common/WorkspaceAvatar';
 import { headerHeight } from './Header';
 import PageNavigation from './PageNavigation';
