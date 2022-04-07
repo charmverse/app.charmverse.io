@@ -1,8 +1,6 @@
-import { PaymentMethod } from '@prisma/client';
 import { Modal } from 'components/common/Modal';
 import Stack from '@mui/material/Stack';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useState } from 'react';
 import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';

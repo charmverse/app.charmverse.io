@@ -6,7 +6,7 @@ import InputLabel from '@mui/material/InputLabel';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
+import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { getChainById } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -106,7 +106,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
             <InputLabel>
               Blockchain
             </InputLabel>
-            <InputBlockchainSearch
+            <InputSearchBlockchain
               defaultChainId={defaultChainId}
               onChange={setChainId}
             />

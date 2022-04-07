@@ -1,26 +1,18 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
-import Input from '@mui/material/Input';
 import TextField from '@mui/material/TextField';
 import Progress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import { PaymentMethod, WalletType } from '@prisma/client';
+import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
-import { getCryptos, getChainById } from 'connectors';
-import { useBounties } from 'hooks/useBounties';
+import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useUser } from 'hooks/useUser';
 import { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { IUserError } from 'lib/utilities/errors';
-import { CryptoCurrency } from 'models/Currency';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -28,8 +20,8 @@ import * as yup from 'yup';
 export type FormMode = 'create' | 'update';
 
 interface Props {
-  onSubmit: (paymentMethod: Partial<PaymentMethod>) => any,
-  defaultChainId?: number
+  onSubmit: (paymentMethod: PaymentMethod) => void;
+  defaultChainId?: number;
 }
 
 export const schema = yup.object({
@@ -143,6 +135,8 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
       });
     }
 
+    return false;
+
   }
 
   // Only checks the format, not if we can load the logo
@@ -151,14 +145,22 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
   return (
     <div>
       {/* @ts-ignore */}
-      <form onSubmit={handleSubmit(addPaymentMethod)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form
+        onSubmit={(event) => {
+          // stop propagation so it doesnt submit parent forms, like bounty editor
+          event.stopPropagation();
+          event.preventDefault();
+          handleSubmit(addPaymentMethod as any)(event);
+        }}
+        style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}
+      >
         <Grid container direction='column' spacing={3}>
 
           <Grid item xs>
             <InputLabel>
               Blockchain
             </InputLabel>
-            <InputBlockchainSearch
+            <InputSearchBlockchain
               defaultChainId={defaultChainId}
               onChange={setChainId}
             />

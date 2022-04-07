@@ -61,6 +61,7 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
         <TextField
           {...params}
           placeholder={placeholder}
+          size='small'
           inputProps={{
             ...params.inputProps
           }}
