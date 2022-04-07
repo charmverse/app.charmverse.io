@@ -271,7 +271,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                         <img
                           alt=''
                           style={{ maxHeight: '50px' }}
-                          src={values.tokenLogo!}
+                          src={values.tokenLogo || ''}
                           onError={(error) => {
                             setLogoLoadSuccess(false);
                           }}
