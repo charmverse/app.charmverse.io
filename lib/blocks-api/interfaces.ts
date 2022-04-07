@@ -93,6 +93,21 @@ export interface BoardPage extends ApiPage {
 }
 
 /**
+ * @swagger
+ *  components:
+ *  schemas:
+ *    CardContentFormats:
+ *      type: object
+ *      properties:
+ *        markdown:
+ *          type: string
+ *          example: Markdown content as a string
+*/
+export interface CardContentFormats {
+  markdown: string;
+}
+
+/**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
  *
  * @swagger
@@ -118,11 +133,12 @@ export interface BoardPage extends ApiPage {
  *          format: date-time
  *          example: 2022-04-02T07:22:31.097Z
  *        title:
- *          type: string
+ *          type: object
+ *            properties
  *          example: Finalise community guidelines
  *        content:
- *          type: string
- *          example: Markdown content appears here
+ *          type: object
+ *          $ref: '#/components/schemas/CardContentFormats'
  *        isTemplate:
  *          type: string
  *          example: false
@@ -142,7 +158,7 @@ export interface Card {
   createdAt: string
   updatedAt: string
   databaseId: string
-  content: string
+  content: CardContentFormats
   title: string
   isTemplate: boolean
   cardProperties: Record<string, string | number>
@@ -175,7 +191,7 @@ export interface Card {
  *              required: false
  *
  */
-export type CardQuery = Partial<Pick<Card, 'title' | 'cardProperties' | 'content'>>
+export type CardQuery = Partial<Pick<Card, 'title' | 'cardProperties'>>
 
 /**
  *
