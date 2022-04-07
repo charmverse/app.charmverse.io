@@ -181,21 +181,23 @@ export function MentionSuggest () {
       >
         <Box>
           {contributors.map(contributor => (
-            <MenuItem
-              sx={{
-                background: theme.palette.background.light
-              }}
-              onClick={() => onSelectMention(contributor.id, 'user')}
-              key={contributor.id}
-            >
-              <ReviewerOption
-                style={{
-                  alignItems: 'center'
+            contributor.isBot === true ? null : (
+              <MenuItem
+                sx={{
+                  background: theme.palette.background.light
                 }}
-                user={contributor}
-                avatarSize='small'
-              />
-            </MenuItem>
+                onClick={() => onSelectMention(contributor.id, 'user')}
+                key={contributor.id}
+              >
+                <ReviewerOption
+                  style={{
+                    alignItems: 'center'
+                  }}
+                  user={contributor}
+                  avatarSize='small'
+                />
+              </MenuItem>
+            )
           ))}
         </Box>
       </ClickAwayListener>,

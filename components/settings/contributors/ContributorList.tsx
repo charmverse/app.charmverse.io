@@ -44,13 +44,16 @@ export default function ContributorList ({ isAdmin, spaceId, spaceOwner }: Props
     <>
       <Legend>Current Contributors</Legend>
       {contributors.map(contributor => (
-        <ContributorListItem
-          isAdmin={isAdmin}
-          key={contributor.id}
-          isSpaceOwner={spaceOwner === contributor.id}
-          contributor={contributor}
-          onChange={updateContributor}
-        />
+        contributor.isBot === true ? null : (
+          <ContributorListItem
+            isAdmin={isAdmin}
+            key={contributor.id}
+            isSpaceOwner={spaceOwner === contributor.id}
+            contributor={contributor}
+            onChange={updateContributor}
+          />
+        )
+
       ))}
     </>
   );

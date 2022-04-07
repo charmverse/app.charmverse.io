@@ -8,6 +8,7 @@ import { HTMLAttributes, useState, useEffect } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
+import { User } from '@prisma/client';
 
 interface IContributorsFilter {
   mode: 'include' | 'exclude',
@@ -16,14 +17,14 @@ interface IContributorsFilter {
 
 function filterContributors<T extends { id: string }> (contributors: T [], filter: IContributorsFilter): T[] {
   if (filter.mode === 'exclude') {
-    return contributors.filter(contributor => {
-      const shouldInclude = filter.userIds.indexOf(contributor.id) === -1;
+    return contributors.filter((contributor: User) => {
+      const shouldInclude = filter.userIds.indexOf(contributor.id) === -1 && contributor.isBot !== true;
       return shouldInclude;
     });
   }
   else {
-    return contributors.filter(contributor => {
-      const shouldInclude = filter.userIds.indexOf(contributor.id) > -1;
+    return contributors.filter((contributor: User) => {
+      const shouldInclude = filter.userIds.indexOf(contributor.id) > -1 && contributor.isBot !== true;
       return shouldInclude;
     });
   }
