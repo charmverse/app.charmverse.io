@@ -1,7 +1,7 @@
 
 import { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { getSpaceFromApiKey, onError, onNoMatch, requireApiKey } from 'lib/middleware';
+import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { filterObjectKeys } from 'lib/utilities/objects';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -33,7 +33,14 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   const { id } = req.query;
 
-  const space = await getSpaceFromApiKey(req);
+  const spaceId = req.authorizedSpaceId;
+  const space = await prisma.space.findUnique({ where: { id: spaceId } });
+
+  if (!space) {
+    return res.status(400).send({
+      error: 'Space not found'
+    });
+  }
 
   const isValidUuid = validate(id as string);
 
@@ -43,11 +50,11 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
       where: isValidUuid ? {
         type: 'board',
         boardId: id as string,
-        spaceId: space.id
+        spaceId
       } : {
         type: 'board',
         path: id as string,
-        spaceId: space.id
+        spaceId
       }
 
     }),
@@ -130,14 +137,14 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   const { id } = req.query;
 
-  const space = await getSpaceFromApiKey(req);
+  const spaceId = req.authorizedSpaceId;
 
   const board = await prisma.block.findFirst({
     where: {
       type: 'board',
       id: id as string,
       // This parameter is only added to ensure requests using the current API key only return data for that space
-      spaceId: space.id
+      spaceId
     }
   });
 

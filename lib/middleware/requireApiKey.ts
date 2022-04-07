@@ -3,6 +3,12 @@ import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 
+declare module 'http' {
+  interface IncomingMessage {
+    authorizedSpaceId: string
+  }
+}
+
 /**
  * @returns Space linked to API key in the request
  * Throws if the API key or space do not exist
@@ -33,6 +39,8 @@ export async function getSpaceFromApiKey (req: NextApiRequest): Promise<Space> {
 
 /**
  * Check for a valid space level API token, and ensure the operation is taking place only in the target space
+ *
+ * assigns authorizedSpaceId so follow-on endpoints can use it
  */
 export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
 
@@ -55,6 +63,7 @@ export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, 
       });
     }
 
+    req.authorizedSpaceId = space.id;
   }
   catch (error) {
     console.log('Found error', error);

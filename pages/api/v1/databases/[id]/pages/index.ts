@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { onError, onNoMatch, getSpaceFromApiKey, requireApiKey, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
@@ -35,13 +35,13 @@ handler
 async function createPage (req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
-  const space = await getSpaceFromApiKey(req);
+  const spaceId = req.authorizedSpaceId;
 
   const board = await prisma.block.findFirst({
     where: {
       type: 'board',
       id: id as string,
-      spaceId: space.id
+      spaceId
     }
   });
 

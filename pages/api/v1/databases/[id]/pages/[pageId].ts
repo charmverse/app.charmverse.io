@@ -2,7 +2,7 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { PageFromBlock, Page, PageProperty, mapProperties, validateUpdateData } from 'lib/public-api';
-import { getSpaceFromApiKey, onError, onNoMatch, requireApiKey } from 'lib/middleware';
+import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -30,7 +30,7 @@ async function getPage (req: NextApiRequest, res: NextApiResponse) {
 
   const { pageId, id } = req.query;
 
-  const space = await getSpaceFromApiKey(req);
+  const spaceId = req.authorizedSpaceId;
 
   const [board, card] = await Promise.all([
     prisma.block.findFirst({
@@ -38,7 +38,7 @@ async function getPage (req: NextApiRequest, res: NextApiResponse) {
         // Parameter only added for documentation purposes. All cards linked to a root board
         type: 'board',
         id: id as string,
-        spaceId: space.id
+        spaceId
       }
     }),
     prisma.block.findFirst({
@@ -46,7 +46,7 @@ async function getPage (req: NextApiRequest, res: NextApiResponse) {
         type: 'card',
         id: pageId as string,
         rootId: id as string,
-        spaceId: space.id
+        spaceId
       }
     })
   ]);
@@ -95,7 +95,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   const { pageId, id } = req.query;
 
-  const space = await getSpaceFromApiKey(req);
+  const spaceId = req.authorizedSpaceId;
 
   const [board, card] = await Promise.all([
     prisma.block.findFirst({
@@ -103,7 +103,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
         // Parameter only added for documentation purposes. All cards linked to a root board
         type: 'board',
         id: id as string,
-        spaceId: space.id
+        spaceId
       }
     }),
     prisma.block.findFirst({
@@ -111,7 +111,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
         type: 'card',
         id: pageId as string,
         rootId: id as string,
-        spaceId: space.id
+        spaceId
       }
     })
   ]);
