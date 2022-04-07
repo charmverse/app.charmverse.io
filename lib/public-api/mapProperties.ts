@@ -7,6 +7,10 @@ import { PageProperty } from './interfaces';
  */
 export function mapProperties (properties: Record<string, string | number>, cardPropertySchema: PageProperty []): Record<string, string | number> {
 
+  if (!properties) {
+    return {};
+  }
+
   const keysToMap = Object.keys(properties);
 
   const mappedValueToReturn: Record<string, string | number> = {};
