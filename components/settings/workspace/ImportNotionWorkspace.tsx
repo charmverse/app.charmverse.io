@@ -24,7 +24,6 @@ interface NotionResponseState {
 }
 
 export default function ImportNotionWorkspace () {
-  const router = useRouter();
   const [notionState, setNotionState] = useState<NotionResponseState>({ loading: false });
   const { showMessage } = useSnackbar();
   const [modalOpen, setModalOpen] = useState(false);
@@ -35,7 +34,7 @@ export default function ImportNotionWorkspace () {
   const notionError = getCookie(AUTH_ERROR_COOKIE);
 
   useEffect(() => {
-    if (space && typeof router.query.code === 'string' && router.query.notion === '1' && !notionState.loading) {
+    if (space && notionCode && !notionState.loading) {
       setNotionState({ failedImports: [], loading: true });
       setModalOpen(true);
       deleteCookie(AUTH_CODE_COOKIE);
@@ -112,7 +111,7 @@ export default function ImportNotionWorkspace () {
             </Typography>
           </>
           )}
-          {!notionState.loading && notionState.failedImports && (
+          {!notionState.loading && notionState.failedImports?.length && (
           <>
             <CompleteIcon color='success' fontSize='large' />
             <Typography sx={{ mb: 0 }}>
@@ -137,7 +136,7 @@ export default function ImportNotionWorkspace () {
           </>
           )}
         </Box>
-        {notionState.failedImports && notionState.failedImports?.length !== 0 && (
+        {notionState.failedImports && notionState.failedImports?.length > 0 && (
           <Alert severity='warning' sx={{ mt: 2 }}>
             <Box sx={{
               display: 'flex', gap: 2, flexDirection: 'column'
