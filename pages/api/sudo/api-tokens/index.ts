@@ -1,7 +1,6 @@
 
-import { Transaction, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireUser, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
@@ -35,8 +34,6 @@ async function provisionToken (req: NextApiRequest, res: NextApiResponse) {
   const { spaceId } = req.body;
 
   const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
-
-  console.log('Space ID ==>', spaceId);
 
   const spaceToken = await prisma.spaceToken.upsert({
     where: {
@@ -72,4 +69,4 @@ async function invalidateToken (req: NextApiRequest, res: NextApiResponse) {
 
 }
 
-export default withSessionRoute(handler);
+export default handler;
