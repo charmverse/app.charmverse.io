@@ -1,9 +1,7 @@
 
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { PageFromBlock } from 'lib/public-api/card.class';
-import { Page, PageProperty } from 'lib/public-api/interfaces';
-import { mapProperties } from 'lib/public-api/mapProperties';
+import { PageFromBlock, Page, PageProperty, mapProperties, validateUpdateData } from 'lib/public-api';
 import { getSpaceFromApiKey, onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -128,6 +126,13 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
   const boardSchema: PageProperty [] = (board.fields as any).cardProperties;
 
   const requestBodyUpdate = req.body as Pick<Page, 'properties' | 'title'>;
+
+  try {
+    validateUpdateData(requestBodyUpdate);
+  }
+  catch (error) {
+    return res.status(400).json(error);
+  }
 
   const updateContent: Prisma.BlockUpdateInput = {
   };

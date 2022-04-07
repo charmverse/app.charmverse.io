@@ -200,7 +200,8 @@ export interface PaginatedResponse<T> {
   cursor?: string
 }
 
-export type PaginatedQuery<T> = T & {
+export type PaginatedQuery<T> = {
   cursor?: string
   limit?: number
+  query: T
 }

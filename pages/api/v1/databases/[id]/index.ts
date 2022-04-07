@@ -5,10 +5,8 @@ import { getSpaceFromApiKey, onError, onNoMatch, requireApiKey } from 'lib/middl
 import { filterObjectKeys } from 'lib/utilities/objects';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { PageFromBlock } from 'lib/public-api/card.class';
 import { validate } from 'uuid';
-import { DatabasePage, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse, Page } from 'lib/public-api/interfaces';
-import { mapProperties } from 'lib/public-api/mapProperties';
+import { DatabasePage, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse, Page, PageFromBlock, mapProperties, validatePageQuery, validatePaginationQuery } from 'lib/public-api';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -106,7 +104,7 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
  *                    type: string
  *                    required: false
  *                    example: e63758e2-de17-48b2-9c74-5a40ea5be761
- *                  card:
+ *                  query:
  *                    type: object
  *                    $ref: '#/components/schemas/PageQuery'
  *     responses:
@@ -147,32 +145,19 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Board not found' });
   }
 
-  const searchQuery = req.body as PaginatedQuery<{card: PageQuery}>;
+  const searchQuery = req.body as PaginatedQuery<PageQuery>;
+
+  try {
+    validatePaginationQuery(searchQuery);
+    validatePageQuery(searchQuery.query);
+  }
+  catch (error) {
+    return res.status(400).send(error);
+  }
 
   const boardSchema = (board.fields as any).cardProperties as PageProperty[];
 
-  // Early exit to inform user these should be nested
-  if ((searchQuery as any).title || (searchQuery as any).properties) {
-    return res.status(400).json({
-      error: 'The query properties such as \'title\' or \'properties\' for a card should be nested inside a \'card\' property in your request JSON',
-      example: {
-        card: {
-          title: 'search title',
-          properties: {
-            Status: 'Completed'
-          }
-        }
-      }
-    });
-  }
-
-  const cardProperties = searchQuery.card?.properties ?? {};
-
-  if (cardProperties && (typeof cardProperties !== 'object' || cardProperties instanceof Array)) {
-    return res.status(400).send({
-      error: 'Optional key cardProperties must be an object if provided'
-    });
-  }
+  const cardProperties = searchQuery.query?.properties ?? {};
 
   const nestedJsonQuery: Prisma.NestedJsonFilter [] = [];
 
@@ -201,9 +186,9 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     })
   };
 
-  if (searchQuery.card?.title) {
+  if (searchQuery.query?.title) {
     prismaQueryContent.title = {
-      contains: searchQuery.card.title,
+      contains: searchQuery.query.title,
       mode: 'insensitive'
     };
   }

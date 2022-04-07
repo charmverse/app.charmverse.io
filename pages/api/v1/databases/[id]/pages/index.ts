@@ -3,16 +3,14 @@ import { prisma } from 'db';
 import { onError, onNoMatch, getSpaceFromApiKey, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { PageFromBlock } from 'lib/public-api/card.class';
 import { v4 } from 'uuid';
-import { Page, PageProperty } from 'lib/public-api/interfaces';
-import { mapProperties } from 'lib/public-api/mapProperties';
+import { Page, PageProperty, mapProperties, PageFromBlock, validateCreationData } from 'lib/public-api';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireApiKey)
-  .use(requireKeys<Page>(['title', 'properties'], 'body'))
+  .use(requireKeys<Page>(['title'], 'body'))
   .post(createPage);
 
 /**
@@ -52,6 +50,14 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
   }
 
   const { title, properties } = req.body;
+
+  try {
+    validateCreationData(req.body);
+
+  }
+  catch (error) {
+    return res.status(400).json(error);
+  }
 
   const boardSchema = (board.fields as any).cardProperties as PageProperty [];
 

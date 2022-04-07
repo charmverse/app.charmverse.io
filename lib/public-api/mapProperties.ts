@@ -16,7 +16,8 @@ export function mapProperties (properties: Record<string, string | number>, card
 
     if (!propertySchema) {
       throw {
-        error: `Field '${property}' does not exist on this database`
+        error: `Field '${property}' does not exist on this database`,
+        fields: cardPropertySchema.map(schema => schema.name)
       };
     }
 

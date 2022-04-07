@@ -17,7 +17,7 @@ export function requireKeys<T> (keys: Array<keyof T>, location: 'body' | 'query'
 
     for (const key of keys) {
       if (!toVerify[key]) {
-        return res.status(400).send({ message: `Key ${key} is required in request ${location}` });
+        return res.status(400).send({ message: `Key ${key} is required in request ${location} and must not be an empty value` });
       }
     }
     next();
