@@ -44,10 +44,10 @@ model Space {
   TokenGate      TokenGate[]
   paymentMethods PaymentMethod[]
   roles          Role[]
-  token          SpaceToken?
+  apiToken       SpaceApiToken?
 }
 
-model SpaceToken {
+model SpaceApiToken {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
   spaceId   String    @db.Uuid
@@ -89,10 +89,10 @@ model Block {
   id        String    @id @db.Uuid
   deletedAt DateTime?
   createdAt DateTime  @default(now())
-  createdBy String?    @db.Uuid
+  createdBy String    @db.Uuid
   user      User?      @relation(fields: [createdBy], references: [id])
   updatedAt DateTime  @default(now())
-  updatedBy String?    @db.Uuid
+  updatedBy String    @db.Uuid
   spaceId   String    @db.Uuid
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   parentId  String
@@ -120,7 +120,6 @@ model User {
   username     String?
   avatar       String?
   discordUser  DiscordUser?
-  token        String?
   telegramUser TelegramUser?
 }
 

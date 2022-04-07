@@ -21,7 +21,7 @@ export async function getSpaceFromApiKey (req: NextApiRequest): Promise<Space> {
     throw new Error('Api key not found');
   }
 
-  const spaceToken = await prisma.spaceToken.findFirst({
+  const spaceToken = await prisma.spaceApiToken.findFirst({
     where: {
       token: apiKey
     },

@@ -35,7 +35,7 @@ async function provisionToken (req: NextApiRequest, res: NextApiResponse) {
 
   const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
 
-  const spaceToken = await prisma.spaceToken.upsert({
+  const spaceToken = await prisma.spaceApiToken.upsert({
     where: {
       spaceId: spaceId as string
     },
@@ -57,7 +57,7 @@ async function provisionToken (req: NextApiRequest, res: NextApiResponse) {
 
 async function invalidateToken (req: NextApiRequest, res: NextApiResponse) {
   const { spaceId } = req.body;
-  await prisma.spaceToken.delete({
+  await prisma.spaceApiToken.delete({
     where: {
       spaceId: spaceId as string
     }
