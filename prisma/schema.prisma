@@ -24,25 +24,25 @@ enum PermissionLevel {
 }
 
 model Space {
-  id             String          @id @default(uuid()) @db.Uuid
-  deletedAt      DateTime?
-  createdAt      DateTime        @default(now())
-  author         User            @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdBy      String          @db.Uuid
-  updatedAt      DateTime
-  updatedBy      String          @db.Uuid
-  name           String
-  domain         String          @unique
+  id              String           @id @default(uuid()) @db.Uuid
+  deletedAt       DateTime?
+  createdAt       DateTime         @default(now())
+  author          User             @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy       String           @db.Uuid
+  updatedAt       DateTime
+  updatedBy       String           @db.Uuid
+  name            String
+  domain          String           @unique
   discordServerId String?
-  spaceRoles     SpaceRole[]
-  permissions    PagePermission[]
-  pages          Page[]
-  blocks         Block[]
-  inviteLinks    InviteLink[]
-  bounties       Bounty[]
-  TokenGate      TokenGate[]
-  paymentMethods PaymentMethod[]
-  roles          Role[]
+  spaceRoles      SpaceRole[]
+  permissions     PagePermission[]
+  pages           Page[]
+  blocks          Block[]
+  inviteLinks     InviteLink[]
+  bounties        Bounty[]
+  TokenGate       TokenGate[]
+  paymentMethods  PaymentMethod[]
+  roles           Role[]
 }
 
 model Page {
@@ -107,6 +107,16 @@ model User {
   username     String?
   avatar       String?
   discordUser  DiscordUser?
+  telegramUser TelegramUser?
+}
+
+model TelegramUser {
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  userId     String   @unique @db.Uuid
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  telegramId Int   @id
+  account    Json
 }
 
 model DiscordUser {

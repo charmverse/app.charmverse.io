@@ -20,6 +20,8 @@ declare module 'lit-share-modal' {
   }
 
   // eslint-disable-next-line react/prefer-stateless-function
-  export class ShareModal extends React.Component<ShareModalProps, any> {}
+  class ShareModal extends React.Component<ShareModalProps, any> {}
+
+  export default ShareModal;
 
 }
