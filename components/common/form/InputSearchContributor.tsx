@@ -8,14 +8,13 @@ import { HTMLAttributes, useState, useEffect } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
-import { User } from '@prisma/client';
 
 interface IContributorsFilter {
   mode: 'include' | 'exclude',
   userIds: string []
 }
 
-function filterContributors (contributors: User [], filter: IContributorsFilter): User[] {
+function filterContributors (contributors: Contributor [], filter: IContributorsFilter): Contributor[] {
   if (filter.mode === 'exclude') {
     return contributors.filter((contributor) => {
       const shouldInclude = filter.userIds.indexOf(contributor.id) === -1 && contributor.isBot !== true;
