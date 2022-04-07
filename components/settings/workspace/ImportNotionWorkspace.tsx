@@ -8,12 +8,12 @@ import charmClient from 'charmClient';
 import { useSWRConfig } from 'swr';
 import { useState, useEffect } from 'react';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useRouter } from 'next/router';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import { getCookie, deleteCookie } from 'lib/browser';
+import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 
 export default function ImportNotionWorkspace () {
-  const router = useRouter();
   const [notionFailedImports, setNotionFailedImports] = useState<FailedImportsError[]>([]);
   const [notionImportError, setNotionImportError] = useState<string | null>(null);
   const { showMessage } = useSnackbar();
@@ -22,13 +22,17 @@ export default function ImportNotionWorkspace () {
   const { mutate } = useSWRConfig();
   const [space] = useCurrentSpace();
 
+  const notionCode = getCookie(AUTH_CODE_COOKIE);
+  const notionError = getCookie(AUTH_ERROR_COOKIE);
+
   useEffect(() => {
-    if (space && typeof router.query.code === 'string' && router.query.notion === '1' && !isImportingFromNotion) {
+    if (space && notionCode && !isImportingFromNotion) {
       setIsImportingFromNotion(true);
       setNotionFailedImports([]);
       setModalOpen(true);
+      deleteCookie(AUTH_CODE_COOKIE);
       charmClient.importFromNotion({
-        code: router.query.code,
+        code: notionCode,
         spaceId: space.id
       })
         .then(({ failedImports }) => {
@@ -53,6 +57,15 @@ export default function ImportNotionWorkspace () {
         });
     }
   }, [space]);
+
+  // show errors from server
+  useEffect(() => {
+    if (notionError) {
+      deleteCookie(AUTH_ERROR_COOKIE);
+      setModalOpen(true);
+      setNotionImportError(notionError);
+    }
+  }, []);
 
   function closeModal () {
     setModalOpen(false);
