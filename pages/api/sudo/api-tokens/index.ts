@@ -40,7 +40,8 @@ async function provisionToken (req: NextApiRequest, res: NextApiResponse) {
       spaceId: spaceId as string
     },
     update: {
-      token: newApiKey
+      token: newApiKey,
+      updatedAt: new Date().toISOString()
     },
     create: {
       token: newApiKey,

@@ -23,17 +23,6 @@ const config = {
       test: /\.svg$/,
       use: ['@svgr/webpack']
     });
-    // add extra entrypoints
-    // if (isServer) {
-    //   const _entry = _config.entry;
-    //   _config.entry = () => {
-    //     return _entry().then((entry) => ({
-    //       ...entry,
-    //       // adding custom entry points
-    //       markdown: path.resolve(process.cwd(), 'scripts/markdown.ts')
-    //     }));
-    //   };
-    // }
     return _config;
   }
 };
