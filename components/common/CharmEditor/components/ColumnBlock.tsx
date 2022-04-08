@@ -1,7 +1,6 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
 import { ReactNode, memo } from 'react';
 
 export const spec = specFactory;
