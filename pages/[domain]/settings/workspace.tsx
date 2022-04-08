@@ -17,6 +17,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
 import { Box, Typography } from '@mui/material';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
+import Link from 'components/common/Link';
 
 export interface FailedImportsError {
   pageId: string,
@@ -101,6 +102,11 @@ export default function WorkspaceSettings () {
           </Grid>
         </Grid>
       </form>
+      <Legend>API Key</Legend>
+      <Link href='https://discord.gg/ACYCzBGC2M' external>
+        <Typography variant='body1'>Request access to the charmverse API in our Discord Channel</Typography>
+      </Link>
+
       <Legend>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ImportNotionWorkspace />
