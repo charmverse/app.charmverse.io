@@ -20,6 +20,8 @@ import ConfirmationDialogBox, {ConfirmationDialogBoxProps} from '../confirmation
 import {sendFlashMessage} from '../flashMessages'
 import Menu from '../../widgets/menu'
 import {IDType, Utils} from '../../utils'
+import { usePages } from 'hooks/usePages'
+import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces'
 
 type Props = {
     board: Board
@@ -33,6 +35,16 @@ type Props = {
 }
 
 const CardDetailProperties = React.memo((props: Props) => {
+
+  const [pagePermissions, setPagePermissions] = useState<IPagePermissionFlags>()
+  const { getPagePermissions } = usePages()
+
+  useEffect(() => {
+    const permissions = getPagePermissions(props.board.id)
+
+    setPagePermissions(permissions)
+  }, [])
+
     const {board, card, cards, views, activeView, contents, comments} = props
     const [newTemplateId, setNewTemplateId] = useState('')
     const intl = useIntl()

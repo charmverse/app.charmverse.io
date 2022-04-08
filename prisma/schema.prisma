@@ -278,6 +278,7 @@ model SpaceRoleToRole {
 enum PagePermissionLevel {
   full_access
   editor
+  content_editor
   view_comment
   view
   custom
@@ -288,7 +289,14 @@ enum PagePermissionLevel {
 enum PageOperations {
   read
   delete
+  // The available properties (and available options for select properties) for a card
+  edit_database_schema
+  // Assigned properties of a card instance
+  edit_properties
+  // Assigned properties of a card instance
+  edit_restricted_properties
   edit_position
+  edit_title
   edit_content
   edit_isPublic
   edit_path

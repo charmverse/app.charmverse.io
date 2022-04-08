@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import CharmEditor, { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor'
 import { PageContent } from 'models'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { IntlShape } from 'react-intl'
 import Box from '@mui/material/Box'
 import { Card } from '../../blocks/card'
@@ -14,6 +14,8 @@ import { useSortableWithGrip } from '../../hooks/sortable'
 import mutator from '../../mutator'
 import ContentBlock from '../contentBlock'
 import { dragAndDropRearrange } from './cardDetailContentsUtility'
+import { IPagePermissionFlags } from '../../../../../../../lib/permissions/pages/page-permission-interfaces'
+import { usePages } from '../../../../../../../hooks/usePages'
 
 
 
@@ -159,6 +161,18 @@ const ContentBlockWithDragAndDrop = (props: ContentBlockWithDragAndDropProps) =>
 
 const CardDetailContents = React.memo((props: Props) => {
 
+
+  const [pagePermissions, setPagePermissions] = useState<IPagePermissionFlags>()
+  const {getPagePermissions } = usePages()
+  useEffect(() => {
+    const userPermissions = getPagePermissions(props.card.rootId)
+
+    setPagePermissions(userPermissions)
+
+    console.log('Found permissions', userPermissions)
+
+  }, [])
+
     const charmTextBlock = props.contents.filter((c): c is CharmTextBlock => (c as Block).type === 'charm_text')[0];
     const content = charmTextBlock?.fields.content;
 
@@ -173,7 +187,12 @@ const CardDetailContents = React.memo((props: Props) => {
     return (
         <div className='octo-content CardDetailContents'>
             <div className='octo-block' style={{ position: 'relative', zIndex: 1 }}>
-                <CharmEditor content={content} onContentChange={updatePageContent} readOnly={props.readonly} />
+                {
+                  pagePermissions ? (
+                    <CharmEditor content={content} onContentChange={updatePageContent} readOnly={pagePermissions?.edit_content !== true} />
+                  ) : null
+                }
+                
                 <Box mb={6} />
             </div>
         </div>

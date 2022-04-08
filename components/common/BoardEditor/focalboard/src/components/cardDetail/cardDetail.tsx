@@ -26,6 +26,7 @@ import { CardDetailProvider } from "./cardDetailContext";
 import CardDetailProperties from "./cardDetailProperties";
 import CommentsList from "./commentsList";
 import useImagePaste from "./imagePaste";
+import { IPagePermissionFlags } from "lib/permissions/pages/page-permission-interfaces";
 
 type Props = {
   board: Board;
@@ -39,7 +40,6 @@ type Props = {
 };
 
 const CardDetail = (props: Props): JSX.Element | null => {
-  console.log("Board", props.board);
 
   const { getPagePermissions } = usePages();
 
@@ -53,10 +53,18 @@ const CardDetail = (props: Props): JSX.Element | null => {
     }
   }, [card.title, title]);
 
+  const [pagePermissions, setPagePermissions] = useState<IPagePermissionFlags>()
+
   const saveTitleRef = useRef<() => void>(saveTitle);
   saveTitleRef.current = saveTitle;
 
   useImagePaste(card.id, card.fields.contentOrder, card.rootId);
+
+  useEffect(() => {
+    const userPermissions = getPagePermissions(props.board.id)
+
+    setPagePermissions(userPermissions)
+  }, [])
 
   useEffect(() => {
     if (!title) {
@@ -156,7 +164,7 @@ const CardDetail = (props: Props): JSX.Element | null => {
           saveOnEsc={true}
           onSave={saveTitle}
           onCancel={() => setTitle(props.card.title)}
-          readonly={props.readonly}
+          readonly={pagePermissions?.edit_title !== true}
           spellCheck={true}
         />
 

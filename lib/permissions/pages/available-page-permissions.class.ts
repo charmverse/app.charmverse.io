@@ -12,6 +12,12 @@ export class AllowedPagePermissions implements IPagePermissionFlags {
 
   delete: boolean = false;
 
+  edit_database_schema: boolean = false;
+
+  edit_properties: boolean = false;
+
+  edit_title: boolean = false;
+
   edit_position: boolean = false;
 
   edit_content: boolean = false;
