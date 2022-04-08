@@ -6,7 +6,7 @@
     "lint": "eslint -c .eslintrc.json . --ext .ts --ext .tsx",
     "lint:prod": "npm run lint -- --quiet",
     "start": "next dev",
-    "start:prod": "node --require dd-trace/init node_modules/.bin/next start",
+    "start:prod": "node_modules/next/dist/bin/next start",
     "start:remote": "react-env --path .env.production -- next dev",
     "prepare": "husky install",
     "db-tool": "dotenv -e .env.production -- npx prisma studio",
