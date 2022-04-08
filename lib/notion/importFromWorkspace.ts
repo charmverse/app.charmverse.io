@@ -75,8 +75,8 @@ type BlockWithChildren = BlockObjectResponse & { children: string[], pageId: str
 const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
 
 async function populateDoc (
-  parentNode: BlockNode,
-  block: BlockWithChildren,
+  _parentNode: BlockNode,
+  _block: BlockWithChildren,
   blocksRecord: Record<string, BlockWithChildren>,
   {
     onLinkToPage,
@@ -87,289 +87,278 @@ async function populateDoc (
     onChildDatabase: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>,
     onChildPage: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>
   },
-  parentInfo: [string, number][]
+  _parentInfo: [string, number][]
 ) {
-  try {
-    switch (block.type) {
-      case 'heading_1': {
-        (parentNode as PageContent).content?.push({
-          type: 'heading',
-          attrs: {
-            level: 1
-          },
-          content: convertRichText(block.heading_1.rich_text)
-        });
-        break;
-      }
 
-      case 'heading_2': {
-        (parentNode as PageContent).content?.push({
-          type: 'heading',
-          attrs: {
-            level: 2
-          },
-          content: convertRichText(block.heading_2.rich_text)
-        });
-        break;
-      }
-
-      case 'heading_3': {
-        (parentNode as PageContent).content?.push({
-          type: 'heading',
-          attrs: {
-            level: 2
-          },
-          content: convertRichText(block.heading_3.rich_text)
-        });
-        break;
-      }
-
-      case 'column_list': {
-        const columnLayoutNode: ColumnLayoutNode = {
-          type: 'columnLayout',
-          content: []
-        };
-
-        for (let index = 0; index < block.children.length; index++) {
-          const childId = block.children[index];
-          await populateDoc(columnLayoutNode, blocksRecord[childId], blocksRecord, {
-            onChildDatabase,
-            onChildPage,
-            onLinkToPage
-          }, [...parentInfo, [blocksRecord[childId].type, index]]);
+  async function recurse (parentNode: BlockNode, block: BlockWithChildren, parentInfo: [string, number][]) {
+    try {
+      switch (block.type) {
+        case 'heading_1': {
+          (parentNode as PageContent).content?.push({
+            type: 'heading',
+            attrs: {
+              level: 1
+            },
+            content: convertRichText(block.heading_1.rich_text)
+          });
+          break;
         }
 
-        (parentNode as PageContent).content?.push(columnLayoutNode);
-        break;
-      }
+        case 'heading_2': {
+          (parentNode as PageContent).content?.push({
+            type: 'heading',
+            attrs: {
+              level: 2
+            },
+            content: convertRichText(block.heading_2.rich_text)
+          });
+          break;
+        }
 
-      case 'column': {
-        const columnBlockNode: ColumnBlockNode = {
-          type: 'columnBlock',
-          // This empty paragraph is necessary, otherwise charmeditor throws an error
-          content: [{
-            type: 'paragraph',
+        case 'heading_3': {
+          (parentNode as PageContent).content?.push({
+            type: 'heading',
+            attrs: {
+              level: 2
+            },
+            content: convertRichText(block.heading_3.rich_text)
+          });
+          break;
+        }
+
+        case 'column_list': {
+          const columnLayoutNode: ColumnLayoutNode = {
+            type: 'columnLayout',
             content: []
-          }]
-        };
+          };
 
-        for (let index = 0; index < block.children.length; index++) {
-          const childId = block.children[index];
-          await populateDoc(columnBlockNode, blocksRecord[childId], blocksRecord, {
-            onChildDatabase,
-            onChildPage,
-            onLinkToPage
-          }, [...parentInfo, [blocksRecord[childId].type, index]]);
-        }
-        (parentNode as PageContent).content?.push(columnBlockNode);
-        break;
-      }
-
-      case 'paragraph': {
-        (parentNode as PageContent).content?.push({
-          type: 'paragraph',
-          content: convertRichText(block[block.type].rich_text)
-        });
-        break;
-      }
-
-      case 'link_to_page': {
-        await onLinkToPage((block[block.type] as any)[block[block.type].type] as string, parentNode);
-        break;
-      }
-
-      case 'child_database': {
-        await onChildDatabase(block, parentNode);
-        break;
-      }
-
-      case 'child_page': {
-        await onChildPage(block, parentNode);
-        break;
-      }
-
-      case 'bulleted_list_item':
-      case 'numbered_list_item':
-      case 'to_do':
-      {
-        let richText: RichTextItemResponse[] = [];
-
-        if (block.type === 'bulleted_list_item') {
-          richText = block.bulleted_list_item.rich_text;
-        }
-        else if (block.type === 'numbered_list_item') {
-          richText = block.numbered_list_item.rich_text;
-        }
-        else if (block.type === 'to_do') {
-          richText = block.to_do.rich_text;
-        }
-
-        const listItemNode: ListItemNode = {
-          type: 'listItem',
-          content: [{
-            type: 'paragraph',
-            content: convertRichText(richText)
-          }],
-          attrs: {
-            todoChecked: block.type === 'to_do' ? block.to_do.checked : null
+          for (let index = 0; index < block.children.length; index++) {
+            const childId = block.children[index];
+            await recurse(columnLayoutNode, blocksRecord[childId], [...parentInfo, [blocksRecord[childId].type, index]]);
           }
-        };
 
-        (parentNode as PageContent).content?.push({
-          type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
-          content: [listItemNode]
-        });
-
-        for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
-          const childId = blocksRecord[block.id].children[index];
-          await populateDoc(listItemNode, blocksRecord[childId], blocksRecord, {
-            onLinkToPage,
-            onChildDatabase,
-            onChildPage
-          }, [...parentInfo, [blocksRecord[childId].type, index]]);
-        }
-        break;
-      }
-
-      case 'callout':
-      case 'quote': {
-        let richText: RichTextItemResponse[] = [];
-        let emoji: string | null = null;
-
-        if (block.type === 'callout') {
-          richText = block.callout.rich_text;
-          emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
-        }
-        else if (block.type === 'quote') {
-          richText = block.quote.rich_text;
+          (parentNode as PageContent).content?.push(columnLayoutNode);
+          break;
         }
 
-        const calloutNode: CalloutNode = {
-          type: block.type === 'callout' ? 'blockquote' : 'quote' as any,
-          attrs: {
-            emoji
-          },
-          content: [
-            {
+        case 'column': {
+          const columnBlockNode: ColumnBlockNode = {
+            type: 'columnBlock',
+            // This empty paragraph is necessary, otherwise charmeditor throws an error
+            content: [{
+              type: 'paragraph',
+              content: []
+            }]
+          };
+
+          for (let index = 0; index < block.children.length; index++) {
+            const childId = block.children[index];
+            await recurse(columnBlockNode, blocksRecord[childId], [...parentInfo, [blocksRecord[childId].type, index]]);
+          }
+          (parentNode as PageContent).content?.push(columnBlockNode);
+          break;
+        }
+
+        case 'paragraph': {
+          (parentNode as PageContent).content?.push({
+            type: 'paragraph',
+            content: convertRichText(block[block.type].rich_text)
+          });
+          break;
+        }
+
+        case 'link_to_page': {
+          await onLinkToPage((block[block.type] as any)[block[block.type].type] as string, parentNode);
+          break;
+        }
+
+        case 'child_database': {
+          await onChildDatabase(block, parentNode);
+          break;
+        }
+
+        case 'child_page': {
+          await onChildPage(block, parentNode);
+          break;
+        }
+
+        case 'bulleted_list_item':
+        case 'numbered_list_item':
+        case 'to_do':
+        {
+          let richText: RichTextItemResponse[] = [];
+
+          if (block.type === 'bulleted_list_item') {
+            richText = block.bulleted_list_item.rich_text;
+          }
+          else if (block.type === 'numbered_list_item') {
+            richText = block.numbered_list_item.rich_text;
+          }
+          else if (block.type === 'to_do') {
+            richText = block.to_do.rich_text;
+          }
+
+          const listItemNode: ListItemNode = {
+            type: 'listItem',
+            content: [{
               type: 'paragraph',
               content: convertRichText(richText)
+            }],
+            attrs: {
+              todoChecked: block.type === 'to_do' ? block.to_do.checked : null
             }
-          ]
-        };
-        (parentNode as PageContent).content?.push(calloutNode);
-        for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
-          const childId = blocksRecord[block.id].children[index];
-          await populateDoc(calloutNode, blocksRecord[childId], blocksRecord, {
-            onLinkToPage,
-            onChildDatabase,
-            onChildPage
-          }, [...parentInfo, [blocksRecord[childId].type, index]]);
+          };
+
+          (parentNode as PageContent).content?.push({
+            type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
+            content: [listItemNode]
+          });
+
+          for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
+            const childId = blocksRecord[block.id].children[index];
+            await recurse(listItemNode, blocksRecord[childId], [...parentInfo, [blocksRecord[childId].type, index]]);
+          }
+          break;
         }
-        break;
-      }
 
-      case 'video': {
-        (parentNode as PageContent).content?.push({
-          type: 'iframe',
-          attrs: {
-            src: block.video.type === 'external' ? extractEmbedLink(block.video.external.url) : null,
-            type: 'video',
-            width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
-            height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
+        case 'callout':
+        case 'quote': {
+          let richText: RichTextItemResponse[] = [];
+          let emoji: string | null = null;
+
+          if (block.type === 'callout') {
+            richText = block.callout.rich_text;
+            emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
           }
-        });
-        break;
-      }
-
-      case 'embed':
-      case 'bookmark':
-      {
-        (parentNode as PageContent).content?.push({
-          type: 'iframe',
-          attrs: {
-            src: extractEmbedLink(block.type === 'bookmark' ? block.bookmark.url : block.embed.url),
-            type: 'embed',
-            width: MAX_EMBED_WIDTH,
-            height: MIN_EMBED_HEIGHT
+          else if (block.type === 'quote') {
+            richText = block.quote.rich_text;
           }
-        });
-        break;
-      }
 
-      case 'divider': {
-        (parentNode as PageContent).content?.push({
-          type: 'horizontalRule'
-        });
-        break;
-      }
-
-      case 'code': {
-        (parentNode as PageContent).content?.push({
-          type: 'codeBlock',
-          content: [{
-            type: 'text',
-            text: block.code.rich_text[0].plain_text
-          }],
-          attrs: {
-            language: block.code.language
+          const calloutNode: CalloutNode = {
+            type: block.type === 'callout' ? 'blockquote' : 'quote' as any,
+            attrs: {
+              emoji
+            },
+            content: [
+              {
+                type: 'paragraph',
+                content: convertRichText(richText)
+              }
+            ]
+          };
+          (parentNode as PageContent).content?.push(calloutNode);
+          for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
+            const childId = blocksRecord[block.id].children[index];
+            await recurse(calloutNode, blocksRecord[childId], [...parentInfo, [blocksRecord[childId].type, index]]);
           }
-        });
-        break;
-      }
+          break;
+        }
 
-      case 'image': {
-        (parentNode as PageContent).content?.push({
-          type: 'image',
-          attrs: {
-            src: block.image.type === 'external' ? block.image.external.url : block.image.type === 'file' ? block.image.file.url : null,
-            size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
-            aspectRatio: 1
-          }
-        });
-        break;
-      }
+        case 'video': {
+          (parentNode as PageContent).content?.push({
+            type: 'iframe',
+            attrs: {
+              src: block.video.type === 'external' ? extractEmbedLink(block.video.external.url) : null,
+              type: 'video',
+              width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
+              height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
+            }
+          });
+          break;
+        }
 
-      case 'table': {
-        const tableNode: TableNode = {
-          type: 'table',
-          content: []
-        };
-        blocksRecord[block.id].children.forEach((rowId, rowIndex) => {
-          const row = blocksRecord[rowId];
-          if (row.type === 'table_row') {
-            const content: TableRowNode['content'] = [];
-            tableNode.content.push({
-              type: 'table_row',
-              content
-            });
-            row.table_row.cells.forEach((cell) => {
-              content.push({
-                type: rowIndex === 0 ? 'table_header' : 'table_cell',
-                content: convertRichText(cell)
+        case 'embed':
+        case 'bookmark':
+        {
+          (parentNode as PageContent).content?.push({
+            type: 'iframe',
+            attrs: {
+              src: extractEmbedLink(block.type === 'bookmark' ? block.bookmark.url : block.embed.url),
+              type: 'embed',
+              width: MAX_EMBED_WIDTH,
+              height: MIN_EMBED_HEIGHT
+            }
+          });
+          break;
+        }
+
+        case 'divider': {
+          (parentNode as PageContent).content?.push({
+            type: 'horizontalRule'
+          });
+          break;
+        }
+
+        case 'code': {
+          (parentNode as PageContent).content?.push({
+            type: 'codeBlock',
+            content: [{
+              type: 'text',
+              text: block.code.rich_text[0].plain_text
+            }],
+            attrs: {
+              language: block.code.language
+            }
+          });
+          break;
+        }
+
+        case 'image': {
+          (parentNode as PageContent).content?.push({
+            type: 'image',
+            attrs: {
+              src: block.image.type === 'external' ? block.image.external.url : block.image.type === 'file' ? block.image.file.url : null,
+              size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
+              aspectRatio: 1
+            }
+          });
+          break;
+        }
+
+        case 'table': {
+          const tableNode: TableNode = {
+            type: 'table',
+            content: []
+          };
+          blocksRecord[block.id].children.forEach((rowId, rowIndex) => {
+            const row = blocksRecord[rowId];
+            if (row.type === 'table_row') {
+              const content: TableRowNode['content'] = [];
+              tableNode.content.push({
+                type: 'table_row',
+                content
               });
-            });
-          }
-        });
-        (parentNode as PageContent).content?.push(tableNode);
-        break;
+              row.table_row.cells.forEach((cell) => {
+                content.push({
+                  type: rowIndex === 0 ? 'table_header' : 'table_cell',
+                  content: convertRichText(cell)
+                });
+              });
+            }
+          });
+          (parentNode as PageContent).content?.push(tableNode);
+          break;
+        }
+        default: {
+          break;
+        }
       }
-      default: {
-        break;
+    }
+    catch (err: any) {
+      const errorTrails = [];
+      try {
+        const errorMessageData = JSON.parse(err.message);
+        errorTrails.push(...errorMessageData);
       }
+      catch (_) {
+        log.debug('Error when creating blocks for page', _);
+        //
+      }
+      throw new Error(JSON.stringify([parentInfo[parentInfo.length - 1], ...errorTrails]));
     }
   }
-  catch (err: any) {
-    const errorTrails = [];
-    try {
-      const errorMessageData = JSON.parse(err.message);
-      errorTrails.push(...errorMessageData);
-    }
-    catch (_) {
-      log.debug('Error when creating blocks for page', _);
-      //
-    }
-    throw new Error(JSON.stringify([parentInfo[parentInfo.length - 1], ...errorTrails]));
-  }
+
+  await recurse(_parentNode, _block, _parentInfo);
 }
 
 function convertPropertyType (propertyType: string): PropertyType | null {
@@ -604,7 +593,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   const createdCards: Record<string, {
     charmText: Prisma.BlockCreateManyInput,
     card: Prisma.BlockCreateManyInput
-    page: CreatePageInput
+    page: CreatePageInput,
+    notionPageId: string
   }> = {};
 
   const blocksRecord: Record<string, BlockWithChildren> = {};
@@ -831,7 +821,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             // If the pages hasn't been created already, only then create it
             // Find the parent its linking
             const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
-
+            console.log(parentAsLinkedPage);
             // Make sure its not referencing itself otherwise an infinite loop will occur
             // Also make sure the linked page id is not its parent
             if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== notionPageId && !parentAsLinkedPage) {
@@ -907,13 +897,12 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
       await createDatabaseAndPopulateCache(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
       const database = createdPages[pageResponse.parent.database_id];
-      const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title')!;
+      const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title') as {title: {plain_text: string}[]};
       const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
 
       const title = convertToPlainText(titleProperty.title);
-      const cardId = uuid();
       const charmTextBlock = createCharmTextBlock({
-        parentId: cardId,
+        parentId: charmversePageId,
         fields: {
           content: pageContent
         }
@@ -965,9 +954,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
       const cardPage = {
         createdBy: userId,
-        id: cardId,
+        id: charmversePageId,
         spaceId,
-        cardId,
+        cardId: charmversePageId,
         title,
         headerImage,
         icon: emoji,
@@ -975,6 +964,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         content: pageContent
       };
       createdCards[notionPageId] = {
+        notionPageId,
         page: cardPage,
         charmText: {
           ...charmTextBlock,
@@ -984,7 +974,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         card: {
           ...createCard({
             title,
-            id: cardId,
+            id: charmversePageId,
             parentId: database.boardId!,
             rootId: database.boardId!,
             fields: {
@@ -997,7 +987,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           ...commonBlockData
         }
       };
-      createdPages[cardId] = cardPage;
+      createdPages[notionPageId] = cardPage;
     }
     return createdPages[notionPageId];
   }
@@ -1077,7 +1067,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       }
       // Make sure the database page has not failed to be created, otherwise no cards will be added
       if (!failedImportsRecord[block.parent.database_id] && !createdPagesSet.has(block.id)) {
-        const { page, card, charmText } = createdCards[block.id];
+        const { notionPageId, page, card, charmText } = createdCards[block.id];
         await prisma.block.createMany({
           data: [
             card,
@@ -1085,7 +1075,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           ]
         });
         // Creating the page corresponding to the card
-        await createCharmversePage(page.id, 'page', page.parentId);
+        await createCharmversePage(notionPageId, 'page', page.parentId);
       }
     }
     // Top level pages and databases, make sure it hasn't been created already
