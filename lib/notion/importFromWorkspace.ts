@@ -70,7 +70,7 @@ interface ChildBlockListResponse {
   next_cursor: string | null
 }
 
-type BlockWithChildren = BlockObjectResponse & { children: string[] };
+type BlockWithChildren = BlockObjectResponse & { children: string[], pageId: string };
 
 const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
 
@@ -407,7 +407,7 @@ type CreatePageInput = {
   type?: Page['type'];
   createdBy: string;
   boardId?: string;
-  parentId?: string;
+  parentId?: string | null;
   cardId?: string
 }
 // &  {userId: string, spaceId: string, pageId: string, title: string};
@@ -569,7 +569,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     workspaceName: string,
     workspaceIcon: string
   }) {
-
   const failedImportsRecord: Record<string, {
     pageId: string,
     type: 'page' | 'database',
@@ -607,6 +606,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     card: Prisma.BlockCreateManyInput
     page: CreatePageInput
   }> = {};
+
+  const blocksRecord: Record<string, BlockWithChildren> = {};
 
   const linkedPages: Record<string, string> = {};
   const focalboardRecord: Record<string, {
@@ -685,7 +686,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   // Array of tuple, [notion block id, charmverse block id]
   async function createPage (pageIds: [string, string][], failedImportBlocks: Array<[string, number][]>) {
     // The last item of the pageIds is the notion block id and the optimistic charmverse page id
-    const [notionPageId, createdPageId] = pageIds[pageIds.length - 1];
+    const [notionPageId, charmversePageId] = pageIds[pageIds.length - 1];
     // The page might have been recursively created via a link_to_page block
     if (createdPages[notionPageId]) return createdPages[notionPageId];
 
@@ -694,8 +695,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       page_id: notionPageId
     }) as unknown as GetPageResponse;
 
-    // Store all the blocks of a page, including nested ones
-    const blocksRecord: Record<string, BlockWithChildren> = {};
     // An array to keep track of the first level children of a page
     const blocks: BlockWithChildren[] = [];
     // Page content, this will be filled with charmverse specific blocks
@@ -763,9 +762,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         // eslint-disable-next-line
         childBlockListResponses.forEach((childBlockListResponse) => {
           childBlockListResponse.results.forEach((block) => {
-            const blockWithChildren = {
+            const blockWithChildren: BlockWithChildren = {
               ...block,
-              children: []
+              children: [],
+              pageId: notionPageId
             };
             blocksRecord[block.id] = blockWithChildren;
             if (depth !== 0) {
@@ -853,7 +853,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
             // If its linking itself
             if (linkedPageId === notionPageId) {
-              id = createdPageId;
+              id = charmversePageId;
             }
             else if (parentAsLinkedPage) {
               id = parentAsLinkedPage[1];
@@ -894,7 +894,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover?.file.url : null,
         icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
         title,
-        id: createdPageId,
+        id: charmversePageId,
         spaceId,
         createdBy: userId
       };
@@ -1010,7 +1010,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     createdBy: userId
   });
 
-  async function createCharmversePage (blockId: string, type: 'page' | 'database', parentId: string) {
+  async function createCharmversePage (blockId: string, type: 'page' | 'database', parentId?: string | null) {
     try {
       await createPrismaPage({
         ...createdPages[blockId],
@@ -1038,7 +1038,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
   }
 
-  const createdPageIds = searchResults.map(_searchResult => _searchResult.id);
+  const charmversePageIds = searchResults.map(_searchResult => _searchResult.id);
   const createdPagesSet: Set<string> = new Set();
 
   async function createCharmversePageFromNotionPage (block: GetPageResponse | GetDatabaseResponse) {
@@ -1057,6 +1057,11 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         // Check if the parent is a regular page first
         // If its not then the parent is a database page (focalboard card)
         parentId = createdPages[block.parent.page_id]?.id ?? createdCards[block.parent.page_id]?.page?.id;
+      }
+      else {
+        // Parent id could be a block, for example there could be a nested page inside a callout/quote/column block
+        // Here parent.page_id is not actually the the id of the page, its the id of the nearest parent of the page, which could be callout/quote/column block
+        parentId = createdPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? workspacePage.id;
       }
 
       if (!createdPagesSet.has(block.id)) {
@@ -1080,7 +1085,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           ]
         });
         // Creating the page corresponding to the card
-        await createCharmversePage(page.id, 'page', page.parentId!);
+        await createCharmversePage(page.id, 'page', page.parentId);
       }
     }
     // Top level pages and databases, make sure it hasn't been created already
@@ -1090,9 +1095,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     createdPagesSet.add(block.id);
   }
 
-  for (let index = 0; index < createdPageIds.length; index++) {
-    const createdPageId = createdPageIds[index];
-    const block = searchResultRecord[createdPageId];
+  for (let index = 0; index < charmversePageIds.length; index++) {
+    const charmversePageId = charmversePageIds[index];
+    const block = searchResultRecord[charmversePageId];
     if (block?.object === 'database' || block?.object === 'page') {
       await createCharmversePageFromNotionPage(block);
     }
