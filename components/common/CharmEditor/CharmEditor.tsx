@@ -240,7 +240,7 @@ interface CharmEditorProps {
 function CharmEditor (
   { content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
 ) {
-
+  console.log(content);
   // check empty state of page on first load
   const _isEmpty = !content?.content
     || content.content.length === 0

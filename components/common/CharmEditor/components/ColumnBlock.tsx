@@ -32,11 +32,6 @@ const StyledColumnBlock = styled.div`
   position: relative;
   transition: background-color 250ms ease-in-out;
 
-  &:hover {
-    transition: background-color 250ms ease-in-out;
-    background-color: ${({ theme }) => theme.palette.background.light};
-  }
-
   & .bangle-nv-content p {
     overflow-wrap: anywhere;
   }
