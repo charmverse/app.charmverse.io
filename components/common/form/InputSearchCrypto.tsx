@@ -1,4 +1,4 @@
-import { Autocomplete, Box, TextField } from '@mui/material';
+import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { CryptoCurrencies } from 'connectors';
 import { CryptoCurrency } from 'models/Currency';
 import Modal from 'components/common/Modal';
@@ -7,16 +7,18 @@ import uniq from 'lodash/uniq';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { PaymentMethod } from '@prisma/client';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import AddIcon from '@mui/icons-material/Add';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import CustomERCTokenForm from 'components/settings/payment-methods/components/CustomERCTokenForm';
 
 export interface IInputSearchCryptoProps {
-  onChange?: (value: CryptoCurrency) => void,
-  onNewPaymentMethod?: (method: PaymentMethod) => void,
-  defaultValue?: CryptoCurrency | string,
-  value?: CryptoCurrency | string, // allow parent to override value
-  hideBackdrop?: boolean, // hide backdrop when modal is open
-  cryptoList?: Array<string | CryptoCurrency>
+  onChange?: (value: CryptoCurrency) => void;
+  onNewPaymentMethod?: (method: PaymentMethod) => void;
+  defaultValue?: CryptoCurrency | string;
+  value?: CryptoCurrency | string; // allow parent to override value
+  hideBackdrop?: boolean; // hide backdrop when modal is open
+  cryptoList?: Array<string | CryptoCurrency>;
+  chainId?: number; // allow passing this down to the 'new custom token' form
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
@@ -27,7 +29,8 @@ export function InputSearchCrypto ({
   onChange = () => {},
   defaultValue = '',
   value: parentValue,
-  cryptoList = CryptoCurrencies
+  cryptoList = CryptoCurrencies,
+  chainId
 }: IInputSearchCryptoProps) {
 
   const [inputValue, setInputValue] = useState('');
@@ -45,7 +48,6 @@ export function InputSearchCrypto ({
 
   useEffect(() => {
     if (parentValue) {
-      console.log('set parent value', parentValue, cryptoList);
       setInputValue(parentValue);
       setValue(parentValue);
     }
@@ -100,7 +102,8 @@ export function InputSearchCrypto ({
           if (option === ADD_NEW_CUSTOM) {
             return (
               <Box component='li' {...props}>
-                Add new custom token
+                <AddIcon color='secondary' sx={{ mr: '5px' }} />
+                <Typography variant='body2'>Add a custom token</Typography>
               </Box>
             );
           }
@@ -134,7 +137,7 @@ export function InputSearchCrypto ({
       />
 
       <Modal title='Add a custom ERC20 token' hideBackdrop={hideBackdrop} open={ERC20PopupState.isOpen} onClose={ERC20PopupState.close} size='500px'>
-        <CustomERCTokenForm onSubmit={onNewPaymentMethod} />
+        <CustomERCTokenForm defaultChainId={chainId} onSubmit={onNewPaymentMethod} />
       </Modal>
     </>
   );

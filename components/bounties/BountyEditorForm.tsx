@@ -245,6 +245,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
               </InputLabel>
               <InputSearchCrypto
                 cryptoList={availableCryptos}
+                chainId={chainId}
                 defaultValue={bounty?.rewardToken}
                 value={rewardToken}
                 hideBackdrop={true}
