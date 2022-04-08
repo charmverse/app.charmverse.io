@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { usePages } from 'hooks/usePages';
-import { StyledIconButton } from 'components/common/NewPageMenu';
+import { StyledIconButton } from 'components/common/PageLayout/components/NewPageMenu';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 

@@ -242,7 +242,7 @@ function CharmEditor (
 ) {
 
   // check empty state of page on first load
-  const _isEmpty = !content.content
+  const _isEmpty = !content?.content
     || content.content.length === 0
     || (content.content.length === 1 && !content.content[0].content?.length);
 
