@@ -36,7 +36,9 @@ export async function getBotUser (spaceId: string): Promise<User> {
     await prisma.spaceRole.create({
       data: {
         spaceId,
-        userId: botUser.id
+        userId: botUser.id,
+        role: 'admin',
+        isAdmin: true
       }
     });
   }
