@@ -183,7 +183,7 @@ export function MentionSuggest () {
         <MenuItem
           component='div'
           sx={{
-            background: theme.palette.background.light
+            background: theme.palette.background.dark
           }}
           onClick={() => onSelectMention(contributor.id, 'user')}
           key={contributor.id}
@@ -205,7 +205,7 @@ export function MentionSuggest () {
       {Object.values(pages).map(page => page && (
       <MenuItem
         sx={{
-          background: theme.palette.background.light
+          background: theme.palette.background.dark
         }}
         key={page.id}
         onClick={() => onSelectMention(page.id, 'page')}
