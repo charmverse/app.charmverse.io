@@ -11,6 +11,7 @@ import CardHeader from '@mui/material/CardHeader';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Application, Bounty } from '@prisma/client';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import charmClient from 'charmClient';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { ApplicationEditorForm } from 'components/bounties/ApplicationEditorForm';
@@ -47,7 +48,7 @@ export default function BountyDetails () {
   const { bounties, setBounties } = useBounties();
   const [bounty, setBounty] = useState<BountyWithDetails | null>(null);
 
-  const [showBountyEditDialog, setShowBountyEditDialog] = useState(false);
+  const bountyEditModal = usePopupState({ variant: 'popover', popupId: 'ERC20-popup' });
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
   const [showBountyDeleteDialog, setShowBountyDeleteDialog] = useState(false);
   const [paymentError, setPaymentError] = useState<{severity: AlertColor, message: string} | null>(null);
@@ -116,11 +117,7 @@ export default function BountyDetails () {
   async function saveBounty (updatedBounty: Bounty) {
     // The API should return a Bounty with a list of transactions
     updateBounty({ ...updatedBounty, applications } as any);
-    setShowBountyEditDialog(false);
-  }
-
-  function toggleBountyEditDialog () {
-    setShowBountyEditDialog(!showBountyEditDialog);
+    bountyEditModal.close();
   }
 
   function toggleBountyDeleteDialog () {
@@ -201,8 +198,6 @@ export default function BountyDetails () {
 
   }
 
-  //  charmClient.getBounty();
-
   if (!space || !bounty) {
     return (
       <Container top={100}>
@@ -239,7 +234,7 @@ export default function BountyDetails () {
               {
                 viewerCanModifyBounty === true && (
                   <>
-                    <IconButton onClick={toggleBountyEditDialog}>
+                    <IconButton onClick={bountyEditModal.open}>
                       <EditIcon fontSize='small' />
                     </IconButton>
                     {
@@ -302,7 +297,7 @@ export default function BountyDetails () {
                   <Box flexDirection='row' gap={1} display='flex'>
                     {/* Assign reviewer */}
                     {!reviewerUser && isAdmin && (
-                    <Button color='secondary' variant='outlined' onClick={toggleBountyEditDialog}>Assign reviewer</Button>
+                      <Button color='secondary' variant='outlined' onClick={bountyEditModal.open}>Assign reviewer</Button>
                     )}
                     {/* Review completed work */}
                     {bounty.status === 'review' && isReviewer && (
@@ -390,7 +385,7 @@ export default function BountyDetails () {
             />
           )
         }
-        <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={showBountyEditDialog} onClose={toggleBountyEditDialog} />
+        <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={bountyEditModal.isOpen} onClose={bountyEditModal.close} />
 
         <Modal title='Bounty Application' size='large' open={showApplicationDialog} onClose={toggleApplicationDialog}>
           <ApplicationEditorForm

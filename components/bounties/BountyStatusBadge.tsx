@@ -10,7 +10,6 @@ import millify from 'millify';
 import Tooltip from '@mui/material/Tooltip';
 import { BountyWithDetails } from 'models';
 import { BOUNTY_LABELS } from 'models/Bounty';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
@@ -171,8 +170,7 @@ function BountyAmount ({ bounty, truncate }: { bounty: Bounty, truncate: boolean
                   (tokenInfo.isContract ? (
                     <img alt='' width='100%' height='100%' src={tokenInfo.tokenLogo} />
                   ) : (
-                    <Image
-                      loading='lazy'
+                    <img
                       width='100%'
                       height='100%'
                       src={tokenInfo.tokenLogo}

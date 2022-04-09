@@ -4,6 +4,7 @@
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["linux-musl", "darwin", "native"]
+  previewFeatures = ["filterJson"]
 }
 
 datasource db {
@@ -34,16 +35,28 @@ model Space {
   name            String
   domain          String           @unique
   discordServerId String?
-  spaceRoles      SpaceRole[]
-  permissions     PagePermission[]
-  pages           Page[]
-  blocks          Block[]
-  inviteLinks     InviteLink[]
-  bounties        Bounty[]
-  TokenGate       TokenGate[]
-  paymentMethods  PaymentMethod[]
-  roles           Role[]
+  spaceRoles     SpaceRole[]
+  permissions    PagePermission[]
+  pages          Page[]
+  blocks         Block[]
+  inviteLinks    InviteLink[]
+  bounties       Bounty[]
+  TokenGate      TokenGate[]
+  paymentMethods PaymentMethod[]
+  roles          Role[]
+  apiToken       SpaceApiToken?
 }
+
+model SpaceApiToken {
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  spaceId   String    @db.Uuid
+  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  token     String
+
+  @@unique([token, spaceId])
+}
+
 
 model Page {
   id            String           @id @default(uuid()) @db.Uuid
@@ -106,6 +119,7 @@ model User {
   applications Application[]
   username     String?
   avatar       String?
+  isBot        Boolean?        @default(false)
   discordUser  DiscordUser?
   telegramUser TelegramUser?
 }
@@ -317,3 +331,5 @@ model PagePermission {
   @@unique([roleId, pageId], name: "roleId_pageId")
   @@unique([spaceId, pageId], name: "spaceId_pageId")
 }
+
+

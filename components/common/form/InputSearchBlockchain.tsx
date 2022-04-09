@@ -1,19 +1,40 @@
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
-import { RPCList } from 'connectors';
-import Select from '@mui/material/Select';
+import { useEffect, useState } from 'react';
+import { RPCList, IChainDetails } from 'connectors';
 import TextField from '@mui/material/TextField';
-import { UseFormRegister } from 'react-hook-form';
 
 interface Props {
-  onChange?: (chainId: number) => void
-  defaultChainId?: number
+  onChange?: (chainId: number) => void;
+  defaultChainId?: number; // allow setting a default
+  chainId?: number; // allow overriding from the parent
 }
 
-export function InputBlockchainSearch ({
+export default function InputSearchBlockchain ({
   defaultChainId,
+  chainId,
   onChange = () => {}
 }: Props) {
+
+  const [value, setValue] = useState<IChainDetails | null>(null);
+
+  useEffect(() => {
+    if (defaultChainId && !value) {
+      const chain = RPCList.find(rpc => rpc.chainId === defaultChainId);
+      if (chain) {
+        setValue(chain);
+      }
+    }
+  }, [defaultChainId]);
+
+  useEffect(() => {
+    if (chainId) {
+      const chain = RPCList.find(rpc => rpc.chainId === chainId);
+      if (chain) {
+        setValue(chain);
+      }
+    }
+  }, [chainId]);
 
   const defaultValueToAssign = defaultChainId ? RPCList.find(rpc => {
     return rpc.chainId === defaultChainId;
@@ -22,13 +43,16 @@ export function InputBlockchainSearch ({
   return (
     <Autocomplete
       defaultValue={defaultValueToAssign}
-      onChange={(_, event) => {
-        if (event?.chainId) {
-          onChange(event.chainId);
+      // @ts-ignore - autocomplete types are a mess
+      value={value}
+      onChange={(_, _value: IChainDetails) => {
+        if (_value?.chainId) {
+          onChange(_value.chainId);
         }
       }}
       sx={{ minWidth: 150 }}
       options={RPCList}
+      disableClearable
       autoHighlight
       size='small'
       getOptionLabel={option => `${option.chainName}`}
