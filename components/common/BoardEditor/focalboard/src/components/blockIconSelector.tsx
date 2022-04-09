@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import { Page } from '@prisma/client'
+import PageIcon from 'components/common/Emoji';
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { BlockIcons } from '../blockIcons'
@@ -44,7 +45,7 @@ const BlockIconSelector = React.memo((props: Props) => {
     if (props.readonly) {
         className += ' readonly'
     }
-    const iconElement = <div className={className}><span>{block.fields.icon}</span></div>
+    const iconElement = <PageIcon size='large' icon={block.fields.icon} />
 
     return (
         <div className='BlockIconSelector'>
