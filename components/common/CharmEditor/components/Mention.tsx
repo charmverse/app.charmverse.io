@@ -3,15 +3,17 @@ import { Command, DOMOutputSpec, EditorState, Plugin, PluginKey, Schema } from '
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { useTheme } from '@emotion/react';
-import { Box, ClickAwayListener, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Divider, List, ListItem, ListItemIcon, ListItemText, ListSubheader, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
-import { Contributor } from 'models';
 import { useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { usePages } from 'hooks/usePages';
+import { Page } from '@prisma/client';
+import { PageIcon } from 'components/common/PageLayout/components/PageNavigation';
 import { hideSuggestionsTooltip } from './@bangle.dev/tooltip/suggest-tooltip';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 
@@ -158,6 +160,7 @@ export function MentionSuggest () {
     tooltipContentDOM,
     suggestTooltipKey
   } = usePluginState(mentionSuggestKey);
+  const { pages } = usePages();
 
   const {
     show: isVisible
@@ -173,31 +176,78 @@ export function MentionSuggest () {
     [view, mentionSuggestKey]
   );
 
+  const contributorsList = (
+    <>
+      {contributors.map(contributor => (
+        <MenuItem
+          sx={{
+            background: theme.palette.background.light
+          }}
+          onClick={() => onSelectMention(contributor.id, 'user')}
+          key={contributor.id}
+        >
+          <ReviewerOption
+            style={{
+              alignItems: 'center'
+            }}
+            user={contributor}
+            avatarSize='small'
+          />
+        </MenuItem>
+      ))}
+    </>
+  );
+
+  const pagesList = (
+    <>
+      {Object.values(pages).slice(0, 10).map(page => page && (
+      <MenuItem
+        sx={{
+          background: theme.palette.background.light
+        }}
+        key={page.id}
+        onClick={() => onSelectMention(page.id, 'page')}
+      >
+        <Box display='flex' gap={0.5}>
+          <PageIcon icon={page.icon} isEditorEmpty={false} pageType={page.type} />
+          {page.title || 'Untitled'}
+        </Box>
+      </MenuItem>
+      ))}
+    </>
+  );
+
   if (isVisible) {
     return createPortal(
       <ClickAwayListener onClickAway={() => {
         hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
       }}
       >
-        <Box>
-          {contributors.map(contributor => (
-            <MenuItem
-              sx={{
-                background: theme.palette.background.light
-              }}
-              onClick={() => onSelectMention(contributor.id, 'user')}
-              key={contributor.id}
-            >
-              <ReviewerOption
-                style={{
-                  alignItems: 'center'
+        <List
+          sx={{
+            width: '350px',
+            position: 'relative',
+            overflow: 'auto',
+            maxHeight: 300,
+            '& ul': { padding: 0 }
+          }}
+          subheader={<li />}
+        >
+          {['Contributors', 'Pages'].map(sectionId => {
+            return (
+              <li key={`section-${sectionId}`}>
+                <ListSubheader>{sectionId}</ListSubheader>
+                {sectionId === 'Contributors' ? contributorsList : pagesList}
+                <hr style={{
+                  height: 2,
+                  marginTop: '8px',
+                  marginBottom: 0
                 }}
-                user={contributor}
-                avatarSize='small'
-              />
-            </MenuItem>
-          ))}
-        </Box>
+                />
+              </li>
+            );
+          })}
+        </List>
       </ClickAwayListener>,
       tooltipContentDOM
     );
@@ -208,7 +258,7 @@ export function MentionSuggest () {
 export function Mention ({ node }: NodeViewProps) {
   const theme = useTheme();
   const [contributors] = useContributors();
-  const contributor = contributors.find(_contributor => _contributor.id === node.attrs.value)!;
+  const contributor = contributors.find(_contributor => _contributor.id === node.attrs.value);
   const ensName = useENSName(contributor?.addresses[0]);
 
   return contributor ? (

@@ -220,6 +220,15 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           disableRipple: true
         }
       },
+      MuiDivider: {
+        styleOverrides: {
+          root: {
+            marginTop: 8,
+            height: 2,
+            marginBottom: 0
+          }
+        }
+      },
       MuiButtonGroup: {
         defaultProps: {
           disableRipple: true

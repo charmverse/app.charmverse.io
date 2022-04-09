@@ -15,7 +15,6 @@ interface ResizerProps {
 
 function Resizer (props: ResizerProps) {
   const height = props.aspectRatio ? props.width / props.aspectRatio : 0;
-  console.log(props);
   return (
     <ResizableContainer>
       <ResizableBox
