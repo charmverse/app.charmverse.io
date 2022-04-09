@@ -181,6 +181,7 @@ export function MentionSuggest () {
     <>
       {contributors.map(contributor => (
         <MenuItem
+          component='div'
           sx={{
             background: theme.palette.background.light
           }}
@@ -201,7 +202,7 @@ export function MentionSuggest () {
 
   const pagesList = (
     <>
-      {Object.values(pages).slice(0, 10).map(page => page && (
+      {Object.values(pages).map(page => page && (
       <MenuItem
         sx={{
           background: theme.palette.background.light
@@ -236,7 +237,13 @@ export function MentionSuggest () {
         >
           {['Contributors', 'Pages'].map(sectionId => {
             return (
-              <li key={`section-${sectionId}`}>
+              <Box
+                key={`section-${sectionId}`}
+                sx={{
+                  // This is required to not show the background while scrolling
+                  backgroundColor: theme.palette.background.dark
+                }}
+              >
                 <ListSubheader>{sectionId}</ListSubheader>
                 {sectionId === 'Contributors' ? contributorsList : pagesList}
                 <hr style={{
@@ -245,7 +252,7 @@ export function MentionSuggest () {
                   marginBottom: 0
                 }}
                 />
-              </li>
+              </Box>
             );
           })}
         </List>
