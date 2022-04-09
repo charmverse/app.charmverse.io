@@ -4,10 +4,10 @@ import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import { Bounty, Bounty as IBounty } from '@prisma/client';
+import { Bounty, Bounty as IBounty, PaymentMethod } from '@prisma/client';
 import charmClient, { PopulatedBounty } from 'charmClient';
 import Button from 'components/common/Button';
-import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
+import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
@@ -62,7 +62,7 @@ function FormDescription ({ onContentChange, content, watch }:
   );
 }
 
-export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
+export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
   const { setBounties, bounties } = useBounties();
 
   const defaultChainId = bounty?.chainId ?? 1;
@@ -90,12 +90,14 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
 
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
 
+  const chainId = watch('chainId');
+  const rewardToken = watch('rewardToken');
+
   useEffect(() => {
-    refreshCryptoList(defaultChainId);
+    refreshCryptoList(defaultChainId, bounty?.rewardToken);
   }, []);
 
   async function submitted (value: IBounty) {
-
     if (mode === 'create') {
       value.spaceId = space!.id;
       value.createdBy = user!.id;
@@ -132,16 +134,15 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
     setValue('reviewer', userId);
   }
 
-  function setChainId (chainId: number) {
-    setValue('chainId', chainId);
-
-    refreshCryptoList(chainId);
+  function setChainId (_chainId: number) {
+    setValue('chainId', _chainId);
+    refreshCryptoList(_chainId);
   }
 
-  function refreshCryptoList (chainId: number) {
+  function refreshCryptoList (_chainId: number, _rewardToken?: string) {
 
     // Set the default chain currency
-    const selectedChain = getChainById(chainId);
+    const selectedChain = getChainById(_chainId);
 
     if (selectedChain) {
 
@@ -150,7 +151,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
       const cryptosToDisplay = [nativeCurrency];
 
       const contractAddresses = paymentMethods
-        .filter(method => method.chainId === chainId)
+        .filter(method => method.chainId === _chainId)
         .map(method => {
           return method.contractAddress;
         })
@@ -158,7 +159,14 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
       cryptosToDisplay.push(...contractAddresses);
 
       setAvailableCryptos(cryptosToDisplay);
-      setValue('rewardToken', nativeCurrency);
+      setValue('rewardToken', _rewardToken || nativeCurrency);
+    }
+  }
+
+  function onNewPaymentMethod (paymentMethod: PaymentMethod) {
+    if (paymentMethod.contractAddress) {
+      setValue('chainId', paymentMethod.chainId);
+      refreshCryptoList(paymentMethod.chainId, paymentMethod.contractAddress);
     }
   }
 
@@ -183,6 +191,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               )
             }
           </Grid>
+
           <FormDescription
             watch={watch}
             content={bounty?.descriptionNodes as PageContent}
@@ -190,6 +199,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               setRichContent(pageContent);
             }}
           />
+
           <Grid item>
             <InputLabel>
               Reviewer
@@ -201,15 +211,13 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               <InputLabel>
                 Select a chain for this transaction
               </InputLabel>
-              <InputBlockchainSearch
-                defaultChainId={defaultChainId}
+              <InputSearchBlockchain
+                chainId={chainId}
                 onChange={setChainId}
               />
             </Grid>
           </Grid>
-          {
 
-          }
           <Grid container item>
             <Grid item xs={6}>
               <InputLabel>
@@ -220,6 +228,7 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
                   valueAsNumber: true
                 })}
                 type='number'
+                size='small'
                 inputProps={{ step: 0.000000001 }}
               />
               {
@@ -236,10 +245,14 @@ export function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBounty
               </InputLabel>
               <InputSearchCrypto
                 cryptoList={availableCryptos}
+                chainId={chainId}
                 defaultValue={bounty?.rewardToken}
+                value={rewardToken}
+                hideBackdrop={true}
                 onChange={newToken => {
                   setValue('rewardToken', newToken);
                 }}
+                onNewPaymentMethod={onNewPaymentMethod}
               />
             </Grid>
           </Grid>

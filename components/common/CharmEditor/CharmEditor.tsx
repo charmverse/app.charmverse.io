@@ -15,7 +15,7 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
-import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
+import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
 import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
@@ -27,6 +27,7 @@ import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
+import { markdownSerializer } from '@bangle.dev/markdown';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import { Callout, calloutSpec } from './components/Callout';
 import ColumnBlock, { spec as columnBlockSpec } from './components/ColumnBlock';
@@ -235,6 +236,27 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
+}
+
+export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
+
+  const serializer = markdownSerializer(specRegistry);
+
+  const state = new BangleEditorState({
+    specRegistry,
+    plugins: charmEditorPlugins(),
+    initialValue: Node.fromJSON(specRegistry.schema, content) ?? ''
+  });
+
+  let markdown = serializer.serialize(state.pmState.doc);
+
+  if (title) {
+    const pageTitleAsMarkdown = `# ${title}`;
+
+    markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
+  }
+
+  return markdown;
 }
 
 function CharmEditor (

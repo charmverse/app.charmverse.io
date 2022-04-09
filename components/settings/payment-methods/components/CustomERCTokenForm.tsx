@@ -1,26 +1,18 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
-import Input from '@mui/material/Input';
 import TextField from '@mui/material/TextField';
 import Progress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import { PaymentMethod, WalletType } from '@prisma/client';
+import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { InputBlockchainSearch } from 'components/common/form/InputBlockchains';
-import { getCryptos, getChainById } from 'connectors';
-import { useBounties } from 'hooks/useBounties';
+import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useUser } from 'hooks/useUser';
 import { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { IUserError } from 'lib/utilities/errors';
-import { CryptoCurrency } from 'models/Currency';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -28,23 +20,19 @@ import * as yup from 'yup';
 export type FormMode = 'create' | 'update';
 
 interface Props {
-  onSubmit: (paymentMethod: Partial<PaymentMethod>) => any,
-  defaultChainId?: number
+  onSubmit: (paymentMethod: PaymentMethod) => void;
+  defaultChainId?: number;
 }
 
 export const schema = yup.object({
   chainId: yup.number().required('Please select a chain'),
-  contractAddress: yup.string().nullable(true).test('verifyContractFormat', 'Invalid contract address', (value) => {
-    return !value || isValidChainAddress(value);
-  }),
-  gnosisSafeAddress: yup.string().test('verifyContractFormat', 'Invalid contract address', (value) => {
+  contractAddress: yup.string().test('verifyContractFormat', 'Invalid contract address', (value) => {
     return !value || isValidChainAddress(value);
   }),
   tokenSymbol: yup.string().nullable(true),
   tokenName: yup.string().nullable(true),
   tokenLogo: yup.string().nullable(true),
-  tokenDecimals: yup.number().nullable(true),
-  walletType: yup.mixed<WalletType>().required().oneOf(['metamask', 'gnosis'])
+  tokenDecimals: yup.number().nullable(true)
 });
 
 type FormValues = yup.InferType<typeof schema>
@@ -83,34 +71,19 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
   const values = watch();
 
   useEffect(() => {
-    const newContractAddress = watch(({ contractAddress, chainId, walletType }, { value, name }) => {
+    const newContractAddress = watch(({ contractAddress, chainId }, { value, name }) => {
 
-      if (walletType === 'metamask') {
-        if ((name === 'contractAddress' || name === 'chainId') && isValidChainAddress(contractAddress as string)) {
-          loadToken({ chainId: chainId as number, contractAddress: contractAddress as string });
-        }
-        // Remove the current token as the contract address is being modified
-        else if (name === 'contractAddress' && !isValidChainAddress(contractAddress as string)) {
-          setValue('tokenSymbol', null);
-          setValue('tokenLogo', null);
-        }
+      if ((name === 'contractAddress' || name === 'chainId') && isValidChainAddress(contractAddress as string)) {
+        loadToken({ chainId: chainId as number, contractAddress: contractAddress as string });
+      }
+      // Remove the current token as the contract address is being modified
+      else if (name === 'contractAddress' && !isValidChainAddress(contractAddress as string)) {
+        setValue('tokenSymbol', null);
+        setValue('tokenLogo', null);
       }
     });
     return () => newContractAddress.unsubscribe();
   }, [watch]);
-
-  useEffect(() => {
-    if (values.gnosisSafeAddress) {
-      const chain = getChainById(values.chainId);
-      if (chain) {
-        setValue('tokenSymbol', chain.nativeCurrency.symbol);
-        setValue('tokenName', chain.nativeCurrency.name);
-        setValue('tokenDecimals', chain.nativeCurrency.decimals);
-        setValue('tokenLogo', null);
-        setValue('contractAddress', null);
-      }
-    }
-  }, [values.chainId, values.gnosisSafeAddress]);
 
   async function loadToken (tokenInfo: ITokenMetadataRequest) {
     setLoadingToken(true);
@@ -144,6 +117,8 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
   async function addPaymentMethod (paymentMethod: Partial<PaymentMethod>) {
     setFormError(null);
     paymentMethod.spaceId = space?.id;
+    paymentMethod.walletType = 'metamask';
+
     if (!logoLoadSuccess) {
       delete paymentMethod.tokenLogo;
     }
@@ -160,6 +135,8 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
       });
     }
 
+    return false;
+
   }
 
   // Only checks the format, not if we can load the logo
@@ -168,75 +145,50 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
   return (
     <div>
       {/* @ts-ignore */}
-      <form onSubmit={handleSubmit(addPaymentMethod)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form
+        onSubmit={(event) => {
+          // stop propagation so it doesnt submit parent forms, like bounty editor
+          event.stopPropagation();
+          event.preventDefault();
+          handleSubmit(addPaymentMethod as any)(event);
+        }}
+        style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}
+      >
         <Grid container direction='column' spacing={3}>
-
-          <Grid item xs>
-            <InputLabel>
-              Wallet Type
-            </InputLabel>
-            <Select
-              {...register('walletType')}
-              displayEmpty
-              fullWidth
-              renderValue={(selected) => {
-                if (!selected) {
-                  return <Typography color='secondary'>Select a wallet type</Typography>;
-                }
-                return selected === 'metamask' ? 'Metamask' : 'Gnosis Safe';
-              }}
-            >
-              <MenuItem value='metamask'>Metamask</MenuItem>
-              <MenuItem value='gnosis'>Gnosis Safe</MenuItem>
-            </Select>
-          </Grid>
 
           <Grid item xs>
             <InputLabel>
               Blockchain
             </InputLabel>
-            <InputBlockchainSearch
+            <InputSearchBlockchain
               defaultChainId={defaultChainId}
               onChange={setChainId}
             />
           </Grid>
 
-          {values.walletType === 'gnosis' && (
-            <Grid item xs>
-              <TextField
-                {...register('gnosisSafeAddress')}
-                fullWidth
-                placeholder='Enter Gnosis Safe address'
-                error={!!errors.gnosisSafeAddress?.message}
-                helperText={errors.gnosisSafeAddress?.message}
-              />
-            </Grid>
-          )}
-
-          {values.walletType === 'metamask' && (
-            <Grid item xs>
-              <InputLabel>
-                Contract address
-              </InputLabel>
-              <TextField
-                {...register('contractAddress')}
-                type='text'
-                fullWidth
-                error={!!errors.contractAddress?.message}
-                helperText={errors.contractAddress?.message}
-                InputProps={{
-                  endAdornment: loadingToken && <Progress color='inherit' size='1em' />
-                }}
-              />
-              {
+          <Grid item xs>
+            <InputLabel>
+              Contract address
+            </InputLabel>
+            <TextField
+              {...register('contractAddress')}
+              type='text'
+              size='small'
+              fullWidth
+              error={!!errors.contractAddress?.message}
+              helperText={errors.contractAddress?.message}
+              InputProps={{
+                endAdornment: loadingToken && <Progress color='inherit' size='1em' />
+              }}
+            />
+            {
                 !(errors?.contractAddress) && allowManualInput && !loadingToken && (
                   <Alert severity='info'>
                     We couldn't find data about this token. Enter its details below, or select a different blockchain.
                   </Alert>
                 )
               }
-            </Grid>
-          )}
+          </Grid>
 
           {
             values.contractAddress && !errors.contractAddress && !loadingToken && (
@@ -251,6 +203,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                         readOnly: !allowManualInput
                       }}
                       {...register('tokenSymbol')}
+                      size='small'
                       type='text'
                       error={!!errors.tokenSymbol?.message}
                       helperText={errors.tokenSymbol?.message}
@@ -264,6 +217,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                     <TextField
                       {...register('tokenDecimals')}
                       type='number'
+                      size='small'
                       inputMode='numeric'
                       inputProps={{
                         step: 1,
@@ -281,6 +235,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                   <TextField
                     {...register('tokenName')}
                     type='text'
+                    size='small'
                     fullWidth
                     InputProps={{
                       readOnly: !allowManualInput
@@ -298,6 +253,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                     <TextField
                       {...register('tokenLogo')}
                       type='text'
+                      size='small'
                       fullWidth
                       error={!!errors.tokenLogo?.message}
                       helperText={errors.tokenLogo?.message}
@@ -317,7 +273,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                         <img
                           alt=''
                           style={{ maxHeight: '50px' }}
-                          src={values.tokenLogo!}
+                          src={values.tokenLogo || ''}
                           onError={(error) => {
                             setLogoLoadSuccess(false);
                           }}
@@ -342,7 +298,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
             )
           }
           <Grid item>
-            <Button type='submit' disabled={!isValid || (values.contractAddress === '' && values.gnosisSafeAddress === '')}>Create payment method</Button>
+            <Button type='submit' disabled={!isValid || (values.contractAddress === '')}>Create payment method</Button>
           </Grid>
         </Grid>
       </form>

@@ -14,16 +14,16 @@ interface IContributorsFilter {
   userIds: string []
 }
 
-function filterContributors<T extends { id: string }> (contributors: T [], filter: IContributorsFilter): T[] {
+function filterContributors (contributors: Contributor [], filter: IContributorsFilter): Contributor[] {
   if (filter.mode === 'exclude') {
-    return contributors.filter(contributor => {
-      const shouldInclude = filter.userIds.indexOf(contributor.id) === -1;
+    return contributors.filter((contributor) => {
+      const shouldInclude = filter.userIds.indexOf(contributor.id) === -1 && contributor.isBot !== true;
       return shouldInclude;
     });
   }
   else {
-    return contributors.filter(contributor => {
-      const shouldInclude = filter.userIds.indexOf(contributor.id) > -1;
+    return contributors.filter((contributor) => {
+      const shouldInclude = filter.userIds.indexOf(contributor.id) > -1 && contributor.isBot !== true;
       return shouldInclude;
     });
   }
@@ -61,6 +61,7 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
         <TextField
           {...params}
           placeholder={placeholder}
+          size='small'
           inputProps={{
             ...params.inputProps
           }}
