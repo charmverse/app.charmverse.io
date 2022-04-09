@@ -305,7 +305,7 @@ export function Mention ({ node }: NodeViewProps) {
     );
   }
 
-  return value && (
+  return value ? (
     <Box
       component='span'
       sx={{
@@ -321,5 +321,5 @@ export function Mention ({ node }: NodeViewProps) {
     >
       {value}
     </Box>
-  );
+  ) : null;
 }
