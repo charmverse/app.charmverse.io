@@ -222,8 +222,7 @@ const defaultContent: PageContent = {
   type: 'doc',
   content: [
     {
-      type: 'paragraph',
-      content: []
+      type: 'paragraph'
     }
   ]
 };
@@ -259,7 +258,7 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
   return markdown;
 }
 
-function checkForEmpty (content: PageContent) {
+export function checkForEmpty (content: PageContent) {
   return !content?.content
   || content.content.length === 0
   || (content.content.length === 1
@@ -273,7 +272,7 @@ function CharmEditor (
 ) {
 
   // check empty state of page on first load
-  const _isEmpty = checkForEmpty(defaultContent);
+  const _isEmpty = checkForEmpty(content);
 
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
