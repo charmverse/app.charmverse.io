@@ -43,6 +43,30 @@ jobs:
     #   run: npm test
 
   deploy:
+    name: Deploy to staging
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Node.js v16
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Install dependencies
+        run: npm ci --no-fund
+      - name: Build
+        run: npm run build
+      - name: Remove dev dependencies
+        run: |
+          npm prune --production
+          rm -rf .git
+
+      - name: Package
+        run: zip deploy.zip -r .
+      - name: Deploy to staging
+        run: npm run deploy:staging
+
+  deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
