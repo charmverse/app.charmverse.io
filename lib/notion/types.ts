@@ -1,4 +1,4 @@
-export type RichTextItemResponse = {
+export type RichTextItemResponse = ({
   type: 'text';
   text: {
     content: string;
@@ -6,6 +6,15 @@ export type RichTextItemResponse = {
       url: string;
     } | null;
   };
+} | {
+  type: 'mention';
+  mention: {
+    type: 'page';
+    page: {
+      id: string;
+    };
+  };
+}) & {
   annotations: {
     bold: boolean;
     italic: boolean;

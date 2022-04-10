@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, ListItemNode, Page, PageContent, ParagraphNode, TableNode, TableRowNode, TextContent } from 'models';
+import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, ListItemNode, MentionNode, Page, PageContent, ParagraphNode, TableNode, TableRowNode, TextContent } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import { Prisma } from '@prisma/client';
 import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'components/common/CharmEditor/components/ResizableIframe';
@@ -18,50 +18,69 @@ const IMPORTED_PAGES_LIMIT = 1000;
 const BLOCKS_FETCHED_PER_REQUEST = 100;
 const MAX_CHILD_BLOCK_DEPTH = 10;
 
-function convertRichText (richTexts: RichTextItemResponse[]): TextContent[] {
-  const textContents: TextContent[] = [];
+function convertRichText (richTexts: RichTextItemResponse[]): {
+  contents: (TextContent | MentionNode)[],
+  inlineLinkedPages: string[]
+} {
+  const contents: (TextContent | MentionNode)[] = [];
+  const inlineLinkedPages: string[] = [];
 
   richTexts.forEach((richText) => {
     const marks: { type: string, attrs?: Record<string, string> }[] = [];
-    if (richText.annotations.strikethrough) {
-      marks.push({ type: 'strike' });
-    }
+    if (richText.type !== 'mention') {
+      if (richText.annotations.strikethrough) {
+        marks.push({ type: 'strike' });
+      }
 
-    if (richText.annotations.bold) {
-      marks.push({ type: 'bold' });
-    }
+      if (richText.annotations.bold) {
+        marks.push({ type: 'bold' });
+      }
 
-    if (richText.annotations.italic) {
-      marks.push({ type: 'italic' });
-    }
+      if (richText.annotations.italic) {
+        marks.push({ type: 'italic' });
+      }
 
-    if (richText.annotations.underline) {
-      marks.push({ type: 'underline' });
-    }
+      if (richText.annotations.underline) {
+        marks.push({ type: 'underline' });
+      }
 
-    if (richText.annotations.code) {
-      marks.push({ type: 'code' });
-    }
+      if (richText.annotations.code) {
+        marks.push({ type: 'code' });
+      }
 
-    if (richText.href) {
-      marks.push({
-        type: 'link',
+      if (richText.href) {
+        marks.push({
+          type: 'link',
+          attrs: {
+            href: richText.href
+          }
+        });
+      }
+
+      if (richText.plain_text) {
+        contents.push({
+          type: 'text',
+          text: richText.plain_text,
+          marks
+        });
+      }
+    }
+    else if (richText.mention?.page?.id) {
+      contents.push({
+        type: 'mention',
         attrs: {
-          href: richText.href
+          type: 'page',
+          value: richText.mention.page.id
         }
       });
-    }
-
-    if (richText.plain_text) {
-      textContents.push({
-        type: 'text',
-        text: richText.plain_text,
-        marks
-      });
+      inlineLinkedPages.push(richText.mention.page.id);
     }
   });
 
-  return textContents;
+  return {
+    contents,
+    inlineLinkedPages
+  };
 }
 
 interface ChildBlockListResponse {
@@ -99,7 +118,7 @@ async function populateDoc (
             attrs: {
               level: 1
             },
-            content: convertRichText(block.heading_1.rich_text)
+            content: convertRichText(block.heading_1.rich_text).contents
           });
           break;
         }
@@ -110,7 +129,7 @@ async function populateDoc (
             attrs: {
               level: 2
             },
-            content: convertRichText(block.heading_2.rich_text)
+            content: convertRichText(block.heading_2.rich_text).contents
           });
           break;
         }
@@ -121,7 +140,7 @@ async function populateDoc (
             attrs: {
               level: 2
             },
-            content: convertRichText(block.heading_3.rich_text)
+            content: convertRichText(block.heading_3.rich_text).contents
           });
           break;
         }
@@ -160,10 +179,14 @@ async function populateDoc (
         }
 
         case 'paragraph': {
+          const { contents, inlineLinkedPages } = convertRichText(block[block.type].rich_text);
           (parentNode as PageContent).content?.push({
             type: 'paragraph',
-            content: convertRichText(block[block.type].rich_text)
+            content: contents
           });
+          for (const inlineLinkedPage of inlineLinkedPages) {
+            await onLinkToPage(inlineLinkedPage, parentNode);
+          }
           break;
         }
 
@@ -202,7 +225,7 @@ async function populateDoc (
             type: 'listItem',
             content: [{
               type: 'paragraph',
-              content: convertRichText(richText)
+              content: convertRichText(richText).contents
             }],
             attrs: {
               todoChecked: block.type === 'to_do' ? block.to_do.checked : null
@@ -242,7 +265,7 @@ async function populateDoc (
             content: [
               {
                 type: 'paragraph',
-                content: convertRichText(richText)
+                content: convertRichText(richText).contents
               }
             ]
           };
@@ -331,7 +354,7 @@ async function populateDoc (
               row.table_row.cells.forEach((cell) => {
                 content.push({
                   type: rowIndex === 0 ? 'table_header' : 'table_cell',
-                  content: convertRichText(cell)
+                  content: convertRichText(cell).contents
                 });
               });
             }
@@ -574,7 +597,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   });
 
   // Store all the blocks the integration has access to
-  const searchResults = searchResult.results;
+  const searchResults = searchResult.results as (GetPageResponse | GetDatabaseResponse)[];
 
   // While there are more pages the integration has access to
   while (searchResult.has_more && searchResult.next_cursor && searchResults.length < IMPORTED_PAGES_LIMIT) {
@@ -582,7 +605,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       page_size: BLOCKS_FETCHED_PER_REQUEST,
       start_cursor: searchResult.next_cursor
     });
-    searchResults.push(...searchResult.results);
+    searchResults.push(...searchResult.results as (GetPageResponse | GetDatabaseResponse)[]);
   }
 
   // Store all the pages/databases the integration fetched in a record
@@ -611,13 +634,15 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     block: GetPageResponse | GetDatabaseResponse
   ) {
     let title = '';
+    // Database
     if (block.object === 'database') {
       title = convertToPlainText((block.title));
     }
     else if (block.parent.type === 'database_id') {
-      // Database pages
+      // Focalboard cards
       title = convertToPlainText((Object.values(block.properties).find(property => property.type === 'title') as any).title);
     }
+    // Regular page
     else {
       title = convertToPlainText((block.properties.title as any)[block.properties.title.type]);
     }
@@ -631,13 +656,13 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
   // This loop would ideally decrease the amount of api requests made to fetch a page/database
   for (let index = 0; index < searchResults.length; index++) {
-    const block = searchResults[index] as GetPageResponse | GetDatabaseResponse;
+    const block = searchResults[index];
     searchResultRecord[block.id] = block;
   }
 
   for (let index = 0; index < searchResults.length; index++) {
     const failedImportBlocks: [string, number][][] = [];
-    const notionPage = searchResults[index] as GetPageResponse | GetDatabaseResponse;
+    const notionPage = searchResults[index];
     try {
       if (notionPage.object === 'page') {
         await createPage([[notionPage.id, uuid()]], failedImportBlocks);
@@ -818,14 +843,13 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             }
           },
           onLinkToPage: async (linkedPageId, parentNode) => {
+            const _failedImportBlocks: [string, number][][] = [];
             // If the pages hasn't been created already, only then create it
             // Find the parent its linking
             const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
-            console.log(parentAsLinkedPage);
             // Make sure its not referencing itself otherwise an infinite loop will occur
             // Also make sure the linked page id is not its parent
             if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== notionPageId && !parentAsLinkedPage) {
-              const _failedImportBlocks: [string, number][][] = [];
               try {
                 const createdPage = await createPage([...pageIds, [linkedPageId, uuid()]], _failedImportBlocks);
                 linkedPages[linkedPageId] = createdPage.id;
@@ -834,7 +858,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
                 }
               }
               catch (_) {
-                log.debug('Error on creating link to page', _);
+                log.debug('Error on creating child page', _);
                 populateFailedImportRecord(_failedImportBlocks, searchResultRecord[linkedPageId]);
               }
             }
