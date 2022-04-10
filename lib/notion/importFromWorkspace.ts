@@ -20,10 +20,10 @@ const MAX_CHILD_BLOCK_DEPTH = 10;
 
 function convertRichText (richTexts: RichTextItemResponse[]): {
   contents: (TextContent | MentionNode)[],
-  inlineLinkedPages: string[]
+  inlineLinkedPages: MentionNode[]
 } {
   const contents: (TextContent | MentionNode)[] = [];
-  const inlineLinkedPages: string[] = [];
+  const inlineLinkedPages: MentionNode[] = [];
 
   richTexts.forEach((richText) => {
     const marks: { type: string, attrs?: Record<string, string> }[] = [];
@@ -66,14 +66,15 @@ function convertRichText (richTexts: RichTextItemResponse[]): {
       }
     }
     else if (richText.mention?.page?.id) {
-      contents.push({
+      const inlineLinkedPage: MentionNode = {
         type: 'mention',
         attrs: {
           type: 'page',
           value: richText.mention.page.id
         }
-      });
-      inlineLinkedPages.push(richText.mention.page.id);
+      };
+      contents.push(inlineLinkedPage);
+      inlineLinkedPages.push(inlineLinkedPage);
     }
   });
 
@@ -102,7 +103,7 @@ async function populateDoc (
     onChildDatabase,
     onChildPage
   }: {
-    onLinkToPage: (pageLink: string, parentNode: BlockNode) => Promise<void>,
+    onLinkToPage: (pageLink: string, parentNode: BlockNode, inlineLink: boolean) => Promise<string | null>,
     onChildDatabase: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>,
     onChildPage: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>
   },
@@ -185,13 +186,17 @@ async function populateDoc (
             content: contents
           });
           for (const inlineLinkedPage of inlineLinkedPages) {
-            await onLinkToPage(inlineLinkedPage, parentNode);
+            const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
+            // Replace the notion page id with the charmverse one
+            if (createdPageId) {
+              inlineLinkedPage.attrs.value = createdPageId;
+            }
           }
           break;
         }
 
         case 'link_to_page': {
-          await onLinkToPage((block[block.type] as any)[block[block.type].type] as string, parentNode);
+          await onLinkToPage((block[block.type] as any)[block[block.type].type] as string, parentNode, false);
           break;
         }
 
@@ -842,7 +847,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               populateFailedImportRecord(_failedImportBlocks, searchResultRecord[block.id]);
             }
           },
-          onLinkToPage: async (linkedPageId, parentNode) => {
+          onLinkToPage: async (linkedPageId, parentNode, inlineLink) => {
             const _failedImportBlocks: [string, number][][] = [];
             // If the pages hasn't been created already, only then create it
             // Find the parent its linking
@@ -863,22 +868,29 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               }
             }
 
-            let id = linkedPages[linkedPageId];
+            if (!inlineLink) {
+              let id = linkedPages[linkedPageId];
 
-            // If its linking itself
-            if (linkedPageId === notionPageId) {
-              id = charmversePageId;
-            }
-            else if (parentAsLinkedPage) {
-              id = parentAsLinkedPage[1];
-            }
-
-            (parentNode as PageContent).content?.push({
-              type: 'page',
-              attrs: {
-                id
+              // If its linking itself
+              if (linkedPageId === notionPageId) {
+                id = charmversePageId;
               }
-            });
+              else if (parentAsLinkedPage) {
+                id = parentAsLinkedPage[1];
+              }
+
+              (parentNode as PageContent).content?.push({
+                type: 'page',
+                attrs: {
+                  id
+                }
+              });
+            }
+
+            if (linkedPages[linkedPageId]) {
+              return linkedPages[linkedPageId];
+            }
+            return null;
           }
         }, [[blocks[index].type, index]]);
       }
