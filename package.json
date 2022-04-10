@@ -3,6 +3,7 @@
     "build": "next build",
     "build:prod": "prisma generate && npm run build",
     "build:analyze": "ANALYZE=true next build",
+    "cdk:bootstrap": "node_modules/.bin/cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess",
     "deploy:staging": "node_modules/.bin/cdk deploy",
     "lint": "eslint -c .eslintrc.json . --ext .ts --ext .tsx",
     "lint:prod": "npm run lint -- --quiet",
