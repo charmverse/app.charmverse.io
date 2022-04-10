@@ -258,7 +258,7 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
   return markdown;
 }
 
-export function checkForEmpty (content: PageContent) {
+export function checkForEmpty (content: PageContent | null) {
   return !content?.content
   || content.content.length === 0
   || (content.content.length === 1
