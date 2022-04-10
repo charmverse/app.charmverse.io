@@ -244,7 +244,12 @@ export function MentionSuggest () {
                   backgroundColor: theme.palette.background.dark
                 }}
               >
-                <ListSubheader>{sectionId}</ListSubheader>
+                <ListSubheader sx={{
+                  top: '-5px',
+                  zIndex: 25
+                }}
+                >{sectionId}
+                </ListSubheader>
                 {sectionId === 'Contributors' ? contributorsList : pagesList}
                 <hr style={{
                   height: 2,
