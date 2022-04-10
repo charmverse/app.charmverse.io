@@ -1,6 +1,7 @@
 import { DiscordServerRole } from 'pages/api/discord/importRoles';
 import { prisma } from 'db';
 import { Role } from '@prisma/client';
+import log from 'lib/log';
 
 type RolesRecord = Record<string, { discord: DiscordServerRole, charmverse: Role | null }>;
 
@@ -11,6 +12,7 @@ export async function findOrCreateRolesFromDiscord (
   userId: string,
   createRoles?: boolean
 ): Promise<RolesRecord> {
+  let roleWithIssue : string | null = null;
   createRoles = createRoles ?? true;
   const rolesRecord: RolesRecord = {};
   // Create all of the discord roles fist
@@ -43,7 +45,7 @@ export async function findOrCreateRolesFromDiscord (
           });
         }
         catch (_) {
-          //
+          roleWithIssue = discordServerRole.name;
         }
       }
 
@@ -52,6 +54,9 @@ export async function findOrCreateRolesFromDiscord (
         charmverse: charmVerseRole
       };
     }
+  }
+  if (roleWithIssue) {
+    log.error(`Error creating role ${roleWithIssue}. Roles: ${discordServerRoles.map(discordServerRole => discordServerRole.name).join(',')}`);
   }
   return rolesRecord;
 }
