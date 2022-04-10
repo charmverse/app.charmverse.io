@@ -15,9 +15,8 @@ export async function findOrCreateRolesFromDiscord (
   const rolesRecord: RolesRecord = {};
   // Create all of the discord roles fist
   for (const discordServerRole of discordServerRoles) {
-    // Skip the @everyone role, this is assigned to all the members of the workspace
+    // Skip the @everyone role, this is assigned to all the members of the server
     if (discordServerRole.name !== '@everyone') {
-      let charmVerseRole: Role | null = null;
       // First check if a role with the same name already exist in the workspace
       const existingRole = await prisma.role.findFirst({
         where: {
@@ -26,22 +25,26 @@ export async function findOrCreateRolesFromDiscord (
         }
       });
 
+      let charmVerseRole = existingRole;
+
       // Only create the role if it doesn't already exist
       if (!existingRole && createRoles) {
-        charmVerseRole = await prisma.role.create({
-          data: {
-            name: discordServerRole.name,
-            space: {
-              connect: {
-                id: spaceId
-              }
-            },
-            createdBy: userId
-          }
-        });
-      }
-      else {
-        charmVerseRole = existingRole;
+        try {
+          charmVerseRole = await prisma.role.create({
+            data: {
+              name: discordServerRole.name,
+              space: {
+                connect: {
+                  id: spaceId
+                }
+              },
+              createdBy: userId
+            }
+          });
+        }
+        catch (_) {
+          //
+        }
       }
 
       rolesRecord[discordServerRole.id] = {
