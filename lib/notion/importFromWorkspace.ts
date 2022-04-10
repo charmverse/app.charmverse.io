@@ -263,7 +263,6 @@ async function populateDoc (
         case 'quote': {
           let richText: RichTextItemResponse[] = [];
           let emoji: string | null = null;
-          const { contents, inlineLinkedPages } = convertRichText(richText);
           if (block.type === 'callout') {
             richText = block.callout.rich_text;
             emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
@@ -271,7 +270,7 @@ async function populateDoc (
           else if (block.type === 'quote') {
             richText = block.quote.rich_text;
           }
-
+          const { contents, inlineLinkedPages } = convertRichText(richText);
           const calloutNode: CalloutNode = {
             type: block.type === 'callout' ? 'blockquote' : 'quote' as any,
             attrs: {
