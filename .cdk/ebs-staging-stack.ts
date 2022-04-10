@@ -9,7 +9,7 @@ export class CdkDeployStack extends Stack {
     super(scope, id, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
-      path: `${__dirname}/../charmverse_app.zip`,
+      path: `${__dirname}/../deploy.zip`,
     });
     // Create a ElasticBeanStalk app.
     const appName = 'CharmVerse-ephemeral';
