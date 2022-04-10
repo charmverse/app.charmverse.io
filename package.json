@@ -124,6 +124,7 @@
     "swr": "^1.2.1",
     "ts-node": "^10.7.0",
     "twemoji": "^14.0.1",
+    "typescript": "^4.6.3",
     "uuid": "^8.3.2",
     "yup": "^0.32.11"
   },
@@ -171,7 +172,6 @@
     "prisma": "^3.9.2",
     "sass": "^1.49.0",
     "ts-jest": "^27.1.3",
-    "tsconfig-paths": "^3.14.1",
-    "typescript": "^4.5.4"
+    "tsconfig-paths": "^3.14.1"
   }
 }
