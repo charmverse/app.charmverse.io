@@ -226,11 +226,13 @@ async function populateDoc (
             richText = block.to_do.rich_text;
           }
 
+          const { contents, inlineLinkedPages } = convertRichText(richText);
+
           const listItemNode: ListItemNode = {
             type: 'listItem',
             content: [{
               type: 'paragraph',
-              content: convertRichText(richText).contents
+              content: contents
             }],
             attrs: {
               todoChecked: block.type === 'to_do' ? block.to_do.checked : null
@@ -241,6 +243,14 @@ async function populateDoc (
             type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
             content: [listItemNode]
           });
+
+          for (const inlineLinkedPage of inlineLinkedPages) {
+            const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
+            // Replace the notion page id with the charmverse one
+            if (createdPageId) {
+              inlineLinkedPage.attrs.value = createdPageId;
+            }
+          }
 
           for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
             const childId = blocksRecord[block.id].children[index];
@@ -253,7 +263,7 @@ async function populateDoc (
         case 'quote': {
           let richText: RichTextItemResponse[] = [];
           let emoji: string | null = null;
-
+          const { contents, inlineLinkedPages } = convertRichText(richText);
           if (block.type === 'callout') {
             richText = block.callout.rich_text;
             emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
@@ -270,11 +280,18 @@ async function populateDoc (
             content: [
               {
                 type: 'paragraph',
-                content: convertRichText(richText).contents
+                content: contents
               }
             ]
           };
           (parentNode as PageContent).content?.push(calloutNode);
+          for (const inlineLinkedPage of inlineLinkedPages) {
+            const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
+            // Replace the notion page id with the charmverse one
+            if (createdPageId) {
+              inlineLinkedPage.attrs.value = createdPageId;
+            }
+          }
           for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
             const childId = blocksRecord[block.id].children[index];
             await recurse(calloutNode, blocksRecord[childId], [...parentInfo, [blocksRecord[childId].type, index]]);
@@ -348,7 +365,8 @@ async function populateDoc (
             type: 'table',
             content: []
           };
-          blocksRecord[block.id].children.forEach((rowId, rowIndex) => {
+          for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
+            const rowId = blocksRecord[block.id].children[index];
             const row = blocksRecord[rowId];
             if (row.type === 'table_row') {
               const content: TableRowNode['content'] = [];
@@ -356,14 +374,22 @@ async function populateDoc (
                 type: 'table_row',
                 content
               });
-              row.table_row.cells.forEach((cell) => {
+              for (const cell of row.table_row.cells) {
+                const { contents, inlineLinkedPages } = convertRichText(cell);
                 content.push({
-                  type: rowIndex === 0 ? 'table_header' : 'table_cell',
-                  content: convertRichText(cell).contents
+                  type: index === 0 ? 'table_header' : 'table_cell',
+                  content: contents
                 });
-              });
+                for (const inlineLinkedPage of inlineLinkedPages) {
+                  const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
+                  // Replace the notion page id with the charmverse one
+                  if (createdPageId) {
+                    inlineLinkedPage.attrs.value = createdPageId;
+                  }
+                }
+              }
             }
-          });
+          }
           (parentNode as PageContent).content?.push(tableNode);
           break;
         }
