@@ -71,7 +71,9 @@ jobs:
       - name: Package
         run: zip deploy.zip -r .
       - name: Deploy to staging
-        run: npm run deploy:staging
+        run: |
+          npm run cdk:bootstrap
+          npm run deploy:staging
 
   deploy:
     name: Deploy to production
