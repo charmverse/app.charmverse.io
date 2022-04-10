@@ -260,12 +260,12 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 }
 
 function checkForEmpty (content: PageContent) {
-  return content === null || !content?.content
+  return !content?.content
   || content.content.length === 0
   || (content.content.length === 1
       // These nodes dont contain any content so there is no content field
       && !content.content[0]?.type.match(/(cryptoPrice|columnLayout|image|iframe|mention|page)/)
-      && !content.content[0].content?.length);
+      && (!content.content[0].content?.length));
 }
 
 function CharmEditor (
@@ -273,9 +273,10 @@ function CharmEditor (
 ) {
 
   // check empty state of page on first load
-  const _isEmpty = checkForEmpty(content);
+  const _isEmpty = checkForEmpty(defaultContent);
 
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
+
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
@@ -284,8 +285,7 @@ function CharmEditor (
 
   function _onContentChange (view: EditorView) {
     // @ts-ignore missing types from the @bangle.dev/react package
-    setIsEmpty(checkForEmpty(view.state.doc as PageContent));
-    console.log({ content: view.state.doc.toJSON() });
+    setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view);
     }
