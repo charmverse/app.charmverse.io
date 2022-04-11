@@ -11,6 +11,9 @@ name: "Install and build application"
 
 runs:
   using: 'composite'
+  defaults:
+    run:
+      shell: bash
   steps:
     - uses: actions/checkout@v2
 
