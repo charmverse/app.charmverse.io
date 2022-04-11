@@ -10,7 +10,7 @@
     "lint:prod": "npm run lint -- --quiet",
     "start": "next dev",
     "start:prod": "node_modules/prisma/build/index.js migrate deploy && node_modules/next/dist/bin/next start",
-    "start:staging": "npx dotenv -e .env.staging -- node_modules/prisma/build/index.js migrate deploy && node_modules/next/dist/bin/next start",
+    "start:staging": "npx dotenv -e .env.staging -- node_modules/prisma/build/index.js migrate deploy && npx dotenv -e .env.staging -- node_modules/next/dist/bin/next start",
     "start:remote": "react-env --path .env.production -- next dev",
     "prepare": "husky install",
     "db-tool": "dotenv -e .env.production -- npx prisma studio",
