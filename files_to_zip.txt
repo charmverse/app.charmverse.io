@@ -8,3 +8,4 @@ next.config.js
 node_modules
 package.json
 public
+prisma
