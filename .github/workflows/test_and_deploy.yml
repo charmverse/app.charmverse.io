@@ -38,7 +38,7 @@ jobs:
         shell: bash
         run: |
           npm prune --production
-          rm -rf .git
+          rm -rf .next/cache
 
       - name: Add Datadog API Key
         run: sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
