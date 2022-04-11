@@ -26,6 +26,7 @@ jobs:
         run: |
           npm prune --production
           rm -rf .next/cache
+          rm .ebextensions/02_alb-http-to-https-redirection.config
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
