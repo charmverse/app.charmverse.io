@@ -10,8 +10,8 @@ export class CdkDeployStack extends Stack {
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
       path: `${__dirname}/../deploy.zip`,
     });
-    // Create a ElasticBeanStalk app.
-    const appName = 'CharmVerse-staging-' + process.env.STAGE;
+    // Create a ElasticBeanStalk app. - must be 40 characters or less
+    const appName = 'CharmVerse-staging-' + process.env.STAGE.slice(0, 20);
 
     const ebApp = new elasticbeanstalk.CfnApplication(this, 'Application', {
       applicationName: appName,
