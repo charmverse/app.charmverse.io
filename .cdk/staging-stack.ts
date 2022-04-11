@@ -82,7 +82,7 @@ export class CdkDeployStack extends Stack {
      * Output the distribution's url so we can pass it to external systems
      */
      new CfnOutput(this, "DeploymentUrl", {
-      value: ebEnv.attrEndpointUrl,
+      value: 'http://' + ebEnv.attrEndpointUrl,
     });
   }
 }
