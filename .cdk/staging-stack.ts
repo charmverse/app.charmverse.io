@@ -65,7 +65,7 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
-        value: 't2.micro',
+        value: 't3.micro',
       },
     ];
 
