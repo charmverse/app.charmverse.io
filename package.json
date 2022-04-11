@@ -2,7 +2,7 @@
   "scripts": {
     "build": "next build",
     "build:prod": "prisma generate && npm run build",
-    "build:analyze": "ANALYZE=true next build",
+    "build:analyze": "cross-env ANALYZE=true next build",
     "lint": "eslint -c .eslintrc.json . --ext .ts --ext .tsx",
     "lint:prod": "npm run lint -- --quiet",
     "start": "next dev",
@@ -147,6 +147,7 @@
     "@types/swagger-ui-react": "^4.1.1",
     "@typescript-eslint/eslint-plugin": "^5.17.0",
     "@typescript-eslint/parser": "^5.17.0",
+    "crossenv": "^0.0.2-security",
     "dotenv-cli": "^4.1.1",
     "eslint": "^8.8.0",
     "eslint-config-airbnb": "^19.0.4",

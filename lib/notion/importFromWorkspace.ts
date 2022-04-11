@@ -2,15 +2,16 @@ import { Client } from '@notionhq/client';
 import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import { Prisma } from '@prisma/client';
-import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'components/common/CharmEditor/components/ResizableIframe';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'components/common/CharmEditor/components/ResizableImage';
 import { prisma } from 'db';
 import { v4 as uuid } from 'uuid';
-import { createBoard, IPropertyTemplate, PropertyType } from 'components/common/BoardEditor/focalboard/src/blocks/board';
 import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { createCharmTextBlock } from 'components/common/BoardEditor/focalboard/src/blocks/charmBlock';
 import log from 'lib/log';
+import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
+import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
+import { PropertyType, IPropertyTemplate, createBoard } from 'lib/focalboard/createBoardView';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
@@ -181,7 +182,6 @@ async function populateDoc (
               content: []
             }]
           };
-
           for (let index = 0; index < block.children.length; index++) {
             const childId = block.children[index];
             await recurse(columnBlockNode, blocksRecord[childId], [...parentInfo, [blocksRecord[childId].type, index]]);

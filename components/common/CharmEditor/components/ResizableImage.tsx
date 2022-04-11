@@ -7,10 +7,8 @@ import { Box, ListItem, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import { HTMLAttributes, memo, useCallback } from 'react';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
 import Resizable from './Resizable/Resizable';
-
-export const MAX_IMAGE_WIDTH = 750;
-export const MIN_IMAGE_WIDTH = 100;
 
 const StyledEmptyImageContainer = styled(Box)`
   display: flex;
