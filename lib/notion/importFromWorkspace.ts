@@ -186,10 +186,15 @@ async function populateDoc (
             content: contents
           });
           for (const inlineLinkedPage of inlineLinkedPages) {
-            const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
-            // Replace the notion page id with the charmverse one
-            if (createdPageId) {
-              inlineLinkedPage.attrs.value = createdPageId;
+            try {
+              const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
+              // Replace the notion page id with the charmverse one
+              if (createdPageId) {
+                inlineLinkedPage.attrs.value = createdPageId;
+              }
+            }
+            catch (_) {
+              //
             }
           }
           break;
@@ -245,10 +250,15 @@ async function populateDoc (
           });
 
           for (const inlineLinkedPage of inlineLinkedPages) {
-            const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
-            // Replace the notion page id with the charmverse one
-            if (createdPageId) {
-              inlineLinkedPage.attrs.value = createdPageId;
+            try {
+              const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
+              // Replace the notion page id with the charmverse one
+              if (createdPageId) {
+                inlineLinkedPage.attrs.value = createdPageId;
+              }
+            }
+            catch (_) {
+              //
             }
           }
 
@@ -285,10 +295,15 @@ async function populateDoc (
           };
           (parentNode as PageContent).content?.push(calloutNode);
           for (const inlineLinkedPage of inlineLinkedPages) {
-            const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
-            // Replace the notion page id with the charmverse one
-            if (createdPageId) {
-              inlineLinkedPage.attrs.value = createdPageId;
+            try {
+              const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
+              // Replace the notion page id with the charmverse one
+              if (createdPageId) {
+                inlineLinkedPage.attrs.value = createdPageId;
+              }
+            }
+            catch (_) {
+              //
             }
           }
           for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
@@ -380,10 +395,15 @@ async function populateDoc (
                   content: contents
                 });
                 for (const inlineLinkedPage of inlineLinkedPages) {
-                  const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
-                  // Replace the notion page id with the charmverse one
-                  if (createdPageId) {
-                    inlineLinkedPage.attrs.value = createdPageId;
+                  try {
+                    const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
+                    // Replace the notion page id with the charmverse one
+                    if (createdPageId) {
+                      inlineLinkedPage.attrs.value = createdPageId;
+                    }
+                  }
+                  catch (_) {
+                    //
                   }
                 }
               }
@@ -958,97 +978,99 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
       await createDatabaseAndPopulateCache(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
       const database = createdPages[pageResponse.parent.database_id];
-      const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title') as {title: {plain_text: string}[]};
-      const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
 
-      const title = convertToPlainText(titleProperty.title);
-      const charmTextBlock = createCharmTextBlock({
-        parentId: charmversePageId,
-        fields: {
+      if (database.boardId) {
+        const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title') as {title: {plain_text: string}[]};
+        const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
+
+        const title = convertToPlainText(titleProperty.title);
+        const charmTextBlock = createCharmTextBlock({
+          parentId: charmversePageId,
+          fields: {
+            content: pageContent
+          }
+        });
+        const { properties } = focalboardRecord[database.boardId];
+
+        const cardProperties: Record<string, any> = {};
+
+        Object.values(pageResponse.properties).forEach(property => {
+          if (property[property.type]) {
+            if (property.type.match(/(email|number|url|checkbox|phone_number)/)) {
+              cardProperties[properties[property.id]] = property[property.type];
+            }
+            else if (property.type === 'rich_text') {
+              cardProperties[properties[property.id]] = convertToPlainText(property[property.type]);
+            }
+            else if (property.type === 'select') {
+              cardProperties[properties[property.id]] = property[property.type].id;
+            }
+            else if (property.type === 'multi_select') {
+              cardProperties[properties[property.id]] = property[property.type]
+                .map((multiSelect: {id: string}) => multiSelect.id);
+            }
+            else if (property.type === 'date') {
+              const dateValue: {from?: number, to?: number} = {};
+              if (property[property.type].start) {
+                dateValue.from = (new Date(property[property.type].start)).getTime();
+              }
+
+              if (property[property.type].end) {
+                dateValue.to = (new Date(property[property.type].end)).getTime();
+              }
+              cardProperties[properties[property.id]] = JSON.stringify(dateValue);
+            }
+          }
+        });
+
+        const commonBlockData = {
+          deletedAt: null,
+          spaceId,
+          createdBy: userId,
+          updatedBy: userId,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+
+        const headerImage = pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover.file.url : null;
+
+        const cardPage = {
+          createdBy: userId,
+          id: charmversePageId,
+          spaceId,
+          cardId: charmversePageId,
+          title,
+          headerImage,
+          icon: emoji,
+          parentId: database.id,
           content: pageContent
-        }
-      });
-
-      const { properties } = focalboardRecord[database.boardId!];
-
-      const cardProperties: Record<string, any> = {};
-
-      Object.values(pageResponse.properties).forEach(property => {
-        if (property[property.type]) {
-          if (property.type.match(/(email|number|url|checkbox|phone_number)/)) {
-            cardProperties[properties[property.id]] = property[property.type];
+        };
+        createdCards[notionPageId] = {
+          notionPageId,
+          page: cardPage,
+          charmText: {
+            ...charmTextBlock,
+            ...commonBlockData,
+            rootId: database.boardId
+          },
+          card: {
+            ...createCard({
+              title,
+              id: charmversePageId,
+              parentId: database.boardId,
+              rootId: database.boardId,
+              fields: {
+                icon: emoji,
+                contentOrder: [charmTextBlock.id],
+                headerImage,
+                properties: cardProperties
+              }
+            }),
+            ...commonBlockData
           }
-          else if (property.type === 'rich_text') {
-            cardProperties[properties[property.id]] = convertToPlainText(property[property.type]);
-          }
-          else if (property.type === 'select') {
-            cardProperties[properties[property.id]] = property[property.type].id;
-          }
-          else if (property.type === 'multi_select') {
-            cardProperties[properties[property.id]] = property[property.type]
-              .map((multiSelect: {id: string}) => multiSelect.id);
-          }
-          else if (property.type === 'date') {
-            const dateValue: {from?: number, to?: number} = {};
-            if (property[property.type].start) {
-              dateValue.from = (new Date(property[property.type].start)).getTime();
-            }
-
-            if (property[property.type].end) {
-              dateValue.to = (new Date(property[property.type].end)).getTime();
-            }
-            cardProperties[properties[property.id]] = JSON.stringify(dateValue);
-          }
-        }
-      });
-
-      const commonBlockData = {
-        deletedAt: null,
-        spaceId,
-        createdBy: userId,
-        updatedBy: userId,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      const headerImage = pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover.file.url : null;
-
-      const cardPage = {
-        createdBy: userId,
-        id: charmversePageId,
-        spaceId,
-        cardId: charmversePageId,
-        title,
-        headerImage,
-        icon: emoji,
-        parentId: database.id,
-        content: pageContent
-      };
-      createdCards[notionPageId] = {
-        notionPageId,
-        page: cardPage,
-        charmText: {
-          ...charmTextBlock,
-          ...commonBlockData,
-          rootId: database.boardId!
-        },
-        card: {
-          ...createCard({
-            title,
-            id: charmversePageId,
-            parentId: database.boardId!,
-            rootId: database.boardId!,
-            fields: {
-              icon: emoji,
-              contentOrder: [charmTextBlock.id],
-              headerImage,
-              properties: cardProperties
-            }
-          }),
-          ...commonBlockData
-        }
-      };
-      createdPages[notionPageId] = cardPage;
+        };
+        createdPages[notionPageId] = cardPage;
+      }
     }
     return createdPages[notionPageId];
   }
@@ -1070,8 +1092,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
       if (type === 'database') {
         const databasePage = createdPages[blockId];
-        if (databasePage) {
-          const { board, view } = focalboardRecord[databasePage.boardId!];
+        if (databasePage && databasePage.boardId) {
+          const { board, view } = focalboardRecord[databasePage.boardId];
           await prisma.block.createMany({
             data: [
               view,
