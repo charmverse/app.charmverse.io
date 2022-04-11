@@ -4,14 +4,14 @@ import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endp
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { v4 as uuid } from 'uuid';
-import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
-import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import { createCharmTextBlock } from 'components/common/BoardEditor/focalboard/src/blocks/charmBlock';
 import log from 'lib/log';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
-import { PropertyType, IPropertyTemplate, createBoard } from 'lib/focalboard/createBoardView';
+import { createBoard, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { createBoardView } from 'lib/focalboard/boardView';
+import { createCharmTextBlock } from 'lib/focalboard/charmBlock';
+import { createCard } from 'lib/focalboard/card';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
