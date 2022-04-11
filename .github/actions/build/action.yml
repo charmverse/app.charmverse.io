@@ -34,8 +34,8 @@ runs:
       id: cache_node_modules
       uses: actions/cache@v2
       with:
-        path: ./node_modules
-        key: modules-${{ hashFiles('package-lock.json') }}
+        path: ${{ github.workspace }}/node_modules
+        key: node_modules-${{ hashFiles('package-lock.json') }}
 
     - name: Install npm dependencies
       shell: bash
