@@ -572,23 +572,15 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
   for (i = 0; i < tempItems.length; i += 1) {
     node = tempItems[i];
     const index = node[key] ? map[node[key]!] : -1;
-    // Make sure its not a database page or a focalboard card
-    if (node[key] && tempItems[index] && !tempItems[index].boardId && !tempItems[index].cardId) {
-      tempItems[index].children.push(node);
-      sortArrayByObjectProperty(tempItems[index].children, 'index');
+    if (node[key] && tempItems[index]) {
+      // Make sure its not a database page or a focalboard card
+      if (!tempItems[index].boardId && !tempItems[index].cardId) {
+        tempItems[index].children.push(node);
+        sortArrayByObjectProperty(tempItems[index].children, 'index');
+      }
     }
     else if (!rootPageIds) {
-      const parentId = node?.[key];
-      const isParentCard = parentId && pagesRecord[parentId!]?.cardId;
-      const isParentBoard = parentId && pagesRecord[parentId!]?.boardId;
-      // Root pages dont have any parentId
-      if (!parentId) {
-        roots.push(node);
-      }
-      // If parentId exists we need to make sure the parent is not associated with a card
-      else if (!isParentBoard && !isParentCard) {
-        roots.push(node);
-      }
+      roots.push(node);
     }
     if (rootPageIds?.includes(node.id)) {
       roots.push(node);
