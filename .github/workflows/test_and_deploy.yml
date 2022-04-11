@@ -34,6 +34,12 @@ jobs:
       - name: Install dependencies and build app
         uses: ./.github/actions/build
 
+    - name: Remove dev dependencies
+      shell: bash
+      run: |
+        npm prune --production
+        rm -rf .git
+
       - name: Add Datadog API Key
         run: sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
 

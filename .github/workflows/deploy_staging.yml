@@ -19,6 +19,12 @@ jobs:
       - name: Install dependencies and build app
         uses: ./.github/actions/build
 
+    - name: Remove dev dependencies
+      shell: bash
+      run: |
+        npm prune --production
+        rm -rf .git
+
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 
