@@ -26,7 +26,7 @@ handler
  *              schema:
  *                $ref: '#/components/schemas/Page'
  */
-async function getPage (req: NextApiRequest, res: NextApiResponse) {
+export async function getPage (req: NextApiRequest, res: NextApiResponse) {
 
   const { pageId } = req.query;
 

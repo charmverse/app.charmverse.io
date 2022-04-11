@@ -13,7 +13,7 @@
     "db-tool:dev": "dotenv -e .env.local -- npx prisma studio",
     "test-setup": "./testing/configure-db.sh",
     "test-client": "npm run test-setup && jest --config='./jest.config-client.ts'",
-    "test-server": "npm run test-setup && dotenv -e .env.local,.env.test.local --override -- jest --config='./jest.config-server.ts'"
+    "test-server": "dotenv -e .env.local,.env.test.local --override -- npx jest --config='./jest.config-server.ts'"
   },
   "postinstall": "patch-package",
   "prepare": "husky install",
@@ -129,8 +129,8 @@
     "@svgr/webpack": "^6.1.2",
     "@testing-library/cypress": "^8.0.2",
     "@testing-library/dom": "^8.11.3",
-    "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "^12.1.2",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
     "@types/color": "^3.0.3",
     "@types/draft-js": "^0.11.8",

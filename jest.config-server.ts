@@ -2,11 +2,16 @@
 import nextJest from 'next/jest';
 
 const createJestConfig = nextJest({ dir: __dirname });
+
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
  */
 
+/**
+ * Configuration copied from
+ * https://nextjs.org/docs/testing
+ * */
 const jestConfig = {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
@@ -24,7 +29,11 @@ const jestConfig = {
   collectCoverage: false,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  // collectCoverageFrom: undefined,
+  collectCoverageFrom: [
+    '**/*.{js,jsx,ts,tsx}',
+    '!**/*.d.ts',
+    '!**/node_modules/**'
+  ],
 
   // The directory where Jest should output its coverage files
   coverageDirectory: 'coverage',
@@ -64,7 +73,12 @@ const jestConfig = {
   // globalTeardown: undefined,
 
   // A set of global variables that need to be available in all test environments
-  // globals: {},
+  // globals: {
+  //   extensionsToTreatAsEsm: ['.ts'],
+  //   'ts-jest': {
+  //     useESM: true
+  //   }
+  // },
 
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
   // maxWorkers: "50%",
@@ -122,10 +136,10 @@ const jestConfig = {
   // rootDir: undefined,
 
   // A list of paths to directories that Jest should use to search for files in
-  roots: [
-    '<rootDir>',
-    __dirname
-  ],
+  // roots: [
+  //   '<rootDir>',
+  //   'node_modules'
+  // ],
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
@@ -143,7 +157,7 @@ const jestConfig = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: 'node',
+  testEnvironment: 'jest-environment-node',
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -156,7 +170,7 @@ const jestConfig = {
     '**/pages/api/**/?(*.)+(spec|test).[tj]s?(x)'
   //   "**/__tests__/**/*.[jt]s?(x)",
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
-  ]
+  ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [
@@ -179,13 +193,17 @@ const jestConfig = {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  // transform: undefined,
+  transform: {
+    // eslint-disable-next-line no-useless-escape
+    // [`node_modules/(${esModules})/.*\.(js|jsx|mjs|cjs|ts|tsx)$`]: 'babel-jest'
+    // 'node_modules/@bangle\.dev/.*\.(js|jsx|mjs|cjs|ts|tsx)$': 'babel-jest'
+  }
 
-  // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
+  // // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: [
-  //   "/node_modules/",
-  //   "\\.pnp\\.[^\\/]+$"
-  // ],
+  //   // eslint-disable-next-line no-useless-escape
+  //   // 'node_modules/@bangle\.dev/.*\.(js|jsx|mjs|cjs|ts|tsx)$'
+  // ]
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,
