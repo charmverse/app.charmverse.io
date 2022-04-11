@@ -14,35 +14,8 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "16"
+      - uses: ./.github/workflows/build.yml
 
-      - name: Cache Next.js build # copied from https://github.com/vercel/next.js/blob/canary/errors/no-cache.md
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.npm
-            ${{ github.workspace }}/.next/cache
-          # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-
-      - name: Install npm dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: npm ci --no-audit --no-fund
-
-      - name: Lint
-        run: npm run lint:prod
-
-      - name: Build Next.js App
-        run: npm run build
-
-      - name: Add Datadog API Key
-        run: sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
     # - name: Run Tests
     #   shell: 'script -q -e -c "bash {0}"' # add support for colors in output. see: https://github.com/actions/runner/issues/241
     #   run: npm test
@@ -53,33 +26,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: test
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-
-    - name: Cache Next.js build # copied from https://github.com/vercel/next.js/blob/canary/errors/no-cache.md
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.npm
-          ${{ github.workspace }}/.next/cache
-        # Generate a new cache whenever packages or source files change.
-        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-        # If source files changed but packages didn't, rebuild from a prior cache.
-        restore-keys: |
-          ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-
-      - name: Install dependencies
-        run: npm ci --no-audit --no-fund
-
-      - name: Build
-        run: npm run build
-
-      - name: Remove dev dependencies
-        run: |
-          npm prune --production
-          rm -rf .git
+      - uses: ./.github/workflows/build.yml
 
       - name: Add Datadog API Key
         run: sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
