@@ -1,5 +1,5 @@
 
-name: "Pull Request clean-up"
+name: "Clean up staging"
 
 on:
   pull_request:

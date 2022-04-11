@@ -1,5 +1,5 @@
 
-name: "Pull Request deploy"
+name: "Deploy to staging"
 
 on:
   pull_request:
