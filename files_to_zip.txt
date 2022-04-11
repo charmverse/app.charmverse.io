@@ -1,0 +1,9 @@
+Dockerfile
+Dockerrun.aws.json
+.ebextensions
+.env
+.env.staging
+.next
+next.config.js
+node_modules
+package.json

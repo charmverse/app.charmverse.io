@@ -55,7 +55,7 @@ jobs:
           rm -rf .git
 
       - name: Package
-        run: zip deploy.zip -r .
+        run: cat files_to_zip.txt | zip -r@ part1.zip
 
       - name: Deploy to staging
         id: cdk_deploy
