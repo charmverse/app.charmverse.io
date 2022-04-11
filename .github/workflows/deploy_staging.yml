@@ -21,6 +21,7 @@ jobs:
         with:
           workflow: build.yml
           workflow_conclusion: success
+          pr: ${{ github.event.pull_request.number }}
 
       - name: inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
