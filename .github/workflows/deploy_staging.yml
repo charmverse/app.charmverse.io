@@ -28,6 +28,10 @@ jobs:
           rm -rf .next/cache
           rm .ebextensions/02_alb-http-to-https-redirection.config
 
+      - name: Change start command
+        # use -i- otherwise sed thinks "Dockerfile" is a command line argument, then we have to clean up Dockerfile-
+        run: sed -i- 's/start:prod/start:staging/g' Dockerfile && rm Dockerfile-
+
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 

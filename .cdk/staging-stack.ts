@@ -80,9 +80,10 @@ export class CdkDeployStack extends Stack {
 
     /**
      * Output the distribution's url so we can pass it to external systems
+    *  Note: something at the end of the path is required or the Load balancer url never resolves
      */
      new CfnOutput(this, "DeploymentUrl", {
-      value: 'http://' + ebEnv.attrEndpointUrl,
+      value: 'http://' + ebEnv.attrEndpointUrl + '/login',
     });
   }
 }
