@@ -7,3 +7,4 @@ Dockerrun.aws.json
 next.config.js
 node_modules
 package.json
+public
