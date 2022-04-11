@@ -34,8 +34,8 @@ runs:
       id: cache_node_modules
       uses: actions/cache@v2
       with:
-        path: ${{ github.workspace }}/node_modules
-        key: node_modules-${{ hashFiles('package-lock.json') }}
+        path: ./node_modules
+        key: node-modules-${{ hashFiles('package-lock.json') }}
 
     - name: Install npm dependencies
       shell: bash
@@ -45,9 +45,3 @@ runs:
     - name: Build
       shell: bash
       run: npm run build
-
-    - name: Remove dev dependencies
-      shell: bash
-      run: |
-        npm prune --production
-        rm -rf .git
