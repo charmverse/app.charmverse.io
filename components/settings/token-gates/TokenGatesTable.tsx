@@ -78,9 +78,11 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
               {new Date(row.createdAt).toDateString()}
             </TableCell>
             <TableCell width={150} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
-              <Box component='span' pr={1}>
-                <Chip onClick={() => testConnect(row)} sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label='Test' />
-              </Box>
+              <Tooltip arrow placement='top' title='Test this gate using your own wallet'>
+                <Box component='span' pr={1}>
+                  <Chip onClick={() => testConnect(row)} sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label='Test' />
+                </Box>
+              </Tooltip>
               {isAdmin && (
                 <Tooltip arrow placement='top' title='Delete'>
                   <ButtonChip

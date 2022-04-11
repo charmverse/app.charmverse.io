@@ -3,15 +3,18 @@ import { Command, DOMOutputSpec, EditorState, Plugin, PluginKey, Schema } from '
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { useTheme } from '@emotion/react';
-import { Box, ClickAwayListener, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Divider, List, ListSubheader, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
-import { Contributor } from 'models';
-import { useCallback } from 'react';
+import { ReactNode, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { usePages } from 'hooks/usePages';
+import { PageIcon } from 'components/common/PageLayout/components/PageNavigation';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import Link from 'next/link';
 import { hideSuggestionsTooltip } from './@bangle.dev/tooltip/suggest-tooltip';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 
@@ -158,6 +161,7 @@ export function MentionSuggest () {
     tooltipContentDOM,
     suggestTooltipKey
   } = usePluginState(mentionSuggestKey);
+  const { pages } = usePages();
 
   const {
     show: isVisible
@@ -173,33 +177,90 @@ export function MentionSuggest () {
     [view, mentionSuggestKey]
   );
 
+  const contributorsList = (
+    <>
+      {contributors.map(contributor => (
+        <MenuItem
+          component='div'
+          sx={{
+            background: theme.palette.background.dark
+          }}
+          onClick={() => onSelectMention(contributor.id, 'user')}
+          key={contributor.id}
+        >
+          <ReviewerOption
+            style={{
+              alignItems: 'center'
+            }}
+            user={contributor}
+            avatarSize='small'
+          />
+        </MenuItem>
+      ))}
+    </>
+  );
+
+  const pagesList = (
+    <>
+      {Object.values(pages).map(page => page && (
+      <MenuItem
+        sx={{
+          background: theme.palette.background.dark
+        }}
+        key={page.id}
+        onClick={() => onSelectMention(page.id, 'page')}
+      >
+        <Box display='flex' gap={0.5}>
+          <PageIcon icon={page.icon} isEditorEmpty={false} pageType={page.type} />
+          {page.title || 'Untitled'}
+        </Box>
+      </MenuItem>
+      ))}
+    </>
+  );
+
   if (isVisible) {
     return createPortal(
       <ClickAwayListener onClickAway={() => {
         hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
       }}
       >
-        <Box>
-          {contributors.map(contributor => (
-            contributor.isBot === true ? null : (
-              <MenuItem
+        <List
+          sx={{
+            width: '350px',
+            position: 'relative',
+            overflow: 'auto',
+            maxHeight: 300,
+            '& ul': { padding: 0 }
+          }}
+          subheader={<li />}
+        >
+          {['Contributors', 'Pages'].map(sectionId => {
+            return (
+              <Box
+                key={`section-${sectionId}`}
                 sx={{
-                  background: theme.palette.background.light
+                  // This is required to not show the background while scrolling
+                  backgroundColor: theme.palette.background.dark
                 }}
-                onClick={() => onSelectMention(contributor.id, 'user')}
-                key={contributor.id}
               >
-                <ReviewerOption
-                  style={{
-                    alignItems: 'center'
-                  }}
-                  user={contributor}
-                  avatarSize='small'
+                <ListSubheader sx={{
+                  top: '-5px',
+                  zIndex: 25
+                }}
+                >{sectionId}
+                </ListSubheader>
+                {sectionId === 'Contributors' ? contributorsList : pagesList}
+                <hr style={{
+                  height: 2,
+                  marginTop: '8px',
+                  marginBottom: 0
+                }}
                 />
-              </MenuItem>
-            )
-          ))}
-        </Box>
+              </Box>
+            );
+          })}
+        </List>
       </ClickAwayListener>,
       tooltipContentDOM
     );
@@ -208,24 +269,37 @@ export function MentionSuggest () {
 }
 
 export function Mention ({ node }: NodeViewProps) {
+  const attrs = node.attrs as {value: string, type: 'user' | 'page'};
   const theme = useTheme();
   const [contributors] = useContributors();
-  const contributor = contributors.find(_contributor => _contributor.id === node.attrs.value)!;
+  const { pages } = usePages();
+  const contributor = contributors.find(_contributor => _contributor.id === attrs.value);
   const ensName = useENSName(contributor?.addresses[0]);
-
-  return contributor ? (
-    <Box
-      component='span'
-      sx={{
-        padding: theme.spacing(0.5, 1),
-        borderRadius: theme.spacing(0.5),
-        fontWeight: 600,
-        opacity: 0.75,
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 0.75
-      }}
+  const [space] = useCurrentSpace();
+  let value: ReactNode = null;
+  if (attrs.type === 'page') {
+    const page = pages[attrs.value];
+    value = page && (
+    <Link
+      href={`/${space?.domain}/${page.path}`}
+      passHref
     >
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        position: 'relative',
+        top: 5,
+        cursor: 'pointer'
+      }}
+      >
+        <PageIcon icon={page.icon} isEditorEmpty={false} pageType={page.type} />
+        <div>{page.title || 'Untitled'}</div>
+      </Box>
+    </Link>
+    );
+  }
+  else if (attrs.type === 'user') {
+    value = (
       <Typography sx={{
         fontSize: 12
       }}
@@ -233,6 +307,24 @@ export function Mention ({ node }: NodeViewProps) {
         @
         {ensName || getDisplayName(contributor)}
       </Typography>
+    );
+  }
+
+  return value ? (
+    <Box
+      component='span'
+      sx={{
+        padding: theme.spacing(0.5, 0.5),
+        borderRadius: theme.spacing(0.5),
+        fontWeight: 600,
+        opacity: 0.75,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.75,
+        fontSize: '14px'
+      }}
+    >
+      {value}
     </Box>
   ) : null;
 }

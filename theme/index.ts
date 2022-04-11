@@ -72,6 +72,10 @@ declare module '@mui/material/IconButton' {
   }
 }
 
+declare module '@mui/material/SvgIcon' {
+  export interface SvgIconPropsColorOverrides extends Record<BrandColor, true> {}
+}
+
 // Explore all theme options: https://material-ui.com/customization/default-theme/
 export const createThemeLightSensitive = (mode: PaletteMode) => {
   const contrastText = mode === 'dark' ? '#fff' : '#000';

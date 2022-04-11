@@ -23,10 +23,8 @@ import { updateView } from '../store/views'
 import { UserSettings } from '../userSettings'
 import { Utils } from '../utils'
 import CalendarFullView from './calendar/fullCalendar'
-import CardDialog from './cardDialog'
 import Gallery from './gallery/gallery'
 import Kanban from './kanban/kanban'
-import RootPortal from './rootPortal'
 import Table from './table/table'
 import ViewHeader from './viewHeader/viewHeader'
 import ViewTitle from './viewTitle'
@@ -45,7 +43,6 @@ type Props = {
     setPage: (p: Partial<Page>) => void
     updateView: (view: BoardView) => void
     addTemplate: (template: Card) => void
-    shownCardId?: string
     showCard: (cardId?: string) => void
     showShared: boolean
 }
@@ -129,20 +126,6 @@ class CenterPanel extends React.Component<Props, State> {
                     keyName='ctrl+d,del,esc,backspace'
                     onKeyDown={this.keydownHandler}
                 />
-                {this.props.shownCardId &&
-                    <RootPortal>
-                        <CardDialog
-                            board={board}
-                            activeView={activeView}
-                            views={views}
-                            cards={cards}
-                            key={this.props.shownCardId}
-                            cardId={this.props.shownCardId}
-                            onClose={() => this.showCard(undefined)}
-                            showCard={(cardId) => this.showCard(cardId)}
-                            readonly={this.props.readonly}
-                        />
-                    </RootPortal>}
                 {board.fields.headerImage && <Box className='PageBanner' width={"100%"} mb={2}>
                   <PageBanner focalBoard headerImage={board.fields.headerImage} setPage={({ headerImage }) => {
                     this.setRandomHeaderImage(board, headerImage!)
@@ -374,7 +357,9 @@ class CenterPanel extends React.Component<Props, State> {
     }
 
     private showCard = (cardId?: string) => {
-        this.setState({selectedCardIds: []})
+        if (this.state.selectedCardIds.length > 0) {
+            this.setState({selectedCardIds: []})
+        }
         this.props.showCard(cardId)
     }
 

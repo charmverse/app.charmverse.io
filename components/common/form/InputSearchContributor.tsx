@@ -61,6 +61,7 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
         <TextField
           {...params}
           placeholder={placeholder}
+          size='small'
           inputProps={{
             ...params.inputProps
           }}
@@ -102,6 +103,7 @@ export function InputSearchContributor ({ defaultValue, onChange, ...props }: II
       options={contributors}
       onChange={(e, _value) => emitValue(_value as Contributor)}
       placeholder='Select a user'
+      value={value}
       {...props}
     />
   );

@@ -222,8 +222,7 @@ const defaultContent: PageContent = {
   type: 'doc',
   content: [
     {
-      type: 'paragraph',
-      content: []
+      type: 'paragraph'
     }
   ]
 };
@@ -259,14 +258,21 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
   return markdown;
 }
 
+export function checkForEmpty (content: PageContent | null) {
+  return !content?.content
+  || content.content.length === 0
+  || (content.content.length === 1
+      // These nodes dont contain any content so there is no content field
+      && !content.content[0]?.type.match(/(cryptoPrice|columnLayout|image|iframe|mention|page)/)
+      && (!content.content[0].content?.length));
+}
+
 function CharmEditor (
   { content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
 ) {
 
   // check empty state of page on first load
-  const _isEmpty = !content.content
-    || content.content.length === 0
-    || (content.content.length === 1 && !content.content[0].content?.length);
+  const _isEmpty = checkForEmpty(content);
 
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
@@ -278,10 +284,7 @@ function CharmEditor (
 
   function _onContentChange (view: EditorView) {
     // @ts-ignore missing types from the @bangle.dev/react package
-    const docContent: { content: { size: number } }[] = view.state.doc.content.content;
-    const __isEmpty = docContent.length <= 1
-      && (!docContent[0] || docContent[0].content.size === 0);
-    setIsEmpty(__isEmpty);
+    setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view);
     }

@@ -58,13 +58,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     const spaceId = space?.id;
     const id = Math.random().toString().replace('0.', '');
     const pageProperties: Prisma.PageCreateInput = {
-      content: {
-        type: 'doc',
-        content: [{
-          type: 'paragraph',
-          content: []
-        }]
-      } as any,
+      content: undefined as any,
       contentText: '',
       createdAt: new Date(),
       author: {
@@ -87,6 +81,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     if (pageProperties.type === 'board') {
       await addBoardClicked(boardId => {
         pageProperties.boardId = boardId;
+        pageProperties.id = boardId; // use the same uuid value
       }, intl);
     }
     const newPage = await charmClient.createPage(pageProperties);
@@ -96,7 +91,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const addPageAndRedirect = async (page?: Partial<Page>) => {
     const newPage = await addPage(page);
-    router.push(`/${(space!).domain}/${newPage.path}`);
+    router.push(`/${space?.domain}/${newPage.path}`);
   };
 
   /**

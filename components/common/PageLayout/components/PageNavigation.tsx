@@ -31,11 +31,12 @@ import Link from 'next/link';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
-import NewPageMenu, { StyledDatabaseIcon } from 'components/common/NewPageMenu';
 import EmojiIcon from 'components/common/Emoji';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
+import { checkForEmpty } from 'components/common/CharmEditor/CharmEditor';
+import NewPageMenu, { StyledDatabaseIcon } from './NewPageMenu';
 import AddNewCard from './AddNewCard';
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
@@ -490,9 +491,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
 
   const { focalboardViewsRecord } = useFocalboardViews();
 
-  const docContent = (item.content as PageContent)?.content;
-  const isEmptyContent = docContent && (docContent.length <= 1
-    && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
+  const isEmptyContent = checkForEmpty(item.content as PageContent);
 
   const viewsRecord = useAppSelector((state) => state.views.views);
   const views = Object.values(viewsRecord).filter(view => view.parentId === item.boardId);
