@@ -631,6 +631,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     workspaceName: string,
     workspaceIcon: string
   }) {
+  const pagesWithoutIntegrationAccess: Set<string> = new Set();
   const failedImportsRecord: Record<string, {
     pageId: string,
     type: 'page' | 'database',
@@ -755,11 +756,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     // The page might have been recursively created via a link_to_page block
     if (createdPages[notionPageId]) return createdPages[notionPageId];
 
-    // If the page doesn't exist in the cache fetch it
-    const pageResponse = searchResultRecord[notionPageId] ?? await notion.pages.retrieve({
-      page_id: notionPageId
-    }) as unknown as GetPageResponse;
-
     // An array to keep track of the first level children of a page
     const blocks: BlockWithChildren[] = [];
     // Page content, this will be filled with charmverse specific blocks
@@ -790,10 +786,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       blockChildrenRequests = [];
 
       childBlockListResponses.forEach(childBlockListResponse => {
-        // If next_cursor exist then this block contains more child blocks
+      // If next_cursor exist then this block contains more child blocks
         if (childBlockListResponse.next_cursor) {
           blockChildrenRequests.push({
-            // Using the request.block_id to get the block's parent id
+          // Using the request.block_id to get the block's parent id
             block_id: childBlockListResponse.request.block_id,
             page_size: BLOCKS_FETCHED_PER_REQUEST,
             start_cursor: childBlockListResponse.next_cursor
@@ -803,274 +799,285 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
       return childBlockListResponses;
     }
+    // notion.pages.retrieve will return an error if the integration doesn't have access to the page
+    try {
+      // If the page doesn't exist in the cache fetch it
+      const pageResponse = searchResultRecord[notionPageId] ?? await notion.pages.retrieve({
+        page_id: notionPageId
+      }) as unknown as GetPageResponse;
 
-    // We allow a maximum of `MAX_CHILD_BLOCK_DEPTH` level of nested contents
-    // Blocks like callout, quote, all forms of list allow other blocks to be nested inside them
-    for (let depth = 0; depth < MAX_CHILD_BLOCK_DEPTH; depth++) {
+      // We allow a maximum of `MAX_CHILD_BLOCK_DEPTH` level of nested contents
+      // Blocks like callout, quote, all forms of list allow other blocks to be nested inside them
+      for (let depth = 0; depth < MAX_CHILD_BLOCK_DEPTH; depth++) {
       // While there are more children to be fetched
-      if (blockChildrenRequests.length !== 0) {
+        if (blockChildrenRequests.length !== 0) {
 
-        log.debug(`[notion] - ${blockChildrenRequests.length} Requests for child blocks at depth: ${depth}`);
+          log.debug(`[notion] - ${blockChildrenRequests.length} Requests for child blocks at depth: ${depth}`);
 
-        const childBlockListResponses = await getChildBlockListResponses();
+          const childBlockListResponses = await getChildBlockListResponses();
 
-        // If the block has more child to be fetch, this will be true
-        while (blockChildrenRequests.length !== 0) {
-          childBlockListResponses.push(...await getChildBlockListResponses());
-        }
+          // If the block has more child to be fetch, this will be true
+          while (blockChildrenRequests.length !== 0) {
+            childBlockListResponses.push(...await getChildBlockListResponses());
+          }
 
-        // Reset the requests as they've all been fetched
-        blockChildrenRequests = [];
+          // Reset the requests as they've all been fetched
+          blockChildrenRequests = [];
 
-        // Now that all child content has been fetched, we need to check if any of the child block has children or not
-        // Go through each of the block and add them to the record
-        // eslint-disable-next-line
+          // Now that all child content has been fetched, we need to check if any of the child block has children or not
+          // Go through each of the block and add them to the record
+          // eslint-disable-next-line
         childBlockListResponses.forEach((childBlockListResponse) => {
-          childBlockListResponse.results.forEach((block) => {
-            const blockWithChildren: BlockWithChildren = {
-              ...block,
-              children: [],
-              pageId: notionPageId
-            };
-            blocksRecord[block.id] = blockWithChildren;
-            if (depth !== 0) {
+            childBlockListResponse.results.forEach((block) => {
+              const blockWithChildren: BlockWithChildren = {
+                ...block,
+                children: [],
+                pageId: notionPageId
+              };
+              blocksRecord[block.id] = blockWithChildren;
+              if (depth !== 0) {
               // Add the current block's id to its parent's `children` array
-              blocksRecord[childBlockListResponse.request.block_id].children.push(block.id);
-            }
-            else {
+                blocksRecord[childBlockListResponse.request.block_id].children.push(block.id);
+              }
+              else {
               // Only push the top level blocks to the array
-              blocks.push(blockWithChildren);
-            }
+                blocks.push(blockWithChildren);
+              }
 
-            // If the block has children then we need to fetch them as well
-            if (block.type.match(BlocksWithChildrenRegex) && block.has_children) {
-              blockChildrenRequests.push({
-                block_id: block.id,
-                page_size: BLOCKS_FETCHED_PER_REQUEST
-              });
-            }
-          });
-        });
-      }
-      else {
-        break;
-      }
-    }
-
-    for (let index = 0; index < blocks.length; index++) {
-      try {
-        await populateDoc(pageContent, blocks[index], blocksRecord, {
-          onChildDatabase: async (block, parentNode) => {
-            // If its a database, we need to fetch more information from api
-            createdPages[block.id] = await createDatabaseAndPopulateCache(await notion.databases.retrieve({
-              database_id: block.id
-            }) as any);
-
-            (parentNode as PageContent).content?.push({
-              type: 'page',
-              attrs: {
-                id: createdPages[block.id].id
+              // If the block has children then we need to fetch them as well
+              if (block.type.match(BlocksWithChildrenRegex) && block.has_children) {
+                blockChildrenRequests.push({
+                  block_id: block.id,
+                  page_size: BLOCKS_FETCHED_PER_REQUEST
+                });
               }
             });
-          },
-          onChildPage: async (block, parentNode) => {
-            const _failedImportBlocks: [string, number][][] = [];
-            try {
-              createdPages[block.id] = await createPage([...pageIds, [block.id, uuid()]], _failedImportBlocks);
+          });
+        }
+        else {
+          break;
+        }
+      }
+
+      for (let index = 0; index < blocks.length; index++) {
+        try {
+          await populateDoc(pageContent, blocks[index], blocksRecord, {
+            onChildDatabase: async (block, parentNode) => {
+            // If its a database, we need to fetch more information from api
+              createdPages[block.id] = await createDatabaseAndPopulateCache(await notion.databases.retrieve({
+                database_id: block.id
+              }) as any);
+
               (parentNode as PageContent).content?.push({
                 type: 'page',
                 attrs: {
                   id: createdPages[block.id].id
                 }
               });
-              if (_failedImportBlocks.length !== 0) {
-                throw new Error();
-              }
-            }
-            catch (_) {
-              log.debug('Error on creating child page', _);
-              populateFailedImportRecord(_failedImportBlocks, searchResultRecord[block.id]);
-            }
-          },
-          onLinkToPage: async (linkedPageId, parentNode, inlineLink) => {
-            const _failedImportBlocks: [string, number][][] = [];
-            // If the pages hasn't been created already, only then create it
-            // Find the parent its linking
-            const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
-            // Make sure its not referencing itself otherwise an infinite loop will occur
-            // Also make sure the linked page id is not its parent
-            if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== notionPageId && !parentAsLinkedPage) {
+            },
+            onChildPage: async (block, parentNode) => {
+              const _failedImportBlocks: [string, number][][] = [];
               try {
-                const createdPage = await createPage([...pageIds, [linkedPageId, uuid()]], _failedImportBlocks);
-                linkedPages[linkedPageId] = createdPage.id;
+                createdPages[block.id] = await createPage([...pageIds, [block.id, uuid()]], _failedImportBlocks);
+                (parentNode as PageContent).content?.push({
+                  type: 'page',
+                  attrs: {
+                    id: createdPages[block.id].id
+                  }
+                });
                 if (_failedImportBlocks.length !== 0) {
                   throw new Error();
                 }
               }
               catch (_) {
                 log.debug('Error on creating child page', _);
-                populateFailedImportRecord(_failedImportBlocks, searchResultRecord[linkedPageId]);
+                populateFailedImportRecord(_failedImportBlocks, searchResultRecord[block.id]);
               }
-            }
-
-            if (!inlineLink) {
-              let id = linkedPages[linkedPageId];
-
-              // If its linking itself
-              if (linkedPageId === notionPageId) {
-                id = charmversePageId;
-              }
-              else if (parentAsLinkedPage) {
-                id = parentAsLinkedPage[1];
-              }
-
-              (parentNode as PageContent).content?.push({
-                type: 'page',
-                attrs: {
-                  id
+            },
+            onLinkToPage: async (linkedPageId, parentNode, inlineLink) => {
+              const _failedImportBlocks: [string, number][][] = [];
+              // If the pages hasn't been created already, only then create it
+              // Find the parent its linking
+              const parentAsLinkedPage = pageIds.find(([notionBlockId]) => notionBlockId === linkedPageId);
+              // Make sure its not referencing itself otherwise an infinite loop will occur
+              // Also make sure the linked page id is not its parent
+              if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== notionPageId && !parentAsLinkedPage) {
+                try {
+                  const createdPage = await createPage([...pageIds, [linkedPageId, uuid()]], _failedImportBlocks);
+                  linkedPages[linkedPageId] = createdPage.id;
+                  if (_failedImportBlocks.length !== 0) {
+                    throw new Error();
+                  }
                 }
-              });
-            }
+                catch (_) {
+                  log.debug('Error on creating child page', _);
+                  populateFailedImportRecord(_failedImportBlocks, searchResultRecord[linkedPageId]);
+                }
+              }
 
-            if (linkedPages[linkedPageId]) {
-              return linkedPages[linkedPageId];
+              if (!inlineLink) {
+                let id = linkedPages[linkedPageId];
+
+                // If its linking itself
+                if (linkedPageId === notionPageId) {
+                  id = charmversePageId;
+                }
+                else if (parentAsLinkedPage) {
+                  id = parentAsLinkedPage[1];
+                }
+
+                (parentNode as PageContent).content?.push({
+                  type: 'page',
+                  attrs: {
+                    id
+                  }
+                });
+              }
+
+              if (linkedPages[linkedPageId]) {
+                return linkedPages[linkedPageId];
+              }
+              return null;
             }
-            return null;
+          }, [[blocks[index].type, index]]);
+        }
+        catch (err: any) {
+          try {
+            const failedBlocks = JSON.parse(err.message);
+            failedImportBlocks.push(failedBlocks);
           }
-        }, [[blocks[index].type, index]]);
-      }
-      catch (err: any) {
-        try {
-          const failedBlocks = JSON.parse(err.message);
-          failedImportBlocks.push(failedBlocks);
-        }
-        catch (_err) {
+          catch (_err) {
           //
+          }
         }
       }
-    }
-    // If there was no content in the notion page only then add an empty paragraph
-    if (pageContent.content?.length === 0) {
-      pageContent.content?.push({
-        type: 'paragraph',
-        content: []
-      });
-    }
-    // Regular pages including databases
-    if (pageResponse.parent.type === 'page_id' || pageResponse.parent.type === 'workspace') {
-      const title = convertToPlainText((pageResponse.properties.title as any)[pageResponse.properties.title.type]);
-      createdPages[notionPageId] = {
-        type: 'page',
-        content: pageContent,
-        headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover?.file.url : null,
-        icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
-        title,
-        id: charmversePageId,
-        spaceId,
-        createdBy: userId
-      };
-      return createdPages[notionPageId];
-    }
-    // Focalboard cards
-    else if (pageResponse.parent.type === 'database_id') {
+      // If there was no content in the notion page only then add an empty paragraph
+      if (pageContent.content?.length === 0) {
+        pageContent.content?.push({
+          type: 'paragraph',
+          content: []
+        });
+      }
+      // Regular pages including databases
+      if (pageResponse.parent.type === 'page_id' || pageResponse.parent.type === 'workspace') {
+        const title = convertToPlainText((pageResponse.properties.title as any)[pageResponse.properties.title.type]);
+        createdPages[notionPageId] = {
+          type: 'page',
+          content: pageContent,
+          headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover?.file.url : null,
+          icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
+          title,
+          id: charmversePageId,
+          spaceId,
+          createdBy: userId
+        };
+        return createdPages[notionPageId];
+      }
+      // Focalboard cards
+      else if (pageResponse.parent.type === 'database_id') {
       // The database must be created before the cards can be added
       // eslint-disable-next-line
 
-      await createDatabaseAndPopulateCache(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
-      const database = createdPages[pageResponse.parent.database_id];
+        await createDatabaseAndPopulateCache(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
+        const database = createdPages[pageResponse.parent.database_id];
 
-      if (database.boardId) {
-        const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title') as {title: {plain_text: string}[]};
-        const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
+        if (database.boardId) {
+          const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title') as {title: {plain_text: string}[]};
+          const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
 
-        const title = convertToPlainText(titleProperty.title);
-        const charmTextBlock = createCharmTextBlock({
-          parentId: charmversePageId,
-          fields: {
+          const title = convertToPlainText(titleProperty.title);
+          const charmTextBlock = createCharmTextBlock({
+            parentId: charmversePageId,
+            fields: {
+              content: pageContent
+            }
+          });
+          const { properties } = focalboardRecord[database.boardId];
+
+          const cardProperties: Record<string, any> = {};
+
+          Object.values(pageResponse.properties).forEach(property => {
+            if (property[property.type]) {
+              if (property.type.match(/(email|number|url|checkbox|phone_number)/)) {
+                cardProperties[properties[property.id]] = property[property.type];
+              }
+              else if (property.type === 'rich_text') {
+                cardProperties[properties[property.id]] = convertToPlainText(property[property.type]);
+              }
+              else if (property.type === 'select') {
+                cardProperties[properties[property.id]] = property[property.type].id;
+              }
+              else if (property.type === 'multi_select') {
+                cardProperties[properties[property.id]] = property[property.type]
+                  .map((multiSelect: {id: string}) => multiSelect.id);
+              }
+              else if (property.type === 'date') {
+                const dateValue: {from?: number, to?: number} = {};
+                if (property[property.type].start) {
+                  dateValue.from = (new Date(property[property.type].start)).getTime();
+                }
+
+                if (property[property.type].end) {
+                  dateValue.to = (new Date(property[property.type].end)).getTime();
+                }
+                cardProperties[properties[property.id]] = JSON.stringify(dateValue);
+              }
+            }
+          });
+
+          const commonBlockData = {
+            deletedAt: null,
+            spaceId,
+            createdBy: userId,
+            updatedBy: userId,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+
+          const headerImage = pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover.file.url : null;
+
+          const cardPage = {
+            createdBy: userId,
+            id: charmversePageId,
+            spaceId,
+            cardId: charmversePageId,
+            title,
+            headerImage,
+            icon: emoji,
+            parentId: database.id,
             content: pageContent
-          }
-        });
-        const { properties } = focalboardRecord[database.boardId];
-
-        const cardProperties: Record<string, any> = {};
-
-        Object.values(pageResponse.properties).forEach(property => {
-          if (property[property.type]) {
-            if (property.type.match(/(email|number|url|checkbox|phone_number)/)) {
-              cardProperties[properties[property.id]] = property[property.type];
+          };
+          createdCards[notionPageId] = {
+            notionPageId,
+            page: cardPage,
+            charmText: {
+              ...charmTextBlock,
+              ...commonBlockData,
+              rootId: database.boardId
+            },
+            card: {
+              ...createCard({
+                title,
+                id: charmversePageId,
+                parentId: database.boardId,
+                rootId: database.boardId,
+                fields: {
+                  icon: emoji,
+                  contentOrder: [charmTextBlock.id],
+                  headerImage,
+                  properties: cardProperties
+                }
+              }),
+              ...commonBlockData
             }
-            else if (property.type === 'rich_text') {
-              cardProperties[properties[property.id]] = convertToPlainText(property[property.type]);
-            }
-            else if (property.type === 'select') {
-              cardProperties[properties[property.id]] = property[property.type].id;
-            }
-            else if (property.type === 'multi_select') {
-              cardProperties[properties[property.id]] = property[property.type]
-                .map((multiSelect: {id: string}) => multiSelect.id);
-            }
-            else if (property.type === 'date') {
-              const dateValue: {from?: number, to?: number} = {};
-              if (property[property.type].start) {
-                dateValue.from = (new Date(property[property.type].start)).getTime();
-              }
-
-              if (property[property.type].end) {
-                dateValue.to = (new Date(property[property.type].end)).getTime();
-              }
-              cardProperties[properties[property.id]] = JSON.stringify(dateValue);
-            }
-          }
-        });
-
-        const commonBlockData = {
-          deletedAt: null,
-          spaceId,
-          createdBy: userId,
-          updatedBy: userId,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-
-        const headerImage = pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover.file.url : null;
-
-        const cardPage = {
-          createdBy: userId,
-          id: charmversePageId,
-          spaceId,
-          cardId: charmversePageId,
-          title,
-          headerImage,
-          icon: emoji,
-          parentId: database.id,
-          content: pageContent
-        };
-        createdCards[notionPageId] = {
-          notionPageId,
-          page: cardPage,
-          charmText: {
-            ...charmTextBlock,
-            ...commonBlockData,
-            rootId: database.boardId
-          },
-          card: {
-            ...createCard({
-              title,
-              id: charmversePageId,
-              parentId: database.boardId,
-              rootId: database.boardId,
-              fields: {
-                icon: emoji,
-                contentOrder: [charmTextBlock.id],
-                headerImage,
-                properties: cardProperties
-              }
-            }),
-            ...commonBlockData
-          }
-        };
-        createdPages[notionPageId] = cardPage;
+          };
+          createdPages[notionPageId] = cardPage;
+        }
       }
+    }
+    catch (_: any) {
+      // TODO: Maybe show the user which pages they need to give access to the integration. but we can only show the id
+      pagesWithoutIntegrationAccess.add(notionPageId);
     }
     return createdPages[notionPageId];
   }
@@ -1176,5 +1183,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
   }
 
+  // console.log(pagesWithoutIntegrationAccess);
   return Object.values(failedImportsRecord);
 }
