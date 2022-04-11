@@ -65,12 +65,23 @@ function convertRichText (richTexts: RichTextItemResponse[]): {
         });
       }
     }
-    else if (richText.mention?.page?.id) {
+    else if (richText.mention?.type === 'page') {
       const inlineLinkedPage: MentionNode = {
         type: 'mention',
         attrs: {
           type: 'page',
           value: richText.mention.page.id
+        }
+      };
+      contents.push(inlineLinkedPage);
+      inlineLinkedPages.push(inlineLinkedPage);
+    }
+    else if (richText.mention?.type === 'database') {
+      const inlineLinkedPage: MentionNode = {
+        type: 'mention',
+        attrs: {
+          type: 'page',
+          value: richText.mention.database.id
         }
       };
       contents.push(inlineLinkedPage);
@@ -812,7 +823,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       // While there are more children to be fetched
         if (blockChildrenRequests.length !== 0) {
 
-          log.debug(`[notion] - ${blockChildrenRequests.length} Requests for child blocks at depth: ${depth}`);
+          // log.debug(`[notion] - ${blockChildrenRequests.length} Requests for child blocks at depth: ${depth}`);
 
           const childBlockListResponses = await getChildBlockListResponses();
 

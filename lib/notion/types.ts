@@ -14,6 +14,14 @@ export type RichTextItemResponse = ({
       id: string;
     };
   };
+} | {
+  type: 'mention';
+  mention: {
+    type: 'database';
+    database: {
+      id: string;
+    };
+  };
 }) & {
   annotations: {
     bold: boolean;
