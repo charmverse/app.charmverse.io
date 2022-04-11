@@ -1,7 +1,6 @@
 import { DiscordServerRole } from 'pages/api/discord/importRoles';
 import { prisma } from 'db';
 import { Role } from '@prisma/client';
-import log from 'lib/log';
 
 type RolesRecord = Record<string, { discord: DiscordServerRole, charmverse: Role | null }>;
 
@@ -12,7 +11,6 @@ export async function findOrCreateRolesFromDiscord (
   userId: string,
   createRoles?: boolean
 ): Promise<RolesRecord> {
-  let roleWithIssue : string | null = null;
   createRoles = createRoles ?? true;
   const rolesRecord: RolesRecord = {};
   // Create all of the discord roles fist
@@ -30,23 +28,33 @@ export async function findOrCreateRolesFromDiscord (
       let charmVerseRole = existingRole;
 
       // Only create the role if it doesn't already exist
-      if (!existingRole && createRoles) {
-        try {
-          charmVerseRole = await prisma.role.create({
-            data: {
-              name: discordServerRole.name,
-              space: {
-                connect: {
-                  id: spaceId
-                }
-              },
-              createdBy: userId
+      if (createRoles) {
+        charmVerseRole = await prisma.role.upsert({
+          where: {
+            spaceId_name: {
+              spaceId,
+              name: discordServerRole.name
             }
-          });
-        }
-        catch (_) {
-          roleWithIssue = discordServerRole.name;
-        }
+          },
+          update: {
+            name: discordServerRole.name,
+            space: {
+              connect: {
+                id: spaceId
+              }
+            },
+            createdBy: userId
+          },
+          create: {
+            name: discordServerRole.name,
+            space: {
+              connect: {
+                id: spaceId
+              }
+            },
+            createdBy: userId
+          }
+        });
       }
 
       rolesRecord[discordServerRole.id] = {
@@ -54,9 +62,6 @@ export async function findOrCreateRolesFromDiscord (
         charmverse: charmVerseRole
       };
     }
-  }
-  if (roleWithIssue) {
-    log.error(`Error creating role ${roleWithIssue}. Roles: ${discordServerRoles.map(discordServerRole => discordServerRole.name).join(',')}`);
   }
   return rolesRecord;
 }
