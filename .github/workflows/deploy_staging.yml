@@ -13,9 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
     concurrency: deploy-pr-app-${{ github.head_ref }}
-    uses: ./.github/workflows/build
     steps:
       - uses: actions/checkout@v2
+
+      - name: Download build artifacts
+        uses: dawidd6/action-download-artifact@v2
+          workflow: build.yml
+          workflow_conclusion: success
+
       - name: inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 

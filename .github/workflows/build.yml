@@ -36,3 +36,11 @@ jobs:
         run: |
           npm prune --production
           rm -rf .git
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-files
+          path: |
+            node_modules
+            .next
