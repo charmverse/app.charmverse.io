@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CdkDeployStack } from '../ebs-staging-stack';
+import { CdkDeployStack } from '../staging-stack';
 
 const app = new cdk.App();
 
-new CdkDeployStack(app, 'CdkDeployStack', {
+const stackName = 'CharmVerse-staging-' + process.env.STAGE;
+
+new CdkDeployStack(app, stackName, {
 
   env: { account: '310849459438' },
 

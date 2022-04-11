@@ -1,3 +1,3 @@
 {
-  "app": "npx ts-node --prefer-ts-exts .cdk/bin/deploy-staging.ts"
+  "app": "npx ts-node --prefer-ts-exts .cdk/bin/app.ts"
 }
