@@ -26,7 +26,6 @@ import { IconButton } from '@mui/material'
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import MuiButton from "@mui/material/Button"
 import { useRouter } from 'next/router'
-import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { usePages } from 'hooks/usePages'
 
 
@@ -166,20 +165,22 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const followingCards = useAppSelector(getUserBlockSubscriptionList)
     const isFollowingCard = Boolean(followingCards.find((following) => following.blockId === props.cardId))
     const router = useRouter();
-    const [space] = useCurrentSpace();
     return card ? (
         <>
             <Dialog
                 onClose={props.onClose}
                 toolsMenu={!props.readonly && menu}
-                toolbar={
-                  <MuiButton onClick={() => {
-                    if (space && pages[card.id]) {
-                      router.push(`/${space.domain}/${pages[card.id]!.path}`)
-                    }
-                  }} variant='outlined' startIcon={<OpenInFullIcon fontSize='small'/>}>
-                    Open as Page
-                  </MuiButton>
+                hideCloseButton={true}
+                toolbar={pages[card.id] && (
+                    <MuiButton
+                        size='small'
+                        color='secondary'
+                        href={`/${router.query.domain}/${pages[card.id]!.path}`}
+                        variant='text'
+                        startIcon={<OpenInFullIcon fontSize='small'/>}>
+                        Open as Page
+                    </MuiButton>
+                    )
                 }
                 // toolbar={toolbar}
             >
