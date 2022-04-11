@@ -11,6 +11,8 @@ jobs:
       (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy') ||
       (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))
     runs-on: ubuntu-latest
+    # prevent workflows running in parallel
+    concurrency: deploy-pr-app-${{ github.head_ref }}
     steps:
       - name: inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
@@ -54,7 +56,9 @@ jobs:
 
       - name: Package
         run: zip deploy.zip -r .
+
       - name: Deploy to staging
+        id: cdk_deploy
         run: npm run deploy:staging
 
       - name: update the github deployment status
