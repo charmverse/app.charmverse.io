@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, ListItemNode, MentionNode, Page, PageContent, ParagraphNode, TableNode, TableRowNode, TextContent } from 'models';
+import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import { Prisma } from '@prisma/client';
 import { extractEmbedLink, MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'components/common/CharmEditor/components/ResizableIframe';
@@ -424,7 +424,7 @@ async function populateDoc (
         errorTrails.push(...errorMessageData);
       }
       catch (_) {
-        log.debug('Error when creating blocks for page', _);
+        log.debug('Error when creating blocks for page');
         //
       }
       throw new Error(JSON.stringify([parentInfo[parentInfo.length - 1], ...errorTrails]));
@@ -863,17 +863,24 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         try {
           await populateDoc(pageContent, blocks[index], blocksRecord, {
             onChildDatabase: async (block, parentNode) => {
-            // If its a database, we need to fetch more information from api
-              createdPages[block.id] = await createDatabaseAndPopulateCache(await notion.databases.retrieve({
-                database_id: block.id
-              }) as any);
+              // If its a database, we need to fetch more information from api
+              try {
+                const databaseResponse = await notion.databases.retrieve({
+                  database_id: block.id
+                }) as GetDatabaseResponse;
+                searchResultRecord[block.id] = databaseResponse;
+                createdPages[block.id] = await createDatabaseAndPopulateCache(databaseResponse);
 
-              (parentNode as PageContent).content?.push({
-                type: 'page',
-                attrs: {
-                  id: createdPages[block.id].id
-                }
-              });
+                (parentNode as PageContent).content?.push({
+                  type: 'page',
+                  attrs: {
+                    id: createdPages[block.id].id
+                  }
+                });
+              }
+              catch (_) {
+                pagesWithoutIntegrationAccess.add(block.id);
+              }
             },
             onChildPage: async (block, parentNode) => {
               const _failedImportBlocks: [string, number][][] = [];
@@ -890,7 +897,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
                 }
               }
               catch (_) {
-                log.debug('Error on creating child page', _);
+                log.debug('Error on creating child page');
                 populateFailedImportRecord(_failedImportBlocks, searchResultRecord[block.id]);
               }
             },
@@ -910,7 +917,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
                   }
                 }
                 catch (_) {
-                  log.debug('Error on creating child page', _);
+                  log.debug('Error on creating child page');
                   populateFailedImportRecord(_failedImportBlocks, searchResultRecord[linkedPageId]);
                 }
               }
@@ -1111,7 +1118,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       }
     }
     catch (_) {
-      log.debug('Error creating charmverse page', _);
+      log.debug('Error creating charmverse page');
       if (!failedImportsRecord[blockId]) {
         populateFailedImportRecord([], searchResultRecord[blockId]);
       }
@@ -1183,6 +1190,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
   }
 
-  // console.log(pagesWithoutIntegrationAccess);
+  log.debug(pagesWithoutIntegrationAccess);
   return Object.values(failedImportsRecord);
 }
