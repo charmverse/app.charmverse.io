@@ -42,39 +42,6 @@ jobs:
     #   shell: 'script -q -e -c "bash {0}"' # add support for colors in output. see: https://github.com/actions/runner/issues/241
     #   run: npm test
 
-  deploy-staging:
-    name: Deploy to staging
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Node.js v16
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16"
-
-      - name: configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Install dependencies
-        run: npm ci --no-fund
-      - name: Build
-        run: npm run build
-      - name: Remove dev dependencies
-        run: |
-          npm prune --production
-          rm -rf .git
-
-      - name: Package
-        run: zip deploy.zip -r .
-      - name: Deploy to staging
-        run: |
-          npm run cdk:bootstrap
-          npm run deploy:staging
-
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest

@@ -2,7 +2,6 @@ import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
-import * as certificatemanager from 'aws-cdk-lib/aws-certificatemanager';
 
 export class CdkDeployStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -12,7 +11,7 @@ export class CdkDeployStack extends Stack {
       path: `${__dirname}/../deploy.zip`,
     });
     // Create a ElasticBeanStalk app.
-    const appName = 'CharmVerse-ephemeral';
+    const appName = 'CharmVerse-staging';
 
     const ebApp = new elasticbeanstalk.CfnApplication(this, 'Application', {
       applicationName: appName,
@@ -29,28 +28,6 @@ export class CdkDeployStack extends Stack {
 
     // Make sure that Elastic Beanstalk app exists before creating an app version
     appVersionProps.addDependsOn(ebApp);
-
-    // Create role and instance profile
-    // const myRole = new iam.Role(this, `${appName}-aws-elasticbeanstalk-ec2-role`, {
-    //   assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
-    // });
-
-    // const managedPolicy = iam.ManagedPolicy.fromAwsManagedPolicyName('AWSElasticBeanstalkWebTier')
-    // myRole.addManagedPolicy(managedPolicy);
-
-    // const myProfileName = `${appName}-InstanceProfile`
-
-    // const instanceProfile = new iam.CfnInstanceProfile(this, myProfileName, {
-    //   instanceProfileName: myProfileName,
-    //   roles: [
-    //     myRole.roleName
-    //   ]
-    // });
-    // const certificate = new certificatemanager.Certificate(this, 'Certificate', {
-    //   // domainName: props.domainName,
-    //   // subjectAlternativeNames: [],
-    //   // validationMethod: certificatemanager.ValidationMethod.EMAIL,
-    // });
 
     // list of all options: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
     const optionSettingProperties: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] = [
@@ -100,15 +77,12 @@ export class CdkDeployStack extends Stack {
       optionSettings: optionSettingProperties,
       versionLabel: appVersionProps.ref,
     });
-    //ebEnv.addDependsOn(ebApp);
 
     /**
      * Output the distribution's url so we can pass it to external systems
      */
      new CfnOutput(this, "DeploymentUrl", {
-      value: "http://" + ebEnv.getMetadata('EnvironmentURL'),
+      value: ebEnv.attrEndpointUrl,
     });
-
-    console.log('Visit your environment: http://' + ebEnv.getMetadata('EnvironmentURL'));
   }
 }
