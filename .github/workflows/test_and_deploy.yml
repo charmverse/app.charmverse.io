@@ -14,6 +14,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - uses: ./.github/workflows/build.yml
 
     # - name: Run Tests
@@ -26,6 +27,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: test
     steps:
+      - uses: actions/checkout@v2
       - uses: ./.github/workflows/build.yml
 
       - name: Add Datadog API Key
