@@ -28,11 +28,14 @@ jobs:
       - name: checkout the files
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: npm ci --no-fund
+      - name: Install dependencies and build app
+        uses: ./.github/actions/install
 
       - name: destroy the stack on AWS
-        run: npm run destroy:staging
+        # we need to create a dummy zip file or else cdk throws an error it cannot find the asset
+        run: |
+          touch deploy.zip
+          npm run destroy:staging
 
       - name: delete the github deployments and the corresponding environment
         uses: strumwolf/delete-deployment-environment@v1.1.0

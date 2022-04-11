@@ -41,7 +41,3 @@ runs:
       shell: bash
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
-
-    - name: Build
-      shell: bash
-      run: npm run build
