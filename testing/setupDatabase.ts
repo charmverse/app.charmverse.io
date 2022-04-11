@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { createUserFromWallet } from 'lib/users/createUser';
 
-export const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: 'postgres://postgres:postgres@localhost:5432/charmversetest'
-    }
-  }
-});
+export default async function seedDatabase () {
+  await createUserFromWallet('0x0bdCC3f24822AD36CE4Fc1fa8Fe9FD6B235f0078');
+  // const user = await
+  return true;
+}
