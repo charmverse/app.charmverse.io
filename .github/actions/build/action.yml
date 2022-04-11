@@ -11,9 +11,6 @@ name: "Install and build application"
 
 runs:
   using: 'composite'
-  defaults:
-    run:
-      shell: bash
   steps:
     - uses: actions/checkout@v2
 
@@ -41,13 +38,16 @@ runs:
         key: modules-${{ hashFiles('package-lock.json') }}
 
     - name: Install npm dependencies
+      shell: bash
       if: steps.cache.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
     - name: Build
+      shell: bash
       run: npm run build
 
     - name: Remove dev dependencies
+      shell: bash
       run: |
         npm prune --production
         rm -rf .git
