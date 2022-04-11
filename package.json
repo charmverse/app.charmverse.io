@@ -11,7 +11,9 @@
     "prepare": "husky install",
     "db-tool": "dotenv -e .env.production -- npx prisma studio",
     "db-tool:dev": "dotenv -e .env.local -- npx prisma studio",
-    "test": "jest"
+    "test-setup": "./testing/configure-db.sh",
+    "test-client": "npm run test-setup && jest --config='./jest.config-client.ts'",
+    "test-server": "npm run test-setup && jest --config='./jest.config-server.ts'"
   },
   "postinstall": "patch-package",
   "prepare": "husky install",
@@ -145,6 +147,7 @@
     "@types/react-intl": "^3.0.0",
     "@types/react-resizable": "^1.7.4",
     "@types/redux-mock-store": "^1.0.3",
+    "@types/supertest": "^2.0.12",
     "@types/swagger-ui-react": "^4.1.1",
     "@typescript-eslint/eslint-plugin": "^5.17.0",
     "@typescript-eslint/parser": "^5.17.0",
@@ -166,6 +169,7 @@
     "prisma": "^3.9.2",
     "sass": "^1.49.0",
     "sharp": "^0.30.2",
+    "supertest": "^6.2.2",
     "ts-jest": "^27.1.4",
     "ts-node": "^10.7.0",
     "tsconfig-paths": "^3.13.0",
