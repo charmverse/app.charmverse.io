@@ -31,7 +31,7 @@ runs:
           ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
     - name: Cache dependencies
-      id: cache
+      id: cache_node_modules
       uses: actions/cache@v2
       with:
         path: ./node_modules
@@ -39,7 +39,7 @@ runs:
 
     - name: Install npm dependencies
       shell: bash
-      if: steps.cache.outputs.cache-hit != 'true'
+      if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
     - name: Build
