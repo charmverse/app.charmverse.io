@@ -11,7 +11,7 @@
     "prepare": "husky install",
     "db-tool": "dotenv -e .env.production -- npx prisma studio",
     "db-tool:dev": "dotenv -e .env.local -- npx prisma studio",
-    "test-setup": "./testing/configure-db.sh",
+    "test-setup-db": "./testing/configure-db.sh",
     "test-client": "npm run test-setup && jest --config='./jest.config-client.ts'",
     "test-server": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts'"
   },
