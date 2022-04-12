@@ -1,5 +1,6 @@
 import * as http from 'adapters/http';
-import log from 'lib/log';
+
+const webhookBaseUrl = 'https://discord.com/api/webhooks';
 
 /**
  * Full JSON body available here
@@ -24,18 +25,19 @@ export interface IEventToLog {
   message: string
 }
 
-const isProdEnvironment = process.env.NODE_ENV === 'production';
-const webhook = process.env.DISCORD_EVENTS_WEBHOOK;
-
 export async function postToDiscord (eventLog: IEventToLog) {
 
   let message = `Event: ${eventLog.funnelStage.toUpperCase()} / ${eventLog.eventType}\r\n`;
 
+  const isProdEnvironment = process.env.NODE_ENV === 'production';
+
   message += eventLog.message;
 
-  log.debug('New event logged', message);
+  console.log('New event logged', message);
 
-  if (isProdEnvironment === true && webhook) {
+  if (isProdEnvironment === true) {
+
+    const webhook = process.env.DISCORD_EVENTS_WEBHOOK!;
 
     try {
       const discordReponse = await http.POST<IDiscordMessage>(webhook, { content: message });

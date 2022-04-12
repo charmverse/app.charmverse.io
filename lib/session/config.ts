@@ -11,6 +11,6 @@ export const ironOptions = {
   password: process.env.AUTH_SECRET as string,
   // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
   cookieOptions: {
-    secure: typeof process.env.DOMAIN === 'string' && process.env.DOMAIN.includes('https')
+    secure: process.env.NODE_ENV === 'production'
   }
 };
