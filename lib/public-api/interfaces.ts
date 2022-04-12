@@ -155,6 +155,7 @@ export interface Page {
   createdAt: string
   updatedAt: string
   databaseId: string
+  spaceId: string
   content: PageContentFormats
   title: string
   isTemplate: boolean
