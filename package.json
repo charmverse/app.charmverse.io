@@ -10,8 +10,8 @@
     "lint:prod": "npm run lint -- --quiet",
     "start": "next dev",
     "start:prod": "prisma migrate deploy && node_modules/next/dist/bin/next start",
-    "start:staging": "npx dotenv -e .env.staging -- prisma migrate deploy && npx react-env --path .env.staging -- node_modules/next/dist/bin/next start",
-    "start:remote": "node_modules/@beam-australia/react-env/dist/cli.js --path .env.production -- next dev",
+    "start:staging": "npx dotenv -e .env.staging -- prisma migrate deploy && npx react-env --path .env.staging -- npx next start",
+    "start:remote": "npx react-env --path .env.production -- next dev",
     "prepare": "husky install",
     "db-tool": "dotenv -e .env.production -- npx prisma studio",
     "db-tool:dev": "dotenv -e .env.local -- npx prisma studio"
