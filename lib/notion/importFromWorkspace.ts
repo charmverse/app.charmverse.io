@@ -787,16 +787,16 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }];
 
     async function getChildBlockListResponses () {
-      const childBlockListResponses = (await Promise.all<ChildBlockListResponse>(
-        blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
-          notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
+      const childBlockListResponses = await Promise.all<ChildBlockListResponse>(
+        blockChildrenRequests.map(blockChildrenRequest => (
+          notion.blocks.children.list(blockChildrenRequest).then((response => ({
             results: response.results as BlockObjectResponse[],
             // Request contains the block_id, which is used to detect the parent of this group of child blocks
             request: blockChildrenRequest,
             next_cursor: response.next_cursor
-          })));
-        }))
-      ));
+          })))
+        ))
+      );
 
       // Reset the requests as they've all been fetched
       blockChildrenRequests = [];
