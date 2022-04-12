@@ -1,5 +1,5 @@
 import { Space, User } from '@prisma/client';
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { createDatabase, createDatabaseCardPage } from '../createDatabaseCardPage';
 import { PageFromBlock } from '../pageFromBlock.class';
@@ -8,7 +8,7 @@ let user: User;
 let space: Space;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace();
+  const generated = await generateUserAndSpaceWithApiToken();
   user = generated.user;
   space = generated.space;
 });

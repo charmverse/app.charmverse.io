@@ -1,3 +1,4 @@
+export * from './createDatabaseCardPage';
 export * from './pageFromBlock.class';
 export * from './interfaces';
 export * from './getPageInBoard';

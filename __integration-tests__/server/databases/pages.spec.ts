@@ -2,8 +2,8 @@ import { Page, Space, User } from '@prisma/client';
 import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
 import { getBotUser } from 'lib/middleware';
 import { createMocks } from 'node-mocks-http';
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { createPage } from '../pages';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage } from '../../../pages/api/v1/databases/[id]/pages';
 
 let testUser: User;
 let testSpace: Space;
@@ -11,7 +11,7 @@ let database: Page;
 
 beforeAll(async () => {
 
-  const { user, space } = await generateUserAndSpace();
+  const { user, space } = await generateUserAndSpaceWithApiToken();
   testUser = user;
   testSpace = space;
 

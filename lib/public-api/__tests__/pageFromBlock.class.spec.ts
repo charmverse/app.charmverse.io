@@ -1,5 +1,5 @@
 import { v4 } from 'uuid';
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { prisma } from 'db';
 import { PageFromBlock } from '../pageFromBlock.class';
 import { PageProperty } from '../interfaces';
@@ -39,7 +39,7 @@ describe('PageFromBlock', () => {
 
   it('should preserve block data and convert properties to human-readable format', async () => {
 
-    const { user, space } = await generateUserAndSpace();
+    const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const createdBlock = await prisma?.block.create({
       data: {

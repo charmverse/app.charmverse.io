@@ -10,7 +10,7 @@ import { v4 } from 'uuid';
  * @param walletAddress
  * @returns
  */
-export async function generateUserAndSpace (walletAddress: string = '0x0bdCC3f24822AD36CE4Fc1fa8Fe9FD6B235f0078'): Promise<{
+export async function generateUserAndSpaceWithApiToken (walletAddress: string = '0x0bdCC3f24822AD36CE4Fc1fa8Fe9FD6B235f0078'): Promise<{
   user: LoggedInUser,
   space: Space,
   apiToken: SpaceApiToken
@@ -59,7 +59,7 @@ export async function generateUserAndSpace (walletAddress: string = '0x0bdCC3f24
 }
 
 export default async function seedDatabase () {
-  const { space } = await generateUserAndSpace();
+  const { space } = await generateUserAndSpaceWithApiToken();
 
   await provisionApiKey(space.id);
 
