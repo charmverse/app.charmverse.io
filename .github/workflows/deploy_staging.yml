@@ -19,8 +19,8 @@ jobs:
       - name: Install dependencies and build app
         uses: ./.github/actions/install
 
-      - name: Build
-        run: npm run build
+      - name: Build app
+        uses: ./.github/actions/build
 
       - name: Remove dev dependencies
         run: |

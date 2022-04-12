@@ -19,8 +19,8 @@ jobs:
       - name: Install dependencies and build app
         uses: ./.github/actions/install
 
-      - name: Build
-        run: npm run build
+      - name: Build app
+        uses: ./.github/actions/build
 
     # - name: Run Tests
     #   shell: 'script -q -e -c "bash {0}"' # add support for colors in output. see: https://github.com/actions/runner/issues/241
@@ -37,8 +37,8 @@ jobs:
       - name: Install dependencies and build app
         uses: ./.github/actions/install
 
-      - name: Build
-        run: npm run build
+      - name: Build app
+        uses: ./.github/actions/build
 
       - name: Remove dev dependencies
         run: |
