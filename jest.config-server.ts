@@ -12,7 +12,7 @@ const createJestConfig = nextJest({ dir: __dirname });
  * Configuration copied from
  * https://nextjs.org/docs/testing
  * */
-const jestConfig = {
+export const jestConfig = {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -169,7 +169,7 @@ const jestConfig = {
   testMatch: [
     '**/pages/api/**/?(*.)+(spec|test).[tj]s?(x)',
     '**/public-api/**/?(*.)+(spec|test).[tj]s?(x)',
-    '**/testing/setupDatabase.spec.ts'
+    '**/testing/**/setupDatabase.spec.ts'
   //   "**/__tests__/**/*.[jt]s?(x)",
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   ],

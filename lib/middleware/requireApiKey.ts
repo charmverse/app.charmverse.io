@@ -42,7 +42,7 @@ export async function provisionApiKey (spaceId: string): Promise<SpaceApiToken> 
 
   await getBotUser(spaceId);
 
-  return spaceToken.token;
+  return spaceToken;
 }
 
 /**
