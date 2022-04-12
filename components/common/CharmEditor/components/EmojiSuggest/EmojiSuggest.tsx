@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { BaseEmoji, Picker } from 'emoji-mart';
 import { useCallback } from 'react';
-import { createPortal } from 'react-dom';
+import Portal from '@mui/material/Portal';
 import { selectEmoji } from './EmojiSuggest.plugin';
 
 export function EmojiSuggest ({
@@ -25,7 +25,7 @@ export function EmojiSuggest ({
   const theme = useTheme();
 
   function closeTooltip () {
-    if (view.dispatch!) {
+    if (view.dispatch) {
       view.dispatch(
         // Chain transactions together
         view.state.tr.setMeta(suggestTooltipKey, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false)
@@ -41,15 +41,16 @@ export function EmojiSuggest ({
     [view, emojiSuggestKey]
   );
 
-  return isVisible && createPortal(
+  return isVisible && (
     <ClickAwayListener onClickAway={closeTooltip}>
-      <Picker
-        theme={theme.palette.mode}
-        onSelect={(emoji: BaseEmoji) => {
-          onSelectEmoji(emoji.native);
-        }}
-      />
-    </ClickAwayListener>,
-    tooltipContentDOM
+      <Portal container={tooltipContentDOM}>
+        <Picker
+          theme={theme.palette.mode}
+          onSelect={(emoji: BaseEmoji) => {
+            onSelectEmoji(emoji.native);
+          }}
+        />
+      </Portal>
+    </ClickAwayListener>
   );
 }
