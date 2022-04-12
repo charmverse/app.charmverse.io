@@ -194,6 +194,8 @@ export const jestConfig = {
   // Setting this value to "fake" allows the use of fake timers for functions such as "setTimeout"
   // timers: "real",
 
+  testTimeout: 30000,
+
   // A map from regular expressions to paths to transformers
   transform: {
     // eslint-disable-next-line no-useless-escape

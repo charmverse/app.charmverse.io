@@ -7,7 +7,8 @@ const ErrorCodes = {
   'Invalid input': 1,
   'Data not found': 2,
   'Access denied': 3,
-  'External service': 4
+  'External service': 4,
+  'Unexpected result': 5
 };
 
 type ErrorType = keyof typeof ErrorCodes
