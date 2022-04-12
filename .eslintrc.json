@@ -54,6 +54,7 @@
       "error",
       "prefer-single"
     ],
+    "max-classes-per-file": "off",
     "max-len": [
       "error",
       {
