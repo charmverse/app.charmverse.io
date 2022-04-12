@@ -32,7 +32,7 @@ handler
  *              schema:
  *                $ref: '#/components/schemas/Page'
  */
-async function createPage (req: NextApiRequest, res: NextApiResponse) {
+export async function createPage (req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
   const spaceId = req.authorizedSpaceId;
@@ -42,7 +42,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
   const domain = process.env.DOMAIN ?? 'https://app.charmverse.io';
 
   if (!isValidUuid) {
-    return res.status(400).json({ error: `Please provide a valid database ID. Visit ${domain}/api-docs to find out how to get this` });
+    return res.status(400).json({ error: `Please provide a valid database ID in the request query. Visit ${domain}/api-docs to find out how to get this` });
   }
 
   const board = await prisma.block.findFirst({
@@ -54,7 +54,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!board) {
-    return res.status(404).send({ error: 'Database not found' });
+    return res.status(404).json({ error: 'Database not found' });
   }
 
   const { title, properties } = req.body;
@@ -75,7 +75,6 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
     propertiesToAdd = mapProperties(properties, boardSchema);
   }
   catch (error) {
-    console.log('Success', boardSchema);
     return res.status(400).json(error);
   }
 
@@ -140,7 +139,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
 
   const card = new PageFromBlock(block, (board.fields as any).cardProperties);
 
-  return res.status(201).send(card);
+  return res.status(201).json(card);
 
 }
 

@@ -165,6 +165,7 @@
     "husky": "^7.0.0",
     "jest": "^27.5.1",
     "lint-staged": "^12.3.2",
+    "node-mocks-http": "^1.11.0",
     "prettier": "^2.5.1",
     "prisma": "^3.9.2",
     "sass": "^1.49.0",

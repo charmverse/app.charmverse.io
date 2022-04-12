@@ -1,9 +1,8 @@
 import { Page } from '@prisma/client';
-import { v4 } from 'uuid';
 import { prisma } from 'db';
-import { PageFromBlock } from './pageFromBlock.class';
-import { validateCreationData } from './validateBody';
+import { v4 } from 'uuid';
 import { PageProperty } from './interfaces';
+import { PageFromBlock } from './pageFromBlock.class';
 
 export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title' | 'createdBy' | 'spaceId'>, string>): Promise<Page> {
 

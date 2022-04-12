@@ -23,8 +23,6 @@ export class PageFromBlock implements Page {
 
   constructor (block: Block, propertySchemas: PageProperty [], pageContent?: PageContent) {
 
-    console.log('Block', block, 'Schemas', propertySchemas);
-
     this.id = block.id;
     this.createdAt = new Date(block.createdAt).toISOString();
     this.updatedAt = new Date(block.createdAt).toISOString();

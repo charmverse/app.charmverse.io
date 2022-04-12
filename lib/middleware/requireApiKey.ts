@@ -10,6 +10,14 @@ declare module 'http' {
   }
 }
 
+declare module 'node-mocks-http' {
+  // Properties here are optional as we construct the request manually
+  interface RequestOptions {
+    authorizedSpaceId?: string
+    botUser?: User
+  }
+}
+
 /**
  * Returns bot user for the space, and creates one if they do not exist
  */
