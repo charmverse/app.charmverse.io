@@ -1,13 +1,11 @@
-import log from 'lib/log';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
-import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
-import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
-import { DiscordAccount } from 'lib/discord/loginByDiscord';
+import { findOrCreateRolesFromDiscord, DiscordServerRole } from 'lib/discord/createRoles';
+import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
 
 const handler = nc({
   onError,
@@ -17,34 +15,6 @@ const handler = nc({
 export interface ImportRolesPayload {
   spaceId: string,
   guildId: string,
-}
-
-export interface DiscordServerRole {
-  id: string
-  name: string
-  color: number
-  hoist: boolean
-  icon?: string
-  position: number
-  permissions: string
-  managed: boolean
-  mentionable: boolean
-  tags?: {
-    bot_id?: string
-    integration_id?: string
-  }[]
-}
-
-export interface DiscordGuildMember {
-  user?: DiscordAccount
-  nick?: string
-  avatar?: string
-  roles: string[]
-  joined_at: string
-  deaf: boolean
-  mute: boolean
-  pending?: boolean
-  permissions?: string
 }
 
 export type ImportRolesResponse = { importedRoleCount: number };
