@@ -57,7 +57,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Package
-        run: cat files_to_zip.txt | zip -r@ deploy.zip
+        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Deploy to staging
         id: cdk_deploy
