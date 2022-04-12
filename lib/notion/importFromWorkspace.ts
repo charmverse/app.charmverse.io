@@ -15,7 +15,7 @@ import { createCard } from 'lib/focalboard/card';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
-const IMPORTED_PAGES_LIMIT = 1000;
+const IMPORTED_PAGES_LIMIT = 10000;
 const BLOCKS_FETCHED_PER_REQUEST = 100;
 const MAX_CHILD_BLOCK_DEPTH = 10;
 
@@ -823,7 +823,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       // While there are more children to be fetched
         if (blockChildrenRequests.length !== 0) {
 
-          // log.debug(`[notion] - ${blockChildrenRequests.length} Requests for child blocks at depth: ${depth}`);
+          log.debug(`[notion] - ${blockChildrenRequests.length} Requests for child blocks at depth: ${depth}`);
 
           const childBlockListResponses = await getChildBlockListResponses();
 
