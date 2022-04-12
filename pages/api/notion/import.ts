@@ -4,8 +4,7 @@ import * as http from 'adapters/http';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
 import { withSessionRoute } from 'lib/session/withSession';
-import { Page } from '@prisma/client';
-import { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import { FailedImportsError } from 'lib/notion/types';
 
 const handler = nc({
   onError,

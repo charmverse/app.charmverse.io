@@ -1,6 +1,21 @@
-import { DiscordServerRole } from 'pages/api/discord/importRoles';
 import { prisma } from 'db';
 import { Role } from '@prisma/client';
+
+export interface DiscordServerRole {
+  id: string
+  name: string
+  color: number
+  hoist: boolean
+  icon?: string
+  position: number
+  permissions: string
+  managed: boolean
+  mentionable: boolean
+  tags?: {
+    bot_id?: string
+    integration_id?: string
+  }[]
+}
 
 type RolesRecord = Record<string, { discord: DiscordServerRole, charmverse: Role | null }>;
 

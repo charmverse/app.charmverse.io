@@ -12,10 +12,9 @@ import { useSWRConfig } from 'swr';
 import { useState, useEffect } from 'react';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import type { FailedImportsError } from 'lib/notion/types';
 import { getCookie, deleteCookie } from 'lib/browser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
-import { useRouter } from 'next/router';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 
