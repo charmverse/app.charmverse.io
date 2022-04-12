@@ -10,3 +10,14 @@ export class SpaceAccessDeniedError extends SystemError {
     });
   }
 }
+
+export class UnknownError extends SystemError {
+  constructor (error: any = {}) {
+    super({
+      errorType: 'Unknown',
+      message: 'Something went wrong!',
+      error,
+      severity: 'error'
+    });
+  }
+}
