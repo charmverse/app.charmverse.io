@@ -49,7 +49,7 @@ jobs:
         run: sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
 
       - name: Package
-        run: zip deploy.zip --symlinks -r .
+        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Deploy to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18
