@@ -1,7 +1,8 @@
-import { Space, User } from '@prisma/client';
+import { Space, SpaceApiToken, User } from '@prisma/client';
 import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
+import crypto from 'node:crypto';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -16,6 +17,32 @@ declare module 'node-mocks-http' {
     authorizedSpaceId?: string
     botUser?: User
   }
+}
+
+export async function provisionApiKey (spaceId: string): Promise<SpaceApiToken> {
+  const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
+
+  const spaceToken = await prisma.spaceApiToken.upsert({
+    where: {
+      spaceId: spaceId as string
+    },
+    update: {
+      token: newApiKey,
+      updatedAt: new Date().toISOString()
+    },
+    create: {
+      token: newApiKey,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      }
+    }
+  });
+
+  await getBotUser(spaceId);
+
+  return spaceToken.token;
 }
 
 /**
