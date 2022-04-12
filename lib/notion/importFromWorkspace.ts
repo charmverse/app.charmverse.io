@@ -14,6 +14,12 @@ import { createCharmTextBlock } from 'lib/focalboard/charmBlock';
 import { createCard } from 'lib/focalboard/card';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
+function sleep (ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 // Limit the highest number of pages that can be imported
 const IMPORTED_PAGES_LIMIT = 10000;
 const BLOCKS_FETCHED_PER_REQUEST = 100;
@@ -787,16 +793,18 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }];
 
     async function getChildBlockListResponses () {
-      const childBlockListResponses = (await Promise.all<ChildBlockListResponse>(
-        blockChildrenRequests.map(blockChildrenRequest => new Promise((resolve) => {
-          notion.blocks.children.list(blockChildrenRequest).then((response => resolve({
-            results: response.results as BlockObjectResponse[],
-            // Request contains the block_id, which is used to detect the parent of this group of child blocks
-            request: blockChildrenRequest,
-            next_cursor: response.next_cursor
-          })));
-        }))
-      ));
+      const childBlockListResponses: ChildBlockListResponse[] = [];
+
+      for (const blockChildrenRequest of blockChildrenRequests) {
+        const response = await notion.blocks.children.list(blockChildrenRequest);
+        childBlockListResponses.push({
+          results: response.results as BlockObjectResponse[],
+          // Request contains the block_id, which is used to detect the parent of this group of child blocks
+          request: blockChildrenRequest,
+          next_cursor: response.next_cursor
+        });
+        await sleep(500);
+      }
 
       // Reset the requests as they've all been fetched
       blockChildrenRequests = [];
