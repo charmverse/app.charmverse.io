@@ -164,9 +164,10 @@ interface PageLinkProps {
   labelIcon?: React.ReactNode;
   boardId?: string;
   pageId?: string;
+  showPicker?: boolean
 }
 
-export function PageLink ({ children, href, label, labelIcon, boardId, pageId }: PageLinkProps) {
+export function PageLink ({ showPicker = true, children, href, label, labelIcon, boardId, pageId }: PageLinkProps) {
   const { setPages } = usePages();
   const isempty = !label;
 
@@ -179,10 +180,12 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
     variant: 'popover'
   });
 
+  const triggerState = bindTrigger(popupState);
   return (
     <PageAnchor onClick={stopPropagation}>
       {labelIcon && (
-        <StyledPageIcon icon={labelIcon} {...bindTrigger(popupState)} />
+        // No need to show hover style if we are not showing the picker when the icon is clicked
+        <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
       )}
       <Link passHref href={href}>
         <PageTitle isempty={isempty ? 1 : 0}>
@@ -190,6 +193,7 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
         </PageTitle>
       </Link>
       {children}
+      {showPicker && (
       <Menu {...bindMenu(popupState)}>
         <EmojiPicker onSelect={async (emoji) => {
           if (pageId) {
@@ -217,6 +221,7 @@ export function PageLink ({ children, href, label, labelIcon, boardId, pageId }:
         }}
         />
       </Menu>
+      )}
     </PageAnchor>
   );
 }
@@ -374,6 +379,7 @@ const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((pr
           href={href}
           label={label}
           labelIcon={labelIcon}
+          showPicker={false}
         />
       )}
       nodeId={nodeId}
