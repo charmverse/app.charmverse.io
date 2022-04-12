@@ -12,13 +12,11 @@ import { createBoard, IPropertyTemplate, PropertyType } from 'lib/focalboard/boa
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCharmTextBlock } from 'lib/focalboard/charmBlock';
 import { createCard } from 'lib/focalboard/card';
+import throttledQueue from 'throttled-queue';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
-function sleep (ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
+// At max 3 requests per second with evenly spaced interval
+const throttle = throttledQueue(3, 1000, true);
 
 // Limit the highest number of pages that can be imported
 const IMPORTED_PAGES_LIMIT = 10000;
@@ -793,18 +791,14 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }];
 
     async function getChildBlockListResponses () {
-      const childBlockListResponses: ChildBlockListResponse[] = [];
-
-      for (const blockChildrenRequest of blockChildrenRequests) {
-        const response = await notion.blocks.children.list(blockChildrenRequest);
-        childBlockListResponses.push({
+      const childBlockListResponses = await Promise.all<ChildBlockListResponse>(blockChildrenRequests.map(
+        blockChildrenRequest => throttle(() => notion.blocks.children.list(blockChildrenRequest).then((response => ({
           results: response.results as BlockObjectResponse[],
           // Request contains the block_id, which is used to detect the parent of this group of child blocks
           request: blockChildrenRequest,
           next_cursor: response.next_cursor
-        });
-        await sleep(500);
-      }
+        }))))
+      ));
 
       // Reset the requests as they've all been fetched
       blockChildrenRequests = [];

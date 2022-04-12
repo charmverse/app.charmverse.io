@@ -123,6 +123,7 @@
     "sharp": "^0.30.3",
     "swagger-ui-react": "4.6.1",
     "swr": "^1.2.1",
+    "throttled-queue": "^2.1.2",
     "ts-node": "^10.7.0",
     "tsconfig-paths": "^3.14.1",
     "twemoji": "^14.0.1",
