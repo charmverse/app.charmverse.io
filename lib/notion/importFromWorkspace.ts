@@ -722,6 +722,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     searchResultRecord[block.id] = block;
   }
 
+  log.debug(`[notion] Fetching content for ${searchResults.length} pages`, { spaceId });
+
   for (let index = 0; index < searchResults.length; index++) {
     const failedImportBlocks: [string, number][][] = [];
     const notionPage = searchResults[index];
@@ -738,6 +740,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
     catch (err: any) {
       populateFailedImportRecord(failedImportBlocks, notionPage);
+    }
+    if (index % 10 === 0) {
+      log.debug(`[notion] Fetched ${index + 1} of ${searchResults.length} pages`);
     }
   }
 
@@ -1201,6 +1206,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
   }
 
-  log.debug(pagesWithoutIntegrationAccess);
+  log.info(`[notion] Completed import of ${searchResults.length} pages`, { pagesWithoutIntegrationAccess });
+
   return Object.values(failedImportsRecord);
 }
