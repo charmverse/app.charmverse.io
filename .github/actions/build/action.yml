@@ -18,5 +18,6 @@ runs:
         key: node-modules-${{ github.event.pull_request.head.sha }}
 
     - name: Build
+      shell: bash
       if: steps.cache_build.outputs.cache-hit != 'true'
       run: npm run build
