@@ -1,8 +1,8 @@
 
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { PageFromBlock, Page, PageProperty, mapProperties, validateUpdateData } from 'lib/public-api';
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
+import { PageFromBlock, Page, PageProperty, mapProperties, validateUpdateData, getPageInBoard } from 'lib/public-api';
+import { onError, onNoMatch, requireApiKey, SpaceAccessDeniedError } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -30,44 +30,15 @@ export async function getPage (req: NextApiRequest, res: NextApiResponse) {
 
   const { pageId } = req.query;
 
+  const page = await getPageInBoard(pageId as string);
+
   const spaceId = req.authorizedSpaceId;
 
-  const card = await prisma.block.findFirst({
-    where: {
-      type: 'card',
-      id: pageId as string,
-      spaceId
-    }
-  });
-
-  if (!card) {
-    return res.status(404).send({ error: 'Page not found' });
-  }
-  const board = await prisma.block.findFirst({
-    where: {
-      // Parameter only added for documentation purposes. All cards linked to a root board
-      type: 'board',
-      id: card.rootId,
-      spaceId
-    }
-  });
-
-  if (!board) {
-    return res.status(404).send({ error: 'Board not found' });
+  if (spaceId !== page.spaceId) {
+    throw new SpaceAccessDeniedError();
   }
 
-  const cardPageContent = await prisma.block.findFirst({
-    where: {
-      type: 'charm_text',
-      parentId: card.id
-    }
-  });
-
-  const boardSchema = (board.fields as any).cardProperties as PageProperty[];
-
-  const cardToReturn = new PageFromBlock(card, boardSchema, (cardPageContent?.fields as any)?.content);
-
-  return res.status(200).json(cardToReturn);
+  return res.status(200).json(page);
 }
 
 /**
