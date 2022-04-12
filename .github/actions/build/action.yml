@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: .next
-        key: node-modules-${{ github.event.pull_request.head.sha }}
+        key: next-build-${{ github.event.pull_request.head.sha }}
 
     - name: Build
       shell: bash
