@@ -24,7 +24,8 @@ async function login (req: NextApiRequest, res: NextApiResponse) {
   const state: NotionState = {
     redirect: encodeURIComponent(req.query.redirect as string)
   };
-  const redirectUri = req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/notion/callback` : 'https://app.charmverse.io/api/notion/callback';
+  const proto = (req.headers['x-forwarded-proto'] || (req.connection as any)?.encrypted) ? 'https' : 'http';
+  const redirectUri = `${proto}://${req.headers.host}/api/notion/callback`;
   const oauthUrl = `${notionUrl}&state=${JSON.stringify(state)}&redirect_uri=${encodeURIComponent(redirectUri)}`;
   res.redirect(oauthUrl);
 }

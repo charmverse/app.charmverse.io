@@ -43,9 +43,11 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse<{
   const encodedToken = Buffer.from(`${process.env.NOTION_OAUTH_CLIENT_ID}:${process.env.NOTION_OAUTH_SECRET}`).toString('base64');
 
   try {
+    const proto = (req.headers['x-forwarded-proto'] || (req.connection as any)?.encrypted) ? 'https' : 'http';
+
     const token = await http.POST<NotionApiResponse>('https://api.notion.com/v1/oauth/token', {
       grant_type: 'authorization_code',
-      redirect_uri: req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/notion/callback` : 'https://app.charmverse.io/api/notion/callback',
+      redirect_uri: `${proto}://${req.headers.host}/api/notion/callback`,
       code: tempAuthCode
     }, {
       headers: {
