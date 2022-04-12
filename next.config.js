@@ -10,6 +10,9 @@ const config = {
       },
       '@mui/icons-material': {
         transform: '@mui/icons-material/{{member}}'
+      },
+      lodash: {
+        transform: 'lodash/{{member}}'
       }
     }
   },
