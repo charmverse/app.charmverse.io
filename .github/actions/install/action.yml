@@ -1,13 +1,5 @@
 
-name: "Install and build application"
-
-# on:
-#   push:
-#     branches: [main]
-#   pull_request:
-#     branches: [main]
-# on:
-#   workflow_call:
+name: "Install dependencies"
 
 runs:
   using: 'composite'

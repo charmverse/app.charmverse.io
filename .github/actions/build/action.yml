@@ -1,0 +1,22 @@
+
+name: "Build application"
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: "16"
+
+    - name: Cache build
+      id: cache_build
+      uses: actions/cache@v2
+      with:
+        path: .next
+        key: node-modules-${{ github.event.pull_request.head.sha }}
+
+    - name: Build
+      if: steps.cache_build.outputs.cache-hit != 'true'
+      run: npm run build
