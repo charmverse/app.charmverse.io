@@ -92,25 +92,21 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
         cardId: cardBlock.id,
         createdAt: cardBlock.createdAt,
         path: `page-${cardBlock.id}`,
-        title: cardBlock.fields.title,
+        title: cardBlock.title,
         icon: cardBlock.fields.icon,
         type: 'page',
         headerImage: cardBlock.fields.headerImage,
         contentText: '',
-        author: {
-          connect: {
-            id: cardBlock.createdBy
-          }
-        }
+        parentId: cardBlock.parentId
       }));
+      await prisma.block.createMany({
+        data: newBlocks
+      });
       if (cardPages.length !== 0) {
         await prisma.page.createMany({
           data: cardPages
         });
       }
-      await prisma.block.createMany({
-        data: newBlocks
-      });
       return res.status(200).json(newBlocks);
     }
   }
