@@ -38,8 +38,8 @@ export class CdkDeployStack extends Stack {
       },
       {
         namespace: 'aws:elasticbeanstalk:environment',
-        optionName: 'LoadBalancerType',
-        value: 'application'
+        optionName: 'EnvironmentType',
+        value: 'SingleInstance'
       },
       // {
       //   namespace: 'aws:elasticbeanstalk:environment',
