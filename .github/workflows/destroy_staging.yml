@@ -35,6 +35,7 @@ jobs:
         # we need to create a dummy zip file or else cdk throws an error it cannot find the asset
         run: |
           touch deploy.zip
+          npm install aws-cdk-lib --no-audit --no-fund
           npm run destroy:staging
 
       - name: delete the github deployments and the corresponding environment

@@ -62,7 +62,7 @@ jobs:
       - name: Deploy to staging
         id: cdk_deploy
         run: |
-          npm install aws-cdk-lib
+          npm install aws-cdk-lib --no-audit --no-fund
           npm run deploy:staging
 
       - name: update the github deployment status
