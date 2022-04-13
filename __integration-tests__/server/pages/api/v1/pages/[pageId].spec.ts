@@ -10,7 +10,7 @@ import { baseUrl } from 'testing/mockApiCall';
 
 describe('GET /api/v1/pages/{pageId}', () => {
 
-  it('should return the page', async () => {
+  it('should respond with 200 and return the page', async () => {
 
     const { user, space, apiToken } = await generateUserAndSpaceWithApiToken(v4());
 

@@ -12,7 +12,7 @@ export function requireSpaceMembership (role?: SpaceRole['role']) {
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 
     if (!req.session.user) {
-      return new ApiError({
+      throw new ApiError({
         message: 'Please log in',
         errorType: 'Access denied'
       });

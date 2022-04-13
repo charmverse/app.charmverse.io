@@ -44,13 +44,9 @@ export async function createPage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  console.log('Boardspace', board?.spaceId, 'spaceId', spaceId);
-
   if (!board || (board.spaceId !== spaceId)) {
     throw new DatabasePageNotFoundError(id as string);
   }
-
-  console.log('Passed');
 
   validateCreationData(req.body);
 
