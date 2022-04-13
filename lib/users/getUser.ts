@@ -4,8 +4,6 @@ import { prisma } from 'db';
 
 type UserIdentifiers = Extract<keyof User, 'id' | 'addresses'>
 
-export type UserProfileQuery = Partial<Record<UserIdentifiers, string>>
-
 export async function getUserProfile (key: UserIdentifiers, value: string): Promise<LoggedInUser> {
 
   const query: Prisma.UserWhereInput = {};
