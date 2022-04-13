@@ -1,6 +1,21 @@
-import { DiscordServerRole } from 'pages/api/discord/importRoles';
 import { prisma } from 'db';
 import { Role } from '@prisma/client';
+
+export interface DiscordServerRole {
+  id: string
+  name: string
+  color: number
+  hoist: boolean
+  icon?: string
+  position: number
+  permissions: string
+  managed: boolean
+  mentionable: boolean
+  tags?: {
+    bot_id?: string
+    integration_id?: string
+  }[]
+}
 
 type RolesRecord = Record<string, { discord: DiscordServerRole, charmverse: Role | null }>;
 
@@ -15,9 +30,8 @@ export async function findOrCreateRolesFromDiscord (
   const rolesRecord: RolesRecord = {};
   // Create all of the discord roles fist
   for (const discordServerRole of discordServerRoles) {
-    // Skip the @everyone role, this is assigned to all the members of the workspace
+    // Skip the @everyone role, this is assigned to all the members of the server
     if (discordServerRole.name !== '@everyone') {
-      let charmVerseRole: Role | null = null;
       // First check if a role with the same name already exist in the workspace
       const existingRole = await prisma.role.findFirst({
         where: {
@@ -26,10 +40,27 @@ export async function findOrCreateRolesFromDiscord (
         }
       });
 
+      let charmVerseRole = existingRole;
+
       // Only create the role if it doesn't already exist
-      if (!existingRole && createRoles) {
-        charmVerseRole = await prisma.role.create({
-          data: {
+      if (createRoles) {
+        charmVerseRole = await prisma.role.upsert({
+          where: {
+            spaceId_name: {
+              spaceId,
+              name: discordServerRole.name
+            }
+          },
+          update: {
+            name: discordServerRole.name,
+            space: {
+              connect: {
+                id: spaceId
+              }
+            },
+            createdBy: userId
+          },
+          create: {
             name: discordServerRole.name,
             space: {
               connect: {
@@ -39,9 +70,6 @@ export async function findOrCreateRolesFromDiscord (
             createdBy: userId
           }
         });
-      }
-      else {
-        charmVerseRole = existingRole;
       }
 
       rolesRecord[discordServerRole.id] = {

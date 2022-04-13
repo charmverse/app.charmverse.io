@@ -30,6 +30,11 @@ const StyledColumnBlock = styled.div`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   position: relative;
   transition: background-color 250ms ease-in-out;
+  
+  &:hover {
+    transition: background-color 250ms ease-in-out;
+    background-color: ${({ theme }) => theme.palette.background.light};
+  }
 
   & .bangle-nv-content p {
     overflow-wrap: anywhere;

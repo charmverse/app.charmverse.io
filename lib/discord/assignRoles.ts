@@ -1,6 +1,19 @@
 import { Role } from '@prisma/client';
-import { DiscordGuildMember, DiscordServerRole } from 'pages/api/discord/importRoles';
 import { prisma } from 'db';
+import { DiscordServerRole } from './createRoles';
+import { DiscordAccount } from './loginByDiscord';
+
+export interface DiscordGuildMember {
+  user?: DiscordAccount
+  nick?: string
+  avatar?: string
+  roles: string[]
+  joined_at: string
+  deaf: boolean
+  mute: boolean
+  pending?: boolean
+  permissions?: string
+}
 
 export async function assignRolesFromDiscord (rolesRecord: Record<string,
   { discord: DiscordServerRole, charmverse: Role | null }>, discordGuildMembers: DiscordGuildMember[], spaceId: string) {

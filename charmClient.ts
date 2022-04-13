@@ -14,7 +14,7 @@ import { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
-import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import type { FailedImportsError } from 'lib/notion/types';
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';

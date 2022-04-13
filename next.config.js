@@ -3,6 +3,19 @@ const path = require('path');
 const config = {
   poweredByHeader: false,
   webpack5: true,
+  experimental: {
+    modularizeImports: {
+      '@mui/material': {
+        transform: '@mui/material/{{member}}'
+      },
+      '@mui/icons-material': {
+        transform: '@mui/icons-material/{{member}}'
+      },
+      lodash: {
+        transform: 'lodash/{{member}}'
+      }
+    }
+  },
   async redirects () {
     return [
       {
