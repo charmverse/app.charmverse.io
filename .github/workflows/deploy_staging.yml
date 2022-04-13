@@ -1,0 +1,76 @@
+
+name: "Deploy to staging"
+
+on:
+  pull_request:
+    types: [labeled, opened, synchronize]
+
+jobs:
+  deploy:
+    if: |
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy') ||
+      (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))
+    runs-on: ubuntu-latest
+    # prevent workflows running in parallel
+    concurrency: deploy-pr-app-${{ github.head_ref }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies and build app
+        uses: ./.github/actions/install
+
+      - name: Build app
+        uses: ./.github/actions/build
+
+      - name: Remove dev dependencies
+        run: |
+          npm prune --production
+          rm -rf .next/cache
+          rm .ebextensions/02_alb-http-to-https-redirection.config
+
+      - name: Change start command
+        # use -i- otherwise sed thinks "Dockerfile" is a command line argument, then we have to clean up Dockerfile-
+        run: sed -i- 's/start:prod/start:staging/g' Dockerfile && rm Dockerfile-
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Set STAGE variable in environment for next steps
+        run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+
+      - name: Create a github deployment
+        uses: bobheadxi/deployments@v0.5.2
+        id: deployment
+        with:
+          step: start
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env: ${{ env.STAGE }}
+          ref: ${{ github.head_ref }}
+          no_override: false
+          transient: true
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Package
+        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+
+      - name: Deploy to staging
+        id: cdk_deploy
+        run: |
+          npm install aws-cdk-lib --no-audit --no-fund
+          npm run deploy:staging
+
+      - name: update the github deployment status
+        uses: bobheadxi/deployments@v0.5.2
+        if: always()
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          env_url: ${{ steps.cdk_deploy.outputs.env_url }}

@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { alpha } from '@mui/material';
+import { alpha } from '@mui/system';
 import styled from '@emotion/styled';
 
 const StyledPlaceholder = styled.div`
