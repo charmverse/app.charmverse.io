@@ -27,11 +27,11 @@ handler.get(async (req, res) => {
   const cookies = new Cookies(req, res);
 
   if (typeof tempAuthCode === 'string') {
-    cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false });
+    cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false, sameSite: 'strict' });
   }
   else {
     log.warn('Error importing from notion', req.query);
-    cookies.set(AUTH_ERROR_COOKIE, 'There was an error from Notion. Please try again', { httpOnly: false });
+    cookies.set(AUTH_ERROR_COOKIE, 'There was an error from Notion. Please try again', { httpOnly: false, sameSite: 'strict' });
   }
 
   res.redirect(redirect);

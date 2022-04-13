@@ -5,13 +5,12 @@ import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
-import { findOrCreateRolesFromDiscord } from 'lib/discord/createRoles';
-import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
+import { findOrCreateRolesFromDiscord, DiscordServerRole } from 'lib/discord/createRoles';
+import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
 import { DiscordUser } from '@prisma/client';
 import log from 'lib/log';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import { DiscordAccount } from 'lib/discord/loginByDiscord';
-import { DiscordGuildMember, DiscordServerRole } from './importRoles';
 
 const handler = nc({
   onError,

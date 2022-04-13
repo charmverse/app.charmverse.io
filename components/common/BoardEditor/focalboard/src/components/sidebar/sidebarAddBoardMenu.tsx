@@ -31,7 +31,7 @@ type Props = {
 export const addBoardClicked = async (showBoard: (id: string) => void, intl: IntlShape, activeBoardId?: string) => {
     const oldBoardId = activeBoardId
 
-    const board = createBoard()
+    const board = createBoard({addDefaultProperty: true})
     board.rootId = board.id
 
     const view = createBoardView()
