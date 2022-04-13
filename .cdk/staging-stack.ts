@@ -77,6 +77,7 @@ export class CdkDeployStack extends Stack {
     // Create an Elastic Beanstalk environment to run the application
     const ebEnv = new elasticbeanstalk.CfnEnvironment(this, 'Environment', {
       environmentName: appName,
+      cnamePrefix: process.env.STACK,
       applicationName: ebApp.applicationName || appName,
       solutionStackName: '64bit Amazon Linux 2 v3.4.13 running Docker',
       optionSettings: optionSettingProperties,
@@ -95,7 +96,7 @@ export class CdkDeployStack extends Stack {
       //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
       target: route53.RecordTarget.fromAlias({
         bind: (): route53.AliasRecordTargetConfig => ({
-          dnsName: ebEnv.attrEndpointUrl,
+          dnsName: `${process.env.STACK}.us-east-1.elasticbeanstalk.com`,
           // https://docs.aws.amazon.com/general/latest/gr/elasticbeanstalk.html
           hostedZoneId: 'Z117KPS5GTRQ2G' // for us-east-1
         })
