@@ -12,11 +12,7 @@ import { createBoard, IPropertyTemplate, PropertyType } from 'lib/focalboard/boa
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCharmTextBlock } from 'lib/focalboard/charmBlock';
 import { createCard } from 'lib/focalboard/card';
-import throttledQueue from 'throttled-queue';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
-
-// At max 3 requests per second with evenly spaced interval
-const throttle = throttledQueue(3, 1000, true);
 
 // Limit the highest number of pages that can be imported
 const IMPORTED_PAGES_LIMIT = 10000;
