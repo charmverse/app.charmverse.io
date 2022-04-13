@@ -15,6 +15,7 @@ datasource db {
 enum PageType {
   board
   page
+  card
 }
 
 enum PermissionLevel {
