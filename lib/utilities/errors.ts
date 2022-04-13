@@ -25,6 +25,8 @@ export interface ISystemError {
   error: any
 }
 
+export type ISystemErrorInput = Pick<ISystemError, 'message' | 'errorType'> & Partial<Pick<ISystemError, 'severity' | 'error'>>
+
 export class SystemError implements ISystemError {
 
   code: number;
@@ -39,7 +41,7 @@ export class SystemError implements ISystemError {
 
   error: any;
 
-  constructor (errorInfo: Pick<ISystemError, 'message' | 'errorType'> & Partial<Pick<ISystemError, 'severity' | 'error'>>) {
+  constructor (errorInfo: ISystemErrorInput) {
     this.errorType = errorInfo.errorType;
     this.code = ErrorCodes[this.errorType];
     this.message = errorInfo.message;
@@ -54,6 +56,3 @@ export class SystemError implements ISystemError {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IApiError extends ISystemError {}
 
-export interface IUserError extends ISystemError {
-  severity: ErrorSeverity
-}
