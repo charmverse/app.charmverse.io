@@ -53,7 +53,7 @@ export class CdkDeployStack extends Stack {
       },
       {
         namespace: 'aws:elbv2:listener:443',
-        optionName: 'SSLCertificateId',
+        optionName: 'SSLCertificateArns',
         value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339',
       },
       {
