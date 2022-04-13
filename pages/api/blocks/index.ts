@@ -91,13 +91,14 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
         spaceId: cardBlock.spaceId,
         cardId: cardBlock.id,
         createdAt: cardBlock.createdAt,
-        path: `page-${cardBlock.id}`,
+        path: `page-${Math.random().toString().replace('0.', '')}`,
         title: cardBlock.title,
         icon: cardBlock.fields.icon,
-        type: 'page',
+        type: 'card',
         headerImage: cardBlock.fields.headerImage,
         contentText: '',
-        parentId: cardBlock.parentId
+        parentId: cardBlock.parentId,
+        updatedAt: cardBlock.updatedAt
       }));
       await prisma.block.createMany({
         data: newBlocks

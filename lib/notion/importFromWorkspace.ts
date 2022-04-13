@@ -504,7 +504,7 @@ async function createPrismaPage ({
   parentId,
   cardId
 }: CreatePageInput) {
-
+  const pagePathId = Math.random().toString().replace('0.', '');
   const pageToCreate: Prisma.PageCreateInput = {
     id,
     content,
@@ -518,7 +518,7 @@ async function createPrismaPage ({
     },
     updatedAt: new Date(),
     updatedBy: createdBy,
-    path: `page-${id}`,
+    path: `page-${pagePathId}`,
     space: {
       connect: {
         id: spaceId || undefined
