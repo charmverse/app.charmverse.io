@@ -124,8 +124,7 @@ export function getCookie (name: string): string {
 export function setCookie (name: string, value: string, expiresInDays: number = 10 * 365) {
   const expires = new Date();
   expires.setDate(expires.getDate() + expiresInDays);
-  const domainString = window.location.hostname === 'localhost' ? '' : 'domain=app.charmverse.io; ';
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; ${domainString}path=/; SameSite=Lax; secure`;
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; secure`;
 }
 
 export function deleteCookie (name: string) {
