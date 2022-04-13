@@ -1,4 +1,4 @@
-import { uniqueValues, sortArrayByObjectProperty } from './array';
+import { uniqueValues, sortArrayByObjectProperty } from '../array';
 
 describe('uniqueValues', () => {
   it('should only return unique values', () => {
