@@ -1,7 +1,7 @@
 import { Client } from '@notionhq/client';
 import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
-import { Prisma } from '@prisma/client';
+import { PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { v4 as uuid } from 'uuid';
 import log from 'lib/log';
@@ -12,6 +12,8 @@ import { createBoard, IPropertyTemplate, PropertyType } from 'lib/focalboard/boa
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCharmTextBlock } from 'lib/focalboard/charmBlock';
 import { createCard } from 'lib/focalboard/card';
+import promiseRetry from 'promise-retry';
+import { isTruthy } from 'lib/utilities/types';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
@@ -732,9 +734,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         await createPage([[notionPage.id, uuid()]], failedImportBlocks);
       }
       else if (notionPage.object === 'database') {
-        if (notionPage.id.replaceAll('-', '') === 'ca7562fc2c484024898fe3a22f0265f2') {
-          throw new Error();
-        }
         await createDatabaseAndPopulateCache(notionPage);
       }
       if (failedImportBlocks.length !== 0) {
@@ -784,28 +783,43 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     };
 
     // Array to store parameters for further requests to retrieve children blocks
-    let blockChildrenRequests: ListBlockChildrenParameters[] = [{
+    let listBlockChildrenParameters: ListBlockChildrenParameters[] = [{
       block_id: notionPageId,
       page_size: BLOCKS_FETCHED_PER_REQUEST
     }];
 
-    async function getChildBlockListResponses () {
-      const childBlockListResponses = await Promise.all<ChildBlockListResponse>(blockChildrenRequests.map(
-        blockChildrenRequest => notion.blocks.children.list(blockChildrenRequest).then((response => ({
-          results: response.results as BlockObjectResponse[],
-          // Request contains the block_id, which is used to detect the parent of this group of child blocks
-          request: blockChildrenRequest,
+    function getChildren (listBlockChildrenParameter: ListBlockChildrenParameters) {
+      return promiseRetry<ChildBlockListResponse | void>((retry) => {
+        return notion.blocks.children.list(listBlockChildrenParameter).then(response => ({
+          results: response.results,
+          request: listBlockChildrenParameter,
           next_cursor: response.next_cursor
-        })))
-      ));
+        } as ChildBlockListResponse))
+          .catch(error => {
+            if (error.status > 499) {
+              retry(error);
+            }
+            else {
+              throw error;
+            }
+          });
+      }, {
+        retries: 3
+      });
+    }
+
+    async function getListBlockChildrenResponses (): Promise<ChildBlockListResponse[]> {
+      const childBlockListResponses = await Promise.all(listBlockChildrenParameters
+        .map(listBlockChildrenParameter => getChildren(listBlockChildrenParameter)))
+        .then(_results => _results.filter(isTruthy));
 
       // Reset the requests as they've all been fetched
-      blockChildrenRequests = [];
+      listBlockChildrenParameters = [];
 
       childBlockListResponses.forEach(childBlockListResponse => {
-      // If next_cursor exist then this block contains more child blocks
+        // If next_cursor exist then this block contains more child blocks
         if (childBlockListResponse.next_cursor) {
-          blockChildrenRequests.push({
+          listBlockChildrenParameters.push({
           // Using the request.block_id to get the block's parent id
             block_id: childBlockListResponse.request.block_id,
             page_size: BLOCKS_FETCHED_PER_REQUEST,
@@ -816,6 +830,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
       return childBlockListResponses;
     }
+
     // notion.pages.retrieve will return an error if the integration doesn't have access to the page
     try {
       // If the page doesn't exist in the cache fetch it
@@ -827,24 +842,24 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       // Blocks like callout, quote, all forms of list allow other blocks to be nested inside them
       for (let depth = 0; depth < MAX_CHILD_BLOCK_DEPTH; depth++) {
       // While there are more children to be fetched
-        if (blockChildrenRequests.length !== 0) {
+        if (listBlockChildrenParameters.length !== 0) {
 
-          log.debug(`[notion] - ${blockChildrenRequests.length} Requests for child blocks at depth: ${depth}`);
+          log.debug(`[notion] - ${listBlockChildrenParameters.length} Requests for child blocks at depth: ${depth}`);
 
-          const childBlockListResponses = await getChildBlockListResponses();
+          const childBlockListResponses = await getListBlockChildrenResponses();
 
           // If the block has more child to be fetch, this will be true
-          while (blockChildrenRequests.length !== 0) {
-            childBlockListResponses.push(...await getChildBlockListResponses());
+          while (listBlockChildrenParameters.length !== 0) {
+            childBlockListResponses.push(...await getListBlockChildrenResponses());
           }
 
           // Reset the requests as they've all been fetched
-          blockChildrenRequests = [];
+          listBlockChildrenParameters = [];
 
           // Now that all child content has been fetched, we need to check if any of the child block has children or not
           // Go through each of the block and add them to the record
           // eslint-disable-next-line
-        childBlockListResponses.forEach((childBlockListResponse) => {
+          childBlockListResponses.forEach((childBlockListResponse) => {
             childBlockListResponse.results.forEach((block) => {
               const blockWithChildren: BlockWithChildren = {
                 ...block,
@@ -863,7 +878,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
               // If the block has children then we need to fetch them as well
               if (block.type.match(BlocksWithChildrenRegex) && block.has_children) {
-                blockChildrenRequests.push({
+                listBlockChildrenParameters.push({
                   block_id: block.id,
                   page_size: BLOCKS_FETCHED_PER_REQUEST
                 });
@@ -1069,7 +1084,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             headerImage,
             icon: emoji,
             parentId: database.id,
-            content: pageContent
+            content: pageContent,
+            type: 'card' as PageType
           };
           createdCards[notionPageId] = {
             notionPageId,
@@ -1114,14 +1130,16 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     createdBy: userId
   });
 
-  const ungroupedPage = await createPrismaPage({
+  const ungroupedPageInput = {
     id: uuid(),
     icon: null,
     spaceId,
     title: 'Ungrouped',
     createdBy: userId,
     parentId: workspacePage.id
-  });
+  };
+
+  let totalUngroupedPages = 0;
 
   async function createCharmversePage (blockId: string, type: 'page' | 'database', parentId?: string | null) {
     try {
@@ -1166,7 +1184,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         let parentId = null;
         const failedToImportParent = failedImportsRecord[block.parent.page_id] && failedImportsRecord[block.parent.page_id].blocks.length === 0;
         if (failedToImportParent) {
-          parentId = ungroupedPage.id;
+          totalUngroupedPages += 1;
+          parentId = ungroupedPageInput.id;
         }
         // If the parent was created successfully
         // Or if we failed to import some blocks from the parent (partial success)
@@ -1178,7 +1197,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         else {
           // Parent id could be a block, for example there could be a nested page inside a callout/quote/column block
           // Here parent.page_id is not actually the the id of the page, its the id of the nearest parent of the page, which could be callout/quote/column block
-          parentId = createdPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPage.id;
+          parentId = createdPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPageInput.id;
         }
 
         await createCharmversePage(block.id, block.object, parentId);
@@ -1230,6 +1249,11 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       await createCharmversePageFromNotionPage(block);
     }
   }
+
+  if (totalUngroupedPages > 0) {
+    await createPrismaPage(ungroupedPageInput);
+  }
+
   log.info(`[notion] Completed import of ${searchResults.length} pages`, { pagesWithoutIntegrationAccess });
 
   return Object.values(failedImportsRecord).slice(0, 25);
