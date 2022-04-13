@@ -121,13 +121,12 @@ export function getCookie (name: string): string {
 }
 
 // cookies reference: https://developer.mozilla.org/en-US/docs/Web/API/document/cookie
-export function setCookie (name: string, value: string, expiresInDays: number = 10 * 365) {
+export function setCookie ({ name, value, expiresInDays = 10 * 365 }: { name: string, value: string, expiresInDays: number }) {
   const expires = new Date();
   expires.setDate(expires.getDate() + expiresInDays);
-  const domainString = window.location.hostname === 'localhost' ? '' : 'domain=app.charmverse.io; ';
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; ${domainString}path=/; SameSite=Lax; secure`;
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; secure`;
 }
 
 export function deleteCookie (name: string) {
-  setCookie(name, '', 0);
+  setCookie({ name, value: '', expiresInDays: 0 });
 }
