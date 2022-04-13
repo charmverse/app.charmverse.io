@@ -38,7 +38,7 @@ jobs:
         uses: ./.github/actions/build
 
       - name: Apply patches
-        run: patch-package
+        run: npx patch-package
 
       - name: Setup test database
         run: bash ./testing/configure-db.sh
