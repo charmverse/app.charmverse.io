@@ -2,6 +2,9 @@ import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
+import * as route53 from 'aws-cdk-lib/aws-route53';
+
+const domain = 'charmverse.co';
 
 export class CdkDeployStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -78,12 +81,31 @@ export class CdkDeployStack extends Stack {
       versionLabel: appVersionProps.ref,
     });
 
+    const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
+      domainName: domain
+    });
+
+    const deploymentDomain = `${process.env.STAGE || ''}.${domain}`;
+
+    new route53.ARecord(this, 'ARecord', {
+      zone,
+      recordName: deploymentDomain,
+      target: route53.RecordTarget.fromIpAddresses(ebEnv.attrEndpointUrl)
+      // target: {
+      //   bind: (): route53.AliasRecordTargetConfig => ({
+      //     dnsName: ebEnv.attrEndpointUrl,
+      //     // https://docs.aws.amazon.com/general/latest/gr/rande.html#elasticbeanstalk_region
+      //     hostedZoneId: 'Z14LCN19Q5QHIC' // for us-east-1
+      //   })
+      // }
+    });
+
     /**
      * Output the distribution's url so we can pass it to external systems
     *  Note: something at the end of the path is required or the Load balancer url never resolves
      */
      new CfnOutput(this, "DeploymentUrl", {
-      value: 'http://' + ebEnv.attrEndpointUrl + '/login',
+      value: 'http://' + deploymentDomain + '/login',
     });
   }
 }
