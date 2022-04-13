@@ -1,7 +1,7 @@
 import { Client } from '@notionhq/client';
 import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
-import { Prisma } from '@prisma/client';
+import { PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { v4 as uuid } from 'uuid';
 import log from 'lib/log';
@@ -1084,7 +1084,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             headerImage,
             icon: emoji,
             parentId: database.id,
-            content: pageContent
+            content: pageContent,
+            type: 'card' as PageType
           };
           createdCards[notionPageId] = {
             notionPageId,
