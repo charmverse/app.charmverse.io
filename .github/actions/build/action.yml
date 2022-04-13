@@ -5,12 +5,17 @@ runs:
   using: 'composite'
   steps:
 
-    # - name: Cache build
-    #   id: cache_build
-    #   uses: actions/cache@v2
-    #   with:
-    #     path: .next
-    #     key: next-build-${{ github.event.pull_request.head.sha }}
+    - name: Show GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+
+    - name: Cache build
+      id: cache_build
+      uses: actions/cache@v2
+      with:
+        path: .next
+        key: next-build-${{ github.sha }}
 
     - name: Build
       shell: bash
