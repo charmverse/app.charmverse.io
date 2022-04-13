@@ -733,6 +733,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     const notionPage = searchResults[index];
     try {
       if (notionPage.object === 'page') {
+        // if (notionPage.id === '87d24f14-c68b-485d-93c9-ef49c8b24d53') {
+        //   throw new Error();
+        // }
         await createPage([[notionPage.id, uuid()]], failedImportBlocks);
       }
       else if (notionPage.object === 'database') {
@@ -792,12 +795,12 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
     async function getChildBlockListResponses () {
       const childBlockListResponses = await Promise.all<ChildBlockListResponse>(blockChildrenRequests.map(
-        blockChildrenRequest => throttle(() => notion.blocks.children.list(blockChildrenRequest).then((response => ({
+        blockChildrenRequest => notion.blocks.children.list(blockChildrenRequest).then((response => ({
           results: response.results as BlockObjectResponse[],
           // Request contains the block_id, which is used to detect the parent of this group of child blocks
           request: blockChildrenRequest,
           next_cursor: response.next_cursor
-        }))))
+        })))
       ));
 
       // Reset the requests as they've all been fetched
@@ -1115,6 +1118,15 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     createdBy: userId
   });
 
+  const ungroupedPage = await createPrismaPage({
+    id: uuid(),
+    icon: null,
+    spaceId,
+    title: 'Ungrouped',
+    createdBy: userId,
+    parentId: workspacePage.id
+  });
+
   async function createCharmversePage (blockId: string, type: 'page' | 'database', parentId?: string | null) {
     try {
       await createPrismaPage({
@@ -1166,7 +1178,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       else {
         // Parent id could be a block, for example there could be a nested page inside a callout/quote/column block
         // Here parent.page_id is not actually the the id of the page, its the id of the nearest parent of the page, which could be callout/quote/column block
-        parentId = createdPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? workspacePage.id;
+        parentId = createdPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPage.id;
       }
 
       if (!createdPagesSet.has(block.id)) {
@@ -1200,10 +1212,12 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     createdPagesSet.add(block.id);
   }
 
+  console.log(JSON.stringify(failedImportsRecord, null, 2));
+
   for (let index = 0; index < charmversePageIds.length; index++) {
     const charmversePageId = charmversePageIds[index];
     const block = searchResultRecord[charmversePageId];
-    if (block?.object === 'database' || block?.object === 'page') {
+    if ((block?.object === 'database' || block?.object === 'page') && !failedImportsRecord[block.id]) {
       await createCharmversePageFromNotionPage(block);
     }
   }
