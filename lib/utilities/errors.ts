@@ -16,18 +16,18 @@ type ErrorType = keyof typeof ErrorCodes
 /**
  * @error used for providing structured JSON or a stack trace
  */
-export interface ISystemError {
+export interface ISystemError<E = any> {
   code: number,
   errorType: ErrorType
   message: string,
   errorConstructor: string
   severity: ErrorSeverity
-  error: any
+  error: E
 }
 
-export type ISystemErrorInput = Pick<ISystemError, 'message' | 'errorType'> & Partial<Pick<ISystemError, 'severity' | 'error'>>
+export type ISystemErrorInput<E = any> = Pick<ISystemError<E>, 'message' | 'errorType'> & Partial<Pick<ISystemError<E>, 'severity' | 'error'>>
 
-export class SystemError implements ISystemError {
+export class SystemError<E = any> implements ISystemError<E> {
 
   code: number;
 
@@ -39,15 +39,15 @@ export class SystemError implements ISystemError {
 
   severity: ErrorSeverity;
 
-  error: any;
+  error: E;
 
-  constructor (errorInfo: ISystemErrorInput) {
+  constructor (errorInfo: ISystemErrorInput<E>) {
     this.errorType = errorInfo.errorType;
     this.code = ErrorCodes[this.errorType];
     this.message = errorInfo.message;
     this.errorConstructor = this.constructor.name;
     this.severity = errorInfo.severity ?? 'error';
-    this.error = errorInfo.error ?? {};
+    this.error = errorInfo.error ?? {} as any;
   }
 
 }

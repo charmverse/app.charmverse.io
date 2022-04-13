@@ -1,4 +1,4 @@
-import { SystemError } from 'lib/utilities/errors';
+import { ISystemErrorInput, SystemError } from 'lib/utilities/errors';
 
 export class PageNotFoundError extends SystemError {
 
@@ -22,9 +22,20 @@ export class DatabasePageNotFoundError extends SystemError {
   }
 }
 
-export interface UnsupportedKeysError<E = any> {
-  error: string
+export interface UnsupportedKeyDetails<E = any> {
   unsupportedKeys: string [],
   allowedKeys: string [],
   example: E
+}
+
+export class UnsupportedKeysError<D = any> extends SystemError<UnsupportedKeyDetails> {
+
+  constructor (errorInfo: Pick<ISystemErrorInput<UnsupportedKeyDetails<D>>, 'error' | 'message'>) {
+    super({
+      errorType: 'Invalid input',
+      message: errorInfo.message,
+      error: errorInfo.error,
+      severity: 'warning'
+    });
+  }
 }

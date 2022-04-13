@@ -1,5 +1,5 @@
 import { PageQuery, PaginatedQuery, Page } from './interfaces';
-import { UnsupportedKeysError } from './errors';
+import { UnsupportedKeyDetails, UnsupportedKeysError } from './errors';
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
@@ -26,8 +26,8 @@ export function validatePageQuery (query: PageQuery): true {
   }
 
   if (unsupportedKeys.length > 0) {
-    throw <UnsupportedKeysError>{
-      error: 'Your query content for pages contains unsupported keys',
+
+    const errorDetails: UnsupportedKeyDetails = {
       unsupportedKeys,
       allowedKeys: supportedKeys,
       example: {
@@ -39,6 +39,12 @@ export function validatePageQuery (query: PageQuery): true {
         }
       }
     };
+
+    throw new UnsupportedKeysError({
+      message: 'Your query content for pages contains unsupported keys',
+      error: errorDetails
+    });
+
   }
 
   return true;
@@ -58,15 +64,16 @@ export function validateCreationData (creationData: PageQuery): true {
     return true;
   }
   catch (error) {
-    const modifiedError: UnsupportedKeysError<Pick<Page, 'title' | 'properties'>> = { ...(error as any) };
+    const modifiedError = error as UnsupportedKeysError<Pick<Page, 'title' | 'properties'>>;
 
-    modifiedError.error = 'Invalid data inside your creation data';
-    modifiedError.example = {
+    modifiedError.error.example = {
       title: 'Page title',
       properties: {
         customProperty: 'initial value'
       }
     };
+
+    modifiedError.message = 'Invalid data inside your creation data';
 
     throw modifiedError;
   }
@@ -86,9 +93,8 @@ export function validateUpdateData (creationData: PageQuery): true {
     return true;
   }
   catch (error) {
-    const modifiedError: UnsupportedKeysError<Pick<Page, 'title' | 'properties'>> = { ...(error as any) };
+    const modifiedError: UnsupportedKeyDetails<Pick<Page, 'title' | 'properties'>> = { ...(error as any) };
 
-    modifiedError.error = 'Invalid data inside your update data';
     modifiedError.example = {
       title: 'New page title',
       properties: {
@@ -96,7 +102,11 @@ export function validateUpdateData (creationData: PageQuery): true {
       }
     };
 
-    throw modifiedError;
+    throw new UnsupportedKeysError({
+      message: 'Invalid data inside your update data',
+      error: modifiedError
+    });
+
   }
 }
 

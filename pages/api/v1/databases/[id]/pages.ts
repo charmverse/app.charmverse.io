@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
+import { ApiError, onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4, validate } from 'uuid';
@@ -42,7 +42,10 @@ export async function createPage (req: NextApiRequest, res: NextApiResponse) {
   const domain = process.env.DOMAIN ?? 'https://app.charmverse.io';
 
   if (!isValidUuid) {
-    return res.status(400).json({ error: `Please provide a valid database ID in the request query. Visit ${domain}/api-docs to find out how to get this` });
+    throw new ApiError({
+      errorType: 'Invalid input',
+      message: `Please provide a valid database ID in the request query. Visit ${domain}/api-docs to find out how to get this`
+    });
   }
 
   const board = await prisma.block.findFirst({
@@ -54,7 +57,10 @@ export async function createPage (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!board) {
-    return res.status(404).json({ error: 'Database not found' });
+    throw new ApiError({
+      message: 'Database not found',
+      errorType: 'Data not found'
+    });
   }
 
   const { title, properties } = req.body;
