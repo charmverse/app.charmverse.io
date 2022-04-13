@@ -118,12 +118,12 @@ __Initial setup__
 We've provided a script you can use to configure a test database that won't interfere with your usual local development database.
 
 ```bash
-# Enable data
+# Make database setup script executable
 $ chmod +x ./testing/configure-db.sh
 
 # Run this script to create the test database in your local postgres instance
 # Re-run this script at any time to drop and recreate the database with the latest prisma migrations applied
-$ npm run test-setup-db
+$ npm run test:setup-db
 
 ```
 
@@ -131,13 +131,13 @@ __Run tests__
 Start your server with following command
 ```bash
 # Start the server
-$ dotenv -e .env.test.local -- npm start
+$ npm run start:test
 
 # (Optional) Open Prisma Studio to see the test data
-$ dotenv -e .env.test.local -- npx prisma studio
+$ npm run db-tool:test
 
 # Execute tests
-$ npm run test-server
+$ npm run test:server
 
 ```
 
