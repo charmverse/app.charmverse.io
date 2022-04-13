@@ -101,8 +101,8 @@ export class CdkDeployStack extends Stack {
       target: route53.RecordTarget.fromAlias({
         bind: (): route53.AliasRecordTargetConfig => ({
           dnsName: ebEnv.attrEndpointUrl,//`${process.env.STACK}.us-east-1.elasticbeanstalk.com`,
-          // https://docs.aws.amazon.com/general/latest/gr/elasticbeanstalk.html
-          hostedZoneId: 'Z35SXDOTRQ7X7K' // from EC2 control panel in AWS console
+          // get hosted zone for elbs based on region: https://docs.aws.amazon.com/general/latest/gr/elb.html
+          hostedZoneId: 'Z35SXDOTRQ7X7K'
         })
       }),
     });
