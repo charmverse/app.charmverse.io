@@ -1,4 +1,4 @@
-import { SystemError } from 'lib/utilities/errors';
+import { SystemError, ISystemErrorInput } from 'lib/utilities/errors';
 
 export class SpaceAccessDeniedError extends SystemError {
 
@@ -19,5 +19,17 @@ export class UnknownError extends SystemError {
       error,
       severity: 'error'
     });
+  }
+}
+
+export class ApiError extends SystemError {
+
+  constructor (errorInfo: Pick<ISystemErrorInput, 'errorType' | 'message'>) {
+    super({
+      errorType: errorInfo.errorType,
+      message: errorInfo.message
+    });
+
+    this.severity = this.code >= 500 ? 'error' : 'warning';
   }
 }

@@ -51,8 +51,3 @@ export class SystemError implements ISystemError {
   }
 
 }
-
-// Keep empty for now until we decide how to do error handling in future
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IApiError extends ISystemError {}
-
