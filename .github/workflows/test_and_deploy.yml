@@ -44,7 +44,7 @@ jobs:
         run: bash ./testing/configure-db.sh
 
       - name: Start test server
-        run: npm run start:test
+        run: npm run start:test &
 
       - name: Run tests
         run: npm run test:server
