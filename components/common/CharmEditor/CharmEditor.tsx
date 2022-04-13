@@ -92,10 +92,10 @@ export function charmEditorPlugins (
   {
     onContentChange,
     readOnly
-  } :
-  {
-    readOnly?: boolean, onContentChange?: (view: EditorView) => void
-  } = {}
+  }:
+    {
+      readOnly?: boolean, onContentChange?: (view: EditorView) => void
+    } = {}
 ) {
   return () => [
     new Plugin({
@@ -177,9 +177,9 @@ export function charmEditorPlugins (
       containerDOM: ['span', { class: 'mention-value' }]
     }),
     tabIndent.plugins()
-  // TODO: Pasting iframe or image link shouldn't create those blocks for now
-  // iframePlugin,
-  // pasteImagePlugin
+    // TODO: Pasting iframe or image link shouldn't create those blocks for now
+    // iframePlugin,
+    // pasteImagePlugin
   ];
 }
 
@@ -270,7 +270,6 @@ export function checkForEmpty (content: PageContent | null) {
 function CharmEditor (
   { content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
 ) {
-
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
 
@@ -328,7 +327,7 @@ function CharmEditor (
             return <ColumnBlock node={props.node}>{NodeViewChildren}</ColumnBlock>;
           }
           case 'cryptoPrice': {
-            const attrs = props.attrs as {base: null | CryptoCurrency, quote: null | FiatCurrency};
+            const attrs = props.attrs as { base: null | CryptoCurrency, quote: null | FiatCurrency };
             return (
               <CryptoPrice
                 preset={{
@@ -416,6 +415,8 @@ function CharmEditor (
 
 export default memo((props: CharmEditorProps) => (
   <ErrorBoundary>
-    <CharmEditor {...props} />
+    <CharmEditor
+      {...props}
+    />
   </ErrorBoundary>
 ));

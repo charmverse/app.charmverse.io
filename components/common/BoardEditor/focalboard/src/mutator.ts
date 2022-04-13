@@ -274,7 +274,7 @@ class Mutator {
 
         const oldBlocks: Block[] = [board]
 
-        const newBoard = createBoard(board)
+        const newBoard = createBoard({block: board})
 
         // insert at end of board.fields.cardProperties
         newBoard.fields.cardProperties.push(newTemplate)
@@ -307,7 +307,7 @@ class Mutator {
 
         const oldBlocks: Block[] = [board]
 
-        const newBoard = createBoard(board)
+        const newBoard = createBoard({block: board})
         const changedBlocks: Block[] = [newBoard]
         const index = newBoard.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === propertyId)
         if (index === -1) {
@@ -345,7 +345,7 @@ class Mutator {
         Utils.log(`srcIndex: ${srcIndex}, destIndex: ${destIndex}`)
         newValue.splice(destIndex, 0, newValue.splice(srcIndex, 1)[0])
 
-        const newBoard = createBoard(board)
+        const newBoard = createBoard({block: board})
         newBoard.fields.cardProperties = newValue
 
         await this.updateBlock(newBoard, board, 'reorder properties')
@@ -354,7 +354,7 @@ class Mutator {
     async deleteProperty(board: Board, views: BoardView[], cards: Card[], propertyId: string) {
         const oldBlocks: Block[] = [board]
 
-        const newBoard = createBoard(board)
+        const newBoard = createBoard({block: board})
         const changedBlocks: Block[] = [newBoard]
         newBoard.fields.cardProperties = board.fields.cardProperties.filter((o: IPropertyTemplate) => o.id !== propertyId)
 
@@ -385,7 +385,7 @@ class Mutator {
     async insertPropertyOption(board: Board, template: IPropertyTemplate, option: IPropertyOption, description = 'add option') {
         Utils.assert(board.fields.cardProperties.includes(template))
 
-        const newBoard = createBoard(board)
+        const newBoard = createBoard({block: board})
         const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === template.id)!
         newTemplate.options.push(option)
 
@@ -393,7 +393,7 @@ class Mutator {
     }
 
     async deletePropertyOption(board: Board, template: IPropertyTemplate, option: IPropertyOption) {
-        const newBoard = createBoard(board)
+        const newBoard = createBoard({block: board})
         const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === template.id)!
         newTemplate.options = newTemplate.options.filter((o) => o.id !== option.id)
 
@@ -404,7 +404,7 @@ class Mutator {
         const srcIndex = template.options.indexOf(option)
         Utils.log(`srcIndex: ${srcIndex}, destIndex: ${destIndex}`)
 
-        const newBoard = createBoard(board)
+        const newBoard = createBoard({block: board})
         const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === template.id)!
         newTemplate.options.splice(destIndex, 0, newTemplate.options.splice(srcIndex, 1)[0])
 
@@ -414,7 +414,7 @@ class Mutator {
     async changePropertyOptionValue(board: Board, propertyTemplate: IPropertyTemplate, option: IPropertyOption, value: string) {
         const oldBlocks: Block[] = [board]
 
-        const newBoard = createBoard(board)
+        const newBoard = createBoard({block: board})
         const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === propertyTemplate.id)!
         const newOption = newTemplate.options.find((o) => o.id === option.id)!
         newOption.value = value
@@ -426,7 +426,7 @@ class Mutator {
     }
 
     async changePropertyOptionColor(board: Board, template: IPropertyTemplate, option: IPropertyOption, color: string) {
-        const newBoard = createBoard(board)
+        const newBoard = createBoard({block: board})
         const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === template.id)!
         const newOption = newTemplate.options.find((o) => o.id === option.id)!
         newOption.color = color
@@ -456,7 +456,7 @@ class Mutator {
             return
         }
 
-        const newBoard = createBoard(board)
+        const newBoard = createBoard({block: board})
         const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === propertyTemplate.id)!
 
         if (propertyTemplate.type !== newType) {

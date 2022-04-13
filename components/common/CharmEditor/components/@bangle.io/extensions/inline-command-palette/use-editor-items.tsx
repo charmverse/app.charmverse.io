@@ -21,8 +21,8 @@ import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { renderSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
 import { NestedPagePluginKey } from 'components/common/CharmEditor/components/NestedPage';
-import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/ResizableIframe';
 import useNestedPage from 'hooks/useNestedPage';
+import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 import { useMemo } from 'react';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
 import {

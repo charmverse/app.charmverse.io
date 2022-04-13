@@ -4,8 +4,7 @@ import * as http from 'adapters/http';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
 import { withSessionRoute } from 'lib/session/withSession';
-import { Page } from '@prisma/client';
-import { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import { FailedImportsError } from 'lib/notion/types';
 
 const handler = nc({
   onError,
@@ -43,9 +42,11 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse<{
   const encodedToken = Buffer.from(`${process.env.NOTION_OAUTH_CLIENT_ID}:${process.env.NOTION_OAUTH_SECRET}`).toString('base64');
 
   try {
+    const proto = (req.headers['x-forwarded-proto'] || (req.connection as any)?.encrypted) ? 'https' : 'http';
+
     const token = await http.POST<NotionApiResponse>('https://api.notion.com/v1/oauth/token', {
       grant_type: 'authorization_code',
-      redirect_uri: req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/notion/callback` : 'https://app.charmverse.io/api/notion/callback',
+      redirect_uri: `${proto}://${req.headers.host}/api/notion/callback`,
       code: tempAuthCode
     }, {
       headers: {

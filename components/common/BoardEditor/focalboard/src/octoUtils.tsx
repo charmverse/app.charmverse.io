@@ -82,7 +82,7 @@ class OctoUtils {
 
     static hydrateBlock(block: Block): Block {
         switch (block.type) {
-        case 'board': { return createBoard(block) }
+        case 'board': { return createBoard({block}) }
         case 'view': { return createBoardView(block) }
         case 'card': { return createCard(block) }
         case 'text': { return createTextBlock(block) }

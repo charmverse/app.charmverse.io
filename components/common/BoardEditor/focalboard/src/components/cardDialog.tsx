@@ -15,15 +15,17 @@ import { getUserBlockSubscriptionList } from '../store/initialLoad'
 import { getMe } from '../store/users'
 import { IUser } from '../user'
 import { Utils } from '../utils'
-import Button from '../widgets/buttons/button'
 import DeleteIcon from '../widgets/icons/delete'
 import LinkIcon from '../widgets/icons/Link'
 import Menu from '../widgets/menu'
 import CardDetail from './cardDetail/cardDetail'
 import Dialog from './dialog'
 import { sendFlashMessage } from './flashMessages'
-
-
+import { IconButton } from '@mui/material'
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import Button from "components/common/Button"
+import { useRouter } from 'next/router'
+import { usePages } from 'hooks/usePages'
 
 
 
@@ -137,37 +139,27 @@ const CardDialog = (props: Props): JSX.Element | null => {
         </Menu>
     )
 
-    const followActionButton = (following: boolean): React.ReactNode => {
-        const followBtn = (
-            <Button
-                className='cardFollowBtn follow'
-                onClick={() => mutator.followBlock(props.cardId, 'card', me!.id)}
-            >
-                {intl.formatMessage({id: 'CardDetail.Follow', defaultMessage: 'Follow'})}
-            </Button>
-        )
-
-        const unfollowBtn = (
-            <Button
-                className='cardFollowBtn unfollow'
-                onClick={() => mutator.unfollowBlock(props.cardId, 'card', me!.id)}
-            >
-                {intl.formatMessage({id: 'CardDetail.Following', defaultMessage: 'Following'})}
-            </Button>
-        )
-
-        return following ? unfollowBtn : followBtn
-    }
-
+    const {pages} = usePages()
     const followingCards = useAppSelector(getUserBlockSubscriptionList)
     const isFollowingCard = Boolean(followingCards.find((following) => following.blockId === props.cardId))
-    const toolbar = followActionButton(isFollowingCard)
-
+    const router = useRouter();
     return card ? (
         <>
             <Dialog
                 onClose={props.onClose}
                 toolsMenu={!props.readonly && menu}
+                hideCloseButton={true}
+                toolbar={pages[card.id] && (
+                    <Button
+                        size='small'
+                        color='secondary'
+                        href={`/${router.query.domain}/${pages[card.id]!.path}`}
+                        variant='text'
+                        startIcon={<OpenInFullIcon fontSize='small'/>}>
+                        Open as Page
+                    </Button>
+                    )
+                }
                 // toolbar={toolbar}
             >
                 {card && card.fields.isTemplate &&
