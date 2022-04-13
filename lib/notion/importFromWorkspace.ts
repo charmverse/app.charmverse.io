@@ -96,7 +96,7 @@ function convertRichText (richTexts: RichTextItemResponse[]): {
   };
 }
 
-interface ChildBlockListResponse {
+interface ListBlockChildrenResponse {
   request: ListBlockChildrenParameters,
   results: BlockObjectResponse[],
   next_cursor: string | null
@@ -558,6 +558,44 @@ interface CreateDatabaseResult {
   page: CreatePageInput;
 }
 
+async function getListBlockChildrenResponses (notion: Client, listBlockChildrenParameters: ListBlockChildrenParameters[]) {
+  const listBlockChildrenResponsesWithError = await Promise.all<ListBlockChildrenResponse |
+    {error: boolean, request: ListBlockChildrenParameters}>(listBlockChildrenParameters.map(
+      listBlockChildrenParameter => notion.blocks.children.list(listBlockChildrenParameter).then((response => ({
+        results: response.results as BlockObjectResponse[],
+        // Request contains the block_id, which is used to detect the parent of this group of child blocks
+        request: listBlockChildrenParameter,
+        next_cursor: response.next_cursor
+      }))).catch((err) => {
+        // Only retry if the status is above 499
+        if (err.status > 499) {
+          return { error: true, request: listBlockChildrenParameter };
+        }
+        else {
+          // Skip these failed request,
+          return { error: false, request: listBlockChildrenParameter };
+        }
+      })
+    ));
+
+  const listBlockChildrenSuccessResponses: ListBlockChildrenResponse[] = [];
+  const listBlockChildrenErrorResponses: {error: boolean, request: ListBlockChildrenParameters}[] = [];
+
+  // Filter out the success and error responses
+  listBlockChildrenResponsesWithError.forEach(listBlockChildrenResponseWithError => {
+    if ('error' in listBlockChildrenResponseWithError) {
+      if (listBlockChildrenResponseWithError.error) {
+        listBlockChildrenErrorResponses.push(listBlockChildrenResponseWithError);
+      }
+    }
+    else {
+      listBlockChildrenSuccessResponses.push(listBlockChildrenResponseWithError);
+    }
+  });
+
+  return [listBlockChildrenSuccessResponses, listBlockChildrenErrorResponses] as const;
+}
+
 async function createDatabase (block: GetDatabaseResponse, {
   spaceId,
   userId
@@ -781,37 +819,46 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     };
 
     // Array to store parameters for further requests to retrieve children blocks
-    let blockChildrenRequests: ListBlockChildrenParameters[] = [{
+    let listBlockChildrenParameters: ListBlockChildrenParameters[] = [{
       block_id: notionPageId,
       page_size: BLOCKS_FETCHED_PER_REQUEST
     }];
 
-    async function getChildBlockListResponses () {
-      const childBlockListResponses = await Promise.all<ChildBlockListResponse>(blockChildrenRequests.map(
-        blockChildrenRequest => notion.blocks.children.list(blockChildrenRequest).then((response => ({
-          results: response.results as BlockObjectResponse[],
-          // Request contains the block_id, which is used to detect the parent of this group of child blocks
-          request: blockChildrenRequest,
-          next_cursor: response.next_cursor
-        })))
-      ));
+    async function getListBlockChildrenSuccessResponses () {
+      let attempts = 0;
+      let [
+        listBlockChildrenSuccessResponses,
+        listBlockChildrenErrorResponses
+      ] = await getListBlockChildrenResponses(notion, listBlockChildrenParameters);
+      // make at-most 3 attempts for failed api request
+      while (attempts < 3 && listBlockChildrenErrorResponses.length !== 0) {
+        const responses = await getListBlockChildrenResponses(
+          notion,
+          listBlockChildrenErrorResponses.map(listBlockChildrenErrorResponse => listBlockChildrenErrorResponse.request)
+        );
+
+        listBlockChildrenErrorResponses = responses[1];
+        // Append the newly successful responses
+        listBlockChildrenSuccessResponses = [...listBlockChildrenSuccessResponses, ...responses[0]];
+        attempts += 1;
+      }
 
       // Reset the requests as they've all been fetched
-      blockChildrenRequests = [];
+      listBlockChildrenParameters = [];
 
-      childBlockListResponses.forEach(childBlockListResponse => {
+      listBlockChildrenSuccessResponses.forEach(listBlockChildrenSuccessResponse => {
       // If next_cursor exist then this block contains more child blocks
-        if (childBlockListResponse.next_cursor) {
-          blockChildrenRequests.push({
+        if (listBlockChildrenSuccessResponse.next_cursor) {
+          listBlockChildrenParameters.push({
           // Using the request.block_id to get the block's parent id
-            block_id: childBlockListResponse.request.block_id,
+            block_id: listBlockChildrenSuccessResponse.request.block_id,
             page_size: BLOCKS_FETCHED_PER_REQUEST,
-            start_cursor: childBlockListResponse.next_cursor
+            start_cursor: listBlockChildrenSuccessResponse.next_cursor
           });
         }
       });
 
-      return childBlockListResponses;
+      return listBlockChildrenSuccessResponses;
     }
     // notion.pages.retrieve will return an error if the integration doesn't have access to the page
     try {
@@ -824,25 +871,25 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       // Blocks like callout, quote, all forms of list allow other blocks to be nested inside them
       for (let depth = 0; depth < MAX_CHILD_BLOCK_DEPTH; depth++) {
       // While there are more children to be fetched
-        if (blockChildrenRequests.length !== 0) {
+        if (listBlockChildrenParameters.length !== 0) {
 
-          log.debug(`[notion] - ${blockChildrenRequests.length} Requests for child blocks at depth: ${depth}`);
+          log.debug(`[notion] - ${listBlockChildrenParameters.length} Requests for child blocks at depth: ${depth}`);
 
-          const childBlockListResponses = await getChildBlockListResponses();
+          const listBlockChildrenSuccessResponses = await getListBlockChildrenSuccessResponses();
 
           // If the block has more child to be fetch, this will be true
-          while (blockChildrenRequests.length !== 0) {
-            childBlockListResponses.push(...await getChildBlockListResponses());
+          while (listBlockChildrenParameters.length !== 0) {
+            listBlockChildrenSuccessResponses.push(...await getListBlockChildrenSuccessResponses());
           }
 
           // Reset the requests as they've all been fetched
-          blockChildrenRequests = [];
+          listBlockChildrenParameters = [];
 
           // Now that all child content has been fetched, we need to check if any of the child block has children or not
           // Go through each of the block and add them to the record
           // eslint-disable-next-line
-        childBlockListResponses.forEach((childBlockListResponse) => {
-            childBlockListResponse.results.forEach((block) => {
+          listBlockChildrenSuccessResponses.forEach((listBlockChildrenSuccessResponse) => {
+            listBlockChildrenSuccessResponse.results.forEach((block) => {
               const blockWithChildren: BlockWithChildren = {
                 ...block,
                 children: [],
@@ -851,7 +898,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               blocksRecord[block.id] = blockWithChildren;
               if (depth !== 0) {
               // Add the current block's id to its parent's `children` array
-                blocksRecord[childBlockListResponse.request.block_id].children.push(block.id);
+                blocksRecord[listBlockChildrenSuccessResponse.request.block_id].children.push(block.id);
               }
               else {
               // Only push the top level blocks to the array
@@ -860,7 +907,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
               // If the block has children then we need to fetch them as well
               if (block.type.match(BlocksWithChildrenRegex) && block.has_children) {
-                blockChildrenRequests.push({
+                listBlockChildrenParameters.push({
                   block_id: block.id,
                   page_size: BLOCKS_FETCHED_PER_REQUEST
                 });
