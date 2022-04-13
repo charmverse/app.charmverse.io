@@ -90,5 +90,5 @@ export class CdkDeployStack extends Stack {
 
 // Member must contain only letters, digits, and the dash character and may not start or end with a dash
 function sanitizeAppName (name: string) {
-  return name.replace(/[^a-zA-Z0-9-]/g, '').replace(/^-/, '0').replace(/-$/, '0');
+  return name.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 40).replace(/^-/, '0').replace(/-$/, '0');
 }
