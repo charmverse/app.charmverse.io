@@ -3,6 +3,8 @@ import { Construct } from 'constructs';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as route53 from 'aws-cdk-lib/aws-route53';
+import * as targets from 'aws-cdk-lib/aws-route53-targets';
+
 
 const domain = 'charmverse.co';
 
@@ -90,7 +92,7 @@ export class CdkDeployStack extends Stack {
     new route53.ARecord(this, 'ARecord', {
       zone,
       recordName: deploymentDomain,
-      target: route53.RecordTarget.fromIpAddresses(ebEnv.attrEndpointUrl)
+      target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
       // target: {
       //   bind: (): route53.AliasRecordTargetConfig => ({
       //     dnsName: ebEnv.attrEndpointUrl,
