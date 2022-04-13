@@ -1,5 +1,6 @@
 import { Space, User } from '@prisma/client';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { ExpectedAnError } from 'testing/errors';
 import { v4 } from 'uuid';
 import { createDatabase, createDatabaseCardPage } from '../createDatabaseCardPage';
 import { PageFromBlock } from '../pageFromBlock.class';
@@ -25,9 +26,7 @@ describe('createDatabaseCardPage', () => {
         spaceId: space.id,
         createdBy: user.id
       });
-      throw {
-        error: 'Expected an error'
-      };
+      throw new ExpectedAnError();
     }
     catch (error) {
 
@@ -49,6 +48,27 @@ describe('createDatabaseCardPage', () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       boardId: database.boardId!,
       properties: {},
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    expect(createdPage).toBeInstanceOf(PageFromBlock);
+
+  });
+
+  it('should handle creation when properties are undefined', async () => {
+
+    const database = await createDatabase({
+      title: 'My database',
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const createdPage = await createDatabaseCardPage({
+      title: 'Example title',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      boardId: database.boardId!,
+      properties: undefined as any,
       spaceId: space.id,
       createdBy: user.id
     });

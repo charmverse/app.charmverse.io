@@ -42,7 +42,7 @@ beforeAll(async () => {
   failedCreateResponse = await invalidCreateRequest();
 });
 
-describe('POST /databases/{id}', () => {
+describe('POST /databases/{id}/pages', () => {
 
   it('should create a new card in the database', async () => {
 
@@ -50,8 +50,38 @@ describe('POST /databases/{id}', () => {
       .post(`/api/v1/databases/${database.boardId}/pages`)
       .set('Authorization', `Bearer ${apiToken.token}`)
       .send({
+        title: 'Example',
+        properties: {}
+      });
+
+    //    TODO; // HANDLE EMPTY PROPERTIES
+
+    expect(response.body).toEqual<ApiPage>(
+      expect.objectContaining<ApiPage>({
+        content: expect.any(Object),
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+        databaseId: expect.any(String),
+        id: expect.any(String),
+        isTemplate: expect.any(Boolean),
+        properties: expect.any(Object),
+        spaceId: expect.any(String),
+        title: expect.any(String)
+      })
+    );
+
+  });
+
+  it('should create a new card in the database without needing custom properties', async () => {
+
+    const response = await request(baseUrl)
+      .post(`/api/v1/databases/${database.boardId}/pages`)
+      .set('Authorization', `Bearer ${apiToken.token}`)
+      .send({
         title: 'Example'
       });
+
+    //    TODO; // HANDLE EMPTY PROPERTIES
 
     expect(response.body).toEqual<ApiPage>(
       expect.objectContaining<ApiPage>({
