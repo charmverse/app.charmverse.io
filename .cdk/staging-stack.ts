@@ -42,13 +42,13 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
-        value: 'SingleInstance'
+        value: 'LoadBalanced'
       },
-      // {
-      //   namespace: 'aws:elasticbeanstalk:environment',
-      //   optionName: 'EnvironmentType',
-      //   value: 'SingleInstance',
-      // },
+      {
+        namespace: 'aws:elbv2:listener:443',
+        optionName: 'SSLCertificateId',
+        value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339',
+      },
       {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
