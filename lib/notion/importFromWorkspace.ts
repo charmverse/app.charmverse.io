@@ -12,6 +12,7 @@ import { createBoard, IPropertyTemplate, PropertyType } from 'lib/focalboard/boa
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCharmTextBlock } from 'lib/focalboard/charmBlock';
 import { createCard } from 'lib/focalboard/card';
+import promiseRetry from 'promise-retry';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
@@ -96,7 +97,7 @@ function convertRichText (richTexts: RichTextItemResponse[]): {
   };
 }
 
-interface ListBlockChildrenResponse {
+interface ChildBlockListResponse {
   request: ListBlockChildrenParameters,
   results: BlockObjectResponse[],
   next_cursor: string | null
@@ -558,44 +559,6 @@ interface CreateDatabaseResult {
   page: CreatePageInput;
 }
 
-async function getListBlockChildrenResponses (notion: Client, listBlockChildrenParameters: ListBlockChildrenParameters[]) {
-  const listBlockChildrenResponsesWithError = await Promise.all<ListBlockChildrenResponse |
-    {error: boolean, request: ListBlockChildrenParameters}>(listBlockChildrenParameters.map(
-      listBlockChildrenParameter => notion.blocks.children.list(listBlockChildrenParameter).then((response => ({
-        results: response.results as BlockObjectResponse[],
-        // Request contains the block_id, which is used to detect the parent of this group of child blocks
-        request: listBlockChildrenParameter,
-        next_cursor: response.next_cursor
-      }))).catch((err) => {
-        // Only retry if the status is above 499
-        if (err.status > 499) {
-          return { error: true, request: listBlockChildrenParameter };
-        }
-        else {
-          // Skip these failed request,
-          return { error: false, request: listBlockChildrenParameter };
-        }
-      })
-    ));
-
-  const listBlockChildrenSuccessResponses: ListBlockChildrenResponse[] = [];
-  const listBlockChildrenErrorResponses: {error: boolean, request: ListBlockChildrenParameters}[] = [];
-
-  // Filter out the success and error responses
-  listBlockChildrenResponsesWithError.forEach(listBlockChildrenResponseWithError => {
-    if ('error' in listBlockChildrenResponseWithError) {
-      if (listBlockChildrenResponseWithError.error) {
-        listBlockChildrenErrorResponses.push(listBlockChildrenResponseWithError);
-      }
-    }
-    else {
-      listBlockChildrenSuccessResponses.push(listBlockChildrenResponseWithError);
-    }
-  });
-
-  return [listBlockChildrenSuccessResponses, listBlockChildrenErrorResponses] as const;
-}
-
 async function createDatabase (block: GetDatabaseResponse, {
   spaceId,
   userId
@@ -770,6 +733,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         await createPage([[notionPage.id, uuid()]], failedImportBlocks);
       }
       else if (notionPage.object === 'database') {
+        if (notionPage.id.replaceAll('-', '') === 'ca7562fc2c484024898fe3a22f0265f2') {
+          throw new Error();
+        }
         await createDatabaseAndPopulateCache(notionPage);
       }
       if (failedImportBlocks.length !== 0) {
@@ -824,41 +790,30 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       page_size: BLOCKS_FETCHED_PER_REQUEST
     }];
 
-    async function getListBlockChildrenSuccessResponses () {
-      let attempts = 0;
-      let [
-        listBlockChildrenSuccessResponses,
-        listBlockChildrenErrorResponses
-      ] = await getListBlockChildrenResponses(notion, listBlockChildrenParameters);
-      // make at-most 3 attempts for failed api request
-      while (attempts < 3 && listBlockChildrenErrorResponses.length !== 0) {
-        const responses = await getListBlockChildrenResponses(
-          notion,
-          listBlockChildrenErrorResponses.map(listBlockChildrenErrorResponse => listBlockChildrenErrorResponse.request)
-        );
-
-        listBlockChildrenErrorResponses = responses[1];
-        // Append the newly successful responses
-        listBlockChildrenSuccessResponses = [...listBlockChildrenSuccessResponses, ...responses[0]];
-        attempts += 1;
-      }
-
-      // Reset the requests as they've all been fetched
-      listBlockChildrenParameters = [];
-
-      listBlockChildrenSuccessResponses.forEach(listBlockChildrenSuccessResponse => {
-      // If next_cursor exist then this block contains more child blocks
-        if (listBlockChildrenSuccessResponse.next_cursor) {
-          listBlockChildrenParameters.push({
-          // Using the request.block_id to get the block's parent id
-            block_id: listBlockChildrenSuccessResponse.request.block_id,
-            page_size: BLOCKS_FETCHED_PER_REQUEST,
-            start_cursor: listBlockChildrenSuccessResponse.next_cursor
+    async function getChildren (listBlockChildrenParameter: ListBlockChildrenParameters) {
+      return promiseRetry<ChildBlockListResponse | void>((retry) => {
+        return notion.blocks.children.list(listBlockChildrenParameter).then(response => ({
+          results: response.results,
+          request: listBlockChildrenParameter,
+          next_cursor: response.next_cursor
+        } as ChildBlockListResponse))
+          .catch(error => {
+            if (error.status > 499) {
+              retry(error);
+            }
+            else {
+              throw error;
+            }
           });
-        }
+      }, {
+        retries: 3
       });
+    }
 
-      return listBlockChildrenSuccessResponses;
+    async function getListBlockChildrenSuccessResponses () {
+      return (await Promise.all(listBlockChildrenParameters
+        .map(listBlockChildrenParameter => getChildren(listBlockChildrenParameter))))
+        .filter(listBlockChildrenResponse => listBlockChildrenResponse) as ChildBlockListResponse[];
     }
     // notion.pages.retrieve will return an error if the integration doesn't have access to the page
     try {
@@ -875,11 +830,11 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
           log.debug(`[notion] - ${listBlockChildrenParameters.length} Requests for child blocks at depth: ${depth}`);
 
-          const listBlockChildrenSuccessResponses = await getListBlockChildrenSuccessResponses();
+          const childBlockListResponses = await getListBlockChildrenSuccessResponses();
 
           // If the block has more child to be fetch, this will be true
           while (listBlockChildrenParameters.length !== 0) {
-            listBlockChildrenSuccessResponses.push(...await getListBlockChildrenSuccessResponses());
+            childBlockListResponses.push(...await getListBlockChildrenSuccessResponses());
           }
 
           // Reset the requests as they've all been fetched
@@ -888,8 +843,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           // Now that all child content has been fetched, we need to check if any of the child block has children or not
           // Go through each of the block and add them to the record
           // eslint-disable-next-line
-          listBlockChildrenSuccessResponses.forEach((listBlockChildrenSuccessResponse) => {
-            listBlockChildrenSuccessResponse.results.forEach((block) => {
+        childBlockListResponses.forEach((childBlockListResponse) => {
+            childBlockListResponse.results.forEach((block) => {
               const blockWithChildren: BlockWithChildren = {
                 ...block,
                 children: [],
@@ -898,7 +853,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               blocksRecord[block.id] = blockWithChildren;
               if (depth !== 0) {
               // Add the current block's id to its parent's `children` array
-                blocksRecord[listBlockChildrenSuccessResponse.request.block_id].children.push(block.id);
+                blocksRecord[childBlockListResponse.request.block_id].children.push(block.id);
               }
               else {
               // Only push the top level blocks to the array
@@ -1158,16 +1113,14 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     createdBy: userId
   });
 
-  const ungroupedPageInput = {
+  const ungroupedPage = await createPrismaPage({
     id: uuid(),
     icon: null,
     spaceId,
     title: 'Ungrouped',
     createdBy: userId,
     parentId: workspacePage.id
-  };
-
-  let totalUngroupedPages = 0;
+  });
 
   async function createCharmversePage (blockId: string, type: 'page' | 'database', parentId?: string | null) {
     try {
@@ -1202,76 +1155,70 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
   async function createCharmversePageFromNotionPage (block: GetPageResponse | GetDatabaseResponse) {
     const failedToImportBlock = failedImportsRecord[block.id] && failedImportsRecord[block.id].blocks.length === 0;
-    try {
-      if (!failedToImportBlock) {
-        // pages and databases
-        if (block.parent.type === 'page_id') {
-          // Create its parent first, parent could be regular page or database pages
-          if (!createdPagesSet.has(block.parent.page_id) && searchResultRecord[block.parent.page_id]) {
-            await createCharmversePageFromNotionPage(searchResultRecord[block.parent.page_id]);
-          }
-          let parentId = null;
-          const failedToImportParent = failedImportsRecord[block.parent.page_id] && failedImportsRecord[block.parent.page_id].blocks.length === 0;
-          if (failedToImportParent) {
-            totalUngroupedPages += 1;
-            parentId = ungroupedPageInput.id;
-          }
-          // If the parent was created successfully
-          // Or if we failed to import some blocks from the parent (partial success)
-          else if (searchResultRecord[block.parent.page_id]) {
-            // Check if the parent is a regular page first
-            // If its not then the parent is a database page (focalboard card)
-            parentId = createdPages[block.parent.page_id]?.id ?? createdCards[block.parent.page_id]?.page?.id;
-          }
-          else {
-            // Parent id could be a block, for example there could be a nested page inside a callout/quote/column block
-            // Here parent.page_id is not actually the the id of the page, its the id of the nearest parent of the page, which could be callout/quote/column block
-            parentId = createdPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPageInput.id;
-          }
+    if (!failedToImportBlock) {
+      // pages and databases
+      if (block.parent.type === 'page_id') {
+        // Create its parent first, parent could be regular page or database pages
+        if (!createdPagesSet.has(block.parent.page_id) && searchResultRecord[block.parent.page_id]) {
+          await createCharmversePageFromNotionPage(searchResultRecord[block.parent.page_id]);
+        }
+        let parentId = null;
+        const failedToImportParent = failedImportsRecord[block.parent.page_id] && failedImportsRecord[block.parent.page_id].blocks.length === 0;
+        if (failedToImportParent) {
+          parentId = ungroupedPage.id;
+        }
+        // If the parent was created successfully
+        // Or if we failed to import some blocks from the parent (partial success)
+        else if (searchResultRecord[block.parent.page_id]) {
+          // Check if the parent is a regular page first
+          // If its not then the parent is a database page (focalboard card)
+          parentId = createdPages[block.parent.page_id]?.id ?? createdCards[block.parent.page_id]?.page?.id;
+        }
+        else {
+          // Parent id could be a block, for example there could be a nested page inside a callout/quote/column block
+          // Here parent.page_id is not actually the the id of the page, its the id of the nearest parent of the page, which could be callout/quote/column block
+          parentId = createdPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPage.id;
+        }
 
-          await createCharmversePage(block.id, block.object, parentId);
+        await createCharmversePage(block.id, block.object, parentId);
+        createdPagesSet.add(block.id);
+      }
+      // Focalboard cards
+      // If the card has been created (in memory) and the database has been created in memory
+      else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
+        // If the parent wasn't created create it first if there were no errors
+        if (!createdPagesSet.has(block.parent.database_id)
+            && searchResultRecord[block.parent.database_id]) {
+          await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
+        }
+        // Make sure the database page has not failed to be created, otherwise no cards will be added
+        const { notionPageId, page, card, charmText } = createdCards[block.id];
+        if (!failedImportsRecord[block.parent.database_id]) {
+          await prisma.block.createMany({
+            data: [
+              card,
+              charmText
+            ]
+          });
+          // Creating the page corresponding to the card
+          await createCharmversePage(notionPageId, 'page', page.parentId);
           createdPagesSet.add(block.id);
         }
-        // Focalboard cards
-        // If the card has been created (in memory) and the database has been created in memory
-        else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
-          // If the parent wasn't created create it first if there were no errors
-          if (!createdPagesSet.has(block.parent.database_id)
-              && searchResultRecord[block.parent.database_id]) {
-            await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
-          }
-          // Make sure the database page has not failed to be created, otherwise no cards will be added
-          const { notionPageId, page, card, charmText } = createdCards[block.id];
-          if (!failedImportsRecord[block.parent.database_id]) {
-            await prisma.block.createMany({
-              data: [
-                card,
-                charmText
-              ]
-            });
-            // Creating the page corresponding to the card
-            await createCharmversePage(notionPageId, 'page', page.parentId);
-            createdPagesSet.add(block.id);
-          }
-          // If the database wasn't imported then the cards cant be created, so add them to failedImportRecord
-          else {
-            failedImportsRecord[notionPageId] = {
-              blocks: [],
-              pageId: notionPageId,
-              title: card.title,
-              type: 'page'
-            };
-          }
-        }
-        // Top level pages and databases
-        else if (block.parent.type === 'workspace') {
-          await createCharmversePage(block.id, block.object, workspacePage.id);
-          createdPagesSet.add(block.id);
+        // If the database wasn't imported then the cards cant be created, so add them to failedImportRecord
+        else {
+          failedImportsRecord[notionPageId] = {
+            blocks: [],
+            pageId: notionPageId,
+            title: card.title,
+            type: 'page'
+          };
         }
       }
-    }
-    catch (_) {
-      populateFailedImportRecord([], block);
+      // Top level pages and databases
+      else if (block.parent.type === 'workspace') {
+        await createCharmversePage(block.id, block.object, workspacePage.id);
+        createdPagesSet.add(block.id);
+      }
     }
   }
 
@@ -1282,13 +1229,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       await createCharmversePageFromNotionPage(block);
     }
   }
-
-  if (totalUngroupedPages > 0) {
-    await createPrismaPage(ungroupedPageInput);
-  }
-
-  log.info('[notion] Failed imports', { failedImportsRecord });
-
   log.info(`[notion] Completed import of ${searchResults.length} pages`, { pagesWithoutIntegrationAccess });
 
   return Object.values(failedImportsRecord).slice(0, 25);
