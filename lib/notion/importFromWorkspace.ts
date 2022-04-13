@@ -734,9 +734,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         await createPage([[notionPage.id, uuid()]], failedImportBlocks);
       }
       else if (notionPage.object === 'database') {
-        if (notionPage.id.replaceAll('-', '') === 'ca7562fc2c484024898fe3a22f0265f2') {
-          throw new Error();
-        }
         await createDatabaseAndPopulateCache(notionPage);
       }
       if (failedImportBlocks.length !== 0) {
@@ -792,7 +789,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }];
 
     function getChildren (listBlockChildrenParameter: ListBlockChildrenParameters) {
-      return promiseRetry((retry, number) => {
+      return promiseRetry<ChildBlockListResponse | void>((retry) => {
         return notion.blocks.children.list(listBlockChildrenParameter).then(response => ({
           results: response.results,
           request: listBlockChildrenParameter,
@@ -1132,14 +1129,16 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     createdBy: userId
   });
 
-  const ungroupedPage = await createPrismaPage({
+  const ungroupedPageInput = {
     id: uuid(),
     icon: null,
     spaceId,
     title: 'Ungrouped',
     createdBy: userId,
     parentId: workspacePage.id
-  });
+  };
+
+  let totalUngroupedPages = 0;
 
   async function createCharmversePage (blockId: string, type: 'page' | 'database', parentId?: string | null) {
     try {
@@ -1184,7 +1183,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         let parentId = null;
         const failedToImportParent = failedImportsRecord[block.parent.page_id] && failedImportsRecord[block.parent.page_id].blocks.length === 0;
         if (failedToImportParent) {
-          parentId = ungroupedPage.id;
+          totalUngroupedPages += 1;
+          parentId = ungroupedPageInput.id;
         }
         // If the parent was created successfully
         // Or if we failed to import some blocks from the parent (partial success)
@@ -1196,7 +1196,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         else {
           // Parent id could be a block, for example there could be a nested page inside a callout/quote/column block
           // Here parent.page_id is not actually the the id of the page, its the id of the nearest parent of the page, which could be callout/quote/column block
-          parentId = createdPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPage.id;
+          parentId = createdPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPageInput.id;
         }
 
         await createCharmversePage(block.id, block.object, parentId);
@@ -1248,6 +1248,11 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       await createCharmversePageFromNotionPage(block);
     }
   }
+
+  if (totalUngroupedPages > 0) {
+    await createPrismaPage(ungroupedPageInput);
+  }
+
   log.info(`[notion] Completed import of ${searchResults.length} pages`, { pagesWithoutIntegrationAccess });
 
   return Object.values(failedImportsRecord).slice(0, 25);
