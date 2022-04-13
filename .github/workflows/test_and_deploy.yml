@@ -39,9 +39,12 @@ jobs:
 
       - name: Apply patches
         run: patch-package
-        
+
       - name: Setup test database
         run: bash ./testing/configure-db.sh
+
+      - name: Start test server
+        run: npm run start:test
 
       - name: Run tests
         run: npm run test:server
