@@ -5,37 +5,20 @@ import { UnknownError } from 'lib/middleware';
 
 export function onError (err: any, req: NextApiRequest, res: NextApiResponse) {
 
-  if (err instanceof SystemError) {
+  if (!(err instanceof SystemError)) {
 
-    let errorCode = 400;
-
-    if (err.errorType === 'Access denied') {
-      errorCode = 401;
-    }
-    else if (err.errorType === 'Unknown' || err.severity === 'error') {
-      errorCode = 500;
-      log.error(`Server Error: ${err.error || err}`, {
-        userId: req.session?.user?.id,
-        url: req.url,
-        body: req.body
-      });
-    }
-
-    res.status(errorCode).json(err);
+    err = new UnknownError((err.stack ?? err.error) ?? err);
   }
-  else {
 
-    const errorContent = (err.stack ?? err.error) ?? err;
-
-    log.error(`Server Error: ${errorContent}`, {
+  if (err.code === 500) {
+    log.error(`Server Error: ${err}`, {
       userId: req.session?.user?.id,
       url: req.url,
       body: req.body
     });
-
-    res.status(500).json(new UnknownError(errorContent));
-
   }
+
+  res.status(err.code).json(err);
 
 }
 

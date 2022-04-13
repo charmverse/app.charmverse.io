@@ -3,12 +3,12 @@
 export type ErrorSeverity = 'warning' | 'error';
 
 const ErrorCodes = {
-  Unknown: 0,
-  'Invalid input': 1,
-  'Data not found': 2,
-  'Access denied': 3,
-  'External service': 4,
-  'Unexpected result': 5
+  Unknown: 500,
+  'Invalid input': 400,
+  'Data not found': 404,
+  'Access denied': 401,
+  'External service': 500,
+  'Unexpected result': 500
 };
 
 type ErrorType = keyof typeof ErrorCodes
