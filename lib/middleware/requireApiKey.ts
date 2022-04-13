@@ -12,14 +12,6 @@ declare module 'http' {
   }
 }
 
-declare module 'node-mocks-http' {
-  // Properties here are optional as we construct the request manually
-  interface RequestOptions {
-    authorizedSpaceId?: string
-    botUser?: User
-  }
-}
-
 export async function provisionApiKey (spaceId: string): Promise<SpaceApiToken> {
   const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
 

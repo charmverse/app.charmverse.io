@@ -11,7 +11,7 @@ export class CdkDeployStack extends Stack {
       path: `${__dirname}/../deploy.zip`,
     });
     // Create a ElasticBeanStalk app. - must be 40 characters or less
-    const appName = 'CharmVerse-staging-' + (process.env.STAGE || '').slice(0, 20);
+    const appName = sanitizeAppName('CharmVerse-staging-' + process.env.STAGE);
 
     const ebApp = new elasticbeanstalk.CfnApplication(this, 'Application', {
       applicationName: appName,
@@ -86,4 +86,9 @@ export class CdkDeployStack extends Stack {
       value: 'http://' + ebEnv.attrEndpointUrl + '/login',
     });
   }
+}
+
+// Member must contain only letters, digits, and the dash character and may not start or end with a dash
+function sanitizeAppName (name: string) {
+  return name.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 40).replace(/^-/, '0').replace(/-$/, '0');
 }

@@ -12,9 +12,11 @@ import { useSWRConfig } from 'swr';
 import { useState, useEffect } from 'react';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { FailedImportsError } from 'pages/[domain]/settings/workspace';
+import type { FailedImportsError } from 'lib/notion/types';
 import { getCookie, deleteCookie } from 'lib/browser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 
 interface NotionResponseState {
   error?: string;
@@ -29,6 +31,7 @@ export default function ImportNotionWorkspace () {
   const [modalOpen, setModalOpen] = useState(false);
   const { mutate } = useSWRConfig();
   const [space] = useCurrentSpace();
+  const dispatch = useAppDispatch();
 
   const notionCode = getCookie(AUTH_CODE_COOKIE);
   const notionError = getCookie(AUTH_ERROR_COOKIE);
@@ -45,6 +48,9 @@ export default function ImportNotionWorkspace () {
         .then(({ failedImports }) => {
           setNotionState({ failedImports, loading: false });
           mutate(`pages/${space.id}`);
+          // Fetch all the focalboard blocks,
+          // TODO: Refactor to only return the imported blocks
+          dispatch(initialLoad());
           if (failedImports.length === 0) {
             showMessage('Notion workspace successfully imported');
             closeModal();

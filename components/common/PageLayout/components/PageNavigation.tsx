@@ -560,7 +560,9 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
 }
 
 function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuNode[] {
+  const pagesRecord: Record<string, Page> = {};
   const tempItems = items.map((item): MenuNode => {
+    pagesRecord[item.id] = item;
     return {
       ...item,
       children: []
@@ -576,10 +578,12 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
   for (i = 0; i < tempItems.length; i += 1) {
     node = tempItems[i];
     const index = node[key] ? map[node[key]!] : -1;
-    // Make sure its not a database page
-    if (node[key] && tempItems[index] && !tempItems[index].boardId) {
-      tempItems[index].children.push(node);
-      sortArrayByObjectProperty(tempItems[index].children, 'index');
+    if (node[key] && tempItems[index]) {
+      // Make sure its not a database page or a focalboard card
+      if (!tempItems[index].boardId && !tempItems[index].cardId) {
+        tempItems[index].children.push(node);
+        sortArrayByObjectProperty(tempItems[index].children, 'index');
+      }
     }
     else if (!rootPageIds) {
       roots.push(node);

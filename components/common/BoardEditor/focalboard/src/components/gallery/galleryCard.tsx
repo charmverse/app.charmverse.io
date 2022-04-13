@@ -46,6 +46,7 @@ type Props = {
 
 const GalleryCard = React.memo((props: Props) => {
     const {card, board} = props
+    
     const intl = useIntl()
     const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readonly, props.onDrop)
     const contents = useAppSelector(getCardContents(card.id))
@@ -58,12 +59,11 @@ const GalleryCard = React.memo((props: Props) => {
         className += ' dragover'
     }
 
-
-    let galleryImageUrl: null | string = null;
+    let galleryImageUrl: null | string = card.fields.headerImage;
 
     const charmTextContent = contents.find(content => (content as Block).type === "charm_text") as CharmTextBlock
 
-    if (charmTextContent) {
+    if (charmTextContent && !galleryImageUrl) {
       const { content } = charmTextContent.fields as {content: PageContent};
 
       if (content?.content) {

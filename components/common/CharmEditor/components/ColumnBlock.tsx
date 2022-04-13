@@ -1,7 +1,6 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
 import { ReactNode, memo } from 'react';
 
 export const spec = specFactory;
@@ -31,7 +30,7 @@ const StyledColumnBlock = styled.div`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   position: relative;
   transition: background-color 250ms ease-in-out;
-
+  
   &:hover {
     transition: background-color 250ms ease-in-out;
     background-color: ${({ theme }) => theme.palette.background.light};
