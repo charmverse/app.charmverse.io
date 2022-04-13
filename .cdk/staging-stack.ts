@@ -93,14 +93,13 @@ export class CdkDeployStack extends Stack {
       zone,
       recordName: deploymentDomain,
       //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
-      target: {
-        // @ts-ignore
+      target: route53.RecordTarget.fromAlias({
         bind: (): route53.AliasRecordTargetConfig => ({
           dnsName: ebEnv.attrEndpointUrl,
-          // https://docs.aws.amazon.com/general/latest/gr/rande.html#elasticbeanstalk_region
+          // https://docs.aws.amazon.com/general/latest/gr/elasticbeanstalk.html
           hostedZoneId: 'Z117KPS5GTRQ2G' // for us-east-1
         })
-      }
+      }),
     });
 
     /**
