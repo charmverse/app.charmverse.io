@@ -13,6 +13,7 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import { createCharmTextBlock } from 'lib/focalboard/charmBlock';
 import { createCard } from 'lib/focalboard/card';
 import promiseRetry from 'promise-retry';
+import { isTruthy } from 'lib/utilities/types';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
@@ -790,8 +791,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       page_size: BLOCKS_FETCHED_PER_REQUEST
     }];
 
-    async function getChildren (listBlockChildrenParameter: ListBlockChildrenParameters) {
-      return promiseRetry<ChildBlockListResponse | void>((retry) => {
+    function getChildren (listBlockChildrenParameter: ListBlockChildrenParameters) {
+      return promiseRetry((retry, number) => {
         return notion.blocks.children.list(listBlockChildrenParameter).then(response => ({
           results: response.results,
           request: listBlockChildrenParameter,
@@ -810,11 +811,29 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       });
     }
 
-    async function getListBlockChildrenSuccessResponses () {
-      return (await Promise.all(listBlockChildrenParameters
-        .map(listBlockChildrenParameter => getChildren(listBlockChildrenParameter))))
-        .filter(listBlockChildrenResponse => listBlockChildrenResponse) as ChildBlockListResponse[];
+    async function getListBlockChildrenResponses (): Promise<ChildBlockListResponse[]> {
+      const childBlockListResponses = await Promise.all(listBlockChildrenParameters
+        .map(listBlockChildrenParameter => getChildren(listBlockChildrenParameter)))
+        .then(_results => _results.filter(isTruthy));
+
+      // Reset the requests as they've all been fetched
+      listBlockChildrenParameters = [];
+
+      childBlockListResponses.forEach(childBlockListResponse => {
+        // If next_cursor exist then this block contains more child blocks
+        if (childBlockListResponse.next_cursor) {
+          listBlockChildrenParameters.push({
+          // Using the request.block_id to get the block's parent id
+            block_id: childBlockListResponse.request.block_id,
+            page_size: BLOCKS_FETCHED_PER_REQUEST,
+            start_cursor: childBlockListResponse.next_cursor
+          });
+        }
+      });
+
+      return childBlockListResponses;
     }
+
     // notion.pages.retrieve will return an error if the integration doesn't have access to the page
     try {
       // If the page doesn't exist in the cache fetch it
@@ -830,11 +849,11 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
           log.debug(`[notion] - ${listBlockChildrenParameters.length} Requests for child blocks at depth: ${depth}`);
 
-          const childBlockListResponses = await getListBlockChildrenSuccessResponses();
+          const childBlockListResponses = await getListBlockChildrenResponses();
 
           // If the block has more child to be fetch, this will be true
           while (listBlockChildrenParameters.length !== 0) {
-            childBlockListResponses.push(...await getListBlockChildrenSuccessResponses());
+            childBlockListResponses.push(...await getListBlockChildrenResponses());
           }
 
           // Reset the requests as they've all been fetched
@@ -843,7 +862,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           // Now that all child content has been fetched, we need to check if any of the child block has children or not
           // Go through each of the block and add them to the record
           // eslint-disable-next-line
-        childBlockListResponses.forEach((childBlockListResponse) => {
+          childBlockListResponses.forEach((childBlockListResponse) => {
             childBlockListResponse.results.forEach((block) => {
               const blockWithChildren: BlockWithChildren = {
                 ...block,
