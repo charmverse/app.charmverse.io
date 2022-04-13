@@ -149,16 +149,18 @@ const CardDialog = (props: Props): JSX.Element | null => {
                 onClose={props.onClose}
                 toolsMenu={!props.readonly && menu}
                 hideCloseButton={true}
-                toolbar={pages[card.id] && (
-                    <Button
-                        size='small'
-                        color='secondary'
-                        href={`/${router.query.domain}/${pages[card.id]!.path}`}
-                        variant='text'
-                        startIcon={<OpenInFullIcon fontSize='small'/>}>
-                        Open as Page
-                    </Button>
-                    )
+                toolbar={(
+                  // <Button
+                  //     size='small'
+                  //     color='secondary'
+                  //     href={`/${router.query.domain}/${pages[card.id]!.path}`}
+                  //     variant='text'
+                  //     startIcon={<OpenInFullIcon fontSize='small'/>}>
+                  //     Open as Page
+                  // </Button>
+                  // An empty div to keep the ellipsis on the right most side
+                    <div></div>
+                  )
                 }
                 // toolbar={toolbar}
             >
