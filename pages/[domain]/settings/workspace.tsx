@@ -18,13 +18,8 @@ import charmClient from 'charmClient';
 import { Box, Typography } from '@mui/material';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Link from 'components/common/Link';
+import { FailedImportsError } from 'lib/notion/types';
 
-export interface FailedImportsError {
-  pageId: string,
-  type: 'page' | 'database',
-  title: string,
-  blocks: [string, number][][]
-}
 export default function WorkspaceSettings () {
   setTitle('Workspace Options');
   const router = useRouter();

@@ -69,7 +69,7 @@ const CalculationRow = (props: Props): JSX.Element => {
                             onChange={(v: string) => {
                                 const calculations = {...selectedCalculations}
                                 calculations[template.id] = v
-                                const newBoard = createBoard(props.board)
+                                const newBoard = createBoard({block: props.board})
                                 newBoard.fields.columnCalculations = calculations
                                 mutator.updateBlock(newBoard, props.board, 'update_calculation')
                                 setHovered(false)
