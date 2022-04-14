@@ -583,7 +583,7 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
         sortArrayByObjectProperty(tempItems[index].children, 'index');
       }
     }
-    else if (!rootPageIds && node.type !== 'card') {
+    else if (!rootPageIds) {
       roots.push(node);
     }
     if (rootPageIds?.includes(node.id)) {

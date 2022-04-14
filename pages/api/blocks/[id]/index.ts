@@ -22,6 +22,7 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block>) {
       rootId: req.query.id as string
     }
   });
+
   return res.status(200).json(deleted);
 }
 
