@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "next build",
-    "build:prod": "prisma generate && npm run build",
+    "build:prisma": "prisma generate",
     "build:analyze": "cross-env ANALYZE=true next build",
     "deploy:staging": "npx cdk deploy \"CharmVerse-staging-${STAGE}\" --outputs-file cdk.out.json",
     "postdeploy:staging": "node --eval \"console.log('::set-output name=env_url::' + require('./cdk.out.json')['CharmVerse-staging-${STAGE}'].DeploymentUrl)\"",
