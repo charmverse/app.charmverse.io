@@ -5,11 +5,11 @@ runs:
   using: 'composite'
   steps:
 
-    - name: Show GitHub context
-      shell: bash
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
+    # - name: Show GitHub context
+    #   shell: bash
+    #   env:
+    #     GITHUB_CONTEXT: ${{ toJson(github) }}
+    #   run: echo "$GITHUB_CONTEXT"
 
     - name: Cache build
       id: cache_build
@@ -18,11 +18,11 @@ runs:
         path: .next
         key: next-build-${{ github.sha }}
 
+    - name: Build Prisma types
+      shell: bash
+      run: npm run build:prisma
+
     - name: Build
       shell: bash
       if: steps.cache_build.outputs.cache-hit != 'true'
       run: npm run build
-
-    - name: Build Prisma types
-      shell: bash
-      run: npm run build:prisma
