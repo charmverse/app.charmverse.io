@@ -52,7 +52,7 @@ beforeAll(async () => {
     title: 'Example title',
     createdBy: user.id,
     spaceId: space.id
-  });
+  }, exampleBoardSchema);
 
   const boardId = database.boardId as string;
   const spaceId = space.id;
@@ -289,7 +289,10 @@ describe('POST /databases/{id}/search', () => {
       .send(<PaginatedQuery<PageQuery>>{
         limit: 2,
         query: {
-          InvalidProp: 'value'
+          properties: {
+            InvalidProp: 'value'
+          }
+
         }
       });
 
@@ -337,7 +340,7 @@ describe('POST /databases/{id}/search', () => {
     const statusSchema = exampleBoardSchema.find(schema => schema.name === 'Status')!;
 
     statusSchema.options.forEach(option => {
-      expect((response.body as InvalidCustomPropertyValueError).error).toContain(option.value);
+      expect((response.body as InvalidCustomPropertyValueError).error.validOptions).toContain(option.value);
     });
   });
 

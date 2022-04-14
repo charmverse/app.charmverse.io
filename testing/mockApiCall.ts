@@ -1,3 +1,3 @@
 
-export const baseUrl = `http://localhost:${process.env.port}`;
+export const baseUrl = `${process.env.DOMAIN}:${process.env.PORT}`;
 

@@ -105,19 +105,19 @@ export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDet
 /**
  * Used when an option does not exist in a list
  */
-export class InvalidCustomPropertyValueError extends SystemError<any []> {
+export class InvalidCustomPropertyValueError extends SystemError<{validOptions: any []}> {
 
   constructor (errorInfo: {key: string, value: any, boardSchema: PageProperty []}) {
 
-    const allowedValues = errorInfo.boardSchema.find(schema => schema.name === 'key')?.options.map(opt => opt.value) ?? [];
+    const allowedValues = errorInfo.boardSchema.find(schema => schema.name === errorInfo.key)?.options.map(opt => opt.value) ?? [];
 
     super({
       message: `Value '${errorInfo.value}' is an invalid option for property ${errorInfo.key}`,
       errorType: 'Invalid input',
       severity: 'warning',
-      error: [
-        allowedValues
-      ]
+      error: {
+        validOptions: allowedValues
+      }
     });
   }
 }
