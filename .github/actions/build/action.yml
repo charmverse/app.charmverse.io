@@ -21,4 +21,4 @@ runs:
     - name: Build
       shell: bash
       # if: steps.cache_build.outputs.cache-hit != 'true'
-      run: npm run build
+      run: prisma generate && npm run build
