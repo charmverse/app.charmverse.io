@@ -1,12 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { prisma } from 'db';
-import request from 'supertest';
-
-import { v4 } from 'uuid';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { createDatabase, createDatabaseCardPage, Page } from 'lib/public-api';
-import { SpaceAccessDeniedError } from 'lib/middleware/errors';
+import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 
 describe('GET /api/v1/pages/{pageId}', () => {
 

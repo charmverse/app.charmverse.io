@@ -4,7 +4,6 @@ import { prisma } from 'db';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { baseUrl } from 'testing/mockApiCall';
 import { createDatabase, createDatabaseCardPage } from '../createDatabaseCardPage';
 import { DatabasePageNotFoundError, InvalidInputError, PageNotFoundError } from '../errors';
 import { getDatabaseRoot, getPageInBoard } from '../getPageInBoard';
@@ -156,7 +155,7 @@ describe('getDatabaseRoot', () => {
         title: expect.any(String),
         schema: expect.any(Array),
         type: expect.stringMatching('board'),
-        url: expect.stringMatching(`${baseUrl}/${space.domain}/${database.path}`)
+        url: expect.any(String)
       })
     );
   });
@@ -180,7 +179,7 @@ describe('getDatabaseRoot', () => {
         title: expect.any(String),
         schema: expect.any(Array),
         type: expect.stringMatching('board'),
-        url: expect.stringMatching(`${baseUrl}/${space.domain}/${database.path}`)
+        url: expect.any(String)
       })
     );
   });

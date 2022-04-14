@@ -45,7 +45,6 @@ describe('GET /databases/{id}', () => {
         title: expect.any(String),
         schema: expect.any(Array),
         type: expect.stringMatching('board'),
-        // #rl: expect.stringMatching(`${baseUrl}/${space.domain}/${database.path}`)
         url: expect.any(String)
       })
     );
