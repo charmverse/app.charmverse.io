@@ -1,0 +1,13 @@
+diff --git a/node_modules/next/dist/build/jest/jest.js b/node_modules/next/dist/build/jest/jest.js
+index 3b9a60c..1624eee 100644
+--- a/node_modules/next/dist/build/jest/jest.js
++++ b/node_modules/next/dist/build/jest/jest.js
+@@ -71,7 +71,7 @@ function nextJest(options = {}) {
+                 },
+                 transformIgnorePatterns: [
+                     // To match Next.js behavior node_modules is not transformed
+-                    '/node_modules/',
++                    //'/node_modules/',
+                     // CSS modules are mocked so they don't need to be transformed
+                     '^.+\\.module\\.(css|sass|scss)$',
+                     // Custom config can append to transformIgnorePatterns but not modify it
