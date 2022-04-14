@@ -19,7 +19,7 @@ import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/c
 import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
-import { useState, CSSProperties, ReactNode, memo, useCallback } from 'react';
+import { useState, CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -30,8 +30,9 @@ import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import { Callout, calloutSpec } from './components/Callout';
-import ColumnBlock, { spec as columnBlockSpec } from './components/ColumnBlock';
-import ColumnLayout, { spec as columnLayoutSpec } from './components/ColumnLayout';
+import * as columnLayout from './components/columnLayout';
+import LayoutColumn from './components/columnLayout/Column';
+import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './components/EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './components/InlinePalette';
@@ -81,8 +82,8 @@ export const specRegistry = new SpecRegistry([
   calloutSpec(), // OK
   cryptoPriceSpec(), // NO
   imageSpec(), // OK
-  columnLayoutSpec(), // NO
-  columnBlockSpec(), // NO ?? ==> Need to clarify how it fits into layout
+  columnLayout.columnSpec(), // NO
+  columnLayout.rowSpec(), // NO
   nestedPageSpec(), // NO
   quoteSpec(), // OK
   tabIndent.spec()
@@ -116,6 +117,7 @@ export function charmEditorPlugins (
     imagePlugins({
       handleDragAndDrop: false
     }),
+    columnLayout.plugins(),
     inlinePalettePlugins(),
     bold.plugins(),
     bulletList.plugins(),
@@ -136,21 +138,6 @@ export function charmEditorPlugins (
     columnResizing,
     floatingMenuPlugin(readOnly),
     blockquote.plugins(),
-    NodeView.createPlugin({
-      name: 'blockquote',
-      containerDOM: ['blockquote'],
-      contentDOM: ['div']
-    }),
-    NodeView.createPlugin({
-      name: 'columnLayout',
-      containerDOM: ['div'],
-      contentDOM: ['div']
-    }),
-    NodeView.createPlugin({
-      name: 'columnBlock',
-      containerDOM: ['div'],
-      contentDOM: ['div']
-    }),
     NodeView.createPlugin({
       name: 'image',
       containerDOM: ['div', { draggable: 'false' }]
@@ -321,10 +308,10 @@ function CharmEditor (
           case 'quote':
             return <Quote {...props}>{NodeViewChildren}</Quote>;
           case 'columnLayout': {
-            return <ColumnLayout node={props.node}>{NodeViewChildren}</ColumnLayout>;
+            return <LayoutRow node={props.node}>{NodeViewChildren}</LayoutRow>;
           }
           case 'columnBlock': {
-            return <ColumnBlock node={props.node}>{NodeViewChildren}</ColumnBlock>;
+            return <LayoutColumn node={props.node}>{NodeViewChildren}</LayoutColumn>;
           }
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency, quote: null | FiatCurrency };
