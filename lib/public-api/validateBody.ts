@@ -93,19 +93,18 @@ export function validateUpdateData (creationData: PageQuery): true {
     return true;
   }
   catch (error) {
-    const modifiedError: UnsupportedKeyDetails<Pick<Page, 'title' | 'properties'>> = { ...(error as any) };
+    const modifiedError = error as UnsupportedKeysError;
 
-    modifiedError.example = {
+    modifiedError.error.example = {
       title: 'New page title',
       properties: {
         customProperty: 'new value'
       }
     };
 
-    throw new UnsupportedKeysError({
-      message: 'Invalid data inside your update data',
-      error: modifiedError
-    });
+    modifiedError.message = 'Invalid data inside your update data';
+
+    throw modifiedError;
 
   }
 }
