@@ -18,7 +18,8 @@ runs:
         path: .next
         key: next-build-${{ github.sha }}
 
-    - name: Build Prisma types
+    # Re-build prisma types which are cached inside of node_modules
+    - name: Re-build Prisma types
       shell: bash
       run: npm run build:prisma
 
