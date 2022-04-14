@@ -12,7 +12,6 @@ const Container = styled.div`
 export interface ILoaderInput {
   message?: string;
   size?: number;
-  sx?: any;
 }
 
 export default function Loader ({ message, size }: ILoaderInput) {
