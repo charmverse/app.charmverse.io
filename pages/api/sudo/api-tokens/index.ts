@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { onError, onNoMatch, requireKeys, getBotUser, provisionApiKey } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, getBotUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
@@ -33,7 +33,27 @@ async function provisionToken (req: NextApiRequest, res: NextApiResponse) {
 
   const { spaceId } = req.body;
 
-  const spaceToken = await provisionApiKey(spaceId);
+  const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
+
+  const spaceToken = await prisma.spaceApiToken.upsert({
+    where: {
+      spaceId: spaceId as string
+    },
+    update: {
+      token: newApiKey,
+      updatedAt: new Date().toISOString()
+    },
+    create: {
+      token: newApiKey,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      }
+    }
+  });
+
+  await getBotUser(spaceId);
 
   return res.status(200).json(spaceToken);
 

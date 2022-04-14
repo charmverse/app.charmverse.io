@@ -1,19 +1,18 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
-import Progress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
-import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
+import Progress from '@mui/material/CircularProgress';
+import InputLabel from '@mui/material/InputLabel';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { FormError } from 'components/common/form/FormError.class';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { ISystemError } from 'lib/utilities/errors';
+import { IUserError } from 'lib/utilities/errors';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -65,7 +64,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
   const [space] = useCurrentSpace();
 
   const [allowManualInput, setAllowManualInput] = useState(false);
-  const [formError, setFormError] = useState<ISystemError | null>(null);
+  const [formError, setFormError] = useState<IUserError | null>(null);
   // Checks if we could load the logo
   const [logoLoadSuccess, setLogoLoadSuccess] = useState(false);
 
@@ -130,13 +129,10 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
       onSubmit(createdPaymentMethod);
     }
     catch (error: any) {
-      setFormError(
-        new FormError({
-          message: error.message || error.error || (typeof error === 'object' ? JSON.stringify(error) : error),
-          severity: error.severity,
-          errorType: error.errorType ?? 'Unknown'
-        })
-      );
+      setFormError({
+        message: error.message || error.error || (typeof error === 'object' ? JSON.stringify(error) : error),
+        severity: error.severity ?? 'error'
+      });
     }
 
     return false;

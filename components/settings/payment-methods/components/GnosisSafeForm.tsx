@@ -1,8 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
-import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
+import InputLabel from '@mui/material/InputLabel';
 import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -11,11 +11,10 @@ import { getChainById } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { ISystemError } from 'lib/utilities/errors';
+import { IUserError } from 'lib/utilities/errors';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { FormError } from 'components/common/form/FormError.class';
 
 export type FormMode = 'create' | 'update';
 
@@ -61,7 +60,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
   const [,, refreshPaymentMethods] = usePaymentMethods();
   const [space] = useCurrentSpace();
 
-  const [formError, setFormError] = useState<ISystemError | null>(null);
+  const [formError, setFormError] = useState<IUserError | null>(null);
 
   const values = watch();
 
@@ -90,13 +89,10 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
       onSubmit(createdPaymentMethod);
     }
     catch (error: any) {
-      setFormError(
-        new FormError({
-          message: error.message || error.error || (typeof error === 'object' ? JSON.stringify(error) : error),
-          severity: error.severity,
-          errorType: error.errorType ?? 'Unknown'
-        })
-      );
+      setFormError({
+        message: error.message || error.error || (typeof error === 'object' ? JSON.stringify(error) : error),
+        severity: error.severity ?? 'error'
+      });
     }
   }
 
