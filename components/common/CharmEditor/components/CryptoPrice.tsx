@@ -4,7 +4,7 @@ import Button from 'components/common/Button';
 import Autorenew from '@mui/icons-material/Autorenew';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
@@ -12,7 +12,7 @@ import { formatMoney } from 'lib/utilities/formatting';
 import { RelativeTime } from 'components/common/RelativeTime';
 import charmClient from 'charmClient';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { CryptoCurrencies, getChainById, RPCList } from 'connectors';
+import { CryptoCurrencies, getChainById } from 'connectors';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { isTruthy } from 'lib/utilities/types';
 

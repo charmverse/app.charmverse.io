@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 import crypto from 'node:crypto';
 import { ApiError } from 'lib/middleware/errors';
+import log from 'lib/log';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -144,6 +145,7 @@ export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, 
 
   }
   catch (error) {
+    log.warn('Found error', error);
     throw new ApiError({
       message: 'Please provide a valid API token',
       errorType: 'Access denied'

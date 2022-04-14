@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, { ReactElement, ReactNode, useState } from 'react'
+import { useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { Board } from '../blocks/board'
 import { BoardView } from '../blocks/boardView'
@@ -21,7 +21,6 @@ import Menu from '../widgets/menu'
 import CardDetail from './cardDetail/cardDetail'
 import Dialog from './dialog'
 import { sendFlashMessage } from './flashMessages'
-import { IconButton } from '@mui/material'
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import Button from "components/common/Button"
 import { useRouter } from 'next/router'
@@ -149,16 +148,18 @@ const CardDialog = (props: Props): JSX.Element | null => {
                 onClose={props.onClose}
                 toolsMenu={!props.readonly && menu}
                 hideCloseButton={true}
-                toolbar={pages[card.id] && (
-                    <Button
-                        size='small'
-                        color='secondary'
-                        href={`/${router.query.domain}/${pages[card.id]!.path}`}
-                        variant='text'
-                        startIcon={<OpenInFullIcon fontSize='small'/>}>
-                        Open as Page
-                    </Button>
-                    )
+                toolbar={(
+                  // <Button
+                  //     size='small'
+                  //     color='secondary'
+                  //     href={`/${router.query.domain}/${pages[card.id]!.path}`}
+                  //     variant='text'
+                  //     startIcon={<OpenInFullIcon fontSize='small'/>}>
+                  //     Open as Page
+                  // </Button>
+                  // An empty div to keep the ellipsis on the right most side
+                    <div></div>
+                  )
                 }
                 // toolbar={toolbar}
             >

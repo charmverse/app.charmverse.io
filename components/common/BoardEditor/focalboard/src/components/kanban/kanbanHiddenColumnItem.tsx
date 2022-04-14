@@ -25,12 +25,12 @@ type Props = {
 
 export default function KanbanHiddenColumnItem(props: Props): JSX.Element {
     const {activeView, intl, group} = props
-    const [{isOver}, drop] = useDrop(() => ({
+    const [{isOver}, drop] = useDrop<Card, any, { isOver: boolean }>(() => ({
         accept: 'card',
         collect: (monitor) => ({
             isOver: monitor.isOver(),
         }),
-        drop: (item: Card) => {
+        drop: (item) => {
             props.onDrop(item)
         },
     }), [props.onDrop])

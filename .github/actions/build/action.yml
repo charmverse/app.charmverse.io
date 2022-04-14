@@ -5,14 +5,25 @@ runs:
   using: 'composite'
   steps:
 
-    # - name: Cache build
-    #   id: cache_build
-    #   uses: actions/cache@v2
-    #   with:
-    #     path: .next
-    #     key: next-build-${{ github.event.pull_request.head.sha }}
+    # - name: Show GitHub context
+    #   shell: bash
+    #   env:
+    #     GITHUB_CONTEXT: ${{ toJson(github) }}
+    #   run: echo "$GITHUB_CONTEXT"
+
+    - name: Cache build
+      id: cache_build
+      uses: actions/cache@v2
+      with:
+        path: .next
+        key: next-build-${{ github.sha }}
+
+    # Re-build prisma types which are cached inside of node_modules
+    - name: Re-build Prisma types
+      shell: bash
+      run: npm run build:prisma
 
     - name: Build
       shell: bash
-      # if: steps.cache_build.outputs.cache-hit != 'true'
+      if: steps.cache_build.outputs.cache-hit != 'true'
       run: npm run build

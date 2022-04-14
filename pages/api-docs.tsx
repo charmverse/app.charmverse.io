@@ -22,7 +22,7 @@ export const getStaticProps: GetStaticProps = async ctx => {
     }
   });
 
-  console.log('Spec', spec);
+  // console.log('API Spec', spec);
 
   return {
     props: {

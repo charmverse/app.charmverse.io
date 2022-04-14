@@ -4,6 +4,7 @@ const config = {
   poweredByHeader: false,
   webpack5: true,
   experimental: {
+    esmExternals: 'loose',
     modularizeImports: {
       '@mui/material': {
         transform: '@mui/material/{{member}}'
@@ -78,7 +79,8 @@ const withTM = require('next-transpile-modules')([
   '@fullcalendar/core',
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
-  '@fullcalendar/react'
+  '@fullcalendar/react',
+  'react-dnd'
 ]);
 
 module.exports = withBundleAnalyzer(withTM(config));
