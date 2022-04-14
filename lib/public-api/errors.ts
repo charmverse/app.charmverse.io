@@ -105,7 +105,7 @@ export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDet
 /**
  * Used when an option does not exist in a list
  */
-export class InvalidCustomPropertyValueError extends SystemError {
+export class InvalidCustomPropertyValueError extends SystemError<any []> {
 
   constructor (errorInfo: {key: string, value: any, boardSchema: PageProperty []}) {
 

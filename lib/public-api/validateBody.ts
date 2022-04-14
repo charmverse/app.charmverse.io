@@ -129,18 +129,21 @@ export function validatePaginationQuery (query: PaginatedQuery<PageQuery>): true
   }
 
   if (unsupportedKeys.length > 0) {
-    throw {
-      error: 'Your query contains unsupported keys',
-      unsupportedKeys,
-      allowedKeys: supportedKeys,
-      example: {
-        limit: 1,
-        cursor: 'e63758e2-de17-48b2-9c74-5a40ea5be761',
-        query: {
-          title: 'my page'
+
+    throw new UnsupportedKeysError({
+      message: 'Your query contains unsupported keys',
+      error: {
+        unsupportedKeys,
+        allowedKeys: supportedKeys,
+        example: {
+          limit: 1,
+          cursor: 'e63758e2-de17-48b2-9c74-5a40ea5be761',
+          query: {
+            title: 'my page'
+          }
         }
       }
-    };
+    });
   }
 
   return true;
