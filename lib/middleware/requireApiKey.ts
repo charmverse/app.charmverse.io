@@ -2,6 +2,7 @@ import { Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
+import log from 'lib/log';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -108,7 +109,7 @@ export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, 
 
   }
   catch (error) {
-    console.log('Found error', error);
+    log.warn('Found error', error);
     return res.status(401).send({ error: 'Please provide a valid API token' });
   }
 

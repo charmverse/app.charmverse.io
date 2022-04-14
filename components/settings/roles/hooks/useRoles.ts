@@ -6,7 +6,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 export default function useRoles () {
   const [space] = useCurrentSpace();
 
-  const { data: roles } = useSWR(() => space ? `roles/${space.id}` : null, () => charmClient.listRoles(space!.id));
+  const { data: roles } = useSWR(() => space ? `roles/${space.id}` : null, () => space && charmClient.listRoles(space.id));
 
   async function createRole (role: Partial<Role>): Promise<Role> {
     role.spaceId = space?.id;
@@ -23,8 +23,10 @@ export default function useRoles () {
   }
 
   async function deleteRole (roleId: string) {
-    await charmClient.deleteRole({ roleId, spaceId: space!.id });
-    refreshRoles();
+    if (space) {
+      await charmClient.deleteRole({ roleId, spaceId: space.id });
+      refreshRoles();
+    }
   }
 
   async function assignRoles (roleId: string, userIds: string[]) {

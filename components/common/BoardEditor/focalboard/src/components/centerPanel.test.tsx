@@ -123,7 +123,6 @@ describe('components/centerPanel', () => {
                     showCard={jest.fn()}
                     showShared={true}
                     groupByProperty={groupProperty}
-                    shownCardId={card1.id}
                 />
             </ReduxProvider>,
         ))
@@ -143,7 +142,6 @@ describe('components/centerPanel', () => {
                     showCard={jest.fn()}
                     showShared={true}
                     groupByProperty={groupProperty}
-                    shownCardId={card1.id}
                 />
             </ReduxProvider>,
         ))
@@ -163,7 +161,6 @@ describe('components/centerPanel', () => {
                     showCard={jest.fn()}
                     showShared={true}
                     groupByProperty={groupProperty}
-                    shownCardId={card1.id}
                 />
             </ReduxProvider>,
         ))
@@ -184,7 +181,6 @@ describe('components/centerPanel', () => {
                         showCard={jest.fn()}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))
@@ -216,7 +212,6 @@ describe('components/centerPanel', () => {
                         showCard={jest.fn()}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))
@@ -240,7 +235,6 @@ describe('components/centerPanel', () => {
                         showCard={jest.fn()}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))
@@ -268,7 +262,6 @@ describe('components/centerPanel', () => {
                         showCard={jest.fn()}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))
@@ -303,7 +296,6 @@ describe('components/centerPanel', () => {
                         showCard={jest.fn()}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))
@@ -330,7 +322,6 @@ describe('components/centerPanel', () => {
                         showCard={jest.fn()}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))
@@ -358,7 +349,6 @@ describe('components/centerPanel', () => {
                         showCard={mockedShowCard}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))
@@ -384,7 +374,6 @@ describe('components/centerPanel', () => {
                         showCard={jest.fn()}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))
@@ -407,7 +396,6 @@ describe('components/centerPanel', () => {
                         showCard={jest.fn()}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))
@@ -433,7 +421,6 @@ describe('components/centerPanel', () => {
                         showCard={jest.fn()}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))
@@ -460,7 +447,6 @@ describe('components/centerPanel', () => {
                         showCard={jest.fn()}
                         showShared={true}
                         groupByProperty={groupProperty}
-                        shownCardId={card1.id}
                     />
                 </ReduxProvider>,
             ))

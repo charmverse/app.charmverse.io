@@ -29,8 +29,7 @@ export default function RoleForm ({ role = {}, mode = 'create', submitted = () =
 
   const {
     createRole,
-    updateRole,
-    roles
+    updateRole
   } = useRoles();
 
   const {
