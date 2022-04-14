@@ -1,4 +1,4 @@
-import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
+import { RawPlugins, RawSpecs, NodeView } from '@bangle.dev/core';
 import { DOMOutputSpec, keymap } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
 import { ReactNode, memo } from 'react';
@@ -50,7 +50,7 @@ export function plugins (): RawPlugins {
         //   dispatch(state.tr.replaceSelectionWith(state.schema.nodes.tabIndent.create()).scrollIntoView());
         // }
         console.log('Tab state', state, !!dispatch);
-        return true;
+        return false;
       },
       // 'Shift-Tab': undentListItem,
       Enter: (state, dispatch) => {
@@ -58,8 +58,18 @@ export function plugins (): RawPlugins {
         //   dispatch(state.tr.replaceSelectionWith(state.schema.nodes.tabIndent.create()).scrollIntoView());
         // }
         console.log('Enter state', state, !!dispatch);
-        return true;
+        return false;
       }
+    }),
+    NodeView.createPlugin({
+      name: 'columnLayout',
+      containerDOM: ['div'],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'columnBlock',
+      containerDOM: ['div'],
+      contentDOM: ['div']
     })
   ];
 }

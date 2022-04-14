@@ -82,8 +82,8 @@ export const specRegistry = new SpecRegistry([
   calloutSpec(), // OK
   cryptoPriceSpec(), // NO
   imageSpec(), // OK
-  columnLayout.columnSpec(), // NO
   columnLayout.rowSpec(), // NO
+  columnLayout.columnSpec(), // NO
   nestedPageSpec(), // NO
   quoteSpec(), // OK
   tabIndent.spec()
@@ -117,7 +117,6 @@ export function charmEditorPlugins (
     imagePlugins({
       handleDragAndDrop: false
     }),
-    columnLayout.plugins(),
     inlinePalettePlugins(),
     bold.plugins(),
     bulletList.plugins(),
@@ -138,6 +137,7 @@ export function charmEditorPlugins (
     columnResizing,
     floatingMenuPlugin(readOnly),
     blockquote.plugins(),
+    columnLayout.plugins(),
     NodeView.createPlugin({
       name: 'image',
       containerDOM: ['div', { draggable: 'false' }]
