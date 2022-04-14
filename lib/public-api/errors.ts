@@ -50,3 +50,15 @@ export class InvalidInputError extends SystemError {
     });
   }
 }
+
+export class SpaceNotFoundError extends SystemError {
+
+  constructor (id: string) {
+    super({
+      message: `Space with id '${id}' was not found`,
+      errorType: 'Data not found',
+      severity: 'warning'
+    });
+  }
+}
+

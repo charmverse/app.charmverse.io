@@ -1,18 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { Space, SpaceApiToken, User } from '@prisma/client';
 import { prisma } from 'db';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { baseUrl } from 'testing/mockApiCall';
 import { createDatabase, createDatabaseCardPage } from '../createDatabaseCardPage';
-import { DatabasePageNotFoundError, PageNotFoundError } from '../errors';
-import { getPageInBoard } from '../getPageInBoard';
-import { Page } from '../interfaces';
+import { DatabasePageNotFoundError, InvalidInputError, PageNotFoundError } from '../errors';
+import { getDatabaseRoot, getPageInBoard } from '../getPageInBoard';
+import { DatabasePage, Page } from '../interfaces';
+
+let user: User;
+let space: Space;
+let apiToken: SpaceApiToken;
+
+beforeAll(async () => {
+  const generated = await generateUserAndSpaceWithApiToken(v4());
+  user = generated.user;
+  space = generated.space;
+  apiToken = generated.apiToken;
+});
 
 describe('getPageInBoard', () => {
 
   it('should return the page', async () => {
-
-    const { user, space, apiToken } = await generateUserAndSpaceWithApiToken(v4());
 
     const databasePage = await createDatabase({
       title: 'Some title',
@@ -50,8 +61,6 @@ describe('getPageInBoard', () => {
 
   it('should throw a database not found error when the database for the page does not exist', async () => {
 
-    const { user, space, apiToken } = await generateUserAndSpaceWithApiToken(v4());
-
     const databasePage = await createDatabase({
       title: 'Some title',
       createdBy: user.id,
@@ -86,8 +95,6 @@ describe('getPageInBoard', () => {
 
   it('should throw a page not found error when the page does not exist', async () => {
 
-    const { user, space, apiToken } = await generateUserAndSpaceWithApiToken(v4());
-
     try {
       const inexistentId = v4();
       const foundCard = await getPageInBoard(inexistentId);
@@ -99,8 +106,6 @@ describe('getPageInBoard', () => {
   });
 
   it('should throw a page not found error when the page does not have the board type', async () => {
-
-    const { user, space, apiToken } = await generateUserAndSpaceWithApiToken(v4());
 
     const page = await prisma.page.create({
       data: {
@@ -127,6 +132,76 @@ describe('getPageInBoard', () => {
     }
   });
 
+});
+
+describe('getDatabaseRoot', () => {
+
+  it('should return a database by passing an ID', async () => {
+
+    const database = await createDatabase({
+      createdBy: user.id,
+      spaceId: space.id,
+      title: 'Example'
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const found = await getDatabaseRoot(database.boardId!);
+
+    expect(found).toEqual<DatabasePage>(
+      expect.objectContaining<DatabasePage>({
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+        id: expect.any(String),
+        spaceId: expect.any(String),
+        title: expect.any(String),
+        schema: expect.any(Array),
+        type: expect.stringMatching('board'),
+        url: expect.stringMatching(`${baseUrl}/${space.domain}/${database.path}`)
+      })
+    );
+  });
+
+  it('should return a database by passing a page path and spaceId', async () => {
+    const database = await createDatabase({
+      createdBy: user.id,
+      spaceId: space.id,
+      title: 'Example'
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const found = await getDatabaseRoot(database.path, space.id);
+
+    expect(found).toEqual<DatabasePage>(
+      expect.objectContaining<DatabasePage>({
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+        id: expect.any(String),
+        spaceId: expect.any(String),
+        title: expect.any(String),
+        schema: expect.any(Array),
+        type: expect.stringMatching('board'),
+        url: expect.stringMatching(`${baseUrl}/${space.domain}/${database.path}`)
+      })
+    );
+  });
+
+  it('should throw an error when passing a page path without a spaceId', async () => {
+    const database = await createDatabase({
+      createdBy: user.id,
+      spaceId: space.id,
+      title: 'Example'
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
+    try {
+      await getDatabaseRoot(database.path);
+    }
+    catch (error) {
+      expect(error).toBeInstanceOf(InvalidInputError);
+    }
+
+  });
 });
 
 export default {};

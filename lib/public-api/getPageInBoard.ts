@@ -1,6 +1,10 @@
+import { Block } from '@prisma/client';
 import { prisma } from 'db';
+import { DatabasePage, DatabasePageNotFoundError } from 'lib/public-api';
+import { filterObjectKeys } from 'lib/utilities/objects';
+import { validate } from 'uuid';
+import { PageNotFoundError, SpaceNotFoundError, InvalidInputError } from './errors';
 import { Page, PageProperty } from './interfaces';
-import { DatabasePageNotFoundError, PageNotFoundError } from './errors';
 import { PageFromBlock } from './pageFromBlock.class';
 
 export async function getPageInBoard (pageId: string): Promise<Page> {
@@ -40,4 +44,65 @@ export async function getPageInBoard (pageId: string): Promise<Page> {
   const cardToReturn = new PageFromBlock(card, boardSchema, (cardPageContent?.fields as any)?.content);
 
   return cardToReturn;
+}
+
+/**
+ * The root database page also containing the schema for that database
+ * @param id The id or path of the database
+ * @param spaceId If searching by database path, you must provide the spaceId to avoid conflicts
+ */
+export async function getDatabaseRoot (id: string, spaceId?: string): Promise<DatabasePage> {
+  const isValidUuid = validate(id as string);
+
+  if (!isValidUuid && !spaceId) {
+    throw new InvalidInputError('Please provide a spaceID in order to search pages by path');
+  }
+
+  // eslint-disable-next-line prefer-const
+  const database = await prisma.page.findFirst({
+    where: isValidUuid ? {
+      type: 'board',
+      boardId: id as string,
+      spaceId
+    } : {
+      type: 'board',
+      path: id as string,
+      spaceId
+    }
+
+  });
+
+  if (!database) {
+    throw new DatabasePageNotFoundError(id as string);
+  }
+
+  const board = await prisma.block.findFirst({
+    where: {
+      type: 'board',
+      id: database.boardId as string
+    }
+  }) as any as Block;
+
+  if (!board) {
+    throw new DatabasePageNotFoundError(id as string);
+  }
+
+  const filteredDatabaseObject = filterObjectKeys(database as any as DatabasePage, 'include', ['id', 'createdAt', 'updatedAt', 'type', 'title', 'url', 'spaceId', 'schema']);
+
+  const domain = process.env.DOMAIN;
+
+  const space = await prisma.space.findUnique({ where: { id: board.spaceId } });
+
+  // This should never be reached as blocks are deleted when a space is deleted
+  // Added to avoid null coalescing assertions
+  if (!space) {
+    throw new SpaceNotFoundError(board.spaceId);
+  }
+
+  filteredDatabaseObject.url = `${domain}/${space.domain}/${database.path}`;
+
+  (filteredDatabaseObject as any).schema = (board as any).fields.cardProperties;
+  filteredDatabaseObject.id = board.id;
+
+  return filteredDatabaseObject;
 }
