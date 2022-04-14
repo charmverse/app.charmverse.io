@@ -26,7 +26,6 @@ jobs:
         run: |
           npm prune --production
           rm -rf .next/cache
-          rm .ebextensions/02_alb-http-to-https-redirection.config
 
       - name: Change start command
         # use -i- otherwise sed thinks "Dockerfile" is a command line argument, then we have to clean up Dockerfile-
