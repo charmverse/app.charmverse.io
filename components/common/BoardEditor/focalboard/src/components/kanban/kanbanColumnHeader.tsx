@@ -55,12 +55,12 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
             isDragging: monitor.isDragging(),
         }),
     }))
-    const [{isOver}, drop] = useDrop(() => ({
+    const [{isOver}, drop] = useDrop<IPropertyOption, any, { isOver: boolean }>(() => ({
         accept: 'column',
         collect: (monitor) => ({
             isOver: monitor.isOver(),
         }),
-        drop: (item: IPropertyOption) => {
+        drop: (item) => {
             props.onDropToColumn(item, undefined, group.option)
         },
     }), [props.onDropToColumn])

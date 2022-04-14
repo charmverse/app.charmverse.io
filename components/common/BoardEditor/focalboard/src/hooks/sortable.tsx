@@ -19,12 +19,12 @@ function useSortableBase<T>(itemType: string, item: T, enabled: boolean, handler
         }),
         canDrag: () => enabled,
     }), [itemType, item, enabled])
-    const [{isOver}, drop] = useDrop(() => ({
+    const [{isOver}, drop] = useDrop<T, any, { isOver: boolean }>(() => ({
         accept: itemType,
         collect: (monitor) => ({
             isOver: monitor.isOver(),
         }),
-        drop: (dragItem: T) => {
+        drop: (dragItem) => {
             handler(dragItem, item)
         },
         canDrop: () => enabled,
