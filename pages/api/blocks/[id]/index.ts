@@ -1,7 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Prisma, Block } from '@prisma/client';
+import { Block } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -14,6 +14,12 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block>) {
   const deleted = await prisma.block.delete({
     where: {
       id: req.query.id as string
+    }
+  });
+
+  await prisma.block.deleteMany({
+    where: {
+      rootId: req.query.id as string
     }
   });
   return res.status(200).json(deleted);
