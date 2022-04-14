@@ -8,7 +8,7 @@ import {Card} from '../../blocks/card'
 import {Board, IPropertyTemplate} from '../../blocks/board'
 import {BoardView} from '../../blocks/boardView'
 import mutator from '../../mutator'
-import {Utils} from '../../utils'
+import { Utils } from '../../utils'
 
 import GalleryCard from './galleryCard'
 
