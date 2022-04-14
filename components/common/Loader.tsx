@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
 import styled from '@emotion/styled';
 
-const Container = styled.div`
+const Container = styled(Box)`
   display: flex;
   height: 100%;
   width: 100%;
@@ -12,11 +12,12 @@ const Container = styled.div`
 export interface ILoaderInput {
   message?: string;
   size?: number;
+  sx?: any;
 }
 
-export default function Loader ({ message, size }: ILoaderInput) {
+export default function Loader ({ message, size, sx }: ILoaderInput) {
   return (
-    <Container>
+    <Container sx={sx}>
       <div>
         <CircularProgress size={size} />
         { message !== undefined && <Typography sx={{ textAlign: 'center' }}>{message}</Typography>}
