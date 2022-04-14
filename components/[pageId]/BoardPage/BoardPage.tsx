@@ -10,7 +10,7 @@ import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/commo
 import { getCurrentViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad, initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { getCurrentBoardViews, getCurrentViewDisplayBy, getCurrentViewGroupBy, getView, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';

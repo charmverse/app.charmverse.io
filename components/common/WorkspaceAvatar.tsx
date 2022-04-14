@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import { lightGreyColor } from 'theme/colors';
 import Avatar from './Avatar';
 
 const StyledAvatar = styled(Avatar)<{ active: boolean }>`
