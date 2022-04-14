@@ -1,10 +1,10 @@
 
 import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4, validate } from 'uuid';
-import { Page, PageProperty, mapProperties, PageFromBlock, validateCreationData, DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
+import { Page, PageProperty, mapProperties, PageFromBlock, validateCreationData } from 'lib/public-api';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -32,32 +32,115 @@ handler
  *              schema:
  *                $ref: '#/components/schemas/Page'
  */
-export async function createPage (req: NextApiRequest, res: NextApiResponse) {
+async function createPage (req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
   const spaceId = req.authorizedSpaceId;
 
+  const isValidUuid = validate(id as string);
+
+  const domain = process.env.DOMAIN ?? 'https://app.charmverse.io';
+
+  if (!isValidUuid) {
+    return res.status(400).json({ error: `Please provide a valid database ID. Visit ${domain}/api-docs to find out how to get this` });
+  }
+
   const board = await prisma.block.findFirst({
     where: {
       type: 'board',
-      id: id as string
+      id: id as string,
+      spaceId
     }
   });
 
-  if (!board || (board.spaceId !== spaceId)) {
-    throw new DatabasePageNotFoundError(id as string);
+  if (!board) {
+    return res.status(404).send({ error: 'Database not found' });
   }
 
-  validateCreationData(req.body);
+  const { title, properties } = req.body;
 
-  const card = await createDatabaseCardPage({
-    ...req.body,
-    boardId: id,
-    spaceId,
-    createdBy: req.botUser.id
+  try {
+    validateCreationData(req.body);
+
+  }
+  catch (error) {
+    return res.status(400).json(error);
+  }
+
+  const boardSchema = (board.fields as any).cardProperties as PageProperty [];
+
+  let propertiesToAdd: Record<string, string | number> = {};
+
+  try {
+    propertiesToAdd = mapProperties(properties, boardSchema);
+  }
+  catch (error) {
+    console.log('Success', boardSchema);
+    return res.status(400).json(error);
+  }
+
+  const pageId = v4();
+
+  const block = await prisma.block.create({
+    data: {
+      id: v4(),
+      user: {
+        connect: {
+          id: req.botUser.id
+        }
+      },
+      updatedBy: req.botUser.id,
+      type: 'card',
+      rootId: id as string,
+      parentId: id as string,
+      title,
+      space: {
+        connect: {
+          id: board.spaceId
+        }
+      },
+      schema: 1,
+      fields: {
+        contentOrder: [
+          pageId
+        ],
+        headerImage: null,
+        icon: '',
+        isTemplate: false,
+        properties: propertiesToAdd
+      }
+
+    }
   });
 
-  return res.status(201).json(card);
+  const page = await prisma.block.create({
+    data: {
+      id: pageId,
+      user: {
+        connect: {
+          id: req.botUser.id
+        }
+      },
+      updatedBy: req.botUser.id,
+      type: 'charm_text',
+      rootId: id as string,
+      parentId: block.id,
+      title: '',
+      space: {
+        connect: {
+          id: board.spaceId
+        }
+      },
+      schema: 1,
+      fields: {
+      }
+
+    }
+  });
+
+  const card = new PageFromBlock(block, (board.fields as any).cardProperties);
+
+  return res.status(201).send(card);
 
 }
 
