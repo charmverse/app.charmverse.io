@@ -1,7 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Block } from '@prisma/client';
+import { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -82,9 +82,32 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
         createdBy: req.session.user.id,
         updatedBy: req.session.user.id
       }));
+      const cardBlocks = newBlocks.filter(newBlock => newBlock.type === 'card');
+
+      const cardPages: Prisma.PageCreateManyInput[] = cardBlocks.map(cardBlock => ({
+        createdBy: cardBlock.createdBy,
+        updatedBy: cardBlock.updatedBy,
+        id: cardBlock.id,
+        spaceId: cardBlock.spaceId,
+        cardId: cardBlock.id,
+        createdAt: cardBlock.createdAt,
+        path: `page-${Math.random().toString().replace('0.', '')}`,
+        title: cardBlock.title,
+        icon: cardBlock.fields.icon,
+        type: 'card',
+        headerImage: cardBlock.fields.headerImage,
+        contentText: '',
+        parentId: cardBlock.parentId,
+        updatedAt: cardBlock.updatedAt
+      }));
       await prisma.block.createMany({
         data: newBlocks
       });
+      if (cardPages.length !== 0) {
+        await prisma.page.createMany({
+          data: cardPages
+        });
+      }
       return res.status(200).json(newBlocks);
     }
   }
