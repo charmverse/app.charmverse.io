@@ -37,14 +37,6 @@ const config = {
       test: /\.svg$/,
       use: ['@svgr/webpack']
     });
-    // hack for react-dnd import - https://github.com/react-dnd/react-dnd/issues/3423
-    _config.resolve.fallback = {
-      'react/jsx-runtime': 'react/jsx-runtime.js',
-      // these are necessary when we define fallbacks. see error and solution: https://github.com/vercel/next.js/issues/33894
-      // fs: false,
-      // module: false,
-      process: require.resolve('process/browser')
-    };
     return _config;
   }
 };
