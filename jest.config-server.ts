@@ -1,8 +1,4 @@
-
-import nextJest from 'next/jest';
-
-const createJestConfig = nextJest({ dir: __dirname });
-
+import createJestConfig from 'testing/createJestConfig';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
@@ -223,16 +219,4 @@ export const jestConfig = {
   // watchman: true,
 };
 
-interface JestConfig {
-  transformIgnorePatterns: string[];
-}
-
-export async function overriddenConfig (_config: any) {
-  return async function defaultExport () {
-    const config: JestConfig = await createJestConfig(_config)();
-    config.transformIgnorePatterns = ['/.next/'];
-    return config;
-  };
-}
-
-export default overriddenConfig(jestConfig);
+export default createJestConfig(jestConfig);

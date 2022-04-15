@@ -1,5 +1,4 @@
-
-import { overriddenConfig } from './jest.config-server';
+import createJestConfig from 'testing/createJestConfig';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
@@ -195,4 +194,4 @@ const jestConfig = {
   // watchman: true,
 };
 
-export default overriddenConfig(jestConfig);
+export default createJestConfig(jestConfig);

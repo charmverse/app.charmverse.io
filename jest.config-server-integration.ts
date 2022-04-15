@@ -1,5 +1,6 @@
+import createJestConfig from 'testing/createJestConfig';
 
-import { jestConfig, overriddenConfig } from './jest.config-server';
+import { jestConfig } from './jest.config-server';
 
 const integrationConfig = {
   ...jestConfig,
@@ -8,4 +9,4 @@ const integrationConfig = {
   ]
 };
 
-export default overriddenConfig(integrationConfig);
+export default createJestConfig(integrationConfig);
