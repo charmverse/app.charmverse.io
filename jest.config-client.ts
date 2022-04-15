@@ -1,7 +1,5 @@
 
-import nextJest from 'next/jest';
-
-const createJestConfig = nextJest({ dir: __dirname });
+import { overriddenConfig } from './jest.config-server';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
@@ -197,14 +195,4 @@ const jestConfig = {
   // watchman: true,
 };
 
-interface JestConfig {
-  testPathIgnorePatterns: string[];
-}
-
-async function overriddenConfig () {
-  const config: JestConfig = await createJestConfig(jestConfig)();
-  config.testPathIgnorePatterns = ['/.next/'];
-  return config;
-}
-
-export default overriddenConfig;
+export default overriddenConfig(jestConfig);

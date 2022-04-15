@@ -224,13 +224,15 @@ export const jestConfig = {
 };
 
 interface JestConfig {
-  testPathIgnorePatterns: string[];
+  transformIgnorePatterns: string[];
 }
 
-async function overriddenConfig () {
-  const config: JestConfig = await createJestConfig(jestConfig)();
-  config.testPathIgnorePatterns = ['/.next/'];
-  return config;
+export async function overriddenConfig (_config: any) {
+  return async function defaultExport () {
+    const config: JestConfig = await createJestConfig(_config)();
+    config.transformIgnorePatterns = ['/.next/'];
+    return config;
+  };
 }
 
-export default overriddenConfig;
+export default overriddenConfig(jestConfig);

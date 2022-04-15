@@ -1,8 +1,5 @@
-import nextJest from 'next/jest';
 
-import { jestConfig } from './jest.config-server';
-
-const createJestConfig = nextJest({ dir: __dirname });
+import { jestConfig, overriddenConfig } from './jest.config-server';
 
 const integrationConfig = {
   ...jestConfig,
@@ -10,3 +7,5 @@ const integrationConfig = {
     '**/__integration-tests__/server/**/?(*.)+(spec|test).[tj]s?(x)'
   ]
 };
+
+export default overriddenConfig(integrationConfig);
