@@ -1,8 +1,6 @@
-import nextJest from 'next/jest';
+import createJestConfig from 'testing/createJestConfig';
 
 import { jestConfig } from './jest.config-server';
-
-const createJestConfig = nextJest({ dir: __dirname });
 
 const integrationConfig = {
   ...jestConfig,
