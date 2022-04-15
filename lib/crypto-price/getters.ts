@@ -1,5 +1,7 @@
+import fetch from 'adapters/http/fetch';
 import { getTimeDifference } from 'lib/utilities/dates';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
+import { IError } from 'lib/utilities/errors';
 import { getPriceFromCoinMarketCap, getPriceFromCryptoCompare } from './dataSources';
 
 class PricingCache {

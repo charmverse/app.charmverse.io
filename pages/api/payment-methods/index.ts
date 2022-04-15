@@ -1,11 +1,12 @@
 
-import { PaymentMethod, Prisma } from '@prisma/client';
-import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { isValidChainAddress } from 'lib/tokens/validation';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { Prisma, PaymentMethod } from '@prisma/client';
+import { prisma } from 'db';
+import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { IApiError } from 'lib/utilities/errors';
+import { isValidChainAddress } from 'lib/tokens/validation';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -15,7 +16,7 @@ handler.use(requireUser)
   .use(requireKeys<PaymentMethod>(['chainId', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals', 'walletType'], 'body'))
   .post(createPaymentMethod);
 
-async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<PaymentMethod []>) {
+async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<PaymentMethod [] | IApiError>) {
 
   const { spaceId } = req.query;
 
@@ -27,7 +28,7 @@ async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<Pay
   return res.status(200).json(paymentMethods);
 }
 
-async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<PaymentMethod>) {
+async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<PaymentMethod | IApiError>) {
 
   const {
     chainId,
@@ -42,15 +43,13 @@ async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<Pa
   } = req.body as PaymentMethod;
 
   if (walletType === 'metamask' && !(contractAddress && isValidChainAddress(contractAddress))) {
-    throw new ApiError({
-      message: 'Contract address is invalid',
-      errorType: 'Invalid input'
+    return res.status(400).json({
+      message: 'Contract address is invalid'
     });
   }
   if (walletType === 'gnosis' && !(gnosisSafeAddress && isValidChainAddress(gnosisSafeAddress))) {
-    throw new ApiError({
-      message: 'Safe address is invalid',
-      errorType: 'Invalid input'
+    return res.status(400).json({
+      message: 'Safe address is invalid'
     });
   }
 

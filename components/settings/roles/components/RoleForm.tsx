@@ -8,7 +8,7 @@ import Button from 'components/common/Button';
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { ISystemError } from 'lib/utilities/errors';
+import { IError } from 'lib/utilities/errors';
 import { useState } from 'react';
 
 export const schema = yup.object({
@@ -25,7 +25,7 @@ interface Props {
 
 export default function RoleForm ({ role = {}, mode = 'create', submitted = () => {} }: Props) {
 
-  const [formError, setFormError] = useState<ISystemError | null>(null);
+  const [formError, setFormError] = useState<IError | null>(null);
 
   const {
     createRole,
