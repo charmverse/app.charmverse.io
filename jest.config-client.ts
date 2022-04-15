@@ -197,4 +197,14 @@ const jestConfig = {
   // watchman: true,
 };
 
-export default createJestConfig(jestConfig);
+interface JestConfig {
+  testPathIgnorePatterns: string[];
+}
+
+async function overriddenConfig () {
+  const config: JestConfig = await createJestConfig(jestConfig)();
+  config.testPathIgnorePatterns = ['/.next/'];
+  return config;
+}
+
+export default overriddenConfig;

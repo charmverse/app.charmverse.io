@@ -10,5 +10,3 @@ const integrationConfig = {
     '**/__integration-tests__/server/**/?(*.)+(spec|test).[tj]s?(x)'
   ]
 };
-
-export default createJestConfig(integrationConfig);
