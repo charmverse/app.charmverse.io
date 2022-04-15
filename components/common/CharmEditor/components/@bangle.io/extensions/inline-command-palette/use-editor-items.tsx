@@ -407,13 +407,18 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
             const node = state.schema.nodes.blockquote.create(
               undefined,
               Fragment.fromArray([
-                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
-                ]))
+                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))
               ])
             )
 
             if (dispatch && isAtBeginningOfLine(state)) {
-              dispatch(state.tr.replaceSelectionWith(node));
+              let tr = state.tr;
+              tr.replaceSelectionWith(node)
+              // move cursor to block
+              const offset = tr.selection.anchor;
+              const resolvedPos = tr.doc.resolve(offset);
+              tr.setSelection(TextSelection.near(resolvedPos));
+              dispatch(tr);
               return true;
             }
             return insertNode(state, dispatch, node)
@@ -445,7 +450,13 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
             )
 
             if (dispatch && isAtBeginningOfLine(state)) {
-              dispatch(state.tr.replaceSelectionWith(node));
+              let tr = state.tr;
+              tr.replaceSelectionWith(node)
+              // move cursor to block
+              const offset = tr.selection.anchor;
+              const resolvedPos = tr.doc.resolve(offset);
+              tr.setSelection(TextSelection.near(resolvedPos));
+              dispatch(tr);
               return true;
             }
             return insertNode(state, dispatch, node)

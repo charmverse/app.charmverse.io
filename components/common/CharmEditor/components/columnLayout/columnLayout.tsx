@@ -80,11 +80,3 @@ export function plugins (): RawPlugins {
 function exitColumn (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, view: EditorView<any> | undefined) {
   return insertEmpty(state.schema.nodes.paragraph, 'below', true)(state, dispatch, view);
 }
-
-function defaultBlockAt (match: any) {
-  for (let i = 0; i < match.edgeCount; i++) {
-    const { type } = match.edge(i);
-    if (type.isTextblock && !type.hasRequiredAttrs()) return type;
-  }
-  return null;
-}
