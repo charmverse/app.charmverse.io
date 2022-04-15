@@ -140,7 +140,7 @@
   white-space: break-spaces;
   -webkit-font-variant-ligatures: none;
   font-variant-ligatures: none;
-  font-feature-settings: "liga" 0;
+  font-feature-settings: "liga"0;
   /* the above doesn't seem to work in Edge */
 }
 
@@ -332,7 +332,7 @@ ol li {
   display: flex;
   flex-direction: row;
   position: relative;
-  left: -1.2rem;
+  left: -1.5rem;
 }
 
 .bangle-editor li[data-bangle-is-todo]>span:first-child>input {
@@ -374,8 +374,8 @@ ol li {
 
 .bangle-editor pre {
   white-space: pre-wrap;
-  margin-top: 1.25rem;
-  margin-bottom: 1.25rem;
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 
 /** Bullet List */

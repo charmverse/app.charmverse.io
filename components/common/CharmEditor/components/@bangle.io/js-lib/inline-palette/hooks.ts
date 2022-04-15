@@ -66,11 +66,11 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
         return () => true;
       }
 
-      return async (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, view: EditorView) => {
-        return await (item.editorExecuteCommand({
+      return (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, view: EditorView) => {
+        return item.editorExecuteCommand({
           item,
           itemIndex,
-        })(state, dispatch, view));
+        })(state, dispatch, view);
       };
     },
     [inlinePaletteKey, items, isItemDisabled],

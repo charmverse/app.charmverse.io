@@ -58,6 +58,7 @@ export function PaletteItemUI({
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (scrollIntoViewIfNeeded && isActive) {
+      console.log('scroll 1');
       ref.current && safeScrollIntoViewIfNeeded(ref.current, false);
     }
   }, [scrollIntoViewIfNeeded, isActive]);

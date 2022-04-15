@@ -4,7 +4,6 @@ import { ReactNode, memo } from 'react';
 
 // grid-template-columns: repeat(${({ colCount }) => `${colCount}, ${Math.floor(100 / colCount)}`}fr);
 const StyledColumnLayout = styled.div<{colCount: number}>`
-  min-height: 60px;
 
   & > .bangle-nv-child-container {
     height: 100%;
