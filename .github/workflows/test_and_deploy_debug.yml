@@ -57,7 +57,7 @@ jobs:
     name: Deploy to prod mirror debug instance
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/revert-revert-api'
-    #needs: test
+    needs: test
     steps:
       - uses: actions/checkout@v2
 
