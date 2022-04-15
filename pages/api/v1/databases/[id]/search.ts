@@ -2,7 +2,7 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { mapProperties, Page, PageFromBlock, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse, validatePageQuery, validatePaginationQuery } from 'lib/public-api';
+import { DatabasePageNotFoundError, mapProperties, Page, PageFromBlock, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse, validatePageQuery, validatePaginationQuery } from 'lib/public-api';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -73,18 +73,14 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!board) {
-    return res.status(404).send({ error: 'Board not found' });
+    throw new DatabasePageNotFoundError(id as string);
   }
 
   const searchQuery = req.body as PaginatedQuery<PageQuery>;
 
-  try {
-    validatePaginationQuery(searchQuery);
-    validatePageQuery(searchQuery.query);
-  }
-  catch (error) {
-    return res.status(400).send(error);
-  }
+  validatePaginationQuery(searchQuery);
+
+  validatePageQuery(searchQuery.query);
 
   const boardSchema = (board.fields as any).cardProperties as PageProperty[];
 
@@ -92,20 +88,14 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   const nestedJsonQuery: Prisma.NestedJsonFilter [] = [];
 
-  try {
-    const queryProperties: Record<string, string | number> = mapProperties(cardProperties, boardSchema);
+  const queryProperties: Record<string, string | number> = mapProperties(cardProperties, boardSchema);
 
-    Object.entries(queryProperties).forEach(queryItem => {
-      nestedJsonQuery.push({
-        path: ['properties', queryItem[0]],
-        equals: queryItem[1]
-      });
+  Object.entries(queryProperties).forEach(queryItem => {
+    nestedJsonQuery.push({
+      path: ['properties', queryItem[0]],
+      equals: queryItem[1]
     });
-
-  }
-  catch (error) {
-    return res.status(400).send(error);
-  }
+  });
 
   const prismaQueryContent: Prisma.BlockWhereInput = {
     rootId: id as string,

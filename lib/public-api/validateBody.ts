@@ -1,5 +1,5 @@
 import { PageQuery, PaginatedQuery, Page } from './interfaces';
-import { UnsupportedKeysError } from './errors';
+import { UnsupportedKeyDetails, UnsupportedKeysError } from './errors';
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
@@ -26,8 +26,8 @@ export function validatePageQuery (query: PageQuery): true {
   }
 
   if (unsupportedKeys.length > 0) {
-    throw <UnsupportedKeysError>{
-      error: 'Your query content for pages contains unsupported keys',
+
+    const errorDetails: UnsupportedKeyDetails = {
       unsupportedKeys,
       allowedKeys: supportedKeys,
       example: {
@@ -39,6 +39,12 @@ export function validatePageQuery (query: PageQuery): true {
         }
       }
     };
+
+    throw new UnsupportedKeysError({
+      message: 'Your query content for pages contains unsupported keys',
+      error: errorDetails
+    });
+
   }
 
   return true;
@@ -58,15 +64,16 @@ export function validateCreationData (creationData: PageQuery): true {
     return true;
   }
   catch (error) {
-    const modifiedError: UnsupportedKeysError<Pick<Page, 'title' | 'properties'>> = { ...(error as any) };
+    const modifiedError = error as UnsupportedKeysError<Pick<Page, 'title' | 'properties'>>;
 
-    modifiedError.error = 'Invalid data inside your creation data';
-    modifiedError.example = {
+    modifiedError.error.example = {
       title: 'Page title',
       properties: {
         customProperty: 'initial value'
       }
     };
+
+    modifiedError.message = 'Invalid data inside your creation data';
 
     throw modifiedError;
   }
@@ -86,17 +93,19 @@ export function validateUpdateData (creationData: PageQuery): true {
     return true;
   }
   catch (error) {
-    const modifiedError: UnsupportedKeysError<Pick<Page, 'title' | 'properties'>> = { ...(error as any) };
+    const modifiedError = error as UnsupportedKeysError;
 
-    modifiedError.error = 'Invalid data inside your update data';
-    modifiedError.example = {
+    modifiedError.error.example = {
       title: 'New page title',
       properties: {
         customProperty: 'new value'
       }
     };
 
+    modifiedError.message = 'Invalid data inside your update data';
+
     throw modifiedError;
+
   }
 }
 
@@ -119,18 +128,21 @@ export function validatePaginationQuery (query: PaginatedQuery<PageQuery>): true
   }
 
   if (unsupportedKeys.length > 0) {
-    throw {
-      error: 'Your query contains unsupported keys',
-      unsupportedKeys,
-      allowedKeys: supportedKeys,
-      example: {
-        limit: 1,
-        cursor: 'e63758e2-de17-48b2-9c74-5a40ea5be761',
-        query: {
-          title: 'my page'
+
+    throw new UnsupportedKeysError({
+      message: 'Your query contains unsupported keys',
+      error: {
+        unsupportedKeys,
+        allowedKeys: supportedKeys,
+        example: {
+          limit: 1,
+          cursor: 'e63758e2-de17-48b2-9c74-5a40ea5be761',
+          query: {
+            title: 'my page'
+          }
         }
       }
-    };
+    });
   }
 
   return true;

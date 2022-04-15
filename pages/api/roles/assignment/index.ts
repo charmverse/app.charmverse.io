@@ -1,13 +1,11 @@
 
+import { Prisma, SpaceRole, SpaceRoleToRole } from '@prisma/client';
+import { prisma } from 'db';
+import { ApiError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
+import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Prisma, Role, SpaceRole, SpaceRoleToRole } from '@prisma/client';
-import { prisma } from 'db';
-import { onError, onNoMatch, requireUser, requireKeys } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
-import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
-import { IApiError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -38,8 +36,9 @@ async function removeRole (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!role || !spaceRole) {
-    return res.status(400).json({
-      message: 'Cannot remove role'
+    throw new ApiError({
+      message: 'Cannot remove role',
+      errorType: 'Invalid input'
     });
   }
 
@@ -55,7 +54,7 @@ async function removeRole (req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json({ success: true, deleteResult });
 }
 
-async function assignRole (req: NextApiRequest, res: NextApiResponse<{success: boolean} | IApiError>) {
+async function assignRole (req: NextApiRequest, res: NextApiResponse<{success: boolean}>) {
   const data = req.body as SpaceRole & SpaceRoleToRole;
 
   const spaceRole = await prisma.spaceRole.findUnique({
@@ -76,8 +75,9 @@ async function assignRole (req: NextApiRequest, res: NextApiResponse<{success: b
   });
 
   if (!role || !spaceRole) {
-    return res.status(400).json({
-      message: 'Cannot assign role'
+    throw new ApiError({
+      message: 'Cannot assign role',
+      errorType: 'Invalid input'
     });
   }
 
