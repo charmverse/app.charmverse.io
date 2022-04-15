@@ -44,14 +44,10 @@ jobs:
         run: bash ./testing/configure-db.sh
 
       - name: Start test server
-        run: npm run start:test &
+        run: npm run start:test:ci &
 
       - name: Run tests
         run: npm run test:server
-
-    # - name: Run Tests
-    #   shell: 'script -q -e -c "bash {0}"' # add support for colors in output. see: https://github.com/actions/runner/issues/241
-    #   run: npm test
 
   deploy:
     name: Deploy to production
