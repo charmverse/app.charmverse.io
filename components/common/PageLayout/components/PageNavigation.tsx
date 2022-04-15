@@ -424,9 +424,9 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       handlerId: monitor.getHandlerId()
     })
   }));
-  const [{ canDrop, isOverCurrent }, drop] = useDrop(() => ({
+  const [{ canDrop, isOverCurrent }, drop] = useDrop<MenuNode, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
     accept: 'item',
-    drop (droppedItem: MenuNode, monitor) {
+    drop (droppedItem, monitor) {
       const didDrop = monitor.didDrop();
       if (didDrop) {
         return;
@@ -560,9 +560,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
 }
 
 function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuNode[] {
-  const pagesRecord: Record<string, Page> = {};
   const tempItems = items.map((item): MenuNode => {
-    pagesRecord[item.id] = item;
     return {
       ...item,
       children: []
@@ -605,9 +603,9 @@ type TreeRootProps = {
 } & ComponentProps<typeof TreeView>;
 
 function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) {
-  const [{ canDrop, isOverCurrent }, drop] = useDrop(() => ({
+  const [{ canDrop, isOverCurrent }, drop] = useDrop<MenuNode, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
     accept: 'item',
-    drop (item: MenuNode, monitor) {
+    drop (item, monitor) {
       const didDrop = monitor.didDrop();
       if (didDrop || !item.parentId) {
         return;

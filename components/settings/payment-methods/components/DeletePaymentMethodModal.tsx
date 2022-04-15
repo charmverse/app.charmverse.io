@@ -18,7 +18,7 @@ export default function CompositeDeletePaymentMethod ({
   paymentMethodIdToDelete
 }: IProps) {
 
-  const [paymentMethods, _, refreshPaymentMethods] = usePaymentMethods();
+  const [paymentMethods, , refreshPaymentMethods] = usePaymentMethods();
   const { bounties } = useBounties();
 
   const methodToDelete = paymentMethods.find(method => method.id === paymentMethodIdToDelete);

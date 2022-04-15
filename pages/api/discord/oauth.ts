@@ -1,5 +1,5 @@
 import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -31,7 +31,7 @@ async function oauth (req: NextApiRequest, res: NextApiResponse) {
     discordQueryParams.push(...['scope=guilds%20bot', 'permissions=0']);
   }
 
-  const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host!.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
+  const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback')}`;
   res.redirect(oauthUrl);
 }
 

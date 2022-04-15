@@ -20,4 +20,5 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": false
   },
+  "jestrunner.configPath": "jest.config-server.ts"
 }

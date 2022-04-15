@@ -56,9 +56,9 @@ const Table = (props: Props): JSX.Element => {
 
     const columnRefs: Map<string, React.RefObject<HTMLDivElement>> = new Map()
 
-    const [, drop] = useDrop(() => ({
+    const [, drop] = useDrop<{ id: string }, any, null>(() => ({
         accept: 'horizontalGrip',
-        drop: async (item: { id: string }, monitor) => {
+        drop: async (item, monitor) => {
             const columnWidths = {...activeView.fields.columnWidths}
             const finalOffset = monitor.getDifferenceFromInitialOffset()?.x || 0
             const newWidth = Math.max(Constants.minColumnWidth, (columnWidths[item.id] || 0) + (finalOffset || 0))

@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import Image from 'next/image';
 import Button from 'components/common/Button';
 import { greyColor2 } from 'theme/colors';
 

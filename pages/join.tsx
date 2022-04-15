@@ -15,7 +15,7 @@ export function AlternateRouteButton ({ href, children }: { href: string, childr
   return (
     <Box display='flex' alignItems='center' justifyContent={showMySpacesLink ? 'space-between' : 'center'}>
       {showMySpacesLink && (
-        <Button variant='text' href={`/${spaces[0]!.domain}`} endIcon={<NavigateNextIcon />}>
+        <Button variant='text' href={`/${spaces[0]?.domain}`} endIcon={<NavigateNextIcon />}>
           Go to my workspace
         </Button>
       )}

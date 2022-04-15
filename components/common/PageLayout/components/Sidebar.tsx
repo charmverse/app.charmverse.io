@@ -33,6 +33,7 @@ import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
 import NewPageMenu from 'components/common/PageLayout/components/NewPageMenu';
 import WorkspaceAvatar from 'components/common/WorkspaceAvatar';
+import { getCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { headerHeight } from './Header';
 import PageNavigation from './PageNavigation';
 
@@ -169,6 +170,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
+  const cards = useAppSelector(getCards);
   const { currentPageId, pages, setPages, addPageAndRedirect } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -210,9 +212,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         newPages = { [newPage.id]: newPage };
       }
     }
-    setPages(newPages);
     if (page?.boardId) {
       const board = boards.find(b => b.id === page.boardId);
+      const deletedCards = board ? Object.values(cards).filter(card => card.parentId === board.id) : [];
+      // Delete the page associated with the card
+      deletedCards.forEach(deletedCard => delete newPages[deletedCard.id]);
       if (board) {
         mutator.deleteBlock(
           board,
@@ -226,7 +230,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         );
       }
     }
-
+    setPages(newPages);
     const currentPage = pages[currentPageId];
     // Redirect from current page
     if (page && currentPage && page.id === currentPage.id) {

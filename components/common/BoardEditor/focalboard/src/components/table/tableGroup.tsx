@@ -35,7 +35,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
     const {board, activeView, group, onDropToGroup, groupByProperty} = props
     const groupId = group.option.id
 
-    const [{isOver}, drop] = useDrop(() => ({
+    const [{isOver}, drop] = useDrop<Card, any, { isOver: boolean }>(() => ({
         accept: 'card',
         collect: (monitor) => ({
             isOver: monitor.isOver(),
