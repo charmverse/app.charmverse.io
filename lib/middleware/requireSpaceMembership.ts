@@ -1,17 +1,21 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from 'db';
-import { IApiError } from 'lib/utilities/errors';
 import { Prisma, SpaceRole } from '@prisma/client';
+import { prisma } from 'db';
+import { ApiError } from 'lib/middleware';
+import { ISystemError } from 'lib/utilities/errors';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
 
 /**
  * Allow an endpoint to be consumed if it originates from a share page
  */
 export function requireSpaceMembership (role?: SpaceRole['role']) {
-  return async (req: NextApiRequest, res: NextApiResponse<IApiError>, next: NextHandler) => {
+  return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 
     if (!req.session.user) {
-      return res.status(401).send({ error: 'Please log in' } as any);
+      throw new ApiError({
+        message: 'Please log in',
+        errorType: 'Access denied'
+      });
     }
 
     const querySpaceId = req.query?.spaceId as string;
@@ -21,14 +25,16 @@ export function requireSpaceMembership (role?: SpaceRole['role']) {
     const spaceId = querySpaceId ?? bodySpaceId;
 
     if (!spaceId) {
-      return res.status(400).json({
-        message: 'Please provide a space Id'
+      throw new ApiError({
+        message: 'Please provide a space Id',
+        errorType: 'Invalid input'
       });
     }
 
     if (querySpaceId && bodySpaceId && querySpaceId !== bodySpaceId) {
-      return res.status(401).json({
-        message: 'Your request refers to multiple spaces. Remove unneeded space ID'
+      throw new ApiError({
+        message: 'Your request refers to multiple spaces. Remove unneeded space ID',
+        errorType: 'Access denied'
       });
     }
 
@@ -45,8 +51,9 @@ export function requireSpaceMembership (role?: SpaceRole['role']) {
     });
 
     if (!spaceRole) {
-      return res.status(401).send({
-        message: role ? `Your are not ${role === 'admin' ? 'an' : 'a'} ${role} of this space` : 'You do not have access to this space'
+      throw new ApiError({
+        message: role ? `Your are not ${role === 'admin' ? 'an' : 'a'} ${role} of this space` : 'You do not have access to this space',
+        errorType: 'Access denied'
       });
     }
     else {
