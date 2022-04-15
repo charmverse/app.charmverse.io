@@ -560,9 +560,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
 }
 
 function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuNode[] {
-  const pagesRecord: Record<string, Page> = {};
   const tempItems = items.map((item): MenuNode => {
-    pagesRecord[item.id] = item;
     return {
       ...item,
       children: []
