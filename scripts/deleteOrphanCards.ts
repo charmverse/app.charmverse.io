@@ -45,9 +45,12 @@ async function init () {
     }
   }
 
+  const orphanCards = cards.filter(c => !boardsInDb.some(b => b.id === c.rootId));
+
   console.log('cards', cards.length);
   console.log('total boards', boardIds.length);
   console.log('deleted boards', deletedBoardIds.length);
+  console.log('cards to delete', orphanCards.length);
   console.log('child blocks to delete', blocksToDelete.length);
 
   // await prisma.block.deleteMany({
