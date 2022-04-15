@@ -1,0 +1,13 @@
+diff --git a/node_modules/@bangle.dev/base-components/dist/list-item/list-item-component.js b/node_modules/@bangle.dev/base-components/dist/list-item/list-item-component.js
+index 49d1c8a..9159253 100644
+--- a/node_modules/@bangle.dev/base-components/dist/list-item/list-item-component.js
++++ b/node_modules/@bangle.dev/base-components/dist/list-item/list-item-component.js
+@@ -32,7 +32,7 @@ const isValidList = (state) => {
+     return parentHasDirectParentOfType(type, [
+         state.schema.nodes['bulletList'],
+         state.schema.nodes['orderedList'],
+-    ]);
++    ])(state);
+ };
+ function specFactory() {
+     const { toDOM, parseDOM } = domSerializationHelpers(name, {

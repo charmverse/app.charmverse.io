@@ -3,6 +3,7 @@ import {
   paragraph
 } from '@bangle.dev/base-components';
 import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
+import { TextSelection } from 'prosemirror-state';
 import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
@@ -88,20 +89,38 @@ function createColumnPaletteItem(colCount: number): Omit<PaletteItemType, "group
     description: `${colCount} Column Layout`,
     editorExecuteCommand: () => {
       return (state, dispatch, view) => {
-        rafCommandExec(view!, (state, dispatch) => {
-          const columnBlocks: Node[] = [];
-          for (let index = 0; index < colCount; index++) {
-            columnBlocks.push(
-              state.schema.nodes.columnBlock.create(undefined, Fragment.fromArray([
-                state.schema.nodes.paragraph.create()
-              ]))
-            )
-          }
-          return insertNode(state, dispatch, state.schema.nodes.columnLayout.create(
-            undefined,
-            Fragment.fromArray(columnBlocks)
-          ))
-        })
+        if (view) {
+          rafCommandExec(view!, (state, dispatch) => {
+
+            const columnBlocks: Node[] = [];
+            for (let index = 0; index < colCount; index++) {
+              columnBlocks.push(
+                state.schema.nodes.columnBlock.create(undefined, Fragment.fromArray([
+                  state.schema.nodes.paragraph.create()
+                ]))
+              )
+            }
+
+            const node = state.schema.nodes.columnLayout.create(
+              undefined,
+              Fragment.fromArray(columnBlocks)
+            );
+
+            if (dispatch && isAtBeginningOfLine(state)) {
+              let tr = state.tr;
+              const offset = tr.selection.anchor;
+              tr = tr.replaceSelectionWith(node);
+
+              // move cursor to first column
+              const resolvedPos = tr.doc.resolve(offset);
+              tr.setSelection(TextSelection.near(resolvedPos));
+
+              dispatch(tr);
+              return true;
+            }
+            return insertNode(state, dispatch, node)
+          })
+        }
         return replaceSuggestionMarkWith(palettePluginKey, '')(
           state,
           dispatch,
@@ -122,10 +141,19 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       description: 'Display a crypto price',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
-          // Execute the animation
-          rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.cryptoPrice.create())
-          })
+          if (view) {
+            // Execute the animation
+            rafCommandExec(view!, (state, dispatch) => {
+
+              const node = state.schema.nodes.cryptoPrice.create();
+
+              if (dispatch && isAtBeginningOfLine(state)) {
+                dispatch(state.tr.replaceSelectionWith(node));
+                return true;
+              }
+              return insertNode(state, dispatch, node)
+            })
+          }
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
             dispatch,
@@ -145,7 +173,12 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
         return (state, dispatch, view) => {
           // Execute the animation
           rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.horizontalRule.create())
+            const node = state.schema.nodes.horizontalRule.create();
+            if (dispatch && isAtBeginningOfLine(state)) {
+              dispatch(state.tr.replaceSelectionWith(node));
+              return true;
+            }
+            return insertNode(state, dispatch, node)
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
@@ -168,9 +201,17 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.image.create({
+
+            const node = state.schema.nodes.image.create({
               src: null
-            }))
+            })
+
+            if (dispatch && isAtBeginningOfLine(state)) {
+              dispatch(state.tr.replaceSelectionWith(node));
+              return true;
+            }
+
+            return insertNode(state, dispatch, node)
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
@@ -190,7 +231,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
+
+            const node = state.schema.nodes.paragraph.create(
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.iframe.create({
@@ -200,7 +242,14 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
                   height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
                 })
               ])
-            ))
+            )
+
+            if (dispatch && isAtBeginningOfLine(state)) {
+              dispatch(state.tr.replaceSelectionWith(node));
+              return true;
+            }
+
+            return insertNode(state, dispatch, node)
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
@@ -219,7 +268,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.paragraph.create(
+
+            const node = state.schema.nodes.paragraph.create(
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.iframe.create({
@@ -229,7 +279,13 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
                   height: MIN_EMBED_HEIGHT
                 })
               ])
-            ))
+            )
+
+            if (dispatch && isAtBeginningOfLine(state)) {
+              dispatch(state.tr.replaceSelectionWith(node));
+              return true;
+            }
+            return insertNode(state, dispatch, node)
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
@@ -318,12 +374,17 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       description: 'Insert a code block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
-          rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.codeBlock.create(
-              { language: "Javascript" },
-              Fragment.fromArray([])
-            ))
-          })
+          if (view) {
+            rafCommandExec(view, (state, dispatch) => {
+              if (isAtBeginningOfLine(state)) {
+                return setBlockType(state.schema.nodes.codeBlock, { language: 'Javascript' })(state, dispatch);
+              }
+              return insertNode(state, dispatch, state.schema.nodes.codeBlock.create(
+                { language: "Javascript" },
+                Fragment.fromArray([])
+              ))
+            })
+          }
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
             dispatch,
@@ -342,13 +403,25 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.blockquote.create(
+
+            const node = state.schema.nodes.blockquote.create(
               undefined,
               Fragment.fromArray([
-                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
-                ]))
+                state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))
               ])
-            ))
+            )
+
+            if (dispatch && isAtBeginningOfLine(state)) {
+              let tr = state.tr;
+              tr.replaceSelectionWith(node)
+              // move cursor to block
+              const offset = tr.selection.$head.end(1); // param 1 is node deep
+              const resolvedPos = tr.doc.resolve(offset);
+              tr.setSelection(TextSelection.near(resolvedPos));
+              dispatch(tr);
+              return true;
+            }
+            return insertNode(state, dispatch, node)
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
@@ -368,13 +441,25 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (state, dispatch) => {
-            return insertNode(state, dispatch, state.schema.nodes.quote.create(
+
+            const node = state.schema.nodes.quote.create(
               undefined,
               Fragment.fromArray([
                 state.schema.nodes.paragraph.create()
               ])
             )
-            )
+
+            if (dispatch && isAtBeginningOfLine(state)) {
+              let tr = state.tr;
+              tr.replaceSelectionWith(node)
+              // move cursor to block
+              const offset = tr.selection.$head.end(1); // param 1 is node deep
+              const resolvedPos = tr.doc.resolve(offset);
+              tr.setSelection(TextSelection.near(resolvedPos));
+              dispatch(tr);
+              return true;
+            }
+            return insertNode(state, dispatch, node)
           })
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
@@ -535,4 +620,10 @@ export function useEditorItems() {
   }, [addNestedPage]);
 
   return paletteItems;
+}
+
+function isAtBeginningOfLine (state: EditorState) {
+  // @ts-ignore types package is missing $cursor property as of 1.2.8
+  const parentOffset = state.selection.$cursor.parentOffset;
+  return parentOffset === 0;
 }
