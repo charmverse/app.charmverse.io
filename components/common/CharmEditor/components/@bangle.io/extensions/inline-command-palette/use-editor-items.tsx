@@ -415,7 +415,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
               let tr = state.tr;
               tr.replaceSelectionWith(node)
               // move cursor to block
-              const offset = tr.selection.anchor;
+              const offset = tr.selection.$head.end(1); // param 1 is node deep
               const resolvedPos = tr.doc.resolve(offset);
               tr.setSelection(TextSelection.near(resolvedPos));
               dispatch(tr);
@@ -453,7 +453,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, "group">[]> 
               let tr = state.tr;
               tr.replaceSelectionWith(node)
               // move cursor to block
-              const offset = tr.selection.anchor;
+              const offset = tr.selection.$head.end(1); // param 1 is node deep
               const resolvedPos = tr.doc.resolve(offset);
               tr.setSelection(TextSelection.near(resolvedPos));
               dispatch(tr);

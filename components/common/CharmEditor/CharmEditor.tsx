@@ -139,6 +139,11 @@ export function charmEditorPlugins (
     floatingMenuPlugin(readOnly),
     blockquote.plugins(),
     NodeView.createPlugin({
+      name: 'blockquote',
+      containerDOM: ['blockquote'],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
       name: 'image',
       containerDOM: ['div', { draggable: 'false' }]
     }),
@@ -303,7 +308,6 @@ function CharmEditor (
       postEditorComponents={<Placeholder show={isEmpty} />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
-        console.log('render view', props.node.type.name);
         switch (props.node.type.name) {
           case 'quote':
             return <Quote {...props}>{NodeViewChildren}</Quote>;
