@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+import log from 'lib/log';
 
 async function deleteOrphanCards () {
   const cards = await prisma.block.findMany({
@@ -6,7 +7,8 @@ async function deleteOrphanCards () {
       type: 'card'
     },
     select: {
-      parentId: true
+      parentId: true,
+      id: true
     }
   });
 
@@ -17,7 +19,7 @@ async function deleteOrphanCards () {
 
   for (;index < cards.length;) {
     // eslint-disable-next-line
-    const boards = await Promise.all(new Array(cardsPerPage).fill(0).map((_, index) => {
+    const orphanCards = await Promise.all<null | string>(new Array(cardsPerPage).fill(0).map((_, index) => {
       return new Promise((resolve) => {
         const card = cards[(page * cardsPerPage) + index];
         if (card) {
@@ -28,23 +30,49 @@ async function deleteOrphanCards () {
             select: {
               id: true
             }
-          }).then(block => resolve(block));
+          }).then((board) => {
+            if (!board) {
+              resolve(card.id);
+            }
+            else {
+              resolve(null);
+            }
+          });
         }
         else {
           resolve(null);
         }
       });
     }));
-
     page += 1;
     index += cardsPerPage;
+
+    const orphanCardDeletionPromises: Promise<any>[] = [];
+    orphanCards.forEach(orphanCard => {
+      // Delete the orphan charm_text and card block
+      if (orphanCard) {
+        orphanCardDeletionPromises.push(prisma.block.delete({
+          where: {
+            id: orphanCard
+          }
+        }));
+        orphanCardDeletionPromises.push(prisma.block.deleteMany({
+          where: {
+            type: 'charm_text',
+            parentId: orphanCard
+          }
+        }));
+      }
+    });
+    await Promise.all(orphanCardDeletionPromises);
+
     // eslint-disable-next-line
-    const orphans = boards.filter(board => !board)
+    const orphans = orphanCards.filter(orphanCard => orphanCard)
     totalOrphanCards += orphans.length;
-    console.log(`Page: ${page}. Orphans: ${totalOrphanCards}`);
+    log.debug(`Page: ${page}. Orphans: ${totalOrphanCards}/${page * cardsPerPage}`);
   }
 
-  console.log('Total orphan cards ', totalOrphanCards);
+  log.debug('Total orphan cards ', totalOrphanCards);
 }
 
 deleteOrphanCards();
