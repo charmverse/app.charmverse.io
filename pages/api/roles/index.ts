@@ -1,11 +1,12 @@
 
-import { Prisma, Role, SpaceRoleToRole, User } from '@prisma/client';
-import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
-import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { Prisma, Role, SpaceRoleToRole, User } from '@prisma/client';
+import { prisma } from 'db';
+import { onError, onNoMatch, requireUser, requireKeys } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
+import { IApiError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -26,13 +27,12 @@ type ListSpaceRolesResponse = {
   }[];
 }[]
 
-async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse>) {
+async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse | IApiError>) {
   const { spaceId } = req.query;
 
   if (!spaceId) {
-    throw new ApiError({
-      message: 'Please provide a valid space ID',
-      errorType: 'Invalid input'
+    return res.status(400).json({
+      message: 'Please provide a valid space ID'
     });
   }
 
@@ -83,10 +83,7 @@ async function deleteRole (req: NextApiRequest, res: NextApiResponse) {
   const data = req.body as SpaceRoleToRole & Role;
 
   if (!data.roleId) {
-    throw new ApiError({
-      message: 'Please provide a valid role id',
-      errorType: 'Invalid input'
-    });
+    return res.status(400).json({ message: 'Please provide a valid role id' } as any);
   }
 
   // Use space ID assertion to prevent role deletion

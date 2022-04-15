@@ -1,11 +1,12 @@
 
-import { Application, Prisma } from '@prisma/client';
+import { Application, Bounty, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { requireKeys } from 'lib/middleware/requireKeys';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { requireKeys } from 'lib/middleware/requireKeys';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { IApiError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -18,10 +19,7 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
   const { bountyId } = req.query;
 
   if (bountyId === undefined) {
-    throw new ApiError({
-      message: 'Please provide a valid bounty ID',
-      errorType: 'Invalid input'
-    });
+    return res.status(400).send({ error: 'Please provide a valid bounty ID' } as any);
   }
 
   const ApplicationListQuery: Prisma.ApplicationFindManyArgs = {
@@ -34,7 +32,7 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
   return res.status(200).json(applications);
 }
 
-async function createApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
+async function createApplication (req: NextApiRequest, res: NextApiResponse<Application | IApiError>) {
   const data = req.body as Application;
   const ApplicationToCreate = { ...data } as any;
 
@@ -46,9 +44,8 @@ async function createApplication (req: NextApiRequest, res: NextApiResponse<Appl
   });
 
   if (existingProposal) {
-    throw new ApiError({
-      message: 'This user has already applied to this bounty',
-      errorType: 'Invalid input'
+    return res.status(400).json(<IApiError>{
+      message: 'This user has already applied to this bounty'
     });
   }
 

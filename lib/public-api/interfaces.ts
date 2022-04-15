@@ -60,10 +60,6 @@ export interface PageProperty {
  *          type: string
  *          format: uuid
  *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
-*         spaceId:
- *          type: string
- *          format: uuid
- *          example: 12c419f4-017e-4696-b8e9-ca3079b32428
  *        createdAt:
  *          type: string
  *          format: date-time
@@ -88,10 +84,9 @@ export interface PageProperty {
  *            $ref: '#/components/schemas/PageProperty'
  *
  */
-export interface DatabasePage extends Pick<PrismaPage, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'title' | 'spaceId'> {
+export interface DatabasePage extends Pick<PrismaPage, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'title'> {
   url: string
   type: 'board'
-  schema: PageProperty []
 }
 
 /**
@@ -160,7 +155,6 @@ export interface Page {
   createdAt: string
   updatedAt: string
   databaseId: string
-  spaceId: string
   content: PageContentFormats
   title: string
   isTemplate: boolean

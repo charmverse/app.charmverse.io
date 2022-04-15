@@ -13,8 +13,6 @@ export class PageFromBlock implements Page {
 
   databaseId: string;
 
-  spaceId: string;
-
   content: PageContentFormats;
 
   title: string;
@@ -24,7 +22,6 @@ export class PageFromBlock implements Page {
   properties: Record<string, string | number>;
 
   constructor (block: Block, propertySchemas: PageProperty [], pageContent?: PageContent) {
-
     this.id = block.id;
     this.createdAt = new Date(block.createdAt).toISOString();
     this.updatedAt = new Date(block.createdAt).toISOString();
@@ -34,7 +31,6 @@ export class PageFromBlock implements Page {
     };
     this.title = block.title;
     this.isTemplate = (block.fields as any).isTemplate === true;
-    this.spaceId = block.spaceId;
     this.properties = this.parseProperties((block.fields as any).properties, propertySchemas);
   }
 
