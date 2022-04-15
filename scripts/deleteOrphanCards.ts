@@ -50,8 +50,8 @@ async function init () {
   console.log('cards', cards.length);
   console.log('total boards', boardIds.length);
   console.log('deleted boards', deletedBoardIds.length);
-  console.log('cards to delete', orphanCards.length);
-  console.log('child blocks to delete', blocksToDelete.length);
+  console.log('orphan cards', orphanCards.length);
+  console.log('total blocks to delete', blocksToDelete.length);
 
   // await prisma.block.deleteMany({
   //   where: {
