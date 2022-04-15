@@ -3,6 +3,8 @@ import { prisma } from 'db';
 import { postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { createUserFromWallet } from 'lib/users/createUser';
+import { getUserProfile } from 'lib/users/getUser';
 import { LoggedInUser } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -18,60 +20,22 @@ handler
 async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
   const { address } = req.body;
-  const user = await prisma.user.findFirst({
-    where: {
-      addresses: {
-        has: address
-      }
-    },
-    include: {
-      favorites: true,
-      spaceRoles: {
-        include: {
-          spaceRoleToRole: {
-            include: {
-              role: true
-            }
-          }
-        }
-      },
-      discordUser: true,
-      telegramUser: true
-    }
-  });
 
-  if (user) {
-    // strip out large fields so we dont break the cookie
-    const { discordUser, spaceRoles, telegramUser, ...userData } = user;
-    req.session.user = userData;
-    await req.session.save();
-    res.status(200).json(user);
+  let user: LoggedInUser;
+
+  try {
+    user = await getUserProfile('addresses', address);
   }
-  else {
-    const newUser = await prisma.user.create({
-      data: {
-        addresses: [address]
-      },
-      include: {
-        favorites: true,
-        spaceRoles: {
-          include: {
-            spaceRoleToRole: {
-              include: {
-                role: true
-              }
-            }
-          }
-        }
-      }
-    });
-
+  catch {
+    user = await createUserFromWallet(address);
     logSignup();
-
-    req.session.user = { ...newUser };
-    await req.session.save();
-    res.status(200).json(newUser);
   }
+
+  const { discordUser, spaceRoles, telegramUser, ...userData } = user;
+  req.session.user = userData;
+  await req.session.save();
+  res.status(200).json(user);
+
 }
 
 async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {

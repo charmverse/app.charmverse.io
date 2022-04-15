@@ -1,13 +1,10 @@
 
+import { PaymentMethod } from '@prisma/client';
+import { prisma } from 'db';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Prisma, Page, PaymentMethod } from '@prisma/client';
-import { prisma } from 'db';
-import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
-import { IApiError } from 'lib/utilities/errors';
-import { isValidChainAddress } from 'lib/tokens/validation';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
