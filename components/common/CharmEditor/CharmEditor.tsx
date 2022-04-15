@@ -129,6 +129,7 @@ export function charmEditorPlugins (
     link.plugins(),
     listItem.plugins(),
     orderedList.plugins(),
+    columnLayout.plugins(),
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),
@@ -137,7 +138,6 @@ export function charmEditorPlugins (
     columnResizing,
     floatingMenuPlugin(readOnly),
     blockquote.plugins(),
-    columnLayout.plugins(),
     NodeView.createPlugin({
       name: 'image',
       containerDOM: ['div', { draggable: 'false' }]

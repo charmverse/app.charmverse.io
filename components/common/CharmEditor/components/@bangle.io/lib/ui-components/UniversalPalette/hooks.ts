@@ -64,6 +64,7 @@ export function usePaletteDriver(
 
   const onSpecialKey = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
+      console.log('on special key', onSelect);
       switch (event.key) {
         case 'ArrowUp': {
           updateCounter((c) => c - 1);

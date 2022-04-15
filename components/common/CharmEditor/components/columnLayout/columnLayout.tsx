@@ -1,14 +1,16 @@
 import { RawPlugins, RawSpecs, NodeView } from '@bangle.dev/core';
-import { DOMOutputSpec, keymap } from '@bangle.dev/pm';
-import styled from '@emotion/styled';
-import { ReactNode, memo } from 'react';
+import { DOMOutputSpec, keymap, newlineInCode, splitBlock, createParagraphNear, EditorState, EditorView, Transaction, chainCommands } from '@bangle.dev/pm';
+import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
+import { Selection } from 'prosemirror-state';
+
+import { createObject, filter, insertEmpty } from '@bangle.dev/utils';
 
 export function rowSpec (): RawSpecs {
   return {
     type: 'node',
     name: 'columnLayout',
     schema: {
-      content: 'columnBlock*',
+      content: 'columnBlock+',
       group: 'block',
       draggable: false,
       parseDOM: [{ tag: 'div.charm-column-row' }],
@@ -42,34 +44,47 @@ export function columnSpec (): RawSpecs {
 }
 
 export function plugins (): RawPlugins {
-  return [
-    keymap({
-      // 'Shift-Tab': undentListItem,
-      Tab: (state, dispatch) => {
-        // if (dispatch) {
-        //   dispatch(state.tr.replaceSelectionWith(state.schema.nodes.tabIndent.create()).scrollIntoView());
-        // }
-        console.log('Tab state', state, !!dispatch);
-        return false;
-      },
-      // 'Shift-Tab': undentListItem,
-      Enter: (state, dispatch) => {
-        // if (dispatch) {
-        //   dispatch(state.tr.replaceSelectionWith(state.schema.nodes.tabIndent.create()).scrollIntoView());
-        // }
-        console.log('Enter state', state, !!dispatch);
-        return false;
-      }
-    }),
-    NodeView.createPlugin({
-      name: 'columnLayout',
-      containerDOM: ['div'],
-      contentDOM: ['div']
-    }),
-    NodeView.createPlugin({
-      name: 'columnBlock',
-      containerDOM: ['div'],
-      contentDOM: ['div']
-    })
-  ];
+  return ({ schema }) => {
+
+    const isColumnBlock = parentHasDirectParentOfType(schema.nodes.columnBlock, schema.nodes.columnLayout);
+
+    return [
+      keymap(
+        createObject([
+          // 'Shift-Tab': undentListItem,
+          ['Tab', filter(isColumnBlock, (state, dispatch) => {
+            // if (dispatch) {
+            //   dispatch(state.tr.replaceSelectionWith(state.schema.nodes.tabIndent.create()).scrollIntoView());
+            // }
+            console.log('Tab state', state, !!dispatch);
+            return false;
+          })],
+          // 'Shift-Tab': undentListItem,
+          ['Mod-Enter', filter(isColumnBlock, exitColumn)],
+          ['Enter', filter(isColumnBlock, chainCommands(newlineInCode, createParagraphNear, splitBlock))]
+        ])
+      ),
+      NodeView.createPlugin({
+        name: 'columnLayout',
+        containerDOM: ['div', { class: 'charm-column' }],
+        contentDOM: ['div']
+      }),
+      NodeView.createPlugin({
+        name: 'columnBlock',
+        containerDOM: ['div', { class: 'charm-column-row' }],
+        contentDOM: ['div']
+      })
+    ];
+  };
+}
+function exitColumn (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, view: EditorView<any> | undefined) {
+  return insertEmpty(state.schema.nodes.paragraph, 'below', true)(state, dispatch, view);
+}
+
+function defaultBlockAt (match: any) {
+  for (let i = 0; i < match.edgeCount; i++) {
+    const { type } = match.edge(i);
+    if (type.isTextblock && !type.hasRequiredAttrs()) return type;
+  }
+  return null;
 }
