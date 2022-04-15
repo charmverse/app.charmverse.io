@@ -1,7 +1,4 @@
-
-import nextJest from 'next/jest';
-
-const createJestConfig = nextJest({ dir: __dirname });
+import createJestConfig from 'testing/createJestConfig';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
