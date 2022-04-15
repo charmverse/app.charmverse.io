@@ -56,7 +56,6 @@ export function InlinePaletteRow ({
 
   useEffect(() => {
     if (scrollIntoViewIfNeeded && isActive) {
-      console.log('scroll 2');
       ref.current && safeScrollIntoViewIfNeeded(ref.current, false);
     }
   }, [scrollIntoViewIfNeeded, isActive]);
