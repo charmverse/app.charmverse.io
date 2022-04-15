@@ -72,44 +72,44 @@ export function plugins (): RawPlugins {
         name: 'columnBlock',
         containerDOM: ['div', { class: 'charm-column-row' }],
         contentDOM: ['div']
-      }),
-      // plugin to prevent deleting column blocks: https://github.com/ueberdosis/tiptap/issues/181#issuecomment-745067085
-      new Plugin({
-        props: {
-          handleKeyDown: (view, event) => {
-            if (event.key === 'Delete' || event.key === 'Backspace') {
-              // @ts-ignore
-              view.state.deleting = true;
-            }
-
-            return false;
-          }
-        },
-
-        filterTransaction: (transaction, state) => {
-          // @ts-ignore
-          if (!state.deleting) {
-            return true;
-          }
-          console.log('deleting?', transaction, state);
-
-          let result = true;
-
-          transaction.mapping.maps.forEach(map => {
-            map.forEach((oldStart, oldEnd) => {
-              console.log('mapping', oldStart, oldEnd);
-              state.doc.nodesBetween(oldStart, oldEnd, (node) => {
-                console.log('dete', node.type.name);
-                if (node.type.name === 'columnLayout') {
-                  result = false;
-                }
-              });
-            });
-          });
-          console.log('filter?', result);
-          return result;
-        }
       })
+      // plugin to prevent deleting column blocks: https://github.com/ueberdosis/tiptap/issues/181#issuecomment-745067085
+      // new Plugin({
+      //   props: {
+      //     handleKeyDown: (view, event) => {
+      //       if (event.key === 'Delete' || event.key === 'Backspace') {
+      //         // @ts-ignore
+      //         view.state.deleting = true;
+      //       }
+
+      //       return false;
+      //     }
+      //   },
+
+      //   filterTransaction: (transaction, state) => {
+      //     // @ts-ignore
+      //     if (!state.deleting) {
+      //       return true;
+      //     }
+      //     console.log('deleting?', transaction, state);
+
+      //     let result = true;
+
+      //     transaction.mapping.maps.forEach(map => {
+      //       map.forEach((oldStart, oldEnd) => {
+      //         console.log('mapping', oldStart, oldEnd);
+      //         state.doc.nodesBetween(oldStart, oldEnd, (node) => {
+      //           console.log('dete', node.type.name);
+      //           if (node.type.name === 'columnLayout') {
+      //             result = false;
+      //           }
+      //         });
+      //       });
+      //     });
+      //     console.log('filter?', result);
+      //     return result;
+      //   }
+      // })
     ];
   };
 }
