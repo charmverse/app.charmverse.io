@@ -1,0 +1,92 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: CI-debug
+
+on:
+  push:
+    branches: [revert-revert-api]
+  pull_request:
+    branches: [revert-revert-api]
+
+jobs:
+  # test:
+  #   name: Test
+  #   runs-on: ubuntu-latest
+  #   # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+  #   services:
+  #     postgres:
+  #       image: postgres
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: postgres
+  #       options: >-
+  #         --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #       ports:
+  #         # Maps tcp port 5432 on service container to the host
+  #         - 5432:5432
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: Install dependencies and build app
+  #       uses: ./.github/actions/install
+
+  #     - name: Build app
+  #       uses: ./.github/actions/build
+
+  #     - name: Apply patches
+  #       run: npx patch-package
+
+  #     - name: Setup test database
+  #       run: bash ./testing/configure-db.sh
+
+  #     - name: Start test server
+  #       run: npm run start:test &
+
+  #     - name: Run tests
+  #       run: npm run test:server
+
+    # - name: Run Tests
+    #   shell: 'script -q -e -c "bash {0}"' # add support for colors in output. see: https://github.com/actions/runner/issues/241
+    #   run: npm test
+
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/revert-revert-api'
+    #needs: test
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies and build app
+        uses: ./.github/actions/install
+
+      - name: Build app
+        uses: ./.github/actions/build
+
+      - name: Remove dev dependencies
+        run: |
+          npm prune --production
+          rm -rf .next/cache
+
+      - name: Add Datadog API Key
+        run: sed -i 's/{API_KEY}/${{ secrets.DATADOG_API_KEY }}/g' .ebextensions/99_datadog.config
+
+      - name: Package
+        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+
+      - name: Deploy to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: web3-workspace
+          environment_name: web3-workspace-production-debug
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
