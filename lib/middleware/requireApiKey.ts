@@ -1,7 +1,9 @@
-import { Space, User } from '@prisma/client';
+import { Space, SpaceApiToken, User } from '@prisma/client';
 import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
+import crypto from 'node:crypto';
+import { ApiError } from 'lib/middleware/errors';
 import log from 'lib/log';
 
 declare module 'http' {
@@ -9,6 +11,32 @@ declare module 'http' {
     authorizedSpaceId: string
     botUser: User
   }
+}
+
+export async function provisionApiKey (spaceId: string): Promise<SpaceApiToken> {
+  const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
+
+  const spaceToken = await prisma.spaceApiToken.upsert({
+    where: {
+      spaceId: spaceId as string
+    },
+    update: {
+      token: newApiKey,
+      updatedAt: new Date().toISOString()
+    },
+    create: {
+      token: newApiKey,
+      space: {
+        connect: {
+          id: spaceId
+        }
+      }
+    }
+  });
+
+  await getBotUser(spaceId);
+
+  return spaceToken;
 }
 
 /**
@@ -56,7 +84,10 @@ export async function getSpaceFromApiKey (req: NextApiRequest): Promise<Space> {
 
   // Protect against api keys or nullish API Keys
   if (!apiKey || apiKey.length < 1) {
-    throw new Error('Api key not found');
+    throw new ApiError({
+      message: 'API Key not found',
+      errorType: 'Access denied'
+    });
   }
 
   const spaceToken = await prisma.spaceApiToken.findFirst({
@@ -69,7 +100,10 @@ export async function getSpaceFromApiKey (req: NextApiRequest): Promise<Space> {
   });
 
   if (!spaceToken) {
-    throw new Error('Invalid API key');
+    throw new ApiError({
+      message: 'Invalid API key',
+      errorType: 'Access denied'
+    });
   }
 
   return spaceToken.space;
@@ -88,16 +122,18 @@ export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, 
     const querySpaceId = req.query.spaceId;
 
     if (querySpaceId && querySpaceId !== space.id) {
-      return res.status(401).send({
-        error: 'API Token does not have access to this space'
+      throw new ApiError({
+        message: 'API Token does not have access to this space',
+        errorType: 'Access denied'
       });
     }
 
     const bodySpaceId = req.body.spaceId;
 
     if (bodySpaceId && bodySpaceId !== space.id) {
-      return res.status(401).send({
-        error: 'API Token does not have access to this space'
+      throw new ApiError({
+        message: 'API Token does not have access to this space',
+        errorType: 'Access denied'
       });
     }
 
@@ -110,7 +146,10 @@ export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, 
   }
   catch (error) {
     log.warn('Found error', error);
-    return res.status(401).send({ error: 'Please provide a valid API token' });
+    throw new ApiError({
+      message: 'Please provide a valid API token',
+      errorType: 'Access denied'
+    });
   }
 
   next();
