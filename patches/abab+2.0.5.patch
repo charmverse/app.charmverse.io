@@ -1,0 +1,14 @@
+diff --git a/node_modules/abab/index.js b/node_modules/abab/index.js
+index 49d5ae9..e69de29 100644
+--- a/node_modules/abab/index.js
++++ b/node_modules/abab/index.js
+@@ -1,9 +0,0 @@
+-"use strict";
+-
+-const atob = require("./lib/atob");
+-const btoa = require("./lib/btoa");
+-
+-module.exports = {
+-  atob,
+-  btoa
+-};
