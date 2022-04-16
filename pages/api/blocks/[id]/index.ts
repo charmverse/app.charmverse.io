@@ -19,7 +19,14 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block>) {
 
   await prisma.block.deleteMany({
     where: {
-      rootId: req.query.id as string
+      OR: [
+        {
+          rootId: req.query.id as string
+        },
+        {
+          parentId: req.query.id as string
+        }
+      ]
     }
   });
 
