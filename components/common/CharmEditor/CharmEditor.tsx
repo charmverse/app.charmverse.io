@@ -175,9 +175,23 @@ export function charmEditorPlugins (
       containerDOM: ['span', { class: 'mention-value' }]
     }),
     tabIndent.plugins(),
-    table.tableEditing(),
+    table.tableEditing({ allowTableNodeSelection: true }),
     table.columnHandles(),
-    table.columnResizing({})
+    table.columnResizing({}),
+    // @ts-ignore missing type
+    table.tablePopUpMenu(),
+    // @ts-ignore missing type
+    table.tableHeadersMenu(),
+    // @ts-ignore missing type
+    table.selectionShadowPlugin(),
+    // @ts-ignore missing type
+    table.typesEnforcer(),
+    // @ts-ignore missing type
+    table.TableDateMenu(),
+    // @ts-ignore missing type
+    table.TableLabelMenu(),
+    // @ts-ignore missing type
+    table.TableFiltersMenu()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -310,6 +324,7 @@ function CharmEditor (
         width: '100%',
         height: '100%'
       }}
+      className='czi-editor-frame-body'
       pmViewOpts={{
         editable: () => !readOnly
       }}

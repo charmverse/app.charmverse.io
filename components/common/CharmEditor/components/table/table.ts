@@ -15,6 +15,5 @@ export function spec (): RawSpecs {
     schema,
     type: 'node'
   }));
-  console.log(specs);
   return specs;
 }

@@ -4,6 +4,7 @@ import '@skiff-org/prosemirror-tables/style/table-types.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
+import 'prosemirror-menu/style/menu.css';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
