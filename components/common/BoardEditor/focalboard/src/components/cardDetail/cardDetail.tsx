@@ -84,112 +84,40 @@ const CardDetail = (props: Props): JSX.Element|null => {
   }, [card.id, card.fields.headerImage])
 
     if (!card) {
-        return null
+      return null
     }
 
-    // return (
-    //     <>
-    //         {card.fields.headerImage && <Box width={"100%"} mb={2}>
-    //           <PageBanner focalBoard headerImage={card.fields.headerImage} setPage={({ headerImage }) => {
-    //             setRandomHeaderImage(headerImage!)
-    //           }} />
-    //         </Box>}
-    //         <div className='CardDetail content'>
-    //             <BlockIconSelector
-    //                 block={card}
-    //                 size='l'
-    //                 readonly={props.readonly}
-    //             />
+    return (
+      <EditorPage pageId={card.id} postPageHeaderComponent={<div className='CardDetail content'>
+        {/* Property list */}
+        <Box sx={{
+          display: "flex",
+          gap: 1,
+          justifyContent: "space-between",
+          width: "100%"
+        }}>
+          <CardDetailProperties
+              board={props.board}
+              card={props.card}
+              contents={props.contents}
+              comments={props.comments}
+              cards={props.cards}
+              activeView={props.activeView}
+              views={props.views}
+              readonly={props.readonly}
+          />
+          <BountyIntegration linkedTaskId={card.id} title={title} readonly={props.readonly} />
+        </Box>
 
-    //             <Box display={"flex"} gap={1} width={"100%"}>
-    //               {!props.readonly && !card.fields.icon &&
-    //                   <div className='add-buttons'>
-    //                       <Button
-    //                           onClick={setRandomIcon}
-    //                           icon={<EmojiEmotionsIcon
-    //                             fontSize='small'
-    //                             sx={{ marginRight: 1 }}
-    //                           />}
-    //                       >
-    //                           <FormattedMessage
-    //                               id='CardDetail.add-icon'
-    //                               defaultMessage='Add icon'
-    //                           />
-    //                       </Button>
-    //                   </div>}
-    //               {!props.readonly && !card.fields.headerImage &&
-    //               <div className='add-buttons'>
-    //                   <Button
-    //                       onClick={() => setRandomHeaderImage()}
-    //                       icon={<ImageIcon
-    //                         fontSize='small'
-    //                         sx={{ marginRight: 1 }}
-    //                       />}
-    //                   >
-    //                       <FormattedMessage
-    //                           id='CardDetail.add-cover'
-    //                           defaultMessage='Add cover'
-    //                       />
-    //                   </Button>
-    //               </div>}
-    //             </Box>
-
-    //             <EditableArea
-    //                 ref={titleRef}
-    //                 className='title'
-    //                 value={title}
-    //                 placeholderText='Untitled'
-    //                 onChange={(newTitle: string) => setTitle(newTitle)}
-    //                 saveOnEsc={true}
-    //                 onSave={saveTitle}
-    //                 onCancel={() => setTitle(props.card.title)}
-    //                 readonly={props.readonly}
-    //                 spellCheck={true}
-    //             />
-
-    //             {/* Property list */}
-
-    //             <Box sx={{
-    //               display: "flex",
-    //               gap: 1,
-    //               justifyContent: "space-between",
-    //               width: "100%"
-    //             }}>
-    //               <CardDetailProperties
-    //                   board={props.board}
-    //                   card={props.card}
-    //                   contents={props.contents}
-    //                   comments={props.comments}
-    //                   cards={props.cards}
-    //                   activeView={props.activeView}
-    //                   views={props.views}
-    //                   readonly={props.readonly}
-    //               />
-    //               <BountyIntegration linkedTaskId={card.id} title={title} readonly={props.readonly} />
-    //             </Box>
-
-    //             {/* Comments */}
-
-    //             <hr/>
-    //             <CommentsList
-    //                 comments={comments}
-    //                 rootId={card.rootId}
-    //                 cardId={card.id}
-    //                 readonly={props.readonly}
-    //             />
-    //         </div>
-
-    //         {/* Content blocks */}
-
-    //         <div className='CardDetail content fullwidth content-blocks' style={{
-    //           height: 150
-    //         }}>
-                
-    //         </div>
-    //     </>
-    // )
-    
-    return <EditorPage pageId={card.id}/>
+        <hr/>
+        <CommentsList
+            comments={comments}
+            rootId={card.rootId}
+            cardId={card.id}
+            readonly={props.readonly}
+        />
+    </div>}/>
+    )
 }
 
 export default CardDetail

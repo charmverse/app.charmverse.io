@@ -1,4 +1,4 @@
-import { useCallback, memo, useMemo } from 'react';
+import { useCallback, memo, useMemo, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
@@ -18,9 +18,9 @@ export const Container = styled(Box)<{ top: number }>`
 `;
 
 export interface IEditorProps {
-  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean }
+  page: Page, setPage: (p: Partial<Page>) => void, readOnly?: boolean, postPageHeaderComponent?: ReactNode }
 
-function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
+function Editor ({ postPageHeaderComponent, page, setPage, readOnly = false }: IEditorProps) {
 
   let pageTop = 100;
   if (page.headerImage) {
@@ -56,6 +56,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             readOnly={readOnly}
             setPage={setPage}
           />
+          {postPageHeaderComponent}
         </CharmEditor>
       </Container>
     </ScrollableWindow>

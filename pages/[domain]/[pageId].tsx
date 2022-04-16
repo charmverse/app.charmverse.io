@@ -8,7 +8,7 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useMemo, useState, useCallback } from 'react';
+import { ReactElement, useEffect, useMemo, useState, useCallback, ReactNode } from 'react';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
@@ -23,8 +23,8 @@ interface IBlocksEditorPage {
 }
 
 export function EditorPage (
-  { pageId, currentPageId = pageId, publicShare = false, onPageLoad }:
-  {onPageLoad?: (pageId: string) => void, pageId: string, publicShare?: boolean, currentPageId?: string}
+  { postPageHeaderComponent = null, pageId, currentPageId = pageId, publicShare = false, onPageLoad }:
+  {postPageHeaderComponent?: ReactNode, onPageLoad?: (pageId: string) => void, pageId: string, publicShare?: boolean, currentPageId?: string}
 ) {
   const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
@@ -112,7 +112,7 @@ export function EditorPage (
     return currentPage?.type === 'board' ? (
       <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={true} />
     ) : (
-      <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={true} />
+      <DocumentPage postPageHeaderComponent={postPageHeaderComponent} page={memoizedCurrentPage} setPage={setPage} readOnly={true} />
     );
   }
   // Wait for permission load
@@ -128,7 +128,14 @@ export function EditorPage (
       return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={pagePermissions.edit_content !== true} />;
     }
     else {
-      return <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={pagePermissions.edit_content !== true} />;
+      return (
+        <DocumentPage
+          postPageHeaderComponent={postPageHeaderComponent}
+          page={memoizedCurrentPage}
+          setPage={setPage}
+          readOnly={pagePermissions.edit_content !== true}
+        />
+      );
     }
   }
   return null;
