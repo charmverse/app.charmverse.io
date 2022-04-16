@@ -1,0 +1,141 @@
+diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
+index fb1644e..c7fab0d 100644
+--- a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
++++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
+@@ -4923,7 +4923,9 @@ var TablePopUpMenuView = /*#__PURE__*/function () {
+     } // append popup to dom
+ 
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM); // add event listeners to color in red before deleting rows/cols
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM); // add event listeners to color in red before deleting rows/cols
++    }
+ 
+     this.popUpDOM.addEventListener('mouseover', addDeleteHoverClass);
+     this.popUpDOM.addEventListener('mouseout', removeDeleteHoverClass); // render prosemirror menu to popUpDom
+@@ -7207,7 +7209,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+       }
+     }); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM); // render prosemirror menu to popUpDom
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM); // render prosemirror menu to popUpDom
++    }
+ 
+     var _renderGrouped = renderGrouped(this.view, items),
+         itemsDOM = _renderGrouped.dom,
+@@ -8745,7 +8749,9 @@ var TableDateMenuView = /*#__PURE__*/function () {
+     this.view = view;
+     this.buildMenuDOM(); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    }
+   }
+ 
+   _createClass(TableDateMenuView, [{
+@@ -8928,7 +8934,9 @@ var TableLabelsMenu = /*#__PURE__*/function () {
+     this.view = view;
+     this.buildMenuDOM(); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    }
+   }
+ 
+   _createClass(TableLabelsMenu, [{
+@@ -9687,7 +9695,9 @@ var TableFiltersMenuView = /*#__PURE__*/function () {
+     this.view = view;
+     this.buildMenuDOM(); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    }
+   }
+ 
+   _createClass(TableFiltersMenuView, [{
+diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
+index fb57edd..e5c9898 100644
+--- a/node_modules/@skiff-org/prosemirror-tables/dist/index.js
++++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
+@@ -3667,6 +3667,7 @@ var getColIndexFromSelectedRect = function getColIndexFromSelectedRect(state, po
+   return cellIndex % tableRect.map.width;
+ };
+ var createElementWithClass = function createElementWithClass(type, className, datatest) {
++  if (typeof document === 'undefined') return;
+   var el = document.createElement(type);
+   el.className = className;
+ 
+@@ -4618,6 +4619,7 @@ var generateMenuPopup$2 = function generateMenuPopup() {
+   return menuElement;
+ };
+ var generateColorItemDOM = function generateColorItemDOM(color) {
++  if (typeof document === 'undefined') return;
+   var container = createElementWithClass('div', 'colorItemContainer');
+   var button = createElementWithClass(color === 'transparent' ? 'span' : 'button', 'colorItemButton');
+   var indicator = createElementWithClass('div', 'colorItemIndicator');
+@@ -6801,6 +6803,9 @@ var HoverDropdown = /*#__PURE__*/function () {
+ }();
+ 
+ var getTypesItems = function getTypesItems() {
++
++  if (typeof document === 'undefined') return [];
++
+   return types.map(function (type) {
+     var dom = document.createElement('div');
+     dom.dataset.test = "".concat(type.id, "-type-item");
+@@ -7430,8 +7435,9 @@ var typeInheritance = function typeInheritance(view, node, pos) {
+ 
+   if (tr.steps.length) view.dispatch(tr);
+ };
+-
+-window.id = "user_".concat(new Date().getTime());
++if (typeof window !== 'undefined') {
++  window.id = "user_".concat(new Date().getTime());
++}
+ var tableHeadersMenu = function tableHeadersMenu() {
+   return new prosemirrorState.Plugin({
+     key: tableHeadersMenuKey,
+@@ -7995,6 +8001,7 @@ var ColDragHandler = /*#__PURE__*/function () {
+ var key$1 = new prosemirrorState.PluginKey('tableColumnHandles');
+ var CellView = /*#__PURE__*/function () {
+   function CellView(node, view, getPos) {
++
+     _classCallCheck(this, CellView);
+ 
+     this.getPos = getPos;
+diff --git a/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css b/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
+index 006716e..66ffcce 100644
+--- a/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
++++ b/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
+@@ -149,22 +149,27 @@
+ .column-chooser .selected-icon.textType {
+   content: url(./svgs/types/text_type.svg);
+ }
++
+ .colItem.numberType .select-dropdown-item-icon,
+ .column-chooser .selected-icon.numberType {
+   content: url(./svgs/types/number_type.svg);
+ }
++
+ .colItem.dateType .select-dropdown-item-icon,
+ .column-chooser .selected-icon.dateType {
+   content: url(./svgs/types/date.svg);
+ }
++
+ .colItem.labelsType .select-dropdown-item-icon,
+ .column-chooser .selected-icon.labelsType {
+   content: url(./svgs/types/label.svg);
+ }
++
+ .colItem.checkboxType .select-dropdown-item-icon,
+ .column-chooser .selected-icon.checkboxType {
+   content: url(./svgs/types/checkbox_type.svg);
+ }
++
+ .colItem.currencyType .select-dropdown-item-icon,
+ .column-chooser .selected-icon.currencyType {
+   content: url(./svgs/types/currency.svg);
