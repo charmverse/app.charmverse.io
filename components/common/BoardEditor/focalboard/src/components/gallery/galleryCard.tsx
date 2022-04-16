@@ -29,6 +29,8 @@ import CardBadges from '../cardBadges'
 import { Block } from '../../blocks/block'
 import { PageContent } from 'models'
 import { CharmTextBlock } from '../../blocks/charmBlock'
+import { usePages } from 'hooks/usePages'
+import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
 
 
 type Props = {
@@ -46,11 +48,13 @@ type Props = {
 
 const GalleryCard = React.memo((props: Props) => {
     const {card, board} = props
-    
+
+    const {pages} = usePages()
     const intl = useIntl()
     const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readonly, props.onDrop)
     const contents = useAppSelector(getCardContents(card.id))
     const comments = useAppSelector(getCardComments(card.id))
+    const cardPage = pages[card.id]
 
     const visiblePropertyTemplates = props.visiblePropertyTemplates || []
 
@@ -59,7 +63,7 @@ const GalleryCard = React.memo((props: Props) => {
         className += ' dragover'
     }
 
-    let galleryImageUrl: null | string = card.fields.headerImage;
+    let galleryImageUrl: null | string | undefined = cardPage?.headerImage;
 
     const charmTextContent = contents.find(content => (content as Block).type === "charm_text") as CharmTextBlock
 
@@ -87,6 +91,7 @@ const GalleryCard = React.memo((props: Props) => {
         }
       }
     }
+
 
     return (
         <div
@@ -152,9 +157,9 @@ const GalleryCard = React.memo((props: Props) => {
                 </CardDetailProvider>}
             {props.visibleTitle &&
                 <div className='gallery-title'>
-                    { card.fields.icon ? <div className='octo-icon'>{card.fields.icon}</div> : undefined }
+                    { cardPage?.icon ? <PageIcon isEditorEmpty={false} pageType="card" icon={cardPage.icon}/> : undefined }
                     <div key='__title'>
-                        {card.title ||
+                        {cardPage?.title ||
                             <FormattedMessage
                                 id='KanbanCard.untitled'
                                 defaultMessage='Untitled'
