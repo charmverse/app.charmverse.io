@@ -18,6 +18,9 @@ import {getCardContents} from '../../store/contents'
 import {getCardComments} from '../../store/comments'
 
 import PropertyValueElement from '../propertyValueElement'
+import { usePages } from 'hooks/usePages'
+import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
+import charmClient from 'charmClient'
 
 type Props = {
     board: Board
@@ -46,9 +49,10 @@ const TableRow = React.memo((props: Props) => {
     const {board, activeView, onSaveWithEnter, columnRefs, card} = props
     const contents = useAppSelector(getCardContents(card.id || ''))
     const comments = useAppSelector(getCardComments(card.id))
-
+    const {pages} = usePages();
+    const pageCard = pages[props.card.id];
     const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null)
-    const [title, setTitle] = useState(props.card.title || '')
+    const [title, setTitle] = useState(pageCard?.title || '')
     const isManualSort = activeView.fields.sortOptions.length === 0
     const isGrouped = Boolean(activeView.fields.groupById)
     const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly && (isManualSort || isGrouped), props.onDrop)
@@ -58,6 +62,12 @@ const TableRow = React.memo((props: Props) => {
             setTimeout(() => titleRef.current?.focus(), 10)
         }
     }, [])
+
+    useEffect(() => {
+      if (pageCard?.title) {
+        setTitle(pageCard?.title)
+      }
+    }, [pageCard?.title])
 
     const visiblePropertyTemplates = useMemo(() => (
         activeView.fields.visiblePropertyIds.map((id) => board.fields.cardProperties.find((t) => t.id === id)).filter((i) => i) as IPropertyTemplate[]
@@ -95,14 +105,17 @@ const TableRow = React.memo((props: Props) => {
                 ref={columnRefs.get(Constants.titleColumnId)}
             >
                 <div className='octo-icontitle'>
-                    <div className='octo-icon'>{card.fields.icon}</div>
+                    <PageIcon isEditorEmpty={false} pageType="page" icon={pageCard?.icon}/>
                     <Editable
                         ref={titleRef}
                         value={title}
                         placeholderText='Untitled'
                         onChange={(newTitle: string) => setTitle(newTitle)}
                         onSave={(saveType) => {
-                            mutator.changeTitle(card.id, card.title, title)
+                            charmClient.updatePage({
+                              id: card.id,
+                              title
+                            })
                             if (saveType === 'onEnter') {
                                 onSaveWithEnter()
                             }
