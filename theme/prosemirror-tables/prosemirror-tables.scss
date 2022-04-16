@@ -1,0 +1,55 @@
+.textItemIcon {
+  content: url(/svgs/types/text_type.svg);
+}
+
+.numberItemIcon {
+  content: url(/svgs/types/number_type.svg);
+}
+
+.dateItemIcon {
+  content: url(/svgs/types/date.svg);
+}
+
+.checkboxItemIcon {
+  content: url(/svgs/types/checkbox_type.svg);
+}
+
+.labelsItemIcon {
+  content: url(/svgs/types/label.svg);
+}
+
+.currencyItemIcon {
+  content: url(/svgs/types/currency.svg);
+}
+
+
+
+.colItem.textType .select-dropdown-item-icon,
+.column-chooser .selected-icon.textType {
+  content: url(/svgs/types/text_type.svg);
+}
+
+.colItem.numberType .select-dropdown-item-icon,
+.column-chooser .selected-icon.numberType {
+  content: url(/svgs/types/number_type.svg);
+}
+
+.colItem.dateType .select-dropdown-item-icon,
+.column-chooser .selected-icon.dateType {
+  content: url(/svgs/types/date.svg);
+}
+
+.colItem.labelsType .select-dropdown-item-icon,
+.column-chooser .selected-icon.labelsType {
+  content: url(/svgs/types/label.svg);
+}
+
+.colItem.checkboxType .select-dropdown-item-icon,
+.column-chooser .selected-icon.checkboxType {
+  content: url(/svgs/types/checkbox_type.svg);
+}
+
+.colItem.currencyType .select-dropdown-item-icon,
+.column-chooser .selected-icon.currencyType {
+  content: url(/svgs/types/currency.svg);
+}

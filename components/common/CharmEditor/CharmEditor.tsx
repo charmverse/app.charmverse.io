@@ -187,7 +187,7 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.typesEnforcer(),
     // @ts-ignore missing type
-    table.TableDateMenu(),
+    table.TableDateMenu('DD/MM/YYYY'),
     // @ts-ignore missing type
     table.TableLabelMenu(),
     // @ts-ignore missing type
