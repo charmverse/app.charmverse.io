@@ -17,9 +17,36 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block>) {
     }
   });
 
+  const blockIds = (await prisma.block.findMany({
+    where: {
+      OR: [
+        {
+          rootId: req.query.id as string
+        },
+        {
+          parentId: req.query.id as string
+        }
+      ]
+    },
+    select: {
+      id: true
+    }
+  })).map(block => block.id);
+
   await prisma.block.deleteMany({
     where: {
-      rootId: req.query.id as string
+      OR: [
+        {
+          id: {
+            in: blockIds
+          }
+        },
+        {
+          parentId: {
+            in: blockIds
+          }
+        }
+      ]
     }
   });
 
