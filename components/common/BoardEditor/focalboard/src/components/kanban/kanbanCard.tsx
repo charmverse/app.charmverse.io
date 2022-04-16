@@ -2,7 +2,9 @@
 // See LICENSE.txt for license information.
 import { Box } from '@mui/material'
 import { BountyStatusColours } from 'components/bounties/BountyCard'
+import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
 import { useBounties } from 'hooks/useBounties'
+import { usePages } from 'hooks/usePages'
 import millify from "millify"
 import { BOUNTY_LABELS } from 'models'
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
@@ -88,6 +90,9 @@ const KanbanCard = React.memo((props: Props) => {
         setShowConfirmationDialogBox(true)
     }
 
+    const {pages} = usePages()
+    const cardPage = pages[card.id]
+
     return (
         <>
             <div
@@ -156,12 +161,12 @@ const KanbanCard = React.memo((props: Props) => {
                     <Box sx={{
                       display: "flex",
                     }}>
-                      { card.fields.icon ? <div className='octo-icon'>{card.fields.icon}</div> : undefined }
+                      { cardPage?.icon ? <PageIcon isEditorEmpty={false} pageType="page" icon={cardPage.icon}/> : undefined }
                       <div
                           key='__title'
                           className='octo-titletext'
                       >
-                          {card.title || intl.formatMessage({id: 'KanbanCard.untitled', defaultMessage: 'Untitled'})}
+                          {cardPage?.title || intl.formatMessage({id: 'KanbanCard.untitled', defaultMessage: 'Untitled'})}
                       </div>
                     </Box>
                 </div>

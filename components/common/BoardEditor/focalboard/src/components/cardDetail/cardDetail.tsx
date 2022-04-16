@@ -1,26 +1,16 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions'
-import ImageIcon from '@mui/icons-material/Image'
 import { Box } from '@mui/material'
 import { BountyIntegration } from 'components/bounties/BountyIntegration'
-import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner'
 import { EditorPage } from 'pages/[domain]/[pageId]'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { FormattedMessage } from 'react-intl'
-import { BlockIcons } from '../../blockIcons'
 import { Board } from '../../blocks/board'
 import { BoardView } from '../../blocks/boardView'
 import { Card } from '../../blocks/card'
 import { CommentBlock } from '../../blocks/commentBlock'
 import { ContentBlock } from '../../blocks/contentBlock'
 import mutator from '../../mutator'
-import Button from '../../widgets/buttons/button'
 import { Focusable } from '../../widgets/editable'
-import EditableArea from '../../widgets/editableArea'
-import BlockIconSelector from '../blockIconSelector'
-import CardDetailContents from './cardDetailContents'
-import { CardDetailProvider } from './cardDetailContext'
 import CardDetailProperties from './cardDetailProperties'
 import CommentsList from './commentsList'
 import useImagePaste from './imagePaste'
@@ -56,7 +46,6 @@ const CardDetail = (props: Props): JSX.Element|null => {
         if (!title) {
             titleRef.current?.focus()
         }
-        // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.ViewCard, {board: props.board.id, view: props.activeView.id, card: card.id})
     }, [])
 
     useEffect(() => {
@@ -71,17 +60,6 @@ const CardDetail = (props: Props): JSX.Element|null => {
             saveTitleRef.current && saveTitleRef.current()
         }
     }, [])
-
-    const setRandomIcon = useCallback(() => {
-        const newIcon = BlockIcons.shared.randomIcon()
-        mutator.changeIcon(card.id, card.fields.icon, newIcon)
-    }, [card.id, card.fields.icon])
-
-    const setRandomHeaderImage = useCallback((headerImage?: string | null) => {
-      const newHeaderImage = headerImage ?? randomBannerImage()
-      // Null is passed if we want to remove the image
-      mutator.changeHeaderImage(card.id, card.fields.headerImage, headerImage !== null ? newHeaderImage : null)
-  }, [card.id, card.fields.headerImage])
 
     if (!card) {
       return null
