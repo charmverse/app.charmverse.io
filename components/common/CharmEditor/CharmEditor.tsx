@@ -18,7 +18,6 @@ import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
 import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import { useState, CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
@@ -44,6 +43,7 @@ import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as tabIndent from './components/tabIndent';
 import DocumentEnd from './components/DocumentEnd';
+import * as table from './components/table';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -75,10 +75,10 @@ export const specRegistry = new SpecRegistry([
   iframeSpec(), // OK
   heading.spec(), // OK
   inlinePaletteSpecs(), // Not required
-  table, // OK
-  tableCell, // OK
-  tableHeader, // OK
-  tableRow, // OK
+  // table, // OK
+  // tableCell, // OK
+  // tableHeader, // OK
+  // tableRow, // OK
   calloutSpec(), // OK
   cryptoPriceSpec(), // NO
   imageSpec(), // OK
@@ -86,7 +86,13 @@ export const specRegistry = new SpecRegistry([
   columnLayout.columnSpec(), // NO
   nestedPageSpec(), // NO
   quoteSpec(), // OK
-  tabIndent.spec()
+  tabIndent.spec(),
+  table.spec()
+  // tables.tableNodes({
+  //   cellAttributes: { },
+  //   cellContent: 'My Cell',
+  //   cellContentGroup: 'My Group'
+  // })
 ]);
 
 export function charmEditorPlugins (
@@ -168,7 +174,10 @@ export function charmEditorPlugins (
       name: 'mention',
       containerDOM: ['span', { class: 'mention-value' }]
     }),
-    tabIndent.plugins()
+    tabIndent.plugins(),
+    table.tableEditing(),
+    table.columnHandles(),
+    table.columnResizing({})
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
