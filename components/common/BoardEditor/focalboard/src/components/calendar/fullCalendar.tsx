@@ -19,6 +19,8 @@ import Tooltip from '../../widgets/tooltip'
 import PropertyValueElement from '../propertyValueElement'
 import {Constants} from '../../constants'
 import CardBadges from '../cardBadges'
+import { usePages } from 'hooks/usePages'
+import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
 
 const oneDay = 60 * 60 * 24 * 1000
 
@@ -74,6 +76,8 @@ const CalendarFullView = (props: Props): JSX.Element|null => {
         initialDate = new Date()
     }
 
+    const {pages} = usePages() 
+    
     const isEditable = useCallback(() : boolean => {
         if (readonly || !dateDisplayProperty || (dateDisplayProperty.type === 'createdTime' || dateDisplayProperty.type === 'updatedTime')) {
             return false
@@ -83,6 +87,7 @@ const CalendarFullView = (props: Props): JSX.Element|null => {
 
     const myEventsList = useMemo(() => (
         cards.flatMap((card): EventInput[] => {
+            const cardPage = pages[card.id]
             let dateFrom = new Date(card.createdAt || 0)
             let dateTo = new Date(card.createdAt || 0)
             if (dateDisplayProperty && dateDisplayProperty?.type === 'updatedTime') {
@@ -103,15 +108,15 @@ const CalendarFullView = (props: Props): JSX.Element|null => {
             }
             return [{
                 id: card.id,
-                title: card.title,
-                extendedProps: {icon: card.fields.icon},
+                title: cardPage?.title || '',
+                extendedProps: {icon: cardPage?.icon},
                 properties: card.fields.properties,
                 allDay: true,
                 start: dateFrom,
                 end: dateTo,
             }]
         })
-    ), [cards, dateDisplayProperty])
+    ), [cards, pages, dateDisplayProperty])
 
     const visibleBadges = activeView.fields.visiblePropertyIds.includes(Constants.badgesColumnId)
 
@@ -120,7 +125,7 @@ const CalendarFullView = (props: Props): JSX.Element|null => {
         return (
             <div>
                 <div className='octo-icontitle'>
-                    { event.extendedProps.icon ? <div className='octo-icon'>{event.extendedProps.icon}</div> : undefined }
+                    { event.extendedProps.icon ? <PageIcon isEditorEmpty={false} pageType="page" icon={event.extendedProps.icon}/> : undefined }
                     <div
                         className='fc-event-title'
                         key='__title'
