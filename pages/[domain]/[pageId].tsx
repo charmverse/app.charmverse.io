@@ -22,24 +22,48 @@ interface IBlocksEditorPage {
   publicShare?: boolean
 }
 
-export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditorPage) {
-
-  const { currentPageId, setIsEditing, pages, setPages, setCurrentPageId, getPagePermissions } = usePages();
-  const router = useRouter();
-  const pageId = router.query.pageId as string;
+export function EditorPage (
+  { pageId, currentPageId = pageId, publicShare = false, onPageLoad }:
+  {onPageLoad?: (pageId: string) => void, pageId: string, publicShare?: boolean, currentPageId?: string}
+) {
+  const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
-
   const [user] = useUser();
-
   const [pagePermissions, setPagePermissions] = useState<Partial<IPagePermissionFlags> | null>(null);
-
   const debouncedPageUpdate = useMemo(() => {
     return debouncePromise((input: Prisma.PageUpdateInput) => {
       setIsEditing(true);
       return charmClient.updatePage(input);
     }, 500);
   }, []);
+
+  async function loadPublicPage (publicPageId: string) {
+    const page = await charmClient.getPublicPage(publicPageId);
+    setTitleState(page.title);
+    onPageLoad?.(page.id);
+    setPages({
+      [page.id]: page
+    });
+  }
+
+  const pagesLoaded = Object.keys(pages).length > 0;
+
+  useEffect(() => {
+    if (publicShare === true && pageId) {
+      loadPublicPage(pageId as string);
+    }
+    else if (pageId && pagesLoaded) {
+      const pageByPath = pages[pageId] || Object.values(pages).filter(isTruthy).find(page => page.path === pageId);
+      if (pageByPath) {
+        setTitleState(pageByPath.title);
+        onPageLoad?.(pageByPath.id);
+      }
+      else {
+        setPageNotFound(true);
+      }
+    }
+  }, [pageId, pagesLoaded]);
 
   const setPage = useCallback(async (updates: Partial<Page>) => {
     if (!currentPageId || publicShare === true) {
@@ -63,33 +87,6 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
         setIsEditing(false);
       });
   }, [currentPageId, publicShare]);
-
-  async function loadPublicPage (publicPageId: string) {
-    const page = await charmClient.getPublicPage(publicPageId);
-    setTitleState(page.title);
-    setCurrentPageId(page.id);
-    setPages({
-      [page.id]: page
-    });
-  }
-
-  const pagesLoaded = Object.keys(pages).length > 0;
-
-  useEffect(() => {
-    if (publicShare === true && pageId) {
-      loadPublicPage(pageId as string);
-    }
-    else if (pageId && pagesLoaded) {
-      const pageByPath = pages[pageId] || Object.values(pages).filter(isTruthy).find(page => page.path === pageId);
-      if (pageByPath) {
-        setTitleState(pageByPath.title);
-        setCurrentPageId(pageByPath.id);
-      }
-      else {
-        setPageNotFound(true);
-      }
-    }
-  }, [pageId, pagesLoaded]);
 
   // memoize the page to avoid re-rendering unless certain fields are changed
   const currentPage = pages[currentPageId];
@@ -135,6 +132,14 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
     }
   }
   return null;
+}
+
+export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditorPage) {
+  const { currentPageId, setCurrentPageId } = usePages();
+  const router = useRouter();
+  const pageId = router.query.pageId as string;
+
+  return <EditorPage currentPageId={currentPageId} onPageLoad={(_pageId) => setCurrentPageId(_pageId)} pageId={pageId} publicShare={publicShare} />;
 }
 
 BlocksEditorPage.getLayout = (page: ReactElement) => {

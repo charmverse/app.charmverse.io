@@ -5,6 +5,7 @@ import ImageIcon from '@mui/icons-material/Image'
 import { Box } from '@mui/material'
 import { BountyIntegration } from 'components/bounties/BountyIntegration'
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner'
+import { EditorPage } from 'pages/[domain]/[pageId]'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { BlockIcons } from '../../blockIcons'
@@ -86,113 +87,109 @@ const CardDetail = (props: Props): JSX.Element|null => {
         return null
     }
 
-    return (
-        <>
-            {card.fields.headerImage && <Box width={"100%"} mb={2}>
-              <PageBanner focalBoard headerImage={card.fields.headerImage} setPage={({ headerImage }) => {
-                setRandomHeaderImage(headerImage!)
-              }} />
-            </Box>}
-            <div className='CardDetail content'>
-                <BlockIconSelector
-                    block={card}
-                    size='l'
-                    readonly={props.readonly}
-                />
+    // return (
+    //     <>
+    //         {card.fields.headerImage && <Box width={"100%"} mb={2}>
+    //           <PageBanner focalBoard headerImage={card.fields.headerImage} setPage={({ headerImage }) => {
+    //             setRandomHeaderImage(headerImage!)
+    //           }} />
+    //         </Box>}
+    //         <div className='CardDetail content'>
+    //             <BlockIconSelector
+    //                 block={card}
+    //                 size='l'
+    //                 readonly={props.readonly}
+    //             />
 
-                <Box display={"flex"} gap={1} width={"100%"}>
-                  {!props.readonly && !card.fields.icon &&
-                      <div className='add-buttons'>
-                          <Button
-                              onClick={setRandomIcon}
-                              icon={<EmojiEmotionsIcon
-                                fontSize='small'
-                                sx={{ marginRight: 1 }}
-                              />}
-                          >
-                              <FormattedMessage
-                                  id='CardDetail.add-icon'
-                                  defaultMessage='Add icon'
-                              />
-                          </Button>
-                      </div>}
-                  {!props.readonly && !card.fields.headerImage &&
-                  <div className='add-buttons'>
-                      <Button
-                          onClick={() => setRandomHeaderImage()}
-                          icon={<ImageIcon
-                            fontSize='small'
-                            sx={{ marginRight: 1 }}
-                          />}
-                      >
-                          <FormattedMessage
-                              id='CardDetail.add-cover'
-                              defaultMessage='Add cover'
-                          />
-                      </Button>
-                  </div>}
-                </Box>
+    //             <Box display={"flex"} gap={1} width={"100%"}>
+    //               {!props.readonly && !card.fields.icon &&
+    //                   <div className='add-buttons'>
+    //                       <Button
+    //                           onClick={setRandomIcon}
+    //                           icon={<EmojiEmotionsIcon
+    //                             fontSize='small'
+    //                             sx={{ marginRight: 1 }}
+    //                           />}
+    //                       >
+    //                           <FormattedMessage
+    //                               id='CardDetail.add-icon'
+    //                               defaultMessage='Add icon'
+    //                           />
+    //                       </Button>
+    //                   </div>}
+    //               {!props.readonly && !card.fields.headerImage &&
+    //               <div className='add-buttons'>
+    //                   <Button
+    //                       onClick={() => setRandomHeaderImage()}
+    //                       icon={<ImageIcon
+    //                         fontSize='small'
+    //                         sx={{ marginRight: 1 }}
+    //                       />}
+    //                   >
+    //                       <FormattedMessage
+    //                           id='CardDetail.add-cover'
+    //                           defaultMessage='Add cover'
+    //                       />
+    //                   </Button>
+    //               </div>}
+    //             </Box>
 
-                <EditableArea
-                    ref={titleRef}
-                    className='title'
-                    value={title}
-                    placeholderText='Untitled'
-                    onChange={(newTitle: string) => setTitle(newTitle)}
-                    saveOnEsc={true}
-                    onSave={saveTitle}
-                    onCancel={() => setTitle(props.card.title)}
-                    readonly={props.readonly}
-                    spellCheck={true}
-                />
+    //             <EditableArea
+    //                 ref={titleRef}
+    //                 className='title'
+    //                 value={title}
+    //                 placeholderText='Untitled'
+    //                 onChange={(newTitle: string) => setTitle(newTitle)}
+    //                 saveOnEsc={true}
+    //                 onSave={saveTitle}
+    //                 onCancel={() => setTitle(props.card.title)}
+    //                 readonly={props.readonly}
+    //                 spellCheck={true}
+    //             />
 
-                {/* Property list */}
+    //             {/* Property list */}
 
-                <Box sx={{
-                  display: "flex",
-                  gap: 1,
-                  justifyContent: "space-between",
-                  width: "100%"
-                }}>
-                  <CardDetailProperties
-                      board={props.board}
-                      card={props.card}
-                      contents={props.contents}
-                      comments={props.comments}
-                      cards={props.cards}
-                      activeView={props.activeView}
-                      views={props.views}
-                      readonly={props.readonly}
-                  />
-                  <BountyIntegration linkedTaskId={card.id} title={title} readonly={props.readonly} />
-                </Box>
+    //             <Box sx={{
+    //               display: "flex",
+    //               gap: 1,
+    //               justifyContent: "space-between",
+    //               width: "100%"
+    //             }}>
+    //               <CardDetailProperties
+    //                   board={props.board}
+    //                   card={props.card}
+    //                   contents={props.contents}
+    //                   comments={props.comments}
+    //                   cards={props.cards}
+    //                   activeView={props.activeView}
+    //                   views={props.views}
+    //                   readonly={props.readonly}
+    //               />
+    //               <BountyIntegration linkedTaskId={card.id} title={title} readonly={props.readonly} />
+    //             </Box>
 
-                {/* Comments */}
+    //             {/* Comments */}
 
-                <hr/>
-                <CommentsList
-                    comments={comments}
-                    rootId={card.rootId}
-                    cardId={card.id}
-                    readonly={props.readonly}
-                />
-            </div>
+    //             <hr/>
+    //             <CommentsList
+    //                 comments={comments}
+    //                 rootId={card.rootId}
+    //                 cardId={card.id}
+    //                 readonly={props.readonly}
+    //             />
+    //         </div>
 
-            {/* Content blocks */}
+    //         {/* Content blocks */}
 
-            <div className='CardDetail content fullwidth content-blocks' style={{
-              height: 150
-            }}>
-                <CardDetailProvider card={card}>
-                    <CardDetailContents
-                        card={props.card}
-                        contents={props.contents}
-                        readonly={props.readonly}
-                    />
-                </CardDetailProvider>
-            </div>
-        </>
-    )
+    //         <div className='CardDetail content fullwidth content-blocks' style={{
+    //           height: 150
+    //         }}>
+                
+    //         </div>
+    //     </>
+    // )
+    
+    return <EditorPage pageId={card.id}/>
 }
 
 export default CardDetail
