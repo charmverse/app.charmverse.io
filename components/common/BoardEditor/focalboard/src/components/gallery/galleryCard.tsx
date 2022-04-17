@@ -31,6 +31,8 @@ import { PageContent } from 'models'
 import { CharmTextBlock } from '../../blocks/charmBlock'
 import { usePages } from 'hooks/usePages'
 import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
+import { mutate } from 'swr'
+import { useCurrentSpace } from 'hooks/useCurrentSpace'
 
 
 type Props = {
@@ -50,6 +52,7 @@ const GalleryCard = React.memo((props: Props) => {
   const { card, board } = props
 
   const { pages } = usePages()
+  const [space] = useCurrentSpace()
   const intl = useIntl()
   const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readonly, props.onDrop)
   const contents = useAppSelector(getCardContents(card.id))
@@ -118,9 +121,12 @@ const GalleryCard = React.memo((props: Props) => {
               id='duplicate'
               name={intl.formatMessage({ id: 'GalleryCard.duplicate', defaultMessage: 'Duplicate' })}
               onClick={() => {
-                if (pages[card.id]) {
+                if (pages[card.id] && space) {
                   mutator.duplicateCard({
-                    cardId: card.id, board, cardPage: pages[card.id]!
+                    cardId: card.id, board, cardPage: pages[card.id]!,
+                    afterRedo: async () => {
+                      mutate(`pages/${space.id}`)
+                    }
                   })
                 }
               }}

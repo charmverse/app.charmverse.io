@@ -4,6 +4,7 @@ import { Box } from '@mui/material'
 import { BountyStatusColours } from 'components/bounties/BountyCard'
 import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
 import { useBounties } from 'hooks/useBounties'
+import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { usePages } from 'hooks/usePages'
 import millify from "millify"
 import { BOUNTY_LABELS } from 'models'
@@ -11,6 +12,7 @@ import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
+import { mutate } from 'swr'
 import { Board, IPropertyTemplate } from '../../blocks/board'
 import { Card } from '../../blocks/card'
 import { useSortable } from '../../hooks/sortable'
@@ -55,6 +57,7 @@ const KanbanCard = React.memo((props: Props) => {
   if (props.isManualSort && isOver) {
     className += ' dragover'
   }
+  const [space] = useCurrentSpace()
 
   const { bounties } = useBounties()
   const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === card.id);
@@ -120,7 +123,7 @@ const KanbanCard = React.memo((props: Props) => {
                 id='duplicate'
                 name={intl.formatMessage({ id: 'KanbanCard.duplicate', defaultMessage: 'Duplicate' })}
                 onClick={() => {
-                  if (pages[card.id]) {
+                  if (pages[card.id] && space) {
                     mutator.duplicateCard(
                       {
                         cardId: card.id,
@@ -128,6 +131,7 @@ const KanbanCard = React.memo((props: Props) => {
                         cardPage: pages[card.id]!,
                         afterRedo: async (newCardId) => {
                           props.showCard(newCardId)
+                          mutate(`pages/${space.id}`)
                         },
                         beforeUndo: async () => {
                           props.showCard(undefined)

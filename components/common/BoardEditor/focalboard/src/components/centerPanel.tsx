@@ -62,7 +62,6 @@ function CenterPanel(props: Props) {
   })
 
   const { pages } = usePages()
-
   const [space] = useCurrentSpace()
 
   const backgroundRef = React.createRef<HTMLDivElement>()
@@ -281,15 +280,17 @@ function CenterPanel(props: Props) {
     if (selectedCardIds.length < 1) {
       return
     }
-
     mutator.performAsUndoGroup(async () => {
       for (const cardId of selectedCardIds) {
         const card = props.cards.find((o) => o.id === cardId)
-        if (card && pages[cardId]) {
+        if (card && pages[cardId] && space) {
           mutator.duplicateCard({
             cardId,
             board,
-            cardPage: pages[cardId]!
+            cardPage: pages[cardId]!,
+            afterRedo: async () => {
+              mutate(`pages/${space.id}`)
+            }
           })
         } else {
           Utils.assertFailure(`Selected card not found: ${cardId}`)

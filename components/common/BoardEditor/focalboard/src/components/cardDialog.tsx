@@ -25,6 +25,8 @@ import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import Button from "components/common/Button"
 import { useRouter } from 'next/router'
 import { usePages } from 'hooks/usePages'
+import { mutate } from 'swr'
+import { useCurrentSpace } from 'hooks/useCurrentSpace'
 
 
 
@@ -48,8 +50,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const contents = useAppSelector(getCardContents(props.cardId))
     const comments = useAppSelector(getCardComments(props.cardId))
     const intl = useIntl()
-    const me = useAppSelector<IUser|null>(getMe)
-
+    const [space] = useCurrentSpace()
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
     const makeTemplateClicked = async () => {
         if (!card) {
@@ -57,8 +58,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
             return
         }
 
-        if (pages[props.cardId]) {
-          // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.AddTemplateFromCard, {board: props.board.id, view: activeView.id, card: props.cardId})
+        if (pages[props.cardId] && space) {
           await mutator.duplicateCard(
             {
               cardId: props.cardId,
@@ -67,6 +67,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
               asTemplate: true,
               afterRedo: async (newCardId) => {
                 props.showCard(newCardId)
+                mutate(`pages/${space.id}`)
               },
               beforeUndo: async () => {
                 props.showCard(undefined)
