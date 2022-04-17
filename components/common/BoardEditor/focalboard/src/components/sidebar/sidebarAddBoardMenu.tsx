@@ -21,6 +21,8 @@ import MenuWrapper from '../../widgets/menuWrapper'
 import BoardTemplateMenuItem from './boardTemplateMenuItem'
 import { Card, createCard } from '../../blocks/card'
 import { CharmTextBlock, createCharmTextBlock } from '../../blocks/charmBlock'
+import { mutate } from 'swr'
+import { useCurrentSpace } from 'hooks/useCurrentSpace'
 
 
 
@@ -30,7 +32,6 @@ type Props = {
 
 export const addBoardClicked = async (showBoard: (id: string) => void, intl: IntlShape, activeBoardId?: string) => {
     const oldBoardId = activeBoardId
-
     const board = createBoard({addDefaultProperty: true})
     board.rootId = board.id
 
@@ -44,17 +45,12 @@ export const addBoardClicked = async (showBoard: (id: string) => void, intl: Int
 
     for (let index = 0; index < 3; index++) {
       const card = createCard()
-  
       card.parentId = board.id
       card.rootId = board.rootId
       card.title = `Card ${index + 1}`
-  
-      const charmTextBlock = createCharmTextBlock()
-      charmTextBlock.parentId = card.id
-      charmTextBlock.rootId = card.rootId
-      card.fields.contentOrder = [charmTextBlock.id];
+      card.fields.contentOrder = [];
       view.fields.cardOrder.push(card.id)
-      blocks.push(card, charmTextBlock)
+      blocks.push(card)
     }
     
     await mutator.insertBlocks(

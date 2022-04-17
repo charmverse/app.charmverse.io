@@ -142,7 +142,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const followingCards = useAppSelector(getUserBlockSubscriptionList)
     const isFollowingCard = Boolean(followingCards.find((following) => following.blockId === props.cardId))
     const router = useRouter();
-    return card ? (
+    return card && pages[card.id] ? (
         <>
             <Dialog
                 onClose={props.onClose}

@@ -277,6 +277,7 @@ class CenterPanel extends React.Component<Props, State> {
                 card,
                 'add card',
                 async (block: Block) => {
+                  // Add the created page to pages state
                     await mutator.insertBlock(charmTextBlock, 'add card description')
                     if (show) {
                         console.log('add card', this.props.addCard.toString());
