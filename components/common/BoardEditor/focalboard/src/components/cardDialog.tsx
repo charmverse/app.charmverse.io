@@ -57,19 +57,25 @@ const CardDialog = (props: Props): JSX.Element | null => {
             return
         }
 
-        // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.AddTemplateFromCard, {board: props.board.id, view: activeView.id, card: props.cardId})
-        await mutator.duplicateCard(
-            props.cardId,
-            board,
-            intl.formatMessage({id: 'Mutator.new-template-from-card', defaultMessage: 'new template from card'}),
-            true,
-            async (newCardId) => {
+        if (pages[props.cardId]) {
+          // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.AddTemplateFromCard, {board: props.board.id, view: activeView.id, card: props.cardId})
+          await mutator.duplicateCard(
+            {
+              cardId: props.cardId,
+              board,
+              description: intl.formatMessage({id: 'Mutator.new-template-from-card', defaultMessage: 'new template from card'}),
+              asTemplate: true,
+              afterRedo: async (newCardId) => {
                 props.showCard(newCardId)
-            },
-            async () => {
+              },
+              beforeUndo: async () => {
                 props.showCard(undefined)
-            },
-        )
+              },
+              cardPage: pages[props.cardId]!
+            }
+          )
+        }
+
     }
     const handleDeleteCard = async () => {
         if (!card) {

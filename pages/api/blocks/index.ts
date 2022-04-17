@@ -84,22 +84,29 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
       }));
       const cardBlocks = newBlocks.filter(newBlock => newBlock.type === 'card');
 
-      const cardPages: Prisma.PageCreateManyInput[] = cardBlocks.map(cardBlock => ({
-        createdBy: cardBlock.createdBy,
-        updatedBy: cardBlock.updatedBy,
-        id: cardBlock.id,
-        spaceId: cardBlock.spaceId,
-        cardId: cardBlock.id,
-        createdAt: cardBlock.createdAt,
-        path: `page-${Math.random().toString().replace('0.', '')}`,
-        title: cardBlock.title,
-        icon: cardBlock.fields.icon,
-        type: 'card',
-        headerImage: cardBlock.fields.headerImage,
-        contentText: '',
-        parentId: cardBlock.parentId,
-        updatedAt: cardBlock.updatedAt
-      }));
+      const cardPages: Prisma.PageCreateManyInput[] = cardBlocks.map(cardBlock => {
+        const cardPage: Prisma.PageCreateManyInput = {
+          createdBy: cardBlock.createdBy,
+          updatedBy: cardBlock.updatedBy,
+          id: cardBlock.id,
+          spaceId: cardBlock.spaceId,
+          cardId: cardBlock.id,
+          createdAt: cardBlock.createdAt,
+          path: `page-${Math.random().toString().replace('0.', '')}`,
+          title: cardBlock.title,
+          icon: cardBlock.fields.icon,
+          type: 'card',
+          headerImage: cardBlock.fields.headerImage,
+          contentText: '',
+          parentId: cardBlock.parentId,
+          updatedAt: cardBlock.updatedAt,
+          content: cardBlock.fields.content ?? undefined
+        };
+        if (cardBlock.fields.content) {
+          delete cardBlock.fields.content;
+        }
+        return cardPage;
+      });
       await prisma.block.createMany({
         data: newBlocks
       });

@@ -4,6 +4,7 @@
 import { Box } from '@mui/system'
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
+import { usePages } from 'hooks/usePages'
 import { randomIntFromInterval } from 'lib/utilities/random'
 import { Page } from 'models'
 import React, { useState } from 'react'
@@ -60,6 +61,8 @@ function CenterPanel(props: Props) {
     selectedCardIds: []
   })
 
+  const { pages } = usePages()
+
   const [space] = useCurrentSpace()
 
   const backgroundRef = React.createRef<HTMLDivElement>()
@@ -109,21 +112,25 @@ function CenterPanel(props: Props) {
     const { activeView, board } = props
 
     mutator.performAsUndoGroup(async () => {
-      const [, newCardId] = await mutator.duplicateCard(
-        cardTemplateId,
-        board,
-        props.intl.formatMessage({ id: 'Mutator.new-card-from-template', defaultMessage: 'new card from template' }),
-        false,
-        async (cardId) => {
-          props.updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: [...activeView.fields.cardOrder, cardId] } })
-          // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCardViaTemplate, {board: props.board.id, view: props.activeView.id, card: cardId, cardTemplateId})
-          showCard(cardId)
-        },
-        async () => {
-          showCard(undefined)
-        },
-      )
-      await mutator.changeViewCardOrder(activeView, [...activeView.fields.cardOrder, newCardId], 'add-card')
+      if (pages[cardTemplateId]) {
+        const [, newCardId] = await mutator.duplicateCard({
+          cardId: cardTemplateId,
+          board,
+          description: props.intl.formatMessage({ id: 'Mutator.new-card-from-template', defaultMessage: 'new card from template' }),
+          asTemplate: false,
+          afterRedo: async (cardId) => {
+            props.updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: [...activeView.fields.cardOrder, cardId] } })
+            // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCardViaTemplate, {board: props.board.id, view: props.activeView.id, card: cardId, cardTemplateId})
+            showCard(cardId)
+          },
+          beforeUndo: async () => {
+            showCard(undefined)
+          },
+          cardPage: pages[cardTemplateId]!
+        }
+        )
+        await mutator.changeViewCardOrder(activeView, [...activeView.fields.cardOrder, newCardId], 'add-card')
+      }
     })
   }
 
@@ -278,8 +285,12 @@ function CenterPanel(props: Props) {
     mutator.performAsUndoGroup(async () => {
       for (const cardId of selectedCardIds) {
         const card = props.cards.find((o) => o.id === cardId)
-        if (card) {
-          mutator.duplicateCard(cardId, board)
+        if (card && pages[cardId]) {
+          mutator.duplicateCard({
+            cardId,
+            board,
+            cardPage: pages[cardId]!
+          })
         } else {
           Utils.assertFailure(`Selected card not found: ${cardId}`)
         }
