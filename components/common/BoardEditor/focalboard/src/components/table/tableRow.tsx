@@ -20,6 +20,7 @@ import PropertyValueElement from '../propertyValueElement'
 import { usePages } from 'hooks/usePages'
 import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
 import charmClient from 'charmClient'
+import { Page } from '@prisma/client'
 
 type Props = {
     board: Board
@@ -48,7 +49,7 @@ const TableRow = React.memo((props: Props) => {
     const {board, activeView, onSaveWithEnter, columnRefs, card} = props
     const contents = useAppSelector(getCardContents(card.id || ''))
     const comments = useAppSelector(getCardComments(card.id))
-    const {pages} = usePages();
+    const {pages, setPages} = usePages();
     const pageCard = pages[props.card.id];
     const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null)
     const [title, setTitle] = useState(pageCard?.title || '')
@@ -110,11 +111,18 @@ const TableRow = React.memo((props: Props) => {
                         value={title}
                         placeholderText='Untitled'
                         onChange={(newTitle: string) => setTitle(newTitle)}
-                        onSave={(saveType) => {
-                            charmClient.updatePage({
+                        onSave={async (saveType) => {
+                            await charmClient.updatePage({
                               id: card.id,
                               title
                             })
+                            setPages((pages) => ({
+                              ...pages,
+                              [card.id]: {
+                                ...(pages[card.id] ?? {}),
+                                title
+                              } as Page
+                            }))
                             if (saveType === 'onEnter') {
                                 onSaveWithEnter()
                             }
