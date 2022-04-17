@@ -9,6 +9,7 @@ import React from 'react'
 import Hotkeys from 'react-hot-keys'
 import { injectIntl, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
+import { mutate } from 'swr'
 import { BlockIcons } from '../blockIcons'
 import { Block } from '../blocks/block'
 import { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../blocks/board'
@@ -263,10 +264,7 @@ class CenterPanel extends React.Component<Props, State> {
             card.fields.icon = BlockIcons.shared.randomIcon()
         }
 
-        const charmTextBlock = createCharmTextBlock()
-        charmTextBlock.parentId = card.id
-        charmTextBlock.rootId = card.rootId
-        card.fields.contentOrder = [charmTextBlock.id];
+        card.fields.contentOrder = [];
 
         mutator.performAsUndoGroup(async () => {
             const newCardOrder = insertLast ? [...activeView.fields.cardOrder, card.id] : [card.id, ...activeView.fields.cardOrder]
@@ -277,8 +275,6 @@ class CenterPanel extends React.Component<Props, State> {
                 card,
                 'add card',
                 async (block: Block) => {
-                  // Add the created page to pages state
-                    await mutator.insertBlock(charmTextBlock, 'add card description')
                     if (show) {
                         console.log('add card', this.props.addCard.toString());
                         this.props.addCard(createCard(block))
