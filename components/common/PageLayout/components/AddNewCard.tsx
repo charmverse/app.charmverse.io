@@ -9,6 +9,7 @@ import { usePages } from 'hooks/usePages';
 import { StyledIconButton } from 'components/common/PageLayout/components/NewPageMenu';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { mutate } from 'swr';
 
 export default function AddNewCard ({ pageId }: {pageId: string}) {
   const router = useRouter();
@@ -25,14 +26,10 @@ export default function AddNewCard ({ pageId }: {pageId: string}) {
           card.parentId = page.boardId;
           card.rootId = page.boardId;
           card.fields.properties = { ...card.fields.properties };
-
-          const charmTextBlock = createCharmTextBlock();
-          charmTextBlock.parentId = card.id;
-          charmTextBlock.rootId = card.rootId;
-          card.fields.contentOrder = [charmTextBlock.id];
-
-          await charmClient.insertBlocks([card, charmTextBlock], () => null);
+          card.fields.contentOrder = [];
+          await charmClient.insertBlocks([card], () => null);
           router.push(`/${space.domain}/${page.path}?cardId=${card.id}`);
+          mutate(`pages/${space.id}`);
           dispatch(addCard(card));
         }
       }}
