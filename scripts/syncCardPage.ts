@@ -33,6 +33,7 @@ async function main () {
     }
   });
   let createdCardPages = 0;
+  let updatedCardPages = 0;
   const cardPageIds = new Set(cardPages.map(cardPage => cardPage.id));
 
   const charmTextBlocks = await prisma.block.findMany({
@@ -53,6 +54,7 @@ async function main () {
     fields: Prisma.JsonValue;
     parentId: string;
   }> = {};
+
   charmTextBlocks.forEach(charmTextBlock => {
     cardBlockCharmTextRecord[charmTextBlock.parentId] = charmTextBlock;
   });
@@ -103,6 +105,22 @@ async function main () {
       });
       createdCardPages += 1;
     }
+    else {
+      const cardPageInput: Prisma.PageUpdateInput = {
+        title: cardBlock.title,
+        icon: (cardBlock.fields as any)?.icon,
+        type: 'card',
+        headerImage: (cardBlock.fields as any)?.headerImage,
+        content: (charmTextBlock?.fields as any)?.content as PageContent
+      };
+      await prisma.page.update({
+        data: cardPageInput,
+        where: {
+          id: cardBlock.id
+        }
+      });
+      updatedCardPages += 1;
+    }
     if (charmTextBlock) {
       charmTextBlockIdsToDelete.push(charmTextBlock.id);
     }
@@ -118,6 +136,7 @@ async function main () {
 
   console.log(`Deleted charm_text blocks: ${charmTextBlockIdsToDelete.length}`);
   console.log(`Created card pages: ${createdCardPages}`);
+  console.log(`Updated card pages: ${updatedCardPages}`);
 }
 
 main();
