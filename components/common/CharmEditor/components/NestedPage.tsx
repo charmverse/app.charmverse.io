@@ -21,6 +21,7 @@ import { useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { isTruthy } from 'lib/utilities/types';
 import { hideSuggestionsTooltip, referenceElement } from './@bangle.dev/tooltip/suggest-tooltip';
+import { checkForEmpty } from '../CharmEditor';
 
 const name = 'page';
 export const NestedPagePluginKey = new PluginKey('suggest_tooltip');
@@ -93,7 +94,7 @@ export function nestedPagePlugins ({ tooltipRenderOpts }: NestedPagePluginOption
           };
         },
         apply (tr, pluginState, _oldState) {
-          const meta = tr.getMeta(NestedPagePluginKey);
+          const meta = tr.getMeta(NestedPagePluginKey) as any;
           if (meta === undefined) {
             return pluginState;
           }
@@ -174,9 +175,7 @@ export function NestedPagesList () {
       >
         <Box>
           {Object.values(pages).filter(isTruthy).map(page => {
-            const docContent = ((page.content) as PageContent)?.content;
-            const isEditorEmpty = docContent && (docContent.length <= 1
-              && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
+            const isEditorEmpty = checkForEmpty(page.content as PageContent);
 
             return (
               <MenuItem
@@ -220,12 +219,7 @@ export function NestedPage ({ node, getPos, view }: NodeViewProps) {
   const nestedPage = pages[node.attrs.id];
   const popupState = usePopupState({ variant: 'popover', popupId: 'nested-page' });
 
-  const docContent = ((nestedPage?.content) as PageContent)?.content;
-
-  const isEditorEmpty = Boolean(
-    docContent && (docContent.length <= 1
-    && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0))
-  );
+  const isEditorEmpty = checkForEmpty(nestedPage?.content as PageContent);
 
   return (
     <NestedPageContainer>
