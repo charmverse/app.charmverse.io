@@ -70,9 +70,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json(error);
   }
 
-  const pageId = v4();
-
-  const block = await prisma.block.create({
+  const cardBlock = await prisma.block.create({
     data: {
       id: v4(),
       type: 'card',
@@ -92,9 +90,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
       },
       schema: 1,
       fields: {
-        contentOrder: [
-          pageId
-        ],
+        contentOrder: [],
         headerImage: null,
         icon: '',
         isTemplate: false,
@@ -104,32 +100,23 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const page = await prisma.block.create({
+  await prisma.page.create({
     data: {
-      id: pageId,
-      user: {
-        connect: {
-          id: req.botUser.id
-        }
-      },
-      updatedBy: req.botUser.id,
-      type: 'charm_text',
-      rootId: id as string,
-      parentId: block.id,
-      title: '',
-      space: {
-        connect: {
-          id: board.spaceId
-        }
-      },
-      schema: 1,
-      fields: {
-      }
-
+      createdBy: cardBlock.createdBy,
+      createdAt: cardBlock.createdAt,
+      updatedBy: cardBlock.updatedBy,
+      updatedAt: cardBlock.updatedAt,
+      cardId: cardBlock.id,
+      contentText: '',
+      path: `page-${Math.random().toString().replace('0.', '')}`,
+      type: 'card',
+      title,
+      parentId: id as string,
+      id: cardBlock.id
     }
   });
 
-  const card = new PageFromBlock(block, (board.fields as any).cardProperties);
+  const card = new PageFromBlock(cardBlock, (board.fields as any).cardProperties);
 
   return res.status(201).send(card);
 

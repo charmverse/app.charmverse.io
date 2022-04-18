@@ -5,6 +5,7 @@ import { PageFromBlock, Page, PageProperty, mapProperties, validateUpdateData } 
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -56,16 +57,18 @@ async function getPage (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Board not found' });
   }
 
-  const cardPageContent = await prisma.block.findFirst({
+  const cardPage = await prisma.page.findUnique({
     where: {
-      type: 'charm_text',
-      parentId: card.id
+      id: card.id
+    },
+    select: {
+      content: true
     }
   });
 
   const boardSchema = (board.fields as any).cardProperties as PageProperty[];
 
-  const cardToReturn = new PageFromBlock(card, boardSchema, (cardPageContent?.fields as any)?.content);
+  const cardToReturn = new PageFromBlock(card, boardSchema, cardPage?.content as PageContent);
 
   return res.status(200).json(cardToReturn);
 }
@@ -91,7 +94,7 @@ async function getPage (req: NextApiRequest, res: NextApiResponse) {
  */
 async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
-  const { pageId, id } = req.query;
+  const { pageId } = req.query;
 
   const spaceId = req.authorizedSpaceId;
 
@@ -135,6 +138,14 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   if (requestBodyUpdate.title) {
     updateContent.title = requestBodyUpdate.title;
+    await prisma.page.update({
+      where: {
+        id: card.id
+      },
+      data: {
+        title: requestBodyUpdate.title
+      }
+    });
   }
 
   if (requestBodyUpdate.properties) {
@@ -169,14 +180,16 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     data: updateContent
   });
 
-  const cardPageContent = await prisma.block.findFirst({
+  const cardPage = await prisma.page.findUnique({
     where: {
-      type: 'charm_text',
-      parentId: card.id
+      id: card.id
+    },
+    select: {
+      content: true
     }
   });
 
-  const cardToReturn = new PageFromBlock(updatedPage, boardSchema, (cardPageContent?.fields as any)?.content);
+  const cardToReturn = new PageFromBlock(updatedPage, boardSchema, cardPage?.content as PageContent);
 
   return res.status(200).json(cardToReturn);
 }
