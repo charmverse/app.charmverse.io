@@ -2,7 +2,8 @@ import { PagePermission, PagePermissionLevel, Prisma, Role, Space, User } from '
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { IPagePermissionUpdate, IPagePermissionWithAssignee } from './page-permission-interfaces';
+import { InvalidPermissionGranteeError } from './errors';
+import { IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionWithAssignee } from './page-permission-interfaces';
 
 export async function listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
   const permissions = await prisma.pagePermission.findMany({
@@ -19,7 +20,12 @@ export async function listPagePermissions (pageId: string): Promise<IPagePermiss
   return permissions;
 }
 
-export async function createPagePermission (permission: PagePermission) {
+/**
+ * Creates a permission for a user, role or space, and a pageId
+ * @param permission
+ * @returns
+ */
+export async function createPagePermission (permission: IPagePermissionToCreate) {
   const permissionLevel = permission.permissionLevel;
 
   if (!isTruthy(permissionLevel) || !isTruthy(PagePermissionLevel[permissionLevel])) {
@@ -42,6 +48,12 @@ export async function createPagePermission (permission: PagePermission) {
     }
 
   } as Prisma.PagePermissionCreateInput;
+
+  if (
+    (permission.userId && (permission.roleId || permission.spaceId))
+    || (permission.roleId && permission.spaceId)) {
+    throw new InvalidPermissionGranteeError();
+  }
 
   // Ensure only 1 group at a time is linked to this permission
   if (permission.userId) {
@@ -72,7 +84,46 @@ export async function createPagePermission (permission: PagePermission) {
 
   }
 
-  const createdPermission = await prisma.pagePermission.create({ data: permissionToCreate });
+  const atomicUpdateQuery: Prisma.PagePermissionWhereUniqueInput = {
+  };
+
+  if (permission.userId) {
+    atomicUpdateQuery.userId_PageId = {
+      pageId: permission.pageId,
+      userId: permission.userId
+    };
+  }
+  else if (permission.roleId) {
+    atomicUpdateQuery.roleId_pageId = {
+      pageId: permission.pageId,
+      roleId: permission.roleId
+    };
+  }
+  else if (permission.spaceId) {
+    atomicUpdateQuery.spaceId_pageId = {
+      pageId: permission.pageId,
+      spaceId: permission.spaceId
+    };
+  }
+  else {
+    throw new InvalidPermissionGranteeError();
+  }
+
+  const createdPermission = await prisma.pagePermission.upsert({
+    where: atomicUpdateQuery,
+    update: {
+      permissionLevel: permission.permissionLevel,
+      permissions: permissionsToAssign
+    },
+    create: {
+      permissionLevel: permission.permissionLevel,
+      permissions: permissionsToAssign,
+      pageId: permission.pageId,
+      userId: permission.userId,
+      roleId: permission.roleId,
+      spaceId: permission.spaceId
+    }
+  });
 
   return createdPermission;
 }
