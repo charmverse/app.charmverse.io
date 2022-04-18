@@ -46,3 +46,43 @@ export function hasFullSetOfBasePermissions (basePermissions: PagePermission [],
 
 }
 
+export async function canInheritPermissionsFromParent (pageId: string) {
+
+  const page = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    },
+    include: {
+      permissions: true
+    }
+  });
+
+  if (!page) {
+    throw new PageNotFoundError(pageId);
+  }
+
+  // Is a root page
+  if (!page.parentId) {
+    return false;
+  }
+
+  const parentPage = await prisma.page.findUnique({
+    where: {
+      id: page.parentId
+    },
+    include: {
+      permissions: true
+    }
+  });
+
+  if (!parentPage) {
+    throw new PageNotFoundError(page.parentId);
+  }
+
+  return hasFullSetOfBasePermissions(parentPage.permissions, page.permissions);
+
+}
+
+export async function refreshPagePermissionInheritance (pageId: string) {
+
+}

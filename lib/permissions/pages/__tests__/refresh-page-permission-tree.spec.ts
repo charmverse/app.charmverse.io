@@ -150,3 +150,69 @@ describe('hasFullSetOfBasePermissions', () => {
   });
 });
 
+describe('canInheritFromParent', () => {
+
+  it('should return false when the page does not have a parent', async () => {
+    const rootPage = await createPage();
+
+    const canInherit = await canInheritPermissionsFromParent(rootPage.id);
+
+    expect(canInherit).toBe(false);
+
+  });
+  it('should return true when the child page has the same amount of permissions as the parent', async () => {
+
+    const [root, child] = await setupPagesWithPermissions([
+      // Root page
+      [{
+        userId: user.id,
+        permissionLevel: 'full_access'
+      },
+      {
+        spaceId: space.id,
+        permissionLevel: 'view'
+      }],
+      // Child page
+      [{
+        userId: user.id,
+        permissionLevel: 'full_access'
+      },
+      {
+        spaceId: space.id,
+        permissionLevel: 'view'
+      }]
+    ]);
+
+    const canInherit = await canInheritPermissionsFromParent(child.id);
+
+    expect(canInherit).toBe(true);
+
+  });
+
+  it('should return false when the child page has less permissions than the parent', async () => {
+
+    const [root, child] = await setupPagesWithPermissions([
+      // Root page
+      [{
+        userId: user.id,
+        permissionLevel: 'full_access'
+      },
+      {
+        spaceId: space.id,
+        permissionLevel: 'view'
+      }],
+      // Child page
+      [
+        {
+          spaceId: space.id,
+          permissionLevel: 'view'
+        }]
+    ]);
+
+    const canInherit = await canInheritPermissionsFromParent(child.id);
+
+    expect(canInherit).toBe(false);
+
+  });
+
+});
