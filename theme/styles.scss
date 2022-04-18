@@ -41,3 +41,14 @@ blockquote .bangle-nv-child-container {
 .telegram-login-CharmverseBot {
   width: 100%;
 }
+
+.CardDetail {
+  hr {
+    width: 100%;
+    height: 1px;
+    border: 0;
+    color: rgba(var(--center-channel-color-rgb), 0.09);
+    background-color: rgba(var(--center-channel-color-rgb), 0.09);
+    margin-bottom: 8px;
+  }
+}
