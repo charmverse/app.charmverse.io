@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
-import { Page } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 
@@ -41,16 +41,71 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     });
   }
 
-  const space = await prisma.page.update({
+  const pageWithPermission = await prisma.page.update({
     where: {
-      id: req.query.id as string
+      id: pageId
     },
     data: req.body,
     include: {
       permissions: true
     }
   });
-  return res.status(200).json(space);
+
+  // Making sure the card page and card block metadata stays in sync
+  if (pageWithPermission.type === 'card') {
+    let shouldUpdate = false;
+    let updatingFields = false;
+    const blockUpdateInput: Prisma.BlockUpdateInput = {};
+
+    if (req.body.title) {
+      blockUpdateInput.title = req.body.title;
+      shouldUpdate = true;
+    }
+
+    if (req.body.icon) {
+      if (!blockUpdateInput.fields) {
+        blockUpdateInput.fields = {};
+      }
+      (blockUpdateInput.fields as any).icon = req.body.icon;
+      shouldUpdate = true;
+      updatingFields = true;
+    }
+
+    if (req.body.headerImage) {
+      if (!blockUpdateInput.fields) {
+        blockUpdateInput.fields = {};
+      }
+      (blockUpdateInput.fields as any).headerImage = req.body.headerImage;
+      shouldUpdate = true;
+      updatingFields = true;
+    }
+    if (shouldUpdate) {
+      if (updatingFields) {
+        const cardBlockFields = await prisma.block.findUnique({
+          where: {
+            id: pageId
+          },
+          select: {
+            fields: true
+          }
+        });
+        if (cardBlockFields) {
+          blockUpdateInput.fields = {
+            ...(cardBlockFields?.fields as any),
+            ...(blockUpdateInput.fields as any)
+          };
+        }
+      }
+
+      await prisma.block.update({
+        where: {
+          id: pageId
+        },
+        data: blockUpdateInput
+      });
+    }
+  }
+  return res.status(200).json(pageWithPermission);
 }
 
 async function deletePage (req: NextApiRequest, res: NextApiResponse) {
