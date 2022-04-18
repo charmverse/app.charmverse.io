@@ -84,10 +84,16 @@ describe('createPagePermission', () => {
     }
   });
 
-  it('should specify which page the permission was inherited from when created', async () => {
+  it('should specify which permission the permission was inherited from when created', async () => {
     const parent = await createPage({
       createdBy: user.id,
       spaceId: space.id
+    });
+
+    const parentPermission = await createPagePermission({
+      pageId: parent.id,
+      permissionLevel: 'full_access',
+      userId: user.id
     });
 
     const child = await createPage({
@@ -100,10 +106,10 @@ describe('createPagePermission', () => {
       pageId: child.id,
       permissionLevel: 'full_access',
       userId: user.id,
-      inheritedFromPage: parent.id
+      inheritedFromPermission: parentPermission.id
     });
 
-    expect(created.inheritedFromPage).toBe(parent.id);
+    expect(created.sourcePermission?.id).toBe(parentPermission.id);
 
   });
 
@@ -113,6 +119,12 @@ describe('createPagePermission', () => {
       spaceId: space.id
     });
 
+    const parentPermission = await createPagePermission({
+      pageId: parent.id,
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
     const child = await createPage({
       createdBy: user.id,
       spaceId: space.id,
@@ -123,7 +135,8 @@ describe('createPagePermission', () => {
       pageId: child.id,
       permissionLevel: 'full_access',
       userId: user.id,
-      inheritedFromPage: parent.id
+      inheritedFromPermission: parentPermission.id
+
     });
 
     const updated = await createPagePermission({
@@ -132,7 +145,7 @@ describe('createPagePermission', () => {
       userId: user.id
     });
 
-    expect(updated.inheritedFromPage).toBeNull();
+    expect(updated.inheritedFromPermission).toBeNull();
 
   });
 

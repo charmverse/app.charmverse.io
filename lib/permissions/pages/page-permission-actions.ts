@@ -3,7 +3,7 @@ import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
 import { AllowedPagePermissions } from './available-page-permissions.class';
 import { InvalidPermissionGranteeError } from './errors';
-import { IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionWithAssignee } from './page-permission-interfaces';
+import { IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionWithAssignee, IPagePermissionWithSource } from './page-permission-interfaces';
 
 export async function listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
   const permissions = await prisma.pagePermission.findMany({
@@ -26,7 +26,7 @@ export async function listPagePermissions (pageId: string): Promise<IPagePermiss
  * @param permission
  * @returns
  */
-export async function createPagePermission (permission: IPagePermissionToCreate) {
+export async function createPagePermission (permission: IPagePermissionToCreate): Promise<IPagePermissionWithSource> {
   const permissionLevel = permission.permissionLevel;
 
   if (!isTruthy(permissionLevel) || !isTruthy(PagePermissionLevel[permissionLevel])) {
@@ -112,19 +112,51 @@ export async function createPagePermission (permission: IPagePermissionToCreate)
 
   const createdPermission = await prisma.pagePermission.upsert({
     where: atomicUpdateQuery,
+    include: {
+      sourcePermission: true
+    },
     update: {
       permissionLevel: permission.permissionLevel,
       permissions: permissionsToAssign,
-      inheritedFromPage: !permission.inheritedFromPage ? null : permission.inheritedFromPage
+      sourcePermission: !permission.inheritedFromPermission
+        ? {
+          disconnect: true
+        }
+        : {
+          connect: {
+            id: permission.inheritedFromPermission as string
+          }
+        }
     },
     create: {
       permissionLevel: permission.permissionLevel,
       permissions: permissionsToAssign,
-      pageId: permission.pageId,
-      userId: permission.userId,
-      roleId: permission.roleId,
-      spaceId: permission.spaceId,
-      inheritedFromPage: !permission.inheritedFromPage ? null : permission.inheritedFromPage
+      page: {
+        connect: {
+          id: permission.pageId
+        }
+      },
+      user: !permission.userId ? undefined : {
+        connect: {
+          id: permission.userId
+        }
+      },
+      role: !permission.roleId ? undefined : {
+        connect: {
+          id: permission.roleId
+        }
+      },
+      space: !permission.spaceId ? undefined : {
+        connect: {
+          id: permission.spaceId
+        }
+      },
+      sourcePermission: !permission.inheritedFromPermission
+        ? undefined : {
+          connect: {
+            id: permission.inheritedFromPermission as string
+          }
+        }
     }
   });
 
@@ -170,8 +202,18 @@ export async function deletePagePermission (permissionId: string) {
     };
   }
 
-  await prisma.pagePermission.delete({ where: {
-    id: permissionId
+  const foundPermission = await prisma.pagePermission.findUnique({
+    where: {
+      id: permissionId
+    }
+  });
+
+  // Delete the permission and the permissions
+  await prisma.pagePermission.deleteMany({ where: {
+    OR: [
+
+    ]
+    //    id: permissionId
   } });
 
   return true;

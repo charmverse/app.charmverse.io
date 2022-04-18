@@ -4,6 +4,7 @@ import { User, Space, SpaceApiToken, Page } from '@prisma/client';
 import { LoggedInUser } from 'models';
 import { prisma } from 'db';
 import { v4 } from 'uuid';
+import { IPageWithPermissions } from '../lib/permissions/pages';
 
 /**
  * Simple utility to provide a user and space object inside test code
@@ -58,7 +59,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export function createPage (options: Pick<Page, 'spaceId' | 'createdBy' | 'parentId'>): Promise<Page> {
+export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Partial<Pick<Page, 'parentId'>>): Promise<IPageWithPermissions> {
   return prisma.page.create({
     data: {
       contentText: '',
@@ -77,6 +78,9 @@ export function createPage (options: Pick<Page, 'spaceId' | 'createdBy' | 'paren
         }
       },
       parentId: options.parentId
+    },
+    include: {
+      permissions: true
     }
   });
 }
