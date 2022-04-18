@@ -1,7 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser, ActionNotPermittedError } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { Page } from '@prisma/client';
@@ -54,6 +54,18 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function deletePage (req: NextApiRequest, res: NextApiResponse) {
+
+  const pageId = req.query.id as string;
+  const userId = req.session.user.id;
+
+  const permissions = await computeUserPagePermissions({
+    pageId,
+    userId
+  });
+
+  if (permissions.delete !== true) {
+    throw new ActionNotPermittedError('You are not allowed to delete this page.');
+  }
 
   await prisma.page.delete({
     where: {
