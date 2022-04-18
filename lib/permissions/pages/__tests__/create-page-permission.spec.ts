@@ -84,4 +84,56 @@ describe('createPagePermission', () => {
     }
   });
 
+  it('should specify which page the permission was inherited from when created', async () => {
+    const parent = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const child = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: parent.id
+    });
+
+    const created = await createPagePermission({
+      pageId: child.id,
+      permissionLevel: 'full_access',
+      userId: user.id,
+      inheritedFromPage: parent.id
+    });
+
+    expect(created.inheritedFromPage).toBe(parent.id);
+
+  });
+
+  it('should delete the reference to the page the permission was inherited from if not provided in upsert mode', async () => {
+    const parent = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const child = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: parent.id
+    });
+
+    const created = await createPagePermission({
+      pageId: child.id,
+      permissionLevel: 'full_access',
+      userId: user.id,
+      inheritedFromPage: parent.id
+    });
+
+    const updated = await createPagePermission({
+      pageId: child.id,
+      permissionLevel: 'view',
+      userId: user.id
+    });
+
+    expect(updated.inheritedFromPage).toBeNull();
+
+  });
+
 });

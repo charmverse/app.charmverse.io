@@ -22,6 +22,7 @@ export async function listPagePermissions (pageId: string): Promise<IPagePermiss
 
 /**
  * Creates a permission for a user, role or space, and a pageId
+ * Works in upsert mode, ensuring there is always only 1 page permission per user/space/role && page pair
  * @param permission
  * @returns
  */
@@ -113,7 +114,8 @@ export async function createPagePermission (permission: IPagePermissionToCreate)
     where: atomicUpdateQuery,
     update: {
       permissionLevel: permission.permissionLevel,
-      permissions: permissionsToAssign
+      permissions: permissionsToAssign,
+      inheritedFromPage: !permission.inheritedFromPage ? null : permission.inheritedFromPage
     },
     create: {
       permissionLevel: permission.permissionLevel,
@@ -121,7 +123,8 @@ export async function createPagePermission (permission: IPagePermissionToCreate)
       pageId: permission.pageId,
       userId: permission.userId,
       roleId: permission.roleId,
-      spaceId: permission.spaceId
+      spaceId: permission.spaceId,
+      inheritedFromPage: !permission.inheritedFromPage ? null : permission.inheritedFromPage
     }
   });
 
