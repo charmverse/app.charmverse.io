@@ -44,8 +44,6 @@ async function preventCircularPermissionInheritance (permission: IPagePermission
       return true;
     }
 
-    console.log('Found permission', existingPermission);
-
     const sourcePermission = await prisma.pagePermission.findUnique({
       where: {
         id: permission.inheritedFromPermission

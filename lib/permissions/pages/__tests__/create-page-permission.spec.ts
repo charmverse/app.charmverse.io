@@ -136,7 +136,6 @@ describe('createPagePermission', () => {
     });
 
     try {
-      console.log('Executing function');
       await createPagePermission({
         pageId: parentPage.id,
         permissionLevel: 'full_access',
@@ -146,7 +145,6 @@ describe('createPagePermission', () => {
       throw new ExpectedAnError();
     }
     catch (error) {
-      console.log('Received an error', error);
       expect(error).toBeInstanceOf(CircularPermissionError);
     }
 
