@@ -6,7 +6,7 @@ export * from '@skiff-org/prosemirror-tables';
 export function spec (): RawSpecs {
   const schemas = tables.tableNodes({
     cellAttributes: { },
-    cellContent: 'block*',
+    cellContent: 'block+',
     cellContentGroup: 'block',
     tableGroup: 'block'
   });

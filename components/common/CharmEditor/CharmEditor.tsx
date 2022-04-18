@@ -27,6 +27,10 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import AdapterDayjs from '@mui/lab/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers';
+import Textfield from '@mui/material/Textfield';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import { Callout, calloutSpec } from './components/Callout';
 import * as columnLayout from './components/columnLayout';
@@ -48,6 +52,23 @@ import * as table from './components/table';
 export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
+}
+
+function LocationTest () {
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DatePicker
+        openTo='day'
+        renderInput={(params) => <Textfield {...params} />}
+        value='12/12/2020'
+        onChange={() => {}}
+
+        // valuedate,
+        // variant='static'
+      />
+    </LocalizationProvider>
+
+  );
 }
 
 export const specRegistry = new SpecRegistry([
@@ -187,7 +208,7 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.typesEnforcer(),
     // @ts-ignore missing type
-    table.TableDateMenu('DD/MM/YYYY'),
+    table.TableDateMenu('MM/DD/YYYY'),
     // @ts-ignore missing type
     table.TableLabelMenu(),
     // @ts-ignore missing type
@@ -405,6 +426,7 @@ function CharmEditor (
             );
           }
           case 'page': {
+            return <LocationTest />;
             return (
               <NestedPage {...props}>
                 {NodeViewChildren}
