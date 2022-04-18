@@ -131,11 +131,11 @@ export default function PagePermissions ({ pageId }: Props) {
       }
     }
     else if (space) {
+      // The permission is being manually edited, so we drop the inheritance reference
       await charmClient.createPermission({
         pageId,
         permissionLevel,
-        spaceId: space.id,
-        inheritedFromPermission: spaceLevelPermission?.inheritedFromPermission
+        spaceId: space.id
       });
     }
     await refreshPermissions();
