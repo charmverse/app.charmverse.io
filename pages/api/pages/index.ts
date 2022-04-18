@@ -47,7 +47,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
         roleId: permission.roleId,
         spaceId: permission.spaceId,
         // Support multi-level inheritance, just like in Notion
-        inheritedFromPage: permission.inheritedFromPage ?? parentPage.id
+        inheritedFromPermission: permission.inheritedFromPermission ?? permission.id
       });
     }));
 

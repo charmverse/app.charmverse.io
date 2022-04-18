@@ -210,12 +210,13 @@ export default function PagePermissions ({ pageId }: Props) {
           </div>
         </Box>
         {
-          spaceLevelPermission?.inheritedFromPage && (
+
+          spaceLevelPermission?.sourcePermission && (
             <Box display='block'>
               <Typography variant='caption'>
                 Inherited from
-                <Link sx={{ ml: 1 }} href={`/${space?.domain}/${pages[spaceLevelPermission?.inheritedFromPage]?.path}`}>
-                  {pages[spaceLevelPermission?.inheritedFromPage]?.title}
+                <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[spaceLevelPermission?.sourcePermission.pageId]?.path}`}>
+                  {pages[spaceLevelPermission?.sourcePermission.pageId]?.title || 'Untitled'}
                 </Link>
               </Typography>
             </Box>
@@ -256,12 +257,12 @@ export default function PagePermissions ({ pageId }: Props) {
                 </div>
               </Box>
               {
-              permission.inheritedFromPage && (
+              permission.sourcePermission && (
                 <Box display='block'>
                   <Typography variant='caption'>
                     Inherited from
-                    <Link sx={{ ml: 1 }} href={`/${space?.domain}/${pages[permission.inheritedFromPage]?.path}`}>
-                      {pages[permission.inheritedFromPage]?.title}
+                    <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[permission.sourcePermission.pageId]?.path}`}>
+                      {pages[permission.sourcePermission.pageId]?.title || 'Untitled'}
                     </Link>
                   </Typography>
                 </Box>
