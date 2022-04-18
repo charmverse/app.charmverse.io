@@ -130,16 +130,12 @@ export default function PagePermissions ({ pageId }: Props) {
         await charmClient.deletePermission(spaceLevelPermission.id);
       }
     }
-    else if (!spaceLevelPermission && space) {
+    else if (space) {
       await charmClient.createPermission({
         pageId,
         permissionLevel,
-        spaceId: space.id
-      });
-    }
-    else if (spaceLevelPermission) {
-      await charmClient.updatePermission(spaceLevelPermission.id, {
-        permissionLevel
+        spaceId: space.id,
+        inheritedFromPermission: spaceLevelPermission?.inheritedFromPermission
       });
     }
     await refreshPermissions();
@@ -152,7 +148,13 @@ export default function PagePermissions ({ pageId }: Props) {
       await charmClient.deletePermission(permission.id);
     }
     else if (permissionLevel !== permission.permissionLevel) {
-      await charmClient.updatePermission(permission.id, { permissionLevel });
+      // The permission is being manually edited, so we drop the inheritance reference
+      await charmClient.createPermission({
+        pageId: permission.pageId,
+        permissionLevel: permission.permissionLevel,
+        roleId: permission.roleId,
+        userId: permission.userId
+      });
     }
     await refreshPermissions();
     setSelectedPermissionId(null);
