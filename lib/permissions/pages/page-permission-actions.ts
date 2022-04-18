@@ -2,7 +2,7 @@ import { PagePermission, PagePermissionLevel, Prisma, Role, Space, User } from '
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { InvalidPermissionGranteeError, PermissionNotFoundError } from './errors';
+import { CircularPermissionError, InvalidPermissionGranteeError, PermissionNotFoundError, SelfInheritancePermissionError } from './errors';
 import { IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionWithAssignee, IPagePermissionWithSource } from './page-permission-interfaces';
 
 export async function listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
@@ -21,6 +21,46 @@ export async function listPagePermissions (pageId: string): Promise<IPagePermiss
   return permissions;
 }
 
+async function preventCircularPermissionInheritance (permission: IPagePermissionToCreate) {
+  if (permission.inheritedFromPermission) {
+    const existingPermission = await prisma.pagePermission.findFirst({
+      where: permission.userId ? {
+        userId: permission.userId,
+        pageId: permission.pageId
+      } : permission.roleId ? {
+        roleId: permission.roleId,
+        pageId: permission.pageId
+      } : {
+        spaceId: permission.spaceId,
+        pageId: permission.pageId
+      }
+    });
+
+    if (existingPermission?.id === permission.inheritedFromPermission) {
+      throw new SelfInheritancePermissionError();
+    }
+
+    if (!existingPermission) {
+      return true;
+    }
+
+    console.log('Found permission', existingPermission);
+
+    const sourcePermission = await prisma.pagePermission.findUnique({
+      where: {
+        id: permission.inheritedFromPermission
+      }
+    });
+
+    if (sourcePermission?.inheritedFromPermission === existingPermission?.id) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      throw new CircularPermissionError(sourcePermission!.id, existingPermission!.id);
+    }
+  }
+
+  return true;
+}
+
 /**
  * Creates a permission for a user, role or space, and a pageId
  * Works in upsert mode, ensuring there is always only 1 page permission per user/space/role && page pair
@@ -35,6 +75,8 @@ export async function createPagePermission (permission: IPagePermissionToCreate)
       error: 'Please provide a valid permission level'
     };
   }
+
+  await preventCircularPermissionInheritance(permission);
 
   // We only need to store permissions in the database for the custom level.
   // For permission groups, we can simply load the template for that group when evaluating permissions
@@ -160,6 +202,24 @@ export async function createPagePermission (permission: IPagePermissionToCreate)
         }
     }
   });
+
+  const inheritingPermissions = await prisma.pagePermission.findMany({
+    where: {
+      inheritedFromPermission: createdPermission.id
+    }
+  });
+
+  await Promise.all(inheritingPermissions.map(perm => {
+    return createPagePermission({
+      pageId: perm.pageId,
+      permissionLevel: createdPermission.permissionLevel,
+      permissions: createdPermission.permissions,
+      inheritedFromPermission: createdPermission.id,
+      userId: createdPermission.userId,
+      roleId: createdPermission.roleId,
+      spaceId: createdPermission.spaceId
+    });
+  }));
 
   return createdPermission;
 }

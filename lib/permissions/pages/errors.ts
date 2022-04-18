@@ -21,3 +21,25 @@ export class PermissionNotFoundError extends SystemError {
     });
   }
 }
+
+export class CircularPermissionError extends SystemError {
+
+  constructor (permissionId: string, inheritsFromPermissionId: string) {
+    super({
+      errorType: 'Invalid input',
+      message: `Circular permission inheritance is not allowed. ${permissionId} already inherits from ${inheritsFromPermissionId}`,
+      severity: 'warning'
+    });
+  }
+}
+
+export class SelfInheritancePermissionError extends SystemError {
+
+  constructor () {
+    super({
+      errorType: 'Invalid input',
+      message: 'Permissions cannot inherit from themselves',
+      severity: 'warning'
+    });
+  }
+}
