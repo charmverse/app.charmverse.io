@@ -1,9 +1,10 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Prisma, Page } from '@prisma/client';
+import { Prisma, Page, PagePermission } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { createPagePermission, IPageWithPermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 
@@ -11,21 +12,52 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(createPage);
 
-async function createPage (req: NextApiRequest, res: NextApiResponse<Page>) {
+async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const data = req.body as Prisma.PageCreateInput;
   const page = await prisma.page.create({ data });
-  const pagePermission = await prisma.pagePermission.create({
-    data: {
-      permissionLevel: 'full_access',
-      spaceId: page.spaceId,
-      pageId: page.id
+  const parentPage = page.parentId ? await prisma.page.findUnique({
+    where: {
+      id: page.parentId
+    },
+    include: {
+      permissions: true
     }
-  });
+  }) : null;
 
-  (page as any).permissions = [pagePermission];
+  const assignedPermissions: PagePermission [] = [];
+
+  if (!parentPage) {
+    const pagePermission = await createPagePermission({
+      permissionLevel: 'full_access',
+      pageId: page.id,
+      spaceId: page.spaceId
+    });
+
+    assignedPermissions.push(pagePermission);
+  }
+  else {
+    // Load up permissions
+    const inheritedPermissions = await Promise.all(parentPage.permissions.map(permission => {
+      return createPagePermission({
+        permissionLevel: permission.permissionLevel,
+        permissions: permission.permissions,
+        pageId: page.id,
+        // Only one of the below will be defined
+        userId: permission.userId,
+        roleId: permission.roleId,
+        spaceId: permission.spaceId,
+        // Support multi-level inheritance, just like in Notion
+        inheritedFromPage: permission.inheritedFromPage ?? parentPage.id
+      });
+    }));
+
+    assignedPermissions.push(...inheritedPermissions);
+  }
+
+  (page as any).permissions = assignedPermissions;
   logFirstWorkspacePageCreation(page);
   logFirstUserPageCreation(page);
-  return res.status(200).json(page);
+  return res.status(200).json(page as IPageWithPermissions);
 }
 
 export default withSessionRoute(handler);
