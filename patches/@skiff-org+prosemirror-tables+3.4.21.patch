@@ -1,8 +1,32 @@
 diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
-index fb1644e..c7fab0d 100644
+index fb1644e..52369b4 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
 +++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
-@@ -4923,7 +4923,9 @@ var TablePopUpMenuView = /*#__PURE__*/function () {
+@@ -8,9 +8,11 @@ import { Transform } from 'prosemirror-transform';
+ import { splitBlockKeepMarks } from 'prosemirror-commands';
+ import { MenuItem as MenuItem$1, Dropdown, renderGrouped } from 'prosemirror-menu';
+ import React, { useRef, useCallback, useEffect, useState, useMemo } from 'react';
+-import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+-import { createGenerateClassName, StylesProvider, ThemeProvider } from '@material-ui/core/styles';
+-import { createTheme } from '@material-ui/core';
++import { DatePicker } from '@mui/x-date-pickers';
++import LocalizationProvider from '@mui/lab/LocalizationProvider';
++import AdapterDayjs from '@mui/lab/AdapterDayjs';
++import { StylesProvider, ThemeProvider } from '@mui/material/styles';
++import { createTheme } from '@mui/material/styles';
+ import ReactDOM from 'react-dom';
+ 
+ function ownKeys(object, enumerableOnly) {
+@@ -4851,7 +4853,7 @@ var deleteMenuItem = function deleteMenuItem() {
+   });
+ };
+ 
+-var colors = ['rgb(255, 191, 181)', 'rgb(247, 204, 98)', 'rgb(181, 220, 175)', 'rgb(214, 232, 250)', 'rgb(216, 195, 255)', 'transparent'];
++var colors = ['var(--prop-pink)', 'rgb(247, 204, 98)', 'rgb(181, 220, 175)', 'rgb(214, 232, 250)', 'rgb(216, 195, 255)', 'transparent'];
+ 
+ var cellBackgroundColorItem = function cellBackgroundColorItem(color) {
+   return new MenuItem$1({
+@@ -4923,7 +4925,9 @@ var TablePopUpMenuView = /*#__PURE__*/function () {
      } // append popup to dom
  
  
@@ -13,7 +37,64 @@ index fb1644e..c7fab0d 100644
  
      this.popUpDOM.addEventListener('mouseover', addDeleteHoverClass);
      this.popUpDOM.addEventListener('mouseout', removeDeleteHoverClass); // render prosemirror menu to popUpDom
-@@ -7207,7 +7209,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+@@ -5824,9 +5828,6 @@ var DateEventEmitter = function DateEventEmitter() {};
+ 
+ ee(DateEventEmitter.prototype);
+ var datePopupEmitter = new DateEventEmitter();
+-var generateClassName$1 = createGenerateClassName({
+-  seed: 'sgo-tables-plugin-'
+-});
+ 
+ var DateComponent = function DateComponent(_ref) {
+   var view = _ref.view,
+@@ -5906,22 +5907,23 @@ var DatePickerComponent = function DatePickerComponent(_ref2) {
+       view.dispatch(tr);
+     }
+   }, [view, pos]);
++
+   return /*#__PURE__*/React.createElement("div", {
+     className: "date-picker",
+     ref: ref
+-  }, /*#__PURE__*/React.createElement(StylesProvider, {
+-    generateClassName: generateClassName$1
+   }, /*#__PURE__*/React.createElement(ThemeProvider, {
+     theme: DatePickerTheme
+-  }, /*#__PURE__*/React.createElement(MuiPickersUtilsProvider, {
+-    utils: DayjsUtils
++  }, /*#__PURE__*/React.createElement(LocalizationProvider, {
++    dateAdapter: AdapterDayjs
+   }, /*#__PURE__*/React.createElement(DatePicker, {
+     autoOk: true,
++    inputFormat: DATE_FORMAT,
+     onChange: handleChange,
+-    openTo: "date",
++    openTo: "day",
++    renderInput: (params) =>  new TextField(params),
+     value: date,
+     variant: "static"
+-  })))));
++  }))));
+ };
+ 
+ var ReactNodeView = /*#__PURE__*/function () {
+@@ -6476,7 +6478,6 @@ var generateMenuPopup$1 = function generateMenuPopup() {
+ };
+ var displayPopup$1 = function displayPopup(view, popupDOM) {
+   var menuData = tableHeadersMenuKey.getState(view.state);
+-
+   if (menuData) {
+     popupDOM.style.display = 'flex';
+     return menuData;
+@@ -7093,7 +7094,7 @@ var deleteItem = function deleteItem() {
+   });
+ };
+ 
+-var menuItems = [[columnTypeDropdown()], [filterItem(), sortItem(1), sortItem(-1), insertColumnItem(1), insertColumnItem(-1), deleteItem()]];
++var menuItems = [/*[columnTypeDropdown()]*/ [/*filterItem(),*/ sortItem(1), sortItem(-1), insertColumnItem(1), insertColumnItem(-1), deleteItem()]];
+ 
+ // ::- The type of field that `FieldPrompt` expects to be passed to it.
+ var Field = /*#__PURE__*/function () {
+@@ -7207,7 +7208,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
        }
      }); // append popup to dom
  
@@ -24,6 +105,48 @@ index fb1644e..c7fab0d 100644
  
      var _renderGrouped = renderGrouped(this.view, items),
          itemsDOM = _renderGrouped.dom,
+@@ -7260,7 +7263,6 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+     value: function updateMenu(view) {
+       // determine whether to display or hide popup - and change style accordingly
+       var headerData = displayPopup$1(view, this.popUpDOM); // different header selected
+-
+       if (headerData && this.headerData && headerData.pos !== this.headerData.pos) {
+         this.onClose();
+       } // no header selected
+@@ -7286,7 +7288,6 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+         this.setTypesDropdownContent();
+       } // Update the menu items state before calculating the position
+ 
+-
+       this.updateMenuItems(view); // // calculate popup position
+ 
+       calculateMenuPosition$1(this.popUpDOM, headerData);
+@@ -7309,6 +7310,7 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+   }, {
+     key: "setTypesDropdownContent",
+     value: function setTypesDropdownContent() {
++      return; // disabled type dropdown
+       var _this$popUpDOM$getEle = this.popUpDOM.getElementsByClassName(dropdownClassName),
+           _this$popUpDOM$getEle2 = _slicedToArray(_this$popUpDOM$getEle, 1),
+           dropDown = _this$popUpDOM$getEle2[0];
+@@ -7371,7 +7373,6 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+ 
+       if (resolvedCell.type.name !== 'table_cell' || resolvedCell.attrs.id !== this.headerData.node.attrs.id) return;
+       var tr = this.view.state.tr;
+-
+       if (inputFieldValue !== '') {
+         if (headerContent === '') {
+           tr.insertText(inputFieldValue, pos + 2);
+@@ -7382,6 +7383,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+         tr.deleteRange(pos + 2, pos + node.nodeSize - 2);
+       }
+ 
++      // prevent infinite recursion
++      this.headerData = null;
++
+       this.view.dispatch(tr);
+     }
+   }, {
 @@ -8745,7 +8749,9 @@ var TableDateMenuView = /*#__PURE__*/function () {
      this.view = view;
      this.buildMenuDOM(); // append popup to dom
@@ -46,7 +169,54 @@ index fb1644e..c7fab0d 100644
    }
  
    _createClass(TableLabelsMenu, [{
-@@ -9687,7 +9695,9 @@ var TableFiltersMenuView = /*#__PURE__*/function () {
+@@ -9319,10 +9327,6 @@ var SelectDropdown = function SelectDropdown(_ref3) {
+   })));
+ };
+ 
+-var generateClassName = createGenerateClassName({
+-  seed: 'sgo-tables-plugin-'
+-});
+-
+ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+   var onFilterChange = _ref.onFilterChange,
+       filterHandler = _ref.filterHandler;
+@@ -9332,28 +9336,27 @@ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+       date = _useState2[0],
+       setDate = _useState2[1];
+ 
+-  return /*#__PURE__*/React.createElement(StylesProvider, {
+-    generateClassName: generateClassName
+-  }, /*#__PURE__*/React.createElement(ThemeProvider, {
++  return React.createElement(ThemeProvider, {
+     theme: DatePickerTheme
+-  }, /*#__PURE__*/React.createElement(MuiPickersUtilsProvider, {
+-    utils: DayjsUtils
++  }, /*#__PURE__*/React.createElement(LocalizationProvider, {
++    dateAdapter: AdapterDayjs
+   }, /*#__PURE__*/React.createElement(DatePicker, {
+-    format: DATE_FORMAT,
++    inputFormat: DATE_FORMAT,
+     onChange: function onChange(newValue) {
+       setDate(newValue.toDate().getTime());
+       onFilterChange(_objectSpread2(_objectSpread2({}, filterHandler.toAttrsValue()), {}, {
+         filterValue: newValue.toDate().getTime()
+       }));
+     },
+-    openTo: "date",
++    openTo: "day",
++    renderInput: (params) =>  new TextField(params),
+     style: {
+       width: '100px',
+       cursor: 'pointer'
+     },
+     value: date,
+     variant: "inline"
+-  }))));
++  })));
+ };
+ 
+ var FiltersInputDropdown = function FiltersInputDropdown(_ref2) {
+@@ -9687,7 +9690,9 @@ var TableFiltersMenuView = /*#__PURE__*/function () {
      this.view = view;
      this.buildMenuDOM(); // append popup to dom
  
@@ -58,9 +228,18 @@ index fb1644e..c7fab0d 100644
  
    _createClass(TableFiltersMenuView, [{
 diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
-index fb57edd..e5c9898 100644
+index fb57edd..78d0b30 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/dist/index.js
 +++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
+@@ -12,7 +12,7 @@ var prosemirrorTransform = require('prosemirror-transform');
+ var prosemirrorCommands = require('prosemirror-commands');
+ var prosemirrorMenu = require('prosemirror-menu');
+ var React = require('react');
+-var pickers = require('@material-ui/pickers');
++var pickers = require('@mui/x-date-pickers');
+ var styles = require('@material-ui/core/styles');
+ var core = require('@material-ui/core');
+ var ReactDOM = require('react-dom');
 @@ -3667,6 +3667,7 @@ var getColIndexFromSelectedRect = function getColIndexFromSelectedRect(state, po
    return cellIndex % tableRect.map.width;
  };
@@ -107,6 +286,19 @@ index fb57edd..e5c9898 100644
      _classCallCheck(this, CellView);
  
      this.getPos = getPos;
+diff --git a/node_modules/@skiff-org/prosemirror-tables/src/columnsTypes/types/Date/utils.js b/node_modules/@skiff-org/prosemirror-tables/src/columnsTypes/types/Date/utils.js
+index a46d6a1..8140e5f 100644
+--- a/node_modules/@skiff-org/prosemirror-tables/src/columnsTypes/types/Date/utils.js
++++ b/node_modules/@skiff-org/prosemirror-tables/src/columnsTypes/types/Date/utils.js
+@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
+ import {PluginKey} from 'prosemirror-state';
+ import {getBaseName} from '../../../util';
+ 
+-export let DATE_FORMAT = 'DD/MM/YYYY';
++export let DATE_FORMAT = 'MM/DD/YYYY';
+ export const setDateFormat = (format) => (DATE_FORMAT = format);
+ export const tableDateMenuKey = new PluginKey('TableDateMenu');
+ 
 diff --git a/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css b/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
 index 006716e..66ffcce 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css

@@ -30,7 +30,8 @@ import { markdownSerializer } from '@bangle.dev/markdown';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import AdapterDayjs from '@mui/lab/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers';
-import Textfield from '@mui/material/Textfield';
+import Textfield from '@mui/material/TextField';
+
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import { Callout, calloutSpec } from './components/Callout';
 import * as columnLayout from './components/columnLayout';
@@ -206,11 +207,11 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.selectionShadowPlugin(),
     // @ts-ignore missing type
-    table.typesEnforcer(),
+    // table.typesEnforcer(),
     // @ts-ignore missing type
-    table.TableDateMenu('MM/DD/YYYY'),
+    // table.TableDateMenu('MM/DD/YYYY'),
     // @ts-ignore missing type
-    table.TableLabelMenu(),
+    // table.TableLabelMenu(),
     // @ts-ignore missing type
     table.TableFiltersMenu()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
