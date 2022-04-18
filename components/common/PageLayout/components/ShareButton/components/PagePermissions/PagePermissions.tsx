@@ -18,6 +18,7 @@ import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { usePages } from 'hooks/usePages';
 import { updatePagePermission } from 'lib/permissions/pages/page-permission-actions';
+import Link from 'components/common/Link';
 import AddPagePermissionsForm from './AddPagePermissionsForm';
 
 const permissionDisplayOrder = ['space', 'role', 'user'];
@@ -91,6 +92,7 @@ interface Props {
 export default function PagePermissions ({ pageId }: Props) {
 
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee []>([]);
+  const { pages } = usePages();
   const [space] = useCurrentSpace();
   const { getPagePermissions } = usePages();
   const [userPagePermissions, setUserPagePermissions] = useState<null | IPagePermissionFlags>(null);
@@ -179,12 +181,13 @@ export default function PagePermissions ({ pageId }: Props) {
         </Box>
       )}
 
-      <Box display='flex' justifyContent='space-between' alignItems='center' py={0.5}>
-        <Typography variant='body2'>
-          Everyone at {space?.name}
-        </Typography>
-        <div style={{ width: '120px', textAlign: 'center' }}>
-          {
+      <Box display='block' py={0.5}>
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <Typography variant='body2'>
+            Everyone at {space?.name}
+          </Typography>
+          <div style={{ width: '120px', textAlign: 'center' }}>
+            {
             selectedPermissionId === 'space' ? (
               <InputEnumToOptions
                 onChange={level => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
@@ -204,19 +207,33 @@ export default function PagePermissions ({ pageId }: Props) {
               </div>
             )
           }
-        </div>
+          </div>
+        </Box>
+        {
+          spaceLevelPermission?.inheritedFromPage && (
+            <Box display='block'>
+              <Typography variant='caption'>
+                Inherited from
+                <Link sx={{ ml: 1 }} href={`/${space?.domain}/${pages[spaceLevelPermission?.inheritedFromPage]?.path}`}>
+                  {pages[spaceLevelPermission?.inheritedFromPage]?.title}
+                </Link>
+              </Typography>
+            </Box>
+          )
+        }
 
       </Box>
 
       {
         sortedPermissions.map(permission => {
           return (
-            <Box display='flex' justifyContent='space-between' alignItems='center' py={0.5} key={permission.displayName}>
-              <Typography variant='body2'>
-                {permission.displayName}
-              </Typography>
-              <div style={{ width: '120px', textAlign: 'center' }}>
-                {
+            <Box display='block' py={0.5}>
+              <Box display='flex' justifyContent='space-between' alignItems='center' key={permission.displayName}>
+                <Typography variant='body2'>
+                  {permission.displayName}
+                </Typography>
+                <div style={{ width: '120px', textAlign: 'center' }}>
+                  {
                   selectedPermissionId === permission.id ? (
                     <InputEnumToOptions
                       onChange={level => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
@@ -236,8 +253,22 @@ export default function PagePermissions ({ pageId }: Props) {
                     </div>
                   )
                 }
-              </div>
+                </div>
+              </Box>
+              {
+              permission.inheritedFromPage && (
+                <Box display='block'>
+                  <Typography variant='caption'>
+                    Inherited from
+                    <Link sx={{ ml: 1 }} href={`/${space?.domain}/${pages[permission.inheritedFromPage]?.path}`}>
+                      {pages[permission.inheritedFromPage]?.title}
+                    </Link>
+                  </Typography>
+                </Box>
+              )
+             }
             </Box>
+
           );
         })
       }
