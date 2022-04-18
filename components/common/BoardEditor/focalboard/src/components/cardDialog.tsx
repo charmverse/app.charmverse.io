@@ -12,8 +12,6 @@ import { getCardComments } from '../store/comments'
 import { getCardContents } from '../store/contents'
 import { useAppSelector } from '../store/hooks'
 import { getUserBlockSubscriptionList } from '../store/initialLoad'
-import { getMe } from '../store/users'
-import { IUser } from '../user'
 import { Utils } from '../utils'
 import DeleteIcon from '../widgets/icons/delete'
 import LinkIcon from '../widgets/icons/Link'
@@ -48,7 +46,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const {board, activeView, cards, views} = props
     const card = useAppSelector(getCard(props.cardId))
     const contents = useAppSelector(getCardContents(props.cardId))
-    const comments = useAppSelector(getCardComments(props.cardId))
     const intl = useIntl()
     const [space] = useCurrentSpace()
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
@@ -184,7 +181,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
                         cards={cards}
                         card={card}
                         contents={contents}
-                        comments={comments}
                         readonly={props.readonly}
                     />}
 

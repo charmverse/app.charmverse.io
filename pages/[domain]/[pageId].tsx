@@ -23,8 +23,8 @@ interface IBlocksEditorPage {
 }
 
 export function EditorPage (
-  { postPageHeaderComponent = null, pageId, currentPageId = pageId, publicShare = false, onPageLoad }:
-  {postPageHeaderComponent?: ReactNode, onPageLoad?: (pageId: string) => void, pageId: string, publicShare?: boolean, currentPageId?: string}
+  { pageId, currentPageId = pageId, publicShare = false, onPageLoad }:
+  {onPageLoad?: (pageId: string) => void, pageId: string, publicShare?: boolean, currentPageId?: string}
 ) {
   const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
@@ -112,7 +112,7 @@ export function EditorPage (
     return currentPage?.type === 'board' ? (
       <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={true} />
     ) : (
-      <DocumentPage postPageHeaderComponent={postPageHeaderComponent} page={memoizedCurrentPage} setPage={setPage} readOnly={true} />
+      <DocumentPage page={memoizedCurrentPage} setPage={setPage} readOnly={true} />
     );
   }
   // Wait for permission load
@@ -130,7 +130,6 @@ export function EditorPage (
     else {
       return (
         <DocumentPage
-          postPageHeaderComponent={postPageHeaderComponent}
           page={memoizedCurrentPage}
           setPage={setPage}
           readOnly={pagePermissions.edit_content !== true}
