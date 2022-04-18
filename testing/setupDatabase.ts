@@ -1,6 +1,6 @@
 import { createUserFromWallet } from 'lib/users/createUser';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import { User, Space, SpaceApiToken } from '@prisma/client';
+import { User, Space, SpaceApiToken, Page } from '@prisma/client';
 import { LoggedInUser } from 'models';
 import { prisma } from 'db';
 import { v4 } from 'uuid';
@@ -56,6 +56,29 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
     space,
     apiToken
   };
+}
+
+export function createPage (options: Pick<Page, 'spaceId' | 'createdBy' | 'parentId'>): Promise<Page> {
+  return prisma.page.create({
+    data: {
+      contentText: '',
+      path: v4(),
+      title: 'Example',
+      type: 'page',
+      updatedBy: options.createdBy,
+      author: {
+        connect: {
+          id: options.createdBy
+        }
+      },
+      space: {
+        connect: {
+          id: options.spaceId as string
+        }
+      },
+      parentId: options.parentId
+    }
+  });
 }
 
 export default async function seedDatabase () {
