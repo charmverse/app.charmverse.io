@@ -2,7 +2,7 @@ import { PagePermission, PagePermissionLevel, Prisma, Role, Space, User } from '
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { InvalidPermissionGranteeError } from './errors';
+import { InvalidPermissionGranteeError, PermissionNotFoundError } from './errors';
 import { IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionWithAssignee, IPagePermissionWithSource } from './page-permission-interfaces';
 
 export async function listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
@@ -209,12 +209,19 @@ export async function deletePagePermission (permissionId: string) {
     }
   });
 
+  if (!foundPermission) {
+    throw new PermissionNotFoundError(permissionId);
+  }
+
   // Delete the permission and the permissions
   await prisma.pagePermission.deleteMany({ where: {
     OR: [
-
+      {
+        id: permissionId
+      }, {
+        inheritedFromPermission: permissionId
+      }
     ]
-    //    id: permissionId
   } });
 
   return true;
