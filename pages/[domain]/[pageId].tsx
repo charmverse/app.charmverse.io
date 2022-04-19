@@ -14,6 +14,8 @@ import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
 import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import { useUser } from 'hooks/useUser';
+import { getCurrentViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 
 /**
  * @viewId - Enforce a specific view inside the nested blocks editor
@@ -39,12 +41,13 @@ export function EditorPage (
   }, []);
 
   async function loadPublicPage (publicPageId: string) {
-    const page = await charmClient.getPublicPage(publicPageId);
-    setTitleState(page.title);
-    onPageLoad?.(page.id);
-    setPages({
-      [page.id]: page
-    });
+    const publicPages = await charmClient.getPublicPage(publicPageId);
+    const rootPage = publicPages.find(page => page.id === publicPageId);
+    if (rootPage) {
+      setTitleState(rootPage?.title);
+      onPageLoad?.(rootPage?.id);
+    }
+    setPages(publicPages.reduce((record, page) => ({ ...record, [page.id]: page }), {}));
   }
 
   const pagesLoaded = Object.keys(pages).length > 0;
@@ -144,7 +147,6 @@ export default function BlocksEditorPage ({ publicShare = false }: IBlocksEditor
   const { currentPageId, setCurrentPageId } = usePages();
   const router = useRouter();
   const pageId = router.query.pageId as string;
-
   return <EditorPage currentPageId={currentPageId} onPageLoad={(_pageId) => setCurrentPageId(_pageId)} pageId={pageId} publicShare={publicShare} />;
 }
 

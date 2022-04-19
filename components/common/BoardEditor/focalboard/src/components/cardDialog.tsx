@@ -142,17 +142,20 @@ const CardDialog = (props: Props): JSX.Element | null => {
         </Menu>
     )
 
+
     const {pages} = usePages()
     const followingCards = useAppSelector(getUserBlockSubscriptionList)
     const isFollowingCard = Boolean(followingCards.find((following) => following.blockId === props.cardId))
     const router = useRouter();
+    const isSharedPage = router.route.startsWith('/share')
+
     return card && pages[card.id] ? (
         <>
             <Dialog
                 onClose={props.onClose}
                 toolsMenu={!props.readonly && menu}
                 hideCloseButton={true}
-                toolbar={(
+                toolbar={!isSharedPage && (
                     <Button
                       size='small'
                       color='secondary'
@@ -181,7 +184,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                         cards={cards}
                         card={card}
                         contents={contents}
-                        readonly={props.readonly}
+                        readonly={props.readonly || isSharedPage}
                     />}
 
                 {!card &&

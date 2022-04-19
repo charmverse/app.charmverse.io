@@ -2,12 +2,12 @@
 // See LICENSE.txt for license information.
 import { Box } from '@mui/material'
 import { BountyIntegration } from 'components/bounties/BountyIntegration'
+import { useRouter } from 'next/router'
 import { EditorPage } from 'pages/[domain]/[pageId]'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Board } from '../../blocks/board'
 import { BoardView } from '../../blocks/boardView'
 import { Card } from '../../blocks/card'
-import { CommentBlock } from '../../blocks/commentBlock'
 import { ContentBlock } from '../../blocks/contentBlock'
 import mutator from '../../mutator'
 import { Focusable } from '../../widgets/editable'
@@ -25,6 +25,9 @@ type Props = {
 
 const CardDetail = (props: Props): JSX.Element|null => {
     const {card} = props
+    const router = useRouter();
+    const isSharedPage = router.route.startsWith('/share')
+
     const [title, setTitle] = useState(card.title)
     const [serverTitle, setServerTitle] = useState(card.title)
     const titleRef = useRef<Focusable>(null)
@@ -63,7 +66,7 @@ const CardDetail = (props: Props): JSX.Element|null => {
     }
 
     return (
-      <EditorPage pageId={card.id}/>
+      <EditorPage pageId={card.id} publicShare={isSharedPage}/>
     )
 }
 

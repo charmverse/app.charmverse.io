@@ -11,6 +11,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { getCardContents } from 'components/common/BoardEditor/focalboard/src/store/contents';
 import { usePages } from 'hooks/usePages';
+import { useRouter } from 'next/router';
 import PageHeader from './components/PageHeader';
 import PageBanner from './components/PageBanner';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
@@ -37,6 +38,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     }
     return null;
   });
+  const router = useRouter();
   const cards = useAppSelector((state) => board ? Object.values(state.cards.cards).filter(card => card.parentId === board.id) : []);
   const boardViews = useAppSelector((state) => {
     if (board) {
@@ -66,7 +68,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const comments = card ? useAppSelector(getCardComments(card.id)) : [];
   const contents = card ? useAppSelector(getCardContents(card.id)) : [];
-
+  console.log({ readOnly });
   return (
     <ScrollableWindow>
       {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
