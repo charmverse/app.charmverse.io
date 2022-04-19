@@ -3,7 +3,8 @@ import { ListSpaceRolesResponse } from 'charmClient';
 import { LoggedInUser } from 'models/User';
 
 export function isPageDeletable (userId?: string, spaceId?: string, permissions?: PagePermission[], spaceRoles?: LoggedInUser['spaceRoles'], roles?: ListSpaceRolesResponse[]) {
-  const isAdminOfSpace = spaceRoles?.find(spaceRole => spaceRole.spaceId === spaceId && spaceRole.isAdmin);
+  // Check if the current user is an admin, admin means implicit full access
+  const isAdminOfSpace = spaceRoles?.find(spaceRole => spaceRole.spaceId === spaceId && (spaceRole.isAdmin || spaceRole.role === 'admin'));
   let canDelete = !!isAdminOfSpace;
   const rolesOfUser: string[] = [];
   if (roles) {

@@ -93,7 +93,6 @@ const GalleryCard = React.memo((props: Props) => {
 
   const [user] = useUser();
 
-  // Check if the current user is an admin, admin means implicit full access
   const { roles } = useRoles();
   const isDeletable = isPageDeletable(user?.id, space?.id,  (cardPage as any)?.permissions as PagePermission[], user?.spaceRoles, roles)
 

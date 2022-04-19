@@ -68,6 +68,13 @@ const KanbanCard = React.memo((props: Props) => {
 
   const contents = useAppSelector(getCardContents(card.id))
   const comments = useAppSelector(getCardComments(card.id))
+  const { pages } = usePages()
+  const cardPage = pages[card.id]
+  const [user] = useUser();
+
+  // Check if the current user is an admin, admin means implicit full access
+  const { roles } = useRoles();
+  const isDeletable = isPageDeletable(user?.id, space?.id,  (cardPage as any)?.permissions as PagePermission[], user?.spaceRoles, roles)
 
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
   const handleDeleteCard = async () => {
@@ -75,8 +82,9 @@ const KanbanCard = React.memo((props: Props) => {
       Utils.assertFailure()
       return
     }
-    // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.DeleteCard, {board: board.id, card: card.id})
-    await mutator.deleteBlock(card, 'delete card')
+    if (isDeletable) {
+      await mutator.deleteBlock(card, 'delete card')
+    }
   }
   const confirmDialogProps: ConfirmationDialogBoxProps = {
     heading: intl.formatMessage({ id: 'CardDialog.delete-confirmation-dialog-heading', defaultMessage: 'Confirm card delete?' }),
@@ -96,14 +104,6 @@ const KanbanCard = React.memo((props: Props) => {
     }
     setShowConfirmationDialogBox(true)
   }
-
-  const { pages } = usePages()
-  const cardPage = pages[card.id]
-  const [user] = useUser();
-
-  // Check if the current user is an admin, admin means implicit full access
-  const { roles } = useRoles();
-  const isDeletable = isPageDeletable(user?.id, space?.id,  (cardPage as any)?.permissions as PagePermission[], user?.spaceRoles, roles)
 
   return (
     <>
