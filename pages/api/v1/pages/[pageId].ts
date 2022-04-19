@@ -106,15 +106,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   if (requestBodyUpdate.title) {
     updateContent.title = requestBodyUpdate.title;
-    // Update the page associated with the card block
-    await prisma.page.update({
-      where: {
-        id: card.id
-      },
-      data: {
-        title: requestBodyUpdate.title
-      }
-    });
   }
 
   if (requestBodyUpdate.properties) {
@@ -148,6 +139,18 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     },
     data: updateContent
   });
+
+  if (updateContent.title) {
+    // Update the page associated with the card block
+    await prisma.page.update({
+      where: {
+        id: card.id
+      },
+      data: {
+        title: requestBodyUpdate.title
+      }
+    });
+  }
 
   const cardPage = await prisma.page.findUnique({
     where: {
