@@ -11,7 +11,6 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { getCardContents } from 'components/common/BoardEditor/focalboard/src/store/contents';
 import { usePages } from 'hooks/usePages';
-import { useRouter } from 'next/router';
 import PageHeader from './components/PageHeader';
 import PageBanner from './components/PageBanner';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
@@ -67,6 +66,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const comments = card ? useAppSelector(getCardComments(card.id)) : [];
   const contents = card ? useAppSelector(getCardContents(card.id)) : [];
+
   return (
     <ScrollableWindow>
       {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
@@ -86,7 +86,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             readOnly={readOnly}
             setPage={setPage}
           />
-          {card && activeView && board && (
+          {card && board && (
           <div className='CardDetail content'>
             {/* Property list */}
             <Box sx={{

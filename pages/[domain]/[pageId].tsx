@@ -14,6 +14,14 @@ import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
 import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import { useUser } from 'hooks/useUser';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { addCard, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
+import { BoardView } from 'lib/focalboard/boardView';
+import { addView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { Board } from 'lib/focalboard/board';
 
 /**
  * @viewId - Enforce a specific view inside the nested blocks editor
@@ -26,6 +34,7 @@ export function EditorPage (
   { shouldLoadPublicPage = true, pageId, currentPageId = pageId, publicShare = false, onPageLoad }:
   {shouldLoadPublicPage?: boolean, onPageLoad?: (pageId: string) => void, pageId: string, publicShare?: boolean, currentPageId?: string}
 ) {
+  const dispatch = useAppDispatch();
   const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
@@ -39,11 +48,22 @@ export function EditorPage (
   }, []);
 
   async function loadPublicPage (publicPageId: string) {
-    const publicPages = await charmClient.getPublicPage(publicPageId);
+    const { pages: publicPages, blocks } = await charmClient.getPublicPage(publicPageId);
+
     const rootPage = publicPages.find(page => page.id === publicPageId);
     if (rootPage) {
       setTitleState(rootPage?.title);
       onPageLoad?.(rootPage?.id);
+    }
+    const cardBlock = blocks.find(block => block.type === 'card');
+    const boardBlock = blocks.find(block => block.type === 'board');
+
+    if (cardBlock) {
+      dispatch(setCurrent(cardBlock.id));
+      dispatch(addCard(cardBlock as unknown as Card));
+    }
+    if (boardBlock) {
+      dispatch(addBoard(boardBlock as unknown as Board));
     }
     setPages(publicPages.reduce((record, page) => ({ ...record, [page.id]: page }), {}));
   }
