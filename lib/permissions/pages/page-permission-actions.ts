@@ -1,9 +1,11 @@
 import { PagePermission, PagePermissionLevel, Prisma, Role, Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
+import { IPageWithPermissions, getPage, PageNotFoundError } from 'lib/pages';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { CircularPermissionError, InvalidPermissionGranteeError, PermissionNotFoundError, SelfInheritancePermissionError } from './errors';
-import { IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionWithAssignee, IPagePermissionWithSource } from './page-permission-interfaces';
+import { CircularPermissionError, InvalidPermissionGranteeError, InvalidPermissionLevelError, PermissionNotFoundError, SelfInheritancePermissionError } from './errors';
+import { IPagePermissionToCreate, IPagePermissionToInherit, IPagePermissionUpdate, IPagePermissionWithAssignee, IPagePermissionWithSource } from './page-permission-interfaces';
+import { resolveChildPages } from './refresh-page-permission-tree';
 
 export async function listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
   const permissions = await prisma.pagePermission.findMany({
@@ -21,42 +23,29 @@ export async function listPagePermissions (pageId: string): Promise<IPagePermiss
   return permissions;
 }
 
-async function preventCircularPermissionInheritance (permission: IPagePermissionToCreate) {
-  if (permission.inheritedFromPermission) {
-    const existingPermission = await prisma.pagePermission.findFirst({
-      where: permission.userId ? {
-        userId: permission.userId,
-        pageId: permission.pageId
-      } : permission.roleId ? {
-        roleId: permission.roleId,
-        pageId: permission.pageId
-      } : {
-        spaceId: permission.spaceId,
-        pageId: permission.pageId
-      }
-    });
+async function preventCircularPermissionInheritance (permissionIdToInheritFrom: string, targetPageId: string) {
 
-    if (existingPermission?.id === permission.inheritedFromPermission) {
-      throw new SelfInheritancePermissionError();
+  const sourcePermission = await prisma.pagePermission.findUnique({
+    where: {
+      id: permissionIdToInheritFrom
+    },
+    include: {
+      sourcePermission: true
     }
+  });
 
-    if (!existingPermission) {
-      return true;
-    }
-
-    const sourcePermission = await prisma.pagePermission.findUnique({
-      where: {
-        id: permission.inheritedFromPermission
-      }
-    });
-
-    if (sourcePermission?.inheritedFromPermission === existingPermission?.id) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      throw new CircularPermissionError(sourcePermission!.id, existingPermission!.id);
-    }
+  if (!sourcePermission) {
+    throw new PermissionNotFoundError(permissionIdToInheritFrom);
   }
 
-  return true;
+  if (sourcePermission.pageId === targetPageId) {
+    throw new SelfInheritancePermissionError();
+  }
+
+  if (sourcePermission.sourcePermission?.pageId === targetPageId) {
+    throw new CircularPermissionError(sourcePermission.id, sourcePermission.sourcePermission.id);
+  }
+
 }
 
 /**
@@ -65,91 +54,62 @@ async function preventCircularPermissionInheritance (permission: IPagePermission
  * @param permission
  * @returns
  */
-export async function createPagePermission (permission: IPagePermissionToCreate): Promise<IPagePermissionWithSource> {
-  const permissionLevel = permission.permissionLevel;
+export async function createPagePermission (permission: IPagePermissionToCreate | IPagePermissionToInherit): Promise<IPagePermissionWithSource> {
 
-  if (!isTruthy(permissionLevel) || !isTruthy(PagePermissionLevel[permissionLevel])) {
-    throw {
-      error: 'Please provide a valid permission level'
-    };
+  // Split the possible types for later use in this function
+  const freshPermission = permission as IPagePermissionToCreate;
+  const permissionToInheritFrom = permission as IPagePermissionToInherit;
+
+  // Inherited from will be defined if this is an inheritable permission
+  if (permissionToInheritFrom.inheritedFromPermission) {
+    await preventCircularPermissionInheritance(permissionToInheritFrom.inheritedFromPermission, permissionToInheritFrom.pageId);
+  // We will be creating this permission from scratch. Check it is valid
+  }
+  else if (
+    // Trying to assign to multiple groups at once
+    (freshPermission.userId && (freshPermission.roleId || freshPermission.spaceId))
+    || (freshPermission.roleId && freshPermission.spaceId)
+    // No group assigned
+    || (!freshPermission.roleId && !freshPermission.userId && !freshPermission.spaceId)) {
+    throw new InvalidPermissionGranteeError();
   }
 
-  await preventCircularPermissionInheritance(permission);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const permissionData = permissionToInheritFrom.inheritedFromPermission ? (await prisma.pagePermission.findUnique({
+    where: {
+      id: permissionToInheritFrom.inheritedFromPermission
+    }
+  }))! : freshPermission;
 
   // We only need to store permissions in the database for the custom level.
   // For permission groups, we can simply load the template for that group when evaluating permissions
-  const permissionsToAssign = permission.permissionLevel === 'custom' ? permission.permissions : [];
+  const permissionsToAssign = permissionData.permissionLevel === 'custom' ? permissionData.permissions : [];
+  const permissionLevel = permissionData.permissionLevel;
 
-  const permissionToCreate = {
-    permissionLevel: permission.permissionLevel,
-    permissions: permissionsToAssign,
-    page: {
-      connect: {
-        id: permission.pageId
-      }
-    }
-
-  } as Prisma.PagePermissionCreateInput;
-
-  if (
-    (permission.userId && (permission.roleId || permission.spaceId))
-    || (permission.roleId && permission.spaceId)) {
-    throw new InvalidPermissionGranteeError();
+  if (!isTruthy(permissionLevel) || !isTruthy(PagePermissionLevel[permissionLevel])) {
+    throw new InvalidPermissionLevelError(permissionLevel);
   }
 
-  // Ensure only 1 group at a time is linked to this permission
-  if (permission.userId) {
-    permissionToCreate.user = {
-      connect: {
-        id: permission.userId
-      }
-    };
-  }
-  else if (permission.roleId) {
-    permissionToCreate.role = {
-      connect: {
-        id: permission.roleId
-      }
-    };
-  }
-  else if (permission.spaceId) {
-    permissionToCreate.space = {
-      connect: {
-        id: permission.spaceId
-      }
-    };
-  }
-  else {
-    throw {
-      error: 'Permissions must be linked to a user, role or space'
-    };
-
-  }
-
+  // Only one of the 3 below items will be defined
   const atomicUpdateQuery: Prisma.PagePermissionWhereUniqueInput = {
+    userId_PageId: permissionData.userId ? {
+      pageId: permission.pageId,
+      userId: permissionData.userId
+    } : undefined,
+    roleId_pageId: permissionData.roleId ? {
+      pageId: permission.pageId,
+      roleId: permissionData.roleId
+    } : undefined,
+    spaceId_pageId: permissionData.spaceId ? {
+      pageId: permission.pageId,
+      spaceId: permissionData.spaceId
+    } : undefined
   };
 
-  if (permission.userId) {
-    atomicUpdateQuery.userId_PageId = {
-      pageId: permission.pageId,
-      userId: permission.userId
-    };
-  }
-  else if (permission.roleId) {
-    atomicUpdateQuery.roleId_pageId = {
-      pageId: permission.pageId,
-      roleId: permission.roleId
-    };
-  }
-  else if (permission.spaceId) {
-    atomicUpdateQuery.spaceId_pageId = {
-      pageId: permission.pageId,
-      spaceId: permission.spaceId
-    };
-  }
-  else {
-    throw new InvalidPermissionGranteeError();
-  }
+  // Load permission before it is modified
+  const permissionBeforeModification = await prisma.pagePermission.findUnique({
+    where: atomicUpdateQuery
+  });
 
   const createdPermission = await prisma.pagePermission.upsert({
     where: atomicUpdateQuery,
@@ -157,67 +117,95 @@ export async function createPagePermission (permission: IPagePermissionToCreate)
       sourcePermission: true
     },
     update: {
-      permissionLevel: permission.permissionLevel,
+      permissionLevel,
       permissions: permissionsToAssign,
-      sourcePermission: !permission.inheritedFromPermission
+      sourcePermission: !permissionToInheritFrom.inheritedFromPermission
         ? {
           disconnect: true
         }
         : {
           connect: {
-            id: permission.inheritedFromPermission as string
+            id: permissionToInheritFrom.inheritedFromPermission
           }
         }
     },
     create: {
-      permissionLevel: permission.permissionLevel,
+      permissionLevel,
       permissions: permissionsToAssign,
       page: {
         connect: {
           id: permission.pageId
         }
       },
-      user: !permission.userId ? undefined : {
+      user: !permissionData.userId ? undefined : {
         connect: {
-          id: permission.userId
+          id: permissionData.userId
         }
       },
-      role: !permission.roleId ? undefined : {
+      role: !permissionData.roleId ? undefined : {
         connect: {
-          id: permission.roleId
+          id: permissionData.roleId
         }
       },
-      space: !permission.spaceId ? undefined : {
+      space: !permissionData.spaceId ? undefined : {
         connect: {
-          id: permission.spaceId
+          id: permissionData.spaceId
         }
       },
-      sourcePermission: !permission.inheritedFromPermission
+      sourcePermission: !permissionToInheritFrom.inheritedFromPermission
         ? undefined : {
           connect: {
-            id: permission.inheritedFromPermission as string
+            id: permissionToInheritFrom.inheritedFromPermission as string
           }
         }
     }
   });
 
-  const inheritingPermissions = await prisma.pagePermission.findMany({
+  const childPages = await resolveChildPages(createdPermission.pageId);
+
+  // Update all permissions that inherit from this
+  await prisma.pagePermission.updateMany({
     where: {
-      inheritedFromPermission: createdPermission.id
+      AND: [
+        {
+          OR: childPages.map(child => {
+            return { pageId: child.id };
+          })
+        },
+        {
+          inheritedFromPermission: createdPermission.id
+        }
+      ]
+    },
+    data: {
+      permissionLevel: createdPermission.permissionLevel,
+      permissions: createdPermission.permissions
     }
   });
 
-  await Promise.all(inheritingPermissions.map(perm => {
-    return createPagePermission({
-      pageId: perm.pageId,
-      permissionLevel: createdPermission.permissionLevel,
-      permissions: createdPermission.permissions,
-      inheritedFromPermission: createdPermission.id,
-      userId: createdPermission.userId,
-      roleId: createdPermission.roleId,
-      spaceId: createdPermission.spaceId
+  // Update permissions that inherited from a parent permission
+  // The new permission is now the authority
+  if (permissionBeforeModification?.inheritedFromPermission && !createdPermission.inheritedFromPermission) {
+    await prisma.pagePermission.updateMany({
+      where: {
+        AND: [
+          {
+            OR: childPages.map(child => {
+              return { pageId: child.id };
+            })
+          },
+          {
+            inheritedFromPermission: permissionBeforeModification.inheritedFromPermission
+          }
+        ]
+      },
+      data: {
+        permissionLevel: createdPermission.permissionLevel,
+        permissions: createdPermission.permissions,
+        inheritedFromPermission: createdPermission.id
+      }
     });
-  }));
+  }
 
   return createdPermission;
 }

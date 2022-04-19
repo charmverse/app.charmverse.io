@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { Space, User } from '@prisma/client';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -84,7 +85,7 @@ describe('createPagePermission', () => {
     }
   });
 
-  it('should throw an error if an attempt inherit a permission from itself happens', async () => {
+  it('should throw an error if an attempt to inherit a permission from itself happens', async () => {
     const parentPage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -99,8 +100,6 @@ describe('createPagePermission', () => {
     try {
       await createPagePermission({
         pageId: parentPage.id,
-        permissionLevel: 'full_access',
-        userId: user.id,
         inheritedFromPermission: parentPagePermission.id
       });
       throw new ExpectedAnError();
@@ -130,16 +129,12 @@ describe('createPagePermission', () => {
 
     const childPagePermission = await createPagePermission({
       pageId: childPage.id,
-      permissionLevel: 'full_access',
-      userId: user.id,
       inheritedFromPermission: parentPagePermission.id
     });
 
     try {
       await createPagePermission({
         pageId: parentPage.id,
-        permissionLevel: 'full_access',
-        userId: user.id,
         inheritedFromPermission: childPagePermission.id
       });
       throw new ExpectedAnError();
@@ -170,8 +165,6 @@ describe('createPagePermission', () => {
 
     const created = await createPagePermission({
       pageId: child.id,
-      permissionLevel: 'full_access',
-      userId: user.id,
       inheritedFromPermission: parentPermission.id
     });
 
@@ -199,8 +192,6 @@ describe('createPagePermission', () => {
 
     const created = await createPagePermission({
       pageId: child.id,
-      permissionLevel: 'full_access',
-      userId: user.id,
       inheritedFromPermission: parentPermission.id
 
     });
@@ -235,8 +226,6 @@ describe('createPagePermission', () => {
 
     const createdChild = await createPagePermission({
       pageId: child.id,
-      permissionLevel: 'full_access',
-      userId: user.id,
       inheritedFromPermission: parentPermission.id
 
     });
@@ -257,6 +246,81 @@ describe('createPagePermission', () => {
     expect(updatedChild!.permissionLevel).toBe(updatedParent.permissionLevel);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(updatedChild!.inheritedFromPermission).toBe(updatedParent.id);
+
+  });
+
+  it('should not update the permissions that inherit from an existing permission, where the related page is a sibling', async () => {
+    const parent = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const parentPermission = await createPagePermission({
+      pageId: parent.id,
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const child = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: parent.id
+    });
+
+    const childPermission = await createPagePermission({
+      pageId: child.id,
+      inheritedFromPermission: parentPermission.id
+    });
+
+    const sibling = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: parent.id
+    });
+
+    const siblingPermission = await createPagePermission({
+      pageId: sibling.id,
+      inheritedFromPermission: parentPermission.id
+    });
+
+    const subChild = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: child.id
+    });
+
+    const subChildPermission = await createPagePermission({
+      pageId: subChild.id,
+      inheritedFromPermission: childPermission.id
+    });
+
+    await createPagePermission({
+      pageId: child.id,
+      userId: user.id,
+      permissionLevel: 'view'
+    });
+
+    const siblingPermissionAfterUpdate = await prisma.pagePermission.findUnique({
+      where: {
+        id: siblingPermission.id
+      }
+    });
+
+    const childPermissionAfterUpdate = await prisma.pagePermission.findUnique({
+      where: {
+        id: childPermission.id
+      }
+    });
+
+    const subChildPermissionAfterUpdate = await prisma.pagePermission.findUnique({
+      where: {
+        id: subChildPermission.id
+      }
+    });
+
+    expect(childPermissionAfterUpdate!.inheritedFromPermission).toBeNull();
+    expect(subChildPermissionAfterUpdate!.inheritedFromPermission).toBe(childPermissionAfterUpdate!.id);
+    expect(siblingPermissionAfterUpdate!.inheritedFromPermission).toBe(parentPermission.id);
 
   });
 
