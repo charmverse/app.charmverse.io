@@ -38,7 +38,6 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     }
     return null;
   });
-  const router = useRouter();
   const cards = useAppSelector((state) => board ? Object.values(state.cards.cards).filter(card => card.parentId === board.id) : []);
   const boardViews = useAppSelector((state) => {
     if (board) {
@@ -68,7 +67,6 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const comments = card ? useAppSelector(getCardComments(card.id)) : [];
   const contents = card ? useAppSelector(getCardContents(card.id)) : [];
-  console.log({ readOnly });
   return (
     <ScrollableWindow>
       {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}

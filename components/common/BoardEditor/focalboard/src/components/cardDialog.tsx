@@ -73,7 +73,6 @@ const CardDialog = (props: Props): JSX.Element | null => {
             }
           )
         }
-
     }
     const handleDeleteCard = async () => {
         if (!card) {

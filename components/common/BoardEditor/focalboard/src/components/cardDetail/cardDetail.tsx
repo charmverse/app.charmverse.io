@@ -66,7 +66,7 @@ const CardDetail = (props: Props): JSX.Element|null => {
     }
 
     return (
-      <EditorPage pageId={card.id} publicShare={isSharedPage}/>
+      <EditorPage pageId={card.id} publicShare={isSharedPage} shouldLoadPublicPage={false}/>
     )
 }
 

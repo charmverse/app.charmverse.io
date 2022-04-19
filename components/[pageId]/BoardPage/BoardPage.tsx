@@ -108,7 +108,6 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
   });
 
   const showCard = useCallback((cardId?: string) => {
-    console.log(cardId);
     const newPath = generatePath(router.pathname, router.query);
 
     const query: any = { cardId, viewId: router.query.viewId };

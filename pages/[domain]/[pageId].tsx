@@ -8,14 +8,12 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useMemo, useState, useCallback, ReactNode } from 'react';
+import { ReactElement, useEffect, useMemo, useState, useCallback } from 'react';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
 import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import { useUser } from 'hooks/useUser';
-import { getCurrentViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 
 /**
  * @viewId - Enforce a specific view inside the nested blocks editor
@@ -25,8 +23,8 @@ interface IBlocksEditorPage {
 }
 
 export function EditorPage (
-  { pageId, currentPageId = pageId, publicShare = false, onPageLoad }:
-  {onPageLoad?: (pageId: string) => void, pageId: string, publicShare?: boolean, currentPageId?: string}
+  { shouldLoadPublicPage = true, pageId, currentPageId = pageId, publicShare = false, onPageLoad }:
+  {shouldLoadPublicPage?: boolean, onPageLoad?: (pageId: string) => void, pageId: string, publicShare?: boolean, currentPageId?: string}
 ) {
   const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
@@ -53,7 +51,7 @@ export function EditorPage (
   const pagesLoaded = Object.keys(pages).length > 0;
 
   useEffect(() => {
-    if (publicShare === true && pageId) {
+    if (publicShare === true && pageId && shouldLoadPublicPage) {
       loadPublicPage(pageId as string);
     }
     else if (pageId && pagesLoaded) {
