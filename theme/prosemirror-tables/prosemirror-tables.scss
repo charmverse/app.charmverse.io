@@ -81,6 +81,11 @@
   font-weight: bold;
   padding: 8px !important;
 
+  .empty-header {
+    top: 10px;
+    left: 10px;
+  }
+
   .cellContent {
     padding-left: 0;
   }
