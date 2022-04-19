@@ -286,19 +286,6 @@ index fb57edd..78d0b30 100644
      _classCallCheck(this, CellView);
  
      this.getPos = getPos;
-diff --git a/node_modules/@skiff-org/prosemirror-tables/src/columnsTypes/types/Date/utils.js b/node_modules/@skiff-org/prosemirror-tables/src/columnsTypes/types/Date/utils.js
-index a46d6a1..8140e5f 100644
---- a/node_modules/@skiff-org/prosemirror-tables/src/columnsTypes/types/Date/utils.js
-+++ b/node_modules/@skiff-org/prosemirror-tables/src/columnsTypes/types/Date/utils.js
-@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
- import {PluginKey} from 'prosemirror-state';
- import {getBaseName} from '../../../util';
- 
--export let DATE_FORMAT = 'DD/MM/YYYY';
-+export let DATE_FORMAT = 'MM/DD/YYYY';
- export const setDateFormat = (format) => (DATE_FORMAT = format);
- export const tableDateMenuKey = new PluginKey('TableDateMenu');
- 
 diff --git a/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css b/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
 index 006716e..66ffcce 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
