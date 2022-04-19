@@ -148,6 +148,9 @@ const PageAnchor = styled.a`
   &:hover .page-actions {
     opacity: 1;
   }
+  &:hover .MuiTypography-root {
+    width: calc(60%);
+  }
 `;
 
 export const StyledPageIcon = styled(EmojiIcon)`
@@ -162,16 +165,16 @@ export const StyledPageIcon = styled(EmojiIcon)`
   }
 `;
 
-export const PageTitle = styled(Typography)<{ isempty?: number }>`
+export const PageTitle = styled(Typography)<{ hasContent?: boolean }>`
   color: inherit;
-  display: flex;
+  display: block;
   align-items: center;
   font-size: 14px;
   height: 24px;
   &:hover {
     color: inherit;
   }
-  ${(props) => props.isempty && 'opacity: 0.5;'}
+  ${(props) => props.hasContent ? 'opacity: 0.5;' : ''}
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -215,7 +218,7 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
             <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
           </span>
         )}
-        <PageTitle isempty={isempty ? 1 : 0}>
+        <PageTitle hasContent={isempty}>
           {isempty ? 'Untitled' : label}
         </PageTitle>
         {children}
