@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
-import { Page, Prisma } from '@prisma/client';
+import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 
@@ -28,8 +28,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   const updateContent = req.body as Page;
 
-  // eslint-disable-next-line eqeqeq
-  if (updateContent.isPublic != undefined && permissions.edit_isPublic !== true) {
+  if (updateContent.isPublic !== undefined && permissions.edit_isPublic !== true) {
     return res.status(401).json({
       error: 'You cannot update the public status of this page'
     });
@@ -51,57 +50,16 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  // Making sure the card page and card block metadata stays in sync
+  // Making sure the card page and card block title stays in sync
   if (pageWithPermission.type === 'card') {
-    let shouldUpdate = false;
-    let updatingFields = false;
-    const blockUpdateInput: Prisma.BlockUpdateInput = {};
-
     if (req.body.title) {
-      blockUpdateInput.title = req.body.title;
-      shouldUpdate = true;
-    }
-
-    if (req.body.icon) {
-      if (!blockUpdateInput.fields) {
-        blockUpdateInput.fields = {};
-      }
-      (blockUpdateInput.fields as any).icon = req.body.icon;
-      shouldUpdate = true;
-      updatingFields = true;
-    }
-
-    if (req.body.headerImage) {
-      if (!blockUpdateInput.fields) {
-        blockUpdateInput.fields = {};
-      }
-      (blockUpdateInput.fields as any).headerImage = req.body.headerImage;
-      shouldUpdate = true;
-      updatingFields = true;
-    }
-    if (shouldUpdate) {
-      if (updatingFields) {
-        const cardBlockFields = await prisma.block.findUnique({
-          where: {
-            id: pageId
-          },
-          select: {
-            fields: true
-          }
-        });
-        if (cardBlockFields) {
-          blockUpdateInput.fields = {
-            ...(cardBlockFields?.fields as any),
-            ...(blockUpdateInput.fields as any)
-          };
-        }
-      }
-
       await prisma.block.update({
         where: {
           id: pageId
         },
-        data: blockUpdateInput
+        data: {
+          title: req.body.title
+        }
       });
     }
   }

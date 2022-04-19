@@ -69,8 +69,6 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json(error);
   }
 
-  validateCreationData(req.body);
-
   const card = await createDatabaseCardPage({
     ...req.body,
     boardId: id,

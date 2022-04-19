@@ -47,7 +47,13 @@ export async function createPage (req: NextApiRequest, res: NextApiResponse) {
     throw new DatabasePageNotFoundError(id as string);
   }
 
-  validateCreationData(req.body);
+  try {
+    validateCreationData(req.body);
+
+  }
+  catch (error) {
+    return res.status(400).json(error);
+  }
 
   const card = await createDatabaseCardPage({
     ...req.body,
