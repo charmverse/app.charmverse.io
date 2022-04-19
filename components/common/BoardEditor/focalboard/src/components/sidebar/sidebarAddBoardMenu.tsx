@@ -20,8 +20,6 @@ import MenuWrapper from '../../widgets/menuWrapper'
 
 import BoardTemplateMenuItem from './boardTemplateMenuItem'
 import { Card, createCard } from '../../blocks/card'
-import { CharmTextBlock } from '../../blocks/charmBlock'
-
 
 
 type Props = {
@@ -39,7 +37,7 @@ export const addBoardClicked = async (showBoard: (id: string) => void, intl: Int
     view.rootId = board.rootId
     view.title = intl.formatMessage({id: 'View.NewBoardTitle', defaultMessage: 'Board view'})
 
-    const blocks: (Card | CharmTextBlock)[] = [];
+    const blocks: Card[] = [];
 
     for (let index = 0; index < 3; index++) {
       const card = createCard()

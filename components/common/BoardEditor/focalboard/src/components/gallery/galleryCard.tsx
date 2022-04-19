@@ -5,11 +5,9 @@ import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Board, IPropertyTemplate } from '../../blocks/board'
 import { Card } from '../../blocks/card'
-import { ContentBlock } from '../../blocks/contentBlock'
 import { useSortable } from '../../hooks/sortable'
 import mutator from '../../mutator'
 import { getCardComments } from '../../store/comments'
-import { getCardContents } from '../../store/contents'
 import { useAppSelector } from '../../store/hooks'
 import { Utils } from '../../utils'
 import IconButton from '../../widgets/buttons/iconButton'
@@ -21,18 +19,15 @@ import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
 import Tooltip from '../../widgets/tooltip'
 import { CardDetailProvider } from '../cardDetail/cardDetailContext'
-import ContentElement from '../content/contentElement'
-import ImageElement from '../content/imageElement'
 import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
 import CardBadges from '../cardBadges'
-import { Block } from '../../blocks/block'
 import { PageContent } from 'models'
-import { CharmTextBlock } from '../../blocks/charmBlock'
 import { usePages } from 'hooks/usePages'
 import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
 import { mutate } from 'swr'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
+import { getCardContents } from '../../store/contents'
 
 
 type Props = {
@@ -55,8 +50,8 @@ const GalleryCard = React.memo((props: Props) => {
   const [space] = useCurrentSpace()
   const intl = useIntl()
   const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readonly, props.onDrop)
-  const contents = useAppSelector(getCardContents(card.id))
   const comments = useAppSelector(getCardComments(card.id))
+  const contents = useAppSelector(getCardContents(card.id))
   const cardPage = pages[card.id]
 
   const visiblePropertyTemplates = props.visiblePropertyTemplates || []
@@ -67,15 +62,12 @@ const GalleryCard = React.memo((props: Props) => {
   }
 
   let galleryImageUrl: null | string | undefined = cardPage?.headerImage;
-
-  const charmTextContent = contents.find(content => (content as Block).type === "charm_text") as CharmTextBlock
-
-  if (charmTextContent && !galleryImageUrl) {
-    const { content } = charmTextContent.fields as { content: PageContent };
-
-    if (content?.content) {
-      for (let index = 0; index < content.content.length; index++) {
-        const item = content.content[index];
+  const cardPageContent = cardPage?.content as PageContent
+  
+  if (cardPageContent && !galleryImageUrl) {
+    if (cardPageContent?.content) {
+      for (let index = 0; index < cardPageContent.content.length; index++) {
+        const item = cardPageContent.content[index];
         if (item.type === "paragraph") {
           const imageNode = item.content?.[0]
           if (imageNode?.type === "image") {
