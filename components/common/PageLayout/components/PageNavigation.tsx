@@ -527,7 +527,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
         // borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
       }}
     >
-      {item.type === 'page' ? (
+      {item.type.match(/(page|card)/) ? (
         item.children.length > 0
           ? item.children.map((childItem) => (
             <RenderDraggableNode
@@ -573,12 +573,13 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
   for (i = 0; i < tempItems.length; i += 1) {
     map[tempItems[i].id] = i; // initialize the map
   }
+
   for (i = 0; i < tempItems.length; i += 1) {
     node = tempItems[i];
     const index = node[key] ? map[node[key]!] : -1;
     if (node[key] && tempItems[index]) {
       // Make sure its not a database page or a focalboard card
-      if (!tempItems[index].boardId && !tempItems[index].cardId) {
+      if (!tempItems[index].boardId) {
         tempItems[index].children.push(node);
         sortArrayByObjectProperty(tempItems[index].children, 'index');
       }
