@@ -20,9 +20,7 @@ import MenuWrapper from '../../widgets/menuWrapper'
 
 import BoardTemplateMenuItem from './boardTemplateMenuItem'
 import { Card, createCard } from '../../blocks/card'
-import { CharmTextBlock, createCharmTextBlock } from '../../blocks/charmBlock'
-import { mutate } from 'swr'
-import { useCurrentSpace } from 'hooks/useCurrentSpace'
+import { CharmTextBlock } from '../../blocks/charmBlock'
 
 
 

@@ -106,7 +106,6 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
         isTemplate: false,
         properties: pageInfo.properties ?? {}
       }
-
     }
   });
 
@@ -117,9 +116,9 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
           id: cardBlock.createdBy
         }
       },
-      createdAt: new Date(cardBlock.createdAt),
+      createdAt: cardBlock.createdAt,
       updatedBy: cardBlock.updatedBy,
-      updatedAt: new Date(cardBlock.updatedAt),
+      updatedAt: cardBlock.updatedAt,
       card: {
         connect: {
           id: cardBlock.id

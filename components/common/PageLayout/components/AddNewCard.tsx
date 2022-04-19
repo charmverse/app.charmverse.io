@@ -1,6 +1,5 @@
 import charmClient from 'charmClient';
 import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import { createCharmTextBlock } from 'components/common/BoardEditor/focalboard/src/blocks/charmBlock';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRouter } from 'next/router';
 import { Tooltip } from '@mui/material';

@@ -7,7 +7,6 @@ import {FormattedMessage, injectIntl, IntlShape} from 'react-intl'
 
 import withScrolling, {createHorizontalStrength, createVerticalStrength} from 'react-dnd-scrolling'
 
-import {Position} from '../cardDetail/cardDetailContents'
 
 import {Board, IPropertyOption, IPropertyTemplate, BoardGroup} from '../../blocks/board'
 import {Card} from '../../blocks/card'
@@ -30,13 +29,7 @@ import { bindTrigger, bindMenu } from 'material-ui-popup-state'
 import { usePopupState } from 'material-ui-popup-state/hooks'
 
 
-
-
-
-
-
-
-
+type Position = 'left' | 'right' | 'above' | 'below' | 'aboveRow' | 'belowRow'
 interface NewGroupTextFieldProps {
   onClick: (groupName: string) => void
 }

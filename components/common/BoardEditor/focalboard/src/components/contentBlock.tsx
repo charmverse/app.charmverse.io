@@ -18,11 +18,12 @@ import GripIcon from '../widgets/icons/grip'
 import Menu from '../widgets/menu'
 import MenuWrapper from '../widgets/menuWrapper'
 import {useSortableWithGrip} from '../hooks/sortable'
-import {Position} from './cardDetail/cardDetailContents'
 
 import ContentElement from './content/contentElement'
 import AddContentMenuItem from './addContentMenuItem'
 import {contentRegistry} from './content/contentRegistry'
+
+type Position = 'left' | 'right' | 'above' | 'below' | 'aboveRow' | 'belowRow'
 
 type Props = {
     block: ContentBlockType
