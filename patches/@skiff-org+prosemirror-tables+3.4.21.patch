@@ -1,5 +1,5 @@
 diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
-index fb1644e..52369b4 100644
+index fb1644e..b60a4b1 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
 +++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
 @@ -8,9 +8,11 @@ import { Transform } from 'prosemirror-transform';
@@ -22,7 +22,7 @@ index fb1644e..52369b4 100644
  };
  
 -var colors = ['rgb(255, 191, 181)', 'rgb(247, 204, 98)', 'rgb(181, 220, 175)', 'rgb(214, 232, 250)', 'rgb(216, 195, 255)', 'transparent'];
-+var colors = ['var(--prop-pink)', 'rgb(247, 204, 98)', 'rgb(181, 220, 175)', 'rgb(214, 232, 250)', 'rgb(216, 195, 255)', 'transparent'];
++var colors = ['var(--bg-gray)', 'var(--bg-brown)', 'var(--bg-orange)', 'var(--bg-yellow)', 'var(--bg-green)', 'var(--bg-blue)', 'var(--bg-purple)', 'var(--bg-pink)', 'var(--bg-red)', 'transparent'];
  
  var cellBackgroundColorItem = function cellBackgroundColorItem(color) {
    return new MenuItem$1({
