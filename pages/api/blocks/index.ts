@@ -122,9 +122,9 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
             ]
           }
         };
-        if (cardBlock.fields.content) {
-          delete cardBlock.fields.content;
-        }
+        delete cardBlock.fields.content;
+        delete cardBlock.fields.headerImage;
+        delete cardBlock.fields.icon;
         return cardPage;
       });
       await prisma.block.createMany({

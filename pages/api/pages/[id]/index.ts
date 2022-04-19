@@ -50,19 +50,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  // Making sure the card page and card block title stays in sync
-  // if (pageWithPermission.type === 'card') {
-  //   if (req.body.title) {
-  //     await prisma.block.update({
-  //       where: {
-  //         id: pageId
-  //       },
-  //       data: {
-  //         title: req.body.title
-  //       }
-  //     });
-  //   }
-  // }
   return res.status(200).json(pageWithPermission);
 }
 

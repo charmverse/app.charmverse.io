@@ -55,8 +55,8 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');
-
-  const isExportablePage = (currentPage as Page)?.type.match(/(page|card)/);
+  const pageType = (currentPage as Page)?.type;
+  const isExportablePage = pageType === 'card' || pageType === 'page';
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -78,7 +78,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
       });
 
       let markdown = serializer.serialize(state.pmState.doc);
-      console.log({ markdown });
 
       if (currentPage.title) {
         const pageTitleAsMarkdown = `# ${currentPage.title}`;
