@@ -1,4 +1,5 @@
 import { SystemError } from 'lib/utilities/errors';
+import { PagePermissionLevel } from '@prisma/client';
 
 export class InvalidPermissionGranteeError extends SystemError {
 
@@ -18,6 +19,20 @@ export class PermissionNotFoundError extends SystemError {
       errorType: 'Data not found',
       message: `Could not find permission with ID ${permissionId}`,
       severity: 'warning'
+    });
+  }
+}
+
+export class InvalidPermissionLevelError extends SystemError {
+
+  constructor (wrongPermissionLevel: string) {
+    super({
+      errorType: 'Invalid input',
+      message: `'${wrongPermissionLevel} is an invalid permission level`,
+      severity: 'warning',
+      error: {
+        validOptions: Object.keys(PagePermissionLevel)
+      }
     });
   }
 }
