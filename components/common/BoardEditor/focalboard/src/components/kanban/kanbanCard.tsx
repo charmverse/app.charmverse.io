@@ -9,6 +9,7 @@ import { useBounties } from 'hooks/useBounties'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { usePages } from 'hooks/usePages'
 import { useUser } from 'hooks/useUser'
+import { isPageDeletable } from 'lib/roles/isPageDeletable'
 import millify from "millify"
 import { BOUNTY_LABELS } from 'models'
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
@@ -101,40 +102,8 @@ const KanbanCard = React.memo((props: Props) => {
   const [user] = useUser();
 
   // Check if the current user is an admin, admin means implicit full access
-  const isAdminOfSpace = user?.spaceRoles.find(spaceRole => spaceRole.spaceId === space?.id && spaceRole.isAdmin);
   const { roles } = useRoles();
-  let canDelete = !!isAdminOfSpace;
-  const rolesOfUser: string[] = [];
-  if (roles && user) {
-    for (const role of roles) {
-      for (const spaceRoleToRole of role.spaceRolesToRole) {
-        if (spaceRoleToRole.spaceRole.user.id === user.id) {
-          rolesOfUser.push(role.id);
-          break;
-        }
-      }
-    }
-  }
-
-  if (!isAdminOfSpace && cardPage && user && space && (cardPage as any).permissions) {
-    for (const permission of ((cardPage as any).permissions as PagePermission[])) {
-      // For individual user id
-      if (permission.userId === user.id && permission.permissionLevel.match(/(editor|full_access)/)) {
-        canDelete = true;
-        break;
-      }
-
-      if (permission.spaceId === space.id && permission.permissionLevel.match(/(editor|full_access)/)) {
-        canDelete = true;
-        break;
-      }
-
-      if (permission.roleId && rolesOfUser.includes(permission.roleId) && permission.permissionLevel.match(/(editor|full_access)/)) {
-        canDelete = true;
-        break;
-      }
-    }
-  }
+  const isDeletable = isPageDeletable(user?.id, space?.id,  (cardPage as any)?.permissions as PagePermission[], user?.spaceRoles, roles)
 
   return (
     <>
@@ -152,7 +121,7 @@ const KanbanCard = React.memo((props: Props) => {
           >
             <IconButton icon={<OptionsIcon />} />
             <Menu position='left'>
-              {canDelete && <Menu.Text
+              {isDeletable && <Menu.Text
                 icon={<DeleteIcon />}
                 id='delete'
                 name={intl.formatMessage({ id: 'KanbanCard.delete', defaultMessage: 'Delete' })}

@@ -28,6 +28,10 @@ import { PageIcon } from 'components/common/PageLayout/components/PageNavigation
 import { mutate } from 'swr'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { getCardContents } from '../../store/contents'
+import useRoles from 'components/settings/roles/hooks/useRoles'
+import { useUser } from 'hooks/useUser'
+import { isPageDeletable } from 'lib/roles/isPageDeletable'
+import { PagePermission } from '@prisma/client'
 
 
 type Props = {
@@ -87,6 +91,11 @@ const GalleryCard = React.memo((props: Props) => {
     }
   }
 
+  const [user] = useUser();
+
+  // Check if the current user is an admin, admin means implicit full access
+  const { roles } = useRoles();
+  const isDeletable = isPageDeletable(user?.id, space?.id,  (cardPage as any)?.permissions as PagePermission[], user?.spaceRoles, roles)
 
   return (
     <div
@@ -102,12 +111,12 @@ const GalleryCard = React.memo((props: Props) => {
         >
           <IconButton icon={<OptionsIcon />} />
           <Menu position='left'>
-            <Menu.Text
+            {isDeletable && <Menu.Text
               icon={<DeleteIcon />}
               id='delete'
               name={intl.formatMessage({ id: 'GalleryCard.delete', defaultMessage: 'Delete' })}
               onClick={() => mutator.deleteBlock(card, 'delete card')}
-            />
+            />}
             <Menu.Text
               icon={<DuplicateIcon />}
               id='duplicate'
