@@ -14,12 +14,9 @@ import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
 import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import { useUser } from 'hooks/useUser';
-import { createAsyncThunk } from '@reduxjs/toolkit';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { addCard, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import { BoardView } from 'lib/focalboard/boardView';
-import { addView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { Board } from 'lib/focalboard/board';
 
