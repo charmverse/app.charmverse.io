@@ -1,3 +1,4 @@
+import { InvalidCustomPropertyKeyError, InvalidCustomPropertyValueError } from './errors';
 import { PageProperty } from './interfaces';
 
 /**
@@ -19,10 +20,7 @@ export function mapProperties (properties: Record<string, string | number>, card
     const propertySchema = cardPropertySchema.find(cardProp => cardProp.name === property);
 
     if (!propertySchema) {
-      throw {
-        error: `Field '${property}' does not exist on this database`,
-        fields: cardPropertySchema.map(schema => schema.name)
-      };
+      throw new InvalidCustomPropertyKeyError({ key: property, boardSchema: cardPropertySchema });
     }
 
     let value = properties[property];
@@ -31,11 +29,7 @@ export function mapProperties (properties: Record<string, string | number>, card
       const matchedOption = propertySchema.options.find(option => option.value === value);
 
       if (!matchedOption) {
-        throw {
-          error: `Value '${value}' is not a valid option for field ${propertySchema.name}`,
-          options: propertySchema.options.map(option => option.value)
-
-        };
+        throw new InvalidCustomPropertyValueError({ key: property, value, boardSchema: cardPropertySchema });
       }
       else {
         value = matchedOption.id;

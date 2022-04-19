@@ -2,7 +2,7 @@
 import { Block } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { DatabasePage } from 'lib/public-api';
+import { DatabasePage, DatabasePageNotFoundError } from 'lib/public-api';
 import { filterObjectKeys } from 'lib/utilities/objects';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -58,7 +58,7 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!database) {
-    return res.status(404).send({ error: 'Database not found' });
+    throw new DatabasePageNotFoundError(id as string);
   }
 
   const board = await prisma.block.findFirst({
@@ -69,10 +69,10 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
   }) as any as Block;
 
   if (!board) {
-    return res.status(404).send({ error: 'Board not found' });
+    throw new DatabasePageNotFoundError(id as string);
   }
 
-  const filteredDatabaseObject = filterObjectKeys(database as any as DatabasePage, 'include', ['id', 'createdAt', 'updatedAt', 'type', 'title', 'url']);
+  const filteredDatabaseObject = filterObjectKeys(database as any as DatabasePage, 'include', ['id', 'createdAt', 'updatedAt', 'type', 'title', 'url', 'spaceId']);
 
   const domain = process.env.DOMAIN;
 
