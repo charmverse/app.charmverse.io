@@ -1,11 +1,10 @@
 import { PagePermission, PagePermissionLevel, Prisma, Role, Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
-import { IPageWithPermissions, getPage, PageNotFoundError } from 'lib/pages';
+import { IPageWithPermissions, getPage, PageNotFoundError, resolveChildPages, resolveParentPages } from 'lib/pages';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { CircularPermissionError, InvalidPermissionGranteeError, InvalidPermissionLevelError, PermissionNotFoundError, SelfInheritancePermissionError } from './errors';
+import { CannotInheritOutsideTreeError, CircularPermissionError, InvalidPermissionGranteeError, InvalidPermissionLevelError, PermissionNotFoundError, SelfInheritancePermissionError } from './errors';
 import { IPagePermissionToCreate, IPagePermissionToInherit, IPagePermissionUpdate, IPagePermissionWithAssignee, IPagePermissionWithSource } from './page-permission-interfaces';
-import { resolveChildPages } from './refresh-page-permission-tree';
 
 export async function listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
   const permissions = await prisma.pagePermission.findMany({
@@ -271,4 +270,61 @@ export async function deletePagePermission (permissionId: string) {
   } });
 
   return true;
+}
+
+export async function inheritPermissions (sourcePageId: string, targetPageId: string): Promise<IPageWithPermissions> {
+  const [sourcePage, targetPage] = await Promise.all([
+    getPage(sourcePageId),
+    getPage(targetPageId)
+  ]);
+
+  if (!sourcePage || !targetPage) {
+    throw new PageNotFoundError(!sourcePage ? sourcePageId : targetPageId);
+  }
+
+  if (targetPage.parentId !== sourcePage.id) {
+    const parentPages = await resolveParentPages(targetPage.id);
+    // Make sure the page we want to inherit from is a prent of this page
+    const isValidParent = parentPages.some(page => page.id === sourcePage.id);
+    if (!isValidParent) {
+      throw new CannotInheritOutsideTreeError(sourcePageId, targetPageId);
+    }
+  }
+
+  const permissionsToCopy = [];
+
+  for (const permission of sourcePage.permissions) {
+    const existingPermission = targetPage.permissions.find(targetPermission => {
+
+      if (permission.userId) {
+        return targetPermission.userId === permission.userId;
+      }
+      else
+      if (permission.roleId) {
+        return targetPermission.roleId === permission.roleId;
+      }
+      else
+      if (permission.spaceId) {
+        return targetPermission.spaceId === permission.spaceId;
+      }
+
+      return false;
+
+    });
+
+    if (!existingPermission) {
+      permissionsToCopy.push(permission);
+    }
+  }
+
+  await Promise.all(permissionsToCopy.map(permission => {
+    return createPagePermission({
+      inheritedFromPermission: permission.id,
+      pageId: targetPageId
+    });
+  }));
+
+  const updatedTargetPageWithClonedPermissions = await getPage(targetPage.id) as IPageWithPermissions;
+
+  return updatedTargetPageWithClonedPermissions;
 }

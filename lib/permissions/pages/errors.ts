@@ -59,11 +59,11 @@ export class SelfInheritancePermissionError extends SystemError {
   }
 }
 
-export class NoInheritableParentError extends SystemError {
-  constructor () {
+export class CannotInheritOutsideTreeError extends SystemError {
+  constructor (attemptedToInheritFromPage: string, targetPageId: string) {
     super({
       errorType: 'Data not found',
-      message: 'No parent page was found to inherit permissions from',
+      message: `Page ${targetPageId} cannot inherit from ${attemptedToInheritFromPage} as the latter is not a parent of the former`,
       severity: 'warning'
     });
   }
