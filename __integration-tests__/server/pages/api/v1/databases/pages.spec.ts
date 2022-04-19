@@ -5,7 +5,7 @@ import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
 import { v4 } from 'uuid';
-
+import { prisma } from 'db';
 import { Space, User, Page, SpaceApiToken } from '@prisma/client';
 import { Page as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
 
@@ -70,6 +70,13 @@ describe('POST /databases/{id}/pages', () => {
       })
     );
 
+    const page = await prisma.page.findUnique({
+      where: {
+        id: (response.body as ApiPage).id
+      }
+    });
+
+    expect(page).toBeTruthy();
   });
 
   it('should create a new card in the database without needing custom properties', async () => {

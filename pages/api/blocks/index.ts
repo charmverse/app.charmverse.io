@@ -84,13 +84,25 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
       }));
       const cardBlocks = newBlocks.filter(newBlock => newBlock.type === 'card');
 
-      const cardPages: Prisma.PageCreateManyInput[] = cardBlocks.map(cardBlock => {
-        const cardPage: Prisma.PageCreateManyInput = {
-          createdBy: cardBlock.createdBy,
+      const cardPages: Prisma.PageCreateInput[] = cardBlocks.map(cardBlock => {
+        const cardPage: Prisma.PageCreateInput = {
+          author: {
+            connect: {
+              id: cardBlock.createdBy
+            }
+          },
           updatedBy: cardBlock.updatedBy,
           id: cardBlock.id,
-          spaceId: cardBlock.spaceId,
-          cardId: cardBlock.id,
+          space: {
+            connect: {
+              id: cardBlock.spaceId
+            }
+          },
+          card: {
+            connect: {
+              id: cardBlock.id
+            }
+          },
           createdAt: cardBlock.createdAt,
           path: `page-${Math.random().toString().replace('0.', '')}`,
           title: cardBlock.title,
@@ -100,7 +112,15 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
           contentText: '',
           parentId: cardBlock.parentId,
           updatedAt: cardBlock.updatedAt,
-          content: cardBlock.fields.content ?? undefined
+          content: cardBlock.fields.content ?? undefined,
+          permissions: {
+            create: [
+              {
+                permissionLevel: 'full_access',
+                spaceId: cardBlock.spaceId
+              }
+            ]
+          }
         };
         if (cardBlock.fields.content) {
           delete cardBlock.fields.content;
@@ -111,9 +131,11 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
         data: newBlocks
       });
       if (cardPages.length !== 0) {
-        await prisma.page.createMany({
-          data: cardPages
-        });
+        for (const cardPage of cardPages) {
+          await prisma.page.create({
+            data: cardPage
+          });
+        }
       }
       return res.status(200).json(newBlocks);
     }

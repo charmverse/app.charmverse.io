@@ -161,6 +161,7 @@ export default function PagePermissions ({ pageId }: Props) {
   const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
+  console.log({ pagePermissions, pageId });
   return (
     <Box padding={1}>
 
