@@ -7,14 +7,9 @@ import { BountyIntegration } from 'components/bounties/BountyIntegration';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { title } from 'process';
-import { getCurrentBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getCurrentViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
-import { useRouter } from 'next/router';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { getCardContents } from 'components/common/BoardEditor/focalboard/src/store/contents';
-import { RootState } from 'components/common/BoardEditor/focalboard/src/store';
 import { usePages } from 'hooks/usePages';
 import PageHeader from './components/PageHeader';
 import PageBanner from './components/PageBanner';
@@ -71,8 +66,6 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const comments = card ? useAppSelector(getCardComments(card.id)) : [];
   const contents = card ? useAppSelector(getCardContents(card.id)) : [];
-
-  console.log({ board, comments, contents, boardViews, cards });
 
   return (
     <ScrollableWindow>

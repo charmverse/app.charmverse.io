@@ -16,6 +16,7 @@ import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { silentlyUpdateURL } from 'lib/browser';
+import { usePages } from 'hooks/usePages';
 
 /**
  *
@@ -39,6 +40,8 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
   const clientConfig = useAppSelector(getClientConfig);
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState(router.query.cardId);
+  const { pages } = usePages();
+  const accessibleCards = cards.filter(card => pages[card.id]);
 
   useEffect(() => {
     const boardId = page.boardId!;
@@ -140,7 +143,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
           readonly={!!readonly}
           board={board}
           setPage={setPage}
-          cards={cards}
+          cards={accessibleCards}
           showCard={showCard}
           activeView={activeView}
           groupByProperty={property}
@@ -154,7 +157,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
               board={board}
               activeView={activeView}
               views={viewsToProvide}
-              cards={cards}
+              cards={accessibleCards}
               key={shownCardId}
               cardId={shownCardId}
               onClose={() => showCard(undefined)}
