@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Page, PagePermission, Role, Space, User } from '@prisma/client';
 import { prisma } from 'db';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken, createPage } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { createPagePermission } from '../page-permission-actions';
 import { IPageWithPermissions } from '../page-permission-interfaces';
@@ -9,29 +10,6 @@ import { canInheritPermissionsFromParent, hasFullSetOfBasePermissions } from '..
 let user: User;
 let space: Space;
 let role: Role;
-
-function createPage (options: Partial<Pick<Page, 'parentId'>> = {}): Promise<Page> {
-  return prisma.page.create({
-    data: {
-      contentText: '',
-      path: v4(),
-      title: 'Example',
-      type: 'page',
-      updatedBy: user.id,
-      author: {
-        connect: {
-          id: user.id
-        }
-      },
-      space: {
-        connect: {
-          id: space.id
-        }
-      },
-      parentId: options.parentId
-    }
-  });
-}
 
 // Will return a nested tree of pages and associated permissions
 // Creates as many pages as there are permission sets
@@ -43,7 +21,9 @@ async function setupPagesWithPermissions (permissionSets: Array<Partial<PagePerm
 
   for (const set of permissionSets) {
     const newPage = await createPage({
-      parentId: currentParentId
+      parentId: currentParentId,
+      createdBy: user.id,
+      spaceId: space.id
     });
 
     currentParentId = newPage.id;
@@ -153,7 +133,10 @@ describe('hasFullSetOfBasePermissions', () => {
 describe('canInheritFromParent', () => {
 
   it('should return false when the page does not have a parent', async () => {
-    const rootPage = await createPage();
+    const rootPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
 
     const canInherit = await canInheritPermissionsFromParent(rootPage.id);
 
@@ -212,6 +195,32 @@ describe('canInheritFromParent', () => {
     const canInherit = await canInheritPermissionsFromParent(child.id);
 
     expect(canInherit).toBe(false);
+
+  });
+
+  it('should return true when the child page has the same permissions as the parent if a specific permission is ignored', async () => {
+
+    const [root, child] = await setupPagesWithPermissions([
+      // Root page
+      [{
+        userId: user.id,
+        permissionLevel: 'full_access'
+      },
+      {
+        spaceId: space.id,
+        permissionLevel: 'view'
+      }],
+      // Child page
+      [
+        {
+          spaceId: space.id,
+          permissionLevel: 'view'
+        }]
+    ]);
+
+    const canInherit = await canInheritPermissionsFromParent(child.id, root.permissions[0].id);
+
+    expect(canInherit).toBe(true);
 
   });
 
