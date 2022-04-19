@@ -61,6 +61,16 @@ export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
     '&.Mui-selected:hover': {
       backgroundColor: theme.palette.action.hover
     },
+    '&.Mui-selected:hover::after': {
+      content: '""',
+      left: 0,
+      top: 0,
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      backgroundColor: theme.palette.action.hover,
+      pointerEvents: 'none'
+    },
     '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
       backgroundColor: theme.palette.action.selected,
       color: theme.palette.text.primary,
@@ -118,11 +128,21 @@ const PageAnchor = styled.a`
   position: relative;
 
   .page-actions {
-    background: ${({ theme }) => theme.palette.action.hover};
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
     opacity: 0;
     position: absolute;
+    bottom: 0px;
     top: 0px;
     right: 0px;
+    .MuiIconButton-root {
+      padding: 0;
+      border-radius: 2px;
+      height: 20px;
+      width: 20px;
+    }
   }
   &:hover .page-actions {
     opacity: 1;
@@ -323,7 +343,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
               {addSubPage && pageType === 'board' ? (
                 <AddNewCard pageId={pageId} />
               ) : (
-                <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} sx={{ marginLeft: '3px' }} />
+                <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} />
               )}
             </div>
           </PageLink>

@@ -86,7 +86,7 @@ const SectionName = styled(Typography)`
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.03em;
-  margin-bottom: ${({ theme }) => theme.spacing(0.5)};
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const StyledSidebarLink = styled(Link)<{ active: boolean }>`
