@@ -1,10 +1,9 @@
 
 import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { v4, validate } from 'uuid';
-import { Page, PageProperty, mapProperties, PageFromBlock, validateCreationData, DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
+import { Page, validateCreationData, DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

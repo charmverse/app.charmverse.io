@@ -4,7 +4,7 @@ import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
-import { Page, PageProperty, mapProperties, PageFromBlock, validateCreationData } from 'lib/public-api';
+import { Page, PageProperty, mapProperties, PageFromBlock, validateCreationData, createDatabaseCardPage } from 'lib/public-api';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -70,53 +70,16 @@ async function createPage (req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json(error);
   }
 
-  const cardBlock = await prisma.block.create({
-    data: {
-      id: v4(),
-      type: 'card',
-      user: {
-        connect: {
-          id: req.botUser.id
-        }
-      },
-      updatedBy: req.botUser.id,
-      rootId: id as string,
-      parentId: id as string,
-      title,
-      space: {
-        connect: {
-          id: board.spaceId
-        }
-      },
-      schema: 1,
-      fields: {
-        contentOrder: [],
-        headerImage: null,
-        icon: '',
-        isTemplate: false,
-        properties: propertiesToAdd
-      }
+  validateCreationData(req.body);
 
-    }
+  const card = await createDatabaseCardPage({
+    ...req.body,
+    boardId: id,
+    spaceId,
+    createdBy: req.botUser.id,
+    properties: propertiesToAdd,
+    title
   });
-
-  await prisma.page.create({
-    data: {
-      createdBy: cardBlock.createdBy,
-      createdAt: cardBlock.createdAt,
-      updatedBy: cardBlock.updatedBy,
-      updatedAt: cardBlock.updatedAt,
-      cardId: cardBlock.id,
-      contentText: '',
-      path: `page-${Math.random().toString().replace('0.', '')}`,
-      type: 'card',
-      title,
-      parentId: id as string,
-      id: cardBlock.id
-    }
-  });
-
-  const card = new PageFromBlock(cardBlock, (board.fields as any).cardProperties);
 
   return res.status(201).send(card);
 

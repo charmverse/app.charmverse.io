@@ -107,6 +107,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   if (requestBodyUpdate.title) {
     updateContent.title = requestBodyUpdate.title;
+    // Update the page associated with the card block
     await prisma.page.update({
       where: {
         id: card.id
