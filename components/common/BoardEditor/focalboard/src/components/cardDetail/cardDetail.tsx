@@ -1,9 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import { Box } from '@mui/material'
-import { BountyIntegration } from 'components/bounties/BountyIntegration'
+import EditorPage from 'components/[pageId]/EditorPage/EditorPage'
 import { useRouter } from 'next/router'
-import { EditorPage } from 'pages/[domain]/[pageId]'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Board } from '../../blocks/board'
 import { BoardView } from '../../blocks/boardView'
