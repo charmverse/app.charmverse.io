@@ -1,8 +1,9 @@
 
 import { prisma } from 'db';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { resolveChildPages } from 'lib/pages';
 import { createPagePermission } from '../page-permission-actions';
-import { breakInheritance, resolveChildPages } from '../refresh-page-permission-tree';
+import { breakInheritance } from '../refresh-page-permission-tree';
 
 describe('breakInheritance', () => {
   it('should convert all permissions inherited by the page to permissions owned by the page', async () => {
@@ -182,75 +183,5 @@ describe('breakInheritance', () => {
 
     expect(localPermission?.inheritedFromPermission).toBeNull();
 
-  });
-});
-
-describe('resolveChildPages', () => {
-  it('should return a list of all children of a page', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
-
-    const root = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    const child = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: root.id
-    });
-
-    const subChild1 = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: child.id
-    });
-
-    const subChild2 = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: child.id
-    });
-
-    const subSubChild1 = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: subChild1.id
-    });
-
-    const subSubChild2 = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: subChild1.id
-    });
-
-    const subSubChild3 = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: subChild1.id
-    });
-
-    const subSubSubChild1 = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: subSubChild1.id
-    });
-
-    const subSubSubSubChild1 = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: subSubSubChild1.id
-    });
-
-    const resolvedChildren = await resolveChildPages(child.id);
-
-    expect(resolvedChildren.length).toBe(7);
-    expect(resolvedChildren.find(page => page.id === subChild1.id)).toBeDefined();
-    expect(resolvedChildren.find(page => page.id === subChild2.id)).toBeDefined();
-    expect(resolvedChildren.find(page => page.id === subSubChild1.id)).toBeDefined();
-    expect(resolvedChildren.find(page => page.id === subSubChild2.id)).toBeDefined();
-    expect(resolvedChildren.find(page => page.id === subSubChild3.id)).toBeDefined();
-    expect(resolvedChildren.find(page => page.id === subSubSubChild1.id)).toBeDefined();
-    expect(resolvedChildren.find(page => page.id === subSubSubSubChild1.id)).toBeDefined();
   });
 });

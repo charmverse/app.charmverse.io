@@ -1,8 +1,7 @@
 import { PagePermission } from '@prisma/client';
 import { prisma } from 'db';
-import { PageNotFoundError } from 'lib/public-api';
+import { getPage, IPageWithPermissions, PageNotFoundError, resolveChildPages } from 'lib/pages';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { IPageWithPermissions } from './page-permission-interfaces';
 import { permissionTemplates } from './page-permission-mapping';
 import { createPagePermission } from './page-permission-actions';
 
@@ -101,14 +100,7 @@ export async function canInheritPermissionsFromParent (pageId: string, permissio
  * Updates children to inherit from this page
  */
 export async function breakInheritance (pageId: string): Promise<IPageWithPermissions> {
-  const page = await prisma.page.findUnique({
-    where: {
-      id: pageId
-    },
-    include: {
-      permissions: true
-    }
-  });
+  const page = await getPage(pageId);
 
   if (!page) {
     throw new PageNotFoundError(pageId);
@@ -157,38 +149,6 @@ export async function breakInheritance (pageId: string): Promise<IPageWithPermis
   }));
 
   return page;
-}
-
-/**
- * Returned a flattened list of all a page's children
- * @param pageId
- */
-export async function resolveChildPages (pageId: string): Promise<IPageWithPermissions []> {
-  const children = await prisma.page.findMany({
-    where: {
-      parentId: pageId
-    },
-    include: {
-      permissions: {
-        include: {
-          sourcePermission: true
-        }
-      }
-    }
-  });
-
-  const nestedChildren = await Promise.all(children.map(childPage => {
-    return resolveChildPages(childPage.id);
-  }));
-
-  // Merge the results
-  const flattenedChildren: IPageWithPermissions [] = [...children];
-
-  nestedChildren.forEach(nestedSet => {
-    flattenedChildren.push(...nestedSet);
-  });
-
-  return flattenedChildren;
 }
 
 /**
