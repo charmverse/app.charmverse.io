@@ -6,7 +6,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { computeUserPagePermissions, breakInheritance } from 'lib/permissions/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -27,6 +27,14 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
   });
 
   const updateContent = req.body as Page;
+
+  if ((typeof updateContent.index === 'number' || updateContent.parentId !== undefined) && permissions.edit_position !== true) {
+    throw new ActionNotPermittedError('You are not allowed to reposition this page');
+  }
+
+  if (updateContent.parentId === null) {
+    await breakInheritance(pageId);
+  }
 
   // eslint-disable-next-line eqeqeq
   if (updateContent.isPublic != undefined && permissions.edit_isPublic !== true) {

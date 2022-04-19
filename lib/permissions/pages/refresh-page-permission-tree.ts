@@ -114,7 +114,18 @@ export async function breakInheritance (pageId: string): Promise<IPageWithPermis
     throw new PageNotFoundError(pageId);
   }
 
+  // List of permission IDs coming from parents, and the new permission children will inherit from
+  const newPermissionIdToInheritFrom: {old: string, new: string} [] = [];
+
   const updatedPermissions = await Promise.all(page.permissions.map(permission => {
+
+    if (permission.inheritedFromPermission) {
+      newPermissionIdToInheritFrom.push({
+        old: permission.inheritedFromPermission,
+        new: permission.id
+      });
+    }
+
     return createPagePermission({
       ...permission,
       inheritedFromPermission: null
@@ -122,6 +133,28 @@ export async function breakInheritance (pageId: string): Promise<IPageWithPermis
   }));
 
   page.permissions = updatedPermissions;
+
+  const childPages = await resolveChildPages(page.id);
+
+  await Promise.all(newPermissionIdToInheritFrom.map(referenceToUpdate => {
+    return prisma.pagePermission.updateMany({
+      where: {
+        AND: [
+          {
+            OR: childPages.map(child => {
+              return { pageId: child.id };
+            })
+          },
+          {
+            inheritedFromPermission: referenceToUpdate.old
+          }
+        ]
+      },
+      data: {
+        inheritedFromPermission: referenceToUpdate.new
+      }
+    });
+  }));
 
   return page;
 }
