@@ -31,5 +31,13 @@ export function emojiSpec({
       toDOM,
       parseDOM,
     },
+    markdown: {
+      toMarkdown(_, node) {
+        return node.attrs.emoji
+      },
+      parseMarkdown() {
+        return ''
+      }
+    }
   };
 }

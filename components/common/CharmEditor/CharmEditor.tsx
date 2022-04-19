@@ -235,7 +235,6 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 
   const state = new BangleEditorState({
     specRegistry,
-    plugins: charmEditorPlugins(),
     initialValue: Node.fromJSON(specRegistry.schema, content) ?? ''
   });
 

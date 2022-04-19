@@ -102,8 +102,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json(error);
   }
 
-  const updateContent: Prisma.BlockUpdateInput = {
-  };
+  const updateContent: Prisma.BlockUpdateInput = {};
 
   if (requestBodyUpdate.title) {
     updateContent.title = requestBodyUpdate.title;
