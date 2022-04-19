@@ -1,0 +1,13 @@
+diff --git a/node_modules/@bangle.dev/pm/dist/index.js b/node_modules/@bangle.dev/pm/dist/index.js
+index e761acd..a588335 100644
+--- a/node_modules/@bangle.dev/pm/dist/index.js
++++ b/node_modules/@bangle.dev/pm/dist/index.js
+@@ -7,7 +7,6 @@ export * from './keymap';
+ export * from './model';
+ export * from './schema-list';
+ export * from './state';
+-export * from './tables';
+ export * from './transform';
+ export * from './view';
+ //# sourceMappingURL=index.js.map
+\ No newline at end of file

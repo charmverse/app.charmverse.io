@@ -18,7 +18,6 @@ import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
 import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import { useState, CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
@@ -28,6 +27,11 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import AdapterDayjs from '@mui/lab/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers';
+import Textfield from '@mui/material/TextField';
+
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import { Callout, calloutSpec } from './components/Callout';
 import * as columnLayout from './components/columnLayout';
@@ -44,10 +48,28 @@ import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as tabIndent from './components/tabIndent';
 import DocumentEnd from './components/DocumentEnd';
+import * as table from './components/table';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
+}
+
+function LocationTest () {
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DatePicker
+        openTo='day'
+        renderInput={(params) => <Textfield {...params} />}
+        value='12/12/2020'
+        onChange={() => {}}
+
+        // valuedate,
+        // variant='static'
+      />
+    </LocalizationProvider>
+
+  );
 }
 
 export const specRegistry = new SpecRegistry([
@@ -75,10 +97,10 @@ export const specRegistry = new SpecRegistry([
   iframeSpec(), // OK
   heading.spec(), // OK
   inlinePaletteSpecs(), // Not required
-  table, // OK
-  tableCell, // OK
-  tableHeader, // OK
-  tableRow, // OK
+  // table, // OK
+  // tableCell, // OK
+  // tableHeader, // OK
+  // tableRow, // OK
   calloutSpec(), // OK
   cryptoPriceSpec(), // NO
   imageSpec(), // OK
@@ -86,7 +108,13 @@ export const specRegistry = new SpecRegistry([
   columnLayout.columnSpec(), // NO
   nestedPageSpec(), // NO
   quoteSpec(), // OK
-  tabIndent.spec()
+  tabIndent.spec(),
+  table.spec()
+  // tables.tableNodes({
+  //   cellAttributes: { },
+  //   cellContent: 'My Cell',
+  //   cellContentGroup: 'My Group'
+  // })
 ]);
 
 export function charmEditorPlugins (
@@ -168,7 +196,24 @@ export function charmEditorPlugins (
       name: 'mention',
       containerDOM: ['span', { class: 'mention-value' }]
     }),
-    tabIndent.plugins()
+    tabIndent.plugins(),
+    table.tableEditing({ allowTableNodeSelection: true }),
+    table.columnHandles(),
+    table.columnResizing({}),
+    // @ts-ignore missing type
+    table.tablePopUpMenu(),
+    // @ts-ignore missing type
+    table.tableHeadersMenu(),
+    // @ts-ignore missing type
+    table.selectionShadowPlugin(),
+    // @ts-ignore missing type
+    // table.typesEnforcer(),
+    // @ts-ignore missing type
+    // table.TableDateMenu('MM/DD/YYYY'),
+    // @ts-ignore missing type
+    // table.TableLabelMenu(),
+    // @ts-ignore missing type
+    table.TableFiltersMenu()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -301,6 +346,7 @@ function CharmEditor (
         width: '100%',
         height: '100%'
       }}
+      className='czi-editor-frame-body'
       pmViewOpts={{
         editable: () => !readOnly
       }}
@@ -381,6 +427,7 @@ function CharmEditor (
             );
           }
           case 'page': {
+            return <LocationTest />;
             return (
               <NestedPage {...props}>
                 {NodeViewChildren}
