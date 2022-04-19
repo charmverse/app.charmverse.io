@@ -751,6 +751,7 @@ class Mutator {
         newCard.parentId = board.id
         if (cardPage) {
           newCard.fields.content = cardPage.content
+          newCard.fields.contentText = cardPage.contentText
         }
         await this.insertBlocks(
             newBlocks,

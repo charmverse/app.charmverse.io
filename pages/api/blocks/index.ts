@@ -109,7 +109,7 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
           icon: cardBlock.fields.icon,
           type: 'card',
           headerImage: cardBlock.fields.headerImage,
-          contentText: '',
+          contentText: cardBlock.fields.contentText ?? undefined,
           parentId: cardBlock.parentId,
           updatedAt: cardBlock.updatedAt,
           content: cardBlock.fields.content ?? undefined,
@@ -123,6 +123,7 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
           }
         };
         delete cardBlock.fields.content;
+        delete cardBlock.fields.contentText;
         delete cardBlock.fields.headerImage;
         delete cardBlock.fields.icon;
         return cardPage;
