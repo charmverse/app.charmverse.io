@@ -20,7 +20,6 @@ async function main () {
     }
   });
 
-  const charmTextBlockIdsToDelete: Array<string> = [];
   const cardBlockIds = new Set(cardBlocks.map(cardBlock => cardBlock.id));
   const cardPages = await prisma.page.findMany({
     where: {
@@ -121,20 +120,17 @@ async function main () {
       });
       updatedCardPages += 1;
     }
-    if (charmTextBlock) {
-      charmTextBlockIdsToDelete.push(charmTextBlock.id);
-    }
   }
 
   await prisma.block.deleteMany({
     where: {
       id: {
-        in: charmTextBlockIdsToDelete
+        in: charmTextBlocks.map(charmTextBlock => charmTextBlock.id)
       }
     }
   });
 
-  console.log(`Deleted charm_text blocks: ${charmTextBlockIdsToDelete.length}`);
+  console.log(`Deleted charm_text blocks: ${charmTextBlocks.length}`);
   console.log(`Created card pages: ${createdCardPages}`);
   console.log(`Updated card pages: ${updatedCardPages}`);
 }
