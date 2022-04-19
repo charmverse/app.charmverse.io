@@ -58,3 +58,27 @@ export const lightModeColors: BrandColorScheme = {
   pink: '#EB82ED',
   red: '#E37898'
 };
+
+export const darkModeBackgroundColors: BrandColorScheme = {
+  gray: '#2f2f2f',
+  brown: '#4a3229',
+  orange: '#5b3b24',
+  yellow: '#554228',
+  green: '#263e31',
+  blue: '#16394d',
+  purple: '#3b2b49',
+  pink: '#4d2a3b',
+  red: '#512e2a'
+};
+
+export const lightModeBackgroundColors: BrandColorScheme = {
+  gray: '#f1f1ef',
+  brown: '#f4eeee',
+  orange: '#fbecdd',
+  yellow: '#fbf3da',
+  green: '#edf4eb',
+  blue: '#e7f3f7',
+  purple: '#f6f3fa',
+  pink: '#f9f0f5',
+  red: '#fdeaec'
+};

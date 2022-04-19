@@ -32,6 +32,7 @@ import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction,
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import EmojiIcon from 'components/common/Emoji';
+import MuiLink from 'components/common/Link';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
@@ -161,7 +162,7 @@ export const StyledPageIcon = styled(EmojiIcon)`
   }
 `;
 
-export const PageTitle = styled(Typography) <{ isempty?: number }>`
+export const PageTitle = styled(Typography)<{ isempty?: number }>`
   color: inherit;
   display: flex;
   align-items: center;
@@ -195,6 +196,11 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
     event.stopPropagation();
   }
 
+  function preventDefault (event: SyntheticEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
   const popupState = usePopupState({
     popupId: 'page-emoji',
     variant: 'popover'
@@ -202,47 +208,48 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
 
   const triggerState = bindTrigger(popupState);
   return (
-    <PageAnchor onClick={stopPropagation}>
-      {labelIcon && (
-        // No need to show hover style if we are not showing the picker when the icon is clicked
-        <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
-      )}
-      <Link passHref href={href}>
+    <Link passHref href={href}>
+      <PageAnchor onClick={stopPropagation}>
+        {labelIcon && (
+          <span onClick={preventDefault}>
+            <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
+          </span>
+        )}
         <PageTitle isempty={isempty ? 1 : 0}>
           {isempty ? 'Untitled' : label}
         </PageTitle>
-      </Link>
-      {children}
-      {showPicker && (
-      <Menu {...bindMenu(popupState)}>
-        <EmojiPicker onSelect={async (emoji) => {
-          if (pageId) {
-            await charmClient.updatePage({
-              id: pageId,
-              icon: emoji
-            });
-            setPages(_pages => ({
-              ..._pages,
-              [pageId]: {
-                ..._pages[pageId]!,
-                icon: emoji
+        {children}
+        {showPicker && (
+          <Menu {...bindMenu(popupState)}>
+            <EmojiPicker onSelect={async (emoji) => {
+              if (pageId) {
+                await charmClient.updatePage({
+                  id: pageId,
+                  icon: emoji
+                });
+                setPages(_pages => ({
+                  ..._pages,
+                  [pageId]: {
+                    ..._pages[pageId]!,
+                    icon: emoji
+                  }
+                }));
+                if (boardId) {
+                  await mutator.changeIcon(boardId, emoji, emoji);
+                }
+                popupState.close();
               }
-            }));
-            if (boardId) {
-              await mutator.changeIcon(boardId, emoji, emoji);
-            }
-            popupState.close();
-          }
 
-          if (boardId) {
-            await mutator.changeIcon(boardId, emoji, emoji);
-          }
-          popupState.close();
-        }}
-        />
-      </Menu>
-      )}
-    </PageAnchor>
+              if (boardId) {
+                await mutator.changeIcon(boardId, emoji, emoji);
+              }
+              popupState.close();
+            }}
+            />
+          </Menu>
+        )}
+      </PageAnchor>
+    </Link>
   );
 }
 
