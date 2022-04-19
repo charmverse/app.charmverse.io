@@ -166,6 +166,11 @@
 //  top toggle buttons
 .ProseMirror {
 
+  // disable - for some reason selecting the whole table doesnt work
+  .tableHandle {
+    display: none;
+  }
+
   .tableScrollWrapper {
     padding-top: 0;
     padding-bottom: 0;
