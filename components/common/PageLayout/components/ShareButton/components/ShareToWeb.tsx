@@ -65,7 +65,7 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
     if (isPublic === false) {
       setShareLink(null);
     }
-    else if (currentPage?.type === 'page') {
+    else if (currentPage?.type === 'page' || currentPage?.type === 'card') {
       const shareLinkToSet = (typeof window !== 'undefined')
         ? `${window.location.origin}/share/${currentPageId}` : '';
       setShareLink(shareLinkToSet);
