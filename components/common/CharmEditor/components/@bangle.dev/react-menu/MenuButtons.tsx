@@ -12,17 +12,17 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { EditorState, PluginKey } from '@bangle.dev/pm';
+import { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
 import { HintPos } from '@bangle.dev/react-menu/dist/types';
 import {
-  defaultKeys as floatingMenuKeys, focusFloatingMenuInput, toggleLinkSubMenu
+  defaultKeys as floatingMenuKeys, focusFloatingMenuInput, toggleInlineCommentSubMenu, toggleLinkSubMenu
 } from '@bangle.dev/react-menu/floating-menu';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import React, { useCallback } from 'react';
-import { queryIsHighlightActive, toggleHighlight } from '../../InlineComment';
+import { createInlineComment, queryIsInlineCommentActive, toggleInlineComment } from '../../InlineComment';
 import { MenuButton } from './Icon';
 
 const {
@@ -93,35 +93,49 @@ export function BoldButton({
   );
 }
 
-export function CommentButton({
+export function InlineCommentButton({
   hints = ['Inline comment'],
   hintPos = 'top',
   children = <ChatBubbleIcon sx={{
     fontSize: 12,
     position: "relative"
   }}/>,
+  menuKey,
   ...props
-}: ButtonProps) {
+}: ButtonProps & {menuKey: PluginKey}) {
   const view = useEditorViewContext();
-  const onSelect = useCallback(
+  const onMouseDown = useCallback(
     (e) => {
       e.preventDefault();
-      if (toggleHighlight()(view.state, view.dispatch, view)) {
-        view.focus();
+      const command = filter(
+        (state: EditorState) => createInlineComment()(state),
+        (_state, dispatch, view) => {
+          if (dispatch) {
+            toggleInlineCommentSubMenu(menuKey)(view!.state, view!.dispatch, view);
+            rafCommandExec(view!, focusFloatingMenuInput(menuKey));
+          }
+          return true;
+        },
+      );
+      if (command(view.state, view.dispatch, view)) {
+        if (view.dispatch as any) {
+          view.focus();
+        }
       }
     },
-    [view],
+    [view, menuKey],
   );
+
   return (
     <MenuButton
       {...props}
       hintPos={hintPos}
-      onMouseDown={onSelect}
+      onMouseDown={onMouseDown}
       hints={hints}
       // Figure out when the button will be active
-      isActive={queryIsHighlightActive()(view.state)}
+      isActive={queryIsInlineCommentActive()(view.state)}
       // Figure out when the button will be disabled
-      isDisabled={!view.editable || !toggleHighlight()(view.state)}
+      isDisabled={!view.editable || !toggleInlineComment()(view.state)}
     >
       {children}
     </MenuButton>

@@ -3,13 +3,14 @@ import { PluginKey } from '@bangle.dev/core';
 import { Node, ResolvedPos } from '@bangle.dev/pm';
 import { FloatingMenu, floatingMenu } from '@bangle.dev/react-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
-import Snackbar from 'components/common/Snackbar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { NodeSelection } from 'prosemirror-state';
+import { InlineCommentSubMenu } from './@bangle.dev/react-menu/InlineCommentMenu';
 import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
-import { BoldButton, CalloutButton, CodeButton, CommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
+import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
+import { queryIsInlineCommentActive, queryIsSelectionAroundInlineComment } from './InlineComment';
 
 const menuKey = new PluginKey('menuKey');
 
@@ -30,7 +31,7 @@ export default function FloatingMenuComponent () {
                 <StrikeButton />
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={menuKey} />
-                <CommentButton />
+                <InlineCommentButton menuKey={menuKey} />
               </MenuGroup>
               <MenuGroup isLastGroup>
                 <ParagraphButton />
@@ -46,6 +47,13 @@ export default function FloatingMenuComponent () {
           return (
             <Menu>
               <LinkSubMenu showMessage={showMessage} />
+            </Menu>
+          );
+        }
+        if (type === 'inlineCommentSubMenu') {
+          return (
+            <Menu>
+              <InlineCommentSubMenu />
             </Menu>
           );
         }
@@ -68,7 +76,15 @@ export const floatingMenuPlugin = (readonly?: boolean) => {
         )) {
         return null;
       }
-      // If were are inside a link
+
+      // If we are inside an inline comment
+      if (hasComponentInSchema(state, 'inline-comment')) {
+        if (queryIsSelectionAroundInlineComment()(state) || queryIsInlineCommentActive()(state)) {
+          return 'inlineCommentSubMenu';
+        }
+      }
+
+      // If we are inside a link
       if (hasComponentInSchema(state, 'link')) {
         if (
           link.queryIsSelectionAroundLink()(state)

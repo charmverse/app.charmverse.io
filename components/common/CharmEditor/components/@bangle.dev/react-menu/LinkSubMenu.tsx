@@ -7,6 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import SaveIcon from '@mui/icons-material/Save';
 import { Box } from '@mui/material';
+import { MenuInput } from 'components/common/MenuInput';
 import React, { useRef, useState } from 'react';
 import { MenuButton } from './Icon';
 
@@ -28,16 +29,6 @@ export function LinkSubMenu({ showMessage, getIsTop = () => true }: {showMessage
     />
   );
 }
-
-const StyledInput = styled.input`
-  background: ${({theme}) => theme.palette.background.default};
-  outline: none;
-  border: none;
-  border-radius: ${({theme}) => theme.spacing(0.5)};
-  padding: ${({theme}) => theme.spacing(1)};
-  color: inherit;
-  font-size: 16px;
-`
 
 function LinkMenu({
   getIsTop,
@@ -63,7 +54,7 @@ function LinkMenu({
     <Box sx={{
       display: "flex"
     }}>
-      <StyledInput
+      <MenuInput
         value={href}
         ref={inputRef}
         onKeyDown={(e) => {
