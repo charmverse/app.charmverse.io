@@ -3,15 +3,10 @@ import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey } fr
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
 import { useTheme } from '@emotion/react';
-import { Box, Button, ClickAwayListener, Divider, ListItem, ListItemAvatar, ListItemText, TextField, Typography } from '@mui/material';
+import { Box, Button, ClickAwayListener, ListItem, TextField, Typography } from '@mui/material';
 import List from '@mui/material/List';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
-import { useSWRConfig } from 'swr';
-import { Web3Provider } from '@ethersproject/providers';
-import { useWeb3React } from '@web3-react/core';
-import user from 'components/common/BoardEditor/focalboard/src/components/properties/user/user';
-import { getDisplayName } from 'lib/users';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { useState } from 'react';
 import styled from '@emotion/styled';
@@ -144,8 +139,8 @@ export function InlineCommentThread () {
                   }}
                   >
                     <ReviewerOption user={comment.user as any} avatarSize='small' />
-                    <Typography color='secondary' variant='subtitle1'>
-                      {new Date(comment.createdAt).toLocaleDateString()}
+                    <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
+                      {new Date(comment.createdAt).toLocaleString()}
                     </Typography>
                   </Box>
                   {commentIndex === 0 && (

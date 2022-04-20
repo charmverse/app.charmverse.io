@@ -13,19 +13,15 @@ handler.use(requireUser)
   .delete(requirePagePermissions(['edit_content'], deleteComment));
 
 async function editComment (req: NextApiRequest, res: NextApiResponse) {
-
   const { content } = req.body as {
     content: string,
   };
 
   const commentId = req.query.id as string;
 
-  const userId = req.session.user.id;
-
   const comment = await prisma.comment.update({
     where: {
-      id: commentId,
-      userId
+      id: commentId
     },
     data: {
       content

@@ -5,6 +5,7 @@ import charmClient from 'charmClient';
 import { MenuInput } from 'components/common/MenuInput';
 import { usePages } from 'hooks/usePages';
 import React, { useRef, useState } from 'react';
+import { mutate } from 'swr';
 import { updateInlineComment } from '../../InlineComment';
 import { MenuButton } from './Icon';
 
@@ -23,6 +24,7 @@ export function InlineCommentSubMenu() {
         context: view.state.doc.cut(view.state.selection.from, view.state.selection.to).textContent,
         pageId: currentPageId
       });
+      mutate(`pages/${currentPageId}/threads`)
       updateInlineComment(thread.id)(view.state, view.dispatch);
       view.focus();
     }
