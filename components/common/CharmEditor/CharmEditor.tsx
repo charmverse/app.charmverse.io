@@ -55,23 +55,6 @@ export interface ICharmEditorOutput {
   rawText: string
 }
 
-function LocationTest () {
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DatePicker
-        openTo='day'
-        renderInput={(params) => <Textfield {...params} />}
-        value='12/12/2020'
-        onChange={() => {}}
-
-        // valuedate,
-        // variant='static'
-      />
-    </LocalizationProvider>
-
-  );
-}
-
 export const specRegistry = new SpecRegistry([
   // Comments to the right of each spec show if it supports markdown export
   // OK => Component exports markdown
@@ -427,7 +410,6 @@ function CharmEditor (
             );
           }
           case 'page': {
-            return <LocationTest />;
             return (
               <NestedPage {...props}>
                 {NodeViewChildren}
