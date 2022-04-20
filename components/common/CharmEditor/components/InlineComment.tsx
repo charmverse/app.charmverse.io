@@ -3,7 +3,7 @@ import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey } fr
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
 import { useTheme } from '@emotion/react';
-import { Box, Button, ClickAwayListener, IconButton, ListItem, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, Button, ClickAwayListener, Divider, IconButton, ListItem, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import List from '@mui/material/List';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
@@ -15,6 +15,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
 import { hideSuggestionsTooltip, renderSuggestionsTooltip, SuggestTooltipPluginKey, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'inline-comment';
@@ -150,6 +151,45 @@ export function InlineCommentThread () {
       >
         <Box p={2} sx={{ background: theme.palette.background.light, minWidth: 500, maxHeight: 350 }}>
           <Box maxHeight={270} pr={1} overflow='auto'>
+            <Box justifyContent='space-between' display='flex' alignItems='center' mb={1}>
+              <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
+                Started at {new Date(thread.createdAt).toLocaleString()}
+              </Typography>
+              <Box display='flex' gap={1}>
+                <Button
+                  sx={{
+                    '.MuiButton-startIcon': {
+                      mr: 0.5
+                    }
+                  }}
+                  startIcon={(
+                    <CheckIcon
+                      fontSize='small'
+                    />
+                )}
+                  variant='outlined'
+                  color='secondary'
+                  size='small'
+                >Resolve
+                </Button>
+                <Button
+                  sx={{
+                    '.MuiButton-startIcon': {
+                      mr: 0.25
+                    }
+                  }}
+                  startIcon={(
+                    <DeleteIcon
+                      fontSize='small'
+                    />
+                  )}
+                  variant='outlined'
+                  color='secondary'
+                  size='small'
+                >Delete
+                </Button>
+              </Box>
+            </Box>
             {thread.Comment.map((comment, commentIndex) => {
               return (
                 <List
