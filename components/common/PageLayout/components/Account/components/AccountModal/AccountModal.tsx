@@ -74,7 +74,7 @@ function AccountModal ({ isOpen, onClose }:
           setUser({ ...user, ...updatedUserFields });
         })
         .catch((err) => {
-          setDiscordError(err.error || 'Something went wrong. Please try again');
+          setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
         })
         .finally(() => {
           setIsConnectDiscordLoading(false);
@@ -128,7 +128,7 @@ function AccountModal ({ isOpen, onClose }:
         setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: null }));
       }
       catch (err: any) {
-        setTelegramError(err.error || 'Something went wrong. Please try again');
+        setTelegramError(err.message || err.error || 'Something went wrong. Please try again');
       }
       setIsConnectingTelegram(false);
     }
@@ -143,7 +143,7 @@ function AccountModal ({ isOpen, onClose }:
           setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
         }
         catch (err: any) {
-          setTelegramError(err.error || 'Something went wrong. Please try again');
+          setTelegramError(err.message || err.error || 'Something went wrong. Please try again');
         }
       }
       else {
