@@ -7,6 +7,7 @@ import { findOrCreateRolesFromDiscord, DiscordServerRole } from 'lib/discord/cre
 import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
 import { DiscordUser } from '@prisma/client';
 import log from 'lib/log';
+import { prisma } from 'db';
 import { getDiscordAccount, DiscordAccount } from 'lib/discord/getDiscordAccount';
 
 const handler = nc({
