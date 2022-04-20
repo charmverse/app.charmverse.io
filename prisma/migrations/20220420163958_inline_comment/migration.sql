@@ -5,6 +5,7 @@ CREATE TABLE "Thread" (
     "pageId" UUID NOT NULL,
     "context" TEXT NOT NULL,
     "userId" UUID NOT NULL,
+    "resolved" BOOLEAN NOT NULL,
 
     CONSTRAINT "Thread_pkey" PRIMARY KEY ("id")
 );

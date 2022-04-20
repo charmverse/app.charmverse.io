@@ -31,6 +31,7 @@ async function startThread (req: NextApiRequest, res: NextApiResponse) {
 
   const thread = await prisma.thread.create({
     data: {
+      resolved: false,
       context,
       page: {
         connect: {

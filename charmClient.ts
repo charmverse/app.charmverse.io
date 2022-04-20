@@ -21,6 +21,7 @@ import { TelegramAccount } from 'pages/api/telegram/connect';
 import { StartThreadRequest, StartThreadResponse } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
+import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -514,6 +515,10 @@ class CharmClient {
 
   deleteThread (threadId: string) {
     return http.DELETE(`/api/threads/${threadId}`);
+  }
+
+  updateThread (threadId: string, request: UpdateThreadRequest) {
+    return http.PUT(`/api/threads/${threadId}`, request);
   }
 
   addComment (request: AddCommentRequest): Promise<CommentWithUser> {

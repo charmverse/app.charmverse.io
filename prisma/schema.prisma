@@ -347,6 +347,7 @@ model Thread {
   userId    String    @db.Uuid()
   user      User      @relation(fields: [userId], references: [id])
   Comment   Comment[]
+  resolved  Boolean
 }
 
 model Comment {
