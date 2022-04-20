@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { ReactNode, useEffect, useRef } from 'react';
-import { safeScrollIntoViewIfNeeded } from 'components/common/CharmEditor/utility';
+import { safeScrollIntoViewIfNeeded } from 'lib/browser';
 
 
 export interface ItemType {

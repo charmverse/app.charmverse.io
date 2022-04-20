@@ -1,9 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import { Box } from '@mui/material'
-import { BountyStatusColours } from 'components/bounties/BountyCard'
+import { BountyStatusColours } from 'components/bounties/BountyStatusBadge'
 import { useBounties } from 'hooks/useBounties'
-import millify from "millify"
 import { BOUNTY_LABELS } from 'models'
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
 import Image from 'next/image'

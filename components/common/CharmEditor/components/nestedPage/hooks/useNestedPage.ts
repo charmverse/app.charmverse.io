@@ -1,9 +1,9 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
 import { Page } from '@prisma/client';
-import { insertNode } from 'components/common/CharmEditor/components/@bangle.io/extensions/inline-command-palette/use-editor-items';
+import { insertNode } from 'components/common/CharmEditor/utils';
 import { useCallback } from 'react';
-import { usePages } from './usePages';
+import { usePages } from 'hooks/usePages';
 
 export default function useNestedPage () {
   const { currentPageId, addPage, pages } = usePages();

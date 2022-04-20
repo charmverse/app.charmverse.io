@@ -1,22 +1,18 @@
-import { PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { BaseEmoji, Picker } from 'emoji-mart';
 import { useCallback } from 'react';
 import Portal from '@mui/material/Portal';
-import { selectEmoji } from './EmojiSuggest.plugin';
+import { selectEmoji } from './emojiSuggest.plugins';
+import { pluginKey } from './emojiSuggest.constants';
 
-export function EmojiSuggest ({
-  emojiSuggestKey
-}: {
-  emojiSuggestKey: PluginKey;
-}) {
+export default function EmojiSuggest () {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
     suggestTooltipKey
-  } = usePluginState(emojiSuggestKey);
+  } = usePluginState(pluginKey);
 
   const {
     show: isVisible
@@ -35,10 +31,10 @@ export function EmojiSuggest ({
 
   const onSelectEmoji = useCallback(
     (emojiAlias: string) => {
-      selectEmoji(emojiSuggestKey, emojiAlias)(view.state, view.dispatch, view);
+      selectEmoji(pluginKey, emojiAlias)(view.state, view.dispatch, view);
       closeTooltip();
     },
-    [view, emojiSuggestKey]
+    [view, pluginKey]
   );
 
   return isVisible && (

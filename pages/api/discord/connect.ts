@@ -1,7 +1,5 @@
 import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import * as http from 'adapters/http';
-import { prisma } from 'db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
@@ -9,8 +7,8 @@ import { findOrCreateRolesFromDiscord, DiscordServerRole } from 'lib/discord/cre
 import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
 import { DiscordUser } from '@prisma/client';
 import log from 'lib/log';
-import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
-import { DiscordAccount } from 'lib/discord/loginByDiscord';
+import { prisma } from 'db';
+import { getDiscordAccount, DiscordAccount } from 'lib/discord/getDiscordAccount';
 
 const handler = nc({
   onError,

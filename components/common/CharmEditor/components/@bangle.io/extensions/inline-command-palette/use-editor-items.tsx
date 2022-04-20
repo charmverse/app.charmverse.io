@@ -4,7 +4,7 @@ import {
 } from '@bangle.dev/base-components';
 import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { TextSelection } from 'prosemirror-state';
-import { rafCommandExec, safeInsert } from '@bangle.dev/utils';
+import { rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import CodeIcon from '@mui/icons-material/Code';
@@ -21,8 +21,8 @@ import TextFieldsIcon from '@mui/icons-material/TextFields';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { renderSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
-import { NestedPagePluginKey } from 'components/common/CharmEditor/components/NestedPage';
-import useNestedPage from 'hooks/useNestedPage';
+import { NestedPagePluginKey } from 'components/common/CharmEditor/components/nestedPage/nestedPage';
+import useNestedPage from 'components/common/CharmEditor/components/nestedPage/hooks/useNestedPage';
 import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 import { useMemo } from 'react';
 import { replaceSuggestionMarkWith } from '../../js-lib/inline-palette';
@@ -31,6 +31,7 @@ import {
 } from './commands';
 import { palettePluginKey } from './config';
 import { PaletteItem, PaletteItemType, PromisedCommand } from './palette-item';
+import { insertNode } from 'components/common/CharmEditor/utils';
 
 const { convertToParagraph } = paragraph;
 const {
@@ -60,23 +61,6 @@ function createTableHeader(state: EditorState, text: string) {
       state.schema.text(text)
     ]))
   ]))
-}
-
-export function insertNode(state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node) {
-  const insertPos = state.selection.$from.after();
-
-  const tr = state.tr;
-  const newTr = safeInsert(nodeToInsert, insertPos)(state.tr);
-
-  if (tr === newTr) {
-    return false;
-  }
-
-  if (dispatch) {
-    dispatch(newTr.scrollIntoView());
-  }
-
-  return true;
 }
 
 function createColumnPaletteItem(colCount: number): Omit<PaletteItemType, "group"> {
