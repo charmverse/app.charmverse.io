@@ -30,6 +30,7 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
       }
 
       <Select
+        size='small'
         value={value}
         onChange={(ev) => {
           setValue(ev.target.value as string);

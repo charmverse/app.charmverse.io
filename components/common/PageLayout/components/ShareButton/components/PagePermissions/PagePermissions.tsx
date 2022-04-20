@@ -168,6 +168,7 @@ export default function PagePermissions ({ pageId }: Props) {
         <Box mb={1} onClick={() => popupState.open()}>
           <StyledInput
             placeholder='Add people and roles'
+            size='small'
             fullWidth
             readOnly
             endAdornment={(

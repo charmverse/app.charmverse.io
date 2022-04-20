@@ -18,8 +18,11 @@ const StyledInput = styled(Input)`
   padding-left: 1em;
 `;
 
-const LinkBox = styled(Box)`
-  background: ${({ theme }) => theme.palette.background.dark};
+const CopyButton = styled((props: any) => <Button color='secondary' variant='outlined' size='small' {...props} />)`
+  border-radius: 0;
+  border-right-color: transparent;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
 `;
 
 export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPagePermissionFlags, }) {
@@ -106,20 +109,20 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
       <Collapse in={isPublic}>
         {
           shareLink && (
-          <LinkBox p={1}>
+          <Box p={1}>
             <StyledInput
               fullWidth
               disableUnderline
               value={shareLink}
               endAdornment={(
                 <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                  <Button color='secondary' variant='text' size='small'>
+                  <CopyButton>
                     {copied ? 'Copied!' : 'Copy'}
-                  </Button>
+                  </CopyButton>
                 </CopyToClipboard>
             )}
             />
-          </LinkBox>
+          </Box>
           )
         }
       </Collapse>
