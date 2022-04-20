@@ -5,20 +5,27 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { prisma } from 'db';
+import { Thread } from '@prisma/client';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .post(requireKeys(['context', 'pageId', 'content'], 'body'), requirePagePermissions(['edit_content'], startThread))
-  .delete(requirePagePermissions(['edit_content'], deleteThread));
+  .post(requireKeys(['context', 'pageId', 'content'], 'body'), requirePagePermissions(['edit_content'], startThread));
+
+export interface StartThreadRequest {
+  content: string,
+  pageId: string,
+  context: string
+}
+
+export interface StartThreadResponse {
+  comment: Comment
+  thread: Thread
+}
 
 async function startThread (req: NextApiRequest, res: NextApiResponse) {
 
-  const { content, context, pageId } = req.body as {
-    content: string,
-    pageId: string,
-    context: string
-  };
+  const { content, context, pageId } = req.body as StartThreadRequest;
 
   const userId = req.session.user.id;
 
@@ -58,15 +65,6 @@ async function startThread (req: NextApiRequest, res: NextApiResponse) {
     comment,
     thread
   });
-}
-
-async function deleteThread (req: NextApiRequest, res: NextApiResponse) {
-  await prisma.thread.delete({
-    where: {
-      id: req.query.id as string
-    }
-  });
-  return res.status(200).json({ ok: true });
 }
 
 export default withSessionRoute(handler);

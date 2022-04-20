@@ -18,6 +18,7 @@ import type { FailedImportsError } from 'lib/notion/types';
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
+import { StartThreadRequest, StartThreadResponse } from 'pages/api/threads';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -503,6 +504,22 @@ class CharmClient {
 
   deletePermission (permissionId: string): Promise<boolean> {
     return http.DELETE('/api/permissions', { permissionId });
+  }
+
+  startThread (request: StartThreadRequest): Promise<StartThreadResponse> {
+    return http.POST('/api/threads', request);
+  }
+
+  deleteThread (threadId: string) {
+    return http.DELETE(`/api/threads/${threadId}`);
+  }
+
+  editComment (commentId: string, content: string): Promise<Comment> {
+    return http.POST(`/api/comments/${commentId}`, { content });
+  }
+
+  deleteComment (commentId: string) {
+    return http.DELETE(`/api/comments/${commentId}`);
   }
 }
 
