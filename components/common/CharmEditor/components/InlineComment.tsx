@@ -3,7 +3,7 @@ import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey } fr
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
 import { useTheme } from '@emotion/react';
-import { Box, Button, ClickAwayListener, ListItem, ListItemAvatar, ListItemText, TextField, Typography } from '@mui/material';
+import { Box, Button, ClickAwayListener, Divider, ListItem, ListItemAvatar, ListItemText, TextField, Typography } from '@mui/material';
 import List from '@mui/material/List';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
@@ -14,6 +14,8 @@ import user from 'components/common/BoardEditor/focalboard/src/components/proper
 import { getDisplayName } from 'lib/users';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { useState } from 'react';
+import styled from '@emotion/styled';
+import charmClient from 'charmClient';
 import { hideSuggestionsTooltip, renderSuggestionsTooltip, SuggestTooltipPluginKey, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'inline-comment';
@@ -76,8 +78,19 @@ export function inlineCommentPlugin (): RawPlugins {
   ];
 }
 
+const ContextBorder = styled.div`
+  width: 3px;
+  height: 22px;
+  border-radius: 3px;
+  margin-left: 2px;
+  margin-right: 8px;
+  background: rgba(255, 212, 0, 0.8);
+  flex-shrink: 0;
+  padding-bottom: 2px;
+`;
+
 export function InlineCommentThread () {
-  const { threads } = useThreads();
+  const { threads, setThreads } = useThreads();
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -90,6 +103,23 @@ export function InlineCommentThread () {
   const theme = useTheme();
   const [commentText, setCommentText] = useState('');
 
+  async function addComment () {
+    if (thread) {
+      const comment = await charmClient.addComment({
+        content: commentText,
+        threadId: thread.id
+      });
+
+      setCommentText('');
+
+      setThreads((_threads) => ({ ..._threads,
+        [thread.id]: {
+          ...thread,
+          Comment: [...thread.Comment, comment]
+        } }));
+    }
+  }
+
   if (isVisible && component === 'inlineComment' && thread) {
     return createPortal(
       <ClickAwayListener onClickAway={() => {
@@ -97,7 +127,7 @@ export function InlineCommentThread () {
       }}
       >
         <Box p={2} sx={{ background: theme.palette.background.light, minWidth: 500 }}>
-          {thread.Comment.map(comment => {
+          {thread.Comment.map((comment, commentIndex) => {
             return (
               <List key={comment.id}>
                 <ListItem sx={{
@@ -105,29 +135,33 @@ export function InlineCommentThread () {
                   flexDirection: 'column',
                   alignItems: 'flex-start',
                   padding: 0,
-                  marginBottom: 2
+                  gap: 1
                 }}
                 >
-                  <div>
-                    <Box sx={{
-                      display: 'flex',
-                      gap: 1
-                    }}
-                    >
-                      <ReviewerOption user={comment.user as any} avatarSize='small' />
-                      <Typography color='secondary' variant='subtitle1'>
-                        {new Date(comment.createdAt).toLocaleDateString()}
-                      </Typography>
+                  <Box sx={{
+                    display: 'flex',
+                    gap: 1
+                  }}
+                  >
+                    <ReviewerOption user={comment.user as any} avatarSize='small' />
+                    <Typography color='secondary' variant='subtitle1'>
+                      {new Date(comment.createdAt).toLocaleDateString()}
+                    </Typography>
+                  </Box>
+                  {commentIndex === 0 && (
+                    <Box pl={4} display='flex'>
+                      <ContextBorder />
+                      <Typography fontWeight={600} color='secondary'>{thread.context}</Typography>
                     </Box>
-                    <Typography my={0.5} pl={4}>{comment.content}</Typography>
-                  </div>
+                  )}
+                  <Typography pl={4}>{comment.content}</Typography>
                 </ListItem>
               </List>
             );
           })}
-          <Box display='flex' gap={1}>
+          <Box display='flex' gap={1} mt={1}>
             <TextField placeholder='Add a comment...' fullWidth size='small' onChange={(e) => setCommentText(e.target.value)} value={commentText} />
-            <Button>Add</Button>
+            <Button onClick={() => addComment()}>Add</Button>
           </Box>
         </Box>
       </ClickAwayListener>,

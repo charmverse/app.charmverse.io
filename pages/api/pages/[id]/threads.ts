@@ -11,10 +11,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser)
   .get(getThreads);
 
+export type CommentWithUser = (Comment & {
+  user: User;
+})
+
 export type ThreadWithComments = Thread & {
-  Comment: (Comment & {
-      user: User;
-  })[];
+  Comment: CommentWithUser[]
 }
 
 async function getThreads (req: NextApiRequest, res: NextApiResponse) {

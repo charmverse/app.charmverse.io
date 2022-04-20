@@ -19,7 +19,8 @@ import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/impor
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { StartThreadRequest, StartThreadResponse } from 'pages/api/threads';
-import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { AddCommentRequest } from 'pages/api/comments';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -515,7 +516,11 @@ class CharmClient {
     return http.DELETE(`/api/threads/${threadId}`);
   }
 
-  editComment (commentId: string, content: string): Promise<Comment> {
+  addComment (request: AddCommentRequest): Promise<CommentWithUser> {
+    return http.POST('/api/comments', request);
+  }
+
+  editComment (commentId: string, content: string): Promise<CommentWithUser> {
     return http.POST(`/api/comments/${commentId}`, { content });
   }
 
