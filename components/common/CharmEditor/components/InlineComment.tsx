@@ -8,12 +8,13 @@ import List from '@mui/material/List';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import charmClient from 'charmClient';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import EditIcon from '@mui/icons-material/Edit';
 import { hideSuggestionsTooltip, renderSuggestionsTooltip, SuggestTooltipPluginKey, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'inline-comment';
@@ -100,11 +101,12 @@ export function InlineCommentThread () {
   const thread = threadId && threads[threadId];
   const theme = useTheme();
   const [commentText, setCommentText] = useState('');
-  const [isAddingComment, setIsAddingComment] = useState(false);
+  const [isMutatingComment, setIsMutatingComment] = useState(false);
+  const [editedComment, setEditedComment] = useState<null | string>(null);
 
   async function addComment () {
-    if (thread && !isAddingComment) {
-      setIsAddingComment(true);
+    if (thread && !isMutatingComment) {
+      setIsMutatingComment(true);
       const comment = await charmClient.addComment({
         content: commentText,
         threadId: thread.id
@@ -117,7 +119,22 @@ export function InlineCommentThread () {
           ...thread,
           Comment: [...thread.Comment, comment]
         } }));
-      setIsAddingComment(false);
+      setIsMutatingComment(false);
+    }
+  }
+
+  async function editComment () {
+    if (thread && editedComment && !isMutatingComment) {
+      setIsMutatingComment(true);
+      await charmClient.editComment(editedComment, commentText);
+      setThreads((_threads) => ({ ..._threads,
+        [thread.id]: {
+          ...thread,
+          Comment: thread.Comment.map(comment => comment.id === editedComment ? ({ ...comment, content: commentText }) : comment)
+        } }));
+      setCommentText('');
+      setEditedComment(null);
+      setIsMutatingComment(false);
     }
   }
 
@@ -127,80 +144,98 @@ export function InlineCommentThread () {
     return createPortal(
       <ClickAwayListener onClickAway={() => {
         hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
+        setCommentText('');
+        setEditedComment(null);
       }}
       >
-        <Box p={2} sx={{ background: theme.palette.background.light, minWidth: 500 }}>
-          {thread.Comment.map((comment, commentIndex) => {
-            return (
-              <List
-                key={comment.id}
-                sx={{
-                  '.comment-actions': {
-                    opacity: 0
-                  },
-                  '&:hover .comment-actions': {
-                    opacity: 1
-                  }
-                }}
-              >
-                <ListItem sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  padding: 0
-                }}
+        <Box p={2} sx={{ background: theme.palette.background.light, minWidth: 500, maxHeight: 350 }}>
+          <Box maxHeight={270} pr={1} overflow='auto'>
+            {thread.Comment.map((comment, commentIndex) => {
+              return (
+                <List
+                  key={comment.id}
+                  sx={{
+                    '.comment-actions': {
+                      opacity: 0
+                    },
+                    '&:hover .comment-actions': {
+                      opacity: 1
+                    }
+                  }}
                 >
-                  <Box display='flex' width='100%' justifyContent='space-between'>
-                    <Box sx={{
-                      display: 'flex',
-                      gap: 1
-                    }}
-                    >
-                      <ReviewerOption user={comment.user as any} avatarSize='small' />
-                      <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
-                        {new Date(comment.createdAt).toLocaleString()}
-                      </Typography>
-                    </Box>
-                    <IconButton size='small' {...bindTrigger(popupState)} className='comment-actions'>
-                      <MoreHorizIcon color='secondary' fontSize='small' />
-                    </IconButton>
-                  </Box>
-                  {commentIndex === 0 && (
-                    <Box my={1} pl={4} display='flex'>
-                      <ContextBorder />
-                      <Typography fontWeight={600} color='secondary'>{thread.context}</Typography>
-                    </Box>
-                  )}
-                  <Typography pl={4}>{comment.content}</Typography>
-                </ListItem>
-                <Menu {...bindMenu(popupState)}>
-                  <MenuItem
-                    sx={{ padding: '3px 12px' }}
-                    onClick={async () => {
-                      await charmClient.deleteComment(comment.id);
-                      const threadWithoutComment = {
-                        ...thread,
-                        Comment: thread.Comment.filter(_comment => _comment.id !== comment.id)
-                      };
-                      setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
-                      popupState.close();
-                    }}
+                  <ListItem sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    padding: 0
+                  }}
                   >
-                    <DeleteIcon
-                      fontSize='small'
-                      sx={{
-                        mr: 1
+                    <Box display='flex' width='100%' justifyContent='space-between'>
+                      <Box sx={{
+                        display: 'flex',
+                        gap: 1
                       }}
-                    />
-                    <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
-                  </MenuItem>
-                </Menu>
-              </List>
-            );
-          })}
+                      >
+                        <ReviewerOption user={comment.user as any} avatarSize='small' />
+                        <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
+                          {new Date(comment.createdAt).toLocaleString()}
+                        </Typography>
+                      </Box>
+                      <IconButton size='small' {...bindTrigger(popupState)} className='comment-actions'>
+                        <MoreHorizIcon color='secondary' fontSize='small' />
+                      </IconButton>
+                    </Box>
+                    {commentIndex === 0 && (
+                      <Box my={1} pl={4} display='flex'>
+                        <ContextBorder />
+                        <Typography fontWeight={600} color='secondary'>{thread.context}</Typography>
+                      </Box>
+                    )}
+                    <Typography pl={4}>{comment.content}</Typography>
+                  </ListItem>
+                  <Menu {...bindMenu(popupState)}>
+                    <MenuItem
+                      onClick={async () => {
+                        setEditedComment(comment.id);
+                        setCommentText(comment.content);
+                        popupState.close();
+                      }}
+                    >
+                      <EditIcon
+                        fontSize='small'
+                        sx={{
+                          mr: 1
+                        }}
+                      />
+                      <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Edit</Typography>
+                    </MenuItem>
+                    <MenuItem
+                      onClick={async () => {
+                        await charmClient.deleteComment(comment.id);
+                        const threadWithoutComment = {
+                          ...thread,
+                          Comment: thread.Comment.filter(_comment => _comment.id !== comment.id)
+                        };
+                        setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
+                        popupState.close();
+                      }}
+                    >
+                      <DeleteIcon
+                        fontSize='small'
+                        sx={{
+                          mr: 1
+                        }}
+                      />
+                      <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
+                    </MenuItem>
+                  </Menu>
+                </List>
+              );
+            })}
+          </Box>
           <Box display='flex' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
             <TextField placeholder='Add a comment...' fullWidth size='small' onChange={(e) => setCommentText(e.target.value)} value={commentText} />
-            <Button disabled={isAddingComment} onClick={() => addComment()}>Add</Button>
+            <Button disabled={isMutatingComment} onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
           </Box>
         </Box>
       </ClickAwayListener>,

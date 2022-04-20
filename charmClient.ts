@@ -521,7 +521,7 @@ class CharmClient {
   }
 
   editComment (commentId: string, content: string): Promise<CommentWithUser> {
-    return http.POST(`/api/comments/${commentId}`, { content });
+    return http.PUT(`/api/comments/${commentId}`, { content });
   }
 
   deleteComment (commentId: string) {
