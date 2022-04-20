@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
 import Input from '@mui/material/OutlinedInput';
 import Modal from 'components/common/Modal';
 import Typography from '@mui/material/Typography';
@@ -12,12 +11,10 @@ import { getDisplayName } from 'lib/users/getDisplayName';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
-import { PagePermission, PagePermissionLevel, Space } from '@prisma/client';
+import { Space } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { usePages } from 'hooks/usePages';
-import { updatePagePermission } from 'lib/permissions/pages/page-permission-actions';
 import AddPagePermissionsForm from './AddPagePermissionsForm';
 
 const permissionDisplayOrder = ['space', 'role', 'user'];
@@ -168,7 +165,6 @@ export default function PagePermissions ({ pageId }: Props) {
         <Box mb={1} onClick={() => popupState.open()}>
           <StyledInput
             placeholder='Add people and roles'
-            size='small'
             fullWidth
             readOnly
             endAdornment={(

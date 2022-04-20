@@ -2,7 +2,8 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
-import Input from '@mui/material/Input';
+import Input from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
 import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
@@ -13,9 +14,20 @@ import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const StyledInput = styled(Input)`
-  border: 1px solid ${({ theme }) => theme.palette.divider};
   font-size: .8em;
-  padding-left: 1em;
+  height: 35px;
+  padding-right: 0;
+
+  .MuiInputAdornment-root {
+    display: block;
+    height: 100%;
+    max-height: none;
+    text-align: right;
+
+    button {
+      height: 100%;
+    }
+  }
 `;
 
 const CopyButton = styled((props: any) => <Button color='secondary' variant='outlined' size='small' {...props} />)`
@@ -112,13 +124,15 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
           <Box p={1}>
             <StyledInput
               fullWidth
-              disableUnderline
+              disabled
               value={shareLink}
               endAdornment={(
                 <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                  <CopyButton>
-                    {copied ? 'Copied!' : 'Copy'}
-                  </CopyButton>
+                  <InputAdornment position='end'>
+                    <CopyButton>
+                      {copied ? 'Copied!' : 'Copy'}
+                    </CopyButton>
+                  </InputAdornment>
                 </CopyToClipboard>
             )}
             />

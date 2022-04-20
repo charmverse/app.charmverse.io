@@ -268,13 +268,26 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
-      // MuiPopover: {
-      //   styleOverrides: {
-      //     root: {
-      //       zIndex: 3000
-      //     }
-      //   }
-      // },
+      MuiInput: {
+        defaultProps: {
+          size: 'small'
+        }
+      },
+      MuiOutlinedInput: {
+        defaultProps: {
+          size: 'small'
+        },
+        styleOverrides: {
+          root: {
+            backgroundColor: 'var(--input-bg)'
+          }
+        }
+      },
+      MuiSelect: {
+        defaultProps: {
+          size: 'small'
+        }
+      },
       MuiLink: {
         styleOverrides: {
           root: {
