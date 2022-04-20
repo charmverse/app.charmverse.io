@@ -109,7 +109,7 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
           icon: cardBlock.fields.icon,
           type: 'card',
           headerImage: cardBlock.fields.headerImage,
-          contentText: cardBlock.fields.contentText ?? undefined,
+          contentText: cardBlock.fields.contentText || '',
           parentId: cardBlock.parentId,
           updatedAt: cardBlock.updatedAt,
           content: cardBlock.fields.content ?? undefined,
