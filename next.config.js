@@ -4,7 +4,7 @@ const config = {
   poweredByHeader: false,
   webpack5: true,
   experimental: {
-    esmExternals: 'loose',
+    esmExternals: false,
     modularizeImports: {
       '@mui/material': {
         transform: '@mui/material/{{member}}'
@@ -80,6 +80,7 @@ const withTM = require('next-transpile-modules')([
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
   '@fullcalendar/react',
+  'react-dnd-scrolling',
   'react-dnd'
 ]);
 
