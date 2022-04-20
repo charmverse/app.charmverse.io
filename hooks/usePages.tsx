@@ -8,9 +8,10 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 import { useIntl } from 'react-intl';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
+import { IPageWithPermissions } from 'lib/pages';
+import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
-import { IPagePermissionFlags, IPageWithPermissions, PageOperationType } from '../lib/permissions/pages/page-permission-interfaces';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
