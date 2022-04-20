@@ -1,7 +1,9 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import SaveIcon from '@mui/icons-material/Save';
 import { Box } from '@mui/material';
+import charmClient from 'charmClient';
 import { MenuInput } from 'components/common/MenuInput';
+import { usePages } from 'hooks/usePages';
 import React, { useRef, useState } from 'react';
 import { updateInlineComment } from '../../InlineComment';
 import { MenuButton } from './Icon';
@@ -9,14 +11,19 @@ import { MenuButton } from './Icon';
 export function InlineCommentSubMenu() {
   const view = useEditorViewContext();
   const [commentText, setCommentText] = useState('');
-
+  const {currentPageId} = usePages()
   const inputRef = useRef<HTMLInputElement>(null);
   const isDisabled = commentText.length === 0;
-  const handleSubmit = (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+  const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     if (!isDisabled) {
       e.preventDefault();
-      // TODO: Update the attribute, set the id attribute to the created thread
-      updateInlineComment('')(view.state, view.dispatch);
+      const {thread} = await charmClient.startThread({
+        content: commentText,
+        // Get the context from current selection
+        context: view.state.doc.cut(view.state.selection.from, view.state.selection.to).textContent,
+        pageId: currentPageId
+      });
+      updateInlineComment(thread.id)(view.state, view.dispatch);
       view.focus();
     }
   };

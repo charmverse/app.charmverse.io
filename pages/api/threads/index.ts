@@ -3,14 +3,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { prisma } from 'db';
 import { Thread } from '@prisma/client';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .post(requireKeys(['context', 'pageId', 'content'], 'body'), requirePagePermissions(['edit_content'], startThread));
+// TODO: Add permission to not allow creating comments/threads on read-only mode
+  .post(requireKeys(['context', 'pageId', 'content'], 'body'), startThread);
 
 export interface StartThreadRequest {
   content: string,

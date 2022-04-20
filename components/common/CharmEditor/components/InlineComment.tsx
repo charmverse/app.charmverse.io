@@ -11,6 +11,11 @@ export function highlightSpec (): RawSpecs {
     type: 'mark',
     name,
     schema: {
+      attrs: {
+        id: {
+          default: null
+        }
+      },
       parseDOM: [
         {
           tag: 'span.charm-inline-comment'
