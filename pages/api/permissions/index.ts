@@ -1,21 +1,20 @@
 
-import { PagePermission, PagePermissionLevel, Prisma } from '@prisma/client';
+import { PagePermission } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { createPagePermission, deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isTruthy } from 'lib/utilities/types';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { createPagePermission, deletePagePermission, listPagePermissions } from 'lib/permissions/pages/page-permission-actions';
-import { IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
 //  .use(requireSpaceMembership)
   .get(findPagePermissions)
-  .post(addPagePermission)
-  .delete(removePagePermission);
+  .delete(removePagePermission)
+  .use(requireKeys<PagePermission>(['pageId'], 'body'))
+  .post(addPagePermission);
 
 async function findPagePermissions (req: NextApiRequest, res: NextApiResponse<IPagePermissionWithAssignee []>) {
 
@@ -28,7 +27,26 @@ async function findPagePermissions (req: NextApiRequest, res: NextApiResponse<IP
 
 async function addPagePermission (req: NextApiRequest, res: NextApiResponse) {
 
+  const { pageId } = req.body;
+
+  // Count before and after permissions so we don't trigger the event unless necessary
+  const permissionsBefore = await prisma.pagePermission.count({
+    where: {
+      pageId
+    }
+  });
+
   const createdPermission = await createPagePermission(req.body);
+
+  const permissionsAfter = await prisma.pagePermission.count({
+    where: {
+      pageId
+    }
+  });
+
+  if (permissionsAfter > permissionsBefore) {
+    setupPermissionsAfterPagePermissionAdded(pageId);
+  }
 
   return res.status(201).json(createdPermission);
 }

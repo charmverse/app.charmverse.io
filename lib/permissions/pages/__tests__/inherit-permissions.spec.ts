@@ -56,6 +56,38 @@ describe('inheritPermissions', () => {
 
   });
 
+  it('should pass the reference of permissions the source page inherits from', async () => {
+    const root = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const rootPermission = await createPagePermission({
+      pageId: root.id,
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const child = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: root.id
+    });
+
+    await inheritPermissions(root.id, child.id);
+
+    const nestedChild = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: child.id
+    });
+
+    const nestedChildWithPermissions = await inheritPermissions(child.id, nestedChild.id);
+
+    expect(nestedChildWithPermissions?.permissions[0].inheritedFromPermission).toBe(rootPermission.id);
+
+  });
+
   it('should not overwrite existing permissions in the target page', async () => {
     const root = await createPage({
       createdBy: user.id,
