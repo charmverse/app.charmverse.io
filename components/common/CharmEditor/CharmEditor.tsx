@@ -16,7 +16,7 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
-import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
+import { EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { useState, CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
@@ -143,7 +143,6 @@ export function charmEditorPlugins (
     underline.plugins(),
     emojiPlugins(),
     mentionPlugins(),
-    columnResizing,
     floatingMenuPlugin(readOnly),
     blockquote.plugins(),
     NodeView.createPlugin({
