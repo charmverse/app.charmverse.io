@@ -1,0 +1,42 @@
+import useSWR from 'swr';
+import charmClient from 'charmClient';
+import { useRouter } from 'next/router';
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
+import { Thread } from '@prisma/client';
+import { usePages } from './usePages';
+
+type IContext = {
+  threads: Record<string, Thread | undefined>,
+  setThreads: Dispatch<SetStateAction<Record<string, Thread | undefined>>>,
+};
+
+const refreshInterval = 1000 * 5 * 60; // 5 minutes
+
+export const ThreadsContext = createContext<Readonly<IContext>>({
+  threads: {},
+  setThreads: () => undefined
+});
+
+export function ThreadsProvider ({ children }: { children: ReactNode }) {
+  const { currentPageId } = usePages();
+  const [threads, setThreads] = useState<Record<string, Thread | undefined>>({});
+  const router = useRouter();
+
+  const { data } = useSWR(() => currentPageId ? `pages/${currentPageId}/threads` : null, () => charmClient.getPageThreads(currentPageId), { refreshInterval });
+  useEffect(() => {
+    setThreads(data?.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
+  }, [data]);
+
+  const value: IContext = useMemo(() => ({
+    threads,
+    setThreads
+  }), [currentPageId, router]);
+
+  return (
+    <ThreadsContext.Provider value={value}>
+      {children}
+    </ThreadsContext.Provider>
+  );
+}
+
+export const useThreads = () => useContext(ThreadsContext);
