@@ -37,14 +37,15 @@ import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
 import EmojiSuggest, { emojiPlugins, emojiSpecs } from './components/EmojiSuggest';
 import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './components/InlinePalette';
 import { Mention, mentionPlugins, mentionSpecs, MentionSuggest } from './components/Mention';
-import { NestedPage, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/NestedPage';
+import { NestedPage, NestedPagesList, nestedPageSpec } from './components/NestedPage';
 import Placeholder from './components/Placeholder';
 import { Quote, quoteSpec } from './components/Quote';
 import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as tabIndent from './components/tabIndent';
 import DocumentEnd from './components/DocumentEnd';
-import { highlightSpec } from './components/InlineComment';
+import { highlightSpec, inlineCommentPlugin } from './components/InlineComment';
+import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -109,9 +110,9 @@ export function charmEditorPlugins (
           }
         }
       })
-
     }),
-    nestedPagePlugins({
+    inlineCommentPlugin(),
+    suggestTooltipPlugins({
       tooltipRenderOpts: {
         placement: 'bottom'
       }

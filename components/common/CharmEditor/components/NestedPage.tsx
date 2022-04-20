@@ -1,8 +1,7 @@
 import { NodeViewProps, RawSpecs } from '@bangle.dev/core';
 import styled from '@emotion/styled';
-import { Schema, Plugin, DOMOutputSpec, TextSelection, PluginKey } from '@bangle.dev/pm';
+import { DOMOutputSpec, TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { createTooltipDOM, SuggestTooltipRenderOpts, tooltipPlacement } from '@bangle.dev/tooltip';
 import { useTheme } from '@emotion/react';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -20,10 +19,9 @@ import Link from 'next/link';
 import { useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { isTruthy } from 'lib/utilities/types';
-import { hideSuggestionsTooltip, referenceElement } from './@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip, SuggestTooltipPluginKey, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'page';
-export const NestedPagePluginKey = new PluginKey('suggest_tooltip');
 
 const NestedPageContainer = styled((props: any) => <div {...props} />)`
   align-items: center;
@@ -68,108 +66,30 @@ export function nestedPageSpec (): RawSpecs {
   };
 }
 
-interface NestedPagePluginState {
-  show: boolean;
-  counter: number;
-  tooltipContentDOM: HTMLElement
-}
-
-interface NestedPagePluginOptions {
-  tooltipRenderOpts: SuggestTooltipRenderOpts;
-}
-
-export function nestedPagePlugins ({ tooltipRenderOpts }: NestedPagePluginOptions) {
-  const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
-
-  return [
-    new Plugin<NestedPagePluginState, Schema>({
-      key: NestedPagePluginKey,
-      state: {
-        init (_, _state) {
-          return {
-            show: false,
-            counter: 0,
-            tooltipContentDOM: tooltipDOMSpec.contentDOM
-          };
-        },
-        apply (tr, pluginState, _oldState) {
-          const meta = tr.getMeta(NestedPagePluginKey);
-          if (meta === undefined) {
-            return pluginState;
-          }
-          if (meta.type === 'RENDER_TOOLTIP') {
-            return {
-              ...pluginState,
-              show: true
-            };
-          }
-          if (meta.type === 'HIDE_TOOLTIP') {
-            // Do not change object reference if show was and is false
-            if (pluginState.show === false) {
-              return pluginState;
-            }
-            return {
-              ...pluginState,
-              show: false,
-              counter: 0
-            };
-          }
-          if (meta.type === 'INCREMENT_COUNTER') {
-            return { ...pluginState, counter: pluginState.counter + 1 };
-          }
-          if (meta.type === 'RESET_COUNTER') {
-            return { ...pluginState, counter: 0 };
-          }
-          if (meta.type === 'UPDATE_COUNTER') {
-            return { ...pluginState, counter: meta.value };
-          }
-          if (meta.type === 'DECREMENT_COUNTER') {
-            return { ...pluginState, counter: pluginState.counter - 1 };
-          }
-          throw new Error('Unknown type');
-        }
-      }
-    }),
-    tooltipPlacement.plugins({
-      stateKey: NestedPagePluginKey,
-      renderOpts: {
-        ...tooltipRenderOpts,
-        tooltipDOMSpec,
-        getReferenceElement: referenceElement((state) => {
-          const { selection } = state;
-          return {
-            end: selection.to,
-            start: selection.from
-          };
-        })
-      }
-    })
-  ];
-}
-
 export function NestedPagesList () {
   const { pages } = usePages();
   const { addNestedPage } = useNestedPage();
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
-    show: isVisible
-  } = usePluginState(NestedPagePluginKey) as NestedPagePluginState;
+    show: isVisible,
+    component
+  } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
 
   const theme = useTheme();
 
   const onSelectPage = useCallback(
     (page: Page) => {
       addNestedPage(page.id);
-      hideSuggestionsTooltip(NestedPagePluginKey)(view.state, view.dispatch, view);
+      hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
     },
     [view]
   );
 
-  if (isVisible) {
+  if (isVisible && component === 'nestedPage') {
     return createPortal(
       <ClickAwayListener onClickAway={() => {
-        hideSuggestionsTooltip(NestedPagePluginKey)(view.state, view.dispatch, view);
+        hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
       }}
       >
         <Box>

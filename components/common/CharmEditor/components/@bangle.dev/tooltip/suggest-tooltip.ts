@@ -7,7 +7,7 @@ import {
   PluginKey, Schema,
   Selection
 } from '@bangle.dev/pm';
-import { tooltipPlacement, TooltipRenderOpts } from '@bangle.dev/tooltip';
+import { createTooltipDOM, tooltipPlacement, TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
@@ -289,7 +289,7 @@ function tooltipController({
             return;
           }
 
-          renderSuggestionsTooltip(key)(view.state, view.dispatch, view);
+          renderSuggestionsTooltip(key, "nestedPage")(view.state, view.dispatch, view);
           return;
         },
       };
@@ -334,12 +334,12 @@ function doesQueryHaveTrigger(
   return textContent.includes(trigger);
 }
 
-export function renderSuggestionsTooltip(key: PluginKey): Command {
+export function renderSuggestionsTooltip(key: PluginKey, component: SuggestTooltipPluginState["component"]): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
       dispatch(
         state.tr
-          .setMeta(key, { type: 'RENDER_TOOLTIP' })
+          .setMeta(key, { type: 'RENDER_TOOLTIP', value: component })
           .setMeta('addToHistory', false),
       );
     }
@@ -591,4 +591,88 @@ export function updateSuggestTooltipCounter(
     }
     return true;
   };
+}
+
+export interface SuggestTooltipPluginState {
+  show: boolean;
+  counter: number;
+  tooltipContentDOM: HTMLElement
+  component: "nestedPage" | "inlineComment"
+}
+
+export interface SuggestTooltipPluginOptions {
+  tooltipRenderOpts: SuggestTooltipRenderOpts;
+}
+
+export const SuggestTooltipPluginKey = new PluginKey('suggest_tooltip');
+
+export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPluginOptions) {
+  const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
+
+  return [
+    new Plugin<SuggestTooltipPluginState, Schema>({
+      key: SuggestTooltipPluginKey,
+      state: {
+        init () {
+          return {
+            show: false,
+            counter: 0,
+            tooltipContentDOM: tooltipDOMSpec.contentDOM,
+            component: "nestedPage"
+          };
+        },
+        apply (tr, pluginState) {
+          const meta = tr.getMeta(SuggestTooltipPluginKey);
+          if (meta === undefined) {
+            return pluginState;
+          }
+          if (meta.type === 'RENDER_TOOLTIP') {
+            return {
+              ...pluginState,
+              component: meta.value,
+              show: true
+            };
+          }
+          if (meta.type === 'HIDE_TOOLTIP') {
+            // Do not change object reference if show was and is false
+            if (pluginState.show === false) {
+              return pluginState;
+            }
+            return {
+              ...pluginState,
+              show: false,
+              counter: 0
+            };
+          }
+          if (meta.type === 'INCREMENT_COUNTER') {
+            return { ...pluginState, counter: pluginState.counter + 1 };
+          }
+          if (meta.type === 'RESET_COUNTER') {
+            return { ...pluginState, counter: 0 };
+          }
+          if (meta.type === 'UPDATE_COUNTER') {
+            return { ...pluginState, counter: meta.value };
+          }
+          if (meta.type === 'DECREMENT_COUNTER') {
+            return { ...pluginState, counter: pluginState.counter - 1 };
+          }
+          throw new Error('Unknown type');
+        }
+      }
+    }),
+    tooltipPlacement.plugins({
+      stateKey: SuggestTooltipPluginKey,
+      renderOpts: {
+        ...tooltipRenderOpts,
+        tooltipDOMSpec,
+        getReferenceElement: referenceElement((state) => {
+          const { selection } = state;
+          return {
+            end: selection.to,
+            start: selection.from
+          };
+        })
+      }
+    })
+  ];
 }

@@ -1,6 +1,7 @@
-import { RawSpecs } from '@bangle.dev/core';
-import { Schema, DOMOutputSpec, Command, toggleMark, EditorState } from '@bangle.dev/pm';
+import { RawPlugins, RawSpecs, Plugin } from '@bangle.dev/core';
+import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey } from '@bangle.dev/pm';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
+import { renderSuggestionsTooltip, SuggestTooltipPluginKey } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'inline-comment';
 
@@ -36,6 +37,31 @@ export function highlightSpec (): RawSpecs {
       }
     }
   };
+}
+
+export const InlineCommentPluginKey = new PluginKey('inlineCommentPluginKey');
+export function inlineCommentPlugin (): RawPlugins {
+  return [
+    new Plugin({
+      props: {
+        handleClickOn: (view) => {
+          const { $from } = view.state.selection;
+          const node = $from.nodeAfter;
+          if (node) {
+            const inlineCommentMark = view.state.doc.type.schema.marks['inline-comment'].isInSet(node.marks);
+            if (inlineCommentMark && inlineCommentMark.attrs.id) {
+              renderSuggestionsTooltip(SuggestTooltipPluginKey, 'inlineComment')(view.state, view.dispatch, view);
+            }
+          }
+          return true;
+        }
+      }
+    })
+  ];
+}
+
+export function InlineCommentThread () {
+
 }
 
 export function toggleInlineComment (): Command {
@@ -134,7 +160,6 @@ export function queryIsSelectionAroundInlineComment () {
   return (state: EditorState) => {
     const { $from, $to } = state.selection;
     const node = $from.nodeAfter;
-
     return (
       !!node
       && $from.textOffset === 0

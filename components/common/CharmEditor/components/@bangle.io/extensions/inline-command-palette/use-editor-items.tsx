@@ -20,8 +20,7 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import { renderSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
-import { NestedPagePluginKey } from 'components/common/CharmEditor/components/NestedPage';
+import { renderSuggestionsTooltip, SuggestTooltipPluginKey } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
 import useNestedPage from 'hooks/useNestedPage';
 import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 import { useMemo } from 'react';
@@ -599,7 +598,7 @@ export function useEditorItems() {
         description: 'Link to a new page',
         editorExecuteCommand: (() => {
           return (async (state, dispatch, view) => {
-            renderSuggestionsTooltip(NestedPagePluginKey)(state, dispatch, view);
+            renderSuggestionsTooltip(SuggestTooltipPluginKey, "nestedPage")(state, dispatch, view);
             return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,
