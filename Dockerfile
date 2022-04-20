@@ -13,6 +13,7 @@ ENV NODE_ENV production
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry.
 ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_OPTIONS=--max_old_space_size=4096
 
 EXPOSE 3000
 
