@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "next build",
+    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" next build",
     "build:prisma": "prisma generate",
     "build:analyze": "cross-env ANALYZE=true next build",
     "deploy:staging": "npx cdk deploy \"CharmVerse-staging-${STAGE}\" --outputs-file cdk.out.json",
