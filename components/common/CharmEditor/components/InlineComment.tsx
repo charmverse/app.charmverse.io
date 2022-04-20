@@ -66,6 +66,54 @@ export function createInlineComment () {
   );
 }
 
+function isTextAtPos (pos: number) {
+  return (state: EditorState) => {
+    const node = state.doc.nodeAt(pos);
+    return !!node && node.isText;
+  };
+}
+
+function setInlineComment (from: number, to: number, id?: string) {
+  return filter(
+    (state) => isTextAtPos(from)(state),
+    (state, dispatch) => {
+      const inlineCommentMark = state.schema.marks['inline-comment'];
+      const tr = state.tr.removeMark(from, to, inlineCommentMark);
+      const mark = state.schema.marks['inline-comment'].create({
+        id
+      });
+      tr.addMark(from, to, mark);
+      if (dispatch) {
+        dispatch(tr);
+      }
+      return true;
+    }
+  );
+}
+
+export function updateInlineComment (id: string): Command {
+  return (state, dispatch) => {
+    if (!state.selection.empty) {
+      return setInlineComment(
+        state.selection.$from.pos,
+        state.selection.$to.pos,
+        id
+      )(state, dispatch);
+    }
+
+    const { $from } = state.selection;
+    const pos = $from.pos - $from.textOffset;
+    const node = state.doc.nodeAt(pos);
+    let to = pos;
+
+    if (node) {
+      to += node.nodeSize;
+    }
+
+    return setInlineComment(pos, to, id)(state, dispatch);
+  };
+}
+
 export function queryIsInlineCommentAllowedInRange (from: number, to: number) {
   return (state: EditorState) => {
     const $from = state.doc.resolve(from);
@@ -90,3 +138,4 @@ export function queryIsSelectionAroundInlineComment () {
     );
   };
 }
+

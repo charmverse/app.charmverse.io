@@ -3,6 +3,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { Box } from '@mui/material';
 import { MenuInput } from 'components/common/MenuInput';
 import React, { useRef, useState } from 'react';
+import { updateInlineComment } from '../../InlineComment';
 import { MenuButton } from './Icon';
 
 export function InlineCommentSubMenu() {
@@ -10,14 +11,15 @@ export function InlineCommentSubMenu() {
   const [commentText, setCommentText] = useState('');
 
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleSubmit = () => {
-    console.log({commentText})
-    // link.updateLink(href)(view.state, view.dispatch);
-    view.focus();
-  };
-
   const isDisabled = commentText.length === 0;
+  const handleSubmit = (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    if (!isDisabled) {
+      e.preventDefault();
+      // TODO: Update the attribute, set the id attribute to the created thread
+      updateInlineComment('')(view.state, view.dispatch);
+      view.focus();
+    }
+  };
 
   return (
     <Box sx={{
@@ -28,9 +30,7 @@ export function InlineCommentSubMenu() {
         ref={inputRef}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
-            e.preventDefault();
-            handleSubmit();
-            view.focus();
+            handleSubmit(e);
             return;
           }
           if (e.key === 'Escape') {
@@ -47,11 +47,8 @@ export function InlineCommentSubMenu() {
       <MenuButton disableButton={isDisabled} hints={["Save"]}>
         <SaveIcon color={!isDisabled ? "inherit" : "disabled"} sx={{
           fontSize: 14
-        }} onClick={() => {
-          if (!isDisabled) {
-            // TODO: Update the attribute, set the id attribute to the created thread
-            // link.updateLink(href)(view.state, view.dispatch);
-          }
+        }} onClick={(e) => {
+          handleSubmit(e)
         }}/>
       </MenuButton>
     </Box>

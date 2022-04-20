@@ -47,7 +47,6 @@ function LinkMenu({
     link.updateLink(href)(view.state, view.dispatch);
     view.focus();
   };
-
   const isSavedDisabled = href === originalHref || (!/^(ipfs|http(s?)):\/\//i.test(href));
 
   return (
