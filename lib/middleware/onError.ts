@@ -11,7 +11,10 @@ export function onError (err: any, req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (err.code === 500) {
-    log.error(`Server Error: ${err}`, {
+    console.log('error', err);
+    log.error(`Server Error: ${err.error || err.message || err}`, {
+      error: err,
+      stack: err.stack,
       userId: req.session?.user?.id,
       url: req.url,
       body: req.body
