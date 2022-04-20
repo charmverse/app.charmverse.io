@@ -12,7 +12,6 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .use(requireKeys(['id'], 'query'))
-  .use(requireUser)
   .put(updatePage)
   .delete(requirePagePermissions(['delete'], deletePage));
 
@@ -28,12 +27,11 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   const updateContent = req.body as Page;
 
-  // eslint-disable-next-line eqeqeq
+  // eslint-disable-next-line
   if (updateContent.isPublic != undefined && permissions.edit_isPublic !== true) {
     return res.status(401).json({
       error: 'You cannot update the public status of this page'
     });
-
   }
   else if (permissions.edit_content !== true) {
     return res.status(401).json({

@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, DiscordUser, TelegramUser } from '@prisma/client';
+import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, DiscordUser, TelegramUser, Thread } from '@prisma/client';
 import * as http from 'adapters/http';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -19,6 +19,7 @@ import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/impor
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { StartThreadRequest, StartThreadResponse } from 'pages/api/threads';
+import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -520,6 +521,10 @@ class CharmClient {
 
   deleteComment (commentId: string) {
     return http.DELETE(`/api/comments/${commentId}`);
+  }
+
+  getPageThreads (pageId: string): Promise<ThreadWithComments[]> {
+    return http.GET(`/api/pages/${pageId}/threads`);
   }
 }
 
