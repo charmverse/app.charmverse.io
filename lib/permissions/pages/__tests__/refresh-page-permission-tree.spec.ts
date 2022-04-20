@@ -122,6 +122,7 @@ describe('hasFullSetOfBasePermissions', () => {
   });
 });
 
+/*
 describe('canInheritFromParent', () => {
 
   it('should return false when the page does not have a parent', async () => {
@@ -217,3 +218,5 @@ describe('canInheritFromParent', () => {
   });
 
 });
+
+*/
