@@ -289,7 +289,9 @@ function tooltipController({
             return;
           }
 
-          renderSuggestionsTooltip(key, "nestedPage")(view.state, view.dispatch, view);
+          renderSuggestionsTooltip(key, {
+            component: "nestedPage"
+          })(view.state, view.dispatch, view);
           return;
         },
       };
@@ -334,12 +336,12 @@ function doesQueryHaveTrigger(
   return textContent.includes(trigger);
 }
 
-export function renderSuggestionsTooltip(key: PluginKey, component: SuggestTooltipPluginState["component"]): Command {
+export function renderSuggestionsTooltip(key: PluginKey, value: Record<string, any>): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
       dispatch(
         state.tr
-          .setMeta(key, { type: 'RENDER_TOOLTIP', value: component })
+          .setMeta(key, { type: 'RENDER_TOOLTIP', value })
           .setMeta('addToHistory', false),
       );
     }
@@ -595,9 +597,9 @@ export function updateSuggestTooltipCounter(
 
 export interface SuggestTooltipPluginState {
   show: boolean;
-  counter: number;
   tooltipContentDOM: HTMLElement
   component: "nestedPage" | "inlineComment"
+  threadId: null | string
 }
 
 export interface SuggestTooltipPluginOptions {
@@ -616,9 +618,9 @@ export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPlug
         init () {
           return {
             show: false,
-            counter: 0,
             tooltipContentDOM: tooltipDOMSpec.contentDOM,
-            component: "nestedPage"
+            component: "nestedPage",
+            threadId: null
           };
         },
         apply (tr, pluginState) {
@@ -629,7 +631,7 @@ export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPlug
           if (meta.type === 'RENDER_TOOLTIP') {
             return {
               ...pluginState,
-              component: meta.value,
+              ...meta.value,
               show: true
             };
           }
@@ -641,20 +643,7 @@ export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPlug
             return {
               ...pluginState,
               show: false,
-              counter: 0
             };
-          }
-          if (meta.type === 'INCREMENT_COUNTER') {
-            return { ...pluginState, counter: pluginState.counter + 1 };
-          }
-          if (meta.type === 'RESET_COUNTER') {
-            return { ...pluginState, counter: 0 };
-          }
-          if (meta.type === 'UPDATE_COUNTER') {
-            return { ...pluginState, counter: meta.value };
-          }
-          if (meta.type === 'DECREMENT_COUNTER') {
-            return { ...pluginState, counter: pluginState.counter - 1 };
           }
           throw new Error('Unknown type');
         }

@@ -1,7 +1,20 @@
 import { RawPlugins, RawSpecs, Plugin } from '@bangle.dev/core';
 import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey } from '@bangle.dev/pm';
+import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
-import { renderSuggestionsTooltip, SuggestTooltipPluginKey } from './@bangle.dev/tooltip/suggest-tooltip';
+import { useTheme } from '@emotion/react';
+import { Box, Button, ClickAwayListener, ListItem, ListItemAvatar, ListItemText, TextField, Typography } from '@mui/material';
+import List from '@mui/material/List';
+import { useThreads } from 'hooks/useThreads';
+import { createPortal } from 'react-dom';
+import { useSWRConfig } from 'swr';
+import { Web3Provider } from '@ethersproject/providers';
+import { useWeb3React } from '@web3-react/core';
+import user from 'components/common/BoardEditor/focalboard/src/components/properties/user/user';
+import { getDisplayName } from 'lib/users';
+import { ReviewerOption } from 'components/common/form/InputSearchContributor';
+import { useState } from 'react';
+import { hideSuggestionsTooltip, renderSuggestionsTooltip, SuggestTooltipPluginKey, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'inline-comment';
 
@@ -50,7 +63,10 @@ export function inlineCommentPlugin (): RawPlugins {
           if (node) {
             const inlineCommentMark = view.state.doc.type.schema.marks['inline-comment'].isInSet(node.marks);
             if (inlineCommentMark && inlineCommentMark.attrs.id) {
-              renderSuggestionsTooltip(SuggestTooltipPluginKey, 'inlineComment')(view.state, view.dispatch, view);
+              renderSuggestionsTooltip(SuggestTooltipPluginKey, {
+                component: 'inlineComment',
+                threadId: inlineCommentMark.attrs.id
+              })(view.state, view.dispatch, view);
             }
           }
           return true;
@@ -61,7 +77,64 @@ export function inlineCommentPlugin (): RawPlugins {
 }
 
 export function InlineCommentThread () {
+  const { threads } = useThreads();
+  const view = useEditorViewContext();
+  const {
+    tooltipContentDOM,
+    show: isVisible,
+    component,
+    threadId
+  } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
 
+  const thread = threadId && threads[threadId];
+  const theme = useTheme();
+  const [commentText, setCommentText] = useState('');
+
+  if (isVisible && component === 'inlineComment' && thread) {
+    return createPortal(
+      <ClickAwayListener onClickAway={() => {
+        hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
+      }}
+      >
+        <Box p={2} sx={{ background: theme.palette.background.light, minWidth: 500 }}>
+          {thread.Comment.map(comment => {
+            return (
+              <List key={comment.id}>
+                <ListItem sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  padding: 0,
+                  marginBottom: 2
+                }}
+                >
+                  <div>
+                    <Box sx={{
+                      display: 'flex',
+                      gap: 1
+                    }}
+                    >
+                      <ReviewerOption user={comment.user as any} avatarSize='small' />
+                      <Typography color='secondary' variant='subtitle1'>
+                        {new Date(comment.createdAt).toLocaleDateString()}
+                      </Typography>
+                    </Box>
+                    <Typography my={0.5} pl={4}>{comment.content}</Typography>
+                  </div>
+                </ListItem>
+              </List>
+            );
+          })}
+          <Box display='flex' gap={1}>
+            <TextField placeholder='Add a comment...' fullWidth size='small' onChange={(e) => setCommentText(e.target.value)} value={commentText} />
+            <Button>Add</Button>
+          </Box>
+        </Box>
+      </ClickAwayListener>,
+      tooltipContentDOM
+    );
+  }
+  return null;
 }
 
 export function toggleInlineComment (): Command {

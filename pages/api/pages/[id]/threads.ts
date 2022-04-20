@@ -4,14 +4,18 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
-import { Thread } from '@prisma/client';
+import { Thread, Comment, User } from '@prisma/client';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .get(getThreads);
 
-export type ThreadWithComments = Thread & {Comment: Comment[]}
+export type ThreadWithComments = Thread & {
+  Comment: (Comment & {
+      user: User;
+  })[];
+}
 
 async function getThreads (req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
@@ -21,7 +25,11 @@ async function getThreads (req: NextApiRequest, res: NextApiResponse) {
       pageId
     },
     include: {
-      Comment: true
+      Comment: {
+        include: {
+          user: true
+        }
+      }
     }
   });
 

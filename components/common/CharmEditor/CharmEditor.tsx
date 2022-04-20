@@ -44,7 +44,7 @@ import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as tabIndent from './components/tabIndent';
 import DocumentEnd from './components/DocumentEnd';
-import { highlightSpec, inlineCommentPlugin } from './components/InlineComment';
+import { highlightSpec, inlineCommentPlugin, InlineCommentThread } from './components/InlineComment';
 import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 
 export interface ICharmEditorOutput {
@@ -219,6 +219,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
     &:hover {
       background: rgba(255,212,0,0.56) !important;
     }
+    cursor: pointer;
   }
 `;
 
@@ -407,6 +408,7 @@ function CharmEditor (
     >
       <FloatingMenu />
       <MentionSuggest />
+      <InlineCommentThread />
       <NestedPagesList />
       {EmojiSuggest}
       {InlinePalette}
