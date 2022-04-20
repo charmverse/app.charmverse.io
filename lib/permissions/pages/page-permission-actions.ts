@@ -160,21 +160,10 @@ export async function createPagePermission (permission: IPagePermissionToCreate 
     }
   });
 
-  const childPages = await resolveChildPages(createdPermission.pageId);
-
   // Update all permissions that inherit from this
   await prisma.pagePermission.updateMany({
     where: {
-      AND: [
-        {
-          OR: childPages.map(child => {
-            return { pageId: child.id };
-          })
-        },
-        {
-          inheritedFromPermission: createdPermission.id
-        }
-      ]
+      inheritedFromPermission: createdPermission.id
     },
     data: {
       permissionLevel: createdPermission.permissionLevel,
@@ -182,8 +171,10 @@ export async function createPagePermission (permission: IPagePermissionToCreate 
     }
   });
 
+  const childPages = await resolveChildPages(createdPermission.pageId);
+
   // Update permissions that inherited from a parent permission
-  // The new permission is now the authority
+  // The new permission is now the authority as it is closer
   if (permissionBeforeModification?.inheritedFromPermission && !createdPermission.inheritedFromPermission) {
     await prisma.pagePermission.updateMany({
       where: {

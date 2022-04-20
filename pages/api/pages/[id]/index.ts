@@ -1,12 +1,12 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { onError, onNoMatch, requireKeys, requireUser, ActionNotPermittedError } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
-import { computeUserPagePermissions, breakInheritance } from 'lib/permissions/pages';
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
+import { computeUserPagePermissions, setupPermissionsAfterPageBecameRoot } from 'lib/permissions/pages';
+import { withSessionRoute } from 'lib/session/withSession';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -33,7 +33,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (updateContent.parentId === null) {
-    await breakInheritance(pageId);
+    await setupPermissionsAfterPageBecameRoot(pageId);
   }
 
   // eslint-disable-next-line eqeqeq
