@@ -3,7 +3,7 @@ import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey } fr
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
 import { useTheme } from '@emotion/react';
-import { Box, Button, ClickAwayListener, ListItem, TextField, Typography } from '@mui/material';
+import { Box, Button, ClickAwayListener, IconButton, ListItem, TextField, Typography } from '@mui/material';
 import List from '@mui/material/List';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
@@ -11,6 +11,7 @@ import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import charmClient from 'charmClient';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { hideSuggestionsTooltip, renderSuggestionsTooltip, SuggestTooltipPluginKey, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'inline-comment';
@@ -124,7 +125,17 @@ export function InlineCommentThread () {
         <Box p={2} sx={{ background: theme.palette.background.light, minWidth: 500 }}>
           {thread.Comment.map((comment, commentIndex) => {
             return (
-              <List key={comment.id}>
+              <List
+                key={comment.id}
+                sx={{
+                  '.comment-actions': {
+                    opacity: 0
+                  },
+                  '&:hover .comment-actions': {
+                    opacity: 1
+                  }
+                }}
+              >
                 <ListItem sx={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -133,15 +144,20 @@ export function InlineCommentThread () {
                   gap: 1
                 }}
                 >
-                  <Box sx={{
-                    display: 'flex',
-                    gap: 1
-                  }}
-                  >
-                    <ReviewerOption user={comment.user as any} avatarSize='small' />
-                    <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
-                      {new Date(comment.createdAt).toLocaleString()}
-                    </Typography>
+                  <Box display='flex' width='100%' justifyContent='space-between'>
+                    <Box sx={{
+                      display: 'flex',
+                      gap: 1
+                    }}
+                    >
+                      <ReviewerOption user={comment.user as any} avatarSize='small' />
+                      <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
+                        {new Date(comment.createdAt).toLocaleString()}
+                      </Typography>
+                    </Box>
+                    <IconButton size='small' onClick={() => {}} className='comment-actions'>
+                      <MoreHorizIcon color='secondary' fontSize='small' />
+                    </IconButton>
                   </Box>
                   {commentIndex === 0 && (
                     <Box pl={4} display='flex'>
