@@ -2,7 +2,8 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import { Box, ClickAwayListener, MenuItem } from '@mui/material';
-import { PageIcon, PageTitle } from 'components/common/PageLayout/components/PageNavigation';
+import PageIcon from 'components/common/PageLayout/components/PageIcon';
+import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
 import { useCallback } from 'react';

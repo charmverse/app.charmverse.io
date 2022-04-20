@@ -6,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import LinkIcon from '@mui/icons-material/Link';
 import { Box, Menu, MenuItem, Typography } from '@mui/material';
 import ActionsMenu from 'components/common/ActionsMenu';
-import { PageIcon } from 'components/common/PageLayout/components/PageNavigation';
+import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
