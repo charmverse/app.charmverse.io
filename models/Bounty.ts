@@ -1,8 +1,4 @@
-import { BountyStatus as BountyStatusEnum, Bounty, Application, Transaction } from '@prisma/client';
-
-export type BountyStatus = keyof typeof BountyStatusEnum;
-
-export const BOUNTY_STATUSES = Object.keys(BountyStatusEnum) as BountyStatus [];
+import { BountyStatus, Bounty, Application, Transaction } from '@prisma/client';
 
 export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   open: 'Open',

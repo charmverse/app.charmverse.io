@@ -10,7 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { Application, Bounty, User } from '@prisma/client';
 import charmClient from 'charmClient';
-import { BountyStatusColours } from 'components/bounties/BountyCard';
+import { BountyStatusColours } from 'components/bounties/BountyStatusBadge';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useContributors } from 'hooks/useContributors';

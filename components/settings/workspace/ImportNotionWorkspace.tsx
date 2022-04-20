@@ -70,7 +70,7 @@ export default function ImportNotionWorkspace () {
           else {
             setNotionState({
               loading: false,
-              error: err.message ?? err.error ?? 'Something went wrong. Please try again'
+              error: err.message || err.error || 'Something went wrong. Please try again'
             });
           }
         });

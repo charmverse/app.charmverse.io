@@ -20,7 +20,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import PaidIcon from '@mui/icons-material/Paid';
 import { ReactNode } from 'react';
 import styled from '@emotion/styled';
-import { BountyStatusColours } from './BountyCard';
+import { BrandColor } from 'theme/colors';
 
 const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   open: <ModeStandbyIcon />,
@@ -28,6 +28,14 @@ const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   review: <GradingIcon />,
   complete: <CheckCircleOutlineIcon />,
   paid: <PaidIcon />
+};
+
+export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
+  open: 'green',
+  assigned: 'yellow',
+  review: 'orange',
+  complete: 'pink',
+  paid: 'gray'
 };
 
 const BountyStatusBox = styled.div<{ status: BountyStatus }>`
@@ -46,7 +54,7 @@ const BountyStatusBox = styled.div<{ status: BountyStatus }>`
   }};
 `;
 
-const BountyIcon = styled.span<{ status: BountyStatus }>`
+const BountyIcon = styled.span`
   display: flex;
   opacity: 0.5;
 `;
@@ -77,7 +85,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
           >
             <BountyAmount bounty={bounty} truncate={truncate} />
             <BountyStatusBox status={bounty.status}>
-              <BountyIcon status={bounty.status}>
+              <BountyIcon>
                 {BOUNTY_STATUS_ICONS[bounty.status]}
               </BountyIcon>
               <Typography
@@ -125,7 +133,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
           </Link>
         </Box>
         <BountyStatusBox status={bounty.status}>
-          <BountyIcon status={bounty.status}>
+          <BountyIcon>
             {BOUNTY_STATUS_ICONS[bounty.status]}
           </BountyIcon>
           <Typography

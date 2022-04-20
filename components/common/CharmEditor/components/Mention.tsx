@@ -12,7 +12,7 @@ import { getDisplayName } from 'lib/users';
 import { ReactNode, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { usePages } from 'hooks/usePages';
-import { PageIcon } from 'components/common/PageLayout/components/PageNavigation';
+import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import Link from 'next/link';
 import { hideSuggestionsTooltip } from './@bangle.dev/tooltip/suggest-tooltip';
