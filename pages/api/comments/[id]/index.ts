@@ -3,14 +3,13 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { prisma } from 'db';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .put(requireKeys(['content'], 'body'), requirePagePermissions(['edit_content'], editComment))
-  .delete(requirePagePermissions(['edit_content'], deleteComment));
+  .put(requireKeys(['content'], 'body'), editComment)
+  .delete(deleteComment);
 
 async function editComment (req: NextApiRequest, res: NextApiResponse) {
   const { content } = req.body as {

@@ -3,7 +3,7 @@ import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey } fr
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
 import { useTheme } from '@emotion/react';
-import { Box, Button, ClickAwayListener, IconButton, ListItem, TextField, Typography } from '@mui/material';
+import { Box, Button, ClickAwayListener, IconButton, ListItem, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import List from '@mui/material/List';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
@@ -12,6 +12,8 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import charmClient from 'charmClient';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { hideSuggestionsTooltip, renderSuggestionsTooltip, SuggestTooltipPluginKey, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'inline-comment';
@@ -116,6 +118,8 @@ export function InlineCommentThread () {
     }
   }
 
+  const popupState = usePopupState({ variant: 'popover', popupId: 'comment-actions' });
+
   if (isVisible && component === 'inlineComment' && thread) {
     return createPortal(
       <ClickAwayListener onClickAway={() => {
@@ -140,8 +144,7 @@ export function InlineCommentThread () {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
-                  padding: 0,
-                  gap: 1
+                  padding: 0
                 }}
                 >
                   <Box display='flex' width='100%' justifyContent='space-between'>
@@ -155,18 +158,40 @@ export function InlineCommentThread () {
                         {new Date(comment.createdAt).toLocaleString()}
                       </Typography>
                     </Box>
-                    <IconButton size='small' onClick={() => {}} className='comment-actions'>
+                    <IconButton size='small' {...bindTrigger(popupState)} className='comment-actions'>
                       <MoreHorizIcon color='secondary' fontSize='small' />
                     </IconButton>
                   </Box>
                   {commentIndex === 0 && (
-                    <Box pl={4} display='flex'>
+                    <Box my={1} pl={4} display='flex'>
                       <ContextBorder />
                       <Typography fontWeight={600} color='secondary'>{thread.context}</Typography>
                     </Box>
                   )}
                   <Typography pl={4}>{comment.content}</Typography>
                 </ListItem>
+                <Menu {...bindMenu(popupState)}>
+                  <MenuItem
+                    sx={{ padding: '3px 12px' }}
+                    onClick={async () => {
+                      await charmClient.deleteComment(comment.id);
+                      const threadWithoutComment = {
+                        ...thread,
+                        Comment: thread.Comment.filter(_comment => _comment.id !== comment.id)
+                      };
+                      setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
+                      popupState.close();
+                    }}
+                  >
+                    <DeleteIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 1
+                      }}
+                    />
+                    <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
+                  </MenuItem>
+                </Menu>
               </List>
             );
           })}
