@@ -190,7 +190,7 @@ export function NestedPagesList () {
                     <PageIcon icon={page.icon} isEditorEmpty={Boolean(isEditorEmpty)} pageType={page.type} />
                   </div>
                   <PageTitle
-                    isempty={page.title.length === 0 ? 1 : 0}
+                    hasContent={page.title.length === 0}
                     sx={{
                       fontWeight: 'bold',
                       height: 26,

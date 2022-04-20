@@ -55,7 +55,7 @@ function createTableCell(state: EditorState, text: string) {
 }
 
 function createTableHeader(state: EditorState, text: string) {
-  return state.schema.nodes.table_header.create(undefined, Fragment.fromArray([
+  return state.schema.nodes.table_cell.create({ header: true }, Fragment.fromArray([
     state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
       state.schema.text(text)
     ]))
