@@ -1,7 +1,6 @@
 import { prisma } from 'db';
+import { getPage, IPageWithPermissions } from 'lib/pages';
 import { PageNotFoundError } from 'lib/public-api';
-import { getPage, IPageWithPermissions } from '../../../pages';
-
 import { createPagePermission, inheritPermissions } from '../page-permission-actions';
 
 export async function setupPermissionsAfterPageCreated (pageId: string): Promise<IPageWithPermissions> {

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Page, PagePermission, Role, Space, User } from '@prisma/client';
+import { PagePermission, Role, Space, User } from '@prisma/client';
 import { prisma } from 'db';
-import { generateUserAndSpaceWithApiToken, createPage } from 'testing/setupDatabase';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { getPage, IPageWithPermissions } from 'lib/pages';
 import { createPagePermission } from '../page-permission-actions';
-import { IPageWithPermissions } from '../page-permission-interfaces';
 import { canInheritPermissionsFromParent, hasFullSetOfBasePermissions } from '../refresh-page-permission-tree';
 
 let user: User;
@@ -35,15 +35,7 @@ async function setupPagesWithPermissions (permissionSets: Array<Partial<PagePerm
       })
     );
 
-    const withPermissions = await prisma.page.findUnique({
-      where: {
-        id: newPage.id
-      },
-      include: {
-        permissions: true
-      }
-    });
-
+    const withPermissions = await getPage(newPage.id);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     pagesWithPermissions.push(withPermissions!);
   }

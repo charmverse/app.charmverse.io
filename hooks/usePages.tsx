@@ -1,15 +1,15 @@
 import { Page, PageOperations, Prisma, Role } from '@prisma/client';
-import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { addBoardClicked } from 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarAddBoardMenu';
+import { IPageWithPermissions } from 'lib/pages';
+import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
+import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
+import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
-import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
-import { IPageWithPermissions } from 'lib/pages';
-import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
+import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 

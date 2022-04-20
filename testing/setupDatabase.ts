@@ -1,10 +1,10 @@
-import { createUserFromWallet } from 'lib/users/createUser';
-import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import { User, Space, SpaceApiToken, Page } from '@prisma/client';
-import { LoggedInUser } from 'models';
+import { Page, Space, SpaceApiToken } from '@prisma/client';
 import { prisma } from 'db';
+import { provisionApiKey } from 'lib/middleware/requireApiKey';
+import { createUserFromWallet } from 'lib/users/createUser';
+import { LoggedInUser } from 'models';
 import { v4 } from 'uuid';
-import { IPageWithPermissions } from '../lib/permissions/pages';
+import { IPageWithPermissions } from 'lib/pages';
 
 /**
  * Simple utility to provide a user and space object inside test code
@@ -80,7 +80,11 @@ export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Parti
       parentId: options.parentId
     },
     include: {
-      permissions: true
+      permissions: {
+        include: {
+          sourcePermission: true
+        }
+      }
     }
   });
 }

@@ -1,5 +1,5 @@
+import { getPage, IPageWithPermissions, resolveChildPages } from 'lib/pages';
 import { PageNotFoundError } from 'lib/public-api';
-import { getPage, IPageWithPermissions, resolveChildPages } from '../../../pages';
 import { inheritPermissions } from '../page-permission-actions';
 
 export async function setupPermissionsAfterPagePermissionAdded (pageId: string): Promise<IPageWithPermissions> {

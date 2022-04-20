@@ -2,8 +2,8 @@ import { PagePermission } from '@prisma/client';
 import { prisma } from 'db';
 import { getPage, IPageWithPermissions, PageNotFoundError, resolveChildPages } from 'lib/pages';
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import { permissionTemplates } from './page-permission-mapping';
 import { createPagePermission } from './page-permission-actions';
+import { permissionTemplates } from './page-permission-mapping';
 
 /**
  * Ensures that a set of comparison permissions contains at least the same or more permissions than the base compared against

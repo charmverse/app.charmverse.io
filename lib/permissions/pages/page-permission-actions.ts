@@ -1,10 +1,9 @@
-import { PagePermission, PagePermissionLevel, Prisma, Role, Space, User } from '@prisma/client';
+import { PagePermissionLevel, Prisma } from '@prisma/client';
 import { prisma } from 'db';
+import { getPage, IPageWithPermissions, PageNotFoundError, resolveChildPages, resolveParentPages } from 'lib/pages';
 import { isTruthy } from 'lib/utilities/types';
-import { IPageWithPermissions, getPage, PageNotFoundError, resolveChildPages, resolveParentPages } from 'lib/pages';
-import { AllowedPagePermissions } from './available-page-permissions.class';
 import { CannotInheritOutsideTreeError, CircularPermissionError, InvalidPermissionGranteeError, InvalidPermissionLevelError, PermissionNotFoundError, SelfInheritancePermissionError } from './errors';
-import { IPagePermissionToCreate, IPagePermissionToInherit, IPagePermissionUpdate, IPagePermissionWithAssignee, IPagePermissionWithSource } from './page-permission-interfaces';
+import { IPagePermissionToCreate, IPagePermissionToInherit, IPagePermissionWithAssignee, IPagePermissionWithSource } from './page-permission-interfaces';
 
 export async function listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
   const permissions = await prisma.pagePermission.findMany({
