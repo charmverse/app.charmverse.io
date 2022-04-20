@@ -8,7 +8,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { NodeSelection } from 'prosemirror-state';
 import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
-import { BoldButton, CalloutButton, CodeButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
+import { BoldButton, CalloutButton, CodeButton, CommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 
 const menuKey = new PluginKey('menuKey');
@@ -30,6 +30,7 @@ export default function FloatingMenuComponent () {
                 <StrikeButton />
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={menuKey} />
+                <CommentButton />
               </MenuGroup>
               <MenuGroup isLastGroup>
                 <ParagraphButton />

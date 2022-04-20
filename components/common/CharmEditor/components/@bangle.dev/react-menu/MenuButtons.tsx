@@ -22,6 +22,7 @@ import {
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import React, { useCallback } from 'react';
+import { queryIsHighlightActive, toggleHighlight } from '../../InlineComment';
 import { MenuButton } from './Icon';
 
 const {
@@ -92,6 +93,41 @@ export function BoldButton({
   );
 }
 
+export function CommentButton({
+  hints = ['Inline comment'],
+  hintPos = 'top',
+  children = <ChatBubbleIcon sx={{
+    fontSize: 12,
+    position: "relative"
+  }}/>,
+  ...props
+}: ButtonProps) {
+  const view = useEditorViewContext();
+  const onSelect = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (toggleHighlight()(view.state, view.dispatch, view)) {
+        view.focus();
+      }
+    },
+    [view],
+  );
+  return (
+    <MenuButton
+      {...props}
+      hintPos={hintPos}
+      onMouseDown={onSelect}
+      hints={hints}
+      // Figure out when the button will be active
+      isActive={queryIsHighlightActive()(view.state)}
+      // Figure out when the button will be disabled
+      isDisabled={!view.editable || !toggleHighlight()(view.state)}
+    >
+      {children}
+    </MenuButton>
+  );
+}
+
 export function StrikeButton({
   hints = ['Strike', strikeKeys.toggleStrike],
   hintPos = 'top',
@@ -151,6 +187,7 @@ export function UnderlineButton({
     </MenuButton>
   );
 }
+
 export function CalloutButton({
   hints = ['Callout', blockquote.defaultKeys.wrapIn],
   hintPos = 'top',

@@ -44,6 +44,7 @@ import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as tabIndent from './components/tabIndent';
 import DocumentEnd from './components/DocumentEnd';
+import { highlightSpec } from './components/InlineComment';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -86,7 +87,8 @@ export const specRegistry = new SpecRegistry([
   columnLayout.columnSpec(), // NO
   nestedPageSpec(), // NO
   quoteSpec(), // OK
-  tabIndent.spec()
+  tabIndent.spec(),
+  highlightSpec()
 ]);
 
 export function charmEditorPlugins (
@@ -207,6 +209,15 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   hr {
     background-color: ${({ theme }) => theme.palette.background.light};
     border: none;
+  }
+
+  .charm-inline-comment {
+    background: rgba(255,212,0,0.14);
+    border-bottom: 2px solid rgb(255, 212, 0);
+    padding-bottom: 2px;
+    &:hover {
+      background: rgba(255,212,0,0.56) !important;
+    }
   }
 `;
 
