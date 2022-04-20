@@ -32,11 +32,10 @@ import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction,
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import EmojiIcon from 'components/common/Emoji';
-import MuiLink from 'components/common/Link';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
-import { checkForEmpty } from 'components/common/CharmEditor/CharmEditor';
+import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import NewPageMenu, { StyledDatabaseIcon } from './NewPageMenu';
 import AddNewCard from './AddNewCard';
 // based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js

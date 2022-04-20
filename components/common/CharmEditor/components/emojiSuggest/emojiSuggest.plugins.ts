@@ -1,43 +1,22 @@
-import { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
+import { SpecRegistry } from '@bangle.dev/core';
 import { Command, EditorState, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import { markName } from './emojiSuggest.constants';
 
-export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {
   queryTriggerText,
   selectEmoji
 };
 
-const defaultTrigger = ':';
-
-function specFactory ({
-  markName,
-  trigger = defaultTrigger
-}: {
-  markName: string;
-  trigger?: string;
-}): BaseRawMarkSpec {
-  const _spec = suggestTooltip.spec({ markName, trigger });
-
-  return {
-    ..._spec,
-    options: {
-      trigger
-    }
-  };
-}
-
 function pluginsFactory ({
   key = new PluginKey('emojiSuggestMenu'),
-  markName,
   tooltipRenderOpts = {}
 }: {
-  markName: string;
   key?: PluginKey;
   tooltipRenderOpts?: SuggestTooltipRenderOpts;
-}) {
+} = {}) {
   return ({
     specRegistry
   }: {

@@ -1,15 +1,6 @@
 import { prisma } from 'db';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 
-export interface DiscordAccount {
-  id: string
-  username: string
-  discriminator: string
-  avatar?: string
-  verified?: boolean
-  bot?: boolean
-}
-
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
 
   const discordAccount = await getDiscordAccount(code, hostName?.startsWith('localhost') ? `http://${hostName}/api/discord/callback` : 'https://app.charmverse.io/api/discord/callback');
