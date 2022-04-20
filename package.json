@@ -119,7 +119,7 @@
     "react-countdown": "^2.3.2",
     "react-csv": "^2.2.2",
     "react-day-picker": "^7.4.10",
-    "react-dnd": "^16.0.0",
+    "react-dnd": "^15.1.2",
     "react-dnd-html5-backend": "^16.0.0",
     "react-dnd-scrolling": "^1.2.1",
     "react-dnd-touch-backend": "^16.0.0",
