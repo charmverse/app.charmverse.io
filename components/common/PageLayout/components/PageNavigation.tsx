@@ -32,6 +32,7 @@ import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction,
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import EmojiIcon from 'components/common/Emoji';
+import MuiLink from 'components/common/Link';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
@@ -60,6 +61,16 @@ export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
     },
     '&.Mui-selected:hover': {
       backgroundColor: theme.palette.action.hover
+    },
+    '&.Mui-selected:hover::after': {
+      content: '""',
+      left: 0,
+      top: 0,
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      backgroundColor: theme.palette.action.hover,
+      pointerEvents: 'none'
     },
     '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
       backgroundColor: theme.palette.action.selected,
@@ -118,14 +129,27 @@ const PageAnchor = styled.a`
   position: relative;
 
   .page-actions {
-    background: ${({ theme }) => theme.palette.action.hover};
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
     opacity: 0;
     position: absolute;
+    bottom: 0px;
     top: 0px;
     right: 0px;
+    .MuiIconButton-root {
+      padding: 0;
+      border-radius: 2px;
+      height: 20px;
+      width: 20px;
+    }
   }
   &:hover .page-actions {
     opacity: 1;
+  }
+  &:hover .MuiTypography-root {
+    width: calc(60%);
   }
 `;
 
@@ -141,16 +165,16 @@ export const StyledPageIcon = styled(EmojiIcon)`
   }
 `;
 
-export const PageTitle = styled(Typography) <{ isempty?: number }>`
+export const PageTitle = styled(Typography)<{ hasContent?: boolean }>`
   color: inherit;
-  display: flex;
+  display: block;
   align-items: center;
   font-size: 14px;
   height: 24px;
   &:hover {
     color: inherit;
   }
-  ${(props) => props.isempty && 'opacity: 0.5;'}
+  ${(props) => props.hasContent ? 'opacity: 0.5;' : ''}
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -175,6 +199,11 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
     event.stopPropagation();
   }
 
+  function preventDefault (event: SyntheticEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
   const popupState = usePopupState({
     popupId: 'page-emoji',
     variant: 'popover'
@@ -182,47 +211,48 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
 
   const triggerState = bindTrigger(popupState);
   return (
-    <PageAnchor onClick={stopPropagation}>
-      {labelIcon && (
-        // No need to show hover style if we are not showing the picker when the icon is clicked
-        <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
-      )}
-      <Link passHref href={href}>
-        <PageTitle isempty={isempty ? 1 : 0}>
+    <Link passHref href={href}>
+      <PageAnchor onClick={stopPropagation}>
+        {labelIcon && (
+          <span onClick={preventDefault}>
+            <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
+          </span>
+        )}
+        <PageTitle hasContent={isempty}>
           {isempty ? 'Untitled' : label}
         </PageTitle>
-      </Link>
-      {children}
-      {showPicker && (
-      <Menu {...bindMenu(popupState)}>
-        <EmojiPicker onSelect={async (emoji) => {
-          if (pageId) {
-            await charmClient.updatePage({
-              id: pageId,
-              icon: emoji
-            });
-            setPages(_pages => ({
-              ..._pages,
-              [pageId]: {
-                ..._pages[pageId]!,
-                icon: emoji
+        {children}
+        {showPicker && (
+          <Menu {...bindMenu(popupState)}>
+            <EmojiPicker onSelect={async (emoji) => {
+              if (pageId) {
+                await charmClient.updatePage({
+                  id: pageId,
+                  icon: emoji
+                });
+                setPages(_pages => ({
+                  ..._pages,
+                  [pageId]: {
+                    ..._pages[pageId]!,
+                    icon: emoji
+                  }
+                }));
+                if (boardId) {
+                  await mutator.changeIcon(boardId, emoji, emoji);
+                }
+                popupState.close();
               }
-            }));
-            if (boardId) {
-              await mutator.changeIcon(boardId, emoji, emoji);
-            }
-            popupState.close();
-          }
 
-          if (boardId) {
-            await mutator.changeIcon(boardId, emoji, emoji);
-          }
-          popupState.close();
-        }}
-        />
-      </Menu>
-      )}
-    </PageAnchor>
+              if (boardId) {
+                await mutator.changeIcon(boardId, emoji, emoji);
+              }
+              popupState.close();
+            }}
+            />
+          </Menu>
+        )}
+      </PageAnchor>
+    </Link>
   );
 }
 
@@ -323,7 +353,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
               {addSubPage && pageType === 'board' ? (
                 <AddNewCard pageId={pageId} />
               ) : (
-                <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} sx={{ marginLeft: '3px' }} />
+                <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} />
               )}
             </div>
           </PageLink>
