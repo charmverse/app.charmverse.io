@@ -148,7 +148,7 @@ export default function PagePermissions ({ pageId }: Props) {
       // The permission is being manually edited, so we drop the inheritance reference
       await charmClient.createPermission({
         pageId: permission.pageId,
-        permissionLevel: permission.permissionLevel,
+        permissionLevel,
         roleId: permission.roleId,
         userId: permission.userId
       });
