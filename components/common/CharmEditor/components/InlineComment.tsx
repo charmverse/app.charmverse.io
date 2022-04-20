@@ -100,9 +100,11 @@ export function InlineCommentThread () {
   const thread = threadId && threads[threadId];
   const theme = useTheme();
   const [commentText, setCommentText] = useState('');
+  const [isAddingComment, setIsAddingComment] = useState(false);
 
   async function addComment () {
-    if (thread) {
+    if (thread && !isAddingComment) {
+      setIsAddingComment(true);
       const comment = await charmClient.addComment({
         content: commentText,
         threadId: thread.id
@@ -115,6 +117,7 @@ export function InlineCommentThread () {
           ...thread,
           Comment: [...thread.Comment, comment]
         } }));
+      setIsAddingComment(false);
     }
   }
 
@@ -195,9 +198,9 @@ export function InlineCommentThread () {
               </List>
             );
           })}
-          <Box display='flex' gap={1} mt={1}>
+          <Box display='flex' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
             <TextField placeholder='Add a comment...' fullWidth size='small' onChange={(e) => setCommentText(e.target.value)} value={commentText} />
-            <Button onClick={() => addComment()}>Add</Button>
+            <Button disabled={isAddingComment} onClick={() => addComment()}>Add</Button>
           </Box>
         </Box>
       </ClickAwayListener>,
