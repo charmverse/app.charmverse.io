@@ -2,7 +2,7 @@ import { SpecRegistry } from '@bangle.dev/core';
 import { Command, EditorState, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
-import { markName } from './emojiSuggest.constants';
+import { markName, pluginKey } from './emojiSuggest.constants';
 
 export const plugins = pluginsFactory;
 export const commands = {
@@ -11,10 +11,8 @@ export const commands = {
 };
 
 function pluginsFactory ({
-  key = new PluginKey('emojiSuggestMenu'),
   tooltipRenderOpts = {}
 }: {
-  key?: PluginKey;
   tooltipRenderOpts?: SuggestTooltipRenderOpts;
 } = {}) {
   return ({
@@ -33,7 +31,7 @@ function pluginsFactory ({
 
     return [
       new Plugin({
-        key,
+        key: pluginKey,
         state: {
           init () {
             return {
