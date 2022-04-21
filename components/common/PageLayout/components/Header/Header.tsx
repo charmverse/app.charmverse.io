@@ -1,6 +1,3 @@
-import { BangleEditorState } from '@bangle.dev/core';
-import { markdownSerializer } from '@bangle.dev/markdown';
-import { Node } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -14,22 +11,18 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import { charmEditorPlugins, specRegistry } from 'components/common/CharmEditor/CharmEditor';
 import { useColorMode } from 'context/color-mode';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import { PageContent } from 'models';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
 import CommentIcon from '@mui/icons-material/Comment';
-import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
@@ -72,43 +65,6 @@ export default function Header (
       ? await charmClient.unfavoritePage(pageId)
       : await charmClient.favoritePage(pageId);
     setUser({ ...user, ...updatedFields });
-  }
-
-  function generateMarkdown () {
-
-    if (currentPage && currentPage.type === 'page') {
-
-      const serializer = markdownSerializer(specRegistry);
-
-      const state = new BangleEditorState({
-        specRegistry,
-        plugins: charmEditorPlugins(),
-        initialValue: currentPage.content ? Node.fromJSON(specRegistry.schema, currentPage.content as PageContent) : ''
-      });
-
-      let markdown = serializer.serialize(state.pmState.doc);
-
-      if (currentPage.title) {
-        const pageTitleAsMarkdown = `# ${currentPage.title}`;
-
-        markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
-      }
-
-      const data = new Blob([markdown], { type: 'text/plain' });
-
-      const linkElement = document.createElement('a');
-
-      linkElement.download = `${currentPage.title || 'page'}.md`;
-
-      const downloadLink = URL.createObjectURL(data);
-
-      linkElement.href = downloadLink;
-
-      linkElement.click();
-
-      URL.revokeObjectURL(downloadLink);
-    }
-
   }
 
   return (
@@ -179,14 +135,12 @@ export default function Header (
               >
                 <List dense>
                   <ListItemButton onClick={() => {
-                    generateMarkdown();
                     setPageMenuOpen(false);
                   }}
                   >
                     <ListItemIcon>
                       <GetAppIcon fontSize='small' />
                     </ListItemIcon>
-                    <ListItemText primary='Export to markdown' />
                   </ListItemButton>
                 </List>
               </Popover>

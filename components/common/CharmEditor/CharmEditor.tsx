@@ -28,7 +28,7 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
-import PageThreads from 'components/[pageId]/DocumentPage/components/PageThreads';
+import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import { Callout, calloutSpec } from './components/Callout';
 import * as columnLayout from './components/columnLayout';
@@ -322,7 +322,7 @@ function CharmEditor (
       }}
       // Components that should be placed after the editor component
       commentThreadsComponent={(
-        showCommentThreads && <PageThreads />
+        showCommentThreads && <PageThreadsList />
       )}
       placeholderComponent={<Placeholder show={isEmpty} />}
       state={state}
