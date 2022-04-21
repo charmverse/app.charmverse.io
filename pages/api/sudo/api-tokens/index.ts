@@ -1,10 +1,8 @@
 
 import { prisma } from 'db';
-import { onError, onNoMatch, requireKeys, getBotUser, provisionApiKey } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
+import { onError, onNoMatch, requireKeys, provisionApiKey } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
-import crypto from 'node:crypto';
 
 function requireSudoKey (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const { sudoApiKey } = req.query;
@@ -18,7 +16,6 @@ function requireSudoKey (req: NextApiRequest, res: NextApiResponse, next: NextHa
   }
 
   next();
-
 }
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -5,6 +5,7 @@ import { PageFromBlock, Page, PageProperty, mapProperties, validateUpdateData, g
 import { onError, onNoMatch, requireApiKey, SpaceAccessDeniedError } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -62,7 +63,7 @@ export async function getPage (req: NextApiRequest, res: NextApiResponse) {
  */
 async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
-  const { pageId, id } = req.query;
+  const { pageId } = req.query;
 
   const spaceId = req.authorizedSpaceId;
 
@@ -101,8 +102,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json(error);
   }
 
-  const updateContent: Prisma.BlockUpdateInput = {
-  };
+  const updateContent: Prisma.BlockUpdateInput = {};
 
   if (requestBodyUpdate.title) {
     updateContent.title = requestBodyUpdate.title;
@@ -140,14 +140,28 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     data: updateContent
   });
 
-  const cardPageContent = await prisma.block.findFirst({
+  if (updateContent.title) {
+    // Update the page associated with the card block
+    await prisma.page.update({
+      where: {
+        id: card.id
+      },
+      data: {
+        title: requestBodyUpdate.title
+      }
+    });
+  }
+
+  const cardPage = await prisma.page.findUnique({
     where: {
-      type: 'charm_text',
-      parentId: card.id
+      id: card.id
+    },
+    select: {
+      content: true
     }
   });
 
-  const cardToReturn = new PageFromBlock(updatedPage, boardSchema, (cardPageContent?.fields as any)?.content);
+  const cardToReturn = new PageFromBlock(updatedPage, boardSchema, cardPage?.content as PageContent);
 
   return res.status(200).json(cardToReturn);
 }

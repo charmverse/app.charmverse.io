@@ -27,7 +27,7 @@ type Props = {
     cards: Card[]
     contents: Array<ContentBlock|ContentBlock[]>
     comments: CommentBlock[]
-    activeView: BoardView
+    activeView?: BoardView
     views: BoardView[]
     readonly: boolean
 }
@@ -173,7 +173,7 @@ const CardDetailProperties = React.memo((props: Props) => {
                 />
             )}
 
-            {!props.readonly &&
+            {!props.readonly && props.activeView && 
                 <div className='octo-propertyname add-property'>
                     <MenuWrapper>
                         <Button>
@@ -192,7 +192,7 @@ const CardDetailProperties = React.memo((props: Props) => {
                                         type,
                                         options: [],
                                     }
-                                    const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template)
+                                    const templateId = await mutator.insertPropertyTemplate(board, activeView!, -1, template)
                                     setNewTemplateId(templateId)
                                 }}
                             />

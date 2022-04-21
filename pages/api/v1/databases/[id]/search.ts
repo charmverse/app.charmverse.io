@@ -2,6 +2,7 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
+import { PageContent } from 'models';
 import { DatabasePageNotFoundError, mapProperties, Page, PageFromBlock, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse, validatePageQuery, validatePaginationQuery } from 'lib/public-api';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -108,9 +109,13 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   };
 
   if (searchQuery.query?.title) {
-    prismaQueryContent.title = {
-      contains: searchQuery.query.title,
-      mode: 'insensitive'
+    prismaQueryContent.Page = {
+      every: {
+        title: {
+          contains: searchQuery.query.title,
+          mode: 'insensitive'
+        }
+      }
     };
   }
 
@@ -133,33 +138,38 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     prismaQueryWithCursor.take = maxRecordsPerQuery;
   }
 
-  const cards = (await prisma.block.findMany(prismaQueryWithCursor));
+  const cardBlocks = (await prisma.block.findMany(prismaQueryWithCursor));
 
-  const cardsPageContent = await prisma.block.findMany({
+  const cardPagesRecord: Record<string, PageContent> = {};
+  const cardPages = (await prisma.page.findMany({
     where: {
-      OR: cards.map(card => {
+      OR: cardBlocks.map(cardBlock => {
         return {
-          parentId: card.id,
-          type: 'charm_text'
+          id: cardBlock.id
         };
       })
+    },
+    select: {
+      content: true,
+      id: true
     }
+  }));
+
+  cardPages.forEach(cardPage => {
+    cardPagesRecord[cardPage.id] = cardPage.content as PageContent;
   });
 
-  const cardsWithContent = cards.map(card => {
-    const cardPageData = cardsPageContent.find(page => page.parentId === card.id);
-
-    return new PageFromBlock(card, boardSchema, (cardPageData?.fields as any)?.content);
+  const cardsWithContent = cardBlocks.map(cardBlock => {
+    return new PageFromBlock(cardBlock, boardSchema, cardPagesRecord[cardBlock.id]);
 
   });
 
   let hasNext = false;
   let cursor: string | undefined;
 
-  if (cards.length > 0) {
+  if (cardBlocks.length > 0) {
 
-    const lastPageId = cards[cards.length - 1].id;
-
+    const lastPageId = cardBlocks[cardBlocks.length - 1].id;
     const remainingRecords = await prisma.block.count({
       cursor: {
         id: lastPageId

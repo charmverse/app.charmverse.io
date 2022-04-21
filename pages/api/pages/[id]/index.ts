@@ -49,16 +49,17 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     });
   }
 
-  const space = await prisma.page.update({
+  const pageWithPermission = await prisma.page.update({
     where: {
-      id: req.query.id as string
+      id: pageId
     },
     data: req.body,
     include: {
       permissions: true
     }
   });
-  return res.status(200).json(space);
+
+  return res.status(200).json(pageWithPermission);
 }
 
 async function deletePage (req: NextApiRequest, res: NextApiResponse) {

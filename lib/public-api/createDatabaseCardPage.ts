@@ -4,7 +4,6 @@ import { v4, validate } from 'uuid';
 import { DatabasePageNotFoundError, InvalidInputError } from './errors';
 import { PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
-import { validateCreationData } from './validateBody';
 
 export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title' | 'createdBy' | 'spaceId'>, string>, boardSchema: PageProperty [] = []): Promise<Page> {
 
@@ -31,7 +30,7 @@ export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title'
     }
   });
 
-  const board = await prisma.block.create({
+  await prisma.block.create({
     data: {
       id: boardId,
       user: {
@@ -81,9 +80,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
 
   const boardSchema = (board.fields as any).cardProperties as PageProperty [];
 
-  const pageId = v4();
-
-  const block = await prisma.block.create({
+  const cardBlock = await prisma.block.create({
     data: {
       id: v4(),
       user: {
@@ -103,44 +100,53 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
       },
       schema: 1,
       fields: {
-        contentOrder: [
-          pageId
-        ],
+        contentOrder: [],
         headerImage: null,
         icon: '',
         isTemplate: false,
         properties: pageInfo.properties ?? {}
       }
-
     }
   });
 
-  const page = await prisma.block.create({
+  await prisma.page.create({
     data: {
-      id: pageId,
-      user: {
+      author: {
         connect: {
-          id: pageInfo.createdBy
+          id: cardBlock.createdBy
         }
       },
-      updatedBy: pageInfo.createdBy,
-      type: 'charm_text',
-      rootId: pageInfo.boardId as string,
-      parentId: block.id,
-      title: '',
+      createdAt: cardBlock.createdAt,
+      updatedBy: cardBlock.updatedBy,
+      updatedAt: cardBlock.updatedAt,
+      card: {
+        connect: {
+          id: cardBlock.id
+        }
+      },
+      contentText: '',
+      path: `page-${Math.random().toString().replace('0.', '')}`,
+      type: 'card',
+      title: pageInfo.title || '',
+      parentId: pageInfo.boardId,
+      id: cardBlock.id,
       space: {
         connect: {
           id: pageInfo.spaceId
         }
       },
-      schema: 1,
-      fields: {
+      permissions: {
+        create: [
+          {
+            permissionLevel: 'full_access',
+            spaceId: pageInfo.spaceId
+          }
+        ]
       }
-
     }
   });
 
-  const card = new PageFromBlock(block, boardSchema);
+  const card = new PageFromBlock(cardBlock, boardSchema);
 
   return card;
 }

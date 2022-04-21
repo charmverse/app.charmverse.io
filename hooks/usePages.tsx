@@ -1,4 +1,5 @@
 import { Page, PageOperations, Prisma, Role } from '@prisma/client';
+import useSWR, { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { addBoardClicked } from 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarAddBoardMenu';
 import { IPageWithPermissions } from 'lib/pages';
@@ -9,7 +10,6 @@ import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
@@ -87,6 +87,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
     const newPage = await charmClient.createPage(pageProperties);
     setPages({ ...pages, [newPage.id]: newPage });
+    mutate(`pages/${space?.id}`);
     return newPage;
   }, [intl, pages, space, user]);
 

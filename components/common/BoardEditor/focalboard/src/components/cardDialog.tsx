@@ -12,8 +12,6 @@ import { getCardComments } from '../store/comments'
 import { getCardContents } from '../store/contents'
 import { useAppSelector } from '../store/hooks'
 import { getUserBlockSubscriptionList } from '../store/initialLoad'
-import { getMe } from '../store/users'
-import { IUser } from '../user'
 import { Utils } from '../utils'
 import DeleteIcon from '../widgets/icons/delete'
 import LinkIcon from '../widgets/icons/Link'
@@ -25,6 +23,8 @@ import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import Button from "components/common/Button"
 import { useRouter } from 'next/router'
 import { usePages } from 'hooks/usePages'
+import { mutate } from 'swr'
+import { useCurrentSpace } from 'hooks/useCurrentSpace'
 
 
 
@@ -46,10 +46,8 @@ const CardDialog = (props: Props): JSX.Element | null => {
     const {board, activeView, cards, views} = props
     const card = useAppSelector(getCard(props.cardId))
     const contents = useAppSelector(getCardContents(props.cardId))
-    const comments = useAppSelector(getCardComments(props.cardId))
     const intl = useIntl()
-    const me = useAppSelector<IUser|null>(getMe)
-
+    const [space] = useCurrentSpace()
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
     const makeTemplateClicked = async () => {
         if (!card) {
@@ -57,19 +55,24 @@ const CardDialog = (props: Props): JSX.Element | null => {
             return
         }
 
-        // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.AddTemplateFromCard, {board: props.board.id, view: activeView.id, card: props.cardId})
-        await mutator.duplicateCard(
-            props.cardId,
-            board,
-            intl.formatMessage({id: 'Mutator.new-template-from-card', defaultMessage: 'new template from card'}),
-            true,
-            async (newCardId) => {
+        if (pages[props.cardId] && space) {
+          await mutator.duplicateCard(
+            {
+              cardId: props.cardId,
+              board,
+              description: intl.formatMessage({id: 'Mutator.new-template-from-card', defaultMessage: 'new template from card'}),
+              asTemplate: true,
+              afterRedo: async (newCardId) => {
                 props.showCard(newCardId)
-            },
-            async () => {
+                mutate(`pages/${space.id}`)
+              },
+              beforeUndo: async () => {
                 props.showCard(undefined)
-            },
-        )
+              },
+              cardPage: pages[props.cardId]!
+            }
+          )
+        }
     }
     const handleDeleteCard = async () => {
         if (!card) {
@@ -138,27 +141,28 @@ const CardDialog = (props: Props): JSX.Element | null => {
         </Menu>
     )
 
+
     const {pages} = usePages()
     const followingCards = useAppSelector(getUserBlockSubscriptionList)
     const isFollowingCard = Boolean(followingCards.find((following) => following.blockId === props.cardId))
     const router = useRouter();
-    return card ? (
+    const isSharedPage = router.route.startsWith('/share')
+
+    return card && pages[card.id] ? (
         <>
             <Dialog
                 onClose={props.onClose}
                 toolsMenu={!props.readonly && menu}
                 hideCloseButton={true}
-                toolbar={(
-                  // <Button
-                  //     size='small'
-                  //     color='secondary'
-                  //     href={`/${router.query.domain}/${pages[card.id]!.path}`}
-                  //     variant='text'
-                  //     startIcon={<OpenInFullIcon fontSize='small'/>}>
-                  //     Open as Page
-                  // </Button>
-                  // An empty div to keep the ellipsis on the right most side
-                    <div></div>
+                toolbar={!isSharedPage && (
+                    <Button
+                      size='small'
+                      color='secondary'
+                      href={`/${router.query.domain}/${pages[card.id]!.path}`}
+                      variant='text'
+                      startIcon={<OpenInFullIcon fontSize='small'/>}>
+                      Open as Page
+                    </Button>
                   )
                 }
                 // toolbar={toolbar}
@@ -179,8 +183,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
                         cards={cards}
                         card={card}
                         contents={contents}
-                        comments={comments}
-                        readonly={props.readonly}
+                        readonly={props.readonly || isSharedPage}
                     />}
 
                 {!card &&
