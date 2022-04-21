@@ -15,6 +15,7 @@ declare module 'lit-share-modal' {
   export interface ShareModalProps {
     onClose: () => void;
     showModal?: boolean;
+    darkMode?: boolean;
     defaultTokens?: Token[];
     onAccessControlConditionsSelected (result: ConditionsModalResult): void;
   }

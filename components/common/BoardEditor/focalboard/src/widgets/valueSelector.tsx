@@ -196,7 +196,7 @@ function ValueSelector(props: Props): JSX.Element {
                     props.onChange('')
                 }
             }}
-            //onBlur={props.onBlur}
+            onBlur={props.onBlur}
             onCreateOption={props.onCreate}
             autoFocus={true}
             value={props.value || null}
