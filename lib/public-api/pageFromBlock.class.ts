@@ -1,6 +1,6 @@
 
 import { Block } from '@prisma/client';
-import { convertPageContentToMarkdown } from 'components/common/CharmEditor/CharmEditor';
+// import { convertPageContentToMarkdown } from 'components/common/CharmEditor/CharmEditor';
 import { PageContent } from 'models';
 import { Page, PageProperty, PageContentFormats } from './interfaces';
 
@@ -30,7 +30,8 @@ export class PageFromBlock implements Page {
     this.updatedAt = new Date(block.createdAt).toISOString();
     this.databaseId = block.rootId;
     this.content = {
-      markdown: pageContent ? convertPageContentToMarkdown(pageContent) : ''
+      markdown: ''
+      //      markdown: pageContent ? convertPageContentToMarkdown(pageContent) : ''
     };
     this.title = block.title;
     this.isTemplate = (block.fields as any).isTemplate === true;
