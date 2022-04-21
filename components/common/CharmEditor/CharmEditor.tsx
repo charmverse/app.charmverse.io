@@ -60,6 +60,7 @@ export const specRegistry = new SpecRegistry([
   //
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
+  highlightSpec(),
   bold.spec(), // OK
   bulletList.spec(), // OK
   hardBreak.spec(), // OK
@@ -88,8 +89,7 @@ export const specRegistry = new SpecRegistry([
   columnLayout.columnSpec(), // NO
   nestedPageSpec(), // NO
   quoteSpec(), // OK
-  tabIndent.spec(),
-  highlightSpec()
+  tabIndent.spec()
 ]);
 
 export function charmEditorPlugins (

@@ -445,12 +445,13 @@ export function queryIsSelectionAroundInlineComment () {
   return (state: EditorState) => {
     const { $from, $to } = state.selection;
     const node = $from.nodeAfter;
+
     return (
       !!node
       && $from.textOffset === 0
       && $to.pos - $from.pos === node.nodeSize
       // Id will be available after the thread has been created
-      && !node.attrs.id
+      && !node.marks.find(mark => mark?.type?.name === name)?.attrs.id
       && !!state.doc.type.schema.marks['inline-comment'].isInSet(node.marks)
     );
   };
