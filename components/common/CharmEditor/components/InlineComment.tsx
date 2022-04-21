@@ -31,6 +31,7 @@ export function highlightSpec (): RawSpecs {
     type: 'mark',
     name,
     schema: {
+      inclusive: false,
       attrs: {
         id: {
           default: null
@@ -286,12 +287,13 @@ export function InlineCommentThread () {
                     background: targetedComment === comment.id ? 'rgba(46, 170, 220, 0.15)' : 'inherit'
                   }}
                 >
-                  <ListItem sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    padding: 0
-                  }}
+                  <ListItem
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      padding: 0
+                    }}
                   >
                     <Box display='flex' width='100%' justifyContent='space-between'>
                       <Box sx={{
@@ -299,7 +301,7 @@ export function InlineCommentThread () {
                         gap: 1
                       }}
                       >
-                        <ReviewerOption user={comment.user as any} avatarSize='small' />
+                        <ReviewerOption component='div' user={comment.user as any} avatarSize='small' />
                         <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
                           {new Date(comment.createdAt).toLocaleString()}
                         </Typography>

@@ -4,7 +4,7 @@ import { Contributor } from 'models';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
-import { HTMLAttributes, useState, useEffect } from 'react';
+import { HTMLAttributes, useState, useEffect, ElementType } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
@@ -147,10 +147,10 @@ export function InputSearchContributorMultiple ({ onChange, defaultValue, ...pro
   );
 }
 
-export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contributor, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement>) {
+export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contributor, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType}) {
   const ensName = useENSName(user.addresses[0]);
   return (
-    <Box component='li' display='flex' gap={1} {...props}>
+    <Box component={props.component ?? 'li'} display='flex' gap={1} {...props}>
       <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={user.avatar} />
       <Typography>{ensName || getDisplayName(user)}</Typography>
     </Box>
