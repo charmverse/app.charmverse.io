@@ -31,15 +31,14 @@ import Link from 'next/link';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
-import EmojiIcon from 'components/common/Emoji';
-import MuiLink from 'components/common/Link';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
-import { checkForEmpty } from 'components/common/CharmEditor/CharmEditor';
-import NewPageMenu, { StyledDatabaseIcon } from './NewPageMenu';
+import { checkForEmpty } from 'components/common/CharmEditor/utils';
+import NewPageMenu from './NewPageMenu';
+import { StyledPageIcon, StyledDatabaseIcon } from './PageIcon';
+import PageTitle from './PageTitle';
 import AddNewCard from './AddNewCard';
-// based off https://codesandbox.io/s/dawn-resonance-pgefk?file=/src/Demo.js
 
 export type MenuNode = Page & {
   children: MenuNode[];
@@ -153,34 +152,6 @@ const PageAnchor = styled.a`
   }
 `;
 
-export const StyledPageIcon = styled(EmojiIcon)`
-  height: 24px;
-  width: 24px;
-  margin-right: 4px;
-  color: ${({ theme }) => theme.palette.secondary.light};
-  // style focalboard icons;
-  .Icon {
-    height: 22px;
-    width: 22px;
-  }
-`;
-
-export const PageTitle = styled(Typography)<{ hasContent?: boolean }>`
-  color: inherit;
-  display: block;
-  align-items: center;
-  font-size: 14px;
-  height: 24px;
-  &:hover {
-    color: inherit;
-  }
-  ${(props) => props.hasContent ? 'opacity: 0.5;' : ''}
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  width: calc(80%); // hack to get ellipsis to appear
-`;
-
 interface PageLinkProps {
   children?: ReactNode;
   href: string;
@@ -264,22 +235,6 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
     </div>
   )
 );
-
-export function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode, pageType: Page['type'], isEditorEmpty: boolean }) {
-
-  if (icon) {
-    return <StyledPageIcon icon={icon} />;
-  }
-  if (pageType === 'board') {
-    return <StyledPageIcon icon={<StyledDatabaseIcon />} />;
-  }
-  else if (isEditorEmpty) {
-    return <StyledPageIcon icon={<InsertDriveFileOutlinedIcon />} />;
-  }
-  else {
-    return <StyledPageIcon icon={<DescriptionOutlinedIcon />} />;
-  }
-}
 
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {

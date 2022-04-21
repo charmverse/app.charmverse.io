@@ -2,15 +2,13 @@
 // See LICENSE.txt for license information.
 import { Box } from '@mui/material'
 import { PagePermission } from '@prisma/client'
-import { BountyStatusColours } from 'components/bounties/BountyCard'
-import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
 import useRoles from 'components/settings/roles/hooks/useRoles'
-import { useBounties } from 'hooks/useBounties'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { usePages } from 'hooks/usePages'
 import { useUser } from 'hooks/useUser'
 import { isPageDeletable } from 'lib/roles/isPageDeletable'
-import millify from "millify"
+import { BountyStatusColours } from 'components/bounties/BountyStatusBadge'
+import { useBounties } from 'hooks/useBounties'
 import { BOUNTY_LABELS } from 'models'
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
 import Image from 'next/image'
@@ -37,6 +35,7 @@ import CardBadges from '../cardBadges'
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../confirmationDialogBox'
 import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
+import PageIcon from 'components/common/PageLayout/components/PageIcon'
 
 
 type Props = {

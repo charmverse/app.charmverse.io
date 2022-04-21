@@ -6,7 +6,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import DeleteIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/delete';
-import EmojiIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/emoji';
+import FBEmojiIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/emoji';
 import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
 import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
@@ -14,7 +14,7 @@ import { randomIntFromInterval } from 'lib/utilities/random';
 import { Page } from 'models';
 import { ChangeEvent, memo } from 'react';
 import { useIntl } from 'react-intl';
-import PageIcon from 'components/common/Emoji';
+import EmojiIcon from 'components/common/Emoji';
 import { randomBannerImage } from './PageBanner';
 import PageTitle from './PageTitle';
 
@@ -87,11 +87,11 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
       <EditorHeader>
         {icon && (
         <MenuWrapper>
-          <PageIcon size='large' icon={icon} />
+          <EmojiIcon size='large' icon={icon} />
           <Menu>
             <Menu.Text
               id='random'
-              icon={<EmojiIcon />}
+              icon={<FBEmojiIcon />}
               name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
               onClick={() => {
                 updatePageIcon(BlockIcons.shared.randomIcon());
@@ -99,7 +99,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
             />
             <Menu.SubMenu
               id='pick'
-              icon={<EmojiIcon />}
+              icon={<FBEmojiIcon />}
               name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
             >
               <EmojiPicker onSelect={(emoji) => {

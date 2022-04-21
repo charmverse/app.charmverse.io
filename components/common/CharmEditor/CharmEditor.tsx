@@ -16,7 +16,7 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
-import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
+import { EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { useState, CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
@@ -27,10 +27,6 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import AdapterDayjs from '@mui/lab/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers';
-import Textfield from '@mui/material/TextField';
 
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import { Callout, calloutSpec } from './components/Callout';
@@ -38,10 +34,10 @@ import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
-import EmojiSuggest, { emojiPlugins, emojiSpecs } from './components/EmojiSuggest';
-import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './components/InlinePalette';
+import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
+import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
 import { Mention, mentionPlugins, mentionSpecs, MentionSuggest } from './components/Mention';
-import { NestedPage, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/NestedPage';
+import NestedPage, { plugins as nestedPagePlugins, NestedPagesList, spec as nestedPageSpec } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
 import { Quote, quoteSpec } from './components/Quote';
 import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
@@ -49,6 +45,7 @@ import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as tabIndent from './components/tabIndent';
 import DocumentEnd from './components/DocumentEnd';
 import * as table from './components/table';
+import { checkForEmpty } from './utils';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -120,11 +117,7 @@ export function charmEditorPlugins (
       })
 
     }),
-    nestedPagePlugins({
-      tooltipRenderOpts: {
-        placement: 'bottom'
-      }
-    }),
+    nestedPagePlugins(),
     imagePlugins({
       handleDragAndDrop: false
     }),
@@ -146,7 +139,6 @@ export function charmEditorPlugins (
     underline.plugins(),
     emojiPlugins(),
     mentionPlugins(),
-    columnResizing,
     floatingMenuPlugin(readOnly),
     blockquote.plugins(),
     NodeView.createPlugin({
@@ -275,15 +267,6 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
   }
 
   return markdown;
-}
-
-export function checkForEmpty (content: PageContent | null) {
-  return !content?.content
-  || content.content.length === 0
-  || (content.content.length === 1
-      // These nodes dont contain any content so there is no content field
-      && !content.content[0]?.type.match(/(cryptoPrice|columnLayout|image|iframe|mention|page)/)
-      && (!content.content[0].content?.length));
 }
 
 function CharmEditor (
@@ -424,8 +407,8 @@ function CharmEditor (
       <FloatingMenu />
       <MentionSuggest />
       <NestedPagesList />
-      {EmojiSuggest}
-      {InlinePalette}
+      <EmojiSuggest />
+      <InlinePalette />
       {children}
       <DocumentEnd />
     </StyledReactBangleEditor>
