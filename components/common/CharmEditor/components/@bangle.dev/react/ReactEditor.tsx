@@ -87,8 +87,10 @@ export const BangleEditor = React.forwardRef<
     return (
       <React.Fragment>
         <EditorViewContext.Provider value={editor?.view as any}>
-          {editor ? children : null}
-          <div ref={renderRef} id={id} className={className} style={style} />
+          <div>
+            {editor ? children : null}
+            <div ref={renderRef} id={id} className={className} style={style} />
+          </div>
           {nodeViews.map((nodeView) => {
             return reactDOM.createPortal(
               <NodeViewWrapper

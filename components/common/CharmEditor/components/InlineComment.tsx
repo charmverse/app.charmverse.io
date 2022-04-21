@@ -83,11 +83,10 @@ export function InlineCommentThread () {
   if (isVisible && component === 'inlineComment' && thread && !thread.resolved) {
     return createPortal(
       <ClickAwayListener onClickAway={() => {
-        console.log(123);
         hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
       }}
       >
-        <PageThread threadId={threadId!} />
+        <PageThread threadId={threadId} />
       </ClickAwayListener>,
       tooltipContentDOM
     );

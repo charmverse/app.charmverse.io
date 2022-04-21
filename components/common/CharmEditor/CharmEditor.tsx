@@ -28,6 +28,7 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
+import PageThreads from 'components/[pageId]/DocumentPage/components/PageThreads';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import { Callout, calloutSpec } from './components/Callout';
 import * as columnLayout from './components/columnLayout';
@@ -185,6 +186,8 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
   left: -50px;
 
+  min-width: 500px;
+
   /** DONT REMOVE THIS STYLING */
   div.ProseMirror.bangle-editor {
     padding-left: 50px;
@@ -239,6 +242,7 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
+  showCommentThreads?: boolean
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -272,7 +276,7 @@ export function checkForEmpty (content: PageContent | null) {
 }
 
 function CharmEditor (
-  { content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
+  { showCommentThreads = false, content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
 ) {
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
@@ -317,7 +321,12 @@ function CharmEditor (
         editable: () => !readOnly
       }}
       // Components that should be placed after the editor component
-      postEditorComponents={<Placeholder show={isEmpty} />}
+      postEditorComponents={(
+        <>
+          {showCommentThreads && <PageThreads />}
+          <Placeholder show={isEmpty} />
+        </>
+      )}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
         switch (props.node.type.name) {
@@ -409,6 +418,7 @@ function CharmEditor (
       <MentionSuggest />
       <InlineCommentThread />
       <NestedPagesList />
+
       {EmojiSuggest}
       {InlinePalette}
       {children}
