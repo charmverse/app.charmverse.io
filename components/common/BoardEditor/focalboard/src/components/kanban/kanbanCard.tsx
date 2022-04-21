@@ -1,12 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import { Box } from '@mui/material'
-import { PagePermission } from '@prisma/client'
-import useRoles from 'components/settings/roles/hooks/useRoles'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { usePages } from 'hooks/usePages'
-import { useUser } from 'hooks/useUser'
-import { isPageDeletable } from 'lib/roles/isPageDeletable'
 import { BountyStatusColours } from 'components/bounties/BountyStatusBadge'
 import { useBounties } from 'hooks/useBounties'
 import { BOUNTY_LABELS } from 'models'
@@ -67,13 +63,11 @@ const KanbanCard = React.memo((props: Props) => {
 
   const contents = useAppSelector(getCardContents(card.id))
   const comments = useAppSelector(getCardComments(card.id))
-  const { pages } = usePages()
+  const { pages, getPagePermissions } = usePages()
   const cardPage = pages[card.id]
-  const [user] = useUser();
 
   // Check if the current user is an admin, admin means implicit full access
-  const { roles } = useRoles();
-  const isDeletable = isPageDeletable(user?.id, space?.id,  (cardPage as any)?.permissions as PagePermission[], user?.spaceRoles, roles)
+  const pagePermissions = getPagePermissions(card.id)
 
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
   const handleDeleteCard = async () => {
@@ -81,7 +75,7 @@ const KanbanCard = React.memo((props: Props) => {
       Utils.assertFailure()
       return
     }
-    if (isDeletable) {
+    if (pagePermissions.delete) {
       await mutator.deleteBlock(card, 'delete card')
     }
   }
@@ -120,7 +114,7 @@ const KanbanCard = React.memo((props: Props) => {
           >
             <IconButton icon={<OptionsIcon />} />
             <Menu position='left'>
-              {isDeletable && <Menu.Text
+              {pagePermissions.delete && <Menu.Text
                 icon={<DeleteIcon />}
                 id='delete'
                 name={intl.formatMessage({ id: 'KanbanCard.delete', defaultMessage: 'Delete' })}

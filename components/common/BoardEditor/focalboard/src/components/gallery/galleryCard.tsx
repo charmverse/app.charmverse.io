@@ -24,14 +24,10 @@ import PropertyValueElement from '../propertyValueElement'
 import CardBadges from '../cardBadges'
 import { PageContent } from 'models'
 import { usePages } from 'hooks/usePages'
-import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
 import { mutate } from 'swr'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { getCardContents } from '../../store/contents'
-import useRoles from 'components/settings/roles/hooks/useRoles'
-import { useUser } from 'hooks/useUser'
-import { isPageDeletable } from 'lib/roles/isPageDeletable'
-import { PagePermission } from '@prisma/client'
+import PageIcon from 'components/common/PageLayout/components/PageIcon'
 
 
 type Props = {
@@ -50,7 +46,7 @@ type Props = {
 const GalleryCard = React.memo((props: Props) => {
   const { card, board } = props
 
-  const { pages } = usePages()
+  const { pages, getPagePermissions } = usePages()
   const [space] = useCurrentSpace()
   const intl = useIntl()
   const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readonly, props.onDrop)
@@ -91,10 +87,7 @@ const GalleryCard = React.memo((props: Props) => {
     }
   }
 
-  const [user] = useUser();
-
-  const { roles } = useRoles();
-  const isDeletable = isPageDeletable(user?.id, space?.id,  (cardPage as any)?.permissions as PagePermission[], user?.spaceRoles, roles)
+  const pagePermissions = getPagePermissions(card.id)
 
   return (
     <div
@@ -110,7 +103,7 @@ const GalleryCard = React.memo((props: Props) => {
         >
           <IconButton icon={<OptionsIcon />} />
           <Menu position='left'>
-            {isDeletable && <Menu.Text
+            {pagePermissions.delete && <Menu.Text
               icon={<DeleteIcon />}
               id='delete'
               name={intl.formatMessage({ id: 'GalleryCard.delete', defaultMessage: 'Delete' })}
