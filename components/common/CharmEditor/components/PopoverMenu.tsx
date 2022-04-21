@@ -12,9 +12,6 @@ interface Props {
 }
 
 const StyledPaper = styled(Paper)`
-
-  // z-index: 10000; // raise above the app bar
-
   max-height: 40vh;
   overflow-y: auto;
 `;
