@@ -7,7 +7,6 @@ import InputLabel from '@mui/material/InputLabel';
 import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
-import { useContributors } from 'hooks/useContributors';
 import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import { useState, useEffect } from 'react';

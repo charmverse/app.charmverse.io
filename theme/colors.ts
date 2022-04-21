@@ -21,6 +21,8 @@ export const backgroundDarkColor = darken(backgroundColor, 0.1);
 export const settingsHeaderBackgroundColor = lighten(backgroundLightColor, 0.4);
 export const scrollBarTrackBackgroundColor = darken(backgroundLightColor, 0.1);
 export const scrollBarThumbBackgroundColor = lighten(scrollBarTrackBackgroundColor, 0.5);
+export const inputBackground = 'rgba(242, 241, 238, 0.6)';
+export const inputBorder = 'rgba(15, 15, 15, 0.1)';
 
 // dark mode
 export const primaryTextColorDarkMode = '#ededed';
@@ -30,6 +32,8 @@ export const backgroundDarkColorDarkMode = darken(backgroundColorDarkMode, 0.3);
 export const settingsHeaderBackgroundColorDarkMode = darken(backgroundLightColorDarkMode, 0.3);
 export const scrollBarTrackBackgroundColorDarkMode = darken(backgroundLightColorDarkMode, 0.2);
 export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackgroundColorDarkMode, 0.1);
+export const inputBackgroundDarkMode = 'rgba(255, 255, 255, 0.055)';
+export const inputBorderDarkMode = 'rgba(15, 15, 15, 0.2)';
 
 export type BrandColor = 'gray' | 'brown' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'red'
 

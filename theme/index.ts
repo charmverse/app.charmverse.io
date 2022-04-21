@@ -268,13 +268,32 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
-      // MuiPopover: {
-      //   styleOverrides: {
-      //     root: {
-      //       zIndex: 3000
-      //     }
-      //   }
-      // },
+      MuiInput: {
+        defaultProps: {
+          size: 'small'
+        }
+      },
+      MuiOutlinedInput: {
+        defaultProps: {
+          size: 'small'
+        },
+        styleOverrides: {
+          root: {
+            backgroundColor: 'var(--input-bg)',
+            '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--input-border)'
+            }
+          },
+          notchedOutline: {
+            borderColor: 'var(--input-border)'
+          }
+        }
+      },
+      MuiSelect: {
+        defaultProps: {
+          size: 'small'
+        }
+      },
       MuiLink: {
         styleOverrides: {
           root: {

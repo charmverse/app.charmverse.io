@@ -2,7 +2,8 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
-import Input from '@mui/material/Input';
+import Input from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
 import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
@@ -13,13 +14,27 @@ import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const StyledInput = styled(Input)`
-  border: 1px solid ${({ theme }) => theme.palette.divider};
   font-size: .8em;
-  padding-left: 1em;
+  height: 35px;
+  padding-right: 0;
+
+  .MuiInputAdornment-root {
+    display: block;
+    height: 100%;
+    max-height: none;
+    text-align: right;
+
+    button {
+      height: 100%;
+    }
+  }
 `;
 
-const LinkBox = styled(Box)`
-  background: ${({ theme }) => theme.palette.background.dark};
+const CopyButton = styled((props: any) => <Button color='secondary' variant='outlined' size='small' {...props} />)`
+  border-radius: 0;
+  border-right-color: transparent;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
 `;
 
 export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPagePermissionFlags, }) {
@@ -29,7 +44,7 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
   const [copied, setCopied] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState(false);
   const [shareLink, setShareLink] = useState<null | string>(null);
-
+  console.log(shareLink);
   async function togglePublic () {
     const updatedPage = await charmClient.togglePagePublicAccess(currentPageId, !isPublic);
     setIsPublic(updatedPage.isPublic);
@@ -52,6 +67,7 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
   }, [currentPageId, pages]);
 
   useEffect(() => {
+    console.log('update share link', isPublic);
     updateShareLink();
   }, [isPublic, router.query.viewId]);
 
@@ -62,10 +78,11 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
 
   async function updateShareLink () {
     const currentPage = pages[currentPageId];
+    console.log(currentPage);
     if (isPublic === false) {
       setShareLink(null);
     }
-    else if (currentPage?.type === 'page') {
+    else if (currentPage?.type === 'page' || currentPage?.type === 'card') {
       const shareLinkToSet = (typeof window !== 'undefined')
         ? `${window.location.origin}/share/${currentPageId}` : '';
       setShareLink(shareLinkToSet);
@@ -106,20 +123,22 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
       <Collapse in={isPublic}>
         {
           shareLink && (
-          <LinkBox p={1}>
+          <Box p={1}>
             <StyledInput
               fullWidth
-              disableUnderline
+              disabled
               value={shareLink}
               endAdornment={(
                 <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                  <Button color='secondary' variant='text' size='small'>
-                    {copied ? 'Copied!' : 'Copy'}
-                  </Button>
+                  <InputAdornment position='end'>
+                    <CopyButton>
+                      {copied ? 'Copied!' : 'Copy'}
+                    </CopyButton>
+                  </InputAdornment>
                 </CopyToClipboard>
-            )}
+              )}
             />
-          </LinkBox>
+          </Box>
           )
         }
       </Collapse>

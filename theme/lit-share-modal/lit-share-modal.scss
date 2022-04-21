@@ -8,15 +8,17 @@
   pointer-events: none; // disable overlay since we're using our own
 }
 
+// token select menu
+.lsm-token-select__menu-portal {
+  .css-26l3qy-menu {}
+}
+
 .lsm-top-modal {
   pointer-events: auto;
   box-sizing: content-box;
   border: 0 none;
   border-radius: 8px;
   box-shadow: 0px 8px 9px -5px rgba(0, 0, 0, 0.2), 0px 15px 22px 2px rgba(0, 0, 0, 0.14), 0px 6px 28px 5px rgba(0, 0, 0, 0.12); // from Modal.tsx output
-  // height: auto;
-  // max-height: 90%;
-  //overflow-y: auto;
 
   button span {
     font-size: 1rem;
@@ -24,7 +26,7 @@
 
   button.lsm-bg-white {
     &:hover {
-      background-color: var(--charm-lit-color-light);
+      //background-color: var(--charm-lit-color-light);
       border-width: 1px;
       border-color: var(--charm-lit-primary);
     }
@@ -67,8 +69,10 @@
   }
 
   // header when selecting a blockchain
-  .lsm-reusable-select-title {
-    background-color: var(--charm-lit-color-light);
+  .lsm-reusable-select-title,
+  .lsm-token-select-header {
+    background-color: var(--charm-lit-color-light) !important;
+    box-sizing: content-box;
     color: var(--charm-lit-text-color);
     font-weight: bold;
 
@@ -147,6 +151,16 @@
     }
   }
 
+  .lsm-dropdown-menu {
+    background-color: var(--charm-lit-color-white);
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 10px 1px;
+    z-index: 100;
+  }
+
+  .lsm-dropdown-item {
+    box-sizing: content-box;
+  }
+
   // utility classes
 
   .lsm-font-segoe {
@@ -176,10 +190,16 @@
   }
 
   .lsm-border-brand-4 {
-    border-color: var(--charm-lit-brand-4);
+    border-color: var(--input-border);
+    background-color: var(--input-bg);
   }
 
-  .lsm-text-brand-4 {
+  .lsm-border-gray {
+    border-color: var(--input-border);
+  }
+
+  .lsm-text-brand-4,
+  .lsm-text-brand-6 {
     color: var(--charm-lit-brand-4);
 
     &:hover {
@@ -195,11 +215,15 @@
     background-color: var(--charm-lit-primary);
   }
 
-  button.disabled\:lsm-bg-gray:disabled {
-    background-color: var(--charm-lit-color-gray);
-  }
-
   .lsm-bg-brand-2 {
     background-color: var(--charm-lit-brand-2);
+  }
+
+  .hover\:lsm-bg-gray:hover {
+    background-color: var(--input-bg) !important;
+  }
+
+  button.disabled\:lsm-bg-gray:disabled {
+    background-color: var(--charm-lit-color-gray);
   }
 }

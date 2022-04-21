@@ -1,6 +1,5 @@
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/tables.css';
-import '@skiff-org/prosemirror-tables/style/table-types.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
