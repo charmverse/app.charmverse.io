@@ -3,7 +3,10 @@ import { PluginKey } from '@bangle.dev/core';
 import { Node, ResolvedPos } from '@bangle.dev/pm';
 import { FloatingMenu, floatingMenu } from '@bangle.dev/react-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
+import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
+import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { NodeSelection } from 'prosemirror-state';
 import { InlineCommentSubMenu } from './@bangle.dev/react-menu/InlineCommentMenu';
 import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
@@ -16,6 +19,8 @@ export const floatingMenuPluginKey = new PluginKey('menuKey');
 
 export default function FloatingMenuComponent () {
   const { showMessage } = useSnackbar();
+  const { getPagePermissions, currentPageId } = usePages();
+  const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
 
   return (
     <FloatingMenu
@@ -31,7 +36,7 @@ export default function FloatingMenuComponent () {
                 <StrikeButton />
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={floatingMenuPluginKey} />
-                <InlineCommentButton menuKey={floatingMenuPluginKey} />
+                {permissions.edit_content && <InlineCommentButton menuKey={floatingMenuPluginKey} />}
               </MenuGroup>
               <MenuGroup isLastGroup>
                 <ParagraphButton />

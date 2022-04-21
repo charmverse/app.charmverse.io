@@ -18,6 +18,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useUser } from 'hooks/useUser';
+import { usePages } from 'hooks/usePages';
+import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { hideSuggestionsTooltip, renderSuggestionsTooltip, SuggestTooltipPluginKey, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'inline-comment';
@@ -108,6 +110,8 @@ export function InlineCommentThread () {
   const [editedComment, setEditedComment] = useState<null | string>(null);
   const [targetedComment, setTargetedComment] = useState<null | string>(null);
   const { removeInlineCommentMark } = useInlineComment();
+  const { getPagePermissions, currentPageId } = usePages();
+  const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
 
   async function addComment () {
     if (thread && !isMutating) {
@@ -188,7 +192,7 @@ export function InlineCommentThread () {
               </Typography>
               <Box display='flex' gap={1}>
                 <Button
-                  disabled={isMutating || (thread.userId !== user?.id)}
+                  disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
                   onClick={resolveThread}
                   sx={{
                     '.MuiButton-startIcon': {
@@ -207,7 +211,7 @@ export function InlineCommentThread () {
                 </Button>
                 <Button
                   onClick={deleteThread}
-                  disabled={isMutating || (thread.userId !== user?.id)}
+                  disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
                   sx={{
                     '.MuiButton-startIcon': {
                       mr: 0.25
@@ -259,7 +263,7 @@ export function InlineCommentThread () {
                           {new Date(comment.createdAt).toLocaleString()}
                         </Typography>
                       </Box>
-                      {comment.userId === user?.id && (
+                      {(comment.userId === user?.id && permissions.edit_content) && (
                       <IconButton
                         size='small'
                         {...bindTriggerProps}
@@ -285,6 +289,7 @@ export function InlineCommentThread () {
               );
             })}
           </Box>
+          {permissions.edit_content && (
           <Box display='flex' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
             <TextField placeholder='Add a comment...' fullWidth size='small' onChange={(e) => setCommentText(e.target.value)} value={commentText} />
             <Button disabled={isMutating} size='small' onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
@@ -301,6 +306,7 @@ export function InlineCommentThread () {
             </Button>
             )}
           </Box>
+          )}
           <Menu {...bindMenu(popupState)}>
             <MenuItem
               onClick={async () => {
