@@ -3,9 +3,9 @@ import { EditorView, keymap } from '@bangle.dev/pm';
 import type { Command, EditorState, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM } from '@bangle.dev/tooltip';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
-import * as suggestTooltip from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
-import { safeRequestAnimationFrame } from '../@bangle.io/lib/utils';
-import { keybindings } from '../@bangle.io/lib/config';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import { safeRequestAnimationFrame } from '../../utils';
+import { keybindings } from '../../keybindings';
 import { paletteMarkName, palettePluginKey, trigger } from './config';
 
 const {

@@ -46,9 +46,6 @@ export default function NestedPagesList () {
 
         return (
           <MenuItem
-            sx={{
-              background: theme.palette.background.light
-            }}
             onClick={() => onSelectPage(page)}
             key={page.id}
           >
