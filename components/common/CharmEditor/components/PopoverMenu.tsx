@@ -16,7 +16,7 @@ const StyledPaper = styled(Paper)`
   // z-index: 10000; // raise above the app bar
 
   max-height: 40vh;
-  overflow-y: scroll;
+  overflow-y: auto;
 `;
 
 export default function PopoverMenu ({ children, container, isOpen, width = 250, onClose }: Props) {
