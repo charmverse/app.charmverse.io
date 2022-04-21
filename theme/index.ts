@@ -279,7 +279,13 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         },
         styleOverrides: {
           root: {
-            backgroundColor: 'var(--input-bg)'
+            backgroundColor: 'var(--input-bg)',
+            '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--input-border)'
+            }
+          },
+          notchedOutline: {
+            borderColor: 'var(--input-border)'
           }
         }
       },

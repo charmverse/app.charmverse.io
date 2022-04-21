@@ -27,7 +27,7 @@ const MultiSelectProperty = (props: Props): JSX.Element => {
 
     const values = Array.isArray(propertyValue) && propertyValue.length > 0 ? propertyValue.map((v) => propertyTemplate.options.find((o) => o!.id === v)).filter((v): v is IPropertyOption => Boolean(v)) : []
 
-    if (!isEditable || !open) {
+    if (!isEditable) {
         return (
             <div
                 className='octo-propertyvalue'

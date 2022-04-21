@@ -44,7 +44,7 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
   const [copied, setCopied] = useState<boolean>(false);
   const [isPublic, setIsPublic] = useState(false);
   const [shareLink, setShareLink] = useState<null | string>(null);
-
+  console.log(shareLink);
   async function togglePublic () {
     const updatedPage = await charmClient.togglePagePublicAccess(currentPageId, !isPublic);
     setIsPublic(updatedPage.isPublic);
@@ -67,6 +67,7 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
   }, [currentPageId, pages]);
 
   useEffect(() => {
+    console.log('update share link', isPublic);
     updateShareLink();
   }, [isPublic, router.query.viewId]);
 
@@ -77,10 +78,11 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
 
   async function updateShareLink () {
     const currentPage = pages[currentPageId];
+    console.log(currentPage);
     if (isPublic === false) {
       setShareLink(null);
     }
-    else if (currentPage?.type === 'page') {
+    else if (currentPage?.type === 'page' || currentPage?.type === 'card') {
       const shareLinkToSet = (typeof window !== 'undefined')
         ? `${window.location.origin}/share/${currentPageId}` : '';
       setShareLink(shareLinkToSet);
@@ -134,7 +136,7 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
                     </CopyButton>
                   </InputAdornment>
                 </CopyToClipboard>
-            )}
+              )}
             />
           </Box>
           )
