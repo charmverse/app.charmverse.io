@@ -8,6 +8,11 @@
         z-index: 1300;
     }
 
+    .toolbar div[role="button"].MenuWrapper {
+      position: absolute;
+      right: 10px;
+    }
+
     .wrapper {
         position: absolute;
         width: 100%;
@@ -60,6 +65,7 @@
 
         > * {
             flex-shrink: 0;
+            overflow-x: hidden;
         }
 
         > .banner {

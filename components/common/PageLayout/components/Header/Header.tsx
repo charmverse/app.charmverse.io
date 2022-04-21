@@ -55,8 +55,8 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');
-
-  const isExportablePage = (currentPage as Page)?.type === 'page';
+  const pageType = (currentPage as Page)?.type;
+  const isExportablePage = pageType === 'card' || pageType === 'page';
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -68,9 +68,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   }
 
   function generateMarkdown () {
-
-    if (currentPage && currentPage.type === 'page') {
-
+    if (currentPage && isExportablePage) {
       const serializer = markdownSerializer(specRegistry);
 
       const state = new BangleEditorState({
@@ -165,9 +163,12 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
                     setPageMenuOpen(false);
                   }}
                   >
-                    <ListItemIcon>
-                      <GetAppIcon fontSize='small' />
-                    </ListItemIcon>
+                    <GetAppIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 1
+                      }}
+                    />
                     <ListItemText primary='Export to markdown' />
                   </ListItemButton>
                 </List>

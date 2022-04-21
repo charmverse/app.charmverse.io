@@ -1,5 +1,5 @@
 import { Page, PageOperations, Prisma, Role } from '@prisma/client';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { addBoardClicked } from 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarAddBoardMenu';
 import { useRouter } from 'next/router';
@@ -86,6 +86,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
     const newPage = await charmClient.createPage(pageProperties);
     setPages({ ...pages, [newPage.id]: newPage });
+    mutate(`pages/${space?.id}`);
     return newPage;
   }, [intl, pages, space, user]);
 

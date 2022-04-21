@@ -37,6 +37,7 @@ const cardsSlice = createSlice({
             state.current = action.payload
         },
         addCard: (state, action: PayloadAction<Card>) => {
+            console.log({state, action})
             state.cards[action.payload.id] = action.payload
         },
         addTemplate: (state, action: PayloadAction<Card>) => {

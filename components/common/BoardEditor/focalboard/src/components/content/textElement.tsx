@@ -35,7 +35,7 @@ const TextElement = React.memo((props: Props): JSX.Element => {
 })
 
 contentRegistry.registerContentType({
-    type: 'charm_text',
+    type: 'text',
     getDisplayText: (intl) => intl.formatMessage({id: 'ContentBlock.text', defaultMessage: 'text'}),
     getIcon: () => <TextIcon/>,
     createBlock: async () => {

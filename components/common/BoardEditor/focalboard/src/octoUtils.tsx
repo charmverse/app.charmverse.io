@@ -10,7 +10,6 @@ import {IPropertyTemplate, createBoard} from './blocks/board'
 import {BoardView, createBoardView} from './blocks/boardView'
 import {Card, createCard} from './blocks/card'
 import {createCommentBlock} from './blocks/commentBlock'
-import {createCharmTextBlock} from './blocks/charmBlock'
 import {createCheckboxBlock} from './blocks/checkboxBlock'
 import {createDividerBlock} from './blocks/dividerBlock'
 import {createImageBlock} from './blocks/imageBlock'
@@ -86,7 +85,6 @@ class OctoUtils {
         case 'view': { return createBoardView(block) }
         case 'card': { return createCard(block) }
         case 'text': { return createTextBlock(block) }
-        case 'charm_text': { return createCharmTextBlock(block) }
         case 'image': { return createImageBlock(block) }
         case 'divider': { return createDividerBlock(block) }
         case 'comment': { return createCommentBlock(block) }
