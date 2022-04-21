@@ -170,11 +170,12 @@ export async function createPagePermission (permission: IPagePermissionToCreate 
     }
   });
 
-  const childPages = await resolveChildPages(createdPermission.pageId);
-
   // Update permissions that inherited from a parent permission
   // The new permission is now the authority as it is closer
   if (permissionBeforeModification?.inheritedFromPermission && !createdPermission.inheritedFromPermission) {
+
+    const childPages = await resolveChildPages(createdPermission.pageId);
+
     await prisma.pagePermission.updateMany({
       where: {
         AND: [
@@ -231,7 +232,10 @@ export async function deletePagePermission (permissionId: string) {
   return true;
 }
 
-export async function inheritPermissions (sourcePageId: string, targetPageId: string): Promise<IPageWithPermissions> {
+export async function inheritPermissions (
+  sourcePageId: string,
+  targetPageId: string
+): Promise<IPageWithPermissions> {
   const [sourcePage, targetPage] = await Promise.all([
     getPage(sourcePageId),
     getPage(targetPageId)
@@ -272,6 +276,13 @@ export async function inheritPermissions (sourcePageId: string, targetPageId: st
     });
 
     if (!existingPermission) {
+
+      permissionsToCopy.push(permission);
+
+    // Inherit permissions if there is no permission, or there is a permission for the same group with same access level
+    }
+    else if (existingPermission && existingPermission.permissionLevel === permission.permissionLevel) {
+      await deletePagePermission(existingPermission.id);
       permissionsToCopy.push(permission);
     }
   }
@@ -286,4 +297,21 @@ export async function inheritPermissions (sourcePageId: string, targetPageId: st
   const updatedTargetPageWithClonedPermissions = await getPage(targetPage.id) as IPageWithPermissions;
 
   return updatedTargetPageWithClonedPermissions;
+}
+
+export async function inheritPermissionsAcrossChildren (
+  sourcePageId: string,
+  targetPageId: string
+): Promise<IPageWithPermissions> {
+
+  const updated = await inheritPermissions(sourcePageId, targetPageId);
+
+  const children = await resolveChildPages(targetPageId);
+  await Promise.all(
+    children.map(child => {
+      return inheritPermissions(sourcePageId, child.id);
+    })
+  );
+
+  return updated;
 }
