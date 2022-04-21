@@ -132,10 +132,8 @@ export function InlineCommentButton({
       hintPos={hintPos}
       onMouseDown={onMouseDown}
       hints={hints}
-      // Figure out when the button will be active
-      isActive={queryIsInlineCommentActive()(view.state)}
       // Figure out when the button will be disabled
-      isDisabled={!view.editable || !toggleInlineComment()(view.state)}
+      isDisabled={!view.editable || queryIsInlineCommentActive()(view.state)}
     >
       {children}
     </MenuButton>

@@ -449,6 +449,8 @@ export function queryIsSelectionAroundInlineComment () {
       !!node
       && $from.textOffset === 0
       && $to.pos - $from.pos === node.nodeSize
+      // Id will be available after the thread has been created
+      && !node.attrs.id
       && !!state.doc.type.schema.marks['inline-comment'].isInSet(node.marks)
     );
   };

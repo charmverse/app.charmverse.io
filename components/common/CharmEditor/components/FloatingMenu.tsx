@@ -79,7 +79,7 @@ export const floatingMenuPlugin = (readonly?: boolean) => {
 
       // If we are inside an inline comment
       if (hasComponentInSchema(state, 'inline-comment')) {
-        if (queryIsSelectionAroundInlineComment()(state) || queryIsInlineCommentActive()(state)) {
+        if (queryIsSelectionAroundInlineComment()(state)) {
           return 'inlineCommentSubMenu';
         }
       }
