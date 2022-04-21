@@ -13,10 +13,6 @@ export interface NestedPagePluginState {
   tooltipContentDOM: HTMLElement
 }
 
-interface NestedPagePluginOptions {
-  tooltipRenderOpts: SuggestTooltipRenderOpts;
-}
-
 export function spec (): RawSpecs {
   return {
     type: 'node',
@@ -42,21 +38,25 @@ export function spec (): RawSpecs {
   };
 }
 
-export function plugins ({ tooltipRenderOpts }: NestedPagePluginOptions) {
-  const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
+export function plugins () {
+
+  const tooltipRenderOpts: SuggestTooltipRenderOpts = {
+    placement: 'bottom-start'
+  };
+  const tooltipDOMSpec = createTooltipDOM();
 
   return [
     new Plugin<NestedPagePluginState, Schema>({
       key: NestedPagePluginKey,
       state: {
-        init (_, _state) {
+        init () {
           return {
             show: false,
             counter: 0,
             tooltipContentDOM: tooltipDOMSpec.contentDOM
           };
         },
-        apply (tr, pluginState, _oldState) {
+        apply (tr, pluginState) {
           const meta = tr.getMeta(NestedPagePluginKey);
           if (meta === undefined) {
             return pluginState;
