@@ -32,4 +32,6 @@ runs:
     - name: Install npm dependencies
       shell: bash
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
-      run: npm ci --no-audit --no-fund
+      run: |
+        npm ci --no-audit --no-fund
+        npx patch-package

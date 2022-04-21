@@ -5,7 +5,7 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import { ReactNode } from 'react';
-import { StyledPageIcon } from '../PageNavigation';
+import { StyledPageIcon } from '../PageIcon';
 
 const BreadCrumb = styled.span`
   display: inline-flex;

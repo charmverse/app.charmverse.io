@@ -22,7 +22,7 @@ import Box from '@mui/material/Box';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import { charmEditorPlugins, specRegistry } from 'components/common/CharmEditor/CharmEditor';
-import { useColorMode } from 'context/color-mode';
+import { useColorMode } from 'context/darkMode';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { PageContent } from 'models';
