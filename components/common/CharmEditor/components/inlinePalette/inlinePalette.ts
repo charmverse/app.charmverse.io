@@ -1,9 +1,12 @@
 import { BaseRawMarkSpec, PluginKey, SpecRegistry } from '@bangle.dev/core';
+import { EditorView, keymap } from '@bangle.dev/pm';
 import type { Command, EditorState, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM } from '@bangle.dev/tooltip';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
 import * as suggestTooltip from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
-import { safeRequestAnimationFrame } from '../../lib/utils';
+import { safeRequestAnimationFrame } from '../@bangle.io/lib/utils';
+import { keybindings } from '../@bangle.io/lib/config';
+import { paletteMarkName, palettePluginKey, trigger } from './config';
 
 const {
   decrementSuggestTooltipCounter,
@@ -15,42 +18,35 @@ export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {};
 
-function specFactory ({
-  markName,
-  trigger
-}: {
-  markName: string;
-  trigger: string;
-}): BaseRawMarkSpec {
-  const spec = suggestTooltip.spec({ markName, trigger });
+function specFactory (): BaseRawMarkSpec {
+
+  const _spec = suggestTooltip.spec({ markName: paletteMarkName, trigger });
 
   return {
-    ...spec,
+    ..._spec,
     options: {
-      ...spec.options,
+      ..._spec.options,
       trigger
     }
   };
 }
 
-function pluginsFactory ({
-  key,
-  markName,
-  tooltipRenderOpts = {}
-}: {
-  key: PluginKey;
-  markName: string;
-  tooltipRenderOpts: suggestTooltip.SuggestTooltipRenderOpts;
-}) {
+function pluginsFactory () {
+
+  const key = palettePluginKey;
+  const markName = paletteMarkName;
+  const tooltipRenderOpts: suggestTooltip.SuggestTooltipRenderOpts = {
+    getScrollContainer,
+    placement: 'top-start'
+  };
+
   return ({ schema, specRegistry }: {schema: Schema, specRegistry: SpecRegistry}) => {
-    const { trigger } = specRegistry.options[markName];
+    const { trigger: _trigger } = specRegistry.options[markName];
     const suggestTooltipKey = new PluginKey('suggestTooltipKey');
 
     // We are converting to DOM elements so that their instances
     // can be shared across plugins.
-    const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
-
-    const getIsTop = () => tooltipDOMSpec.dom.getAttribute('data-popper-placement') === 'top-start';
+    const tooltipDOMSpec = createTooltipDOM();
 
     if (!schema.marks[markName]) {
       bangleWarn(
@@ -59,12 +55,12 @@ function pluginsFactory ({
       throw new Error(`markName ${markName} not found`);
     }
 
-    const updateCounter: any = (key = 'UP'): Command => {
+    const updateCounter: any = (_key = 'UP'): Command => {
       return (state, dispatch, view) => {
         safeRequestAnimationFrame(() => {
           view?.focus();
         });
-        if (key === 'UP') {
+        if (_key === 'UP') {
           return decrementSuggestTooltipCounter(suggestTooltipKey)(
             state,
             dispatch,
@@ -101,9 +97,8 @@ function pluginsFactory ({
       suggestTooltip.plugins({
         key: suggestTooltipKey,
         markName,
-        trigger,
+        trigger: _trigger,
         tooltipRenderOpts: {
-          placement: 'left',
           ...tooltipRenderOpts,
           tooltipDOMSpec
         },
@@ -112,9 +107,40 @@ function pluginsFactory ({
         },
         onArrowDown: updateCounter('DOWN'),
         onArrowUp: updateCounter('UP')
+      }),
+
+      keymap({
+        [keybindings.toggleInlineCommandPalette.key]: (
+          state,
+          dispatch
+        ): boolean => {
+          const { tr, schema: _schema, selection } = state;
+
+          if (queryInlinePaletteActive(palettePluginKey)(state)) {
+            return false;
+          }
+          const marks = selection.$from.marks();
+          const mark = _schema.mark(paletteMarkName, { trigger: _trigger });
+
+          const textBefore = selection.$from.nodeBefore?.text;
+          // Insert a space so we follow the convention of <space> trigger
+          if (textBefore && !textBefore.endsWith(' ')) {
+            tr.replaceSelectionWith(_schema.text(' '), false);
+          }
+          tr.replaceSelectionWith(
+            _schema.text(_trigger, [mark, ...marks]),
+            false
+          );
+          dispatch?.(tr);
+          return true;
+        }
       })
     ];
   };
+}
+
+function getScrollContainer (view: EditorView) {
+  return view.dom.parentElement!;
 }
 
 export function getSuggestTooltipKey (key: PluginKey) {

@@ -35,7 +35,7 @@ import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
 import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
-import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './components/InlinePalette';
+import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
 import { Mention, mentionPlugins, mentionSpecs, MentionSuggest } from './components/Mention';
 import NestedPage, { plugins as nestedPagePlugins, NestedPagesList, spec as nestedPageSpec } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
