@@ -196,6 +196,31 @@ export async function createPagePermission (permission: IPagePermissionToCreate 
       }
     });
   }
+  // Permission now inherits from parent
+  // Children should also inherit
+  else if (!permissionBeforeModification?.inheritedFromPermission && createdPermission.inheritedFromPermission) {
+    const childPages = await resolveChildPages(createdPermission.pageId);
+
+    await prisma.pagePermission.updateMany({
+      where: {
+        AND: [
+          {
+            OR: childPages.map(child => {
+              return { pageId: child.id };
+            })
+          },
+          {
+            inheritedFromPermission: createdPermission.id
+          }
+        ]
+      },
+      data: {
+        permissionLevel: createdPermission.permissionLevel,
+        permissions: createdPermission.permissions,
+        inheritedFromPermission: createdPermission.inheritedFromPermission
+      }
+    });
+  }
 
   return createdPermission;
 }

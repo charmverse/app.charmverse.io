@@ -7,6 +7,7 @@ import { computeUserPagePermissions, setupPermissionsAfterPageBecameRoot } from 
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages/triggers/page-repositioned';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -34,6 +35,9 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   if (updateContent.parentId === null) {
     await setupPermissionsAfterPageBecameRoot(pageId);
+  }
+  else if (typeof updateContent.parentId === 'string') {
+    await setupPermissionsAfterPageRepositioned(pageId, updateContent.parentId);
   }
 
   // eslint-disable-next-line eqeqeq

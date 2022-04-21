@@ -59,12 +59,12 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Partial<Pick<Page, 'parentId'>>): Promise<IPageWithPermissions> {
+export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Partial<Pick<Page, 'parentId' | 'title'>>): Promise<IPageWithPermissions> {
   return prisma.page.create({
     data: {
       contentText: '',
       path: v4(),
-      title: 'Example',
+      title: options.title || 'Example',
       type: 'page',
       updatedBy: options.createdBy,
       author: {

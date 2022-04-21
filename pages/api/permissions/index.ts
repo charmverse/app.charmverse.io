@@ -6,6 +6,7 @@ import { createPagePermission, deletePagePermission, IPagePermissionRequest, IPa
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { setupPermissionsAfterPagePermissionUpdated } from 'lib/permissions/pages/triggers/page-permission-updated';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -46,6 +47,9 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse) {
 
   if (permissionsAfter > permissionsBefore) {
     setupPermissionsAfterPagePermissionAdded(pageId);
+  }
+  else {
+    setupPermissionsAfterPagePermissionUpdated(createdPermission.id);
   }
 
   return res.status(201).json(createdPermission);
