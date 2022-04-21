@@ -42,8 +42,8 @@ import Placeholder from './components/Placeholder';
 import { Quote, quoteSpec } from './components/Quote';
 import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
+import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
-import DocumentEnd from './components/DocumentEnd';
 import * as table from './components/table';
 import { checkForEmpty } from './utils';
 
@@ -188,7 +188,8 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     // table.TableLabelMenu(),
     // @ts-ignore missing type
-    table.TableFiltersMenu()
+    table.TableFiltersMenu(),
+    trailingNode.plugins()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -410,7 +411,6 @@ function CharmEditor (
       <EmojiSuggest />
       <InlinePalette />
       {children}
-      <DocumentEnd />
     </StyledReactBangleEditor>
   );
 }
