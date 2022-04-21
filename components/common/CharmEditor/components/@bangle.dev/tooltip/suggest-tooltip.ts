@@ -290,7 +290,8 @@ function tooltipController({
           }
 
           renderSuggestionsTooltip(key, {
-            component: "nestedPage"
+            component: "nestedPage",
+            selection: state.selection
           })(view.state, view.dispatch, view);
           return;
         },
@@ -600,6 +601,7 @@ export interface SuggestTooltipPluginState {
   tooltipContentDOM: HTMLElement
   component: "nestedPage" | "inlineComment"
   threadId: null | string
+  selection: null | Selection
 }
 
 export interface SuggestTooltipPluginOptions {
@@ -620,7 +622,8 @@ export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPlug
             show: false,
             tooltipContentDOM: tooltipDOMSpec.contentDOM,
             component: "nestedPage",
-            threadId: null
+            threadId: null,
+            selection: null
           };
         },
         apply (tr, pluginState) {

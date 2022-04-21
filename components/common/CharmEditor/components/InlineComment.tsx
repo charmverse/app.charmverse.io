@@ -3,12 +3,12 @@ import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey } fr
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
 import { useTheme } from '@emotion/react';
-import { Box, Button, ClickAwayListener, Divider, IconButton, ListItem, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, Button, ClickAwayListener, IconButton, ListItem, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import List from '@mui/material/List';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import charmClient from 'charmClient';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -67,7 +67,8 @@ export function inlineCommentPlugin (): RawPlugins {
             if (inlineCommentMark && inlineCommentMark.attrs.id) {
               renderSuggestionsTooltip(SuggestTooltipPluginKey, {
                 component: 'inlineComment',
-                threadId: inlineCommentMark.attrs.id
+                threadId: inlineCommentMark.attrs.id,
+                selection: view.state.selection
               })(view.state, view.dispatch, view);
             }
           }
@@ -92,23 +93,25 @@ const ContextBorder = styled.div`
 export function InlineCommentThread () {
   const { threads, setThreads } = useThreads();
   const view = useEditorViewContext();
+  const schema = view.state.schema;
   const {
     tooltipContentDOM,
     show: isVisible,
     component,
-    threadId
+    threadId,
+    selection
   } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
 
   const thread = threadId && threads[threadId];
   const theme = useTheme();
   const [commentText, setCommentText] = useState('');
-  const [isMutatingComment, setIsMutatingComment] = useState(false);
+  const [isMutating, setIsMutating] = useState(false);
   const [editedComment, setEditedComment] = useState<null | string>(null);
   const [targetedComment, setTargetedComment] = useState<null | string>(null);
 
   async function addComment () {
-    if (thread && !isMutatingComment) {
-      setIsMutatingComment(true);
+    if (thread && !isMutating) {
+      setIsMutating(true);
       const comment = await charmClient.addComment({
         content: commentText,
         threadId: thread.id
@@ -120,13 +123,13 @@ export function InlineCommentThread () {
           ...thread,
           Comment: [...thread.Comment, comment]
         } }));
-      setIsMutatingComment(false);
+      setIsMutating(false);
     }
   }
 
   async function editComment () {
-    if (thread && editedComment && !isMutatingComment) {
-      setIsMutatingComment(true);
+    if (thread && editedComment && !isMutating) {
+      setIsMutating(true);
       await charmClient.editComment(editedComment, commentText);
       setThreads((_threads) => ({ ..._threads,
         [thread.id]: {
@@ -135,14 +138,36 @@ export function InlineCommentThread () {
         } }));
       setCommentText('');
       setEditedComment(null);
-      setIsMutatingComment(false);
+      setIsMutating(false);
       setTargetedComment(null);
+    }
+  }
+
+  async function resolveThread () {
+    if (thread && selection) {
+      setIsMutating(true);
+      await charmClient.updateThread(thread.id, {
+        resolved: true
+      });
+      setThreads((_threads) => ({ ..._threads,
+        [thread.id]: {
+          ...thread,
+          resolved: true
+        } }));
+      // TODO: Remove the inline-comment mark from the position
+      const [from, to] = [selection.$from.pos, selection.$to.pos];
+      const inlineCommentMark = schema.marks['inline-comment'];
+      const tr = view.state.tr.removeMark(from, to, inlineCommentMark);
+      if (view.dispatch) {
+        view.dispatch(tr);
+      }
+      setIsMutating(false);
     }
   }
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'comment-actions' });
   const bindTriggerProps = bindTrigger(popupState);
-  if (isVisible && component === 'inlineComment' && thread) {
+  if (isVisible && component === 'inlineComment' && thread && !thread.resolved) {
     return createPortal(
       <ClickAwayListener onClickAway={() => {
         hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
@@ -150,14 +175,16 @@ export function InlineCommentThread () {
         setEditedComment(null);
       }}
       >
-        <Box p={2} sx={{ background: theme.palette.background.light, minWidth: 500, maxHeight: 350 }}>
-          <Box maxHeight={270} pr={1} overflow='auto'>
+        <Box p={2} sx={{ background: theme.palette.background.light, minWidth: 500, maxHeight: 450 }}>
+          <Box maxHeight={350} pr={1} overflow='auto'>
             <Box justifyContent='space-between' display='flex' alignItems='center' mb={1}>
               <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
                 Started at {new Date(thread.createdAt).toLocaleString()}
               </Typography>
               <Box display='flex' gap={1}>
                 <Button
+                  disabled={isMutating}
+                  onClick={resolveThread}
                   sx={{
                     '.MuiButton-startIcon': {
                       mr: 0.5
@@ -174,6 +201,7 @@ export function InlineCommentThread () {
                 >Resolve
                 </Button>
                 <Button
+                  disabled={isMutating}
                   sx={{
                     '.MuiButton-startIcon': {
                       mr: 0.25
@@ -251,7 +279,7 @@ export function InlineCommentThread () {
           </Box>
           <Box display='flex' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
             <TextField placeholder='Add a comment...' fullWidth size='small' onChange={(e) => setCommentText(e.target.value)} value={commentText} />
-            <Button disabled={isMutatingComment} size='small' onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
+            <Button disabled={isMutating} size='small' onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
             {editedComment && (
             <Button
               onClick={() => {
@@ -334,12 +362,12 @@ export function createInlineComment () {
     )(state),
     (state, dispatch) => {
       const [from, to] = [state.selection.$from.pos, state.selection.$to.pos];
-      const linkMark = state.schema.marks.link;
-      const tr = state.tr.removeMark(from, to, linkMark);
-      const inlineCommentMark = state.schema.marks['inline-comment'].create({
+      const inlineCommentMark = state.schema.marks['inline-comment'];
+      const tr = state.tr.removeMark(from, to, inlineCommentMark);
+      const createdInlineCommentMark = state.schema.marks['inline-comment'].create({
         id: null
       });
-      tr.addMark(from, to, inlineCommentMark);
+      tr.addMark(from, to, createdInlineCommentMark);
 
       if (dispatch) {
         dispatch(tr);
