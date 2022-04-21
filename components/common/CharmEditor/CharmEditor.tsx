@@ -413,7 +413,7 @@ function CharmEditor (
       <MentionSuggest />
       <NestedPagesList />
       <EmojiSuggest />
-      {InlinePalette}
+      <InlinePalette />
       {children}
       <DocumentEnd />
     </StyledReactBangleEditor>

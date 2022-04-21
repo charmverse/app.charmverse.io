@@ -5,8 +5,6 @@ import {
 } from 'lib/browser';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-const BASE_PADDING = 10;
-
 interface InlinePaletteRowProps {
   dataId: string;
   title?: string;
@@ -21,17 +19,15 @@ interface InlinePaletteRowProps {
   allowHover?: boolean;
 }
 
-const StyledInlinePaletteRow = styled.div<{ active: boolean, disabled: boolean }>`
+const StyledInlinePaletteRow = styled.div<{ disabled: boolean }>`
   padding: 0.5rem 0;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing(1.5)};
   width: 100%;
-  ${props => props.active && 'background-color: rgb(0, 0, 0, 0.125);'};
   font-weight: bold;
   font-size: 14px;
-  padding: 5px ${BASE_PADDING}px
 `;
 
 export default function InlinePaletteRow ({
@@ -77,7 +73,6 @@ export default function InlinePaletteRow ({
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
       ref={ref}
-      active={Boolean(isActive)}
       disabled={Boolean(disabled)}
       className={className}
       style={style}

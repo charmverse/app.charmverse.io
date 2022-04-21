@@ -1,9 +1,9 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Portal from '@mui/material/Portal';
 import { BaseEmoji, Picker } from 'emoji-mart';
 import { useCallback } from 'react';
-import Portal from '@mui/material/Portal';
 import { selectEmoji } from './emojiSuggest.plugins';
 import { pluginKey } from './emojiSuggest.constants';
 

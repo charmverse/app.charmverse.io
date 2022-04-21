@@ -1,15 +1,20 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, Menu, MenuItem } from '@mui/material';
+import { Menu, MenuItem } from '@mui/material';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
+import MenuList from '@mui/material/MenuList';
+import Popper from '@mui/material/Popper';
+import Paper from '@mui/material/Paper';
+import Grow from '@mui/material/Grow';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Portal from '@mui/material/Portal';
 import {
   useInlinePaletteItems,
   useInlinePaletteQuery
 } from '../hooks';
 import InlinePaletteRow from './InlinePaletteRow';
 import { palettePluginKey } from '../config';
-import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import {
   PaletteItem, PALETTE_ITEM_REGULAR_TYPE
 } from '../paletteItem';
@@ -64,25 +69,17 @@ const GroupLabel = styled(MenuItem)`
   font-size: 12px;
   text-transform: uppercase;
   font-weight: 600;
-  color: ${({ theme }) => theme.palette.secondary.main}
+  color: ${({ theme }) => theme.palette.secondary.main};
+  opacity: 1 !important;
 `;
 
-const InlinePaletteWrapper = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  max-height: 350px;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  overflow-y: auto;
-  padding: ${({ theme }) => theme.spacing(1.5)};
-  border-radius: ${({ theme }) => theme.spacing(0.5)};
-  width: 200px;
-  z-index: 1000000;
-  position: relative;
-`;
+const StyledPaper = styled(Paper)`
 
-const StyledMenu = styled(Menu)`
-  width: 200px;
-  max-height: 350px;
+  // z-index: 10000; // raise above the app bar
+
+    max-height: 350px;
+    overflow-y: scroll;
+    width: 200px;
 `;
 
 const InlinePaletteGroup = styled.div`
@@ -129,7 +126,7 @@ export default function InlineCommandPalette () {
     isVisible
   ]);
 
-  const { getItemProps } = useInlinePaletteItems(
+  const { dismissPalette, getItemProps } = useInlinePaletteItems(
     palettePluginKey,
     items,
     counter,
@@ -144,7 +141,7 @@ export default function InlineCommandPalette () {
       paletteGroupItemsRecord[item.group] = [];
     }
     paletteGroupItemsRecord[item.group].push(
-      <MenuItem key={item.uid} disabled={item._isItemDisabled} sx={{ py: 0, px: 0 }}>
+      <MenuItem key={item.uid} disabled={item._isItemDisabled} selected={itemProps.isActive} sx={{ py: 0 }}>
         <InlinePaletteRow
           dataId={item.uid}
           key={item.uid}
@@ -157,22 +154,46 @@ export default function InlineCommandPalette () {
     );
   });
 
-  function onClose () {
-    console.log('close');
-    hideSuggestionsTooltip(palettePluginKey)(view.state, view.dispatch, view);
+  function handleListKeyDown (event: React.KeyboardEvent) {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      dismissPalette();
+    }
+    else if (event.key === 'Escape') {
+      dismissPalette();
+    }
   }
 
   return (
-    <StyledMenu anchorEl={tooltipContentDOM} open={isVisible} onClose={onClose}>
-      {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
-        <InlinePaletteGroup key={group}>
-          <GroupLabel>
-            {group}
-          </GroupLabel>
-          {paletteItems}
-        </InlinePaletteGroup>
-      ))}
-    </StyledMenu>
+    isVisible && (
+      <ClickAwayListener onClickAway={dismissPalette}>
+        <Portal container={tooltipContentDOM}>
+          <Grow
+            in={true}
+            style={{
+              transformOrigin: 'left top'
+            }}
+          >
+            <StyledPaper>
+              <MenuList
+                autoFocusItem={isVisible}
+                onKeyDown={handleListKeyDown}
+                sx={{ py: 0 }}
+              >
+                {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
+                  <InlinePaletteGroup key={group}>
+                    <GroupLabel disabled>
+                      {group}
+                    </GroupLabel>
+                    {paletteItems}
+                  </InlinePaletteGroup>
+                ))}
+              </MenuList>
+            </StyledPaper>
+          </Grow>
+        </Portal>
+      </ClickAwayListener>
+    )
   );
 }
 

@@ -37,12 +37,12 @@ function pluginsFactory () {
   const markName = paletteMarkName;
   const tooltipRenderOpts: suggestTooltip.SuggestTooltipRenderOpts = {
     getScrollContainer,
-    placement: 'top-start'
+    placement: 'bottom-start'
   };
 
   return ({ schema, specRegistry }: {schema: Schema, specRegistry: SpecRegistry}) => {
     const { trigger: _trigger } = specRegistry.options[markName];
-    const suggestTooltipKey = new PluginKey('suggestTooltipKey');
+    const suggestTooltipKey = new PluginKey('inlinePaletteTooltipKey');
 
     // We are converting to DOM elements so that their instances
     // can be shared across plugins.
