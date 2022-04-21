@@ -104,6 +104,7 @@ export function InlineCommentThread () {
   const [commentText, setCommentText] = useState('');
   const [isMutatingComment, setIsMutatingComment] = useState(false);
   const [editedComment, setEditedComment] = useState<null | string>(null);
+  const [targetedComment, setTargetedComment] = useState<null | string>(null);
 
   async function addComment () {
     if (thread && !isMutatingComment) {
@@ -114,7 +115,6 @@ export function InlineCommentThread () {
       });
 
       setCommentText('');
-
       setThreads((_threads) => ({ ..._threads,
         [thread.id]: {
           ...thread,
@@ -136,11 +136,12 @@ export function InlineCommentThread () {
       setCommentText('');
       setEditedComment(null);
       setIsMutatingComment(false);
+      setTargetedComment(null);
     }
   }
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'comment-actions' });
-
+  const bindTriggerProps = bindTrigger(popupState);
   if (isVisible && component === 'inlineComment' && thread) {
     return createPortal(
       <ClickAwayListener onClickAway={() => {
@@ -200,7 +201,10 @@ export function InlineCommentThread () {
                     },
                     '&:hover .comment-actions': {
                       opacity: 1
-                    }
+                    },
+                    p: 1,
+                    borderRadius: theme.spacing(0.5),
+                    background: targetedComment === comment.id ? 'rgba(46, 170, 220, 0.15)' : 'inherit'
                   }}
                 >
                   <ListItem sx={{
@@ -221,7 +225,15 @@ export function InlineCommentThread () {
                           {new Date(comment.createdAt).toLocaleString()}
                         </Typography>
                       </Box>
-                      <IconButton size='small' {...bindTrigger(popupState)} className='comment-actions'>
+                      <IconButton
+                        size='small'
+                        {...bindTriggerProps}
+                        onClick={(e) => {
+                          setTargetedComment(comment.id);
+                          bindTriggerProps.onClick(e);
+                        }}
+                        className='comment-actions'
+                      >
                         <MoreHorizIcon color='secondary' fontSize='small' />
                       </IconButton>
                     </Box>
@@ -233,50 +245,69 @@ export function InlineCommentThread () {
                     )}
                     <Typography pl={4}>{comment.content}</Typography>
                   </ListItem>
-                  <Menu {...bindMenu(popupState)}>
-                    <MenuItem
-                      onClick={async () => {
-                        setEditedComment(comment.id);
-                        setCommentText(comment.content);
-                        popupState.close();
-                      }}
-                    >
-                      <EditIcon
-                        fontSize='small'
-                        sx={{
-                          mr: 1
-                        }}
-                      />
-                      <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Edit</Typography>
-                    </MenuItem>
-                    <MenuItem
-                      onClick={async () => {
-                        await charmClient.deleteComment(comment.id);
-                        const threadWithoutComment = {
-                          ...thread,
-                          Comment: thread.Comment.filter(_comment => _comment.id !== comment.id)
-                        };
-                        setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
-                        popupState.close();
-                      }}
-                    >
-                      <DeleteIcon
-                        fontSize='small'
-                        sx={{
-                          mr: 1
-                        }}
-                      />
-                      <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
-                    </MenuItem>
-                  </Menu>
                 </List>
               );
             })}
           </Box>
           <Box display='flex' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
             <TextField placeholder='Add a comment...' fullWidth size='small' onChange={(e) => setCommentText(e.target.value)} value={commentText} />
-            <Button disabled={isMutatingComment} onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
+            <Button disabled={isMutatingComment} size='small' onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
+            {editedComment && (
+            <Button
+              onClick={() => {
+                setCommentText('');
+                setEditedComment(null);
+                setTargetedComment(null);
+              }}
+              color='error'
+              size='small'
+            >Cancel
+            </Button>
+            )}
           </Box>
+          <Menu {...bindMenu(popupState)}>
+            <MenuItem
+              onClick={async () => {
+                const comment = thread.Comment.find(_comment => _comment.id === targetedComment);
+                if (comment) {
+                  setEditedComment(comment.id);
+                  setCommentText(comment.content);
+                  popupState.close();
+                }
+              }}
+            >
+              <EditIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Edit</Typography>
+            </MenuItem>
+            <MenuItem
+              onClick={async () => {
+                const comment = thread.Comment.find(_comment => _comment.id === targetedComment);
+                if (comment) {
+                  await charmClient.deleteComment(comment.id);
+                  const threadWithoutComment = {
+                    ...thread,
+                    Comment: thread.Comment.filter(_comment => _comment.id !== comment.id)
+                  };
+                  setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
+                  popupState.close();
+                  setTargetedComment(null);
+                }
+              }}
+            >
+              <DeleteIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
+            </MenuItem>
+          </Menu>
         </Box>
       </ClickAwayListener>,
       tooltipContentDOM
