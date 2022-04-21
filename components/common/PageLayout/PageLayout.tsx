@@ -127,6 +127,6 @@ export default function PageLayout ({ children }: { children: React.ReactNode })
   );
 }
 
-export function useThreads () {
+export function useThreadsDisplay () {
   return React.useContext(ThreadsContext);
 }

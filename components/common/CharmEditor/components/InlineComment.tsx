@@ -69,7 +69,7 @@ export function inlineCommentPlugin (): RawPlugins {
   ];
 }
 
-export function InlineCommentThread () {
+export function InlineCommentThread ({ showCommentThreads }: {showCommentThreads: boolean}) {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -81,7 +81,8 @@ export function InlineCommentThread () {
   const thread = threadId && threads[threadId];
 
   if (isVisible && component === 'inlineComment' && thread && !thread.resolved) {
-    return createPortal(
+    // Only show comment thread on inline comment if the page threads list is not active
+    return !showCommentThreads ? createPortal(
       <ClickAwayListener onClickAway={() => {
         hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
       }}
@@ -89,7 +90,7 @@ export function InlineCommentThread () {
         <PageThread threadId={threadId} />
       </ClickAwayListener>,
       tooltipContentDOM
-    );
+    ) : null;
   }
   return null;
 }

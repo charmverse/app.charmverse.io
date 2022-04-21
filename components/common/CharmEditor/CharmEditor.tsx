@@ -321,12 +321,10 @@ function CharmEditor (
         editable: () => !readOnly
       }}
       // Components that should be placed after the editor component
-      postEditorComponents={(
-        <>
-          {showCommentThreads && <PageThreads />}
-          <Placeholder show={isEmpty} />
-        </>
+      commentThreadsComponent={(
+        showCommentThreads && <PageThreads />
       )}
+      placeholderComponent={<Placeholder show={isEmpty} />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
         switch (props.node.type.name) {
@@ -416,9 +414,8 @@ function CharmEditor (
     >
       <FloatingMenu />
       <MentionSuggest />
-      <InlineCommentThread />
+      <InlineCommentThread showCommentThreads={showCommentThreads} />
       <NestedPagesList />
-
       {EmojiSuggest}
       {InlinePalette}
       {children}

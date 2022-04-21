@@ -29,6 +29,8 @@ import { PageContent } from 'models';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
 import CommentIcon from '@mui/icons-material/Comment';
+import { useInlineComment } from 'hooks/useInlineComment';
+import { useThreads } from 'hooks/useThreads';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -45,6 +47,7 @@ export default function Header (
   { setShowThreads, showThreads, open, openSidebar }:
   { showThreads: boolean, setShowThreads: React.Dispatch<React.SetStateAction<boolean>>, open: boolean, openSidebar: () => void }
 ) {
+  const { threads } = useThreads();
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, currentPageId } = usePages();
@@ -136,7 +139,14 @@ export default function Header (
               <ShareButton headerHeight={headerHeight} />
               <Tooltip title='Show comment threads' arrow placement='bottom'>
                 <IconButton size='small' disableRipple color={!showThreads ? 'secondary' : 'inherit'}>
-                  <CommentIcon fontSize='small' onClick={() => setShowThreads(!showThreads)} />
+                  <CommentIcon
+                    fontSize='small'
+                    onClick={() => {
+                      if (Object.keys(threads).length !== 0) {
+                        setShowThreads(!showThreads);
+                      }
+                    }}
+                  />
                 </IconButton>
               </Tooltip>
               <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>

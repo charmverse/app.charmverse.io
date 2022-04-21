@@ -147,7 +147,7 @@ export default forwardRef<HTMLDivElement, {threadId: string}>(({ threadId }, ref
   }
 
   return thread ? (
-    <Box ref={ref} p={2} sx={{ background: theme.palette.background.light, minWidth: 500, maxHeight: 550 }}>
+    <Box id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, minWidth: 500, maxHeight: 550 }}>
       <Box maxHeight={400} pr={1} overflow='auto'>
         <Box justifyContent='space-between' display='flex' alignItems='center' mb={1}>
           <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>

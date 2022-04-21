@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { Page, PageContent } from 'models';
-import { useThreads } from 'components/common/PageLayout/PageLayout';
+import { useThreadsDisplay } from 'components/common/PageLayout/PageLayout';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
 import PageHeader from './components/PageHeader';
@@ -40,7 +40,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     pageTop = 200;
   }
 
-  const { showThreads } = useThreads();
+  const { showThreads } = useThreadsDisplay();
 
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
     setPage({ content: content.doc, contentText: content.rawText });
