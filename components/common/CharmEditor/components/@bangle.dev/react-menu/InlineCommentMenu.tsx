@@ -4,6 +4,7 @@ import { Box, Button } from '@mui/material';
 import charmClient from 'charmClient';
 import { MenuInput } from 'components/common/MenuInput';
 import { usePages } from 'hooks/usePages';
+import { TextSelection } from 'prosemirror-state';
 import React, { useRef, useState } from 'react';
 import { mutate } from 'swr';
 import { floatingMenuPluginKey } from '../../FloatingMenu';
@@ -27,6 +28,8 @@ export function InlineCommentSubMenu() {
       mutate(`pages/${currentPageId}/threads`)
       updateInlineComment(thread.id)(view.state, view.dispatch);
       hideSelectionTooltip(floatingMenuPluginKey)(view.state, view.dispatch, view)
+      const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)))
+      view.dispatch(tr)
       view.focus();
     }
   };
