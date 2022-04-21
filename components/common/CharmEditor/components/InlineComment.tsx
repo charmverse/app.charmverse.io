@@ -150,15 +150,20 @@ export function InlineCommentThread () {
   async function resolveThread () {
     if (thread) {
       setIsMutating(true);
-      await charmClient.updateThread(thread.id, {
-        resolved: true
-      });
-      setThreads((_threads) => ({ ..._threads,
-        [thread.id]: {
-          ...thread,
+      try {
+        await charmClient.updateThread(thread.id, {
           resolved: true
-        } }));
-      removeInlineCommentMark();
+        });
+        setThreads((_threads) => ({ ..._threads,
+          [thread.id]: {
+            ...thread,
+            resolved: true
+          } }));
+        removeInlineCommentMark();
+      }
+      catch (_) {
+        //
+      }
       setIsMutating(false);
     }
   }
@@ -166,10 +171,15 @@ export function InlineCommentThread () {
   async function deleteThread () {
     if (thread) {
       setIsMutating(true);
-      await charmClient.deleteThread(thread.id);
-      delete threads[thread.id];
-      setThreads(threads);
-      removeInlineCommentMark();
+      try {
+        await charmClient.deleteThread(thread.id);
+        delete threads[thread.id];
+        setThreads(threads);
+        removeInlineCommentMark();
+      }
+      catch (_) {
+        //
+      }
       setIsMutating(false);
     }
   }

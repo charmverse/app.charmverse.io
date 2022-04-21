@@ -5,7 +5,6 @@ import { FloatingMenu, floatingMenu } from '@bangle.dev/react-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { NodeSelection } from 'prosemirror-state';
 import { InlineCommentSubMenu } from './@bangle.dev/react-menu/InlineCommentMenu';

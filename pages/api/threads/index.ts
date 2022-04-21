@@ -9,7 +9,6 @@ import { Thread } from '@prisma/client';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-// TODO: Add permission to not allow creating comments/threads on read-only mode
   .post(requireKeys(['context', 'pageId', 'content'], 'body'), startThread);
 
 export interface StartThreadRequest {
