@@ -18,16 +18,30 @@ async function editComment (req: NextApiRequest, res: NextApiResponse) {
 
   const commentId = req.query.id as string;
 
-  const comment = await prisma.comment.update({
+  const comment = await prisma.comment.findUnique({
     where: {
       id: commentId
+    }
+  });
+
+  if (!comment) {
+    return res.status(404).json({ error: 'Comment not found' });
+  }
+
+  await prisma.comment.updateMany({
+    where: {
+      id: commentId,
+      userId: req.session.user.id as string
     },
     data: {
       content
     }
   });
 
-  return res.status(200).json(comment);
+  return res.status(200).json({
+    ...comment,
+    content
+  });
 }
 
 async function deleteComment (req: NextApiRequest, res: NextApiResponse) {

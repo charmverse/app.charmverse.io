@@ -26,9 +26,10 @@ export interface UpdateThreadRequest {
 }
 
 async function updateThread (req: NextApiRequest, res: NextApiResponse) {
-  await prisma.thread.update({
+  await prisma.thread.updateMany({
     where: {
-      id: req.query.id as string
+      id: req.query.id as string,
+      userId: req.session.user.id as string
     },
     data: {
       resolved: req.body.resolved

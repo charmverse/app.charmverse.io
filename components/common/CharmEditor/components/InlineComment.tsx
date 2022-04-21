@@ -188,7 +188,7 @@ export function InlineCommentThread () {
               </Typography>
               <Box display='flex' gap={1}>
                 <Button
-                  disabled={isMutating}
+                  disabled={isMutating || (thread.userId !== user?.id)}
                   onClick={resolveThread}
                   sx={{
                     '.MuiButton-startIcon': {
@@ -207,7 +207,7 @@ export function InlineCommentThread () {
                 </Button>
                 <Button
                   onClick={deleteThread}
-                  disabled={isMutating}
+                  disabled={isMutating || (thread.userId !== user?.id)}
                   sx={{
                     '.MuiButton-startIcon': {
                       mr: 0.25
@@ -274,7 +274,7 @@ export function InlineCommentThread () {
                       )}
                     </Box>
                     {commentIndex === 0 && (
-                      <Box my={1} pl={4} display='flex'>
+                      <Box mb={1} pl={4} display='flex'>
                         <ContextBorder />
                         <Typography fontWeight={600} color='secondary'>{thread.context}</Typography>
                       </Box>
