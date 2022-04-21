@@ -1,14 +1,9 @@
 import { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Menu, MenuItem } from '@mui/material';
+import { MenuItem } from '@mui/material';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 import MenuList from '@mui/material/MenuList';
-import Popper from '@mui/material/Popper';
-import Paper from '@mui/material/Paper';
-import Grow from '@mui/material/Grow';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import Portal from '@mui/material/Portal';
 import {
   useInlinePaletteItems,
   useInlinePaletteQuery
@@ -19,6 +14,7 @@ import {
   PaletteItem, PALETTE_ITEM_REGULAR_TYPE
 } from '../paletteItem';
 import { useEditorItems } from '../useEditorItems';
+import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 
 function getItemsAndHints (
   view: EditorView,
@@ -64,23 +60,6 @@ function getItemsAndHints (
     });
   return { items };
 }
-
-const GroupLabel = styled(MenuItem)`
-  font-size: 12px;
-  text-transform: uppercase;
-  font-weight: 600;
-  color: ${({ theme }) => theme.palette.secondary.main};
-  opacity: 1 !important;
-`;
-
-const StyledPaper = styled(Paper)`
-
-  // z-index: 10000; // raise above the app bar
-
-    max-height: 350px;
-    overflow-y: scroll;
-    width: 200px;
-`;
 
 const InlinePaletteGroup = styled.div`
   margin: ${({ theme }) => theme.spacing(1, 0)};
@@ -165,35 +144,26 @@ export default function InlineCommandPalette () {
   }
 
   return (
-    isVisible && (
-      <ClickAwayListener onClickAway={dismissPalette}>
-        <Portal container={tooltipContentDOM}>
-          <Grow
-            in={true}
-            style={{
-              transformOrigin: 'left top'
-            }}
-          >
-            <StyledPaper>
-              <MenuList
-                autoFocusItem={isVisible}
-                onKeyDown={handleListKeyDown}
-                sx={{ py: 0 }}
-              >
-                {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
-                  <InlinePaletteGroup key={group}>
-                    <GroupLabel disabled>
-                      {group}
-                    </GroupLabel>
-                    {paletteItems}
-                  </InlinePaletteGroup>
-                ))}
-              </MenuList>
-            </StyledPaper>
-          </Grow>
-        </Portal>
-      </ClickAwayListener>
-    )
+    <PopoverMenu
+      isOpen={isVisible}
+      container={tooltipContentDOM}
+      onClose={dismissPalette}
+    >
+      <MenuList
+        autoFocusItem={isVisible}
+        onKeyDown={handleListKeyDown}
+        sx={{ py: 0 }}
+      >
+        {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
+          <InlinePaletteGroup key={group}>
+            <GroupLabel>
+              {group}
+            </GroupLabel>
+            {paletteItems}
+          </InlinePaletteGroup>
+        ))}
+      </MenuList>
+    </PopoverMenu>
   );
 }
 

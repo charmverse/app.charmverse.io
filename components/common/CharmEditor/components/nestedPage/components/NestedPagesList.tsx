@@ -1,16 +1,17 @@
 
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
-import { Menu, MenuItem, ListItemIcon } from '@mui/material';
+import { MenuItem, ListItemIcon } from '@mui/material';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
 import { useCallback } from 'react';
 import { isTruthy } from 'lib/utilities/types';
-import useNestedPage from './hooks/useNestedPage';
-import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { NestedPagePluginKey, NestedPagePluginState } from './nestedPage';
+import useNestedPage from '../hooks/useNestedPage';
+import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import { NestedPagePluginKey, NestedPagePluginState } from '../nestedPage';
+import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 
 export default function NestedPagesList () {
   const { pages } = usePages();
@@ -36,7 +37,8 @@ export default function NestedPagesList () {
   }
 
   return (
-    <Menu anchorEl={tooltipContentDOM} open={isVisible} onClose={onClose} sx={{ maxHeight: 400 }}>
+    <PopoverMenu container={tooltipContentDOM} isOpen={isVisible} onClose={onClose} width={460}>
+      <GroupLabel>Select a page</GroupLabel>
       {Object.values(pages).filter(isTruthy).map(page => {
         const docContent = ((page.content) as PageContent)?.content;
         const isEditorEmpty = docContent && (docContent.length <= 1
@@ -66,6 +68,6 @@ export default function NestedPagesList () {
           </MenuItem>
         );
       })}
-    </Menu>
+    </PopoverMenu>
   );
 }

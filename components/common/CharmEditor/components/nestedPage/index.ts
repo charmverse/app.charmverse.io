@@ -1,5 +1,5 @@
-import NestedPage from './NestedPage.component';
-import NestedPagesList from './NestedPagesList';
+import NestedPage from './components/NestedPage';
+import NestedPagesList from './components/NestedPagesList';
 
 export * from './nestedPage';
 export { NestedPagesList };

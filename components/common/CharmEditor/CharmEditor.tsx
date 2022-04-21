@@ -117,11 +117,7 @@ export function charmEditorPlugins (
       })
 
     }),
-    nestedPagePlugins({
-      tooltipRenderOpts: {
-        placement: 'bottom'
-      }
-    }),
+    nestedPagePlugins(),
     imagePlugins({
       handleDragAndDrop: false
     }),

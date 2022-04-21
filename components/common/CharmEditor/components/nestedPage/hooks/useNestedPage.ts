@@ -1,7 +1,6 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
 import { Page } from '@prisma/client';
-import { insertNode } from 'components/common/CharmEditor/utils';
 import { useCallback } from 'react';
 import { usePages } from 'hooks/usePages';
 
@@ -25,9 +24,13 @@ export default function useNestedPage () {
       if (!page) {
         return false;
       }
-      return insertNode(state, dispatch, state.schema.nodes.page.create({
+      const nestedPageNode = state.schema.nodes.page.create({
         id: page.id
-      }));
+      });
+      if (dispatch) {
+        dispatch(state.tr.replaceSelectionWith(nestedPageNode));
+      }
+      return true;
     });
   }, [currentPageId, addPage, view]);
 
