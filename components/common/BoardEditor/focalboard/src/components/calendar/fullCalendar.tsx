@@ -20,7 +20,7 @@ import PropertyValueElement from '../propertyValueElement'
 import {Constants} from '../../constants'
 import CardBadges from '../cardBadges'
 import { usePages } from 'hooks/usePages'
-import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
+import PageIcon from 'components/common/PageLayout/components/PageIcon'
 
 const oneDay = 60 * 60 * 24 * 1000
 

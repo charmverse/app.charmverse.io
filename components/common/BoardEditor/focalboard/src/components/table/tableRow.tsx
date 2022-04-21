@@ -18,9 +18,9 @@ import {getCardComments} from '../../store/comments'
 
 import PropertyValueElement from '../propertyValueElement'
 import { usePages } from 'hooks/usePages'
-import { PageIcon } from 'components/common/PageLayout/components/PageNavigation'
 import charmClient from 'charmClient'
 import { Page } from '@prisma/client'
+import PageIcon from 'components/common/PageLayout/components/PageIcon'
 
 type Props = {
     board: Board
