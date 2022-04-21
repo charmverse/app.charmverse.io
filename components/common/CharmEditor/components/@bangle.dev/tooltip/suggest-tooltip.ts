@@ -601,7 +601,6 @@ export interface SuggestTooltipPluginState {
   tooltipContentDOM: HTMLElement
   component: "nestedPage" | "inlineComment"
   threadId: null | string
-  selection: null | Selection
 }
 
 export interface SuggestTooltipPluginOptions {

@@ -598,7 +598,7 @@ export function useEditorItems() {
         description: 'Link to a new page',
         editorExecuteCommand: (() => {
           return (async (state, dispatch, view) => {
-            renderSuggestionsTooltip(SuggestTooltipPluginKey, {component: "nestedPage", selection: state.selection, threadId: null})(state, dispatch, view);
+            renderSuggestionsTooltip(SuggestTooltipPluginKey, {component: "nestedPage", threadId: null})(state, dispatch, view);
             return replaceSuggestionMarkWith(palettePluginKey, '')(
               state,
               dispatch,

@@ -68,8 +68,7 @@ export function inlineCommentPlugin (): RawPlugins {
             if (inlineCommentMark && inlineCommentMark.attrs.id) {
               renderSuggestionsTooltip(SuggestTooltipPluginKey, {
                 component: 'inlineComment',
-                threadId: inlineCommentMark.attrs.id,
-                selection: view.state.selection
+                threadId: inlineCommentMark.attrs.id
               })(view.state, view.dispatch, view);
             }
           }
