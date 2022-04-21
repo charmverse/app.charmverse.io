@@ -4,6 +4,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
+import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -17,15 +18,34 @@ async function editComment (req: NextApiRequest, res: NextApiResponse) {
   };
 
   const commentId = req.query.id as string;
-
-  const comment = await prisma.comment.findUnique({
+  const userId = req.session.user.id;
+  const comment = await prisma.comment.findFirst({
     where: {
-      id: commentId
+      id: commentId,
+      userId
+    },
+    select: {
+      thread: {
+        select: {
+          pageId: true
+        }
+      }
     }
   });
 
   if (!comment) {
     return res.status(404).json({ error: 'Comment not found' });
+  }
+
+  const permissionSet = await computeUserPagePermissions({
+    pageId: comment.thread.pageId,
+    userId
+  });
+
+  if (!permissionSet.edit_content) {
+    return res.status(401).json({
+      error: 'You are not allowed to perform this action'
+    });
   }
 
   await prisma.comment.updateMany({
@@ -46,6 +66,35 @@ async function editComment (req: NextApiRequest, res: NextApiResponse) {
 
 async function deleteComment (req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
+  const comment = await prisma.comment.findFirst({
+    where: {
+      id: req.query.id as string,
+      userId
+    },
+    select: {
+      thread: {
+        select: {
+          pageId: true
+        }
+      }
+    }
+  });
+
+  if (!comment) {
+    return res.status(404).json({ error: 'Comment not found' });
+  }
+
+  const permissionSet = await computeUserPagePermissions({
+    pageId: comment.thread.pageId,
+    userId
+  });
+
+  if (!permissionSet.edit_content) {
+    return res.status(401).json({
+      error: 'You are not allowed to perform this action'
+    });
+  }
+
   await prisma.comment.deleteMany({
     where: {
       id: req.query.id as string,

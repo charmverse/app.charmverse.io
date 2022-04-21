@@ -112,38 +112,71 @@ export function InlineCommentThread () {
   const { removeInlineCommentMark } = useInlineComment();
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
+  const popupState = usePopupState({ variant: 'popover', popupId: 'comment-actions' });
+  const bindTriggerProps = bindTrigger(popupState);
 
   async function addComment () {
     if (thread && !isMutating) {
-      setIsMutating(true);
-      const comment = await charmClient.addComment({
-        content: commentText,
-        threadId: thread.id
-      });
+      try {
+        setIsMutating(true);
+        const comment = await charmClient.addComment({
+          content: commentText,
+          threadId: thread.id
+        });
 
+        setThreads((_threads) => ({ ..._threads,
+          [thread.id]: {
+            ...thread,
+            Comment: [...thread.Comment, comment]
+          } }));
+      }
+      catch (_) {
+        //
+      }
       setCommentText('');
-      setThreads((_threads) => ({ ..._threads,
-        [thread.id]: {
-          ...thread,
-          Comment: [...thread.Comment, comment]
-        } }));
       setIsMutating(false);
     }
   }
 
   async function editComment () {
     if (thread && editedComment && !isMutating) {
-      setIsMutating(true);
-      await charmClient.editComment(editedComment, commentText);
-      setThreads((_threads) => ({ ..._threads,
-        [thread.id]: {
-          ...thread,
-          Comment: thread.Comment.map(comment => comment.id === editedComment ? ({ ...comment, content: commentText }) : comment)
-        } }));
+      try {
+        setIsMutating(true);
+        await charmClient.editComment(editedComment, commentText);
+        setThreads((_threads) => ({ ..._threads,
+          [thread.id]: {
+            ...thread,
+            Comment: thread.Comment.map(comment => comment.id === editedComment ? ({ ...comment, content: commentText }) : comment)
+          } }));
+      }
+      catch (_) {
+        //
+      }
       setCommentText('');
       setEditedComment(null);
       setIsMutating(false);
       setTargetedComment(null);
+    }
+  }
+
+  async function deleteComment () {
+    if (thread) {
+      const comment = thread.Comment.find(_comment => _comment.id === targetedComment);
+      if (comment) {
+        try {
+          await charmClient.deleteComment(comment.id);
+          const threadWithoutComment = {
+            ...thread,
+            Comment: thread.Comment.filter(_comment => _comment.id !== comment.id)
+          };
+          setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
+        }
+        catch (_) {
+          //
+        }
+        popupState.close();
+        setTargetedComment(null);
+      }
     }
   }
 
@@ -184,8 +217,6 @@ export function InlineCommentThread () {
     }
   }
 
-  const popupState = usePopupState({ variant: 'popover', popupId: 'comment-actions' });
-  const bindTriggerProps = bindTrigger(popupState);
   if (isVisible && component === 'inlineComment' && thread && !thread.resolved) {
     return createPortal(
       <ClickAwayListener onClickAway={() => {
@@ -273,7 +304,7 @@ export function InlineCommentThread () {
                           {new Date(comment.createdAt).toLocaleString()}
                         </Typography>
                       </Box>
-                      {(comment.userId === user?.id && permissions.edit_content) && (
+                      {(comment.userId === user?.id) && permissions.edit_content && (
                       <IconButton
                         size='small'
                         {...bindTriggerProps}
@@ -302,7 +333,7 @@ export function InlineCommentThread () {
           {permissions.edit_content && (
           <Box display='flex' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
             <TextField placeholder='Add a comment...' fullWidth size='small' onChange={(e) => setCommentText(e.target.value)} value={commentText} />
-            <Button disabled={isMutating} size='small' onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
+            <Button disabled={isMutating || commentText.length === 0} size='small' onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
             {editedComment && (
             <Button
               onClick={() => {
@@ -317,6 +348,7 @@ export function InlineCommentThread () {
             )}
           </Box>
           )}
+          {permissions.edit_content && (
           <Menu {...bindMenu(popupState)}>
             <MenuItem
               onClick={async () => {
@@ -337,19 +369,7 @@ export function InlineCommentThread () {
               <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Edit</Typography>
             </MenuItem>
             <MenuItem
-              onClick={async () => {
-                const comment = thread.Comment.find(_comment => _comment.id === targetedComment);
-                if (comment) {
-                  await charmClient.deleteComment(comment.id);
-                  const threadWithoutComment = {
-                    ...thread,
-                    Comment: thread.Comment.filter(_comment => _comment.id !== comment.id)
-                  };
-                  setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
-                  popupState.close();
-                  setTargetedComment(null);
-                }
-              }}
+              onClick={deleteComment}
             >
               <DeleteIcon
                 fontSize='small'
@@ -360,6 +380,7 @@ export function InlineCommentThread () {
               <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
             </MenuItem>
           </Menu>
+          )}
         </Box>
       </ClickAwayListener>,
       tooltipContentDOM
