@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import { useInlineComment } from 'hooks/useInlineComment';
+import { useUser } from 'hooks/useUser';
 import { hideSuggestionsTooltip, renderSuggestionsTooltip, SuggestTooltipPluginKey, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'inline-comment';
@@ -99,7 +100,7 @@ export function InlineCommentThread () {
     component,
     threadId
   } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
-
+  const [user] = useUser();
   const thread = threadId && threads[threadId];
   const theme = useTheme();
   const [commentText, setCommentText] = useState('');
@@ -179,8 +180,8 @@ export function InlineCommentThread () {
         setEditedComment(null);
       }}
       >
-        <Box p={2} sx={{ background: theme.palette.background.light, minWidth: 500, maxHeight: 450 }}>
-          <Box maxHeight={350} pr={1} overflow='auto'>
+        <Box p={2} sx={{ background: theme.palette.background.light, minWidth: 500, maxHeight: 550 }}>
+          <Box maxHeight={400} pr={1} overflow='auto'>
             <Box justifyContent='space-between' display='flex' alignItems='center' mb={1}>
               <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
                 Started at {new Date(thread.createdAt).toLocaleString()}
@@ -258,6 +259,7 @@ export function InlineCommentThread () {
                           {new Date(comment.createdAt).toLocaleString()}
                         </Typography>
                       </Box>
+                      {comment.userId === user?.id && (
                       <IconButton
                         size='small'
                         {...bindTriggerProps}
@@ -269,6 +271,7 @@ export function InlineCommentThread () {
                       >
                         <MoreHorizIcon color='secondary' fontSize='small' />
                       </IconButton>
+                      )}
                     </Box>
                     {commentIndex === 0 && (
                       <Box my={1} pl={4} display='flex'>

@@ -12,9 +12,10 @@ handler.use(requireUser)
   .put(updateThread);
 
 async function deleteThread (req: NextApiRequest, res: NextApiResponse) {
-  await prisma.thread.delete({
+  await prisma.thread.deleteMany({
     where: {
-      id: req.query.id as string
+      id: req.query.id as string,
+      userId: req.session.user.id as string
     }
   });
   return res.status(200).json({ ok: true });

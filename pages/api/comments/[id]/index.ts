@@ -31,9 +31,11 @@ async function editComment (req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function deleteComment (req: NextApiRequest, res: NextApiResponse) {
-  await prisma.comment.delete({
+  const userId = req.session.user.id;
+  await prisma.comment.deleteMany({
     where: {
-      id: req.query.id as string
+      id: req.query.id as string,
+      userId
     }
   });
   return res.status(200).json({ ok: true });
