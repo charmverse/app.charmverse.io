@@ -1,13 +1,13 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import SaveIcon from '@mui/icons-material/Save';
-import { Box } from '@mui/material';
+import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
+import { Box, Button } from '@mui/material';
 import charmClient from 'charmClient';
 import { MenuInput } from 'components/common/MenuInput';
 import { usePages } from 'hooks/usePages';
 import React, { useRef, useState } from 'react';
 import { mutate } from 'swr';
+import { floatingMenuPluginKey } from '../../FloatingMenu';
 import { updateInlineComment } from '../../InlineComment';
-import { MenuButton } from './Icon';
 
 export function InlineCommentSubMenu() {
   const view = useEditorViewContext();
@@ -15,7 +15,7 @@ export function InlineCommentSubMenu() {
   const {currentPageId} = usePages()
   const inputRef = useRef<HTMLInputElement>(null);
   const isDisabled = commentText.length === 0;
-  const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+  const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!isDisabled) {
       e.preventDefault();
       const {thread} = await charmClient.startThread({
@@ -26,6 +26,7 @@ export function InlineCommentSubMenu() {
       });
       mutate(`pages/${currentPageId}/threads`)
       updateInlineComment(thread.id)(view.state, view.dispatch);
+      hideSelectionTooltip(floatingMenuPluginKey)(view.state, view.dispatch, view)
       view.focus();
     }
   };
@@ -53,13 +54,13 @@ export function InlineCommentSubMenu() {
           e.preventDefault();
         }}
       />
-      <MenuButton disableButton={isDisabled} hints={["Save"]}>
-        <SaveIcon color={!isDisabled ? "inherit" : "disabled"} sx={{
-          fontSize: 14
-        }} onClick={(e) => {
-          handleSubmit(e)
-        }}/>
-      </MenuButton>
+      <Button size="small" onClick={(e) => {
+        handleSubmit(e)
+      }} sx={{
+        fontSize: 14
+      }} disabled={isDisabled}>
+        Start
+      </Button>
     </Box>
   );
 }

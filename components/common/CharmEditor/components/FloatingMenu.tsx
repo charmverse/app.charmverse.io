@@ -10,16 +10,16 @@ import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
 import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
-import { queryIsInlineCommentActive, queryIsSelectionAroundInlineComment } from './InlineComment';
+import { queryIsSelectionAroundInlineComment } from './InlineComment';
 
-const menuKey = new PluginKey('menuKey');
+export const floatingMenuPluginKey = new PluginKey('menuKey');
 
 export default function FloatingMenuComponent () {
   const { showMessage } = useSnackbar();
 
   return (
     <FloatingMenu
-      menuKey={menuKey}
+      menuKey={floatingMenuPluginKey}
       renderMenuType={({ type }) => {
         if (type === 'defaultMenu') {
           return (
@@ -30,8 +30,8 @@ export default function FloatingMenuComponent () {
                 <CodeButton />
                 <StrikeButton />
                 <UnderlineButton />
-                <FloatingLinkButton menuKey={menuKey} />
-                <InlineCommentButton menuKey={menuKey} />
+                <FloatingLinkButton menuKey={floatingMenuPluginKey} />
+                <InlineCommentButton menuKey={floatingMenuPluginKey} />
               </MenuGroup>
               <MenuGroup isLastGroup>
                 <ParagraphButton />
@@ -65,7 +65,7 @@ export default function FloatingMenuComponent () {
 
 export const floatingMenuPlugin = (readonly?: boolean) => {
   return floatingMenu.plugins({
-    key: menuKey,
+    key: floatingMenuPluginKey,
     calculateType: (state) => {
       if (readonly) {
         return null;

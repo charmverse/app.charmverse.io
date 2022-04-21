@@ -24,6 +24,7 @@ import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import React, { useCallback } from 'react';
 import { createInlineComment, queryIsInlineCommentActive, toggleInlineComment } from '../../InlineComment';
 import { MenuButton } from './Icon';
+import CommentIcon from '@mui/icons-material/Comment';
 
 const {
   defaultKeys: orderedListKeys,
@@ -96,7 +97,7 @@ export function BoldButton({
 export function InlineCommentButton({
   hints = ['Inline comment'],
   hintPos = 'top',
-  children = <ChatBubbleIcon sx={{
+  children = <CommentIcon sx={{
     fontSize: 12,
     position: "relative"
   }}/>,
