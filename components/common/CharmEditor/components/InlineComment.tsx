@@ -16,6 +16,7 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
+import { useInlineComment } from 'hooks/useInlineComment';
 import { hideSuggestionsTooltip, renderSuggestionsTooltip, SuggestTooltipPluginKey, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'inline-comment';
@@ -93,13 +94,11 @@ const ContextBorder = styled.div`
 export function InlineCommentThread () {
   const { threads, setThreads } = useThreads();
   const view = useEditorViewContext();
-  const schema = view.state.schema;
   const {
     tooltipContentDOM,
     show: isVisible,
     component,
-    threadId,
-    selection
+    threadId
   } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
 
   const thread = threadId && threads[threadId];
@@ -108,6 +107,7 @@ export function InlineCommentThread () {
   const [isMutating, setIsMutating] = useState(false);
   const [editedComment, setEditedComment] = useState<null | string>(null);
   const [targetedComment, setTargetedComment] = useState<null | string>(null);
+  const { removeInlineCommentMark } = useInlineComment();
 
   async function addComment () {
     if (thread && !isMutating) {
@@ -144,7 +144,7 @@ export function InlineCommentThread () {
   }
 
   async function resolveThread () {
-    if (thread && selection) {
+    if (thread) {
       setIsMutating(true);
       await charmClient.updateThread(thread.id, {
         resolved: true
@@ -154,13 +154,18 @@ export function InlineCommentThread () {
           ...thread,
           resolved: true
         } }));
-      // TODO: Remove the inline-comment mark from the position
-      const [from, to] = [selection.$from.pos, selection.$to.pos];
-      const inlineCommentMark = schema.marks['inline-comment'];
-      const tr = view.state.tr.removeMark(from, to, inlineCommentMark);
-      if (view.dispatch) {
-        view.dispatch(tr);
-      }
+      removeInlineCommentMark();
+      setIsMutating(false);
+    }
+  }
+
+  async function deleteThread () {
+    if (thread) {
+      setIsMutating(true);
+      await charmClient.deleteThread(thread.id);
+      delete threads[thread.id];
+      setThreads(threads);
+      removeInlineCommentMark();
       setIsMutating(false);
     }
   }
@@ -201,6 +206,7 @@ export function InlineCommentThread () {
                 >Resolve
                 </Button>
                 <Button
+                  onClick={deleteThread}
                   disabled={isMutating}
                   sx={{
                     '.MuiButton-startIcon': {
