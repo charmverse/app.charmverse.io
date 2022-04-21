@@ -20,7 +20,7 @@
     "db-tool:test": "dotenv -e .env.test.local -- npx prisma studio",
     "test:setup-db": "./testing/configure-db.sh",
     "test:client": "npm run test-setup && jest --config='./jest.config-client.ts'",
-    "test:server": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose"
+    "test:server": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose"
   },
   "postinstall": "patch-package",
   "prepare": "husky install",
@@ -119,7 +119,7 @@
     "react-countdown": "^2.3.2",
     "react-csv": "^2.2.2",
     "react-day-picker": "^7.4.10",
-    "react-dnd": "^15.1.2",
+    "react-dnd": "^16.0.0",
     "react-dnd-html5-backend": "^16.0.0",
     "react-dnd-scrolling": "^1.2.1",
     "react-dnd-touch-backend": "^16.0.0",
