@@ -28,6 +28,7 @@ import { useUser } from 'hooks/useUser';
 import { PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
+import CommentIcon from '@mui/icons-material/Comment';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -130,7 +131,11 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
           {isPage && (
             <>
               <ShareButton headerHeight={headerHeight} />
-
+              <Tooltip title='Show comment threads' arrow placement='bottom'>
+                <IconButton size='small'>
+                  <CommentIcon fontSize='small' />
+                </IconButton>
+              </Tooltip>
               <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
                 <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}

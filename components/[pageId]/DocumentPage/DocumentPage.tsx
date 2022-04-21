@@ -6,6 +6,7 @@ import { Page, PageContent } from 'models';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageBanner from './components/PageBanner';
 import PageHeader from './components/PageHeader';
+import PageThreads from './components/PageThreads';
 
 export const Container = styled(Box)<{ top: number }>`
   width: 860px;
@@ -40,24 +41,27 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   return (
     <ScrollableWindow>
       {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
-      <Container
-        top={pageTop}
-      >
-        <CharmEditor
-          key={page.id}
-          content={page.content as PageContent}
-          onContentChange={updatePageContent}
-          readOnly={readOnly}
+      <Box display='flex' gap={10}>
+        <Container
+          top={pageTop}
         >
-          <PageHeader
-            headerImage={page.headerImage}
-            icon={page.icon}
-            title={page.title}
+          <CharmEditor
+            key={page.id}
+            content={page.content as PageContent}
+            onContentChange={updatePageContent}
             readOnly={readOnly}
-            setPage={setPage}
-          />
-        </CharmEditor>
-      </Container>
+          >
+            <PageHeader
+              headerImage={page.headerImage}
+              icon={page.icon}
+              title={page.title}
+              readOnly={readOnly}
+              setPage={setPage}
+            />
+          </CharmEditor>
+        </Container>
+        <PageThreads />
+      </Box>
     </ScrollableWindow>
   );
 }

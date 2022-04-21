@@ -12,7 +12,7 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import { Command, EditorState, PluginKey } from '@bangle.dev/pm';
+import { EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
 import { HintPos } from '@bangle.dev/react-menu/dist/types';

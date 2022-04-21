@@ -3,7 +3,6 @@
 /* eslint-disable max-lines */
 import { Box } from '@mui/system'
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner'
-import { randomIntFromInterval } from 'lib/utilities/random'
 import { Page } from 'models'
 import React from 'react'
 import Hotkeys from 'react-hot-keys'
