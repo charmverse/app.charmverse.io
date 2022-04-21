@@ -8,6 +8,7 @@ const PageTitle = styled(({ hasContent, ...props }: any) => <Typography {...prop
   align-items: center;
   font-size: 14px;
   height: 24px;
+  line-height: 24px;
   &:hover {
     color: inherit;
   }

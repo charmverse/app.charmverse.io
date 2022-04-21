@@ -13,7 +13,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { PageContent } from 'models';
 import Link from 'next/link';
-import useNestedPage from './hooks/useNestedPage';
+import useNestedPage from '../hooks/useNestedPage';
 
 const NestedPageContainer = styled((props: any) => <div {...props} />)`
   align-items: center;

@@ -2,7 +2,7 @@
   border-radius: 8px;
 }
 
-.bangle-editor li[data-bangle-is-todo]>span:first-child>input {
+.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.45rem;
 }
 
@@ -34,9 +34,9 @@
   text-decoration: underline;
 }
 
-.bangle-editor p>code {}
+.bangle-editor p > code {}
 
-.bangle-editor li[data-bangle-is-todo]>span:first-child>input {
+.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.45rem;
 }
 
@@ -49,23 +49,23 @@
   outline: none;
 }
 
-// .ProseMirror .tableWrapper {
-//   overflow-x: auto;
-// }
+.ProseMirror .tableWrapper {
+  overflow-x: auto;
+}
 
-// .ProseMirror table {
-//   border-collapse: collapse;
-//   table-layout: fixed;
-//   width: 100%;
-//   overflow: hidden;
-// }
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  overflow: hidden;
+}
 
-// .ProseMirror td,
-// .ProseMirror th {
-//   vertical-align: top;
-//   box-sizing: border-box;
-//   position: relative;
-// }
+.ProseMirror td,
+.ProseMirror th {
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+}
 
 .ProseMirror .column-resize-handle {
   position: absolute;
@@ -101,29 +101,29 @@
   outline: none;
 }
 
-// .ProseMirror {
-//   padding: 5px 0;
-// }
+.ProseMirror {
+  padding: 5px 0;
+}
 
 .ProseMirror table {
   margin: 0;
 }
 
-// .ProseMirror th,
-// .ProseMirror td {
-//   min-width: 1em;
-//   border: 1px solid #ddd;
-//   padding: 3px 5px;
-// }
+.ProseMirror th,
+.ProseMirror td {
+  min-width: 1em;
+  border: 1px solid #ddd;
+  padding: 3px 5px;
+}
 
-// .ProseMirror .tableWrapper {
-//   margin: 1em 0;
-// }
+.ProseMirror .tableWrapper {
+  margin: 1em 0;
+}
 
-// .ProseMirror th {
-//   font-weight: bold;
-//   text-align: left;
-// }
+.ProseMirror th {
+  font-weight: bold;
+  text-align: left;
+}
 
 // @bangle.dev/core/style.css
 /**
@@ -140,7 +140,7 @@
   white-space: break-spaces;
   -webkit-font-variant-ligatures: none;
   font-variant-ligatures: none;
-  font-feature-settings: "liga"0;
+  font-feature-settings: "liga" 0;
   /* the above doesn't seem to work in Edge */
 }
 
@@ -206,21 +206,21 @@ img.ProseMirror-separator {
   text-decoration: underline;
 }
 
-.bangle-editor>p:first-child,
-.bangle-editor>h1:first-child,
-.bangle-editor>h2:first-child,
-.bangle-editor>h3:first-child,
-.bangle-editor>h4:first-child,
-.bangle-editor>h5:first-child,
-.bangle-editor>h6:first-child,
-.bangle-editor>blockquote:first-child,
-.bangle-editor>pre:first-child,
-.bangle-editor>hr:first-child,
-.bangle-editor>figure:first-child,
-.bangle-editor>dl:first-child,
-.bangle-editor>dd:first-child,
-.bangle-editor>ul:first-child,
-.bangle-editor>ol:first-child {
+.bangle-editor > p:first-child,
+.bangle-editor > h1:first-child,
+.bangle-editor > h2:first-child,
+.bangle-editor > h3:first-child,
+.bangle-editor > h4:first-child,
+.bangle-editor > h5:first-child,
+.bangle-editor > h6:first-child,
+.bangle-editor > blockquote:first-child,
+.bangle-editor > pre:first-child,
+.bangle-editor > hr:first-child,
+.bangle-editor > figure:first-child,
+.bangle-editor > dl:first-child,
+.bangle-editor > dd:first-child,
+.bangle-editor > ul:first-child,
+.bangle-editor > ol:first-child {
   /** this prevents elements from bleeding out of the container */
   margin-top: 0;
 }
@@ -308,7 +308,7 @@ ol li {
   }
 }
 
-.bangle-editor li>span {
+.bangle-editor li > span {
   display: block;
 }
 
@@ -335,13 +335,13 @@ ol li {
   left: -1.5rem;
 }
 
-.bangle-editor li[data-bangle-is-todo]>span:first-child>input {
+.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.5rem;
   margin-right: 6px;
   outline: none;
 }
 
-.bangle-editor>ol {
+.bangle-editor > ol {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
@@ -358,12 +358,12 @@ ol li {
   // font-size: 1.125rem;
 }
 
-.bangle-editor>p {
+.bangle-editor > p {
   padding-top: 3px;
   padding-bottom: 3px;
 }
 
-.bangle-editor p>code {
+.bangle-editor p > code {
   font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   padding: 0.2em 0.4em;

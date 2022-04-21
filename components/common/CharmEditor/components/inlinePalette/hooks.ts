@@ -2,16 +2,23 @@ import type { EditorState, EditorView, PluginKey, Transaction } from '@bangle.de
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { suggestTooltip } from '@bangle.dev/tooltip';
 import { useCallback, useEffect } from 'react';
-import { PromisedCommand } from '../../extensions/inline-command-palette/palette-item';
-import { getSuggestTooltipKey } from './inline-palette';
+import { PromisedCommand } from './paletteItem';
+import { getSuggestTooltipKey } from './inlinePalette';
 
-export function useInlinePaletteQuery(inlinePaletteKey: PluginKey) {
+export interface InlinePaletteItem {
+  editorExecuteCommand: (arg: {
+    item: InlinePaletteItem;
+    itemIndex: number;
+  }) => PromisedCommand;
+}
+
+export function useInlinePaletteQuery (inlinePaletteKey: PluginKey) {
   const view = useEditorViewContext();
   // TODO show is a bad name
   const {
     triggerText: query,
     counter,
-    show: isVisible,
+    show: isVisible
   } = usePluginState(getSuggestTooltipKey(inlinePaletteKey)(view.state), true);
   const { tooltipContentDOM } = usePluginState(inlinePaletteKey);
 
@@ -25,11 +32,11 @@ export function useInlinePaletteQuery(inlinePaletteKey: PluginKey) {
  * @param {*} param0
  * @returns
  */
-export function useInlinePaletteItems<T extends InlinePaletteItem>(
+export function useInlinePaletteItems<T extends InlinePaletteItem> (
   inlinePaletteKey: PluginKey,
   items: T[],
   counter: number,
-  isItemDisabled?: (item: T) => boolean,
+  isItemDisabled?: (item: T) => boolean
 ): {
   getItemProps: (
     item: T,
@@ -47,7 +54,7 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
     return suggestTooltip.removeSuggestMark(inlinePaletteKey)(
       view.state,
       view.dispatch,
-      view,
+      view
     );
   }, [view, inlinePaletteKey]);
 
@@ -66,24 +73,24 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
         return () => true;
       }
 
-      return (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, view: EditorView) => {
+      return (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, _view: EditorView) => {
         return item.editorExecuteCommand({
           item,
-          itemIndex,
-        })(state, dispatch, view);
+          itemIndex
+        })(state, dispatch, _view);
       };
     },
-    [inlinePaletteKey, items, isItemDisabled],
+    [inlinePaletteKey, items, isItemDisabled]
   );
 
   useEffect(() => {
     // Save the callback to get the active item so that the plugin
     // can execute an enter on the active item
-    setExecuteItemCommand((state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, view: EditorView) => {
+    setExecuteItemCommand((state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, _view: EditorView) => {
       const result = executeHandler(getActiveIndex(counter, items.length))(
         state,
         dispatch,
-        view,
+        _view
       );
       return result;
     });
@@ -100,26 +107,19 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
           if (executeHandler(index)(view.state, view.dispatch, view)) {
             e.preventDefault();
           }
-        },
+        }
       };
     },
-    [activeIndex, executeHandler, view],
+    [activeIndex, executeHandler, view]
   );
 
   return {
     getItemProps,
-    dismissPalette,
+    dismissPalette
   };
 }
 
-function getActiveIndex(counter: number, size: number): number {
+function getActiveIndex (counter: number, size: number): number {
   const r = counter % size;
   return r < 0 ? r + size : r;
-}
-
-export interface InlinePaletteItem {
-  editorExecuteCommand: (arg: {
-    item: InlinePaletteItem;
-    itemIndex: number;
-  }) => PromisedCommand;
 }

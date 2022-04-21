@@ -27,3 +27,15 @@ export function insertNode (state: EditorState, dispatch: ((tr: Transaction<any>
 
   return true;
 }
+
+export const safeRequestAnimationFrame = typeof window !== 'undefined' && window.requestAnimationFrame
+  ? window.requestAnimationFrame
+  : function (callback: ((time: number) => void)) {
+    const currTime = new Date().getTime();
+    const timeToCall = Math.max(0, 16 - (currTime - ((window as any).lastTime ?? 0)));
+    const id = window.setTimeout(() => {
+      callback(currTime + timeToCall);
+    }, timeToCall);
+    (window as any).lastTime = currTime + timeToCall;
+    return id;
+  };
