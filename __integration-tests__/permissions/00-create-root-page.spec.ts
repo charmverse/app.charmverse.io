@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Page, Prisma, Space, SpaceApiToken, User } from '@prisma/client';
-import { createDatabase, createDatabaseCardPage, InvalidCustomPropertyValueError, Page as ApiPage, PageProperty, UnsupportedKeysError } from 'lib/public-api';
+import { Prisma, Space, User } from '@prisma/client';
+import { IPageWithPermissions } from 'lib/pages';
 import request from 'supertest';
+import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { v4 } from 'uuid';
-import { IPageWithPermissions } from 'lib/pages';
 
-let databasePage: Page;
 let user: User;
 let space: Space;
 let cookie: string;
@@ -26,12 +24,6 @@ beforeAll(async () => {
     });
 
   cookie = loggedInResponse.headers['set-cookie'][0];
-
-  databasePage = await createDatabase({
-    title: 'Some title',
-    createdBy: user.id,
-    spaceId: space.id
-  });
 });
 
 describe('POST /api/pages - create root page', () => {
