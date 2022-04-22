@@ -4,6 +4,7 @@ import { createDatabase, createDatabaseCardPage, InvalidCustomPropertyValueError
 import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { v4 } from 'uuid';
 import { IPageWithPermissions } from 'lib/pages';
 
@@ -37,23 +38,10 @@ describe('POST /api/pages - create root page', () => {
 
   it('should assign to the phase a default permission of full access for the space members', async () => {
 
-    const pageToCreate: Prisma.PageCreateInput = {
-      author: {
-        connect: {
-          id: user.id
-        }
-      },
-      contentText: '',
-      path: v4(),
-      title: 'Root',
-      type: 'page',
-      updatedBy: user.id,
-      space: {
-        connect: {
-          id: space.id
-        }
-      }
-    };
+    const pageToCreate: Prisma.PageCreateInput = generatePageToCreateStub({
+      userId: user.id,
+      spaceId: space.id
+    });
 
     const response = await request(baseUrl)
       .post('/api/pages')
