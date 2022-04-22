@@ -21,7 +21,6 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 const ContextBorder = styled.div`
   width: 3px;
-  height: 22px;
   border-radius: 3px;
   margin-left: 2px;
   margin-right: 8px;
@@ -268,7 +267,15 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 {commentIndex === 0 && (
                 <Box mb={1} pl={4} display='flex'>
                   <ContextBorder />
-                  <Typography fontWeight={600} color='secondary'>{thread.context}</Typography>
+                  <Typography
+                    sx={{
+                      wordBreak: 'break-all',
+                      textAlign: 'justify'
+                    }}
+                    fontWeight={600}
+                    color='secondary'
+                  >{thread.context}
+                  </Typography>
                 </Box>
                 )}
                 <Typography pl={4}>{comment.content}</Typography>
