@@ -272,7 +272,6 @@ function CharmEditor (
 ) {
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
-  console.log('content', content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
