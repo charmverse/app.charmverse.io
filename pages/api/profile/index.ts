@@ -88,7 +88,7 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       addresses: req.body.addresses
     }
   });
-  console.log('update user', req.body, user);
+
   return res.status(200).json(user);
 }
 
