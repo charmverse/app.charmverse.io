@@ -22,11 +22,15 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
   const unResolvedThreads = allThreads.filter(thread => thread && !thread.resolved);
   const resolvedThreads = allThreads.filter(thread => thread && thread.resolved);
   const [threadClass, setThreadClass] = useState<'resolved' | 'open'>('open');
-  const handleChange: SelectProps['onChange'] = (event) => {
+  const [threadSort, setThreadSort] = useState<'earliest' | 'latest'>('latest');
+  const handleThreadClassChange: SelectProps['onChange'] = (event) => {
     setThreadClass(event.target.value as any);
   };
+  const handleThreadListSortChange: SelectProps['onChange'] = (event) => {
+    setThreadSort(event.target.value as any);
+  };
 
-  const threadsList = threadClass === 'resolved' ? resolvedThreads : unResolvedThreads;
+  const threadsList = (threadClass === 'resolved' ? resolvedThreads : unResolvedThreads).sort((threadA, threadB) => threadA && threadB ? new Date((threadSort === 'earliest' ? threadA : threadB).createdAt).getTime() - new Date((threadSort === 'earliest' ? threadB : threadA).createdAt).getTime() : 0);
 
   return (
     <Box
@@ -42,10 +46,16 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
     >
       <Box display='flex' alignItems='center' justifyContent='space-between' my={1}>
         <Typography variant='h6'>Threads</Typography>
-        <Select variant='outlined' value={threadClass} onChange={handleChange}>
-          <MenuItem value='resolved'>Resolved</MenuItem>
-          <MenuItem value='open'>Open</MenuItem>
-        </Select>
+        <Box display='flex' gap={1}>
+          <Select variant='outlined' value={threadClass} onChange={handleThreadClassChange}>
+            <MenuItem value='resolved'>Resolved</MenuItem>
+            <MenuItem value='open'>Open</MenuItem>
+          </Select>
+          <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
+            <MenuItem value='earliest'>Earliest</MenuItem>
+            <MenuItem value='latest'>Latest</MenuItem>
+          </Select>
+        </Box>
       </Box>
       <List sx={{
         height: 'calc(100% - 30px)',
