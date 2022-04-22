@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 const ContextBorder = styled.div`
   width: 3px;
@@ -150,9 +151,33 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       <Box maxHeight={inline ? 'calc(100% - 50px)' : 'fit-content'} pr={inline ? 1 : 0} overflow='auto'>
         <Box justifyContent='space-between' display='flex' alignItems='center' mb={1} gap={5}>
           <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
-            Started at {new Date(thread.createdAt).toLocaleString()}
+            {new Date(thread.createdAt).toLocaleString()}
           </Typography>
           <Box display='flex' gap={1}>
+            <Button
+              onClick={() => {
+                const threadDocument = document.getElementById(`inline-comment.${threadId}`);
+                if (threadDocument) {
+                  threadDocument.scrollIntoView({
+                    behavior: 'smooth'
+                  });
+                }
+              }}
+              sx={{
+                '.MuiButton-startIcon': {
+                  mr: 0.5
+                }
+              }}
+              startIcon={(
+                <LocationOnIcon
+                  fontSize='small'
+                />
+          )}
+              variant='outlined'
+              color='secondary'
+              size='small'
+            >Find
+            </Button>
             <Button
               disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
               onClick={resolveThread}

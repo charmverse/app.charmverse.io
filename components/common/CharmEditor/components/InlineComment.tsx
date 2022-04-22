@@ -29,7 +29,7 @@ export function highlightSpec (): RawSpecs {
           tag: 'span.charm-inline-comment'
         }
       ],
-      toDOM: (): DOMOutputSpec => ['span', { class: 'charm-inline-comment' }]
+      toDOM: (mark): DOMOutputSpec => ['span', { class: 'charm-inline-comment', id: `inline-comment.${mark.attrs.id}` }]
     },
     markdown: {
       // TODO: Fix convert to markdown
