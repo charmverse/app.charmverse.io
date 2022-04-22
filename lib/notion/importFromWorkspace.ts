@@ -1250,6 +1250,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
   log.info('[notion] Completed import of Notion pages', {
     resultsFromSearch: searchResults.length,
+    retrievedPages: Object.keys(retrievedPages).length,
+    createdCards: Object.keys(createdCards).length,
     createdPages: createdPages.size,
     failedPages: failedImportsRecord,
     pagesWithoutIntegrationAccess
