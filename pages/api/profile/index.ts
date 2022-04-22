@@ -1,7 +1,7 @@
 
 import { prisma } from 'db';
 import { postToDiscord } from 'lib/log/userEvents';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
@@ -15,7 +15,7 @@ handler
   .post(createUser)
   .use(requireUser)
   .get(getUser)
-  .put(updateUser);
+  .put(requireKeys(['addresses'], 'body'), updateUser);
 
 async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
@@ -65,6 +65,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
 }
 
 async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
+
   const user = await prisma.user.update({
     where: {
       id: req.session.user.id
@@ -87,6 +88,7 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       addresses: req.body.addresses
     }
   });
+  console.log('update user', req.body, user);
   return res.status(200).json(user);
 }
 
