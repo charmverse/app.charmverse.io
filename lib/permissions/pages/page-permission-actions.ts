@@ -246,16 +246,48 @@ export async function deletePagePermission (permissionId: string) {
     throw new PermissionNotFoundError(permissionId);
   }
 
-  // Delete the permission and the permissions
-  await prisma.pagePermission.deleteMany({ where: {
-    OR: [
-      {
-        id: permissionId
-      }, {
-        inheritedFromPermission: permissionId
-      }
-    ]
-  } });
+  // We are deleting an intermediate permission, so we need to also delete all children
+  if (foundPermission.inheritedFromPermission) {
+    const childPages = await resolveChildPages(foundPermission.pageId);
+    // Delete all child permissions that inherited from the same permission as this
+    await prisma.pagePermission.deleteMany({ where: {
+      AND: [
+        // Permission linked to this page or the children
+        {
+          OR: [{
+            pageId: foundPermission.pageId
+          }, ...childPages.map(page => {
+            return {
+              pageId: page.id
+            };
+          })
+          ]
+        },
+        // Permission itself or child page permissions that inherit from same page as this
+        {
+          OR: [
+            {
+              id: permissionId
+            }, {
+              inheritedFromPermission: foundPermission.inheritedFromPermission
+            }
+          ]
+        }
+      ]
+    } });
+  }
+  else {
+    // Delete the permission and the permissions
+    await prisma.pagePermission.deleteMany({ where: {
+      OR: [
+        {
+          id: permissionId
+        }, {
+          inheritedFromPermission: permissionId
+        }
+      ]
+    } });
+  }
 
   return true;
 }
