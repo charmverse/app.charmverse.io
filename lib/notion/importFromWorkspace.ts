@@ -559,17 +559,17 @@ function convertToPlainText (chunks: {plain_text: string}[]) {
   return chunks.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
 }
 
-interface CreateDatabaseResult {
+interface RetrieveDatabaseResult {
   focalboardPropertiesRecord: Record<string, string>;
   board: Prisma.BlockCreateManyInput;
   view: Prisma.BlockCreateManyInput;
   page: CreatePageInput;
 }
 
-async function createDatabase (block: GetDatabaseResponse, {
+async function retrieveDatabase (block: GetDatabaseResponse, {
   spaceId,
   userId
-}: {spaceId: string, userId: string}): Promise<CreateDatabaseResult> {
+}: {spaceId: string, userId: string}): Promise<RetrieveDatabaseResult> {
   const title = convertToPlainText((block as any).title);
   const cardProperties: IPropertyTemplate[] = [];
 
@@ -683,7 +683,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
   const retrievedPages: Record<string, CreatePageInput> = {};
 
-  const createdCards: Record<string, {
+  const retrievedCards: Record<string, {
     card: Prisma.BlockCreateManyInput
     page: CreatePageInput,
     notionPageId: string
@@ -756,7 +756,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   async function retrieveDatabaseInformation (block: GetDatabaseResponse) {
     // Only create the database if it hasn't been created already
     if (!retrievedPages[block.id]) {
-      const { board, focalboardPropertiesRecord, page, view } = await createDatabase(block as GetDatabaseResponse, {
+      const { board, focalboardPropertiesRecord, page, view } = await retrieveDatabase(block as GetDatabaseResponse, {
         spaceId,
         userId
       });
@@ -1087,7 +1087,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             content: pageContent,
             type: 'card' as PageType
           };
-          createdCards[notionPageId] = {
+          retrievedCards[notionPageId] = {
             notionPageId,
             page: cardPage,
             card: {
@@ -1188,7 +1188,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         else if (searchResultRecord[block.parent.page_id]) {
           // Check if the parent is a regular page first
           // If its not then the parent is a database page (focalboard card)
-          parentId = retrievedPages[block.parent.page_id]?.id ?? createdCards[block.parent.page_id]?.page?.id;
+          parentId = retrievedPages[block.parent.page_id]?.id ?? retrievedCards[block.parent.page_id]?.page?.id;
         }
         else {
           // Parent id could be a block, for example there could be a nested page inside a callout/quote/column block
@@ -1201,14 +1201,14 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       }
       // Focalboard cards
       // If the card has been created (in memory) and the database has been created in memory
-      else if (block.parent.type === 'database_id' && createdCards[block.id] && retrievedPages[block.parent.database_id]) {
+      else if (block.parent.type === 'database_id' && retrievedCards[block.id] && retrievedPages[block.parent.database_id]) {
         // If the parent wasn't created create it first if there were no errors
         if (!createdPages.has(block.parent.database_id)
             && searchResultRecord[block.parent.database_id]) {
           await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
         }
         // Make sure the database page has not failed to be created, otherwise no cards will be added
-        const { notionPageId, page, card } = createdCards[block.id];
+        const { notionPageId, page, card } = retrievedCards[block.id];
         if (!failedImportsRecord[block.parent.database_id]) {
           await prisma.block.create({
             data: card
@@ -1251,7 +1251,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   log.info('[notion] Completed import of Notion pages', {
     resultsFromSearch: searchResults.length,
     retrievedPages: Object.keys(retrievedPages).length,
-    createdCards: Object.keys(createdCards).length,
+    retrievedCards: Object.keys(retrievedCards).length,
     createdPages: createdPages.size,
     failedPages: failedImportsRecord,
     pagesWithoutIntegrationAccess
