@@ -28,7 +28,7 @@ import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
-import { Portal } from '@mui/material';
+import { Grow, Portal } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import { Callout, calloutSpec } from './components/Callout';
 import * as columnLayout from './components/columnLayout';
