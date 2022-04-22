@@ -2,6 +2,7 @@ import { RawPlugins, RawSpecs, Plugin } from '@bangle.dev/core';
 import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey, TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
+import { useTheme } from '@emotion/react';
 import { ClickAwayListener } from '@mui/material';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
@@ -79,7 +80,7 @@ export function inlineCommentPlugin (): RawPlugins {
   ];
 }
 
-export function InlineCommentThread ({ showCommentThreads }: {showCommentThreads: boolean}) {
+export function InlineCommentThread ({ showingCommentThreadsList }: {showingCommentThreadsList: boolean}) {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -87,12 +88,28 @@ export function InlineCommentThread ({ showCommentThreads }: {showCommentThreads
     component,
     threadId
   } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
+  const theme = useTheme();
   const { threads } = useThreads();
   const thread = threadId && threads[threadId];
-
+  // TODO: Move it to a lib module
+  if (threadId && showingCommentThreadsList) {
+    const threadDocument = document.getElementById(`thread.${threadId}`);
+    if (threadDocument) {
+      threadDocument?.scrollIntoView({
+        behavior: 'smooth'
+      });
+      threadDocument.style.backgroundColor = 'rgba(46, 170, 220, 0.2)';
+      threadDocument.style.transition = ' background-color 250ms ease-in-out';
+      setTimeout(() => {
+        threadDocument.style.backgroundColor = theme.palette.background.light;
+        threadDocument.style.transition = ' background-color 250ms ease-in-out';
+      }, 500);
+    }
+    return null;
+  }
   if (isVisible && component === 'inlineComment' && thread && !thread.resolved) {
     // Only show comment thread on inline comment if the page threads list is not active
-    return !showCommentThreads ? createPortal(
+    return !showingCommentThreadsList ? createPortal(
       <ClickAwayListener onClickAway={() => {
         hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
       }}

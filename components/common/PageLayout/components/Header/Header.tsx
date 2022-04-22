@@ -42,8 +42,10 @@ const StyledToolbar = styled(Toolbar)`
 `;
 
 export default function Header (
-  { setShowThreads, showThreads, open, openSidebar }:
-  { showThreads: boolean, setShowThreads: React.Dispatch<React.SetStateAction<boolean>>, open: boolean, openSidebar: () => void }
+  { setShowingCommentThreadsList, showingCommentThreadsList, open, openSidebar }:
+  {
+    showingCommentThreadsList: boolean,
+    setShowingCommentThreadsList: React.Dispatch<React.SetStateAction<boolean>>, open: boolean, openSidebar: () => void }
 ) {
   const { threads } = useThreads();
   const router = useRouter();
@@ -137,12 +139,12 @@ export default function Header (
                 <IconButton
                   onClick={() => {
                     if (Object.keys(threads).length !== 0) {
-                      setShowThreads(!showThreads);
+                      setShowingCommentThreadsList(!showingCommentThreadsList);
                     }
                   }}
                   size='small'
                   disableRipple
-                  color={!showThreads ? 'secondary' : 'inherit'}
+                  color={!showingCommentThreadsList ? 'secondary' : 'inherit'}
                 >
                   <CommentIcon
                     fontSize='small'

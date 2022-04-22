@@ -44,7 +44,7 @@ import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
-import { highlightSpec, inlineCommentPlugin } from './components/InlineComment';
+import { highlightSpec, inlineCommentPlugin, InlineCommentThread } from './components/InlineComment';
 import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 import * as table from './components/table';
 import { checkForEmpty } from './utils';
@@ -270,7 +270,7 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  showCommentThreads?: boolean
+  showingCommentThreadsList?: boolean
   commentThreadsListRef?: RefObject<HTMLDivElement>
 }
 
@@ -295,7 +295,7 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 }
 
 function CharmEditor (
-  { commentThreadsListRef, showCommentThreads = false, content = defaultContent, children, onContentChange, style, readOnly = false }:
+  { commentThreadsListRef, showingCommentThreadsList = false, content = defaultContent, children, onContentChange, style, readOnly = false }:
   CharmEditorProps
 ) {
   // check empty state of page on first load
@@ -436,11 +436,12 @@ function CharmEditor (
       <EmojiSuggest />
       <InlinePalette />
       {children}
-      {commentThreadsListRef?.current && showCommentThreads && (
+      {commentThreadsListRef?.current && showingCommentThreadsList && (
         <Portal container={commentThreadsListRef.current}>
           <PageThreadsList inline={false} />
         </Portal>
       )}
+      <InlineCommentThread showingCommentThreadsList={showingCommentThreadsList} />
     </StyledReactBangleEditor>
   );
 }

@@ -146,8 +146,8 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
   }
 
   return thread ? (
-    <Box id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, maxHeight: inline ? 550 : 'inherit' }}>
-      <Box maxHeight={inline ? 550 : 'inherit'} pr={inline ? 1 : 0} overflow='auto'>
+    <Box id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, maxHeight: inline ? 300 : 'fit-content' }}>
+      <Box maxHeight={inline ? 'calc(100% - 50px)' : 'fit-content'} pr={inline ? 1 : 0} overflow='auto'>
         <Box justifyContent='space-between' display='flex' alignItems='center' mb={1} gap={5}>
           <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
             Started at {new Date(thread.createdAt).toLocaleString()}
@@ -254,7 +254,16 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       </Box>
       {permissions.edit_content && (
       <Box display='flex' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
-        <TextField placeholder='Add a comment...' fullWidth size='small' onChange={(e) => setCommentText(e.target.value)} value={commentText} />
+        <TextField
+          InputProps={{
+            className: 'PageThread-TextField-input'
+          }}
+          placeholder='Add a comment...'
+          fullWidth
+          size='small'
+          onChange={(e) => setCommentText(e.target.value)}
+          value={commentText}
+        />
         <Button disabled={isMutating || commentText.length === 0} size='small' onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
         {editedComment && (
         <Button

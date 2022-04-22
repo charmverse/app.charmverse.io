@@ -44,16 +44,16 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
         width: '100%'
       }}
     >
-      <Box display='flex' alignItems='center' justifyContent='space-between' my={1}>
+      <Box display='flex' alignItems='center' justifyContent='space-between' mb={1}>
         <Typography variant='h6'>Threads</Typography>
         <Box display='flex' gap={1}>
           <Select variant='outlined' value={threadClass} onChange={handleThreadClassChange}>
-            <MenuItem value='resolved'>Resolved</MenuItem>
             <MenuItem value='open'>Open</MenuItem>
+            <MenuItem value='resolved'>Resolved</MenuItem>
           </Select>
           <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
-            <MenuItem value='earliest'>Earliest</MenuItem>
             <MenuItem value='latest'>Latest</MenuItem>
+            <MenuItem value='earliest'>Earliest</MenuItem>
           </Select>
         </Box>
       </Box>

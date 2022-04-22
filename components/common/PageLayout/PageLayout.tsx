@@ -74,12 +74,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' })
   }));
 
 interface IContext {
-  showThreads: boolean,
-  setShowThreads: React.Dispatch<React.SetStateAction<boolean>>
+  showingCommentThreadsList: boolean,
+  setShowingCommentThreadsList: React.Dispatch<React.SetStateAction<boolean>>
 }
 const ThreadsContext = React.createContext<IContext>({
-  setShowThreads: () => undefined,
-  showThreads: false
+  setShowingCommentThreadsList: () => undefined,
+  showingCommentThreadsList: false
 });
 
 const HeaderSpacer = styled.div`
@@ -91,7 +91,7 @@ export default function PageLayout ({ children }: { children: React.ReactNode })
   const [user] = useUser();
   const { currentPageId, pages } = usePages();
   const currentPage = pages[currentPageId];
-  const [showThreads, setShowThreads] = React.useState(false);
+  const [showingCommentThreadsList, setShowingCommentThreadsList] = React.useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -102,9 +102,9 @@ export default function PageLayout ({ children }: { children: React.ReactNode })
   };
 
   const value = React.useMemo<IContext>(() => ({
-    showThreads,
-    setShowThreads
-  }), [showThreads]);
+    showingCommentThreadsList,
+    setShowingCommentThreadsList
+  }), [showingCommentThreadsList]);
 
   return (
     <ThreadsContext.Provider value={value}>
@@ -113,7 +113,12 @@ export default function PageLayout ({ children }: { children: React.ReactNode })
       </Head>
       <Box sx={{ display: 'flex', height: '100%' }}>
         <AppBar position='fixed' open={open}>
-          <Header setShowThreads={setShowThreads} showThreads={showThreads} open={open} openSidebar={handleDrawerOpen} />
+          <Header
+            setShowingCommentThreadsList={setShowingCommentThreadsList}
+            showingCommentThreadsList={showingCommentThreadsList}
+            open={open}
+            openSidebar={handleDrawerOpen}
+          />
         </AppBar>
         <Drawer variant='permanent' open={open}>
           <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />

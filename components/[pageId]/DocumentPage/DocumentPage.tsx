@@ -59,7 +59,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     pageTop = 200;
   }
 
-  const { showThreads } = useThreadsDisplay();
+  const { showingCommentThreadsList } = useThreadsDisplay();
 
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
     setPage({ content: content.doc, contentText: content.rawText });
@@ -75,7 +75,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     <ScrollableWindow>
       <Box display='flex' gap={1}>
         <div style={{
-          width: showThreads ? 'calc(100% - 550px)' : '100%'
+          width: showingCommentThreadsList ? 'calc(100% - 550px)' : '100%'
         }}
         >
           {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
@@ -88,7 +88,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
               content={page.content as PageContent}
               onContentChange={updatePageContent}
               readOnly={readOnly}
-              showCommentThreads={showThreads}
+              showingCommentThreadsList={showingCommentThreadsList}
             >
               <PageHeader
                 headerImage={page.headerImage}
@@ -141,7 +141,9 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             position: 'fixed',
             overflow: 'auto',
             height: 'calc(100% - 65px)',
-            paddingRight: '10px'
+            paddingRight: '10px',
+            // This is required to make the scroll work
+            display: showingCommentThreadsList ? 'initial' : 'none'
           }}
         />
       </Box>
