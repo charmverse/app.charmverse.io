@@ -37,7 +37,6 @@ const cardsSlice = createSlice({
             state.current = action.payload
         },
         addCard: (state, action: PayloadAction<Card>) => {
-            console.log({state, action})
             state.cards[action.payload.id] = action.payload
         },
         addTemplate: (state, action: PayloadAction<Card>) => {
@@ -173,7 +172,6 @@ function sortCards(cards: Card[], board: Board, activeView: BoardView, usersById
 
     let sortedCards = cards
     for (const sortOption of sortOptions) {
-        console.log('sort option', sortOption)
         if (sortOption.propertyId === Constants.titleColumnId) {
             Utils.log('Sort by title')
             sortedCards = sortedCards.sort((a, b) => {
@@ -187,7 +185,6 @@ function sortCards(cards: Card[], board: Board, activeView: BoardView, usersById
                 Utils.logError(`Missing template for property id: ${sortPropertyId}`)
                 return sortedCards
             }
-            console.log(template)
             Utils.log(`Sort by property: ${template?.name}`)
             sortedCards = sortedCards.sort((a, b) => {
                 // Always put cards with no titles at the bottom, regardless of sort
@@ -330,7 +327,6 @@ export const getCurrentViewCardsSortedFilteredAndGrouped = createSelector(
         if (searchText) {
             result = searchFilterCards(result, board, searchText)
         }
-        console.log('sort cards', result)
         result = sortCards(result, board, view, users)
         return result
     },
