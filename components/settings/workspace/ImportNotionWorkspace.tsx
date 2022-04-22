@@ -55,10 +55,6 @@ export default function ImportNotionWorkspace () {
             showMessage('Notion workspace successfully imported');
             closeModal();
           }
-          setNotionState({
-            loading: false,
-            warning: 'It can take up to an hour to import large Notion spaces. Your data will appear on the left navigation when the import is completed.'
-          });
         })
         .catch((err) => {
           if (err.status === 504) {

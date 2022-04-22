@@ -20,7 +20,13 @@ export function apply (log: Logger) {
       return (message, opt) => {
 
         const timestamp = DateTime.local().toFormat(TIMESTAMP_FORMAT);
-        rawMethod(`[${timestamp}] ${methodName}: ${message}`, opt);
+
+        if (opt) {
+          rawMethod(`[${timestamp}] ${methodName}: ${message}`, opt);
+        }
+        else {
+          rawMethod(`[${timestamp}] ${methodName}: ${message}`);
+        }
 
         // post errors to Discord
         if (methodName === 'error') {

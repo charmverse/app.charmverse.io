@@ -37,7 +37,6 @@ const cardsSlice = createSlice({
             state.current = action.payload
         },
         addCard: (state, action: PayloadAction<Card>) => {
-            console.log({state, action})
             state.cards[action.payload.id] = action.payload
         },
         addTemplate: (state, action: PayloadAction<Card>) => {
@@ -131,7 +130,7 @@ function titleOrCreatedOrder(cardA: Card, cardB: Card) {
     const aValue = cardA.title
     const bValue = cardB.title
 
-    if (aValue && bValue) {
+    if (aValue && bValue && aValue.localeCompare) {
         return aValue.localeCompare(bValue)
     }
 
@@ -188,10 +187,7 @@ function sortCards(cards: Card[], board: Board, activeView: BoardView, usersById
             }
             Utils.log(`Sort by property: ${template?.name}`)
             sortedCards = sortedCards.sort((a, b) => {
-                // Always put cards with no titles at the bottom, regardless of sort
-                if (!a.title || !b.title) {
-                    return titleOrCreatedOrder(a, b)
-                }
+
 
                 let aValue = a.fields.properties[sortPropertyId] || ''
                 let bValue = b.fields.properties[sortPropertyId] || ''
@@ -211,13 +207,13 @@ function sortCards(cards: Card[], board: Board, activeView: BoardView, usersById
                 if (template.type === 'number' || template.type === 'date') {
                     // Always put empty values at the bottom
                     if (aValue && !bValue) {
-                        return -1
+                        result = -1
                     }
                     if (bValue && !aValue) {
-                        return 1
+                        result = 1
                     }
                     if (!aValue && !bValue) {
-                        return titleOrCreatedOrder(a, b)
+                        result = titleOrCreatedOrder(a, b)
                     }
 
                     result = Number(aValue) - Number(bValue)
@@ -225,17 +221,28 @@ function sortCards(cards: Card[], board: Board, activeView: BoardView, usersById
                     result = a.createdAt - b.createdAt
                 } else if (template.type === 'updatedTime') {
                     result = a.updatedAt - b.updatedAt
+                } else if (template.type === 'checkbox') {
+                    // aValue will be true or empty string
+                    if (aValue) {
+                        result = 1;
+                    }
+                    else if (bValue) {
+                        result = -1;
+                    }
+                    else {
+                        result = titleOrCreatedOrder(a, b)
+                    }
                 } else {
                     // Text-based sort
 
                     if (aValue.length > 0 && bValue.length <= 0) {
-                        return -1
+                        result = -1
                     }
                     if (bValue.length > 0 && aValue.length <= 0) {
-                        return 1
+                        result = 1
                     }
                     if (aValue.length <= 0 && bValue.length <= 0) {
-                        return titleOrCreatedOrder(a, b)
+                        result = titleOrCreatedOrder(a, b)
                     }
 
                     if (template.type === 'select' || template.type === 'multiSelect') {
@@ -243,7 +250,9 @@ function sortCards(cards: Card[], board: Board, activeView: BoardView, usersById
                         bValue = template.options.find((o) => o.id === (Array.isArray(bValue) ? bValue[0] : bValue))?.value || ''
                     }
 
-                    result = (aValue as string).localeCompare(bValue as string)
+                    if (result == 0) {
+                        result = (aValue as string).localeCompare(bValue as string)
+                    }
                 }
 
                 if (result === 0) {
