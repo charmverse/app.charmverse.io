@@ -1,5 +1,5 @@
 import { RawPlugins, RawSpecs, Plugin } from '@bangle.dev/core';
-import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey } from '@bangle.dev/pm';
+import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey, TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
 import { ClickAwayListener } from '@mui/material';
@@ -51,15 +51,25 @@ export function inlineCommentPlugin (): RawPlugins {
     new Plugin({
       props: {
         handleClickOn: (view) => {
-          const { $from } = view.state.selection;
-          const node = $from.nodeAfter;
-          if (node) {
-            const inlineCommentMark = view.state.doc.type.schema.marks['inline-comment'].isInSet(node.marks);
+          const { $from, $to } = view.state.selection;
+          const fromNodeAfter = $from.nodeAfter;
+          const toNodeAfter = $to.nodeAfter;
+          if (!toNodeAfter) {
+            const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)));
+            view.dispatch(tr);
+            return true;
+          }
+          if (fromNodeAfter) {
+            const inlineCommentMark = view.state.doc.type.schema.marks['inline-comment'].isInSet(fromNodeAfter.marks);
             if (inlineCommentMark && inlineCommentMark.attrs.id) {
               renderSuggestionsTooltip(SuggestTooltipPluginKey, {
                 component: 'inlineComment',
                 threadId: inlineCommentMark.attrs.id
               })(view.state, view.dispatch, view);
+            }
+            else if (!view.state.selection.empty) {
+              const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$from.pos)));
+              view.dispatch(tr);
             }
           }
           return true;
