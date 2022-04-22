@@ -20,7 +20,7 @@ async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
 
   logFirstWorkspacePageCreation(page);
   logFirstUserPageCreation(page);
-  return res.status(200).json(pageWithPermissions);
+  return res.status(201).json(pageWithPermissions);
 }
 
 export default withSessionRoute(handler);
