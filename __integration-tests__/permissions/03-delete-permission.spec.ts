@@ -128,7 +128,7 @@ describe('DELETE /api/permissions - delete permission', () => {
       .send(generatePageToCreateStub({
         userId: user.id,
         spaceId: space.id,
-        parentId: childPage.id,
+        parentId: nestedChildPage.id,
         title: 'Nested'
       }))
       .expect(201)).body as IPageWithPermissions;
