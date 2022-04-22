@@ -915,7 +915,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
                   }
                 });
               }
-              catch (_) {
+              catch (error) {
+                log.warn('Could not retrieve database', { databaseId: block.id, error });
                 pagesWithoutIntegrationAccess.add(block.id);
               }
             },
@@ -1109,7 +1110,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         }
       }
     }
-    catch (_: any) {
+    catch (error) {
+      log.warn('Could not access page', { pageId: notionPageId, error });
       // TODO: Maybe show the user which pages they need to give access to the integration. but we can only show the id
       pagesWithoutIntegrationAccess.add(notionPageId);
     }
