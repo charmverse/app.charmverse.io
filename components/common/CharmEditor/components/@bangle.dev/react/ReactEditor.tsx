@@ -24,7 +24,6 @@ interface BangleEditorProps<PluginMetadata = any>
   onReady?: (editor: CoreBangleEditor<PluginMetadata>) => void;
   editorViewRef?: typeof useRef;
   // Components that should be placed underneath the editor
-  commentThreadsComponent?: ReactNode,
   placeholderComponent?: ReactNode
 }
 
@@ -43,7 +42,6 @@ export const BangleEditor = React.forwardRef<
       className,
       style,
       onReady = () => {},
-      commentThreadsComponent,
       placeholderComponent
     },
     ref,
@@ -106,7 +104,6 @@ export const BangleEditor = React.forwardRef<
               objectUid.get(nodeView),
             );
           })}
-          {editor ? commentThreadsComponent : null}
         </EditorViewContext.Provider>
       </React.Fragment>
     );

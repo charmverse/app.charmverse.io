@@ -134,14 +134,18 @@ export default function Header (
             <>
               <ShareButton headerHeight={headerHeight} />
               <Tooltip title='Show comment threads' arrow placement='bottom'>
-                <IconButton size='small' disableRipple color={!showThreads ? 'secondary' : 'inherit'}>
+                <IconButton
+                  onClick={() => {
+                    if (Object.keys(threads).length !== 0) {
+                      setShowThreads(!showThreads);
+                    }
+                  }}
+                  size='small'
+                  disableRipple
+                  color={!showThreads ? 'secondary' : 'inherit'}
+                >
                   <CommentIcon
                     fontSize='small'
-                    onClick={() => {
-                      if (Object.keys(threads).length !== 0) {
-                        setShowThreads(!showThreads);
-                      }
-                    }}
                   />
                 </IconButton>
               </Tooltip>

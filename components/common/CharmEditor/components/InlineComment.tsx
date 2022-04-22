@@ -97,7 +97,7 @@ export function InlineCommentThread ({ showCommentThreads }: {showCommentThreads
         hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
       }}
       >
-        <PageThread threadId={threadId} />
+        <PageThread threadId={threadId} inline />
       </ClickAwayListener>,
       tooltipContentDOM
     ) : null;

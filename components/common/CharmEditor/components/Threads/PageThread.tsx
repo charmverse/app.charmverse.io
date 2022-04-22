@@ -29,7 +29,7 @@ const ContextBorder = styled.div`
   padding-bottom: 2px;
 `;
 
-export default forwardRef<HTMLDivElement, {threadId: string}>(({ threadId }, ref) => {
+export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(({ threadId, inline = true }, ref) => {
   const { threads, setThreads } = useThreads();
   const [user] = useUser();
   const thread = threadId && threads[threadId];
@@ -43,7 +43,6 @@ export default forwardRef<HTMLDivElement, {threadId: string}>(({ threadId }, ref
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
   const popupState = usePopupState({ variant: 'popover', popupId: 'comment-actions' });
   const bindTriggerProps = bindTrigger(popupState);
-
   async function addComment () {
     if (thread && !isMutating) {
       try {
@@ -114,12 +113,12 @@ export default forwardRef<HTMLDivElement, {threadId: string}>(({ threadId }, ref
       setIsMutating(true);
       try {
         await charmClient.updateThread(thread.id, {
-          resolved: true
+          resolved: !thread.resolved
         });
         setThreads((_threads) => ({ ..._threads,
           [thread.id]: {
             ...thread,
-            resolved: true
+            resolved: !thread.resolved
           } }));
         removeInlineCommentMark();
       }
@@ -147,9 +146,9 @@ export default forwardRef<HTMLDivElement, {threadId: string}>(({ threadId }, ref
   }
 
   return thread ? (
-    <Box id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, minWidth: 500, maxHeight: 550 }}>
-      <Box maxHeight={400} pr={1} overflow='auto'>
-        <Box justifyContent='space-between' display='flex' alignItems='center' mb={1}>
+    <Box id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, maxHeight: inline ? 550 : 'inherit' }}>
+      <Box maxHeight={inline ? 550 : 'inherit'} pr={inline ? 1 : 0} overflow='auto'>
+        <Box justifyContent='space-between' display='flex' alignItems='center' mb={1} gap={5}>
           <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
             Started at {new Date(thread.createdAt).toLocaleString()}
           </Typography>
@@ -170,7 +169,7 @@ export default forwardRef<HTMLDivElement, {threadId: string}>(({ threadId }, ref
               variant='outlined'
               color='secondary'
               size='small'
-            >Resolve
+            >{thread.resolved ? 'Un-resolve' : 'Resolve'}
             </Button>
             <Button
               onClick={deleteThread}

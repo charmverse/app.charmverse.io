@@ -1,25 +1,30 @@
-import { Box, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
+import { Box, BoxProps, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
 import PageThread from 'components/common/CharmEditor/components/Threads/PageThread';
 import { useThreads } from 'hooks/useThreads';
 import { useState } from 'react';
 
-export default function PageThreadsList () {
+export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
   const { threads } = useThreads();
-  const threadsList = Object.values(threads);
-  const unResolvedThreads = threadsList.filter(thread => thread && !thread.resolved);
-  const resolvedThreads = threadsList.filter(thread => thread && thread.resolved);
-  const [threadClass, setThreadClass] = useState<'resolved' | 'unresolved'>('resolved');
+  const allThreads = Object.values(threads);
+  const unResolvedThreads = allThreads.filter(thread => thread && !thread.resolved);
+  const resolvedThreads = allThreads.filter(thread => thread && thread.resolved);
+  const [threadClass, setThreadClass] = useState<'resolved' | 'unresolved'>('unresolved');
   const handleChange: SelectProps['onChange'] = (event) => {
     setThreadClass(event.target.value as any);
   };
+
+  const threadsList = threadClass === 'resolved' ? resolvedThreads : unResolvedThreads;
+
   return (
     <Box
-      sx={{
-        maxHeight: 500,
-        width: 550
-      }}
       // The className is used to refer to it using regular dom api
       className='PageThreadsList'
+      {...props}
+      sx={{
+        ...(sx ?? {}),
+        maxWidth: 550,
+        width: '100%'
+      }}
     >
       <Box display='flex' alignItems='center' justifyContent='space-between' my={1}>
         <Typography variant='h6'>Threads</Typography>
@@ -33,11 +38,10 @@ export default function PageThreadsList () {
         overflow: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        pr: 1,
         gap: 1
       }}
       >
-        {threadClass === 'resolved' ? resolvedThreads.map(resolvedThread => resolvedThread && <PageThread key={resolvedThread.id} threadId={resolvedThread?.id} />) : unResolvedThreads.map(unresolvedThread => unresolvedThread && <PageThread key={unresolvedThread.id} threadId={unresolvedThread?.id} />)}
+        {threadsList.map(resolvedThread => resolvedThread && <PageThread inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
       </List>
     </Box>
   );

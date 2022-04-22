@@ -1,4 +1,4 @@
-import { useCallback, memo } from 'react';
+import { useCallback, memo, useRef } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
@@ -16,21 +16,14 @@ import PageBanner from './components/PageBanner';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageHeader from './components/PageHeader';
 
-export const Container = styled(Box)<{ top: number, showThreads?: boolean }>`
-  width: ${({ showThreads }) => showThreads ? '1000px' : '860px'};
+export const Container = styled(Box)<{ top: number }>`
+  width: 860px;
   max-width: 100%;
   margin: 0 auto ${({ top }) => top + 100}px;
   padding: 0 80px;
   position: relative;
   top: ${({ top }) => top}px;
-  display: flex;
   padding-bottom: ${({ theme }) => theme.spacing(5)};
-  ${({ showThreads }) => showThreads && `
-    margin: 0px;
-    width: calc(100% - 100px);
-    padding: 0px;
-    padding-left: 100px;
-  `}
 `;
 
 export interface IEditorProps {
@@ -76,30 +69,35 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const comments = card ? useAppSelector(getCardComments(card.id)) : [];
   const contents = card ? useAppSelector(getCardContents(card.id)) : [];
+  const commentThreadsListRef = useRef<HTMLDivElement>(null);
 
   return (
     <ScrollableWindow>
-      {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
-      <Box display='flex' gap={10}>
-        <Container
-          showThreads={showThreads}
-          top={pageTop}
+      <Box display='flex' gap={1}>
+        <div style={{
+          width: showThreads ? 'calc(100% - 550px)' : '100%'
+        }}
         >
-          <CharmEditor
-            key={page.id}
-            content={page.content as PageContent}
-            onContentChange={updatePageContent}
-            readOnly={readOnly}
-            showCommentThreads={showThreads}
+          {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
+          <Container
+            top={pageTop}
           >
-            <PageHeader
-              headerImage={page.headerImage}
-              icon={page.icon}
-              title={page.title}
+            <CharmEditor
+              commentThreadsListRef={commentThreadsListRef}
+              key={page.id}
+              content={page.content as PageContent}
+              onContentChange={updatePageContent}
               readOnly={readOnly}
-              setPage={setPage}
-            />
-            {card && board && (
+              showCommentThreads={showThreads}
+            >
+              <PageHeader
+                headerImage={page.headerImage}
+                icon={page.icon}
+                title={page.title}
+                readOnly={readOnly}
+                setPage={setPage}
+              />
+              {card && board && (
               <div className='CardDetail content'>
                 {/* Property list */}
                 <Box sx={{
@@ -130,9 +128,22 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
                   readonly={readOnly}
                 />
               </div>
-            )}
-          </CharmEditor>
-        </Container>
+              )}
+            </CharmEditor>
+          </Container>
+        </div>
+        <div
+          ref={commentThreadsListRef}
+          className='PageThreadList-portal'
+          style={{
+            width: 500,
+            right: '50px',
+            position: 'fixed',
+            overflow: 'auto',
+            height: 'calc(100% - 65px)',
+            paddingRight: '10px'
+          }}
+        />
       </Box>
     </ScrollableWindow>
   );

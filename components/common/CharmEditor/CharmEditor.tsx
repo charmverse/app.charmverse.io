@@ -18,7 +18,7 @@ import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
 import { EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { useState, CSSProperties, ReactNode, memo } from 'react';
+import { useState, CSSProperties, ReactNode, memo, RefObject } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -28,6 +28,7 @@ import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
+import { Portal } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import { Callout, calloutSpec } from './components/Callout';
 import * as columnLayout from './components/columnLayout';
@@ -43,12 +44,13 @@ import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
-import { highlightSpec, inlineCommentPlugin, InlineCommentThread } from './components/InlineComment';
+import { highlightSpec, inlineCommentPlugin } from './components/InlineComment';
 import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 import * as table from './components/table';
 import { checkForEmpty } from './utils';
 import { nestedPagePlugins, nestedPageSpec } from './components/nestedPage/nestedPage';
 import NestedPage, { NestedPagesList } from './components/nestedPage';
+import PopoverMenu from './components/PopoverMenu';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -269,6 +271,7 @@ interface CharmEditorProps {
   readOnly?: boolean;
   style?: CSSProperties;
   showCommentThreads?: boolean
+  commentThreadsListRef?: RefObject<HTMLDivElement>
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -292,7 +295,8 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 }
 
 function CharmEditor (
-  { showCommentThreads = false, content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
+  { commentThreadsListRef, showCommentThreads = false, content = defaultContent, children, onContentChange, style, readOnly = false }:
+  CharmEditorProps
 ) {
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
@@ -337,10 +341,6 @@ function CharmEditor (
       pmViewOpts={{
         editable: () => !readOnly
       }}
-      // Components that should be placed after the editor component
-      commentThreadsComponent={(
-        showCommentThreads && <PageThreadsList />
-      )}
       placeholderComponent={<Placeholder show={isEmpty} />}
       state={state}
       renderNodeViews={({ children: NodeViewChildren, ...props }) => {
@@ -431,11 +431,16 @@ function CharmEditor (
     >
       <FloatingMenu />
       <MentionSuggest />
-      <InlineCommentThread showCommentThreads={showCommentThreads} />
+
       <NestedPagesList />
       <EmojiSuggest />
       <InlinePalette />
       {children}
+      {commentThreadsListRef?.current && showCommentThreads && (
+        <Portal container={commentThreadsListRef.current}>
+          <PageThreadsList inline={false} />
+        </Portal>
+      )}
     </StyledReactBangleEditor>
   );
 }
