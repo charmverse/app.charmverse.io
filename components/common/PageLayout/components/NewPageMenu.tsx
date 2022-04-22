@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import DatabaseIcon from '@mui/icons-material/TableChart';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
@@ -11,12 +10,13 @@ import Typography from '@mui/material/Typography';
 import { Page } from 'models';
 import { MouseEvent, useState } from 'react';
 import { greyColor2 } from 'theme/colors';
+import { StyledDatabaseIcon } from './PageIcon';
 
 export const StyledIconButton = styled(IconButton)`
   border-radius: 3px;
   border: 1px solid ${({ theme }) => theme.palette.divider};
-  height: 16px;
-  width: 16px;
+  width: 20px;
+  height: 20px;
   svg {
     font-size: 16px;
   }
@@ -26,12 +26,6 @@ export const StyledIconButton = styled(IconButton)`
 `;
 
 export const StyledArticleIcon = styled(ArticleIcon)`
-  color: ${greyColor2};
-  opacity: 0.5;
-  font-size: 22px;
-`;
-
-export const StyledDatabaseIcon = styled(DatabaseIcon)`
   color: ${greyColor2};
   opacity: 0.5;
   font-size: 22px;

@@ -121,11 +121,12 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       mode,
       action: {
         focus: mode === 'dark' ? 'rgb(29, 92, 132)' : 'rgb(29, 92, 132, 0.1)', // darken(backgroundLightColor, 0.1)
-        hover: mode === 'dark' ? '#5b5f62' : '#e2e6e9',
-        selected: mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(22, 52, 71, 0.06)'
+        hover: mode === 'dark' ? 'rgba(255, 255, 255, 0.055)' : 'rgba(22, 52, 71, 0.07)',
+        selected: mode === 'dark' ? 'rgba(255, 255, 255, 0.055)' : 'rgba(22, 52, 71, 0.07)'
       },
       background: {
         default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor,
+        paper: mode === 'dark' ? backgroundLightColorDarkMode : backgroundColor,
         light: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor,
         dark: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
       },
@@ -239,7 +240,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiCard: {
         styleOverrides: {
           root: {
-            borderRadius: '20px'
+            borderRadius: '3px'
           }
         }
       },
@@ -267,20 +268,32 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
-      MuiPaper: {
+      MuiInput: {
+        defaultProps: {
+          size: 'small'
+        }
+      },
+      MuiOutlinedInput: {
+        defaultProps: {
+          size: 'small'
+        },
         styleOverrides: {
           root: {
-            backgroundColor: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
+            backgroundColor: 'var(--input-bg)',
+            '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--input-border)'
+            }
+          },
+          notchedOutline: {
+            borderColor: 'var(--input-border)'
           }
         }
       },
-      // MuiPopover: {
-      //   styleOverrides: {
-      //     root: {
-      //       zIndex: 3000
-      //     }
-      //   }
-      // },
+      MuiSelect: {
+        defaultProps: {
+          size: 'small'
+        }
+      },
       MuiLink: {
         styleOverrides: {
           root: {

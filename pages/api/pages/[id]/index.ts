@@ -27,8 +27,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   const updateContent = req.body as Page;
 
-  // eslint-disable-next-line
-  if (updateContent.isPublic != undefined && permissions.edit_isPublic !== true) {
+  if (updateContent.isPublic !== undefined && permissions.edit_isPublic !== true) {
     return res.status(401).json({
       error: 'You cannot update the public status of this page'
     });
@@ -39,16 +38,17 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     });
   }
 
-  const space = await prisma.page.update({
+  const pageWithPermission = await prisma.page.update({
     where: {
-      id: req.query.id as string
+      id: pageId
     },
     data: req.body,
     include: {
       permissions: true
     }
   });
-  return res.status(200).json(space);
+
+  return res.status(200).json(pageWithPermission);
 }
 
 async function deletePage (req: NextApiRequest, res: NextApiResponse) {

@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import charmClient from 'charmClient'
-import { PageContent } from 'models'
+import { Page, PageContent } from 'models'
 import { publishIncrementalUpdate } from '../../publisher'
 import { BlockIcons } from './blockIcons'
 import { Block, BlockPatch, createPatchesFromBlocks } from './blocks/block'
@@ -709,12 +709,23 @@ class Mutator {
     // Duplicate
 
     async duplicateCard(
-        cardId: string,
-        board: Board,
-        description = 'duplicate card',
-        asTemplate = false,
-        afterRedo?: (newCardId: string) => Promise<void>,
-        beforeUndo?: () => Promise<void>,
+        {
+          cardId,
+          board,
+          description = 'duplicate card',
+          asTemplate = false,
+          afterRedo,
+          beforeUndo,
+          cardPage
+        }: {
+          cardId: string,
+          board: Board,
+          cardPage: Page,
+          description?: string,
+          asTemplate?: boolean,
+          afterRedo?: (newCardId: string) => Promise<void>,
+          beforeUndo?: () => Promise<void>,
+        }
     ): Promise<[Block[], string]> {
         const blocks = await charmClient.getSubtree(cardId, 2)
         const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [Block[], Card, Record<string, string>]
@@ -738,6 +749,10 @@ class Mutator {
         newCard.fields.isTemplate = asTemplate
         newCard.rootId = board.id
         newCard.parentId = board.id
+        if (cardPage) {
+          newCard.fields.content = cardPage.content
+          newCard.fields.contentText = cardPage.contentText
+        }
         await this.insertBlocks(
             newBlocks,
             description,

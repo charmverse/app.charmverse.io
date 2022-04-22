@@ -2,6 +2,7 @@ import { Block } from '@prisma/client';
 import { prisma } from 'db';
 import { DatabasePage, DatabasePageNotFoundError } from 'lib/public-api';
 import { filterObjectKeys } from 'lib/utilities/objects';
+import { PageContent } from 'models';
 import { validate } from 'uuid';
 import { PageNotFoundError, SpaceNotFoundError, InvalidInputError } from './errors';
 import { Page, PageProperty } from './interfaces';
@@ -32,16 +33,18 @@ export async function getPageInBoard (pageId: string): Promise<Page> {
     throw new DatabasePageNotFoundError(card.rootId);
   }
 
-  const cardPageContent = await prisma.block.findFirst({
+  const cardPage = await prisma.page.findUnique({
     where: {
-      type: 'charm_text',
-      parentId: card.id
+      id: card.id
+    },
+    select: {
+      content: true
     }
   });
 
   const boardSchema = (board.fields as any).cardProperties as PageProperty[];
 
-  const cardToReturn = new PageFromBlock(card, boardSchema, (cardPageContent?.fields as any)?.content);
+  const cardToReturn = new PageFromBlock(card, boardSchema, cardPage?.content as PageContent);
 
   return cardToReturn;
 }

@@ -17,7 +17,7 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
 import { HintPos } from '@bangle.dev/react-menu/dist/types';
 import {
-  defaultKeys as floatingMenuKeys, focusFloatingMenuInput, toggleInlineCommentSubMenu, toggleLinkSubMenu
+  defaultKeys as floatingMenuKeys, focusFloatingMenuInput, toggleLinkSubMenu
 } from '@bangle.dev/react-menu/floating-menu';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';

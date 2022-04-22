@@ -17,13 +17,18 @@ import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import { useColorMode } from 'context/color-mode';
+import { charmEditorPlugins, specRegistry } from 'components/common/CharmEditor/CharmEditor';
+import { useColorMode } from 'context/darkMode';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
 import CommentIcon from '@mui/icons-material/Comment';
 import { useThreads } from 'hooks/useThreads';
+import { BangleEditorState } from '@bangle.dev/core';
+import { markdownSerializer } from '@bangle.dev/markdown';
+import { PageContent } from 'models';
+import { Node } from '@bangle.dev/pm';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -55,8 +60,8 @@ export default function Header (
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
 
   const isPage = router.route.includes('pageId');
-
-  const isExportablePage = (currentPage as Page)?.type === 'page';
+  const pageType = (currentPage as Page)?.type;
+  const isExportablePage = pageType === 'card' || pageType === 'page';
 
   async function toggleFavorite () {
     if (!currentPage || !user) return;
@@ -65,6 +70,41 @@ export default function Header (
       ? await charmClient.unfavoritePage(pageId)
       : await charmClient.favoritePage(pageId);
     setUser({ ...user, ...updatedFields });
+  }
+
+  function generateMarkdown () {
+    if (currentPage && isExportablePage) {
+      const serializer = markdownSerializer(specRegistry);
+
+      const state = new BangleEditorState({
+        specRegistry,
+        plugins: charmEditorPlugins(),
+        initialValue: currentPage.content ? Node.fromJSON(specRegistry.schema, currentPage.content as PageContent) : ''
+      });
+
+      let markdown = serializer.serialize(state.pmState.doc);
+
+      if (currentPage.title) {
+        const pageTitleAsMarkdown = `# ${currentPage.title}`;
+
+        markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
+      }
+
+      const data = new Blob([markdown], { type: 'text/plain' });
+
+      const linkElement = document.createElement('a');
+
+      linkElement.download = `${currentPage.title || 'page'}.md`;
+
+      const downloadLink = URL.createObjectURL(data);
+
+      linkElement.href = downloadLink;
+
+      linkElement.click();
+
+      URL.revokeObjectURL(downloadLink);
+    }
+
   }
 
   return (

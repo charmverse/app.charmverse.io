@@ -42,7 +42,7 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
       })
       .catch(_error => {
         // Major failure while trying to import discord server role
-        showMessage(_error.error ?? 'Something went wrong. Please try again', 'error');
+        showMessage(_error.message || _error.error || 'Something went wrong. Please try again', 'error');
       })
       .finally(() => {
         setIsLoading(false);

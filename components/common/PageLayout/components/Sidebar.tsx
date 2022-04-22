@@ -70,6 +70,19 @@ const SidebarContainer = styled.div`
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
   }
+
+  &:hover {
+    .sidebar-header {
+      .MuiTypography-root {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .MuiIconButton-root {
+        opacity: 1;
+      }
+    }
+  }
+
   &:hover .add-a-page {
     opacity: 1;
   }
@@ -86,7 +99,7 @@ const SectionName = styled(Typography)`
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.03em;
-  margin-bottom: ${({ theme }) => theme.spacing(0.5)};
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const StyledSidebarLink = styled(Link)<{ active: boolean }>`
@@ -116,31 +129,18 @@ const SidebarHeader = styled.div(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: theme.spacing(0, 2),
+  padding: theme.spacing(0, 1.5, 0, 2),
   '& .MuiIconButton-root': {
     opacity: 0,
+    borderRadius: '4px',
     transition: theme.transitions.create('opacity', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     })
   },
-  '&:hover .MuiTypography-root': {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
-  },
-  '&:hover .MuiIconButton-root': {
-    opacity: 1
-  },
   // necessary for content to be below app bar
   minHeight: headerHeight
 }));
-
-const SidebarFooter = styled.div`
-  padding: ${({ theme }) => theme.spacing(1)};
-  display: flex;
-  align-items: center;
-  border-top: 1px solid ${({ theme }) => theme.palette.divider};
-`;
 
 const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   flex-grow: 1;
@@ -277,9 +277,9 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       </WorkspacesContainer>
       {space && (
         <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-          <SidebarHeader>
+          <SidebarHeader className='sidebar-header'>
             <Typography><strong>{space.name}</strong></Typography>
-            <IconButton onClick={closeSidebar}>
+            <IconButton onClick={closeSidebar} size='small'>
               <ChevronLeftIcon />
             </IconButton>
           </SidebarHeader>

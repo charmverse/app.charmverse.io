@@ -21,6 +21,8 @@ export const backgroundDarkColor = darken(backgroundColor, 0.1);
 export const settingsHeaderBackgroundColor = lighten(backgroundLightColor, 0.4);
 export const scrollBarTrackBackgroundColor = darken(backgroundLightColor, 0.1);
 export const scrollBarThumbBackgroundColor = lighten(scrollBarTrackBackgroundColor, 0.5);
+export const inputBackground = 'rgba(242, 241, 238, 0.6)';
+export const inputBorder = 'rgba(15, 15, 15, 0.1)';
 
 // dark mode
 export const primaryTextColorDarkMode = '#ededed';
@@ -30,6 +32,8 @@ export const backgroundDarkColorDarkMode = darken(backgroundColorDarkMode, 0.3);
 export const settingsHeaderBackgroundColorDarkMode = darken(backgroundLightColorDarkMode, 0.3);
 export const scrollBarTrackBackgroundColorDarkMode = darken(backgroundLightColorDarkMode, 0.2);
 export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackgroundColorDarkMode, 0.1);
+export const inputBackgroundDarkMode = 'rgba(255, 255, 255, 0.055)';
+export const inputBorderDarkMode = 'rgba(15, 15, 15, 0.2)';
 
 export type BrandColor = 'gray' | 'brown' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'red'
 
@@ -57,4 +61,28 @@ export const lightModeColors: BrandColorScheme = {
   purple: '#B7AFD4',
   pink: '#EB82ED',
   red: '#E37898'
+};
+
+export const darkModeBackgroundColors: BrandColorScheme = {
+  gray: '#2f2f2f',
+  brown: '#4a3229',
+  orange: '#5b3b24',
+  yellow: '#554228',
+  green: '#263e31',
+  blue: '#16394d',
+  purple: '#3b2b49',
+  pink: '#4d2a3b',
+  red: '#512e2a'
+};
+
+export const lightModeBackgroundColors: BrandColorScheme = {
+  gray: '#f1f1ef',
+  brown: '#f4eeee',
+  orange: '#fbecdd',
+  yellow: '#fbf3da',
+  green: '#edf4eb',
+  blue: '#e7f3f7',
+  purple: '#f6f3fa',
+  pink: '#f9f0f5',
+  red: '#fdeaec'
 };

@@ -134,7 +134,7 @@ class CharmClient {
   }
 
   getPublicPage (pageId: string) {
-    return http.GET<Page>(`/api/public/pages/${pageId}`);
+    return http.GET<{pages: Page[], blocks: Block[]}>(`/api/public/pages/${pageId}`);
   }
 
   togglePagePublicAccess (pageId: string, publiclyAccessible: boolean) {

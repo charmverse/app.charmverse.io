@@ -2,22 +2,12 @@ import { Box, Card, CardActionArea, CardHeader, Typography } from '@mui/material
 import { Bounty as IBounty } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { fancyTrim } from 'lib/utilities/strings';
-import { BountyStatus } from 'models/Bounty';
-import { BrandColor } from 'theme/colors';
 import BountyStatusBadge from './BountyStatusBadge';
 
 export interface IBountyInput {
   bounty: IBounty
   truncate?: boolean
 }
-
-export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
-  open: 'green',
-  assigned: 'yellow',
-  review: 'orange',
-  complete: 'pink',
-  paid: 'gray'
-};
 
 export function BountyCard ({ truncate = true, bounty }: IBountyInput) {
   const [space] = useCurrentSpace();

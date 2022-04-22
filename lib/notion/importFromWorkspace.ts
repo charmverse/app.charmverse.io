@@ -10,7 +10,6 @@ import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT 
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
 import { createBoard, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
-import { createCharmTextBlock } from 'lib/focalboard/charmBlock';
 import { createCard } from 'lib/focalboard/card';
 import promiseRetry from 'promise-retry';
 import { isTruthy } from 'lib/utilities/types';
@@ -685,7 +684,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   const createdPages: Record<string, CreatePageInput> = {};
 
   const createdCards: Record<string, {
-    charmText: Prisma.BlockCreateManyInput,
     card: Prisma.BlockCreateManyInput
     page: CreatePageInput,
     notionPageId: string
@@ -1032,12 +1030,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
 
           const title = convertToPlainText(titleProperty.title);
-          const charmTextBlock = createCharmTextBlock({
-            parentId: charmversePageId,
-            fields: {
-              content: pageContent
-            }
-          });
           const { properties } = focalboardRecord[database.boardId];
 
           const cardProperties: Record<string, any> = {};
@@ -1097,11 +1089,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           createdCards[notionPageId] = {
             notionPageId,
             page: cardPage,
-            charmText: {
-              ...charmTextBlock,
-              ...commonBlockData,
-              rootId: database.boardId
-            },
             card: {
               ...createCard({
                 title,
@@ -1110,7 +1097,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
                 rootId: database.boardId,
                 fields: {
                   icon: emoji,
-                  contentOrder: [charmTextBlock.id],
+                  contentOrder: [],
                   headerImage,
                   properties: cardProperties
                 }
@@ -1219,13 +1206,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
         }
         // Make sure the database page has not failed to be created, otherwise no cards will be added
-        const { notionPageId, page, card, charmText } = createdCards[block.id];
+        const { notionPageId, page, card } = createdCards[block.id];
         if (!failedImportsRecord[block.parent.database_id]) {
-          await prisma.block.createMany({
-            data: [
-              card,
-              charmText
-            ]
+          await prisma.block.create({
+            data: card
           });
           // Creating the page corresponding to the card
           await createCharmversePage(notionPageId, 'page', page.parentId);

@@ -163,10 +163,11 @@ export const jestConfig = {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    '**/pages/api/**/?(*.)+(spec).[tj]s?(x)',
-    '**/public-api/**/?(*.)+(spec).[tj]s?(x)',
-    '**/lib/**/?(*.)+(spec).[tj]s?(x)',
-    '**/testing/**/setupDatabase.spec.ts'
+    // '**/pages/api/**/?(*.)+(spec).[tj]s?(x)',
+    // '**/public-api/**/?(*.)+(spec).[tj]s?(x)',
+    // '**/lib/**/?(*.)+(spec).[tj]s?(x)',
+    // '**/testing/**/setupDatabase.spec.ts'
+    '**/__integration-tests__/**/**.spec.ts'
   //   "**/__tests__/**/*.[jt]s?(x)",
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   ],

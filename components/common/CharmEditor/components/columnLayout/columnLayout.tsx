@@ -10,6 +10,7 @@ export function rowSpec (): RawSpecs {
     name: 'columnLayout',
     schema: {
       content: 'columnBlock+',
+      isolating: true,
       group: 'block',
       draggable: false,
       parseDOM: [{ tag: 'div.charm-column-row' }],
@@ -28,6 +29,7 @@ export function columnSpec (): RawSpecs {
     type: 'node',
     name: 'columnBlock',
     schema: {
+      isolating: true,
       content: 'block*',
       group: 'block',
       draggable: false,

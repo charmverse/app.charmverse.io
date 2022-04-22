@@ -29,7 +29,6 @@ type Props = {
 
 const TableRows = (props: Props): JSX.Element => {
     const {board, cards, activeView} = props
-
     return (
         <>
             {cards.map((card) => {

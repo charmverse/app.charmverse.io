@@ -16,9 +16,8 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
-import { columnResizing, EditorView, Node } from '@bangle.dev/pm';
+import { EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { table, tableCell, tableHeader, tableRow } from '@bangle.dev/table';
 import { useState, CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
@@ -35,18 +34,21 @@ import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
-import EmojiSuggest, { emojiPlugins, emojiSpecs } from './components/EmojiSuggest';
-import InlinePalette, { inlinePalettePlugins, inlinePaletteSpecs } from './components/InlinePalette';
+import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
+import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
 import { Mention, mentionPlugins, mentionSpecs, MentionSuggest } from './components/Mention';
-import { NestedPage, NestedPagesList, nestedPageSpec } from './components/NestedPage';
 import Placeholder from './components/Placeholder';
 import { Quote, quoteSpec } from './components/Quote';
 import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
+import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
-import DocumentEnd from './components/DocumentEnd';
 import { highlightSpec, inlineCommentPlugin, InlineCommentThread } from './components/InlineComment';
 import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
+import * as table from './components/table';
+import { checkForEmpty } from './utils';
+import { nestedPagePlugins, nestedPageSpec } from './components/nestedPage/nestedPage';
+import NestedPage, { NestedPagesList } from './components/nestedPage';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -79,10 +81,10 @@ export const specRegistry = new SpecRegistry([
   iframeSpec(), // OK
   heading.spec(), // OK
   inlinePaletteSpecs(), // Not required
-  table, // OK
-  tableCell, // OK
-  tableHeader, // OK
-  tableRow, // OK
+  // table, // OK
+  // tableCell, // OK
+  // tableHeader, // OK
+  // tableRow, // OK
   calloutSpec(), // OK
   cryptoPriceSpec(), // NO
   imageSpec(), // OK
@@ -90,7 +92,13 @@ export const specRegistry = new SpecRegistry([
   columnLayout.columnSpec(), // NO
   nestedPageSpec(), // NO
   quoteSpec(), // OK
-  tabIndent.spec()
+  tabIndent.spec(),
+  table.spec()
+  // tables.tableNodes({
+  //   cellAttributes: { },
+  //   cellContent: 'My Cell',
+  //   cellContentGroup: 'My Group'
+  // })
 ]);
 
 export function charmEditorPlugins (
@@ -118,6 +126,7 @@ export function charmEditorPlugins (
         placement: 'bottom'
       }
     }),
+    nestedPagePlugins(),
     imagePlugins({
       handleDragAndDrop: false
     }),
@@ -139,7 +148,6 @@ export function charmEditorPlugins (
     underline.plugins(),
     emojiPlugins(),
     mentionPlugins(),
-    columnResizing,
     floatingMenuPlugin(readOnly),
     blockquote.plugins(),
     NodeView.createPlugin({
@@ -172,7 +180,25 @@ export function charmEditorPlugins (
       name: 'mention',
       containerDOM: ['span', { class: 'mention-value' }]
     }),
-    tabIndent.plugins()
+    tabIndent.plugins(),
+    table.tableEditing({ allowTableNodeSelection: true }),
+    table.columnHandles(),
+    table.columnResizing({}),
+    // @ts-ignore missing type
+    table.tablePopUpMenu(),
+    // @ts-ignore missing type
+    table.tableHeadersMenu(),
+    // @ts-ignore missing type
+    table.selectionShadowPlugin(),
+    // @ts-ignore missing type
+    // table.typesEnforcer(),
+    // @ts-ignore missing type
+    // table.TableDateMenu('MM/DD/YYYY'),
+    // @ts-ignore missing type
+    // table.TableLabelMenu(),
+    // @ts-ignore missing type
+    table.TableFiltersMenu(),
+    trailingNode.plugins()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -251,7 +277,6 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 
   const state = new BangleEditorState({
     specRegistry,
-    plugins: charmEditorPlugins(),
     initialValue: Node.fromJSON(specRegistry.schema, content) ?? ''
   });
 
@@ -264,15 +289,6 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
   }
 
   return markdown;
-}
-
-export function checkForEmpty (content: PageContent | null) {
-  return !content?.content
-  || content.content.length === 0
-  || (content.content.length === 1
-      // These nodes dont contain any content so there is no content field
-      && !content.content[0]?.type.match(/(cryptoPrice|columnLayout|image|iframe|mention|page)/)
-      && (!content.content[0].content?.length));
 }
 
 function CharmEditor (
@@ -317,6 +333,7 @@ function CharmEditor (
         width: '100%',
         height: '100%'
       }}
+      className='czi-editor-frame-body'
       pmViewOpts={{
         editable: () => !readOnly
       }}
@@ -416,10 +433,9 @@ function CharmEditor (
       <MentionSuggest />
       <InlineCommentThread showCommentThreads={showCommentThreads} />
       <NestedPagesList />
-      {EmojiSuggest}
-      {InlinePalette}
+      <EmojiSuggest />
+      <InlinePalette />
       {children}
-      <DocumentEnd />
     </StyledReactBangleEditor>
   );
 }

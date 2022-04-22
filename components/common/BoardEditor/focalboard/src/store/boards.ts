@@ -22,6 +22,9 @@ const boardsSlice = createSlice({
         setCurrent: (state, action: PayloadAction<string>) => {
             state.current = action.payload
         },
+        addBoard: (state, action: PayloadAction<Board>) => {
+          state.boards[action.payload.id] = action.payload
+        },
         updateBoards: (state, action: PayloadAction<Board[]>) => {
             for (const board of action.payload) {
                 if (board.deletedAt !== 0) {
@@ -61,9 +64,8 @@ const boardsSlice = createSlice({
     },
 })
 
-export const {updateBoards, setCurrent} = boardsSlice.actions
+export const {updateBoards, setCurrent, addBoard} = boardsSlice.actions
 export const {reducer} = boardsSlice
-
 export const getBoards = (state: RootState): {[key: string]: Board} => state.boards.boards
 
 export const getSortedBoards = createSelector(

@@ -1,6 +1,12 @@
 import '@bangle.dev/tooltip/style.css';
+import '@skiff-org/prosemirror-tables/style/tables.css';
+import '@skiff-org/prosemirror-tables/style/table-popup.css';
+import '@skiff-org/prosemirror-tables/style/table-headers.css';
+import '@skiff-org/prosemirror-tables/style/table-filters.css';
+import 'prosemirror-menu/style/menu.css';
+import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import createCache from '@emotion/cache';
-import { CacheProvider } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
+import { Global, CacheProvider } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
 // fullcalendar css
@@ -79,7 +85,7 @@ import { fetchLanguage, getLanguage } from 'components/common/BoardEditor/focalb
 import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/variables.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
-import { setTheme } from 'components/common/BoardEditor/focalboard/src/theme';
+import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
 // import 'components/common/BoardEditor/focalboard/src/widgets/buttons/button.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/buttonWithMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
@@ -135,7 +141,7 @@ import 'components/common/BoardEditor/focalboard/src/widgets/tooltip.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/valueSelector.scss';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
-import { ColorModeContext } from 'context/color-mode';
+import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
@@ -168,6 +174,8 @@ import {
   darkTheme,
   lightTheme
 } from 'theme/focalboard/theme';
+import { setDarkMode } from 'theme/darkMode';
+import cssVariables from 'theme/cssVariables';
 import 'theme/lit-share-modal/lit-share-modal.scss';
 import { setTheme as setLitProtocolTheme } from 'theme/lit-share-modal/theme';
 import 'theme/styles.scss';
@@ -202,26 +210,23 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>('darkMode', null);
   const [mode, setMode] = useState<PaletteMode>('light');
-  const colorMode = useMemo(
-    () => ({
-      // The dark mode switch would invoke this method
-      toggleColorMode: () => {
-        setMode((prevMode: PaletteMode) => {
-          const newMode = prevMode === 'light' ? 'dark' : 'light';
-          setSavedDarkMode(newMode);
-          return newMode;
-        });
-      }
-    }),
-    []
-  );
+  const colorModeContext = useMemo(() => ({
+    toggleColorMode: () => {
+      setMode((prevMode: PaletteMode) => {
+        const newMode = prevMode === 'light' ? 'dark' : 'light';
+        return newMode;
+      });
+    }
+  }), []);
 
   // Update the theme only if the mode changes
   const theme = useMemo(() => {
     const muiTheme = createThemeLightSensitive(mode);
     if (typeof window !== 'undefined') {
-      setTheme(mode === 'dark' ? darkTheme : lightTheme);
+      setFocalBoardTheme(mode === 'dark' ? darkTheme : lightTheme);
+      setSavedDarkMode(mode);
       setLitProtocolTheme(mode, muiTheme);
+      setDarkMode(mode === 'dark');
     }
     return muiTheme;
   }, [mode]);
@@ -243,7 +248,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <CacheProvider value={createCache({ key: 'app' })}>
-      <ColorModeContext.Provider value={colorMode}>
+      <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <Web3ReactProvider getLibrary={getLibrary}>
             <Web3ConnectionManager>
@@ -264,6 +269,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                           )}
                         </TitleContext.Consumer>
                         <CssBaseline enableColorScheme={true} />
+                        <Global styles={cssVariables} />
                         <RouteGuard>
                           <ErrorBoundary>
                             {getLayout(<Component {...pageProps} />)}

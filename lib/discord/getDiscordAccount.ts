@@ -1,6 +1,14 @@
 import * as http from 'adapters/http';
 import { getDiscordToken } from './getDiscordToken';
-import { DiscordAccount } from './loginByDiscord';
+
+export interface DiscordAccount {
+  id: string
+  username: string
+  discriminator: string
+  avatar?: string
+  verified?: boolean
+  bot?: boolean
+}
 
 export async function getDiscordAccount (code: string, redirectUrl: string) {
   const token = await getDiscordToken(code, redirectUrl);
