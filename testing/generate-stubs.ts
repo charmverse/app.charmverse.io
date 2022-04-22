@@ -1,7 +1,7 @@
 import { Page, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
-export function generatePageToCreateStub (options: {userId: string, spaceId: string, parentId?: string}): Prisma.PageCreateInput {
+export function generatePageToCreateStub (options: {userId: string, spaceId: string, title?: string, parentId?: string}): Prisma.PageCreateInput {
   return {
     author: {
       connect: {
@@ -10,7 +10,7 @@ export function generatePageToCreateStub (options: {userId: string, spaceId: str
     },
     contentText: '',
     path: v4(),
-    title: 'Root',
+    title: options.title || 'Root',
     type: 'page',
     updatedBy: options.userId,
     space: {
