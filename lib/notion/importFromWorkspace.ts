@@ -559,17 +559,17 @@ function convertToPlainText (chunks: {plain_text: string}[]) {
   return chunks.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
 }
 
-interface CreateDatabaseResult {
+interface RetrieveDatabaseResult {
   focalboardPropertiesRecord: Record<string, string>;
   board: Prisma.BlockCreateManyInput;
   view: Prisma.BlockCreateManyInput;
   page: CreatePageInput;
 }
 
-async function createDatabase (block: GetDatabaseResponse, {
+async function retrieveDatabase (block: GetDatabaseResponse, {
   spaceId,
   userId
-}: {spaceId: string, userId: string}): Promise<CreateDatabaseResult> {
+}: {spaceId: string, userId: string}): Promise<RetrieveDatabaseResult> {
   const title = convertToPlainText((block as any).title);
   const cardProperties: IPropertyTemplate[] = [];
 
@@ -681,9 +681,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   // Store all the pages/databases the integration fetched in a record
   const searchResultRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
 
-  const createdPages: Record<string, CreatePageInput> = {};
+  const retrievedPages: Record<string, CreatePageInput> = {};
 
-  const createdCards: Record<string, {
+  const retrievedCards: Record<string, {
     card: Prisma.BlockCreateManyInput
     page: CreatePageInput,
     notionPageId: string
@@ -736,10 +736,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     const notionPage = searchResults[index];
     try {
       if (notionPage.object === 'page') {
-        await createPage([[notionPage.id, uuid()]], failedImportBlocks);
+        await retrievePageInformation([[notionPage.id, uuid()]], failedImportBlocks);
       }
       else if (notionPage.object === 'database') {
-        await createDatabaseAndPopulateCache(notionPage);
+        await retrieveDatabaseInformation(notionPage);
       }
       if (failedImportBlocks.length !== 0) {
         throw new Error();
@@ -753,10 +753,10 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
   }
 
-  async function createDatabaseAndPopulateCache (block: GetDatabaseResponse) {
+  async function retrieveDatabaseInformation (block: GetDatabaseResponse) {
     // Only create the database if it hasn't been created already
-    if (!createdPages[block.id]) {
-      const { board, focalboardPropertiesRecord, page, view } = await createDatabase(block as GetDatabaseResponse, {
+    if (!retrievedPages[block.id]) {
+      const { board, focalboardPropertiesRecord, page, view } = await retrieveDatabase(block as GetDatabaseResponse, {
         spaceId,
         userId
       });
@@ -766,18 +766,18 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         view,
         properties: focalboardPropertiesRecord
       };
-      createdPages[block.id] = page as any;
+      retrievedPages[block.id] = page as any;
     }
 
-    return createdPages[block.id];
+    return retrievedPages[block.id];
   }
 
   // Array of tuple, [notion block id, charmverse block id]
-  async function createPage (pageIds: [string, string][], failedImportBlocks: Array<[string, number][]>) {
+  async function retrievePageInformation (pageIds: [string, string][], failedImportBlocks: Array<[string, number][]>) {
     // The last item of the pageIds is the notion block id and the optimistic charmverse page id
     const [notionPageId, charmversePageId] = pageIds[pageIds.length - 1];
     // The page might have been recursively created via a link_to_page block
-    if (createdPages[notionPageId]) return createdPages[notionPageId];
+    if (retrievedPages[notionPageId]) return retrievedPages[notionPageId];
 
     // An array to keep track of the first level children of a page
     const blocks: BlockWithChildren[] = [];
@@ -906,27 +906,28 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
                   database_id: block.id
                 }) as GetDatabaseResponse;
                 searchResultRecord[block.id] = databaseResponse;
-                createdPages[block.id] = await createDatabaseAndPopulateCache(databaseResponse);
+                retrievedPages[block.id] = await retrieveDatabaseInformation(databaseResponse);
 
                 (parentNode as PageContent).content?.push({
                   type: 'page',
                   attrs: {
-                    id: createdPages[block.id].id
+                    id: retrievedPages[block.id].id
                   }
                 });
               }
-              catch (_) {
+              catch (error) {
+                log.warn('Could not retrieve database', { databaseId: block.id, error });
                 pagesWithoutIntegrationAccess.add(block.id);
               }
             },
             onChildPage: async (block, parentNode) => {
               const _failedImportBlocks: [string, number][][] = [];
               try {
-                createdPages[block.id] = await createPage([...pageIds, [block.id, uuid()]], _failedImportBlocks);
+                retrievedPages[block.id] = await retrievePageInformation([...pageIds, [block.id, uuid()]], _failedImportBlocks);
                 (parentNode as PageContent).content?.push({
                   type: 'page',
                   attrs: {
-                    id: createdPages[block.id].id
+                    id: retrievedPages[block.id].id
                   }
                 });
                 if (_failedImportBlocks.length !== 0) {
@@ -947,7 +948,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               // Also make sure the linked page id is not its parent
               if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== notionPageId && !parentAsLinkedPage) {
                 try {
-                  const createdPage = await createPage([...pageIds, [linkedPageId, uuid()]], _failedImportBlocks);
+                  const createdPage = await retrievePageInformation([...pageIds, [linkedPageId, uuid()]], _failedImportBlocks);
                   linkedPages[linkedPageId] = createdPage.id;
                   if (_failedImportBlocks.length !== 0) {
                     throw new Error();
@@ -1005,7 +1006,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       // Regular pages including databases
       if (pageResponse.parent.type === 'page_id' || pageResponse.parent.type === 'workspace') {
         const title = convertToPlainText((pageResponse.properties.title as any)[pageResponse.properties.title.type]);
-        createdPages[notionPageId] = {
+        retrievedPages[notionPageId] = {
           type: 'page',
           content: pageContent,
           headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover?.file.url : null,
@@ -1015,15 +1016,15 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           spaceId,
           createdBy: userId
         };
-        return createdPages[notionPageId];
+        return retrievedPages[notionPageId];
       }
       // Focalboard cards
       else if (pageResponse.parent.type === 'database_id') {
       // The database must be created before the cards can be added
       // eslint-disable-next-line
 
-        await createDatabaseAndPopulateCache(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
-        const database = createdPages[pageResponse.parent.database_id];
+        await retrieveDatabaseInformation(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
+        const database = retrievedPages[pageResponse.parent.database_id];
 
         if (database.boardId) {
           const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title') as {title: {plain_text: string}[]};
@@ -1086,7 +1087,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             content: pageContent,
             type: 'card' as PageType
           };
-          createdCards[notionPageId] = {
+          retrievedCards[notionPageId] = {
             notionPageId,
             page: cardPage,
             card: {
@@ -1105,15 +1106,16 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               ...commonBlockData
             }
           };
-          createdPages[notionPageId] = cardPage;
+          retrievedPages[notionPageId] = cardPage;
         }
       }
     }
-    catch (_: any) {
+    catch (error) {
+      log.warn('Could not access page', { pageId: notionPageId, error });
       // TODO: Maybe show the user which pages they need to give access to the integration. but we can only show the id
       pagesWithoutIntegrationAccess.add(notionPageId);
     }
-    return createdPages[notionPageId];
+    return retrievedPages[notionPageId];
   }
 
   const workspacePage = await createPrismaPage({
@@ -1138,12 +1140,12 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   async function createCharmversePage (blockId: string, type: 'page' | 'database', parentId?: string | null) {
     try {
       await createPrismaPage({
-        ...createdPages[blockId],
+        ...retrievedPages[blockId],
         parentId
       });
 
       if (type === 'database') {
-        const databasePage = createdPages[blockId];
+        const databasePage = retrievedPages[blockId];
         if (databasePage && databasePage.boardId) {
           const { board, view } = focalboardRecord[databasePage.boardId];
           await prisma.block.createMany({
@@ -1164,7 +1166,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   }
 
   const charmversePageIds = searchResults.map(_searchResult => _searchResult.id);
-  const createdPagesSet: Set<string> = new Set();
+  const createdPages: Set<string> = new Set();
 
   async function createCharmversePageFromNotionPage (block: GetPageResponse | GetDatabaseResponse) {
     const failedToImportBlock = failedImportsRecord[block.id] && failedImportsRecord[block.id].blocks.length === 0;
@@ -1172,7 +1174,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       // pages and databases
       if (block.parent.type === 'page_id') {
         // Create its parent first, parent could be regular page or database pages
-        if (!createdPagesSet.has(block.parent.page_id) && searchResultRecord[block.parent.page_id]) {
+        if (!createdPages.has(block.parent.page_id) && searchResultRecord[block.parent.page_id]) {
           await createCharmversePageFromNotionPage(searchResultRecord[block.parent.page_id]);
         }
         let parentId = null;
@@ -1186,34 +1188,34 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         else if (searchResultRecord[block.parent.page_id]) {
           // Check if the parent is a regular page first
           // If its not then the parent is a database page (focalboard card)
-          parentId = createdPages[block.parent.page_id]?.id ?? createdCards[block.parent.page_id]?.page?.id;
+          parentId = retrievedPages[block.parent.page_id]?.id ?? retrievedCards[block.parent.page_id]?.page?.id;
         }
         else {
           // Parent id could be a block, for example there could be a nested page inside a callout/quote/column block
           // Here parent.page_id is not actually the the id of the page, its the id of the nearest parent of the page, which could be callout/quote/column block
-          parentId = createdPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPageInput.id;
+          parentId = retrievedPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPageInput.id;
         }
 
         await createCharmversePage(block.id, block.object, parentId);
-        createdPagesSet.add(block.id);
+        createdPages.add(block.id);
       }
       // Focalboard cards
       // If the card has been created (in memory) and the database has been created in memory
-      else if (block.parent.type === 'database_id' && createdCards[block.id] && createdPages[block.parent.database_id]) {
+      else if (block.parent.type === 'database_id' && retrievedCards[block.id] && retrievedPages[block.parent.database_id]) {
         // If the parent wasn't created create it first if there were no errors
-        if (!createdPagesSet.has(block.parent.database_id)
+        if (!createdPages.has(block.parent.database_id)
             && searchResultRecord[block.parent.database_id]) {
           await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
         }
         // Make sure the database page has not failed to be created, otherwise no cards will be added
-        const { notionPageId, page, card } = createdCards[block.id];
+        const { notionPageId, page, card } = retrievedCards[block.id];
         if (!failedImportsRecord[block.parent.database_id]) {
           await prisma.block.create({
             data: card
           });
           // Creating the page corresponding to the card
           await createCharmversePage(notionPageId, 'page', page.parentId);
-          createdPagesSet.add(block.id);
+          createdPages.add(block.id);
         }
         // If the database wasn't imported then the cards cant be created, so add them to failedImportRecord
         else {
@@ -1228,7 +1230,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       // Top level pages and databases
       else if (block.parent.type === 'workspace') {
         await createCharmversePage(block.id, block.object, workspacePage.id);
-        createdPagesSet.add(block.id);
+        createdPages.add(block.id);
       }
     }
   }
@@ -1236,7 +1238,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   for (let index = 0; index < charmversePageIds.length; index++) {
     const charmversePageId = charmversePageIds[index];
     const block = searchResultRecord[charmversePageId];
-    if ((block?.object === 'database' || block?.object === 'page') && !createdPagesSet.has(block.id)) {
+    // check if we alredy created the page and skip
+    if ((block?.object === 'database' || block?.object === 'page') && !createdPages.has(block.id)) {
       await createCharmversePageFromNotionPage(block);
     }
   }
@@ -1245,7 +1248,14 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     await createPrismaPage(ungroupedPageInput);
   }
 
-  log.info(`[notion] Completed import of ${searchResults.length} pages`, { pagesWithoutIntegrationAccess });
+  log.info('[notion] Completed import of Notion pages', {
+    resultsFromSearch: searchResults.length,
+    retrievedPages: Object.keys(retrievedPages).length,
+    retrievedCards: Object.keys(retrievedCards).length,
+    createdPages: createdPages.size,
+    failedPages: failedImportsRecord,
+    pagesWithoutIntegrationAccess
+  });
 
   return Object.values(failedImportsRecord).slice(0, 25);
 }
