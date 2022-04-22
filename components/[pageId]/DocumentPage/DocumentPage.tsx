@@ -16,7 +16,7 @@ import PageBanner from './components/PageBanner';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
 import PageHeader from './components/PageHeader';
 
-export const Container = styled(Box)<{ top: number, showThreads: boolean }>`
+export const Container = styled(Box)<{ top: number, showThreads?: boolean }>`
   width: ${({ showThreads }) => showThreads ? '1000px' : '860px'};
   max-width: 100%;
   margin: 0 auto ${({ top }) => top + 100}px;

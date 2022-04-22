@@ -12,6 +12,7 @@ import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placeme
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import log from 'lib/log';
+import { pluginKey } from '../../EmojiSuggest/emojiSuggest.constants';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -210,7 +211,7 @@ export function referenceElement(
   return (view) => {
     return {
       getBoundingClientRect: () => {
-        const emojiSuggestState = emojiSuggestKey.getState(view.state);
+        const emojiSuggestState = pluginKey.getState(view.state);
         // Ref will be present if we are triggering the emoji suggest by clicking on page icon
         if (emojiSuggestState.ref) {
           return (emojiSuggestState.ref as HTMLDivElement).getBoundingClientRect()

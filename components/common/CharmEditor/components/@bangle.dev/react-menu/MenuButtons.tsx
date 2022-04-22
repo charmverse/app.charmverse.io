@@ -17,7 +17,7 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
 import { HintPos } from '@bangle.dev/react-menu/dist/types';
 import {
-  defaultKeys as floatingMenuKeys, focusFloatingMenuInput, toggleLinkSubMenu
+  defaultKeys as floatingMenuKeys, focusFloatingMenuInput
 } from '@bangle.dev/react-menu/floating-menu';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
@@ -25,6 +25,7 @@ import React, { useCallback } from 'react';
 import { createInlineComment, queryIsInlineCommentActive, toggleInlineComment } from '../../InlineComment';
 import { MenuButton } from './Icon';
 import CommentIcon from '@mui/icons-material/Comment';
+import { toggleSubMenu } from './floating-menu';
 
 const {
   defaultKeys: orderedListKeys,
@@ -112,7 +113,7 @@ export function InlineCommentButton({
         (state: EditorState) => createInlineComment()(state),
         (_state, dispatch, view) => {
           if (dispatch) {
-            toggleInlineCommentSubMenu(menuKey)(view!.state, view!.dispatch, view);
+            toggleSubMenu("inlineCommentSubMenu")(view!.state, view!.dispatch, view);
             rafCommandExec(view!, focusFloatingMenuInput(menuKey));
           }
           return true;
@@ -559,7 +560,7 @@ export function FloatingLinkButton({
         (state: EditorState) => createLink('')(state),
         (_state, dispatch, view) => {
           if (dispatch) {
-            toggleLinkSubMenu(menuKey)(view!.state, view!.dispatch, view);
+            toggleSubMenu("linkSubMenu")(view!.state, view!.dispatch, view);
             rafCommandExec(view!, focusFloatingMenuInput(menuKey));
           }
           return true;
