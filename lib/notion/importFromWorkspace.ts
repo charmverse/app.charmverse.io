@@ -1249,7 +1249,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   log.info('[notion] Completed import of Notion pages', {
     resultsFromSearch: searchResults.length,
     createdPages: createdPages.size,
-    failedPages: Object.keys(failedImportsRecord).length,
+    failedPages: failedImportsRecord,
     pagesWithoutIntegrationAccess
   });
 
