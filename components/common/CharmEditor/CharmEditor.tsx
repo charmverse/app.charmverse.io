@@ -39,7 +39,7 @@ import { Mention, mentionPlugins, mentionSpecs, MentionSuggest } from './compone
 import NestedPage, { plugins as nestedPagePlugins, NestedPagesList, spec as nestedPageSpec } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
-import Disclosure, * as disclosure from './components/disclosure';
+import * as disclosure from './components/disclosure';
 import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
@@ -393,20 +393,6 @@ function CharmEditor (
               <NestedPage {...props}>
                 {_children}
               </NestedPage>
-            );
-          }
-          case 'disclosureDetails': {
-            return (
-              <Disclosure {...props}>
-                {_children}
-              </Disclosure>
-            );
-          }
-          case 'disclosureSummary': {
-            return (
-              <Disclosure {...props}>
-                {_children}
-              </Disclosure>
             );
           }
           default: {
