@@ -26,7 +26,7 @@ beforeAll(async () => {
 
 });
 
-describe('POST /api/pages - create root page', () => {
+describe('POST /api/pages - create child pages', () => {
 
   it('should assign the permissions of the parent to the child', async () => {
 

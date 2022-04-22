@@ -166,7 +166,10 @@ export async function createPagePermission (permission: IPagePermissionToCreate 
     },
     data: {
       permissionLevel: createdPermission.permissionLevel,
-      permissions: createdPermission.permissions
+      permissions: createdPermission.permissions,
+      // Update inheritance if these permissions should now also inherit upwards
+      inheritedFromPermission: (!permissionBeforeModification?.inheritedFromPermission && createdPermission.inheritedFromPermission)
+        ? createdPermission.inheritedFromPermission : undefined
     }
   });
 

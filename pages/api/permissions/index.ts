@@ -45,11 +45,12 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
+  // TODO - This could be an async job, but there is a risk of the UI being out of sync
   if (permissionsAfter > permissionsBefore) {
-    setupPermissionsAfterPagePermissionAdded(pageId);
+    await setupPermissionsAfterPagePermissionAdded(pageId);
   }
   else {
-    setupPermissionsAfterPagePermissionUpdated(createdPermission.id);
+    await setupPermissionsAfterPagePermissionUpdated(createdPermission.id);
   }
 
   return res.status(201).json(createdPermission);
