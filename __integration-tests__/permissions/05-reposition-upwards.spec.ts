@@ -12,6 +12,8 @@ let user: User;
 let space: Space;
 let cookie: string;
 
+jest.setTimeout(1000000);
+
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(v4());
 
@@ -143,7 +145,9 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
     const createdChildPermission = (await request(baseUrl)
       .post('/api/permissions')
       .set('Cookie', cookie)
-      .send(permissionToAdd)).body as IPagePermissionWithSource;
+      .send(permissionToAdd)
+      .expect(201)
+      ).body as IPagePermissionWithSource;
 
     //      .expect(201)).body as IPagePermissionWithSource;
 
@@ -155,9 +159,6 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
         id: nestedChildPage.id,
         index: 0,
         parentId: rootPage.id
-      })
-      .then(response => {
-        return response;
       });
 
     const [rootPageWithPermissions, nestedChildWithPermissions, superNestedChildWithPermissions] = (await Promise.all([
@@ -168,7 +169,7 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
 
     const rootPagePermissionId = rootPageWithPermissions.permissions[0].id;
 
-    // Should have kept inherited permissions
+    // Should have kept same count of permissions (default space + the child one that was assigned)
     expect(nestedChildWithPermissions.permissions.length).toBe(2);
 
     const nestedInheritsFromChild = nestedChildWithPermissions.permissions.every(
