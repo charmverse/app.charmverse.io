@@ -1,8 +1,5 @@
-import { RawPlugins, RawSpecs, NodeView, createElement } from '@bangle.dev/core';
-import { DOMOutputSpec, Plugin, PluginKey, splitBlock, createParagraphNear, EditorState, EditorView, Transaction, chainCommands } from '@bangle.dev/pm';
-import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
-
-import { createObject, filter, insertEmpty } from '@bangle.dev/utils';
+import { RawPlugins, RawSpecs, createElement } from '@bangle.dev/core';
+import { DOMOutputSpec, Plugin, PluginKey } from '@bangle.dev/pm';
 
 export function spec () {
   return [
@@ -70,7 +67,6 @@ function ContainerPlugin ({ type, contentDOM }: { type: string, contentDOM: DOMO
               if ((mutation as MutationRecord).attributeName === 'open') {
                 return true;
               }
-              console.log('mutation', mutation);
               return false;
             },
             node,
