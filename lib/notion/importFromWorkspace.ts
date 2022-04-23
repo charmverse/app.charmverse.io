@@ -106,7 +106,8 @@ interface ChildBlockListResponse {
 
 type BlockWithChildren = BlockObjectResponse & { children: string[], pageId: string };
 
-const BlocksWithChildrenRegex = /(table|toggle|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
+// eslint-disable-next-line
+const BlocksWithChildrenRegex = /(heading_1|heading_2|heading_3|table|toggle|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
 
 async function populateDoc (
   {
@@ -128,43 +129,67 @@ async function populateDoc (
   },
   _parentInfo: [string, number][]
 ) {
-
   async function recurse (parentNode: BlockNode, block: BlockWithChildren, parentInfo: [string, number][]) {
+    async function createInlinePageLinks (inlineLinkedPages: MentionNode[]) {
+      for (const inlineLinkedPage of inlineLinkedPages) {
+        try {
+          const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
+          if (createdPageId) {
+            inlineLinkedPage.attrs.value = createdPageId;
+          }
+        }
+        catch (_) {
+          //
+        }
+      }
+    }
+
     try {
       switch (block.type) {
-        case 'heading_1': {
-          (parentNode as PageContent).content?.push({
-            type: 'heading',
-            attrs: {
-              level: 1
-            },
-            content: convertRichText(block.heading_1.rich_text).contents
-          });
+        case 'heading_1':
+        case 'heading_2':
+        case 'heading_3':
+        {
+          const level = Number(block.type.split('_')[1]);
+          const { contents, inlineLinkedPages } = convertRichText((block as any)[block.type].rich_text);
+          const children = blocksRecord[block.id].children;
+          if (children.length !== 0) {
+            // Toggle list heading 1
+            const disclosureDetailsNode: DisclosureDetailsNode = {
+              type: 'disclosureDetails',
+              content: [{
+                type: 'disclosureSummary',
+                content: [
+                  {
+                    type: 'heading',
+                    attrs: {
+                      level
+                    },
+                    content: contents
+                  }
+                ]
+              }]
+            };
+
+            for (let index = 0; index < children.length; index++) {
+              const childId = children[index];
+              await recurse(disclosureDetailsNode, blocksRecord[childId], [...parentInfo, [blocksRecord[childId].type, index]]);
+            }
+            (parentNode as PageContent).content?.push(disclosureDetailsNode);
+          }
+          else {
+            // Regular heading 1
+            (parentNode as PageContent).content?.push({
+              type: 'heading',
+              attrs: {
+                level
+              },
+              content: contents
+            });
+          }
+          await createInlinePageLinks(inlineLinkedPages);
           break;
         }
-
-        case 'heading_2': {
-          (parentNode as PageContent).content?.push({
-            type: 'heading',
-            attrs: {
-              level: 2
-            },
-            content: convertRichText(block.heading_2.rich_text).contents
-          });
-          break;
-        }
-
-        case 'heading_3': {
-          (parentNode as PageContent).content?.push({
-            type: 'heading',
-            attrs: {
-              level: 2
-            },
-            content: convertRichText(block.heading_3.rich_text).contents
-          });
-          break;
-        }
-
         case 'toggle': {
           // TODO: Linked page support
           const { contents, inlineLinkedPages } = convertRichText(block.toggle.rich_text);
@@ -181,17 +206,7 @@ async function populateDoc (
             }]
           };
 
-          for (const inlineLinkedPage of inlineLinkedPages) {
-            try {
-              const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
-              if (createdPageId) {
-                inlineLinkedPage.attrs.value = createdPageId;
-              }
-            }
-            catch (_) {
-              //
-            }
-          }
+          await createInlinePageLinks(inlineLinkedPages);
 
           for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
             const childId = blocksRecord[block.id].children[index];
@@ -240,18 +255,8 @@ async function populateDoc (
             type: 'paragraph',
             content: contents
           });
-          for (const inlineLinkedPage of inlineLinkedPages) {
-            try {
-              const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
-              // Replace the notion page id with the charmverse one
-              if (createdPageId) {
-                inlineLinkedPage.attrs.value = createdPageId;
-              }
-            }
-            catch (_) {
-              //
-            }
-          }
+
+          await createInlinePageLinks(inlineLinkedPages);
           break;
         }
 
@@ -304,18 +309,7 @@ async function populateDoc (
             content: [listItemNode]
           });
 
-          for (const inlineLinkedPage of inlineLinkedPages) {
-            try {
-              const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
-              // Replace the notion page id with the charmverse one
-              if (createdPageId) {
-                inlineLinkedPage.attrs.value = createdPageId;
-              }
-            }
-            catch (_) {
-              //
-            }
-          }
+          await createInlinePageLinks(inlineLinkedPages);
 
           for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
             const childId = blocksRecord[block.id].children[index];
@@ -349,18 +343,7 @@ async function populateDoc (
             ]
           };
           (parentNode as PageContent).content?.push(calloutNode);
-          for (const inlineLinkedPage of inlineLinkedPages) {
-            try {
-              const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
-              // Replace the notion page id with the charmverse one
-              if (createdPageId) {
-                inlineLinkedPage.attrs.value = createdPageId;
-              }
-            }
-            catch (_) {
-              //
-            }
-          }
+          await createInlinePageLinks(inlineLinkedPages);
           for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
             const childId = blocksRecord[block.id].children[index];
             await recurse(calloutNode, blocksRecord[childId], [...parentInfo, [blocksRecord[childId].type, index]]);
@@ -450,18 +433,7 @@ async function populateDoc (
                   type: index === 0 ? 'table_header' : 'table_cell',
                   content: contents
                 });
-                for (const inlineLinkedPage of inlineLinkedPages) {
-                  try {
-                    const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
-                    // Replace the notion page id with the charmverse one
-                    if (createdPageId) {
-                      inlineLinkedPage.attrs.value = createdPageId;
-                    }
-                  }
-                  catch (_) {
-                    //
-                  }
-                }
+                await createInlinePageLinks(inlineLinkedPages);
               }
             }
           }
