@@ -1,5 +1,5 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import { uploadToS3 } from 'lib/aws/uploadToS3';
+import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import {
   Command,
   EditorView,
