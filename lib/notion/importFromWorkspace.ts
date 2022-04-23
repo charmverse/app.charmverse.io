@@ -167,6 +167,7 @@ async function populateDoc (
 
         case 'toggle': {
           // TODO: Linked page support
+          const { contents, inlineLinkedPages } = convertRichText(block.toggle.rich_text);
           const disclosureDetailsNode: DisclosureDetailsNode = {
             type: 'disclosureDetails',
             content: [{
@@ -174,11 +175,23 @@ async function populateDoc (
               content: [
                 {
                   type: 'paragraph',
-                  content: convertRichText(block.toggle.rich_text).contents
+                  content: contents
                 }
               ]
             }]
           };
+
+          for (const inlineLinkedPage of inlineLinkedPages) {
+            try {
+              const createdPageId = await onLinkToPage(inlineLinkedPage.attrs.value, parentNode, true);
+              if (createdPageId) {
+                inlineLinkedPage.attrs.value = createdPageId;
+              }
+            }
+            catch (_) {
+              //
+            }
+          }
 
           for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
             const childId = blocksRecord[block.id].children[index];
