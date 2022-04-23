@@ -9,7 +9,7 @@ const originalFactory = _log.methodFactory;
 export function apply (log: Logger) {
 
   const isProduction = process.env.NODE_ENV === 'production';
-  const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || (isProduction ? 'error' : 'debug');
+  const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || (isProduction ? 'debug' : 'debug');
   log.setDefaultLevel(defaultLevel);
 
   // add timestamps and send errors to Slack channel in production
