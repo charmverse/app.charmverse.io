@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
+import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, DisclosureDetailsNode, ListItemNode, MentionNode, Page, PageContent, ParagraphNode, TableNode, TableRowNode, TextContent } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import { PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
@@ -106,7 +106,7 @@ interface ChildBlockListResponse {
 
 type BlockWithChildren = BlockObjectResponse & { children: string[], pageId: string };
 
-const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
+const BlocksWithChildrenRegex = /(table|toggle|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
 
 async function populateDoc (
   {
@@ -165,6 +165,30 @@ async function populateDoc (
           break;
         }
 
+        case 'toggle': {
+          // TODO: Linked page support
+          const disclosureDetailsNode: DisclosureDetailsNode = {
+            type: 'disclosureDetails',
+            content: [{
+              type: 'disclosureSummary',
+              content: [
+                {
+                  type: 'paragraph',
+                  content: convertRichText(block.toggle.rich_text).contents
+                }
+              ]
+            }]
+          };
+
+          for (let index = 0; index < blocksRecord[block.id].children.length; index++) {
+            const childId = blocksRecord[block.id].children[index];
+            await recurse(disclosureDetailsNode, blocksRecord[childId], [...parentInfo, [blocksRecord[childId].type, index]]);
+          }
+
+          (parentNode as PageContent).content?.push(disclosureDetailsNode);
+
+          break;
+        }
         case 'column_list': {
           const columnLayoutNode: ColumnLayoutNode = {
             type: 'columnLayout',

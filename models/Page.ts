@@ -61,6 +61,15 @@ export interface ParagraphNode {
   content: (ParagraphNode | TextContent | MentionNode)[]
 }
 
+export interface DisclosureSummaryNode {
+  type: 'disclosureSummary'
+  content: (ParagraphNode | TextContent | MentionNode)[]
+}
+export interface DisclosureDetailsNode {
+  type: 'disclosureDetails'
+  content: [DisclosureSummaryNode, ...(ParagraphNode | TextContent | MentionNode)[]]
+}
+
 export interface ListItemNode {
   attrs: {todoChecked?: null | boolean}
   type: 'listItem',
