@@ -566,133 +566,13 @@ function convertToPlainText (chunks: {plain_text: string}[]) {
   return chunks.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
 }
 
-interface RetrieveDatabaseResult {
-  focalboardPropertiesRecord: Record<string, string>;
-  board: Prisma.BlockCreateManyInput;
-  view: Prisma.BlockCreateManyInput;
-  page: CreatePageInput;
-}
-
-async function retrieveDatabase (block: GetDatabaseResponse, {
-  spaceId,
-  userId
-}: {spaceId: string, userId: string}): Promise<RetrieveDatabaseResult> {
-  const title = convertToPlainText((block as any).title);
-  const cardProperties: IPropertyTemplate[] = [];
-
-  const board = createBoard();
-
-  const focalboardPropertiesRecord : Record<string, string> = {};
-
-  const databaseProperties = Object.values(block.properties);
-  databaseProperties.forEach(property => {
-    const focalboardPropertyType = convertPropertyType(property.type);
-    if (focalboardPropertyType) {
-      const cardProperty: IPropertyTemplate = {
-        id: uuid(),
-        name: property.name,
-        options: [],
-        type: focalboardPropertyType
-      };
-
-      focalboardPropertiesRecord[property.id] = cardProperty.id;
-      cardProperties.push(cardProperty);
-      if (property.type === 'select' || property.type === 'multi_select') {
-        (property as any)[property.type].options.forEach((option: {id: string, name: string, color: string}) => {
-          cardProperty.options.push({
-            value: option.name,
-            color: `propColor${option.color.charAt(0).toUpperCase() + option.color.slice(1)}`,
-            id: option.id
-          });
-        });
-      }
-    }
-  });
-
-  const headerImageUrl = block.cover ? await getPersistentImageUrl({ image: block.cover, spaceId }) : null;
-
-  board.title = title;
-  board.fields.icon = block.icon?.type === 'emoji' ? block.icon.emoji : '';
-  board.fields.headerImage = headerImageUrl;
-  board.rootId = board.id;
-  board.fields.cardProperties = cardProperties;
-  const view = createBoardView();
-  view.fields.viewType = 'board';
-  view.parentId = board.id;
-  view.rootId = board.rootId;
-  view.title = 'Board view';
-
-  const commonBlockData = {
-    spaceId,
-    createdBy: userId,
-    updatedBy: userId,
-    deletedAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  };
-
-  return {
-    board: {
-      ...board,
-      ...commonBlockData
-    },
-    view: {
-      ...view,
-      ...commonBlockData
-    },
-    focalboardPropertiesRecord,
-    page: {
-      headerImage: headerImageUrl,
-      icon: block.icon?.type === 'emoji' ? block.icon.emoji : null,
-      title,
-      type: 'board',
-      spaceId,
-      createdBy: userId,
-      boardId: board.id,
-      id: uuid()
-    }
-  };
-}
-
 export async function importFromWorkspace ({ workspaceName, workspaceIcon, accessToken, userId, spaceId }:
   { accessToken: string, spaceId: string, userId: string,
     workspaceName: string,
     workspaceIcon: string
   }) {
-  const pagesWithoutIntegrationAccess: Set<string> = new Set();
-  const failedImportsRecord: Record<string, {
-    pageId: string,
-    type: 'page' | 'database',
-    title: string,
-    blocks: [string, number][][]
-  }> = {};
-
-  const notion = new Client({
-    auth: accessToken
-  });
-
-  let searchResult = await notion.search({
-    page_size: BLOCKS_FETCHED_PER_REQUEST
-  });
-
-  // Store all the blocks the integration has access to
-  const searchResults = searchResult.results as (GetPageResponse | GetDatabaseResponse)[];
-
-  // While there are more pages the integration has access to
-  while (searchResult.has_more && searchResult.next_cursor && searchResults.length < IMPORTED_PAGES_LIMIT) {
-    searchResult = await notion.search({
-      page_size: BLOCKS_FETCHED_PER_REQUEST,
-      start_cursor: searchResult.next_cursor
-    });
-    searchResults.push(...searchResult.results as (GetPageResponse | GetDatabaseResponse)[]);
-  }
-
-  // Store all the pages/databases the integration fetched in a record
-  const searchResultRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
-
-  const retrievedPages: Record<string, CreatePageInput> = {};
-
-  const retrievedCards: Record<string, {
+  const charmversePagesRecord: Record<string, CreatePageInput> = {};
+  const charmverseCardsRecord: Record<string, {
     card: Prisma.BlockCreateManyInput
     page: CreatePageInput,
     notionPageId: string
@@ -706,6 +586,39 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     view: Prisma.BlockCreateManyInput,
     properties: Record<string, string>
   }> = {};
+  const pagesWithoutIntegrationAccess: Set<string> = new Set();
+  const failedImportsRecord: Record<string, {
+    pageId: string,
+    type: 'page' | 'database',
+    title: string,
+    blocks: [string, number][][]
+  }> = {};
+  const notionPagesRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
+
+  const notion = new Client({
+    auth: accessToken
+  });
+
+  let searchResult = await notion.search({
+    page_size: BLOCKS_FETCHED_PER_REQUEST
+  });
+
+  // Store all the blocks the integration has access to
+  const notionPages = searchResult.results as (GetPageResponse | GetDatabaseResponse)[];
+  // Store all the pages/databases the integration fetched in a record
+  // While there are more pages the integration has access to
+  while (searchResult.has_more && searchResult.next_cursor && notionPages.length < IMPORTED_PAGES_LIMIT) {
+    searchResult = await notion.search({
+      page_size: BLOCKS_FETCHED_PER_REQUEST,
+      start_cursor: searchResult.next_cursor
+    });
+    notionPages.push(...searchResult.results as (GetPageResponse | GetDatabaseResponse)[]);
+  }
+
+  notionPages.forEach(notionPage => {
+    // This would ideally decrease the amount of api requests made to fetch a page/database
+    notionPagesRecord[notionPage.id] = notionPage;
+  });
 
   function populateFailedImportRecord (
     failedImportBlocks: [string, number][][],
@@ -732,23 +645,40 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     };
   }
 
-  // This loop would ideally decrease the amount of api requests made to fetch a page/database
-  for (let index = 0; index < searchResults.length; index++) {
-    const block = searchResults[index];
-    searchResultRecord[block.id] = block;
+  async function retrieveNotionPage (notionPageId: string) {
+    // If the page doesn't exist in the cache fetch it
+    if (!notionPagesRecord[notionPageId]) {
+      const pageResponse = await notion.pages.retrieve({
+        page_id: notionPageId
+      }) as unknown as GetPageResponse;
+      notionPagesRecord[notionPageId] = pageResponse;
+      notionPages.push(pageResponse);
+      log.debug(`[notion]: Retrieved page ${notionPageId} manually`);
+    }
   }
 
-  log.debug(`[notion] Fetching content for ${searchResults.length} pages`, { spaceId });
+  async function retrieveNotionDatabasePage (notionDatabasePageId: string) {
+    if (!notionPagesRecord[notionDatabasePageId]) {
+      const databasePage = await notion.databases.retrieve({
+        database_id: notionDatabasePageId
+      }) as GetDatabaseResponse;
+      notionPagesRecord[notionDatabasePageId] = databasePage;
+      notionPages.push(databasePage);
+      log.debug(`[notion]: Retrieved database ${notionDatabasePageId} manually`);
+    }
+  }
 
-  for (let index = 0; index < searchResults.length; index++) {
+  log.debug(`[notion] Fetching content for ${notionPages.length} pages`, { spaceId });
+
+  for (let index = 0; index < notionPages.length; index++) {
     const failedImportBlocks: [string, number][][] = [];
-    const notionPage = searchResults[index];
+    const notionPage = notionPages[index];
     try {
       if (notionPage.object === 'page') {
-        await retrievePageInformation([[notionPage.id, uuid()]], failedImportBlocks);
+        await createCharmversePageInMemory([[notionPage.id, uuid()]], failedImportBlocks);
       }
       else if (notionPage.object === 'database') {
-        await retrieveDatabaseInformation(notionPage);
+        await createCharmverseDatabasePageInMemory(notionPage.id);
       }
       if (failedImportBlocks.length !== 0) {
         throw new Error();
@@ -758,35 +688,101 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       populateFailedImportRecord(failedImportBlocks, notionPage);
     }
     if (index % 10 === 0) {
-      log.debug(`[notion] Fetched ${index + 1} of ${searchResults.length} pages`);
+      log.debug(`[notion] Fetched ${index + 1} of ${notionPages.length} pages`);
     }
   }
 
-  async function retrieveDatabaseInformation (block: GetDatabaseResponse) {
+  async function createCharmverseDatabasePageInMemory (notionDatabasePageId: string): Promise<CreatePageInput> {
+    retrieveNotionDatabasePage(notionDatabasePageId);
     // Only create the database if it hasn't been created already
-    if (!retrievedPages[block.id]) {
-      const { board, focalboardPropertiesRecord, page, view } = await retrieveDatabase(block as GetDatabaseResponse, {
-        spaceId,
-        userId
+    if (!charmversePagesRecord[notionDatabasePageId]) {
+      const notionPage = notionPagesRecord[notionDatabasePageId] as GetDatabaseResponse;
+      const title = convertToPlainText(notionPage.title);
+      const cardProperties: IPropertyTemplate[] = [];
+
+      const board = createBoard();
+
+      const focalboardPropertiesRecord : Record<string, string> = {};
+
+      const databaseProperties = Object.values(notionPage.properties);
+      databaseProperties.forEach(property => {
+        const focalboardPropertyType = convertPropertyType(property.type);
+        if (focalboardPropertyType) {
+          const cardProperty: IPropertyTemplate = {
+            id: uuid(),
+            name: property.name,
+            options: [],
+            type: focalboardPropertyType
+          };
+
+          focalboardPropertiesRecord[property.id] = cardProperty.id;
+          cardProperties.push(cardProperty);
+          if (property.type === 'select' || property.type === 'multi_select') {
+            (property as any)[property.type].options.forEach((option: {id: string, name: string, color: string}) => {
+              cardProperty.options.push({
+                value: option.name,
+                color: `propColor${option.color.charAt(0).toUpperCase() + option.color.slice(1)}`,
+                id: option.id
+              });
+            });
+          }
+        }
       });
 
+      const headerImageUrl = notionPage.cover ? await getPersistentImageUrl({ image: notionPage.cover, spaceId }) : null;
+
+      board.title = title;
+      board.fields.icon = notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : '';
+      board.fields.headerImage = headerImageUrl;
+      board.rootId = board.id;
+      board.fields.cardProperties = cardProperties;
+      const view = createBoardView();
+      view.fields.viewType = 'board';
+      view.parentId = board.id;
+      view.rootId = board.rootId;
+      view.title = 'Board view';
+
+      const commonBlockData = {
+        spaceId,
+        createdBy: userId,
+        updatedBy: userId,
+        deletedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
       focalboardRecord[board.id] = {
-        board,
-        view,
+        board: {
+          ...board,
+          ...commonBlockData
+        },
+        view: {
+          ...view,
+          ...commonBlockData
+        },
         properties: focalboardPropertiesRecord
       };
-      retrievedPages[block.id] = page as any;
-    }
 
-    return retrievedPages[block.id];
+      charmversePagesRecord[notionDatabasePageId] = {
+        headerImage: headerImageUrl,
+        icon: notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : null,
+        title,
+        type: 'board',
+        spaceId,
+        createdBy: userId,
+        boardId: board.id,
+        id: board.id
+      };
+    }
+    return charmversePagesRecord[notionDatabasePageId];
   }
 
   // Array of tuple, [notion block id, charmverse block id]
-  async function retrievePageInformation (pageIds: [string, string][], failedImportBlocks: Array<[string, number][]>) {
+  async function createCharmversePageInMemory (pageIds: [string, string][], failedImportBlocks: Array<[string, number][]>) {
     // The last item of the pageIds is the notion block id and the optimistic charmverse page id
     const [notionPageId, charmversePageId] = pageIds[pageIds.length - 1];
     // The page might have been recursively created via a link_to_page block
-    if (retrievedPages[notionPageId]) return retrievedPages[notionPageId];
+    if (charmversePagesRecord[notionPageId]) return charmversePagesRecord[notionPageId];
 
     // An array to keep track of the first level children of a page
     const blocks: BlockWithChildren[] = [];
@@ -847,10 +843,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
     // notion.pages.retrieve will return an error if the integration doesn't have access to the page
     try {
-      // If the page doesn't exist in the cache fetch it
-      const pageResponse = searchResultRecord[notionPageId] ?? await notion.pages.retrieve({
-        page_id: notionPageId
-      }) as unknown as GetPageResponse;
+      retrieveNotionPage(notionPageId);
+      const notionPage = notionPagesRecord[notionPageId];
 
       // We allow a maximum of `MAX_CHILD_BLOCK_DEPTH` level of nested contents
       // Blocks like callout, quote, all forms of list allow other blocks to be nested inside them
@@ -915,16 +909,11 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             onChildDatabase: async (block, parentNode) => {
               // If its a database, we need to fetch more information from api
               try {
-                const databaseResponse = await notion.databases.retrieve({
-                  database_id: block.id
-                }) as GetDatabaseResponse;
-                searchResultRecord[block.id] = databaseResponse;
-                retrievedPages[block.id] = await retrieveDatabaseInformation(databaseResponse);
-
+                await createCharmverseDatabasePageInMemory(block.id);
                 (parentNode as PageContent).content?.push({
                   type: 'page',
                   attrs: {
-                    id: retrievedPages[block.id].id
+                    id: charmversePagesRecord[block.id].id
                   }
                 });
               }
@@ -936,11 +925,11 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             onChildPage: async (block, parentNode) => {
               const _failedImportBlocks: [string, number][][] = [];
               try {
-                retrievedPages[block.id] = await retrievePageInformation([...pageIds, [block.id, uuid()]], _failedImportBlocks);
+                await createCharmversePageInMemory([...pageIds, [block.id, uuid()]], _failedImportBlocks);
                 (parentNode as PageContent).content?.push({
                   type: 'page',
                   attrs: {
-                    id: retrievedPages[block.id].id
+                    id: charmversePagesRecord[block.id].id
                   }
                 });
                 if (_failedImportBlocks.length !== 0) {
@@ -949,7 +938,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               }
               catch (_) {
                 log.debug('Error on creating child page');
-                populateFailedImportRecord(_failedImportBlocks, searchResultRecord[block.id]);
+                populateFailedImportRecord(_failedImportBlocks, notionPagesRecord[block.id]);
               }
             },
             onLinkToPage: async (linkedPageId, parentNode, inlineLink) => {
@@ -961,7 +950,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               // Also make sure the linked page id is not its parent
               if (linkedPageId && !linkedPages[linkedPageId] && linkedPageId !== notionPageId && !parentAsLinkedPage) {
                 try {
-                  const createdPage = await retrievePageInformation([...pageIds, [linkedPageId, uuid()]], _failedImportBlocks);
+                  const createdPage = await createCharmversePageInMemory([...pageIds, [linkedPageId, uuid()]], _failedImportBlocks);
                   linkedPages[linkedPageId] = createdPage.id;
                   if (_failedImportBlocks.length !== 0) {
                     throw new Error();
@@ -969,7 +958,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
                 }
                 catch (_) {
                   log.debug('Error on creating child page');
-                  populateFailedImportRecord(_failedImportBlocks, searchResultRecord[linkedPageId]);
+                  populateFailedImportRecord(_failedImportBlocks, notionPagesRecord[linkedPageId]);
                 }
               }
 
@@ -1018,40 +1007,38 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       }
       // Regular pages including databases
 
-      const headerImageUrl = pageResponse.cover ? await getPersistentImageUrl({ image: pageResponse.cover, spaceId }) : null;
+      const headerImageUrl = notionPage.cover ? await getPersistentImageUrl({ image: notionPage.cover, spaceId }) : null;
 
-      if (pageResponse.parent.type === 'page_id' || pageResponse.parent.type === 'workspace') {
-        const title = convertToPlainText((pageResponse.properties.title as any)[pageResponse.properties.title.type]);
-        retrievedPages[notionPageId] = {
+      if (notionPage.parent.type === 'page_id' || notionPage.parent.type === 'workspace') {
+        const title = convertToPlainText((notionPage.properties.title as any)[notionPage.properties.title.type]);
+        charmversePagesRecord[notionPageId] = {
           type: 'page',
           content: pageContent,
           headerImage: headerImageUrl,
-          icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
+          icon: notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : null,
           title,
           id: charmversePageId,
           spaceId,
           createdBy: userId
         };
-        return retrievedPages[notionPageId];
       }
       // Focalboard cards
-      else if (pageResponse.parent.type === 'database_id') {
+      else if (notionPage.parent.type === 'database_id') {
       // The database must be created before the cards can be added
       // eslint-disable-next-line
+        await createCharmverseDatabasePageInMemory(notionPage.parent.database_id);
+        const charmverseDatabasePage = charmversePagesRecord[notionPage.parent.database_id];
 
-        await retrieveDatabaseInformation(searchResultRecord[pageResponse.parent.database_id] as GetDatabaseResponse);
-        const database = retrievedPages[pageResponse.parent.database_id];
-
-        if (database.boardId) {
-          const titleProperty = Object.values(pageResponse.properties).find(value => value.type === 'title') as {title: {plain_text: string}[]};
-          const emoji = pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null;
+        if (charmverseDatabasePage.boardId) {
+          const titleProperty = Object.values(notionPage.properties).find(value => value.type === 'title') as {title: {plain_text: string}[]};
+          const emoji = notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : null;
 
           const title = convertToPlainText(titleProperty.title);
-          const { properties } = focalboardRecord[database.boardId];
+          const { properties } = focalboardRecord[charmverseDatabasePage.boardId];
 
           const cardProperties: Record<string, any> = {};
 
-          Object.values(pageResponse.properties).forEach(property => {
+          Object.values(notionPage.properties).forEach(property => {
             if (property[property.type]) {
               if (property.type.match(/(email|number|url|checkbox|phone_number)/)) {
                 cardProperties[properties[property.id]] = property[property.type];
@@ -1089,7 +1076,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             updatedAt: new Date()
           };
 
-          const headerImage = pageResponse.cover ? await getPersistentImageUrl({ image: pageResponse.cover, spaceId }) : null;
+          const headerImage = notionPage.cover ? await getPersistentImageUrl({ image: notionPage.cover, spaceId }) : null;
 
           const cardPage = {
             createdBy: userId,
@@ -1099,19 +1086,19 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             title,
             headerImage,
             icon: emoji,
-            parentId: database.id,
+            parentId: charmverseDatabasePage.id,
             content: pageContent,
             type: 'card' as PageType
           };
-          retrievedCards[notionPageId] = {
+          charmverseCardsRecord[notionPageId] = {
             notionPageId,
             page: cardPage,
             card: {
               ...createCard({
                 title,
                 id: charmversePageId,
-                parentId: database.boardId,
-                rootId: database.boardId,
+                parentId: charmverseDatabasePage.boardId,
+                rootId: charmverseDatabasePage.boardId,
                 fields: {
                   icon: emoji,
                   contentOrder: [],
@@ -1122,7 +1109,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
               ...commonBlockData
             }
           };
-          retrievedPages[notionPageId] = cardPage;
+          charmversePagesRecord[notionPageId] = cardPage;
         }
       }
     }
@@ -1131,7 +1118,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       // TODO: Maybe show the user which pages they need to give access to the integration. but we can only show the id
       pagesWithoutIntegrationAccess.add(notionPageId);
     }
-    return retrievedPages[notionPageId];
+    return charmversePagesRecord[notionPageId];
   }
 
   const workspacePage = await createPrismaPage({
@@ -1152,37 +1139,50 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   };
 
   let totalUngroupedPages = 0;
+  const createdCharmversePageIds: Set<string> = new Set();
 
-  async function createCharmversePage (blockId: string, type: 'page' | 'database', parentId?: string | null) {
+  async function createCharmverseDatabasePage (notionPageId: string, parentId?: string | null) {
     try {
       await createPrismaPage({
-        ...retrievedPages[blockId],
+        ...charmversePagesRecord[notionPageId],
         parentId
       });
 
-      if (type === 'database') {
-        const databasePage = retrievedPages[blockId];
-        if (databasePage && databasePage.boardId) {
-          const { board, view } = focalboardRecord[databasePage.boardId];
-          await prisma.block.createMany({
-            data: [
-              view,
-              board
-            ]
-          });
-        }
+      const charmverseDatabasePage = charmversePagesRecord[notionPageId];
+      if (charmverseDatabasePage && charmverseDatabasePage.boardId) {
+        const { board, view } = focalboardRecord[charmverseDatabasePage.boardId];
+        await prisma.block.createMany({
+          data: [
+            view,
+            board
+          ]
+        });
       }
+      createdCharmversePageIds.add(notionPageId);
     }
     catch (_) {
       log.debug('Error creating charmverse page');
-      if (!failedImportsRecord[blockId]) {
-        populateFailedImportRecord([], searchResultRecord[blockId]);
+      if (!failedImportsRecord[notionPageId]) {
+        populateFailedImportRecord([], notionPagesRecord[notionPageId]);
       }
     }
   }
 
-  const charmversePageIds = searchResults.map(_searchResult => _searchResult.id);
-  const createdPages: Set<string> = new Set();
+  async function createCharmversePage (notionPageId: string, parentId?: string | null) {
+    try {
+      await createPrismaPage({
+        ...charmversePagesRecord[notionPageId],
+        parentId
+      });
+      createdCharmversePageIds.add(notionPageId);
+    }
+    catch (_) {
+      log.debug('Error creating charmverse page');
+      if (!failedImportsRecord[notionPageId]) {
+        populateFailedImportRecord([], notionPagesRecord[notionPageId]);
+      }
+    }
+  }
 
   async function createCharmversePageFromNotionPage (block: GetPageResponse | GetDatabaseResponse) {
     const failedToImportBlock = failedImportsRecord[block.id] && failedImportsRecord[block.id].blocks.length === 0;
@@ -1190,8 +1190,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       // pages and databases
       if (block.parent.type === 'page_id') {
         // Create its parent first, parent could be regular page or database pages
-        if (!createdPages.has(block.parent.page_id) && searchResultRecord[block.parent.page_id]) {
-          await createCharmversePageFromNotionPage(searchResultRecord[block.parent.page_id]);
+        if (!createdCharmversePageIds.has(block.parent.page_id) && notionPagesRecord[block.parent.page_id]) {
+          await createCharmversePageFromNotionPage(notionPagesRecord[block.parent.page_id]);
         }
         let parentId = null;
         const failedToImportParent = failedImportsRecord[block.parent.page_id] && failedImportsRecord[block.parent.page_id].blocks.length === 0;
@@ -1201,37 +1201,40 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         }
         // If the parent was created successfully
         // Or if we failed to import some blocks from the parent (partial success)
-        else if (searchResultRecord[block.parent.page_id]) {
+        else if (notionPagesRecord[block.parent.page_id]) {
           // Check if the parent is a regular page first
           // If its not then the parent is a database page (focalboard card)
-          parentId = retrievedPages[block.parent.page_id]?.id ?? retrievedCards[block.parent.page_id]?.page?.id;
+          parentId = charmversePagesRecord[block.parent.page_id]?.id ?? charmverseCardsRecord[block.parent.page_id]?.page?.id;
         }
         else {
           // Parent id could be a block, for example there could be a nested page inside a callout/quote/column block
           // Here parent.page_id is not actually the the id of the page, its the id of the nearest parent of the page, which could be callout/quote/column block
-          parentId = retrievedPages[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPageInput.id;
+          parentId = charmversePagesRecord[blocksRecord[block.parent.page_id]?.pageId]?.id ?? ungroupedPageInput.id;
         }
 
-        await createCharmversePage(block.id, block.object, parentId);
-        createdPages.add(block.id);
+        if (block.object === 'database') {
+          await createCharmverseDatabasePage(block.id, parentId);
+        }
+        else if (block.object === 'page') {
+          await createCharmversePage(block.id, parentId);
+        }
       }
       // Focalboard cards
       // If the card has been created (in memory) and the database has been created in memory
-      else if (block.parent.type === 'database_id' && retrievedCards[block.id] && retrievedPages[block.parent.database_id]) {
+      else if (block.parent.type === 'database_id' && charmverseCardsRecord[block.id] && charmversePagesRecord[block.parent.database_id]) {
         // If the parent wasn't created create it first if there were no errors
-        if (!createdPages.has(block.parent.database_id)
-            && searchResultRecord[block.parent.database_id]) {
-          await createCharmversePageFromNotionPage(searchResultRecord[block.parent.database_id]);
+        if (!createdCharmversePageIds.has(block.parent.database_id)
+            && notionPagesRecord[block.parent.database_id]) {
+          await createCharmversePageFromNotionPage(notionPagesRecord[block.parent.database_id]);
         }
         // Make sure the database page has not failed to be created, otherwise no cards will be added
-        const { notionPageId, page, card } = retrievedCards[block.id];
+        const { notionPageId, page, card } = charmverseCardsRecord[block.id];
         if (!failedImportsRecord[block.parent.database_id]) {
           await prisma.block.create({
             data: card
           });
           // Creating the page corresponding to the card
-          await createCharmversePage(notionPageId, 'page', page.parentId);
-          createdPages.add(block.id);
+          await createCharmversePage(notionPageId, page.parentId);
         }
         // If the database wasn't imported then the cards cant be created, so add them to failedImportRecord
         else {
@@ -1245,18 +1248,21 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       }
       // Top level pages and databases
       else if (block.parent.type === 'workspace') {
-        await createCharmversePage(block.id, block.object, workspacePage.id);
-        createdPages.add(block.id);
+        if (block.object === 'database') {
+          await createCharmverseDatabasePage(block.id, workspacePage.id);
+        }
+        else if (block.object === 'page') {
+          await createCharmversePage(block.id, workspacePage.id);
+        }
       }
     }
   }
 
-  for (let index = 0; index < charmversePageIds.length; index++) {
-    const charmversePageId = charmversePageIds[index];
-    const block = searchResultRecord[charmversePageId];
-    // check if we alredy created the page and skip
-    if ((block?.object === 'database' || block?.object === 'page') && !createdPages.has(block.id)) {
-      await createCharmversePageFromNotionPage(block);
+  for (let index = 0; index < notionPages.length; index++) {
+    const notionPage = notionPages[index];
+    // check if we already created the page and skip
+    if ((notionPage?.object === 'database' || notionPage?.object === 'page') && !createdCharmversePageIds.has(notionPage.id)) {
+      await createCharmversePageFromNotionPage(notionPage);
     }
   }
 
@@ -1265,18 +1271,18 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   }
 
   log.info('[notion] Completed import of Notion pages', {
-    resultsFromSearch: searchResults.length,
-    retrievedPages: Object.keys(retrievedPages).length,
-    retrievedCards: Object.keys(retrievedCards).length,
-    createdPages: createdPages.size,
-    failedPages: failedImportsRecord,
+    'Notion pages': notionPages.length,
+    'CharmVerse pages': Object.keys(charmversePagesRecord).length,
+    'CharmVerse cards': Object.keys(charmverseCardsRecord).length,
+    'Created CharmVerse pages (incl. cards)': createdCharmversePageIds.size,
+    'Failed import pages': failedImportsRecord,
     pagesWithoutIntegrationAccess
   });
 
   return Object.values(failedImportsRecord).slice(0, 25);
 }
 
-// if image is stored in notion s3, it will expire so we need to reupload it to our s3
+// if image is stored in notion s3, it will expire so we need to re-upload it to our s3
 function getPersistentImageUrl ({ image, spaceId }: { image: NotionImage, spaceId: string }): Promise<string | null> {
   const url = image.type === 'external' ? image.external.url : image.type === 'file' ? image.file.url : null;
   const isNotionS3 = url?.includes('amazonaws.com/secure.notion-static.com');
