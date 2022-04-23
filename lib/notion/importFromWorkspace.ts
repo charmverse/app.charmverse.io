@@ -13,7 +13,8 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import promiseRetry from 'promise-retry';
 import { isTruthy } from 'lib/utilities/types';
-import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
+import { getFilePath, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse, NotionImage } from './types';
 
 // Limit the highest number of pages that can be imported
 const IMPORTED_PAGES_LIMIT = 10000;
@@ -108,14 +109,19 @@ type BlockWithChildren = BlockObjectResponse & { children: string[], pageId: str
 const BlocksWithChildrenRegex = /(table|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
 
 async function populateDoc (
-  _parentNode: BlockNode,
-  _block: BlockWithChildren,
-  blocksRecord: Record<string, BlockWithChildren>,
   {
+    parentNode: _parentNode,
+    block: _block,
+    blocksRecord,
+    spaceId,
     onLinkToPage,
     onChildDatabase,
     onChildPage
   }: {
+    parentNode: BlockNode,
+    block: BlockWithChildren,
+    blocksRecord: Record<string, BlockWithChildren>,
+    spaceId: string,
     onLinkToPage: (pageLink: string, parentNode: BlockNode, inlineLink: boolean) => Promise<string | null>,
     onChildDatabase: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>,
     onChildPage: (block: BlockWithChildren, parentNode: BlockNode) => Promise<void>
@@ -375,10 +381,11 @@ async function populateDoc (
         }
 
         case 'image': {
+          const persistentUrl = await getPersistentImageUrl({ image: block.image, spaceId });
           (parentNode as PageContent).content?.push({
             type: 'image',
             attrs: {
-              src: block.image.type === 'external' ? block.image.external.url : block.image.type === 'file' ? block.image.file.url : null,
+              src: persistentUrl,
               size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
               aspectRatio: 1
             }
@@ -602,9 +609,11 @@ async function retrieveDatabase (block: GetDatabaseResponse, {
     }
   });
 
+  const headerImageUrl = block.cover ? await getPersistentImageUrl({ image: block.cover, spaceId }) : null;
+
   board.title = title;
   board.fields.icon = block.icon?.type === 'emoji' ? block.icon.emoji : '';
-  board.fields.headerImage = block.cover?.type === 'external' ? block.cover.external.url : block.cover?.type === 'file' ? block.cover.file.url : null;
+  board.fields.headerImage = headerImageUrl;
   board.rootId = board.id;
   board.fields.cardProperties = cardProperties;
   const view = createBoardView();
@@ -633,7 +642,7 @@ async function retrieveDatabase (block: GetDatabaseResponse, {
     },
     focalboardPropertiesRecord,
     page: {
-      headerImage: block.cover?.type === 'external' ? block.cover.external.url : block.cover?.type === 'file' ? block.cover?.file.url : null,
+      headerImage: headerImageUrl,
       icon: block.icon?.type === 'emoji' ? block.icon.emoji : null,
       title,
       type: 'board',
@@ -898,7 +907,11 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
       for (let index = 0; index < blocks.length; index++) {
         try {
-          await populateDoc(pageContent, blocks[index], blocksRecord, {
+          await populateDoc({
+            parentNode: pageContent,
+            block: blocks[index],
+            blocksRecord,
+            spaceId,
             onChildDatabase: async (block, parentNode) => {
               // If its a database, we need to fetch more information from api
               try {
@@ -1004,12 +1017,15 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         });
       }
       // Regular pages including databases
+
+      const headerImageUrl = pageResponse.cover ? await getPersistentImageUrl({ image: pageResponse.cover, spaceId }) : null;
+
       if (pageResponse.parent.type === 'page_id' || pageResponse.parent.type === 'workspace') {
         const title = convertToPlainText((pageResponse.properties.title as any)[pageResponse.properties.title.type]);
         retrievedPages[notionPageId] = {
           type: 'page',
           content: pageContent,
-          headerImage: pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover?.file.url : null,
+          headerImage: headerImageUrl,
           icon: pageResponse.icon?.type === 'emoji' ? pageResponse.icon.emoji : null,
           title,
           id: charmversePageId,
@@ -1073,7 +1089,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             updatedAt: new Date()
           };
 
-          const headerImage = pageResponse.cover?.type === 'external' ? pageResponse.cover.external.url : pageResponse.cover?.type === 'file' ? pageResponse.cover.file.url : null;
+          const headerImage = pageResponse.cover ? await getPersistentImageUrl({ image: pageResponse.cover, spaceId }) : null;
 
           const cardPage = {
             createdBy: userId,
@@ -1258,4 +1274,20 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   });
 
   return Object.values(failedImportsRecord).slice(0, 25);
+}
+
+// if image is stored in notion s3, it will expire so we need to reupload it to our s3
+function getPersistentImageUrl ({ image, spaceId }: { image: NotionImage, spaceId: string }): Promise<string | null> {
+  const url = image.type === 'external' ? image.external.url : image.type === 'file' ? image.file.url : null;
+  const isNotionS3 = url?.includes('amazonaws.com/secure.notion-static.com');
+  if (url && isNotionS3) {
+    const fileName = getFilePath({ url, spaceId });
+    return uploadToS3({ fileName, url }).then(r => r.url).catch(error => {
+      log.warn('could not upload image to s3', { error });
+      return url;
+    });
+  }
+  else {
+    return Promise.resolve(url);
+  }
 }

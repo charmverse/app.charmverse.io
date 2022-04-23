@@ -5,7 +5,7 @@ import { S3Client, PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import charmClient from 'charmClient';
 
-export const uploadToS3 = async (file: File) => {
+export async function uploadToS3 (file: File) {
   const data = await charmClient.uploadToS3(file);
 
   const client = new S3Client({
@@ -39,4 +39,4 @@ export const uploadToS3 = async (file: File) => {
     bucket: data.bucket,
     key: data.key
   };
-};
+}

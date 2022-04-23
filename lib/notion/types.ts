@@ -6,6 +6,19 @@ export interface FailedImportsError {
   blocks: [string, number][][]
 }
 
+export type NotionImage = {
+  type: 'external';
+  external: {
+      url: string;
+  };
+} | {
+  type: 'file';
+  file: {
+      url: string;
+      expiry_time: string;
+  };
+};
+
 export type RichTextItemResponse = ({
   type: 'text';
   text: {
