@@ -42,6 +42,5 @@ export async function uploadToS3 ({ fileName, url }: { fileName: string, url: st
 
 export function getFilePath ({ spaceId, url }: { spaceId: string, url: string }) {
   const filename = decodeURIComponent(new URL(url).pathname.split('/').pop() || '')?.replace(/\s/g, '-') || uuid();
-  console.log('url', url, '=>', filename);
   return `spaces/${spaceId}/${uuid()}/${filename}`;
 }
