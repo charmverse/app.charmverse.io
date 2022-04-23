@@ -686,6 +686,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
     catch (err: any) {
       populateFailedImportRecord(failedImportBlocks, notionPage);
+      log.debug(`[notion] Failed to create page in memory ${notionPage.id}`);
     }
     if (index % 10 === 0) {
       log.debug(`[notion] Fetched ${index + 1} of ${notionPages.length} pages`);
@@ -728,7 +729,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           }
         }
       });
-
       const headerImageUrl = notionPage.cover ? await getPersistentImageUrl({ image: notionPage.cover, spaceId }) : null;
 
       board.title = title;
@@ -1005,10 +1005,8 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           content: []
         });
       }
-      // Regular pages including databases
 
       const headerImageUrl = notionPage.cover ? await getPersistentImageUrl({ image: notionPage.cover, spaceId }) : null;
-
       if (notionPage.parent.type === 'page_id' || notionPage.parent.type === 'workspace') {
         const title = convertToPlainText((notionPage.properties.title as any)[notionPage.properties.title.type]);
         charmversePagesRecord[notionPageId] = {
@@ -1024,9 +1022,9 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       }
       // Focalboard cards
       else if (notionPage.parent.type === 'database_id') {
-      // The database must be created before the cards can be added
-      // eslint-disable-next-line
-        await createCharmverseDatabasePageInMemory(notionPage.parent.database_id);
+        // The database must be created before the cards can be added
+        // eslint-disable-next-line
+          await createCharmverseDatabasePageInMemory(notionPage.parent.database_id);
         const charmverseDatabasePage = charmversePagesRecord[notionPage.parent.database_id];
 
         if (charmverseDatabasePage.boardId) {
@@ -1075,7 +1073,6 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
             createdAt: new Date(),
             updatedAt: new Date()
           };
-
           const headerImage = notionPage.cover ? await getPersistentImageUrl({ image: notionPage.cover, spaceId }) : null;
 
           const cardPage = {
@@ -1112,6 +1109,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
           charmversePagesRecord[notionPageId] = cardPage;
         }
       }
+      // Regular pages including databases
     }
     catch (error) {
       log.warn('Could not access page', { pageId: notionPageId, error });
@@ -1161,7 +1159,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       createdCharmversePageIds.add(notionPageId);
     }
     catch (_) {
-      log.debug('Error creating charmverse page');
+      log.debug(`Error creating charmverse database page ${notionPageId}`);
       if (!failedImportsRecord[notionPageId]) {
         populateFailedImportRecord([], notionPagesRecord[notionPageId]);
       }
@@ -1177,7 +1175,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
       createdCharmversePageIds.add(notionPageId);
     }
     catch (_) {
-      log.debug('Error creating charmverse page');
+      log.debug(`Error creating charmverse page ${notionPageId}`);
       if (!failedImportsRecord[notionPageId]) {
         populateFailedImportRecord([], notionPagesRecord[notionPageId]);
       }
@@ -1201,7 +1199,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         }
         // If the parent was created successfully
         // Or if we failed to import some blocks from the parent (partial success)
-        else if (notionPagesRecord[block.parent.page_id]) {
+        else if (notionPagesRecord[block.parent.page_id] && createdCharmversePageIds.has(block.parent.page_id)) {
           // Check if the parent is a regular page first
           // If its not then the parent is a database page (focalboard card)
           parentId = charmversePagesRecord[block.parent.page_id]?.id ?? charmverseCardsRecord[block.parent.page_id]?.page?.id;
@@ -1229,7 +1227,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
         }
         // Make sure the database page has not failed to be created, otherwise no cards will be added
         const { notionPageId, page, card } = charmverseCardsRecord[block.id];
-        if (!failedImportsRecord[block.parent.database_id]) {
+        if (!failedImportsRecord[block.parent.database_id] && createdCharmversePageIds.has(block.parent.database_id)) {
           await prisma.block.create({
             data: card
           });
