@@ -5,7 +5,6 @@ import { Block } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -24,12 +23,16 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block | {e
   });
 
   async function _deleteBlock () {
-    const deleted = await prisma.block.delete({
+    const deleted = await prisma.block.update({
       where: {
         id: blockId
+      },
+      data: {
+        isAlive: false,
+        deletedAt: new Date()
       }
     });
-    await prisma.block.deleteMany({
+    await prisma.block.updateMany({
       where: {
         OR: [
           {
@@ -39,6 +42,10 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block | {e
             parentId: blockId
           }
         ]
+      },
+      data: {
+        isAlive: false,
+        deletedAt: new Date()
       }
     });
 

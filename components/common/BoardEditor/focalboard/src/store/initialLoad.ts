@@ -2,8 +2,6 @@
 // See LICENSE.txt for license information.
 
 import {createAsyncThunk, createSelector} from '@reduxjs/toolkit'
-
-import {default as client} from '../octoClient'
 import charmClient from 'charmClient'
 
 import {Subscription} from '../wsclient'

@@ -84,6 +84,32 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
+  await prisma.block.updateMany({
+    where: {
+      OR: [
+        {
+          id: {
+            in: deletedChildPageIds
+          }
+        },
+        {
+          parentId: {
+            in: deletedChildPageIds
+          }
+        },
+        {
+          rootId: {
+            in: deletedChildPageIds
+          }
+        }
+      ]
+    },
+    data: {
+      isAlive: false,
+      deletedAt: new Date()
+    }
+  });
+
   return res.status(200).json({ deletedCount: deletedChildPageIds.length });
 }
 
