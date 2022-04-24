@@ -319,7 +319,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
     {
       uid: 'insertDisclosure',
       icon: <ArrowForwardIcon sx={{ fontSize: 16 }} />,
-      title: 'Disclosure',
+      title: 'Toggle List/Heading',
       keywords: ['summary', 'disclosure', 'toggle', 'collapse'],
       description: 'Insert a summary and content',
       editorExecuteCommand: () => {
