@@ -9,13 +9,13 @@ export interface FailedImportsError {
 export type NotionImage = {
   type: 'external';
   external: {
-      url: string;
+    url: string;
   };
 } | {
   type: 'file';
   file: {
-      url: string;
-      expiry_time: string;
+    url: string;
+    expiry_time: string;
   };
 };
 
