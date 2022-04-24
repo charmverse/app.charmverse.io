@@ -114,7 +114,7 @@ class CharmClient {
   }
 
   deletePage (pageId: string) {
-    return http.DELETE(`/api/pages/${pageId}`);
+    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}`);
   }
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {

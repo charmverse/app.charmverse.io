@@ -54,13 +54,33 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function deletePage (req: NextApiRequest, res: NextApiResponse) {
+  const deletedChildPageIds: string[] = [];
+  const parentId = req.query.id as string;
+  let childPageIds = [parentId];
 
-  await prisma.page.delete({
+  while (childPageIds.length !== 0) {
+    deletedChildPageIds.push(...childPageIds);
+    childPageIds = (await prisma.page.findMany({
+      where: {
+        parentId: {
+          in: childPageIds
+        }
+      },
+      select: {
+        id: true
+      }
+    })).map(childPage => childPage.id);
+  }
+
+  await prisma.page.deleteMany({
     where: {
-      id: req.query.id as string
+      id: {
+        in: deletedChildPageIds
+      }
     }
   });
-  return res.status(200).json({ ok: true });
+
+  return res.status(200).json({ deletedCount: deletedChildPageIds.length });
 }
 
 export default withSessionRoute(handler);

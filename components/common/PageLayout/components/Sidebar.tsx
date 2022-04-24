@@ -34,6 +34,7 @@ import { Modal } from 'components/common/Modal';
 import NewPageMenu from 'components/common/PageLayout/components/NewPageMenu';
 import WorkspaceAvatar from 'components/common/WorkspaceAvatar';
 import { getCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { mutate } from 'swr';
 import { headerHeight } from './Header';
 import PageNavigation from './PageNavigation';
 
@@ -200,17 +201,18 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   async function deletePage (pageId: string) {
     const page = pages[pageId];
+    const totalPages = Object.keys(pages).length;
     let newPages = { ...pages };
-    delete newPages[pageId];
     if (page) {
-      await charmClient.deletePage(page.id);
-      if (Object.keys(newPages).length === 0) {
+      const { deletedCount } = await charmClient.deletePage(page.id);
+      if (totalPages - deletedCount === 0) {
         const newPage = await charmClient.createPage(untitledPage({
           userId: user!.id,
           spaceId: space!.id
         }));
         newPages = { [newPage.id]: newPage };
       }
+      await mutate(`pages/${space?.id}`);
     }
     if (page?.boardId) {
       const board = boards.find(b => b.id === page.boardId);
