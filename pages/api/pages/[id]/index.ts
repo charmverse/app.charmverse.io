@@ -72,11 +72,15 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
     })).map(childPage => childPage.id);
   }
 
-  await prisma.page.deleteMany({
+  await prisma.page.updateMany({
     where: {
       id: {
         in: deletedChildPageIds
       }
+    },
+    data: {
+      isAlive: false,
+      deletedAt: new Date()
     }
   });
 

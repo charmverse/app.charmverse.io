@@ -45,6 +45,7 @@ async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { 
   if (space) {
     const blocks = await prisma.block.findMany({
       where: {
+        isAlive: true,
         id: req.query.id
           ? req.query.id as string
           : req.query.ids

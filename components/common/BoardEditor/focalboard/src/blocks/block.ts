@@ -30,7 +30,7 @@ interface Block {
     rootId: string
     createdBy: string
     updatedBy: string
-
+    isAlive: boolean | null
     schema: number
     type: BlockTypes
     title: string
@@ -58,6 +58,7 @@ function createBlock(block?: Partial<Block>): Block {
         createdAt: block?.createdAt || now,
         updatedAt: block?.updatedAt || now,
         deletedAt: block?.deletedAt || null,
+        isAlive: true
     }
 }
 
