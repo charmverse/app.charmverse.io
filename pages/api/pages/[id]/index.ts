@@ -88,7 +88,6 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
   }
 
   const deletedChildPageIds = Object.keys(childPagesIdRecord);
-
   await prisma.page.updateMany({
     where: {
       id: {
@@ -109,12 +108,8 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
           }
         },
         {
+          type: 'view',
           parentId: {
-            in: deletedChildPageIds
-          }
-        },
-        {
-          rootId: {
             in: deletedChildPageIds
           }
         }
