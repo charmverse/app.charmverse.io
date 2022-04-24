@@ -11,7 +11,7 @@ import { tooltipPlacement, TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
-import { pluginKey as emojiSuggestKey } from 'components/common/CharmEditor/components/EmojiSuggest/emojiSuggest.constants';
+import { pluginKey as emojiSuggestKey } from 'components/common/CharmEditor/components/emojiSuggest/emojiSuggest.constants';
 import log from 'lib/log';
 
 export const spec = specFactory;
