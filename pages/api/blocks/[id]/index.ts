@@ -20,6 +20,7 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
     allChildIds.push(...childIds);
     childIds = (await prisma.block.findMany({
       where: {
+        deletedAt: null,
         OR: [
           {
             parentId: {
@@ -35,18 +36,20 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
       },
       select: {
         id: true,
-        type: true
+        deletedAt: true
       }
     })).map(childPage => childPage.id);
 
     const _childPageIds = (await prisma.page.findMany({
       where: {
+        deletedAt: null,
         parentId: {
           in: childIds
         }
       },
       select: {
-        id: true
+        id: true,
+        deletedAt: true
       }
     })).map(childPage => childPage.id);
 
@@ -79,7 +82,6 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
       }
     },
     data: {
-      isAlive: false,
       deletedAt: new Date()
     }
   });
@@ -91,7 +93,6 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
       }
     },
     data: {
-      isAlive: false,
       deletedAt: new Date()
     }
   });

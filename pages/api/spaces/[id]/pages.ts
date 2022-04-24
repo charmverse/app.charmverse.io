@@ -18,7 +18,7 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
 
   const pages = await prisma.page.findMany({
     where: {
-      isAlive: true,
+      deletedAt: null,
       OR: [
         {
           spaceId,

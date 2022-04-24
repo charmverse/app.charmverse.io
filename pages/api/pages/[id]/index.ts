@@ -62,6 +62,7 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
     allChildPageIds.push(...childPageIds);
     childPageIds = (await prisma.page.findMany({
       where: {
+        deletedAt: null,
         parentId: {
           in: childPageIds
         }
@@ -95,7 +96,6 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
       }
     },
     data: {
-      isAlive: false,
       deletedAt: new Date()
     }
   });
@@ -121,7 +121,6 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
       ]
     },
     data: {
-      isAlive: false,
       deletedAt: new Date()
     }
   });
