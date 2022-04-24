@@ -56,7 +56,7 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
   }
 
   // Making a record of all the child ids that can be potentially deleted
-  const deletedChildPageRecord: Record<string, boolean> = childIds.reduce((cur, childId) => ({ ...cur, [childId]: true }), {});
+  const deletedChildPageRecord: Record<string, boolean> = allChildIds.reduce((cur, childId) => ({ ...cur, [childId]: true }), {});
 
   for (const childPageId of childPageIds) {
     const pagePermission = await computeUserPagePermissions({

@@ -14,7 +14,7 @@ handler.use(requireUser)
   .use(requireKeys(['id'], 'query'))
   .use(requireUser)
   .put(updatePage)
-  .delete(requirePagePermissions(['delete'], deletePage));
+  .delete(deletePage);
 
 async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
@@ -54,12 +54,12 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function deletePage (req: NextApiRequest, res: NextApiResponse) {
-  const deletedChildPageIds: string[] = [];
+  const allChildPageIds: string[] = [];
   const parentId = req.query.id as string;
   let childPageIds = [parentId];
 
   while (childPageIds.length !== 0) {
-    deletedChildPageIds.push(...childPageIds);
+    allChildPageIds.push(...childPageIds);
     childPageIds = (await prisma.page.findMany({
       where: {
         parentId: {
@@ -71,6 +71,22 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
       }
     })).map(childPage => childPage.id);
   }
+
+  // Making a record of all the child ids that can be potentially deleted
+  const childPagesIdRecord: Record<string, boolean> = allChildPageIds.reduce((cur, childId) => ({ ...cur, [childId]: true }), {});
+  for (const childPageId of allChildPageIds) {
+    const pagePermission = await computeUserPagePermissions({
+      pageId: childPageId,
+      userId: req.session.user.id
+    });
+
+    // If the child can't be deleted due to lack of permission, remove it from the record
+    if (!pagePermission.delete) {
+      delete childPagesIdRecord[childPageId];
+    }
+  }
+
+  const deletedChildPageIds = Object.keys(childPagesIdRecord);
 
   await prisma.page.updateMany({
     where: {

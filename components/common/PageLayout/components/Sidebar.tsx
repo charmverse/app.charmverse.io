@@ -205,7 +205,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     let newPages = { ...pages };
     if (page) {
       const { deletedCount } = await charmClient.deletePage(page.id);
-      if (totalPages - deletedCount === 0) {
+      if (totalPages - deletedCount === 0 && deletedCount !== 0) {
         const newPage = await charmClient.createPage(untitledPage({
           userId: user!.id,
           spaceId: space!.id
@@ -213,7 +213,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         newPages = { [newPage.id]: newPage };
       }
 
-      if (page.boardId) {
+      if (page.boardId && deletedCount !== 0) {
         const board = boards.find(b => b.id === page.boardId);
         const deletedCards = board ? Object.values(cards).filter(card => card.parentId === board.id) : [];
         // Delete the page associated with the card
@@ -231,7 +231,9 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           );
         }
       }
-      await mutate(`pages/${space?.id}`);
+      if (deletedCount !== 0) {
+        await mutate(`pages/${space?.id}`);
+      }
     }
     setPages(newPages);
     const currentPage = pages[currentPageId];
