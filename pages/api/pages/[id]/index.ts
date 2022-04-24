@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
@@ -60,7 +59,7 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
 
   while (childPageIds.length !== 0) {
     allChildPageIds.push(...childPageIds);
-    childPageIds = (await prisma.page.findMany({
+    const _childPageIds = (await prisma.page.findMany({
       where: {
         deletedAt: null,
         parentId: {
@@ -71,27 +70,24 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
         id: true
       }
     })).map(childPage => childPage.id);
-  }
 
-  // Making a record of all the child ids that can be potentially deleted
-  const childPagesIdRecord: Record<string, boolean> = allChildPageIds.reduce((cur, childId) => ({ ...cur, [childId]: true }), {});
-  for (const childPageId of allChildPageIds) {
-    const pagePermission = await computeUserPagePermissions({
-      pageId: childPageId,
-      userId: req.session.user.id
-    });
+    childPageIds = [];
+    for (const _childPageId of _childPageIds) {
+      const pagePermission = await computeUserPagePermissions({
+        pageId: _childPageId,
+        userId: req.session.user.id
+      });
 
-    // If the child can't be deleted due to lack of permission, remove it from the record
-    if (!pagePermission.delete) {
-      delete childPagesIdRecord[childPageId];
+      if (pagePermission.delete) {
+        childPageIds.push(_childPageId);
+      }
     }
   }
 
-  const deletedChildPageIds = Object.keys(childPagesIdRecord);
   await prisma.page.updateMany({
     where: {
       id: {
-        in: deletedChildPageIds
+        in: allChildPageIds
       }
     },
     data: {
@@ -104,13 +100,12 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
       OR: [
         {
           id: {
-            in: deletedChildPageIds
+            in: allChildPageIds
           }
         },
         {
-          type: 'view',
           parentId: {
-            in: deletedChildPageIds
+            in: allChildPageIds
           }
         }
       ]
@@ -120,7 +115,7 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  return res.status(200).json({ deletedCount: deletedChildPageIds.length });
+  return res.status(200).json({ deletedCount: allChildPageIds.length });
 }
 
 export default withSessionRoute(handler);

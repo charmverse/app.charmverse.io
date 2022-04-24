@@ -11,85 +11,41 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).delete(deleteBlock);
 
 async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCount: number} | {error: string}>) {
+  const allChildPageIds: string[] = [];
   const parentId = req.query.id as string;
-  let childIds = [parentId];
-  const allChildIds: string[] = [];
-  // For computing the permission we need the page ids separate from block ids
-  const childPageIds: string[] = [];
-  while (childIds.length !== 0) {
-    allChildIds.push(...childIds);
-    childIds = (await prisma.block.findMany({
-      where: {
-        deletedAt: null,
-        OR: [
-          {
-            parentId: {
-              in: childIds
-            }
-          },
-          {
-            rootId: {
-              in: childIds
-            }
-          }
-        ]
-      },
-      select: {
-        id: true,
-        deletedAt: true
-      }
-    })).map(childPage => childPage.id);
-
-    const _childPageIds = (await prisma.page.findMany({
+  let childPageIds = [parentId];
+  while (childPageIds.length !== 0) {
+    allChildPageIds.push(...childPageIds);
+    const childPages = (await prisma.page.findMany({
       where: {
         deletedAt: null,
         parentId: {
-          in: childIds
+          in: childPageIds
         }
       },
       select: {
         id: true,
-        deletedAt: true
+        type: true
       }
-    })).map(childPage => childPage.id);
+    }));
 
-    childIds.push(..._childPageIds);
-    childPageIds.push(..._childPageIds);
-    childIds = Array.from(new Set(childIds));
-  }
+    childPageIds = [];
+    for (const childPage of childPages) {
+      const pagePermission = await computeUserPagePermissions({
+        pageId: childPage.id,
+        userId: req.session.user.id
+      });
 
-  // Making a record of all the child ids that can be potentially deleted
-  const deletedChildPageRecord: Record<string, boolean> = allChildIds.reduce((cur, childId) => ({ ...cur, [childId]: true }), {});
-
-  for (const childPageId of childPageIds) {
-    const pagePermission = await computeUserPagePermissions({
-      pageId: childPageId,
-      userId: req.session.user.id
-    });
-
-    // If the child can't be deleted due to lack of permission, remove it from the record
-    if (!pagePermission.delete) {
-      delete deletedChildPageRecord[childPageId];
+      if (pagePermission.delete || childPage.type === 'card') {
+        childPageIds.push(childPage.id);
+      }
     }
   }
-
-  const deletedChildPageIds = Object.keys(deletedChildPageRecord);
-
-  await prisma.block.updateMany({
-    where: {
-      id: {
-        in: deletedChildPageIds
-      }
-    },
-    data: {
-      deletedAt: new Date()
-    }
-  });
 
   await prisma.page.updateMany({
     where: {
       id: {
-        in: deletedChildPageIds
+        in: allChildPageIds
       }
     },
     data: {
@@ -97,7 +53,27 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
     }
   });
 
-  return res.status(200).json({ deletedCount: deletedChildPageIds.length });
+  await prisma.block.updateMany({
+    where: {
+      OR: [
+        {
+          id: {
+            in: allChildPageIds
+          }
+        },
+        {
+          parentId: {
+            in: allChildPageIds
+          }
+        }
+      ]
+    },
+    data: {
+      deletedAt: new Date()
+    }
+  });
+
+  return res.status(200).json({ deletedCount: allChildPageIds.length });
 }
 
 export default withSessionRoute(handler);
