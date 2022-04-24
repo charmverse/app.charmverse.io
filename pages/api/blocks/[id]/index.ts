@@ -6,15 +6,17 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
+import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).delete(deleteBlock);
 
-async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block>) {
+async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block | {error: string}>) {
+  const blockId = req.query.id as string;
   const blockType = await prisma.block.findUnique({
     where: {
-      id: req.query.id as string
+      id: blockId
     },
     select: {
       type: true
@@ -24,18 +26,17 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block>) {
   async function _deleteBlock () {
     const deleted = await prisma.block.delete({
       where: {
-        id: req.query.id as string
+        id: blockId
       }
     });
-
     await prisma.block.deleteMany({
       where: {
         OR: [
           {
-            rootId: req.query.id as string
+            rootId: blockId
           },
           {
-            parentId: req.query.id as string
+            parentId: blockId
           }
         ]
       }
@@ -45,9 +46,20 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block>) {
   }
 
   if (blockType?.type === 'card') {
-    requirePagePermissions(['delete'], async () => {
-      return res.status(200).json(await _deleteBlock());
-    })(req, res);
+    // Check if the user has the permission to delete the card page
+    const permissionSet = await computeUserPagePermissions({
+      pageId: blockId,
+      userId: req.session.user.id as string
+    });
+
+    if (!permissionSet.delete) {
+      return res.status(401).json({
+        error: 'You are not allowed to perform this action'
+      });
+    }
+    else {
+      await _deleteBlock();
+    }
   }
   else {
     return res.status(200).json(await _deleteBlock());

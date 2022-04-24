@@ -212,25 +212,26 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         }));
         newPages = { [newPage.id]: newPage };
       }
-      await mutate(`pages/${space?.id}`);
-    }
-    if (page?.boardId) {
-      const board = boards.find(b => b.id === page.boardId);
-      const deletedCards = board ? Object.values(cards).filter(card => card.parentId === board.id) : [];
-      // Delete the page associated with the card
-      deletedCards.forEach(deletedCard => delete newPages[deletedCard.id]);
-      if (board) {
-        mutator.deleteBlock(
-          board,
-          intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
-          async () => {
-            // success
-          },
-          async () => {
-            // error
-          }
-        );
+
+      if (page.boardId) {
+        const board = boards.find(b => b.id === page.boardId);
+        const deletedCards = board ? Object.values(cards).filter(card => card.parentId === board.id) : [];
+        // Delete the page associated with the card
+        deletedCards.forEach(deletedCard => delete newPages[deletedCard.id]);
+        if (board) {
+          mutator.deleteBlock(
+            board,
+            intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
+            async () => {
+              // success
+            },
+            async () => {
+              // error
+            }
+          );
+        }
       }
+      await mutate(`pages/${space?.id}`);
     }
     setPages(newPages);
     const currentPage = pages[currentPageId];
