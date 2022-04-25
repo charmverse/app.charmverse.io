@@ -290,6 +290,8 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     }
   }
 
+  const { getPagePermissions } = usePages();
+  const pagePermission = getPagePermissions(pageId);
   return (
     <>
       <StyledTreeItem
@@ -320,6 +322,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
         ref={ref}
       />
 
+      {pagePermission.delete && (
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -336,6 +339,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
         </MenuItem>
       </Menu>
+      )}
     </>
   );
 });

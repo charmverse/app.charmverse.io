@@ -1,57 +1,32 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Block } from '@prisma/client';
-import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
+import { deleteNestedChild } from 'lib/api/deleteNestedChild';
+import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { Block } from '@prisma/client';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).delete(deleteBlock);
 
-async function deleteBlock (req: NextApiRequest, res: NextApiResponse<Block>) {
-  const blockType = await prisma.block.findUnique({
-    where: {
-      id: req.query.id as string
-    },
-    select: {
-      type: true
-    }
+async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCount: number, rootBlock: Block} | {error: string}>) {
+  const pageId = req.query.id as string;
+  const userId = req.session.user.id as string;
+
+  const permissionsSet = await computeUserPagePermissions({
+    pageId: req.query.id as string,
+    userId: req.session.user.id as string
   });
 
-  async function _deleteBlock () {
-    const deleted = await prisma.block.delete({
-      where: {
-        id: req.query.id as string
-      }
+  if (!permissionsSet.delete) {
+    return res.status(401).json({
+      error: 'You are not allowed to perform this action'
     });
-
-    await prisma.block.deleteMany({
-      where: {
-        OR: [
-          {
-            rootId: req.query.id as string
-          },
-          {
-            parentId: req.query.id as string
-          }
-        ]
-      }
-    });
-
-    return deleted;
   }
-
-  if (blockType?.type === 'card') {
-    requirePagePermissions(['delete'], async () => {
-      return res.status(200).json(await _deleteBlock());
-    })(req, res);
-  }
-  else {
-    return res.status(200).json(await _deleteBlock());
-  }
+  const { deletedChildPageIds, rootBlock } = await deleteNestedChild(pageId, userId);
+  return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
 }
 
 export default withSessionRoute(handler);

@@ -1,12 +1,13 @@
 
-import { Page } from '@prisma/client';
-import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
-import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { withSessionRoute } from 'lib/session/withSession';
+import { Page } from '@prisma/client';
+import { prisma } from 'db';
+import { deleteNestedChild } from 'lib/api/deleteNestedChild';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -14,7 +15,7 @@ handler.use(requireUser)
   .use(requireKeys(['id'], 'query'))
   .use(requireUser)
   .put(updatePage)
-  .delete(requirePagePermissions(['delete'], deletePage));
+  .delete(deletePage);
 
 async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
@@ -82,7 +83,9 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
       id: req.query.id as string
     }
   });
-  return res.status(200).json({ ok: true });
+
+  const { deletedChildPageIds, rootBlock } = (await deleteNestedChild(pageId, userId));
+  return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
 }
 
 export default withSessionRoute(handler);

@@ -45,6 +45,7 @@ async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { 
   if (space) {
     const blocks = await prisma.block.findMany({
       where: {
+        deletedAt: null,
         id: req.query.id
           ? req.query.id as string
           : req.query.ids
@@ -80,7 +81,8 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
         fields: block.fields as any,
         spaceId: space.id,
         createdBy: req.session.user.id,
-        updatedBy: req.session.user.id
+        updatedBy: req.session.user.id,
+        deletedAt: null
       }));
       const cardBlocks = newBlocks.filter(newBlock => newBlock.type === 'card');
 

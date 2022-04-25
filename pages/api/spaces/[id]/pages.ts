@@ -18,6 +18,7 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
 
   const pages = await prisma.page.findMany({
     where: {
+      deletedAt: null,
       OR: [
         {
           spaceId,
@@ -62,7 +63,6 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
           }
         }
       ]
-
     },
     include: {
       permissions: {

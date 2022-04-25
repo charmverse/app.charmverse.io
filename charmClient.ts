@@ -114,7 +114,7 @@ class CharmClient {
   }
 
   deletePage (pageId: string) {
-    return http.DELETE(`/api/pages/${pageId}`);
+    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}`);
   }
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
@@ -277,8 +277,8 @@ class CharmClient {
   }
 
   async deleteBlock (blockId: string, updater: BlockUpdater): Promise<void> {
-    const deletedBlock = await http.DELETE<Block>(`/api/blocks/${blockId}`);
-    const fbBlock = this.blockToFBBlock(deletedBlock);
+    const { rootBlock } = await http.DELETE<{deletedCount: number, rootBlock: Block}>(`/api/blocks/${blockId}`);
+    const fbBlock = this.blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
   }
