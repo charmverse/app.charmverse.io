@@ -28,7 +28,7 @@ beforeAll(async () => {
 
 });
 
-describe('POST /api/permissions - upsert permissions', () => {
+describe('POST /api/permissions - update permissions', () => {
 
   it('should replace an existing permission with the same pageId and user/space/role link', async () => {
 
