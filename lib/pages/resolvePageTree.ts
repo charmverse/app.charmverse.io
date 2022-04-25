@@ -1,14 +1,13 @@
 import { prisma } from 'db';
 import { PageNotFoundError } from './errors';
 import { getPage } from './getPage';
-import { IPageWithPermissions } from './interfaces';
+import { IPageWithPermissions, PageWithChildren } from './interfaces';
 
-export * from './getPage';
 /**
  * Returned a flattened list of all a page's children
  * @param pageId
  */
-export async function resolveChildPages (pageId: string): Promise<IPageWithPermissions []> {
+export async function resolveChildPagesAsFlatList (pageId: string): Promise<IPageWithPermissions []> {
   const children = await prisma.page.findMany({
     where: {
       parentId: pageId
@@ -23,7 +22,7 @@ export async function resolveChildPages (pageId: string): Promise<IPageWithPermi
   });
 
   const nestedChildren = await Promise.all(children.map(childPage => {
-    return resolveChildPages(childPage.id);
+    return resolveChildPagesAsFlatList(childPage.id);
   }));
 
   // Merge the results
@@ -34,6 +33,50 @@ export async function resolveChildPages (pageId: string): Promise<IPageWithPermi
   });
 
   return flattenedChildren;
+}
+
+/**
+ * Returned a flattened list of all a page's children
+ * @param pageId
+ */
+export async function resolveChildPages (pageId: string, directOnly: boolean): Promise<PageWithChildren []> {
+
+  const children = await prisma.page.findMany({
+    where: {
+      parentId: pageId
+    },
+    include: {
+      permissions: {
+        include: {
+          sourcePermission: true
+        }
+      }
+    }
+  });
+
+  if (directOnly || children.length === 0) {
+    return children.map(child => {
+      return {
+        ...child,
+        children: []
+      };
+    });
+  }
+
+  const childrenWithNestedChildren: PageWithChildren [] = await Promise.all(children.map(childPage => {
+    return new Promise<PageWithChildren>((resolve, reject) => {
+      resolveChildPages(childPage.id, false)
+        .then(nestedChildren => {
+          resolve({
+            ...childPage,
+            children: nestedChildren
+          });
+        });
+    });
+  }));
+
+  return childrenWithNestedChildren;
+
 }
 
 /**
