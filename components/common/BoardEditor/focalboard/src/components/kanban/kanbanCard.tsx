@@ -68,7 +68,6 @@ const KanbanCard = React.memo((props: Props) => {
 
   // Check if the current user is an admin, admin means implicit full access
   const pagePermissions = getPagePermissions(card.id)
-
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
   const handleDeleteCard = async () => {
     if (!card) {
@@ -77,6 +76,7 @@ const KanbanCard = React.memo((props: Props) => {
     }
     if (pagePermissions.delete) {
       await mutator.deleteBlock(card, 'delete card')
+      mutate(`pages/${space?.id}`)
     }
   }
   const confirmDialogProps: ConfirmationDialogBoxProps = {
