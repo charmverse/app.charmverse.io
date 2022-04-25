@@ -14,7 +14,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
 import TreeItemContent from 'components/common/TreeItemContent';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -23,30 +22,42 @@ import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import useRefState from 'hooks/useRefState';
+import { useUser } from 'hooks/useUser';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { isTruthy } from 'lib/utilities/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { Page, PageContent } from 'models';
 import Link from 'next/link';
-import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef, memo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import type { Identifier } from 'dnd-core';
 import { greyColor2 } from 'theme/colors';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
+import { addPageAndRedirect, NewPageInput } from 'lib/pages';
 import NewPageMenu from './NewPageMenu';
 import { StyledPageIcon, StyledDatabaseIcon } from './PageIcon';
 import PageTitle from './PageTitle';
 import AddNewCard from './AddNewCard';
 
-export type MenuNode = Page & {
-  children: MenuNode[];
+type MenuNode = Pick<Page, 'id' | 'title' | 'icon' | 'index' | 'parentId' | 'path' | 'type'> & { isDeletable: boolean, isEmptyContent: boolean };
+
+export type ParentMenuNode = MenuNode & {
+  children: ParentMenuNode[];
 }
 
-export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
+const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
+  flex-grow: ${props => props.isFavorites ? 0 : 1};
+  width: 100%;
+  overflow-y: auto;
+`;
+
+export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: prop => prop !== 'isActive' })<{ isActive?: boolean }>(({ isActive, theme }) => ({
 
   position: 'relative',
+  backgroundColor: isActive ? theme.palette.action.focus : 'unset',
 
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
@@ -157,30 +168,53 @@ interface PageLinkProps {
   href: string;
   label?: string;
   labelIcon?: React.ReactNode;
-  boardId?: string;
+  pageType?: Page['type']; // optional since we use this for views as well
   pageId?: string;
   showPicker?: boolean
 }
 
-export function PageLink ({ showPicker = true, children, href, label, labelIcon, boardId, pageId }: PageLinkProps) {
+export function PageLink ({ showPicker = true, children, href, label, labelIcon, pageType, pageId }: PageLinkProps) {
+
   const { setPages } = usePages();
-  const isempty = !label;
-
-  function stopPropagation (event: SyntheticEvent) {
-    event.stopPropagation();
-  }
-
-  function preventDefault (event: SyntheticEvent) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
 
   const popupState = usePopupState({
     popupId: 'page-emoji',
     variant: 'popover'
   });
 
+  const isempty = !label;
+
+  const stopPropagation = useCallback((event: SyntheticEvent) => {
+    event.stopPropagation();
+  }, []);
+
+  const preventDefault = useCallback((event: SyntheticEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+  }, []);
+
+  const onSelectEmoji = useCallback(async (emoji: string) => {
+    if (pageId) {
+      await charmClient.updatePage({
+        id: pageId,
+        icon: emoji
+      });
+      setPages(_pages => ({
+        ..._pages,
+        [pageId]: {
+          ..._pages[pageId]!,
+          icon: emoji
+        }
+      }));
+      if (pageType === 'board') {
+        mutator.changeIcon(pageId, emoji, emoji);
+      }
+    }
+    popupState.close();
+  }, [pageId, setPages]);
+
   const triggerState = bindTrigger(popupState);
+
   return (
     <Link passHref href={href}>
       <PageAnchor onClick={stopPropagation}>
@@ -195,31 +229,7 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
         {children}
         {showPicker && (
           <Menu {...bindMenu(popupState)}>
-            <EmojiPicker onSelect={async (emoji) => {
-              if (pageId) {
-                await charmClient.updatePage({
-                  id: pageId,
-                  icon: emoji
-                });
-                setPages(_pages => ({
-                  ..._pages,
-                  [pageId]: {
-                    ..._pages[pageId]!,
-                    icon: emoji
-                  }
-                }));
-                if (boardId) {
-                  await mutator.changeIcon(boardId, emoji, emoji);
-                }
-                popupState.close();
-              }
-
-              if (boardId) {
-                await mutator.changeIcon(boardId, emoji, emoji);
-              }
-              popupState.close();
-            }}
-            />
+            <EmojiPicker onSelect={onSelectEmoji} />
           </Menu>
         )}
       </PageAnchor>
@@ -236,24 +246,50 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
+const PageMenuItem = styled(MenuItem)`
+  padding: 3px 12px;
+  .MuiTypography-root {
+    font-size: 15px;
+    font-weight: 600;
+  }
+`;
+
+interface PageTreeItemProps {
+  addSubPage: (page: Partial<Page>) => void;
+  deletePage: () => void;
+  handlerId: Identifier | null; // for drag n drop
+  href: string;
+  isActive: boolean;
+  isAdjacent: boolean;
+  isDeletable: boolean;
+  isEmptyContent: boolean;
+  labelIcon?: string;
+  label: string;
+  pageType?: Page['type'];
+  pageId: string;
+  hasSelectedChildView: boolean;
+  children: React.ReactNode;
+}
+
 // eslint-disable-next-line react/function-component-definition
-const PageTreeItem = forwardRef((props: any, ref) => {
+const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   const theme = useTheme();
   const {
     addSubPage,
+    children,
     deletePage,
+    handlerId,
     href,
+    isActive,
     isAdjacent,
+    isDeletable,
     isEmptyContent,
     labelIcon,
     label,
-    boardId,
     pageType,
     pageId,
-    hasSelectedChildView,
-    ...other
+    hasSelectedChildView
   } = props;
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   function showMenu (event: React.MouseEvent<HTMLElement>) {
@@ -290,55 +326,62 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     }
   }
 
-  const { getPagePermissions } = usePages();
-  const pagePermission = getPagePermissions(pageId);
+  const ContentProps = useMemo(() => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }), [isAdjacent, hasSelectedChildView]);
+  const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
+  const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
+  const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);
+
+  const labelComponent = useMemo(() => (
+    <PageLink
+      href={href}
+      label={label}
+      labelIcon={Icon}
+      pageId={pageId}
+      pageType={pageType}
+    >
+      <div className='page-actions'>
+        <IconButton size='small' onClick={showMenu}>
+          <MoreHorizIcon color='secondary' fontSize='small' />
+        </IconButton>
+        {pageType === 'board' ? (
+          <AddNewCard pageId={pageId} />
+        ) : (
+          <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
+        )}
+      </div>
+    </PageLink>
+  ), [href, label, pageId, Icon, addSubPage, pageType]);
+
   return (
     <>
       <StyledTreeItem
-        label={(
-          <PageLink
-            href={href}
-            label={label}
-            labelIcon={Icon}
-            pageId={pageId}
-            boardId={boardId}
-          >
-            <div className='page-actions'>
-              <IconButton size='small' onClick={showMenu}>
-                <MoreHorizIcon color='secondary' fontSize='small' />
-              </IconButton>
-              {addSubPage && pageType === 'board' ? (
-                <AddNewCard pageId={pageId} />
-              ) : (
-                <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} />
-              )}
-            </div>
-          </PageLink>
-        )}
+        data-handler-id={handlerId}
+        isActive={isActive}
+        label={labelComponent}
+        nodeId={pageId}
+        // @ts-ignore
         ContentComponent={TreeItemComponent}
-        ContentProps={{ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }}
-        {...other}
-        TransitionProps={{ timeout: 50 }}
+        ContentProps={ContentProps}
+        TransitionProps={TransitionProps}
         ref={ref}
-      />
-
-      {pagePermission.delete && (
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={hideMenu}
-        onClick={hideMenu}
-        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left'
-        }}
       >
-        <MenuItem sx={{ padding: '3px 12px' }} onClick={deletePage}>
-          <ListItemIcon><DeleteIcon fontSize='small' /></ListItemIcon>
-          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
-        </MenuItem>
-      </Menu>
+        {children}
+      </StyledTreeItem>
+
+      {isDeletable && (
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={hideMenu}
+          onClick={hideMenu}
+          anchorOrigin={anchorOrigin}
+          transformOrigin={transformOrigin}
+        >
+          <PageMenuItem onClick={deletePage}>
+            <ListItemIcon><DeleteIcon fontSize='small' /></ListItemIcon>
+            <Typography>Delete</Typography>
+          </PageMenuItem>
+        </Menu>
       )}
     </>
   );
@@ -393,9 +436,9 @@ function mergeRefs (refs: any) {
 }
 
 type NodeProps = {
-  item: MenuNode;
-  onDropAdjacent: (a: MenuNode, b: MenuNode) => void;
-  onDropChild: (a: MenuNode, b: MenuNode) => void;
+  item: ParentMenuNode;
+  onDropAdjacent: (a: ParentMenuNode, b: ParentMenuNode) => void;
+  onDropChild: (a: ParentMenuNode, b: ParentMenuNode) => void;
   pathPrefix: string;
   addPage?: (p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
@@ -404,7 +447,6 @@ type NodeProps = {
 
 function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage, selectedNodeId }: NodeProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const theme = useTheme();
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
   const [{ handlerId }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
@@ -413,7 +455,8 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       handlerId: monitor.getHandlerId()
     })
   }));
-  const [{ canDrop, isOverCurrent }, drop] = useDrop<MenuNode, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
+
+  const [{ canDrop, isOverCurrent }, drop] = useDrop<ParentMenuNode, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
     accept: 'item',
     drop (droppedItem, monitor) {
       const didDrop = monitor.didDrop();
@@ -469,57 +512,50 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
     drag(elt);
   }, [drag]);
 
-  const isActive = !isAdjacent && canDrop && isOverCurrent && !item.boardId;
+  const isActive = !isAdjacent && canDrop && isOverCurrent && item.type !== 'board';
   const isAdjacentActive = isAdjacent && canDrop && isOverCurrent;
 
-  function addSubPage (page: Partial<Page>) {
+  const addSubPage = useCallback((page: Partial<Page>) => {
     if (addPage) {
       addPage({ ...page, parentId: item.id });
     }
-  }
+  }, [addPage]);
 
-  function deleteThisPage () {
+  const deleteThisPage = useCallback(() => {
     if (deletePage) {
       deletePage(item.id);
     }
-  }
+  }, [deletePage]);
 
   const { focalboardViewsRecord } = useFocalboardViews();
 
-  const isEmptyContent = checkForEmpty(item.content as PageContent);
-
   const viewsRecord = useAppSelector((state) => state.views.views);
-  const views = Object.values(viewsRecord).filter(view => view.parentId === item.boardId);
+  const views = Object.values(viewsRecord).filter(view => view.parentId === item.id);
 
   const hasSelectedChildView = views.some(view => view.id === selectedNodeId);
 
   return (
     <PageTreeItem
-      data-handler-id={handlerId}
+      handlerId={handlerId}
       pageId={item.id}
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
       hasSelectedChildView={hasSelectedChildView}
       ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
-      nodeId={item.id}
-      id={item.id}
       label={item.title}
-      href={`${pathPrefix}/${item.path}${item.type === 'board' && item.boardId && focalboardViewsRecord[item.boardId] ? `?viewId=${focalboardViewsRecord[item.boardId]}` : ''}`}
+      href={`${pathPrefix}/${item.path}${item.type === 'board' && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''}`}
+      isActive={isActive}
       isAdjacent={isAdjacentActive}
-      isEmptyContent={isEmptyContent}
-      boardId={item.boardId}
+      isDeletable={item.isDeletable}
+      isEmptyContent={item.isEmptyContent}
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}
-      sx={{
-        backgroundColor: isActive ? theme.palette.action.focus : 'unset', // 'rgba(22, 52, 71, 0.08)' : 'unset'
-        position: 'relative'
-        // borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
-      }}
     >
       {item.type.match(/(page|card)/) ? (
         item.children.length > 0
           ? item.children.map((childItem) => (
-            <RenderDraggableNode
+            // eslint-disable-next-line no-use-before-define
+            <MemoizedRenderDraggableNode
               onDropAdjacent={onDropAdjacent}
               onDropChild={onDropChild}
               pathPrefix={pathPrefix}
@@ -548,15 +584,17 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
   );
 }
 
-function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuNode[] {
-  const tempItems = items.map((item): MenuNode => {
+const MemoizedRenderDraggableNode = memo(RenderDraggableNode);
+
+function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): ParentMenuNode[] {
+  const tempItems = items.map((item): ParentMenuNode => {
     return {
       ...item,
       children: []
     };
   });
   const map: { [key: string]: number } = {};
-  let node: MenuNode;
+  let node: ParentMenuNode;
   const roots = [];
   let i: number;
   for (i = 0; i < tempItems.length; i += 1) {
@@ -568,7 +606,7 @@ function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuN
     const index = node[key] ? map[node[key]!] : -1;
     if (node[key] && tempItems[index]) {
       // Make sure its not a database page or a focalboard card
-      if (!tempItems[index].boardId) {
+      if (tempItems[index].type === 'page') {
         tempItems[index].children.push(node);
         sortArrayByObjectProperty(tempItems[index].children, 'index');
       }
@@ -631,26 +669,42 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
 type NavProps = {
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
-  space: Space;
+  spaceId: string;
   rootPageIds?: string[];
 };
 
 export default function PageNavigation ({
   deletePage,
   isFavorites,
-  space,
+  spaceId,
   rootPageIds
 }: NavProps) {
   const router = useRouter();
-  const { pages, currentPageId, setPages, addPageAndRedirect } = usePages();
-  const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
+  const { pages, currentPageId, getPagePermissions, setPages } = usePages();
+  const [user] = useUser();
+  const [expanded, setExpanded] = useLocalStorage<string[]>(`${spaceId}.expanded-pages`, []);
+
+  const pagesArray: MenuNode[] = Object.values(pages)
+    .filter((page): page is Page => Boolean(isTruthy(page) && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))))
+    .map((page): MenuNode => ({
+      id: page.id,
+      title: page.title,
+      icon: page.icon,
+      index: page.index,
+      isDeletable: getPagePermissions(page.id).delete,
+      isEmptyContent: checkForEmpty(page.content as PageContent),
+      parentId: page.parentId,
+      path: page.path,
+      type: page.type
+    }));
+  const pageHash = JSON.stringify(pagesArray);
+  // console.log(pageHash);
 
   const mappedItems = useMemo(() => {
-    const pagesArray = Object.keys(pages).map(pageId => pages[pageId]).filter(isTruthy);
     return mapTree(pagesArray, 'parentId', rootPageIds);
-  }, [pages, rootPageIds]);
+  }, [pageHash, rootPageIds]);
 
-  const onDropAdjacent = (droppedItem: MenuNode, containerItem: MenuNode) => {
+  const onDropAdjacent = useCallback((droppedItem: ParentMenuNode, containerItem: MenuNode) => {
 
     if (droppedItem.id === containerItem?.id) {
       return;
@@ -660,7 +714,11 @@ export default function PageNavigation ({
     setPages(_pages => {
       const siblings = Object.values(_pages).filter(isTruthy).filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
       const originIndex = siblings.findIndex((page) => page.id === containerItem.id);
-      siblings.splice(originIndex, 0, droppedItem);
+      const droppedPage = _pages[droppedItem.id];
+      if (!droppedPage) {
+        throw new Error('canot find dropped page');
+      }
+      siblings.splice(originIndex, 0, droppedPage);
       siblings.forEach((page, _index) => {
         page.index = _index;
         page.parentId = parentId;
@@ -681,9 +739,13 @@ export default function PageNavigation ({
       });
       return { ..._pages };
     });
-  };
+  }, []);
 
-  const onDropChild = (droppedItem: MenuNode, containerItem: MenuNode) => {
+  const onDropChild = useCallback((droppedItem: MenuNode, containerItem: MenuNode) => {
+
+    if (containerItem.type === 'board') {
+      return;
+    }
 
     if (droppedItem.id === containerItem?.id) {
       return;
@@ -704,7 +766,7 @@ export default function PageNavigation ({
         parentId
       }
     }));
-  };
+  }, []);
 
   useEffect(() => {
     const currentPage = pages[currentPageId];
@@ -728,8 +790,17 @@ export default function PageNavigation ({
     }
   }
 
+  const addPage = useCallback((page: Partial<Page>) => {
+    const newPage: NewPageInput = {
+      ...page,
+      createdBy: user!.id,
+      spaceId
+    };
+    return addPageAndRedirect(newPage, router);
+  }, []);
+
   return (
-    <TreeRoot
+    <StyledTreeRoot
       setPages={setPages}
       expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
@@ -739,25 +810,20 @@ export default function PageNavigation ({
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
       defaultExpandIcon={<ChevronRightIcon fontSize='large' />}
       isFavorites={isFavorites}
-      sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
     >
       {mappedItems.map((item) => (
-        <RenderDraggableNode
+        <MemoizedRenderDraggableNode
           key={item.id}
           item={item}
-          onDropChild={(a, b) => {
-            if (!item.boardId) {
-              onDropChild(a, b);
-            }
-          }}
+          onDropChild={onDropChild}
           onDropAdjacent={onDropAdjacent}
-          pathPrefix={`/${space.domain}`}
+          pathPrefix={`/${router.query.domain}`}
           // pass down so parent databases can highlight themselves
           selectedNodeId={selectedNodeId}
-          addPage={page => addPageAndRedirect(page)}
+          addPage={addPage}
           deletePage={deletePage}
         />
       ))}
-    </TreeRoot>
+    </StyledTreeRoot>
   );
 }

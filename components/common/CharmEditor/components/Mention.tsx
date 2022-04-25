@@ -3,13 +3,13 @@ import { Command, DOMOutputSpec, EditorState, Plugin, PluginKey, Schema } from '
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { useTheme } from '@emotion/react';
-import { Box, ClickAwayListener, Divider, List, ListSubheader, Typography } from '@mui/material';
+import { Box, ClickAwayListener, List, ListSubheader, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
-import { ReactNode, useCallback } from 'react';
+import { ReactNode, useCallback, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { usePages } from 'hooks/usePages';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
@@ -154,7 +154,19 @@ export function selectMention (key: PluginKey, mentionValue: string, mentionType
   };
 }
 
-export function MentionSuggest () {
+function MentionSuggest () {
+
+  const { suggestTooltipKey } = usePluginState(mentionSuggestKey);
+
+  const { show: isVisible } = usePluginState(suggestTooltipKey);
+
+  if (isVisible) {
+    return <MentionSuggestMenu />;
+  }
+  return null;
+}
+
+function MentionSuggestMenu () {
   const [contributors] = useContributors();
   const view = useEditorViewContext();
   const {
@@ -162,10 +174,6 @@ export function MentionSuggest () {
     suggestTooltipKey
   } = usePluginState(mentionSuggestKey);
   const { pages } = usePages();
-
-  const {
-    show: isVisible
-  } = usePluginState(suggestTooltipKey);
 
   const theme = useTheme();
 
@@ -219,54 +227,54 @@ export function MentionSuggest () {
     </>
   );
 
-  if (isVisible) {
-    return createPortal(
-      <ClickAwayListener onClickAway={() => {
-        hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
-      }}
+  return createPortal(
+    <ClickAwayListener onClickAway={() => {
+      hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
+    }}
+    >
+      <List
+        sx={{
+          width: '350px',
+          position: 'relative',
+          overflow: 'auto',
+          maxHeight: 300,
+          '& ul': { padding: 0 }
+        }}
+        subheader={<li />}
       >
-        <List
-          sx={{
-            width: '350px',
-            position: 'relative',
-            overflow: 'auto',
-            maxHeight: 300,
-            '& ul': { padding: 0 }
-          }}
-          subheader={<li />}
-        >
-          {['Contributors', 'Pages'].map(sectionId => {
-            return (
-              <Box
-                key={`section-${sectionId}`}
-                sx={{
-                  // This is required to not show the background while scrolling
-                  backgroundColor: theme.palette.background.dark
-                }}
-              >
-                <ListSubheader sx={{
-                  top: '-5px',
-                  zIndex: 25
-                }}
-                >{sectionId}
-                </ListSubheader>
-                {sectionId === 'Contributors' ? contributorsList : pagesList}
-                <hr style={{
-                  height: 2,
-                  marginTop: '8px',
-                  marginBottom: 0
-                }}
-                />
-              </Box>
-            );
-          })}
-        </List>
-      </ClickAwayListener>,
-      tooltipContentDOM
-    );
-  }
-  return null;
+        {['Contributors', 'Pages'].map(sectionId => {
+          return (
+            <Box
+              key={`section-${sectionId}`}
+              sx={{
+                // This is required to not show the background while scrolling
+                backgroundColor: theme.palette.background.dark
+              }}
+            >
+              <ListSubheader sx={{
+                top: '-5px',
+                zIndex: 25
+              }}
+              >{sectionId}
+              </ListSubheader>
+              {sectionId === 'Contributors' ? contributorsList : pagesList}
+              <hr style={{
+                height: 2,
+                marginTop: '8px',
+                marginBottom: 0
+              }}
+              />
+            </Box>
+          );
+        })}
+      </List>
+    </ClickAwayListener>,
+    tooltipContentDOM
+  );
+
 }
+
+export default memo(MentionSuggest);
 
 export function Mention ({ node }: NodeViewProps) {
   const attrs = node.attrs as {value: string, type: 'user' | 'page'};
