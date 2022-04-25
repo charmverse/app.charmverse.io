@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 
-export async function deleteNestedChild (parentId: string) {
+export async function deleteNestedChild (parentId: string, userId: string) {
   const deletedChildPageIds: string[] = [];
   let childPageIds = [parentId];
 
@@ -26,7 +26,9 @@ export async function deleteNestedChild (parentId: string) {
       }
     },
     data: {
-      deletedAt: new Date()
+      deletedAt: new Date(),
+      updatedAt: new Date(),
+      updatedBy: userId
     }
   });
 
@@ -46,7 +48,9 @@ export async function deleteNestedChild (parentId: string) {
       ]
     },
     data: {
-      deletedAt: new Date()
+      deletedAt: new Date(),
+      updatedAt: new Date(),
+      updatedBy: userId
     }
   });
 
