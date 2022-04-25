@@ -1,11 +1,10 @@
-import { Page, PagePermission, PagePermissionLevel, Prisma } from '@prisma/client';
+import { PagePermission, PagePermissionLevel, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { getPage, IPageWithPermissions, PageNotFoundError, resolveChildPages, resolveChildPagesAsFlatList, resolveParentPages } from 'lib/pages';
+import { resolveChildPagesAsFlatList, resolveParentPages } from 'lib/pages';
 import { isTruthy } from 'lib/utilities/types';
-import { CannotInheritOutsideTreeError, CircularPermissionError, InvalidPermissionGranteeError, InvalidPermissionLevelError, PermissionNotFoundError, SelfInheritancePermissionError } from '../errors';
-import { IPagePermissionToCreate, IPagePermissionToInherit, IPagePermissionWithAssignee, IPagePermissionWithSource } from '../page-permission-interfaces';
-import { permissionLevels } from '../page-permission-mapping';
-import { findExistingPermissionForGroup } from './find-existing-permission-for-group';
+import { CannotInheritOutsideTreeError, InvalidPermissionGranteeError, InvalidPermissionLevelError, PermissionNotFoundError, SelfInheritancePermissionError } from '../errors';
+import { IPagePermissionToCreate, IPagePermissionWithSource } from '../page-permission-interfaces';
+import { checkParentForSamePermission } from './check-parent-for-same-permission';
 
 /**
  * Ensures that an inheritance reference will always return the source permission
@@ -28,38 +27,6 @@ async function getSourcePermission (permissionId: string): Promise<PagePermissio
   }
 
   return permission;
-}
-
-/**
- * Check if the parent page has a permission with the same access level as the one we are assigning. If so, return permission ID to inherit from
- * @param page
- * @param permission
- */
-async function checkParentForSamePermission (pageId: string, permission: IPagePermissionToCreate): Promise<string | null> {
-
-  const page = await getPage(pageId);
-
-  if (!page) {
-    throw new PageNotFoundError(pageId);
-  }
-
-  if (!page.parentId) {
-    return null;
-  }
-
-  const parent = await getPage(page.parentId);
-
-  if (!parent) {
-    return null;
-  }
-
-  const matchingPermission = findExistingPermissionForGroup(permission, parent.permissions);
-
-  if (!matchingPermission) {
-    return null;
-  }
-
-  return matchingPermission.inheritedFromPermission ?? matchingPermission.id;
 }
 
 function generatePermissionQuery (pageId: string, permission: IPagePermissionToCreate): Prisma.PagePermissionWhereUniqueInput {
@@ -241,7 +208,7 @@ export async function upsertPermission (pageId: string, permission: IPagePermiss
   });
 
   // Refresh the inheritance tree if downstream permissions should now inherit from here
-  if (permissionBeforeModification && permissionBeforeModification.inheritedFromPermission && !upsertedPermission.inheritedFromPermission) {
+  if (permissionBeforeModification && permissionBeforeModification.inheritedFromPermission !== upsertedPermission.inheritedFromPermission) {
     const childrenIds = (await resolveChildPagesAsFlatList(upsertedPermission.pageId)).map(page => {
       return {
         pageId: page.id
@@ -262,7 +229,7 @@ export async function upsertPermission (pageId: string, permission: IPagePermiss
       data: {
         permissionLevel: upsertedPermission.permissionLevel,
         permissions: upsertedPermission.permissions,
-        inheritedFromPermission: upsertedPermission.id
+        inheritedFromPermission: upsertedPermission.inheritedFromPermission ?? upsertedPermission.id
       }
     });
   }
