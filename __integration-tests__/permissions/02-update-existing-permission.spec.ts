@@ -41,18 +41,20 @@ describe('POST /api/permissions - upsert permissions', () => {
       }))
       .expect(201)).body as IPageWithPermissions;
 
-    const childPage = (await request(baseUrl)
-      .post('/api/pages')
+    const permissionToCreate: IPagePermissionToCreate = {
+      pageId: rootPage.id,
+      permissionLevel: 'editor',
+      spaceId: space.id
+    };
+
+    (await request(baseUrl)
+      .post('/api/permissions')
       .set('Cookie', cookie)
-      .send(generatePageToCreateStub({
-        userId: user.id,
-        spaceId: space.id,
-        parentId: rootPage.id
-      }))
-      .expect(201)).body as IPageWithPermissions;
+      .send(permissionToCreate)
+      .expect(201));
 
     const permissionToUpsert: IPagePermissionToCreate = {
-      pageId: childPage.id,
+      pageId: rootPage.id,
       permissionLevel: 'view',
       spaceId: space.id
     };
@@ -63,13 +65,12 @@ describe('POST /api/permissions - upsert permissions', () => {
       .send(permissionToUpsert)
       .expect(201));
 
-    const childPageWithPermissions = (await getPage(childPage.id)) as IPageWithPermissions;
+    const rootPageWithPermissions = (await getPage(rootPage.id)) as IPageWithPermissions;
 
     // Only 1 default permission
-    expect(childPageWithPermissions.parentId).toBe(rootPage.id);
-    expect(childPageWithPermissions.permissions.length).toBe(1);
-    expect(childPageWithPermissions.permissions[0].permissionLevel).toBe('view');
-    expect(childPageWithPermissions.permissions[0].spaceId).toBe(space.id);
+    expect(rootPageWithPermissions.permissions.length).toBe(1);
+    expect(rootPageWithPermissions.permissions[0].permissionLevel).toBe('view');
+    expect(rootPageWithPermissions.permissions[0].spaceId).toBe(space.id);
   });
 
   it('should cascade an updated permission down to the children, and make the page the authority for that permission (as long as it is different from the page\'s parent)', async () => {
