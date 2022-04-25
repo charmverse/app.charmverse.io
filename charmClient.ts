@@ -277,7 +277,10 @@ class CharmClient {
   }
 
   async deleteBlock (blockId: string, updater: BlockUpdater): Promise<void> {
-    await http.DELETE<{deletedCount: number}>(`/api/blocks/${blockId}`);
+    const { rootBlock } = await http.DELETE<{deletedCount: number, rootBlock: Block}>(`/api/blocks/${blockId}`);
+    const fbBlock = this.blockToFBBlock(rootBlock);
+    fbBlock.deletedAt = new Date().getTime();
+    updater([fbBlock]);
   }
 
   async insertBlocks (fbBlocks: FBBlock[], updater: BlockUpdater): Promise<FBBlock[]> {

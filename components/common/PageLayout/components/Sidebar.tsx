@@ -231,11 +231,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           );
         }
       }
-      if (deletedCount !== 0) {
-        await mutate(`pages/${space?.id}`);
-      }
+      await mutate(`pages/${space?.id}`);
     }
-    setPages(newPages);
     const currentPage = pages[currentPageId];
     // Redirect from current page
     if (page && currentPage && page.id === currentPage.id) {

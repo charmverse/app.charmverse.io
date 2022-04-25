@@ -81,7 +81,8 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
         fields: block.fields as any,
         spaceId: space.id,
         createdBy: req.session.user.id,
-        updatedBy: req.session.user.id
+        updatedBy: req.session.user.id,
+        deletedAt: null
       }));
       const cardBlocks = newBlocks.filter(newBlock => newBlock.type === 'card');
 

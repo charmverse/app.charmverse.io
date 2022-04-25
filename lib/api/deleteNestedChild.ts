@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+import { Block } from '@prisma/client';
 
 export async function deleteNestedChild (parentId: string, userId: string) {
   const deletedChildPageIds: string[] = [];
@@ -54,5 +55,14 @@ export async function deleteNestedChild (parentId: string, userId: string) {
     }
   });
 
-  return deletedChildPageIds;
+  const rootBlock = await prisma.block.findUnique({
+    where: {
+      id: parentId
+    }
+  });
+
+  return {
+    deletedChildPageIds,
+    rootBlock: rootBlock as Block
+  };
 }

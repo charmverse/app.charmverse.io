@@ -66,7 +66,8 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
       error: 'You are not allowed to perform this action'
     });
   }
-  return res.status(200).json({ deletedCount: (await deleteNestedChild(pageId, userId)).length });
+  const { deletedChildPageIds, rootBlock } = (await deleteNestedChild(pageId, userId));
+  return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
 }
 
 export default withSessionRoute(handler);
