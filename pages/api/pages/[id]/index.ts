@@ -33,13 +33,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     throw new ActionNotPermittedError('You are not allowed to reposition this page');
   }
 
-  if (updateContent.parentId === null) {
-    await setupPermissionsAfterPageBecameRoot(pageId);
-  }
-  else if (typeof updateContent.parentId === 'string') {
-    await setupPermissionsAfterPageRepositioned(pageId, updateContent.parentId);
-  }
-
   // eslint-disable-next-line eqeqeq
   if (updateContent.isPublic != undefined && permissions.edit_isPublic !== true) {
     return res.status(401).json({
@@ -62,6 +55,15 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
       permissions: true
     }
   });
+
+  if (updateContent.parentId === null) {
+    const updatedPage = await setupPermissionsAfterPageBecameRoot(pageId);
+    return res.status(200).json(updatedPage);
+  }
+  else if (typeof updateContent.parentId === 'string') {
+    const updatedPage = await setupPermissionsAfterPageRepositioned(pageId, updateContent.parentId);
+    return res.status(200).json(updatedPage);
+  }
 
   return res.status(200).json(pageWithPermission);
 }

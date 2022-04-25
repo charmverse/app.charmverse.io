@@ -40,8 +40,6 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
       }))
       .expect(201)).body as IPageWithPermissions;
 
-    const rootPermissionId = rootPage.permissions[0].id;
-
     const childPage = (await request(baseUrl)
       .post('/api/pages')
       .set('Cookie', cookie)
@@ -52,16 +50,14 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
       }))
       .expect(201)).body;
 
-    await request(baseUrl)
+    const childWithPermissions = (await request(baseUrl)
       .put(`/api/pages/${childPage.id}`)
       .set('Cookie', cookie)
       .send({
         id: childPage.id,
         parentId: null
-      })
-      .expect(200);
-
-    const childWithPermissions = (await getPage(childPage.id)) as IPageWithPermissions;
+      })).body as IPageWithPermissions;
+    //      .expect(200);
 
     // Only 1 default permission
     expect(childWithPermissions.permissions.length).toBe(1);
