@@ -30,6 +30,7 @@ import { Page, PageContent } from 'models';
 import Link from 'next/link';
 import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef, memo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import type { Identifier } from 'dnd-core';
 import { greyColor2 } from 'theme/colors';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
@@ -53,7 +54,7 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
   overflow-y: auto;
 `;
 
-export const StyledTreeItem = styled(({ isActive, ...props }: any) => <TreeItem {...props} />)<{ isActive?: boolean }>(({ isActive, theme }) => ({
+export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: prop => prop !== 'isActive' })<{ isActive?: boolean }>(({ isActive, theme }) => ({
 
   position: 'relative',
   backgroundColor: isActive ? theme.palette.action.focus : 'unset',
@@ -206,7 +207,7 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
         }
       }));
       if (pageType === 'board') {
-        await mutator.changeIcon(pageId, emoji, emoji);
+        mutator.changeIcon(pageId, emoji, emoji);
       }
     }
     popupState.close();
@@ -253,18 +254,17 @@ const PageMenuItem = styled(MenuItem)`
   }
 `;
 
-interface PageTreeItemsProps {
+interface PageTreeItemProps {
   addSubPage: (page: Partial<Page>) => void;
   deletePage: () => void;
+  handlerId: Identifier | null; // for drag n drop
   href: string;
-  id: string;
   isActive: boolean;
   isAdjacent: boolean;
   isDeletable: boolean;
   isEmptyContent: boolean;
   labelIcon?: string;
   label: string;
-  nodeId: string;
   pageType?: Page['type'];
   pageId: string;
   hasSelectedChildView: boolean;
@@ -272,11 +272,13 @@ interface PageTreeItemsProps {
 }
 
 // eslint-disable-next-line react/function-component-definition
-const PageTreeItem = forwardRef((props: PageTreeItemsProps, ref) => {
+const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   const theme = useTheme();
   const {
     addSubPage,
+    children,
     deletePage,
+    handlerId,
     href,
     isActive,
     isAdjacent,
@@ -286,10 +288,8 @@ const PageTreeItem = forwardRef((props: PageTreeItemsProps, ref) => {
     label,
     pageType,
     pageId,
-    hasSelectedChildView,
-    ...other
+    hasSelectedChildView
   } = props;
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   function showMenu (event: React.MouseEvent<HTMLElement>) {
@@ -325,7 +325,6 @@ const PageTreeItem = forwardRef((props: PageTreeItemsProps, ref) => {
       );
     }
   }
-  console.log('render page tree item');
 
   const ContentProps = useMemo(() => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }), [isAdjacent, hasSelectedChildView]);
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
@@ -356,14 +355,18 @@ const PageTreeItem = forwardRef((props: PageTreeItemsProps, ref) => {
   return (
     <>
       <StyledTreeItem
+        data-handler-id={handlerId}
         isActive={isActive}
         label={labelComponent}
+        nodeId={pageId}
+        // @ts-ignore
         ContentComponent={TreeItemComponent}
         ContentProps={ContentProps}
-        {...other}
         TransitionProps={TransitionProps}
         ref={ref}
-      />
+      >
+        {children}
+      </StyledTreeItem>
 
       {isDeletable && (
         <Menu
@@ -452,6 +455,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       handlerId: monitor.getHandlerId()
     })
   }));
+
   const [{ canDrop, isOverCurrent }, drop] = useDrop<ParentMenuNode, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
     accept: 'item',
     drop (droppedItem, monitor) {
@@ -532,14 +536,12 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
 
   return (
     <PageTreeItem
-      data-handler-id={handlerId}
+      handlerId={handlerId}
       pageId={item.id}
       addSubPage={addSubPage}
       deletePage={deleteThisPage}
       hasSelectedChildView={hasSelectedChildView}
       ref={mergeRefs([ref, drag, drop, dragPreview, focusListener])}
-      nodeId={item.id}
-      id={item.id}
       label={item.title}
       href={`${pathPrefix}/${item.path}${item.type === 'board' && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''}`}
       isActive={isActive}
