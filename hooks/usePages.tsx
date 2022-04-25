@@ -1,11 +1,9 @@
-import { Page, PageOperations, Prisma, Role } from '@prisma/client';
-import useSWR, { mutate } from 'swr';
+import { Page, PageOperations, Role } from '@prisma/client';
+import useSWR from 'swr';
 import charmClient from 'charmClient';
-import { addBoardClicked } from 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarAddBoardMenu';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
 import { useCurrentSpace } from './useCurrentSpace';
@@ -13,7 +11,6 @@ import { useUser } from './useUser';
 import { IPagePermissionFlags, IPageWithPermissions, PageOperationType } from '../lib/permissions/pages/page-permission-interfaces';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
-type AddPageFn = (page?: Partial<Page>) => Promise<Page>;
 type IContext = {
   currentPageId: string,
   pages: Record<string, Page | undefined>,
@@ -21,8 +18,6 @@ type IContext = {
   setPages: Dispatch<SetStateAction<Record<string, Page | undefined>>>,
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
-  addPage: AddPageFn,
-  addPageAndRedirect: (page?: Partial<Page>) => void
   getPagePermissions: (pageId: string) => IPagePermissionFlags,
 };
 
@@ -35,8 +30,6 @@ export const PagesContext = createContext<Readonly<IContext>>({
   setPages: () => undefined,
   isEditing: true,
   setIsEditing: () => { },
-  addPage: null as any,
-  addPageAndRedirect: null as any,
   getPagePermissions: () => new AllowedPagePermissions()
 });
 
@@ -46,56 +39,14 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [pages, setPages] = useState<Record<string, Page | undefined>>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
-  const intl = useIntl();
   const [user] = useUser();
 
   const { data } = useSWR(() => space ? `pages/${space?.id}` : null, () => charmClient.getPages(space!.id), { refreshInterval });
   useEffect(() => {
-    setPages(data?.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
+    if (data) {
+      setPages(data.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
+    }
   }, [data]);
-
-  const addPage: AddPageFn = React.useCallback(async (page) => {
-    const spaceId = space?.id;
-    const id = Math.random().toString().replace('0.', '');
-    const pageProperties: Prisma.PageCreateInput = {
-      content: undefined as any,
-      contentText: '',
-      createdAt: new Date(),
-      author: {
-        connect: {
-          id: user!.id
-        }
-      },
-      updatedAt: new Date(),
-      updatedBy: user!.id,
-      path: `page-${id}`,
-      space: {
-        connect: {
-          id: spaceId
-        }
-      },
-      title: '',
-      type: 'page',
-      ...(page ?? {})
-    };
-    if (pageProperties.type === 'board') {
-      await addBoardClicked(boardId => {
-        pageProperties.boardId = boardId;
-        pageProperties.id = boardId; // use the same uuid value
-      }, intl);
-    }
-    const newPage = await charmClient.createPage(pageProperties);
-    setPages({ ...pages, [newPage.id]: newPage });
-    mutate(`pages/${space?.id}`);
-    return newPage;
-  }, [intl, pages, space, user]);
-
-  const addPageAndRedirect = React.useCallback(async (page?: Partial<Page>) => {
-    if (page) {
-      const newPage = await addPage(page);
-      router.push(`/${space?.domain}/${newPage.path}`);
-    }
-  }, [addPage]);
 
   /**
    * Will return permissions for the currently connected user
@@ -146,8 +97,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     pages,
     setCurrentPageId,
     setPages,
-    addPage,
-    addPageAndRedirect,
     getPagePermissions
   }), [currentPageId, isEditing, router, pages, user]);
 

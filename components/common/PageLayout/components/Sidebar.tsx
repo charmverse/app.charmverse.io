@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Prisma } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -33,7 +33,7 @@ import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
 import NewPageMenu from 'components/common/PageLayout/components/NewPageMenu';
 import WorkspaceAvatar from 'components/common/WorkspaceAvatar';
-import { getCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { addPageAndRedirect, NewPageInput } from 'lib/pages';
 import { mutate } from 'swr';
 import { headerHeight } from './Header';
 import PageNavigation from './PageNavigation';
@@ -171,7 +171,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
-  const { currentPageId, pages, addPageAndRedirect } = usePages();
+  const { currentPageId, pages } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
@@ -240,6 +240,17 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     }
   }, [boards]);
 
+  const addPage = useCallback((_page: Partial<Page>) => {
+    if (user && space) {
+      const newPage: NewPageInput = {
+        ..._page,
+        createdBy: user.id,
+        spaceId: space.id
+      };
+      addPageAndRedirect(newPage, router);
+    }
+  }, []);
+
   return (
     <SidebarContainer>
       <WorkspacesContainer>
@@ -304,7 +315,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 WORKSPACE
               </SectionName>
               <div className='add-a-page'>
-                <NewPageMenu tooltip='Add a page' addPage={addPageAndRedirect} />
+                <NewPageMenu tooltip='Add a page' addPage={addPage} />
               </div>
             </WorkspaceLabel>
             <Box sx={{ mb: 6 }}>
