@@ -3,11 +3,11 @@ import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
-import { computeUserPagePermissions, setupPermissionsAfterPageBecameRoot } from 'lib/permissions/pages';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages/triggers/page-repositioned';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages/triggers/page-repositioned';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -56,12 +56,8 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  if (updateContent.parentId === null) {
-    const updatedPage = await setupPermissionsAfterPageBecameRoot(pageId);
-    return res.status(200).json(updatedPage);
-  }
-  else if (typeof updateContent.parentId === 'string') {
-    const updatedPage = await setupPermissionsAfterPageRepositioned(pageId, updateContent.parentId);
+  if (updateContent.parentId === null || typeof updateContent.parentId === 'string') {
+    const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
     return res.status(200).json(updatedPage);
   }
 

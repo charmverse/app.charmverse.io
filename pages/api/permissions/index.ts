@@ -2,12 +2,10 @@
 import { PagePermission } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { createPagePermission, deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded } from 'lib/permissions/pages';
+import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { setupPermissionsAfterPagePermissionUpdated } from 'lib/permissions/pages/triggers/page-permission-updated';
-import { upsertPermission } from '../../../lib/permissions/pages/v2/upsert-permission';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
