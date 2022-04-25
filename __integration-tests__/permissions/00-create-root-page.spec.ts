@@ -28,7 +28,7 @@ beforeAll(async () => {
 
 describe('POST /api/pages - create root page', () => {
 
-  it('should assign to the phase a default permission of full access for the space members', async () => {
+  it('should assign to the page a default permission of full access for the space members', async () => {
 
     const pageToCreate: Prisma.PageCreateInput = generatePageToCreateStub({
       userId: user.id,

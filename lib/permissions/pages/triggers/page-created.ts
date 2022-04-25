@@ -1,13 +1,8 @@
-import { prisma } from 'db';
 import { getPage, IPageWithPermissions, PageNotFoundError } from 'lib/pages';
-import { createPagePermission, inheritPermissions } from '../page-permission-actions';
+import { upsertPermission } from '../v2/upsert-permission';
 
 export async function setupPermissionsAfterPageCreated (pageId: string): Promise<IPageWithPermissions> {
-  const page = await prisma.page.findUnique({
-    where: {
-      id: pageId
-    }
-  });
+  const page = await getPage(pageId);
 
   if (!page) {
     throw new PageNotFoundError(pageId);
@@ -15,14 +10,19 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
 
   // This is a root page, so we can go ahead
   if (!page.parentId) {
-    await createPagePermission({
-      pageId: page.id,
-      permissionLevel: 'full_access',
-      spaceId: page.spaceId
-    });
+    await upsertPermission(
+      pageId,
+      {
+        permissionLevel: 'full_access',
+        spaceId: page.spaceId
+      }
+    );
   }
   else {
-    await inheritPermissions(page.parentId, page.id);
+    const parent = (await getPage(page.parentId) as IPageWithPermissions);
+    await Promise.all(parent.permissions.map(permission => {
+      return upsertPermission(page.id, permission.id);
+    }));
   }
 
   const pageWithPermissions = await getPage(page.id) as IPageWithPermissions;

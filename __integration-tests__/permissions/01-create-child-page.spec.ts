@@ -35,7 +35,8 @@ describe('POST /api/pages - create child pages', () => {
       .set('Cookie', cookie)
       .send(generatePageToCreateStub({
         userId: user.id,
-        spaceId: space.id
+        spaceId: space.id,
+        title: 'Root'
       }))
       .expect(201)).body;
 
@@ -45,6 +46,7 @@ describe('POST /api/pages - create child pages', () => {
       .send(generatePageToCreateStub({
         userId: user.id,
         spaceId: space.id,
+        title: 'Child',
         parentId: rootPage.id
       }))
       .expect(201)).body;
