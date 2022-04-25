@@ -43,9 +43,16 @@ export type MenuNode = Page & {
   children: MenuNode[];
 }
 
-export const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
+const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
+  flex-grow: ${props => props.isFavorites ? 0 : 1};
+  width: 100%;
+  overflow-y: auto;
+`;
+
+export const StyledTreeItem = styled(({ isActive, ...props }: any) => <TreeItem {...props} />)<{ isActive?: boolean }>(({ isActive, theme }) => ({
 
   position: 'relative',
+  backgroundColor: isActive ? theme.palette.action.focus : 'unset',
 
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
@@ -239,6 +246,14 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
   )
 );
 
+const PageMenuItem = styled(MenuItem)`
+  padding: 3px 12px;
+  .MuiTypography-root {
+    font-size: 15px;
+    font-weight: 600;
+  }
+`;
+
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef((props: any, ref) => {
   const theme = useTheme();
@@ -246,6 +261,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     addSubPage,
     deletePage,
     href,
+    isActive,
     isAdjacent,
     isEmptyContent,
     labelIcon,
@@ -293,33 +309,41 @@ const PageTreeItem = forwardRef((props: any, ref) => {
     }
   }
 
+  const ContentProps = useMemo(() => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }), [isAdjacent, hasSelectedChildView]);
+  const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
+  const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
+  const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);
+
+  const labelComponent = useMemo(() => (
+    <PageLink
+      href={href}
+      label={label}
+      labelIcon={Icon}
+      pageId={pageId}
+      boardId={boardId}
+    >
+      <div className='page-actions'>
+        <IconButton size='small' onClick={showMenu}>
+          <MoreHorizIcon color='secondary' fontSize='small' />
+        </IconButton>
+        {addSubPage && pageType === 'board' ? (
+          <AddNewCard pageId={pageId} />
+        ) : (
+          <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
+        )}
+      </div>
+    </PageLink>
+  ), [href, label, pageId, Icon, boardId, addSubPage, pageType]);
+
   return (
     <>
       <StyledTreeItem
-        label={(
-          <PageLink
-            href={href}
-            label={label}
-            labelIcon={Icon}
-            pageId={pageId}
-            boardId={boardId}
-          >
-            <div className='page-actions'>
-              <IconButton size='small' onClick={showMenu}>
-                <MoreHorizIcon color='secondary' fontSize='small' />
-              </IconButton>
-              {addSubPage && pageType === 'board' ? (
-                <AddNewCard pageId={pageId} />
-              ) : (
-                <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
-              )}
-            </div>
-          </PageLink>
-        )}
+        isActive={isActive}
+        label={labelComponent}
         ContentComponent={TreeItemComponent}
-        ContentProps={{ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }}
+        ContentProps={ContentProps}
         {...other}
-        TransitionProps={{ timeout: 50 }}
+        TransitionProps={TransitionProps}
         ref={ref}
       />
 
@@ -328,16 +352,13 @@ const PageTreeItem = forwardRef((props: any, ref) => {
         open={Boolean(anchorEl)}
         onClose={hideMenu}
         onClick={hideMenu}
-        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left'
-        }}
+        anchorOrigin={anchorOrigin}
+        transformOrigin={transformOrigin}
       >
-        <MenuItem sx={{ padding: '3px 12px' }} onClick={deletePage}>
+        <PageMenuItem onClick={deletePage}>
           <ListItemIcon><DeleteIcon fontSize='small' /></ListItemIcon>
-          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
-        </MenuItem>
+          <Typography>Delete</Typography>
+        </PageMenuItem>
       </Menu>
     </>
   );
@@ -504,16 +525,12 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       id={item.id}
       label={item.title}
       href={`${pathPrefix}/${item.path}${item.type === 'board' && item.boardId && focalboardViewsRecord[item.boardId] ? `?viewId=${focalboardViewsRecord[item.boardId]}` : ''}`}
+      isActive={isActive}
       isAdjacent={isAdjacentActive}
       isEmptyContent={isEmptyContent}
       boardId={item.boardId}
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}
-      sx={{
-        backgroundColor: isActive ? theme.palette.action.focus : 'unset', // 'rgba(22, 52, 71, 0.08)' : 'unset'
-        position: 'relative'
-        // borderTop: isAdjacentActive ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
-      }}
     >
       {item.type.match(/(page|card)/) ? (
         item.children.length > 0
@@ -735,7 +752,7 @@ export default function PageNavigation ({
   }
 
   return (
-    <TreeRoot
+    <StyledTreeRoot
       setPages={setPages}
       expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
@@ -745,7 +762,6 @@ export default function PageNavigation ({
       defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
       defaultExpandIcon={<ChevronRightIcon fontSize='large' />}
       isFavorites={isFavorites}
-      sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
     >
       {mappedItems.map((item) => (
         <MemoizedRenderDraggableNode
@@ -760,6 +776,6 @@ export default function PageNavigation ({
           deletePage={deletePage}
         />
       ))}
-    </TreeRoot>
+    </StyledTreeRoot>
   );
 }
