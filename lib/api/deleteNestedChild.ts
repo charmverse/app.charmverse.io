@@ -1,13 +1,12 @@
 import { prisma } from 'db';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 
-export async function deleteNestedChild (parentId: string, userId: string) {
+export async function deleteNestedChild (parentId: string) {
   const deletedChildPageIds: string[] = [];
   let childPageIds = [parentId];
 
   while (childPageIds.length !== 0) {
     deletedChildPageIds.push(...childPageIds);
-    const _childPages = (await prisma.page.findMany({
+    childPageIds = (await prisma.page.findMany({
       where: {
         deletedAt: null,
         parentId: {
@@ -15,22 +14,9 @@ export async function deleteNestedChild (parentId: string, userId: string) {
         }
       },
       select: {
-        id: true,
-        type: true
+        id: true
       }
-    }));
-
-    childPageIds = [];
-    for (const _childPage of _childPages) {
-      const pagePermission = await computeUserPagePermissions({
-        pageId: _childPage.id,
-        userId
-      });
-
-      if (pagePermission.delete || _childPage.type === 'card') {
-        childPageIds.push(_childPage.id);
-      }
-    }
+    })).map(childPage => childPage.id);
   }
 
   await prisma.page.updateMany({

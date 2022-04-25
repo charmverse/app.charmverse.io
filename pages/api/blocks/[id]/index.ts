@@ -10,7 +10,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).delete(deleteBlock);
 
 async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCount: number} | {error: string}>) {
-  return res.status(200).json({ deletedCount: (await deleteNestedChild(req.query.id as string, req.session.user.id)).length });
+  return res.status(200).json({ deletedCount: (await deleteNestedChild(req.query.id as string)).length });
 }
 
 export default withSessionRoute(handler);
