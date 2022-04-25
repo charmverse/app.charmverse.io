@@ -7,6 +7,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { setupPermissionsAfterPagePermissionUpdated } from 'lib/permissions/pages/triggers/page-permission-updated';
+import { upsertPermission } from '../../../lib/permissions/pages/v2/upsert-permission';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -28,6 +29,8 @@ async function findPagePermissions (req: NextApiRequest, res: NextApiResponse<IP
 
 async function addPagePermission (req: NextApiRequest, res: NextApiResponse) {
 
+  console.log('Received request', req.body);
+
   const { pageId } = req.body;
 
   // Count before and after permissions so we don't trigger the event unless necessary
@@ -37,7 +40,7 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const createdPermission = await createPagePermission(req.body);
+  const createdPermission = await upsertPermission(pageId, req.body);
 
   const permissionsAfter = await prisma.pagePermission.count({
     where: {
@@ -47,10 +50,7 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse) {
 
   // TODO - This could be an async job, but there is a risk of the UI being out of sync
   if (permissionsAfter > permissionsBefore) {
-    await setupPermissionsAfterPagePermissionAdded(pageId);
-  }
-  else {
-    await setupPermissionsAfterPagePermissionUpdated(createdPermission.id);
+    await setupPermissionsAfterPagePermissionAdded(createdPermission.id);
   }
 
   return res.status(201).json(createdPermission);

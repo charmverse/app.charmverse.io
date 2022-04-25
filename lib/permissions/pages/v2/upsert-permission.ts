@@ -1,10 +1,11 @@
 import { Page, PagePermission, PagePermissionLevel, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { getPage, IPageWithPermissions, PageNotFoundError, resolveChildPages, resolveParentPages } from 'lib/pages';
+import { getPage, IPageWithPermissions, PageNotFoundError, resolveChildPages, resolveChildPagesAsFlatList, resolveParentPages } from 'lib/pages';
 import { isTruthy } from 'lib/utilities/types';
 import { CannotInheritOutsideTreeError, CircularPermissionError, InvalidPermissionGranteeError, InvalidPermissionLevelError, PermissionNotFoundError, SelfInheritancePermissionError } from '../errors';
 import { IPagePermissionToCreate, IPagePermissionToInherit, IPagePermissionWithAssignee, IPagePermissionWithSource } from '../page-permission-interfaces';
 import { permissionLevels } from '../page-permission-mapping';
+import { findExistingPermissionForGroup } from './find-existing-permission-for-group';
 
 /**
  * Ensures that an inheritance reference will always return the source permission
@@ -52,26 +53,7 @@ async function checkParentForSamePermission (pageId: string, permission: IPagePe
     return null;
   }
 
-  const matchingPermission = parent.permissions.find(parentPermission => {
-
-    if (parentPermission.permissionLevel !== permission.permissionLevel) {
-      return false;
-    }
-
-    if (permission.userId) {
-      return permission.userId === parentPermission.userId;
-    }
-
-    if (permission.roleId) {
-      return permission.roleId === parentPermission.roleId;
-    }
-
-    if (permission.spaceId) {
-      return permission.spaceId === parentPermission.spaceId;
-    }
-
-    return false;
-  });
+  const matchingPermission = findExistingPermissionForGroup(permission, parent.permissions);
 
   if (!matchingPermission) {
     return null;
@@ -80,26 +62,30 @@ async function checkParentForSamePermission (pageId: string, permission: IPagePe
   return matchingPermission.inheritedFromPermission ?? matchingPermission.id;
 }
 
+function generatePermissionQuery (pageId: string, permission: IPagePermissionToCreate): Prisma.PagePermissionWhereUniqueInput {
+  return {
+    roleId_pageId: !permission.roleId ? undefined : {
+      pageId,
+      roleId: permission.roleId
+    },
+    spaceId_pageId: !permission.spaceId ? undefined : {
+      pageId,
+      spaceId: permission.spaceId
+    },
+    userId_PageId: !permission.userId ? undefined : {
+      pageId,
+      userId: permission.userId
+    }
+  };
+}
+
 function generatePrismaUpsertArgs (
   pageId: string,
   permission: IPagePermissionToCreate,
   inheritedFromPermissionId?: string
 ): Prisma.PagePermissionUpsertArgs {
   return {
-    where: {
-      roleId_pageId: !permission.roleId ? undefined : {
-        pageId,
-        roleId: permission.roleId
-      },
-      spaceId_pageId: !permission.spaceId ? undefined : {
-        pageId,
-        spaceId: permission.spaceId
-      },
-      userId_PageId: !permission.userId ? undefined : {
-        pageId,
-        userId: permission.userId
-      }
-    },
+    where: generatePermissionQuery(pageId, permission),
     create: {
       permissionLevel: permission.permissionLevel,
       permissions: permission.permissions,
@@ -201,9 +187,13 @@ function validatePermissionToCreate (permission: IPagePermissionToCreate) {
  */
 export async function upsertPermission (pageId: string, permission: IPagePermissionToCreate | string): Promise<IPagePermissionWithSource> {
 
+  console.log('Received permission', permission);
   // Get the source permission we are inheriting from
 
   let permissionData: Prisma.PagePermissionUpsertArgs;
+
+  // Used in a later query
+  let permissionToAssign: IPagePermissionToCreate;
 
   if (typeof permission === 'string') {
     const sourcePermission = await getSourcePermission(permission);
@@ -214,19 +204,68 @@ export async function upsertPermission (pageId: string, permission: IPagePermiss
     validatePermissionToCreate(sourcePermission);
 
     permissionData = generatePrismaUpsertArgs(pageId, sourcePermission, sourcePermission.id);
+
+    permissionToAssign = sourcePermission;
   }
   else {
     const parentPermissionId = await checkParentForSamePermission(pageId, permission);
+    // Ensures the inheritance relationship will only be initiated from the source permission
     if (parentPermissionId) {
       return upsertPermission(pageId, parentPermissionId);
     }
     validatePermissionToCreate(permission);
 
     permissionData = generatePrismaUpsertArgs(pageId, permission);
-
+    permissionToAssign = permission;
   }
 
+  const permissionBeforeModification = await prisma.pagePermission.findUnique(
+    {
+      where: generatePermissionQuery(pageId, permissionToAssign)
+    }
+  );
+
   const upsertedPermission = await prisma.pagePermission.upsert(permissionData);
+
+  // Refresh permissions that inherit from this
+  await prisma.pagePermission.updateMany({
+    where: {
+      inheritedFromPermission: upsertedPermission.id
+    },
+    data: {
+      permissionLevel: upsertedPermission.permissionLevel,
+      permissions: upsertedPermission.permissions,
+      // Refresh the downstream inheritance reference if this permission now inherits
+      inheritedFromPermission: !upsertedPermission.inheritedFromPermission ? undefined : upsertedPermission.inheritedFromPermission
+    }
+  });
+
+  // Refresh the inheritance tree if downstream permissions should now inherit from here
+  if (permissionBeforeModification && permissionBeforeModification.inheritedFromPermission && !upsertedPermission.inheritedFromPermission) {
+    const childrenIds = (await resolveChildPagesAsFlatList(upsertedPermission.pageId)).map(page => {
+      return {
+        pageId: page.id
+      };
+    });
+
+    await prisma.pagePermission.updateMany({
+      where: {
+        AND: [
+          {
+            OR: childrenIds
+          },
+          {
+            inheritedFromPermission: permissionBeforeModification.inheritedFromPermission
+          }
+        ]
+      },
+      data: {
+        permissionLevel: upsertedPermission.permissionLevel,
+        permissions: upsertedPermission.permissions,
+        inheritedFromPermission: upsertedPermission.id
+      }
+    });
+  }
 
   return upsertedPermission as IPagePermissionWithSource;
 
