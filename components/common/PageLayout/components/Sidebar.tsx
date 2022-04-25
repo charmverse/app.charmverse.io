@@ -34,6 +34,7 @@ import { Modal } from 'components/common/Modal';
 import NewPageMenu from 'components/common/PageLayout/components/NewPageMenu';
 import WorkspaceAvatar from 'components/common/WorkspaceAvatar';
 import { getCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { mutate } from 'swr';
 import { headerHeight } from './Header';
 import PageNavigation from './PageNavigation';
 
@@ -170,8 +171,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
-  const cards = useAppSelector(getCards);
-  const { currentPageId, pages, setPages, addPageAndRedirect } = usePages();
+  const { currentPageId, pages, addPageAndRedirect } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
@@ -200,32 +200,32 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   const deletePage = useCallback(async (pageId: string) => {
     const page = pages[pageId];
-    let newPages = { ...pages };
-    delete newPages[pageId];
+    const totalPages = Object.keys(pages).length;
     if (page) {
-      await charmClient.deletePage(page.id);
-      if (Object.keys(newPages).length === 0) {
-        const newPage = await charmClient.createPage(untitledPage({
+      const { deletedCount } = await charmClient.deletePage(page.id);
+      if (totalPages - deletedCount === 0 && deletedCount !== 0) {
+        await charmClient.createPage(untitledPage({
           userId: user!.id,
           spaceId: space!.id
         }));
-        newPages = { [newPage.id]: newPage };
+      }
+
+      const board = boards.find(b => b.id === page.id);
+      // Delete the page associated with the card
+      if (board) {
+        mutator.deleteBlock(
+          board,
+          intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
+          async () => {
+            // success
+          },
+          async () => {
+            // error
+          }
+        );
       }
     }
-    setPages(newPages);
-    const board = boards.find(b => b.id === pageId);
-    if (board) {
-      mutator.deleteBlock(
-        board,
-        intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
-        async () => {
-          // success
-        },
-        async () => {
-          // error
-        }
-      );
-    }
+    await mutate(`pages/${space?.id}`);
     const currentPage = pages[currentPageId];
     // Redirect from current page
     if (page && currentPage && page.id === currentPage.id) {

@@ -308,6 +308,8 @@ const PageTreeItem = forwardRef((props: any, ref) => {
       );
     }
   }
+  const { getPagePermissions } = usePages();
+  const pagePermission = getPagePermissions(pageId);
 
   const ContentProps = useMemo(() => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }), [isAdjacent, hasSelectedChildView]);
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
@@ -347,6 +349,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
         ref={ref}
       />
 
+      {pagePermission.delete && (
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -360,6 +363,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
           <Typography>Delete</Typography>
         </PageMenuItem>
       </Menu>
+      )}
     </>
   );
 });
@@ -424,7 +428,6 @@ type NodeProps = {
 
 function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage, selectedNodeId }: NodeProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const theme = useTheme();
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
   const [{ handlerId }, drag, dragPreview] = useDrag(() => ({
     type: 'item',

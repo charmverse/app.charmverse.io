@@ -42,7 +42,7 @@ function NestedPagesList () {
   );
 }
 
-function PagesList ({ onSelectPage }: { onSelectPage: (page: Page) => void }) {
+function PagesList ({ onSelectPage }: { onSelectPage: (page: Page) => void }): JSX.Element {
   const { pages } = usePages();
 
   const items = Object.values(pages).filter(isTruthy).map(page => {
@@ -72,7 +72,8 @@ function PagesList ({ onSelectPage }: { onSelectPage: (page: Page) => void }) {
     );
   });
 
-  return items;
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <>{items}</>;
 }
 
 export default memo(NestedPagesList);

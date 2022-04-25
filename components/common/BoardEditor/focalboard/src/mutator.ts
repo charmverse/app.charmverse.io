@@ -140,7 +140,7 @@ class Mutator {
                 await charmClient.deleteBlock(block.id, publishIncrementalUpdate)
             },
             async () => {
-                await charmClient.insertBlock(block, publishIncrementalUpdate)
+                // await charmClient.insertBlock(block, publishIncrementalUpdate)
                 await afterUndo?.()
             },
             actualDescription,
