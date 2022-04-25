@@ -8,7 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Page } from 'models';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useState, memo } from 'react';
 import { greyColor2 } from 'theme/colors';
 import { StyledDatabaseIcon } from './PageIcon';
 
@@ -33,7 +33,7 @@ export const StyledArticleIcon = styled(ArticleIcon)`
 
 type Props = { addPage: (p: Partial<Page>) => void, tooltip: string, sx?: any };
 
-export default function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
+function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -73,3 +73,5 @@ export default function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
     </>
   );
 }
+
+export default memo(NewPageMenu);

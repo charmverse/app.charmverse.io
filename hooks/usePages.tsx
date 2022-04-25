@@ -90,10 +90,12 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return newPage;
   }, [intl, pages, space, user]);
 
-  const addPageAndRedirect = async (page?: Partial<Page>) => {
-    const newPage = await addPage(page);
-    router.push(`/${space?.domain}/${newPage.path}`);
-  };
+  const addPageAndRedirect = React.useCallback(async (page?: Partial<Page>) => {
+    if (page) {
+      const newPage = await addPage(page);
+      router.push(`/${space?.domain}/${newPage.path}`);
+    }
+  }, [addPage]);
 
   /**
    * Will return permissions for the currently connected user
@@ -135,7 +137,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     });
 
     return computedPermissions;
-
   }
 
   const value: IContext = useMemo(() => ({

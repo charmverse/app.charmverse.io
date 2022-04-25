@@ -14,7 +14,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
 import TreeItemContent from 'components/common/TreeItemContent';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -28,7 +27,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { Page, PageContent } from 'models';
 import Link from 'next/link';
-import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { ComponentProps, Dispatch, forwardRef, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useRef, memo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -163,24 +162,52 @@ interface PageLinkProps {
 }
 
 export function PageLink ({ showPicker = true, children, href, label, labelIcon, boardId, pageId }: PageLinkProps) {
+
   const { setPages } = usePages();
-  const isempty = !label;
-
-  function stopPropagation (event: SyntheticEvent) {
-    event.stopPropagation();
-  }
-
-  function preventDefault (event: SyntheticEvent) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
 
   const popupState = usePopupState({
     popupId: 'page-emoji',
     variant: 'popover'
   });
 
+  const isempty = !label;
+
+  const stopPropagation = useCallback((event: SyntheticEvent) => {
+    event.stopPropagation();
+  }, []);
+
+  const preventDefault = useCallback((event: SyntheticEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+  }, []);
+
+  const onSelectEmoji = useCallback(async (emoji: string) => {
+    if (pageId) {
+      await charmClient.updatePage({
+        id: pageId,
+        icon: emoji
+      });
+      setPages(_pages => ({
+        ..._pages,
+        [pageId]: {
+          ..._pages[pageId]!,
+          icon: emoji
+        }
+      }));
+      if (boardId) {
+        await mutator.changeIcon(boardId, emoji, emoji);
+      }
+      popupState.close();
+    }
+
+    if (boardId) {
+      await mutator.changeIcon(boardId, emoji, emoji);
+    }
+    popupState.close();
+  }, [pageId, setPages]);
+
   const triggerState = bindTrigger(popupState);
+
   return (
     <Link passHref href={href}>
       <PageAnchor onClick={stopPropagation}>
@@ -195,31 +222,7 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
         {children}
         {showPicker && (
           <Menu {...bindMenu(popupState)}>
-            <EmojiPicker onSelect={async (emoji) => {
-              if (pageId) {
-                await charmClient.updatePage({
-                  id: pageId,
-                  icon: emoji
-                });
-                setPages(_pages => ({
-                  ..._pages,
-                  [pageId]: {
-                    ..._pages[pageId]!,
-                    icon: emoji
-                  }
-                }));
-                if (boardId) {
-                  await mutator.changeIcon(boardId, emoji, emoji);
-                }
-                popupState.close();
-              }
-
-              if (boardId) {
-                await mutator.changeIcon(boardId, emoji, emoji);
-              }
-              popupState.close();
-            }}
-            />
+            <EmojiPicker onSelect={onSelectEmoji} />
           </Menu>
         )}
       </PageAnchor>
@@ -308,7 +311,7 @@ const PageTreeItem = forwardRef((props: any, ref) => {
               {addSubPage && pageType === 'board' ? (
                 <AddNewCard pageId={pageId} />
               ) : (
-                <NewPageMenu tooltip='Add a page inside' addPage={page => addSubPage(page)} />
+                <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
               )}
             </div>
           </PageLink>
@@ -468,17 +471,17 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
   const isActive = !isAdjacent && canDrop && isOverCurrent && !item.boardId;
   const isAdjacentActive = isAdjacent && canDrop && isOverCurrent;
 
-  function addSubPage (page: Partial<Page>) {
+  const addSubPage = useCallback((page: Partial<Page>) => {
     if (addPage) {
       addPage({ ...page, parentId: item.id });
     }
-  }
+  }, [addPage]);
 
-  function deleteThisPage () {
+  const deleteThisPage = useCallback(() => {
     if (deletePage) {
       deletePage(item.id);
     }
-  }
+  }, [deletePage]);
 
   const { focalboardViewsRecord } = useFocalboardViews();
 
@@ -515,7 +518,8 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       {item.type.match(/(page|card)/) ? (
         item.children.length > 0
           ? item.children.map((childItem) => (
-            <RenderDraggableNode
+            // eslint-disable-next-line no-use-before-define
+            <MemoizedRenderDraggableNode
               onDropAdjacent={onDropAdjacent}
               onDropChild={onDropChild}
               pathPrefix={pathPrefix}
@@ -543,6 +547,8 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
     </PageTreeItem>
   );
 }
+
+const MemoizedRenderDraggableNode = memo(RenderDraggableNode);
 
 function mapTree (items: Page[], key: 'parentId', rootPageIds?: string[]): MenuNode[] {
   const tempItems = items.map((item): MenuNode => {
@@ -627,26 +633,26 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
 type NavProps = {
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
-  space: Space;
+  spaceId: string;
   rootPageIds?: string[];
 };
 
 export default function PageNavigation ({
   deletePage,
   isFavorites,
-  space,
+  spaceId,
   rootPageIds
 }: NavProps) {
   const router = useRouter();
   const { pages, currentPageId, setPages, addPageAndRedirect } = usePages();
-  const [expanded, setExpanded] = useLocalStorage<string[]>(`${space.id}.expanded-pages`, []);
+  const [expanded, setExpanded] = useLocalStorage<string[]>(`${spaceId}.expanded-pages`, []);
 
   const mappedItems = useMemo(() => {
-    const pagesArray = Object.keys(pages).map(pageId => pages[pageId]).filter(isTruthy);
+    const pagesArray = Object.values(pages).filter((page): page is Page => page?.type === 'board' || page?.type === 'page');
     return mapTree(pagesArray, 'parentId', rootPageIds);
   }, [pages, rootPageIds]);
 
-  const onDropAdjacent = (droppedItem: MenuNode, containerItem: MenuNode) => {
+  const onDropAdjacent = useCallback((droppedItem: MenuNode, containerItem: MenuNode) => {
 
     if (droppedItem.id === containerItem?.id) {
       return;
@@ -677,9 +683,13 @@ export default function PageNavigation ({
       });
       return { ..._pages };
     });
-  };
+  }, []);
 
-  const onDropChild = (droppedItem: MenuNode, containerItem: MenuNode) => {
+  const onDropChild = useCallback((droppedItem: MenuNode, containerItem: MenuNode) => {
+
+    if (containerItem.boardId) {
+      return;
+    }
 
     if (droppedItem.id === containerItem?.id) {
       return;
@@ -700,7 +710,7 @@ export default function PageNavigation ({
         parentId
       }
     }));
-  };
+  }, []);
 
   useEffect(() => {
     const currentPage = pages[currentPageId];
@@ -738,19 +748,15 @@ export default function PageNavigation ({
       sx={{ flexGrow: isFavorites ? 0 : 1, width: '100%', overflowY: 'auto' }}
     >
       {mappedItems.map((item) => (
-        <RenderDraggableNode
+        <MemoizedRenderDraggableNode
           key={item.id}
           item={item}
-          onDropChild={(a, b) => {
-            if (!item.boardId) {
-              onDropChild(a, b);
-            }
-          }}
+          onDropChild={onDropChild}
           onDropAdjacent={onDropAdjacent}
-          pathPrefix={`/${space.domain}`}
+          pathPrefix={`/${router.query.domain}`}
           // pass down so parent databases can highlight themselves
           selectedNodeId={selectedNodeId}
-          addPage={page => addPageAndRedirect(page)}
+          addPage={addPageAndRedirect}
           deletePage={deletePage}
         />
       ))}
