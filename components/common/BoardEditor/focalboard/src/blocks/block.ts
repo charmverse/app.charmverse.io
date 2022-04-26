@@ -30,7 +30,6 @@ interface Block {
     rootId: string
     createdBy: string
     updatedBy: string
-
     schema: number
     type: BlockTypes
     title: string

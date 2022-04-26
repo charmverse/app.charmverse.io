@@ -12,9 +12,9 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { getCardContents } from 'components/common/BoardEditor/focalboard/src/store/contents';
 import { usePages } from 'hooks/usePages';
+import PageHeader from './components/PageHeader';
 import PageBanner from './components/PageBanner';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
-import PageHeader from './components/PageHeader';
 
 export const Container = styled(Box)<{ top: number }>`
   width: 860px;

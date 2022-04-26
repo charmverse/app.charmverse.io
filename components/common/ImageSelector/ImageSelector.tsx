@@ -2,7 +2,7 @@ import { Button, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
-import { uploadToS3 } from 'lib/aws/uploadToS3';
+import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { ReactNode, useState } from 'react';
 import ImageSelectorGallery from './ImageSelectorGallery';
 

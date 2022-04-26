@@ -3,18 +3,27 @@ import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
 import { Page } from '@prisma/client';
 import { useCallback } from 'react';
 import { usePages } from 'hooks/usePages';
+import { addPage } from 'lib/pages';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useUser } from 'hooks/useUser';
 
 export default function useNestedPage () {
-  const { currentPageId, addPage, pages } = usePages();
+  const [space] = useCurrentSpace();
+  const [user] = useUser();
+  const { currentPageId, pages } = usePages();
   const view = useEditorViewContext();
 
   const addNestedPage = useCallback(async (pageId?: string) => {
     let page: Page | undefined;
     // Creating a new page
     if (!pageId) {
-      page = await addPage({
-        parentId: currentPageId
-      });
+      if (user && space) {
+        page = await addPage({
+          createdBy: user.id,
+          parentId: currentPageId,
+          spaceId: space.id
+        });
+      }
     }
     else {
       page = pages[pageId];

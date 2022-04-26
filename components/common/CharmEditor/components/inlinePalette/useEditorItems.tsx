@@ -23,13 +23,16 @@ import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { renderSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
 import { NestedPagePluginKey } from 'components/common/CharmEditor/components/nestedPage/nestedPage';
 import useNestedPage from 'components/common/CharmEditor/components/nestedPage/hooks/useNestedPage';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 import { useMemo } from 'react';
 import { replaceSuggestionMarkWith } from './inlinePalette';
+import {
+  isList
+} from './commands';
 import { palettePluginKey } from './config';
 import { PaletteItem, PaletteItemType, PromisedCommand } from './paletteItem';
 import { insertNode } from '../../utils';
-import { isList } from './commands';
 
 const { convertToParagraph } = paragraph;
 const {
@@ -312,7 +315,33 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
       }
     },
     createColumnPaletteItem(2),
-    createColumnPaletteItem(3)
+    createColumnPaletteItem(3),
+    {
+      uid: 'insertDisclosure',
+      icon: <ArrowForwardIcon sx={{ fontSize: 16 }} />,
+      title: 'Toggle List/Heading',
+      keywords: ['summary', 'disclosure', 'toggle', 'collapse'],
+      description: 'Insert a summary and content',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          rafCommandExec(view!, (_state, _dispatch) => {
+
+            const node = _state.schema.nodes.disclosureDetails.createAndFill();
+
+            if (_dispatch && isAtBeginningOfLine(_state)) {
+              _dispatch(_state.tr.replaceSelectionWith(node));
+              return true;
+            }
+            return insertNode(_state, _dispatch, node);
+          });
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view
+          );
+        };
+      }
+    }
   ],
   text: [
     {

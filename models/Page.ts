@@ -41,6 +41,14 @@ export interface TableHeaderNode {
   content: (TextContent | MentionNode)[]
 }
 
+export interface HeadingNode {
+  type: 'heading',
+  content: (TextContent | MentionNode)[]
+  attrs: {
+    level: number
+  }
+}
+
 export interface TableCellNode {
   type: 'table_cell',
   content: (TextContent | MentionNode)[]
@@ -59,6 +67,15 @@ export interface TableNode {
 export interface ParagraphNode {
   type: 'paragraph',
   content: (ParagraphNode | TextContent | MentionNode)[]
+}
+
+export interface DisclosureSummaryNode {
+  type: 'disclosureSummary'
+  content: (ParagraphNode | HeadingNode)[]
+}
+export interface DisclosureDetailsNode {
+  type: 'disclosureDetails'
+  content: [DisclosureSummaryNode, ...(ParagraphNode | TextContent | MentionNode)[]]
 }
 
 export interface ListItemNode {

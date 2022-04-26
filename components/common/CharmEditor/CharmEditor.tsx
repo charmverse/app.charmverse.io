@@ -1,5 +1,4 @@
 import {
-  blockquote,
   bold,
   bulletList,
   code,
@@ -28,18 +27,19 @@ import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
-import { Grow, Portal } from '@mui/material';
+import { Portal } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
-import { Callout, calloutSpec } from './components/Callout';
+import Callout, * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
-import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/EmojiSuggest';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
-import { Mention, mentionPlugins, mentionSpecs, MentionSuggest } from './components/Mention';
+import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
+import MentionSuggest, { Mention, mentionPlugins, mentionSpecs } from './components/Mention';
+import NestedPage, { nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
-import { Quote, quoteSpec } from './components/Quote';
+import Quote, * as quote from './components/quote';
 import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
@@ -48,9 +48,7 @@ import { highlightSpec, inlineCommentPlugin, InlineCommentThread } from './compo
 import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 import * as table from './components/table';
 import { checkForEmpty } from './utils';
-import { nestedPagePlugins, nestedPageSpec } from './components/nestedPage/nestedPage';
-import NestedPage, { NestedPagesList } from './components/nestedPage';
-import PopoverMenu from './components/PopoverMenu';
+import * as disclosure from './components/disclosure';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -87,15 +85,16 @@ export const specRegistry = new SpecRegistry([
   // tableCell, // OK
   // tableHeader, // OK
   // tableRow, // OK
-  calloutSpec(), // OK
+  callout.spec(), // OK
   cryptoPriceSpec(), // NO
   imageSpec(), // OK
   columnLayout.rowSpec(), // NO
   columnLayout.columnSpec(), // NO
   nestedPageSpec(), // NO
-  quoteSpec(), // OK
+  quote.spec(), // OK
   tabIndent.spec(),
-  table.spec()
+  table.spec(),
+  disclosure.spec()
   // tables.tableNodes({
   //   cellAttributes: { },
   //   cellContent: 'My Cell',
@@ -151,12 +150,7 @@ export function charmEditorPlugins (
     emojiPlugins(),
     mentionPlugins(),
     floatingMenuPlugin(readOnly),
-    blockquote.plugins(),
-    NodeView.createPlugin({
-      name: 'blockquote',
-      containerDOM: ['blockquote'],
-      contentDOM: ['div']
-    }),
+    callout.plugins(),
     NodeView.createPlugin({
       name: 'image',
       containerDOM: ['div', { draggable: 'false' }]
@@ -200,7 +194,8 @@ export function charmEditorPlugins (
     // table.TableLabelMenu(),
     // @ts-ignore missing type
     table.TableFiltersMenu(),
-    trailingNode.plugins()
+    trailingNode.plugins(),
+    disclosure.plugins()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -300,7 +295,6 @@ function CharmEditor (
 ) {
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
-
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
@@ -343,15 +337,15 @@ function CharmEditor (
       }}
       placeholderComponent={<Placeholder show={isEmpty} />}
       state={state}
-      renderNodeViews={({ children: NodeViewChildren, ...props }) => {
+      renderNodeViews={({ children: _children, ...props }) => {
         switch (props.node.type.name) {
           case 'quote':
-            return <Quote {...props}>{NodeViewChildren}</Quote>;
+            return <Quote {...props}>{_children}</Quote>;
           case 'columnLayout': {
-            return <LayoutRow node={props.node}>{NodeViewChildren}</LayoutRow>;
+            return <LayoutRow node={props.node}>{_children}</LayoutRow>;
           }
           case 'columnBlock': {
-            return <LayoutColumn node={props.node}>{NodeViewChildren}</LayoutColumn>;
+            return <LayoutColumn node={props.node}>{_children}</LayoutColumn>;
           }
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency, quote: null | FiatCurrency };
@@ -377,7 +371,7 @@ function CharmEditor (
           case 'blockquote': {
             return (
               <Callout {...props}>
-                {NodeViewChildren}
+                {_children}
               </Callout>
             );
           }
@@ -412,14 +406,14 @@ function CharmEditor (
           case 'mention': {
             return (
               <Mention {...props}>
-                {NodeViewChildren}
+                {_children}
               </Mention>
             );
           }
           case 'page': {
             return (
               <NestedPage {...props}>
-                {NodeViewChildren}
+                {_children}
               </NestedPage>
             );
           }

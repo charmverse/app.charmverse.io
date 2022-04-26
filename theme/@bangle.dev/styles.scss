@@ -391,6 +391,19 @@ ol li {
   margin-bottom: 0;
 }
 
+/** Disclosure component **/
+details {
+  padding-left: 14px;
+  summary {
+    margin-left: -14px;
+
+    & > * {
+      display: inline;
+    }
+  }
+}
+
+
 /** Component-Styling-END */
 
 /**

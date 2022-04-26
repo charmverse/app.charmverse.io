@@ -26,7 +26,7 @@ type Props = {
     activeBoardId?: string
 }
 
-export const addBoardClicked = async (showBoard: (id: string) => void, intl: IntlShape, activeBoardId?: string) => {
+export const addBoardClicked = async (showBoard: (id: string) => void, activeBoardId?: string) => {
     const oldBoardId = activeBoardId
     const board = createBoard({addDefaultProperty: true})
     board.rootId = board.id
@@ -35,7 +35,7 @@ export const addBoardClicked = async (showBoard: (id: string) => void, intl: Int
     view.fields.viewType = 'board'
     view.parentId = board.id
     view.rootId = board.rootId
-    view.title = intl.formatMessage({id: 'View.NewBoardTitle', defaultMessage: 'Board view'})
+    view.title = 'Board view'
 
     const blocks: Card[] = [];
 
@@ -48,7 +48,7 @@ export const addBoardClicked = async (showBoard: (id: string) => void, intl: Int
       view.fields.cardOrder.push(card.id)
       blocks.push(card)
     }
-    
+
     await mutator.insertBlocks(
         [board, view, ...blocks],
         'add board',
@@ -164,7 +164,7 @@ const SidebarAddBoardMenu = (props: Props): JSX.Element => {
                         id='empty-template'
                         name={intl.formatMessage({id: 'Sidebar.empty-board', defaultMessage: 'Empty board'})}
                         icon={<BoardIcon/>}
-                        onClick={() => addBoardClicked(showBoard, intl, props.activeBoardId)}
+                        onClick={() => addBoardClicked(showBoard, props.activeBoardId)}
                     />
 
                     <Menu.Text

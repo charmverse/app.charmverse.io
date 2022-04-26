@@ -29,6 +29,7 @@ import { BangleEditorState } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import { PageContent } from 'models';
 import { Node } from '@bangle.dev/pm';
+import ListItemText from '@mui/material/ListItemText';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -74,6 +75,7 @@ export default function Header (
     setUser({ ...user, ...updatedFields });
   }
 
+  // TODO: Add this back
   function generateMarkdown () {
     if (currentPage && isExportablePage) {
       const serializer = markdownSerializer(specRegistry);
@@ -184,9 +186,13 @@ export default function Header (
                     setPageMenuOpen(false);
                   }}
                   >
-                    <ListItemIcon>
-                      <GetAppIcon fontSize='small' />
-                    </ListItemIcon>
+                    <GetAppIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 1
+                      }}
+                    />
+                    <ListItemText primary='Export to markdown' />
                   </ListItemButton>
                 </List>
               </Popover>

@@ -12,7 +12,7 @@ import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placeme
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import log from 'lib/log';
-import { pluginKey } from '../../EmojiSuggest/emojiSuggest.constants';
+import { pluginKey } from '../../emojiSuggest/emojiSuggest.constants';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;

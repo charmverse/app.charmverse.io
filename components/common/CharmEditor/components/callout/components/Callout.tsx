@@ -1,9 +1,8 @@
-import { blockquote } from '@bangle.dev/base-components';
-import { BaseRawNodeSpec, NodeViewProps } from '@bangle.dev/core';
+
+import { NodeViewProps } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Menu } from '@mui/material';
-import { Box } from '@mui/system';
+import { Box, Menu } from '@mui/material';
 import { BaseEmoji, Picker } from 'emoji-mart';
 import { MouseEvent, ReactNode, useState } from 'react';
 
@@ -38,16 +37,7 @@ const CalloutEmoji = styled.div`
   }
 `;
 
-export function calloutSpec () {
-  const spec = blockquote.spec() as BaseRawNodeSpec;
-  spec.name = 'blockquote';
-  spec.schema.attrs = {
-    emoji: { default: '😃' }
-  };
-  return spec;
-}
-
-export function Callout ({ children, node, updateAttrs }: NodeViewProps & { children: ReactNode }) {
+export default function Callout ({ children, node, updateAttrs }: NodeViewProps & { children: ReactNode }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
