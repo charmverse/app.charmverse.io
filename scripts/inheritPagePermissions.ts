@@ -2,17 +2,19 @@ import { prisma } from 'db';
 import { setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages/triggers';
 import { cond } from 'lodash';
 import { resolve } from 'node:path/win32';
-import { resolveChildPages } from '../lib/pages/server';
+import { IPageWithPermissions, resolveChildPages } from '../lib/pages/server';
 
-async function recursiveRebuild (pageId: string): Promise<true> {
+async function recursiveRebuild (pageId: string | IPageWithPermissions, level = 0, sourcePageNumber = 0): Promise<true> {
   await setupPermissionsAfterPageRepositioned(pageId);
 
-  const children = await resolveChildPages(pageId, true);
+  const idToPass = typeof pageId === 'string' ? pageId : pageId.id;
 
-  await Promise.all(children.map(childPage => {
-    return recursiveRebuild(childPage.id);
-  }));
+  const children = await resolveChildPages(idToPass, true);
 
+  for (let i = 0; i < children.length; i++) {
+    console.log(`Processing root ${sourcePageNumber}, level ${level}, child ${i + 1}`);
+    await recursiveRebuild(children[i].id, level + 1, sourcePageNumber);
+  }
   return true;
 
 }
@@ -21,7 +23,7 @@ async function recursiveRebuild (pageId: string): Promise<true> {
  * We will load root pages and traverse their respective trees
  * @param cursor
  */
-async function inheritPermissions (cursor?: string, processed = 0, total = 0): Promise<true> {
+async function inheritPermissions (processed = 0, total = 0): Promise<true> {
 
   // Only runs first time
   if (total === 0) {
@@ -33,13 +35,20 @@ async function inheritPermissions (cursor?: string, processed = 0, total = 0): P
   }
 
   const foundPages = await prisma.page.findMany({
-    take: 5,
-    skip: cursor ? 1 : undefined,
-    cursor: cursor ? {
-      id: cursor
-    } : undefined,
+    take: 3,
+    skip: processed,
     where: {
       parentId: null
+    },
+    orderBy: {
+      id: 'asc'
+    },
+    include: {
+      permissions: {
+        include: {
+          sourcePermission: true
+        }
+      }
     }
   });
 
@@ -49,12 +58,12 @@ async function inheritPermissions (cursor?: string, processed = 0, total = 0): P
 
   console.log('Processing page tree ', processed + 1, '-', processed + foundPages.length, ' / ', total);
 
-  await Promise.all(foundPages.map(page => {
+  await Promise.all(foundPages.map((page, index) => {
 
-    return recursiveRebuild(page.id);
+    return recursiveRebuild(page, 0, processed + index + 1);
   }));
 
-  return inheritPermissions(foundPages[foundPages.length - 1].id, processed + foundPages.length, total);
+  return inheritPermissions(processed + foundPages.length, total);
 
 }
 
@@ -69,7 +78,7 @@ prisma.pagePermission.updateMany({
 */
 
 /* Run this function
-inheritPermissions()
+inheritPermissions(264)
   .then(() => {
     console.log('Success');
   });
