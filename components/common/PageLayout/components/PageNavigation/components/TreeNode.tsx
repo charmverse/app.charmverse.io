@@ -7,6 +7,7 @@ import { useCallback, useRef, memo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useTreeItem } from '@mui/lab/TreeItem';
 import PageTreeItem from './PageTreeItem';
 import BoardViewTreeItem from './BoardViewTreeItem';
 
@@ -108,6 +109,8 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
   const views = Object.values(viewsRecord).filter(view => view.parentId === item.id);
 
   const hasSelectedChildView = views.some(view => view.id === selectedNodeId);
+  const { expanded } = useTreeItem(item.id);
+  const hideChildren = !expanded;
 
   return (
     <PageTreeItem
@@ -124,35 +127,39 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}
     >
-      {item.type.match(/(page|card)/) ? (
-        item.children.length > 0
-          ? item.children.map((childItem) => (
-            // eslint-disable-next-line no-use-before-define
-            <MemoizedRenderDraggableNode
-              onDropAdjacent={onDropAdjacent}
-              onDropChild={onDropChild}
-              pathPrefix={pathPrefix}
-              key={childItem.id}
-              item={childItem}
-              addPage={addPage}
-              selectedNodeId={selectedNodeId}
-              deletePage={deletePage}
+      {hideChildren ? <div>{/* empty div to trick TreeView into showing expand icon */}</div> : (
+        item.type === 'board' ? (
+          views.map(view => (
+            <BoardViewTreeItem
+              key={view.id}
+              href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+              label={view.title}
+              nodeId={view.id}
+              viewType={view.fields.viewType}
             />
           ))
-          : (
-            <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
-              No pages inside
-            </Typography>
-          )
-      ) : views.map(view => (
-        <BoardViewTreeItem
-          key={view.id}
-          href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
-          label={view.title}
-          nodeId={view.id}
-          viewType={view.fields.viewType}
-        />
-      ))}
+        ) : (
+          item.children.length > 0
+            ? item.children.map((childItem) => (
+              // eslint-disable-next-line no-use-before-define
+              <MemoizedRenderDraggableNode
+                onDropAdjacent={onDropAdjacent}
+                onDropChild={onDropChild}
+                pathPrefix={pathPrefix}
+                key={childItem.id}
+                item={childItem}
+                addPage={addPage}
+                selectedNodeId={selectedNodeId}
+                deletePage={deletePage}
+              />
+            ))
+            : (
+              <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
+                No pages inside
+              </Typography>
+            )
+        )
+      )}
     </PageTreeItem>
   );
 }
