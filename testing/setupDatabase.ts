@@ -1,16 +1,17 @@
-import { createUserFromWallet } from 'lib/users/createUser';
-import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import { User, Space, SpaceApiToken } from '@prisma/client';
-import { LoggedInUser } from 'models';
+import { Page, Space, SpaceApiToken } from '@prisma/client';
 import { prisma } from 'db';
+import { provisionApiKey } from 'lib/middleware/requireApiKey';
+import { createUserFromWallet } from 'lib/users/createUser';
+import { LoggedInUser } from 'models';
 import { v4 } from 'uuid';
+import { IPageWithPermissions } from 'lib/pages/server';
 
 /**
  * Simple utility to provide a user and space object inside test code
  * @param walletAddress
  * @returns
  */
-export async function generateUserAndSpaceWithApiToken (walletAddress: string = '0x0bdCC3f24822AD36CE4Fc1fa8Fe9FD6B235f0078'): Promise<{
+export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4()): Promise<{
   user: LoggedInUser,
   space: Space,
   apiToken: SpaceApiToken
@@ -56,6 +57,36 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
     space,
     apiToken
   };
+}
+
+export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Partial<Pick<Page, 'parentId' | 'title'>>): Promise<IPageWithPermissions> {
+  return prisma.page.create({
+    data: {
+      contentText: '',
+      path: v4(),
+      title: options.title || 'Example',
+      type: 'page',
+      updatedBy: options.createdBy,
+      author: {
+        connect: {
+          id: options.createdBy
+        }
+      },
+      space: {
+        connect: {
+          id: options.spaceId as string
+        }
+      },
+      parentId: options.parentId
+    },
+    include: {
+      permissions: {
+        include: {
+          sourcePermission: true
+        }
+      }
+    }
+  });
 }
 
 export default async function seedDatabase () {

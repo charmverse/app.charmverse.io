@@ -11,6 +11,17 @@ export class SpaceAccessDeniedError extends SystemError {
   }
 }
 
+export class ActionNotPermittedError extends SystemError {
+
+  constructor (message?: string) {
+    super({
+      severity: 'warning',
+      errorType: 'Access denied',
+      message: message ?? 'You are not allowed to perform this action.'
+    });
+  }
+}
+
 export class UnknownError extends SystemError {
   constructor (error: any = {}) {
     super({

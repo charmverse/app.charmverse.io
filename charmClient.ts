@@ -497,10 +497,6 @@ class CharmClient {
     return http.POST('/api/permissions', permission);
   }
 
-  updatePermission (permissionId: string, permission: IPagePermissionUpdate): Promise<boolean> {
-    return http.PUT(`/api/permissions/${permissionId}`, permission);
-  }
-
   deletePermission (permissionId: string): Promise<boolean> {
     return http.DELETE('/api/permissions', { permissionId });
   }

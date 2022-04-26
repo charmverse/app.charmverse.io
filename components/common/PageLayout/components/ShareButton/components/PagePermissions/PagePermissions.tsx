@@ -1,20 +1,21 @@
+import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Input from '@mui/material/OutlinedInput';
-import Modal from 'components/common/Modal';
-import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
+import Input from '@mui/material/OutlinedInput';
+import Typography from '@mui/material/Typography';
+import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
+import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
+import Link from 'components/common/Link';
+import Modal from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 import { IPagePermissionFlags, IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import { getDisplayName } from 'lib/users/getDisplayName';
-import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
-import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
-import { Space } from '@prisma/client';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { usePages } from 'hooks/usePages';
+import { useEffect, useState } from 'react';
 import AddPagePermissionsForm from './AddPagePermissionsForm';
 
 const permissionDisplayOrder = ['space', 'role', 'user'];
@@ -88,6 +89,7 @@ interface Props {
 export default function PagePermissions ({ pageId }: Props) {
 
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee []>([]);
+  const { pages } = usePages();
   const [space] = useCurrentSpace();
   const { getPagePermissions } = usePages();
   const [userPagePermissions, setUserPagePermissions] = useState<null | IPagePermissionFlags>(null);
@@ -125,16 +127,12 @@ export default function PagePermissions ({ pageId }: Props) {
         await charmClient.deletePermission(spaceLevelPermission.id);
       }
     }
-    else if (!spaceLevelPermission && space) {
+    else if (space) {
+      // The permission is being manually edited, so we drop the inheritance reference
       await charmClient.createPermission({
         pageId,
         permissionLevel,
         spaceId: space.id
-      });
-    }
-    else if (spaceLevelPermission) {
-      await charmClient.updatePermission(spaceLevelPermission.id, {
-        permissionLevel
       });
     }
     await refreshPermissions();
@@ -147,7 +145,13 @@ export default function PagePermissions ({ pageId }: Props) {
       await charmClient.deletePermission(permission.id);
     }
     else if (permissionLevel !== permission.permissionLevel) {
-      await charmClient.updatePermission(permission.id, { permissionLevel });
+      // The permission is being manually edited, so we drop the inheritance reference
+      await charmClient.createPermission({
+        pageId: permission.pageId,
+        permissionLevel,
+        roleId: permission.roleId,
+        userId: permission.userId
+      });
     }
     await refreshPermissions();
     setSelectedPermissionId(null);
@@ -177,12 +181,13 @@ export default function PagePermissions ({ pageId }: Props) {
         </Box>
       )}
 
-      <Box display='flex' justifyContent='space-between' alignItems='center' py={0.5}>
-        <Typography variant='body2'>
-          Everyone at {space?.name}
-        </Typography>
-        <div style={{ width: '120px', textAlign: 'center' }}>
-          {
+      <Box display='block' py={0.5}>
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <Typography variant='body2'>
+            Everyone at {space?.name}
+          </Typography>
+          <div style={{ width: '120px', textAlign: 'center' }}>
+            {
             selectedPermissionId === 'space' ? (
               <InputEnumToOptions
                 onChange={level => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
@@ -202,19 +207,34 @@ export default function PagePermissions ({ pageId }: Props) {
               </div>
             )
           }
-        </div>
+          </div>
+        </Box>
+        {
+
+          spaceLevelPermission?.sourcePermission && (
+            <Box display='block'>
+              <Typography variant='caption'>
+                Inherited from
+                <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[spaceLevelPermission?.sourcePermission.pageId]?.path}`}>
+                  {pages[spaceLevelPermission?.sourcePermission.pageId]?.title || 'Untitled'}
+                </Link>
+              </Typography>
+            </Box>
+          )
+        }
 
       </Box>
 
       {
         sortedPermissions.map(permission => {
           return (
-            <Box display='flex' justifyContent='space-between' alignItems='center' py={0.5} key={permission.displayName}>
-              <Typography variant='body2'>
-                {permission.displayName}
-              </Typography>
-              <div style={{ width: '120px', textAlign: 'center' }}>
-                {
+            <Box display='block' py={0.5}>
+              <Box display='flex' justifyContent='space-between' alignItems='center' key={permission.displayName}>
+                <Typography variant='body2'>
+                  {permission.displayName}
+                </Typography>
+                <div style={{ width: '120px', textAlign: 'center' }}>
+                  {
                   selectedPermissionId === permission.id ? (
                     <InputEnumToOptions
                       onChange={level => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
@@ -234,8 +254,22 @@ export default function PagePermissions ({ pageId }: Props) {
                     </div>
                   )
                 }
-              </div>
+                </div>
+              </Box>
+              {
+              permission.sourcePermission && (
+                <Box display='block'>
+                  <Typography variant='caption'>
+                    Inherited from
+                    <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[permission.sourcePermission.pageId]?.path}`}>
+                      {pages[permission.sourcePermission.pageId]?.title || 'Untitled'}
+                    </Link>
+                  </Typography>
+                </Box>
+              )
+             }
             </Box>
+
           );
         })
       }

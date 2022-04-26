@@ -1,14 +1,15 @@
 import { Page, PageOperations, Role } from '@prisma/client';
-import useSWR from 'swr';
 import charmClient from 'charmClient';
+import { IPageWithPermissions } from 'lib/pages';
+import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
+import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
+import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
-import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
+import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
-import { IPagePermissionFlags, IPageWithPermissions, PageOperationType } from '../lib/permissions/pages/page-permission-interfaces';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 type IContext = {
