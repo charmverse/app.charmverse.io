@@ -329,6 +329,13 @@ model PagePermission {
   pageId          String              @db.Uuid
   page            Page                @relation(fields: [pageId], references: [id], onDelete: Cascade)
   permissionLevel PagePermissionLevel
+  // The permissionId ID this permission was inherited from
+  inheritedFromPermission String?     @db.Uuid 
+  sourcePermission        PagePermission? @relation(fields: [inheritedFromPermission], references: [id], onDelete: Cascade, name: "InheritedPermissions")
+  // The children who inherit from this
+  inheritingChildren     PagePermission [] @relation("InheritedPermissions")
+
+
   // Scope of access
   // We only need to store true values
   permissions     PageOperations[]

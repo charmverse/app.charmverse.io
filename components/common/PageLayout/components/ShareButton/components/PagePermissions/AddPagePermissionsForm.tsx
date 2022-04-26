@@ -1,18 +1,17 @@
 
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
 import charmClient, { ListSpaceRolesResponse } from 'charmClient';
 import Button from 'components/common/Button';
-import InputLabel from '@mui/material/InputLabel';
 import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
+import useRoles from 'components/settings/roles/hooks/useRoles';
 import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import useRoles from 'components/settings/roles/hooks/useRoles';
 
 export const schema = yup.object({
   id: yup.string(),

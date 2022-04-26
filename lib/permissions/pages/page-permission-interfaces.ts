@@ -23,8 +23,10 @@ export interface IPagePermissionUserRequest extends IPagePermissionRequest {
 
 /**
  * Provide one of userId, spaceId or roleId
+ * @pageId can be passed in the body or externally
  */
-export type IPagePermissionToCreate = Pick<PagePermission, 'pageId' | 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions' | 'userId' | 'spaceId' | 'roleId'>>
+export type IPagePermissionToCreate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions' | 'userId' | 'spaceId' | 'roleId' | 'pageId'>>
+export type IPagePermissionToInherit = Pick<PagePermission, 'pageId' | 'inheritedFromPermission'>
 
 export type IPagePermissionUpdate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions'>>
 
@@ -32,8 +34,8 @@ export interface IPagePermissionToDelete {
   permissionId: string
 }
 
-export interface IPageWithPermissions extends Page {
-  permissions: PagePermission []
+export interface IPagePermissionWithSource extends PagePermission {
+  sourcePermission: PagePermission | null
 }
 
 export interface IPageWithNestedSpaceRole extends Page {
@@ -42,7 +44,7 @@ export interface IPageWithNestedSpaceRole extends Page {
   }
 }
 
-export interface IPagePermissionWithAssignee extends PagePermission {
+export interface IPagePermissionWithAssignee extends PagePermission, IPagePermissionWithSource {
   user: User | null;
   role: Role | null;
   space: Space | null;

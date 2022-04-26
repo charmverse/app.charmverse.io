@@ -48,4 +48,17 @@ export class AllowedPagePermissions implements IPagePermissionFlags {
     }
   }
 
+  /**
+   * Given a list of operations, indicates if all these are available in current permission set
+   */
+  hasPermissions (operations: PageOperationType []): boolean {
+    for (const op of operations) {
+      if (this[op] !== true) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
 }

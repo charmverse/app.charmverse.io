@@ -14,6 +14,7 @@ import { createCard } from 'lib/focalboard/card';
 import promiseRetry from 'promise-retry';
 import { isTruthy } from 'lib/utilities/types';
 import { getFilePath, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse, NotionImage } from './types';
 
 // Limit the highest number of pages that can be imported
@@ -547,15 +548,7 @@ async function createPrismaPage ({
     title: title || '',
     type,
     boardId,
-    parentId,
-    permissions: {
-      create: [
-        {
-          permissionLevel: 'full_access',
-          spaceId
-        }
-      ]
-    }
+    parentId
   };
 
   if (type === 'card' && cardId) {
@@ -567,7 +560,10 @@ async function createPrismaPage ({
   }
 
   // eslint-disable-next-line
-  const page = await prisma.page.create({ data: pageToCreate });
+  let page = await prisma.page.create({ data: pageToCreate });
+
+  page = await setupPermissionsAfterPageCreated(page.id);
+
   return page;
 }
 
