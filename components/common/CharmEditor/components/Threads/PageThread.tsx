@@ -32,13 +32,15 @@ const ContextBorder = styled.div`
   padding-bottom: 2px;
 `;
 
-const defaultCharmEditorContent = {
-  type: 'doc',
-  content: [
-    {
-      type: 'paragraph'
-    }
-  ]
+const defaultCharmEditorContent = () => {
+  return {
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph'
+      }
+    ]
+  };
 };
 
 export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(({ threadId, inline = true }, ref) => {
@@ -46,7 +48,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
   const [user] = useUser();
   const thread = threadId && threads[threadId];
   const theme = useTheme();
-  const [commentContent, setCommentContent] = useState<PageContent>(defaultCharmEditorContent);
+  const [commentContent, setCommentContent] = useState<PageContent>(defaultCharmEditorContent());
   const isEmpty = checkForEmpty(commentContent);
   const [isMutating, setIsMutating] = useState(false);
   const [editedComment, setEditedComment] = useState<null | string>(null);
@@ -75,10 +77,12 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       catch (_) {
         //
       }
-      setCommentContent(defaultCharmEditorContent);
+      setCommentContent(defaultCharmEditorContent());
       setIsMutating(false);
     }
   }
+
+  console.log(commentContent);
 
   async function editComment () {
     if (thread && editedComment && !isMutating) {
@@ -160,9 +164,9 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
   }
 
   return thread ? (
-    <Box id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, maxHeight: inline ? 300 : 'fit-content' }}>
-      <Box maxHeight={inline ? 220 : 'fit-content'} pr={inline ? 1 : 0} overflow='auto'>
-        <Box justifyContent='space-between' display='flex' alignItems='center' mb={1} gap={5}>
+    <Box overflow={inline ? 'auto' : 'unset'} id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, maxHeight: inline ? 300 : 'fit-content' }}>
+      <Box pr={inline ? 1 : 0}>
+        <Box justifyContent='space-between' display='flex' alignItems='center' mb={1} gap={2}>
           <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
             {new Date(thread.createdAt).toLocaleString()}
           </Typography>
@@ -242,7 +246,6 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 '&:hover .comment-actions': {
                   opacity: 1
                 },
-                p: 1,
                 borderRadius: theme.spacing(0.5),
                 background: targetedComment === comment.id ? 'rgba(46, 170, 220, 0.15)' : 'inherit'
               }}
@@ -252,7 +255,10 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
-                  padding: 0
+                  padding: 0,
+                  '& .ProseMirror.bangle-editor': {
+                    padding: 0
+                  }
                 }}
               >
                 <Box display='flex' width='100%' justifyContent='space-between'>
@@ -311,18 +317,26 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
         <InlineCharmEditor
           style={{
             backgroundColor: theme.palette.background.default,
-            padding: theme.spacing(0.5, 1)
+            padding: theme.spacing(0, 1)
           }}
           content={commentContent}
           onContentChange={({ doc }) => {
             setCommentContent(doc);
           }}
         />
-        <Button disabled={isMutating || isEmpty} size='small' onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
+        <Button
+          sx={{
+            alignSelf: 'flex-end'
+          }}
+          disabled={isMutating || isEmpty}
+          size='small'
+          onClick={() => editedComment ? editComment() : addComment()}
+        >{editedComment ? 'Edit' : 'Add'}
+        </Button>
         {editedComment && (
         <Button
           onClick={() => {
-            setCommentContent(defaultCharmEditorContent);
+            setCommentContent(defaultCharmEditorContent());
             setEditedComment(null);
             setTargetedComment(null);
           }}

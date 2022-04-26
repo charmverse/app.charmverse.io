@@ -89,6 +89,10 @@ export function charmEditorPlugins (
 }
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
+  .ProseMirror.bangle-editor {
+    padding-left: 0px !important;
+    width: 100% !important;
+  }
   code {
     border-radius: 2px !important;
     background-color: ${({ theme }) => theme.palette.code.background};
@@ -191,9 +195,7 @@ function CharmEditor (
 }
 
 export default memo((props: CharmEditorProps) => (
-  <ErrorBoundary>
-    <CharmEditor
-      {...props}
-    />
-  </ErrorBoundary>
+  <CharmEditor
+    {...props}
+  />
 ));

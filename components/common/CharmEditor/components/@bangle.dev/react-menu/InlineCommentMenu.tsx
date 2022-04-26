@@ -1,5 +1,6 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
+import { useTheme } from '@emotion/react';
 import { Box, Button } from '@mui/material';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
@@ -12,6 +13,7 @@ import { mutate } from 'swr';
 import { updateInlineComment } from '../../InlineComment';
 
 export function InlineCommentSubMenu({pluginKey}: {pluginKey: PluginKey}) {
+  const theme = useTheme()
   const view = useEditorViewContext();
   const [commentContent, setCommentContent] = useState<PageContent>({
     type: 'doc',
@@ -43,14 +45,22 @@ export function InlineCommentSubMenu({pluginKey}: {pluginKey: PluginKey}) {
 
   return (
     <Box sx={{
-      display: "flex"
+      display: "flex",
+      width: 300
     }}>
-      <InlineCharmEditor content={commentContent} onContentChange={({doc}) => {
-        setCommentContent(doc);
-      }}/>
+      <Box sx={{
+        width: 'calc(100% - 75px)'
+      }}>
+        <InlineCharmEditor content={commentContent} style={{
+          padding: theme.spacing(0, 1)
+        }} onContentChange={({doc}) => {
+          setCommentContent(doc);
+        }}/>
+      </Box>
       <Button size="small" onClick={(e) => {
         handleSubmit(e)
       }} sx={{
+        alignSelf: "flex-end",
         fontSize: 14
       }} disabled={isEmpty}>
         Start
