@@ -5,8 +5,8 @@ import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatab
 import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { ExpectedAnError } from 'testing/errors';
-import { createPagePermission } from '../page-permission-actions';
-import { CircularPermissionError, InvalidPermissionGranteeError, SelfInheritancePermissionError } from '../errors';
+import { upsertPermission } from '../upsert-permission';
+import { CannotInheritOutsideTreeError, InvalidPermissionGranteeError, SelfInheritancePermissionError } from '../../errors';
 
 let user: User;
 let space: Space;
@@ -17,7 +17,7 @@ beforeAll(async () => {
   space = generated.space;
 });
 
-describe('createPagePermission', () => {
+describe('upsertPermission', () => {
 
   it('should create a permission for a page', async () => {
     const page = await createPage({
@@ -25,8 +25,7 @@ describe('createPagePermission', () => {
       spaceId: space.id
     });
 
-    const createdPermission = await createPagePermission({
-      pageId: page.id,
+    const createdPermission = await upsertPermission(page.id, {
       permissionLevel: 'full_access',
       userId: user.id
     });
@@ -40,14 +39,12 @@ describe('createPagePermission', () => {
       spaceId: space.id
     });
 
-    await createPagePermission({
-      pageId: page.id,
+    await upsertPermission(page.id, {
       permissionLevel: 'full_access',
       userId: user.id
     });
 
-    const updatedPermission = await createPagePermission({
-      pageId: page.id,
+    const updatedPermission = await upsertPermission(page.id, {
       permissionLevel: 'view',
       userId: user.id
     });
@@ -71,8 +68,7 @@ describe('createPagePermission', () => {
 
     try {
 
-      await createPagePermission({
-        pageId: page.id,
+      await upsertPermission(page.id, {
         permissionLevel: 'full_access',
         userId: user.id,
         spaceId: space.id
@@ -91,17 +87,14 @@ describe('createPagePermission', () => {
       spaceId: space.id
     });
 
-    const parentPagePermission = await createPagePermission({
+    const parentPagePermission = await upsertPermission(parentPage.id, {
       pageId: parentPage.id,
       permissionLevel: 'full_access',
       userId: user.id
     });
 
     try {
-      await createPagePermission({
-        pageId: parentPage.id,
-        inheritedFromPermission: parentPagePermission.id
-      });
+      await upsertPermission(parentPage.id, parentPagePermission.id);
       throw new ExpectedAnError();
     }
     catch (error) {
@@ -109,38 +102,28 @@ describe('createPagePermission', () => {
     }
   });
 
-  it('should throw an error if an attempt to create circular inheritance between two permissions happens', async () => {
+  it('should throw an error if an attempt to inherit outside the parent tree happens', async () => {
     const parentPage = await createPage({
       createdBy: user.id,
       spaceId: space.id
     });
 
-    const childPage = await createPage({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: parentPage.id
-    });
-
-    const parentPagePermission = await createPagePermission({
-      pageId: parentPage.id,
+    const parentPagePermission = await upsertPermission(parentPage.id, {
       permissionLevel: 'full_access',
       userId: user.id
     });
 
-    const childPagePermission = await createPagePermission({
-      pageId: childPage.id,
-      inheritedFromPermission: parentPagePermission.id
+    const otherParent = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
     });
 
     try {
-      await createPagePermission({
-        pageId: parentPage.id,
-        inheritedFromPermission: childPagePermission.id
-      });
+      await upsertPermission(otherParent.id, parentPagePermission.id);
       throw new ExpectedAnError();
     }
     catch (error) {
-      expect(error).toBeInstanceOf(CircularPermissionError);
+      expect(error).toBeInstanceOf(CannotInheritOutsideTreeError);
     }
 
   });
@@ -151,8 +134,7 @@ describe('createPagePermission', () => {
       spaceId: space.id
     });
 
-    const parentPermission = await createPagePermission({
-      pageId: parent.id,
+    const parentPermission = await upsertPermission(parent.id, {
       permissionLevel: 'full_access',
       userId: user.id
     });
@@ -163,10 +145,7 @@ describe('createPagePermission', () => {
       parentId: parent.id
     });
 
-    const created = await createPagePermission({
-      pageId: child.id,
-      inheritedFromPermission: parentPermission.id
-    });
+    const created = await upsertPermission(child.id, parentPermission.id);
 
     expect(created.sourcePermission?.id).toBe(parentPermission.id);
 
@@ -178,8 +157,7 @@ describe('createPagePermission', () => {
       spaceId: space.id
     });
 
-    const parentPermission = await createPagePermission({
-      pageId: parent.id,
+    const parentPermission = await upsertPermission(parent.id, {
       permissionLevel: 'full_access',
       userId: user.id
     });
@@ -190,14 +168,9 @@ describe('createPagePermission', () => {
       parentId: parent.id
     });
 
-    const created = await createPagePermission({
-      pageId: child.id,
-      inheritedFromPermission: parentPermission.id
+    const created = await upsertPermission(child.id, parentPermission.id);
 
-    });
-
-    const updated = await createPagePermission({
-      pageId: child.id,
+    const updated = await upsertPermission(child.id, {
       permissionLevel: 'view',
       userId: user.id
     });
@@ -212,8 +185,7 @@ describe('createPagePermission', () => {
       spaceId: space.id
     });
 
-    const parentPermission = await createPagePermission({
-      pageId: parent.id,
+    const parentPermission = await upsertPermission(parent.id, {
       permissionLevel: 'full_access',
       userId: user.id
     });
@@ -224,14 +196,9 @@ describe('createPagePermission', () => {
       parentId: parent.id
     });
 
-    const createdChild = await createPagePermission({
-      pageId: child.id,
-      inheritedFromPermission: parentPermission.id
+    const createdChild = await upsertPermission(child.id, parentPermission.id);
 
-    });
-
-    const updatedParent = await createPagePermission({
-      pageId: parent.id,
+    const updatedParent = await upsertPermission(parent.id, {
       permissionLevel: 'view',
       userId: user.id
     });
@@ -255,8 +222,7 @@ describe('createPagePermission', () => {
       spaceId: space.id
     });
 
-    const parentPermission = await createPagePermission({
-      pageId: parent.id,
+    const parentPermission = await upsertPermission(parent.id, {
       permissionLevel: 'full_access',
       userId: user.id
     });
@@ -267,10 +233,7 @@ describe('createPagePermission', () => {
       parentId: parent.id
     });
 
-    const childPermission = await createPagePermission({
-      pageId: child.id,
-      inheritedFromPermission: parentPermission.id
-    });
+    const childPermission = await upsertPermission(child.id, parentPermission.id);
 
     const sibling = await createPage({
       createdBy: user.id,
@@ -278,10 +241,7 @@ describe('createPagePermission', () => {
       parentId: parent.id
     });
 
-    const siblingPermission = await createPagePermission({
-      pageId: sibling.id,
-      inheritedFromPermission: parentPermission.id
-    });
+    const siblingPermission = await upsertPermission(sibling.id, parentPermission.id);
 
     const subChild = await createPage({
       createdBy: user.id,
@@ -289,13 +249,9 @@ describe('createPagePermission', () => {
       parentId: child.id
     });
 
-    const subChildPermission = await createPagePermission({
-      pageId: subChild.id,
-      inheritedFromPermission: childPermission.id
-    });
+    const subChildPermission = await upsertPermission(subChild.id, childPermission.id);
 
-    await createPagePermission({
-      pageId: child.id,
+    await upsertPermission(child.id, {
       userId: user.id,
       permissionLevel: 'view'
     });

@@ -5,8 +5,8 @@ import { getPage, IPageWithPermissions } from 'lib/pages/server';
 import { ExpectedAnError } from 'testing/errors';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { upsertPermission, deletePagePermission } from '../actions';
-import { PermissionNotFoundError } from '../errors';
+import { upsertPermission, deletePagePermission } from '..';
+import { PermissionNotFoundError } from '../../errors';
 
 let user: User;
 let space: Space;

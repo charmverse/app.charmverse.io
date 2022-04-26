@@ -4,8 +4,8 @@ import { prisma } from 'db';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { getPage, IPageWithPermissions } from 'lib/pages/server';
-import { createPagePermission } from '../page-permission-actions';
-import { canInheritPermissionsFromParent, hasFullSetOfBasePermissions } from '../refresh-page-permission-tree';
+import { hasSameOrMorePermissions } from '../has-same-or-more-permissions';
+import { upsertPermission } from '../upsert-permission';
 
 let user: User;
 let space: Space;
@@ -30,8 +30,7 @@ async function setupPagesWithPermissions (permissionSets: Array<Partial<PagePerm
 
     await Promise.all(
       set.map(permission => {
-        permission.pageId = newPage.id;
-        return createPagePermission(permission as any);
+        return upsertPermission(newPage.id, permission as any);
       })
     );
 
@@ -64,7 +63,7 @@ beforeAll(async () => {
 
 });
 
-describe('hasFullSetOfBasePermissions', () => {
+describe('hasSameOrMorePermissions', () => {
 
   it('should return true when the compared list of permissions allows the same set of operations than the base', async () => {
 
@@ -90,7 +89,7 @@ describe('hasFullSetOfBasePermissions', () => {
     ]);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const hasEqualOrMorePermissions = hasFullSetOfBasePermissions(root!.permissions, child!.permissions);
+    const hasEqualOrMorePermissions = hasSameOrMorePermissions(root!.permissions, child!.permissions);
 
     expect(hasEqualOrMorePermissions).toBe(true);
 
@@ -116,7 +115,7 @@ describe('hasFullSetOfBasePermissions', () => {
     ]);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const hasEqualOrMorePermissions = hasFullSetOfBasePermissions(root!.permissions, child!.permissions);
+    const hasEqualOrMorePermissions = hasSameOrMorePermissions(root!.permissions, child!.permissions);
 
     expect(hasEqualOrMorePermissions).toBe(false);
   });

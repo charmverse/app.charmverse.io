@@ -37,17 +37,6 @@ export class InvalidPermissionLevelError extends SystemError {
   }
 }
 
-export class CircularPermissionError extends SystemError {
-
-  constructor (permissionId: string, inheritsFromPermissionId: string) {
-    super({
-      errorType: 'Invalid input',
-      message: `Circular permission inheritance is not allowed. ${permissionId} already inherits from ${inheritsFromPermissionId}`,
-      severity: 'warning'
-    });
-  }
-}
-
 export class SelfInheritancePermissionError extends SystemError {
 
   constructor () {
