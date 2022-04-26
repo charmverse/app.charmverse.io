@@ -153,8 +153,6 @@ function validatePermissionToCreate (permission: IPagePermissionToCreate) {
  * @param permission Either the values of the permission or the ID of a permission to inherit from
  */
 export async function upsertPermission (pageId: string, permission: IPagePermissionToCreate | string): Promise<IPagePermissionWithSource> {
-
-  console.log('Received permission', permission);
   // Get the source permission we are inheriting from
 
   let permissionData: Prisma.PagePermissionUpsertArgs;

@@ -1,7 +1,8 @@
 import { PagePermission, Space, User } from '@prisma/client';
-import { createPagePermission } from 'lib/permissions/pages/page-permission-actions';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { PagePermissionLevelType } from '../../page-permission-interfaces';
+import { upsertPermission } from 'lib/permissions/pages/actions/upsert-permission';
+import { PagePermissionLevelType } from 'lib/permissions/pages';
+import { IPageWithPermissions } from 'lib/pages/server';
 import { setupPermissionsAfterPageCreated } from '../page-created';
 
 let user: User;
@@ -36,20 +37,18 @@ describe('setupPermissionsAfterPageCreated', () => {
     );
   });
 
-  it('should return the page with its new permissions', async () => {
+  it('should inherit all permissions from the parent', async () => {
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
     });
 
     const assignedPermissions = await Promise.all([
-      createPagePermission({
-        pageId: page.id,
+      upsertPermission(page.id, {
         permissionLevel: 'full_access',
         userId: user.id
       }),
-      createPagePermission({
-        pageId: page.id,
+      upsertPermission(page.id, {
         permissionLevel: 'view',
         spaceId: space.id
       })
@@ -61,11 +60,16 @@ describe('setupPermissionsAfterPageCreated', () => {
       parentId: page.id
     });
 
-    const childWithPermissions = await setupPermissionsAfterPageCreated(childPage.id);
+    const childWithPermissions = await setupPermissionsAfterPageCreated(childPage.id) as IPageWithPermissions;
 
     expect(childWithPermissions?.permissions.length).toBe(assignedPermissions.length);
-    expect(childWithPermissions?.permissions.some(permission => permission.permissionLevel === 'full_access' && permission.userId === user.id && permission.pageId === childWithPermissions.id && permission.inheritedFromPermission === assignedPermissions[0].id));
-    expect(childWithPermissions?.permissions.some(permission => permission.permissionLevel === 'view' && permission.spaceId === user.id && permission.pageId === childWithPermissions.id && permission.inheritedFromPermission === assignedPermissions[0].id));
+
+    const childInheritedUserPermission = childWithPermissions?.permissions.some(permission => permission.permissionLevel === 'full_access' && permission.userId === user.id && permission.pageId === childWithPermissions.id && permission.inheritedFromPermission === assignedPermissions[0].id);
+
+    const childInheritedSpacePermission = childWithPermissions?.permissions.some(permission => permission.permissionLevel === 'view' && permission.spaceId === space.id && permission.pageId === childWithPermissions.id && permission.inheritedFromPermission === assignedPermissions[1].id);
+
+    expect(childInheritedUserPermission).toBe(true);
+    expect(childInheritedSpacePermission).toBe(true);
 
   });
 
