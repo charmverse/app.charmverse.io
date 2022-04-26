@@ -223,6 +223,12 @@ export async function upsertPermission (pageId: string, permission: IPagePermiss
           },
           {
             inheritedFromPermission: permissionBeforeModification.inheritedFromPermission
+          },
+          // Avoid accidentally editing non inherited permissions
+          {
+            inheritedFromPermission: {
+              not: null
+            }
           }
         ]
       },

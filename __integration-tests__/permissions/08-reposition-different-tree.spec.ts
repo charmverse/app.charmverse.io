@@ -253,4 +253,108 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
     expect(childWithPermissions.permissions.length).toBe(1);
     expect(childWithPermissions.permissions[0].inheritedFromPermission).toBe(newRootPermissionId);
   });
+
+  /**
+   * This test was added to deal with a case where moving pages around the tree created a phantom inheritance for a permission that should be locally defined.
+   *
+   * Setup: Create Root, Child 1, Child 1.1, Child 1.1.1
+   * Add User / view on child 1.1
+   * Make Child 1 root (which brings along child 1.1 and 1.1.1
+   * Put child 1 back under root page
+   *
+   * Child 1.1's permission was appearing as inherited from Root, even though it should be locally defined.
+   *
+   * The fix was inside upsert permission, however this test has been added to protect against this case.
+   *
+   */
+  it('should not insert phantom inheritance', async () => {
+    const rootPage = (await request(baseUrl)
+      .post('/api/pages')
+      .set('Cookie', cookie)
+      .send(generatePageToCreateStub({
+        userId: user.id,
+        spaceId: space.id,
+        title: 'Root'
+      }))
+      .expect(201)).body as IPageWithPermissions;
+
+    const childPage = (await request(baseUrl)
+      .post('/api/pages')
+      .set('Cookie', cookie)
+      .send(generatePageToCreateStub({
+        userId: user.id,
+        spaceId: space.id,
+        parentId: rootPage.id,
+        title: 'Child 1'
+      }))
+      .expect(201)).body as IPageWithPermissions;
+
+    const nestedChildPage = (await request(baseUrl)
+      .post('/api/pages')
+      .set('Cookie', cookie)
+      .send(generatePageToCreateStub({
+        userId: user.id,
+        spaceId: space.id,
+        parentId: childPage.id,
+        title: 'Nested'
+      }))
+      .expect(201)).body;
+
+    const superNestedChildPage = (await request(baseUrl)
+      .post('/api/pages')
+      .set('Cookie', cookie)
+      .send(generatePageToCreateStub({
+        userId: user.id,
+        spaceId: space.id,
+        parentId: nestedChildPage.id,
+        title: 'Nested'
+      }))
+      .expect(201)).body;
+
+    const permissionToAdd: IPagePermissionToCreate = {
+      pageId: nestedChildPage.id,
+      permissionLevel: 'view',
+      userId: user.id
+    };
+
+    // Add permission on child page which will inherit downwards
+    const createdNestedChildPermission = (await request(baseUrl)
+      .post('/api/permissions')
+      .set('Cookie', cookie)
+      .send(permissionToAdd)
+      .expect(201)
+        ).body as IPagePermissionWithSource;
+
+    // Move subtree out to root
+    await request(baseUrl)
+      .put(`/api/pages/${childPage.id}`)
+      .set('Cookie', cookie)
+      .send({
+        id: childPage.id,
+        index: 0,
+        parentId: null
+      })
+      .expect(200);
+
+    // Move subtree back to tree
+    await request(baseUrl)
+      .put(`/api/pages/${childPage.id}`)
+      .set('Cookie', cookie)
+      .send({
+        id: childPage.id,
+        index: 0,
+        parentId: rootPage.id
+      })
+      .expect(200);
+
+    const nestedChildWithPermissions = await getPage(nestedChildPage.id) as IPageWithPermissions;
+
+    expect(nestedChildWithPermissions.permissions.length).toBe(2);
+
+    const userPermissionLocallyDefined = nestedChildWithPermissions.permissions.some(perm => {
+      return perm.userId === user.id && perm.inheritedFromPermission === null;
+    });
+    expect(userPermissionLocallyDefined).toBe(true);
+
+  });
 });
