@@ -1,4 +1,4 @@
-import { Mark, MarkType, Schema } from '@bangle.dev/pm';
+import { Mark, MarkType } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
 

@@ -12,7 +12,7 @@ const name = 'inline-comment';
 
 const getTypeFromSchema = (schema: Schema) => schema.marks[name];
 
-export function highlightSpec (): RawSpecs {
+export function inlineCommentSpec (): RawSpecs {
   return {
     type: 'mark',
     name,

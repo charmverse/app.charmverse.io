@@ -16,7 +16,7 @@ import { queryIsSelectionAroundInlineComment } from './InlineComment';
 
 export const floatingMenuPluginKey = new PluginKey('menuKey');
 
-export default function FloatingMenuComponent () {
+export default function FloatingMenuComponent ({ inline = false }: {inline?: boolean}) {
   const { showMessage } = useSnackbar();
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
@@ -35,8 +35,9 @@ export default function FloatingMenuComponent () {
                 <StrikeButton />
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={floatingMenuPluginKey} />
-                {permissions.edit_content && <InlineCommentButton menuKey={floatingMenuPluginKey} />}
+                {!inline && permissions.edit_content && <InlineCommentButton menuKey={floatingMenuPluginKey} />}
               </MenuGroup>
+              {!inline && (
               <MenuGroup isLastGroup>
                 <ParagraphButton />
                 <CalloutButton />
@@ -44,6 +45,7 @@ export default function FloatingMenuComponent () {
                 <HeadingButton level={2} />
                 <HeadingButton level={3} />
               </MenuGroup>
+              )}
             </Menu>
           );
         }
@@ -54,7 +56,7 @@ export default function FloatingMenuComponent () {
             </Menu>
           );
         }
-        if (type === 'inlineCommentSubMenu') {
+        if (type === 'inlineCommentSubMenu' && !inline) {
           return (
             <Menu>
               <InlineCommentSubMenu />
