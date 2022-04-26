@@ -163,7 +163,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
 
   return thread ? (
     <Box overflow={inline ? 'auto' : 'unset'} id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, maxHeight: inline ? 300 : 'fit-content' }}>
-      <Box pr={inline ? 1 : 0}>
+      <div>
         <Box justifyContent='space-between' display='flex' alignItems='center' mb={1} gap={2}>
           <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
             {new Date(thread.createdAt).toLocaleString()}
@@ -253,7 +253,8 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
-                  padding: 0,
+                  px: 1,
+                  py: 0,
                   '& .ProseMirror.bangle-editor': {
                     padding: 0
                   }
@@ -309,7 +310,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
             </List>
           );
         })}
-      </Box>
+      </div>
       {permissions.edit_content && (
       <Box display='flex' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
         <InlineCharmEditor
@@ -333,6 +334,9 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
         </Button>
         {editedComment && (
         <Button
+          sx={{
+            alignSelf: 'flex-end'
+          }}
           onClick={() => {
             setCommentContent(defaultCharmEditorContent());
             setEditedComment(null);
@@ -348,7 +352,8 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       {permissions.edit_content && (
       <Menu {...bindMenu(popupState)}>
         <MenuItem
-          onClick={async () => {
+          onClick={async (e) => {
+            e.stopPropagation();
             const comment = thread.Comment.find(_comment => _comment.id === targetedComment);
             if (comment) {
               setEditedComment(comment.id);
