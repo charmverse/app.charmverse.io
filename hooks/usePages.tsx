@@ -41,8 +41,9 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const [user] = useUser();
-
-  const { data } = useSWR(() => space ? `pages/${space?.id}` : null, () => charmClient.getPages(space!.id), { refreshInterval });
+  const { data } = useSWR(() => space ? `pages/${space?.id}` : null, (e) => {
+    return charmClient.getPages(space!.id);
+  }, { refreshInterval });
   useEffect(() => {
     if (data) {
       setPages(data.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
