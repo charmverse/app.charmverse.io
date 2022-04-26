@@ -40,4 +40,16 @@ describe('generateUserAndSpaceWithApiToken', () => {
     expect(generated.apiToken.token).toEqual(generated2.apiToken.token);
   });
 
+  it('should always generate a different wallet address, space and user if no address is provided', async () => {
+
+    const generated = await generateUserAndSpaceWithApiToken();
+    const generated2 = await generateUserAndSpaceWithApiToken();
+
+    expect(generated.user.id).not.toEqual(generated2.user.id);
+
+    expect(generated.space.id).not.toEqual(generated2.space.id);
+
+    expect(generated.user.addresses[0]).not.toEqual(generated2.user.addresses[0]);
+  });
+
 });

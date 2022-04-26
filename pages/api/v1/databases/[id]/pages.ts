@@ -4,6 +4,7 @@ import { onError, onNoMatch, requireApiKey, requireKeys } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { Page, validateCreationData, DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
+import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -55,6 +56,8 @@ export async function createPage (req: NextApiRequest, res: NextApiResponse) {
     spaceId,
     createdBy: req.botUser.id
   });
+
+  await setupPermissionsAfterPageCreated(card.id);
 
   return res.status(201).json(card);
 

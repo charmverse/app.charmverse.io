@@ -1,11 +1,10 @@
 import { Block } from '@prisma/client';
 import { prisma } from 'db';
-import { DatabasePage, DatabasePageNotFoundError } from 'lib/public-api';
 import { filterObjectKeys } from 'lib/utilities/objects';
 import { PageContent } from 'models';
 import { validate } from 'uuid';
-import { PageNotFoundError, SpaceNotFoundError, InvalidInputError } from './errors';
-import { Page, PageProperty } from './interfaces';
+import { DatabasePageNotFoundError, PageNotFoundError, SpaceNotFoundError, InvalidInputError } from './errors';
+import { Page, PageProperty, DatabasePage } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
 
 export async function getPageInBoard (pageId: string): Promise<Page> {

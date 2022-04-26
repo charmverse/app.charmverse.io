@@ -65,7 +65,11 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
       ]
     },
     include: {
-      permissions: true
+      permissions: {
+        include: {
+          sourcePermission: true
+        }
+      }
     }
   });
 

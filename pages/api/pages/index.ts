@@ -1,31 +1,26 @@
 
+import { Page, Prisma } from '@prisma/client';
+import { prisma } from 'db';
+import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { IPageWithPermissions } from 'lib/pages/server';
+import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Prisma, Page } from '@prisma/client';
-import { prisma } from 'db';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(createPage);
 
-async function createPage (req: NextApiRequest, res: NextApiResponse<Page>) {
+async function createPage (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const data = req.body as Prisma.PageCreateInput;
   const page = await prisma.page.create({ data });
-  const pagePermission = await prisma.pagePermission.create({
-    data: {
-      permissionLevel: 'full_access',
-      spaceId: page.spaceId,
-      pageId: page.id
-    }
-  });
+  const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
 
-  (page as any).permissions = [pagePermission];
   logFirstWorkspacePageCreation(page);
   logFirstUserPageCreation(page);
-  return res.status(200).json(page);
+  return res.status(201).json(pageWithPermissions);
 }
 
 export default withSessionRoute(handler);
