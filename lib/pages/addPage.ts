@@ -6,8 +6,7 @@ import { addBoardClicked } from 'components/common/BoardEditor/focalboard/src/co
 
 export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string };
 
-export async function addPage (page: NewPageInput): Promise<Page> {
-  const spaceId = page.spaceId;
+export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput): Promise<Page> {
   const id = Math.random().toString().replace('0.', '');
   const pageProperties: Prisma.PageCreateInput = {
     content: undefined as any,
@@ -15,11 +14,11 @@ export async function addPage (page: NewPageInput): Promise<Page> {
     createdAt: new Date(),
     author: {
       connect: {
-        id: page.createdBy
+        id: createdBy
       }
     },
     updatedAt: new Date(),
-    updatedBy: page.createdBy,
+    updatedBy: createdBy,
     path: `page-${id}`,
     space: {
       connect: {
@@ -37,7 +36,7 @@ export async function addPage (page: NewPageInput): Promise<Page> {
     });
   }
   const newPage = await charmClient.createPage(pageProperties);
-  mutate(`pages/${page.spaceId}`);
+  await mutate(`pages/${spaceId}`);
   return newPage;
 }
 
