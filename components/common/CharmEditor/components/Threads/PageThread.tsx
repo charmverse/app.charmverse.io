@@ -18,6 +18,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import InlineCharmEditor from '../../InlineCharmEditor';
 
 const ContextBorder = styled.div`
   width: 3px;
@@ -281,7 +282,13 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                   </Typography>
                 </Box>
                 )}
-                <Typography pl={4}>{comment.content}</Typography>
+                <InlineCharmEditor
+                  readOnly
+                  content={comment.content}
+                  style={{
+                    paddingLeft: 4
+                  }}
+                />
               </ListItem>
             </List>
           );

@@ -2,8 +2,10 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import { Box, Button } from '@mui/material';
 import charmClient from 'charmClient';
-import { MenuInput } from 'components/common/MenuInput';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { usePages } from 'hooks/usePages';
+import { PageContent } from 'models';
 import { TextSelection } from 'prosemirror-state';
 import React, { useRef, useState } from 'react';
 import { mutate } from 'swr';
@@ -12,15 +14,21 @@ import { updateInlineComment } from '../../InlineComment';
 
 export function InlineCommentSubMenu() {
   const view = useEditorViewContext();
-  const [commentText, setCommentText] = useState('');
+  const [commentContent, setCommentContent] = useState<PageContent>({
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph'
+      }
+    ]
+  });
   const {currentPageId} = usePages()
-  const inputRef = useRef<HTMLInputElement>(null);
-  const isDisabled = commentText.length === 0;
+  const isEmpty = checkForEmpty(commentContent);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
-    if (!isDisabled) {
+    if (!isEmpty) {
       e.preventDefault();
       const {thread} = await charmClient.startThread({
-        content: commentText,
+        content: commentContent,
         // Get the context from current selection
         context: view.state.doc.cut(view.state.selection.from, view.state.selection.to).textContent,
         pageId: currentPageId
@@ -38,30 +46,14 @@ export function InlineCommentSubMenu() {
     <Box sx={{
       display: "flex"
     }}>
-      <MenuInput
-        value={commentText}
-        ref={inputRef}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            handleSubmit(e);
-            return;
-          }
-          if (e.key === 'Escape') {
-            e.preventDefault();
-            view.focus();
-            return;
-          }
-        }}
-        onChange={(e) => {
-          setCommentText(e.target.value);
-          e.preventDefault();
-        }}
-      />
+      <InlineCharmEditor content={commentContent} onContentChange={({doc}) => {
+        setCommentContent(doc);
+      }}/>
       <Button size="small" onClick={(e) => {
         handleSubmit(e)
       }} sx={{
         fontSize: 14
-      }} disabled={isDisabled}>
+      }} disabled={isEmpty}>
         Start
       </Button>
     </Box>
