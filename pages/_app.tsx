@@ -221,6 +221,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   // Update the theme only if the mode changes
   const theme = useMemo(() => {
     const muiTheme = createThemeLightSensitive(mode);
+
     if (typeof window !== 'undefined') {
       setFocalBoardTheme(mode === 'dark' ? darkTheme : lightTheme);
       setSavedDarkMode(mode);

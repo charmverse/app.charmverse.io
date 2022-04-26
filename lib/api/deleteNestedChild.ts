@@ -55,14 +55,5 @@ export async function deleteNestedChild (parentId: string, userId: string) {
     }
   });
 
-  const rootBlock = await prisma.block.findUnique({
-    where: {
-      id: parentId
-    }
-  });
-
-  return {
-    deletedChildPageIds,
-    rootBlock: rootBlock as Block
-  };
+  return deletedChildPageIds;
 }

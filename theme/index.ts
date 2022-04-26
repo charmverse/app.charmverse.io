@@ -40,6 +40,7 @@ declare module '@mui/material/styles/createPalette' {
   interface PaletteOptions extends CustomColors {
     blue: PaletteOptions['primary'];
     facebook: PaletteOptions['primary'];
+    textPrimary: PaletteOptions['primary'];
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
     quoteMarker: PaletteOptions['primary'];
@@ -47,6 +48,7 @@ declare module '@mui/material/styles/createPalette' {
   interface Palette extends CustomColors {
     blue: Palette['primary'];
     facebook: Palette['primary'];
+    textPrimary: Palette['primary'];
     twitter: Palette['primary'];
     white: Palette['primary'];
     quoteMarker: Palette['primary'];
@@ -132,6 +134,9 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       text: {
         primary: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor
+      },
+      textPrimary: {
+        main: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor
       },
       twitter: {
         contrastText,
@@ -292,6 +297,14 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiSelect: {
         defaultProps: {
           size: 'small'
+        }
+      },
+      MuiTab: {
+        styleOverrides: {
+          root: {
+            minHeight: 0,
+            textTransform: 'none'
+          }
         }
       },
       MuiLink: {
