@@ -119,7 +119,7 @@ function ViewTabs ({ intl, readonly, showView, views }: ViewTabsProps) {
   }, [views, currentView, showView])
 
   function handleRenameView () {
-    handleClose();
+    setAnchorEl(null);
     popupState.open();
   }
 

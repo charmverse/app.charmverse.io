@@ -36,11 +36,12 @@ export const PimpedButton = forwardRef<HTMLButtonElement, InputProps<ElementType
   );
 });
 
+// make sure teh id prop is on the same element as onClick
 const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<ElementType>>((_props, ref) => {
-  const { href, external, children, onClick, target, ...props } = _props;
+  const { href, external, children, id, onClick, target, ...props } = _props;
   if (href) {
     if (external) {
-      return <PimpedButton ref={ref} href={href} onClick={onClick} {...props}>{children}</PimpedButton>;
+      return <PimpedButton ref={ref} href={href} id={id} onClick={onClick} {...props}>{children}</PimpedButton>;
     }
     // @ts-ignore
     const mouseOnClick = onClick as MouseEventHandler<HTMLAnchorElement>;
@@ -48,14 +49,14 @@ const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<Elemen
       <NextLink href={href} passHref>
         {/** use an anchor tag to catch the ref passed down by NextLink.
        *  see https://github.com/vercel/next.js/issues/7915 */}
-        <MuiLink target={target} onClick={mouseOnClick}>
+        <MuiLink target={target} id={id} onClick={mouseOnClick}>
           <PimpedButton {...props}>{children}</PimpedButton>
         </MuiLink>
       </NextLink>
     );
   }
 
-  return <PimpedButton ref={ref} onClick={onClick} {...props}>{children}</PimpedButton>;
+  return <PimpedButton ref={ref} id={id} onClick={onClick} {...props}>{children}</PimpedButton>;
 });
 
 export default PimpedButtonWithNextLink;
