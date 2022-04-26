@@ -2,7 +2,6 @@ import { RawPlugins, RawSpecs, Plugin } from '@bangle.dev/core';
 import { Schema, DOMOutputSpec, Command, toggleMark, EditorState, PluginKey, TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
-import { useTheme } from '@emotion/react';
 import { ClickAwayListener } from '@mui/material';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
@@ -62,15 +61,31 @@ export function inlineCommentPlugin (): RawPlugins {
           }
           if (fromNodeAfter) {
             const inlineCommentMark = view.state.doc.type.schema.marks['inline-comment'].isInSet(fromNodeAfter.marks);
-            if (inlineCommentMark && inlineCommentMark.attrs.id) {
-              renderSuggestionsTooltip(SuggestTooltipPluginKey, {
-                component: 'inlineComment',
-                threadId: inlineCommentMark.attrs.id
-              })(view.state, view.dispatch, view);
-            }
-            else if (!view.state.selection.empty) {
-              const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$from.pos)));
-              view.dispatch(tr);
+            const pageThreadListNode = document.querySelector('.PageThreadList-portal');
+            const isShowingCommentThreadsList = pageThreadListNode?.children.length !== 0;
+            const threadId = inlineCommentMark?.attrs.id;
+            if (threadId) {
+              // If we are showing the thread list on the right, then navigate to the appropriate thread
+              if (isShowingCommentThreadsList && threadId) {
+                const threadDocument = document.getElementById(`thread.${threadId}`);
+                if (threadDocument) {
+                  threadDocument?.scrollIntoView({
+                    behavior: 'smooth'
+                  });
+                  threadDocument.style.backgroundColor = 'rgba(46, 170, 220, 0.2)';
+                  threadDocument.style.transition = 'background-color 250ms ease-in-out';
+                  setTimeout(() => {
+                    threadDocument.style.removeProperty('background-color');
+                    threadDocument.style.transition = 'background-color 250ms ease-in-out';
+                  }, 500);
+                }
+              }
+              else {
+                renderSuggestionsTooltip(SuggestTooltipPluginKey, {
+                  component: 'inlineComment',
+                  threadId
+                })(view.state, view.dispatch, view);
+              }
             }
           }
           return true;
@@ -88,25 +103,8 @@ export function InlineCommentThread ({ showingCommentThreadsList }: {showingComm
     component,
     threadId
   } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
-  const theme = useTheme();
   const { threads } = useThreads();
   const thread = threadId && threads[threadId];
-  // TODO: Move it to a lib module
-  if (threadId && showingCommentThreadsList) {
-    const threadDocument = document.getElementById(`thread.${threadId}`);
-    if (threadDocument) {
-      threadDocument?.scrollIntoView({
-        behavior: 'smooth'
-      });
-      threadDocument.style.backgroundColor = 'rgba(46, 170, 220, 0.2)';
-      threadDocument.style.transition = ' background-color 250ms ease-in-out';
-      setTimeout(() => {
-        threadDocument.style.backgroundColor = theme.palette.background.light;
-        threadDocument.style.transition = ' background-color 250ms ease-in-out';
-      }, 500);
-    }
-    return null;
-  }
   if (isVisible && component === 'inlineComment' && thread && !thread.resolved) {
     // Only show comment thread on inline comment if the page threads list is not active
     return !showingCommentThreadsList ? createPortal(

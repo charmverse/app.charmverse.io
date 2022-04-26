@@ -607,7 +607,7 @@ export interface SuggestTooltipPluginOptions {
   tooltipRenderOpts: SuggestTooltipRenderOpts;
 }
 
-export const SuggestTooltipPluginKey = new PluginKey('suggest_tooltip');
+export const SuggestTooltipPluginKey = new PluginKey<SuggestTooltipPluginState, Schema>('suggest_tooltip');
 
 export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPluginOptions) {
   const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
@@ -622,7 +622,6 @@ export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPlug
             tooltipContentDOM: tooltipDOMSpec.contentDOM,
             component: "nestedPage",
             threadId: null,
-            selection: null
           };
         },
         apply (tr, pluginState) {
