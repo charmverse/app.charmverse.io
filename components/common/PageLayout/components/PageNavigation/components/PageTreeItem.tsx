@@ -173,7 +173,7 @@ interface PageLinkProps {
 }
 
 export function PageLink ({ showPicker = true, children, href, label, labelIcon, pageType, pageId }: PageLinkProps) {
-
+  console.log('redner page link');
   const { setPages } = usePages();
 
   const popupState = usePopupState({
