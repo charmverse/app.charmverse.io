@@ -127,7 +127,7 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}
     >
-      {hideChildren ? <div></div> : (
+      {hideChildren ? <div>{/* empty div to trick TreeView into showing expand icon */}</div> : (
         item.type === 'board' ? (
           views.map(view => (
             <BoardViewTreeItem
