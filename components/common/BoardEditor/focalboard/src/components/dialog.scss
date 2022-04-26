@@ -70,30 +70,30 @@
             }
         }
 
-        >* {
+        > * {
             flex-shrink: 0;
             overflow-x: hidden;
         }
 
-        >.banner {
+        > .banner {
             background-color: rgba(230, 220, 192, 0.9);
             text-align: center;
             padding: 10px;
             color: #222;
         }
 
-        >.banner.error {
+        > .banner.error {
             background-color: rgba(230, 192, 192, 0.9);
         }
 
-        >.toolbar {
+        > .toolbar {
             display: flex;
             flex-direction: row;
             padding: 16px;
             justify-content: space-between;
         }
 
-        >.content {
+        > .content {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -107,7 +107,7 @@
             }
         }
 
-        >.content.fullwidth {
+        > .content.fullwidth {
             padding: 10px 126px;
         }
     }
