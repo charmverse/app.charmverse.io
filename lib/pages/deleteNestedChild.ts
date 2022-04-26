@@ -1,5 +1,4 @@
 import { prisma } from 'db';
-import { Block } from '@prisma/client';
 
 export async function deleteNestedChild (parentId: string, userId: string) {
   const deletedChildPageIds: string[] = [];

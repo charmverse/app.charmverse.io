@@ -6,7 +6,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
-import { deleteNestedChild } from 'lib/api/deleteNestedChild';
+import { deleteNestedChild } from 'lib/pages/deleteNestedChild';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -66,7 +66,12 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
       error: 'You are not allowed to perform this action'
     });
   }
-  const { deletedChildPageIds, rootBlock } = (await deleteNestedChild(pageId, userId));
+  const rootBlock = await prisma.block.findUnique({
+    where: {
+      id: pageId
+    }
+  });
+  const deletedChildPageIds = (await deleteNestedChild(pageId, userId));
   return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
 }
 
