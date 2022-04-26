@@ -15,26 +15,19 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { LoggedInUser } from 'models';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useCallback } from 'react';
-import { useIntl } from 'react-intl';
-import { untitledPage } from 'seedData';
 import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
 import NewPageMenu from 'components/common/PageLayout/components/NewPageMenu';
 import WorkspaceAvatar from 'components/common/WorkspaceAvatar';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
-import { mutate } from 'swr';
 import { headerHeight } from './Header';
 import PageNavigation from './PageNavigation';
 
@@ -170,12 +163,9 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [user, setUser] = useUser();
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
-  const boards = useAppSelector(getSortedBoards);
-  const { currentPageId, pages } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
-  const intl = useIntl();
 
   function showSpaceForm () {
     setSpaceFormOpen(true);
@@ -197,48 +187,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     setUser(_user);
     router.push(`/${newSpace.domain}`);
   }
-
-  const deletePage = useCallback(async (pageId: string) => {
-    const page = pages[pageId];
-    const totalPages = Object.keys(pages).length;
-    if (page) {
-      const { deletedCount } = await charmClient.deletePage(page.id);
-      if (totalPages - deletedCount === 0 && deletedCount !== 0) {
-        await charmClient.createPage(untitledPage({
-          userId: user!.id,
-          spaceId: space!.id
-        }));
-      }
-
-      const board = boards.find(b => b.id === page.id);
-      // Delete the page associated with the card
-      if (board) {
-        mutator.deleteBlock(
-          board,
-          intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
-          async () => {
-            // success
-          },
-          async () => {
-            // error
-          }
-        );
-      }
-    }
-    await mutate(`pages/${space?.id}`);
-    const currentPage = pages[currentPageId];
-    // Redirect from current page
-    if (page && currentPage && page.id === currentPage.id) {
-      let newPath = `/${router.query.domain}`;
-      if (currentPage.parentId) {
-        const parent = pages[currentPage.parentId];
-        if (parent) {
-          newPath += `/${parent.path}`;
-        }
-      }
-      router.push(newPath);
-    }
-  }, [boards]);
 
   const addPage = useCallback((_page: Partial<Page>) => {
     if (user && space) {
@@ -319,10 +267,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               </div>
             </WorkspaceLabel>
             <Box sx={{ mb: 6 }}>
-              <PageNavigation
-                spaceId={space.id}
-                deletePage={deletePage}
-              />
+              <PageNavigation spaceId={space.id} />
             </Box>
             <Box sx={{ mb: 2 }}>
               <SidebarLink
