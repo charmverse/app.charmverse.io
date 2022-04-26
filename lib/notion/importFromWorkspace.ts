@@ -852,7 +852,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
 
     // notion.pages.retrieve will return an error if the integration doesn't have access to the page
     try {
-      retrieveNotionPage(notionPageId);
+      await retrieveNotionPage(notionPageId);
       const notionPage = notionPagesRecord[notionPageId];
 
       // We allow a maximum of `MAX_CHILD_BLOCK_DEPTH` level of nested contents

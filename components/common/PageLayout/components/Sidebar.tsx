@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Prisma } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -25,7 +25,7 @@ import { useUser } from 'hooks/useUser';
 import { LoggedInUser } from 'models';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { untitledPage } from 'seedData';
 import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
@@ -33,7 +33,7 @@ import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
 import NewPageMenu from 'components/common/PageLayout/components/NewPageMenu';
 import WorkspaceAvatar from 'components/common/WorkspaceAvatar';
-import { getCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { addPageAndRedirect, NewPageInput } from 'lib/pages';
 import { mutate } from 'swr';
 import { headerHeight } from './Header';
 import PageNavigation from './PageNavigation';
@@ -171,8 +171,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [space] = useCurrentSpace();
   const [spaces, setSpaces] = useSpaces();
   const boards = useAppSelector(getSortedBoards);
-  const cards = useAppSelector(getCards);
-  const { currentPageId, pages, setPages, addPageAndRedirect } = usePages();
+  const { currentPageId, pages } = usePages();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
@@ -199,44 +198,38 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
     router.push(`/${newSpace.domain}`);
   }
 
-  async function deletePage (pageId: string) {
+  const deletePage = useCallback(async (pageId: string) => {
     const page = pages[pageId];
     const totalPages = Object.keys(pages).length;
-    let newPages = { ...pages };
     if (page) {
       const { deletedCount } = await charmClient.deletePage(page.id);
       if (totalPages - deletedCount === 0 && deletedCount !== 0) {
-        const newPage = await charmClient.createPage(untitledPage({
+        await charmClient.createPage(untitledPage({
           userId: user!.id,
           spaceId: space!.id
         }));
-        newPages = { [newPage.id]: newPage };
       }
 
-      if (page.boardId && deletedCount !== 0) {
-        const board = boards.find(b => b.id === page.boardId);
-        const deletedCards = board ? Object.values(cards).filter(card => card.parentId === board.id) : [];
-        // Delete the page associated with the card
-        deletedCards.forEach(deletedCard => delete newPages[deletedCard.id]);
-        if (board) {
-          mutator.deleteBlock(
-            board,
-            intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
-            async () => {
-              // success
-            },
-            async () => {
-              // error
-            }
-          );
-        }
+      const board = boards.find(b => b.id === page.id);
+      // Delete the page associated with the card
+      if (board) {
+        mutator.deleteBlock(
+          board,
+          intl.formatMessage({ id: 'Sidebar.delete-board', defaultMessage: 'Delete board' }),
+          async () => {
+            // success
+          },
+          async () => {
+            // error
+          }
+        );
       }
-      await mutate(`pages/${space?.id}`);
     }
+    await mutate(`pages/${space?.id}`);
     const currentPage = pages[currentPageId];
     // Redirect from current page
     if (page && currentPage && page.id === currentPage.id) {
-      let newPath = `/${space!.domain}`;
+      let newPath = `/${router.query.domain}`;
       if (currentPage.parentId) {
         const parent = pages[currentPage.parentId];
         if (parent) {
@@ -245,7 +238,18 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       }
       router.push(newPath);
     }
-  }
+  }, [boards]);
+
+  const addPage = useCallback((_page: Partial<Page>) => {
+    if (user && space) {
+      const newPage: NewPageInput = {
+        ..._page,
+        createdBy: user.id,
+        spaceId: space.id
+      };
+      addPageAndRedirect(newPage, router);
+    }
+  }, []);
 
   return (
     <SidebarContainer>
@@ -301,7 +305,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               </SectionName>
               <PageNavigation
                 isFavorites={true}
-                space={space}
+                spaceId={space.id}
                 rootPageIds={favoritePageIds}
               />
             </Box>
@@ -311,12 +315,12 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 WORKSPACE
               </SectionName>
               <div className='add-a-page'>
-                <NewPageMenu tooltip='Add a page' addPage={page => addPageAndRedirect(page)} />
+                <NewPageMenu tooltip='Add a page' addPage={addPage} />
               </div>
             </WorkspaceLabel>
             <Box sx={{ mb: 6 }}>
               <PageNavigation
-                space={space}
+                spaceId={space.id}
                 deletePage={deletePage}
               />
             </Box>
