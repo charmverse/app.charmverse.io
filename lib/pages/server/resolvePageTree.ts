@@ -83,11 +83,11 @@ export async function resolveChildPages (pageId: string, directOnly: boolean): P
  * Returns a list of parents up to the root
  * @param pageId
  */
-export async function resolveParentPages (pageId: string): Promise<IPageWithPermissions []> {
-  const page = await getPage(pageId);
+export async function resolveParentPages (pageId: string | IPageWithPermissions): Promise<IPageWithPermissions []> {
+  const page = typeof pageId === 'string' ? await getPage(pageId) : pageId;
 
   if (!page) {
-    throw new PageNotFoundError(pageId);
+    throw new PageNotFoundError(pageId as string);
   }
 
   if (!page.parentId) {
