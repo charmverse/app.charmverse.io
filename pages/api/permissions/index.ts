@@ -1,11 +1,14 @@
 
 import { PagePermission } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
+
 import nc from 'next-connect';
+import { getPage } from '../../../lib/pages/server';
+import { PermissionNotFoundError } from '../../../lib/permissions/pages/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -27,9 +30,16 @@ async function findPagePermissions (req: NextApiRequest, res: NextApiResponse<IP
 
 async function addPagePermission (req: NextApiRequest, res: NextApiResponse) {
 
-  console.log('Received request', req.body);
-
   const { pageId } = req.body;
+
+  const computedPermissions = await computeUserPagePermissions({
+    pageId,
+    userId: req.session.user.id
+  });
+
+  if (computedPermissions.grant_permissions !== true) {
+    throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  }
 
   // Count before and after permissions so we don't trigger the event unless necessary
   const permissionsBefore = await prisma.pagePermission.count({
@@ -57,6 +67,21 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse) {
 async function removePagePermission (req: NextApiRequest, res: NextApiResponse) {
 
   const { permissionId } = req.body as IPagePermissionToDelete;
+
+  const permission = await getPagePermission(permissionId);
+
+  if (!permission) {
+    throw new PermissionNotFoundError(permissionId);
+  }
+
+  const computedPermissions = await computeUserPagePermissions({
+    pageId: permission.pageId,
+    userId: req.session.user.id
+  });
+
+  if (computedPermissions.grant_permissions !== true) {
+    throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  }
 
   await deletePagePermission(permissionId);
 
