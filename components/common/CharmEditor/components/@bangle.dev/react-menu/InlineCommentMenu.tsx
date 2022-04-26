@@ -4,16 +4,14 @@ import { Box, Button } from '@mui/material';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { MenuInput } from 'components/common/MenuInput';
 import { usePages } from 'hooks/usePages';
 import { PageContent } from 'models';
-import { TextSelection } from 'prosemirror-state';
-import React, { useRef, useState } from 'react';
+import { PluginKey, TextSelection } from 'prosemirror-state';
+import React, { useState } from 'react';
 import { mutate } from 'swr';
-import { floatingMenuPluginKey } from '../../FloatingMenu';
 import { updateInlineComment } from '../../InlineComment';
 
-export function InlineCommentSubMenu() {
+export function InlineCommentSubMenu({pluginKey}: {pluginKey: PluginKey}) {
   const view = useEditorViewContext();
   const [commentContent, setCommentContent] = useState<PageContent>({
     type: 'doc',
@@ -24,7 +22,6 @@ export function InlineCommentSubMenu() {
     ]
   });
   const {currentPageId} = usePages()
-  const inputRef = useRef<HTMLInputElement>(null);
   const isEmpty = checkForEmpty(commentContent);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!isEmpty) {
@@ -37,7 +34,7 @@ export function InlineCommentSubMenu() {
       });
       mutate(`pages/${currentPageId}/threads`)
       updateInlineComment(thread.id)(view.state, view.dispatch);
-      hideSelectionTooltip(floatingMenuPluginKey)(view.state, view.dispatch, view)
+      hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view)
       const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)))
       view.dispatch(tr)
       view.focus();

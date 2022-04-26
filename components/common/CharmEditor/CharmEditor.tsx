@@ -57,6 +57,7 @@ export interface ICharmEditorOutput {
 
 const emojiSuggestPluginKey = new PluginKey('emojiSuggest');
 const mentionSuggestPluginKey = new PluginKey('mentionSuggest');
+const floatingMenuPluginKey = new PluginKey('floatingMenu');
 
 export const specRegistry = new SpecRegistry([
   // Comments to the right of each spec show if it supports markdown export
@@ -156,7 +157,10 @@ export function charmEditorPlugins (
     mentionPlugins({
       key: mentionSuggestPluginKey
     }),
-    floatingMenuPlugin(readOnly),
+    floatingMenuPlugin({
+      menuKey: floatingMenuPluginKey,
+      readOnly
+    }),
     callout.plugins(),
     NodeView.createPlugin({
       name: 'image',
@@ -430,7 +434,7 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu />
+      <FloatingMenu pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionSuggestPluginKey} />
       <NestedPagesList />
       <EmojiSuggest pluginKey={emojiSuggestPluginKey} />

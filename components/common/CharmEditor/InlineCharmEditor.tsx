@@ -28,6 +28,7 @@ export interface ICharmEditorOutput {
 
 const emojiSuggestPluginKey = new PluginKey('emojiSuggest');
 const mentionSuggestPluginKey = new PluginKey('mentionSuggest');
+const floatingMenuPluginKey = new PluginKey('floatingMenu');
 
 export const specRegistry = new SpecRegistry([
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
@@ -75,7 +76,10 @@ export function charmEditorPlugins (
     mentionPlugins({
       key: mentionSuggestPluginKey
     }),
-    floatingMenuPlugin(readOnly),
+    floatingMenuPlugin({
+      menuKey: floatingMenuPluginKey,
+      readOnly
+    }),
     NodeView.createPlugin({
       name: 'mention',
       containerDOM: ['span', { class: 'mention-value' }]
@@ -178,7 +182,7 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu />
+      <FloatingMenu pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionSuggestPluginKey} />
       <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
       {children}

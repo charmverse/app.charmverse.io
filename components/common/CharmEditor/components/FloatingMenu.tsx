@@ -14,16 +14,14 @@ import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLin
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 import { queryIsSelectionAroundInlineComment } from './InlineComment';
 
-export const floatingMenuPluginKey = new PluginKey('menuKey');
-
-export default function FloatingMenuComponent ({ inline = false }: {inline?: boolean}) {
+export default function FloatingMenuComponent ({ pluginKey, inline = false }: {pluginKey: PluginKey, inline?: boolean}) {
   const { showMessage } = useSnackbar();
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
 
   return (
     <FloatingMenu
-      menuKey={floatingMenuPluginKey}
+      menuKey={pluginKey}
       renderMenuType={({ type }) => {
         if (type === 'defaultMenu') {
           return (
@@ -34,8 +32,8 @@ export default function FloatingMenuComponent ({ inline = false }: {inline?: boo
                 <CodeButton />
                 <StrikeButton />
                 <UnderlineButton />
-                <FloatingLinkButton menuKey={floatingMenuPluginKey} />
-                {!inline && permissions.edit_content && <InlineCommentButton menuKey={floatingMenuPluginKey} />}
+                <FloatingLinkButton menuKey={pluginKey} />
+                {!inline && permissions.edit_content && <InlineCommentButton menuKey={pluginKey} />}
               </MenuGroup>
               {!inline && (
               <MenuGroup isLastGroup>
@@ -59,7 +57,7 @@ export default function FloatingMenuComponent ({ inline = false }: {inline?: boo
         if (type === 'inlineCommentSubMenu' && !inline) {
           return (
             <Menu>
-              <InlineCommentSubMenu />
+              <InlineCommentSubMenu pluginKey={pluginKey} />
             </Menu>
           );
         }
@@ -69,11 +67,11 @@ export default function FloatingMenuComponent ({ inline = false }: {inline?: boo
   );
 }
 
-export const floatingMenuPlugin = (readonly?: boolean) => {
+export const floatingMenuPlugin = ({ menuKey, readOnly }:{menuKey: PluginKey, readOnly?: boolean}) => {
   return floatingMenu.plugins({
-    key: floatingMenuPluginKey,
+    key: menuKey,
     calculateType: (state) => {
-      if (readonly) {
+      if (readOnly) {
         return null;
       }
       if (state.selection.empty

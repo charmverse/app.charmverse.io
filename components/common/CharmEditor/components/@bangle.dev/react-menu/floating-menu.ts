@@ -4,9 +4,8 @@ import { hasComponentInSchema } from "@bangle.dev/react-menu/helper";
 import { querySelectionTooltipType, hideSelectionTooltip, updateSelectionTooltipType } from "@bangle.dev/tooltip/selection-tooltip";
 import { rafCommandExec } from "@bangle.dev/utils";
 import { PluginKey } from "prosemirror-state";
-import { floatingMenuPluginKey } from "../../FloatingMenu";
 
-export function toggleSubMenu(subMenu: 'linkSubMenu' | 'inlineCommentSubMenu'): Command {
+export function toggleSubMenu(floatingMenuPluginKey: PluginKey, subMenu: 'linkSubMenu' | 'inlineCommentSubMenu'): Command {
   let nodeName = subMenu === "inlineCommentSubMenu" ? 'inline-comment' : 'link'
   return (state, _dispatch, view) => {
     const type = querySelectionTooltipType(floatingMenuPluginKey)(state);

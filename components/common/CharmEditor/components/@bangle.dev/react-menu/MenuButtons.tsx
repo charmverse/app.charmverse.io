@@ -113,7 +113,7 @@ export function InlineCommentButton({
         (state: EditorState) => createInlineComment()(state),
         (_state, dispatch, view) => {
           if (dispatch) {
-            toggleSubMenu("inlineCommentSubMenu")(view!.state, view!.dispatch, view);
+            toggleSubMenu(menuKey, "inlineCommentSubMenu")(view!.state, view!.dispatch, view);
             rafCommandExec(view!, focusFloatingMenuInput(menuKey));
           }
           return true;
@@ -560,7 +560,7 @@ export function FloatingLinkButton({
         (state: EditorState) => createLink('')(state),
         (_state, dispatch, view) => {
           if (dispatch) {
-            toggleSubMenu("linkSubMenu")(view!.state, view!.dispatch, view);
+            toggleSubMenu(menuKey, "linkSubMenu")(view!.state, view!.dispatch, view);
             rafCommandExec(view!, focusFloatingMenuInput(menuKey));
           }
           return true;
