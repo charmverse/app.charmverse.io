@@ -1,7 +1,5 @@
 import { prisma } from 'db';
 import { setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages/triggers';
-import { cond } from 'lodash';
-import { resolve } from 'node:path/win32';
 import { IPageWithPermissions, resolveChildPages } from '../lib/pages/server';
 
 async function recursiveRebuild (pageId: string | IPageWithPermissions, level = 0, sourcePageNumber = 0): Promise<true> {
@@ -11,10 +9,15 @@ async function recursiveRebuild (pageId: string | IPageWithPermissions, level = 
 
   const children = await resolveChildPages(idToPass, true);
 
-  for (let i = 0; i < children.length; i++) {
-    console.log(`Processing root ${sourcePageNumber}, level ${level}, child ${i + 1}`);
-    await recursiveRebuild(children[i].id, level + 1, sourcePageNumber);
+  const parallelFactor = 5;
+
+  for (let i = 0; i < children.length; i += parallelFactor) {
+    await Promise.all(children.slice(i, i + parallelFactor).map((child, childIndex) => {
+      console.log(`Processing root ${sourcePageNumber}, level ${level}, child ${i + childIndex + 1}`);
+      return recursiveRebuild(child, level + 1, sourcePageNumber);
+    }));
   }
+
   return true;
 
 }
@@ -78,8 +81,13 @@ prisma.pagePermission.updateMany({
 */
 
 /* Run this function
-inheritPermissions(264)
+prisma.$connect()
   .then(() => {
-    console.log('Success');
+    console.log('Connected to DB');
+    inheritPermissions(264)
+      .then(() => {
+        console.log('Success');
+      });
   });
+
 */
