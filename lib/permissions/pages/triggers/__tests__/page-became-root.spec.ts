@@ -1,14 +1,14 @@
 
 import { prisma } from 'db';
-import { resolveChildPages } from 'lib/pages/server';
+import { getPage, IPageWithPermissions, resolveChildPagesAsFlatList } from 'lib/pages/server';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { createPagePermission } from '../../page-permission-actions';
-import { setupPermissionsAfterPageBecameRoot } from '../page-became-root';
+import { upsertPermission } from '../../actions/upsert-permission';
+import { setupPermissionsAfterPageRepositioned } from '../page-repositioned';
 
 /**
  * For now, these tests are 1:1 with breakInheritance as setupPermissionsAfterPageBecameRoot has no further needs than breakInheritance
  */
-describe('setupPermissionsAfterPageBecameRoot', () => {
+describe('setupPermissionsAfterPageRepositioned / page became root', () => {
   it('should convert all permissions inherited by the page to permissions owned by the page', async () => {
 
     const { user, space } = await generateUserAndSpaceWithApiToken();
@@ -18,8 +18,7 @@ describe('setupPermissionsAfterPageBecameRoot', () => {
       spaceId: space.id
     });
 
-    const rootPermission = await createPagePermission({
-      pageId: root.id,
+    const rootPermission = await upsertPermission(root.id, {
       permissionLevel: 'full_access',
       spaceId: space.id
     });
@@ -30,14 +29,19 @@ describe('setupPermissionsAfterPageBecameRoot', () => {
       parentId: root.id
     });
 
-    const childPermission = await createPagePermission({
-      pageId: child.id,
-      permissionLevel: 'full_access',
-      spaceId: space.id,
-      inheritedFromPermission: rootPermission.id
+    const childPermission = await upsertPermission(child.id, rootPermission.id);
+
+    // Set the child to have no parent
+    await prisma.page.update({
+      where: {
+        id: child.id
+      },
+      data: {
+        parentId: null
+      }
     });
 
-    const updatedPage = await setupPermissionsAfterPageBecameRoot(child.id);
+    const updatedPage = await setupPermissionsAfterPageRepositioned(child.id);
 
     expect(updatedPage.permissions.length).toBe(1);
     expect(updatedPage.permissions[0].permissionLevel).toBe('full_access');
@@ -53,8 +57,7 @@ describe('setupPermissionsAfterPageBecameRoot', () => {
       spaceId: space.id
     });
 
-    const rootPermission = await createPagePermission({
-      pageId: root.id,
+    const rootPermission = await upsertPermission(root.id, {
       permissionLevel: 'full_access',
       spaceId: space.id
     });
@@ -65,12 +68,7 @@ describe('setupPermissionsAfterPageBecameRoot', () => {
       parentId: root.id
     });
 
-    const childPermission = await createPagePermission({
-      pageId: child.id,
-      permissionLevel: 'full_access',
-      spaceId: space.id,
-      inheritedFromPermission: rootPermission.id
-    });
+    const childPermission = await upsertPermission(child.id, rootPermission.id);
 
     const subChild1 = await createPage({
       createdBy: user.id,
@@ -78,12 +76,7 @@ describe('setupPermissionsAfterPageBecameRoot', () => {
       parentId: child.id
     });
 
-    const subChild1Permission = await createPagePermission({
-      pageId: subChild1.id,
-      permissionLevel: 'full_access',
-      spaceId: space.id,
-      inheritedFromPermission: rootPermission.id
-    });
+    const subChild1Permission = await upsertPermission(subChild1.id, rootPermission.id);
 
     const subChild2 = await createPage({
       createdBy: user.id,
@@ -91,12 +84,7 @@ describe('setupPermissionsAfterPageBecameRoot', () => {
       parentId: child.id
     });
 
-    const subChild2Permission = await createPagePermission({
-      pageId: subChild2.id,
-      permissionLevel: 'full_access',
-      spaceId: space.id,
-      inheritedFromPermission: rootPermission.id
-    });
+    const subChild2Permission = await upsertPermission(subChild2.id, rootPermission.id);
 
     const subSubChild1 = await createPage({
       createdBy: user.id,
@@ -104,16 +92,21 @@ describe('setupPermissionsAfterPageBecameRoot', () => {
       parentId: subChild1.id
     });
 
-    const subSubChild1Permission = await createPagePermission({
-      pageId: subChild1.id,
-      permissionLevel: 'full_access',
-      spaceId: space.id,
-      inheritedFromPermission: rootPermission.id
+    const subSubChild1Permission = await upsertPermission(subChild1.id, rootPermission.id);
+
+    // Set the child to have no parent
+    await prisma.page.update({
+      where: {
+        id: child.id
+      },
+      data: {
+        parentId: null
+      }
     });
 
-    await setupPermissionsAfterPageBecameRoot(child.id);
+    await setupPermissionsAfterPageRepositioned(child.id);
 
-    const children = await resolveChildPages(child.id);
+    const children = await resolveChildPagesAsFlatList(child.id);
 
     children.forEach(nestedPage => {
       nestedPage.permissions.forEach(nestedPagePermission => {
@@ -131,8 +124,7 @@ describe('setupPermissionsAfterPageBecameRoot', () => {
       spaceId: space.id
     });
 
-    const rootPermission = await createPagePermission({
-      pageId: root.id,
+    const rootPermission = await upsertPermission(root.id, {
       permissionLevel: 'full_access',
       spaceId: space.id
     });
@@ -143,12 +135,7 @@ describe('setupPermissionsAfterPageBecameRoot', () => {
       parentId: root.id
     });
 
-    const childPermission = await createPagePermission({
-      pageId: child.id,
-      permissionLevel: 'full_access',
-      spaceId: space.id,
-      inheritedFromPermission: rootPermission.id
-    });
+    const childPermission = await upsertPermission(child.id, rootPermission.id);
 
     const subChild1 = await createPage({
       createdBy: user.id,
@@ -156,35 +143,33 @@ describe('setupPermissionsAfterPageBecameRoot', () => {
       parentId: child.id
     });
 
-    const subChild1Permission = await createPagePermission({
-      pageId: subChild1.id,
-      permissionLevel: 'full_access',
-      spaceId: space.id,
-      inheritedFromPermission: rootPermission.id
-    });
-
-    const subChild1LocalPermission = await createPagePermission({
-      pageId: subChild1.id,
-      permissionLevel: 'view',
+    const subChild1Permission = await upsertPermission(subChild1.id, rootPermission.id);
+    const subChild1LocalPermission = await upsertPermission(subChild1.id, {
+      permissionLevel: 'editor',
       userId: user.id
     });
 
-    await setupPermissionsAfterPageBecameRoot(child.id);
-
-    const nestedPage = await prisma.page.findUnique({
+    // Set the child to have no parent
+    await prisma.page.update({
       where: {
-        id: subChild1.id
+        id: child.id
       },
-      include: {
-        permissions: true
+      data: {
+        parentId: null
       }
     });
 
-    expect(nestedPage?.permissions.length).toBe(2);
+    await setupPermissionsAfterPageRepositioned(child.id);
 
-    const localPermission = nestedPage?.permissions.find(permission => permission.id === subChild1LocalPermission.id);
+    const nestedPage = await getPage(subChild1.id) as IPageWithPermissions;
 
-    expect(localPermission?.inheritedFromPermission).toBeNull();
+    expect(nestedPage.permissions.length).toBe(2);
+
+    const stillHasLocalPermission = nestedPage.permissions.some(permission => {
+      return permission.userId === user.id && permission.inheritedFromPermission === null;
+    });
+
+    expect(stillHasLocalPermission).toBe(true);
 
   });
 });
