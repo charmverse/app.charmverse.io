@@ -5,7 +5,7 @@ import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { getPage, IPageWithPermissions } from '../../lib/pages';
+import { getPage, IPageWithPermissions } from 'lib/pages/server';
 
 let user: User;
 let space: Space;

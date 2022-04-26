@@ -5,7 +5,7 @@ import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatab
 import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { ExpectedAnError } from 'testing/errors';
-import { getPage } from 'lib/pages';
+import { getPage } from 'lib/pages/server';
 import { createPagePermission, inheritPermissions, inheritPermissionsAcrossChildren } from '../page-permission-actions';
 import { CannotInheritOutsideTreeError, CircularPermissionError, InvalidPermissionGranteeError, SelfInheritancePermissionError } from '../errors';
 

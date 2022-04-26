@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { resolveChildPagesAsFlatList } from 'lib/pages';
+import { resolveChildPagesAsFlatList } from 'lib/pages/server';
 import { isTruthy } from 'lib/utilities/types';
 import { PermissionNotFoundError } from '../errors';
 

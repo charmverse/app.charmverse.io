@@ -3,7 +3,7 @@ import { PagePermission, Role, Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { getPage, IPageWithPermissions } from 'lib/pages';
+import { getPage, IPageWithPermissions } from 'lib/pages/server';
 import { createPagePermission } from '../page-permission-actions';
 import { canInheritPermissionsFromParent, hasFullSetOfBasePermissions } from '../refresh-page-permission-tree';
 

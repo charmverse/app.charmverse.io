@@ -1,5 +1,5 @@
 
-import { getPage, IPageWithPermissions } from 'lib/pages';
+import { getPage, IPageWithPermissions } from 'lib/pages/server';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { createPagePermission } from '../../page-permission-actions';
 import { setupPermissionsAfterPagePermissionAdded } from '../page-permission-added';

@@ -1,6 +1,6 @@
 import { PagePermission, PagePermissionLevel, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { resolveChildPagesAsFlatList, resolveParentPages } from 'lib/pages';
+import { resolveChildPagesAsFlatList, resolveParentPages } from 'lib/pages/server';
 import { isTruthy } from 'lib/utilities/types';
 import { CannotInheritOutsideTreeError, InvalidPermissionGranteeError, InvalidPermissionLevelError, PermissionNotFoundError, SelfInheritancePermissionError } from '../errors';
 import { IPagePermissionToCreate, IPagePermissionWithSource } from '../page-permission-interfaces';

@@ -1,5 +1,5 @@
 import { PagePermission } from '@prisma/client';
-import { getPage, IPageWithPermissions, resolveChildPages } from 'lib/pages';
+import { getPage, IPageWithPermissions, resolveChildPages } from 'lib/pages/server';
 import { PermissionNotFoundError } from '../errors';
 import { findExistingPermissionForGroup } from '../actions/find-existing-permission-for-group';
 import { getPagePermission } from '../actions/get-permission';

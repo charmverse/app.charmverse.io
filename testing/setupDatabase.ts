@@ -4,7 +4,7 @@ import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { LoggedInUser } from 'models';
 import { v4 } from 'uuid';
-import { IPageWithPermissions } from 'lib/pages';
+import { IPageWithPermissions } from 'lib/pages/server';
 
 /**
  * Simple utility to provide a user and space object inside test code

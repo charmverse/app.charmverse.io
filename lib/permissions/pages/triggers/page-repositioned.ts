@@ -1,4 +1,4 @@
-import { getPage, IPageWithPermissions, PageNotFoundError, resolveParentPages } from 'lib/pages';
+import { getPage, IPageWithPermissions, PageNotFoundError, resolveParentPages } from 'lib/pages/server';
 import { upsertPermission, findExistingPermissionForGroup, hasSameOrMorePermissions, checkParentForSamePermission } from '../actions';
 
 /**

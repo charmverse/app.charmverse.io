@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import { PageNotFoundError } from './errors';
 import { getPage } from './getPage';
-import { IPageWithPermissions, PageWithChildren } from './interfaces';
+import { IPageWithPermissions, PageWithChildren } from '../interfaces';
 
 /**
  * Returned a flattened list of all a page's children

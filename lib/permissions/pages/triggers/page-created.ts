@@ -1,4 +1,4 @@
-import { getPage, IPageWithPermissions, PageNotFoundError } from 'lib/pages';
+import { getPage, IPageWithPermissions, PageNotFoundError } from 'lib/pages/server';
 import { upsertPermission } from '../actions/upsert-permission';
 
 export async function setupPermissionsAfterPageCreated (pageId: string): Promise<IPageWithPermissions> {

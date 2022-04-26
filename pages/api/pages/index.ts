@@ -3,7 +3,7 @@ import { Page, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { IPageWithPermissions } from 'lib/pages';
+import { IPageWithPermissions } from 'lib/pages/server';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';

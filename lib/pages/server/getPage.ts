@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { IPageWithPermissions } from './interfaces';
+import { IPageWithPermissions } from '../interfaces';
 
 export async function getPage (pageId: string): Promise<IPageWithPermissions | null> {
   return prisma.page.findUnique({

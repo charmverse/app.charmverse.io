@@ -1,5 +1,2 @@
-export * from './interfaces';
-export * from './getPage';
-export * from './errors';
-export * from './resolvePageTree';
 export * from './addPage';
+export * from './interfaces';

@@ -1,4 +1,4 @@
-import { getPage, PageNotFoundError } from 'lib/pages';
+import { getPage, PageNotFoundError } from 'lib/pages/server';
 import { IPagePermissionToCreate } from '../page-permission-interfaces';
 import { findExistingPermissionForGroup } from './find-existing-permission-for-group';
 

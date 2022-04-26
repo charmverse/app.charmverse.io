@@ -1,9 +1,8 @@
 import { PagePermission, Space, User } from '@prisma/client';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { createPagePermission } from 'lib/permissions/pages/page-permission-actions';
-import { getPage } from 'lib/pages';
-import { setupPermissionsAfterPageCreated } from '../page-created';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { PagePermissionLevelType } from '../../page-permission-interfaces';
+import { setupPermissionsAfterPageCreated } from '../page-created';
 
 let user: User;
 let space: Space;

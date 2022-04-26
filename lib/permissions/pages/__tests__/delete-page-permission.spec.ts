@@ -4,7 +4,7 @@ import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatab
 import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { ExpectedAnError } from 'testing/errors';
-import { getPage, IPageWithPermissions } from 'lib/pages';
+import { getPage, IPageWithPermissions } from 'lib/pages/server';
 import { createPagePermission, deletePagePermission, inheritPermissionsAcrossChildren } from '../page-permission-actions';
 import { InvalidPermissionGranteeError, PermissionNotFoundError } from '../errors';
 

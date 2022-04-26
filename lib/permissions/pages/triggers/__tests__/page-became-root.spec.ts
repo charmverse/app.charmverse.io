@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { resolveChildPages } from 'lib/pages';
+import { resolveChildPages } from 'lib/pages/server';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { createPagePermission } from '../../page-permission-actions';
 import { setupPermissionsAfterPageBecameRoot } from '../page-became-root';
