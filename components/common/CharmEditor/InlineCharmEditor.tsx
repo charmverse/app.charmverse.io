@@ -13,7 +13,6 @@ import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
-import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';

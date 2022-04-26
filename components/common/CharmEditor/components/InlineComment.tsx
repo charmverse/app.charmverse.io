@@ -49,6 +49,7 @@ export function inlineCommentSpec (): RawSpecs {
 }
 
 export const InlineCommentPluginKey = new PluginKey('inlineCommentPluginKey');
+
 export function inlineCommentPlugin (): RawPlugins {
   return [
     new Plugin({

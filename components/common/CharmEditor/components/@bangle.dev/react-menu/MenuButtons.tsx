@@ -106,6 +106,7 @@ export function InlineCommentButton({
   ...props
 }: ButtonProps & {menuKey: PluginKey}) {
   const view = useEditorViewContext();
+  
   const onMouseDown = useCallback(
     (e) => {
       e.preventDefault();

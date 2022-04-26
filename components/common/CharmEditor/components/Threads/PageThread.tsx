@@ -82,8 +82,6 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
     }
   }
 
-  console.log(commentContent);
-
   async function editComment () {
     if (thread && editedComment && !isMutating) {
       try {
