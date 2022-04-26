@@ -13,7 +13,7 @@ export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title'
     data: {
       id: boardId,
       title: 'Example title',
-      path: 'demo-path',
+      path: v4(),
       type: 'board',
       contentText: '',
       boardId,
