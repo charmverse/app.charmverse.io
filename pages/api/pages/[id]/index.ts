@@ -71,7 +71,7 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
       id: pageId
     }
   });
-  const deletedChildPageIds = (await deleteNestedChild(pageId, userId));
+  const deletedChildPageIds = await deleteNestedChild(pageId, userId);
   return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
 }
 
