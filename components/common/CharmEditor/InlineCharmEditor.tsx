@@ -8,10 +8,10 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
-import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
+import { BangleEditorState, NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { CSSProperties, ReactNode, memo } from 'react';
+import { CSSProperties, ReactNode, memo, useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
@@ -128,7 +128,7 @@ interface CharmEditorProps {
   style?: CSSProperties;
 }
 
-function CharmEditor (
+export default function CharmEditor (
   { content = defaultContent, children, onContentChange, style, readOnly = false }:
   CharmEditorProps
 ) {
@@ -145,7 +145,7 @@ function CharmEditor (
     }
   }
 
-  const state = useEditorState({
+  const [state, setState] = useState(new BangleEditorState({
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
@@ -156,7 +156,22 @@ function CharmEditor (
     dropCursorOpts: {
       color: 'transparent'
     }
-  });
+  }));
+
+  useEffect(() => {
+    setState(new BangleEditorState({
+      specRegistry,
+      plugins: charmEditorPlugins({
+        onContentChange: _onContentChange,
+        readOnly
+      }),
+      initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
+      // hide the black bar when dragging items - we dont even support dragging most components
+      dropCursorOpts: {
+        color: 'transparent'
+      }
+    }));
+  }, [content]);
 
   return (
     <StyledReactBangleEditor
@@ -192,9 +207,3 @@ function CharmEditor (
     </StyledReactBangleEditor>
   );
 }
-
-export default memo((props: CharmEditorProps) => (
-  <CharmEditor
-    {...props}
-  />
-));

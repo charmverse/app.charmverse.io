@@ -162,7 +162,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
   }
 
   return thread ? (
-    <Box overflow={inline ? 'auto' : 'unset'} id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, maxHeight: inline ? 300 : 'fit-content' }}>
+    <Box overflow={inline ? 'auto' : 'unset'} id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, maxWidth: inline ? 500 : 'inherit', maxHeight: inline ? 300 : 'fit-content' }}>
       <div>
         <Box justifyContent='space-between' display='flex' alignItems='center' mb={1} gap={2}>
           <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
@@ -188,7 +188,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 <LocationOnIcon
                   fontSize='small'
                 />
-          )}
+            )}
               variant='outlined'
               color='secondary'
               size='small'
@@ -301,6 +301,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 )}
                 <InlineCharmEditor
                   readOnly
+                  key={comment.id}
                   content={comment.content as PageContent}
                   style={{
                     paddingLeft: theme.spacing(4)
@@ -312,41 +313,41 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
         })}
       </div>
       {permissions.edit_content && (
-      <Box display='flex' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
+      <Box display='flex' flexDirection='column' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
         <InlineCharmEditor
           style={{
             backgroundColor: theme.palette.background.default,
             padding: theme.spacing(0, 1)
           }}
+          key={editedComment}
           content={commentContent}
           onContentChange={({ doc }) => {
             setCommentContent(doc);
           }}
         />
-        <Button
-          sx={{
-            alignSelf: 'flex-end'
-          }}
-          disabled={isMutating || isEmpty}
-          size='small'
-          onClick={() => editedComment ? editComment() : addComment()}
-        >{editedComment ? 'Edit' : 'Add'}
-        </Button>
-        {editedComment && (
-        <Button
-          sx={{
-            alignSelf: 'flex-end'
-          }}
-          onClick={() => {
-            setCommentContent(defaultCharmEditorContent());
-            setEditedComment(null);
-            setTargetedComment(null);
-          }}
-          color='error'
-          size='small'
-        >Cancel
-        </Button>
-        )}
+        <div>
+          <Button
+            sx={{
+              mr: 1
+            }}
+            disabled={isMutating || isEmpty}
+            size='small'
+            onClick={() => editedComment ? editComment() : addComment()}
+          >{editedComment ? 'Edit' : 'Add'}
+          </Button>
+          {editedComment && (
+          <Button
+            onClick={() => {
+              setCommentContent(defaultCharmEditorContent());
+              setEditedComment(null);
+              setTargetedComment(null);
+            }}
+            color='error'
+            size='small'
+          >Cancel
+          </Button>
+          )}
+        </div>
       </Box>
       )}
       {permissions.edit_content && (
@@ -371,7 +372,10 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Edit</Typography>
         </MenuItem>
         <MenuItem
-          onClick={deleteComment}
+          onClick={(e) => {
+            e.stopPropagation();
+            deleteComment();
+          }}
         >
           <DeleteIcon
             fontSize='small'
