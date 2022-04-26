@@ -1,12 +1,12 @@
 
 import { Space, User } from '@prisma/client';
+import { prisma } from 'db';
+import { getPage, IPageWithPermissions } from 'lib/pages/server';
+import { ExpectedAnError } from 'testing/errors';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { prisma } from 'db';
-import { ExpectedAnError } from 'testing/errors';
-import { getPage, IPageWithPermissions } from 'lib/pages/server';
-import { createPagePermission, deletePagePermission, inheritPermissionsAcrossChildren } from '../page-permission-actions';
-import { InvalidPermissionGranteeError, PermissionNotFoundError } from '../errors';
+import { upsertPermission, deletePagePermission } from '../actions';
+import { PermissionNotFoundError } from '../errors';
 
 let user: User;
 let space: Space;
@@ -26,15 +26,14 @@ describe('deletePagePermission', () => {
     });
 
     const rootPermissions = await Promise.all([
-      createPagePermission(
+      upsertPermission(
+        page.id,
         {
-          pageId: page.id,
           permissionLevel: 'full_access',
           userId: user.id
         }
       ),
-      createPagePermission({
-        pageId: page.id,
+      upsertPermission(page.id, {
         permissionLevel: 'view',
         spaceId: space.id
       })
@@ -65,35 +64,22 @@ describe('deletePagePermission', () => {
     });
 
     const rootPermissions = await Promise.all([
-      createPagePermission(
+      upsertPermission(
+        root.id,
         {
-          pageId: root.id,
           permissionLevel: 'full_access',
           userId: user.id
         }
       ),
-      createPagePermission({
-        pageId: root.id,
+      upsertPermission(root.id, {
         permissionLevel: 'view',
         spaceId: space.id
       })
     ]);
 
     const childPermissions = await Promise.all([
-      createPagePermission(
-        {
-          pageId: child.id,
-          permissionLevel: 'full_access',
-          userId: user.id,
-          inheritedFromPermission: rootPermissions[0].id
-        }
-      ),
-      createPagePermission({
-        pageId: child.id,
-        permissionLevel: 'view',
-        spaceId: space.id,
-        inheritedFromPermission: rootPermissions[1].id
-      })
+      upsertPermission(child.id, rootPermissions[0].id),
+      upsertPermission(child.id, rootPermissions[1].id)
     ]);
 
     await deletePagePermission(rootPermissions[0].id);
@@ -147,27 +133,17 @@ describe('deletePagePermission', () => {
       title: 'Nested'
     });
 
-    const rootPermission = await createPagePermission({
+    const rootPermission = await upsertPermission(rootPage.id, {
       permissionLevel: 'full_access',
-      pageId: rootPage.id,
       spaceId: space.id
     });
 
     const rootPermissionId = rootPermission.id;
 
     await Promise.all([
-      createPagePermission({
-        pageId: childPage.id,
-        inheritedFromPermission: rootPermissionId
-      }),
-      createPagePermission({
-        pageId: nestedChildPage.id,
-        inheritedFromPermission: rootPermissionId
-      }),
-      createPagePermission({
-        pageId: superNestedChildPage.id,
-        inheritedFromPermission: rootPermissionId
-      })
+      upsertPermission(childPage.id, rootPermissionId),
+      upsertPermission(nestedChildPage.id, rootPermissionId),
+      upsertPermission(superNestedChildPage.id, rootPermissionId)
     ]);
 
     const nestedChildWithPermissions = (await getPage(nestedChildPage.id) as IPageWithPermissions);
