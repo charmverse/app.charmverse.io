@@ -58,7 +58,7 @@ async function removePagePermission (req: NextApiRequest, res: NextApiResponse) 
 
   const { permissionId } = req.body as IPagePermissionToDelete;
 
-  await deletePagePermission(req.body.permissionId);
+  await deletePagePermission(permissionId);
 
   return res.status(200).json({
     success: true
