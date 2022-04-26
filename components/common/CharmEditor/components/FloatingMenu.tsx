@@ -12,7 +12,7 @@ import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
 import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
-import { queryIsSelectionAroundInlineComment } from './InlineComment';
+import { queryIsSelectionAroundInlineComment } from './inlineComment';
 
 export default function FloatingMenuComponent ({ pluginKey, inline = false }: {pluginKey: PluginKey, inline?: boolean}) {
   const { showMessage } = useSnackbar();

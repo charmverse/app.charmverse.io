@@ -22,7 +22,7 @@ import {
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import React, { useCallback } from 'react';
-import { createInlineComment, queryIsInlineCommentActive, toggleInlineComment } from '../../InlineComment';
+import { createInlineComment, queryIsInlineCommentActive, toggleInlineComment } from '../../inlineComment';
 import { MenuButton } from './Icon';
 import CommentIcon from '@mui/icons-material/Comment';
 import { toggleSubMenu } from './floating-menu';

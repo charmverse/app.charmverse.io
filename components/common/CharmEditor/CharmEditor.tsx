@@ -44,11 +44,11 @@ import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
-import { inlineCommentSpec, inlineCommentPlugin, InlineCommentThread } from './components/InlineComment';
 import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 import * as table from './components/table';
 import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
+import InlineCommentThread, * as inlineComment from './components/inlineComment';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -67,7 +67,7 @@ export const specRegistry = new SpecRegistry([
   //
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
-  inlineCommentSpec(),
+  inlineComment.spec(),
   bold.spec(), // OK
   bulletList.spec(), // OK
   hardBreak.spec(), // OK
@@ -125,7 +125,7 @@ export function charmEditorPlugins (
         }
       })
     }),
-    inlineCommentPlugin(),
+    inlineComment.plugin(),
     suggestTooltipPlugins({
       tooltipRenderOpts: {
         placement: 'bottom'

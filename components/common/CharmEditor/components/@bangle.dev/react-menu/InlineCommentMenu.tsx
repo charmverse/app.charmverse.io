@@ -10,7 +10,7 @@ import { PageContent } from 'models';
 import { PluginKey, TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
 import { mutate } from 'swr';
-import { updateInlineComment } from '../../InlineComment';
+import { updateInlineComment } from '../../inlineComment';
 
 export function InlineCommentSubMenu({pluginKey}: {pluginKey: PluginKey}) {
   const theme = useTheme()
