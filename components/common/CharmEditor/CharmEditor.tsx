@@ -323,7 +323,7 @@ function CharmEditor (
             return <LayoutRow node={props.node}>{_children}</LayoutRow>;
           }
           case 'columnBlock': {
-            return <LayoutColumn node={props.node}>{_children}</LayoutColumn>;
+            return <LayoutColumn attrs={props.attrs} updateAttrs={props.updateAttrs} node={props.node}>{_children}</LayoutColumn>;
           }
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency, quote: null | FiatCurrency };

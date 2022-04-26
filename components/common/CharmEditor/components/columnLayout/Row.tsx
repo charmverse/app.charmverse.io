@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { ReactNode, memo } from 'react';
 
 // grid-template-columns: repeat(${({ colCount }) => `${colCount}, ${Math.floor(100 / colCount)}`}fr);
-const StyledColumnLayout = styled.div<{colCount: number}>`
+const StyledRow = styled.div<{colCount: number}>`
 
   & > .bangle-nv-child-container {
     height: 100%;
@@ -17,13 +17,14 @@ const StyledColumnLayout = styled.div<{colCount: number}>`
   }
 `;
 
-function ColumnLayout ({ children, node }: {node: Node, children: ReactNode}) {
+function Row ({ children, node }: {node: Node, children: ReactNode}) {
   const totalChildren = (node.content as any)?.content?.length ?? 3;
+  console.log(node.content?.content);
   return (
-    <StyledColumnLayout colCount={totalChildren}>
+    <StyledRow colCount={totalChildren}>
       {children}
-    </StyledColumnLayout>
+    </StyledRow>
   );
 }
 
-export default memo(ColumnLayout);
+export default memo(Row);

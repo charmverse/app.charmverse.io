@@ -1,6 +1,7 @@
 import { Node } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
-import { ReactNode, memo } from 'react';
+import { ReactNode, memo, useCallback, useState } from 'react';
+import HorizontalResizer from '../Resizable/HorizontalResizer';
 
 const StyledColumnBlock = styled.div`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
@@ -23,11 +24,43 @@ const StyledColumnBlock = styled.div`
   }
 `;
 
-function ColumnBlock ({ children, node }: {node: Node, children: ReactNode}) {
+interface Props { attrs?: { width?: number }, node: Node, children: ReactNode, updateAttrs: (attrs: any) => void }
+
+function ColumnBlock ({ children, node, attrs = {}, updateAttrs }: Props) {
+
+  const [size, setSize] = useState(attrs.width || 100);
+  const onResizeStopCallback = useCallback((_, data) => {
+    console.log('resized', data.size);
+    updateAttrs({
+      width: data.size.width
+    });
+    // if (onResizeStop) {
+    //   onResizeStop(view);
+    // }
+  }, []);
+
+  const onResizeCallback = useCallback((_, data) => {
+    if (typeof data.size.width === 'number') {
+      setSize(data.size.width);
+      console.log('width', data.size.width);
+      updateAttrs({
+        width: data.size.width
+      });
+    }
+  }, []);
+
   return (
     <StyledColumnBlock>
       <div>
-        {children}
+        <HorizontalResizer
+          onResizeStop={onResizeStopCallback}
+          width={size}
+          minWidth={60}
+          maxWidth={400}
+          onResize={onResizeCallback}
+        >
+          {children}
+        </HorizontalResizer>
       </div>
     </StyledColumnBlock>
   );
