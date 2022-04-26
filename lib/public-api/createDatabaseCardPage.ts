@@ -11,6 +11,7 @@ export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title'
 
   const database = await prisma.page.create({
     data: {
+      id: boardId,
       title: 'Example title',
       path: 'demo-path',
       type: 'board',
