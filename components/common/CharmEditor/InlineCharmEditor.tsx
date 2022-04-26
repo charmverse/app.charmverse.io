@@ -77,7 +77,7 @@ export function charmEditorPlugins (
       key: mentionSuggestPluginKey
     }),
     floatingMenuPlugin({
-      menuKey: floatingMenuPluginKey,
+      key: floatingMenuPluginKey,
       readOnly
     }),
     NodeView.createPlugin({
@@ -182,7 +182,7 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu pluginKey={floatingMenuPluginKey} />
+      <FloatingMenu inline pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionSuggestPluginKey} />
       <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
       {children}

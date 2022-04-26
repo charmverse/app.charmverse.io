@@ -311,7 +311,7 @@ export function Mention ({ node }: NodeViewProps) {
     <Box
       component='span'
       sx={{
-        padding: theme.spacing(0.5, 0.5),
+        padding: theme.spacing(0, 0.5),
         borderRadius: theme.spacing(0.5),
         fontWeight: 600,
         opacity: 0.75,

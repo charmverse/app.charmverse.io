@@ -99,7 +99,7 @@ export function nestedPagePlugins () {
       renderOpts: {
         ...tooltipRenderOpts,
         tooltipDOMSpec,
-        getReferenceElement: referenceElement((state) => {
+        getReferenceElement: referenceElement(NestedPagePluginKey, (state) => {
           const { selection } = state;
           return {
             end: selection.to,

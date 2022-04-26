@@ -19,6 +19,17 @@ export default function FloatingMenuComponent ({ pluginKey, inline = false }: {p
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
 
+  const inlineFormatButtons = (
+    <>
+      <BoldButton />
+      <ItalicButton />
+      <CodeButton />
+      <StrikeButton />
+      <UnderlineButton />
+      <FloatingLinkButton menuKey={pluginKey} />
+      {!inline && permissions.edit_content && <InlineCommentButton menuKey={pluginKey} />}
+    </>
+  );
   return (
     <FloatingMenu
       menuKey={pluginKey}
@@ -26,15 +37,11 @@ export default function FloatingMenuComponent ({ pluginKey, inline = false }: {p
         if (type === 'defaultMenu') {
           return (
             <Menu>
-              <MenuGroup>
-                <BoldButton />
-                <ItalicButton />
-                <CodeButton />
-                <StrikeButton />
-                <UnderlineButton />
-                <FloatingLinkButton menuKey={pluginKey} />
-                {!inline && permissions.edit_content && <InlineCommentButton menuKey={pluginKey} />}
-              </MenuGroup>
+              {!inline ? (
+                <MenuGroup>
+                  {inlineFormatButtons}
+                </MenuGroup>
+              ) : inlineFormatButtons}
               {!inline && (
               <MenuGroup isLastGroup>
                 <ParagraphButton />
@@ -67,9 +74,9 @@ export default function FloatingMenuComponent ({ pluginKey, inline = false }: {p
   );
 }
 
-export const floatingMenuPlugin = ({ menuKey, readOnly }:{menuKey: PluginKey, readOnly?: boolean}) => {
+export const floatingMenuPlugin = ({ key, readOnly }:{key: PluginKey, readOnly?: boolean}) => {
   return floatingMenu.plugins({
-    key: menuKey,
+    key,
     calculateType: (state) => {
       if (readOnly) {
         return null;

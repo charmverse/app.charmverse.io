@@ -158,7 +158,7 @@ export function charmEditorPlugins (
       key: mentionSuggestPluginKey
     }),
     floatingMenuPlugin({
-      menuKey: floatingMenuPluginKey,
+      key: floatingMenuPluginKey,
       readOnly
     }),
     callout.plugins(),
