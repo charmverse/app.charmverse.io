@@ -599,7 +599,7 @@ export function updateSuggestTooltipCounter(
 export interface SuggestTooltipPluginState {
   show: boolean;
   tooltipContentDOM: HTMLElement
-  component: "nestedPage" | "inlineComment"
+  component: null | "nestedPage" | "inlineComment"
   threadId: null | string
 }
 
@@ -643,6 +643,8 @@ export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPlug
             }
             return {
               ...pluginState,
+              component: null,
+              threadId: null,
               show: false,
             };
           }

@@ -30,6 +30,8 @@ import { markdownSerializer } from '@bangle.dev/markdown';
 import { PageContent } from 'models';
 import { Node } from '@bangle.dev/pm';
 import ListItemText from '@mui/material/ListItemText';
+import { hideSuggestionsTooltip, SuggestTooltipPluginKey } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
+import { useEditorViewContext } from '@bangle.dev/react';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -57,7 +59,6 @@ export default function Header (
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
-
   const currentPage = currentPageId ? pages[currentPageId] : undefined;
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);

@@ -65,7 +65,7 @@ export function inlineCommentPlugin (): RawPlugins {
             const isShowingCommentThreadsList = pageThreadListNode?.children.length !== 0;
             const threadId = inlineCommentMark?.attrs.id;
             if (threadId) {
-              // If we are showing the thread list on the right, then navigate to the appropriate thread
+              // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
               if (isShowingCommentThreadsList && threadId) {
                 const threadDocument = document.getElementById(`thread.${threadId}`);
                 if (threadDocument) {

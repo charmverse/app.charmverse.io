@@ -20,7 +20,6 @@ export const ThreadsContext = createContext<Readonly<IContext>>({
 export function ThreadsProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const [threads, setThreads] = useState<Record<string, ThreadWithComments | undefined>>({});
-  const router = useRouter();
 
   const { data } = useSWR(() => currentPageId ? `pages/${currentPageId}/threads` : null, () => charmClient.getPageThreads(currentPageId), { refreshInterval });
   useEffect(() => {
@@ -30,7 +29,7 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
   const value: IContext = useMemo(() => ({
     threads,
     setThreads
-  }), [currentPageId, threads, router]);
+  }), [currentPageId, threads, setThreads]);
 
   return (
     <ThreadsContext.Provider value={value}>

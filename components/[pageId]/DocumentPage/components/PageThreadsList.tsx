@@ -1,4 +1,4 @@
-import { Box, BoxProps, List, MenuItem, Paper, Select, SelectProps, Typography } from '@mui/material';
+import { Box, BoxProps, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
 import PageThread from 'components/common/CharmEditor/components/Threads/PageThread';
 import { useThreads } from 'hooks/useThreads';
 import { useState } from 'react';

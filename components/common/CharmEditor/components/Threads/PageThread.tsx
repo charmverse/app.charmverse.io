@@ -135,7 +135,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       try {
         await charmClient.deleteThread(thread.id);
         delete threads[thread.id];
-        setThreads(threads);
+        setThreads({ ...threads });
         removeInlineCommentMark();
       }
       catch (_) {
@@ -153,6 +153,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
             {new Date(thread.createdAt).toLocaleString()}
           </Typography>
           <Box display='flex' gap={1}>
+            {/* Find button should not be present for inline thread  */ !inline && (
             <Button
               onClick={() => {
                 const threadDocument = document.getElementById(`inline-comment.${threadId}`);
@@ -177,6 +178,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
               size='small'
             >Find
             </Button>
+            )}
             <Button
               disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
               onClick={resolveThread}
