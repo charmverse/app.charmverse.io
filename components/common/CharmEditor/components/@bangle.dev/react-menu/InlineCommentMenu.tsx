@@ -4,6 +4,7 @@ import { Box, Button } from '@mui/material';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
+import { MenuInput } from 'components/common/MenuInput';
 import { usePages } from 'hooks/usePages';
 import { PageContent } from 'models';
 import { TextSelection } from 'prosemirror-state';
@@ -23,6 +24,7 @@ export function InlineCommentSubMenu() {
     ]
   });
   const {currentPageId} = usePages()
+  const inputRef = useRef<HTMLInputElement>(null);
   const isEmpty = checkForEmpty(commentContent);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!isEmpty) {

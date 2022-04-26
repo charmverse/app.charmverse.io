@@ -12,7 +12,6 @@ import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placeme
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import log from 'lib/log';
-import { pluginKey } from '../../emojiSuggest/emojiSuggest.constants';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -172,7 +171,7 @@ function pluginsFactory({
         stateKey: key,
         renderOpts: {
           ...tooltipRenderOpts,
-          getReferenceElement: referenceElement((state: EditorState) => {
+          getReferenceElement: referenceElement(key, (state: EditorState) => {
             const markType = schema.marks[markName];
             const { selection } = state;
             return findFirstMarkPosition(
@@ -206,6 +205,7 @@ function pluginsFactory({
 }
 
 export function referenceElement(
+  pluginKey: PluginKey,
   getActiveMarkPos: (state: EditorState) => { start: number; end: number },
 ): GetReferenceElementFunction {
   return (view) => {
@@ -657,7 +657,7 @@ export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPlug
       renderOpts: {
         ...tooltipRenderOpts,
         tooltipDOMSpec,
-        getReferenceElement: referenceElement((state) => {
+        getReferenceElement: referenceElement(SuggestTooltipPluginKey, (state) => {
           const { selection } = state;
           return {
             end: selection.to,

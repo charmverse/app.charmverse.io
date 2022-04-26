@@ -9,14 +9,13 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
-import { EditorView, Node } from '@bangle.dev/pm';
+import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
-import { useTheme } from '@emotion/react';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
 import MentionSuggest, { Mention, mentionPlugins, mentionSpecs } from './components/Mention';
@@ -26,6 +25,9 @@ export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
 }
+
+const emojiSuggestPluginKey = new PluginKey('emojiSuggest');
+const mentionSuggestPluginKey = new PluginKey('mentionSuggest');
 
 export const specRegistry = new SpecRegistry([
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
@@ -67,8 +69,12 @@ export function charmEditorPlugins (
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),
-    emojiPlugins(),
-    mentionPlugins(),
+    emojiPlugins({
+      key: emojiSuggestPluginKey
+    }),
+    mentionPlugins({
+      key: mentionSuggestPluginKey
+    }),
     floatingMenuPlugin(readOnly),
     NodeView.createPlugin({
       name: 'mention',
@@ -119,7 +125,6 @@ function CharmEditor (
   { content = defaultContent, children, onContentChange, style, readOnly = false }:
   CharmEditorProps
 ) {
-  const theme = useTheme();
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
@@ -174,8 +179,8 @@ function CharmEditor (
       }}
     >
       <FloatingMenu />
-      <MentionSuggest />
-      <EmojiSuggest />
+      <MentionSuggest pluginKey={mentionSuggestPluginKey} />
+      <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
       {children}
     </StyledReactBangleEditor>
   );

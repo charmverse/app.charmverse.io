@@ -20,17 +20,16 @@ import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'mention';
 
-export const mentionSuggestKey = new PluginKey('mentionSuggestKey');
 export const mentionSuggestMarkName = 'mentionSuggest';
 export const mentionTrigger = '@';
 
-function pluginsFactory ({
+export function mentionPlugins ({
   key = new PluginKey('emojiSuggestMenu'),
-  markName,
+  markName = mentionSuggestMarkName,
   tooltipRenderOpts = {}
 }: {
-  markName: string;
-  key?: PluginKey;
+  markName?: string;
+  key: PluginKey;
   tooltipRenderOpts?: SuggestTooltipRenderOpts;
 }) {
   return ({
@@ -127,16 +126,6 @@ export function mentionSpecs (): RawSpecs {
   ];
 }
 
-export function mentionPlugins () {
-  return pluginsFactory({
-    key: mentionSuggestKey,
-    markName: mentionSuggestMarkName,
-    tooltipRenderOpts: {
-      placement: 'bottom'
-    }
-  });
-}
-
 export function selectMention (key: PluginKey, mentionValue: string, mentionType: string): Command {
   return (state, dispatch, view) => {
     const mentionNode = state.schema.nodes.mention.create({
@@ -154,35 +143,35 @@ export function selectMention (key: PluginKey, mentionValue: string, mentionType
   };
 }
 
-function MentionSuggest () {
+function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey}) {
 
-  const { suggestTooltipKey } = usePluginState(mentionSuggestKey);
+  const { suggestTooltipKey } = usePluginState(pluginKey);
 
   const { show: isVisible } = usePluginState(suggestTooltipKey);
 
   if (isVisible) {
-    return <MentionSuggestMenu />;
+    return <MentionSuggestMenu pluginKey={pluginKey} />;
   }
   return null;
 }
 
-function MentionSuggestMenu () {
+function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
   const [contributors] = useContributors();
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
     suggestTooltipKey
-  } = usePluginState(mentionSuggestKey);
+  } = usePluginState(pluginKey);
   const { pages } = usePages();
 
   const theme = useTheme();
 
   const onSelectMention = useCallback(
     (value: string, type: string) => {
-      selectMention(mentionSuggestKey, value, type)(view.state, view.dispatch, view);
+      selectMention(pluginKey, value, type)(view.state, view.dispatch, view);
       hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
     },
-    [view, mentionSuggestKey]
+    [view, pluginKey]
   );
 
   const contributorsList = (

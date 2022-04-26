@@ -15,7 +15,7 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
-import { EditorView, Node } from '@bangle.dev/pm';
+import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { useState, CSSProperties, ReactNode, memo, RefObject } from 'react';
 import styled from '@emotion/styled';
@@ -54,6 +54,9 @@ export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
 }
+
+const emojiSuggestPluginKey = new PluginKey('emojiSuggest');
+const mentionSuggestPluginKey = new PluginKey('mentionSuggest');
 
 export const specRegistry = new SpecRegistry([
   // Comments to the right of each spec show if it supports markdown export
@@ -147,8 +150,12 @@ export function charmEditorPlugins (
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),
-    emojiPlugins(),
-    mentionPlugins(),
+    emojiPlugins({
+      key: emojiSuggestPluginKey
+    }),
+    mentionPlugins({
+      key: mentionSuggestPluginKey
+    }),
     floatingMenuPlugin(readOnly),
     callout.plugins(),
     NodeView.createPlugin({
@@ -424,10 +431,9 @@ function CharmEditor (
       }}
     >
       <FloatingMenu />
-      <MentionSuggest />
-
+      <MentionSuggest pluginKey={mentionSuggestPluginKey} />
       <NestedPagesList />
-      <EmojiSuggest />
+      <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
       <InlinePalette />
       {children}
       {commentThreadsListRef?.current && showingCommentThreadsList && (
