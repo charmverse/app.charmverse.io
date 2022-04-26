@@ -1,18 +1,27 @@
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { SuggestTooltipPluginKey, SuggestTooltipPluginState } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
+import { useEditorViewContext } from '@bangle.dev/react';
+import { findChildrenByMark } from 'prosemirror-utils';
 
 export function useInlineComment () {
   const view = useEditorViewContext();
-  const {
-    threadId
-  } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
 
   return {
-    removeInlineCommentMark () {
-      if (threadId) {
-        const [from, to] = [view.state.selection.$from.start(), view.state.selection.$to.end()];
-        const inlineCommentMark = view.state.schema.marks['inline-comment'];
-        const tr = view.state.tr.removeMark(from, to, inlineCommentMark);
+    removeInlineCommentMark (threadId: string) {
+      const doc = view.state.doc;
+      const inlineCommentMarkSchema = view.state.schema.marks['inline-comment'];
+      const inlineCommentNodes = findChildrenByMark(doc, inlineCommentMarkSchema);
+      const inlineCommentNode = inlineCommentNodes.find(({ node }) => {
+        // Find the inline comment mark for the node
+        const inlineCommentMark = node.marks.find(mark => mark.type.name === inlineCommentMarkSchema.name);
+        if (inlineCommentMark) {
+          // Make sure the mark has the same threadId as the given one
+          return inlineCommentMark.attrs.id === threadId;
+        }
+        return false;
+      });
+      if (inlineCommentNode) {
+        const from = inlineCommentNode.pos;
+        const to = from + inlineCommentNode.node.nodeSize;
+        const tr = view.state.tr.removeMark(from, to, inlineCommentMarkSchema);
         if (view.dispatch) {
           view.dispatch(tr);
         }

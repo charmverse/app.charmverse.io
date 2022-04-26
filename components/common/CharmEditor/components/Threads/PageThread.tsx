@@ -120,7 +120,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
             ...thread,
             resolved: !thread.resolved
           } }));
-        removeInlineCommentMark();
+        removeInlineCommentMark(thread.id);
       }
       catch (_) {
         //
@@ -136,7 +136,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
         await charmClient.deleteThread(thread.id);
         delete threads[thread.id];
         setThreads({ ...threads });
-        removeInlineCommentMark();
+        removeInlineCommentMark(thread.id);
       }
       catch (_) {
         //
