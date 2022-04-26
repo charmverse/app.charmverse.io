@@ -141,9 +141,7 @@ export default function Header (
               <Tooltip title='Show comment threads' arrow placement='bottom'>
                 <IconButton
                   onClick={() => {
-                    if (Object.keys(threads).length !== 0) {
-                      setShowingCommentThreadsList(!showingCommentThreadsList);
-                    }
+                    setShowingCommentThreadsList(!showingCommentThreadsList);
                   }}
                   size='small'
                   disableRipple

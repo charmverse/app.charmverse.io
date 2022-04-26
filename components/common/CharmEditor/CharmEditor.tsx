@@ -237,7 +237,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
     background-color: ${({ theme }) => theme.palette.background.light};
   }
 
-  .charm-inline-comment {
+  .charm-inline-comment.active {
     background: rgba(255,212,0,0.14);
     border-bottom: 2px solid rgb(255, 212, 0);
     padding-bottom: 2px;

@@ -120,7 +120,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
             ...thread,
             resolved: !thread.resolved
           } }));
-        removeInlineCommentMark(thread.id);
+        removeInlineCommentMark(thread.id, true);
       }
       catch (_) {
         //

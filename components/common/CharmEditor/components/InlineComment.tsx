@@ -21,6 +21,9 @@ export function highlightSpec (): RawSpecs {
       attrs: {
         id: {
           default: null
+        },
+        resolved: {
+          default: false
         }
       },
       parseDOM: [
@@ -28,7 +31,7 @@ export function highlightSpec (): RawSpecs {
           tag: 'span.charm-inline-comment'
         }
       ],
-      toDOM: (mark): DOMOutputSpec => ['span', { class: 'charm-inline-comment', id: `inline-comment.${mark.attrs.id}` }]
+      toDOM: (mark): DOMOutputSpec => ['span', { class: `charm-inline-comment ${mark.attrs.resolved ? 'resolved' : 'active'}`, id: `inline-comment.${mark.attrs.id}` }]
     },
     markdown: {
       // TODO: Fix convert to markdown
@@ -66,7 +69,9 @@ export function inlineCommentPlugin (): RawPlugins {
             const threadId = inlineCommentMark?.attrs.id;
             if (threadId) {
               // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
-              if (isShowingCommentThreadsList && threadId) {
+              if (isShowingCommentThreadsList) {
+                // Use regular dom methods as we have no access to a ref inside a plugin
+                // Plus this is only a cosmetic change which doesn't impact any of the state
                 const threadDocument = document.getElementById(`thread.${threadId}`);
                 if (threadDocument) {
                   threadDocument?.scrollIntoView({
@@ -74,6 +79,7 @@ export function inlineCommentPlugin (): RawPlugins {
                   });
                   threadDocument.style.backgroundColor = 'rgba(46, 170, 220, 0.2)';
                   threadDocument.style.transition = 'background-color 250ms ease-in-out';
+                  // Remove the highlight after 500 ms
                   setTimeout(() => {
                     threadDocument.style.removeProperty('background-color');
                     threadDocument.style.transition = 'background-color 250ms ease-in-out';
@@ -81,6 +87,7 @@ export function inlineCommentPlugin (): RawPlugins {
                 }
               }
               else {
+                // If the page thread list isn't open, then we need to show the inline thread component
                 renderSuggestionsTooltip(SuggestTooltipPluginKey, {
                   component: 'inlineComment',
                   threadId
