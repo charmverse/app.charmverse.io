@@ -53,6 +53,11 @@ async function startThread (req: NextApiRequest, res: NextApiResponse) {
           id: thread.id
         }
       },
+      page: {
+        connect: {
+          id: pageId
+        }
+      },
       user: {
         connect: {
           id: userId

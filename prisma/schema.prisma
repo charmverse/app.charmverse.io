@@ -85,6 +85,7 @@ model Page {
   cardId        String?          @unique @db.Uuid
   card          Block?           @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   Thread        Thread[]
+  Comment       Comment[]
 }
 
 // focalboard blocks
@@ -355,7 +356,9 @@ model Comment {
   createdAt DateTime @default(now())
   threadId  String   @db.Uuid
   thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  content   String
+  content   Json?
   userId    String   @db.Uuid
   user      User     @relation(fields: [userId], references: [id])
+  pageId    String   @db.Uuid
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
 }

@@ -15,8 +15,9 @@ CREATE TABLE "Comment" (
     "id" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "threadId" UUID NOT NULL,
-    "content" TEXT NOT NULL,
+    "content" JSONB,
     "userId" UUID NOT NULL,
+    "pageId" UUID NOT NULL,
 
     CONSTRAINT "Comment_pkey" PRIMARY KEY ("id")
 );
@@ -26,6 +27,9 @@ ALTER TABLE "Thread" ADD CONSTRAINT "Thread_pageId_fkey" FOREIGN KEY ("pageId") 
 
 -- AddForeignKey
 ALTER TABLE "Thread" ADD CONSTRAINT "Thread_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Comment" ADD CONSTRAINT "Comment_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "Page"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Comment" ADD CONSTRAINT "Comment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

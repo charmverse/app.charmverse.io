@@ -44,7 +44,7 @@ import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
-import { highlightSpec, inlineCommentPlugin, InlineCommentThread } from './components/InlineComment';
+import { inlineCommentSpec, inlineCommentPlugin, InlineCommentThread } from './components/InlineComment';
 import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 import * as table from './components/table';
 import { checkForEmpty } from './utils';
@@ -63,7 +63,7 @@ export const specRegistry = new SpecRegistry([
   //
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
-  highlightSpec(),
+  inlineCommentSpec(),
   bold.spec(), // OK
   bulletList.spec(), // OK
   hardBreak.spec(), // OK

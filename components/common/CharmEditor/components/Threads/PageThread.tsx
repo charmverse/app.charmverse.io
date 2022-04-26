@@ -49,7 +49,8 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
         setIsMutating(true);
         const comment = await charmClient.addComment({
           content: commentText,
-          threadId: thread.id
+          threadId: thread.id,
+          pageId: currentPageId
         });
 
         setThreads((_threads) => ({ ..._threads,
@@ -191,7 +192,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 <CheckIcon
                   fontSize='small'
                 />
-          )}
+              )}
               variant='outlined'
               color='secondary'
               size='small'
