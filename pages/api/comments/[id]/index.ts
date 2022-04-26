@@ -5,6 +5,7 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -14,7 +15,7 @@ handler.use(requireUser)
 
 async function editComment (req: NextApiRequest, res: NextApiResponse) {
   const { content } = req.body as {
-    content: string,
+    content: PageContent,
   };
 
   const commentId = req.query.id as string;

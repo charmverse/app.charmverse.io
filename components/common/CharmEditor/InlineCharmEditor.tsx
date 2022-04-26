@@ -8,22 +8,19 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
-import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
+import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { useState, CSSProperties, ReactNode, memo } from 'react';
+import { CSSProperties, ReactNode, memo } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
-import { markdownSerializer } from '@bangle.dev/markdown';
+import { useTheme } from '@emotion/react';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
 import MentionSuggest, { Mention, mentionPlugins, mentionSpecs } from './components/Mention';
-import Placeholder from './components/Placeholder';
 import * as tabIndent from './components/tabIndent';
-import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
-import { checkForEmpty } from './utils';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -118,34 +115,11 @@ interface CharmEditorProps {
   style?: CSSProperties;
 }
 
-export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
-
-  const serializer = markdownSerializer(specRegistry);
-
-  const state = new BangleEditorState({
-    specRegistry,
-    initialValue: Node.fromJSON(specRegistry.schema, content) ?? ''
-  });
-
-  let markdown = serializer.serialize(state.pmState.doc);
-
-  if (title) {
-    const pageTitleAsMarkdown = `# ${title}`;
-
-    markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
-  }
-
-  return markdown;
-}
-
 function CharmEditor (
   { content = defaultContent, children, onContentChange, style, readOnly = false }:
   CharmEditorProps
 ) {
-  // check empty state of page on first load
-  const _isEmpty = checkForEmpty(content);
-  const [isEmpty, setIsEmpty] = useState(_isEmpty);
-
+  const theme = useTheme();
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
@@ -154,7 +128,6 @@ function CharmEditor (
 
   function _onContentChange (view: EditorView) {
     // @ts-ignore missing types from the @bangle.dev/react package
-    setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view);
     }
@@ -184,7 +157,6 @@ function CharmEditor (
       pmViewOpts={{
         editable: () => !readOnly
       }}
-      placeholderComponent={<Placeholder show={isEmpty} />}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
         switch (props.node.type.name) {

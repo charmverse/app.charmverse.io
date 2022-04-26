@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Typography, Button, ListItem, IconButton, TextField, Menu, MenuItem } from '@mui/material';
+import { Typography, Button, ListItem, IconButton, Menu, MenuItem } from '@mui/material';
 import { useTheme } from '@emotion/react';
 import { Box } from '@mui/system';
 import charmClient from 'charmClient';
@@ -18,7 +18,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { PageContent } from 'models';
 import InlineCharmEditor from '../../InlineCharmEditor';
+import { checkForEmpty } from '../../utils';
 
 const ContextBorder = styled.div`
   width: 3px;
@@ -30,12 +32,22 @@ const ContextBorder = styled.div`
   padding-bottom: 2px;
 `;
 
+const defaultCharmEditorContent = {
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph'
+    }
+  ]
+};
+
 export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(({ threadId, inline = true }, ref) => {
   const { threads, setThreads } = useThreads();
   const [user] = useUser();
   const thread = threadId && threads[threadId];
   const theme = useTheme();
-  const [commentText, setCommentText] = useState('');
+  const [commentContent, setCommentContent] = useState<PageContent>(defaultCharmEditorContent);
+  const isEmpty = checkForEmpty(commentContent);
   const [isMutating, setIsMutating] = useState(false);
   const [editedComment, setEditedComment] = useState<null | string>(null);
   const [targetedComment, setTargetedComment] = useState<null | string>(null);
@@ -49,7 +61,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       try {
         setIsMutating(true);
         const comment = await charmClient.addComment({
-          content: commentText,
+          content: commentContent,
           threadId: thread.id,
           pageId: currentPageId
         });
@@ -63,7 +75,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       catch (_) {
         //
       }
-      setCommentText('');
+      setCommentContent(defaultCharmEditorContent);
       setIsMutating(false);
     }
   }
@@ -72,17 +84,17 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
     if (thread && editedComment && !isMutating) {
       try {
         setIsMutating(true);
-        await charmClient.editComment(editedComment, commentText);
+        await charmClient.editComment(editedComment, commentContent);
         setThreads((_threads) => ({ ..._threads,
           [thread.id]: {
             ...thread,
-            Comment: thread.Comment.map(comment => comment.id === editedComment ? ({ ...comment, content: commentText }) : comment)
+            Comment: thread.Comment.map(comment => comment.id === editedComment ? ({ ...comment, content: commentContent }) : comment)
           } }));
       }
       catch (_) {
         //
       }
-      setCommentText('');
+      setCommentContent(commentContent);
       setEditedComment(null);
       setIsMutating(false);
       setTargetedComment(null);
@@ -269,7 +281,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                   )}
                 </Box>
                 {commentIndex === 0 && (
-                <Box mb={1} pl={4} display='flex'>
+                <Box pl={4} display='flex'>
                   <ContextBorder />
                   <Typography
                     sx={{
@@ -284,9 +296,9 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 )}
                 <InlineCharmEditor
                   readOnly
-                  content={comment.content}
+                  content={comment.content as PageContent}
                   style={{
-                    paddingLeft: 4
+                    paddingLeft: theme.spacing(4)
                   }}
                 />
               </ListItem>
@@ -296,21 +308,21 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       </Box>
       {permissions.edit_content && (
       <Box display='flex' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
-        <TextField
-          InputProps={{
-            className: 'PageThread-TextField-input'
+        <InlineCharmEditor
+          style={{
+            backgroundColor: theme.palette.background.default,
+            padding: theme.spacing(0.5, 1)
           }}
-          placeholder='Add a comment...'
-          fullWidth
-          size='small'
-          onChange={(e) => setCommentText(e.target.value)}
-          value={commentText}
+          content={commentContent}
+          onContentChange={({ doc }) => {
+            setCommentContent(doc);
+          }}
         />
-        <Button disabled={isMutating || commentText.length === 0} size='small' onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
+        <Button disabled={isMutating || isEmpty} size='small' onClick={() => editedComment ? editComment() : addComment()}>{editedComment ? 'Edit' : 'Add'}</Button>
         {editedComment && (
         <Button
           onClick={() => {
-            setCommentText('');
+            setCommentContent(defaultCharmEditorContent);
             setEditedComment(null);
             setTargetedComment(null);
           }}
@@ -328,7 +340,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
             const comment = thread.Comment.find(_comment => _comment.id === targetedComment);
             if (comment) {
               setEditedComment(comment.id);
-              setCommentText(comment.content);
+              setCommentContent(comment.content as PageContent);
               popupState.close();
             }
           }}

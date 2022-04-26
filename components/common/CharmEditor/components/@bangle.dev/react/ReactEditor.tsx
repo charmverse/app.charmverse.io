@@ -87,7 +87,7 @@ export const BangleEditor = React.forwardRef<
     return (
       <React.Fragment>
         <EditorViewContext.Provider value={editor?.view as any}>
-          <div>
+          <div className="bangle-editor-core">
             {editor ? children : null}
             <div ref={renderRef} id={id} className={className} style={style} />
             {editor ? placeholderComponent : null}

@@ -5,6 +5,7 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -12,7 +13,7 @@ handler.use(requireUser)
   .post(requireKeys(['content'], 'body'), addComment);
 
 export interface AddCommentRequest {
-  content: string
+  content: PageContent
   threadId: string
   pageId: string
 }

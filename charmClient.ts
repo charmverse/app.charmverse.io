@@ -5,7 +5,7 @@ import * as http from 'adapters/http';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
-import { BountyWithDetails, Contributor, LoggedInUser } from 'models';
+import { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -525,7 +525,7 @@ class CharmClient {
     return http.POST('/api/comments', request);
   }
 
-  editComment (commentId: string, content: string): Promise<CommentWithUser> {
+  editComment (commentId: string, content: PageContent): Promise<CommentWithUser> {
     return http.PUT(`/api/comments/${commentId}`, { content });
   }
 
