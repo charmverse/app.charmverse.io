@@ -147,7 +147,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
 
   return thread ? (
     <Box id={`thread.${threadId}`} ref={ref} p={2} sx={{ background: theme.palette.background.light, maxHeight: inline ? 300 : 'fit-content' }}>
-      <Box maxHeight={inline ? 'calc(100% - 50px)' : 'fit-content'} pr={inline ? 1 : 0} overflow='auto'>
+      <Box maxHeight={inline ? 220 : 'fit-content'} pr={inline ? 1 : 0} overflow='auto'>
         <Box justifyContent='space-between' display='flex' alignItems='center' mb={1} gap={5}>
           <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
             {new Date(thread.createdAt).toLocaleString()}
