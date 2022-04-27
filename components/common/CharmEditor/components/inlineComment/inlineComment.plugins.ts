@@ -35,7 +35,7 @@ export function plugin (): RawPlugins {
                 // If the page thread list isn't open, then we need to show the inline thread component
                 renderSuggestionsTooltip(SuggestTooltipPluginKey, {
                   component: 'inlineComment',
-                  threadId
+                  threadIds: [threadId]
                 })(view.state, view.dispatch, view);
               }
             }

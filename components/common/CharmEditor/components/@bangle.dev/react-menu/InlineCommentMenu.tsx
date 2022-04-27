@@ -5,7 +5,6 @@ import { Box, Button } from '@mui/material';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { useContributors } from 'hooks/useContributors';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
@@ -27,7 +26,7 @@ export function InlineCommentSubMenu({pluginKey}: {pluginKey: PluginKey}) {
   });
   const {extractTextFromSelection} = useInlineComment()
   const {setThreads} = useThreads()
-  const {currentPageId, pages} = usePages()
+  const {currentPageId} = usePages()
   const isEmpty = checkForEmpty(commentContent);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!isEmpty) {

@@ -45,18 +45,20 @@ export function useInlineComment () {
       const inlineCommentMarkSchema = view.state.schema.marks['inline-comment'] as MarkType;
       const inlineCommentNodes = findChildrenByMark(node, inlineCommentMarkSchema);
       let totalInlineComments = 0;
+      const threadIds: string[] = [];
       for (const inlineCommentNode of inlineCommentNodes) {
         // Find the inline comment mark for the node
         const inlineCommentMark = inlineCommentNode.node.marks.find(mark => mark.type.name === inlineCommentMarkSchema.name);
         // Make sure the mark has the same threadId as the given one
         if (inlineCommentMark && !inlineCommentMark.attrs.resolved) {
+          threadIds.push(inlineCommentMark.attrs.id);
           const thread = threads[inlineCommentMark.attrs.id];
           if (thread) {
             totalInlineComments += thread.Comment.length;
           }
         }
       }
-      return totalInlineComments;
+      return { totalInlineComments, threadIds };
     },
     removeInlineCommentMark (threadId: string, deleteThread?: boolean) {
       deleteThread = deleteThread ?? false;

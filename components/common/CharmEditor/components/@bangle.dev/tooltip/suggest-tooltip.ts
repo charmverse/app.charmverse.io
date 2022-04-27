@@ -600,7 +600,7 @@ export interface SuggestTooltipPluginState {
   show: boolean;
   tooltipContentDOM: HTMLElement
   component: null | "nestedPage" | "inlineComment"
-  threadId: null | string
+  threadIds: string[]
 }
 
 export interface SuggestTooltipPluginOptions {
@@ -621,7 +621,7 @@ export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPlug
             show: false,
             tooltipContentDOM: tooltipDOMSpec.contentDOM,
             component: "nestedPage",
-            threadId: null,
+            threadIds: [],
           };
         },
         apply (tr, pluginState) {
@@ -644,7 +644,7 @@ export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPlug
             return {
               ...pluginState,
               component: null,
-              threadId: null,
+              threadIds: [],
               show: false,
             };
           }

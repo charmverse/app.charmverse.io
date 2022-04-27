@@ -4,11 +4,14 @@ import { useThreads } from 'hooks/useThreads';
 import { ReactNode, useMemo } from 'react';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import { Box } from '@mui/material';
+import { useEditorViewContext } from '@bangle.dev/react';
+import { renderSuggestionsTooltip, SuggestTooltipPluginKey } from './@bangle.dev/tooltip/suggest-tooltip';
 
 export default function Paragraph ({ node, children }: NodeViewProps & {children: ReactNode}) {
   const { findTotalInlineComments } = useInlineComment();
   const { threads } = useThreads();
-  const totalInlineComments = useMemo(() => findTotalInlineComments(node), [threads, node]);
+  const { threadIds, totalInlineComments } = useMemo(() => findTotalInlineComments(node), [threads, node]);
+  const view = useEditorViewContext();
   return (
     <>
       {children}
@@ -21,7 +24,13 @@ export default function Paragraph ({ node, children }: NodeViewProps & {children
           cursor: 'pointer'
         }}
       >
-        <ModeCommentOutlinedIcon color='secondary' fontSize='small' />
+        <ModeCommentOutlinedIcon
+          onClick={() => {
+            renderSuggestionsTooltip(SuggestTooltipPluginKey, { component: 'inlineComment', threadIds })(view.state, view.dispatch, view);
+          }}
+          color='secondary'
+          fontSize='small'
+        />
         <Box
           component='span'
           sx={{

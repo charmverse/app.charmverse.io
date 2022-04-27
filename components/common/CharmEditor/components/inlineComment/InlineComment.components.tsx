@@ -1,5 +1,5 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { ClickAwayListener } from '@mui/material';
+import { Box, ClickAwayListener } from '@mui/material';
 import { useThreadsDisplay } from 'components/common/PageLayout/PageLayout';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
@@ -12,19 +12,30 @@ export default function InlineCommentThread () {
     tooltipContentDOM,
     show: isVisible,
     component,
-    threadId
+    threadIds
   } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
   const { threads } = useThreads();
+
   const { showingCommentThreadsList } = useThreadsDisplay();
-  const thread = threadId ? threads[threadId] : null;
-  if (isVisible && component === 'inlineComment' && threadId && !thread?.resolved) {
+  const unResolvedThreads = threadIds.map(threadId => threads[threadId]).filter(thread => !thread?.resolved);
+  if (isVisible && component === 'inlineComment' && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
     return !showingCommentThreadsList ? createPortal(
       <ClickAwayListener onClickAway={() => {
         hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
       }}
       >
-        <PageThread threadId={threadId} inline />
+        <Box sx={{
+          maxHeight: 400,
+          overflow: 'auto',
+          display: 'flex',
+          gap: 1,
+          flexDirection: 'column'
+        }}
+        >
+          {unResolvedThreads.map(resolvedThread => resolvedThread
+            && <PageThread inline={false} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
+        </Box>
       </ClickAwayListener>,
       tooltipContentDOM
     ) : null;
