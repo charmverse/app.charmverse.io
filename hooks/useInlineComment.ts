@@ -1,11 +1,44 @@
 import { Mark, MarkType } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
+import { useContributors } from './useContributors';
+import { usePages } from './usePages';
 
 export function useInlineComment () {
   const view = useEditorViewContext();
+  const { pages } = usePages();
+  const [contributors] = useContributors();
 
   return {
+    extractTextFromSelection () {
+      // Get the context from current selection
+      const cutDoc = view.state.doc.cut(view.state.selection.from, view.state.selection.to);
+      let textContent = '';
+      cutDoc.descendants(node => {
+        if (node.isText) {
+          textContent += node.text;
+        }
+        else if (node.type.name === 'mention') {
+          const { type, value } = node.attrs;
+          if (type === 'user') {
+            const contributor = contributors.find(_contributor => _contributor.id === value);
+            if (contributor) {
+              textContent += `@${(contributor.username ?? contributor.addresses[0])}`;
+            }
+          }
+          else {
+            const page = pages[value];
+            if (page) {
+              textContent += `@${page.title}`;
+            }
+          }
+        }
+        else if (node.type.name === 'emoji') {
+          textContent += node.attrs.emoji;
+        }
+      });
+      return textContent;
+    },
     removeInlineCommentMark (threadId: string, deleteThread?: boolean) {
       deleteThread = deleteThread ?? false;
       const doc = view.state.doc;
