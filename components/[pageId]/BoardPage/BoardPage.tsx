@@ -41,7 +41,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState(router.query.cardId);
   const { pages } = usePages();
-  const accessibleCards = useMemo(() => cards.filter(card => pages[card.id]), [Object.keys(pages).toString()]);
+  const accessibleCards = useMemo(() => cards.filter(card => pages[card.id]), [cards, Object.keys(pages).toString()]);
 
   useEffect(() => {
     const boardId = page.boardId!;

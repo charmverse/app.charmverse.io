@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import styled from '@emotion/styled';
 import Typography from '@mui/material/Typography';
 
@@ -19,4 +20,4 @@ const PageTitle = styled(({ hasContent, ...props }: any) => <Typography {...prop
   width: calc(80%); // hack to get ellipsis to appear
 `;
 
-export default PageTitle;
+export default memo(PageTitle);
