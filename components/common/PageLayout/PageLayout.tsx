@@ -83,13 +83,13 @@ export default function PageLayout ({ children }: { children: React.ReactNode })
   const { currentPageId, pages } = usePages();
   const currentPage = pages[currentPageId];
 
-  const handleDrawerOpen = () => {
+  const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);
-  };
+  }, []);
 
-  const handleDrawerClose = () => {
+  const handleDrawerClose = React.useCallback(() => {
     setOpen(false);
-  };
+  }, []);
 
   return (
     <>
