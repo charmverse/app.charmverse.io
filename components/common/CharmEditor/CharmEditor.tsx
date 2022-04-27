@@ -15,7 +15,7 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
-import { DOMOutputSpec, EditorView, Node, PluginKey } from '@bangle.dev/pm';
+import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { useState, CSSProperties, ReactNode, memo, RefObject, useCallback } from 'react';
 import styled from '@emotion/styled';
@@ -27,7 +27,7 @@ import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
-import { Grow, Portal } from '@mui/material';
+import { Portal } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import Callout, * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
