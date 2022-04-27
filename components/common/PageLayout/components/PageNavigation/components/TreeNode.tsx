@@ -27,7 +27,7 @@ type NodeProps = {
   selectedNodeId: string | null;
 }
 
-function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage, selectedNodeId }: NodeProps) {
+function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage, selectedNodeId }: NodeProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
   const [{ handlerId }, drag, dragPreview] = useDrag(() => ({
@@ -127,39 +127,41 @@ function RenderDraggableNode ({ item, onDropAdjacent, onDropChild, pathPrefix, a
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}
     >
-      {hideChildren ? <div>{/* empty div to trick TreeView into showing expand icon */}</div> : (
-        item.type === 'board' ? (
-          views.map(view => (
-            <BoardViewTreeItem
-              key={view.id}
-              href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
-              label={view.title}
-              nodeId={view.id}
-              viewType={view.fields.viewType}
-            />
-          ))
-        ) : (
-          item.children.length > 0
-            ? item.children.map((childItem) => (
-              // eslint-disable-next-line no-use-before-define
-              <MemoizedRenderDraggableNode
-                onDropAdjacent={onDropAdjacent}
-                onDropChild={onDropChild}
-                pathPrefix={pathPrefix}
-                key={childItem.id}
-                item={childItem}
-                addPage={addPage}
-                selectedNodeId={selectedNodeId}
-                deletePage={deletePage}
+      {hideChildren
+        ? <div>{/* empty div to trick TreeView into showing expand icon */}</div>
+        : (
+          item.type === 'board' ? (
+            views.map(view => (
+              <BoardViewTreeItem
+                key={view.id}
+                href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+                label={view.title}
+                nodeId={view.id}
+                viewType={view.fields.viewType}
               />
             ))
-            : (
-              <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
-                No pages inside
-              </Typography>
-            )
-        )
-      )}
+          ) : (
+            item.children.length > 0
+              ? item.children.map((childItem) => (
+              // eslint-disable-next-line no-use-before-define
+                <MemoizedTreeNode
+                  onDropAdjacent={onDropAdjacent}
+                  onDropChild={onDropChild}
+                  pathPrefix={pathPrefix}
+                  key={childItem.id}
+                  item={childItem}
+                  addPage={addPage}
+                  selectedNodeId={selectedNodeId}
+                  deletePage={deletePage}
+                />
+              ))
+              : (
+                <Typography variant='caption' className='MuiTreeItem-content' sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}>
+                  No pages inside
+                </Typography>
+              )
+          )
+        )}
     </PageTreeItem>
   );
 }
@@ -178,6 +180,6 @@ function mergeRefs (refs: any) {
   };
 }
 
-const MemoizedRenderDraggableNode = memo(RenderDraggableNode);
+const MemoizedTreeNode = memo(DraggableTreeNode);
 
-export default MemoizedRenderDraggableNode;
+export default MemoizedTreeNode;

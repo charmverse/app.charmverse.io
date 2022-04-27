@@ -77,11 +77,14 @@ const HeaderSpacer = styled.div`
   min-height: ${headerHeight}px;
 `;
 
-export default function PageLayout ({ children }: { children: React.ReactNode }) {
+const LayoutContainer = styled.div`
+  display: flex;
+  height: 100%;
+`;
+
+function PageLayout ({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
   const [user] = useUser();
-  const { currentPageId, pages } = usePages();
-  const currentPage = pages[currentPageId];
 
   const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);
@@ -94,9 +97,9 @@ export default function PageLayout ({ children }: { children: React.ReactNode })
   return (
     <>
       <Head>
-        <Favicon pageIcon={currentPage?.icon} />
+        <CurrentPageFavicon />
       </Head>
-      <Box sx={{ display: 'flex', height: '100%' }}>
+      <LayoutContainer>
         <AppBar position='fixed' open={open}>
           <Header open={open} openSidebar={handleDrawerOpen} />
         </AppBar>
@@ -107,7 +110,15 @@ export default function PageLayout ({ children }: { children: React.ReactNode })
           <HeaderSpacer />
           {children}
         </PageContainer>
-      </Box>
+      </LayoutContainer>
     </>
   );
 }
+
+function CurrentPageFavicon () {
+  const { currentPageId, pages } = usePages();
+  const currentPage = pages[currentPageId];
+  return <Favicon pageIcon={currentPage?.icon} />;
+}
+
+export default PageLayout;

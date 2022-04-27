@@ -15,7 +15,7 @@ import EmptyCardButton from './emptyCardButton'
 
 type Props = {
     addCard: () => void
-    addCardFromTemplate: (cardTemplateId: string) => void
+    //addCardFromTemplate: (cardTemplateId: string) => void
     addCardTemplate: () => void
     editCardTemplate: (cardTemplateId: string) => void
 }
@@ -28,7 +28,7 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
         <ButtonWithMenu
             onClick={() => {
                 if (currentView.fields.defaultTemplateId) {
-                    props.addCardFromTemplate(currentView.fields.defaultTemplateId)
+                    //props.addCardFromTemplate(currentView.fields.defaultTemplateId)
                 } else {
                     props.addCard()
                 }

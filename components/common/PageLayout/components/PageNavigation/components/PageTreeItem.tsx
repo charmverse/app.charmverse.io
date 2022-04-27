@@ -1,4 +1,4 @@
-import React, { forwardRef, ReactNode, SyntheticEvent, useCallback, useMemo } from 'react';
+import React, { forwardRef, ReactNode, SyntheticEvent, useCallback, useMemo, memo } from 'react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useIntl } from 'react-intl';
@@ -173,8 +173,6 @@ interface PageLinkProps {
 }
 
 export function PageLink ({ showPicker = true, children, href, label, labelIcon, pageType, pageId }: PageLinkProps) {
-  console.log('redner page link');
-  const { setPages } = usePages();
 
   const popupState = usePopupState({
     popupId: 'page-emoji',
@@ -192,6 +190,28 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
     event.preventDefault();
   }, []);
 
+  const triggerState = bindTrigger(popupState);
+
+  return (
+    <Link passHref href={href}>
+      <PageAnchor onClick={stopPropagation}>
+        {labelIcon && (
+          <span onClick={preventDefault}>
+            <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
+          </span>
+        )}
+        <PageTitle hasContent={isempty}>
+          {isempty ? 'Untitled' : label}
+        </PageTitle>
+        {children}
+        {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} pageType={pageType} />}
+      </PageAnchor>
+    </Link>
+  );
+}
+
+function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId: string, pageType?: Page['type'] }) {
+  const { setPages } = usePages();
   const onSelectEmoji = useCallback(async (emoji: string) => {
     if (pageId) {
       await charmClient.updatePage({
@@ -212,27 +232,10 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
     popupState.close();
   }, [pageId, setPages]);
 
-  const triggerState = bindTrigger(popupState);
-
   return (
-    <Link passHref href={href}>
-      <PageAnchor onClick={stopPropagation}>
-        {labelIcon && (
-          <span onClick={preventDefault}>
-            <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
-          </span>
-        )}
-        <PageTitle hasContent={isempty}>
-          {isempty ? 'Untitled' : label}
-        </PageTitle>
-        {children}
-        {showPicker && (
-          <Menu {...bindMenu(popupState)}>
-            <EmojiPicker onSelect={onSelectEmoji} />
-          </Menu>
-        )}
-      </PageAnchor>
-    </Link>
+    <Menu {...bindMenu(popupState)}>
+      <EmojiPicker onSelect={onSelectEmoji} />
+    </Menu>
   );
 }
 
@@ -244,6 +247,14 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
     </div>
   )
 );
+
+function MoreIconButton ({ onClick }: { onClick: (e: any) => void }) {
+  return (
+    <IconButton size='small' onClick={onClick}>
+      <MoreHorizIcon color='secondary' fontSize='small' />
+    </IconButton>
+  );
+}
 
 const PageMenuItem = styled(MenuItem)`
   padding: 3px 12px;
@@ -274,11 +285,11 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   } = props;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  function showMenu (event: React.MouseEvent<HTMLElement>) {
+  const showMenu = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     event.preventDefault();
     event.stopPropagation();
-  }
+  }, []);
 
   function closeMenu () {
     setAnchorEl(null);
@@ -322,9 +333,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
       pageType={pageType}
     >
       <div className='page-actions'>
-        <IconButton size='small' onClick={showMenu}>
-          <MoreHorizIcon color='secondary' fontSize='small' />
-        </IconButton>
+        <MoreIconButton onClick={showMenu} />
         {pageType === 'board' ? (
           <AddNewCard pageId={pageId} />
         ) : (
@@ -370,8 +379,7 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
   const [space] = useCurrentSpace();
   const boards = useAppSelector(getSortedBoards);
   const intl = useIntl();
-  const { currentPageId, pages } = usePages();
-  const { getPagePermissions } = usePages();
+  const { currentPageId, getPagePermissions, pages } = usePages();
   const { showMessage } = useSnackbar();
   const permissions = getPagePermissions(pageId);
 
@@ -457,4 +465,4 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
   );
 }
 
-export default PageTreeItem;
+export default memo(PageTreeItem);
