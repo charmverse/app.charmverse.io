@@ -1,13 +1,11 @@
 
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { requirePagePermissions } from 'lib/middleware/requirePagePermissions';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { deleteNestedChild } from 'lib/pages/deleteNestedChild';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -78,15 +76,15 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
   if (permissions.delete !== true) {
     throw new ActionNotPermittedError('You are not allowed to delete this page.');
   }
-  
+
   const rootBlock = await prisma.block.findUnique({
     where: {
       id: pageId
     }
   });
-  
+
   const deletedChildPageIds = await deleteNestedChild(pageId, userId);
-  
+
   return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
 }
 
