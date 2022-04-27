@@ -14,8 +14,8 @@ export default function InlineCommentThread ({ showingCommentThreadsList }: {sho
     threadId
   } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
   const { threads } = useThreads();
-  const thread = threadId && threads[threadId];
-  if (isVisible && component === 'inlineComment' && thread && !thread.resolved) {
+  const thread = threadId ? threads[threadId] : null;
+  if (isVisible && component === 'inlineComment' && threadId && !thread?.resolved) {
     // Only show comment thread on inline comment if the page threads list is not active
     return !showingCommentThreadsList ? createPortal(
       <ClickAwayListener onClickAway={() => {

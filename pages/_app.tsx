@@ -331,13 +331,13 @@ function DataProviders ({ children }: { children: ReactNode }) {
           <BountiesProvider>
             <PaymentMethodsProvider>
               <PagesProvider>
-                <ThreadsProvider>
-                  <PageTitleProvider>
+                <PageTitleProvider>
+                  <ThreadsProvider>
                     <FocalboardViewsProvider>
                       {children}
                     </FocalboardViewsProvider>
-                  </PageTitleProvider>
-                </ThreadsProvider>
+                  </ThreadsProvider>
+                </PageTitleProvider>
               </PagesProvider>
             </PaymentMethodsProvider>
           </BountiesProvider>

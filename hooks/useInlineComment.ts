@@ -12,6 +12,7 @@ export function useInlineComment () {
       const inlineCommentMarkSchema = view.state.schema.marks['inline-comment'] as MarkType;
       const inlineCommentNodes = findChildrenByMark(doc, inlineCommentMarkSchema);
       let inlineCommentNodeWithMark: (NodeWithPos & {mark: Mark}) | null = null;
+
       for (const inlineCommentNode of inlineCommentNodes) {
         // Find the inline comment mark for the node
         const inlineCommentMark = inlineCommentNode.node.marks.find(mark => mark.type.name === inlineCommentMarkSchema.name);

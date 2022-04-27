@@ -13,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { PageContent } from 'models';
+import { useInlineComment } from 'hooks/useInlineComment';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
 
@@ -53,8 +54,8 @@ const ThreadHeaderBox = styled(Box)`
   gap: ${({ theme }) => theme.spacing(2)}
 `;
 
-const ThreadCommentListItem = styled(ListItem)<{highlight?: boolean}>`
-  background: ${({ highlight }) => highlight ? 'rgba(46, 170, 220, 0.15)' : 'inherit'};
+const ThreadCommentListItem = styled(ListItem)<{highlighted?: string}>`
+  background: ${({ highlighted }) => highlighted === 'true' ? 'rgba(46, 170, 220, 0.15)' : 'inherit'};
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -93,6 +94,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
   const [editedComment, setEditedComment] = useState<null | string>(null);
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
+  const { removeInlineCommentMark } = useInlineComment();
 
   function resetState () {
     setEditedComment(null);
@@ -138,9 +140,10 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 />
               )}
               disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
-              onClick={() => {
+              onClick={async () => {
                 setIsMutating(true);
-                resolveThread(threadId);
+                await resolveThread(threadId);
+                removeInlineCommentMark(thread.id);
                 setIsMutating(false);
               }}
             />
@@ -151,9 +154,10 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 />
             )}
               text='Delete'
-              onClick={() => {
+              onClick={async () => {
                 setIsMutating(true);
-                deleteThread(threadId);
+                await deleteThread(threadId);
+                removeInlineCommentMark(thread.id, true);
                 setIsMutating(false);
               }}
               disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
@@ -164,7 +168,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
           return (
             <ThreadCommentListItem
               key={comment.id}
-              highlight={editedComment === comment.id}
+              highlighted={(editedComment === comment.id).toString()}
             >
               <Box display='flex' width='100%' justifyContent='space-between'>
                 <Box sx={{

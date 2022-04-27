@@ -31,7 +31,6 @@ export const ThreadsContext = createContext<Readonly<IContext>>({
 export function ThreadsProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const [threads, setThreads] = useState<Record<string, ThreadWithComments | undefined>>({});
-  const { removeInlineCommentMark } = useInlineComment();
 
   const { data } = useSWR(() => currentPageId ? `pages/${currentPageId}/threads` : null, () => charmClient.getPageThreads(currentPageId), { refreshInterval });
   useEffect(() => {
@@ -110,7 +109,6 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
             ...thread,
             resolved: !thread.resolved
           } }));
-        removeInlineCommentMark(thread.id);
       }
       catch (_) {
         //
@@ -126,7 +124,6 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
         await charmClient.deleteThread(thread.id);
         delete threads[thread.id];
         setThreads({ ...threads });
-        removeInlineCommentMark(thread.id, true);
       }
       catch (_) {
         //
