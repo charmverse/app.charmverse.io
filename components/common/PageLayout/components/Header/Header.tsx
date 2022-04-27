@@ -132,6 +132,7 @@ export default function Header (
           {isPage && (
             <>
               <ShareButton headerHeight={headerHeight} />
+              {currentPage?.type !== 'board' && (
               <Tooltip title='Show comment threads' arrow placement='bottom'>
                 <IconButton
                   onClick={() => {
@@ -146,6 +147,7 @@ export default function Header (
                   />
                 </IconButton>
               </Tooltip>
+              )}
               <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
                 <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
