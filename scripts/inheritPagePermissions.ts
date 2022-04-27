@@ -9,7 +9,7 @@ async function recursiveRebuild (pageId: string | IPageWithPermissions, level = 
 
   const children = await resolveChildPages(idToPass, true);
 
-  const parallelFactor = 5;
+  const parallelFactor = 10;
 
   for (let i = 0; i < children.length; i += parallelFactor) {
     await Promise.all(children.slice(i, i + parallelFactor).map((child, childIndex) => {
@@ -32,16 +32,44 @@ async function inheritPermissions (processed = 0, total = 0): Promise<true> {
   if (total === 0) {
     total = await prisma.page.count({
       where: {
-        parentId: null
+        AND: [
+          {
+            parentId: null
+          },
+          {
+            spaceId: {
+              not: '0eae61ed-e2d9-4f26-b5fe-e403dad8ecd9'
+            }
+          },
+          {
+            spaceId: {
+              not: '5c3cc4fc-3313-4c22-a574-abbf9c4a63d8'
+            }
+          }
+        ]
       }
     });
   }
 
   const foundPages = await prisma.page.findMany({
-    take: 3,
+    take: 5,
     skip: processed,
     where: {
-      parentId: null
+      AND: [
+        {
+          parentId: null
+        },
+        {
+          spaceId: {
+            not: '0eae61ed-e2d9-4f26-b5fe-e403dad8ecd9'
+          }
+        },
+        {
+          spaceId: {
+            not: '5c3cc4fc-3313-4c22-a574-abbf9c4a63d8'
+          }
+        }
+      ]
     },
     orderBy: {
       id: 'asc'
@@ -84,7 +112,7 @@ prisma.pagePermission.updateMany({
 prisma.$connect()
   .then(() => {
     console.log('Connected to DB');
-    inheritPermissions(264)
+    inheritPermissions(0)
       .then(() => {
         console.log('Success');
       });
