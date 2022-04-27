@@ -49,6 +49,7 @@ import * as table from './components/table';
 import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
+import Paragraph from './components/Paragraph';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -185,6 +186,11 @@ export function charmEditorPlugins (
       contentDOM: ['div']
     }),
     NodeView.createPlugin({
+      name: 'paragraph',
+      containerDOM: ['p', { class: 'charm-paragraph' }],
+      contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
       name: 'mention',
       containerDOM: ['span', { class: 'mention-value' }]
     }),
@@ -257,6 +263,13 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
       background: rgba(255,212,0,0.56) !important;
     }
     cursor: pointer;
+  }
+
+  .charm-paragraph {
+    display: flex;
+    .bangle-nv-child-container {
+      width: 100%;
+    }
   }
 `;
 
@@ -359,6 +372,9 @@ function CharmEditor (
       renderNodeViews={({ children: _children, ...props }) => {
 
         switch (props.node.type.name) {
+          case 'paragraph': {
+            return <Paragraph {...props}>{_children}</Paragraph>;
+          }
           case 'quote':
             return <Quote {...props}>{_children}</Quote>;
           case 'columnLayout': {

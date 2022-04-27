@@ -1,13 +1,15 @@
-import { Mark, MarkType } from '@bangle.dev/pm';
+import { Node, Mark, MarkType } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
 import { useContributors } from './useContributors';
 import { usePages } from './usePages';
+import { useThreads } from './useThreads';
 
 export function useInlineComment () {
   const view = useEditorViewContext();
   const { pages } = usePages();
   const [contributors] = useContributors();
+  const { threads } = useThreads();
 
   return {
     extractTextFromSelection () {
@@ -38,6 +40,23 @@ export function useInlineComment () {
         }
       });
       return textContent;
+    },
+    findTotalInlineComments (node: Node) {
+      const inlineCommentMarkSchema = view.state.schema.marks['inline-comment'] as MarkType;
+      const inlineCommentNodes = findChildrenByMark(node, inlineCommentMarkSchema);
+      let totalInlineComments = 0;
+      for (const inlineCommentNode of inlineCommentNodes) {
+        // Find the inline comment mark for the node
+        const inlineCommentMark = inlineCommentNode.node.marks.find(mark => mark.type.name === inlineCommentMarkSchema.name);
+        // Make sure the mark has the same threadId as the given one
+        if (inlineCommentMark && !inlineCommentMark.attrs.resolved) {
+          const thread = threads[inlineCommentMark.attrs.id];
+          if (thread) {
+            totalInlineComments += thread.Comment.length;
+          }
+        }
+      }
+      return totalInlineComments;
     },
     removeInlineCommentMark (threadId: string, deleteThread?: boolean) {
       deleteThread = deleteThread ?? false;

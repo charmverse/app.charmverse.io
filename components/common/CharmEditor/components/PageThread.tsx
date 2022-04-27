@@ -125,6 +125,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                   // Check for highest 5 levels of depth
                   for (let i = 0; i < 5; i++) {
                     element = threadDocument.parentElement;
+                    // Get the first paragraph parent element
                     if (element?.tagName === 'P') {
                       parentElement = element;
                       break;
@@ -139,15 +140,18 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
 
                   setTimeout(() => {
                     if (parentElement) {
+                      // Need to create a custom element as adding styling to prosemirror-node isn't possible
                       const highlightElement = document.createElement('div');
                       document.body.appendChild(highlightElement);
                       const boundingRect = parentElement.getBoundingClientRect();
+                      // Set the location of the custom element
                       highlightElement.style.top = `${boundingRect.top}px`;
                       highlightElement.style.left = `${boundingRect.left}px`;
                       highlightElement.style.width = `${boundingRect.width}px`;
                       highlightElement.style.height = `${boundingRect.height}px`;
                       highlightElement.style.position = 'absolute';
                       highlightDomElement(highlightElement, () => {
+                        // Remove the custom element after the highlighting is done
                         document.body.removeChild(highlightElement);
                       });
                     }
