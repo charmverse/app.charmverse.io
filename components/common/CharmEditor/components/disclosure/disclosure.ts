@@ -1,5 +1,6 @@
 import { RawPlugins, RawSpecs, createElement } from '@bangle.dev/core';
 import { DOMOutputSpec, Plugin, PluginKey } from '@bangle.dev/pm';
+import { checkForEmpty } from 'components/common/CharmEditor/utils';
 
 export function spec () {
   return [
@@ -32,6 +33,7 @@ function detailsSpec (): RawSpecs {
     name: 'disclosureDetails',
     schema: {
       content: 'disclosureSummary block+',
+      defining: true,
       group: 'block',
       parseDOM: [{ tag: 'details' }],
       toDOM: (): DOMOutputSpec => {
@@ -56,9 +58,19 @@ export function plugins (): RawPlugins {
 function ContainerPlugin ({ type, contentDOM }: { type: string, contentDOM: DOMOutputSpec }) {
   return new Plugin({
     key: new PluginKey(`${type}-NodeView`),
+    view: () => ({
+      update: (view, prevState) => {
+        if (!view.state.doc.eq(prevState.doc)) {
+          console.log(view);
+        }
+      }
+    }),
     props: {
       nodeViews: {
         [type]: function nodeView (node, view, getPos, decorations) {
+          // @ts-ignore
+          const isEmpty = checkForEmpty(node);
+          console.log('is empty', isEmpty);
           const element = createElement(contentDOM);
           return {
             contentDOM: element,

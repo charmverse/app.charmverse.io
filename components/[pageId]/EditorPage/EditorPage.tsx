@@ -85,6 +85,7 @@ export default function EditorPage (
         ...updates
       }
     }));
+
     if (updates.hasOwnProperty('title')) {
       setTitleState(updates.title || 'Untitled');
     }
