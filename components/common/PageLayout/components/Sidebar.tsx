@@ -253,7 +253,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               </SectionName>
               <PageNavigation
                 isFavorites={true}
-                spaceId={space.id}
                 rootPageIds={favoritePageIds}
               />
             </Box>
@@ -266,10 +265,10 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 <NewPageMenu tooltip='Add a page' addPage={addPage} />
               </div>
             </WorkspaceLabel>
-            <Box sx={{ mb: 6 }}>
-              <PageNavigation spaceId={space.id} />
+            <Box mb={6}>
+              <PageNavigation />
             </Box>
-            <Box sx={{ mb: 2 }}>
+            <Box mb={2}>
               <SidebarLink
                 href={`/${space.domain}/bounties`}
                 active={router.pathname.startsWith('/[domain]/bounties')}

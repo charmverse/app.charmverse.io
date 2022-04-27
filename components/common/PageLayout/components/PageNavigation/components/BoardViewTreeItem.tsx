@@ -1,5 +1,5 @@
 
-import { forwardRef } from 'react';
+import { forwardRef, memo } from 'react';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import { StyledTreeItem, PageLink } from './PageTreeItem';
@@ -38,4 +38,4 @@ const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((pr
   );
 });
 
-export default BoardViewTreeItem;
+export default memo(BoardViewTreeItem);

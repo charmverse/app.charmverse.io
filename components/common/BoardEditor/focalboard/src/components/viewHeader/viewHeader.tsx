@@ -33,7 +33,7 @@ type Props = {
     cards: Card[]
     groupByProperty?: IPropertyTemplate
     addCard: () => void
-    addCardFromTemplate: (cardTemplateId: string) => void
+    //addCardFromTemplate: (cardTemplateId: string) => void
     addCardTemplate: () => void
     editCardTemplate: (cardTemplateId: string) => void
     readonly: boolean
@@ -167,7 +167,7 @@ const ViewHeader = React.memo((props: Props) => {
 
                 <NewCardButton
                     addCard={props.addCard}
-                    addCardFromTemplate={props.addCardFromTemplate}
+                   // addCardFromTemplate={props.addCardFromTemplate}
                     addCardTemplate={props.addCardTemplate}
                     editCardTemplate={props.editCardTemplate}
                 />

@@ -1,7 +1,7 @@
 import { generatePath } from 'lib/utilities/strings';
 import { Page } from 'models';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import { sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
@@ -41,7 +41,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState(router.query.cardId);
   const { pages } = usePages();
-  const accessibleCards = cards.filter(card => pages[card.id]);
+  const accessibleCards = useMemo(() => cards.filter(card => pages[card.id]), [cards, Object.keys(pages).toString()]);
 
   useEffect(() => {
     const boardId = page.boardId!;

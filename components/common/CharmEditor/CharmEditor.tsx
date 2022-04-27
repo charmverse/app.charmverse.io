@@ -17,7 +17,7 @@ import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
 import { EditorView, Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { useState, CSSProperties, ReactNode, memo } from 'react';
+import { useState, CSSProperties, ReactNode, memo, useCallback } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -301,6 +301,13 @@ function CharmEditor (
     }
   });
 
+  const onResizeStop = useCallback((view: EditorView<any>) => {
+    if (onContentChangeDebounced) {
+      // Save the current embed size on the backend after we are done resizing
+      onContentChangeDebounced(view);
+    }
+  }, [onContentChangeDebounced]);
+
   return (
     <StyledReactBangleEditor
       style={{
@@ -316,6 +323,7 @@ function CharmEditor (
       postEditorComponents={<Placeholder show={isEmpty} />}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
+
         switch (props.node.type.name) {
           case 'quote':
             return <Quote {...props}>{_children}</Quote>;
@@ -357,12 +365,7 @@ function CharmEditor (
             return (
               <ResizableImage
                 readOnly={readOnly}
-                onResizeStop={(view: EditorView<any>) => {
-                  if (onContentChangeDebounced) {
-                    // Save the current image size on the backend after we are done resizing
-                    onContentChangeDebounced(view);
-                  }
-                }}
+                onResizeStop={onResizeStop}
                 {...props}
               />
             );
@@ -371,12 +374,7 @@ function CharmEditor (
             return (
               <ResizableIframe
                 readOnly={readOnly}
-                onResizeStop={(view) => {
-                  if (onContentChangeDebounced) {
-                    // Save the current embed size on the backend after we are done resizing
-                    onContentChangeDebounced(view);
-                  }
-                }}
+                onResizeStop={onResizeStop}
                 {...props}
               />
             );

@@ -7,11 +7,12 @@ import TreeView from '@mui/lab/TreeView';
 import charmClient from 'charmClient';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { isTruthy } from 'lib/utilities/types';
 import { Page, PageContent } from 'models';
-import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
+import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, memo } from 'react';
 import { useDrop } from 'react-dnd';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
@@ -107,20 +108,19 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
 type PageNavigationProps = {
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
-  spaceId: string;
   rootPageIds?: string[];
 };
 
-export default function PageNavigation ({
+function PageNavigation ({
   deletePage,
   isFavorites,
-  spaceId,
   rootPageIds
 }: PageNavigationProps) {
   const router = useRouter();
   const { pages, currentPageId, setPages } = usePages();
+  const [space] = useCurrentSpace();
   const [user] = useUser();
-  const [expanded, setExpanded] = useLocalStorage<string[]>(`${spaceId}.expanded-pages`, []);
+  const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
 
   const pagesArray: MenuNode[] = Object.values(pages)
     .filter((page): page is Page => Boolean(isTruthy(page) && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))))
@@ -134,6 +134,7 @@ export default function PageNavigation ({
       path: page.path,
       type: page.type
     }));
+
   const pageHash = JSON.stringify(pagesArray);
   // console.log(pageHash);
 
@@ -230,11 +231,11 @@ export default function PageNavigation ({
   }
 
   const addPage = useCallback((page: Partial<Page>) => {
-    if (user) {
+    if (space && user) {
       const newPage: NewPageInput = {
         ...page,
         createdBy: user.id,
-        spaceId
+        spaceId: space.id
       };
       return addPageAndRedirect(newPage, router);
     }
@@ -268,3 +269,5 @@ export default function PageNavigation ({
     </StyledTreeRoot>
   );
 }
+
+export default memo(PageNavigation);
