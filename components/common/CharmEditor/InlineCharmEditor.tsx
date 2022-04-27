@@ -145,7 +145,7 @@ export default function CharmEditor (
     }
   }
 
-  const [state, setState] = useState(new BangleEditorState({
+  const state = useEditorState({
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
@@ -156,22 +156,7 @@ export default function CharmEditor (
     dropCursorOpts: {
       color: 'transparent'
     }
-  }));
-
-  useEffect(() => {
-    setState(new BangleEditorState({
-      specRegistry,
-      plugins: charmEditorPlugins({
-        onContentChange: _onContentChange,
-        readOnly
-      }),
-      initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
-      // hide the black bar when dragging items - we dont even support dragging most components
-      dropCursorOpts: {
-        color: 'transparent'
-      }
-    }));
-  }, [content]);
+  });
 
   return (
     <StyledReactBangleEditor

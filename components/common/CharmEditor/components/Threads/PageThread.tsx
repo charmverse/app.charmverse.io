@@ -96,7 +96,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       catch (_) {
         //
       }
-      setCommentContent(commentContent);
+      setCommentContent(defaultCharmEditorContent());
       setEditedComment(null);
       setIsMutating(false);
       setTargetedComment(null);
@@ -301,7 +301,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 )}
                 <InlineCharmEditor
                   readOnly
-                  key={comment.id}
+                  key={JSON.stringify(comment.content)}
                   content={comment.content as PageContent}
                   style={{
                     paddingLeft: theme.spacing(4)
