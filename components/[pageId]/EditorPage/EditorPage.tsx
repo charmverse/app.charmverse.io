@@ -29,9 +29,16 @@ export default function EditorPage (
   const [user] = useUser();
   const [pagePermissions, setPagePermissions] = useState<Partial<IPagePermissionFlags> | null>(null);
   const debouncedPageUpdate = useMemo(() => {
-    return debouncePromise((input: Prisma.PageUpdateInput) => {
+    return debouncePromise((updates: Prisma.PageUpdateInput) => {
       setIsEditing(true);
-      return charmClient.updatePage(input);
+      setPages((_pages) => ({
+        ..._pages,
+        [currentPageId]: {
+          ..._pages[currentPageId]!,
+          ...updates as Partial<Page>
+        }
+      }));
+      return charmClient.updatePage(updates);
     }, 500);
   }, []);
 
@@ -78,13 +85,6 @@ export default function EditorPage (
     if (!currentPageId || publicShare === true) {
       return;
     }
-    setPages((_pages) => ({
-      ..._pages,
-      [currentPageId]: {
-        ..._pages[currentPageId]!,
-        ...updates
-      }
-    }));
     if (updates.hasOwnProperty('title')) {
       setTitleState(updates.title || 'Untitled');
     }

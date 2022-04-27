@@ -1,8 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import EditorPage from 'components/[pageId]/EditorPage/EditorPage'
+import DocumentPage from 'components/[pageId]/DocumentPage'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { Board } from '../../blocks/board'
 import { BoardView } from '../../blocks/boardView'
 import { Card } from '../../blocks/card'
@@ -10,6 +11,11 @@ import { ContentBlock } from '../../blocks/contentBlock'
 import mutator from '../../mutator'
 import { Focusable } from '../../widgets/editable'
 import useImagePaste from './imagePaste'
+import { usePages } from 'hooks/usePages'
+import log from 'lib/log'
+import { Prisma, Page } from '@prisma/client';
+import charmClient from 'charmClient';
+import debouncePromise from 'lib/utilities/debouncePromise';
 
 type Props = {
     board: Board
@@ -22,9 +28,8 @@ type Props = {
 }
 
 const CardDetail = (props: Props): JSX.Element|null => {
-    const {card} = props
+    const {card, readonly} = props
     const router = useRouter();
-    const isSharedPage = router.route.startsWith('/share')
 
     const [title, setTitle] = useState(card.title)
     const [serverTitle, setServerTitle] = useState(card.title)
@@ -59,12 +64,34 @@ const CardDetail = (props: Props): JSX.Element|null => {
         }
     }, [])
 
-    if (!card) {
+    const { pages, setPages } = usePages();
+
+    const debouncedPageUpdate = useMemo(() => {
+        return debouncePromise((updates: Prisma.PageUpdateInput) => {
+            setPages((_pages) => ({
+                ..._pages,
+                [card.id]: {
+                ..._pages[card.id]!,
+                ...updates as Partial<Page>
+                }
+            }));
+            return charmClient.updatePage(updates);
+        }, 500);
+      }, []);
+
+    const setPage = useCallback(async (updates: Partial<Page>) => {
+      debouncedPageUpdate({ id: card.id, ...updates } as Prisma.PageUpdateInput)
+        .catch((err: any) => {
+          log.error('Error saving page', err);
+        });
+    }, [card]);
+
+    const page = pages[card?.id];
+    if (!card || !page) {
       return null
     }
-
     return (
-      <EditorPage pageId={card.id} publicShare={isSharedPage} shouldLoadPublicPage={false}/>
+      <DocumentPage page={page} setPage={setPage} readOnly={readonly} />
     )
 }
 
