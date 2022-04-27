@@ -129,9 +129,9 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 />
               )}
               disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
-              onClick={async () => {
+              onClick={() => {
                 setIsMutating(true);
-                await resolveThread(threadId);
+                resolveThread(threadId);
                 setIsMutating(false);
               }}
             />
@@ -142,9 +142,9 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 />
             )}
               text='Delete'
-              onClick={async () => {
+              onClick={() => {
                 setIsMutating(true);
-                await deleteThread(threadId);
+                deleteThread(threadId);
                 setIsMutating(false);
               }}
               disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
@@ -190,9 +190,9 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                     </IconButton>
                     <IconButton
                       size='small'
-                      onClick={async () => {
+                      onClick={() => {
                         setIsMutating(true);
-                        await deleteComment(threadId, comment.id);
+                        deleteComment(threadId, comment.id);
                         if (editedComment === comment.id) {
                           resetState();
                         }
@@ -250,13 +250,13 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
             }}
             disabled={isMutating || isEmpty}
             size='small'
-            onClick={async () => {
+            onClick={() => {
               setIsMutating(true);
               if (editedComment) {
-                await editComment(threadId, editedComment, commentContent);
+                editComment(threadId, editedComment, commentContent);
               }
               else {
-                await addComment(threadId, commentContent);
+                addComment(threadId, commentContent);
               }
               resetState();
             }}
