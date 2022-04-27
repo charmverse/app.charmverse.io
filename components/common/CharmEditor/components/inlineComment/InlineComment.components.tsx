@@ -3,7 +3,7 @@ import { ClickAwayListener } from '@mui/material';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { SuggestTooltipPluginKey, SuggestTooltipPluginState, hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
-import PageThread from '../Threads/PageThread';
+import PageThread from '../PageThread';
 
 export default function InlineCommentThread ({ showingCommentThreadsList }: {showingCommentThreadsList: boolean}) {
   const view = useEditorViewContext();

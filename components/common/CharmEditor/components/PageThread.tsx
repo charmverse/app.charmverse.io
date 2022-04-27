@@ -19,8 +19,8 @@ import CheckIcon from '@mui/icons-material/Check';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { PageContent } from 'models';
-import InlineCharmEditor from '../../InlineCharmEditor';
-import { checkForEmpty } from '../../utils';
+import InlineCharmEditor from '../InlineCharmEditor';
+import { checkForEmpty } from '../utils';
 
 const ContextBorder = styled.div`
   width: 3px;
@@ -58,6 +58,14 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
   const popupState = usePopupState({ variant: 'popover', popupId: 'comment-actions' });
   const bindTriggerProps = bindTrigger(popupState);
+
+  function resetState () {
+    setEditedComment(null);
+    setIsMutating(false);
+    setTargetedComment(null);
+    setCommentContent(defaultCharmEditorContent());
+  }
+
   async function addComment () {
     if (thread && !isMutating) {
       try {
@@ -77,8 +85,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       catch (_) {
         //
       }
-      setCommentContent(defaultCharmEditorContent());
-      setIsMutating(false);
+      resetState();
     }
   }
 
@@ -96,10 +103,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
       catch (_) {
         //
       }
-      setCommentContent(defaultCharmEditorContent());
-      setEditedComment(null);
-      setIsMutating(false);
-      setTargetedComment(null);
+      resetState();
     }
   }
 
@@ -118,8 +122,12 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
         catch (_) {
           //
         }
+        if (editedComment === comment.id) {
+          setEditedComment(null);
+        }
         popupState.close();
         setTargetedComment(null);
+        setIsMutating(false);
       }
     }
   }
@@ -319,7 +327,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
             backgroundColor: theme.palette.background.default,
             padding: theme.spacing(0, 1)
           }}
-          key={editedComment}
+          key={`${editedComment}.${targetedComment}`}
           content={commentContent}
           onContentChange={({ doc }) => {
             setCommentContent(doc);

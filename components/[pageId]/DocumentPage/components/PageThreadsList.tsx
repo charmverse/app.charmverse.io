@@ -1,5 +1,5 @@
 import { Box, BoxProps, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
-import PageThread from 'components/common/CharmEditor/components/Threads/PageThread';
+import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { useThreads } from 'hooks/useThreads';
 import { useState } from 'react';
 import CommentSvg from 'public/svgs/comments.svg';
@@ -40,7 +40,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
       sx={{
         ...(sx ?? {}),
         maxWidth: 550,
-        height: 'calc(100% - 25px)',
+        height: '100%',
         width: '100%'
       }}
     >
@@ -58,11 +58,13 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
         </Box>
       </Box>
       <List sx={{
-        height: 'calc(100% - 30px)',
+        // This is required to show the no thread graphic on the center
+        height: 'calc(100% - 50px)',
         overflow: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        gap: 1
+        gap: 1,
+        pt: 0
       }}
       >
         {threadsList.length === 0 ? (
