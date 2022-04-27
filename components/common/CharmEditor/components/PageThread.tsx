@@ -2,13 +2,10 @@ import styled from '@emotion/styled';
 import { Typography, Button, ListItem, IconButton, ButtonProps } from '@mui/material';
 import { useTheme } from '@emotion/react';
 import { Box } from '@mui/system';
-import charmClient from 'charmClient';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
-import { useInlineComment } from 'hooks/useInlineComment';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import List from '@mui/material/List';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { forwardRef, ReactNode, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -56,6 +53,18 @@ const ThreadHeaderBox = styled(Box)`
   gap: ${({ theme }) => theme.spacing(2)}
 `;
 
+const ThreadCommentListItem = styled(ListItem)<{highlight?: boolean}>`
+  background: ${({ highlight }) => highlight ? 'rgba(46, 170, 220, 0.15)' : 'inherit'};
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: ${({ theme }) => theme.spacing(1)};
+  padding-right: ${({ theme }) => theme.spacing(1)};
+  & .ProseMirror.bangle-editor: {
+    padding: 0px;
+  }
+`;
+
 function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon }: {disabled?: boolean, onClick: ButtonProps['onClick'], startIcon: ReactNode, text: string}) {
   return (
     <Button
@@ -84,6 +93,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
   const [editedComment, setEditedComment] = useState<null | string>(null);
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
+  console.log(123);
 
   function resetState () {
     setEditedComment(null);
@@ -153,18 +163,9 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
         </ThreadHeaderBox>
         {thread.Comment.map((comment, commentIndex) => {
           return (
-            <ListItem
+            <ThreadCommentListItem
               key={comment.id}
-              sx={{
-                background: editedComment === comment.id ? 'rgba(46, 170, 220, 0.15)' : 'inherit',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                px: 1,
-                '& .ProseMirror.bangle-editor': {
-                  padding: 0
-                }
-              }}
+              highlight={editedComment === comment.id}
             >
               <Box display='flex' width='100%' justifyContent='space-between'>
                 <Box sx={{
@@ -226,7 +227,7 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                   paddingLeft: theme.spacing(4)
                 }}
               />
-            </ListItem>
+            </ThreadCommentListItem>
           );
         })}
       </div>
