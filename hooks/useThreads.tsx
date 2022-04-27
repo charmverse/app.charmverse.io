@@ -4,7 +4,6 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { PageContent } from 'models';
 import { usePages } from './usePages';
-import { useInlineComment } from './useInlineComment';
 
 type IContext = {
   threads: Record<string, ThreadWithComments | undefined>,

@@ -2,7 +2,7 @@
 
 import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, DiscordUser, TelegramUser, Thread } from '@prisma/client';
 import * as http from 'adapters/http';
-import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
 import { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
@@ -18,7 +18,7 @@ import type { FailedImportsError } from 'lib/notion/types';
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { StartThreadRequest, StartThreadResponse } from 'pages/api/threads';
+import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
@@ -505,7 +505,7 @@ class CharmClient {
     return http.DELETE('/api/permissions', { permissionId });
   }
 
-  startThread (request: StartThreadRequest): Promise<StartThreadResponse> {
+  startThread (request: StartThreadRequest): Promise<ThreadWithComments> {
     return http.POST('/api/threads', request);
   }
 

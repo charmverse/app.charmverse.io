@@ -6,6 +6,7 @@ import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { usePages } from 'hooks/usePages';
+import { useThreads } from 'hooks/useThreads';
 import { PageContent } from 'models';
 import { PluginKey, TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
@@ -23,19 +24,20 @@ export function InlineCommentSubMenu({pluginKey}: {pluginKey: PluginKey}) {
       }
     ]
   });
+  const {setThreads} = useThreads()
   const {currentPageId} = usePages()
   const isEmpty = checkForEmpty(commentContent);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!isEmpty) {
       e.preventDefault();
-      const {thread} = await charmClient.startThread({
+      const threadWithComment = await charmClient.startThread({
         content: commentContent,
         // Get the context from current selection
         context: view.state.doc.cut(view.state.selection.from, view.state.selection.to).textContent,
         pageId: currentPageId
       });
-      mutate(`pages/${currentPageId}/threads`)
-      updateInlineComment(thread.id)(view.state, view.dispatch);
+      setThreads((_threads) =>({..._threads, [threadWithComment.id]: threadWithComment}))
+      updateInlineComment(threadWithComment.id)(view.state, view.dispatch);
       hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view)
       const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)))
       view.dispatch(tr)

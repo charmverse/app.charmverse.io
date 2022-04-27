@@ -6,6 +6,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { Thread } from '@prisma/client';
 import { PageContent } from 'models';
+import { ThreadWithComments } from '../pages/[id]/threads';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -18,12 +19,7 @@ export interface StartThreadRequest {
   context: string
 }
 
-export interface StartThreadResponse {
-  comment: Comment
-  thread: Thread
-}
-
-async function startThread (req: NextApiRequest, res: NextApiResponse) {
+async function startThread (req: NextApiRequest, res: NextApiResponse<ThreadWithComments>) {
 
   const { content, context, pageId } = req.body as StartThreadRequest;
 
@@ -64,13 +60,13 @@ async function startThread (req: NextApiRequest, res: NextApiResponse) {
           id: userId
         }
       }
+    },
+    include: {
+      user: true
     }
   });
 
-  return res.status(200).json({
-    comment,
-    thread
-  });
+  return res.status(200).json({ ...thread, Comment: [comment] });
 }
 
 export default withSessionRoute(handler);
