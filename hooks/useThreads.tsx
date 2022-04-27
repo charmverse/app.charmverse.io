@@ -1,6 +1,5 @@
 import useSWR from 'swr';
 import charmClient from 'charmClient';
-import { useRouter } from 'next/router';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { usePages } from './usePages';
