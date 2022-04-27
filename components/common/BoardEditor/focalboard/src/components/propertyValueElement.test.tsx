@@ -16,7 +16,6 @@ import PropertyValueElement from './propertyValueElement'
 describe('components/propertyValueElement', () => {
     const board = TestBlockFactory.createBoard()
     const card = TestBlockFactory.createCard(board)
-    const comments = TestBlockFactory.createComment(card)
 
     test('should match snapshot, select', async () => {
         const propertyTemplate = board.fields.cardProperties.find((p) => p.id === 'property1')
@@ -25,8 +24,8 @@ describe('components/propertyValueElement', () => {
                 board={board}
                 readOnly={false}
                 card={card}
-                contents={[]}
-                comments={[comments]}
+                updatedAt=''
+                updatedBy=''
                 propertyTemplate={propertyTemplate || board.fields.cardProperties[0]}
                 showEmptyPlaceholder={true}
             />,
@@ -43,8 +42,8 @@ describe('components/propertyValueElement', () => {
                 board={board}
                 readOnly={true}
                 card={card}
-                contents={[]}
-                comments={[comments]}
+                updatedBy=''
+                updatedAt=''
                 propertyTemplate={propertyTemplate || board.fields.cardProperties[0]}
                 showEmptyPlaceholder={true}
             />,
@@ -77,8 +76,8 @@ describe('components/propertyValueElement', () => {
                 board={board}
                 readOnly={false}
                 card={card}
-                contents={[]}
-                comments={[comments]}
+                updatedBy=''
+                updatedAt=''
                 propertyTemplate={propertyTemplate}
                 showEmptyPlaceholder={true}
             />,
@@ -102,8 +101,8 @@ describe('components/propertyValueElement', () => {
                 board={board}
                 readOnly={false}
                 card={card}
-                contents={[]}
-                comments={[comments]}
+                updatedBy=''
+                updatedAt=''
                 propertyTemplate={propertyTemplate}
                 showEmptyPlaceholder={true}
             />,
@@ -127,8 +126,8 @@ describe('components/propertyValueElement', () => {
                 board={board}
                 readOnly={false}
                 card={card}
-                contents={[]}
-                comments={[comments]}
+                updatedBy=''
+                updatedAt=''
                 propertyTemplate={propertyTemplate}
                 showEmptyPlaceholder={true}
             />,
@@ -152,8 +151,8 @@ describe('components/propertyValueElement', () => {
                 board={board}
                 readOnly={false}
                 card={card}
-                contents={[]}
-                comments={[comments]}
+                updatedBy=''
+                updatedAt=''
                 propertyTemplate={propertyTemplate}
                 showEmptyPlaceholder={true}
             />,
@@ -177,8 +176,8 @@ describe('components/propertyValueElement', () => {
                 board={board}
                 readOnly={false}
                 card={card}
-                contents={[]}
-                comments={[comments]}
+                updatedBy=''
+                updatedAt=''
                 propertyTemplate={propertyTemplate}
                 showEmptyPlaceholder={true}
             />,
@@ -200,8 +199,8 @@ describe('components/propertyValueElement', () => {
                 board={board}
                 readOnly={false}
                 card={card}
-                contents={[]}
-                comments={[comments]}
+                updatedBy=''
+                updatedAt=''
                 propertyTemplate={propertyTemplate}
                 showEmptyPlaceholder={true}
             />,
@@ -228,8 +227,8 @@ describe('components/propertyValueElement', () => {
                 board={board}
                 readOnly={false}
                 card={card}
-                contents={[]}
-                comments={[comments]}
+                updatedBy=''
+                updatedAt=''
                 propertyTemplate={propertyTemplate}
                 showEmptyPlaceholder={true}
             />,

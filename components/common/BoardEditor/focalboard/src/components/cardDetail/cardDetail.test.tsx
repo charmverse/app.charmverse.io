@@ -72,7 +72,7 @@ describe('components/cardDetail/CardDetail', () => {
                         views={[view]}
                         cards={[card]}
                         card={card}
-                        comments={[comment1, comment2]}
+                        //comments={[comment1, comment2]}
                         contents={[]}
                         readonly={false}
                     />,
@@ -117,7 +117,6 @@ describe('components/cardDetail/CardDetail', () => {
                         views={[view]}
                         cards={[card]}
                         card={card}
-                        comments={[comment1, comment2]}
                         contents={[]}
                         readonly={true}
                     />,

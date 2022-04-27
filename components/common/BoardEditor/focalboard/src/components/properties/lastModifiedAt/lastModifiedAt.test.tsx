@@ -15,19 +15,10 @@ describe('componnets/properties/lastModifiedAt', () => {
     test('should match snapshot', () => {
         const card = createCard()
         card.id = 'card-id-1'
-        card.updatedBy = 'user-id-1'
-        card.updatedAt = Date.parse('10 Jun 2021 16:22:00')
-
-        const comment = createCommentBlock()
-        comment.updatedBy = 'user-id-1'
-        comment.parentId = 'card-id-1'
-        comment.updatedAt = Date.parse('15 Jun 2021 16:22:00')
 
         const component = wrapIntl(
             <LastModifiedAt
-                card={card}
-                contents={[]}
-                comments={[comment]}
+                updatedAt=''
             />,
         )
 

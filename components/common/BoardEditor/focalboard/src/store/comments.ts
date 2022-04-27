@@ -56,14 +56,15 @@ export function getCardComments(cardId: string): (state: RootState) => CommentBl
     }
 }
 
-export function getCardCommentsMemoFriendly (): (state: RootState, cardId: string) => CommentBlock[] {
-    return createDeepEqualSelector(
-        (state: RootState) => state.comments.comments,
-        (_: RootState, cardId: string) => cardId,
-        (comments, cardId: string): CommentBlock[] => {
-            return Object.values(comments).
-                filter((c) => c.parentId === cardId).
-                sort((a, b) => a.createdAt - b.createdAt)
-        }
-    )
-}
+// optimized version. see: https://react-redux.js.org/api/hooks
+// export function getCardCommentsMemoFriendly (): (state: RootState, cardId: string) => CommentBlock[] {
+//     return createDeepEqualSelector(
+//         (state: RootState) => state.comments.comments,
+//         (_: RootState, cardId: string) => cardId,
+//         (comments, cardId: string): CommentBlock[] => {
+//             return Object.values(comments).
+//                 filter((c) => c.parentId === cardId).
+//                 sort((a, b) => a.createdAt - b.createdAt)
+//         }
+//     )
+// }
