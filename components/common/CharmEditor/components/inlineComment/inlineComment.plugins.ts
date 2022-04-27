@@ -1,5 +1,6 @@
 import { Plugin, RawPlugins } from '@bangle.dev/core';
 import { TextSelection } from '@bangle.dev/pm';
+import { highlightDomElement } from 'lib/dom/highlight';
 import { renderSuggestionsTooltip, SuggestTooltipPluginKey } from '../@bangle.dev/tooltip/suggest-tooltip';
 
 export function plugin (): RawPlugins {
@@ -27,16 +28,7 @@ export function plugin (): RawPlugins {
                 // Plus this is only a cosmetic change which doesn't impact any of the state
                 const threadDocument = document.getElementById(`thread.${threadId}`);
                 if (threadDocument) {
-                  threadDocument?.scrollIntoView({
-                    behavior: 'smooth'
-                  });
-                  threadDocument.style.backgroundColor = 'rgba(46, 170, 220, 0.2)';
-                  threadDocument.style.transition = 'background-color 250ms ease-in-out';
-                  // Remove the highlight after 500 ms
-                  setTimeout(() => {
-                    threadDocument.style.removeProperty('background-color');
-                    threadDocument.style.transition = 'background-color 250ms ease-in-out';
-                  }, 500);
+                  highlightDomElement(threadDocument);
                 }
               }
               else {

@@ -27,7 +27,8 @@ const StyledPageThreadsList = styled(List)`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(1)};
-  padding-top: ${({ theme }) => theme.spacing(1)};
+  padding-top: 0px;
+  padding-bottom: 0px;
   height: calc(100% - 50px);
 `;
 

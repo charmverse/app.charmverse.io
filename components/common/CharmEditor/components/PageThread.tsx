@@ -14,6 +14,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { PageContent } from 'models';
 import { useInlineComment } from 'hooks/useInlineComment';
+import { highlightDomElement } from 'lib/dom/highlight';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
 
@@ -119,9 +120,38 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 // Find the inline-comment with the threadId and scroll into view
                 const threadDocument = document.getElementById(`inline-comment.${threadId}`);
                 if (threadDocument) {
-                  threadDocument.scrollIntoView({
-                    behavior: 'smooth'
+                  let parentElement: HTMLElement | null = null;
+                  let element: HTMLElement | null = threadDocument;
+                  // Check for highest 5 levels of depth
+                  for (let i = 0; i < 5; i++) {
+                    element = threadDocument.parentElement;
+                    if (element?.tagName === 'P') {
+                      parentElement = element;
+                      break;
+                    }
+                  }
+
+                  requestAnimationFrame(() => {
+                    threadDocument.scrollIntoView({
+                      behavior: 'smooth'
+                    });
                   });
+
+                  setTimeout(() => {
+                    if (parentElement) {
+                      const highlightElement = document.createElement('div');
+                      document.body.appendChild(highlightElement);
+                      const boundingRect = parentElement.getBoundingClientRect();
+                      highlightElement.style.top = `${boundingRect.top}px`;
+                      highlightElement.style.left = `${boundingRect.left}px`;
+                      highlightElement.style.width = `${boundingRect.width}px`;
+                      highlightElement.style.height = `${boundingRect.height}px`;
+                      highlightElement.style.position = 'absolute';
+                      highlightDomElement(highlightElement, () => {
+                        document.body.removeChild(highlightElement);
+                      });
+                    }
+                  }, 500);
                 }
               }}
               startIcon={(
