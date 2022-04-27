@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages/triggers';
-import { IPageWithPermissions, resolveChildPages } from '../lib/pages/server';
+import { IPageWithPermissions, resolveChildPages } from 'lib/pages/server';
 
 async function recursiveRebuild (pageId: string | IPageWithPermissions, level = 0, sourcePageNumber = 0): Promise<true> {
   await setupPermissionsAfterPageRepositioned(pageId);
