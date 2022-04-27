@@ -38,7 +38,7 @@ const defaultCharmEditorContent = () => {
 };
 
 const StyledThreadBox = styled(Box)<{inline: boolean}>`
-  overflow: ${({ inline }) => inline ? 'auto' : 'inherit'};
+  overflow: ${({ inline }) => inline ? 'auto' : 'unset'};
   padding: ${({ theme }) => theme.spacing(2)};
   background: ${({ theme }) => theme.palette.background.light};
   width: ${({ inline }) => inline ? '500px' : 'inherit'};
@@ -60,7 +60,7 @@ const ThreadCommentListItem = styled(ListItem)<{highlight?: boolean}>`
   align-items: flex-start;
   padding-left: ${({ theme }) => theme.spacing(1)};
   padding-right: ${({ theme }) => theme.spacing(1)};
-  & .ProseMirror.bangle-editor: {
+  & .ProseMirror.bangle-editor {
     padding: 0px;
   }
 `;
@@ -93,7 +93,6 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
   const [editedComment, setEditedComment] = useState<null | string>(null);
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
-  console.log(123);
 
   function resetState () {
     setEditedComment(null);

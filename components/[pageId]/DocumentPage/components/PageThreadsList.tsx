@@ -59,12 +59,12 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
       </Box>
       <List sx={{
         // This is required to show the no thread graphic on the center
-        height: 'calc(100% - 50px)',
         overflow: 'auto',
         display: 'flex',
         flexDirection: 'column',
         gap: 1,
-        pt: 0
+        pt: 0,
+        height: 'calc(100% - 50px)'
       }}
       >
         {threadsList.length === 0 ? (

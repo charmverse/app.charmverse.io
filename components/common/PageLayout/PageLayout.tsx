@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
@@ -86,20 +85,23 @@ const HeaderSpacer = styled.div`
   min-height: ${headerHeight}px;
 `;
 
-export default function PageLayout ({ children }: { children: React.ReactNode }) {
+const LayoutContainer = styled.div`
+  display: flex;
+  height: 100%;
+`;
+
+function PageLayout ({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
   const [user] = useUser();
-  const { currentPageId, pages } = usePages();
-  const currentPage = pages[currentPageId];
   const [showingCommentThreadsList, setShowingCommentThreadsList] = React.useState(false);
 
-  const handleDrawerOpen = () => {
+  const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);
-  };
+  }, []);
 
-  const handleDrawerClose = () => {
+  const handleDrawerClose = React.useCallback(() => {
     setOpen(false);
-  };
+  }, []);
 
   const value = React.useMemo<IContext>(() => ({
     showingCommentThreadsList,
@@ -109,9 +111,9 @@ export default function PageLayout ({ children }: { children: React.ReactNode })
   return (
     <ThreadsContext.Provider value={value}>
       <Head>
-        <Favicon pageIcon={currentPage?.icon} />
+        <CurrentPageFavicon />
       </Head>
-      <Box sx={{ display: 'flex', height: '100%' }}>
+      <LayoutContainer>
         <AppBar position='fixed' open={open}>
           <Header
             setShowingCommentThreadsList={setShowingCommentThreadsList}
@@ -127,7 +129,7 @@ export default function PageLayout ({ children }: { children: React.ReactNode })
           <HeaderSpacer />
           {children}
         </PageContainer>
-      </Box>
+      </LayoutContainer>
     </ThreadsContext.Provider>
   );
 }
@@ -135,3 +137,11 @@ export default function PageLayout ({ children }: { children: React.ReactNode })
 export function useThreadsDisplay () {
   return React.useContext(ThreadsContext);
 }
+
+function CurrentPageFavicon () {
+  const { currentPageId, pages } = usePages();
+  const currentPage = pages[currentPageId];
+  return <Favicon pageIcon={currentPage?.icon} />;
+}
+
+export default PageLayout;

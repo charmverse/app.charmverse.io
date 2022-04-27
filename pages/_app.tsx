@@ -148,6 +148,7 @@ import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PagesProvider } from 'hooks/usePages';
 import { ThreadsProvider } from 'hooks/useThreads';
+import { ContributorsProvider } from 'hooks/useContributors';
 import { PageTitleProvider, TitleContext } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
@@ -326,19 +327,21 @@ function DataProviders ({ children }: { children: ReactNode }) {
   return (
     <UserProvider>
       <SpacesProvider>
-        <PagesProvider>
-          <ThreadsProvider>
-            <BountiesProvider>
-              <PaymentMethodsProvider>
-                <PageTitleProvider>
-                  <FocalboardViewsProvider>
-                    {children}
-                  </FocalboardViewsProvider>
-                </PageTitleProvider>
-              </PaymentMethodsProvider>
-            </BountiesProvider>
-          </ThreadsProvider>
-        </PagesProvider>
+        <ContributorsProvider>
+          <BountiesProvider>
+            <PaymentMethodsProvider>
+              <PagesProvider>
+                <ThreadsProvider>
+                  <PageTitleProvider>
+                    <FocalboardViewsProvider>
+                      {children}
+                    </FocalboardViewsProvider>
+                  </PageTitleProvider>
+                </ThreadsProvider>
+              </PagesProvider>
+            </PaymentMethodsProvider>
+          </BountiesProvider>
+        </ContributorsProvider>
       </SpacesProvider>
     </UserProvider>
   );

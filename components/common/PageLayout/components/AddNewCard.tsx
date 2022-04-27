@@ -9,8 +9,9 @@ import { StyledIconButton } from 'components/common/PageLayout/components/NewPag
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { mutate } from 'swr';
+import { memo } from 'react';
 
-export default function AddNewCard ({ pageId }: {pageId: string}) {
+function AddNewCard ({ pageId }: {pageId: string}) {
   const router = useRouter();
   const [space] = useCurrentSpace();
   const { pages } = usePages();
@@ -38,3 +39,5 @@ export default function AddNewCard ({ pageId }: {pageId: string}) {
     </Tooltip>
   );
 }
+
+export default memo(AddNewCard);
