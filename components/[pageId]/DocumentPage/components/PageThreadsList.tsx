@@ -2,8 +2,8 @@ import { Box, BoxProps, List, MenuItem, Select, SelectProps, Typography } from '
 import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { useThreads } from 'hooks/useThreads';
 import { useState } from 'react';
-import CommentSvg from 'public/svgs/comments.svg';
 import styled from '@emotion/styled';
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 
 const Center = styled.div`
   position: absolute;
@@ -32,6 +32,13 @@ const StyledPageThreadsList = styled(List)`
   height: calc(100% - 50px);
 `;
 
+const EmptyThreadContainerBox = styled(Box)`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: ${({ theme }) => theme.palette.background.light};
+`;
+
 export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
   const { threads } = useThreads();
   const allThreads = Object.values(threads);
@@ -45,7 +52,6 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
   const handleThreadListSortChange: SelectProps['onChange'] = (event) => {
     setThreadSort(event.target.value as any);
   };
-
   const threadsList = (threadClass === 'resolved' ? resolvedThreads : unResolvedThreads).sort((threadA, threadB) => threadA && threadB ? new Date((threadSort === 'earliest' ? threadA : threadB).createdAt).getTime() - new Date((threadSort === 'earliest' ? threadB : threadA).createdAt).getTime() : 0);
 
   return (
@@ -72,10 +78,19 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
       </Box>
       <StyledPageThreadsList>
         {threadsList.length === 0 ? (
-          <Center>
-            <CommentSvg />
-            <Typography variant='subtitle1' color='secondary'>No {threadClass} threads yet </Typography>
-          </Center>
+          <EmptyThreadContainerBox>
+            <Center>
+              <ForumOutlinedIcon
+                fontSize='large'
+                color='secondary'
+                sx={{
+                  height: '2em',
+                  width: '2em'
+                }}
+              />
+              <Typography variant='subtitle1' color='secondary'>No {threadClass} threads yet</Typography>
+            </Center>
+          </EmptyThreadContainerBox>
         ) : threadsList.map(resolvedThread => resolvedThread
           && <PageThread showFindButton inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
       </StyledPageThreadsList>
