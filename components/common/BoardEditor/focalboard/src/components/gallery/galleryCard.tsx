@@ -177,8 +177,8 @@ const GalleryCard = React.memo((props: Props) => {
               placement='top'
             >
               <PropertyValueElement
-                updatedAt={cardPage!.updatedAt.toString()}
-                updatedBy={cardPage!.updatedBy}
+                updatedAt={cardPage?.updatedAt.toString() || ''}
+                updatedBy={cardPage?.updatedBy || ''}
                 board={board}
                 readOnly={true}
                 card={card}

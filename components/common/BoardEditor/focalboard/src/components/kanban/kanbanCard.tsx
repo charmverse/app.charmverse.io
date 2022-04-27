@@ -187,8 +187,8 @@ const KanbanCard = React.memo((props: Props) => {
               board={board}
               readOnly={true}
               card={card}
-              contents={contents}
-              comments={comments}
+              updatedAt={cardPage?.updatedAt.toString() || ''}
+              updatedBy={cardPage?.updatedBy || ''}
               propertyTemplate={template}
               showEmptyPlaceholder={false}
             />
