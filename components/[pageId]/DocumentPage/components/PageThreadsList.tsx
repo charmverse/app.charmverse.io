@@ -16,6 +16,21 @@ const Center = styled.div`
   flex-direction: column;
 `;
 
+const StyledPageThreadsBox = styled(Box)`
+  max-width: 550px;
+  height: 100%;
+  width: 100%;
+`;
+
+const StyledPageThreadsList = styled(List)`
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(1)};
+  padding-top: ${({ theme }) => theme.spacing(1)};
+  height: calc(100% - 50px);
+`;
+
 export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
   const { threads } = useThreads();
   const allThreads = Object.values(threads);
@@ -33,15 +48,12 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
   const threadsList = (threadClass === 'resolved' ? resolvedThreads : unResolvedThreads).sort((threadA, threadB) => threadA && threadB ? new Date((threadSort === 'earliest' ? threadA : threadB).createdAt).getTime() - new Date((threadSort === 'earliest' ? threadB : threadA).createdAt).getTime() : 0);
 
   return (
-    <Box
+    <StyledPageThreadsBox
       // The className is used to refer to it using regular dom api
       className='PageThreadsList'
       {...props}
       sx={{
-        ...(sx ?? {}),
-        maxWidth: 550,
-        height: '100%',
-        width: '100%'
+        ...(sx ?? {})
       }}
     >
       <Box display='flex' alignItems='center' justifyContent='space-between' mb={1}>
@@ -57,23 +69,14 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
           </Select>
         </Box>
       </Box>
-      <List sx={{
-        // This is required to show the no thread graphic on the center
-        overflow: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 1,
-        pt: 0,
-        height: 'calc(100% - 50px)'
-      }}
-      >
+      <StyledPageThreadsList>
         {threadsList.length === 0 ? (
           <Center>
             <CommentSvg />
             <Typography variant='subtitle1' color='secondary'>No {threadClass} threads yet </Typography>
           </Center>
         ) : threadsList.map(resolvedThread => resolvedThread && <PageThread inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
-      </List>
-    </Box>
+      </StyledPageThreadsList>
+    </StyledPageThreadsBox>
   );
 }

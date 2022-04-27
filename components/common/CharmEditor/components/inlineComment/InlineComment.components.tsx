@@ -1,11 +1,12 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { ClickAwayListener } from '@mui/material';
+import { useThreadsDisplay } from 'components/common/PageLayout/PageLayout';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { SuggestTooltipPluginKey, SuggestTooltipPluginState, hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import PageThread from '../PageThread';
 
-export default function InlineCommentThread ({ showingCommentThreadsList }: {showingCommentThreadsList: boolean}) {
+export default function InlineCommentThread () {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -14,6 +15,7 @@ export default function InlineCommentThread ({ showingCommentThreadsList }: {sho
     threadId
   } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
   const { threads } = useThreads();
+  const { showingCommentThreadsList } = useThreadsDisplay();
   const thread = threadId ? threads[threadId] : null;
   if (isVisible && component === 'inlineComment' && threadId && !thread?.resolved) {
     // Only show comment thread on inline comment if the page threads list is not active

@@ -27,7 +27,7 @@ import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
-import { Portal } from '@mui/material';
+import { Grow, Portal } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import Callout, * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
@@ -440,11 +440,11 @@ function CharmEditor (
       <InlinePalette />
       {children}
       {commentThreadsListRef?.current && showingCommentThreadsList && (
-        <Portal container={commentThreadsListRef.current}>
-          <PageThreadsList inline={false} />
-        </Portal>
+      <Portal container={commentThreadsListRef.current}>
+        <PageThreadsList inline={false} />
+      </Portal>
       )}
-      <InlineCommentThread showingCommentThreadsList={showingCommentThreadsList} />
+      <InlineCommentThread />
     </StyledReactBangleEditor>
   );
 }
