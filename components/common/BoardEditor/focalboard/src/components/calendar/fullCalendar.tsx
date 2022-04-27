@@ -76,8 +76,8 @@ const CalendarFullView = (props: Props): JSX.Element|null => {
         initialDate = new Date()
     }
 
-    const {pages} = usePages() 
-    
+    const {pages} = usePages()
+
     const isEditable = useCallback(() : boolean => {
         if (readonly || !dateDisplayProperty || (dateDisplayProperty.type === 'createdTime' || dateDisplayProperty.type === 'updatedTime')) {
             return false
@@ -140,8 +140,8 @@ const CalendarFullView = (props: Props): JSX.Element|null => {
                             board={board}
                             readOnly={true}
                             card={cards.find((o) => o.id === event.id) || cards[0]}
-                            contents={[]}
-                            comments={[]}
+                            updatedAt=''
+                            updatedBy=''
                             propertyTemplate={template}
                             showEmptyPlaceholder={false}
                         />

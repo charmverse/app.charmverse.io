@@ -34,7 +34,6 @@ const URLProperty = (props: Props): JSX.Element => {
             </a>
         )
     }
-
     return (
         <div className='URLProperty property-link url'>
             {(hasValue || props.placeholder) &&
@@ -42,7 +41,7 @@ const URLProperty = (props: Props): JSX.Element => {
                 className='octo-propertyvalue'
                 placeholderText={props.placeholder}
                 value={props.value}
-                autoExpand={true}
+                autoExpand={false}
                 readonly={props.readonly}
                 onChange={props.onChange}
                 onSave={props.onSave}

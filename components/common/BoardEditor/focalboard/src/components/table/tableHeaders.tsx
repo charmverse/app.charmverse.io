@@ -41,9 +41,11 @@ const TableHeaders = (props: Props): JSX.Element => {
         let longestSize = headerWidth
         const visibleProperties = board.fields.cardProperties.filter(() => activeView.fields.visiblePropertyIds.includes(columnID)) || []
         const columnRef = columnRefs.get(columnID)
+        console.log('onAutosize column ... ', columnRef)
         if (!columnRef?.current) {
             return
         }
+        console.log('onAutosize column', columnRef)
 
         let template: IPropertyTemplate | undefined
         const columnFontPadding = Utils.getFontAndPaddingFromCell(columnRef.current)

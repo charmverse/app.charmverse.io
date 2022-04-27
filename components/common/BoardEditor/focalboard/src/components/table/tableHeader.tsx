@@ -38,6 +38,7 @@ const TableHeader = (props: Props): JSX.Element => {
     }
 
     const onAutoSizeColumn = React.useCallback((templateId: string) => {
+        console.log('auto size column')
         let width = Constants.minColumnWidth
         if (columnRef.current) {
             const {fontDescriptor, padding} = Utils.getFontAndPaddingFromCell(columnRef.current)

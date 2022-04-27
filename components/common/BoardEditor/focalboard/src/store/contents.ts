@@ -1,14 +1,18 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {createSlice, PayloadAction, createSelector} from '@reduxjs/toolkit'
+import {createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit'
+import { createSelectorCreator, defaultMemoize } from 'reselect'
 
+import isEqual from 'lodash/isEqual'
 import {ContentBlock} from '../blocks/contentBlock'
 
 import {getCards, getTemplates} from './cards'
 import {initialLoad, initialReadOnlyLoad} from './initialLoad'
 
 import {RootState} from './index'
+
+export const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
 
 const contentsSlice = createSlice({
     name: 'contents',
@@ -81,3 +85,33 @@ export function getCardContents(cardId: string): (state: RootState) => Array<Con
         },
     )
 }
+
+// optimized version. see: https://react-redux.js.org/api/hooks
+// export function getCardContentsMemoFriendly(): (state: RootState, cardId: string) => Array<ContentBlock|ContentBlock[]> {
+//     return createDeepEqualSelector(
+//         getContentsById,
+//         (_: RootState, cardId: string) => cardId,
+//         getCards,
+//         getTemplates,
+//         (contents, cardId, cards, templates): Array<ContentBlock|ContentBlock[]> => {
+//             const card = {...cards, ...templates}[cardId]
+//             const result: Array<ContentBlock|ContentBlock[]> = []
+//             if (card?.fields?.contentOrder) {
+//                 for (const contentId of card.fields.contentOrder) {
+//                     if (typeof contentId === 'string' && contents[contentId]) {
+//                         result.push(contents[contentId])
+//                     } else if (typeof contentId === 'object') {
+//                         const subResult: ContentBlock[] = []
+//                         for (const subContentId of contentId) {
+//                             if (typeof subContentId === 'string' && contents[subContentId]) {
+//                                 subResult.push(contents[subContentId])
+//                             }
+//                         }
+//                         result.push(subResult)
+//                     }
+//                 }
+//             }
+//             return result
+//         },
+//     )
+// }
