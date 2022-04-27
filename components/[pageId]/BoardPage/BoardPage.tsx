@@ -150,9 +150,6 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
           <RootPortal>
             <CardDialog
               board={board}
-              activeView={activeView}
-              views={boardViews}
-              cards={accessibleCards}
               key={shownCardId}
               cardId={shownCardId}
               onClose={() => showCard(undefined)}

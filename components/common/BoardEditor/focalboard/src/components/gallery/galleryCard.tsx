@@ -63,7 +63,7 @@ const GalleryCard = React.memo((props: Props) => {
 
   let galleryImageUrl: null | string | undefined = cardPage?.headerImage;
   const cardPageContent = cardPage?.content as PageContent
-  
+
   if (cardPageContent && !galleryImageUrl) {
     if (cardPageContent?.content) {
       for (let index = 0; index < cardPageContent.content.length; index++) {
@@ -177,8 +177,8 @@ const GalleryCard = React.memo((props: Props) => {
               placement='top'
             >
               <PropertyValueElement
-                contents={contents}
-                comments={comments}
+                updatedAt={cardPage!.updatedAt.toString()}
+                updatedBy={cardPage!.updatedBy}
                 board={board}
                 readOnly={true}
                 card={card}

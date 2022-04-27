@@ -1,13 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import EditorPage from 'components/[pageId]/EditorPage/EditorPage'
+
 import DocumentPage from 'components/[pageId]/DocumentPage'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
-import { Board } from '../../blocks/board'
-import { BoardView } from '../../blocks/boardView'
 import { Card } from '../../blocks/card'
-import { ContentBlock } from '../../blocks/contentBlock'
 import mutator from '../../mutator'
 import { Focusable } from '../../widgets/editable'
 import useImagePaste from './imagePaste'
@@ -18,18 +14,12 @@ import charmClient from 'charmClient';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 type Props = {
-    board: Board
-    activeView: BoardView
-    views: BoardView[]
-    cards: Card[]
     card: Card
-    contents: Array<ContentBlock|ContentBlock[]>
     readonly: boolean
 }
 
 const CardDetail = (props: Props): JSX.Element|null => {
     const {card, readonly} = props
-    const router = useRouter();
 
     const [title, setTitle] = useState(card.title)
     const [serverTitle, setServerTitle] = useState(card.title)

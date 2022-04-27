@@ -77,9 +77,6 @@ describe('components/cardDialog', () => {
                 <ReduxProvider store={store}>
                     <CardDialog
                         board={board}
-                        activeView={boardView}
-                        views={[boardView]}
-                        cards={[card]}
                         cardId={card.id}
                         onClose={jest.fn()}
                         showCard={jest.fn()}
@@ -98,9 +95,6 @@ describe('components/cardDialog', () => {
                 <ReduxProvider store={store}>
                     <CardDialog
                         board={board}
-                        activeView={boardView}
-                        views={[boardView]}
-                        cards={[card]}
                         cardId={card.id}
                         onClose={jest.fn()}
                         showCard={jest.fn()}
@@ -119,9 +113,6 @@ describe('components/cardDialog', () => {
                 <ReduxProvider store={store}>
                     <CardDialog
                         board={board}
-                        activeView={boardView}
-                        views={[boardView]}
-                        cards={[card]}
                         cardId={card.id}
                         onClose={closeFn}
                         showCard={jest.fn()}
@@ -141,9 +132,6 @@ describe('components/cardDialog', () => {
                 <ReduxProvider store={store}>
                     <CardDialog
                         board={board}
-                        activeView={boardView}
-                        views={[boardView]}
-                        cards={[card]}
                         cardId={card.id}
                         onClose={jest.fn()}
                         showCard={jest.fn()}
@@ -163,9 +151,6 @@ describe('components/cardDialog', () => {
                 <ReduxProvider store={store}>
                     <CardDialog
                         board={board}
-                        activeView={boardView}
-                        views={[boardView]}
-                        cards={[card]}
                         cardId={card.id}
                         onClose={jest.fn()}
                         showCard={jest.fn()}
@@ -199,9 +184,6 @@ describe('components/cardDialog', () => {
                 <ReduxProvider store={store}>
                     <CardDialog
                         board={board}
-                        activeView={boardView}
-                        views={[boardView]}
-                        cards={[card]}
                         cardId={card.id}
                         onClose={jest.fn()}
                         showCard={jest.fn()}
@@ -236,9 +218,6 @@ describe('components/cardDialog', () => {
                 <ReduxProvider store={store}>
                     <CardDialog
                         board={board}
-                        activeView={boardView}
-                        views={[boardView]}
-                        cards={[card]}
                         cardId={card.id}
                         onClose={jest.fn()}
                         showCard={jest.fn()}
@@ -260,9 +239,6 @@ describe('components/cardDialog', () => {
                 <ReduxProvider store={store}>
                     <CardDialog
                         board={board}
-                        activeView={boardView}
-                        views={[boardView]}
-                        cards={[card]}
                         cardId={card.id}
                         onClose={jest.fn()}
                         showCard={jest.fn()}
@@ -299,9 +275,6 @@ describe('components/cardDialog', () => {
                 <ReduxProvider store={newStore}>
                     <CardDialog
                         board={board}
-                        activeView={boardView}
-                        views={[boardView]}
-                        cards={[card]}
                         cardId={card.id}
                         onClose={jest.fn()}
                         showCard={jest.fn()}

@@ -67,13 +67,7 @@ describe('components/cardDetail/CardDetail', () => {
             <ReduxProvider store={store}>
                 {wrapIntl(
                     <CardDetail
-                        board={board}
-                        activeView={view}
-                        views={[view]}
-                        cards={[card]}
                         card={card}
-                        //comments={[comment1, comment2]}
-                        contents={[]}
                         readonly={false}
                     />,
                 )}
@@ -112,12 +106,7 @@ describe('components/cardDetail/CardDetail', () => {
             <ReduxProvider store={store}>
                 {wrapIntl(
                     <CardDetail
-                        board={board}
-                        activeView={view}
-                        views={[view]}
-                        cards={[card]}
                         card={card}
-                        contents={[]}
                         readonly={true}
                     />,
                 )}
