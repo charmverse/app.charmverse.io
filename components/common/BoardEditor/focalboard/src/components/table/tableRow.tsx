@@ -82,7 +82,6 @@ function TableRow (props: Props) {
             ref={cardRef}
             style={{opacity: isDragging ? 0.5 : 1}}
         >
-
             {/* Name / title */}
             <div
                 className='octo-table-cell title-cell'
@@ -128,7 +127,7 @@ function TableRow (props: Props) {
                             card={card}
                             board={board}
                             propertyTemplate={template}
-                            showEmptyPlaceholder={false}
+                            showEmptyPlaceholder={true}
                             updatedAt={pageUpdatedAt}
                             updatedBy={pageUpdatedBy}
                         />

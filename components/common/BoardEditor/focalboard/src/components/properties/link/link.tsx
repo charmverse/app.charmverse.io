@@ -34,7 +34,6 @@ const URLProperty = (props: Props): JSX.Element => {
             </a>
         )
     }
-
     return (
         <div className='URLProperty property-link url'>
             {(hasValue || props.placeholder) &&

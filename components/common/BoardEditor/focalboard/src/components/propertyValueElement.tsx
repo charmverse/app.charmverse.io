@@ -51,29 +51,12 @@ const PropertyValueElement = (props:Props): JSX.Element => {
 
     const editableFields: Array<PropertyType> = ['text', 'number', 'email', 'url', 'phone']
 
-    const saveTextProperty = useCallback(() => {
-        if (editableFields.includes(props.propertyTemplate.type)) {
-            if (value !== (props.card.fields.properties[props.propertyTemplate.id] || '')) {
-                mutator.changePropertyValue(card, propertyTemplate.id, value)
-            }
-        }
-    }, [props.card, props.propertyTemplate, value])
-
-    const saveTextPropertyRef = useRef<() => void>(saveTextProperty)
-    saveTextPropertyRef.current = saveTextProperty
-
     useEffect(() => {
         if (serverValue === value) {
             setValue(props.card.fields.properties[props.propertyTemplate.id] || '')
         }
         setServerValue(props.card.fields.properties[props.propertyTemplate.id] || '')
     }, [value, props.card.fields.properties[props.propertyTemplate.id]])
-
-    useEffect(() => {
-        return () => {
-            saveTextPropertyRef.current && saveTextPropertyRef.current()
-        }
-    }, [])
 
     const onDeleteValue = useCallback(() => mutator.changePropertyValue(card, propertyTemplate.id, ''), [card, propertyTemplate.id])
 
@@ -185,7 +168,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                 readonly={readOnly}
                 placeholder={emptyDisplayValue}
                 onChange={setValue}
-                onSave={saveTextProperty}
+                onSave={() => mutator.changePropertyValue(card, propertyTemplate.id, value)}
                 onCancel={() => setValue(propertyValue || '')}
                 validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
             />
@@ -234,7 +217,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                     value={value.toString()}
                     autoExpand={false}
                     onChange={setValue}
-                    onSave={saveTextProperty}
+                    onSave={() => mutator.changePropertyValue(card, propertyTemplate.id, value)}
                     onCancel={() => setValue(propertyValue || '')}
                     validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
                     spellCheck={propertyTemplate.type === 'text'}
