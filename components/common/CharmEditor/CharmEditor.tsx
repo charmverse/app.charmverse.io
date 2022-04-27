@@ -373,7 +373,7 @@ function CharmEditor (
 
         switch (props.node.type.name) {
           case 'paragraph': {
-            return <Paragraph {...props}>{_children}</Paragraph>;
+            return <Paragraph calculateInlineComments={!showingCommentThreadsList} {...props}>{_children}</Paragraph>;
           }
           case 'quote':
             return <Quote {...props}>{_children}</Quote>;

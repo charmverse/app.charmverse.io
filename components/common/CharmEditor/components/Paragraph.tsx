@@ -7,10 +7,15 @@ import { Box } from '@mui/material';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { renderSuggestionsTooltip, SuggestTooltipPluginKey } from './@bangle.dev/tooltip/suggest-tooltip';
 
-export default function Paragraph ({ node, children }: NodeViewProps & {children: ReactNode}) {
+export default function Paragraph (
+  { node, children, calculateInlineComments = true }:
+  NodeViewProps & {children: ReactNode, calculateInlineComments?: boolean}
+) {
   const { findTotalInlineComments } = useInlineComment();
   const { threads } = useThreads();
-  const { threadIds, totalInlineComments } = useMemo(() => findTotalInlineComments(node), [threads, node]);
+  const { threadIds, totalInlineComments } = useMemo(() => calculateInlineComments
+    ? findTotalInlineComments(node)
+    : { threadIds: [], totalInlineComments: 0 }, [threads, node, calculateInlineComments]);
   const view = useEditorViewContext();
   return (
     <>

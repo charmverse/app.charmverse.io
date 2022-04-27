@@ -30,7 +30,8 @@ export default function InlineCommentThread () {
           overflow: 'auto',
           display: 'flex',
           gap: 1,
-          flexDirection: 'column'
+          flexDirection: 'column',
+          minWidth: 500
         }}
         >
           {unResolvedThreads.map(resolvedThread => resolvedThread

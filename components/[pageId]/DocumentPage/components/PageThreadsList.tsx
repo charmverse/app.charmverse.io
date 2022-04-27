@@ -76,7 +76,8 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
             <CommentSvg />
             <Typography variant='subtitle1' color='secondary'>No {threadClass} threads yet </Typography>
           </Center>
-        ) : threadsList.map(resolvedThread => resolvedThread && <PageThread inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
+        ) : threadsList.map(resolvedThread => resolvedThread
+          && <PageThread showFindButton inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
       </StyledPageThreadsList>
     </StyledPageThreadsBox>
   );
