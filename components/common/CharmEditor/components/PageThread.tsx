@@ -128,7 +128,7 @@ export default forwardRef<HTMLDivElement,
                     for (let i = 0; i < 5; i++) {
                       element = threadDocument.parentElement;
                       // Get the first paragraph parent element
-                      if (element?.tagName === 'P') {
+                      if (element?.classList.contains('bangle-nv-content')) {
                         parentElement = element;
                         break;
                       }

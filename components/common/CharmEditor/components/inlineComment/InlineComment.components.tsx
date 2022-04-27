@@ -1,10 +1,20 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import styled from '@emotion/styled';
 import { Box, ClickAwayListener } from '@mui/material';
 import { useThreadsDisplay } from 'components/common/PageLayout/PageLayout';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { SuggestTooltipPluginKey, SuggestTooltipPluginState, hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import PageThread from '../PageThread';
+
+const ThreadContainerBox = styled(Box)`
+  max-height: 400px;
+  overflow: auto;
+  display: flex;
+  gap: 1;
+  flex-direction: column;
+  min-width: 500px;
+`;
 
 export default function InlineCommentThread () {
   const view = useEditorViewContext();
@@ -25,18 +35,10 @@ export default function InlineCommentThread () {
         hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
       }}
       >
-        <Box sx={{
-          maxHeight: 400,
-          overflow: 'auto',
-          display: 'flex',
-          gap: 1,
-          flexDirection: 'column',
-          minWidth: 500
-        }}
-        >
+        <ThreadContainerBox>
           {unResolvedThreads.map(resolvedThread => resolvedThread
             && <PageThread inline={false} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
-        </Box>
+        </ThreadContainerBox>
       </ClickAwayListener>,
       tooltipContentDOM
     ) : null;

@@ -31,7 +31,7 @@ export function useInlineComment () {
           else {
             const page = pages[value];
             if (page) {
-              textContent += `@${page.title}`;
+              textContent += `@${page.title || 'Untitled'}`;
             }
           }
         }
