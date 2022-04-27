@@ -15,7 +15,7 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
-import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
+import { DOMOutputSpec, EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { useState, CSSProperties, ReactNode, memo, RefObject, useCallback } from 'react';
 import styled from '@emotion/styled';
@@ -104,6 +104,7 @@ export const specRegistry = new SpecRegistry([
   //   cellContent: 'My Cell',
   //   cellContentGroup: 'My Group'
   // })
+
 ]);
 
 export function charmEditorPlugins (

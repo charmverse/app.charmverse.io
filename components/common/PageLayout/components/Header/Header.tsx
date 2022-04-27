@@ -10,7 +10,6 @@ import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
@@ -24,14 +23,11 @@ import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
 import CommentIcon from '@mui/icons-material/Comment';
-import { useThreads } from 'hooks/useThreads';
 import { BangleEditorState } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import { PageContent } from 'models';
 import { Node } from '@bangle.dev/pm';
 import ListItemText from '@mui/material/ListItemText';
-import { hideSuggestionsTooltip, SuggestTooltipPluginKey } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
-import { useEditorViewContext } from '@bangle.dev/react';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -50,7 +46,6 @@ export default function Header (
     showingCommentThreadsList: boolean,
     setShowingCommentThreadsList: React.Dispatch<React.SetStateAction<boolean>>, open: boolean, openSidebar: () => void }
 ) {
-  const { threads } = useThreads();
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, currentPageId } = usePages();
@@ -76,7 +71,6 @@ export default function Header (
     setUser({ ...user, ...updatedFields });
   }
 
-  // TODO: Add this back
   function generateMarkdown () {
     if (currentPage && isExportablePage) {
       const serializer = markdownSerializer(specRegistry);
@@ -183,6 +177,7 @@ export default function Header (
                 <List dense>
                   <ListItemButton onClick={() => {
                     setPageMenuOpen(false);
+                    generateMarkdown();
                   }}
                   >
                     <GetAppIcon

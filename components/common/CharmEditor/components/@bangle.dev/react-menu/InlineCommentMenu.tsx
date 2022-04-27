@@ -5,6 +5,7 @@ import { Box, Button } from '@mui/material';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
+import { useContributors } from 'hooks/useContributors';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
 import { PageContent } from 'models';
@@ -24,16 +25,39 @@ export function InlineCommentSubMenu({pluginKey}: {pluginKey: PluginKey}) {
       }
     ]
   });
+  const [contributors] = useContributors()
   const {setThreads} = useThreads()
-  const {currentPageId} = usePages()
+  const {currentPageId, pages} = usePages()
   const isEmpty = checkForEmpty(commentContent);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!isEmpty) {
       e.preventDefault();
+      // Get the context from current selection
+      const cutDoc = view.state.doc.cut(view.state.selection.from, view.state.selection.to);
+      let context = '';
+      cutDoc.descendants(node => {
+        if (node.isText) {
+          context += node.text 
+        } else if (node.type.name === "mention") {
+          const {type, value} = node.attrs;
+          if (type === "user") {
+            const contributor = contributors.find(_contributor => _contributor.id === value);
+            if (contributor) {
+              context += `@${(contributor.username ?? contributor.addresses[0])}`
+            }
+          } else {
+            const page = pages[value];
+            if (page) {
+              context += `@${page.title}`
+            }
+          }
+        } else if (node.type.name === "emoji") {
+          context += node.attrs.emoji
+        }
+      })
       const threadWithComment = await charmClient.startThread({
         content: commentContent,
-        // Get the context from current selection
-        context: view.state.doc.cut(view.state.selection.from, view.state.selection.to).textContent,
+        context,
         pageId: currentPageId
       });
       setThreads((_threads) =>({..._threads, [threadWithComment.id]: threadWithComment}))
