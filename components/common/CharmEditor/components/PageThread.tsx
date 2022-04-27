@@ -76,15 +76,15 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon }: {di
 }
 
 export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(({ threadId, inline = true }, ref) => {
-  const { threads, setThreads } = useThreads();
+  const { deleteThread, resolveThread, deleteComment, editComment, addComment, threads } = useThreads();
   const [user] = useUser();
   const theme = useTheme();
   const [commentContent, setCommentContent] = useState<PageContent>(defaultCharmEditorContent());
   const [isMutating, setIsMutating] = useState(false);
   const [editedComment, setEditedComment] = useState<null | string>(null);
-  const { removeInlineCommentMark } = useInlineComment();
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
+
   function resetState () {
     setEditedComment(null);
     setIsMutating(false);
@@ -93,107 +93,6 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
 
   const isEmpty = checkForEmpty(commentContent);
   const thread = threadId ? threads[threadId] : null;
-
-  async function addComment () {
-    if (thread && !isMutating) {
-      try {
-        setIsMutating(true);
-        const comment = await charmClient.addComment({
-          content: commentContent,
-          threadId: thread.id,
-          pageId: currentPageId
-        });
-
-        setThreads((_threads) => ({ ..._threads,
-          [thread.id]: {
-            ...thread,
-            Comment: [...thread.Comment, comment]
-          } }));
-      }
-      catch (_) {
-        //
-      }
-      resetState();
-    }
-  }
-
-  async function editComment () {
-    if (thread && editedComment && !isMutating) {
-      try {
-        setIsMutating(true);
-        await charmClient.editComment(editedComment, commentContent);
-        setThreads((_threads) => ({ ..._threads,
-          [thread.id]: {
-            ...thread,
-            Comment: thread.Comment.map(comment => comment.id === editedComment ? ({ ...comment, content: commentContent }) : comment)
-          } }));
-      }
-      catch (_) {
-        //
-      }
-      resetState();
-    }
-  }
-
-  async function deleteComment (commentId: string) {
-    if (thread) {
-      const comment = thread.Comment.find(_comment => _comment.id === commentId);
-      if (comment) {
-        try {
-          await charmClient.deleteComment(comment.id);
-          const threadWithoutComment = {
-            ...thread,
-            Comment: thread.Comment.filter(_comment => _comment.id !== comment.id)
-          };
-          setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
-        }
-        catch (_) {
-          //
-        }
-        if (editedComment === comment.id) {
-          setEditedComment(null);
-        }
-        setIsMutating(false);
-      }
-    }
-  }
-
-  async function resolveThread () {
-    if (thread) {
-      setIsMutating(true);
-      try {
-        await charmClient.updateThread(thread.id, {
-          resolved: !thread.resolved
-        });
-        setThreads((_threads) => ({ ..._threads,
-          [thread.id]: {
-            ...thread,
-            resolved: !thread.resolved
-          } }));
-        removeInlineCommentMark(thread.id);
-      }
-      catch (_) {
-        //
-      }
-      setIsMutating(false);
-    }
-  }
-
-  async function deleteThread () {
-    if (thread) {
-      setIsMutating(true);
-      try {
-        await charmClient.deleteThread(thread.id);
-        delete threads[thread.id];
-        setThreads({ ...threads });
-        removeInlineCommentMark(thread.id, true);
-      }
-      catch (_) {
-        //
-      }
-      setIsMutating(false);
-    }
-  }
 
   return thread ? (
     <StyledThreadBox inline={inline} id={`thread.${threadId}`} ref={ref}>
@@ -230,7 +129,11 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 />
               )}
               disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
-              onClick={resolveThread}
+              onClick={async () => {
+                setIsMutating(true);
+                await resolveThread(threadId);
+                setIsMutating(false);
+              }}
             />
             <ThreadHeaderButton
               startIcon={(
@@ -239,7 +142,11 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                 />
             )}
               text='Delete'
-              onClick={deleteThread}
+              onClick={async () => {
+                setIsMutating(true);
+                await deleteThread(threadId);
+                setIsMutating(false);
+              }}
               disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
             />
           </Box>
@@ -283,8 +190,13 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
                     </IconButton>
                     <IconButton
                       size='small'
-                      onClick={() => {
-                        deleteComment(comment.id);
+                      onClick={async () => {
+                        setIsMutating(true);
+                        await deleteComment(threadId, comment.id);
+                        if (editedComment === comment.id) {
+                          resetState();
+                        }
+                        setIsMutating(false);
                       }}
                     >
                       <DeleteIcon fontSize='small' color='error' />
@@ -338,15 +250,21 @@ export default forwardRef<HTMLDivElement, {threadId: string, inline?: boolean}>(
             }}
             disabled={isMutating || isEmpty}
             size='small'
-            onClick={() => editedComment ? editComment() : addComment()}
+            onClick={async () => {
+              setIsMutating(true);
+              if (editedComment) {
+                await editComment(threadId, editedComment, commentContent);
+              }
+              else {
+                await addComment(threadId, commentContent);
+              }
+              resetState();
+            }}
           >{editedComment ? 'Edit' : 'Add'}
           </Button>
           {editedComment && (
           <Button
-            onClick={() => {
-              setCommentContent(defaultCharmEditorContent());
-              setEditedComment(null);
-            }}
+            onClick={resetState}
             color='error'
             size='small'
           >Cancel

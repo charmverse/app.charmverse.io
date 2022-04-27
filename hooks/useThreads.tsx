@@ -2,33 +2,147 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { PageContent } from 'models';
 import { usePages } from './usePages';
+import { useInlineComment } from './useInlineComment';
 
 type IContext = {
   threads: Record<string, ThreadWithComments | undefined>,
   setThreads: Dispatch<SetStateAction<Record<string, ThreadWithComments | undefined>>>,
+  addComment: (threadId: string, commentContent: PageContent) => Promise<void>,
+  editComment: (threadId: string, commentId: string, commentContent: PageContent) => Promise<void>,
+  deleteComment: (threadId: string, commentId: string) => Promise<void>,
+  resolveThread: (threadId: string) => Promise<void>,
+  deleteThread: (threadId: string) => Promise<void>,
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
 
 export const ThreadsContext = createContext<Readonly<IContext>>({
   threads: {},
-  setThreads: () => undefined
+  setThreads: () => undefined,
+  addComment: () => undefined as any,
+  editComment: () => undefined as any,
+  deleteComment: () => undefined as any,
+  resolveThread: () => undefined as any,
+  deleteThread: () => undefined as any
 });
 
 export function ThreadsProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const [threads, setThreads] = useState<Record<string, ThreadWithComments | undefined>>({});
+  const { removeInlineCommentMark } = useInlineComment();
 
   const { data } = useSWR(() => currentPageId ? `pages/${currentPageId}/threads` : null, () => charmClient.getPageThreads(currentPageId), { refreshInterval });
   useEffect(() => {
     setThreads(data?.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
   }, [data]);
 
+  async function addComment (threadId: string, commentContent: PageContent) {
+    const thread = threads[threadId];
+    if (thread) {
+      try {
+        const comment = await charmClient.addComment({
+          content: commentContent,
+          threadId: thread.id,
+          pageId: currentPageId
+        });
+
+        setThreads((_threads) => ({ ..._threads,
+          [thread.id]: {
+            ...thread,
+            Comment: [...thread.Comment, comment]
+          } }));
+      }
+      catch (_) {
+        //
+      }
+    }
+  }
+
+  async function editComment (threadId: string, editedCommentId: string, commentContent: PageContent) {
+    const thread = threads[threadId];
+    if (thread) {
+      try {
+        await charmClient.editComment(editedCommentId, commentContent);
+        setThreads((_threads) => ({ ..._threads,
+          [thread.id]: {
+            ...thread,
+            Comment: thread.Comment.map(comment => comment.id === editedCommentId ? ({ ...comment, content: commentContent }) : comment)
+          } }));
+      }
+      catch (_) {
+        //
+      }
+    }
+  }
+
+  async function deleteComment (threadId: string, commentId: string) {
+    const thread = threads[threadId];
+    if (thread) {
+      const comment = thread.Comment.find(_comment => _comment.id === commentId);
+      if (comment) {
+        try {
+          await charmClient.deleteComment(comment.id);
+          const threadWithoutComment = {
+            ...thread,
+            Comment: thread.Comment.filter(_comment => _comment.id !== comment.id)
+          };
+          setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
+        }
+        catch (_) {
+          //
+        }
+      }
+    }
+  }
+
+  async function resolveThread (threadId: string) {
+    const thread = threads[threadId];
+
+    if (thread) {
+      try {
+        await charmClient.updateThread(thread.id, {
+          resolved: !thread.resolved
+        });
+        setThreads((_threads) => ({ ..._threads,
+          [thread.id]: {
+            ...thread,
+            resolved: !thread.resolved
+          } }));
+        removeInlineCommentMark(thread.id);
+      }
+      catch (_) {
+        //
+      }
+    }
+  }
+
+  async function deleteThread (threadId: string) {
+    const thread = threads[threadId];
+
+    if (thread) {
+      try {
+        await charmClient.deleteThread(thread.id);
+        delete threads[thread.id];
+        setThreads({ ...threads });
+        removeInlineCommentMark(thread.id, true);
+      }
+      catch (_) {
+        //
+      }
+    }
+  }
+
   const value: IContext = useMemo(() => ({
     threads,
-    setThreads
-  }), [currentPageId, threads, setThreads]);
+    setThreads,
+    addComment,
+    editComment,
+    deleteComment,
+    resolveThread,
+    deleteThread
+  }), [currentPageId, threads]);
 
   return (
     <ThreadsContext.Provider value={value}>
