@@ -394,8 +394,14 @@ ol li {
 /** Disclosure component **/
 details {
   padding-left: 14px;
+  
   summary {
     margin-left: -14px;
+    outline: 0 none;
+
+    &::marker {
+      color: var(--prop-gray);
+    }
 
     & > * {
       display: inline;
