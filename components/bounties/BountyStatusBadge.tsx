@@ -65,6 +65,36 @@ export interface IBountyBadgeProps {
   truncate?: boolean
 }
 
+export function BountyStatusChip ({
+  status,
+  children,
+  showStatusLogo = true
+}: {status: BountyStatus, children?: ReactNode, showStatusLogo?: boolean}) {
+  return (
+    <BountyStatusBox status={status}>
+      {
+        showStatusLogo && (
+        <BountyIcon>
+          {BOUNTY_STATUS_ICONS[status]}
+        </BountyIcon>
+        )
+      }
+
+      <Typography
+        component='span'
+        sx={{
+          fontWeight: 600
+        }}
+        variant='body1'
+        pl={1}
+      >
+        {BOUNTY_LABELS[status]}
+      </Typography>
+      {children}
+    </BountyStatusBox>
+  );
+}
+
 export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, layout = 'row' } : IBountyBadgeProps) {
   const [space] = useCurrentSpace();
 
@@ -132,21 +162,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
             </IconButton>
           </Link>
         </Box>
-        <BountyStatusBox status={bounty.status}>
-          <BountyIcon>
-            {BOUNTY_STATUS_ICONS[bounty.status]}
-          </BountyIcon>
-          <Typography
-            component='span'
-            sx={{
-              fontWeight: 600
-            }}
-            variant='body1'
-            pl={1}
-          >
-            {BOUNTY_LABELS[bounty.status]}
-          </Typography>
-        </BountyStatusBox>
+        <BountyStatusChip status={bounty.status} />
       </Box>
     );
   }
