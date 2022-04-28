@@ -32,8 +32,8 @@ type Props = {
     board: Board
     readOnly: boolean
     card: Card
-    contents: Array<ContentBlock|ContentBlock[]>
-    comments: CommentBlock[]
+    updatedBy: string
+    updatedAt: string
     propertyTemplate: IPropertyTemplate
     showEmptyPlaceholder: boolean
 }
@@ -42,7 +42,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '')
     const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '')
 
-    const {card, propertyTemplate, readOnly, showEmptyPlaceholder, board, contents, comments} = props
+    const {card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt} = props
     const intl = useIntl()
     const propertyValue = card.fields.properties[propertyTemplate.id]
     const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, intl)
@@ -51,29 +51,12 @@ const PropertyValueElement = (props:Props): JSX.Element => {
 
     const editableFields: Array<PropertyType> = ['text', 'number', 'email', 'url', 'phone']
 
-    const saveTextProperty = useCallback(() => {
-        if (editableFields.includes(props.propertyTemplate.type)) {
-            if (value !== (props.card.fields.properties[props.propertyTemplate.id] || '')) {
-                mutator.changePropertyValue(card, propertyTemplate.id, value)
-            }
-        }
-    }, [props.card, props.propertyTemplate, value])
-
-    const saveTextPropertyRef = useRef<() => void>(saveTextProperty)
-    saveTextPropertyRef.current = saveTextProperty
-
     useEffect(() => {
         if (serverValue === value) {
             setValue(props.card.fields.properties[props.propertyTemplate.id] || '')
         }
         setServerValue(props.card.fields.properties[props.propertyTemplate.id] || '')
     }, [value, props.card.fields.properties[props.propertyTemplate.id]])
-
-    useEffect(() => {
-        return () => {
-            saveTextPropertyRef.current && saveTextPropertyRef.current()
-        }
-    }, [])
 
     const onDeleteValue = useCallback(() => mutator.changePropertyValue(card, propertyTemplate.id, ''), [card, propertyTemplate.id])
 
@@ -185,7 +168,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                 readonly={readOnly}
                 placeholder={emptyDisplayValue}
                 onChange={setValue}
-                onSave={saveTextProperty}
+                onSave={() => mutator.changePropertyValue(card, propertyTemplate.id, value)}
                 onCancel={() => setValue(propertyValue || '')}
                 validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
             />
@@ -208,10 +191,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     } else if (propertyTemplate.type === 'updatedBy') {
         return (
             <LastModifiedBy
-                card={card}
-                board={board}
-                contents={contents}
-                comments={comments}
+                updatedBy={updatedBy}
             />
         )
     } else if (propertyTemplate.type === 'createdTime') {
@@ -221,9 +201,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     } else if (propertyTemplate.type === 'updatedTime') {
         return (
             <LastModifiedAt
-                card={card}
-                contents={contents}
-                comments={comments}
+                updatedAt={updatedAt}
             />
         )
     }
@@ -237,9 +215,9 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                     className='octo-propertyvalue'
                     placeholderText={emptyDisplayValue}
                     value={value.toString()}
-                    autoExpand={true}
+                    autoExpand={false}
                     onChange={setValue}
-                    onSave={saveTextProperty}
+                    onSave={() => mutator.changePropertyValue(card, propertyTemplate.id, value)}
                     onCancel={() => setValue(propertyValue || '')}
                     validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
                     spellCheck={propertyTemplate.type === 'text'}

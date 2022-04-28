@@ -120,10 +120,6 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
     setShownCardId(cardId);
   }, [router.query]);
 
-  const viewsToProvide = readonly ? boardViews.filter(view => {
-    return view.id === activeView?.id;
-  }) : boardViews;
-
   if (board && activeView) {
     let property = groupByProperty;
     if ((!property || property.type !== 'select') && activeView.fields.viewType === 'board') {
@@ -147,16 +143,13 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
           activeView={activeView}
           groupByProperty={property}
           dateDisplayProperty={displayProperty}
-          views={viewsToProvide}
+          views={boardViews}
           showShared={clientConfig?.enablePublicSharedBoards || false}
         />
         {typeof shownCardId === 'string' && (
           <RootPortal>
             <CardDialog
               board={board}
-              activeView={activeView}
-              views={viewsToProvide}
-              cards={accessibleCards}
               key={shownCardId}
               cardId={shownCardId}
               onClose={() => showCard(undefined)}

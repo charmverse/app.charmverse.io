@@ -8,7 +8,6 @@ import { Card } from '../blocks/card'
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmationDialogBox'
 import mutator from '../mutator'
 import { getCard } from '../store/cards'
-import { getCardComments } from '../store/comments'
 import { getCardContents } from '../store/contents'
 import { useAppSelector } from '../store/hooks'
 import { getUserBlockSubscriptionList } from '../store/initialLoad'
@@ -33,9 +32,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace'
 
 type Props = {
     board: Board
-    activeView: BoardView
-    views: BoardView[]
-    cards: Card[]
     cardId: string
     onClose: () => void
     showCard: (cardId?: string) => void
@@ -43,9 +39,8 @@ type Props = {
 }
 
 const CardDialog = (props: Props): JSX.Element | null => {
-    const {board, activeView, cards, views} = props
+    const {board} = props
     const card = useAppSelector(getCard(props.cardId))
-    const contents = useAppSelector(getCardContents(props.cardId))
     const intl = useIntl()
     const [space] = useCurrentSpace()
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
@@ -177,12 +172,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
 
                 {card &&
                     <CardDetail
-                        board={board}
-                        activeView={activeView}
-                        views={views}
-                        cards={cards}
                         card={card}
-                        contents={contents}
                         readonly={props.readonly || isSharedPage}
                     />}
 

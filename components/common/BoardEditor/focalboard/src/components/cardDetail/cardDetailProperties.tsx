@@ -25,15 +25,15 @@ type Props = {
     board: Board
     card: Card
     cards: Card[]
-    contents: Array<ContentBlock|ContentBlock[]>
-    comments: CommentBlock[]
     activeView?: BoardView
     views: BoardView[]
     readonly: boolean
+    pageUpdatedBy: string
+    pageUpdatedAt: string
 }
 
 const CardDetailProperties = React.memo((props: Props) => {
-    const {board, card, cards, views, activeView, contents, comments} = props
+    const {board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy } = props
     const [newTemplateId, setNewTemplateId] = useState('')
     const intl = useIntl()
 
@@ -158,8 +158,8 @@ const CardDetailProperties = React.memo((props: Props) => {
                             readOnly={props.readonly}
                             card={card}
                             board={board}
-                            contents={contents}
-                            comments={comments}
+                            updatedAt={pageUpdatedAt}
+                            updatedBy={pageUpdatedBy}
                             propertyTemplate={propertyTemplate}
                             showEmptyPlaceholder={true}
                         />
@@ -173,7 +173,7 @@ const CardDetailProperties = React.memo((props: Props) => {
                 />
             )}
 
-            {!props.readonly && props.activeView && 
+            {!props.readonly && props.activeView &&
                 <div className='octo-propertyname add-property'>
                     <MenuWrapper>
                         <Button>
