@@ -66,6 +66,16 @@ const ThreadCommentListItem = styled(ListItem)<{highlighted?: string}>`
   & .ProseMirror.bangle-editor {
     padding: 0px;
   }
+
+  &:hover .comment-actions {
+    transition: opacity 150ms ease-in-out;
+    opacity: 1;
+  }
+
+  & .comment-actions {
+    transition: opacity 150ms ease-in-out;
+    opacity: 0;
+  }
 `;
 
 function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon }: {disabled?: boolean, onClick: ButtonProps['onClick'], startIcon: ReactNode, text: string}) {
@@ -218,7 +228,7 @@ export default forwardRef<HTMLDivElement,
                     </Typography>
                   </Box>
                   {(comment.userId === user?.id) && permissions.edit_content && (
-                  <Box display='flex'>
+                  <Box display='flex' className='comment-actions'>
                     <IconButton
                       size='small'
                       onClick={() => {
