@@ -464,27 +464,23 @@ function CharmEditor (
       <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
       <InlinePalette />
       {children}
-      {
-        showingCommentThreadsList
-        && (
-        <Grow
-          in
-          style={{
-            transformOrigin: 'left top'
-          }}
-          easing={{
-            enter: 'ease-in-out'
-          }}
-          timeout={500}
+      <Grow
+        in={showingCommentThreadsList}
+        style={{
+          transformOrigin: 'left top'
+        }}
+        easing={{
+          enter: 'ease-in',
+          exit: 'ease-out'
+        }}
+        timeout={250}
+      >
+        <PageThreadListBox
+          className='PageThreadListBox'
         >
-          <PageThreadListBox
-            className='PageThreadListBox'
-          >
-            <PageThreadsList inline={false} />
-          </PageThreadListBox>
-        </Grow>
-        )
-      }
+          <PageThreadsList inline={false} />
+        </PageThreadListBox>
+      </Grow>
       <InlineCommentThread />
     </StyledReactBangleEditor>
   );

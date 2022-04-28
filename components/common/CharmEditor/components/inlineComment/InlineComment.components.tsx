@@ -1,6 +1,6 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, Button, ClickAwayListener } from '@mui/material';
+import { Box, Button, ClickAwayListener, Grow } from '@mui/material';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
@@ -38,6 +38,7 @@ export default function InlineCommentThread () {
   const { threads } = useThreads();
 
   const { showingCommentThreadsList } = useCommentThreadsListDisplay();
+  // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
   const unResolvedThreads = threadIds
     .map(threadId => threads[threadId])
     .filter(thread => !thread?.resolved)
@@ -50,10 +51,21 @@ export default function InlineCommentThread () {
         hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
       }}
       >
-        <ThreadContainerBox>
-          {unResolvedThreads.map(resolvedThread => resolvedThread
-            && <PageThread key={resolvedThread.id} threadId={resolvedThread?.id} />)}
-        </ThreadContainerBox>
+        <Grow
+          in
+          style={{
+            transformOrigin: 'left top'
+          }}
+          easing={{
+            enter: 'ease-in-out'
+          }}
+          timeout={250}
+        >
+          <ThreadContainerBox>
+            {unResolvedThreads.map(resolvedThread => resolvedThread
+              && <PageThread key={resolvedThread.id} threadId={resolvedThread?.id} />)}
+          </ThreadContainerBox>
+        </Grow>
       </ClickAwayListener>,
       tooltipContentDOM
     ) : null;
