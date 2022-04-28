@@ -33,30 +33,28 @@ type Props = {
 const TableRows = (props: Props): JSX.Element => {
     const {board, cards, activeView} = props
     const { pages, setPages } = usePages();
+    const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string) => {
+        await charmClient.updatePage({
+            id: cardId,
+            title
+        })
+        setPages((pages) => ({
+            ...pages,
+            [cardId]: {
+                ...(pages[cardId] ?? {}),
+                title
+            } as Page
+        }))
+        if (saveType === 'onEnter') {
+            const card = cards.find(card => card.id === cardId);
+            if (card && cards.length > 0 && cards[cards.length - 1] === card) {
+                props.addCard(activeView.fields.groupById ? card.fields.properties[activeView.fields.groupById!] as string : '')
+            }
+        }
+    }, []);
     return (
         <>
             {cards.map((card) => {
-                const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string) => {
-                    await charmClient.updatePage({
-                    id: cardId,
-                    title
-                    })
-                    setPages((pages) => ({
-                    ...pages,
-                    [cardId]: {
-                        ...(pages[cardId] ?? {}),
-                        title
-                    } as Page
-                    }))
-                    if (saveType === 'onEnter') {
-                        if (cards.length > 0 && cards[cards.length - 1] === card) {
-                            props.addCard(activeView.fields.groupById ? card.fields.properties[activeView.fields.groupById!] as string : '')
-                        }
-                    }
-                }, []);
-                const onClick = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-                    props.onCardClicked(e, card)
-                }, [])
 
                 const cardPage = pages[card.id]
                 if (!cardPage) {
@@ -75,7 +73,7 @@ const TableRows = (props: Props): JSX.Element => {
                         pageTitle={cardPage.title  || ''}
                         pageUpdatedAt={cardPage.updatedAt.toString()}
                         pageUpdatedBy={cardPage.updatedBy}
-                        onClick={onClick}
+                        onClick={props.onCardClicked}
                         saveTitle={saveTitle}
                         showCard={props.showCard}
                         readonly={props.readonly}
