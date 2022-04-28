@@ -13,8 +13,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { PageContent } from 'models';
-import { useInlineComment } from 'hooks/useInlineComment';
 import { highlightDomElement } from 'lib/dom/highlight';
+import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
+import { useEditorViewContext } from '@bangle.dev/react';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
 
@@ -97,8 +98,7 @@ export default forwardRef<HTMLDivElement,
     const [editedComment, setEditedComment] = useState<null | string>(null);
     const { getPagePermissions, currentPageId } = usePages();
     const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
-    const { removeInlineCommentMark } = useInlineComment();
-
+    const view = useEditorViewContext();
     function resetState () {
       setEditedComment(null);
       setIsMutating(false);
@@ -179,7 +179,7 @@ export default forwardRef<HTMLDivElement,
                 onClick={async () => {
                   setIsMutating(true);
                   await resolveThread(threadId);
-                  removeInlineCommentMark(thread.id);
+                  removeInlineCommentMark(view, thread.id);
                   setIsMutating(false);
                 }}
               />
@@ -193,7 +193,7 @@ export default forwardRef<HTMLDivElement,
                 onClick={async () => {
                   setIsMutating(true);
                   await deleteThread(threadId);
-                  removeInlineCommentMark(thread.id, true);
+                  removeInlineCommentMark(view, thread.id, true);
                   setIsMutating(false);
                 }}
                 disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
