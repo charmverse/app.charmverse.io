@@ -22,6 +22,20 @@ function filterBounties (bounties: PopulatedBounty[], statuses: BountyStatus[]):
   return bounties?.filter(bounty => statuses.indexOf(bounty.status) > -1) ?? [];
 }
 
+function sortSelected (bountyStatuses: BountyStatus[]): BountyStatus[] {
+  return bountyStatuses.sort((first, second) => {
+    if (first === second) {
+      return 0;
+    }
+    else if (bountyOrder.indexOf(first) < bountyOrder.indexOf(second)) {
+      return -1;
+    }
+    else {
+      return 1;
+    }
+  });
+}
+
 export function BountyList () {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
   const { bounties, setBounties } = useContext(BountiesContext);
@@ -91,23 +105,12 @@ export function BountyList () {
             bountyFilter.map(status => {
               return (
                 <Box sx={{ mr: 1, alignContent: 'center', flexDirection: 'column', alignSelf: 'center' }}>
-                  <BountyStatusChip status={status} showStatusLogo={false}>
-                    <Tooltip arrow placement='top' title='Delete'>
-                      <ButtonChip
-                        className='row-actions'
-                        icon={<DeleteIcon />}
-                        clickable
-                        color='default'
-                        size='small'
-                        variant='outlined'
-                        onClick={() => {
-                          setBountyFilter(bountyFilter.filter(displayedStatus => displayedStatus !== status));
-                          console.log('Delete');
-                        }}
-                        sx={{ ml: 1 }}
-                      />
-                    </Tooltip>
-                  </BountyStatusChip>
+                  <BountyStatusChip
+                    status={status}
+                    onDelete={() => {
+                      setBountyFilter(sortSelected(bountyFilter.filter(selected => selected !== status)));
+                    }}
+                  />
                 </Box>
               );
             })
@@ -117,7 +120,7 @@ export function BountyList () {
           <Box>
             <InputBountyStatus
               onChange={(statuses) => {
-                setBountyFilter(statuses);
+                setBountyFilter(sortSelected(statuses));
               }}
               renderSelected={false}
               defaultValues={bountyFilter}

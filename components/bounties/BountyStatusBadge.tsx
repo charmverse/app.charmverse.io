@@ -3,6 +3,7 @@ import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Chip from '@mui/material/Chip';
 import { Bounty, BountyStatus } from '@prisma/client';
 import { getChainExplorerLink, getChainById } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -21,6 +22,7 @@ import PaidIcon from '@mui/icons-material/Paid';
 import { ReactNode } from 'react';
 import styled from '@emotion/styled';
 import { BrandColor } from 'theme/colors';
+import { useTheme } from '@emotion/react';
 
 const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   open: <ModeStandbyIcon />,
@@ -65,12 +67,32 @@ export interface IBountyBadgeProps {
   truncate?: boolean
 }
 
-export function BountyStatusChip ({
-  status,
-  children,
-  showStatusLogo = true
-}: {status: BountyStatus, children?: ReactNode, showStatusLogo?: boolean}) {
+export function BountyStatusChip ({ status, onDelete }: {status: BountyStatus, onDelete?: (status: BountyStatus) => void}) {
+
+  const theme = useTheme();
+
   return (
+    <Chip
+      label={BOUNTY_LABELS[status]}
+      variant='filled'
+      onDelete={onDelete}
+      sx={{
+        fontWeight: 'bold',
+        backgroundColor: () => {
+          // @ts-ignore
+          return theme.palette[BountyStatusColours[status]].main;
+        }
+      }}
+    />
+  );
+}
+
+function BountyStatusChipWithIcon ({
+  status,
+  showStatusLogo = true
+}: {status: BountyStatus, showStatusLogo?: boolean}) {
+  return (
+
     <BountyStatusBox status={status}>
       {
         showStatusLogo && (
@@ -90,7 +112,6 @@ export function BountyStatusChip ({
       >
         {BOUNTY_LABELS[status]}
       </Typography>
-      {children}
     </BountyStatusBox>
   );
 }
@@ -162,7 +183,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
             </IconButton>
           </Link>
         </Box>
-        <BountyStatusChip status={bounty.status} />
+        <BountyStatusChipWithIcon status={bounty.status} />
       </Box>
     );
   }

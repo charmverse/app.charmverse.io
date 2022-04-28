@@ -66,7 +66,7 @@ export default function InputBountyStatus ({ onChange, defaultValues = [], rende
                     (selectedValues as any[])?.map(val => {
                       return (
                         <MenuItem sx={{ p: 0, pr: 0.2 }} key={val} value={val}>
-                          <BountyStatusChip status={val as BountyStatus} showStatusLogo={false} />
+                          <BountyStatusChip status={val as BountyStatus} />
                         </MenuItem>
                       );
                     })
@@ -85,7 +85,7 @@ export default function InputBountyStatus ({ onChange, defaultValues = [], rende
                   // External component manages display, so we hide selected options
                   || (!renderSelected && !isSelected(option)) ? (
                     <MenuItem key={option} value={option}>
-                      <BountyStatusChip status={option} showStatusLogo={false} />
+                      <BountyStatusChip status={option} />
                     </MenuItem>
                     ) : null);
               })
