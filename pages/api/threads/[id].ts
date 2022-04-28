@@ -1,7 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
@@ -10,13 +10,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .delete(deleteThread)
-  .put(updateThread);
+  .put(requireKeys(['resolved'], 'body'), updateThread);
 
 async function deleteThread (req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id as string;
+  const threadId = req.query.id as string;
   const thread = await prisma.thread.findFirst({
     where: {
-      id: req.query.id as string,
+      id: threadId,
       userId
     },
     select: {
@@ -25,7 +26,7 @@ async function deleteThread (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!thread) {
-    return res.status(404).json({ error: 'Thread not found' });
+    throw new NotFoundError();
   }
 
   const permissionSet = await computeUserPagePermissions({
@@ -34,14 +35,12 @@ async function deleteThread (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!permissionSet.edit_content) {
-    return res.status(401).json({
-      error: 'You are not allowed to perform this action'
-    });
+    throw new ActionNotPermittedError();
   }
 
   await prisma.thread.delete({
     where: {
-      id: req.query.id as string
+      id: threadId
     }
   });
   return res.status(200).json({ ok: true });
@@ -53,9 +52,10 @@ export interface UpdateThreadRequest {
 
 async function updateThread (req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id as string;
+  const threadId = req.query.id as string;
   const thread = await prisma.thread.findFirst({
     where: {
-      id: req.query.id as string,
+      id: threadId,
       userId
     },
     select: {
@@ -64,7 +64,7 @@ async function updateThread (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!thread) {
-    return res.status(404).json({ error: 'Thread not found' });
+    throw new NotFoundError();
   }
 
   const permissionSet = await computeUserPagePermissions({
@@ -73,14 +73,12 @@ async function updateThread (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!permissionSet.edit_content) {
-    return res.status(401).json({
-      error: 'You are not allowed to perform this action'
-    });
+    throw new ActionNotPermittedError();
   }
 
   await prisma.thread.update({
     where: {
-      id: req.query.id as string
+      id: threadId
     },
     data: {
       resolved: req.body.resolved
