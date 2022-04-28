@@ -1,7 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
@@ -28,9 +28,7 @@ async function addComment (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!permissionSet.edit_content) {
-    return res.status(401).json({
-      error: 'You are not allowed to perform this action'
-    });
+    throw new ActionNotPermittedError();
   }
 
   const comment = await prisma.comment.create({

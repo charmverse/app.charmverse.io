@@ -1,7 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
@@ -35,7 +35,7 @@ async function editComment (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!comment) {
-    return res.status(404).json({ error: 'Comment not found' });
+    throw new NotFoundError();
   }
 
   const permissionSet = await computeUserPagePermissions({
@@ -82,7 +82,7 @@ async function deleteComment (req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!comment) {
-    return res.status(404).json({ error: 'Comment not found' });
+    throw new NotFoundError();
   }
 
   const permissionSet = await computeUserPagePermissions({

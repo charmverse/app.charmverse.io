@@ -11,6 +11,17 @@ export class SpaceAccessDeniedError extends SystemError {
   }
 }
 
+export class NotFoundError extends SystemError {
+
+  constructor () {
+    super({
+      severity: 'warning',
+      errorType: 'Data not found',
+      message: 'Data not found'
+    });
+  }
+}
+
 export class ActionNotPermittedError extends SystemError {
 
   constructor (message?: string) {
