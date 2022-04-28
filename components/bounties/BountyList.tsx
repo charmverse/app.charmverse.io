@@ -1,24 +1,36 @@
 import { useMemo, useContext, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { Box, Grid, Typography } from '@mui/material';
-import { BountyStatus } from '@prisma/client';
+import { Bounty, BountyStatus } from '@prisma/client';
 import Button from 'components/common/Button';
 import BountyModal from 'components/bounties/BountyModal';
 import { BountiesContext } from 'hooks/useBounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import InputBountyStatus from 'components/common/form/InputBountyStatus';
+import { BOUNTY_LABELS } from 'models/Bounty';
+import { PopulatedBounty } from 'charmClient';
+import ButtonChip from 'components/common/ButtonChip';
+import Tooltip from '@mui/material/Tooltip';
+import DeleteIcon from '@mui/icons-material/Close';
 import { BountyCard } from './BountyCard';
 import MultiPaymentModal from './MultiPaymentModal';
+import { BountyStatusChip } from './BountyStatusBadge';
 
-const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete'];
+const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete', 'paid'];
+
+function filterBounties (bounties: PopulatedBounty[], statuses: BountyStatus[]): PopulatedBounty[] {
+  return bounties?.filter(bounty => statuses.indexOf(bounty.status) > -1) ?? [];
+}
 
 export function BountyList () {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
   const { bounties, setBounties } = useContext(BountiesContext);
 
-  let sortedBounties = bounties ? sortArrayByObjectProperty(bounties.slice(), 'status', bountyOrder) : [];
-  sortedBounties = sortedBounties.filter(bounty => {
-    return bounty.status !== 'paid';
-  });
+  const [bountyFilter, setBountyFilter] = useState<BountyStatus[]>(['open', 'assigned', 'review']);
+
+  const filteredBounties = filterBounties(bounties.slice(), bountyFilter);
+
+  const sortedBounties = bounties ? sortArrayByObjectProperty(filteredBounties, 'status', bountyOrder) : [];
 
   const csvData = useMemo(() => {
     const completedBounties = sortedBounties.filter(bounty => bounty.status === BountyStatus.complete);
@@ -70,6 +82,50 @@ export function BountyList () {
             Create Bounty
           </Button>
         </Box>
+      </Box>
+
+      {/* Filters for the bounties */}
+      <Box display='flex' alignContent='left' justifyContent='flex-start' mb={3}>
+
+        {
+            bountyFilter.map(status => {
+              return (
+                <Box sx={{ mr: 1, alignContent: 'center', flexDirection: 'column', alignSelf: 'center' }}>
+                  <BountyStatusChip status={status} showStatusLogo={false}>
+                    <Tooltip arrow placement='top' title='Delete'>
+                      <ButtonChip
+                        className='row-actions'
+                        icon={<DeleteIcon />}
+                        clickable
+                        color='default'
+                        size='small'
+                        variant='outlined'
+                        onClick={() => {
+                          setBountyFilter(bountyFilter.filter(displayedStatus => displayedStatus !== status));
+                          console.log('Delete');
+                        }}
+                        sx={{ ml: 1 }}
+                      />
+                    </Tooltip>
+                  </BountyStatusChip>
+                </Box>
+              );
+            })
+          }
+        {
+          bountyFilter.length < Object.keys(BountyStatus).length && (
+          <Box>
+            <InputBountyStatus
+              onChange={(statuses) => {
+                setBountyFilter(statuses);
+              }}
+              renderSelected={false}
+              defaultValues={bountyFilter}
+            />
+          </Box>
+          )
+
+        }
       </Box>
 
       <Grid container sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
