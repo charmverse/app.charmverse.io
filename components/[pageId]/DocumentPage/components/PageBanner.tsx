@@ -69,7 +69,7 @@ function PageBanner ({ focalBoard, headerImage, setPage }: PageBannerProps) {
   return (
     <StyledPageBanner focalBoard={focalBoard}>
       {/* eslint-disable-next-line */}
-      <img src={headerImage} alt='Page Banner' />
+      <img src={headerImage} />
       <Box
         sx={{
           background: theme.palette.background.light,

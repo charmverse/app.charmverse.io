@@ -235,12 +235,12 @@ function CenterPanel(props: Props) {
     e.stopPropagation()
   }
 
-  const showCard = (cardId?: string) => {
+  const showCard = React.useCallback((cardId?: string) => {
     if (state.selectedCardIds.length > 0) {
       setState({ ...state, selectedCardIds: [] })
     }
     props.showCard(cardId)
-  }
+  }, [props.showCard, state.selectedCardIds])
 
   async function deleteSelectedCards() {
     const { selectedCardIds } = state

@@ -6,7 +6,7 @@ import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
-import { deleteNestedChild } from 'lib/api/deleteNestedChild';
+import { deleteNestedChild } from 'lib/pages/deleteNestedChild';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -75,13 +75,14 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
     throw new ActionNotPermittedError('You are not allowed to delete this page.');
   }
 
-  await prisma.page.delete({
+  const rootBlock = await prisma.block.findUnique({
     where: {
-      id: req.query.id as string
+      id: pageId
     }
   });
 
-  const { deletedChildPageIds, rootBlock } = (await deleteNestedChild(pageId, userId));
+  const deletedChildPageIds = await deleteNestedChild(pageId, userId);
+
   return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
 }
 

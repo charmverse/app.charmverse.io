@@ -137,6 +137,7 @@
     "react-redux": "^7.2.6",
     "react-resizable": "^3.0.4",
     "react-select": "^5.2.1",
+    "react-window": "^1.8.7",
     "reselect": "^4.0.0",
     "sharp": "^0.30.3",
     "swagger-ui-react": "4.6.1",
@@ -195,6 +196,7 @@
     "prettier": "^2.5.1",
     "prisma": "^3.9.2",
     "sass": "^1.49.0",
-    "supertest": "^6.2.2"
+    "supertest": "^6.2.2",
+    "ts-jest": "^27.1.4"
   }
 }

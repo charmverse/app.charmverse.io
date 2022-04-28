@@ -54,7 +54,18 @@ const Table = (props: Props): JSX.Element => {
         }
     })
 
-    const columnRefs: Map<string, React.RefObject<HTMLDivElement>> = new Map()
+    const visiblePropertyTemplates = React.useMemo(() => (
+        activeView.fields.visiblePropertyIds.map((id) => board.fields.cardProperties.find((t) => t.id === id)).filter((i) => i) as IPropertyTemplate[]
+    ), [board.fields.cardProperties, activeView.fields.visiblePropertyIds])
+
+    const columnRefs = React.useMemo(() => {
+        const refs: Map<string, React.RefObject<HTMLDivElement>>  = new Map();
+        visiblePropertyTemplates.forEach(template => {
+            refs.set(template.id, React.createRef())
+        })
+        refs.set(Constants.titleColumnId, React.createRef())
+        return refs;
+    }, [visiblePropertyTemplates])
 
     const [, drop] = useDrop<{ id: string }, any, null>(() => ({
         accept: 'horizontalGrip',
@@ -177,6 +188,7 @@ const Table = (props: Props): JSX.Element => {
     const propertyNameChanged = useCallback(async (option: IPropertyOption, text: string): Promise<void> => {
         await mutator.changePropertyOptionValue(board, groupByProperty!, option, text)
     }, [board, groupByProperty])
+
 
     return (
         <div

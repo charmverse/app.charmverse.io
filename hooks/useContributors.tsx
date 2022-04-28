@@ -20,7 +20,7 @@ export function ContributorsProvider ({ children }: { children: ReactNode }) {
     setContributors(data || []);
   }, [data]);
 
-  const value = useMemo(() => [contributors, setContributors] as Context, [data]);
+  const value = useMemo(() => [contributors, setContributors] as Context, [contributors]);
 
   return (
     <ContributorsContext.Provider value={value}>

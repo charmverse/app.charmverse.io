@@ -10,7 +10,6 @@ import CommentsList from 'components/common/BoardEditor/focalboard/src/component
 import { title } from 'process';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
-import { getCardContents } from 'components/common/BoardEditor/focalboard/src/store/contents';
 import { usePages } from 'hooks/usePages';
 import PageHeader from './components/PageHeader';
 import PageBanner from './components/PageBanner';
@@ -72,7 +71,6 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const card = cards.find(_card => _card.id === page.id);
 
   const comments = card ? useAppSelector(getCardComments(card.id)) : [];
-  const contents = card ? useAppSelector(getCardContents(card.id)) : [];
   const commentThreadsListRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -114,12 +112,12 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
                   <CardDetailProperties
                     board={board}
                     card={card}
-                    contents={contents}
                     cards={cards}
-                    comments={comments}
                     activeView={activeView}
                     views={boardViews}
                     readonly={readOnly}
+                    pageUpdatedAt={page.updatedAt.toString()}
+                    pageUpdatedBy={page.updatedBy}
                   />
                   <BountyIntegration linkedTaskId={card.id} title={title} readonly={readOnly} />
                 </Box>
