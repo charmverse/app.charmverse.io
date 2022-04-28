@@ -1,7 +1,6 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, Button, ClickAwayListener } from '@mui/material';
-import { useThreadsDisplay } from 'components/common/PageLayout/PageLayout';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
@@ -14,6 +13,7 @@ import { usePages } from 'hooks/usePages';
 import { PageContent } from 'models';
 import { PluginKey, TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
+import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import PageThread from '../PageThread';
 import { SuggestTooltipPluginKey, SuggestTooltipPluginState, hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { updateInlineComment } from './inlineComment.utils';
@@ -37,7 +37,7 @@ export default function InlineCommentThread () {
   } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
   const { threads } = useThreads();
 
-  const { showingCommentThreadsList } = useThreadsDisplay();
+  const { showingCommentThreadsList } = useCommentThreadsListDisplay();
   const unResolvedThreads = threadIds
     .map(threadId => threads[threadId])
     .filter(thread => !thread?.resolved)

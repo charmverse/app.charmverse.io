@@ -6,9 +6,7 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import * as React from 'react';
-import { useThreads } from 'hooks/useThreads';
-import { useSWRConfig } from 'swr';
-import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { CommentThreadsListDisplayProvider } from 'hooks/useCommentThreadsListDisplay';
 import Header, { headerHeight } from './components/Header';
 import Sidebar from './components/Sidebar';
 import Favicon from './components/Favicon';
@@ -75,15 +73,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' })
     })
   }));
 
-interface IContext {
-  showingCommentThreadsList: boolean,
-  setShowingCommentThreadsList: React.Dispatch<React.SetStateAction<boolean>>
-}
-const CommentThreadsListDisplayContext = React.createContext<IContext>({
-  setShowingCommentThreadsList: () => undefined,
-  showingCommentThreadsList: false
-});
-
 const HeaderSpacer = styled.div`
   min-height: ${headerHeight}px;
 `;
@@ -96,17 +85,6 @@ const LayoutContainer = styled.div`
 function PageLayout ({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
   const [user] = useUser();
-  const { currentPageId } = usePages();
-  const { isValidating } = useThreads();
-  const [showingCommentThreadsList, setShowingCommentThreadsList] = React.useState(false);
-  const { cache } = useSWRConfig();
-  React.useEffect(() => {
-    // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
-    const cachedData: ThreadWithComments[] | undefined = cache.get(`pages/${currentPageId}/threads`);
-    if (cachedData) {
-      setShowingCommentThreadsList(cachedData.filter(thread => thread && !thread.resolved).length > 0);
-    }
-  }, [isValidating, currentPageId]);
 
   const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);
@@ -116,37 +94,30 @@ function PageLayout ({ children }: { children: React.ReactNode }) {
     setOpen(false);
   }, []);
 
-  const value = React.useMemo<IContext>(() => ({
-    showingCommentThreadsList,
-    setShowingCommentThreadsList
-  }), [showingCommentThreadsList]);
-
   return (
-    <CommentThreadsListDisplayContext.Provider value={value}>
+    <>
       <Head>
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer>
-        <AppBar position='fixed' open={open}>
-          <Header
-            open={open}
-            openSidebar={handleDrawerOpen}
-          />
-        </AppBar>
-        <Drawer variant='permanent' open={open}>
-          <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
-        </Drawer>
-        <PageContainer>
-          <HeaderSpacer />
-          {children}
-        </PageContainer>
+        <CommentThreadsListDisplayProvider>
+          <AppBar position='fixed' open={open}>
+            <Header
+              open={open}
+              openSidebar={handleDrawerOpen}
+            />
+          </AppBar>
+          <Drawer variant='permanent' open={open}>
+            <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
+          </Drawer>
+          <PageContainer>
+            <HeaderSpacer />
+            {children}
+          </PageContainer>
+        </CommentThreadsListDisplayProvider>
       </LayoutContainer>
-    </CommentThreadsListDisplayContext.Provider>
+    </>
   );
-}
-
-export function useThreadsDisplay () {
-  return React.useContext(CommentThreadsListDisplayContext);
 }
 
 function CurrentPageFavicon () {

@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { Page, PageContent } from 'models';
-import { useThreadsDisplay } from 'components/common/PageLayout/PageLayout';
 import { BountyIntegration } from 'components/bounties/BountyIntegration';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
@@ -11,6 +10,7 @@ import { title } from 'process';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { usePages } from 'hooks/usePages';
+import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import PageHeader from './components/PageHeader';
 import PageBanner from './components/PageBanner';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
@@ -62,7 +62,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     pageTop = 200;
   }
 
-  const { showingCommentThreadsList } = useThreadsDisplay();
+  const { showingCommentThreadsList } = useCommentThreadsListDisplay();
 
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
     setPage({ content: content.doc, contentText: content.rawText });

@@ -28,10 +28,10 @@ import { markdownSerializer } from '@bangle.dev/markdown';
 import { PageContent } from 'models';
 import { Node } from '@bangle.dev/pm';
 import ListItemText from '@mui/material/ListItemText';
+import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
-import { useThreadsDisplay } from '../../PageLayout';
 
 export const headerHeight = 56;
 
@@ -42,7 +42,7 @@ const StyledToolbar = styled(Toolbar)`
 `;
 
 function CommentThreadsListButton () {
-  const { showingCommentThreadsList, setShowingCommentThreadsList } = useThreadsDisplay();
+  const { showingCommentThreadsList, setShowingCommentThreadsList } = useCommentThreadsListDisplay();
   return (
     <Tooltip title={`${showingCommentThreadsList ? 'Hide' : 'Show'} comment threads`} arrow placement='bottom'>
       <IconButton
