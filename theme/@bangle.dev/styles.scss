@@ -437,3 +437,9 @@ details {
 }
 
 /** Prosemirror-Gap-Cursor-END */
+
+/* This helps to position the page threads list */
+.bangle-editor-core {
+  width: 100%;
+  position: relative;
+}
