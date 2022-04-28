@@ -27,7 +27,11 @@ export default function InlineCommentThread () {
   const { threads } = useThreads();
 
   const { showingCommentThreadsList } = useThreadsDisplay();
-  const unResolvedThreads = threadIds.map(threadId => threads[threadId]).filter(thread => !thread?.resolved);
+  const unResolvedThreads = threadIds
+    .map(threadId => threads[threadId])
+    .filter(thread => !thread?.resolved)
+    .sort((threadA, threadB) => threadA && threadB ? (new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime()) : 0);
+
   if (isVisible && component === 'inlineComment' && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
     return !showingCommentThreadsList ? createPortal(
@@ -37,7 +41,7 @@ export default function InlineCommentThread () {
       >
         <ThreadContainerBox>
           {unResolvedThreads.map(resolvedThread => resolvedThread
-            && <PageThread inline={false} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
+            && <PageThread key={resolvedThread.id} threadId={resolvedThread?.id} />)}
         </ThreadContainerBox>
       </ClickAwayListener>,
       tooltipContentDOM

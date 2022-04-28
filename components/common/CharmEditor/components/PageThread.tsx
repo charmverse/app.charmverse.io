@@ -87,7 +87,7 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon }: {di
 }
 
 export default forwardRef<HTMLDivElement,
-  {threadId: string, inline?: boolean, showFindButton?: boolean}>(({ showFindButton = false, threadId, inline = true }, ref) => {
+  {threadId: string, inline?: boolean, showFindButton?: boolean}>(({ showFindButton = false, threadId, inline = false }, ref) => {
     showFindButton = showFindButton ?? (!inline);
     const { deleteThread, resolveThread, deleteComment, editComment, addComment, threads } = useThreads();
     const [user] = useUser();

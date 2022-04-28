@@ -133,7 +133,7 @@ export default function Header (
             <>
               <ShareButton headerHeight={headerHeight} />
               {currentPage?.type !== 'board' && (
-              <Tooltip title='Show comment threads' arrow placement='bottom'>
+              <Tooltip title={`${showingCommentThreadsList ? 'Hide' : 'Show'} comment threads`} arrow placement='bottom'>
                 <IconButton
                   onClick={() => {
                     setShowingCommentThreadsList(!showingCommentThreadsList);

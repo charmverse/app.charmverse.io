@@ -17,7 +17,7 @@ import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { useState, CSSProperties, ReactNode, memo, RefObject, useCallback } from 'react';
+import { useState, CSSProperties, ReactNode, memo, useCallback } from 'react';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -27,7 +27,7 @@ import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
-import { Box, Portal } from '@mui/material';
+import { Box } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import Callout, * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
@@ -273,6 +273,16 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 `;
 
+const PageThreadListBox = styled(Box)`
+  position: fixed;
+  right: 50px;
+  width: 500px;
+  top: 75px;
+  z-index: 2000;
+  height: calc(100% - 80px);
+  overflow: auto;
+`;
+
 const defaultContent: PageContent = {
   type: 'doc',
   content: [
@@ -455,20 +465,11 @@ function CharmEditor (
       <InlinePalette />
       {children}
       {showingCommentThreadsList && (
-      <Box
-        sx={{
-          position: 'fixed',
-          right: 50,
-          width: 500,
-          top: 75,
-          zIndex: 2000,
-          height: 'calc(100% - 80px)',
-          overflow: 'auto'
-        }}
+      <PageThreadListBox
         className='PageThreadListBox'
       >
         <PageThreadsList inline={false} />
-      </Box>
+      </PageThreadListBox>
       )}
       <InlineCommentThread />
     </StyledReactBangleEditor>
