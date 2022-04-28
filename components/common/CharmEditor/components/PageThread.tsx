@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Typography, Button, ListItem, IconButton, ButtonProps } from '@mui/material';
+import { Typography, Button, ListItem, IconButton, ButtonProps, Tooltip } from '@mui/material';
 import { useTheme } from '@emotion/react';
 import { Box } from '@mui/system';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
@@ -16,6 +16,7 @@ import { PageContent } from 'models';
 import { highlightDomElement } from 'lib/dom/highlight';
 import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
 import { useEditorViewContext } from '@bangle.dev/react';
+import { DateTime } from 'luxon';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
 
@@ -122,9 +123,19 @@ export default forwardRef<HTMLDivElement,
       <StyledThreadBox inline={inline} id={`thread.${threadId}`} ref={ref}>
         <div>
           <ThreadHeaderBox>
-            <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
-              {new Date(thread.createdAt).toLocaleString()}
-            </Typography>
+            <Tooltip arrow placement='bottom' title={new Date(thread.createdAt).toLocaleString()}>
+              <Typography
+                sx={{
+                  cursor: 'pointer'
+                }}
+                color='secondary'
+                variant='subtitle1'
+                display='flex'
+                flexDirection='row'
+              >
+                Started {DateTime.fromJSDate(new Date(thread.createdAt)).toRelative({ base: (DateTime.now()) })}
+              </Typography>
+            </Tooltip>
             <Box display='flex' gap={1}>
               {/* Find button should not be present for inline thread  */ showFindButton && (
               <ThreadHeaderButton
@@ -223,9 +234,19 @@ export default forwardRef<HTMLDivElement,
                   }}
                   >
                     <ReviewerOption component='div' user={comment.user as any} avatarSize='small' />
-                    <Typography color='secondary' variant='subtitle1' display='flex' flexDirection='row'>
-                      {new Date(comment.createdAt).toLocaleString()}
-                    </Typography>
+                    <Tooltip arrow placement='bottom' title={new Date(comment.createdAt).toLocaleString()}>
+                      <Typography
+                        sx={{
+                          cursor: 'pointer'
+                        }}
+                        color='secondary'
+                        variant='subtitle1'
+                        display='flex'
+                        flexDirection='row'
+                      >
+                        {DateTime.fromJSDate(new Date(comment.createdAt)).toRelative({ base: (DateTime.now()) })}
+                      </Typography>
+                    </Tooltip>
                   </Box>
                   {(comment.userId === user?.id) && permissions.edit_content && (
                   <Box display='flex' className='comment-actions'>
