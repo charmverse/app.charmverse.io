@@ -17,7 +17,7 @@ const Center = styled.div`
 `;
 
 const StyledPageThreadsBox = styled(Box)`
-  max-width: 550px;
+  max-width: 400px;
   height: 100%;
   width: 100%;
 `;

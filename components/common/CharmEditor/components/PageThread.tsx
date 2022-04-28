@@ -228,7 +228,7 @@ export default forwardRef<HTMLDivElement,
                 key={comment.id}
                 highlighted={(editedComment === comment.id).toString()}
               >
-                <Box display='flex' width='100%' justifyContent='space-between'>
+                <Box display='flex' width='100%' gap={1}>
                   <Box sx={{
                     display: 'flex',
                     gap: 1
@@ -259,40 +259,14 @@ export default forwardRef<HTMLDivElement,
                         display='flex'
                         flexDirection='row'
                       >
-                        (Updated)
+                        (Edited)
                       </Typography>
                     </Tooltip>
                     )}
                   </Box>
-                  {(comment.userId === user?.id) && permissions.edit_content && (
-                  <Box display='flex' className='comment-actions'>
-                    <IconButton
-                      size='small'
-                      onClick={() => {
-                        setEditedComment(comment.id);
-                        setCommentContent(comment.content as PageContent);
-                      }}
-                    >
-                      <EditIcon fontSize='small' color='primary' />
-                    </IconButton>
-                    <IconButton
-                      size='small'
-                      onClick={() => {
-                        setIsMutating(true);
-                        deleteComment(threadId, comment.id);
-                        if (editedComment === comment.id) {
-                          resetState();
-                        }
-                        setIsMutating(false);
-                      }}
-                    >
-                      <DeleteIcon fontSize='small' color='error' />
-                    </IconButton>
-                  </Box>
-                  )}
                 </Box>
                 {commentIndex === 0 && (
-                <Box pl={4} display='flex'>
+                <Box pl={4} display='flex' mt={1}>
                   <ContextBorder />
                   <Typography
                     sx={{
@@ -305,14 +279,43 @@ export default forwardRef<HTMLDivElement,
                   </Typography>
                 </Box>
                 )}
-                <InlineCharmEditor
-                  readOnly
-                  key={JSON.stringify(comment.content)}
-                  content={comment.content as PageContent}
-                  style={{
-                    paddingLeft: theme.spacing(4)
-                  }}
-                />
+                <Box display='flex' width='100%' justifyContent='space-between'>
+                  <InlineCharmEditor
+                    readOnly
+                    key={JSON.stringify(comment.content)}
+                    content={comment.content as PageContent}
+                    style={{
+                      paddingLeft: theme.spacing(4)
+                    }}
+                  />
+                  {(comment.userId === user?.id) && permissions.edit_content && (
+                    <Box display='flex' className='comment-actions'>
+                      <IconButton
+                        size='small'
+                        onClick={() => {
+                          setEditedComment(comment.id);
+                          setCommentContent(comment.content as PageContent);
+                        }}
+                      >
+                        <EditIcon fontSize='small' color='primary' />
+                      </IconButton>
+                      <IconButton
+                        size='small'
+                        onClick={() => {
+                          setIsMutating(true);
+                          deleteComment(threadId, comment.id);
+                          if (editedComment === comment.id) {
+                            resetState();
+                          }
+                          setIsMutating(false);
+                        }}
+                      >
+                        <DeleteIcon fontSize='small' color='error' />
+                      </IconButton>
+                    </Box>
+                  )}
+
+                </Box>
               </ThreadCommentListItem>
             );
           })}
