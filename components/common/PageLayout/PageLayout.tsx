@@ -6,6 +6,9 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import * as React from 'react';
+import { useThreads } from 'hooks/useThreads';
+import { useSWRConfig } from 'swr';
+import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import Header, { headerHeight } from './components/Header';
 import Sidebar from './components/Sidebar';
 import Favicon from './components/Favicon';
@@ -76,7 +79,7 @@ interface IContext {
   showingCommentThreadsList: boolean,
   setShowingCommentThreadsList: React.Dispatch<React.SetStateAction<boolean>>
 }
-const ThreadsContext = React.createContext<IContext>({
+const CommentThreadsListDisplayContext = React.createContext<IContext>({
   setShowingCommentThreadsList: () => undefined,
   showingCommentThreadsList: false
 });
@@ -93,7 +96,17 @@ const LayoutContainer = styled.div`
 function PageLayout ({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
   const [user] = useUser();
+  const { currentPageId } = usePages();
+  const { isValidating } = useThreads();
   const [showingCommentThreadsList, setShowingCommentThreadsList] = React.useState(false);
+  const { cache } = useSWRConfig();
+  React.useEffect(() => {
+    // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
+    const cachedData: ThreadWithComments[] | undefined = cache.get(`pages/${currentPageId}/threads`);
+    if (cachedData) {
+      setShowingCommentThreadsList(cachedData.filter(thread => thread && !thread.resolved).length > 0);
+    }
+  }, [isValidating, currentPageId]);
 
   const handleDrawerOpen = React.useCallback(() => {
     setOpen(true);
@@ -109,7 +122,7 @@ function PageLayout ({ children }: { children: React.ReactNode }) {
   }), [showingCommentThreadsList]);
 
   return (
-    <ThreadsContext.Provider value={value}>
+    <CommentThreadsListDisplayContext.Provider value={value}>
       <Head>
         <CurrentPageFavicon />
       </Head>
@@ -130,12 +143,12 @@ function PageLayout ({ children }: { children: React.ReactNode }) {
           {children}
         </PageContainer>
       </LayoutContainer>
-    </ThreadsContext.Provider>
+    </CommentThreadsListDisplayContext.Provider>
   );
 }
 
 export function useThreadsDisplay () {
-  return React.useContext(ThreadsContext);
+  return React.useContext(CommentThreadsListDisplayContext);
 }
 
 function CurrentPageFavicon () {

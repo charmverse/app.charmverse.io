@@ -96,7 +96,7 @@ export function BoldButton({
 }
 
 export function InlineCommentButton({
-  hints = ['Inline comment'],
+  hints = ['Comment'],
   hintPos = 'top',
   children = <CommentIcon sx={{
     fontSize: 12,

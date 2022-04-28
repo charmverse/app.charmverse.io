@@ -6,6 +6,7 @@ import { PageContent } from 'models';
 import { usePages } from './usePages';
 
 type IContext = {
+  isValidating: boolean,
   threads: Record<string, ThreadWithComments | undefined>,
   setThreads: Dispatch<SetStateAction<Record<string, ThreadWithComments | undefined>>>,
   addComment: (threadId: string, commentContent: PageContent) => Promise<void>,
@@ -15,9 +16,8 @@ type IContext = {
   deleteThread: (threadId: string) => Promise<void>,
 };
 
-const refreshInterval = 1000 * 5 * 60; // 5 minutes
-
 export const ThreadsContext = createContext<Readonly<IContext>>({
+  isValidating: true,
   threads: {},
   setThreads: () => undefined,
   addComment: () => undefined as any,
@@ -31,7 +31,7 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const [threads, setThreads] = useState<Record<string, ThreadWithComments | undefined>>({});
 
-  const { data } = useSWR(() => currentPageId ? `pages/${currentPageId}/threads` : null, () => charmClient.getPageThreads(currentPageId), { refreshInterval });
+  const { data, isValidating } = useSWR(() => currentPageId ? `pages/${currentPageId}/threads` : null, () => charmClient.getPageThreads(currentPageId), { revalidateOnFocus: false });
   useEffect(() => {
     setThreads(data?.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
   }, [data]);
@@ -137,8 +137,9 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
     editComment,
     deleteComment,
     resolveThread,
-    deleteThread
-  }), [currentPageId, threads]);
+    deleteThread,
+    isValidating
+  }), [currentPageId, threads, isValidating]);
 
   return (
     <ThreadsContext.Provider value={value}>
