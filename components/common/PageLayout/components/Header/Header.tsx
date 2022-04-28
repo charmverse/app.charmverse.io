@@ -31,6 +31,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
+import { useThreadsDisplay } from '../../PageLayout';
 
 export const headerHeight = 56;
 
@@ -40,11 +41,30 @@ const StyledToolbar = styled(Toolbar)`
   min-height: ${headerHeight}px;
 `;
 
+function CommentThreadsListButton () {
+  const { showingCommentThreadsList, setShowingCommentThreadsList } = useThreadsDisplay();
+  return (
+    <Tooltip title={`${showingCommentThreadsList ? 'Hide' : 'Show'} comment threads`} arrow placement='bottom'>
+      <IconButton
+        onClick={() => {
+          setShowingCommentThreadsList(!showingCommentThreadsList);
+        }}
+        size='small'
+        disableRipple
+        color={!showingCommentThreadsList ? 'secondary' : 'inherit'}
+      >
+        <CommentIcon
+          fontSize='small'
+        />
+      </IconButton>
+    </Tooltip>
+  );
+}
+
 export default function Header (
-  { setShowingCommentThreadsList, showingCommentThreadsList, open, openSidebar }:
+  { open, openSidebar }:
   {
-    showingCommentThreadsList: boolean,
-    setShowingCommentThreadsList: React.Dispatch<React.SetStateAction<boolean>>, open: boolean, openSidebar: () => void }
+    open: boolean, openSidebar: () => void }
 ) {
   const router = useRouter();
   const colorMode = useColorMode();
@@ -132,22 +152,7 @@ export default function Header (
           {isPage && (
             <>
               <ShareButton headerHeight={headerHeight} />
-              {currentPage?.type !== 'board' && (
-              <Tooltip title={`${showingCommentThreadsList ? 'Hide' : 'Show'} comment threads`} arrow placement='bottom'>
-                <IconButton
-                  onClick={() => {
-                    setShowingCommentThreadsList(!showingCommentThreadsList);
-                  }}
-                  size='small'
-                  disableRipple
-                  color={!showingCommentThreadsList ? 'secondary' : 'inherit'}
-                >
-                  <CommentIcon
-                    fontSize='small'
-                  />
-                </IconButton>
-              </Tooltip>
-              )}
+              {currentPage?.type !== 'board' && <CommentThreadsListButton />}
               <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
                 <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}

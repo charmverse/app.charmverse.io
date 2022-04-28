@@ -129,8 +129,6 @@ function PageLayout ({ children }: { children: React.ReactNode }) {
       <LayoutContainer>
         <AppBar position='fixed' open={open}>
           <Header
-            setShowingCommentThreadsList={setShowingCommentThreadsList}
-            showingCommentThreadsList={showingCommentThreadsList}
             open={open}
             openSidebar={handleDrawerOpen}
           />
