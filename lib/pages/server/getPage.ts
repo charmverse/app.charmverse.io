@@ -6,16 +6,13 @@ export async function getPage (pageId: string): Promise<IPageWithPermissions | n
     where: {
       id: pageId
     },
-    select: {
-      id: true,
-      parentId: true,
+    include: {
       permissions: {
         include: {
           sourcePermission: true
         }
-      },
-      spaceId: true
+      }
     }
-  }) as any;
+  });
 }
 
