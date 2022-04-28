@@ -121,7 +121,51 @@ export default forwardRef<HTMLDivElement,
 
     return thread ? (
       <StyledThreadBox inline={inline} id={`thread.${threadId}`} ref={ref}>
-        <div>
+        <div onClick={() => {
+          if (showFindButton) {
+            // Find the inline-comment with the threadId and scroll into view
+            const threadDocument = document.getElementById(`inline-comment.${threadId}`);
+            if (threadDocument) {
+              let parentElement: HTMLElement | null = null;
+              let element: HTMLElement | null = threadDocument;
+              // Check for highest 5 levels of depth
+              for (let i = 0; i < 5; i++) {
+                element = threadDocument.parentElement;
+                // Get the first paragraph parent element
+                if (element?.classList.contains('bangle-nv-content')) {
+                  parentElement = element;
+                  break;
+                }
+              }
+
+              requestAnimationFrame(() => {
+                threadDocument.scrollIntoView({
+                  behavior: 'smooth'
+                });
+              });
+
+              setTimeout(() => {
+                if (parentElement) {
+                  // Need to create a custom element as adding styling to prosemirror-node isn't possible
+                  const highlightElement = document.createElement('div');
+                  document.body.appendChild(highlightElement);
+                  const boundingRect = parentElement.getBoundingClientRect();
+                  // Set the location of the custom element
+                  highlightElement.style.top = `${boundingRect.top}px`;
+                  highlightElement.style.left = `${boundingRect.left}px`;
+                  highlightElement.style.width = `${boundingRect.width}px`;
+                  highlightElement.style.height = `${boundingRect.height}px`;
+                  highlightElement.style.position = 'absolute';
+                  highlightDomElement(highlightElement, () => {
+                    // Remove the custom element after the highlighting is done
+                    document.body.removeChild(highlightElement);
+                  });
+                }
+              }, 500);
+            }
+          }
+        }}
+        >
           <ThreadHeaderBox>
             <Tooltip arrow placement='bottom' title={new Date(thread.createdAt).toLocaleString()}>
               <Typography
@@ -133,62 +177,10 @@ export default forwardRef<HTMLDivElement,
                 display='flex'
                 flexDirection='row'
               >
-                Started {DateTime.fromJSDate(new Date(thread.createdAt)).toRelative({ base: (DateTime.now()) })}
+                {DateTime.fromJSDate(new Date(thread.createdAt)).toRelative({ base: (DateTime.now()) })}
               </Typography>
             </Tooltip>
             <Box display='flex' gap={1}>
-              {/* Find button should not be present for inline thread  */ showFindButton && (
-              <ThreadHeaderButton
-                onClick={() => {
-                // Find the inline-comment with the threadId and scroll into view
-                  const threadDocument = document.getElementById(`inline-comment.${threadId}`);
-                  if (threadDocument) {
-                    let parentElement: HTMLElement | null = null;
-                    let element: HTMLElement | null = threadDocument;
-                    // Check for highest 5 levels of depth
-                    for (let i = 0; i < 5; i++) {
-                      element = threadDocument.parentElement;
-                      // Get the first paragraph parent element
-                      if (element?.classList.contains('bangle-nv-content')) {
-                        parentElement = element;
-                        break;
-                      }
-                    }
-
-                    requestAnimationFrame(() => {
-                      threadDocument.scrollIntoView({
-                        behavior: 'smooth'
-                      });
-                    });
-
-                    setTimeout(() => {
-                      if (parentElement) {
-                      // Need to create a custom element as adding styling to prosemirror-node isn't possible
-                        const highlightElement = document.createElement('div');
-                        document.body.appendChild(highlightElement);
-                        const boundingRect = parentElement.getBoundingClientRect();
-                        // Set the location of the custom element
-                        highlightElement.style.top = `${boundingRect.top}px`;
-                        highlightElement.style.left = `${boundingRect.left}px`;
-                        highlightElement.style.width = `${boundingRect.width}px`;
-                        highlightElement.style.height = `${boundingRect.height}px`;
-                        highlightElement.style.position = 'absolute';
-                        highlightDomElement(highlightElement, () => {
-                        // Remove the custom element after the highlighting is done
-                          document.body.removeChild(highlightElement);
-                        });
-                      }
-                    }, 500);
-                  }
-                }}
-                startIcon={(
-                  <LocationOnIcon
-                    fontSize='small'
-                  />
-              )}
-                text='Find'
-              />
-              )}
               <ThreadHeaderButton
                 text={thread.resolved ? 'Un-resolve' : 'Resolve'}
                 startIcon={(
