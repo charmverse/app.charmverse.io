@@ -74,65 +74,63 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   return (
     <ScrollableWindow>
-      <Box display='flex' gap={1}>
-        <div style={{
-          width: showingCommentThreadsList ? 'calc(100% - 550px)' : '100%'
-        }}
+      <div style={{
+        width: showingCommentThreadsList ? 'calc(100% - 550px)' : '100%'
+      }}
+      >
+        {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
+        <Container
+          top={pageTop}
         >
-          {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
-          <Container
-            top={pageTop}
+          <CharmEditor
+            key={page.id}
+            content={page.content as PageContent}
+            onContentChange={updatePageContent}
+            readOnly={readOnly}
+            showingCommentThreadsList={showingCommentThreadsList}
           >
-            <CharmEditor
-              key={page.id}
-              content={page.content as PageContent}
-              onContentChange={updatePageContent}
+            <PageHeader
+              headerImage={page.headerImage}
+              icon={page.icon}
+              title={page.title}
               readOnly={readOnly}
-              showingCommentThreadsList={showingCommentThreadsList}
-            >
-              <PageHeader
-                headerImage={page.headerImage}
-                icon={page.icon}
-                title={page.title}
-                readOnly={readOnly}
-                setPage={setPage}
-              />
-              {card && board && (
-              <div className='CardDetail content'>
-                {/* Property list */}
-                <Box sx={{
-                  display: 'flex',
-                  gap: 1,
-                  justifyContent: 'space-between',
-                  width: '100%'
-                }}
-                >
-                  <CardDetailProperties
-                    board={board}
-                    card={card}
-                    cards={cards}
-                    activeView={activeView}
-                    views={boardViews}
-                    readonly={readOnly}
-                    pageUpdatedAt={page.updatedAt.toString()}
-                    pageUpdatedBy={page.updatedBy}
-                  />
-                  <BountyIntegration linkedTaskId={card.id} title={title} readonly={readOnly} />
-                </Box>
-
-                <hr />
-                <CommentsList
-                  comments={comments}
-                  rootId={card.rootId}
-                  cardId={card.id}
+              setPage={setPage}
+            />
+            {card && board && (
+            <div className='CardDetail content'>
+              {/* Property list */}
+              <Box sx={{
+                display: 'flex',
+                gap: 1,
+                justifyContent: 'space-between',
+                width: '100%'
+              }}
+              >
+                <CardDetailProperties
+                  board={board}
+                  card={card}
+                  cards={cards}
+                  activeView={activeView}
+                  views={boardViews}
                   readonly={readOnly}
+                  pageUpdatedAt={page.updatedAt.toString()}
+                  pageUpdatedBy={page.updatedBy}
                 />
-              </div>
-              )}
-            </CharmEditor>
-          </Container>
-        </div>
-      </Box>
+                <BountyIntegration linkedTaskId={card.id} title={title} readonly={readOnly} />
+              </Box>
+
+              <hr />
+              <CommentsList
+                comments={comments}
+                rootId={card.rootId}
+                cardId={card.id}
+                readonly={readOnly}
+              />
+            </div>
+            )}
+          </CharmEditor>
+        </Container>
+      </div>
     </ScrollableWindow>
   );
 }

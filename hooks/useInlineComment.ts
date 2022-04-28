@@ -1,6 +1,8 @@
-import { Node, Mark, MarkType } from '@bangle.dev/pm';
+import { Node } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import { findChildrenByMark, NodeWithPos } from 'prosemirror-utils';
+import { extractTextFromSelection } from 'lib/inline-comments/extractTextFromSelection';
+import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
+import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
 import { useContributors } from './useContributors';
 import { usePages } from './usePages';
 import { useThreads } from './useThreads';
@@ -13,89 +15,13 @@ export function useInlineComment () {
 
   return {
     extractTextFromSelection () {
-      // Get the context from current selection
-      const cutDoc = view.state.doc.cut(view.state.selection.from, view.state.selection.to);
-      let textContent = '';
-      cutDoc.descendants(node => {
-        if (node.isText) {
-          textContent += node.text;
-        }
-        else if (node.type.name === 'mention') {
-          const { type, value } = node.attrs;
-          if (type === 'user') {
-            const contributor = contributors.find(_contributor => _contributor.id === value);
-            if (contributor) {
-              textContent += `@${(contributor.username ?? contributor.addresses[0])}`;
-            }
-          }
-          else {
-            const page = pages[value];
-            if (page) {
-              textContent += `@${page.title || 'Untitled'}`;
-            }
-          }
-        }
-        else if (node.type.name === 'emoji') {
-          textContent += node.attrs.emoji;
-        }
-      });
-      return textContent;
+      return extractTextFromSelection(view, contributors, pages);
     },
     findTotalInlineComments (node: Node) {
-      const inlineCommentMarkSchema = view.state.schema.marks['inline-comment'] as MarkType;
-      const inlineCommentNodes = findChildrenByMark(node, inlineCommentMarkSchema);
-      let totalInlineComments = 0;
-      // There is a possibility that multiple nodes can have the same threadId so use a set to capture only the unique ones
-      const threadIds: Set<string> = new Set();
-      for (const inlineCommentNode of inlineCommentNodes) {
-        // Find the inline comment mark for the node
-        const inlineCommentMark = inlineCommentNode.node.marks.find(mark => mark.type.name === inlineCommentMarkSchema.name);
-        // Only count the non-resolved threads
-        if (inlineCommentMark && !inlineCommentMark.attrs.resolved) {
-          const thread = threads[inlineCommentMark.attrs.id];
-          if (thread && !threadIds.has(thread.id)) {
-            totalInlineComments += thread.Comment.length;
-          }
-          threadIds.add(inlineCommentMark.attrs.id);
-        }
-      }
-      return { totalInlineComments, threadIds: Array.from(threadIds) };
+      return findTotalInlineComments(view, node, threads);
     },
     removeInlineCommentMark (threadId: string, deleteThread?: boolean) {
-      deleteThread = deleteThread ?? false;
-      const doc = view.state.doc;
-      const inlineCommentMarkSchema = view.state.schema.marks['inline-comment'] as MarkType;
-      const inlineCommentNodes = findChildrenByMark(doc, inlineCommentMarkSchema);
-      const inlineCommentNodeWithMarks: (NodeWithPos & {mark: Mark})[] = [];
-
-      for (const inlineCommentNode of inlineCommentNodes) {
-        // Find the inline comment mark for the node
-        const inlineCommentMark = inlineCommentNode.node.marks.find(mark => mark.type.name === inlineCommentMarkSchema.name);
-        // Make sure the mark has the same threadId as the given one
-        if (inlineCommentMark?.attrs.id === threadId) {
-          inlineCommentNodeWithMarks.push({
-            ...inlineCommentNode,
-            mark: inlineCommentMark
-          });
-        }
-      }
-
-      inlineCommentNodeWithMarks.forEach(inlineCommentNodeWithMark => {
-        const from = inlineCommentNodeWithMark.pos;
-        const to = from + inlineCommentNodeWithMark.node.nodeSize;
-        const tr = view.state.tr.removeMark(from, to, inlineCommentMarkSchema);
-        // If we are not deleting the thread, resolve or un-resolve it based on current re-solve status
-        // This will update the view accordingly
-        if (!deleteThread) {
-          tr.addMark(from, to, inlineCommentMarkSchema.create({
-            id: threadId,
-            resolved: !inlineCommentNodeWithMark.mark.attrs.resolved
-          }));
-        }
-        if (view.dispatch) {
-          view.dispatch(tr);
-        }
-      });
+      removeInlineCommentMark(view, threadId, deleteThread);
     }
   };
 }
