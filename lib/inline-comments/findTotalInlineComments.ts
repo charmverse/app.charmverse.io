@@ -15,7 +15,7 @@ export function findTotalInlineComments (view:EditorView, node: Node, threads: R
     if (inlineCommentMark && !inlineCommentMark.attrs.resolved) {
       const thread = threads[inlineCommentMark.attrs.id];
       if (thread && !threadIds.has(thread.id)) {
-        totalInlineComments += thread.Comment.length;
+        totalInlineComments += thread.comments.length;
       }
       threadIds.add(inlineCommentMark.attrs.id);
     }

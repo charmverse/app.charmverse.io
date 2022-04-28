@@ -49,7 +49,7 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
         setThreads((_threads) => ({ ..._threads,
           [thread.id]: {
             ...thread,
-            Comment: [...thread.Comment, comment]
+            comments: [...thread.comments, comment]
           } }));
       }
       catch (_) {
@@ -66,7 +66,7 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
         setThreads((_threads) => ({ ..._threads,
           [thread.id]: {
             ...thread,
-            Comment: thread.Comment.map(comment => comment.id === editedCommentId ? ({ ...comment, content: commentContent }) : comment)
+            comments: thread.comments.map(comment => comment.id === editedCommentId ? ({ ...comment, content: commentContent }) : comment)
           } }));
       }
       catch (_) {
@@ -78,13 +78,13 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
   async function deleteComment (threadId: string, commentId: string) {
     const thread = threads[threadId];
     if (thread) {
-      const comment = thread.Comment.find(_comment => _comment.id === commentId);
+      const comment = thread.comments.find(_comment => _comment.id === commentId);
       if (comment) {
         try {
           await charmClient.deleteComment(comment.id);
           const threadWithoutComment = {
             ...thread,
-            Comment: thread.Comment.filter(_comment => _comment.id !== comment.id)
+            comments: thread.comments.filter(_comment => _comment.id !== comment.id)
           };
           setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
         }

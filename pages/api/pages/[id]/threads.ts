@@ -14,7 +14,7 @@ export type CommentWithUser = (Comment & {
 })
 
 export type ThreadWithComments = Thread & {
-  Comment: CommentWithUser[]
+  comments: CommentWithUser[]
 }
 
 async function getThreads (req: NextApiRequest, res: NextApiResponse) {
@@ -25,7 +25,7 @@ async function getThreads (req: NextApiRequest, res: NextApiResponse) {
       pageId
     },
     include: {
-      Comment: {
+      comments: {
         include: {
           user: true
         },

@@ -200,7 +200,7 @@ export default forwardRef<HTMLDivElement,
               />
             </Box>
           </ThreadHeaderBox>
-          {thread.Comment.map((comment, commentIndex) => {
+          {thread.comments.map((comment, commentIndex) => {
             return (
               <ThreadCommentListItem
                 key={comment.id}
@@ -271,13 +271,13 @@ export default forwardRef<HTMLDivElement,
           })}
         </div>
         {permissions.edit_content && (
-        <Box display='flex' flexDirection='column' gap={1} mt={thread.Comment.length !== 0 ? 1 : 0}>
+        <Box display='flex' flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
           <InlineCharmEditor
             style={{
               backgroundColor: theme.palette.background.default,
               padding: theme.spacing(0, 1)
             }}
-            key={`${editedComment}.${thread.Comment[thread.Comment.length - 1]?.id}`}
+            key={`${editedComment}.${thread.comments[thread.comments.length - 1]?.id}`}
             content={commentContent}
             onContentChange={({ doc }) => {
               setCommentContent(doc);
