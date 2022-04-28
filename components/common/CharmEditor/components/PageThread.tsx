@@ -47,6 +47,7 @@ const StyledThreadBox = styled(Box)<{inline: boolean}>`
   background: ${({ theme }) => theme.palette.background.light};
   width: ${({ inline }) => inline ? '500px' : 'inherit'};
   max-height: ${({ inline }) => inline ? '300px' : 'fit-content'};
+  pointer-events: all;
 `;
 
 const ThreadHeaderBox = styled(Box)`

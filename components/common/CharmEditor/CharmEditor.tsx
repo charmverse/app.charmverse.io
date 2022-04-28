@@ -281,6 +281,7 @@ const PageThreadListBox = styled(Box)`
   z-index: 2000;
   height: calc(100% - 80px);
   overflow: auto;
+  pointer-events: none;
 `;
 
 const defaultContent: PageContent = {
