@@ -81,7 +81,8 @@ async function updateThread (req: NextApiRequest, res: NextApiResponse) {
       id: threadId
     },
     data: {
-      resolved: req.body.resolved
+      resolved: req.body.resolved,
+      updatedAt: new Date()
     }
   });
   return res.status(200).json({ ok: true });

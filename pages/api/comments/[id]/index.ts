@@ -55,7 +55,8 @@ async function editComment (req: NextApiRequest, res: NextApiResponse) {
       userId: req.session.user.id as string
     },
     data: {
-      content
+      content,
+      updatedAt: new Date()
     }
   });
 

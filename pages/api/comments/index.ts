@@ -31,6 +31,19 @@ async function addComment (req: NextApiRequest, res: NextApiResponse) {
     throw new ActionNotPermittedError();
   }
 
+  const page = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    },
+    select: {
+      space: {
+        select: {
+          id: true
+        }
+      }
+    }
+  });
+
   const comment = await prisma.comment.create({
     data: {
       content,
@@ -47,6 +60,11 @@ async function addComment (req: NextApiRequest, res: NextApiResponse) {
       user: {
         connect: {
           id: userId
+        }
+      },
+      space: {
+        connect: {
+          id: page?.space?.id
         }
       }
     },
