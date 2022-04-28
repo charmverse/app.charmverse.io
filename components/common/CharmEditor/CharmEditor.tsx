@@ -27,7 +27,7 @@ import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
-import { Portal } from '@mui/material';
+import { Box, Portal } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import Callout, * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
@@ -291,7 +291,6 @@ interface CharmEditorProps {
   readOnly?: boolean;
   style?: CSSProperties;
   showingCommentThreadsList?: boolean
-  commentThreadsListRef?: RefObject<HTMLDivElement>
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -315,7 +314,7 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 }
 
 function CharmEditor (
-  { commentThreadsListRef, showingCommentThreadsList = false, content = defaultContent, children, onContentChange, style, readOnly = false }:
+  { showingCommentThreadsList = false, content = defaultContent, children, onContentChange, style, readOnly = false }:
   CharmEditorProps
 ) {
   // check empty state of page on first load
@@ -455,10 +454,21 @@ function CharmEditor (
       <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
       <InlinePalette />
       {children}
-      {commentThreadsListRef?.current && showingCommentThreadsList && (
-      <Portal container={commentThreadsListRef.current}>
+      {showingCommentThreadsList && (
+      <Box
+        sx={{
+          position: 'fixed',
+          right: 50,
+          width: 500,
+          top: 75,
+          zIndex: 2000,
+          height: 'calc(100% - 80px)',
+          overflow: 'auto'
+        }}
+        className='PageThreadListBox'
+      >
         <PageThreadsList inline={false} />
-      </Portal>
+      </Box>
       )}
       <InlineCommentThread />
     </StyledReactBangleEditor>

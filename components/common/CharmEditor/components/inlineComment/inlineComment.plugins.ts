@@ -18,7 +18,7 @@ export function plugin (): RawPlugins {
           }
           if (fromNodeAfter) {
             const inlineCommentMark = view.state.doc.type.schema.marks['inline-comment'].isInSet(fromNodeAfter.marks);
-            const pageThreadListNode = document.querySelector('.PageThreadList-portal');
+            const pageThreadListNode = document.querySelector('.PageThreadListBox');
             const isShowingCommentThreadsList = pageThreadListNode?.children.length !== 0;
             const threadId = inlineCommentMark?.attrs.id;
             if (threadId) {

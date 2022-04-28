@@ -1,11 +1,9 @@
 import { NodeViewProps } from '@bangle.dev/core';
 import { useInlineComment } from 'hooks/useInlineComment';
-import { useThreads } from 'hooks/useThreads';
 import { ReactNode, useMemo } from 'react';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import { Box } from '@mui/material';
 import { useEditorViewContext } from '@bangle.dev/react';
-import { useSWRConfig } from 'swr';
 import { renderSuggestionsTooltip, SuggestTooltipPluginKey } from './@bangle.dev/tooltip/suggest-tooltip';
 
 export default function Paragraph (
@@ -13,10 +11,9 @@ export default function Paragraph (
   NodeViewProps & {children: ReactNode, calculateInlineComments?: boolean}
 ) {
   const { findTotalInlineComments } = useInlineComment();
-  const { threads } = useThreads();
   const { threadIds, totalInlineComments } = useMemo(() => calculateInlineComments
     ? findTotalInlineComments(node)
-    : { threadIds: [], totalInlineComments: 0 }, [threads, node, calculateInlineComments]);
+    : { threadIds: [], totalInlineComments: 0 }, [node, calculateInlineComments]);
 
   const view = useEditorViewContext();
   return (
@@ -28,7 +25,8 @@ export default function Paragraph (
         display='flex'
         gap={0.5}
         sx={{
-          cursor: 'pointer'
+          cursor: 'pointer',
+          userSelect: 'none'
         }}
       >
         <ModeCommentOutlinedIcon

@@ -11,7 +11,7 @@ const ThreadContainerBox = styled(Box)`
   max-height: 400px;
   overflow: auto;
   display: flex;
-  gap: 1;
+  gap: ${({ theme }) => theme.spacing(1)};
   flex-direction: column;
   min-width: 500px;
 `;

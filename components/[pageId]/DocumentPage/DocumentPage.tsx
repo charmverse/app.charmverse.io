@@ -1,4 +1,4 @@
-import { useCallback, memo, useRef } from 'react';
+import { useCallback, memo } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
@@ -71,7 +71,6 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const card = cards.find(_card => _card.id === page.id);
 
   const comments = card ? useAppSelector(getCardComments(card.id)) : [];
-  const commentThreadsListRef = useRef<HTMLDivElement>(null);
 
   return (
     <ScrollableWindow>
@@ -85,7 +84,6 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             top={pageTop}
           >
             <CharmEditor
-              commentThreadsListRef={commentThreadsListRef}
               key={page.id}
               content={page.content as PageContent}
               onContentChange={updatePageContent}
@@ -134,20 +132,6 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
             </CharmEditor>
           </Container>
         </div>
-        <div
-          ref={commentThreadsListRef}
-          className='PageThreadList-portal'
-          style={{
-            width: 500,
-            right: '50px',
-            position: 'fixed',
-            overflow: 'auto',
-            height: 'calc(100% - 65px)',
-            paddingRight: '10px',
-            // This is required to make the scroll work
-            display: showingCommentThreadsList ? 'initial' : 'none'
-          }}
-        />
       </Box>
     </ScrollableWindow>
   );
