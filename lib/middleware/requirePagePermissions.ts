@@ -99,8 +99,7 @@ export function requirePagePermissions (
   requiredPermissions: PageOperationType [],
   routeHandler: (req: NextApiRequest, res: NextApiResponse<Page>) => any
 ) {
-
-  return async function anonymous (req: NextApiRequest, res: NextApiResponse) {
+  return async function requirePagePermissionsMiddleware (req: NextApiRequest, res: NextApiResponse) {
     const pageId = req.query.id as string ?? req.body.id as string ?? req.query.pageId as string ?? req.body.pageId as string;
 
     if (!pageId) {
@@ -131,7 +130,5 @@ export function requirePagePermissions (
     }
 
     return routeHandler(req, res);
-
   };
-
 }

@@ -7,12 +7,12 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { NodeSelection } from 'prosemirror-state';
-import { InlineCommentSubMenu } from './@bangle.dev/react-menu/InlineCommentMenu';
 import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
 import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 import { queryIsSelectionAroundInlineComment } from './inlineComment';
+import { InlineCommentSubMenu } from './inlineComment/InlineComment.components';
 
 export default function FloatingMenuComponent ({ pluginKey, inline = false }: {pluginKey: PluginKey, inline?: boolean}) {
   const { showMessage } = useSnackbar();

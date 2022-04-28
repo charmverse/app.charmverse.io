@@ -7,7 +7,6 @@ export function highlightDomElement (domElement: HTMLElement, postHighlight?: ()
   // Remove the highlight after 500 ms
   setTimeout(() => {
     domElement.style.removeProperty('background-color');
-    domElement.style.transition = 'background-color 250ms ease-in-out';
     postHighlight?.();
   }, 500);
 }
