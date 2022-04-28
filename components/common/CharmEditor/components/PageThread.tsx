@@ -247,6 +247,21 @@ export default forwardRef<HTMLDivElement,
                         {DateTime.fromJSDate(new Date(comment.createdAt)).toRelative({ base: (DateTime.now()) })}
                       </Typography>
                     </Tooltip>
+                    {comment.updatedAt && (
+                    <Tooltip arrow placement='bottom' title={new Date(comment.createdAt).toLocaleString()}>
+                      <Typography
+                        sx={{
+                          cursor: 'pointer'
+                        }}
+                        color='secondary'
+                        variant='subtitle1'
+                        display='flex'
+                        flexDirection='row'
+                      >
+                        (Updated)
+                      </Typography>
+                    </Tooltip>
+                    )}
                   </Box>
                   {(comment.userId === user?.id) && permissions.edit_content && (
                   <Box display='flex' className='comment-actions'>

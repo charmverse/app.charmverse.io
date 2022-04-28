@@ -66,7 +66,8 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
         setThreads((_threads) => ({ ..._threads,
           [thread.id]: {
             ...thread,
-            comments: thread.comments.map(comment => comment.id === editedCommentId ? ({ ...comment, content: commentContent }) : comment)
+            comments: thread.comments
+              .map(comment => comment.id === editedCommentId ? ({ ...comment, content: commentContent, updatedAt: new Date() }) : comment)
           } }));
       }
       catch (_) {
