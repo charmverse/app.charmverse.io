@@ -1,14 +1,23 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback, MouseEvent} from 'react'
 import {FormattedMessage} from 'react-intl'
-
-import ViewMenu from '../viewMenu'
+import { useRouter } from 'next/router'
+import NextLink from 'next/link';
+import Link from 'components/common/Link';
+import Typography from '@mui/material/Typography';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import { generatePath } from 'lib/utilities/strings';
+import ViewMenu, { iconForViewType } from '../viewMenu'
+import ViewTabs from './viewTabs';
+import AddViewMenu from '../addViewMenu'
 import mutator from '../../mutator'
 import {Board, IPropertyTemplate} from '../../blocks/board'
 import {BoardView} from '../../blocks/boardView'
 import {Card} from '../../blocks/card'
 import Button from '../../widgets/buttons/button'
+import CharmButton from 'components/common/Button'
 import IconButton from '../../widgets/buttons/iconButton'
 import DropdownIcon from '../../widgets/icons/dropdown'
 import MenuWrapper from '../../widgets/menuWrapper'
@@ -33,7 +42,7 @@ type Props = {
     cards: Card[]
     groupByProperty?: IPropertyTemplate
     addCard: () => void
-    addCardFromTemplate: (cardTemplateId: string) => void
+    //addCardFromTemplate: (cardTemplateId: string) => void
     addCardTemplate: () => void
     editCardTemplate: (cardTemplateId: string) => void
     readonly: boolean
@@ -42,6 +51,7 @@ type Props = {
 }
 
 const ViewHeader = React.memo((props: Props) => {
+    const router = useRouter()
     const [showFilter, setShowFilter] = useState(false)
 
     const {board, activeView, views, groupByProperty, cards, showShared, dateDisplayProperty} = props
@@ -58,39 +68,39 @@ const ViewHeader = React.memo((props: Props) => {
 
     const hasFilter = activeView.fields.filter && activeView.fields.filter.filters?.length > 0
 
+    const showView = useCallback((viewId) => {
+        let newPath = generatePath(router.pathname, router.query)
+        router.push({ pathname: newPath, query: { viewId: viewId || '' } }, undefined, { shallow: true });
+    }, [router.query, history])
+
+
     return (
         <div className='ViewHeader'>
-            <Editable
-                value={viewTitle}
-                placeholderText='Untitled View'
-                onSave={(): void => {
-                    mutator.changeTitle(activeView.id, activeView.title, viewTitle)
-                }}
-                onCancel={(): void => {
-                    setViewTitle(activeView.title)
-                }}
-                onChange={setViewTitle}
-                saveOnEsc={true}
+
+            <ViewTabs
+                views={views}
                 readonly={props.readonly}
-                spellCheck={true}
-                autoExpand={false}
+                showView={showView}
             />
-            {
-                  !props.readonly && <MenuWrapper>
-                  <IconButton icon={<DropdownIcon/>}/>
-                  <ViewMenu
-                      board={board}
-                      activeView={activeView}
-                      views={views}
-                      readonly={props.readonly}
-                  />
-              </MenuWrapper>
-            }
+
+            {/* add a view */}
+
+            {!props.readonly && (
+                <AddViewMenu
+                    board={board}
+                    activeView={activeView}
+                    views={views}
+                    showView={showView}
+                />
+            )}
+
 
             <div className='octo-spacer'/>
 
             {!props.readonly &&
             <>
+
+
                 {/* Card properties */}
 
                 <ViewHeaderPropertiesMenu
@@ -167,7 +177,7 @@ const ViewHeader = React.memo((props: Props) => {
 
                 <NewCardButton
                     addCard={props.addCard}
-                    addCardFromTemplate={props.addCardFromTemplate}
+                   // addCardFromTemplate={props.addCardFromTemplate}
                     addCardTemplate={props.addCardTemplate}
                     editCardTemplate={props.editCardTemplate}
                 />

@@ -18,14 +18,6 @@ import LastModifiedBy from './lastModifiedBy'
 
 describe('components/properties/lastModifiedBy', () => {
     test('should match snapshot', () => {
-        const card = createCard()
-        card.id = 'card-id-1'
-        card.updatedBy = 'user-id-1'
-
-        const board = createBoard()
-        const comment = createCommentBlock()
-        comment.updatedBy = 'user-id-1'
-        comment.parentId = 'card-id-1'
 
         const mockStore = configureStore([])
         const store = mockStore({
@@ -39,10 +31,7 @@ describe('components/properties/lastModifiedBy', () => {
         const component = (
             <ReduxProvider store={store}>
                 <LastModifiedBy
-                    card={card}
-                    board={board}
-                    contents={[]}
-                    comments={[comment]}
+                    updatedBy='user-id-1'
                 />
             </ReduxProvider>
         )

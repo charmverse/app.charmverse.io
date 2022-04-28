@@ -16,7 +16,7 @@ import { ChangeEvent, memo } from 'react';
 import { useIntl } from 'react-intl';
 import EmojiIcon from 'components/common/Emoji';
 import { randomBannerImage } from './PageBanner';
-import PageTitle from './PageTitle';
+import PageTitleInput from './PageTitleInput';
 
 const PageControlItem = styled(ListItemButton)`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
@@ -139,7 +139,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
           )}
         </Controls>
       </EditorHeader>
-      <PageTitle
+      <PageTitleInput
         readOnly={readOnly}
         value={title}
         onChange={updateTitle}

@@ -4,8 +4,6 @@
 import { Box } from '@mui/system'
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
-import { usePages } from 'hooks/usePages'
-import { randomIntFromInterval } from 'lib/utilities/random'
 import { Page } from 'models'
 import React, { useState } from 'react'
 import Hotkeys from 'react-hot-keys'
@@ -60,7 +58,6 @@ function CenterPanel(props: Props) {
     selectedCardIds: []
   })
 
-  const { pages } = usePages()
   const [space] = useCurrentSpace()
 
   const backgroundRef = React.createRef<HTMLDivElement>()
@@ -83,13 +80,6 @@ function CenterPanel(props: Props) {
         e.stopPropagation()
       }
 
-      // TODO: Might need a different hotkey, as Cmd+D is save bookmark on Chrome
-      if (keyName === 'ctrl+d') {
-        // CTRL+D: Duplicate selected cards
-        duplicateSelectedCards()
-        e.stopPropagation()
-        e.preventDefault()
-      }
     }
   }
 
@@ -106,31 +96,31 @@ function CenterPanel(props: Props) {
     }
   }
 
-  const addCardFromTemplate = async (cardTemplateId: string) => {
-    const { activeView, board } = props
+  // const addCardFromTemplate = async (cardTemplateId: string) => {
+  //   const { activeView, board } = props
 
-    mutator.performAsUndoGroup(async () => {
-      if (pages[cardTemplateId]) {
-        const [, newCardId] = await mutator.duplicateCard({
-          cardId: cardTemplateId,
-          board,
-          description: props.intl.formatMessage({ id: 'Mutator.new-card-from-template', defaultMessage: 'new card from template' }),
-          asTemplate: false,
-          afterRedo: async (cardId) => {
-            props.updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: [...activeView.fields.cardOrder, cardId] } })
-            // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCardViaTemplate, {board: props.board.id, view: props.activeView.id, card: cardId, cardTemplateId})
-            showCard(cardId)
-          },
-          beforeUndo: async () => {
-            showCard(undefined)
-          },
-          cardPage: pages[cardTemplateId]!
-        }
-        )
-        await mutator.changeViewCardOrder(activeView, [...activeView.fields.cardOrder, newCardId], 'add-card')
-      }
-    })
-  }
+  //   mutator.performAsUndoGroup(async () => {
+  //     if (pages[cardTemplateId]) {
+  //       const [, newCardId] = await mutator.duplicateCard({
+  //         cardId: cardTemplateId,
+  //         board,
+  //         description: props.intl.formatMessage({ id: 'Mutator.new-card-from-template', defaultMessage: 'new card from template' }),
+  //         asTemplate: false,
+  //         afterRedo: async (cardId) => {
+  //           props.updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: [...activeView.fields.cardOrder, cardId] } })
+  //           // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCardViaTemplate, {board: props.board.id, view: props.activeView.id, card: cardId, cardTemplateId})
+  //           showCard(cardId)
+  //         },
+  //         beforeUndo: async () => {
+  //           showCard(undefined)
+  //         },
+  //         cardPage: pages[cardTemplateId]!
+  //       }
+  //       )
+  //       await mutator.changeViewCardOrder(activeView, [...activeView.fields.cardOrder, newCardId], 'add-card')
+  //     }
+  //   })
+  // }
 
   const addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = false): Promise<void> => {
     const { activeView, board, groupByProperty } = props
@@ -169,7 +159,6 @@ function CenterPanel(props: Props) {
             await mutate(`pages/${space.id}`)
           }
           if (show) {
-            console.log('add card', props.addCard.toString());
             props.addCard(createCard(block))
             props.updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } })
             showCard(block.id)
@@ -246,12 +235,12 @@ function CenterPanel(props: Props) {
     e.stopPropagation()
   }
 
-  const showCard = (cardId?: string) => {
+  const showCard = React.useCallback((cardId?: string) => {
     if (state.selectedCardIds.length > 0) {
       setState({ ...state, selectedCardIds: [] })
     }
     props.showCard(cardId)
-  }
+  }, [props.showCard, state.selectedCardIds])
 
   async function deleteSelectedCards() {
     const { selectedCardIds } = state
@@ -273,32 +262,6 @@ function CenterPanel(props: Props) {
     setState({ ...state, selectedCardIds: [] })
   }
 
-  async function duplicateSelectedCards() {
-    const { board } = props
-    const { selectedCardIds } = state
-    if (selectedCardIds.length < 1) {
-      return
-    }
-    mutator.performAsUndoGroup(async () => {
-      for (const cardId of selectedCardIds) {
-        const card = props.cards.find((o) => o.id === cardId)
-        if (card && pages[cardId] && space) {
-          mutator.duplicateCard({
-            cardId,
-            board,
-            cardPage: pages[cardId]!,
-            afterRedo: async () => {
-              mutate(`pages/${space.id}`)
-            }
-          })
-        } else {
-          Utils.assertFailure(`Selected card not found: ${cardId}`)
-        }
-      }
-    })
-
-    setState({ ...state, selectedCardIds: [] })
-  }
 
   function groupCardsByOptions(cards: Card[], optionIds: string[], groupByProperty?: IPropertyTemplate): BoardGroup[] {
     const groups = []
@@ -383,7 +346,7 @@ function CenterPanel(props: Props) {
           groupByProperty={props.groupByProperty}
           dateDisplayProperty={props.dateDisplayProperty}
           addCard={() => addCard('', true)}
-          addCardFromTemplate={addCardFromTemplate}
+          //addCardFromTemplate={addCardFromTemplate}
           addCardTemplate={addCardTemplate}
           editCardTemplate={editCardTemplate}
           readonly={props.readonly}

@@ -28,12 +28,6 @@ export default function EditorPage (
   const [pageNotFound, setPageNotFound] = useState(false);
   const [user] = useUser();
   const [pagePermissions, setPagePermissions] = useState<Partial<IPagePermissionFlags> | null>(null);
-  const debouncedPageUpdate = useMemo(() => {
-    return debouncePromise((input: Prisma.PageUpdateInput) => {
-      setIsEditing(true);
-      return charmClient.updatePage(input);
-    }, 500);
-  }, []);
 
   async function loadPublicPage (publicPageId: string) {
     const { pages: publicPages, blocks } = await charmClient.getPublicPage(publicPageId);
@@ -74,17 +68,22 @@ export default function EditorPage (
     }
   }, [pageId, pagesLoaded]);
 
-  const setPage = useCallback(async (updates: Partial<Page>) => {
-    if (!currentPageId || publicShare === true) {
-      return;
-    }
+  const debouncedPageUpdate = debouncePromise((updates: Prisma.PageUpdateInput) => {
+    setIsEditing(true);
     setPages((_pages) => ({
       ..._pages,
       [currentPageId]: {
         ..._pages[currentPageId]!,
-        ...updates
+        ...updates as Partial<Page>
       }
     }));
+    return charmClient.updatePage(updates);
+  }, 500);
+
+  const setPage = useCallback(async (updates: Partial<Page>) => {
+    if (!currentPageId || publicShare === true) {
+      return;
+    }
     if (updates.hasOwnProperty('title')) {
       setTitleState(updates.title || 'Untitled');
     }
