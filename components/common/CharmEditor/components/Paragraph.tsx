@@ -2,7 +2,7 @@ import { NodeViewProps } from '@bangle.dev/core';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { ReactNode, useMemo } from 'react';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { renderSuggestionsTooltip, SuggestTooltipPluginKey } from './@bangle.dev/tooltip/suggest-tooltip';
 
@@ -28,21 +28,19 @@ export default function Paragraph (
           cursor: 'pointer',
           userSelect: 'none'
         }}
+        onClick={() => {
+          renderSuggestionsTooltip(SuggestTooltipPluginKey, { component: 'inlineComment', threadIds })(view.state, view.dispatch, view);
+        }}
       >
         <ModeCommentOutlinedIcon
-          onClick={() => {
-            renderSuggestionsTooltip(SuggestTooltipPluginKey, { component: 'inlineComment', threadIds })(view.state, view.dispatch, view);
-          }}
           color='secondary'
           fontSize='small'
         />
-        <Box
+        <Typography
           component='span'
-          sx={{
-            fontSize: 12
-          }}
+          variant='subtitle1'
         >{totalInlineComments}
-        </Box>
+        </Typography>
       </Box>
       )}
     </>

@@ -19,7 +19,8 @@ export function plugin (): RawPlugins {
           if (fromNodeAfter) {
             const inlineCommentMark = view.state.doc.type.schema.marks['inline-comment'].isInSet(fromNodeAfter.marks);
             const pageThreadListNode = document.querySelector('.PageThreadListBox');
-            const isShowingCommentThreadsList = pageThreadListNode?.children.length !== 0;
+            // Page threads list node might not be present
+            const isShowingCommentThreadsList = pageThreadListNode && pageThreadListNode.children.length !== 0;
             const threadId = inlineCommentMark?.attrs.id;
             if (threadId) {
               // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
