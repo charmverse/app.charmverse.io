@@ -25,7 +25,7 @@ export const Container = styled(Box)<{ top: number }>`
 
   padding: 0 40px;
   @media (min-width: 975px) {
-    padding: 0 80px;
+    padding: 0 40px;
   }
 `;
 
@@ -73,9 +73,11 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const comments = card ? useAppSelector(getCardComments(card.id)) : [];
 
   return (
-    <ScrollableWindow>
+    <ScrollableWindow hideScroll={showingCommentThreadsList}>
       <div style={{
-        width: showingCommentThreadsList ? 'calc(100% - 550px)' : '100%'
+        width: showingCommentThreadsList ? 'calc(100% - 425px)' : '100%',
+        height: showingCommentThreadsList ? 'calc(100vh - 65px)' : 'inherit',
+        overflow: showingCommentThreadsList ? 'auto' : 'inherit'
       }}
       >
         {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}

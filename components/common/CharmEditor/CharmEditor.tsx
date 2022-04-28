@@ -275,13 +275,12 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
 
 const PageThreadListBox = styled(Box)`
   position: fixed;
-  right: 50px;
-  width: 500px;
+  right: 0px;
+  width: 400px;
   top: 75px;
   z-index: 2000;
   height: calc(100% - 80px);
   overflow: auto;
-  pointer-events: none;
 `;
 
 const defaultContent: PageContent = {
