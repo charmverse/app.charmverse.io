@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, ButtonProps, Tooltip, SxProps } from '@mui/material';
 import { useTheme } from '@emotion/react';
-import type { CommentWithUser } from 'pages/api/pages/[id]/threads';
+import type { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
@@ -17,6 +17,7 @@ import { DateTime } from 'luxon';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
 import { scrollToThread } from 'lib/inline-comments/client/scrollToThread';
+import { BoxProps } from '@mui/system';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
 
@@ -90,7 +91,7 @@ function AddCommentCharmEditor (
   const theme = useTheme();
   const isEmpty = checkForEmpty(commentContent);
   const { addComment, threads } = useThreads();
-  const thread = threads[threadId]!;
+  const thread = threads[threadId] as ThreadWithComments;
 
   return (
     <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
@@ -124,6 +125,70 @@ function AddCommentCharmEditor (
   );
 }
 
+function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, onContainerClick, onSave, onCancel }: {disabled: boolean, isEditable: boolean, onCancel: ButtonProps['onClick'], threadId: string, commentId: string, onContainerClick: BoxProps['onClick'], onSave: (cb: () => Promise<void>) => void}) {
+  const [commentContent, setCommentContent] = useState<PageContent | null>(null);
+  const isEmpty = checkForEmpty(commentContent);
+  const { editComment, threads } = useThreads();
+  const thread = threads[threadId] as ThreadWithComments;
+  const comment = thread.comments.find(_comment => _comment.id === commentId) as CommentWithUser;
+
+  return (
+    <>
+      <Box
+        onClick={onContainerClick}
+        flex={1}
+        width='100%'
+      >
+        <Box sx={{ marginLeft: `${32 - 4}px`, paddingLeft: '4px', bgcolor: isEditable ? 'background.default' : '' }}>
+          <InlineCharmEditor
+            readOnly={!isEditable}
+            key={comment.id + isEditable}
+            content={comment.content as PageContent}
+            onContentChange={({ doc }) => {
+              setCommentContent(doc);
+            }}
+            noPadding={true}
+            style={{
+              fontSize: 14,
+              width: '100%'
+            }}
+          />
+        </Box>
+      </Box>
+      <Collapse
+        sx={{
+          pl: isEditable ? 4 : 1
+        }}
+        in={isEditable}
+      >
+        <Box display='flex' gap={1} pt={1}>
+          <Button
+            disabled={disabled || isEmpty}
+            size='small'
+            onClick={async () => {
+              onSave(async () => {
+                if (commentContent) {
+                  await editComment(threadId, comment.id, commentContent);
+                }
+              });
+            }}
+          >
+            Save
+          </Button>
+          <Button
+            onClick={onCancel}
+            variant='outlined'
+            color='secondary'
+            size='small'
+          >
+            Cancel
+          </Button>
+        </Box>
+      </Collapse>
+    </>
+  );
+}
+
 interface PageThreadProps {
   threadId: string;
   inline?: boolean;
@@ -132,18 +197,16 @@ interface PageThreadProps {
 
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton = false, threadId, inline = false }, ref) => {
   showFindButton = showFindButton ?? (!inline);
-  const { deleteThread, resolveThread, deleteComment, editComment, threads } = useThreads();
+  const { deleteThread, resolveThread, deleteComment, threads } = useThreads();
   const [user] = useUser();
   const [isMutating, setIsMutating] = useState(false);
   const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
   const { getPagePermissions, currentPageId } = usePages();
   const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
   const [actionComment, setActionComment] = useState<null | CommentWithUser>(null);
-  const [commentContent, setCommentContent] = useState<PageContent | null>(null);
 
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
   const view = useEditorViewContext();
-  const isEmpty = checkForEmpty(commentContent);
   const thread = threadId ? threads[threadId] : null;
 
   function resetState () {
@@ -323,62 +386,25 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                   </Typography>
                 </Box>
               )}
-              <Box
-                onClick={() => {
+
+              <EditCommentCharmEditor
+                commentId={comment.id}
+                disabled={isMutating}
+                isEditable={isEditable}
+                onCancel={resetState}
+                onContainerClick={() => {
                   // Shouldn't scroll if we are in comment edit mode
                   if (showFindButton && !isEditable) {
                     scrollToThread(threadId);
                   }
                 }}
-                flex={1}
-                width='100%'
-              >
-                <Box sx={{ marginLeft: `${32 - 4}px`, paddingLeft: '4px', bgcolor: isEditable ? 'background.default' : '' }}>
-                  <InlineCharmEditor
-                    readOnly={!isEditable}
-                    key={comment.id + isEditable}
-                    content={comment.content as PageContent}
-                    onContentChange={({ doc }) => {
-                      setCommentContent(doc);
-                    }}
-                    noPadding={true}
-                    style={{
-                      fontSize: 14,
-                      width: '100%'
-                    }}
-                  />
-                </Box>
-              </Box>
-              <Collapse
-                sx={{
-                  pl: isEditable ? 4 : 1
+                onSave={async (cb) => {
+                  setIsMutating(true);
+                  await cb();
+                  resetState();
                 }}
-                in={isEditable}
-              >
-                <Box display='flex' gap={1} pt={1}>
-                  <Button
-                    disabled={isMutating || isEmpty}
-                    size='small'
-                    onClick={async () => {
-                      setIsMutating(true);
-                      if (commentContent) {
-                        await editComment(threadId, comment.id, commentContent);
-                      }
-                      resetState();
-                    }}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    onClick={resetState}
-                    variant='outlined'
-                    color='secondary'
-                    size='small'
-                  >
-                    Cancel
-                  </Button>
-                </Box>
-              </Collapse>
+                threadId={thread.id}
+              />
             </ThreadCommentListItem>
           );
         })}
