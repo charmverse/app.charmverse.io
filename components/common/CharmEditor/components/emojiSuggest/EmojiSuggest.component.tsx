@@ -38,15 +38,15 @@ export default function EmojiSuggest ({ pluginKey }: {pluginKey: PluginKey}) {
   );
 
   return isVisible && (
+  <Portal container={tooltipContentDOM}>
     <ClickAwayListener onClickAway={closeTooltip}>
-      <Portal container={tooltipContentDOM}>
-        <Picker
-          theme={theme.palette.mode}
-          onSelect={(emoji: BaseEmoji) => {
-            onSelectEmoji(emoji.native);
-          }}
-        />
-      </Portal>
+      <Picker
+        theme={theme.palette.mode}
+        onSelect={(emoji: BaseEmoji) => {
+          onSelectEmoji(emoji.native);
+        }}
+      />
     </ClickAwayListener>
+  </Portal>
   );
 }
