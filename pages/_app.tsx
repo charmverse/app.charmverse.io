@@ -5,7 +5,8 @@ import '@skiff-org/prosemirror-tables/style/table-headers.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
-import { Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
+import createCache from '@emotion/cache';
+import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
 // fullcalendar css
@@ -247,46 +248,49 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
     return null;
   }
 
+  // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
-    <ColorModeContext.Provider value={colorModeContext}>
-      <ThemeProvider theme={theme}>
-        <Web3ReactProvider getLibrary={getLibrary}>
-          <Web3ConnectionManager>
-            <LitProtocolProvider>
-              <ReduxProvider store={store}>
-                <FocalBoardProviders>
-                  <DataProviders>
-                    <SnackbarProvider>
-                      <TitleContext.Consumer>
-                        {([title]) => (
-                          <Head>
-                            <title>
-                              {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-                            </title>
-                            {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
-                            <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                          </Head>
-                        )}
-                      </TitleContext.Consumer>
-                      <CssBaseline enableColorScheme={true} />
-                      <Global styles={cssVariables} />
-                      <RouteGuard>
-                        <ErrorBoundary>
-                          {getLayout(<Component {...pageProps} />)}
-                          <Snackbar />
-                        </ErrorBoundary>
-                      </RouteGuard>
-                    </SnackbarProvider>
-                  </DataProviders>
-                </FocalBoardProviders>
-                {/** include the root portal for focalboard's popup */}
-                <FocalBoardPortal />
-              </ReduxProvider>
-            </LitProtocolProvider>
-          </Web3ConnectionManager>
-        </Web3ReactProvider>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+    <CacheProvider value={createCache({ key: 'app' })}>
+      <ColorModeContext.Provider value={colorModeContext}>
+        <ThemeProvider theme={theme}>
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <Web3ConnectionManager>
+              <LitProtocolProvider>
+                <ReduxProvider store={store}>
+                  <FocalBoardProviders>
+                    <DataProviders>
+                      <SnackbarProvider>
+                        <TitleContext.Consumer>
+                          {([title]) => (
+                            <Head>
+                              <title>
+                                {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+                              </title>
+                              {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
+                              <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+                            </Head>
+                          )}
+                        </TitleContext.Consumer>
+                        <CssBaseline enableColorScheme={true} />
+                        <Global styles={cssVariables} />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            {getLayout(<Component {...pageProps} />)}
+                            <Snackbar />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </SnackbarProvider>
+                    </DataProviders>
+                  </FocalBoardProviders>
+                  {/** include the root portal for focalboard's popup */}
+                  <FocalBoardPortal />
+                </ReduxProvider>
+              </LitProtocolProvider>
+            </Web3ConnectionManager>
+          </Web3ReactProvider>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
+    </CacheProvider>
   );
 }
 
