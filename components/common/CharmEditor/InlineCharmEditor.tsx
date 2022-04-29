@@ -111,19 +111,10 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 `;
 
-const defaultContent: PageContent = {
-  type: 'doc',
-  content: [
-    {
-      type: 'paragraph'
-    }
-  ]
-};
-
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
-  content?: PageContent;
+  content?: PageContent | null;
   children?: ReactNode;
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
@@ -131,7 +122,7 @@ interface CharmEditorProps {
 }
 
 export default function CharmEditor (
-  { content = defaultContent, children, onContentChange, style, readOnly = false }:
+  { content, children, onContentChange, style, readOnly = false }:
   CharmEditorProps
 ) {
   const _isEmpty = checkForEmpty(content);

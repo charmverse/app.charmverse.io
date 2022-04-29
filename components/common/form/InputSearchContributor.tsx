@@ -1,6 +1,6 @@
 import { Autocomplete, AutocompleteProps, Box, TextField, Typography } from '@mui/material';
 import { useContributors } from 'hooks/useContributors';
-import { Contributor } from 'models';
+import { Contributor, User } from 'models';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
@@ -147,7 +147,7 @@ export function InputSearchContributorMultiple ({ onChange, defaultValue, ...pro
   );
 }
 
-export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contributor, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType}) {
+export function ReviewerOption ({ user, avatarSize, ...props }: { user: User, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType}) {
   const ensName = useENSName(user.addresses[0]);
   return (
     <Box component={props.component ?? 'li'} display='flex' gap={1} {...props}>

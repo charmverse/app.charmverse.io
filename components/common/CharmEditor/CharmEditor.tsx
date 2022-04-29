@@ -273,7 +273,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 `;
 
-const PageThreadListBox = styled(Box)`
+const PageThreadListBox = styled.div`
   position: fixed;
   right: 0px;
   width: 400px;
