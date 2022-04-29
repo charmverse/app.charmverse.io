@@ -62,7 +62,7 @@ export default function InlineCommentThread () {
         >
           <ThreadContainer elevation={4}>
             {unResolvedThreads.map(resolvedThread => resolvedThread
-              && <PageThread inline key={resolvedThread.id} threadId={resolvedThread?.id} />)}
+              && <PageThread inline={threadIds.length === 1} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
           </ThreadContainer>
         </Grow>
       </ClickAwayListener>,
