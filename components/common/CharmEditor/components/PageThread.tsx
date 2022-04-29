@@ -7,10 +7,9 @@ import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
-import { forwardRef, MouseEvent, ReactNode, useState } from 'react';
+import { forwardRef, MouseEvent, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
-import CheckIcon from '@mui/icons-material/Check';
 import { PageContent } from 'models';
 import { highlightDomElement } from 'lib/dom/highlight';
 import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
@@ -18,6 +17,7 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { DateTime } from 'luxon';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
+import { alpha } from '@mui/system';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
 
@@ -69,20 +69,17 @@ const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
   }
 `;
 
-function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon }: {disabled?: boolean, onClick: ButtonProps['onClick'], startIcon: ReactNode, text: string}) {
+function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...props }: {disabled?: boolean, onClick: ButtonProps['onClick'], text: string} & ButtonProps) {
+  const theme = useTheme();
   return (
     <Button
       disabled={disabled}
       onClick={onClick}
-      sx={{
-        '.MuiButton-startIcon': {
-          mr: 0.5
-        }
-      }}
       startIcon={startIcon}
       variant='outlined'
       color='secondary'
       size='small'
+      {...props}
     >{text}
     </Button>
   );
@@ -228,12 +225,12 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
               }}
               highlighted={(editedCommentId === comment.id).toString()}
             >
-              <Box display='flex' width='100%' justifyContent='space-between'>
+              <Box display='flex' width='100%' alignItems='center' justifyContent='space-between'>
                 <Box display='flex' gap={1}>
                   <ReviewerOption
                     sx={{
                       '& .MuiTypography-root': {
-                        maxWidth: commentIndex === 0 ? 50 : 150,
+                        maxWidth: commentIndex === 0 ? 75 : 150,
                         textOverflow: 'ellipsis',
                         overflow: 'hidden'
                       }
@@ -268,32 +265,25 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                 </Box>
                 <div>
                   {commentIndex === 0 ? (
-                    <>
-                      <ThreadHeaderButton
-                        text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-                        startIcon={(
-                          <CheckIcon
-                            fontSize='small'
-                          />
+                    <ThreadHeaderButton
+                      text={thread.resolved ? 'Un-resolve' : 'Resolve'}
+                      endIcon={(
+                        <MoreHorizIcon
+                          onClick={(e: any) => {
+                            e.stopPropagation();
+                            onClickCommentActions(e, comment);
+                          }}
+                          fontSize='small'
+                        />
                       )}
-                        disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
-                        onClick={async () => {
-                          setIsMutating(true);
-                          await resolveThread(threadId);
-                          removeInlineCommentMark(view, thread.id);
-                          setIsMutating(false);
-                        }}
-                      />
-                      <IconButton
-                        size='small'
-                        onClick={(e: any) => {
-                          e.stopPropagation();
-                          onClickCommentActions(e, comment);
-                        }}
-                      >
-                        <MoreHorizIcon fontSize='small' />
-                      </IconButton>
-                    </>
+                      disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
+                      onClick={async () => {
+                        setIsMutating(true);
+                        await resolveThread(threadId);
+                        removeInlineCommentMark(view, thread.id);
+                        setIsMutating(false);
+                      }}
+                    />
                   ) : (comment.userId === user?.id && permissions.edit_content)
                   && (
                     <IconButton
