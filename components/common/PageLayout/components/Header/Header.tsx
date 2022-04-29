@@ -46,12 +46,11 @@ function CommentThreadsListButton () {
   return (
     <Tooltip title={`${showingCommentThreadsList ? 'Hide' : 'Show'} comment threads`} arrow placement='bottom'>
       <IconButton
+        color={!showingCommentThreadsList ? 'secondary' : 'inherit'}
         onClick={() => {
           setShowingCommentThreadsList(!showingCommentThreadsList);
         }}
-        size='small'
-        disableRipple
-        color={!showingCommentThreadsList ? 'secondary' : 'inherit'}
+        sx={showingCommentThreadsList ? { backgroundColor: 'emoji.hoverBackground' } : {}}
       >
         <CommentIcon
           fontSize='small'
