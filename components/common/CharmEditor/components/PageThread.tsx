@@ -200,12 +200,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
 
   return (
     <StyledPageThread inline={inline} id={`thread.${threadId}`} ref={ref}>
-      <div onClick={() => {
-        if (showFindButton) {
-          scrollToThread(threadId);
-        }
-      }}
-      >
+      <div>
         <ThreadHeader>
           <Tooltip arrow placement='bottom' title={new Date(thread.createdAt).toLocaleString()}>
             <Typography
@@ -242,6 +237,11 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
           return (
             <ThreadCommentListItem
               key={comment.id}
+              onClick={() => {
+                if (showFindButton) {
+                  scrollToThread(threadId);
+                }
+              }}
               highlighted={(editedCommentId === comment.id).toString()}
             >
               <Box display='flex' width='100%' justifyContent='space-between'>

@@ -4,6 +4,8 @@ import { useThreads } from 'hooks/useThreads';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
+import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { useUser } from 'hooks/useUser';
 
 const Center = styled.div`
   position: absolute;
@@ -41,18 +43,35 @@ const EmptyThreadContainerBox = styled(Box)`
 
 export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {inline?: boolean}) {
   const { threads } = useThreads();
+  const [user] = useUser();
   const allThreads = Object.values(threads);
-  const unResolvedThreads = allThreads.filter(thread => thread && !thread.resolved);
-  const resolvedThreads = allThreads.filter(thread => thread && thread.resolved);
-  const [threadClass, setThreadClass] = useState<'resolved' | 'open'>('open');
+  const unResolvedThreads = allThreads.filter(thread => thread && !thread.resolved) as ThreadWithComments[];
+  const resolvedThreads = allThreads.filter(thread => thread && thread.resolved) as ThreadWithComments[];
+  const [threadFilter, setThreadFilter] = useState<'resolved' | 'open' | 'all' | 'you'>('open');
   const [threadSort, setThreadSort] = useState<'earliest' | 'latest'>('latest');
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
-    setThreadClass(event.target.value as any);
+    setThreadFilter(event.target.value as any);
   };
   const handleThreadListSortChange: SelectProps['onChange'] = (event) => {
     setThreadSort(event.target.value as any);
   };
-  const threadsList = (threadClass === 'resolved' ? resolvedThreads : unResolvedThreads).sort((threadA, threadB) => threadA && threadB ? new Date((threadSort === 'earliest' ? threadA : threadB).createdAt).getTime() - new Date((threadSort === 'earliest' ? threadB : threadA).createdAt).getTime() : 0);
+
+  let threadList: ThreadWithComments[] = [];
+  if (threadFilter === 'resolved') {
+    threadList = resolvedThreads;
+  }
+  else if (threadFilter === 'open') {
+    threadList = unResolvedThreads;
+  }
+  else if (threadFilter === 'all') {
+    threadList = allThreads as ThreadWithComments[];
+  }
+  else if (threadFilter === 'you') {
+    // Filter the threads where there is atleast a single comment by the current user
+    threadList = unResolvedThreads.filter(unResolvedThread => unResolvedThread.comments.some(comment => comment.userId === user?.id));
+  }
+
+  const sortedThreadList = threadList.sort((threadA, threadB) => threadA && threadB ? new Date((threadSort === 'earliest' ? threadA : threadB).createdAt).getTime() - new Date((threadSort === 'earliest' ? threadB : threadA).createdAt).getTime() : 0);
 
   return (
     <StyledPageThreadsBox
@@ -66,9 +85,11 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
       <Box display='flex' alignItems='center' justifyContent='space-between' mb={1}>
         <Typography fontWeight={600} fontSize={20}>Comments</Typography>
         <Box display='flex' gap={1}>
-          <Select variant='outlined' value={threadClass} onChange={handleThreadClassChange}>
+          <Select variant='outlined' value={threadFilter} onChange={handleThreadClassChange}>
             <MenuItem value='open'>Open</MenuItem>
             <MenuItem value='resolved'>Resolved</MenuItem>
+            <MenuItem value='you'>For you</MenuItem>
+            <MenuItem value='all'>All</MenuItem>
           </Select>
           <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
             <MenuItem value='latest'>Latest</MenuItem>
@@ -77,7 +98,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
         </Box>
       </Box>
       <StyledPageThreadsList>
-        {threadsList.length === 0 ? (
+        {sortedThreadList.length === 0 ? (
           <EmptyThreadContainerBox>
             <Center>
               <ForumOutlinedIcon
@@ -88,10 +109,10 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
                   width: '2em'
                 }}
               />
-              <Typography variant='subtitle1' color='secondary'>No {threadClass} threads yet</Typography>
+              <Typography variant='subtitle1' color='secondary'>No {threadFilter} threads yet</Typography>
             </Center>
           </EmptyThreadContainerBox>
-        ) : threadsList.map(resolvedThread => resolvedThread
+        ) : sortedThreadList.map(resolvedThread => resolvedThread
           && <PageThread showFindButton inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />)}
       </StyledPageThreadsList>
     </StyledPageThreadsBox>
