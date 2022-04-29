@@ -64,7 +64,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
       }}
     >
       <Box display='flex' alignItems='center' justifyContent='space-between' mb={1}>
-        <Typography variant='h6'>Comments</Typography>
+        <Typography fontWeight={600} fontSize={20}>Comments</Typography>
         <Box display='flex' gap={1}>
           <Select variant='outlined' value={threadClass} onChange={handleThreadClassChange}>
             <MenuItem value='open'>Open</MenuItem>

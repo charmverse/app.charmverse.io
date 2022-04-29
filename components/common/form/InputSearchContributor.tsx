@@ -150,7 +150,7 @@ export function InputSearchContributorMultiple ({ onChange, defaultValue, ...pro
 export function ReviewerOption ({ user, avatarSize, ...props }: { user: User, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType}) {
   const ensName = useENSName(user.addresses[0]);
   return (
-    <Box component={props.component ?? 'li'} display='flex' gap={1} {...props}>
+    <Box display='flex' gap={1} {...props} component={props.component ?? 'li'}>
       <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={user.avatar} />
       <Typography>{ensName || getDisplayName(user)}</Typography>
     </Box>
