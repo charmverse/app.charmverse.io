@@ -76,6 +76,7 @@ export function BountyStatusChip ({ status, onDelete }: {status: BountyStatus, o
       label={BOUNTY_LABELS[status]}
       variant='filled'
       onDelete={onDelete}
+      size='small'
       sx={{
         fontWeight: 'bold',
         backgroundColor: () => {

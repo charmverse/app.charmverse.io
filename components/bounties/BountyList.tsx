@@ -95,7 +95,7 @@ export function BountyList () {
       </Box>
 
       {/* Filters for the bounties */}
-      <Box display='flex' alignContent='left' justifyContent='flex-start' mb={3}>
+      <Box display='flex' alignContent='center' justifyContent='flex-end' mb={3}>
 
         {
             bountyFilter.map(status => {
