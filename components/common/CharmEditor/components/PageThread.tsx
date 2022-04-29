@@ -33,7 +33,7 @@ const ContextBorder = styled.div`
 
 const StyledPageThread = styled(Paper)<{ inline: boolean }>`
   overflow: ${({ inline }) => inline ? 'auto' : 'unset'};
-  padding: ${({ theme }) => theme.spacing(2)};
+  padding: ${({ theme }) => theme.spacing(1)};
   background: ${({ theme }) => theme.palette.background.light};
   width: ${({ inline }) => inline ? '500px' : 'inherit'};
   max-height: ${({ inline }) => inline ? '300px' : 'fit-content'};
@@ -215,23 +215,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
               {DateTime.fromJSDate(new Date(thread.createdAt)).toRelative({ base: (DateTime.now()) })}
             </Typography>
           </Tooltip>
-          <Box display='flex' gap={1}>
-            <ThreadHeaderButton
-              text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-              startIcon={(
-                <CheckIcon
-                  fontSize='small'
-                />
-            )}
-              disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
-              onClick={async () => {
-                setIsMutating(true);
-                await resolveThread(threadId);
-                removeInlineCommentMark(view, thread.id);
-                setIsMutating(false);
-              }}
-            />
-          </Box>
+
         </ThreadHeader>
         {thread.comments.map((comment, commentIndex) => {
           return (
@@ -246,7 +230,18 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
             >
               <Box display='flex' width='100%' justifyContent='space-between'>
                 <Box display='flex' gap={1}>
-                  <ReviewerOption component='div' user={comment.user} avatarSize='small' />
+                  <ReviewerOption
+                    sx={{
+                      '& .MuiTypography-root': {
+                        maxWidth: commentIndex === 0 ? 50 : 150,
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden'
+                      }
+                    }}
+                    component='div'
+                    user={comment.user}
+                    avatarSize='small'
+                  />
                   <Typography
                     sx={{
                       cursor: 'pointer'
@@ -269,8 +264,37 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                     </Tooltip>
                     )}
                   </Typography>
+
                 </Box>
-                {(comment.userId === user?.id && permissions.edit_content)
+                <div>
+                  {commentIndex === 0 ? (
+                    <>
+                      <ThreadHeaderButton
+                        text={thread.resolved ? 'Un-resolve' : 'Resolve'}
+                        startIcon={(
+                          <CheckIcon
+                            fontSize='small'
+                          />
+                      )}
+                        disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
+                        onClick={async () => {
+                          setIsMutating(true);
+                          await resolveThread(threadId);
+                          removeInlineCommentMark(view, thread.id);
+                          setIsMutating(false);
+                        }}
+                      />
+                      <IconButton
+                        size='small'
+                        onClick={(e: any) => {
+                          e.stopPropagation();
+                          onClickCommentActions(e, comment);
+                        }}
+                      >
+                        <MoreHorizIcon fontSize='small' />
+                      </IconButton>
+                    </>
+                  ) : (comment.userId === user?.id && permissions.edit_content)
                   && (
                     <IconButton
                       className='comment-actions'
@@ -283,6 +307,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                       <MoreHorizIcon fontSize='small' />
                     </IconButton>
                   )}
+                </div>
               </Box>
               {commentIndex === 0 && (
               <Box pl={4} display='flex'>

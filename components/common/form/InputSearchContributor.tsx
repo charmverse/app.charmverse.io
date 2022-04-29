@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteProps, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, AutocompleteProps, Box, BoxProps, TextField, Typography } from '@mui/material';
 import { useContributors } from 'hooks/useContributors';
 import { Contributor, User } from 'models';
 import useENSName from 'hooks/useENSName';
@@ -55,7 +55,7 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
       autoHighlight
       getOptionLabel={(user) => cache.get(`@"ENS",102~,"${user.addresses[0]}",${chainId},`) ?? getDisplayName(user)}
       renderOption={(_props, user) => (
-        <ReviewerOption {..._props} user={user} />
+        <ReviewerOption {..._props as any} user={user} />
       )}
       renderInput={(params) => (
         <TextField
@@ -147,7 +147,7 @@ export function InputSearchContributorMultiple ({ onChange, defaultValue, ...pro
   );
 }
 
-export function ReviewerOption ({ user, avatarSize, ...props }: { user: User, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType}) {
+export function ReviewerOption ({ user, avatarSize, ...props }: { user: User, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
   const ensName = useENSName(user.addresses[0]);
   return (
     <Box display='flex' gap={1} {...props} component={props.component ?? 'li'}>

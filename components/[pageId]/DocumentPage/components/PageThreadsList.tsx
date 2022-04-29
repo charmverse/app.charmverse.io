@@ -67,7 +67,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
     threadList = allThreads as ThreadWithComments[];
   }
   else if (threadFilter === 'you') {
-    // Filter the threads where there is atleast a single comment by the current user
+    // Filter the threads where there is at-least a single comment by the current user
     threadList = unResolvedThreads.filter(unResolvedThread => unResolvedThread.comments.some(comment => comment.userId === user?.id));
   }
 
