@@ -37,7 +37,8 @@ function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): 
       atom: true,
       toDOM,
       parseDOM,
-      selectable: true
+      selectable: true,
+      allowGapCursor: true
     }
   };
 }

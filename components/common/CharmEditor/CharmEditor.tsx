@@ -188,7 +188,7 @@ export function charmEditorPlugins (
     NodeView.createPlugin({
       name: 'paragraph',
       containerDOM: ['p', { class: 'charm-paragraph' }],
-      contentDOM: ['div']
+      contentDOM: ['p']
     }),
     NodeView.createPlugin({
       name: 'mention',

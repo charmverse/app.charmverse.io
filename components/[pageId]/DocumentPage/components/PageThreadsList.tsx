@@ -1,7 +1,7 @@
 import { Box, BoxProps, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
 import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { useThreads } from 'hooks/useThreads';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import { ThreadWithComments } from 'pages/api/pages/[id]/threads';

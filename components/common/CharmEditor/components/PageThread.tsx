@@ -30,12 +30,12 @@ const ContextBorder = styled.div`
   padding-bottom: 2px;
 `;
 
-const StyledPageThread = styled(Paper)<{ inline: boolean }>`
-  overflow: ${({ inline }) => inline ? 'auto' : 'unset'};
-  padding: ${({ theme, inline }) => theme.spacing(inline ? 2 : 1)};
+const StyledPageThread = styled(Paper)<{ inline: string }>`
+  overflow: ${({ inline }) => inline === 'true' ? 'auto' : 'unset'};
+  padding: ${({ theme, inline }) => theme.spacing(inline === 'true' ? 2 : 1)};
   background: ${({ theme }) => theme.palette.background.light};
-  width: ${({ inline }) => inline ? '500px' : 'inherit'};
-  max-height: ${({ inline }) => inline ? '350px' : 'fit-content'};
+  width: ${({ inline }) => inline === 'true' ? '500px' : 'inherit'};
+  max-height: ${({ inline }) => inline === 'true' ? '350px' : 'fit-content'};
 `;
 
 const ThreadHeader = styled.div`
@@ -192,7 +192,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
   }
 
   return (
-    <StyledPageThread inline={inline} id={`thread.${threadId}`} ref={ref}>
+    <StyledPageThread inline={inline.toString()} id={`thread.${threadId}`} ref={ref}>
       <div>
         <ThreadHeader>
           <Tooltip arrow placement='bottom' title={new Date(thread.createdAt).toLocaleString()}>
