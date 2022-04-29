@@ -95,9 +95,10 @@ export function BountyList () {
       </Box>
 
       {/* Filters for the bounties */}
-      <Box display='flex' alignContent='center' justifyContent='flex-end' mb={3}>
+      <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
 
         {
+          /*
             bountyFilter.map(status => {
               return (
                 <Box sx={{ mr: 1, alignContent: 'center', flexDirection: 'column', alignSelf: 'center' }}>
@@ -110,22 +111,19 @@ export function BountyList () {
                 </Box>
               );
             })
+          */
           }
-        {
-          bountyFilter.length < Object.keys(BountyStatus).length && (
-          <Box>
-            <InputBountyStatus
-              onChange={(statuses) => {
-                setBountyFilter(sortSelected(statuses));
-              }}
-              renderSelectedInValue={false}
-              renderSelectedInOption={false}
-              defaultValues={bountyFilter}
-            />
-          </Box>
-          )
 
-        }
+        <Box>
+          <InputBountyStatus
+            onChange={(statuses) => {
+              setBountyFilter(sortSelected(statuses));
+            }}
+            renderSelectedInValue={true}
+            renderSelectedInOption={true}
+            defaultValues={bountyFilter}
+          />
+        </Box>
       </Box>
 
       <Grid container sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
