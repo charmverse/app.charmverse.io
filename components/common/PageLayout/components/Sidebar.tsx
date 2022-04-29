@@ -252,8 +252,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               )
             }
             <SidebarLink
-              active={router.pathname.startsWith('/[domain]/settings')}
-              href='https://discord.com/channels/894960387743698944/945679068710469714'
+              active={false}
+              href='https://discord.gg/ACYCzBGC2M'
               icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
               label='Support & Feedback'
             />
