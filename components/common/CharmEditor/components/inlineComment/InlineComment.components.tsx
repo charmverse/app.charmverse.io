@@ -18,9 +18,8 @@ import PageThread from '../PageThread';
 import { SuggestTooltipPluginKey, SuggestTooltipPluginState, hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { updateInlineComment } from './inlineComment.utils';
 
-const ThreadContainerBox = styled(Box)`
+const ThreadContainer = styled.div`
   max-height: 400px;
-  overflow: auto;
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
   flex-direction: column;
@@ -44,9 +43,9 @@ export default function InlineCommentThread () {
     .filter(thread => !thread?.resolved)
     .sort((threadA, threadB) => threadA && threadB ? (new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime()) : 0);
 
-  if (isVisible && component === 'inlineComment' && unResolvedThreads.length !== 0) {
+  if (!showingCommentThreadsList && isVisible && component === 'inlineComment' && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
-    return !showingCommentThreadsList ? createPortal(
+    return createPortal(
       <ClickAwayListener onClickAway={() => {
         hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
       }}
@@ -61,14 +60,14 @@ export default function InlineCommentThread () {
           }}
           timeout={250}
         >
-          <ThreadContainerBox>
+          <ThreadContainer>
             {unResolvedThreads.map(resolvedThread => resolvedThread
               && <PageThread key={resolvedThread.id} threadId={resolvedThread?.id} />)}
-          </ThreadContainerBox>
+          </ThreadContainer>
         </Grow>
       </ClickAwayListener>,
       tooltipContentDOM
-    ) : null;
+    );
   }
   return null;
 }
@@ -106,18 +105,12 @@ export function InlineCommentSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
   };
 
   return (
-    <Box sx={{
-      display: 'flex',
-      width: 300
-    }}
-    >
-      <Box sx={{
-        width: 'calc(100% - 75px)'
-      }}
-      >
+    <Box display='flex' width='400px'>
+      <Box flexGrow={1}>
         <InlineCharmEditor
           content={commentContent}
           style={{
+            fontSize: '14px',
             padding: theme.spacing(0, 1)
           }}
           onContentChange={({ doc }) => {
@@ -127,12 +120,11 @@ export function InlineCommentSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
       </Box>
       <Button
         size='small'
-        onClick={(e) => {
-          handleSubmit(e);
-        }}
+        onClick={handleSubmit}
         sx={{
           alignSelf: 'flex-end',
-          fontSize: 14
+          marginBottom: '4px',
+          marginRight: '8px'
         }}
         disabled={isEmpty}
       >
