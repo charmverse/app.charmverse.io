@@ -147,12 +147,12 @@ export function InputSearchContributorMultiple ({ onChange, defaultValue, ...pro
   );
 }
 
-export function ReviewerOption ({ user, avatarSize, ...props }: { user: User, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
+export function ReviewerOption ({ user, avatarSize, fontSize, fontWeight, ...props }: { fontSize?: string | number, fontWeight?: number | string, user: User, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
   const ensName = useENSName(user.addresses[0]);
   return (
     <Box display='flex' gap={1} {...props} component={props.component ?? 'li'}>
       <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={user.avatar} />
-      <Typography>{ensName || getDisplayName(user)}</Typography>
+      <Typography fontSize={fontSize} fontWeight={fontWeight}>{ensName || getDisplayName(user)}</Typography>
     </Box>
   );
 }

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, ButtonProps, Tooltip } from '@mui/material';
+import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, ButtonProps, Tooltip } from '@mui/material';
 import { useTheme } from '@emotion/react';
 import type { CommentWithUser } from 'pages/api/pages/[id]/threads';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
@@ -17,7 +17,6 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { DateTime } from 'luxon';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
-import { alpha } from '@mui/system';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
 
@@ -70,7 +69,6 @@ const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
 `;
 
 function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...props }: {disabled?: boolean, onClick: ButtonProps['onClick'], text: string} & ButtonProps) {
-  const theme = useTheme();
   return (
     <Button
       disabled={disabled}
@@ -165,7 +163,6 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
   function onClickEditComment () {
     if (actionComment) {
       setEditedCommentId(actionComment.id);
-      setCommentContent(actionComment.content as PageContent);
     }
     menuState.close();
   }
@@ -215,38 +212,45 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
 
         </ThreadHeader>
         {thread.comments.map((comment, commentIndex) => {
+          const isEditable = comment.id === editedCommentId;
           return (
             <ThreadCommentListItem
               key={comment.id}
-              onClick={() => {
-                if (showFindButton) {
-                  scrollToThread(threadId);
-                }
-              }}
               highlighted={(editedCommentId === comment.id).toString()}
             >
               <Box display='flex' width='100%' alignItems='center' justifyContent='space-between'>
-                <Box display='flex' gap={1}>
+                <Box
+                  display='flex'
+                  gap={1}
+                  onClick={() => {
+                    if (showFindButton) {
+                      scrollToThread(threadId);
+                    }
+                  }}
+                >
                   <ReviewerOption
+                    component='div'
+                    user={comment.user}
+                    avatarSize='small'
                     sx={{
                       '& .MuiTypography-root': {
-                        maxWidth: commentIndex === 0 ? 75 : 150,
+                        maxWidth: commentIndex === 0 ? 100 : 150,
                         textOverflow: 'ellipsis',
                         overflow: 'hidden'
                       }
                     }}
-                    component='div'
-                    user={comment.user}
-                    avatarSize='small'
+                    fontSize={14}
+                    fontWeight={500}
                   />
                   <Typography
                     sx={{
-                      cursor: 'pointer'
+                      cursor: 'default',
+                      fontSize: 12,
+                      display: 'flex',
+                      alignItems: 'center'
                     }}
                     color='secondary'
                     variant='subtitle1'
-                    display='flex'
-                    flexDirection='row'
                   >
                     <Tooltip arrow placement='bottom' title={new Date(comment.createdAt).toLocaleString()}>
                       <span>
@@ -300,30 +304,77 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                 </div>
               </Box>
               {commentIndex === 0 && (
-              <Box pl={4} display='flex'>
-                <ContextBorder />
-                <Typography
-                  sx={{
-                    wordBreak: 'break-all',
-                    textAlign: 'justify'
-                  }}
-                  fontWeight={600}
-                  color='secondary'
-                >
-                  {thread.context}
-                </Typography>
-              </Box>
+                <Box pl={4} pb={1} display='flex'>
+                  <ContextBorder />
+                  <Typography
+                    sx={{
+                      wordBreak: 'break-all',
+                      textAlign: 'justify'
+                    }}
+                    fontSize={14}
+                    fontWeight={600}
+                    color='secondary'
+                  >
+                    {thread.context}
+                  </Typography>
+                </Box>
               )}
-              <Box display='flex' width='100%' justifyContent='space-between'>
-                <InlineCharmEditor
-                  readOnly
-                  key={JSON.stringify(comment.content)}
-                  content={comment.content as PageContent}
-                  style={{
-                    paddingLeft: theme.spacing(4)
-                  }}
-                />
+              <Box
+                onClick={() => {
+                  // Shouldn't scroll if we are in comment edit mode
+                  if (showFindButton && !isEditable) {
+                    scrollToThread(threadId);
+                  }
+                }}
+                flex={1}
+                width='100%'
+              >
+                <Box sx={{ marginLeft: `${32 - 4}px`, paddingLeft: '4px', bgcolor: isEditable ? 'background.default' : '' }}>
+                  <InlineCharmEditor
+                    readOnly={!isEditable}
+                    key={comment.id + isEditable}
+                    content={comment.content as PageContent}
+                    onContentChange={({ doc }) => {
+                      setCommentContent(doc);
+                    }}
+                    noPadding={true}
+                    style={{
+                      fontSize: 14,
+                      width: '100%'
+                    }}
+                  />
+                </Box>
               </Box>
+              <Collapse
+                sx={{
+                  pl: isEditable ? 4 : 1
+                }}
+                in={isEditable}
+              >
+                <Box display='flex' gap={1} pt={1}>
+                  <Button
+                    disabled={isMutating || isEmpty}
+                    size='small'
+                    onClick={async () => {
+                      setIsMutating(true);
+                      if (commentContent) {
+                        await editComment(threadId, comment.id, commentContent);
+                      }
+                      resetState();
+                    }}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    onClick={resetState}
+                    variant='outlined'
+                    color='secondary'
+                    size='small'
+                  >
+                    Cancel
+                  </Button>
+                </Box>
+              </Collapse>
             </ThreadCommentListItem>
           );
         })}
@@ -344,47 +395,36 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
         </Menu>
       </div>
       {permissions.edit_content && (
-      <Box display='flex' flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
-        <InlineCharmEditor
-          style={{
-            backgroundColor: theme.palette.background.default,
-            padding: theme.spacing(0, 1)
-          }}
-          key={`${editedCommentId}.${thread.comments[thread.comments.length - 1]?.id}`}
-          content={commentContent}
-          onContentChange={({ doc }) => {
-            setCommentContent(doc);
-          }}
-        />
-        <Box display='flex' gap={1}>
-          <Button
-            disabled={isMutating || isEmpty}
-            size='small'
-            onClick={() => {
-              setIsMutating(true);
-              if (editedCommentId && commentContent) {
-                editComment(threadId, editedCommentId, commentContent);
-              }
-              else if (commentContent) {
-                addComment(threadId, commentContent);
-              }
-              resetState();
+        <Box display='flex' flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
+          <InlineCharmEditor
+            style={{
+              backgroundColor: theme.palette.background.default
             }}
-          >
-            {editedCommentId ? 'Save' : 'Add'}
-          </Button>
-          {editedCommentId && (
-          <Button
-            onClick={resetState}
-            variant='outlined'
-            color='secondary'
-            size='small'
-          >
-            Cancel
-          </Button>
-          )}
+            key={`${thread.comments[thread.comments.length - 1]?.id}`}
+            content={commentContent}
+            onContentChange={({ doc }) => {
+              setCommentContent(doc);
+            }}
+          />
+          <Box display='flex' gap={1}>
+            <Button
+              disabled={!!editedCommentId || isMutating || isEmpty}
+              size='small'
+              onClick={() => {
+                if (editedCommentId) {
+                  return;
+                }
+                setIsMutating(true);
+                if (commentContent) {
+                  addComment(threadId, commentContent);
+                }
+                resetState();
+              }}
+            >
+              Add
+            </Button>
+          </Box>
         </Box>
-      </Box>
       )}
     </StyledPageThread>
   );
