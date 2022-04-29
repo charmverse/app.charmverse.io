@@ -125,7 +125,7 @@ export default function CharmEditor (
   { content, children, onContentChange, style, readOnly = false }:
   CharmEditorProps
 ) {
-  const _isEmpty = checkForEmpty(content);
+  const _isEmpty = !content || checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {

@@ -316,6 +316,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
           {...bindMenu(menuState)}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          onClick={(e) => e.stopPropagation()}
         >
           <MenuItem onClick={onClickEditComment}>
             <ListItemIcon><EditIcon /></ListItemIcon>
