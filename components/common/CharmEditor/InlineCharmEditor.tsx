@@ -89,7 +89,10 @@ export function charmEditorPlugins (
   ];
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean }>`
+  & {
+    padding: ${({ noPadding, theme }) => noPadding ? 0 : theme.spacing(0, 1)};
+  }
   .ProseMirror.bangle-editor {
     padding-left: 0px !important;
     width: 100% !important;
@@ -119,10 +122,11 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
+  noPadding?: boolean;
 }
 
 export default function CharmEditor (
-  { content, children, onContentChange, style, readOnly = false }:
+  { content, children, onContentChange, style, noPadding, readOnly = false }:
   CharmEditorProps
 ) {
   const _isEmpty = !content || checkForEmpty(content);
@@ -163,6 +167,7 @@ export default function CharmEditor (
         height: '100%'
       }}
       className='czi-editor-frame-body'
+      noPadding={noPadding}
       pmViewOpts={{
         editable: () => !readOnly
       }}
@@ -170,8 +175,8 @@ export default function CharmEditor (
         <Placeholder
           sx={{
             zIndex: 20,
-            top: 8,
-            left: 8,
+            top: noPadding ? 2 : 8,
+            left: noPadding ? 0 : 8,
             position: 'absolute'
           }}
           text='Reply...'

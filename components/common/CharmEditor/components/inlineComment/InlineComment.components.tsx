@@ -111,8 +111,7 @@ export function InlineCommentSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
         <InlineCharmEditor
           content={commentContent}
           style={{
-            fontSize: '14px',
-            padding: theme.spacing(0, 1)
+            fontSize: '14px'
           }}
           onContentChange={({ doc }) => {
             setCommentContent(doc);
