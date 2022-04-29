@@ -135,6 +135,23 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         }
       };
     }
+    else if (isSpaceDomain(spaceDomain) && path.match('/settings')) {
+
+      const space = spaces.find(_space => _space.domain === spaceDomain);
+
+      const isAdmin = user?.spaceRoles.some(role => role.spaceId === space?.id && (role.isAdmin || role.role === 'admin'));
+
+      if (!isAdmin) {
+        return {
+          authorized: false,
+          redirect: {
+            pathname: `/${spaceDomain}`
+          }
+        };
+      }
+      return { authorized: true };
+
+    }
     else {
       return { authorized: true };
     }
