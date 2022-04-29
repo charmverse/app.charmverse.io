@@ -3,33 +3,39 @@ import { PluginKey } from '@bangle.dev/core';
 import { Node, ResolvedPos } from '@bangle.dev/pm';
 import { FloatingMenu, floatingMenu } from '@bangle.dev/react-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
+import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { NodeSelection } from 'prosemirror-state';
 import { LinkSubMenu } from './@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from './@bangle.dev/react-menu/Menu';
-import { BoldButton, CalloutButton, CodeButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
+import { BoldButton, CalloutButton, CodeButton, InlineCommentButton, FloatingLinkButton, HeadingButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from './@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
+import { queryIsSelectionAroundInlineComment } from './inlineComment';
+import { InlineCommentSubMenu } from './inlineComment/InlineComment.components';
 
-const menuKey = new PluginKey('menuKey');
-
-export default function FloatingMenuComponent () {
+export default function FloatingMenuComponent ({ pluginKey, inline = false }: {pluginKey: PluginKey, inline?: boolean}) {
   const { showMessage } = useSnackbar();
+  const { getPagePermissions, currentPageId } = usePages();
+  const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
 
   return (
     <FloatingMenu
-      menuKey={menuKey}
+      menuKey={pluginKey}
       renderMenuType={({ type }) => {
         if (type === 'defaultMenu') {
           return (
             <Menu>
-              <MenuGroup>
+              <MenuGroup isLastGroup={inline}>
                 <BoldButton />
                 <ItalicButton />
                 <CodeButton />
                 <StrikeButton />
                 <UnderlineButton />
-                <FloatingLinkButton menuKey={menuKey} />
+                <FloatingLinkButton menuKey={pluginKey} />
+                {!inline && permissions.edit_content && <InlineCommentButton menuKey={pluginKey} />}
               </MenuGroup>
+              {!inline && (
               <MenuGroup isLastGroup>
                 <ParagraphButton />
                 <CalloutButton />
@@ -37,6 +43,7 @@ export default function FloatingMenuComponent () {
                 <HeadingButton level={2} />
                 <HeadingButton level={3} />
               </MenuGroup>
+              )}
             </Menu>
           );
         }
@@ -47,17 +54,24 @@ export default function FloatingMenuComponent () {
             </Menu>
           );
         }
+        if (type === 'inlineCommentSubMenu' && !inline) {
+          return (
+            <Menu>
+              <InlineCommentSubMenu pluginKey={pluginKey} />
+            </Menu>
+          );
+        }
         return null;
       }}
     />
   );
 }
 
-export const floatingMenuPlugin = (readonly?: boolean) => {
+export const floatingMenuPlugin = ({ key, readOnly }:{key: PluginKey, readOnly?: boolean}) => {
   return floatingMenu.plugins({
-    key: menuKey,
+    key,
     calculateType: (state) => {
-      if (readonly) {
+      if (readOnly) {
         return null;
       }
       if (state.selection.empty
@@ -66,7 +80,15 @@ export const floatingMenuPlugin = (readonly?: boolean) => {
         )) {
         return null;
       }
-      // If were are inside a link
+
+      // If we are inside an inline comment
+      if (hasComponentInSchema(state, 'inline-comment')) {
+        if (queryIsSelectionAroundInlineComment()(state)) {
+          return 'inlineCommentSubMenu';
+        }
+      }
+
+      // If we are inside a link
       if (hasComponentInSchema(state, 'link')) {
         if (
           link.queryIsSelectionAroundLink()(state)

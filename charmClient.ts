@@ -1,11 +1,11 @@
 /* eslint-disable class-methods-use-this */
 
-import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PagePermission, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, DiscordUser, TelegramUser } from '@prisma/client';
+import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, TelegramUser } from '@prisma/client';
 import * as http from 'adapters/http';
-import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUpdate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
-import { BountyWithDetails, Contributor, LoggedInUser } from 'models';
+import { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -18,6 +18,10 @@ import type { FailedImportsError } from 'lib/notion/types';
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
+import { StartThreadRequest } from 'pages/api/threads';
+import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { AddCommentRequest } from 'pages/api/comments';
+import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -499,6 +503,34 @@ class CharmClient {
 
   deletePermission (permissionId: string): Promise<boolean> {
     return http.DELETE('/api/permissions', { permissionId });
+  }
+
+  startThread (request: StartThreadRequest): Promise<ThreadWithComments> {
+    return http.POST('/api/threads', request);
+  }
+
+  deleteThread (threadId: string) {
+    return http.DELETE(`/api/threads/${threadId}`);
+  }
+
+  updateThread (threadId: string, request: UpdateThreadRequest) {
+    return http.PUT(`/api/threads/${threadId}`, request);
+  }
+
+  addComment (request: AddCommentRequest): Promise<CommentWithUser> {
+    return http.POST('/api/comments', request);
+  }
+
+  editComment (commentId: string, content: PageContent): Promise<CommentWithUser> {
+    return http.PUT(`/api/comments/${commentId}`, { content });
+  }
+
+  deleteComment (commentId: string) {
+    return http.DELETE(`/api/comments/${commentId}`);
+  }
+
+  getPageThreads (pageId: string): Promise<ThreadWithComments[]> {
+    return http.GET(`/api/pages/${pageId}/threads`);
   }
 }
 

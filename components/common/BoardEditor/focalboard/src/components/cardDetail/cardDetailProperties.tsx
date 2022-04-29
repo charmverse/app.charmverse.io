@@ -6,8 +6,6 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {Board, IPropertyTemplate, PropertyType} from '../../blocks/board'
 import {Card} from '../../blocks/card'
 import {BoardView} from '../../blocks/boardView'
-import {ContentBlock} from '../../blocks/contentBlock'
-import {CommentBlock} from '../../blocks/commentBlock'
 
 import mutator from '../../mutator'
 import Button from '../../widgets/buttons/button'

@@ -13,7 +13,7 @@ export interface NestedPagePluginState {
   tooltipContentDOM: HTMLElement
 }
 
-export function spec (): RawSpecs {
+export function nestedPageSpec (): RawSpecs {
   return {
     type: 'node',
     name,
@@ -38,7 +38,7 @@ export function spec (): RawSpecs {
   };
 }
 
-export function plugins () {
+export function nestedPagePlugins () {
 
   const tooltipRenderOpts: SuggestTooltipRenderOpts = {
     placement: 'bottom-start'
@@ -99,7 +99,7 @@ export function plugins () {
       renderOpts: {
         ...tooltipRenderOpts,
         tooltipDOMSpec,
-        getReferenceElement: referenceElement((state) => {
+        getReferenceElement: referenceElement(NestedPagePluginKey, (state) => {
           const { selection } = state;
           return {
             end: selection.to,

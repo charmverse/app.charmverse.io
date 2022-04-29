@@ -20,7 +20,7 @@ export function requireKeys<T> (keys: Array<keyof T>, location: 'body' | 'query'
     }
 
     for (const key of keys) {
-      if (!toVerify[key]) {
+      if (!(key in toVerify)) {
         throw new ApiError({
           errorType: 'Invalid input',
           message: `Key ${key} is required in request ${location} and must not be an empty value`

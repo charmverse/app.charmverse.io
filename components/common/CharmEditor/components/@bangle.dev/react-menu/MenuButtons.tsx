@@ -17,12 +17,15 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
 import { HintPos } from '@bangle.dev/react-menu/dist/types';
 import {
-  defaultKeys as floatingMenuKeys, focusFloatingMenuInput, toggleLinkSubMenu
+  defaultKeys as floatingMenuKeys, focusFloatingMenuInput
 } from '@bangle.dev/react-menu/floating-menu';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import React, { useCallback } from 'react';
+import { createInlineComment, queryIsInlineCommentActive, toggleInlineComment } from '../../inlineComment';
 import { MenuButton } from './Icon';
+import CommentIcon from '@mui/icons-material/Comment';
+import { toggleSubMenu } from './floating-menu';
 
 const {
   defaultKeys: orderedListKeys,
@@ -92,6 +95,54 @@ export function BoldButton({
   );
 }
 
+export function InlineCommentButton({
+  hints = ['Comment'],
+  hintPos = 'top',
+  children = <CommentIcon sx={{
+    fontSize: 12,
+    position: "relative"
+  }}/>,
+  menuKey,
+  ...props
+}: ButtonProps & {menuKey: PluginKey}) {
+  const view = useEditorViewContext();
+  
+  const onMouseDown = useCallback(
+    (e) => {
+      e.preventDefault();
+      const command = filter(
+        (state: EditorState) => createInlineComment()(state),
+        (_state, dispatch, view) => {
+          if (dispatch) {
+            toggleSubMenu(menuKey, "inlineCommentSubMenu")(view!.state, view!.dispatch, view);
+            rafCommandExec(view!, focusFloatingMenuInput(menuKey));
+          }
+          return true;
+        },
+      );
+      if (command(view.state, view.dispatch, view)) {
+        if (view.dispatch as any) {
+          view.focus();
+        }
+      }
+    },
+    [view, menuKey],
+  );
+
+  return (
+    <MenuButton
+      {...props}
+      hintPos={hintPos}
+      onMouseDown={onMouseDown}
+      hints={hints}
+      // Figure out when the button will be disabled
+      isDisabled={!view.editable || queryIsInlineCommentActive()(view.state)}
+    >
+      {children}
+    </MenuButton>
+  );
+}
+
 export function StrikeButton({
   hints = ['Strike', strikeKeys.toggleStrike],
   hintPos = 'top',
@@ -151,6 +202,7 @@ export function UnderlineButton({
     </MenuButton>
   );
 }
+
 export function CalloutButton({
   hints = ['Callout', blockquote.defaultKeys.wrapIn],
   hintPos = 'top',
@@ -509,7 +561,7 @@ export function FloatingLinkButton({
         (state: EditorState) => createLink('')(state),
         (_state, dispatch, view) => {
           if (dispatch) {
-            toggleLinkSubMenu(menuKey)(view!.state, view!.dispatch, view);
+            toggleSubMenu(menuKey, "linkSubMenu")(view!.state, view!.dispatch, view);
             rafCommandExec(view!, focusFloatingMenuInput(menuKey));
           }
           return true;

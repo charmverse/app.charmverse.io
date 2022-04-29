@@ -146,6 +146,7 @@ import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PagesProvider } from 'hooks/usePages';
+import { ThreadsProvider } from 'hooks/useThreads';
 import { ContributorsProvider } from 'hooks/useContributors';
 import { PageTitleProvider, TitleContext } from 'hooks/usePageTitle';
 import { SpacesProvider } from 'hooks/useSpaces';
@@ -329,9 +330,11 @@ function DataProviders ({ children }: { children: ReactNode }) {
             <PaymentMethodsProvider>
               <PagesProvider>
                 <PageTitleProvider>
-                  <FocalboardViewsProvider>
-                    {children}
-                  </FocalboardViewsProvider>
+                  <ThreadsProvider>
+                    <FocalboardViewsProvider>
+                      {children}
+                    </FocalboardViewsProvider>
+                  </ThreadsProvider>
                 </PageTitleProvider>
               </PagesProvider>
             </PaymentMethodsProvider>
