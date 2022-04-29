@@ -151,6 +151,8 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
 
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
   const view = useEditorViewContext();
+  const isEmpty = checkForEmpty(commentContent);
+  const thread = threadId ? threads[threadId] : null;
 
   function resetState () {
     setEditedCommentId(null);
@@ -171,20 +173,26 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
     menuState.close();
   }
 
-  function onClickDeleteComment () {
-    if (actionComment) {
-      setIsMutating(true);
-      deleteComment(threadId, actionComment.id);
-      if (editedCommentId === actionComment.id) {
-        resetState();
+  async function onClickDeleteComment () {
+    if (actionComment && thread) {
+      // If we delete the last comment, delete the whole thread
+      if (thread.comments.length === 1) {
+        setIsMutating(true);
+        await deleteThread(threadId);
+        removeInlineCommentMark(view, thread.id, true);
+        setIsMutating(false);
       }
-      setIsMutating(false);
+      else {
+        setIsMutating(true);
+        deleteComment(threadId, actionComment.id);
+        if (editedCommentId === actionComment.id) {
+          resetState();
+        }
+        setIsMutating(false);
+      }
     }
     menuState.close();
   }
-
-  const isEmpty = checkForEmpty(commentContent);
-  const thread = threadId ? threads[threadId] : null;
 
   if (!thread) {
     return null;
@@ -227,21 +235,6 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                 removeInlineCommentMark(view, thread.id);
                 setIsMutating(false);
               }}
-            />
-            <ThreadHeaderButton
-              startIcon={(
-                <DeleteIcon
-                  fontSize='small'
-                />
-            )}
-              text='Delete'
-              onClick={async () => {
-                setIsMutating(true);
-                await deleteThread(threadId);
-                removeInlineCommentMark(view, thread.id, true);
-                setIsMutating(false);
-              }}
-              disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
             />
           </Box>
         </ThreadHeader>
