@@ -79,8 +79,7 @@ export function BountyStatusChip ({ status, onDelete }: {status: BountyStatus, o
       sx={{
         fontWeight: 'bold',
         backgroundColor: () => {
-          // @ts-ignore
-          return theme.palette[BountyStatusColours[status]].main;
+          return theme.palette[BountyStatusColours[status]]?.main;
         }
       }}
     />
