@@ -26,6 +26,9 @@ export function CommentThreadsListDisplayProvider ({ children }: { children: Rea
     if (cachedData) {
       setShowingCommentThreadsList(cachedData.filter(thread => thread && !thread.resolved).length > 0);
     }
+    else {
+      setShowingCommentThreadsList(false);
+    }
   }, [isValidating, currentPageId]);
 
   const value = useMemo<IContext>(() => ({

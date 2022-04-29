@@ -376,7 +376,15 @@ function CharmEditor (
       pmViewOpts={{
         editable: () => !readOnly
       }}
-      placeholderComponent={<Placeholder show={isEmpty} />}
+      placeholderComponent={(
+        <Placeholder
+          sx={{
+            // This fixes the placeholder and cursor not being aligned
+            top: -34
+          }}
+          show={isEmpty}
+        />
+      )}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
 

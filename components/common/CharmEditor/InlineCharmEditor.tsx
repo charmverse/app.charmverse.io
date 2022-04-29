@@ -8,10 +8,10 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
-import { BangleEditorState, NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
+import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
-import { CSSProperties, ReactNode, memo, useState, useEffect } from 'react';
+import { CSSProperties, ReactNode, useState } from 'react';
 import styled from '@emotion/styled';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
@@ -19,6 +19,8 @@ import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
 import MentionSuggest, { Mention, mentionPlugins, mentionSpecs } from './components/Mention';
 import * as tabIndent from './components/tabIndent';
+import Placeholder from './components/Placeholder';
+import { checkForEmpty } from './utils';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -132,6 +134,9 @@ export default function CharmEditor (
   { content = defaultContent, children, onContentChange, style, readOnly = false }:
   CharmEditorProps
 ) {
+  const _isEmpty = checkForEmpty(content);
+  const [isEmpty, setIsEmpty] = useState(_isEmpty);
+
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
@@ -139,6 +144,7 @@ export default function CharmEditor (
   }, 100) : undefined;
 
   function _onContentChange (view: EditorView) {
+    setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
     // @ts-ignore missing types from the @bangle.dev/react package
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view);
@@ -169,6 +175,18 @@ export default function CharmEditor (
       pmViewOpts={{
         editable: () => !readOnly
       }}
+      placeholderComponent={(
+        <Placeholder
+          sx={{
+            zIndex: 20,
+            top: 8,
+            left: 8,
+            position: 'absolute'
+          }}
+          text='Reply...'
+          show={isEmpty}
+        />
+      )}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
         switch (props.node.type.name) {

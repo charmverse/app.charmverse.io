@@ -201,7 +201,7 @@ export default forwardRef<HTMLDivElement,
                   <DeleteIcon
                     fontSize='small'
                   />
-            )}
+              )}
                 text='Delete'
                 onClick={async () => {
                   setIsMutating(true);
