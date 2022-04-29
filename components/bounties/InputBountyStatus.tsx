@@ -5,6 +5,9 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { BountyStatus } from '@prisma/client';
 import { BountyStatusChip } from 'components/bounties/BountyStatusBadge';
 import { useEffect, useState } from 'react';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 
 /**
  * @renderSelected Show selected options in the options menu. Default is true.
@@ -45,20 +48,21 @@ export default function InputBountyStatus ({ onChange, defaultValues = [], rende
   }
 
   return (
-    <Grid container direction='row' alignItems='center'>
-      <Grid item xs={12}>
-        <Select
-          multiple
-          value={selectedChoices as any}
-          onChange={selectOption}
-          displayEmpty={true}
-          renderValue={(selectedValues: any) => (
+    <FormControl sx={{ m: 1, minWidth: 150 }}>
+      <Select
+        id='bounty-status'
+        variant='outlined'
+        multiple
+        value={selectedChoices as any}
+        onChange={selectOption}
+        displayEmpty={true}
+        renderValue={(selectedValues: any) => (
 
-            (renderSelectedInValue === false || !selectedValues || selectedValues.length === 0) ? (
-              'Select status'
-            ) : (
-              <Box display='flex'>
-                {
+          (renderSelectedInValue === false || !selectedValues || selectedValues.length === 0) ? (
+            'Bounty status'
+          ) : (
+            <Box display='flex' sx={{ pt: 0.5, pb: 0.5 }}>
+              {
                     (selectedValues as any[])?.map(val => {
                       return (
                         <MenuItem sx={{ p: 0, pr: 0.2 }} key={val} value={val}>
@@ -67,12 +71,12 @@ export default function InputBountyStatus ({ onChange, defaultValues = [], rende
                       );
                     })
                   }
-              </Box>
-            )
+            </Box>
+          )
 
-          )}
-        >
-          {
+        )}
+      >
+        {
               bountyFilterOptions.map((option) => {
 
                 return (
@@ -86,9 +90,8 @@ export default function InputBountyStatus ({ onChange, defaultValues = [], rende
                     ) : null);
               })
             }
-        </Select>
-      </Grid>
-    </Grid>
+      </Select>
+    </FormControl>
   );
 }
 
