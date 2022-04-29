@@ -191,7 +191,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
   }
 
   return (
-    <StyledPageThread elevation={inline ? 0 : 8} inline={inline} id={`thread.${threadId}`} ref={ref}>
+    <StyledPageThread inline={inline} id={`thread.${threadId}`} ref={ref}>
       <div onClick={() => {
         if (showFindButton) {
           scrollToThread(threadId);

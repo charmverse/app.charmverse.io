@@ -1,6 +1,6 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, Button, ClickAwayListener, Grow } from '@mui/material';
+import { Box, Button, ClickAwayListener, Grow, Paper } from '@mui/material';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
@@ -18,12 +18,13 @@ import PageThread from '../PageThread';
 import { SuggestTooltipPluginKey, SuggestTooltipPluginState, hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { updateInlineComment } from './inlineComment.utils';
 
-const ThreadContainer = styled.div`
+const ThreadContainer = styled(Paper)`
   max-height: 400px;
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
   flex-direction: column;
   min-width: 500px;
+  overflow: auto;
 `;
 
 export default function InlineCommentThread () {
@@ -60,7 +61,7 @@ export default function InlineCommentThread () {
           }}
           timeout={250}
         >
-          <ThreadContainer>
+          <ThreadContainer elevation={4}>
             {unResolvedThreads.map(resolvedThread => resolvedThread
               && <PageThread key={resolvedThread.id} threadId={resolvedThread?.id} />)}
           </ThreadContainer>
