@@ -1,28 +1,24 @@
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import Checkbox from '@mui/material/Checkbox';
-import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import Typography from '@mui/material/Typography';
-import { useState, useEffect } from 'react';
-import { BOUNTY_LABELS } from 'models/Bounty';
 import { BountyStatus } from '@prisma/client';
-import BountyStatusBadge, { BountyStatusChip } from 'components/bounties/BountyStatusBadge';
+import { BountyStatusChip } from 'components/bounties/BountyStatusBadge';
+import { useEffect, useState } from 'react';
 
 /**
- * @renderSelected Show selected options in this component, in the top, and the menu. Default is true.
+ * @renderSelected Show selected options in the options menu. Default is true.
  */
 interface Props {
-  renderSelected?: boolean
+  renderSelectedInOption?: boolean
+  renderSelectedInValue?: boolean
   onChange: (value: any) => void
   defaultValues?: BountyStatus []
 }
 
 const bountyFilterOptions = Object.keys(BountyStatus) as BountyStatus[];
 
-export default function InputBountyStatus ({ onChange, defaultValues = [], renderSelected = true }: Props) {
+export default function InputBountyStatus ({ onChange, defaultValues = [], renderSelectedInValue = true, renderSelectedInOption = true }: Props) {
 
   const [selectedChoices, setSelectedChoices] = useState<BountyStatus[]>(defaultValues);
 
@@ -58,7 +54,7 @@ export default function InputBountyStatus ({ onChange, defaultValues = [], rende
           displayEmpty={true}
           renderValue={(selectedValues: any) => (
 
-            (renderSelected === false || !selectedValues || selectedValues.length === 0) ? (
+            (renderSelectedInValue === false || !selectedValues || selectedValues.length === 0) ? (
               'Select status'
             ) : (
               <Box display='flex'>
@@ -81,9 +77,9 @@ export default function InputBountyStatus ({ onChange, defaultValues = [], rende
 
                 return (
                   // Component manages display
-                  renderSelected
+                  renderSelectedInOption
                   // External component manages display, so we hide selected options
-                  || (!renderSelected && !isSelected(option)) ? (
+                  || (!renderSelectedInOption && !isSelected(option)) ? (
                     <MenuItem key={option} value={option}>
                       <BountyStatusChip status={option} />
                     </MenuItem>

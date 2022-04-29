@@ -122,7 +122,8 @@ export function BountyList () {
               onChange={(statuses) => {
                 setBountyFilter(sortSelected(statuses));
               }}
-              renderSelected={false}
+              renderSelectedInValue={false}
+              renderSelectedInOption={false}
               defaultValues={bountyFilter}
             />
           </Box>
