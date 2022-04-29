@@ -28,9 +28,11 @@ import { useUser } from 'hooks/useUser';
 import { PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
+import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
+import PublishToSnapshot from './PublishToSnapshot';
 
 export const headerHeight = 56;
 
@@ -67,29 +69,15 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
     setUser({ ...user, ...updatedFields });
   }
 
-  function generateMarkdown () {
-    if (currentPage && isExportablePage) {
-      const serializer = markdownSerializer(specRegistry);
+  function exportMarkdown () {
+    const markdownContent = generateMarkdown(currentPage as Page);
 
-      const state = new BangleEditorState({
-        specRegistry,
-        plugins: charmEditorPlugins(),
-        initialValue: currentPage.content ? Node.fromJSON(specRegistry.schema, currentPage.content as PageContent) : ''
-      });
-
-      let markdown = serializer.serialize(state.pmState.doc);
-
-      if (currentPage.title) {
-        const pageTitleAsMarkdown = `# ${currentPage.title}`;
-
-        markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
-      }
-
-      const data = new Blob([markdown], { type: 'text/plain' });
+    if (markdownContent) {
+      const data = new Blob([markdownContent], { type: 'text/plain' });
 
       const linkElement = document.createElement('a');
 
-      linkElement.download = `${currentPage.title || 'page'}.md`;
+      linkElement.download = `${currentPage?.title || 'page'}.md`;
 
       const downloadLink = URL.createObjectURL(data);
 
@@ -99,7 +87,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
 
       URL.revokeObjectURL(downloadLink);
     }
-
   }
 
   return (
@@ -159,7 +146,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
               >
                 <List dense>
                   <ListItemButton onClick={() => {
-                    generateMarkdown();
+                    exportMarkdown();
                     setPageMenuOpen(false);
                   }}
                   >
@@ -170,6 +157,17 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
                       }}
                     />
                     <ListItemText primary='Export to markdown' />
+                  </ListItemButton>
+
+                  {/* Publishing to snapshot */}
+                  <ListItemButton>
+                    <GetAppIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 1
+                      }}
+                    />
+                    <PublishToSnapshot page={currentPage as Page} />
                   </ListItemButton>
                 </List>
               </Popover>
