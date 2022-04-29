@@ -192,7 +192,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
   }
 
   return (
-    <StyledPageThread inline={inline} elevation={inline ? 0 : 8} id={`thread.${threadId}`} ref={ref}>
+    <StyledPageThread inline={inline} id={`thread.${threadId}`} ref={ref}>
       <div>
         <ThreadHeader>
           <Tooltip arrow placement='bottom' title={new Date(thread.createdAt).toLocaleString()}>
