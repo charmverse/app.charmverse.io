@@ -234,7 +234,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                     avatarSize='small'
                     sx={{
                       '& .MuiTypography-root': {
-                        maxWidth: commentIndex === 0 ? 100 : 150,
+                        maxWidth: commentIndex === 0 ? thread.resolved ? 50 : 100 : 150,
                         textOverflow: 'ellipsis',
                         overflow: 'hidden'
                       }
@@ -265,7 +265,6 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                     </Tooltip>
                     )}
                   </Typography>
-
                 </Box>
                 <div>
                   {commentIndex === 0 ? (
@@ -304,7 +303,16 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                 </div>
               </Box>
               {commentIndex === 0 && (
-                <Box pl={4} pb={1} display='flex'>
+                <Box
+                  pl={4}
+                  pb={1}
+                  display='flex'
+                  onClick={() => {
+                    if (showFindButton) {
+                      scrollToThread(threadId);
+                    }
+                  }}
+                >
                   <ContextBorder />
                   <Typography
                     sx={{

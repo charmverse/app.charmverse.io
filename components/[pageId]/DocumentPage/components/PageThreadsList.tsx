@@ -1,11 +1,13 @@
 import { Box, BoxProps, List, MenuItem, Select, SelectProps, Typography } from '@mui/material';
 import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { useThreads } from 'hooks/useThreads';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { useUser } from 'hooks/useUser';
+import { useEditorViewContext } from '@bangle.dev/react';
+import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 
 const Center = styled.div`
   position: absolute;
@@ -48,7 +50,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
   const unResolvedThreads = allThreads.filter(thread => thread && !thread.resolved) as ThreadWithComments[];
   const resolvedThreads = allThreads.filter(thread => thread && thread.resolved) as ThreadWithComments[];
   const [threadFilter, setThreadFilter] = useState<'resolved' | 'open' | 'all' | 'you'>('open');
-  const [threadSort, setThreadSort] = useState<'earliest' | 'latest'>('latest');
+  const [threadSort, setThreadSort] = useState<'earliest' | 'latest' | 'position'>('position');
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
     setThreadFilter(event.target.value as any);
   };
@@ -71,7 +73,25 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
     threadList = unResolvedThreads.filter(unResolvedThread => unResolvedThread.comments.some(comment => comment.userId === user?.id));
   }
 
-  const sortedThreadList = threadList.sort((threadA, threadB) => threadA && threadB ? new Date((threadSort === 'earliest' ? threadA : threadB).createdAt).getTime() - new Date((threadSort === 'earliest' ? threadB : threadA).createdAt).getTime() : 0);
+  const view = useEditorViewContext();
+  const inlineThreadsIds = threadSort === 'position' ? findTotalInlineComments(view, view.state.doc, threads, true).threadIds : [];
+
+  let sortedThreadList: ThreadWithComments[] = [];
+  if (threadSort === 'earliest') {
+    sortedThreadList = threadList.sort(
+      (threadA, threadB) => threadA && threadB ? new Date(threadA.createdAt).getTime() - new Date(threadB.createdAt).getTime() : 0
+    );
+  }
+  else if (threadSort === 'latest') {
+    sortedThreadList = threadList.sort(
+      (threadA, threadB) => threadA && threadB ? new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime() : 0
+    );
+  }
+  else {
+    const threadListSet = new Set(threadList.map(thread => thread.id));
+    const filteredThreadIds = inlineThreadsIds.filter(inlineThreadsId => threadListSet.has(inlineThreadsId));
+    sortedThreadList = filteredThreadIds.map(filteredThreadId => threads[filteredThreadId] as ThreadWithComments);
+  }
 
   return (
     <StyledPageThreadsBox
@@ -92,6 +112,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
             <MenuItem value='all'>All</MenuItem>
           </Select>
           <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
+            <MenuItem value='position'>Position</MenuItem>
             <MenuItem value='latest'>Latest</MenuItem>
             <MenuItem value='earliest'>Earliest</MenuItem>
           </Select>

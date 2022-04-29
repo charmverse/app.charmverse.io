@@ -2,7 +2,13 @@ import { EditorView, MarkType, Node } from '@bangle.dev/pm';
 import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { findChildrenByMark } from 'prosemirror-utils';
 
-export function findTotalInlineComments (view:EditorView, node: Node, threads: Record<string, ThreadWithComments | undefined>) {
+export function findTotalInlineComments (
+  view:EditorView,
+  node: Node,
+  threads: Record<string, ThreadWithComments | undefined>,
+  keepResolved?: boolean
+) {
+  keepResolved = keepResolved ?? false;
   const inlineCommentMarkSchema = view.state.schema.marks['inline-comment'] as MarkType;
   const inlineCommentNodes = findChildrenByMark(node, inlineCommentMarkSchema);
   let totalInlineComments = 0;
@@ -12,7 +18,7 @@ export function findTotalInlineComments (view:EditorView, node: Node, threads: R
     // Find the inline comment mark for the node
     const inlineCommentMark = inlineCommentNode.node.marks.find(mark => mark.type.name === inlineCommentMarkSchema.name);
     // Only count the non-resolved threads
-    if (inlineCommentMark && !inlineCommentMark.attrs.resolved) {
+    if (inlineCommentMark && (keepResolved || !inlineCommentMark.attrs.resolved)) {
       const thread = threads[inlineCommentMark.attrs.id];
       if (thread && !threadIds.has(thread.id)) {
         totalInlineComments += thread.comments.length;
