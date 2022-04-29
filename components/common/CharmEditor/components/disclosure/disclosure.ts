@@ -1,5 +1,6 @@
 import { RawPlugins, RawSpecs, createElement } from '@bangle.dev/core';
 import { DOMOutputSpec, Plugin, PluginKey } from '@bangle.dev/pm';
+import { checkForEmpty } from 'components/common/CharmEditor/utils';
 
 export function spec () {
   return [
@@ -32,6 +33,7 @@ function detailsSpec (): RawSpecs {
     name: 'disclosureDetails',
     schema: {
       content: 'disclosureSummary block+',
+      defining: true,
       group: 'block',
       parseDOM: [{ tag: 'details' }],
       toDOM: (): DOMOutputSpec => {
@@ -59,6 +61,7 @@ function ContainerPlugin ({ type, contentDOM }: { type: string, contentDOM: DOMO
     props: {
       nodeViews: {
         [type]: function nodeView (node, view, getPos, decorations) {
+          // @ts-ignore
           const element = createElement(contentDOM);
           return {
             contentDOM: element,

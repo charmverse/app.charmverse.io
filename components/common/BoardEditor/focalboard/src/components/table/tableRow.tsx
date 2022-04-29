@@ -29,7 +29,7 @@ type Props = {
     pageUpdatedBy: string
     resizingColumn: string
     columnRefs: Map<string, React.RefObject<HTMLDivElement>>
-    onClick?: (e: React.MouseEvent<HTMLDivElement>) => void
+    onClick?: (e: React.MouseEvent<HTMLDivElement>, card: Card) => void
     onDrop: (srcCard: Card, dstCard: Card) => void
     saveTitle: (saveType: string, cardId: string, title: string) => void
 }
@@ -78,7 +78,7 @@ function TableRow (props: Props) {
     return (
         <div
             className={className}
-            onClick={props.onClick}
+            onClick={e => props.onClick?.(e, card)}
             ref={cardRef}
             style={{opacity: isDragging ? 0.5 : 1}}
         >
