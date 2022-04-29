@@ -1,20 +1,16 @@
-import { useMemo, useContext, useState } from 'react';
-import { CSVLink } from 'react-csv';
 import { Box, Grid, Typography } from '@mui/material';
-import { Bounty, BountyStatus } from '@prisma/client';
-import Button from 'components/common/Button';
+import { BountyStatus } from '@prisma/client';
+import { PopulatedBounty } from 'charmClient';
 import BountyModal from 'components/bounties/BountyModal';
+import InputBountyStatus from 'components/bounties/InputBountyStatus';
+import Button from 'components/common/Button';
 import { BountiesContext } from 'hooks/useBounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import InputBountyStatus from 'components/common/form/InputBountyStatus';
-import { BOUNTY_LABELS } from 'models/Bounty';
-import { PopulatedBounty } from 'charmClient';
-import ButtonChip from 'components/common/ButtonChip';
-import Tooltip from '@mui/material/Tooltip';
-import DeleteIcon from '@mui/icons-material/Close';
+import { useContext, useMemo, useState } from 'react';
+import { CSVLink } from 'react-csv';
 import { BountyCard } from './BountyCard';
-import MultiPaymentModal from './MultiPaymentModal';
 import { BountyStatusChip } from './BountyStatusBadge';
+import MultiPaymentModal from './MultiPaymentModal';
 
 const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete', 'paid'];
 
