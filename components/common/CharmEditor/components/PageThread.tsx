@@ -41,7 +41,6 @@ const StyledPageThread = styled(Paper)<{ inline: boolean }>`
 const ThreadHeader = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: ${({ theme }) => theme.spacing(1)};
   justify-content: space-between;
   gap: ${({ theme }) => theme.spacing(2)}
 `;
@@ -199,17 +198,17 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
           <Tooltip arrow placement='bottom' title={new Date(thread.createdAt).toLocaleString()}>
             <Typography
               sx={{
-                cursor: 'pointer'
+                cursor: 'pointer',
+                pl: 1
               }}
               color='secondary'
               variant='subtitle1'
               display='flex'
               flexDirection='row'
             >
-              {DateTime.fromJSDate(new Date(thread.createdAt)).toRelative({ base: (DateTime.now()) })}
+              Started {DateTime.fromJSDate(new Date(thread.createdAt)).toRelative({ base: (DateTime.now()), style: 'short' })}
             </Typography>
           </Tooltip>
-
         </ThreadHeader>
         {thread.comments.map((comment, commentIndex) => {
           const isEditable = comment.id === editedCommentId;
@@ -254,7 +253,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                   >
                     <Tooltip arrow placement='bottom' title={new Date(comment.createdAt).toLocaleString()}>
                       <span>
-                        {DateTime.fromJSDate(new Date(comment.createdAt)).toRelative({ base: (DateTime.now()) })}
+                        {DateTime.fromJSDate(new Date(comment.createdAt)).toRelative({ base: DateTime.now(), style: 'short' })}
                       </span>
                     </Tooltip>
                     {comment.updatedAt && (
@@ -403,7 +402,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
         </Menu>
       </div>
       {permissions.edit_content && (
-        <Box display='flex' flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
+        <Box display='flex' px={1} pb={1} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
           <InlineCharmEditor
             style={{
               backgroundColor: theme.palette.background.default

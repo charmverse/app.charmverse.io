@@ -76,7 +76,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     <ScrollableWindow hideScroll={showingCommentThreadsList}>
       <div style={{
         width: showingCommentThreadsList ? 'calc(100% - 425px)' : '100%',
-        height: showingCommentThreadsList ? 'calc(100vh - 65px)' : 'inherit',
+        height: showingCommentThreadsList ? 'calc(100vh - 65px)' : '100%',
         overflow: showingCommentThreadsList ? 'auto' : 'inherit'
       }}
       >
