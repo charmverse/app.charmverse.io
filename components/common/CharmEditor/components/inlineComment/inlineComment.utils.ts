@@ -40,7 +40,7 @@ export function createInlineComment () {
 function isTextAtPos (pos: number) {
   return (state: EditorState) => {
     const node = state.doc.nodeAt(pos);
-    return !!node && node.isText;
+    return !!node && (node.isText || node.type.name.match(/(emoji|mention)/));
   };
 }
 
