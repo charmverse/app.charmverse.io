@@ -168,6 +168,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
 
+  const isAdmin = user?.spaceRoles.some(role => role.spaceId === space?.id && (role.isAdmin === true || role.role === 'admin'));
+
   function showSpaceForm () {
     setSpaceFormOpen(true);
   }
@@ -239,12 +241,16 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             </IconButton>
           </SidebarHeader>
           <Box mb={2}>
-            <SidebarLink
-              active={router.pathname.startsWith('/[domain]/settings')}
-              href={`/${space.domain}/settings/workspace`}
-              icon={<SettingsIcon color='secondary' fontSize='small' />}
-              label='Settings & Members'
-            />
+            {
+              isAdmin && (
+                <SidebarLink
+                  active={router.pathname.startsWith('/[domain]/settings')}
+                  href={`/${space.domain}/settings/workspace`}
+                  icon={<SettingsIcon color='secondary' fontSize='small' />}
+                  label='Settings & Members'
+                />
+              )
+            }
             <SidebarLink
               active={router.pathname.startsWith('/[domain]/settings')}
               href='https://discord.com/channels/894960387743698944/945679068710469714'
