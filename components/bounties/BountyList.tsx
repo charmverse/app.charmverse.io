@@ -1,24 +1,46 @@
-import { useMemo, useContext, useState } from 'react';
-import { CSVLink } from 'react-csv';
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
-import Button from 'components/common/Button';
+import { PopulatedBounty } from 'charmClient';
 import BountyModal from 'components/bounties/BountyModal';
+import InputBountyStatus from 'components/bounties/InputBountyStatus';
+import Button from 'components/common/Button';
 import { BountiesContext } from 'hooks/useBounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { useContext, useMemo, useState } from 'react';
+import { CSVLink } from 'react-csv';
 import { BountyCard } from './BountyCard';
+import { BountyStatusChip } from './BountyStatusBadge';
 import MultiPaymentModal from './MultiPaymentModal';
 
-const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete'];
+const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete', 'paid'];
+
+function filterBounties (bounties: PopulatedBounty[], statuses: BountyStatus[]): PopulatedBounty[] {
+  return bounties?.filter(bounty => statuses.indexOf(bounty.status) > -1) ?? [];
+}
+
+function sortSelected (bountyStatuses: BountyStatus[]): BountyStatus[] {
+  return bountyStatuses.sort((first, second) => {
+    if (first === second) {
+      return 0;
+    }
+    else if (bountyOrder.indexOf(first) < bountyOrder.indexOf(second)) {
+      return -1;
+    }
+    else {
+      return 1;
+    }
+  });
+}
 
 export function BountyList () {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
   const { bounties, setBounties } = useContext(BountiesContext);
 
-  let sortedBounties = bounties ? sortArrayByObjectProperty(bounties.slice(), 'status', bountyOrder) : [];
-  sortedBounties = sortedBounties.filter(bounty => {
-    return bounty.status !== 'paid';
-  });
+  const [bountyFilter, setBountyFilter] = useState<BountyStatus[]>(['open', 'assigned', 'review']);
+
+  const filteredBounties = filterBounties(bounties.slice(), bountyFilter);
+
+  const sortedBounties = bounties ? sortArrayByObjectProperty(filteredBounties, 'status', bountyOrder) : [];
 
   const csvData = useMemo(() => {
     const completedBounties = sortedBounties.filter(bounty => bounty.status === BountyStatus.complete);
@@ -70,6 +92,40 @@ export function BountyList () {
             Create Bounty
           </Button>
         </Box>
+      </Box>
+
+      {/* Filters for the bounties */}
+      <Box display='flex' alignContent='center' justifyContent='flex-end' mb={3}>
+
+        {
+            bountyFilter.map(status => {
+              return (
+                <Box sx={{ mr: 1, alignContent: 'center', flexDirection: 'column', alignSelf: 'center' }}>
+                  <BountyStatusChip
+                    status={status}
+                    onDelete={() => {
+                      setBountyFilter(sortSelected(bountyFilter.filter(selected => selected !== status)));
+                    }}
+                  />
+                </Box>
+              );
+            })
+          }
+        {
+          bountyFilter.length < Object.keys(BountyStatus).length && (
+          <Box>
+            <InputBountyStatus
+              onChange={(statuses) => {
+                setBountyFilter(sortSelected(statuses));
+              }}
+              renderSelectedInValue={false}
+              renderSelectedInOption={false}
+              defaultValues={bountyFilter}
+            />
+          </Box>
+          )
+
+        }
       </Box>
 
       <Grid container sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
