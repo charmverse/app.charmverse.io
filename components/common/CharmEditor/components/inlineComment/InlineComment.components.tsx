@@ -4,7 +4,6 @@ import { Box, Button, ClickAwayListener, Grow, Paper } from '@mui/material';
 import { useThreads } from 'hooks/useThreads';
 import { createPortal } from 'react-dom';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
-import { useTheme } from '@emotion/react';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
@@ -63,7 +62,7 @@ export default function InlineCommentThread () {
         >
           <ThreadContainer elevation={4}>
             {unResolvedThreads.map(resolvedThread => resolvedThread
-              && <PageThread key={resolvedThread.id} threadId={resolvedThread?.id} />)}
+              && <PageThread inline key={resolvedThread.id} threadId={resolvedThread?.id} />)}
           </ThreadContainer>
         </Grow>
       </ClickAwayListener>,
@@ -74,7 +73,6 @@ export default function InlineCommentThread () {
 }
 
 export function InlineCommentSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
-  const theme = useTheme();
   const view = useEditorViewContext();
   const [commentContent, setCommentContent] = useState<PageContent>({
     type: 'doc',

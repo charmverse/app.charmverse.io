@@ -32,10 +32,10 @@ const ContextBorder = styled.div`
 
 const StyledPageThread = styled(Paper)<{ inline: boolean }>`
   overflow: ${({ inline }) => inline ? 'auto' : 'unset'};
-  padding: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme, inline }) => theme.spacing(inline ? 2 : 1)};
   background: ${({ theme }) => theme.palette.background.light};
   width: ${({ inline }) => inline ? '500px' : 'inherit'};
-  max-height: ${({ inline }) => inline ? '300px' : 'fit-content'};
+  max-height: ${({ inline }) => inline ? '350px' : 'fit-content'};
 `;
 
 const ThreadHeader = styled.div`
