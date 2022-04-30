@@ -12,19 +12,24 @@ import { setTitle } from 'hooks/usePageTitle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FormValues, schema } from 'components/common/CreateSpaceForm';
 import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
 import { Box, Typography } from '@mui/material';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Link from 'components/common/Link';
-import { FailedImportsError } from 'lib/notion/types';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 export default function WorkspaceSettings () {
   setTitle('Workspace Options');
   const router = useRouter();
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
+  const [user] = useUser();
+
+  const isAdmin = isSpaceAdmin(user, space?.id);
 
   const {
     register,
@@ -40,7 +45,7 @@ export default function WorkspaceSettings () {
   const watchName = watch('name');
 
   async function onSubmit (values: FormValues) {
-    if (!space) return;
+    if (!space || !isAdmin) return;
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
     const updatedSpace = await charmClient.updateSpace({ ...space, ...values });
@@ -54,8 +59,8 @@ export default function WorkspaceSettings () {
   }
 
   async function deleteWorkspace () {
-    if (space && window.confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
-      await charmClient.deleteSpace(space!.id);
+    if (isAdmin && space && window.confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
+      await charmClient.deleteSpace(space.id);
       const nextSpace = spaces.filter(s => s.id !== space.id)[0];
       window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
     }
@@ -73,6 +78,7 @@ export default function WorkspaceSettings () {
             <FieldLabel>Name</FieldLabel>
             <TextField
               {...register('name')}
+              disabled={!isAdmin}
               fullWidth
               error={!!errors.name}
               helperText={errors.name?.message}
@@ -82,25 +88,32 @@ export default function WorkspaceSettings () {
             <FieldLabel>Domain</FieldLabel>
             <TextField
               {...register('domain')}
+              disabled={!isAdmin}
               fullWidth
               error={!!errors.domain}
               helperText={errors.domain?.message}
             />
           </Grid>
-          <Grid item display='flex' justifyContent='space-between'>
-            <PrimaryButton disabled={!isDirty} type='submit'>
-              Save
-            </PrimaryButton>
-            <Button variant='outlined' color='error' onClick={deleteWorkspace}>
-              Delete Workspace
-            </Button>
-          </Grid>
+          {isAdmin && (
+            <Grid item display='flex' justifyContent='space-between'>
+              <PrimaryButton disabled={!isDirty} type='submit'>
+                Save
+              </PrimaryButton>
+              <Button variant='outlined' color='error' onClick={deleteWorkspace}>
+                Delete Workspace
+              </Button>
+            </Grid>
+          )}
         </Grid>
       </form>
       <Legend>API Key</Legend>
-      <Link href='https://discord.gg/ACYCzBGC2M' external>
-        <Typography variant='body1'>Request access to the charmverse API in our Discord Channel</Typography>
-      </Link>
+      <Typography variant='body1'>
+        Request access to the charmverse API in our
+        {' '}
+        <Link href='https://discord.gg/ACYCzBGC2M' external target='_blank'>
+          Discord Channel <LaunchIcon fontSize='small' />
+        </Link>
+      </Typography>
 
       <Legend>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>

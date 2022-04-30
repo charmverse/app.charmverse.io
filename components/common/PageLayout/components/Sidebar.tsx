@@ -145,9 +145,9 @@ const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   ${({ isScrolled, theme }) => isScrolled ? `border-top: 1px solid ${theme.palette.divider}` : ''};
 `;
 
-function SidebarLink ({ active, href, icon, label }: { active: boolean, href: string, icon: any, label: string }) {
+function SidebarLink ({ active, href, icon, label, target }: { active: boolean, href: string, icon: any, label: string, target?: string }) {
   return (
-    <StyledSidebarLink href={href} active={active}>
+    <StyledSidebarLink href={href} active={active} target={target}>
       {icon}
       {label}
     </StyledSidebarLink>
@@ -167,8 +167,6 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
-
-  const isAdmin = user?.spaceRoles.some(role => role.spaceId === space?.id && (role.isAdmin === true || role.role === 'admin'));
 
   function showSpaceForm () {
     setSpaceFormOpen(true);
@@ -241,21 +239,18 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             </IconButton>
           </SidebarHeader>
           <Box mb={2}>
-            {
-              isAdmin && (
-                <SidebarLink
-                  active={router.pathname.startsWith('/[domain]/settings')}
-                  href={`/${space.domain}/settings/workspace`}
-                  icon={<SettingsIcon color='secondary' fontSize='small' />}
-                  label='Settings & Members'
-                />
-              )
-            }
+            <SidebarLink
+              active={router.pathname.startsWith('/[domain]/settings')}
+              href={`/${space.domain}/settings/workspace`}
+              icon={<SettingsIcon color='secondary' fontSize='small' />}
+              label='Settings & Members'
+            />
             <SidebarLink
               active={false}
               href='https://discord.gg/ACYCzBGC2M'
               icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
               label='Support & Feedback'
+              target='_blank'
             />
           </Box>
           <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll}>
