@@ -104,7 +104,7 @@ function AddCommentCharmEditor (
         onContentChange={({ doc }) => {
           setCommentContent(doc);
         }}
-        readOnly={readOnly}
+        readOnly={readOnly || disabled}
       />
       <Box display='flex' gap={1}>
         <Button
@@ -438,7 +438,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
       </div>
       {permissions.edit_content && (
         <AddCommentCharmEditor
-          key={`${Boolean(editedCommentId)}.${thread.comments[thread.comments.length - 1]?.id}`}
+          key={thread.comments[thread.comments.length - 1]?.id}
           readOnly={Boolean(editedCommentId)}
           sx={{
             display: 'flex',
