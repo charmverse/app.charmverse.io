@@ -16,10 +16,10 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { DateTime } from 'luxon';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
-import { scrollToThread } from 'lib/inline-comments/client/scrollToThread';
 import { BoxProps } from '@mui/system';
 import InlineCharmEditor from '../InlineCharmEditor';
 import { checkForEmpty } from '../utils';
+import { scrollToThread } from './inlineComment/inlineComment.utils';
 
 const ContextBorder = styled.div`
   width: 3px;
