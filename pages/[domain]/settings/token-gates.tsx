@@ -1,19 +1,17 @@
 import SettingsLayout from 'components/settings/Layout';
 import { ReactElement } from 'react';
 import { setTitle } from 'hooks/usePageTitle';
-import { useUser } from 'hooks/useUser';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import TokenGateList from 'components/settings/token-gates/TokenGates';
-import isSpaceAdmin from 'lib/users/isSpaceAdmin';
+import useIsAdmin from 'hooks/useIsAdmin';
 
 export default function ContributorSettings () {
 
   const [space] = useCurrentSpace();
-  const [user] = useUser();
-
-  const isAdmin = isSpaceAdmin(user, space?.id);
+  const isAdmin = useIsAdmin();
 
   setTitle('Token Gates');
+
   if (!space) {
     return null;
   }
