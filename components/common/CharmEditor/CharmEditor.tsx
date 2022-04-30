@@ -46,7 +46,7 @@ import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
 import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 import * as table from './components/table';
-import * as handles from './components/handles';
+import * as handles from './components/nodeHandle';
 import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
