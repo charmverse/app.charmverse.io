@@ -22,7 +22,6 @@ async function updateSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
 }
 
 async function deleteSpace (req: NextApiRequest, res: NextApiResponse) {
-
   await prisma.space.delete({
     where: {
       id: req.query.id as string

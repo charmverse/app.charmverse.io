@@ -1,6 +1,6 @@
 import { Command, EditorState, Schema, toggleMark } from '@bangle.dev/pm';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
-import { highlightDomElement } from 'lib/dom/client/highlight';
+import { highlightDomElement } from 'lib/browser';
 import { markName } from './inlineComment.constants';
 
 const getTypeFromSchema = (schema: Schema) => schema.marks[markName];

@@ -7,7 +7,7 @@ import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
-import { forwardRef, MouseEvent, useState } from 'react';
+import { forwardRef, memo, MouseEvent, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import { PageContent } from 'models';
@@ -157,7 +157,7 @@ function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, on
       </Box>
       <Collapse
         sx={{
-          pl: isEditable ? 4 : 1
+          pl: 4
         }}
         in={isEditable}
       >
@@ -194,6 +194,53 @@ interface PageThreadProps {
   inline?: boolean;
   showFindButton?: boolean;
 }
+
+const ThreadCreatedDate = memo<{createdAt: Date}>(({ createdAt }) => {
+  return (
+    <Tooltip arrow placement='bottom' title={new Date(createdAt).toLocaleString()}>
+      <Typography
+        sx={{
+          cursor: 'pointer',
+          pl: 1
+        }}
+        color='secondary'
+        variant='subtitle1'
+        display='flex'
+        flexDirection='row'
+      >
+        Started {DateTime.fromJSDate(new Date(createdAt)).toRelative({ base: (DateTime.now()), style: 'short' })}
+      </Typography>
+    </Tooltip>
+  );
+});
+
+const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdAt, updatedAt }) => {
+  return (
+    <Typography
+      sx={{
+        cursor: 'default',
+        fontSize: 12,
+        display: 'flex',
+        alignItems: 'center'
+      }}
+      color='secondary'
+      variant='subtitle1'
+    >
+      <Tooltip arrow placement='bottom' title={new Date(createdAt).toLocaleString()}>
+        <span>
+          {DateTime.fromJSDate(new Date(createdAt)).toRelative({ base: DateTime.now(), style: 'short' })}
+        </span>
+      </Tooltip>
+      {updatedAt && (
+      <Tooltip arrow placement='bottom' title={new Date(updatedAt).toLocaleString()}>
+        <span style={{ marginLeft: '4px' }}>
+          (edited)
+        </span>
+      </Tooltip>
+      )}
+    </Typography>
+  );
+});
 
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton = false, threadId, inline = false }, ref) => {
   showFindButton = showFindButton ?? (!inline);
@@ -255,20 +302,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
     <StyledPageThread inline={inline.toString()} id={`thread.${threadId}`} ref={ref}>
       <div>
         <ThreadHeader>
-          <Tooltip arrow placement='bottom' title={new Date(thread.createdAt).toLocaleString()}>
-            <Typography
-              sx={{
-                cursor: 'pointer',
-                pl: 1
-              }}
-              color='secondary'
-              variant='subtitle1'
-              display='flex'
-              flexDirection='row'
-            >
-              Started {DateTime.fromJSDate(new Date(thread.createdAt)).toRelative({ base: (DateTime.now()), style: 'short' })}
-            </Typography>
-          </Tooltip>
+          <ThreadCreatedDate createdAt={thread.createdAt} />
         </ThreadHeader>
         {thread.comments.map((comment, commentIndex) => {
           const isEditable = comment.id === editedCommentId;
@@ -301,29 +335,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                     fontSize={14}
                     fontWeight={500}
                   />
-                  <Typography
-                    sx={{
-                      cursor: 'default',
-                      fontSize: 12,
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                    color='secondary'
-                    variant='subtitle1'
-                  >
-                    <Tooltip arrow placement='bottom' title={new Date(comment.createdAt).toLocaleString()}>
-                      <span>
-                        {DateTime.fromJSDate(new Date(comment.createdAt)).toRelative({ base: DateTime.now(), style: 'short' })}
-                      </span>
-                    </Tooltip>
-                    {comment.updatedAt && (
-                    <Tooltip arrow placement='bottom' title={new Date(comment.updatedAt).toLocaleString()}>
-                      <span style={{ marginLeft: '4px' }}>
-                        (edited)
-                      </span>
-                    </Tooltip>
-                    )}
-                  </Typography>
+                  <CommentDate createdAt={comment.createdAt} updatedAt={comment.updatedAt} />
                 </Box>
                 <div>
                   {commentIndex === 0 ? (

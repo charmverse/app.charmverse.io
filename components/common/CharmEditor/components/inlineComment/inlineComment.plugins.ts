@@ -1,6 +1,6 @@
 import { Plugin, RawPlugins } from '@bangle.dev/core';
 import { TextSelection } from '@bangle.dev/pm';
-import { highlightDomElement } from 'lib/dom/client/highlight';
+import { highlightDomElement } from 'lib/browser';
 import { renderSuggestionsTooltip, SuggestTooltipPluginKey } from '../@bangle.dev/tooltip/suggest-tooltip';
 
 export function plugin (): RawPlugins {
