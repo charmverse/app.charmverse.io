@@ -10,7 +10,10 @@ export function plugins () {
     new Plugin({
       key: new PluginKey('handles'),
       view: (view) => {
-
+        console.log(view.dom.parentNode);
+        // view.dom.appendChild(createElement(['div']));
+        console.log('view dom', view.dom, view.dom.getBoundingClientRect());
+        console.log('new elm', createElement(['div', { class: 'row-handle' }]));
         function onMouseOver (e: MouseEventInit) {
           const ob = view.posAtCoords({ left: e.clientX!, top: e.clientY! });
           if (ob) {
@@ -21,15 +24,21 @@ export function plugins () {
             }
             const dom = view.domAtPos(topPos.pos);
             const node = view.state.doc.nodeAt(topPos.pos);
-            const handle = createElement(['div']);
+            const viewBox = view.dom.getBoundingClientRect();
             // @ts-ignore pm types are wrong
             const box = dom.node.getBoundingClientRect();
-            console.log('top position', box.top, topPos.pos, dom, node);
-            handle.style.top = `${box.top}px`;
-            // handles_wrapper.append(handle);
-            // dom.addEventListener('mouseleave', () => {
-            //   handle.remove();
-            // });
+            const top = box.top - viewBox.top;
+            const handle = createElement(['div', {
+              class: 'row-handle',
+              style: `top: ${top}px`
+            }]);
+            view.dom.parentNode?.appendChild(handle);
+            console.log('row to hover', top, box.top, viewBox.top, topPos.pos, dom, node);
+
+            dom.node.addEventListener('mouseleave', () => {
+              console.log('leave');
+              handle.remove();
+            });
           }
         }
 
@@ -38,10 +47,6 @@ export function plugins () {
         return {
           destroy () {
             view.dom.removeEventListener('mouseover', onMouseOver);
-          },
-
-          update (_view, prevState) {
-            console.log('update view');
           }
         };
       }

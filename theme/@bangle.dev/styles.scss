@@ -452,3 +452,12 @@ details {
 .ProseMirror.bangle-editor {
   z-index: 100;
 }
+
+// handles on the side of each row
+.row-handle {
+  left: 0px;
+  position: absolute;
+  background: green;
+  width: 10px;
+  height: 1em;
+}
