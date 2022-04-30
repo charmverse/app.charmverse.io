@@ -267,7 +267,7 @@ export function gettingStartedPageContent (): PageContent {
                   {
                     type: 'link',
                     attrs: {
-                      href: 'https://discord.gg/VvhEafEWcg'
+                      href: 'https://discord.gg/ACYCzBGC2M'
                     }
                   }
                 ],
