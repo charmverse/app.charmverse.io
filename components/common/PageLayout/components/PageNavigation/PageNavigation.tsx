@@ -43,14 +43,14 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
     node = tempItems[i];
     const nodeIndex = node[key];
     const index = nodeIndex ? map[nodeIndex] : -1;
-    if (node[key] && tempItems[index]) {
+    if (node[key] && tempItems[index] && node.deletedAt === null) {
       // Make sure its not a database page or a focalboard card
       if (tempItems[index].type === 'page') {
         tempItems[index].children.push(node);
         sortArrayByObjectProperty(tempItems[index].children, 'index');
       }
     }
-    else if (!rootPageIds) {
+    else if (!rootPageIds && node.deletedAt === null) {
       roots.push(node);
     }
     if (rootPageIds?.includes(node.id)) {
@@ -132,7 +132,8 @@ function PageNavigation ({
       isEmptyContent: checkForEmpty(page.content as PageContent),
       parentId: page.parentId,
       path: page.path,
-      type: page.type
+      type: page.type,
+      deletedAt: page.deletedAt
     }));
 
   const pageHash = JSON.stringify(pagesArray);

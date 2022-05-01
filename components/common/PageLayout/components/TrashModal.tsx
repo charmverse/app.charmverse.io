@@ -8,7 +8,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import charmClient from 'charmClient';
 import { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DateTime } from 'luxon';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
@@ -16,10 +16,17 @@ import Link from 'components/common/Link';
 import PageIcon from './PageIcon';
 
 export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, isOpen: boolean}) {
-  const { deletedPages, getPagePermissions } = usePages();
+  const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
   const [isMutating, setIsMutating] = useState(false);
   const dispatch = useAppDispatch();
+
+  const deletedPages = useMemo(() => (Object
+    .values(pages)
+    .filter(page => page && page.deletedAt !== null
+        && getPagePermissions(page.id).delete) as Page[]).sort((deletedPageA, deletedPageB) => deletedPageA.deletedAt && deletedPageB.deletedAt
+    ? new Date(deletedPageB.deletedAt).getTime() - new Date(deletedPageA.deletedAt).getTime()
+    : 0), [pages]);
 
   async function deletePage (pageId: string) {
     setIsMutating(true);
@@ -38,12 +45,6 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
   }
 
   // Remove the pages you dont have delete access of
-  const deletedPagesWithPermission = (Object
-    .values(deletedPages)
-    .filter(deletedPage => deletedPage && getPagePermissions(deletedPage.id).delete) as Page[])
-    .sort((deletedPageA, deletedPageB) => deletedPageA.deletedAt && deletedPageB.deletedAt
-      ? new Date(deletedPageB.deletedAt).getTime() - new Date(deletedPageA.deletedAt).getTime()
-      : 0);
   return (
     <Modal
       open={isOpen}
@@ -52,15 +53,15 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
       <div>
         <Box display='flex' justifyContent='space-between'>
           <DialogTitle>Trash</DialogTitle>
-          <Typography variant='subtitle1' color='secondary'>{deletedPagesWithPermission.length} pages</Typography>
+          <Typography variant='subtitle1' color='secondary'>{deletedPages.length} pages</Typography>
         </Box>
-        {deletedPagesWithPermission.length === 0 ? <Typography variant='subtitle1' color='secondary'>No archived pages</Typography> : (
+        {deletedPages.length === 0 ? <Typography variant='subtitle1' color='secondary'>No archived pages</Typography> : (
           <List sx={{
             maxHeight: 500,
             overflow: 'auto'
           }}
           >
-            {deletedPagesWithPermission.map(deletedPage => {
+            {deletedPages.map(deletedPage => {
               const isEditorEmpty = checkForEmpty(deletedPage.content as PageContent);
               return (
                 <ListItem disableGutters disabled={isMutating} key={deletedPage.id}>
