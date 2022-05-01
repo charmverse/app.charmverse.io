@@ -77,6 +77,8 @@ declare module 'lit-js-sdk' {
 
   export class LitNodeClient {
 
+    constructor (params?: { alertWhenUnauthorized?: boolean })
+
     connectedNodes: string[];
 
     ready: boolean;

@@ -13,7 +13,8 @@ import Divider from '@mui/material/Divider';
 import CheckIcon from '@mui/icons-material/Check';
 import { TokenGate, Space } from '@prisma/client';
 import Link from 'components/common/Link';
-import { DialogTitle } from 'components/common/Modal';
+import { DialogTitle, ErrorModal } from 'components/common/Modal';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -33,13 +34,13 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
   const [error, setError] = useState('');
   const [user, setUser] = useUser();
   const [, setSpaces] = useSpaces();
+  const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [tokenGate, setTokenGate] = useState<TokenGate & { space: Space } | null>(null);
   const [description, setDescription] = useState('');
   const [spaceDomain, setSpaceDomain] = useState('');
   const litClient = useLitProtocol();
   const [userInputStatus, setStatus] = useState('');
-
-  const [apiError, setApiError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!tokenGate) {
@@ -84,6 +85,9 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     if (!tokenGate || !litClient) {
       return;
     }
+
+    setIsLoading(true);
+
     const chain = getLitChainFromChainId(chainId);
 
     setError('');
@@ -107,8 +111,8 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
       accessControlConditions: (tokenGate.conditions as any)!.accessControlConditions
     })
       .catch(err => {
-        if (err.errCode === 'not_authorized') {
-          setError('Your wallet doesn\'t meet the requirements');
+        if (err.errorCode === 'not_authorized') {
+          setError('Please make sure your wallet meets the requirements');
         }
         else {
           setError(err.message || err);
@@ -136,6 +140,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     else {
       log.error('Unhandled response from token gate', result);
     }
+    setIsLoading(false);
   }
 
   function onChangeDomainName (event: ChangeEvent<HTMLInputElement>) {
@@ -190,7 +195,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
               </Card>
             </Grid>
             <Grid item>
-              <PrimaryButton size='large' fullWidth type='submit' onClick={onSubmit}>
+              <PrimaryButton loading={isLoading} size='large' fullWidth type='submit' onClick={onSubmit}>
                 Verify Wallet
               </PrimaryButton>
             </Grid>
@@ -203,11 +208,12 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
             </Grid>
           </>
         )}
-        {error && (
-          <Grid item>
-            <Alert severity='error'>{error}</Alert>
-          </Grid>
-        )}
+        <ErrorModal
+          title='Access denied'
+          message={error}
+          open={!!error}
+          onClose={() => setError('')}
+        />
       </Grid>
     </>
   );
