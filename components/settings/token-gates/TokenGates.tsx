@@ -12,8 +12,9 @@ import BackDrop from '@mui/material/Backdrop';
 import Portal from '@mui/material/Portal';
 import { ErrorModal } from 'components/common/Modal';
 import Button from 'components/common/Button';
+import { getChainFromConditions } from 'lib/token-gates';
 import Legend from '../Legend';
-import TokenGatesTable, { getChainFromConditions } from './TokenGatesTable';
+import TokenGatesTable from './TokenGatesTable';
 
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
 
@@ -41,11 +42,6 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   }
 
   async function saveTokenGate (conditions: Partial<SigningConditions>) {
-    // a top-level chain is required for litClient but its not actually used since each condition can be on different chains
-    const chain = getChainFromConditions(conditions);
-    if (!chain) {
-      throw new Error('No chain found in access conditions');
-    }
     const tokenGateId = uuid();
     const resourceId: ResourceId = {
       baseUrl: 'https://app.charmverse.io',
@@ -58,12 +54,12 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
     };
 
     const authSig = await checkAndSignAuthMessage({
-      chain
+      chain: 'ethereum'
     });
     await litClient!.saveSigningCondition({
       ...conditions,
       authSig,
-      chain,
+      chain: 'ethereum',
       resourceId
     });
     await charmClient.saveTokenGate({

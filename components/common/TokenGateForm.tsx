@@ -1,8 +1,7 @@
-import { ALL_LIT_CHAINS, humanizeAccessControlConditions, Chain, checkAndSignAuthMessage } from 'lit-js-sdk';
+import { ALL_LIT_CHAINS, humanizeAccessControlConditions, checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -21,6 +20,7 @@ import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
 import { useRouter } from 'next/router';
 import log from 'lib/log';
+import { getChainFromGate } from 'lib/token-gates';
 
 interface Props {
   onSubmit: (values: Space) => void;
@@ -38,6 +38,8 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
   const [spaceDomain, setSpaceDomain] = useState('');
   const litClient = useLitProtocol();
   const [userInputStatus, setStatus] = useState('');
+
+  const [apiError, setApiError] = useState<string>('');
 
   useEffect(() => {
     if (!tokenGate) {
@@ -82,15 +84,25 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     if (!tokenGate || !litClient) {
       return;
     }
-    const chain = getChain(tokenGate);
+
     setError('');
+
     const authSig = await checkAndSignAuthMessage({
-      chain
-    });
-    const jwt = await litClient.getSignedToken({
+      chain: 'ethereum'
+    })
+      .catch(err => {
+        if (err.errorCode === 'unsupported_chain') {
+          setError('Unspported Network. Please make sure you are connected to the correct network');
+        }
+        else {
+          console.error(err);
+        }
+      });
+
+    const jwt = authSig && await litClient.getSignedToken({
       resourceId: tokenGate.resourceId as any,
       authSig,
-      chain,
+      chain: 'ethereum',
       accessControlConditions: (tokenGate.conditions as any)!.accessControlConditions
     })
       .catch(err => {
@@ -201,11 +213,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
 }
 
-function getChain (tokenGate: TokenGate): Chain {
-  return (tokenGate.conditions as any)!.accessControlConditions![0].chain;
-}
-
 function getChainName (tokenGate: TokenGate): string | undefined {
-  const chain = getChain(tokenGate);
+  const chain = getChainFromGate(tokenGate);
   return ALL_LIT_CHAINS[chain]?.name;
 }

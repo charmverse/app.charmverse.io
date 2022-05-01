@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { humanizeAccessControlConditions, Chain, AccessControlCondition, SigningConditions, checkAndSignAuthMessage, ALL_LIT_CHAINS } from 'lit-js-sdk';
+import { humanizeAccessControlConditions, checkAndSignAuthMessage, ALL_LIT_CHAINS } from 'lit-js-sdk';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { TokenGate } from '@prisma/client';
@@ -15,6 +15,7 @@ import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
+import { getChainFromGate } from 'lib/token-gates';
 
 interface Props {
   tokenGates: TokenGate[];
@@ -39,9 +40,9 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
   }, [tokenGates]);
 
   async function testConnect (tokenGate: TokenGate) {
-    const chain = getChain(tokenGate);
+    const chain = getChainFromGate(tokenGate);
     const authSig = await checkAndSignAuthMessage({
-      chain
+      chain: 'ethereum'
     });
     const jwt = await litClient!.getSignedToken({
       resourceId: tokenGate.resourceId as any,
@@ -72,7 +73,7 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
               <Typography>{descriptions[index]}</Typography>
             </TableCell>
             <TableCell width={150}>
-              <Typography>{ALL_LIT_CHAINS[getChain(row)]?.name}</Typography>
+              <Typography>{ALL_LIT_CHAINS[getChainFromGate(row)]?.name}</Typography>
             </TableCell>
             <TableCell width={150} sx={{ whiteSpace: 'nowrap' }}>
               {new Date(row.createdAt).toDateString()}
@@ -102,14 +103,4 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
       </TableBody>
     </Table>
   );
-}
-
-function getChain (tokenGate: TokenGate): Chain {
-  return getChainFromConditions(tokenGate.conditions as any);
-}
-
-export function getChainFromConditions (conditions: Partial<SigningConditions>): Chain {
-  return (conditions.accessControlConditions?.[0] as AccessControlCondition[])[0]?.chain
-    || (conditions.accessControlConditions?.[0] as AccessControlCondition).chain
-    || 'ethereum';
 }
