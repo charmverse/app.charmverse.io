@@ -38,7 +38,7 @@ export default function StatusModal ({ status, message, ...props }: Props) {
           )}
           {status === 'loading' && (
             <>
-              <CircularProgress size={30} />
+              <CircularProgress size={24} />
               Loading
             </>
           )}
