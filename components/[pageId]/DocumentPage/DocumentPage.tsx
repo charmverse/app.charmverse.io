@@ -71,7 +71,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const card = cards.find(_card => _card.id === page.id);
 
-  const comments = card ? useAppSelector(getCardComments(card.id)) : [];
+  const comments = useAppSelector(getCardComments(card?.id));
 
   return (
     <ScrollableWindow hideScroll={showingCommentThreadsList}>
