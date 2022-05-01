@@ -32,7 +32,7 @@ export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
     await charmClient.deletePage(pageId);
     await mutate(`pages/${space?.id}`);
     // Route to the first alive page
-    router.push(`/${router.query.domain}/${Object.values(pages).filter(page => page?.deletedAt === null)[0]?.path}`);
+    router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.deletedAt === null)?.path}`);
     setIsMutating(false);
   }
 
@@ -49,7 +49,12 @@ export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
   return (
     <StyledPageDeleteBanner>
       <Box display='flex' gap={1} alignItems='center'>
-        This page is in Trash
+        <div style={{
+          color: 'white',
+          fontWeight: 600
+        }}
+        >This page is in Trash
+        </div>
         <Button color={'white' as any} disabled={isMutating} onClick={restorePage} variant='outlined'>Restore Page</Button>
         <Button color={'white' as any} disabled={isMutating} onClick={deletePage} variant='outlined'>Delete permanently</Button>
       </Box>

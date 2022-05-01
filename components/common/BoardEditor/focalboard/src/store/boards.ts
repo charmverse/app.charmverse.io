@@ -27,10 +27,11 @@ const boardsSlice = createSlice({
         },
         updateBoards: (state, action: PayloadAction<Board[]>) => {
             for (const board of action.payload) {
-                if (board.deletedAt !== 0 && board.deletedAt !== null) {
+                /* if (board.deletedAt !== 0 && board.deletedAt !== null) {
                     delete state.boards[board.id]
                     delete state.templates[board.id]
-                } else if (board.fields.isTemplate) {
+                } else */
+                if (board.fields.isTemplate) {
                     state.templates[board.id] = board
                 } else {
                     state.boards[board.id] = board
