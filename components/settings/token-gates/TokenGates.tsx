@@ -7,12 +7,13 @@ import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-s
 import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { TokenGate } from '@prisma/client';
+import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import BackDrop from '@mui/material/Backdrop';
 import Portal from '@mui/material/Portal';
 import { ErrorModal } from 'components/common/Modal';
 import Button from 'components/common/Button';
-import { getChainFromConditions } from 'lib/token-gates';
+import { getLitChainFromChainId } from 'lib/token-gates';
 import Legend from '../Legend';
 import TokenGatesTable from './TokenGatesTable';
 
@@ -23,7 +24,7 @@ type ConditionsModalResult = Pick<SigningConditions, 'accessControlConditions' |
 export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
 
   const litClient = useLitProtocol();
-
+  const { chainId } = useWeb3React();
   const { data, mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
   const popupState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
@@ -52,14 +53,15 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         tokenGateId
       })
     };
+    const chain = getLitChainFromChainId(chainId);
 
     const authSig = await checkAndSignAuthMessage({
-      chain: 'ethereum'
+      chain
     });
     await litClient!.saveSigningCondition({
       ...conditions,
       authSig,
-      chain: 'ethereum',
+      chain,
       resourceId
     });
     await charmClient.saveTokenGate({

@@ -15,7 +15,7 @@ import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
-import { getChainFromGate } from 'lib/token-gates';
+import { getChainFromGate, getLitChainFromChainId } from 'lib/token-gates';
 
 interface Props {
   tokenGates: TokenGate[];
@@ -25,7 +25,7 @@ interface Props {
 
 export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props) {
 
-  const { account } = useWeb3React();
+  const { account, chainId } = useWeb3React();
   const [descriptions, setDescriptions] = useState<string[]>([]);
   const litClient = useLitProtocol();
 
@@ -40,9 +40,9 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
   }, [tokenGates]);
 
   async function testConnect (tokenGate: TokenGate) {
-    const chain = getChainFromGate(tokenGate);
+    const chain = getLitChainFromChainId(chainId);
     const authSig = await checkAndSignAuthMessage({
-      chain: 'ethereum'
+      chain
     });
     const jwt = await litClient!.getSignedToken({
       resourceId: tokenGate.resourceId as any,

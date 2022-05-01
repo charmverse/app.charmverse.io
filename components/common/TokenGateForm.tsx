@@ -20,7 +20,7 @@ import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
 import { useRouter } from 'next/router';
 import log from 'lib/log';
-import { getChainFromGate } from 'lib/token-gates';
+import { getChainFromGate, getLitChainFromChainId } from 'lib/token-gates';
 
 interface Props {
   onSubmit: (values: Space) => void;
@@ -29,7 +29,7 @@ interface Props {
 export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
   const router = useRouter();
-  const { account } = useWeb3React();
+  const { account, chainId } = useWeb3React();
   const [error, setError] = useState('');
   const [user, setUser] = useUser();
   const [, setSpaces] = useSpaces();
@@ -84,25 +84,26 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     if (!tokenGate || !litClient) {
       return;
     }
+    const chain = getLitChainFromChainId(chainId);
 
     setError('');
 
     const authSig = await checkAndSignAuthMessage({
-      chain: 'ethereum'
+      chain
     })
       .catch(err => {
         if (err.errorCode === 'unsupported_chain') {
           setError('Unspported Network. Please make sure you are connected to the correct network');
         }
         else {
-          console.error(err);
+          log.error(`error getting signature: ${err.message || err}`);
         }
       });
 
     const jwt = authSig && await litClient.getSignedToken({
       resourceId: tokenGate.resourceId as any,
       authSig,
-      chain: 'ethereum',
+      chain,
       accessControlConditions: (tokenGate.conditions as any)!.accessControlConditions
     })
       .catch(err => {
