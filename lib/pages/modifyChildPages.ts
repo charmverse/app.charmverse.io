@@ -1,22 +1,17 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 
-interface Options {
-  deletePermanently?: boolean
-  restore?: boolean
-}
+export type ChildModificationAction = 'delete' | 'restore' | 'archive'
 
-export async function deleteNestedChild (parentId: string, userId: string, options?: Options) {
-  const deletedChildPageIds: string[] = [];
+export async function modifyChildPages (parentId: string, userId: string, action: ChildModificationAction) {
+  const modifiedChildPageIds: string[] = [];
   let childPageIds = [parentId];
-  options = options ?? {};
-  const { deletePermanently = false, restore = false } = options;
 
   while (childPageIds.length !== 0) {
-    deletedChildPageIds.push(...childPageIds);
+    modifiedChildPageIds.push(...childPageIds);
     childPageIds = (await prisma.page.findMany({
       where: {
-        deletedAt: (deletePermanently || restore) ? {
+        deletedAt: (action === 'restore' || action === 'delete') ? {
           not: null
         } : null,
         parentId: {
@@ -29,26 +24,31 @@ export async function deleteNestedChild (parentId: string, userId: string, optio
     })).map(childPage => childPage.id);
   }
 
-  if (deletePermanently) {
+  if (action === 'delete') {
     await prisma.page.deleteMany({
       where: {
         id: {
-          in: deletedChildPageIds
+          in: modifiedChildPageIds
         }
       }
     });
 
     await prisma.block.deleteMany({
       where: {
-        id: {
-          in: deletedChildPageIds
-        }
+        OR: [{
+          id: {
+            in: modifiedChildPageIds
+          },
+          parentId: {
+            in: modifiedChildPageIds
+          }
+        }]
       }
     });
   }
   else {
     const data: Prisma.PageUncheckedUpdateManyInput = {};
-    if (restore) {
+    if (action === 'restore') {
       data.deletedAt = null;
     }
     else {
@@ -60,7 +60,7 @@ export async function deleteNestedChild (parentId: string, userId: string, optio
     await prisma.page.updateMany({
       where: {
         id: {
-          in: deletedChildPageIds
+          in: modifiedChildPageIds
         }
       },
       data: data as Prisma.PageUncheckedUpdateManyInput
@@ -71,12 +71,12 @@ export async function deleteNestedChild (parentId: string, userId: string, optio
         OR: [
           {
             id: {
-              in: deletedChildPageIds
+              in: modifiedChildPageIds
             }
           },
           {
             parentId: {
-              in: deletedChildPageIds
+              in: modifiedChildPageIds
             }
           }
         ]
@@ -85,5 +85,5 @@ export async function deleteNestedChild (parentId: string, userId: string, optio
     });
   }
 
-  return deletedChildPageIds;
+  return modifiedChildPageIds;
 }

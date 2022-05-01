@@ -4,9 +4,9 @@ import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } fro
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
-import { Page, PagePermission } from '@prisma/client';
+import { Page } from '@prisma/client';
 import { prisma } from 'db';
-import { deleteNestedChild } from 'lib/pages/deleteNestedChild';
+import { ChildModificationAction, modifyChildPages } from 'lib/pages/modifyChildPages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -19,7 +19,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
-  const restorePage = req.query.restore ? (req.query.restore as string) === 'true' : false;
 
   const permissions = await computeUserPagePermissions({
     pageId,
@@ -43,43 +42,27 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
       error: 'You cannot update this page'
     });
   }
-  let pageWithPermission: Page & {
-    permissions: PagePermission[];
-  } | null = null;
-
-  if (restorePage) {
-    await deleteNestedChild(pageId, userId, { restore: true });
-    pageWithPermission = await prisma.page.findUnique({
-      where: {
-        id: pageId
-      },
-      include: {
-        permissions: true
-      }
-    })!;
-  }
-  else {
-    pageWithPermission = await prisma.page.update({
-      where: {
-        id: pageId
-      },
-      data: req.body,
-      include: {
-        permissions: true
-      }
-    });
-
-    if (updateContent.parentId === null || typeof updateContent.parentId === 'string') {
-      const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
-      return res.status(200).json(updatedPage);
+  const pageWithPermission = await prisma.page.update({
+    where: {
+      id: pageId
+    },
+    data: req.body,
+    include: {
+      permissions: true
     }
+  });
+
+  if (updateContent.parentId === null || typeof updateContent.parentId === 'string') {
+    const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
+    return res.status(200).json(updatedPage);
   }
+
   return res.status(200).json(pageWithPermission);
 }
 
 async function deletePage (req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
-  const deletePermanently = req.query.permanent ? (req.query.permanent as string) === 'true' : false;
+  const childModificationAction = req.query.action as ChildModificationAction;
   const userId = req.session.user.id;
 
   const permissions = await computeUserPagePermissions({
@@ -97,9 +80,9 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const deletedChildPageIds = await deleteNestedChild(pageId, userId, { deletePermanently });
+  const modifiedChildCount = await modifyChildPages(pageId, userId, childModificationAction);
 
-  return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
+  return res.status(200).json({ deletedCount: modifiedChildCount.length, rootBlock });
 }
 
 export default withSessionRoute(handler);

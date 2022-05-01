@@ -17,9 +17,9 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
   const [space] = useCurrentSpace();
   const [isMutating, setIsMutating] = useState(false);
 
-  async function deletePagePermanently (pageId: string) {
+  async function deletePage (pageId: string) {
     setIsMutating(true);
-    await charmClient.deletePagePermanently(pageId);
+    await charmClient.deletePage(pageId);
     await mutate(`pages/deleted/${space?.id}`);
     setIsMutating(false);
   }
@@ -63,7 +63,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
                         <RestoreIcon color='info' fontSize='small' />
                       </Tooltip>
                     </IconButton>
-                    <IconButton disabled={isMutating} size='small' onClick={() => deletePagePermanently(deletedPage.id)}>
+                    <IconButton disabled={isMutating} size='small' onClick={() => deletePage(deletedPage.id)}>
                       <Tooltip arrow placement='top' title='Delete page permanently'>
                         <DeleteIcon color='error' fontSize='small' />
                       </Tooltip>

@@ -121,20 +121,20 @@ class CharmClient {
     return http.POST<Page>('/api/pages', pageOpts);
   }
 
-  deletePage (pageId: string) {
-    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}`);
+  archivePage (pageId: string) {
+    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}?action=archive`);
   }
 
-  async deletePagePermanently (pageId: string) {
-    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}?permanent=true`);
+  async deletePage (pageId: string) {
+    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}?action=delete`);
+  }
+
+  async restorePage (pageId: string) {
+    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}?action=restore`);
   }
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
     return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
-  }
-
-  async restorePage (pageId: string) {
-    return http.PUT<Page>(`/api/pages/${pageId}?restore=true`, {});
   }
 
   favoritePage (pageId: string) {
