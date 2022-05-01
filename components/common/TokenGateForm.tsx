@@ -1,7 +1,6 @@
 import { ALL_LIT_CHAINS, humanizeAccessControlConditions, checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -14,7 +13,6 @@ import CheckIcon from '@mui/icons-material/Check';
 import { TokenGate, Space } from '@prisma/client';
 import Link from 'components/common/Link';
 import { DialogTitle, ErrorModal } from 'components/common/Modal';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -22,6 +20,7 @@ import charmClient from 'charmClient';
 import { useRouter } from 'next/router';
 import log from 'lib/log';
 import { getChainFromGate, getLitChainFromChainId } from 'lib/token-gates';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 interface Props {
   onSubmit: (values: Space) => void;
@@ -31,10 +30,10 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
   const router = useRouter();
   const { account, chainId } = useWeb3React();
+  const { showMessage } = useSnackbar();
   const [error, setError] = useState('');
   const [user, setUser] = useUser();
   const [, setSpaces] = useSpaces();
-  const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [tokenGate, setTokenGate] = useState<TokenGate & { space: Space } | null>(null);
   const [description, setDescription] = useState('');
   const [spaceDomain, setSpaceDomain] = useState('');
@@ -131,6 +130,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
       charmClient.getSpaces()
         .then(_spaces => {
           setSpaces(_spaces);
+          showMessage(`Successfully joined workspace: ${result.space.name}`);
           _onSubmit(result.space);
         });
     }
