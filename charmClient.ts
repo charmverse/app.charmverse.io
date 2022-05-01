@@ -113,6 +113,10 @@ class CharmClient {
     return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
   }
 
+  getDeletedPages (spaceId: string) {
+    return http.GET<Page[]>(`/api/spaces/${spaceId}/pages?deleted=true`);
+  }
+
   createPage (pageOpts: Prisma.PageCreateInput) {
     return http.POST<Page>('/api/pages', pageOpts);
   }

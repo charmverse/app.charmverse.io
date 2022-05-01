@@ -15,8 +15,10 @@ export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedP
 type IContext = {
   currentPageId: string,
   pages: Record<string, Page | undefined>,
-  setCurrentPageId: Dispatch<SetStateAction<string>>,
   setPages: Dispatch<SetStateAction<Record<string, Page | undefined>>>,
+  deletedPages: Record<string, Page | undefined>,
+  setDeletedPages: Dispatch<SetStateAction<Record<string, Page | undefined>>>,
+  setCurrentPageId: Dispatch<SetStateAction<string>>,
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   getPagePermissions: (pageId: string) => IPagePermissionFlags,
@@ -27,6 +29,8 @@ const refreshInterval = 1000 * 5 * 60; // 5 minutes
 export const PagesContext = createContext<Readonly<IContext>>({
   currentPageId: '',
   pages: {},
+  deletedPages: {},
+  setDeletedPages: () => undefined,
   setCurrentPageId: () => '',
   setPages: () => undefined,
   isEditing: true,
@@ -38,17 +42,27 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [isEditing, setIsEditing] = useState(false);
   const [space] = useCurrentSpace();
   const [pages, setPages] = useState<Record<string, Page | undefined>>({});
+  const [deletedPages, setDeletedPages] = useState<Record<string, Page | undefined>>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const [user] = useUser();
   const { data } = useSWR(() => space ? `pages/${space?.id}` : null, (e) => {
     return charmClient.getPages(space!.id);
   }, { refreshInterval });
+  const { data: deletedPagesResponse } = useSWR(() => space ? `pages/deleted/${space?.id}` : null, () => {
+    return charmClient.getDeletedPages(space!.id);
+  });
   useEffect(() => {
     if (data) {
       setPages(data.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
     }
   }, [data]);
+
+  useEffect(() => {
+    if (deletedPagesResponse) {
+      setDeletedPages(deletedPagesResponse.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
+    }
+  }, [deletedPagesResponse]);
 
   /**
    * Will return permissions for the currently connected user
@@ -99,8 +113,10 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     pages,
     setCurrentPageId,
     setPages,
-    getPagePermissions
-  }), [currentPageId, isEditing, router, pages, user]);
+    getPagePermissions,
+    deletedPages,
+    setDeletedPages
+  }), [deletedPages, currentPageId, isEditing, router, pages, user]);
 
   return (
     <PagesContext.Provider value={value}>

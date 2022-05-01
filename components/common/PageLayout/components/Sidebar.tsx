@@ -29,8 +29,10 @@ import { Modal } from 'components/common/Modal';
 import NewPageMenu from 'components/common/PageLayout/components/NewPageMenu';
 import WorkspaceAvatar from 'components/common/WorkspaceAvatar';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
+import { DialogTitle } from '@mui/material';
 import { headerHeight } from './Header';
 import PageNavigation from './PageNavigation';
+import TrashModal from './TrashModal';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -166,6 +168,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [spaces, setSpaces] = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showingTrash, setShowingTrash] = useState(false);
+
   const favoritePageIds = favorites.map(f => f.pageId);
 
   function showSpaceForm () {
@@ -283,10 +287,22 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 icon={<BountyIcon fontSize='small' />}
                 label='Bounties'
               />
+              <IconButton onClick={() => {
+                setShowingTrash(true);
+              }}
+              >
+                <BountyIcon fontSize='small' />
+              </IconButton>
             </Box>
           </ScrollingContainer>
         </Box>
       )}
+      <TrashModal
+        isOpen={showingTrash}
+        onClose={() => {
+          setShowingTrash(false);
+        }}
+      />
     </SidebarContainer>
   );
 }

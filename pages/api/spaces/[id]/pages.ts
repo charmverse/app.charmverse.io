@@ -13,12 +13,14 @@ handler.use(requireUser).get(getPages);
 async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
 
   const spaceId = req.query.id as string;
-
+  const deletedPage = req.query.deleted ? Boolean(req.query.deleted as string) : false;
   const userId = req.session.user.id;
 
   const pages = await prisma.page.findMany({
     where: {
-      deletedAt: null,
+      deletedAt: deletedPage ? {
+        not: null
+      } : null,
       OR: [
         {
           spaceId,
