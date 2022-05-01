@@ -31,7 +31,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
   async function deletePage (pageId: string) {
     setIsMutating(true);
     await charmClient.deletePage(pageId);
-    await mutate(`pages/deleted/${space?.id}`);
+    await mutate(`pages/${space?.id}`);
     setIsMutating(false);
   }
 
@@ -39,7 +39,6 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
     setIsMutating(true);
     await charmClient.restorePage(pageId);
     await mutate(`pages/${space?.id}`);
-    await mutate(`pages/deleted/${space?.id}`);
     dispatch(initialLoad());
     setIsMutating(false);
   }

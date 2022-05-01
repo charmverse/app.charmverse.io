@@ -416,7 +416,6 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
       }
     }
     await mutate(`pages/${space?.id}`);
-    await mutate(`pages/deleted/${space?.id}`);
     const currentPage = pages[currentPageId];
     // Redirect from current page
     if (page && currentPage && page.id === currentPage.id) {
