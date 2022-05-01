@@ -4,7 +4,7 @@ import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } fro
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
-import { Page } from '@prisma/client';
+import { Page, PagePermission } from '@prisma/client';
 import { prisma } from 'db';
 import { deleteNestedChild } from 'lib/pages/deleteNestedChild';
 
@@ -19,19 +19,20 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
+  const restorePage = req.query.restore ? (req.query.restore as string) === 'true' : false;
 
   const permissions = await computeUserPagePermissions({
     pageId,
     userId
   });
 
-  const updateContent = req.body as Page;
+  const updateContent = req.body as Page ?? {};
 
   if ((typeof updateContent.index === 'number' || updateContent.parentId !== undefined) && permissions.edit_position !== true) {
     throw new ActionNotPermittedError('You are not allowed to reposition this page');
   }
 
-  // eslint-disable-next-line eqeqeq
+  // eslint-disable-next-line
   if (updateContent.isPublic != undefined && permissions.edit_isPublic !== true) {
     return res.status(401).json({
       error: 'You cannot update the public status of this page'
@@ -42,27 +43,41 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
       error: 'You cannot update this page'
     });
   }
+  let pageWithPermission: Page & {
+    permissions: PagePermission[];
+  } | null = null;
 
-  const pageWithPermission = await prisma.page.update({
-    where: {
-      id: pageId
-    },
-    data: req.body,
-    include: {
-      permissions: true
-    }
-  });
-
-  if (updateContent.parentId === null || typeof updateContent.parentId === 'string') {
-    const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
-    return res.status(200).json(updatedPage);
+  if (restorePage) {
+    await deleteNestedChild(pageId, userId, { restore: true });
+    pageWithPermission = await prisma.page.findUnique({
+      where: {
+        id: pageId
+      },
+      include: {
+        permissions: true
+      }
+    })!;
   }
+  else {
+    pageWithPermission = await prisma.page.update({
+      where: {
+        id: pageId
+      },
+      data: req.body,
+      include: {
+        permissions: true
+      }
+    });
 
+    if (updateContent.parentId === null || typeof updateContent.parentId === 'string') {
+      const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
+      return res.status(200).json(updatedPage);
+    }
+  }
   return res.status(200).json(pageWithPermission);
 }
 
 async function deletePage (req: NextApiRequest, res: NextApiResponse) {
-
   const pageId = req.query.id as string;
   const deletePermanently = req.query.permanent ? (req.query.permanent as string) === 'true' : false;
   const userId = req.session.user.id;
@@ -82,7 +97,7 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const deletedChildPageIds = await deleteNestedChild(pageId, userId, deletePermanently);
+  const deletedChildPageIds = await deleteNestedChild(pageId, userId, { deletePermanently });
 
   return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
 }

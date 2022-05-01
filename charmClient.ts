@@ -133,6 +133,10 @@ class CharmClient {
     return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
+  async restorePage (pageId: string) {
+    return http.PUT<Page>(`/api/pages/${pageId}?restore=true`, {});
+  }
+
   favoritePage (pageId: string) {
     return http.POST<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
