@@ -46,9 +46,16 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
       onClose={onClose}
     >
       <div>
-        <DialogTitle>Trash</DialogTitle>
+        <Box display='flex' justifyContent='space-between'>
+          <DialogTitle>Trash</DialogTitle>
+          <Typography variant='subtitle1' color='secondary'>{deletedPagesWithPermission.length} pages</Typography>
+        </Box>
         {deletedPagesWithPermission.length === 0 ? <Typography variant='subtitle1' color='secondary'>No archived pages</Typography> : (
-          <List>
+          <List sx={{
+            maxHeight: 500,
+            overflow: 'auto'
+          }}
+          >
             {deletedPagesWithPermission.map(deletedPage => {
               const isEditorEmpty = checkForEmpty(deletedPage.content as PageContent);
               return (
