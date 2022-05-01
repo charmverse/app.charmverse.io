@@ -125,6 +125,10 @@ class CharmClient {
     return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}`);
   }
 
+  async deletePagePermanently (pageId: string) {
+    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}?permanent=true`);
+  }
+
   updatePage (pageOpts: Prisma.PageUpdateInput) {
     return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
   }

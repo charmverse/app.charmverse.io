@@ -64,6 +64,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 async function deletePage (req: NextApiRequest, res: NextApiResponse) {
 
   const pageId = req.query.id as string;
+  const deletePermanently = req.query.permanent ? (req.query.permanent as string) === 'true' : false;
   const userId = req.session.user.id;
 
   const permissions = await computeUserPagePermissions({
@@ -81,7 +82,7 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const deletedChildPageIds = await deleteNestedChild(pageId, userId);
+  const deletedChildPageIds = await deleteNestedChild(pageId, userId, deletePermanently);
 
   return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
 }

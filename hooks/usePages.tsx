@@ -71,13 +71,12 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   function getPagePermissions (pageId: string): IPagePermissionFlags {
     const computedPermissions = new AllowedPagePermissions();
 
-    const targetPage = pages[pageId] as IPageWithPermissions;
+    const targetPage = (pages[pageId] ?? deletedPages[pageId]) as IPageWithPermissions;
 
     // Return empty permission set so this silently fails
     if (!targetPage) {
       return computedPermissions;
     }
-
     const userSpaceRole = user?.spaceRoles.find(spaceRole => spaceRole.spaceId === targetPage.spaceId);
 
     // TEMPORARY TILL WE FIX SPACE PROVISIONING
