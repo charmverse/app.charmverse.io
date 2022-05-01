@@ -10,12 +10,16 @@ import { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useState } from 'react';
 import { DateTime } from 'luxon';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import Link from 'components/common/Link';
 import PageIcon from './PageIcon';
 
 export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, isOpen: boolean}) {
   const { deletedPages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
   const [isMutating, setIsMutating] = useState(false);
+  const dispatch = useAppDispatch();
 
   async function deletePage (pageId: string) {
     setIsMutating(true);
@@ -29,6 +33,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
     await charmClient.restorePage(pageId);
     await mutate(`pages/${space?.id}`);
     await mutate(`pages/deleted/${space?.id}`);
+    dispatch(initialLoad());
     setIsMutating(false);
   }
 
@@ -37,9 +42,8 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
     .values(deletedPages)
     .filter(deletedPage => deletedPage && getPagePermissions(deletedPage.id).delete) as Page[])
     .sort((deletedPageA, deletedPageB) => deletedPageA.deletedAt && deletedPageB.deletedAt
-      ? new Date(deletedPageA.deletedAt).getTime() - new Date(deletedPageB.deletedAt).getTime()
+      ? new Date(deletedPageB.deletedAt).getTime() - new Date(deletedPageA.deletedAt).getTime()
       : 0);
-
   return (
     <Modal
       open={isOpen}
@@ -63,7 +67,11 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
                   <Box mr={1}>
                     <PageIcon pageType={deletedPage.type} icon={deletedPage.icon} isEditorEmpty={isEditorEmpty} />
                   </Box>
-                  <ListItemText secondary={DateTime.fromJSDate(new Date(deletedPage.deletedAt!)).toRelative({ base: (DateTime.now()) })}>{deletedPage.title || 'Untitled'}</ListItemText>
+                  <ListItemText secondary={DateTime.fromJSDate(new Date(deletedPage.deletedAt!)).toRelative({ base: (DateTime.now()) })}>
+                    <Link href={`/${space?.domain}/${deletedPage.path}`}>
+                      {deletedPage.title || 'Untitled'}
+                    </Link>
+                  </ListItemText>
                   <div>
                     <IconButton disabled={isMutating} size='small' onClick={() => restorePages(deletedPage.id)}>
                       <Tooltip arrow placement='top' title='Restore page'>
