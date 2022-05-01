@@ -49,7 +49,7 @@ export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
   }
 
   return (
-    <StyledPageDeleteBanner card={Boolean(isShowingCard)}>
+    <StyledPageDeleteBanner card={isShowingCard ? (isShowingCard !== 'undefined' && isShowingCard.length !== 0) : false}>
       <Box display='flex' gap={1} alignItems='center'>
         <div style={{
           color: 'white',
