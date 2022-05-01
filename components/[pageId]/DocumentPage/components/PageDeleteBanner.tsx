@@ -9,10 +9,10 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { mutate } from 'swr';
 
-const StyledPageDeleteBanner = styled(Box)`
+const StyledPageDeleteBanner = styled(Box)<{card?: boolean}>`
   position: fixed;
-  top: 55px;
-  width: calc(100% - 300px);
+  top: ${({ card }) => card ? '50px' : '55px'};
+  width: ${({ card }) => card ? '100%' : 'calc(100% - 300px)'};
   z-index: 2500;
   display: flex;
   justify-content: center;
@@ -26,6 +26,8 @@ export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
   const dispatch = useAppDispatch();
   const { pages } = usePages();
   const router = useRouter();
+
+  const isShowingCard = new URLSearchParams(window.location.search).get('cardId');
 
   async function deletePage () {
     setIsMutating(true);
@@ -47,7 +49,7 @@ export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
   }
 
   return (
-    <StyledPageDeleteBanner>
+    <StyledPageDeleteBanner card={Boolean(isShowingCard)}>
       <Box display='flex' gap={1} alignItems='center'>
         <div style={{
           color: 'white',

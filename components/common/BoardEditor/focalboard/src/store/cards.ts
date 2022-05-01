@@ -71,11 +71,13 @@ const cardsSlice = createSlice({
             state.cards = {}
             state.templates = {}
             for (const block of action.payload.blocks) {
-                if (block.type === 'card' && block.fields.isTemplate) {
+              if (block.type === 'card') {
+                if (block.fields.isTemplate) {
                     state.templates[block.id] = block as Card
-                } else if (block.type === 'card' && !block.fields.isTemplate) {
+                } else {
                     state.cards[block.id] = block as Card
                 }
+              }
             }
         })
     },
