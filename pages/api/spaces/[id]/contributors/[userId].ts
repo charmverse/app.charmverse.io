@@ -10,9 +10,9 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 const requireAdmin = async (req: NextApiRequest, res: NextApiResponse, next: NextHandler) => {
   const userId = req.session.user.id;
-  const { error } = await hasAccessToSpace({ userId, spaceId: req.query.id as string, role: 'admin' });
+  const { error } = await hasAccessToSpace({ userId, spaceId: req.query.id as string, adminOnly: true });
   if (error) {
-    return res.status(401).json({ error });
+    throw error;
   }
   next();
 };

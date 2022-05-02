@@ -26,10 +26,10 @@ async function deleteTokenGate (req: NextApiRequest, res: NextApiResponse) {
   const { error } = await hasAccessToSpace({
     userId: req.session.user.id,
     spaceId: gate.spaceId,
-    role: 'admin'
+    adminOnly: true
   });
   if (error) {
-    return res.status(401).json({ error });
+    throw error;
   }
   await prisma.tokenGate.delete({
     where: {

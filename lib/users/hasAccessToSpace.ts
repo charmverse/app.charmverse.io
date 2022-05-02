@@ -1,10 +1,11 @@
 import { prisma } from 'db';
-import { Role } from 'models';
+import { InvalidInputError } from 'lib/utilities/errors';
+import { AdministratorOnlyError, UserIsNotSpaceMemberError } from './errors';
 
 interface Input {
   userId: string;
   spaceId: string;
-  role?: Role;
+  adminOnly?: boolean;
 }
 
 interface Result {
@@ -12,10 +13,10 @@ interface Result {
   success?: boolean;
 }
 
-export async function hasAccessToSpace ({ userId, spaceId, role = 'contributor' }: Input): Promise<Result> {
+export async function hasAccessToSpace ({ userId, spaceId, adminOnly = false }: Input): Promise<Result> {
 
   if (!spaceId || !userId) {
-    return { error: 'userId and spaceId are required' };
+    return new InvalidInputError('User ID and space ID are required');
   }
 
   const spaceRole = await prisma.spaceRole.findFirst({
@@ -25,10 +26,10 @@ export async function hasAccessToSpace ({ userId, spaceId, role = 'contributor' 
     }
   });
   if (!spaceRole) {
-    return { error: 'User does not have access to space' };
+    return new UserIsNotSpaceMemberError();
   }
-  else if (role === 'admin' && spaceRole.role !== role) {
-    return { error: 'Requires admin permission' };
+  else if (adminOnly && spaceRole.isAdmin !== true) {
+    return new AdministratorOnlyError();
   }
   return { success: true };
 }
