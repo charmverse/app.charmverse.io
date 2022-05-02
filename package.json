@@ -13,7 +13,7 @@
     "start:dev:cron": "concurrently --names \"cron,next\" -c \"yellow,green\" \"npm run cron:dev\" \"npm run server:dev\"",
     "cron:staging": "dotenv -e .env.staging -- node ./next/server/deleteArchived.js",
     "cron:prod": "dotenv -e .env.production -- node ./next/server/deleteArchived.js",
-    "cron:dev": "dotenv -e .env.local -- ts-node scripts/deleteArchivedPages.ts",
+    "cron:dev": "dotenv -e .env.local -- ts-node ./background/deleteArchived.ts",
     "migrate:prod": "npx dotenv -e .env.staging -- prisma migrate deploy",
     "migrate:staging": "npx dotenv -e .env.staging -- prisma migrate deploy",
     "server:dev": "next dev",
