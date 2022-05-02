@@ -13,7 +13,6 @@ handler
   .use(requireSpaceMembership())
   .get(listPaymentMethods)
   .use(requireKeys<PaymentMethod>(['chainId', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals', 'walletType'], 'body'))
-  .use(requireSpaceMembership({ adminOnly: true }))
   .post(createPaymentMethod);
 
 async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<PaymentMethod []>) {
