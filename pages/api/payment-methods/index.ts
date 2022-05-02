@@ -1,7 +1,7 @@
 
 import { PaymentMethod, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { ApiError, onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -9,10 +9,11 @@ import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
   .use(requireSpaceMembership())
   .get(listPaymentMethods)
   .use(requireKeys<PaymentMethod>(['chainId', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals', 'walletType'], 'body'))
+  .use(requireSpaceMembership({ adminOnly: true }))
   .post(createPaymentMethod);
 
 async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<PaymentMethod []>) {
