@@ -71,11 +71,10 @@ export default function BountyList () {
   return (
     <ScrollableWindow>
       <Box py={3} px='80px'>
-        <Box sx={{ position: 'static ' }}>
-          <Box display='flex' justifyContent='space-between' mb={3}>
-            <Typography variant='h1'>Bounty list</Typography>
-            <Box display='flex' justifyContent='flex-end'>
-              { !!csvData.length
+        <Box display='flex' justifyContent='space-between' mb={3}>
+          <Typography variant='h1'>Bounty list</Typography>
+          <Box display='flex' justifyContent='flex-end'>
+            { !!csvData.length
             && (
               <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
                 <Button variant='outlined'>
@@ -83,29 +82,28 @@ export default function BountyList () {
                 </Button>
               </CSVLink>
             )}
-              <MultiPaymentModal />
-              <Button
-                sx={{ ml: 1 }}
-                onClick={() => {
-                  setDisplayBountyDialog(true);
-                }}
-              >
-                Create Bounty
-              </Button>
-            </Box>
-          </Box>
-
-          {/* Filters for the bounties */}
-          <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
-            <InputBountyStatus
-              onChange={(statuses) => {
-                setBountyFilter(sortSelected(statuses));
+            <MultiPaymentModal />
+            <Button
+              sx={{ ml: 1 }}
+              onClick={() => {
+                setDisplayBountyDialog(true);
               }}
-              renderSelectedInValue={true}
-              renderSelectedInOption={true}
-              defaultValues={bountyFilter}
-            />
+            >
+              Create Bounty
+            </Button>
           </Box>
+        </Box>
+
+        {/* Filters for the bounties */}
+        <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
+          <InputBountyStatus
+            onChange={(statuses) => {
+              setBountyFilter(sortSelected(statuses));
+            }}
+            renderSelectedInValue={true}
+            renderSelectedInOption={true}
+            defaultValues={bountyFilter}
+          />
         </Box>
 
         <Grid container spacing={1}>
