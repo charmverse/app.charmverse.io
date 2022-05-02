@@ -3,6 +3,7 @@ import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Chip from '@mui/material/Chip';
 import { Bounty, BountyStatus } from '@prisma/client';
 import { getChainExplorerLink, getChainById } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -21,6 +22,7 @@ import PaidIcon from '@mui/icons-material/Paid';
 import { ReactNode } from 'react';
 import styled from '@emotion/styled';
 import { BrandColor } from 'theme/colors';
+import { useTheme } from '@emotion/react';
 
 const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   open: <ModeStandbyIcon />,
@@ -63,6 +65,55 @@ export interface IBountyBadgeProps {
   bounty: Bounty
   layout?: 'row' | 'stacked'
   truncate?: boolean
+}
+
+export function BountyStatusChip ({ status, onDelete }: {status: BountyStatus, onDelete?: (status: BountyStatus) => void}) {
+
+  const theme = useTheme();
+
+  return (
+    <Chip
+      label={BOUNTY_LABELS[status]}
+      variant='filled'
+      onDelete={onDelete}
+      size='small'
+      sx={{
+        fontWeight: 'bold',
+        backgroundColor: () => {
+          return theme.palette[BountyStatusColours[status]]?.main;
+        }
+      }}
+    />
+  );
+}
+
+function BountyStatusChipWithIcon ({
+  status,
+  showStatusLogo = true
+}: {status: BountyStatus, showStatusLogo?: boolean}) {
+  return (
+
+    <BountyStatusBox status={status}>
+      {
+        showStatusLogo && (
+        <BountyIcon>
+          {BOUNTY_STATUS_ICONS[status]}
+        </BountyIcon>
+        )
+      }
+
+      <Typography
+        component='span'
+        sx={{
+          fontWeight: 600
+        }}
+        variant='body1'
+        pl={1}
+      >
+        {BOUNTY_LABELS[status]}
+      </Typography>
+    </BountyStatusBox>
+  );
 }
 
 export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, layout = 'row' } : IBountyBadgeProps) {
@@ -132,21 +183,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
             </IconButton>
           </Link>
         </Box>
-        <BountyStatusBox status={bounty.status}>
-          <BountyIcon>
-            {BOUNTY_STATUS_ICONS[bounty.status]}
-          </BountyIcon>
-          <Typography
-            component='span'
-            sx={{
-              fontWeight: 600
-            }}
-            variant='body1'
-            pl={1}
-          >
-            {BOUNTY_LABELS[bounty.status]}
-          </Typography>
-        </BountyStatusBox>
+        <BountyStatusChipWithIcon status={bounty.status} />
       </Box>
     );
   }

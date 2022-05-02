@@ -15,7 +15,7 @@ import {
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
 import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
-import { EditorView, Node } from '@bangle.dev/pm';
+import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { useState, CSSProperties, ReactNode, memo, useCallback } from 'react';
 import styled from '@emotion/styled';
@@ -26,31 +26,39 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import { PageContent } from 'models';
 import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
-
+import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
+import { Grow } from '@mui/material';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import Callout, * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
 import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
-import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
+import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
 import MentionSuggest, { Mention, mentionPlugins, mentionSpecs } from './components/Mention';
-import NestedPage, { plugins as nestedPagePlugins, NestedPagesList, spec as nestedPageSpec } from './components/nestedPage';
+import NestedPage, { nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
-import * as disclosure from './components/disclosure';
 import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
+import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 import * as table from './components/table';
 import { checkForEmpty } from './utils';
+import * as disclosure from './components/disclosure';
+import InlineCommentThread, * as inlineComment from './components/inlineComment';
+import Paragraph from './components/Paragraph';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
 }
+
+const emojiSuggestPluginKey = new PluginKey('emojiSuggest');
+const mentionSuggestPluginKey = new PluginKey('mentionSuggest');
+const floatingMenuPluginKey = new PluginKey('floatingMenu');
 
 export const specRegistry = new SpecRegistry([
   // Comments to the right of each spec show if it supports markdown export
@@ -60,6 +68,7 @@ export const specRegistry = new SpecRegistry([
   //
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
+  inlineComment.spec(),
   bold.spec(), // OK
   bulletList.spec(), // OK
   hardBreak.spec(), // OK
@@ -96,6 +105,7 @@ export const specRegistry = new SpecRegistry([
   //   cellContent: 'My Cell',
   //   cellContentGroup: 'My Group'
   // })
+
 ]);
 
 export function charmEditorPlugins (
@@ -116,7 +126,12 @@ export function charmEditorPlugins (
           }
         }
       })
-
+    }),
+    inlineComment.plugin(),
+    suggestTooltipPlugins({
+      tooltipRenderOpts: {
+        placement: 'bottom'
+      }
     }),
     nestedPagePlugins(),
     imagePlugins({
@@ -138,9 +153,16 @@ export function charmEditorPlugins (
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),
-    emojiPlugins(),
-    mentionPlugins(),
-    floatingMenuPlugin(readOnly),
+    emojiPlugins({
+      key: emojiSuggestPluginKey
+    }),
+    mentionPlugins({
+      key: mentionSuggestPluginKey
+    }),
+    floatingMenuPlugin({
+      key: floatingMenuPluginKey,
+      readOnly
+    }),
     callout.plugins(),
     NodeView.createPlugin({
       name: 'image',
@@ -162,6 +184,11 @@ export function charmEditorPlugins (
       name: 'quote',
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'paragraph',
+      containerDOM: ['p', { class: 'charm-paragraph' }],
+      contentDOM: ['p']
     }),
     NodeView.createPlugin({
       name: 'mention',
@@ -200,6 +227,8 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   /** ITS TO MAKE SURE THE USER CAN DRAG PAST THE ACTUAL CONTENT FROM RIGHT TO LEFT AND STILL SHOW THE FLOATING MENU */
   left: -50px;
 
+  min-width: 500px;
+
   /** DONT REMOVE THIS STYLING */
   div.ProseMirror.bangle-editor {
     padding-left: 50px;
@@ -224,8 +253,34 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
 
   hr {
     background-color: ${({ theme }) => theme.palette.background.light};
-    border: none;
   }
+
+  .charm-inline-comment.active {
+    background: rgba(255,212,0,0.14);
+    border-bottom: 2px solid rgb(255, 212, 0);
+    padding-bottom: 2px;
+    &:hover {
+      background: rgba(255,212,0,0.56) !important;
+    }
+    cursor: pointer;
+  }
+
+  .charm-paragraph {
+    display: flex;
+    .bangle-nv-child-container {
+      width: 100%;
+    }
+  }
+`;
+
+const PageThreadListBox = styled.div`
+  position: fixed;
+  right: 0px;
+  width: 400px;
+  top: 75px;
+  z-index: 2000;
+  height: calc(100% - 80px);
+  overflow: auto;
 `;
 
 const defaultContent: PageContent = {
@@ -245,6 +300,7 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
+  showingCommentThreadsList?: boolean
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -268,7 +324,8 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 }
 
 function CharmEditor (
-  { content = defaultContent, children, onContentChange, style, readOnly = false }: CharmEditorProps
+  { showingCommentThreadsList = false, content = defaultContent, children, onContentChange, style, readOnly = false }:
+  CharmEditorProps
 ) {
   // check empty state of page on first load
   const _isEmpty = checkForEmpty(content);
@@ -319,12 +376,22 @@ function CharmEditor (
       pmViewOpts={{
         editable: () => !readOnly
       }}
-      // Components that should be placed after the editor component
-      postEditorComponents={<Placeholder show={isEmpty} />}
+      placeholderComponent={(
+        <Placeholder
+          sx={{
+            // This fixes the placeholder and cursor not being aligned
+            top: -34
+          }}
+          show={isEmpty}
+        />
+      )}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
 
         switch (props.node.type.name) {
+          case 'paragraph': {
+            return <Paragraph calculateInlineComments={!showingCommentThreadsList} {...props}>{_children}</Paragraph>;
+          }
           case 'quote':
             return <Quote {...props}>{_children}</Quote>;
           case 'columnLayout': {
@@ -399,12 +466,30 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu />
-      <MentionSuggest />
+      <FloatingMenu pluginKey={floatingMenuPluginKey} />
+      <MentionSuggest pluginKey={mentionSuggestPluginKey} />
       <NestedPagesList />
-      <EmojiSuggest />
+      <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
       <InlinePalette />
       {children}
+      <Grow
+        in={showingCommentThreadsList}
+        style={{
+          transformOrigin: 'left top'
+        }}
+        easing={{
+          enter: 'ease-in',
+          exit: 'ease-out'
+        }}
+        timeout={250}
+      >
+        <PageThreadListBox
+          className='PageThreadListBox'
+        >
+          <PageThreadsList inline={false} />
+        </PageThreadListBox>
+      </Grow>
+      <InlineCommentThread />
     </StyledReactBangleEditor>
   );
 }

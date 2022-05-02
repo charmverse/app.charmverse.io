@@ -27,7 +27,7 @@
 }
 
 .bangle-tooltip {
-  z-index: 3000;
+  z-index: 100;
 }
 
 .bangle-editor a {
@@ -353,7 +353,7 @@ ol li {
 }
 
 .bangle-editor p {
-  font-size: 1rem;
+  //font-size: 1rem;
   line-height: 1.625;
   // font-size: 1.125rem;
 }
@@ -396,6 +396,11 @@ details {
   padding-left: 14px;
   summary {
     margin-left: -14px;
+    outline: 0 none;
+
+    &::marker {
+      color: var(--prop-gray);
+    }
 
     & > * {
       display: inline;
@@ -437,3 +442,13 @@ details {
 }
 
 /** Prosemirror-Gap-Cursor-END */
+
+/* This helps to position the page threads list */
+.bangle-editor-core {
+  width: 100%;
+  position: relative;
+}
+
+.ProseMirror.bangle-editor {
+  z-index: 100;
+}

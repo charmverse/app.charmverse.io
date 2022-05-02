@@ -4,10 +4,10 @@ import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Portal from '@mui/material/Portal';
 import { BaseEmoji, Picker } from 'emoji-mart';
 import { useCallback } from 'react';
+import { PluginKey } from 'prosemirror-state';
 import { selectEmoji } from './emojiSuggest.plugins';
-import { pluginKey } from './emojiSuggest.constants';
 
-export default function EmojiSuggest () {
+export default function EmojiSuggest ({ pluginKey }: {pluginKey: PluginKey}) {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -38,15 +38,15 @@ export default function EmojiSuggest () {
   );
 
   return isVisible && (
+  <Portal container={tooltipContentDOM}>
     <ClickAwayListener onClickAway={closeTooltip}>
-      <Portal container={tooltipContentDOM}>
-        <Picker
-          theme={theme.palette.mode}
-          onSelect={(emoji: BaseEmoji) => {
-            onSelectEmoji(emoji.native);
-          }}
-        />
-      </Portal>
+      <Picker
+        theme={theme.palette.mode}
+        onSelect={(emoji: BaseEmoji) => {
+          onSelectEmoji(emoji.native);
+        }}
+      />
     </ClickAwayListener>
+  </Portal>
   );
 }

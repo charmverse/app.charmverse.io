@@ -23,11 +23,12 @@ import RoleMemberRow from './RoleMemberRow';
 import RoleForm from './RoleForm';
 
 interface RoleRowProps {
-  role: ListSpaceRolesResponse
+  isEditable: boolean;
+  role: ListSpaceRolesResponse;
   assignRoles: (roleId: string, userIds: string[]) => void;
   deleteRole: (roleId: string) => void;
   unassignRole: (roleId: string, userId: string) => void;
-  refreshRoles: () => void
+  refreshRoles: () => void;
 }
 
 const ScrollableBox = styled.div<{ rows: number }>`
@@ -36,7 +37,7 @@ const ScrollableBox = styled.div<{ rows: number }>`
   ${({ theme, rows }) => rows > 5 && `border-bottom: 1px solid ${theme.palette.divider}`};
 `;
 
-export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, refreshRoles }: RoleRowProps) {
+export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, deleteRole, refreshRoles }: RoleRowProps) {
 
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
@@ -77,9 +78,11 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
         <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {role.name} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
         </Typography>
-        <IconButton size='small' {...bindTrigger(menuState)}>
-          <MoreHorizIcon />
-        </IconButton>
+        {isEditable && (
+          <IconButton size='small' {...bindTrigger(menuState)}>
+            <MoreHorizIcon />
+          </IconButton>
+        )}
       </Box>
       <Divider />
 
@@ -88,6 +91,7 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
           <RoleMemberRow
             key={contributor.id}
             contributor={contributor}
+            isEditable={isEditable}
             onRemove={(userId) => {
               removeMember(userId);
               userIdsToHide = userIdsToHide.filter(id => id !== userId);
@@ -98,7 +102,7 @@ export default function RoleRow ({ role, assignRoles, unassignRole, deleteRole, 
 
       {
         assignedContributors.length < contributors.length ? (
-          <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
+          isEditable && <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
         ) : (
           <Typography variant='caption'>All space members have been added to this role</Typography>
         )

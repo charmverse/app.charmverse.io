@@ -5,6 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import BountyIcon from '@mui/icons-material/RequestPage';
 import SettingsIcon from '@mui/icons-material/Settings';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import Box from '@mui/material/Box';
 import Button from 'components/common/Button';
@@ -144,9 +145,9 @@ const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   ${({ isScrolled, theme }) => isScrolled ? `border-top: 1px solid ${theme.palette.divider}` : ''};
 `;
 
-function SidebarLink ({ active, href, icon, label }: { active: boolean, href: string, icon: any, label: string }) {
+function SidebarLink ({ active, href, icon, label, target }: { active: boolean, href: string, icon: any, label: string, target?: string }) {
   return (
-    <StyledSidebarLink href={href} active={active}>
+    <StyledSidebarLink href={href} active={active} target={target}>
       {icon}
       {label}
     </StyledSidebarLink>
@@ -243,6 +244,13 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               href={`/${space.domain}/settings/workspace`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
               label='Settings & Members'
+            />
+            <SidebarLink
+              active={false}
+              href='https://discord.gg/ACYCzBGC2M'
+              icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
+              label='Support & Feedback'
+              target='_blank'
             />
           </Box>
           <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll}>

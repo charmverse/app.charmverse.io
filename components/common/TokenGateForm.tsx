@@ -1,8 +1,6 @@
-import { ALL_LIT_CHAINS, humanizeAccessControlConditions, Chain, checkAndSignAuthMessage } from 'lit-js-sdk';
+import { ALL_LIT_CHAINS, humanizeAccessControlConditions, checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useState, useEffect, ChangeEvent } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -14,13 +12,15 @@ import Divider from '@mui/material/Divider';
 import CheckIcon from '@mui/icons-material/Check';
 import { TokenGate, Space } from '@prisma/client';
 import Link from 'components/common/Link';
-import { DialogTitle } from 'components/common/Modal';
+import { DialogTitle, ErrorModal } from 'components/common/Modal';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import charmClient from 'charmClient';
 import { useRouter } from 'next/router';
 import log from 'lib/log';
+import { getChainFromGate, getLitChainFromChainId } from 'lib/token-gates';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 interface Props {
   onSubmit: (values: Space) => void;
@@ -29,7 +29,8 @@ interface Props {
 export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
 
   const router = useRouter();
-  const { account } = useWeb3React();
+  const { account, chainId } = useWeb3React();
+  const { showMessage } = useSnackbar();
   const [error, setError] = useState('');
   const [user, setUser] = useUser();
   const [, setSpaces] = useSpaces();
@@ -38,6 +39,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
   const [spaceDomain, setSpaceDomain] = useState('');
   const litClient = useLitProtocol();
   const [userInputStatus, setStatus] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!tokenGate) {
@@ -82,20 +84,34 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     if (!tokenGate || !litClient) {
       return;
     }
-    const chain = getChain(tokenGate);
+
+    setIsLoading(true);
+
+    const chain = getLitChainFromChainId(chainId);
+
     setError('');
+
     const authSig = await checkAndSignAuthMessage({
       chain
-    });
-    const jwt = await litClient.getSignedToken({
+    })
+      .catch(err => {
+        if (err.errorCode === 'unsupported_chain') {
+          setError('Unspported Network. Please make sure you are connected to the correct network');
+        }
+        else {
+          log.error(`error getting signature: ${err.message || err}`);
+        }
+      });
+
+    const jwt = authSig && await litClient.getSignedToken({
       resourceId: tokenGate.resourceId as any,
       authSig,
       chain,
       accessControlConditions: (tokenGate.conditions as any)!.accessControlConditions
     })
       .catch(err => {
-        if (err.errCode === 'not_authorized') {
-          setError('Your wallet doesn\'t meet the requirements');
+        if (err.errorCode === 'not_authorized') {
+          setError('Please make sure your wallet meets the requirements');
         }
         else {
           setError(err.message || err);
@@ -114,6 +130,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
       charmClient.getSpaces()
         .then(_spaces => {
           setSpaces(_spaces);
+          showMessage(`Successfully joined workspace: ${result.space.name}`);
           _onSubmit(result.space);
         });
     }
@@ -123,6 +140,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     else {
       log.error('Unhandled response from token gate', result);
     }
+    setIsLoading(false);
   }
 
   function onChangeDomainName (event: ChangeEvent<HTMLInputElement>) {
@@ -177,7 +195,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
               </Card>
             </Grid>
             <Grid item>
-              <PrimaryButton size='large' fullWidth type='submit' onClick={onSubmit}>
+              <PrimaryButton loading={isLoading} size='large' fullWidth type='submit' onClick={onSubmit}>
                 Verify Wallet
               </PrimaryButton>
             </Grid>
@@ -190,22 +208,19 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
             </Grid>
           </>
         )}
-        {error && (
-          <Grid item>
-            <Alert severity='error'>{error}</Alert>
-          </Grid>
-        )}
+        <ErrorModal
+          title='Access denied'
+          message={error}
+          open={!!error}
+          onClose={() => setError('')}
+        />
       </Grid>
     </>
   );
 
 }
 
-function getChain (tokenGate: TokenGate): Chain {
-  return (tokenGate.conditions as any)!.accessControlConditions![0].chain;
-}
-
 function getChainName (tokenGate: TokenGate): string | undefined {
-  const chain = getChain(tokenGate);
+  const chain = getChainFromGate(tokenGate);
   return ALL_LIT_CHAINS[chain]?.name;
 }

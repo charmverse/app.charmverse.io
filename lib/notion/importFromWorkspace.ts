@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, DisclosureDetailsNode, ListItemNode, MentionNode, Page, PageContent, ParagraphNode, TableNode, TableRowNode, TextContent } from 'models';
+import { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, DisclosureDetailsNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
 import { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import { PageType, Prisma } from '@prisma/client';
 import { prisma } from 'db';
@@ -699,7 +699,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
   }
 
   async function createCharmverseDatabasePageInMemory (notionDatabasePageId: string): Promise<CreatePageInput> {
-    retrieveNotionDatabasePage(notionDatabasePageId);
+    await retrieveNotionDatabasePage(notionDatabasePageId);
     // Only create the database if it hasn't been created already
     if (!charmversePagesRecord[notionDatabasePageId]) {
       const notionPage = notionPagesRecord[notionDatabasePageId] as GetDatabaseResponse;

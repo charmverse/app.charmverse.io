@@ -24,7 +24,7 @@ interface BangleEditorProps<PluginMetadata = any>
   onReady?: (editor: CoreBangleEditor<PluginMetadata>) => void;
   editorViewRef?: typeof useRef;
   // Components that should be placed underneath the editor
-  postEditorComponents?: ReactNode
+  placeholderComponent?: ReactNode
 }
 
 export const BangleEditor = React.forwardRef<
@@ -42,7 +42,7 @@ export const BangleEditor = React.forwardRef<
       className,
       style,
       onReady = () => {},
-      postEditorComponents
+      placeholderComponent
     },
     ref,
   ) => {
@@ -87,8 +87,11 @@ export const BangleEditor = React.forwardRef<
     return (
       <React.Fragment>
         <EditorViewContext.Provider value={editor?.view as any}>
-          {editor ? children : null}
-          <div ref={renderRef} id={id} className={className} style={style} />
+          <div className="bangle-editor-core">
+            {editor ? children : null}
+            <div ref={renderRef} id={id} className={className} style={style} />
+            {editor ? placeholderComponent : null}
+          </div>
           {nodeViews.map((nodeView) => {
             return reactDOM.createPortal(
               <NodeViewWrapper
@@ -101,7 +104,6 @@ export const BangleEditor = React.forwardRef<
               objectUid.get(nodeView),
             );
           })}
-          {editor ? postEditorComponents : null}
         </EditorViewContext.Provider>
       </React.Fragment>
     );

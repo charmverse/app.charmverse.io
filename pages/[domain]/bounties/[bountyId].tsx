@@ -124,8 +124,6 @@ export default function BountyDetails () {
     setShowBountyDeleteDialog(!showBountyDeleteDialog);
   }
 
-  const deleteableBounty = bounty?.status === 'open';
-
   async function deleteBounty () {
     await charmClient.deleteBounty(bounty!.id);
     const filteredBounties = bounties.filter(bountyInList => {
@@ -235,15 +233,11 @@ export default function BountyDetails () {
                 viewerCanModifyBounty === true && (
                   <>
                     <IconButton onClick={bountyEditModal.open}>
-                      <EditIcon fontSize='small' />
+                      <EditIcon fontSize='medium' />
                     </IconButton>
-                    {
-                      deleteableBounty === true && (
-                      <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
-                        <DeleteIcon fontSize='small' sx={{ color: 'red.main' }} />
-                      </IconButton>
-                      )
-                    }
+                    <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
+                      <DeleteIcon fontSize='medium' />
+                    </IconButton>
                   </>
                 )
               }
@@ -397,6 +391,17 @@ export default function BountyDetails () {
         </Modal>
 
         <Modal open={showBountyDeleteDialog} onClose={toggleBountyDeleteDialog}>
+
+          {
+            bounty.status !== 'open' && (
+            <Typography sx={{ mb: 1 }}>
+              {
+                bounty.status === 'complete' ? 'This bounty is already complete.' : 'This is bounty in progress.'
+              }
+
+            </Typography>
+            )
+          }
 
           <Typography>
             Are you sure you want to delete this bounty?

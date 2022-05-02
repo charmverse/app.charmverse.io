@@ -6,6 +6,7 @@ import Legend from 'components/settings/Legend';
 import ImportDiscordRoles from 'components/settings/roles/components/ImportDiscordRolesButton';
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import useIsAdmin from 'hooks/useIsAdmin';
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';
 
@@ -18,16 +19,19 @@ export default function RoleSettings () {
     roles
   } = useRoles();
 
+  const isAdmin = useIsAdmin();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
 
   return (
     <>
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
         Roles
-        <Box component='span' display='flex' gap={1}>
-          <ImportDiscordRoles onUpdate={refreshRoles} />
-          <Button {...bindTrigger(popupState)}>Add a role</Button>
-        </Box>
+        {isAdmin && (
+          <Box component='span' display='flex' gap={1}>
+            <ImportDiscordRoles onUpdate={refreshRoles} />
+            <Button {...bindTrigger(popupState)}>Add a role</Button>
+          </Box>
+        )}
       </Legend>
 
       <Modal {...bindPopover(popupState)} title='Add a role'>
@@ -43,6 +47,7 @@ export default function RoleSettings () {
 
       {roles?.map(role => (
         <RoleRow
+          isEditable={isAdmin}
           assignRoles={assignRoles}
           unassignRole={unassignRole}
           deleteRole={deleteRole}

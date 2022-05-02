@@ -1,6 +1,3 @@
-import { BangleEditorState } from '@bangle.dev/core';
-import { markdownSerializer } from '@bangle.dev/markdown';
-import { Node } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -13,8 +10,6 @@ import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
@@ -25,9 +20,15 @@ import { charmEditorPlugins, specRegistry } from 'components/common/CharmEditor/
 import { useColorMode } from 'context/darkMode';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import { PageContent } from 'models';
 import { useRouter } from 'next/router';
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import CommentIcon from '@mui/icons-material/Comment';
+import { BangleEditorState } from '@bangle.dev/core';
+import { markdownSerializer } from '@bangle.dev/markdown';
+import { PageContent } from 'models';
+import { Node } from '@bangle.dev/pm';
+import ListItemText from '@mui/material/ListItemText';
+import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -40,7 +41,30 @@ const StyledToolbar = styled(Toolbar)`
   min-height: ${headerHeight}px;
 `;
 
-export default function Header ({ open, openSidebar }: { open: boolean, openSidebar: () => void }) {
+function CommentThreadsListButton () {
+  const { showingCommentThreadsList, setShowingCommentThreadsList } = useCommentThreadsListDisplay();
+  return (
+    <Tooltip title={`${showingCommentThreadsList ? 'Hide' : 'Show'} comment threads`} arrow placement='bottom'>
+      <IconButton
+        color={!showingCommentThreadsList ? 'secondary' : 'inherit'}
+        onClick={() => {
+          setShowingCommentThreadsList(!showingCommentThreadsList);
+        }}
+        sx={showingCommentThreadsList ? { backgroundColor: 'emoji.hoverBackground' } : {}}
+      >
+        <CommentIcon
+          fontSize='small'
+        />
+      </IconButton>
+    </Tooltip>
+  );
+}
+
+export default function Header (
+  { open, openSidebar }:
+  {
+    open: boolean, openSidebar: () => void }
+) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, currentPageId } = usePages();
@@ -49,7 +73,6 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
-
   const currentPage = currentPageId ? pages[currentPageId] : undefined;
 
   const isFavorite = currentPage && user?.favorites.some(({ pageId }) => pageId === currentPage.id);
@@ -128,7 +151,7 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
           {isPage && (
             <>
               <ShareButton headerHeight={headerHeight} />
-
+              {currentPage?.type !== 'board' && <CommentThreadsListButton />}
               <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
                 <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>
                   {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
@@ -159,8 +182,8 @@ export default function Header ({ open, openSidebar }: { open: boolean, openSide
               >
                 <List dense>
                   <ListItemButton onClick={() => {
-                    generateMarkdown();
                     setPageMenuOpen(false);
+                    generateMarkdown();
                   }}
                   >
                     <GetAppIcon

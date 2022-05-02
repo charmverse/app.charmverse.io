@@ -10,7 +10,7 @@ declare module 'lit-js-sdk' {
   export type Chain = EVMChain | SolanaChain;
 
   type ChainConfig = {
-    chainId: string;
+    chainId: number;
     contractAddress: string;
     name: string;
     symbol: string;
@@ -76,6 +76,8 @@ declare module 'lit-js-sdk' {
   }
 
   export class LitNodeClient {
+
+    constructor (params?: { alertWhenUnauthorized?: boolean })
 
     connectedNodes: string[];
 

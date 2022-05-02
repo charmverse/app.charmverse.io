@@ -10,6 +10,7 @@ import { title } from 'process';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { usePages } from 'hooks/usePages';
+import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import PageHeader from './components/PageHeader';
 import PageBanner from './components/PageBanner';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
@@ -24,7 +25,7 @@ export const Container = styled(Box)<{ top: number }>`
 
   padding: 0 40px;
   @media (min-width: 975px) {
-    padding: 0 80px;
+    padding: 0 40px;
   }
 `;
 
@@ -61,6 +62,8 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
     pageTop = 200;
   }
 
+  const { showingCommentThreadsList } = useCommentThreadsListDisplay();
+
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
     setPage({ content: content.doc, contentText: content.rawText });
   }, [setPage]);
@@ -70,58 +73,66 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
   const comments = card ? useAppSelector(getCardComments(card.id)) : [];
 
   return (
-    <ScrollableWindow>
-      {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
-      <Container
-        top={pageTop}
+    <ScrollableWindow hideScroll={showingCommentThreadsList}>
+      <div style={{
+        width: showingCommentThreadsList ? 'calc(100% - 425px)' : '100%',
+        height: showingCommentThreadsList ? 'calc(100vh - 65px)' : '100%',
+        overflow: showingCommentThreadsList ? 'auto' : 'inherit'
+      }}
       >
-        <CharmEditor
-          key={page.id}
-          content={page.content as PageContent}
-          onContentChange={updatePageContent}
-          readOnly={readOnly}
+        {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
+        <Container
+          top={pageTop}
         >
-          <PageHeader
-            headerImage={page.headerImage}
-            icon={page.icon}
-            title={page.title}
+          <CharmEditor
+            key={page.id}
+            content={page.content as PageContent}
+            onContentChange={updatePageContent}
             readOnly={readOnly}
-            setPage={setPage}
-          />
-          {card && board && (
-          <div className='CardDetail content'>
-            {/* Property list */}
-            <Box sx={{
-              display: 'flex',
-              gap: 1,
-              justifyContent: 'space-between',
-              width: '100%'
-            }}
-            >
-              <CardDetailProperties
-                board={board}
-                card={card}
-                cards={cards}
-                pageUpdatedAt={page.updatedAt.toString()}
-                pageUpdatedBy={page.updatedBy}
-                activeView={activeView}
-                views={boardViews}
+            showingCommentThreadsList={showingCommentThreadsList}
+          >
+            <PageHeader
+              headerImage={page.headerImage}
+              icon={page.icon}
+              title={page.title}
+              readOnly={readOnly}
+              setPage={setPage}
+            />
+            {card && board && (
+            <div className='CardDetail content'>
+              {/* Property list */}
+              <Box sx={{
+                display: 'flex',
+                gap: 1,
+                justifyContent: 'space-between',
+                width: '100%'
+              }}
+              >
+                <CardDetailProperties
+                  board={board}
+                  card={card}
+                  cards={cards}
+                  activeView={activeView}
+                  views={boardViews}
+                  readonly={readOnly}
+                  pageUpdatedAt={page.updatedAt.toString()}
+                  pageUpdatedBy={page.updatedBy}
+                />
+                <BountyIntegration linkedTaskId={card.id} title={title} readonly={readOnly} />
+              </Box>
+
+              <hr />
+              <CommentsList
+                comments={comments}
+                rootId={card.rootId}
+                cardId={card.id}
                 readonly={readOnly}
               />
-              <BountyIntegration linkedTaskId={card.id} title={title} readonly={readOnly} />
-            </Box>
-
-            <hr />
-            <CommentsList
-              comments={comments}
-              rootId={card.rootId}
-              cardId={card.id}
-              readonly={readOnly}
-            />
-          </div>
-          )}
-        </CharmEditor>
-      </Container>
+            </div>
+            )}
+          </CharmEditor>
+        </Container>
+      </div>
     </ScrollableWindow>
   );
 }

@@ -12,7 +12,6 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .use(requireKeys(['id'], 'query'))
-  .use(requireUser)
   .put(updatePage)
   .delete(deletePage);
 
@@ -37,7 +36,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).json({
       error: 'You cannot update the public status of this page'
     });
-
   }
   else if (permissions.edit_content !== true) {
     return res.status(401).json({
