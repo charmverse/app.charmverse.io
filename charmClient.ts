@@ -470,8 +470,8 @@ class CharmClient {
     return http.PUT(`/api/roles/${role.id}`, role);
   }
 
-  deleteRole (roleToDelete: {roleId: string, spaceId: string}): Promise<Role> {
-    return http.DELETE('/api/roles', roleToDelete);
+  deleteRole (roleId: string): Promise<Role> {
+    return http.DELETE(`/api/roles/${roleId}`);
   }
 
   listRoles (spaceId: string): Promise<ListSpaceRolesResponse[]> {

@@ -1,21 +1,18 @@
 
-import { Prisma, Role, SpaceRoleToRole, User } from '@prisma/client';
+import { Prisma, Role, User } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ApiError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { DataNotFoundError } from '../../../lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireSpaceMembership(false))
+  .use(requireSpaceMembership({ adminOnly: false }))
   .get(listSpaceRoles)
-  // Manual check for admin done inside delete
-  .delete(deleteRole)
-  .use(requireSpaceMembership(true))
+  .use(requireSpaceMembership({ adminOnly: true }))
   .use(requireKeys<Role>(['spaceId', 'name'], 'body'))
   .post(createRole);
 
@@ -80,47 +77,6 @@ async function createRole (req: NextApiRequest, res: NextApiResponse<Role>) {
   const role = await prisma.role.create({ data: creationData });
 
   return res.status(200).json(role);
-}
-
-async function deleteRole (req: NextApiRequest, res: NextApiResponse) {
-  const { roleId } = req.body as SpaceRoleToRole & Role;
-
-  if (!roleId) {
-    throw new ApiError({
-      message: 'Please provide a valid role id',
-      errorType: 'Invalid input'
-    });
-  }
-
-  const role = await prisma.role.findUnique({
-    where: {
-      id: roleId
-    }
-  });
-
-  if (!role) {
-    throw new DataNotFoundError(`Could not find role with id ${roleId}`);
-  }
-
-  // Check user can delete role
-  const { error } = await hasAccessToSpace({
-    userId: req.session.user.id,
-    spaceId: role.spaceId,
-    adminOnly: true
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  // Use space ID assertion to prevent role deletion
-  await prisma.role.delete({
-    where: {
-      id: roleId
-    }
-  });
-
-  return res.status(200).json({ success: true });
 }
 
 export default withSessionRoute(handler);
