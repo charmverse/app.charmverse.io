@@ -1,8 +1,8 @@
 import { generateUserAndSpaceWithApiToken, createPage } from 'testing/setupDatabase';
 import { prisma } from 'db';
-import { resolveChildPages, resolveParentPages } from '../resolvePageTree';
+import { resolveChildPages, resolveChildPagesAsFlatList, resolveParentPages } from '../resolvePageTree';
 
-describe('resolveChildPages', () => {
+describe('resolveChildPagesAsFlatList', () => {
   it('should return a list of all children of a page', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
@@ -59,7 +59,7 @@ describe('resolveChildPages', () => {
       parentId: subSubSubChild1.id
     });
 
-    const resolvedChildren = await resolveChildPages(child.id);
+    const resolvedChildren = await resolveChildPagesAsFlatList(child.id);
 
     expect(resolvedChildren.length).toBe(7);
     expect(resolvedChildren.find(page => page.id === subChild1.id)).toBeDefined();
@@ -69,6 +69,117 @@ describe('resolveChildPages', () => {
     expect(resolvedChildren.find(page => page.id === subSubChild3.id)).toBeDefined();
     expect(resolvedChildren.find(page => page.id === subSubSubChild1.id)).toBeDefined();
     expect(resolvedChildren.find(page => page.id === subSubSubSubChild1.id)).toBeDefined();
+  });
+});
+
+describe('resolveChildPages', () => {
+  it('should return a list of direct children of a page', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken();
+
+    const root = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const child = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: root.id
+    });
+
+    const subChild1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: child.id
+    });
+
+    const subChild2 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: child.id
+    });
+
+    // Create a super nested chilod that shouldn't be returned
+    const subSubChild1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: subChild1.id
+    });
+
+    const resolvedChildren = await resolveChildPages(child.id, true);
+
+    expect(resolvedChildren.length).toBe(2);
+    expect(resolvedChildren.find(page => page.id === subChild1.id)).toBeDefined();
+    expect(resolvedChildren.find(page => page.id === subChild2.id)).toBeDefined();
+  });
+
+  it('should return a list of all children as a tree if directOnly is false', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken();
+
+    const root = await createPage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const child = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: root.id
+    });
+
+    const subChild1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: child.id
+    });
+
+    const subChild2 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: child.id
+    });
+
+    const subSubChild1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: subChild1.id
+    });
+
+    const subSubChild2 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: subChild1.id
+    });
+
+    const subSubChild3 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: subChild1.id
+    });
+
+    const subSubSubChild1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: subSubChild1.id
+    });
+
+    const subSubSubSubChild1 = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: subSubSubChild1.id
+    });
+
+    const resolvedChildren = await resolveChildPages(child.id, false);
+
+    expect(resolvedChildren.length).toBe(2);
+
+    const subChild = resolvedChildren.find(nestedChild => nestedChild.id === subChild1.id);
+
+    expect(subChild?.children.length).toBe(3);
+
+    expect(subChild?.children.find(page => page.id === subSubChild1.id)).toBeDefined();
+    expect(subChild?.children.find(page => page.id === subSubChild2.id)).toBeDefined();
+    expect(subChild?.children.find(page => page.id === subSubChild3.id)).toBeDefined();
   });
 });
 

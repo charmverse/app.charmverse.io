@@ -1,4 +1,4 @@
-import { Page, Space, SpaceApiToken } from '@prisma/client';
+import { Page, Prisma, Space, SpaceApiToken } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -59,7 +59,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Partial<Pick<Page, 'parentId' | 'title'>>): Promise<IPageWithPermissions> {
+export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Partial<Pick<Page, 'parentId' | 'title' | 'content'>>): Promise<IPageWithPermissions> {
   return prisma.page.create({
     data: {
       contentText: '',
@@ -67,6 +67,7 @@ export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Parti
       title: options.title || 'Example',
       type: 'page',
       updatedBy: options.createdBy,
+      content: options.content as Prisma.InputJsonObject,
       author: {
         connect: {
           id: options.createdBy

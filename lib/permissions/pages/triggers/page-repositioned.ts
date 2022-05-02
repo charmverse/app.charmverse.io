@@ -6,11 +6,11 @@ import { upsertPermission, findExistingPermissionForGroup, hasSameOrMorePermissi
  * @param pageId
  * @param newParent
  */
-export async function setupPermissionsAfterPageRepositioned (pageId: string): Promise<IPageWithPermissions> {
-  const page = await getPage(pageId);
+export async function setupPermissionsAfterPageRepositioned (pageId: string | IPageWithPermissions): Promise<IPageWithPermissions> {
+  const page = typeof pageId === 'string' ? await getPage(pageId) : pageId;
 
   if (!page) {
-    throw new PageNotFoundError(pageId);
+    throw new PageNotFoundError(pageId as string);
   }
 
   const parents = await resolveParentPages(page.id);
