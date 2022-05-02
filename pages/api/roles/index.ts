@@ -1,18 +1,21 @@
 
 import { Prisma, Role, SpaceRoleToRole, User } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ApiError, hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { DataNotFoundError } from '../../../lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireSpaceMembership())
+  .use(requireSpaceMembership(false))
   .get(listSpaceRoles)
+  // Manual check for admin done inside delete
   .delete(deleteRole)
+  .use(requireSpaceMembership(true))
   .use(requireKeys<Role>(['spaceId', 'name'], 'body'))
   .post(createRole);
 
@@ -80,20 +83,40 @@ async function createRole (req: NextApiRequest, res: NextApiResponse<Role>) {
 }
 
 async function deleteRole (req: NextApiRequest, res: NextApiResponse) {
-  const data = req.body as SpaceRoleToRole & Role;
+  const { roleId } = req.body as SpaceRoleToRole & Role;
 
-  if (!data.roleId) {
+  if (!roleId) {
     throw new ApiError({
       message: 'Please provide a valid role id',
       errorType: 'Invalid input'
     });
   }
 
-  // Use space ID assertion to prevent role deletion
-  await prisma.role.deleteMany({
+  const role = await prisma.role.findUnique({
     where: {
-      id: data.roleId,
-      spaceId: data.spaceId
+      id: roleId
+    }
+  });
+
+  if (!role) {
+    throw new DataNotFoundError(`Could not find role with id ${roleId}`);
+  }
+
+  // Check user can delete role
+  const { error } = await hasAccessToSpace({
+    userId: req.session.user.id,
+    spaceId: role.spaceId,
+    adminOnly: true
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  // Use space ID assertion to prevent role deletion
+  await prisma.role.delete({
+    where: {
+      id: roleId
     }
   });
 
