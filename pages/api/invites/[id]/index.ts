@@ -1,7 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { SpaceRole } from '@prisma/client';
@@ -9,7 +9,11 @@ import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(acceptInvite).delete(deleteInvite);
+handler
+  .use(requireUser)
+  .post(acceptInvite)
+  .use(requireSpaceMembership({ adminOnly: true }))
+  .delete(deleteInvite);
 
 async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
 
