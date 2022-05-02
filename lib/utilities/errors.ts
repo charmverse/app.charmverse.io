@@ -51,3 +51,15 @@ export class SystemError<E = any> implements ISystemError<E> {
   }
 
 }
+
+// Common Errors
+export class InvalidInputError extends SystemError {
+
+  constructor (message: string) {
+    super({
+      message,
+      errorType: 'Invalid input',
+      severity: 'warning'
+    });
+  }
+}
