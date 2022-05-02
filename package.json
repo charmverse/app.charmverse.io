@@ -13,7 +13,7 @@
     "start:cron": "dotenv -e .env.local -- ts-node scripts/deleteArchivedPages.ts",
     "start:test": "dotenv -e .env.test.local -- npm start",
     "start:test:ci": "npx react-env --path .env.test.local -- npx next start",
-    "start:prod": "concurrently --names \"cron,next\" -c \"yellow,green\" \"npm run start:cron\" \"npx next start\"",
+    "start:prod": "prisma migrate deploy && concurrently --names \"cron,next\" -c \"yellow,green\" \"npm run start:cron\" \"npx next start\"",
     "start:staging": "npx dotenv -e .env.staging -- prisma migrate deploy && npx react-env --path .env.staging -- npx next start",
     "start:remote": "npx react-env --path .env.production -- next dev",
     "prepare": "husky install",
