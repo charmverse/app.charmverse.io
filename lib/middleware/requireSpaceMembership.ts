@@ -12,7 +12,7 @@ export function requireSpaceMembership (options: {adminOnly: boolean, spaceIdKey
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 
     // Where to find the space ID
-    const spaceIdKey = 'spaceId';
+    const spaceIdKey = options.spaceIdKey ?? 'spaceId';
 
     if (!req.session.user) {
       throw new ApiError({
