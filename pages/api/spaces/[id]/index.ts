@@ -9,7 +9,7 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireSpaceMembership({ adminOnly: true }))
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .put(updateSpace)
   .delete(deleteSpace);
 
