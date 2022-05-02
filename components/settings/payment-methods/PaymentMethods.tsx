@@ -30,24 +30,24 @@ export default function PaymentMethods () {
 
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
         Payment Methods
-        {isAdmin && (
-          <Stack component='span' spacing={1} direction='row'>
-            <Button
-              onClick={gnosisPopupState.open}
-              variant='outlined'
-              sx={{ float: 'right' }}
-            >
-              Add Gnosis Safe wallet
-            </Button>
-            <Button
-              onClick={ERC20PopupState.open}
-              variant='outlined'
-              sx={{ float: 'right' }}
-            >
-              Add custom token
-            </Button>
-          </Stack>
-        )}
+
+        <Stack component='span' spacing={1} direction='row'>
+          <Button
+            onClick={gnosisPopupState.open}
+            variant='outlined'
+            sx={{ float: 'right' }}
+          >
+            Add Gnosis Safe wallet
+          </Button>
+          <Button
+            onClick={ERC20PopupState.open}
+            variant='outlined'
+            sx={{ float: 'right' }}
+          >
+            Add custom token
+          </Button>
+        </Stack>
+
       </Legend>
       {paymentMethods.length > 0 && <PaymentMethodList paymentMethods={paymentMethods} />}
       {paymentMethods.length === 0 && <Typography color='secondary'>No payment methods yet</Typography>}
