@@ -165,7 +165,7 @@ export const jestConfig = {
   testMatch: [
     // '**/pages/api/**/?(*.)+(spec).[tj]s?(x)',
     // '**/public-api/**/?(*.)+(spec).[tj]s?(x)',
-    // '**/lib/**/?(*.)+(spec).[tj]s?(x)',
+    '**/lib/**/?(*.)+(spec).[tj]s?(x)',
     // '**/testing/**/setupDatabase.spec.ts'
     '**/__integration-tests__/**/**.spec.ts'
   //   "**/__tests__/**/*.[jt]s?(x)",

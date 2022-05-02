@@ -31,7 +31,7 @@
     "test:setup-db": "./testing/configure-db.sh",
     "test:client": "npm run test-setup && jest --config='./jest.config-client.ts'",
     "test:migrate": "dotenv -e .env.local -- npx prisma migrate dev",
-    "test:server": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose",
+    "test:server": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose",
     "test:server-integration": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server-integration.ts' --verbose"
   },
   "postinstall": "patch-package",

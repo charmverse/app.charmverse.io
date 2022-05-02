@@ -1,4 +1,4 @@
-import { Block, Page, Space, SpaceApiToken } from '@prisma/client';
+import { Block, Page, Prisma, Space, SpaceApiToken } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -59,7 +59,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Partial<Pick<Page, 'parentId' | 'title' | 'deletedAt' >>): Promise<IPageWithPermissions> {
+export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {
   return prisma.page.create({
     data: {
       contentText: '',
@@ -67,6 +67,7 @@ export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Parti
       title: options.title || 'Example',
       type: 'page',
       updatedBy: options.createdBy,
+      content: options.content as Prisma.InputJsonObject,
       author: {
         connect: {
           id: options.createdBy
@@ -90,7 +91,7 @@ export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Parti
   });
 }
 
-export function createBlock (options: Pick<Block, 'spaceId' | 'createdBy' | 'rootId'> & Partial<Pick<Block, 'title' | 'deletedAt' >>): Promise<Block> {
+export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' | 'rootId'>): Promise<Block> {
   return prisma.block.create({
     data: {
       title: options.title || 'Example',
@@ -109,7 +110,7 @@ export function createBlock (options: Pick<Block, 'spaceId' | 'createdBy' | 'roo
       rootId: options.rootId,
       deletedAt: options.deletedAt ?? null,
       fields: {},
-      parentId: options.rootId,
+      parentId: options.parentId || options.rootId,
       schema: 0,
       id: v4()
     }
