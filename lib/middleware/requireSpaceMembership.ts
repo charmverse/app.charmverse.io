@@ -9,7 +9,7 @@ import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/erro
 /**
  * Allow an endpoint to be consumed if it originates from a share page
  */
-export function requireSpaceMembership (adminOnly: boolean = false) {
+export function requireSpaceMembership (options: {adminOnly: boolean} = { adminOnly: false }) {
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 
     if (!req.session.user) {
@@ -50,7 +50,7 @@ export function requireSpaceMembership (adminOnly: boolean = false) {
       throw new UserIsNotSpaceMemberError();
     }
 
-    if (adminOnly && spaceRole.isAdmin !== true) {
+    if (options.adminOnly && spaceRole.isAdmin !== true) {
       throw new AdministratorOnlyError();
     }
 
