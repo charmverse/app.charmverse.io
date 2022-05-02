@@ -8,7 +8,7 @@ const MAX_ARCHIVE_PAGE_DAYS = 30;
 export async function main () {
   log.debug('[cron]: Starting delete-archived-pages cron job');
   // Cron job that runs every hour
-  cron.schedule('*/30 * * * * *', async () => {
+  cron.schedule('0 * * * *', async () => {
     const { count: deletedPagesCount } = await prisma.page.deleteMany({
       where: {
         deletedAt: {
@@ -29,7 +29,7 @@ export async function main () {
       }
     });
 
-    log.debug(`[cron]: Deleted ${deletedPagesCount} pages, ${deletedBlocksCount} blocks`);
+    // log.debug(`[cron]: Deleted ${deletedPagesCount} pages, ${deletedBlocksCount} blocks`);
   });
 }
 
