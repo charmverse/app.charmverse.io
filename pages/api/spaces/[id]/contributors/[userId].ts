@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
 import { onError, onNoMatch, requireUser, hasAccessToSpace } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { Role } from 'models';
 import { prisma } from 'db';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -31,7 +30,7 @@ async function updateContributor (req: NextApiRequest, res: NextApiResponse) {
       }
     },
     data: {
-      role: req.body.role as Role
+      isAdmin: req.body.isAdmin
     }
   });
   res.status(200).json({ ok: true });

@@ -93,8 +93,8 @@ class CharmClient {
     return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
   }
 
-  updateContributor ({ spaceId, userId, role }: { spaceId: string, userId: string, role: string }) {
-    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { role });
+  updateContributor ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
+    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { isAdmin });
   }
 
   removeContributor ({ spaceId, userId }: { spaceId: string, userId: string }) {
