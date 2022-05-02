@@ -4,17 +4,20 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import useIsAdmin from 'hooks/useIsAdmin';
 import CustomERCTokenForm from './components/CustomERCTokenForm';
 import GnosisSafeForm from './components/GnosisSafeForm';
 import Legend from '../Legend';
 import PaymentMethodList from './components/PaymentMethodList';
 
-export default function PaymentMethods ({ isAdmin = true }) {
+export default function PaymentMethods () {
 
   const gnosisPopupState = usePopupState({ variant: 'popover', popupId: 'gnosis-popup' });
   const ERC20PopupState = usePopupState({ variant: 'popover', popupId: 'ERC20-popup' });
 
   const [paymentMethods] = usePaymentMethods();
+
+  const isAdmin = useIsAdmin();
 
   return (
     <>
