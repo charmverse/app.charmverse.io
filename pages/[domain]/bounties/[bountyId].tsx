@@ -36,8 +36,6 @@ import { BountyWithDetails, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
 
-export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
-
 export default function BountyDetails () {
   const [space] = useCurrentSpace();
   const [applications, setApplications] = useState([] as Application []);
