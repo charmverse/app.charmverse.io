@@ -5,6 +5,7 @@ export type ErrorSeverity = 'warning' | 'error';
 const ErrorCodes = {
   Unknown: 500,
   'Invalid input': 400,
+  'Undesirable operation': 400,
   'Data not found': 404,
   'Access denied': 401,
   'External service': 500,

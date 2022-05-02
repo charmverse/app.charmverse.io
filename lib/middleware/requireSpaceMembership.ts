@@ -1,4 +1,3 @@
-import { Prisma, SpaceRole } from '@prisma/client';
 import { prisma } from 'db';
 import { ApiError } from 'lib/middleware';
 import { ISystemError } from 'lib/utilities/errors';
@@ -9,8 +8,11 @@ import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/erro
 /**
  * Allow an endpoint to be consumed if it originates from a share page
  */
-export function requireSpaceMembership (options: {adminOnly: boolean} = { adminOnly: false }) {
+export function requireSpaceMembership (options: {adminOnly: boolean, spaceIdKey?: string} = { adminOnly: false }) {
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
+
+    // Where to find the space ID
+    const spaceIdKey = 'spaceId';
 
     if (!req.session.user) {
       throw new ApiError({
@@ -19,9 +21,9 @@ export function requireSpaceMembership (options: {adminOnly: boolean} = { adminO
       });
     }
 
-    const querySpaceId = req.query?.spaceId as string;
+    const querySpaceId = req.query?.[spaceIdKey] as string;
 
-    const bodySpaceId = req.body?.spaceId as string;
+    const bodySpaceId = req.body?.[spaceIdKey] as string;
 
     const spaceId = querySpaceId ?? bodySpaceId;
 
