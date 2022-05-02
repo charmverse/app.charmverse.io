@@ -2,8 +2,8 @@ import { Button } from '@mui/material';
 import { Box } from '@mui/system';
 import { useBounties } from 'hooks/useBounties';
 import { useState } from 'react';
-import BountyStatusBadge from './BountyStatusBadge';
-import BountyModal from './BountyModal';
+import BountyStatusBadge from '../../../bounties/components/BountyStatusBadge';
+import BountyModal from '../../../bounties/components/BountyModal';
 
 interface BountyIntegrationProps {
   linkedTaskId: string
@@ -11,7 +11,7 @@ interface BountyIntegrationProps {
   readonly?: boolean
 }
 
-export function BountyIntegration (props: BountyIntegrationProps) {
+export default function BountyIntegration (props: BountyIntegrationProps) {
   const { bounties } = useBounties();
   const { title, linkedTaskId } = props;
   const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === linkedTaskId);

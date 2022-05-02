@@ -10,13 +10,13 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { Application, Bounty, User } from '@prisma/client';
 import charmClient from 'charmClient';
-import { BountyStatusColours } from 'components/bounties/BountyStatusBadge';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useContributors } from 'hooks/useContributors';
 import { getDisplayName } from 'lib/users';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { BountyStatusColours } from '../../components/BountyStatusBadge';
 
 /**
  * @updateApplication callback to parent [bountyId] page that implements application update logic
