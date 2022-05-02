@@ -4,11 +4,12 @@ import { ApiError } from 'lib/middleware';
 import { ISystemError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextHandler } from 'next-connect';
+import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/errors';
 
 /**
  * Allow an endpoint to be consumed if it originates from a share page
  */
-export function requireSpaceMembership (role?: SpaceRole['role']) {
+export function requireSpaceMembership (adminOnly: boolean = false) {
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 
     if (!req.session.user) {
@@ -38,24 +39,21 @@ export function requireSpaceMembership (role?: SpaceRole['role']) {
       });
     }
 
-    const spaceRoleWhereQuery: Prisma.SpaceRoleWhereInput = {
-      userId: req.session.user.id,
-      spaceId: spaceId as string
-    };
-
-    if (role) {
-      spaceRoleWhereQuery.role = role;
-    }
     const spaceRole = await prisma.spaceRole.findFirst({
-      where: spaceRoleWhereQuery
+      where: {
+        userId: req.session.user.id,
+        spaceId: spaceId as string
+      }
     });
 
     if (!spaceRole) {
-      throw new ApiError({
-        message: role ? `Your are not ${role === 'admin' ? 'an' : 'a'} ${role} of this space` : 'You do not have access to this space',
-        errorType: 'Access denied'
-      });
+      throw new UserIsNotSpaceMemberError();
     }
+
+    if (adminOnly && spaceRole.isAdmin !== true) {
+      throw new AdministratorOnlyError();
+    }
+
     else {
       next();
     }

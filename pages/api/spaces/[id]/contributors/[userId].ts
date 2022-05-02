@@ -1,23 +1,14 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc, { NextHandler } from 'next-connect';
-import { onError, onNoMatch, requireUser, hasAccessToSpace } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
+import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-const requireAdmin = async (req: NextApiRequest, res: NextApiResponse, next: NextHandler) => {
-  const userId = req.session.user.id;
-  const { error } = await hasAccessToSpace({ userId, spaceId: req.query.id as string, adminOnly: true });
-  if (error) {
-    throw error;
-  }
-  next();
-};
-
 handler.use(requireUser)
-  .use(requireAdmin)
+  .use(requireSpaceMembership(true))
   .put(updateContributor)
   .delete(deleteContributor);
 
