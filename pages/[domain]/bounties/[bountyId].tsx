@@ -35,6 +35,7 @@ import { eToNumber } from 'lib/utilities/numbers';
 import { BountyWithDetails, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
+import useIsAdmin from 'hooks/useIsAdmin';
 
 export default function BountyDetails () {
   const [space] = useCurrentSpace();
@@ -56,9 +57,7 @@ export default function BountyDetails () {
   const isAssignee = bounty && user && bounty.assignee === user.id;
   const isReviewer = bounty && user && bounty.reviewer === user.id;
 
-  const isAdmin = space && user?.spaceRoles.some(spaceRole => {
-    return spaceRole.spaceId === space.id && spaceRole.role === 'admin';
-  });
+  const isAdmin = useIsAdmin();
 
   const isApplicant = user && applications.some(application => {
     return application.createdBy === user.id;
