@@ -1,4 +1,4 @@
-import { Page, Space, SpaceApiToken } from '@prisma/client';
+import { Block, Page, Space, SpaceApiToken } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -59,7 +59,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Partial<Pick<Page, 'parentId' | 'title'>>): Promise<IPageWithPermissions> {
+export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Partial<Pick<Page, 'parentId' | 'title' | 'deletedAt' >>): Promise<IPageWithPermissions> {
   return prisma.page.create({
     data: {
       contentText: '',
@@ -77,7 +77,8 @@ export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Parti
           id: options.spaceId as string
         }
       },
-      parentId: options.parentId
+      parentId: options.parentId,
+      deletedAt: options.deletedAt ?? null
     },
     include: {
       permissions: {
@@ -85,6 +86,32 @@ export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Parti
           sourcePermission: true
         }
       }
+    }
+  });
+}
+
+export function createBlock (options: Pick<Block, 'spaceId' | 'createdBy' | 'rootId'> & Partial<Pick<Block, 'title' | 'deletedAt' >>): Promise<Block> {
+  return prisma.block.create({
+    data: {
+      title: options.title || 'Example',
+      type: 'card',
+      user: {
+        connect: {
+          id: options.createdBy
+        }
+      },
+      updatedBy: options.createdBy,
+      space: {
+        connect: {
+          id: options.spaceId as string
+        }
+      },
+      rootId: options.rootId,
+      deletedAt: options.deletedAt ?? null,
+      fields: {},
+      parentId: options.rootId,
+      schema: 0,
+      id: v4()
     }
   });
 }
