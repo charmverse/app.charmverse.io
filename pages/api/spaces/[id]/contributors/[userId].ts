@@ -9,7 +9,7 @@ import { MinimumOneSpaceAdminRequiredError } from 'lib/spaces/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .delete(deleteContributor)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
@@ -56,33 +56,35 @@ async function updateContributor (req: NextApiRequest, res: NextApiResponse) {
 
 async function deleteContributor (req: NextApiRequest, res: NextApiResponse) {
 
+  const requestingUserId = req.session.user.id;
+
   const userId = req.query.userId as string;
   const spaceId = req.query.id as string;
 
-  const existingRole = await prisma.spaceRole.findUnique({
+  const requesterRole = await prisma.spaceRole.findUnique({
     where: {
       spaceUser: {
         spaceId,
-        userId
+        userId: requestingUserId
       }
     }
   });
 
-  if (!existingRole) {
+  if (!requesterRole) {
     throw new UserIsNotSpaceMemberError();
   }
 
   // Non admin user trying to delete another user
-  if (existingRole.isAdmin !== true && userId !== req.session.user.id) {
+  if (requesterRole.isAdmin !== true && userId !== requestingUserId) {
     throw new AdministratorOnlyError();
   }
-  else if (existingRole.isAdmin) {
+  else if (requesterRole.isAdmin && userId === requestingUserId) {
     const otherAdmins = await prisma.spaceRole.count({
       where: {
         isAdmin: true,
         spaceId,
         userId: {
-          not: req.session.user.id
+          not: requestingUserId
         }
       }
     });
@@ -95,8 +97,8 @@ async function deleteContributor (req: NextApiRequest, res: NextApiResponse) {
   await prisma.spaceRole.delete({
     where: {
       spaceUser: {
-        userId,
-        spaceId
+        spaceId,
+        userId
       }
     }
   });
