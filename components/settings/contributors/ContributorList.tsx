@@ -1,6 +1,5 @@
 import { Contributor } from 'models';
 import { useContributors } from 'hooks/useContributors';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import charmClient from 'charmClient';
 import Legend from '../Legend';
 import ContributorListItem, { RoleAction } from './ContributorListItem';
@@ -19,13 +18,13 @@ export default function ContributorList ({ isAdmin, spaceId, spaceOwner }: Props
     switch (action) {
 
       case 'makeAdmin':
-        await charmClient.updateContributor({ spaceId, userId: contributor.id, role: 'admin' });
-        setContributors(contributors.map(c => c.id === contributor.id ? { ...c, role: 'admin' } : c));
+        await charmClient.updateContributor({ spaceId, userId: contributor.id, isAdmin: true });
+        setContributors(contributors.map(c => c.id === contributor.id ? { ...c, isAdmin: true } : c));
         break;
 
       case 'makeContributor':
-        await charmClient.updateContributor({ spaceId, userId: contributor.id, role: 'contributor' });
-        setContributors(contributors.map(c => c.id === contributor.id ? { ...c, role: 'contributor' } : c));
+        await charmClient.updateContributor({ spaceId, userId: contributor.id, isAdmin: false });
+        setContributors(contributors.map(c => c.id === contributor.id ? { ...c, isAdmin: false } : c));
         break;
 
       case 'removeFromSpace':

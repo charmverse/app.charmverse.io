@@ -23,10 +23,8 @@ export default function useRoles () {
   }
 
   async function deleteRole (roleId: string) {
-    if (space) {
-      await charmClient.deleteRole({ roleId, spaceId: space.id });
-      refreshRoles();
-    }
+    await charmClient.deleteRole(roleId);
+    refreshRoles();
   }
 
   async function assignRoles (roleId: string, userIds: string[]) {

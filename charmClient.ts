@@ -93,8 +93,8 @@ class CharmClient {
     return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
   }
 
-  updateContributor ({ spaceId, userId, role }: { spaceId: string, userId: string, role: string }) {
-    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { role });
+  updateContributor ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
+    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { isAdmin });
   }
 
   removeContributor ({ spaceId, userId }: { spaceId: string, userId: string }) {
@@ -470,8 +470,8 @@ class CharmClient {
     return http.PUT(`/api/roles/${role.id}`, role);
   }
 
-  deleteRole (roleToDelete: {roleId: string, spaceId: string}): Promise<Role> {
-    return http.DELETE('/api/roles', roleToDelete);
+  deleteRole (roleId: string): Promise<Role> {
+    return http.DELETE(`/api/roles/${roleId}`);
   }
 
   listRoles (spaceId: string): Promise<ListSpaceRolesResponse[]> {

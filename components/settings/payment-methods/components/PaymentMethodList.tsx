@@ -3,14 +3,14 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Tooltip from '@mui/material/Tooltip';
+import { PaymentMethod } from '@prisma/client';
+import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
+import Link from 'components/common/Link';
 import TableRow from 'components/common/Table/TableRow';
 import { getChainById, getChainExplorerLink } from 'connectors';
-import { PaymentMethod } from '@prisma/client';
-import { useUser } from 'hooks/useUser';
-import { useState } from 'react';
-import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { shortenHex } from 'lib/utilities/strings';
-import Link from 'components/common/Link';
+import { useState } from 'react';
 import CompositeDeletePaymentMethod from './DeletePaymentMethodModal';
 
 interface IProps {
@@ -21,10 +21,9 @@ const getGnosisSafeUrl = (address: string) => `https://gnosis-safe.io/app/rin:${
 
 export default function CompositePaymentMethodList ({ paymentMethods }: IProps) {
 
-  const [user] = useUser();
   const [paymentMethodIdToDelete, setPaymentMethodIdToDelete] = useState<string | null>(null);
 
-  const isAdmin = user?.spaceRoles.some(spaceRole => spaceRole.role === 'admin') === true;
+  const isAdmin = useIsAdmin();
 
   const sortedMethods = [...paymentMethods]
     .sort((methodA, methodB) => {

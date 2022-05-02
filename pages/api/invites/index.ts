@@ -1,20 +1,21 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 import { InviteLink, User } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
 import { createInviteLink } from 'lib/invites';
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 export type InviteLinkPopulated = InviteLink & { author: User };
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireUser)
-  .post(createInviteLinkEndpoint)
-  .get(getInviteLinks);
+  .use(requireSpaceMembership())
+  .get(getInviteLinks)
+  .use(requireSpaceMembership({ adminOnly: true }))
+  .post(createInviteLinkEndpoint);
 
 async function createInviteLinkEndpoint (req: NextApiRequest, res: NextApiResponse) {
 
