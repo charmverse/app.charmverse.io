@@ -22,8 +22,26 @@ export async function deleteArchivedPages (maxDay: number) {
     }
   });
 
+  const archivedPagesCount = await prisma.page.count({
+    where: {
+      deletedAt: {
+        not: null
+      }
+    }
+  });
+
+  const archivedBlocksCount = await prisma.block.count({
+    where: {
+      deletedAt: {
+        not: null
+      }
+    }
+  });
+
   return {
     deletedBlocksCount,
-    deletedPagesCount
+    deletedPagesCount,
+    archivedBlocksCount,
+    archivedPagesCount
   };
 }

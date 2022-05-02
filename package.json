@@ -107,6 +107,7 @@
     "draft-js": "^0.11.7",
     "emoji-mart": "^3.0.1",
     "ethers": "^5.5.4",
+    "hot-shots": "^9.0.0",
     "immutability-helper": "^3.1.1",
     "immutable": "^4.0.0",
     "iron-session": "^6.0.5",
