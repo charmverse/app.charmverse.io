@@ -63,3 +63,13 @@ export class InvalidInputError extends SystemError {
     });
   }
 }
+
+export class DataNotFoundError extends SystemError {
+  constructor (message: string = 'Data not found') {
+    super({
+      message,
+      errorType: 'Data not found',
+      severity: 'warning'
+    });
+  }
+}
