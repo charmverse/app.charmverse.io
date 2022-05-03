@@ -1,9 +1,6 @@
 import { gql } from '@apollo/client';
-import snapshot from '@snapshot-labs/snapshot.js';
 import client from './graphql-client';
 import { SnapshotSpace } from './interfaces';
-
-const testClient = new snapshot.Client();
 
 export async function getSnapshotSpace (spaceDomain: string): Promise<SnapshotSpace | null> {
   const { data } = await client.query({

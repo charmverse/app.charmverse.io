@@ -22,6 +22,21 @@ export interface SnapshotSpace {
   // validation:
 }
 
+export type SnapshotProposalState = 'pending' | 'active' | 'closed'
+
+export interface SnapshotProposal {
+  id: string;
+  title: string;
+  body: string;
+  choices: string [];
+  start: number;
+  end: number;
+  snapshot: string;
+  state: SnapshotProposalState;
+  author: string;
+  space: Pick<SnapshotSpace, 'id' | 'name'>
+}
+
 export interface SnapshotReceipt {
   id: string;
   ipfs: string;
