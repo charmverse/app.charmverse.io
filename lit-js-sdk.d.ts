@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { Web3Provider } from '@ethersproject/providers';
 
 declare module 'lit-js-sdk' {
 
@@ -92,6 +93,9 @@ declare module 'lit-js-sdk' {
   }
 
   export async function checkAndSignAuthMessage (input: { chain: Chain }): Promise<AuthSig>;
+
+  // defined: https://github.com/LIT-Protocol/lit-js-sdk/blob/a059f3aa4d3cf581000440e71468ec5513619c78/src/utils/eth.js
+  export async function signAndSaveAuthMessage (params: { web3: Web3Provider, account: string, chainId: number }): Promise<void>;
 
   export async function verifyJwt (input: { jwt: string }): Promise<{
     verified: boolean;
