@@ -1,25 +1,59 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React from 'react'
+import React, { useState, MouseEvent } from 'react'
+import EditIcon from '@mui/icons-material/Edit';
 import {FormattedMessage, useIntl} from 'react-intl'
-
-import {Constants} from '../../constants'
-import {IPropertyTemplate} from '../../blocks/board'
+import {IPropertyTemplate, PropertyType} from '../../blocks/board'
 import {BoardView} from '../../blocks/boardView'
 import mutator from '../../mutator'
 import Button from '../../widgets/buttons/button'
-import Menu from '../../widgets/menu'
-import MenuWrapper from '../../widgets/menuWrapper'
+import Menu from '@mui/material/Menu'
+import { IconButton, ListItemIcon, ListItemText, MenuItem } from '@mui/material'
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import PersonIcon from '@mui/icons-material/Person';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import ListIcon from '@mui/icons-material/List';
+import NumbersIcon from '@mui/icons-material/Numbers';
+import PhoneIcon from '@mui/icons-material/Phone';
+import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
+import SubjectIcon from '@mui/icons-material/Subject';
+import LinkIcon from '@mui/icons-material/Link';
 
 type Props = {
     properties: readonly IPropertyTemplate[]
     activeView: BoardView
 }
+
+export const iconForPropertyType = (propertyType: PropertyType) => {
+  switch(propertyType) {
+    case "checkbox": return <CheckBoxIcon fontSize="small"/>
+    case "createdBy": return <PersonIcon fontSize="small" />
+    case "createdTime": return <AccessTimeIcon fontSize="small"/>
+    case "date": return <EventNoteIcon fontSize="small"/>
+    case "email": return <AlternateEmailIcon fontSize="small"/>
+    case "file": return <AttachFileIcon fontSize="small"/>
+    case "multiSelect": return <ListIcon fontSize="small"/>
+    case "number": return <NumbersIcon fontSize="small"/>
+    case "person": return <PersonIcon fontSize="small" />
+    case "phone": return <PhoneIcon fontSize="small"/>
+    case "select": return <ArrowDropDownCircleIcon fontSize="small"/>
+    case "text": return <SubjectIcon fontSize="small"/>
+    case "updatedBy": return <PersonIcon fontSize="small" />
+    case "updatedTime": return <AccessTimeIcon fontSize="small"/>
+    case "url": return <LinkIcon fontSize="small"/>
+  }
+}
+
+
 const ViewHeaderPropertiesMenu = React.memo((props: Props) => {
     const {properties, activeView} = props
-    const intl = useIntl()
-    const {viewType, visiblePropertyIds} = activeView.fields
-    const canShowBadges = viewType === 'board' || viewType === 'gallery' || viewType === 'calendar'
+    const {visiblePropertyIds} = activeView.fields
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const toggleVisibility = (propertyId: string) => {
         let newVisiblePropertyIds = []
@@ -31,14 +65,46 @@ const ViewHeaderPropertiesMenu = React.memo((props: Props) => {
         mutator.changeViewVisibleProperties(activeView.id, visiblePropertyIds, newVisiblePropertyIds)
     }
 
+    const showPropertiesMenu = (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      event.preventDefault()
+      setAnchorEl(event.currentTarget);
+    }
+
+    const hidePropertiesMenu = () => {
+      setAnchorEl(null);
+    }
+
     return (
-        <MenuWrapper label={intl.formatMessage({id: 'ViewHeader.properties-menu', defaultMessage: 'Properties menu'})}>
-            <Button>
-                <FormattedMessage
-                    id='ViewHeader.properties'
-                    defaultMessage='Properties'
-                />
-            </Button>
+      <>
+        <Button onClick={showPropertiesMenu}>
+          <FormattedMessage
+              id='ViewHeader.properties'
+              defaultMessage='Properties'
+          />
+        </Button>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={hidePropertiesMenu}
+        >
+          {
+            properties.map(property => <MenuItem sx={{
+              minWidth: 250
+            }} key={property.id}>
+              <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
+              <ListItemText>{property.name}</ListItemText>
+                <IconButton size="small" onClick={() => {
+                  toggleVisibility(property.id)
+                }}>
+                  {visiblePropertyIds.includes(property.id) ? <VisibilityIcon fontSize="small"/> : <VisibilityOffIcon fontSize="small" color="secondary"/>}
+                </IconButton>
+            </MenuItem>)
+          }
+        </Menu>
+
+        {/* <MenuWrapper label={intl.formatMessage({id: 'ViewHeader.properties-menu', defaultMessage: 'Properties menu'})}>
+            
             <Menu>
                 {activeView.fields.viewType === 'gallery' &&
                     <Menu.Switch
@@ -57,16 +123,9 @@ const ViewHeaderPropertiesMenu = React.memo((props: Props) => {
                         onClick={toggleVisibility}
                     />
                 ))}
-                {canShowBadges &&
-                    <Menu.Switch
-                        key={Constants.badgesColumnId}
-                        id={Constants.badgesColumnId}
-                        name={intl.formatMessage({id: 'default-properties.badges', defaultMessage: 'Comments and Description'})}
-                        isOn={visiblePropertyIds.includes(Constants.badgesColumnId)}
-                        onClick={toggleVisibility}
-                    />}
             </Menu>
-        </MenuWrapper>
+        </MenuWrapper> */}
+      </>
     )
 })
 
