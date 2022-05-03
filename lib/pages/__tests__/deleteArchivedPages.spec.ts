@@ -23,7 +23,7 @@ describe('deleteArchivedPages', () => {
       });
 
       // A page archived 30 days ago
-      await createPage({
+      const thirdPage = await createPage({
         spaceId: space.id,
         createdBy: user.id,
         deletedAt: new Date(DateTime.now().minus({
@@ -47,7 +47,7 @@ describe('deleteArchivedPages', () => {
       });
 
       // A block archived 30 days ago
-      await createBlock({
+      const thirdBlock = await createBlock({
         spaceId: space.id,
         createdBy: user.id,
         deletedAt: new Date(DateTime.now().minus({
@@ -61,15 +61,27 @@ describe('deleteArchivedPages', () => {
       expect(deletedPagesCount).toBe(1);
 
       const pages = await prisma.page.findMany({
+        where: {
+          id: {
+            in: [firstPage.id, secondPage.id, thirdPage.id]
+          }
+        },
         select: {
           id: true
         }
       });
+
       const blocks = await prisma.block.findMany({
+        where: {
+          id: {
+            in: [firstBlock.id, secondBlock.id, thirdBlock.id]
+          }
+        },
         select: {
           id: true
         }
       });
+
       const pageIds = new Set(pages.map(page => page.id));
       const blockIds = new Set(blocks.map(block => block.id));
 
