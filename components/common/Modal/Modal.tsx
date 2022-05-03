@@ -1,6 +1,7 @@
 import { ComponentProps, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import MuiModal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -19,6 +20,13 @@ const ModalContainer = styled.div<{ size: ModalSize }>`
   border-radius: ${({ theme }) => theme.spacing(1)};
   box-shadow: ${({ theme }) => theme.shadows[15]};
   padding: ${({ theme }) => theme.spacing(4)};
+  max-height: calc(80vh - ${({ theme }) => theme.spacing(8)});
+`;
+
+const ScrollableModalContainer = styled(ModalContainer)`
+  display: flex;
+  flex-direction: column;
+  padding: ${({ theme }) => theme.spacing(4, 0)};
 `;
 
 const StyledDialogTitle = styled(MuiDialogTitle)`
@@ -35,10 +43,16 @@ const CloseButton = styled(IconButton)`
   padding: 0;
 `;
 
+const ScrollableContainer = styled.div`
+  flex-grow: 1;
+  overflow: auto;
+  padding: ${({ theme }) => theme.spacing(0, 4)};
+`;
+
 export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose'> & {
   size?: ModalSize,
   children: any,
-  title?: string,
+  title?: any,
   onClose: () => void
 };
 
@@ -50,6 +64,19 @@ export function Modal ({ children, size = defaultSize, title, ...props }: ModalP
           {title && <DialogTitle onClose={props.onClose}>{title}</DialogTitle>}
           {children}
         </ModalContainer>
+      </div>
+    </MuiModal>
+  );
+}
+
+export function ScrollableModal ({ children, size = defaultSize, title, ...props }: ModalProps) {
+  return (
+    <MuiModal {...props}>
+      <div>
+        <ScrollableModalContainer size={size}>
+          {title && <Box px={4}><DialogTitle>{title}</DialogTitle></Box>}
+          <ScrollableContainer>{children}</ScrollableContainer>
+        </ScrollableModalContainer>
       </div>
     </MuiModal>
   );

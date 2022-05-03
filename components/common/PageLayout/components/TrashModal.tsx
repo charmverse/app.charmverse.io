@@ -1,6 +1,6 @@
-import { Box, IconButton, List, ListItem, ListItemText, Tooltip, Typography } from '@mui/material';
+import { IconButton, List, ListItem, ListItemText, ListItemIcon, Tooltip, Typography } from '@mui/material';
 import { usePages } from 'hooks/usePages';
-import { Modal, DialogTitle } from 'components/common/Modal';
+import { ScrollableModal as Modal } from 'components/common/Modal';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { Page, PageContent } from 'models';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -8,7 +8,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import charmClient from 'charmClient';
 import { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, ReactFragment } from 'react';
 import { DateTime } from 'luxon';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
@@ -48,27 +48,26 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
     <Modal
       open={isOpen}
       onClose={onClose}
-    >
-      <div>
-        <Box display='flex' justifyContent='space-between'>
-          <DialogTitle>Trash</DialogTitle>
+      title={(
+        <>
+          Trash
           <Typography variant='subtitle1' color='secondary'>{deletedPages.length} pages</Typography>
-        </Box>
-        {deletedPages.length === 0 ? <Typography variant='subtitle1' color='secondary'>No archived pages</Typography> : (
-          <List sx={{
-            maxHeight: 500,
-            overflow: 'auto'
-          }}
-          >
+        </>
+      )}
+    >
+      {deletedPages.length === 0
+        ? <Typography variant='subtitle1' color='secondary'>No archived pages</Typography>
+        : (
+          <List>
             {deletedPages.map(deletedPage => {
               const isEditorEmpty = checkForEmpty(deletedPage.content as PageContent);
               return (
-                <ListItem disableGutters disabled={isMutating} key={deletedPage.id}>
-                  <Box mr={1}>
+                <ListItem disableGutters dense disabled={isMutating} key={deletedPage.id}>
+                  <ListItemIcon>
                     <PageIcon pageType={deletedPage.type} icon={deletedPage.icon} isEditorEmpty={isEditorEmpty} />
-                  </Box>
+                  </ListItemIcon>
                   <ListItemText secondary={DateTime.fromJSDate(new Date(deletedPage.deletedAt!)).toRelative({ base: (DateTime.now()) })}>
-                    <Link href={`/${space?.domain}/${deletedPage.path}`}>
+                    <Link color='inherit' href={`/${space?.domain}/${deletedPage.path}`}>
                       {deletedPage.title || 'Untitled'}
                     </Link>
                   </ListItemText>
@@ -89,7 +88,6 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
             })}
           </List>
         )}
-      </div>
     </Modal>
   );
 }
