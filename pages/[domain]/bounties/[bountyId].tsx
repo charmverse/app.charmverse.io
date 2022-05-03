@@ -78,6 +78,7 @@ export default function BountyDetails () {
     // Otherwise it shows the `Type / for commands` placeholder
     return bounty && bounty.description ? (
       <CharmEditor
+        disabledPageSpecificFeatures
         readOnly
         key={bounty.description}
         content={bounty.descriptionNodes as PageContent}
