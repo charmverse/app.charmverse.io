@@ -14,7 +14,7 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
-import { NodeView, Plugin, SpecRegistry, BangleEditorState } from '@bangle.dev/core';
+import { NodeView, Plugin, SpecRegistry, BangleEditorState, RawPlugins } from '@bangle.dev/core';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { useState, CSSProperties, ReactNode, memo, useCallback } from 'react';
@@ -111,13 +111,14 @@ export const specRegistry = new SpecRegistry([
 export function charmEditorPlugins (
   {
     onContentChange,
-    readOnly
+    readOnly,
+    disabledPageSpecificFeatures = false
   }:
     {
-      readOnly?: boolean, onContentChange?: (view: EditorView) => void
+      readOnly?: boolean, onContentChange?: (view: EditorView) => void, disabledPageSpecificFeatures?: boolean
     } = {}
-) {
-  return () => [
+): () => RawPlugins[] {
+  const basePlugins: RawPlugins[] = [
     new Plugin({
       view: () => ({
         update: (view, prevState) => {
@@ -127,7 +128,6 @@ export function charmEditorPlugins (
         }
       })
     }),
-    inlineComment.plugin(),
     suggestTooltipPlugins({
       tooltipRenderOpts: {
         placement: 'bottom'
@@ -218,6 +218,12 @@ export function charmEditorPlugins (
     // iframePlugin,
     // pasteImagePlugin
   ];
+
+  if (!disabledPageSpecificFeatures) {
+    basePlugins.push(inlineComment.plugin());
+  }
+
+  return () => basePlugins;
 }
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)`
@@ -301,6 +307,7 @@ interface CharmEditorProps {
   readOnly?: boolean;
   style?: CSSProperties;
   showingCommentThreadsList?: boolean
+  disabledPageSpecificFeatures?: boolean
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -324,7 +331,15 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
 }
 
 function CharmEditor (
-  { showingCommentThreadsList = false, content = defaultContent, children, onContentChange, style, readOnly = false }:
+  {
+    showingCommentThreadsList = false,
+    content = defaultContent,
+    children,
+    onContentChange,
+    style,
+    readOnly = false,
+    disabledPageSpecificFeatures = false
+  }:
   CharmEditorProps
 ) {
   // check empty state of page on first load
@@ -466,12 +481,13 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu pluginKey={floatingMenuPluginKey} />
+      <FloatingMenu disableComments={disabledPageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionSuggestPluginKey} />
       <NestedPagesList />
       <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
-      <InlinePalette />
+      <InlinePalette disableNestedPage={disabledPageSpecificFeatures} />
       {children}
+      {!disabledPageSpecificFeatures && (
       <Grow
         in={showingCommentThreadsList}
         style={{
@@ -489,6 +505,7 @@ function CharmEditor (
           <PageThreadsList inline={false} />
         </PageThreadListBox>
       </Grow>
+      )}
       <InlineCommentThread />
     </StyledReactBangleEditor>
   );
