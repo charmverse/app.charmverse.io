@@ -90,6 +90,8 @@ model Page {
   card          Block?           @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   threads       Thread[]
   comments      Comment[]
+  snapshotProposalDomain String?
+  snapshotProposalId String?
 }
 
 // focalboard blocks

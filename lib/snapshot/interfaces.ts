@@ -1,3 +1,5 @@
+import { StringLiteralLike } from 'typescript';
+
 /**
  * @id the actual snapshot domain
  */
@@ -18,4 +20,13 @@ export interface SnapshotSpace {
   strategies: any[]
   // TBC - Check out validation
   // validation:
+}
+
+export interface SnapshotReceipt {
+  id: string;
+  ipfs: string;
+  relayer: {
+    address: string;
+    receipt: string
+  }
 }
