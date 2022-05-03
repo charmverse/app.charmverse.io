@@ -1,26 +1,24 @@
 import { SvgIcon } from '@mui/material';
-import { useRouter } from 'next/router';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useUser } from 'hooks/useUser';
-import { useState, useEffect } from 'react';
-import Button from 'components/common/Button';
-import DiscordIcon from 'public/images/discord_logo.svg';
-import { useSnackbar } from 'hooks/useSnackbar';
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useRouter } from 'next/router';
+import DiscordIcon from 'public/images/discord_logo.svg';
+import { useEffect, useState } from 'react';
 
 export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () => void }) {
 
   const { showMessage } = useSnackbar();
   const [currentSpace] = useCurrentSpace();
-  const [user] = useUser();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const isCurrentUserAdmin = (user?.spaceRoles
-    .find(spaceRole => spaceRole.spaceId === currentSpace?.id)?.role === 'admin');
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
-    const shouldRequestServers = isCurrentUserAdmin && currentSpace && typeof router.query.guild_id === 'string' && router.query.discord === '1' && router.query.type === 'server';
+    const shouldRequestServers = isAdmin && currentSpace && typeof router.query.guild_id === 'string' && router.query.discord === '1' && router.query.type === 'server';
     if (shouldRequestServers) {
       importFromServer(router.query.guild_id as string);
     }
@@ -49,7 +47,7 @@ export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () =
       });
   }
 
-  if (!isCurrentUserAdmin) {
+  if (!isAdmin) {
     return null;
   }
 

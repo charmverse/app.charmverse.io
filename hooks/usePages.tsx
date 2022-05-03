@@ -10,6 +10,7 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 import useSWR from 'swr';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
+import useIsAdmin from './useIsAdmin';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 type IContext = {
@@ -44,6 +45,9 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const { data } = useSWR(() => space ? `pages/${space?.id}` : null, (e) => {
     return charmClient.getPages(space!.id);
   }, { refreshInterval });
+
+  const isAdmin = useIsAdmin();
+
   useEffect(() => {
     if (data) {
       setPages(data.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
@@ -66,8 +70,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
     const userSpaceRole = user?.spaceRoles.find(spaceRole => spaceRole.spaceId === targetPage.spaceId);
 
-    // TEMPORARY TILL WE FIX SPACE PROVISIONING
-    if (userSpaceRole?.role === 'admin' || userSpaceRole?.isAdmin === true) {
+    // For now, we allow admin users to override explicitly assigned permissions
+    if (isAdmin) {
       computedPermissions.addPermissions(Object.keys(PageOperations) as PageOperationType []);
       return computedPermissions;
     }

@@ -1,13 +1,10 @@
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { BountyStatus } from '@prisma/client';
-import { BountyStatusChip } from 'components/bounties/BountyStatusBadge';
 import { useEffect, useState } from 'react';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+import { BountyStatusChip } from './BountyStatusBadge';
 
 /**
  * @renderSelected Show selected options in the options menu. Default is true.
@@ -48,7 +45,7 @@ export default function InputBountyStatus ({ onChange, defaultValues = [], rende
   }
 
   return (
-    <FormControl sx={{ m: 1, minWidth: 150 }}>
+    <FormControl sx={{ minWidth: 150 }}>
       <Select
         id='bounty-status'
         variant='outlined'

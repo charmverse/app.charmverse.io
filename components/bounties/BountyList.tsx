@@ -1,16 +1,16 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import { PopulatedBounty } from 'charmClient';
-import BountyModal from 'components/bounties/BountyModal';
-import InputBountyStatus from 'components/bounties/InputBountyStatus';
+import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import Button from 'components/common/Button';
 import { BountiesContext } from 'hooks/useBounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { useContext, useMemo, useState } from 'react';
 import { CSVLink } from 'react-csv';
-import { BountyCard } from './BountyCard';
-import { BountyStatusChip } from './BountyStatusBadge';
-import MultiPaymentModal from './MultiPaymentModal';
+import InputBountyStatus from './components/InputBountyStatus';
+import { BountyCard } from './components/BountyCard';
+import MultiPaymentModal from './components/MultiPaymentModal';
+import BountyModal from './components/BountyModal';
 
 const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete', 'paid'];
 
@@ -32,9 +32,9 @@ function sortSelected (bountyStatuses: BountyStatus[]): BountyStatus[] {
   });
 }
 
-export function BountyList () {
+export default function BountyList () {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
-  const { bounties, setBounties } = useContext(BountiesContext);
+  const { bounties } = useContext(BountiesContext);
 
   const [bountyFilter, setBountyFilter] = useState<BountyStatus[]>(['open', 'assigned', 'review']);
 
@@ -69,52 +69,33 @@ export function BountyList () {
   }
 
   return (
-    <>
-
-      <Box display='flex' justifyContent='space-between' mb={3}>
-        <Typography variant='h1'>Bounty list</Typography>
-        <Box display='flex' justifyContent='flex-end'>
-          { !!csvData.length
-          && (
-            <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
-              <Button variant='outlined'>
-                Export to CSV
-              </Button>
-            </CSVLink>
-          )}
-          <MultiPaymentModal />
-          <Button
-            sx={{ ml: 1 }}
-            onClick={() => {
-              setDisplayBountyDialog(true);
-            }}
-          >
-            Create Bounty
-          </Button>
+    <ScrollableWindow>
+      <Box py={3} px='80px'>
+        <Box display='flex' justifyContent='space-between' mb={3}>
+          <Typography variant='h1'>Bounty list</Typography>
+          <Box display='flex' justifyContent='flex-end'>
+            { !!csvData.length
+            && (
+              <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
+                <Button variant='outlined'>
+                  Export to CSV
+                </Button>
+              </CSVLink>
+            )}
+            <MultiPaymentModal />
+            <Button
+              sx={{ ml: 1 }}
+              onClick={() => {
+                setDisplayBountyDialog(true);
+              }}
+            >
+              Create Bounty
+            </Button>
+          </Box>
         </Box>
-      </Box>
 
-      {/* Filters for the bounties */}
-      <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
-
-        {
-          /*
-            bountyFilter.map(status => {
-              return (
-                <Box sx={{ mr: 1, alignContent: 'center', flexDirection: 'column', alignSelf: 'center' }}>
-                  <BountyStatusChip
-                    status={status}
-                    onDelete={() => {
-                      setBountyFilter(sortSelected(bountyFilter.filter(selected => selected !== status)));
-                    }}
-                  />
-                </Box>
-              );
-            })
-          */
-          }
-
-        <Box>
+        {/* Filters for the bounties */}
+        <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
           <InputBountyStatus
             onChange={(statuses) => {
               setBountyFilter(sortSelected(statuses));
@@ -124,31 +105,35 @@ export function BountyList () {
             defaultValues={bountyFilter}
           />
         </Box>
-      </Box>
 
-      <Grid container sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
+        <Grid container spacing={1}>
+          {
+            sortedBounties.length === 0
+              ? <Typography paragraph={true}>No bounties were found</Typography>
+              : sortedBounties.map(bounty => {
+                return (
+                  <Grid key={bounty.id} item>
+                    <BountyCard truncate={false} key={bounty.id} bounty={bounty} />
+                  </Grid>
+                );
+              })
+          }
+        </Grid>
         {
-          bounties.length === 0
-            ? <Typography paragraph={true}>No bounties were found</Typography>
-            : sortedBounties.map(bounty => {
-              return <BountyCard truncate={false} key={bounty.id} bounty={bounty} />;
-            })
+          /**
+           * Remove later to its own popup modal
+           */
+          displayBountyDialog === true && (
+            <BountyModal
+              onSubmit={bountyCreated}
+              open={displayBountyDialog}
+              onClose={() => {
+                setDisplayBountyDialog(false);
+              }}
+            />
+          )
         }
-      </Grid>
-      {
-        /**
-         * Remove later to its own popup modal
-         */
-        displayBountyDialog === true && (
-          <BountyModal
-            onSubmit={bountyCreated}
-            open={displayBountyDialog}
-            onClose={() => {
-              setDisplayBountyDialog(false);
-            }}
-          />
-        )
-      }
-    </>
+      </Box>
+    </ScrollableWindow>
   );
 }

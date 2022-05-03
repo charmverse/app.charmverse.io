@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import React from 'react'
 
-import {Board, IPropertyTemplate} from '../../blocks/board'
+import {Board, IPropertyTemplate, PropertyType} from '../../blocks/board'
 import {Constants} from '../../constants'
 import {Card} from '../../blocks/card'
 import {BoardView} from '../../blocks/boardView'
@@ -16,6 +16,8 @@ import {Utils} from '../../utils'
 import HorizontalGrip from './horizontalGrip'
 
 import TableHeaderMenu from './tableHeaderMenu'
+import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu'
+import { Typography } from '@mui/material'
 
 type Props = {
     readonly: boolean
@@ -27,6 +29,7 @@ type Props = {
     views: BoardView[]
     template: IPropertyTemplate
     offset: number
+    type: PropertyType
     onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void
     onAutoSizeColumn: (columnID: string, headerWidth: number) => void
 }
@@ -61,7 +64,13 @@ const TableHeader = (props: Props): JSX.Element => {
         >
             <MenuWrapper disabled={props.readonly}>
                 <Label>
-                    {props.name}
+                    <div style={{marginRight: 4, display: "flex"}}>{iconForPropertyType(props.type, {
+                      sx: {
+                        width: 18,
+                        height: 18
+                      }
+                    })}</div>
+                    <Typography variant="subtitle1">{props.name}</Typography>
                     {props.sorted === 'up' && <SortUpIcon/>}
                     {props.sorted === 'down' && <SortDownIcon/>}
                 </Label>

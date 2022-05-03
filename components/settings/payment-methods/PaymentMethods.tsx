@@ -4,17 +4,20 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import useIsAdmin from 'hooks/useIsAdmin';
 import CustomERCTokenForm from './components/CustomERCTokenForm';
 import GnosisSafeForm from './components/GnosisSafeForm';
 import Legend from '../Legend';
 import PaymentMethodList from './components/PaymentMethodList';
 
-export default function PaymentMethods ({ isAdmin = true }) {
+export default function PaymentMethods () {
 
   const gnosisPopupState = usePopupState({ variant: 'popover', popupId: 'gnosis-popup' });
   const ERC20PopupState = usePopupState({ variant: 'popover', popupId: 'ERC20-popup' });
 
   const [paymentMethods] = usePaymentMethods();
+
+  const isAdmin = useIsAdmin();
 
   return (
     <>
@@ -27,24 +30,24 @@ export default function PaymentMethods ({ isAdmin = true }) {
 
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
         Payment Methods
-        {isAdmin && (
-          <Stack component='span' spacing={1} direction='row'>
-            <Button
-              onClick={gnosisPopupState.open}
-              variant='outlined'
-              sx={{ float: 'right' }}
-            >
-              Add Gnosis Safe wallet
-            </Button>
-            <Button
-              onClick={ERC20PopupState.open}
-              variant='outlined'
-              sx={{ float: 'right' }}
-            >
-              Add custom token
-            </Button>
-          </Stack>
-        )}
+
+        <Stack component='span' spacing={1} direction='row'>
+          <Button
+            onClick={gnosisPopupState.open}
+            variant='outlined'
+            sx={{ float: 'right' }}
+          >
+            Add Gnosis Safe wallet
+          </Button>
+          <Button
+            onClick={ERC20PopupState.open}
+            variant='outlined'
+            sx={{ float: 'right' }}
+          >
+            Add custom token
+          </Button>
+        </Stack>
+
       </Legend>
       {paymentMethods.length > 0 && <PaymentMethodList paymentMethods={paymentMethods} />}
       {paymentMethods.length === 0 && <Typography color='secondary'>No payment methods yet</Typography>}

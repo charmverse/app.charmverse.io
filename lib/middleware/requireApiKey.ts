@@ -66,7 +66,6 @@ export async function getBotUser (spaceId: string): Promise<User> {
       data: {
         spaceId,
         userId: botUser.id,
-        role: 'admin',
         isAdmin: true
       }
     });

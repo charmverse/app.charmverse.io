@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import Button from 'components/common/Button';
 import Box from '@mui/material/Box';
-import charmClient, { PopulatedBounty } from 'charmClient';
+import charmClient from 'charmClient';
 import { bindTrigger, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';

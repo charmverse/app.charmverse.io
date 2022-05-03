@@ -74,6 +74,6 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
   }
 }
 
-handler.use(requireUser).use(requireSpaceMembership('admin')).post(importRoles);
+handler.use(requireUser).use(requireSpaceMembership({ adminOnly: true })).post(importRoles);
 
 export default withSessionRoute(handler);

@@ -162,7 +162,6 @@ model FavoritePage {
 
 model SpaceRole {
   id                     String            @id @default(uuid()) @db.Uuid
-  role                   String            @default("contributor")
   isAdmin                Boolean           @default(false)
   spaceId                String            @db.Uuid
   space                  Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
