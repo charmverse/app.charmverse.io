@@ -25,10 +25,10 @@ import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
+import PublishToSnapshot from 'components/snapshot/PublishToSnapshot';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
-import PublishToSnapshot from './PublishToSnapshot';
 
 export const headerHeight = 56;
 
