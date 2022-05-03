@@ -7,17 +7,17 @@ const MAX_ARCHIVE_DAYS = process.env.MAX_ARCHIVE_DAYS ? parseInt(process.env.MAX
 
 export async function main () {
 
-  log.debug('[cron]: Starting delete-archived cron job');
+  log.debug('Starting delete-archived cron job');
 
   // Cron job that runs every hour
   cron.schedule('0 * * * *', async () => {
 
-    log.debug('[cron]: Running delete-archived cron job');
+    log.debug('Running delete-archived cron job');
 
     try {
       const { deletedPagesCount, deletedBlocksCount, archivedBlocksCount, archivedPagesCount } = await deleteArchivedPages(MAX_ARCHIVE_DAYS);
 
-      log.info(`[cron]: Deleted ${deletedPagesCount} pages, ${deletedBlocksCount} blocks`);
+      log.info(`Deleted ${deletedPagesCount} pages, ${deletedBlocksCount} blocks`);
 
       gauge('cron.delete-archived.deleted-pages', deletedPagesCount);
       gauge('cron.delete-archived.deleted-blocks', deletedBlocksCount);
@@ -25,7 +25,7 @@ export async function main () {
       gauge('cron.delete-archived.archived-blocks', archivedBlocksCount);
     }
     catch (error: any) {
-      log.error(`[cron]: Error deleting archived pages: ${error.stack || error.message || error}`, { error });
+      log.error(`Error deleting archived pages: ${error.stack || error.message || error}`, { error });
     }
   });
 }
