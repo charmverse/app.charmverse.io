@@ -11,12 +11,12 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireKeys<Page>(['snapshotProposalDomain', 'snapshotProposalId'], 'body'))
+  .use(requireKeys<Page>(['snapshotProposalId'], 'body'))
   .put(recordSnapshotInfo);
 
 async function recordSnapshotInfo (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
 
-  const { snapshotProposalDomain, snapshotProposalId } = req.body;
+  const { snapshotProposalId } = req.body;
 
   const pageId = req.query.id as string;
 
@@ -40,7 +40,6 @@ async function recordSnapshotInfo (req: NextApiRequest, res: NextApiResponse<IPa
       id: pageId
     },
     data: {
-      snapshotProposalDomain,
       snapshotProposalId
     },
     include: {

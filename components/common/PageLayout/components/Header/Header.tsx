@@ -179,15 +179,9 @@ export default function Header (
                   </ListItemButton>
 
                   {/* Publishing to snapshot */}
-                  <ListItemButton>
-                    <GetAppIcon
-                      fontSize='small'
-                      sx={{
-                        mr: 1
-                      }}
-                    />
-                    <PublishToSnapshot page={currentPage as Page} />
-                  </ListItemButton>
+
+                  <PublishToSnapshot page={currentPage as Page} />
+
                 </List>
               </Popover>
             </Box>

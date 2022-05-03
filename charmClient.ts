@@ -538,7 +538,7 @@ class CharmClient {
     return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
   }
 
-  updatePageSnapshotData (pageId: string, data: Pick<Page, 'snapshotProposalDomain' | 'snapshotProposalId'>): Promise<IPageWithPermissions> {
+  updatePageSnapshotData (pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {
     return http.PUT(`/api/pages/${pageId}/snapshot`, data);
   }
 }
