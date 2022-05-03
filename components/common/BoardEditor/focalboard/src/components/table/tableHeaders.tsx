@@ -119,13 +119,12 @@ const TableHeaders = (props: Props): JSX.Element => {
         activeView.fields.visiblePropertyIds.map((id) => board.fields.cardProperties.find((t) => t.id === id)).filter((i) => i) as IPropertyTemplate[]
     ), [board.fields.cardProperties, activeView.fields.visiblePropertyIds])
 
-    const onDropToColumn = useCallback(async (template: IPropertyTemplate, container: IPropertyTemplate) => {
-        Utils.log(`ondrop. Source column: ${template.name}, dest column: ${container.name}`)
-
+    const onDropToColumn = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
+        Utils.log(`ondrop. Source column: ${sourceProperty.name}, dest column: ${destinationProperty.name}`)
         // Move template to new index
-        const destIndex = container ? activeView.fields.visiblePropertyIds.indexOf(container.id) : 0
-        await mutator.changeViewVisiblePropertiesOrder(activeView, template, destIndex >= 0 ? destIndex : 0)
-    }, [])
+        const destIndex = destinationProperty ? activeView.fields.visiblePropertyIds.indexOf(destinationProperty.id) : 0
+        await mutator.changeViewVisiblePropertiesOrder(activeView, sourceProperty, destIndex >= 0 ? destIndex : 0)
+    }
 
     const titleSortOption = activeView.fields.sortOptions?.find((o) => o.propertyId === Constants.titleColumnId)
     let titleSorted: 'up' | 'down' | 'none' = 'none'
