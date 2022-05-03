@@ -27,7 +27,7 @@
 }
 
 .bangle-tooltip {
-  z-index: 100;
+  z-index: var(--z-index-tooltip);
 }
 
 .bangle-editor a {
@@ -140,7 +140,7 @@
   white-space: break-spaces;
   -webkit-font-variant-ligatures: none;
   font-variant-ligatures: none;
-  font-feature-settings: "liga" 0;
+  font-feature-settings: "liga"0;
   /* the above doesn't seem to work in Edge */
 }
 
@@ -394,6 +394,7 @@ ol li {
 /** Disclosure component **/
 details {
   padding-left: 14px;
+
   summary {
     margin-left: -14px;
     outline: 0 none;

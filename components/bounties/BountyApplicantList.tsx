@@ -119,8 +119,7 @@ export function BountyApplicantList ({
           background: theme.palette.background.dark,
           '.MuiTableCell-root': {
             background: theme.palette.settingsHeader.background
-          },
-          zIndex: 9000
+          }
         }}
         >
           <TableRow>

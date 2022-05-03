@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import ShareModal from 'lit-share-modal';
-import { ResourceId, checkAndSignAuthMessage, SigningConditions, signAndSaveAuthMessage } from 'lit-js-sdk';
+import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
 import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { TokenGate } from '@prisma/client';
@@ -101,7 +101,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         <BackDrop
           onClick={popupState.close}
           open={popupState.isOpen}
-          sx={{ zIndex: 9999 }}
+          sx={{ zIndex: 'var(--z-index-modal)' }}
         >
           <div role='dialog' onClick={e => e.stopPropagation()}>
             <ShareModal
