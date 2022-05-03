@@ -4,8 +4,9 @@ import { prisma } from 'db';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { createDatabase, createDatabaseCardPage } from '../createDatabaseCardPage';
-import { DatabasePageNotFoundError, InvalidInputError, PageNotFoundError } from '../errors';
+import { DatabasePageNotFoundError, PageNotFoundError } from '../errors';
 import { getDatabaseRoot, getPageInBoard } from '../getPageInBoard';
 import { DatabasePage, Page } from '../interfaces';
 

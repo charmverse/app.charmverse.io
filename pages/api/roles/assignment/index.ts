@@ -10,7 +10,7 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireSpaceMembership())
+  .use(requireSpaceMembership({ adminOnly: true }))
   .use(requireKeys<SpaceRoleToRole & SpaceRole>(['spaceId', 'roleId', 'userId'], 'body'))
   .post(assignRole)
   .delete(removeRole);

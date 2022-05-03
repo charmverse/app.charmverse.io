@@ -1,14 +1,17 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
 import { Space } from '@prisma/client';
 import { prisma } from 'db';
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(updateSpace).delete(deleteSpace);
+handler
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
+  .put(updateSpace)
+  .delete(deleteSpace);
 
 async function updateSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
 

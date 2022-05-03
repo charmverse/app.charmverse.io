@@ -2,10 +2,8 @@ import type { DiscordUser, FavoritePage, SpaceRole, User, Role as RoleMembership
 
 export { FavoritePage, SpaceRole, User };
 
-export type Role = 'admin' | 'contributor';
-
 export interface Contributor extends User {
-  role: Role;
+  isAdmin: boolean;
 }
 
 interface NestedMemberships {

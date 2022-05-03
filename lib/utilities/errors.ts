@@ -5,6 +5,7 @@ export type ErrorSeverity = 'warning' | 'error';
 const ErrorCodes = {
   Unknown: 500,
   'Invalid input': 400,
+  'Undesirable operation': 400,
   'Data not found': 404,
   'Access denied': 401,
   'External service': 500,
@@ -50,4 +51,26 @@ export class SystemError<E = any> implements ISystemError<E> {
     this.error = errorInfo.error ?? {} as any;
   }
 
+}
+
+// Common Errors
+export class InvalidInputError extends SystemError {
+
+  constructor (message: string) {
+    super({
+      message,
+      errorType: 'Invalid input',
+      severity: 'warning'
+    });
+  }
+}
+
+export class DataNotFoundError extends SystemError {
+  constructor (message: string = 'Data not found') {
+    super({
+      message,
+      errorType: 'Data not found',
+      severity: 'warning'
+    });
+  }
 }
