@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import ShareModal from 'lit-share-modal';
-import { ResourceId, checkAndSignAuthMessage, SigningConditions } from 'lit-js-sdk';
+import { ResourceId, checkAndSignAuthMessage, SigningConditions, AuthSig } from 'lit-js-sdk';
 import { usePopupState, bindTrigger } from 'material-ui-popup-state/hooks';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { TokenGate } from '@prisma/client';
@@ -32,13 +32,13 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
 
   function onSubmit (conditions: ConditionsModalResult) {
     setApiError('');
-    saveTokenGate(conditions)
-      .then(() => {
-        popupState.close();
-      })
+    return saveTokenGate(conditions)
       .catch(error => {
         setApiError(error.message || error);
         errorPopupState.open();
+      })
+      .then(() => {
+        popupState.close();
       });
   }
 
@@ -55,6 +55,18 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
     };
     const chain = getLitChainFromChainId(chainId);
 
+    // TODO: catch the error in case a user closes the modal. but right now we cant reset the Lit Protocol state to let them retry
+    // let authSig: AuthSig;
+    // try {
+    // authSig = await checkAndSignAuthMessage({
+    //   chain
+    // });
+    // }
+    // catch (error) {
+    //   // user probably closed the popup
+    //   console.log('err', error);
+    //   return false;
+    // }
     const authSig = await checkAndSignAuthMessage({
       chain
     });
