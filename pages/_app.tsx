@@ -183,6 +183,8 @@ import 'theme/styles.scss';
 import Snackbar from 'components/common/Snackbar';
 import { SnackbarProvider } from 'hooks/useSnackbar';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -254,39 +256,41 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <Web3ReactProvider getLibrary={getLibrary}>
-            <Web3ConnectionManager>
-              <LitProtocolProvider>
-                <ReduxProvider store={store}>
-                  <FocalBoardProviders>
-                    <DataProviders>
-                      <SnackbarProvider>
-                        <TitleContext.Consumer>
-                          {([title]) => (
-                            <Head>
-                              <title>
-                                {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-                              </title>
-                              {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
-                              <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                            </Head>
-                          )}
-                        </TitleContext.Consumer>
-                        <CssBaseline enableColorScheme={true} />
-                        <Global styles={cssVariables} />
-                        <RouteGuard>
-                          <ErrorBoundary>
-                            {getLayout(<Component {...pageProps} />)}
-                            <Snackbar />
-                          </ErrorBoundary>
-                        </RouteGuard>
-                      </SnackbarProvider>
-                    </DataProviders>
-                  </FocalBoardProviders>
-                  {/** include the root portal for focalboard's popup */}
-                  <FocalBoardPortal />
-                </ReduxProvider>
-              </LitProtocolProvider>
-            </Web3ConnectionManager>
+            <LocalizationProvider dateAdapter={AdapterLuxon}>
+              <Web3ConnectionManager>
+                <LitProtocolProvider>
+                  <ReduxProvider store={store}>
+                    <FocalBoardProviders>
+                      <DataProviders>
+                        <SnackbarProvider>
+                          <TitleContext.Consumer>
+                            {([title]) => (
+                              <Head>
+                                <title>
+                                  {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+                                </title>
+                                {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
+                                <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+                              </Head>
+                            )}
+                          </TitleContext.Consumer>
+                          <CssBaseline enableColorScheme={true} />
+                          <Global styles={cssVariables} />
+                          <RouteGuard>
+                            <ErrorBoundary>
+                              {getLayout(<Component {...pageProps} />)}
+                              <Snackbar />
+                            </ErrorBoundary>
+                          </RouteGuard>
+                        </SnackbarProvider>
+                      </DataProviders>
+                    </FocalBoardProviders>
+                    {/** include the root portal for focalboard's popup */}
+                    <FocalBoardPortal />
+                  </ReduxProvider>
+                </LitProtocolProvider>
+              </Web3ConnectionManager>
+            </LocalizationProvider>
           </Web3ReactProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>

@@ -33,6 +33,7 @@
     ]
   },
   "dependencies": {
+    "@apollo/client": "^3.6.2",
     "@aws-sdk/client-s3": "^3.67.0",
     "@aws-sdk/client-sts": "^3.67.0",
     "@aws-sdk/lib-storage": "^3.67.0",
@@ -47,6 +48,7 @@
     "@bangle.dev/tooltip": "^0.28.4-alpha.2",
     "@bangle.dev/utils": "^0.28.8",
     "@beam-australia/react-env": "^3.1.1",
+    "@date-io/luxon": "^2.13.1",
     "@draft-js-plugins/editor": "^4.1.1",
     "@draft-js-plugins/mention": "^5.1.1",
     "@emotion/cache": "^11.7.1",
@@ -98,6 +100,7 @@
     "draft-js": "^0.11.7",
     "emoji-mart": "^3.0.1",
     "ethers": "^5.5.4",
+    "graphql": "^16.4.0",
     "immutability-helper": "^3.1.1",
     "immutable": "^4.0.0",
     "iron-session": "^6.0.5",

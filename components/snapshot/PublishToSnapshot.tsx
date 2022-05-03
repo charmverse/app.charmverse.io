@@ -10,21 +10,26 @@ import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { generateMarkdown } from 'lib/pages/generateMarkdown';
+
 import { getSnapshotProposal, SnapshotProposal, SnapshotReceipt } from 'lib/snapshot';
 import { useEffect, useState } from 'react';
-
-const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-const client = new snapshot.Client712(hub);
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import { Modal } from 'components/common/Modal';
+import PublishingForm from './PublishingForm';
 
 export default function PublishToSnapshot ({ page }: {page: Page}) {
-  const { account, library } = useWeb3React();
 
   const [space] = useCurrentSpace();
 
   const [checkingProposal, setCheckingProposal] = useState(!!page.snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const { pages, setPages } = usePages();
+
+  const {
+    isOpen,
+    open,
+    close
+  } = usePopupState({ variant: 'popover', popupId: 'publish-proposal' });
 
   async function verifyProposal (proposalId: string) {
     const snapshotProposal = await getSnapshotProposal(proposalId);
@@ -43,48 +48,6 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
 
   }, [page, page?.snapshotProposalId]);
 
-  const startDate = Math.round((Date.now() / 1000) + 3600);
-  const endDate = Math.round((Date.now() / 1000) + 3600 * 24 * (space?.defaultVotingDuration ?? 0));
-
-  async function publish () {
-    if (account) {
-
-      const content = generateMarkdown(page, false);
-
-      const currentBlockNum = await library.getBlockNumber();
-
-      const receipt = await client.proposal(library, account, {
-        space: space?.snapshotDomain as any,
-        type: 'single-choice',
-        title: page.title,
-        body: content,
-        choices: ['Yay', 'Neigh'],
-        start: startDate,
-        end: endDate,
-        snapshot: 0,
-        network: '4',
-        strategies: JSON.stringify([{ name: 'ticket', network: '4', params: {} }]),
-        plugins: JSON.stringify({}),
-        metadata: JSON.stringify({})
-      }) as SnapshotReceipt;
-
-      const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
-        snapshotProposalId: receipt.id
-      });
-
-      console.log('Receipt', receipt);
-      setPages({
-        ...pages,
-        [page.id]: updatedPage
-      });
-
-    }
-  }
-
-  async function getBlock () {
-
-  }
-
   return (
     <ListItemButton>
 
@@ -95,6 +58,7 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
           <LoadingIcon size={18} sx={{ mr: 1 }} />
           <ListItemText primary='Checking proposal' />
           {
+
           /**
            *   <LoadingComponent>
             <ListItemText primary='Checking proposal' />
@@ -116,7 +80,11 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
                 mr: 1
               }}
             />
-            <ListItemText onClick={publish} primary='Publish to snapshot' />
+            <ListItemText onClick={open} primary='Publish to snapshot' />
+
+            <Modal open={isOpen} onClose={close}>
+              <PublishingForm onSubmit={close} page={page} />
+            </Modal>
           </>
         )
       }
@@ -131,6 +99,7 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
           }}
         />
         <ListItemText primary='View on Snapshot' />
+
       </Link>
       )
       }
