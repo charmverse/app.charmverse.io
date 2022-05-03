@@ -1,14 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import React, { useState, MouseEvent } from 'react'
-import EditIcon from '@mui/icons-material/Edit';
-import {FormattedMessage, useIntl} from 'react-intl'
+import {FormattedMessage} from 'react-intl'
 import {IPropertyTemplate, PropertyType} from '../../blocks/board'
 import {BoardView} from '../../blocks/boardView'
 import mutator from '../../mutator'
 import Button from '../../widgets/buttons/button'
 import Menu from '@mui/material/Menu'
-import { IconButton, ListItemIcon, ListItemText, MenuItem } from '@mui/material'
+import { IconButton, ListItemIcon, ListItemText, MenuItem, SvgIconProps } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -29,26 +28,25 @@ type Props = {
     activeView: BoardView
 }
 
-export const iconForPropertyType = (propertyType: PropertyType) => {
+export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconProps) => {
   switch(propertyType) {
-    case "checkbox": return <CheckBoxIcon fontSize="small"/>
-    case "createdBy": return <PersonIcon fontSize="small" />
-    case "createdTime": return <AccessTimeIcon fontSize="small"/>
-    case "date": return <EventNoteIcon fontSize="small"/>
-    case "email": return <AlternateEmailIcon fontSize="small"/>
-    case "file": return <AttachFileIcon fontSize="small"/>
-    case "multiSelect": return <ListIcon fontSize="small"/>
-    case "number": return <NumbersIcon fontSize="small"/>
-    case "person": return <PersonIcon fontSize="small" />
-    case "phone": return <PhoneIcon fontSize="small"/>
-    case "select": return <ArrowDropDownCircleIcon fontSize="small"/>
-    case "text": return <SubjectIcon fontSize="small"/>
-    case "updatedBy": return <PersonIcon fontSize="small" />
-    case "updatedTime": return <AccessTimeIcon fontSize="small"/>
-    case "url": return <LinkIcon fontSize="small"/>
+    case "checkbox": return <CheckBoxIcon fontSize="small" {...props}/>
+    case "createdBy": return <PersonIcon fontSize="small" {...props} />
+    case "createdTime": return <AccessTimeIcon fontSize="small" {...props}/>
+    case "date": return <EventNoteIcon fontSize="small" {...props}/>
+    case "email": return <AlternateEmailIcon fontSize="small" {...props}/>
+    case "file": return <AttachFileIcon fontSize="small" {...props}/>
+    case "multiSelect": return <ListIcon fontSize="small" {...props}/>
+    case "number": return <NumbersIcon fontSize="small" {...props}/>
+    case "person": return <PersonIcon fontSize="small" {...props} />
+    case "phone": return <PhoneIcon fontSize="small" {...props}/>
+    case "select": return <ArrowDropDownCircleIcon fontSize="small" {...props}/>
+    case "text": return <SubjectIcon fontSize="small" {...props}/>
+    case "updatedBy": return <PersonIcon fontSize="small" {...props} />
+    case "updatedTime": return <AccessTimeIcon fontSize="small" {...props}/>
+    case "url": return <LinkIcon fontSize="small" {...props}/>
   }
 }
-
 
 const ViewHeaderPropertiesMenu = React.memo((props: Props) => {
     const {properties, activeView} = props

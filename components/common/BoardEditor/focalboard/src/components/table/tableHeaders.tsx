@@ -139,6 +139,7 @@ const TableHeaders = (props: Props): JSX.Element => {
             id='mainBoardHeader'
         >
             <TableHeader
+                type={"text"}
                 name={'Title'}
                 sorted={titleSorted}
                 readonly={props.readonly}
@@ -161,6 +162,7 @@ const TableHeaders = (props: Props): JSX.Element => {
                 }
                 return (
                     <TableHeader
+                        type={template.type}
                         name={template.name}
                         sorted={sorted}
                         readonly={props.readonly}
