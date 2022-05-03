@@ -2,7 +2,7 @@ import {
   bulletList, orderedList,
   paragraph
 } from '@bangle.dev/base-components';
-import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
+import { EditorState, Fragment, Node, setBlockType, Transaction, wrapIn } from '@bangle.dev/pm';
 import { TextSelection } from 'prosemirror-state';
 import { rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
@@ -324,16 +324,31 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
       description: 'Insert a summary and content',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
+
           rafCommandExec(view!, (_state, _dispatch) => {
 
-            const node = _state.schema.nodes.disclosureDetails.createAndFill();
+            const { $from, $to } = _state.selection;
+            const range = $from.blockRange($to);
 
-            if (_dispatch && isAtBeginningOfLine(_state)) {
-              _dispatch(_state.tr.replaceSelectionWith(node));
-              return true;
+            if (_dispatch && range) {
+              const tr = _state.tr;
+              tr.wrap(range, [
+                {
+                  type: _state.schema.nodes.disclosureDetails
+                }
+              ]);
+              tr.insert(range.start + 1, _state.schema.nodes.disclosureSummary.createChecked(null, Fragment.fromArray([
+                _state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))
+              ])));
+              const resolvedPos = tr.doc.resolve(range.start + 1);
+
+              tr.setSelection(TextSelection.near(resolvedPos));
+
+              _dispatch(tr);
             }
-            return insertNode(_state, _dispatch, node);
+            return true;
           });
+
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
             dispatch,
@@ -617,7 +632,7 @@ export function useEditorItems () {
           description: 'Link to a new page',
           editorExecuteCommand: (() => {
             return (async (state, dispatch, view) => {
-              renderSuggestionsTooltip(NestedPagePluginKey)(state, dispatch, view);
+              renderSuggestionsTooltip(NestedPagePluginKey, { component: 'nestedPage', threadIds: [] })(state, dispatch, view);
               return replaceSuggestionMarkWith(palettePluginKey, '')(
                 state,
                 dispatch,

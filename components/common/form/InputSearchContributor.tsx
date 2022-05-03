@@ -1,10 +1,10 @@
-import { Autocomplete, AutocompleteProps, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, AutocompleteProps, Box, BoxProps, TextField, Typography } from '@mui/material';
 import { useContributors } from 'hooks/useContributors';
-import { Contributor } from 'models';
+import { Contributor, User } from 'models';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
-import { HTMLAttributes, useState, useEffect } from 'react';
+import { HTMLAttributes, useState, useEffect, ElementType } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useSWRConfig } from 'swr';
@@ -55,7 +55,7 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
       autoHighlight
       getOptionLabel={(user) => cache.get(`@"ENS",102~,"${user.addresses[0]}",${chainId},`) ?? getDisplayName(user)}
       renderOption={(_props, user) => (
-        <ReviewerOption {..._props} user={user} />
+        <ReviewerOption {..._props as any} user={user} />
       )}
       renderInput={(params) => (
         <TextField
@@ -147,12 +147,12 @@ export function InputSearchContributorMultiple ({ onChange, defaultValue, ...pro
   );
 }
 
-export function ReviewerOption ({ user, avatarSize, ...props }: { user: Contributor, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement>) {
+export function ReviewerOption ({ user, avatarSize, fontSize, fontWeight, ...props }: { fontSize?: string | number, fontWeight?: number | string, user: User, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
   const ensName = useENSName(user.addresses[0]);
   return (
-    <Box component='li' display='flex' gap={1} {...props}>
+    <Box display='flex' gap={1} {...props} component={props.component ?? 'li'}>
       <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={user.avatar} />
-      <Typography>{ensName || getDisplayName(user)}</Typography>
+      <Typography fontSize={fontSize} fontWeight={fontWeight}>{ensName || getDisplayName(user)}</Typography>
     </Box>
   );
 }

@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
 import { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import Head from 'next/head';
 import * as React from 'react';
+import { CommentThreadsListDisplayProvider } from 'hooks/useCommentThreadsListDisplay';
 import Header, { headerHeight } from './components/Header';
 import Sidebar from './components/Sidebar';
 import Favicon from './components/Favicon';
@@ -100,16 +100,21 @@ function PageLayout ({ children }: { children: React.ReactNode }) {
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer>
-        <AppBar position='fixed' open={open}>
-          <Header open={open} openSidebar={handleDrawerOpen} />
-        </AppBar>
-        <Drawer variant='permanent' open={open}>
-          <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
-        </Drawer>
-        <PageContainer>
-          <HeaderSpacer />
-          {children}
-        </PageContainer>
+        <CommentThreadsListDisplayProvider>
+          <AppBar position='fixed' open={open}>
+            <Header
+              open={open}
+              openSidebar={handleDrawerOpen}
+            />
+          </AppBar>
+          <Drawer variant='permanent' open={open}>
+            <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
+          </Drawer>
+          <PageContainer>
+            <HeaderSpacer />
+            {children}
+          </PageContainer>
+        </CommentThreadsListDisplayProvider>
       </LayoutContainer>
     </>
   );

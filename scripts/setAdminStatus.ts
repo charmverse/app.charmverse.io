@@ -3,6 +3,9 @@
 import { RPCList } from 'connectors';
 import { prisma } from 'db';
 
+/**
+ * Restore admin status
+ */
 function setAdminStatus (): Promise<any> {
 
   return new Promise((resolve, reject) => {
@@ -35,3 +38,27 @@ setAdminStatus()
   });
 */
 
+/**
+ * Moving away from role names
+ */
+async function migrateAdminStatus () {
+  prisma.spaceRole.updateMany({
+    where: {
+      role: 'admin'
+    },
+    data: {
+      isAdmin: true
+    }
+  }).then(data => {
+    console.log(data.count, ' space roles affected');
+
+    return true;
+  });
+}
+
+/*
+migrateAdminStatus()
+  .then(() => {
+    console.log('Job complete');
+  });
+*/

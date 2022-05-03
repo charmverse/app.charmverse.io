@@ -7,11 +7,10 @@ import {
   PluginKey, Schema,
   Selection
 } from '@bangle.dev/pm';
-import { tooltipPlacement, TooltipRenderOpts } from '@bangle.dev/tooltip';
+import { createTooltipDOM, tooltipPlacement, TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
-import { pluginKey as emojiSuggestKey } from 'components/common/CharmEditor/components/emojiSuggest/emojiSuggest.constants';
 import log from 'lib/log';
 
 export const spec = specFactory;
@@ -172,7 +171,7 @@ function pluginsFactory({
         stateKey: key,
         renderOpts: {
           ...tooltipRenderOpts,
-          getReferenceElement: referenceElement((state: EditorState) => {
+          getReferenceElement: referenceElement(key, (state: EditorState) => {
             const markType = schema.marks[markName];
             const { selection } = state;
             return findFirstMarkPosition(
@@ -206,12 +205,13 @@ function pluginsFactory({
 }
 
 export function referenceElement(
+  pluginKey: PluginKey,
   getActiveMarkPos: (state: EditorState) => { start: number; end: number },
 ): GetReferenceElementFunction {
   return (view) => {
     return {
       getBoundingClientRect: () => {
-        const emojiSuggestState = emojiSuggestKey.getState(view.state);
+        const emojiSuggestState = pluginKey.getState(view.state);
         // Ref will be present if we are triggering the emoji suggest by clicking on page icon
         if (emojiSuggestState.ref) {
           return (emojiSuggestState.ref as HTMLDivElement).getBoundingClientRect()
@@ -289,7 +289,10 @@ function tooltipController({
             return;
           }
 
-          renderSuggestionsTooltip(key)(view.state, view.dispatch, view);
+          renderSuggestionsTooltip(key, {
+            component: "nestedPage",
+            selection: state.selection
+          })(view.state, view.dispatch, view);
           return;
         },
       };
@@ -334,12 +337,12 @@ function doesQueryHaveTrigger(
   return textContent.includes(trigger);
 }
 
-export function renderSuggestionsTooltip(key: PluginKey): Command {
+export function renderSuggestionsTooltip(key: PluginKey, value: Record<string, any>): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
       dispatch(
         state.tr
-          .setMeta(key, { type: 'RENDER_TOOLTIP' })
+          .setMeta(key, { type: 'RENDER_TOOLTIP', value })
           .setMeta('addToHistory', false),
       );
     }
@@ -591,4 +594,77 @@ export function updateSuggestTooltipCounter(
     }
     return true;
   };
+}
+
+export interface SuggestTooltipPluginState {
+  show: boolean;
+  tooltipContentDOM: HTMLElement
+  component: null | "nestedPage" | "inlineComment"
+  threadIds: string[]
+}
+
+export interface SuggestTooltipPluginOptions {
+  tooltipRenderOpts: SuggestTooltipRenderOpts;
+}
+
+export const SuggestTooltipPluginKey = new PluginKey<SuggestTooltipPluginState, Schema>('suggest_tooltip');
+
+export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPluginOptions) {
+  const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
+
+  return [
+    new Plugin<SuggestTooltipPluginState, Schema>({
+      key: SuggestTooltipPluginKey,
+      state: {
+        init () {
+          return {
+            show: false,
+            tooltipContentDOM: tooltipDOMSpec.contentDOM,
+            component: "nestedPage",
+            threadIds: [],
+          };
+        },
+        apply (tr, pluginState) {
+          const meta = tr.getMeta(SuggestTooltipPluginKey);
+          if (meta === undefined) {
+            return pluginState;
+          }
+          if (meta.type === 'RENDER_TOOLTIP') {
+            return {
+              ...pluginState,
+              ...meta.value,
+              show: true
+            };
+          }
+          if (meta.type === 'HIDE_TOOLTIP') {
+            // Do not change object reference if show was and is false
+            if (pluginState.show === false) {
+              return pluginState;
+            }
+            return {
+              ...pluginState,
+              component: null,
+              threadIds: [],
+              show: false,
+            };
+          }
+          throw new Error('Unknown type');
+        }
+      }
+    }),
+    tooltipPlacement.plugins({
+      stateKey: SuggestTooltipPluginKey,
+      renderOpts: {
+        ...tooltipRenderOpts,
+        tooltipDOMSpec,
+        getReferenceElement: referenceElement(SuggestTooltipPluginKey, (state) => {
+          const { selection } = state;
+          return {
+            end: selection.to,
+            start: selection.from
+          };
+        })
+      }
+    })
+  ];
 }

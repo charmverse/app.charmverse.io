@@ -1,20 +1,21 @@
 import { memo } from 'react';
-import { alpha } from '@mui/system';
-import styled from '@emotion/styled';
+import { alpha, SxProps } from '@mui/system';
+import { Box } from '@mui/material';
+import { useTheme } from '@emotion/react';
 
-const StyledPlaceholder = styled.div`
-  top: -2em;
-  position: relative;
-  color: ${({ theme }) => alpha(theme.palette.text.secondary, 0.5)};
-  // Place it beneath the actual editor
-  z-index: -20;
-`;
-
-function PlaceHolder ({ show }: { show: boolean }) {
+function PlaceHolder ({ show, text = "Type '/' for commands", sx }: { sx?: SxProps, text?: string, show: boolean }) {
+  const theme = useTheme();
   return show ? (
-    <StyledPlaceholder>
-      Type '/' for commands
-    </StyledPlaceholder>
+    <Box sx={{
+      top: '-2em',
+      position: 'relative',
+      color: alpha(theme.palette.text.secondary, 0.5),
+      zIndex: -20,
+      ...(sx ?? {})
+    }}
+    >
+      {text}
+    </Box>
   ) : null;
 }
 

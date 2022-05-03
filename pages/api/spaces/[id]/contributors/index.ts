@@ -1,10 +1,10 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
+import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { Contributor, Role } from 'models';
-import { prisma } from 'db';
+import { Contributor } from 'models';
+import { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -22,7 +22,7 @@ async function getContributors (req: NextApiRequest, res: NextApiResponse<Contri
   const contributors = spaceRoles.map((spaceRole): Contributor => {
     return {
       ...spaceRole.user,
-      role: spaceRole.role as Role
+      isAdmin: spaceRole.isAdmin
     };
   });
   return res.status(200).json(contributors);

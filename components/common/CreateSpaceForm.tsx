@@ -74,7 +74,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         updatedBy: user!.id,
         spaceRoles: {
           create: [{
-            role: 'admin',
+            isAdmin: true,
             user: {
               connect: {
                 id: user!.id

@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import DocumentPage from 'components/[pageId]/DocumentPage'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Card } from '../../blocks/card'
 import { usePages } from 'hooks/usePages'
 import log from 'lib/log'
@@ -18,9 +18,19 @@ type Props = {
 const CardDetail = (props: Props): JSX.Element|null => {
     const {card, readonly} = props
 
+    const mounted = useRef(false);
+
+    useEffect(() => {
+      mounted.current = true;
+      return () => {
+        mounted.current = false;
+      }
+    }, [])
+
     const { pages, setPages } = usePages();
 
     const debouncedPageUpdate = debouncePromise((updates: Prisma.PageUpdateInput) => {
+        
         setPages((_pages) => ({
           ..._pages,
           [card.id]: {
@@ -32,10 +42,12 @@ const CardDetail = (props: Props): JSX.Element|null => {
     }, 500);
 
     const setPage = useCallback(async (updates: Partial<Page>) => {
-      debouncedPageUpdate({ id: card.id, ...updates } as Prisma.PageUpdateInput)
-        .catch((err: any) => {
-          log.error('Error saving page', err);
-        });
+      if (mounted.current) {
+        debouncedPageUpdate({ id: card.id, ...updates } as Prisma.PageUpdateInput)
+          .catch((err: any) => {
+            log.error('Error saving page', err);
+          });
+      }
     }, [card]);
 
     const page = pages[card?.id];

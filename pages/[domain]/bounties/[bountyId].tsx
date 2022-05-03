@@ -35,8 +35,7 @@ import { eToNumber } from 'lib/utilities/numbers';
 import { BountyWithDetails, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
-
-export type BountyDetailsPersona = 'applicant' | 'reviewer' | 'admin'
+import useIsAdmin from 'hooks/useIsAdmin';
 
 export default function BountyDetails () {
   const [space] = useCurrentSpace();
@@ -58,9 +57,7 @@ export default function BountyDetails () {
   const isAssignee = bounty && user && bounty.assignee === user.id;
   const isReviewer = bounty && user && bounty.reviewer === user.id;
 
-  const isAdmin = space && user?.spaceRoles.some(spaceRole => {
-    return spaceRole.spaceId === space.id && spaceRole.role === 'admin';
-  });
+  const isAdmin = useIsAdmin();
 
   const isApplicant = user && applications.some(application => {
     return application.createdBy === user.id;
@@ -123,8 +120,6 @@ export default function BountyDetails () {
   function toggleBountyDeleteDialog () {
     setShowBountyDeleteDialog(!showBountyDeleteDialog);
   }
-
-  const deleteableBounty = bounty?.status === 'open';
 
   async function deleteBounty () {
     await charmClient.deleteBounty(bounty!.id);
@@ -235,15 +230,11 @@ export default function BountyDetails () {
                 viewerCanModifyBounty === true && (
                   <>
                     <IconButton onClick={bountyEditModal.open}>
-                      <EditIcon fontSize='small' />
+                      <EditIcon fontSize='medium' />
                     </IconButton>
-                    {
-                      deleteableBounty === true && (
-                      <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
-                        <DeleteIcon fontSize='small' sx={{ color: 'red.main' }} />
-                      </IconButton>
-                      )
-                    }
+                    <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
+                      <DeleteIcon fontSize='medium' />
+                    </IconButton>
                   </>
                 )
               }
@@ -397,6 +388,17 @@ export default function BountyDetails () {
         </Modal>
 
         <Modal open={showBountyDeleteDialog} onClose={toggleBountyDeleteDialog}>
+
+          {
+            bounty.status !== 'open' && (
+            <Typography sx={{ mb: 1 }}>
+              {
+                bounty.status === 'complete' ? 'This bounty is already complete.' : 'This is bounty in progress.'
+              }
+
+            </Typography>
+            )
+          }
 
           <Typography>
             Are you sure you want to delete this bounty?
