@@ -29,6 +29,7 @@ import { eToNumber } from 'lib/utilities/numbers';
 import { BountyWithDetails, PageContent } from 'models';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
+import useIsAdmin from 'hooks/useIsAdmin';
 import BountyModal from '../components/BountyModal';
 import BountyStatusBadge from '../components/BountyStatusBadge';
 import BountyPaymentButton from './components/BountyPaymentButton';
@@ -56,10 +57,7 @@ export default function BountyDetails () {
 
   const isAssignee = bounty && user && bounty.assignee === user.id;
   const isReviewer = bounty && user && bounty.reviewer === user.id;
-
-  const isAdmin = space && user?.spaceRoles.some(spaceRole => {
-    return spaceRole.spaceId === space.id && spaceRole.role === 'admin';
-  });
+  const isAdmin = useIsAdmin();
 
   const isApplicant = user && applications.some(application => {
     return application.createdBy === user.id;
@@ -132,7 +130,7 @@ export default function BountyDetails () {
     router.push(`/${space!.domain}/bounties`);
   }
 
-  function applicationSubmitted (application: Application) {
+  function applicationSubmitted () {
     toggleApplicationDialog();
     loadBounty();
   }

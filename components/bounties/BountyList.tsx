@@ -112,7 +112,7 @@ export default function BountyList () {
               ? <Typography paragraph={true}>No bounties were found</Typography>
               : sortedBounties.map(bounty => {
                 return (
-                  <Grid item>
+                  <Grid key={bounty.id} item>
                     <BountyCard truncate={false} key={bounty.id} bounty={bounty} />
                   </Grid>
                 );
