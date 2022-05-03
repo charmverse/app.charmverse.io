@@ -49,10 +49,10 @@ const ScrollableContainer = styled.div`
   padding: ${({ theme }) => theme.spacing(0, 4)};
 `;
 
-export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose'> & {
+export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose' | 'title'> & {
   size?: ModalSize,
   children: any,
-  title?: any,
+  title?: string | ReactNode,
   onClose: () => void
 };
 
