@@ -284,7 +284,7 @@ const PageThreadListBox = styled.div`
   right: 0px;
   width: 400px;
   top: 75px;
-  z-index: 2000;
+  z-index: var(--z-index-drawer);
   height: calc(100% - 80px);
   overflow: auto;
 `;

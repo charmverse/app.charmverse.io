@@ -217,7 +217,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiAutocomplete: {
         styleOverrides: {
           popper: {
-            zIndex: 3000
+            zIndex: 'var(--z-index-speedDial)'
           }
         }
       },
