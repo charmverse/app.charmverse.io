@@ -6,9 +6,9 @@ import Button from '@mui/material/Button';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { getChainById, RPC } from 'connectors';
+import { getChainById } from 'connectors';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import ERC20ABI from '../../abis/ERC20ABI.json';
+import ERC20ABI from '../../../../abis/ERC20ABI.json';
 
 interface Props {
   receiver: string;

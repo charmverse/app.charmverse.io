@@ -5,7 +5,7 @@ import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
 import { ethers } from 'ethers';
 import { getChainById } from 'connectors';
-import useGnosisSafe from './hooks/useGnosisSafe';
+import useGnosisSafe from '../hooks/useGnosisSafe';
 
 export interface MultiPaymentResult {
   transactions: MetaTransactionData[];

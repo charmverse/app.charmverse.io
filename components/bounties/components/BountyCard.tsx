@@ -17,9 +17,8 @@ export function BountyCard ({ truncate = true, bounty }: IBountyInput) {
     <Card
       sx={{
         width: 290,
-        m: '5px',
         minHeight: 200,
-        cursor: 'pointer'
+        display: 'grid' // make child full height
       }}
       variant='outlined'
     >
