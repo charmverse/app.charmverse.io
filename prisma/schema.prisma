@@ -36,6 +36,8 @@ model Space {
   name            String
   domain          String           @unique
   discordServerId String?
+  snapshotDomain  String?
+  defaultVotingDuration Int?
   spaceRoles      SpaceRole[]
   permissions     PagePermission[]
   pages           Page[]

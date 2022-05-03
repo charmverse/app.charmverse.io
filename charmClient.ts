@@ -532,6 +532,10 @@ class CharmClient {
   getPageThreads (pageId: string): Promise<ThreadWithComments[]> {
     return http.GET(`/api/pages/${pageId}/threads`);
   }
+
+  updateSnapshotConnection (spaceId: string, data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>): Promise<ThreadWithComments[]> {
+    return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
+  }
 }
 
 const charmClient = new CharmClient();

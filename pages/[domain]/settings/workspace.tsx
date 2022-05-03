@@ -21,6 +21,7 @@ import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWor
 import Link from 'components/common/Link';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
+import ConnectSnapshot from 'components/settings/snapshot/connect-snapshot';
 
 export default function WorkspaceSettings () {
   setTitle('Workspace Options');
@@ -118,6 +119,11 @@ export default function WorkspaceSettings () {
       <Legend>Import Content</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ImportNotionWorkspace />
+      </Box>
+
+      <Legend>Snapshot.org Integration</Legend>
+      <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
+        <ConnectSnapshot />
       </Box>
     </>
   );
