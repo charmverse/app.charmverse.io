@@ -124,12 +124,20 @@
 
         &.header-cell {
             padding-right: 0;
-
+            cursor: pointer;
+            .Label {
+              display: flex;
+              align-items: center;
+            }
             .Icon {
                 width: 16px;
                 height: 16px;
                 vertical-align: middle;
                 margin-left: 5px;
+            }
+
+            &:hover {
+              background-color: rgba(var(--center-channel-color-rgb), 0.05);
             }
         }
 

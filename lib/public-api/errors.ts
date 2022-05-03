@@ -41,17 +41,6 @@ export class UnsupportedKeysError<D = any> extends SystemError<UnsupportedKeyDet
   }
 }
 
-export class InvalidInputError extends SystemError {
-
-  constructor (message: string) {
-    super({
-      message,
-      errorType: 'Invalid input',
-      severity: 'warning'
-    });
-  }
-}
-
 export class SpaceNotFoundError extends SystemError {
 
   constructor (id: string) {

@@ -69,7 +69,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
     }
   });
 
-  const activeRoleAction = (contributor.role === 'admin') ? 'makeAdmin' : 'makeContributor';
+  const activeRoleAction = contributor.isAdmin ? 'makeAdmin' : 'makeContributor';
 
   return (
     <StyledRow pb={2} mb={2}>
@@ -90,7 +90,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
               {...bindTrigger(popupState)}
               endIcon={<KeyboardArrowDownIcon fontSize='small' />}
             >
-              {contributor.role}
+              {contributor.isAdmin ? 'admin' : 'contributor'}
             </Button>
             {/* <Typography color='secondary' variant='body2' sx={{ px: 3 }} {...bindTrigger(popupState)}>
             {contributor.role}
@@ -137,7 +137,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
         )
           : (
             <Typography color='secondary'>
-              {contributor.role}
+              {contributor.isAdmin ? 'admin' : 'contributor'}
             </Typography>
           )}
       </Box>

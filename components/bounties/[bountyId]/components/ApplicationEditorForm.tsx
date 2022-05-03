@@ -10,7 +10,7 @@ import { useUser } from 'hooks/useUser';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { FormMode } from './BountyEditorForm';
+import { FormMode } from '../../components/BountyEditorForm';
 
 interface IApplicationFormProps {
   onSubmit: (application: Application) => any,

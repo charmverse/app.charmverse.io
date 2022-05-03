@@ -14,7 +14,11 @@ import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 import { queryIsSelectionAroundInlineComment } from './inlineComment';
 import { InlineCommentSubMenu } from './inlineComment/InlineComment.components';
 
-export default function FloatingMenuComponent ({ pluginKey, inline = false }: {pluginKey: PluginKey, inline?: boolean}) {
+export default function FloatingMenuComponent (
+  {
+    pluginKey, disableComments = false, inline = false }: {disableComments?: boolean, pluginKey: PluginKey, inline?: boolean
+  }
+) {
   const { showMessage } = useSnackbar();
   const { getPagePermissions, currentPageId } = usePages();
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
@@ -33,7 +37,7 @@ export default function FloatingMenuComponent ({ pluginKey, inline = false }: {p
                 <StrikeButton />
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={pluginKey} />
-                {!inline && permissions.edit_content && <InlineCommentButton menuKey={pluginKey} />}
+                {!inline && permissions.edit_content && !disableComments && <InlineCommentButton menuKey={pluginKey} />}
               </MenuGroup>
               {!inline && (
               <MenuGroup isLastGroup>

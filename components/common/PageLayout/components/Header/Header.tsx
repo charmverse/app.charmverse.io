@@ -2,6 +2,8 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import MoonIcon from '@mui/icons-material/DarkMode';
+import SunIcon from '@mui/icons-material/WbSunny';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -202,7 +204,7 @@ export default function Header (
           {/** dark mode toggle */}
           <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
             <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-              {theme.palette.mode === 'dark' ? <Brightness7Icon color='secondary' /> : <Brightness4Icon color='secondary' />}
+              {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
             </IconButton>
           </Tooltip>
           {/** user account */}

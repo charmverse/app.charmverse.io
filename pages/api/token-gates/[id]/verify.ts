@@ -42,7 +42,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
       if (!spaceRole) {
         await prisma.spaceRole.create({
           data: {
-            role: tokenGate.userRole || undefined,
+            isAdmin: false,
             userId: user.id,
             spaceId: tokenGate.spaceId,
             tokenGateId: tokenGate.id,
@@ -51,7 +51,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
         });
         console.log('Gave user access to workspace', { tokenGateId: tokenGate.id, userId: user.id });
       }
-      else if (spaceRole.tokenGateId || spaceRole.role !== 'admin') {
+      else if (spaceRole.tokenGateId || spaceRole.isAdmin !== true) {
         await prisma.spaceRole.update({
           where: {
             spaceUser: {
@@ -60,7 +60,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
             }
           },
           data: {
-            role: tokenGate.userRole || undefined,
+            isAdmin: false,
             tokenGateId: tokenGate.id,
             tokenGateConnectedDate: new Date()
           }

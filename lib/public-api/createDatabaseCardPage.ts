@@ -1,7 +1,8 @@
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { v4, validate } from 'uuid';
-import { DatabasePageNotFoundError, InvalidInputError } from './errors';
+import { InvalidInputError } from 'lib/utilities/errors';
+import { DatabasePageNotFoundError } from './errors';
 import { PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
 
@@ -13,7 +14,7 @@ export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title'
     data: {
       id: boardId,
       title: 'Example title',
-      path: v4(),
+      path: `path-${v4()}`,
       type: 'board',
       contentText: '',
       boardId,

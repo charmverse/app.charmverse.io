@@ -3,7 +3,7 @@
 import { Box } from '@mui/material'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { usePages } from 'hooks/usePages'
-import { BountyStatusColours } from 'components/bounties/BountyStatusBadge'
+import { BountyStatusColours } from 'components/bounties/components/BountyStatusBadge'
 import { useBounties } from 'hooks/useBounties'
 import { BOUNTY_LABELS } from 'models'
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'

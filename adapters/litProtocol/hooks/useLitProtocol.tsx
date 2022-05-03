@@ -6,7 +6,9 @@ const LitProtocolContext = createContext<LitJsSdk.LitNodeClient | null>(null);
 export function LitProtocolProvider ({ children }: { children: ReactNode }) {
 
   const [litClient, setClient] = useState<LitJsSdk.LitNodeClient | null>(null);
-  const client = useMemo(() => new LitJsSdk.LitNodeClient(), []);
+  const client = useMemo(() => new LitJsSdk.LitNodeClient({
+    alertWhenUnauthorized: false
+  }), []);
 
   useEffect(() => {
     client.connect()

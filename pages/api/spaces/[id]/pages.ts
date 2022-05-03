@@ -48,13 +48,8 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
             id: spaceId,
             spaceRoles: {
               some: {
-                OR: [{
-                  userId,
-                  isAdmin: true
-                }, {
-                  userId,
-                  role: 'admin'
-                }]
+                userId,
+                isAdmin: true
               }
             }
           }

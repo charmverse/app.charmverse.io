@@ -66,6 +66,7 @@ function AddViewMenu (props: AddViewProps) {
       view.fields.viewType = 'board'
       view.parentId = board.id
       view.rootId = board.rootId
+      view.fields.cardOrder = activeView.fields.cardOrder;
 
       const oldViewId = activeView.id
 
@@ -97,6 +98,7 @@ function AddViewMenu (props: AddViewProps) {
       view.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id)
       view.fields.columnWidths = {}
       view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth
+      view.fields.cardOrder = activeView.fields.cardOrder;
 
       const oldViewId = activeView.id
 
@@ -126,6 +128,7 @@ function AddViewMenu (props: AddViewProps) {
       view.parentId = board.id
       view.rootId = board.rootId
       view.fields.visiblePropertyIds = [Constants.titleColumnId]
+      view.fields.cardOrder = activeView.fields.cardOrder;
 
       const oldViewId = activeView.id
 
@@ -154,6 +157,7 @@ function AddViewMenu (props: AddViewProps) {
       view.parentId = board.id
       view.rootId = board.rootId
       view.fields.visiblePropertyIds = [Constants.titleColumnId]
+      view.fields.cardOrder = activeView.fields.cardOrder;
 
       const oldViewId = activeView.id
 
