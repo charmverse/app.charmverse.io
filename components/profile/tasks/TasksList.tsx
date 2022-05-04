@@ -8,17 +8,16 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Link, Task } from 'models';
+import { useTasks } from 'hooks/useTasks';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
   border-bottom: 1px solid #000;
 `;
 
-type TasksListProps = {
-  tasks: Task[];
-};
+export default function TasksList () {
 
-export default function TasksList ({ tasks }: TasksListProps) {
+  const tasks = useTasks();
 
   const handleSign = () => {
   };

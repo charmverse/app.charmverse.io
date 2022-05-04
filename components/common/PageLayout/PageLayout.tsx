@@ -8,7 +8,7 @@ import Head from 'next/head';
 import * as React from 'react';
 import { CommentThreadsListDisplayProvider } from 'hooks/useCommentThreadsListDisplay';
 import Header, { headerHeight } from './components/Header';
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/Sidebar/Sidebar';
 import Favicon from './components/Favicon';
 import PageContainer from './components/PageContainer';
 
@@ -82,7 +82,12 @@ const LayoutContainer = styled.div`
   height: 100%;
 `;
 
-function PageLayout ({ children }: { children: React.ReactNode }) {
+interface PageLayoutProps {
+  children: React.ReactNode;
+  sidebar?: (p: { closeSidebar: () => void }) => JSX.Element
+}
+
+function PageLayout ({ children, sidebar: SidebarOverride }: PageLayoutProps) {
   const [open, setOpen] = React.useState(true);
   const [user] = useUser();
 
@@ -108,7 +113,9 @@ function PageLayout ({ children }: { children: React.ReactNode }) {
             />
           </AppBar>
           <Drawer variant='permanent' open={open}>
-            <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
+            {SidebarOverride
+              ? <SidebarOverride closeSidebar={handleDrawerClose} />
+              : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
           </Drawer>
           <PageContainer>
             <HeaderSpacer />

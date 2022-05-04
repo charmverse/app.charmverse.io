@@ -1,19 +1,19 @@
 import { ReactElement } from 'react';
 import PageLayout from 'components/profile/components/ProfileLayout';
 import { setTitle } from 'hooks/usePageTitle';
-import TasksList from 'components/profile/tasks';
+import PublicProfile from 'components/profile/public';
 
-export default function TasksPage () {
+export default function PublicProfilePage () {
 
-  setTitle('Tasks');
+  setTitle('Public Profile');
 
   return (
-    <TasksList />
+    <PublicProfile />
   );
 
 }
 
-TasksPage.getLayout = (page: ReactElement) => {
+PublicProfilePage.getLayout = (page: ReactElement) => {
   return (
     <PageLayout>
       {page}

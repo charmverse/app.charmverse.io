@@ -1,19 +1,19 @@
 import { ReactElement } from 'react';
 import PageLayout from 'components/profile/components/ProfileLayout';
 import { setTitle } from 'hooks/usePageTitle';
-import TasksList from 'components/profile/tasks';
+import Integrations from 'components/profile/integrations';
 
-export default function TasksPage () {
+export default function IntegrationsPage () {
 
-  setTitle('Tasks');
+  setTitle('Integrations');
 
   return (
-    <TasksList />
+    <Integrations />
   );
 
 }
 
-TasksPage.getLayout = (page: ReactElement) => {
+IntegrationsPage.getLayout = (page: ReactElement) => {
   return (
     <PageLayout>
       {page}
