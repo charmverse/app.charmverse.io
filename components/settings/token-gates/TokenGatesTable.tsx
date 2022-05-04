@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { humanizeAccessControlConditions, checkAndSignAuthMessage } from 'lit-js-sdk';
+import { useState } from 'react';
+import { checkAndSignAuthMessage } from 'lit-js-sdk';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { TokenGate } from '@prisma/client';
@@ -17,11 +17,10 @@ import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
 import { getLitChainFromChainId } from 'lib/token-gates';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { mutate } from 'swr';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 import useRoles from '../roles/hooks/useRoles';
+import { useTokenGates } from './hooks/useTokenGates';
 
 interface Props {
   tokenGates: TokenGateWithRoles[];
@@ -30,23 +29,11 @@ interface Props {
 }
 
 export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Props) {
-  const { account, chainId } = useWeb3React();
-  const [descriptions, setDescriptions] = useState<string[]>([]);
+  const { chainId } = useWeb3React();
+  const { tokenGateDescriptions, updateTokenGateRoles, deleteRoleFromTokenGate } = useTokenGates();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
   const { roles } = useRoles();
-  const [space] = useCurrentSpace();
-
-  useEffect(() => {
-    Promise.all(tokenGates.map(tokenGate => humanizeAccessControlConditions({
-      myWalletAddress: account || '',
-      accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
-    })))
-      .then(result => {
-        setDescriptions(result);
-      });
-  }, [tokenGates]);
-
   async function testConnect (tokenGate: TokenGate) {
     const chain = getLitChainFromChainId(chainId);
     setTestResult({ status: 'loading' });
@@ -70,23 +57,6 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
     }
   }
 
-  async function updateTokenGateRoles (tokenGateId: string, roleIds: string[]) {
-    if (space) {
-      await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
-      // TODO: Replace this with network friendly cache update
-      mutate(`tokenGates/${space.id}`);
-    }
-  }
-
-  async function deleteRoleFromTokenGate (tokenGateId: string, roleId: string) {
-    const tokenGate = tokenGates.find(_tokenGate => _tokenGate.id === tokenGateId);
-    if (space && tokenGate) {
-      const roleIds = tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId).filter(tokenGateRoleId => tokenGateRoleId !== roleId);
-      await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
-      mutate(`tokenGates/${space.id}`);
-    }
-  }
-
   return (
     <>
       <Table size='small' aria-label='simple table'>
@@ -98,13 +68,13 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
           </TableRow>
         </TableHead>
         <TableBody>
-          {tokenGates.map((tokenGate, index) => (
+          {tokenGates.map((tokenGate) => (
             <TableRow key={tokenGate.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
               <TableCell sx={{ px: 0 }}>
                 <Typography sx={{
                   my: 1
                 }}
-                >{descriptions[index]}
+                >{tokenGateDescriptions[tokenGate.id]}
                 </Typography>
                 {roles?.length !== 0 && (
                 <TokenGateRolesSelect
