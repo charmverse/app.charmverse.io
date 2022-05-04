@@ -14,8 +14,8 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
-import { SnapshotReceipt, SnapshotSpace, getSnapshotSpace } from 'lib/snapshot';
-import { SystemError } from 'lib/utilities/errors';
+import { getSnapshotSpace, SnapshotReceipt, SnapshotSpace } from 'lib/snapshot';
+import { ExternalServiceError, SystemError } from 'lib/utilities/errors';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -120,31 +120,39 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
       const currentBlockNum = await library.getBlockNumber();
 
-      console.log(space);
+      let receipt: SnapshotReceipt;
 
       try {
-        const receipt = await client.proposal(library, account, {
+        receipt = await client.proposal(library, account, {
           space: space?.snapshotDomain as any,
           type: 'single-choice',
           title: page.title,
           body: content,
           choices: ['Yay', 'Neigh'],
-          start: startDate,
+          start: 0,
           end: endDate,
           snapshot: 0,
           network: '4',
-          strategies: JSON.stringify([{ name: 'ticket', network: '4', params: {} }]),
+          strategies: JSON.stringify([]),
+          // strategies: JSON.stringify([{ name: 'ticket', network: '4', params: {} }]),
           plugins: JSON.stringify({}),
           metadata: JSON.stringify({})
         } as any) as SnapshotReceipt;
 
-        const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
-          snapshotProposalId: receipt.id
-        });
       }
-      catch (err) {
-        console.log('Error occurred', err);
+      catch (err: any) {
+
+        const errorMessageToShow = err?.error_description ? `Snapshot error: ${err?.error_description}` : undefined;
+
+        setFormError(
+          new ExternalServiceError(errorMessageToShow)
+        );
+        return;
       }
+
+      const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
+        snapshotProposalId: receipt.id
+      });
 
       console.log('Receipt', receipt);
       setPages({
@@ -194,7 +202,6 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
               <FieldLabel>Start date</FieldLabel>
               <DateTimePicker
                 {...register('startDate')}
-                sx={{ zIndex: 1000 }}
                 value={startDate}
                 onChange={(value) => {
                   console.log(value);

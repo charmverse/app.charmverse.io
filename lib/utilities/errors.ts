@@ -75,3 +75,14 @@ export class DataNotFoundError extends SystemError {
     });
   }
 }
+
+export class ExternalServiceError extends SystemError {
+  constructor (message: string = 'Something went wrong with an external service') {
+    super({
+      message,
+      errorType: 'External service',
+      severity: 'error'
+    });
+  }
+}
+
