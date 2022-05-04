@@ -448,6 +448,10 @@ class CharmClient {
     return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
   }
 
+  updateTokenGateRoles (tokenGateId: string, spaceId: string, roleIds: string[]) {
+    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
+  }
+
   getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
     return http.GET('/api/tokens/metadata', { chainId, contractAddress });
   }
@@ -533,10 +537,6 @@ class CharmClient {
 
   getPageThreads (pageId: string): Promise<ThreadWithComments[]> {
     return http.GET(`/api/pages/${pageId}/threads`);
-  }
-
-  updateTokenGateRoles (tokenGateId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
   }
 }
 

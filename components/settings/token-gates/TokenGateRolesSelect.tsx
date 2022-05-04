@@ -1,4 +1,4 @@
-import { Box, Chip, FormControl, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, Chip, FormControl, MenuItem, Select } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { useMemo } from 'react';
 import styled from '@emotion/styled';
@@ -37,7 +37,10 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
   const { roles } = useRoles();
 
   const rolesRecord: Record<string, ListSpaceRolesResponse> = useMemo(() => roles ? roles.reduce((obj, role) => (
-    { ...obj, [role.id]: role }
+    {
+      ...obj,
+      [role.id]: role
+    }
   ), {}) : {}, [roles]);
 
   async function selectOption (ev: SelectChangeEvent<string[]>) {

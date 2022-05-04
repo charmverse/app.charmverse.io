@@ -32,17 +32,27 @@ export function TokenGatesProvider ({ spaceId, children }:{spaceId: string, chil
   useEffect(() => {
     async function main () {
       if (data) {
-        setTokenGatesWithRoles(data.reduce((acc, cur) => ({ ...acc, [cur.id]: cur }), {}));
-        const results = await Promise.all(data.map(tokenGate => humanizeAccessControlConditions({
-          myWalletAddress: account || '',
-          accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
-        }).then(description => {
-          return {
-            description,
-            tokenGateId: tokenGate.id
-          };
-        })));
-        setTokenGateDescriptions(results.reduce((acc, result) => ({ ...acc, [result.tokenGateId]: result.description }), {}));
+        setTokenGatesWithRoles(
+          data.reduce((tokenGatesWithRolesRecord, tokenGateWithRole) => (
+            { ...tokenGatesWithRolesRecord, [tokenGateWithRole.id]: tokenGateWithRole }
+          ), {})
+        );
+        const results = await Promise.all(
+          data.map(tokenGate => humanizeAccessControlConditions({
+            myWalletAddress: account || '',
+            accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
+          }).then(description => {
+            return {
+              description,
+              tokenGateId: tokenGate.id
+            };
+          }))
+        );
+        setTokenGateDescriptions(
+          results.reduce((tokenGateDescriptionsRecord, { description, tokenGateId }) => (
+            { ...tokenGateDescriptionsRecord, [tokenGateId]: description }
+          ), {})
+        );
       }
     }
     main();
