@@ -48,7 +48,6 @@ describe('GET /databases/{id}', () => {
         url: expect.any(String)
       })
     );
-
   });
 
   it('should respond with 401 status when an invalid API key is provided', async () => {
