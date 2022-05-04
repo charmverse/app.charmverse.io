@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { humanizeAccessControlConditions, checkAndSignAuthMessage, ALL_LIT_CHAINS } from 'lit-js-sdk';
+import { humanizeAccessControlConditions, checkAndSignAuthMessage } from 'lit-js-sdk';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { TokenGate } from '@prisma/client';
@@ -10,14 +10,15 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import DeleteIcon from '@mui/icons-material/Close';
 import ButtonChip from 'components/common/ButtonChip';
-import { ErrorModal, SuccessModal } from 'components/common/Modal';
 import Tooltip from '@mui/material/Tooltip';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
-import { getChainFromGate, getLitChainFromChainId } from 'lib/token-gates';
+import { getLitChainFromChainId } from 'lib/token-gates';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
+import TokenGateRolesSelect from './TokenGateRolesSelect';
+import useRoles from '../roles/hooks/useRoles';
 
 interface Props {
   tokenGates: TokenGate[];
@@ -26,12 +27,11 @@ interface Props {
 }
 
 export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props) {
-
   const { account, chainId } = useWeb3React();
   const [descriptions, setDescriptions] = useState<string[]>([]);
-  const [gateTesterror, setGateTestError] = useState('');
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
+  const { roles } = useRoles();
 
   useEffect(() => {
     Promise.all(tokenGates.map(tokenGate => humanizeAccessControlConditions({
@@ -54,7 +54,7 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
         resourceId: tokenGate.resourceId as any,
         authSig,
         chain,
-        accessControlConditions: (tokenGate.conditions as any)!.accessControlConditions
+        accessControlConditions: (tokenGate.conditions as any).accessControlConditions
       });
       await charmClient.verifyTokenGate({ jwt, id: tokenGate.id });
 
@@ -72,23 +72,24 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
         <TableHead>
           <TableRow>
             <TableCell sx={{ px: 0 }}>Description</TableCell>
-            <TableCell>Chain</TableCell>
-            <TableCell>Created</TableCell>
-            <TableCell>{/* actions */}</TableCell>
+            <TableCell></TableCell>
+            {/* <TableCell></TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
           {tokenGates.map((row, index) => (
-            <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+            <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
               <TableCell sx={{ px: 0 }}>
-                <Typography>{descriptions[index]}</Typography>
+                <Typography sx={{
+                  my: 1
+                }}
+                >{descriptions[index]}
+                </Typography>
+                {roles?.length !== 0 && <TokenGateRolesSelect />}
               </TableCell>
-              <TableCell width={150}>
-                <Typography>{ALL_LIT_CHAINS[getChainFromGate(row)]?.name}</Typography>
-              </TableCell>
-              <TableCell width={150} sx={{ whiteSpace: 'nowrap' }}>
-                {new Date(row.createdAt).toDateString()}
-              </TableCell>
+              {/* <TableCell sx={{ width: '150px' }}>
+                {roles?.length !== 0 && <Button size='small' variant='outlined' onClick={() => setShowingTokenGateRolesModal(true)}>Attach Roles</Button>}
+              </TableCell> */}
               <TableCell width={150} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
                 <Tooltip arrow placement='top' title='Test this gate using your own wallet'>
                   <Box component='span' pr={1}>
@@ -113,7 +114,6 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
           ))}
         </TableBody>
       </Table>
-
       <TestConnectionModal
         status={testResult.status}
         message={testResult.message}
