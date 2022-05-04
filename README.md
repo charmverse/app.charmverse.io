@@ -28,6 +28,7 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/charmverse
 ```
 git clone git@github.com:charmverse/app.charmverse.io.git
 npm ci
+npx patch-package
 npx prisma migrate dev
 npm start
 ```
