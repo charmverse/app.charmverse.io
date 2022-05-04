@@ -25,7 +25,7 @@
     "test:server": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose",
     "test:server-integration": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server-integration.ts' --verbose"
   },
-  "postinstall": "patch-package",
+  "postinstall": "patch-package --error-on-fail",
   "prepare": "husky install",
   "lint-staged": {
     "*.{ts,tsx}": [

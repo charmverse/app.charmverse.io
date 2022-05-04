@@ -389,7 +389,8 @@ function CharmEditor (
       }}
       className='czi-editor-frame-body'
       pmViewOpts={{
-        editable: () => !readOnly
+        editable: () => !readOnly,
+        plugins: []
       }}
       placeholderComponent={(
         <Placeholder
