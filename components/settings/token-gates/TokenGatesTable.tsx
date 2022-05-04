@@ -19,7 +19,6 @@ import { getLitChainFromChainId } from 'lib/token-gates';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
-import useRoles from '../roles/hooks/useRoles';
 import { useTokenGates } from './hooks/useTokenGates';
 
 interface Props {
@@ -33,7 +32,6 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   const { tokenGateDescriptions, updateTokenGateRoles, deleteRoleFromTokenGate } = useTokenGates();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
-  const { roles } = useRoles();
   async function testConnect (tokenGate: TokenGate) {
     const chain = getLitChainFromChainId(chainId);
     setTestResult({ status: 'loading' });
@@ -96,17 +94,17 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                   </Box>
                 </Tooltip>
                 {isAdmin && (
-                <Tooltip arrow placement='top' title='Delete'>
-                  <ButtonChip
-                    className='row-actions'
-                    icon={<DeleteIcon />}
-                    clickable
-                    color='secondary'
-                    size='small'
-                    variant='outlined'
-                    onClick={() => onDelete(tokenGate)}
-                  />
-                </Tooltip>
+                  <Tooltip arrow placement='top' title='Delete'>
+                    <ButtonChip
+                      className='row-actions'
+                      icon={<DeleteIcon />}
+                      clickable
+                      color='secondary'
+                      size='small'
+                      variant='outlined'
+                      onClick={() => onDelete(tokenGate)}
+                    />
+                  </Tooltip>
                 )}
               </TableCell>
             </TableRow>
