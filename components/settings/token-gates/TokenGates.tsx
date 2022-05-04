@@ -104,7 +104,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         </span>
         <Box display='flex' gap={1}>
           <CopyToClipboard text={shareLink} onCopy={onCopy}>
-            <Button href={shareLink} external target='_blank' onClick={e => e.preventDefault()} variant='outlined'>
+            <Button href={shareLink} external target='_blank' onClick={(e: any) => e.preventDefault()} variant='outlined'>
               Copy Invite Link
             </Button>
           </CopyToClipboard>
