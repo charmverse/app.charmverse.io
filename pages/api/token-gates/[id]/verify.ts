@@ -44,6 +44,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
           tokenGateId
         }
       });
+
       if (!spaceRole) {
         const createdSpaceRole = await prisma.spaceRole.create({
           data: {
@@ -61,45 +62,6 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
           }))
         });
         console.log('Gave user access to workspace', { tokenGateId: tokenGate.id, userId: user.id });
-      }
-      else if (spaceRole.tokenGateId || spaceRole.isAdmin !== true) {
-        await prisma.spaceRole.update({
-          where: {
-            spaceUser: {
-              spaceId: spaceRole.spaceId,
-              userId: spaceRole.userId
-            }
-          },
-          data: {
-            isAdmin: false,
-            tokenGateId: tokenGate.id,
-            tokenGateConnectedDate: new Date()
-          }
-        });
-
-        for (const tokenGateToRole of tokenGateToRoles) {
-          await prisma.spaceRoleToRole.upsert({
-            create: {
-              role: {
-                connect: {
-                  id: tokenGateToRole.roleId
-                }
-              },
-              spaceRole: {
-                connect: {
-                  id: spaceRole.id
-                }
-              }
-            },
-            where: {
-              spaceRoleId_roleId: {
-                roleId: tokenGateToRole.roleId,
-                spaceRoleId: spaceRole.id
-              }
-            },
-            update: {}
-          });
-        }
       }
     }
     const space = await prisma.space.findFirst({
