@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import styled from '@emotion/styled';
+import { useState } from 'react';
 import { Box, Card, Chip, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -9,14 +10,18 @@ import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
 import Modal from 'components/common/Modal';
 import GnosisSafeForm from 'components/settings/payment-methods/components/GnosisSafeForm';
+import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { shortenHex } from 'lib/utilities/strings';
 import charmClient from 'charmClient';
+import { getChainById } from 'connectors';
 
 interface Wallet {
-  name: string;
-  workspace: string | null;
-  type: string;
-  chain: string;
+  id: string;
+  name: string | null;
+  workspace?: string | null;
+  walletType: string;
+  chainId: number;
   address: string;
 }
 
@@ -25,20 +30,27 @@ const StyledTableCell = styled(TableCell)`
   border-bottom: 1px solid #000;
 `;
 
+const walletTypes = {
+  gnosis: 'Gnosis Safe Wallet',
+  metamask: 'MetaMask'
+};
+
+const gnosisUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address}/home`;
+
 export default function MultiSigList () {
 
   const { data } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs());
 
-  const wallets: Wallet[] = [
-    // { name: 'Aave', workspace: null, type: 'Gnosis Safe', chain: 'Ethereum', address: '0xE7faB335A404a09ACcE83Ae5F08723d8e5c69b58' },
-    // { name: 'Juicebox', workspace: 'Juicebox', type: 'Gnosis Safe', chain: 'Ethereum', address: '0xabC8De1353Fb4E1fC83246B1b561aECC40f43E24' }
-  ];
-
   const gnosisPopupState = usePopupState({ variant: 'popover', popupId: 'gnosis-popup' });
-
-  const gnosisUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address}/home`;
+  const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
   function onNewWallet () {
+    mutate('/profile/multi-sigs');
+    gnosisPopupState.close();
+  }
+
+  async function deleteWallet (wallet: Wallet) {
+    await charmClient.deleteUserMultiSig(wallet.id);
     mutate('/profile/multi-sigs');
     gnosisPopupState.close();
   }
@@ -99,19 +111,33 @@ export default function MultiSigList () {
                   {/* {wallet.workspace} */}
                 </TableCell>
                 <TableCell>
-                  {wallet.walletType}
+                  {walletTypes[wallet.walletType]}
                 </TableCell>
                 <TableCell>
-                  {wallet.chainId}
+                  {getChainById(wallet.chainId)?.chainName}
                 </TableCell>
                 <TableCell>
                   <Tooltip placement='top' title={wallet.address}>
-                    <Link external href={gnosisUrl(wallet.address)} target='_blank'>
-                      {shortenHex(wallet.address)}
-                    </Link>
+                    <span>
+                      <Link external href={gnosisUrl(wallet.address)} target='_blank'>
+                        {shortenHex(wallet.address)}
+                      </Link>
+                    </span>
                   </Tooltip>
                 </TableCell>
-                <TableCell><Chip label='Sign' variant='outlined' /></TableCell>
+                <TableCell sx={{ px: 0 }} align='right'>
+
+                  <ElementDeleteIcon onClick={deleteConfirmation.open} />
+
+                  <ConfirmDeleteModal
+                    key={wallet.id}
+                    title={`Delete role: ${wallet.address}`}
+                    question='Are you sure you want to delete this wallet?'
+                    onConfirm={() => deleteWallet(wallet)}
+                    onClose={deleteConfirmation.close}
+                    open={deleteConfirmation.isOpen}
+                  />
+                </TableCell>
               </TableRow>
             ))
           }

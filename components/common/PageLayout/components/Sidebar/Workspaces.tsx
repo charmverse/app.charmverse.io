@@ -66,7 +66,6 @@ export default function Workspaces () {
     setUser(_user);
     router.push(`/${newSpace.domain}`);
   }
-  console.log(router);
 
   const userName = user ? getDisplayName(user) : '';
 
@@ -101,7 +100,9 @@ export default function Workspaces () {
           </Grid>
         ))}
         <Grid item>
-          <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
+          <Tooltip title='Create or join a workspace' placement='right' arrow>
+            <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
+          </Tooltip>
         </Grid>
       </Grid>
       <Modal open={spaceFormOpen} onClose={closeSpaceForm}>

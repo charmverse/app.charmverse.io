@@ -80,7 +80,6 @@ export default function GnosisSafeForm ({ onSubmit, isPersonalSafe, defaultChain
     paymentMethod.walletType = 'gnosis';
 
     try {
-      console.log('isPersonalSafe', isPersonalSafe);
       if (isPersonalSafe) {
         const createdPaymentMethod = await charmClient.createUserMultiSig({
           address: paymentMethod.gnosisSafeAddress || '',
@@ -148,7 +147,7 @@ export default function GnosisSafeForm ({ onSubmit, isPersonalSafe, defaultChain
           }
           <Grid item>
             <Button type='submit' disabled={!isValid || (values.gnosisSafeAddress === '')}>
-              {isPersonalSafe ? 'Add wallet' : 'Create payment method'}
+              Save
             </Button>
           </Grid>
         </Grid>
