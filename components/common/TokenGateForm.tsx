@@ -96,7 +96,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
     })
       .catch(err => {
         if (err.errorCode === 'unsupported_chain') {
-          setError('Unspported Network. Please make sure you are connected to the correct network');
+          setError('Unsupported Network. Please make sure you are connected to the correct network');
         }
         else {
           log.error(`error getting signature: ${err.message || err}`);
@@ -107,7 +107,7 @@ export default function JoinSpacePage ({ onSubmit: _onSubmit }: Props) {
       resourceId: tokenGate.resourceId as any,
       authSig,
       chain,
-      accessControlConditions: (tokenGate.conditions as any)!.accessControlConditions
+      accessControlConditions: (tokenGate.conditions as any).accessControlConditions
     })
       .catch(err => {
         if (err.errorCode === 'not_authorized') {

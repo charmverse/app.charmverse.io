@@ -39,8 +39,13 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
           spaceId: tokenGate.spaceId
         }
       });
+      const tokenGateToRoles = await prisma.tokenGateToRole.findMany({
+        where: {
+          tokenGateId
+        }
+      });
       if (!spaceRole) {
-        await prisma.spaceRole.create({
+        const createdSpaceRole = await prisma.spaceRole.create({
           data: {
             isAdmin: false,
             userId: user.id,
@@ -48,6 +53,12 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
             tokenGateId: tokenGate.id,
             tokenGateConnectedDate: new Date()
           }
+        });
+        await prisma.spaceRoleToRole.createMany({
+          data: tokenGateToRoles.map(tokenGateToRole => ({
+            roleId: tokenGateToRole.roleId,
+            spaceRoleId: createdSpaceRole.id
+          }))
         });
         console.log('Gave user access to workspace', { tokenGateId: tokenGate.id, userId: user.id });
       }
@@ -65,6 +76,30 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
             tokenGateConnectedDate: new Date()
           }
         });
+
+        for (const tokenGateToRole of tokenGateToRoles) {
+          await prisma.spaceRoleToRole.upsert({
+            create: {
+              role: {
+                connect: {
+                  id: tokenGateToRole.roleId
+                }
+              },
+              spaceRole: {
+                connect: {
+                  id: spaceRole.id
+                }
+              }
+            },
+            where: {
+              spaceRoleId_roleId: {
+                roleId: tokenGateToRole.roleId,
+                spaceRoleId: spaceRole.id
+              }
+            },
+            update: {}
+          });
+        }
       }
     }
     const space = await prisma.space.findFirst({
