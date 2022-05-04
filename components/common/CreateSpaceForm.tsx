@@ -4,8 +4,8 @@ import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
 import TextField from '@mui/material/TextField';
 import PrimaryButton from 'components/common/PrimaryButton';
-import FieldLabel from 'components/settings/FieldLabel';
-import Avatar from 'components/settings/LargeAvatar';
+import FieldLabel from 'components/common/form/FieldLabel';
+import Avatar from 'components/settings/workspace/LargeAvatar';
 import Divider from '@mui/material/Divider';
 import { useUser } from 'hooks/useUser';
 import { Prisma, Space } from '@prisma/client';
@@ -14,6 +14,7 @@ import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
 import { DOMAIN_BLACKLIST } from 'lib/spaces';
 import charmClient from 'charmClient';
+import log from 'lib/log';
 
 export const schema = yup.object({
   id: yup.string(),
@@ -71,9 +72,9 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         createdAt: new Date(),
         updatedAt: new Date(),
         updatedBy: user!.id,
-        permissions: {
+        spaceRoles: {
           create: [{
-            role: 'admin',
+            isAdmin: true,
             user: {
               connect: {
                 id: user!.id
@@ -85,7 +86,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
       });
     }
     catch (err) {
-      console.error(err);
+      log.error('Error creating space', err);
       setSaveError((err as Error).message || err);
     }
   }

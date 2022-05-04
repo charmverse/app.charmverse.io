@@ -28,14 +28,30 @@ export interface TextContent {
   marks?: TextMark[]
 }
 
+export interface MentionNode {
+  type: 'mention',
+  attrs: {
+    type: 'user' | 'page'
+    value: string
+  }
+}
+
 export interface TableHeaderNode {
   type: 'table_header',
-  content: TextContent[]
+  content: (TextContent | MentionNode)[]
+}
+
+export interface HeadingNode {
+  type: 'heading',
+  content: (TextContent | MentionNode)[]
+  attrs: {
+    level: number
+  }
 }
 
 export interface TableCellNode {
   type: 'table_cell',
-  content: TextContent[]
+  content: (TextContent | MentionNode)[]
 }
 
 export interface TableRowNode {
@@ -50,7 +66,16 @@ export interface TableNode {
 
 export interface ParagraphNode {
   type: 'paragraph',
-  content: (ParagraphNode | TextContent)[]
+  content: (ParagraphNode | TextContent | MentionNode)[]
+}
+
+export interface DisclosureSummaryNode {
+  type: 'disclosureSummary'
+  content: (ParagraphNode | HeadingNode)[]
+}
+export interface DisclosureDetailsNode {
+  type: 'disclosureDetails'
+  content: [DisclosureSummaryNode, ...(ParagraphNode | TextContent | MentionNode)[]]
 }
 
 export interface ListItemNode {
@@ -58,6 +83,17 @@ export interface ListItemNode {
   type: 'listItem',
   // eslint-disable-next-line
   content: (ParagraphNode | BulletListNode)[]
+}
+
+export interface ColumnBlockNode {
+  type: 'columnBlock',
+  // eslint-disable-next-line
+  content: ParagraphNode[]
+}
+
+export interface ColumnLayoutNode {
+  type: 'columnLayout',
+  content: ColumnBlockNode[]
 }
 
 export interface BulletListNode {

@@ -1,13 +1,11 @@
 
+import { PaymentMethod } from '@prisma/client';
+import { prisma } from 'db';
+import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Prisma, Page, PaymentMethod } from '@prisma/client';
-import { prisma } from 'db';
-import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { IEventToLog, postToDiscord } from 'lib/logs/notifyDiscord';
-import { IApiError } from 'lib/utilities/errors';
-import { isValidChainAddress } from 'lib/tokens/validation';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -16,8 +14,27 @@ handler.use(requireUser)
   .delete(deletePaymentMethod);
 
 async function deletePaymentMethod (req: NextApiRequest, res: NextApiResponse) {
-
   const { id } = req.query as any as PaymentMethod;
+
+  const paymentMethod = await prisma.paymentMethod.findUnique({
+    where: {
+      id
+    }
+  });
+
+  if (!paymentMethod) {
+    throw new DataNotFoundError(`Payment method with ID ${id} not found`);
+  }
+
+  const { error } = await hasAccessToSpace({
+    userId: req.session.user.id,
+    spaceId: paymentMethod.spaceId,
+    adminOnly: true
+  });
+
+  if (error) {
+    throw error;
+  }
 
   await prisma.paymentMethod.delete({
     where: {

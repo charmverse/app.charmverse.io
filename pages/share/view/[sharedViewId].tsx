@@ -1,4 +1,4 @@
-import BlocksEditorPage from 'pages/[domain]/[pageId]';
+import PageView from 'pages/[domain]/[pageId]';
 import { useRouter } from 'next/router';
 import { generatePath } from 'lib/utilities/strings';
 
@@ -18,5 +18,5 @@ export default function PublicBoardView () {
     return null;
   }
 
-  return <BlocksEditorPage publicShare={true} />;
+  return <PageView publicShare={true} />;
 }

@@ -1,58 +1,67 @@
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, AutocompleteProps, Box, BoxProps, TextField, Typography } from '@mui/material';
 import { useContributors } from 'hooks/useContributors';
-import { Contributor } from 'models';
+import { Contributor, User } from 'models';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import Avatar from 'components/common/Avatar';
+import { HTMLAttributes, useState, useEffect, ElementType } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
+import { useWeb3React } from '@web3-react/core';
+import { useSWRConfig } from 'swr';
 
-export interface IInputSearchContributorProps {
-  onChange?: (id: string) => any
-  defaultValue?: string
+interface IContributorsFilter {
+  mode: 'include' | 'exclude',
+  userIds: string []
 }
 
-export function InputSearchContributor ({ onChange = () => {}, defaultValue }: IInputSearchContributorProps) {
-
-  const [contributors] = useContributors();
-
-  const preselectedContributor = contributors.find(contributor => {
-    return contributor.id === defaultValue;
-  });
-
-  function emitValue (selectedUser: Contributor) {
-
-    if (selectedUser === null) {
-      return;
-    }
-
-    const matchingContributor = contributors.find(contributor => {
-      return contributor.id === selectedUser.id;
+function filterContributors (contributors: Contributor [], filter: IContributorsFilter): Contributor[] {
+  if (filter.mode === 'exclude') {
+    return contributors.filter((contributor) => {
+      const shouldInclude = filter.userIds.indexOf(contributor.id) === -1 && contributor.isBot !== true;
+      return shouldInclude;
     });
-
-    if (matchingContributor) {
-      onChange(matchingContributor.id);
-    }
   }
-
-  if (contributors.length === 0) {
-    return null;
+  else {
+    return contributors.filter((contributor) => {
+      const shouldInclude = filter.userIds.indexOf(contributor.id) > -1 && contributor.isBot !== true;
+      return shouldInclude;
+    });
   }
+}
+
+type BooleanField = boolean | undefined;
+
+interface Props extends Omit<AutocompleteProps<Contributor, BooleanField, BooleanField, BooleanField>, 'options' | 'renderInput'> {
+  filter?: IContributorsFilter;
+  options: Contributor[];
+}
+
+function InputSearchContributorBase ({ filter, options, placeholder, ...props }: Props) {
+
+  const { chainId } = useWeb3React<Web3Provider>();
+
+  const { cache } = useSWRConfig();
+
+  const filteredOptions = filter ? filterContributors(options, filter) : options;
 
   return (
     <Autocomplete
-      defaultValue={preselectedContributor}
-      onChange={(_, value) => {
-        emitValue(value as any);
-      }}
+      {...props}
+      disabled={filteredOptions.length === 0}
+      loading={options.length === 0}
       sx={{ minWidth: 150 }}
-      options={contributors}
+      // @ts-ignore - not sure why this fails
+      options={filteredOptions}
       autoHighlight
-      getOptionLabel={user => getDisplayName(user)}
-      renderOption={(props, user) => (
-        <ReviewerOption {...props} user={user} />
+      getOptionLabel={(user) => cache.get(`@"ENS",102~,"${user.addresses[0]}",${chainId},`) ?? getDisplayName(user)}
+      renderOption={(_props, user) => (
+        <ReviewerOption {..._props as any} user={user} />
       )}
       renderInput={(params) => (
         <TextField
           {...params}
+          placeholder={placeholder}
+          size='small'
           inputProps={{
             ...params.inputProps
           }}
@@ -62,12 +71,88 @@ export function InputSearchContributor ({ onChange = () => {}, defaultValue }: I
   );
 }
 
-function ReviewerOption ({ user, ...props }: { user: Contributor } & any) {
+interface IInputSearchContributorProps {
+  onChange: (id: string) => void
+  defaultValue?: string,
+  filter?: IContributorsFilter
+}
+
+export function InputSearchContributor ({ defaultValue, onChange, ...props }: IInputSearchContributorProps) {
+
+  const [contributors] = useContributors();
+  const [value, setValue] = useState<Contributor | null>(null);
+
+  useEffect(() => {
+    if (defaultValue && !value) {
+      const contributor = contributors.find(c => c.id === defaultValue);
+      if (contributor) {
+        setValue(contributor);
+      }
+    }
+  }, [defaultValue, contributors]);
+
+  function emitValue (selectedUser: Contributor) {
+    if (selectedUser) {
+      onChange(selectedUser.id);
+    }
+    setValue(selectedUser);
+  }
+
+  return (
+    <InputSearchContributorBase
+      options={contributors}
+      onChange={(e, _value) => emitValue(_value as Contributor)}
+      placeholder='Select a user'
+      value={value}
+      {...props}
+    />
+  );
+}
+
+interface IInputSearchContributorMultipleProps {
+  onChange: (id: string[]) => void
+  defaultValue?: string[]
+  filter?: IContributorsFilter
+}
+
+export function InputSearchContributorMultiple ({ onChange, defaultValue, ...props }: IInputSearchContributorMultipleProps) {
+
+  const [contributors] = useContributors();
+  const [value, setValue] = useState<Contributor[]>([]);
+
+  function emitValue (users: Contributor[]) {
+    onChange(users.map(user => user.id));
+    setValue(users);
+  }
+
+  useEffect(() => {
+    if (defaultValue && value.length === 0) {
+      const defaultContributors = contributors.filter(contributor => {
+        return defaultValue.includes(contributor.id);
+      });
+      setValue(defaultContributors);
+    }
+  }, [defaultValue, contributors]);
+
+  return (
+    <InputSearchContributorBase
+      filterSelectedOptions
+      multiple
+      options={contributors}
+      placeholder='Select users'
+      value={value}
+      onChange={(e, _value) => emitValue(_value as Contributor[])}
+      {...props}
+    />
+  );
+}
+
+export function ReviewerOption ({ user, avatarSize, fontSize, fontWeight, ...props }: { fontSize?: string | number, fontWeight?: number | string, user: User, avatarSize?: 'small' | 'medium' } & HTMLAttributes<HTMLLIElement> & {component?: ElementType} & BoxProps) {
   const ensName = useENSName(user.addresses[0]);
   return (
-    <Box component='li' display='flex' gap={1} {...props}>
-      <Avatar name={ensName || getDisplayName(user)} />
-      <Typography>{ensName || getDisplayName(user)}</Typography>
+    <Box display='flex' gap={1} {...props} component={props.component ?? 'li'}>
+      <Avatar size={avatarSize} name={ensName || getDisplayName(user)} avatar={user.avatar} />
+      <Typography fontSize={fontSize} fontWeight={fontWeight}>{ensName || getDisplayName(user)}</Typography>
     </Box>
   );
 }

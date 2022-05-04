@@ -55,9 +55,9 @@ export function Modal ({ children, size = defaultSize, title, ...props }: ModalP
   );
 }
 
-export function DialogTitle ({ children, onClose }: { children: ReactNode, onClose?: () => void }) {
+export function DialogTitle ({ children, onClose, sx }: { children: ReactNode, onClose?: () => void, sx?: any }) {
   return (
-    <StyledDialogTitle>
+    <StyledDialogTitle sx={sx}>
       {children}
       {onClose && (
         <CloseButton onClick={onClose}>
@@ -70,3 +70,5 @@ export function DialogTitle ({ children, onClose }: { children: ReactNode, onClo
 
 // TODO: add special theme for alert dialogs
 export const Alert = Modal;
+
+export default Modal;

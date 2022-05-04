@@ -4,10 +4,11 @@ import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
-import getBaseLayout from 'components/common/base-layout/getLayout';
+import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import TokenGateForm from 'components/common/TokenGateForm';
 import Button from 'components/common/Button';
 import { useSpaces } from 'hooks/useSpaces';
+import { ErrorModal } from 'components/common/Modal';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
   const [spaces] = useSpaces();
@@ -15,7 +16,7 @@ export function AlternateRouteButton ({ href, children }: { href: string, childr
   return (
     <Box display='flex' alignItems='center' justifyContent={showMySpacesLink ? 'space-between' : 'center'}>
       {showMySpacesLink && (
-        <Button variant='text' href={`/${spaces[0]!.domain}`} endIcon={<NavigateNextIcon />}>
+        <Button variant='text' href={`/${spaces[0]?.domain}`} endIcon={<NavigateNextIcon />}>
           Go to my workspace
         </Button>
       )}
@@ -39,6 +40,7 @@ export default function CreateSpace () {
       router.push(`/${space.domain}`);
     }
   }
+
   useEffect(() => {
     if (spaces.some(space => space.domain === router.query.domain)) {
       router.push(`/${router.query.domain}`);

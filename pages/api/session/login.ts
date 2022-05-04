@@ -1,4 +1,3 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { User } from '@prisma/client';
@@ -9,9 +8,9 @@ import { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.post(authenticate);
+handler.post(login);
 
-async function authenticate (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
   const { address } = req.body;
   const user = await prisma.user.findFirst({
     where: {
@@ -21,7 +20,17 @@ async function authenticate (req: NextApiRequest, res: NextApiResponse<LoggedInU
     },
     include: {
       favorites: true,
-      spaceRoles: true
+      telegramUser: true,
+      discordUser: true,
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          }
+        }
+      }
     }
   });
 
@@ -29,7 +38,9 @@ async function authenticate (req: NextApiRequest, res: NextApiResponse<LoggedInU
     return res.status(401).send({ error: 'No user has been associated with this wallet address' });
   }
 
-  req.session.user = user;
+  // strip out large fields so we dont break the cookie
+  const { discordUser, spaceRoles, telegramUser, ...userData } = user;
+  req.session.user = userData;
   await req.session.save();
 
   return res.status(200).json(user);

@@ -6,7 +6,7 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { gettingStartedPageContent } from 'seedData';
-import { postToDiscord, IDiscordMessage, IEventToLog } from 'lib/logs/notifyDiscord';
+import { postToDiscord, IEventToLog } from 'lib/log/userEvents';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -42,7 +42,16 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
       updatedBy: data.author.connect!.id!
     }]
   };
-  const space = await prisma.space.create({ data });
+  const space = await prisma.space.create({ data, include: { pages: true } });
+
+  await prisma.pagePermission.create({
+    data: {
+      permissionLevel: 'full_access',
+      spaceId: space.id,
+      pageId: space.pages[0].id
+    }
+  });
+
   logSpaceCreation(space);
   return res.status(200).json(space);
 }

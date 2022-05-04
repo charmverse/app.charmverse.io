@@ -4,7 +4,7 @@ import { darken } from '@mui/system';
 import {
   backgroundColor,
   backgroundColorDarkMode, backgroundDarkColor, backgroundDarkColorDarkMode, backgroundLightColor,
-  backgroundLightColorDarkMode, blueColor, BrandColors,
+  backgroundLightColorDarkMode, blueColor, BrandColor,
   darkBlueColor, darkModeColors, lightModeColors, primaryTextColor,
   primaryTextColorDarkMode, settingsHeaderBackgroundColor,
   settingsHeaderBackgroundColorDarkMode
@@ -18,7 +18,7 @@ declare module '@emotion/react' {
 
 type FocalBoardColors = typeof darkThemeFocalBoard;
 
-interface CustomColors extends FocalBoardColors, Record<BrandColors, any> {
+interface CustomColors extends FocalBoardColors, Record<BrandColor, any> {
   settingsHeader: {
     background: string
   };
@@ -40,6 +40,7 @@ declare module '@mui/material/styles/createPalette' {
   interface PaletteOptions extends CustomColors {
     blue: PaletteOptions['primary'];
     facebook: PaletteOptions['primary'];
+    textPrimary: PaletteOptions['primary'];
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
     quoteMarker: PaletteOptions['primary'];
@@ -47,6 +48,7 @@ declare module '@mui/material/styles/createPalette' {
   interface Palette extends CustomColors {
     blue: Palette['primary'];
     facebook: Palette['primary'];
+    textPrimary: Palette['primary'];
     twitter: Palette['primary'];
     white: Palette['primary'];
     quoteMarker: Palette['primary'];
@@ -59,7 +61,7 @@ declare module '@mui/material/styles/createPalette' {
 
 // Extend color prop on components
 declare module '@mui/material/Chip' {
-  export interface ChipPropsColorOverrides extends Record<BrandColors, true> {
+  export interface ChipPropsColorOverrides extends Record<BrandColor, true> {
     facebook: true;
     twitter: true;
   }
@@ -70,6 +72,10 @@ declare module '@mui/material/IconButton' {
     blue: true;
     white: true;
   }
+}
+
+declare module '@mui/material/SvgIcon' {
+  export interface SvgIconPropsColorOverrides extends Record<BrandColor, true> {}
 }
 
 // Explore all theme options: https://material-ui.com/customization/default-theme/
@@ -117,16 +123,20 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       mode,
       action: {
         focus: mode === 'dark' ? 'rgb(29, 92, 132)' : 'rgb(29, 92, 132, 0.1)', // darken(backgroundLightColor, 0.1)
-        hover: mode === 'dark' ? '#5b5f62' : '#e2e6e9',
-        selected: mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(22, 52, 71, 0.06)'
+        hover: mode === 'dark' ? 'rgba(255, 255, 255, 0.055)' : 'rgba(22, 52, 71, 0.07)',
+        selected: mode === 'dark' ? 'rgba(255, 255, 255, 0.055)' : 'rgba(22, 52, 71, 0.07)'
       },
       background: {
         default: mode === 'dark' ? backgroundColorDarkMode : backgroundColor,
+        paper: mode === 'dark' ? backgroundLightColorDarkMode : backgroundColor,
         light: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor,
         dark: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
       },
       text: {
         primary: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor
+      },
+      textPrimary: {
+        main: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor
       },
       twitter: {
         contrastText,
@@ -207,7 +217,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiAutocomplete: {
         styleOverrides: {
           popper: {
-            zIndex: 3000
+            zIndex: 'var(--z-index-speedDial)'
           }
         }
       },
@@ -235,7 +245,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiCard: {
         styleOverrides: {
           root: {
-            borderRadius: '20px'
+            borderRadius: '3px'
           }
         }
       },
@@ -256,25 +266,44 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
-      MuiPaper: {
+      MuiListItemButton: {
         styleOverrides: {
           root: {
-            backgroundColor: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
+            padding: '8px'
           }
         }
       },
-      // MuiPopover: {
-      //   styleOverrides: {
-      //     root: {
-      //       zIndex: 3000
-      //     }
-      //   }
-      // },
+      MuiInput: {
+        defaultProps: {
+          size: 'small'
+        }
+      },
       MuiOutlinedInput: {
+        defaultProps: {
+          size: 'small'
+        },
         styleOverrides: {
-          input: {
-            padding: '10px 10px',
-            fontSize: 16
+          root: {
+            backgroundColor: 'var(--input-bg)',
+            '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--input-border)'
+            }
+          },
+          notchedOutline: {
+            borderColor: 'var(--input-border)'
+          }
+        }
+      },
+      MuiSelect: {
+        defaultProps: {
+          size: 'small'
+        }
+      },
+      MuiTab: {
+        styleOverrides: {
+          root: {
+            minHeight: 0,
+            textTransform: 'none'
           }
         }
       },

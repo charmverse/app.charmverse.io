@@ -1,48 +1,104 @@
 
+import { prisma } from 'db';
+import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch, requireUser, hasAccessToSpace } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { Role } from 'models';
-import { prisma } from 'db';
+import { AdministratorOnlyError, UserIsNotSpaceMemberError } from 'lib/users/errors';
+import { MinimumOneSpaceAdminRequiredError } from 'lib/spaces/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-const requireAdmin = async (req: NextApiRequest, res: NextApiResponse, next: Function) => {
-  const userId = req.session.user.id;
-  const { error } = await hasAccessToSpace({ userId, spaceId: req.query.id as string, role: 'admin' });
-  if (error) {
-    return res.status(401).json({ error });
-  }
-  next();
-};
-
-handler.use(requireUser)
-  .use(requireAdmin)
-  .put(updateContributor)
-  .delete(deleteContributor);
+handler
+  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
+  .delete(deleteContributor)
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
+  .use(requireKeys(['isAdmin'], 'body'))
+  .put(updateContributor);
 
 async function updateContributor (req: NextApiRequest, res: NextApiResponse) {
+
+  const userId = req.query.userId as string;
+  const spaceId = req.query.id as string;
+
+  const newAdminStatus = req.body.isAdmin;
+
+  // Check the space won't end up with 0 admins
+  if (newAdminStatus === false) {
+    const otherAdmins = await prisma.spaceRole.count({
+      where: {
+        isAdmin: true,
+        spaceId,
+        userId: {
+          not: req.session.user.id
+        }
+      }
+    });
+
+    if (otherAdmins === 0) {
+      throw new MinimumOneSpaceAdminRequiredError();
+    }
+  }
+
   await prisma.spaceRole.update({
     where: {
-      spaceId_userId: {
-        userId: req.query.userId as string,
-        spaceId: req.query.id as string
+      spaceUser: {
+        userId,
+        spaceId
       }
     },
     data: {
-      role: req.body.role as Role
+      isAdmin: req.body.isAdmin
     }
   });
   res.status(200).json({ ok: true });
 }
 
 async function deleteContributor (req: NextApiRequest, res: NextApiResponse) {
+
+  const requestingUserId = req.session.user.id;
+
+  const userId = req.query.userId as string;
+  const spaceId = req.query.id as string;
+
+  const requesterRole = await prisma.spaceRole.findUnique({
+    where: {
+      spaceUser: {
+        spaceId,
+        userId: requestingUserId
+      }
+    }
+  });
+
+  if (!requesterRole) {
+    throw new UserIsNotSpaceMemberError();
+  }
+
+  // Non admin user trying to delete another user
+  if (requesterRole.isAdmin !== true && userId !== requestingUserId) {
+    throw new AdministratorOnlyError();
+  }
+  else if (requesterRole.isAdmin && userId === requestingUserId) {
+    const otherAdmins = await prisma.spaceRole.count({
+      where: {
+        isAdmin: true,
+        spaceId,
+        userId: {
+          not: requestingUserId
+        }
+      }
+    });
+
+    if (otherAdmins === 0) {
+      throw new MinimumOneSpaceAdminRequiredError();
+    }
+  }
+
   await prisma.spaceRole.delete({
     where: {
-      spaceId_userId: {
-        userId: req.query.userId as string,
-        spaceId: req.query.id as string
+      spaceUser: {
+        spaceId,
+        userId
       }
     }
   });

@@ -1,36 +1,63 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
+import { ApiError } from 'lib/middleware';
+import { ISystemError } from 'lib/utilities/errors';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { NextHandler } from 'next-connect';
+import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/errors';
 
 /**
  * Allow an endpoint to be consumed if it originates from a share page
  */
-export async function requireSpaceMembership (req: NextApiRequest, res: NextApiResponse, next: Function) {
+export function requireSpaceMembership (options: {adminOnly: boolean, spaceIdKey?: string} = { adminOnly: false }) {
+  return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 
-  if (!req.session.user) {
-    return res.status(401).send({ error: 'Please log in' });
-  }
+    // Where to find the space ID
+    const spaceIdKey = options.spaceIdKey ?? 'spaceId';
 
-  const spaceId = req.query?.spaceId ?? req.body?.spaceId;
-
-  if (!spaceId) {
-    return res.status(400).json({
-      message: 'Please provide a space Id'
-    });
-  }
-
-  const spaceRole = await prisma.spaceRole.findFirst({
-    where: {
-      userId: req.session.user.id,
-      spaceId: spaceId as string
+    if (!req.session.user) {
+      throw new ApiError({
+        message: 'Please log in',
+        errorType: 'Access denied'
+      });
     }
-  });
 
-  if (!spaceRole) {
-    return res.status(401).send({
-      message: 'You do not have access to this space'
+    const querySpaceId = req.query?.[spaceIdKey] as string;
+
+    const bodySpaceId = req.body?.[spaceIdKey] as string;
+
+    const spaceId = querySpaceId ?? bodySpaceId;
+
+    if (!spaceId) {
+      throw new ApiError({
+        message: 'Please provide a space Id',
+        errorType: 'Invalid input'
+      });
+    }
+
+    if (querySpaceId && bodySpaceId && querySpaceId !== bodySpaceId) {
+      throw new ApiError({
+        message: 'Your request refers to multiple spaces. Remove unneeded space ID',
+        errorType: 'Access denied'
+      });
+    }
+
+    const spaceRole = await prisma.spaceRole.findFirst({
+      where: {
+        userId: req.session.user.id,
+        spaceId: spaceId as string
+      }
     });
-  }
-  else {
-    next();
-  }
+
+    if (!spaceRole) {
+      throw new UserIsNotSpaceMemberError();
+    }
+
+    if (options.adminOnly && spaceRole.isAdmin !== true) {
+      throw new AdministratorOnlyError();
+    }
+
+    else {
+      next();
+    }
+  };
 }

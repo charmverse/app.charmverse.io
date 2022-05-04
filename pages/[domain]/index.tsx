@@ -10,9 +10,11 @@ export default function RedirectToMainPage () {
   const { pages } = usePages();
 
   useEffect(() => {
-    const firstPageId = Object.keys(pages)[0];
-    if (firstPageId && space) {
-      router.push(`/${space.domain}/${pages[firstPageId].path}`);
+    const firstPageId = Object.entries(pages)
+      .filter(([, page]) => page?.type === 'board' || page?.type === 'page')[0]?.[0];
+    const page = pages[firstPageId];
+    if (space && page) {
+      router.push(`/${space.domain}/${page.path}`);
     }
   }, [space, pages]);
 

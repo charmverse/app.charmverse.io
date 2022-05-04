@@ -1,16 +1,15 @@
 
-import { Bounty, Prisma } from '@prisma/client';
-import { BountyWithDetails } from 'models';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
+import nc, { NextHandler } from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use((req: NextApiRequest, res: NextApiResponse, next: Function) => {
+  .use((req: NextApiRequest, res: NextApiResponse, next: NextHandler) => {
     const bountyId = req.query.id;
     if (!bountyId) {
       return res.status(400).send({ error: 'Please provide a valid bountyId' });

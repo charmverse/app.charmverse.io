@@ -1,7 +1,22 @@
+const path = require('path');
 
 const config = {
   poweredByHeader: false,
   webpack5: true,
+  experimental: {
+    esmExternals: 'loose',
+    modularizeImports: {
+      '@mui/material': {
+        transform: '@mui/material/{{member}}'
+      },
+      '@mui/icons-material': {
+        transform: '@mui/icons-material/{{member}}'
+      },
+      lodash: {
+        transform: 'lodash/{{member}}'
+      }
+    }
+  },
   async redirects () {
     return [
       {
@@ -64,7 +79,8 @@ const withTM = require('next-transpile-modules')([
   '@fullcalendar/core',
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
-  '@fullcalendar/react'
+  '@fullcalendar/react',
+  'react-dnd'
 ]);
 
 module.exports = withBundleAnalyzer(withTM(config));

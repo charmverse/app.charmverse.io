@@ -1,4 +1,25 @@
-export type RichTextItemResponse = {
+
+export interface FailedImportsError {
+  pageId: string,
+  type: 'page' | 'database',
+  title: string,
+  blocks: [string, number][][]
+}
+
+export type NotionImage = {
+  type: 'external';
+  external: {
+    url: string;
+  };
+} | {
+  type: 'file';
+  file: {
+    url: string;
+    expiry_time: string;
+  };
+};
+
+export type RichTextItemResponse = ({
   type: 'text';
   text: {
     content: string;
@@ -6,6 +27,23 @@ export type RichTextItemResponse = {
       url: string;
     } | null;
   };
+} | {
+  type: 'mention';
+  mention: {
+    type: 'page';
+    page: {
+      id: string;
+    };
+  };
+} | {
+  type: 'mention';
+  mention: {
+    type: 'database';
+    database: {
+      id: string;
+    };
+  };
+}) & {
   annotations: {
     bold: boolean;
     italic: boolean;

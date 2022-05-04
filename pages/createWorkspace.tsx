@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import getBaseLayout from 'components/common/base-layout/getLayout';
+import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import CreateSpaceForm, { getDomainFromName } from 'components/common/CreateSpaceForm';
 import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
@@ -17,6 +17,7 @@ export default function CreateSpace () {
   const router = useRouter();
 
   async function addSpace (newSpace: Prisma.SpaceCreateInput) {
+
     const space = await charmClient.createSpace(newSpace);
     setSpaces([...spaces, space]);
     // refresh user permissions

@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { NextHandler } from 'next-connect';
 
-export function requireUser (req: NextApiRequest, res: NextApiResponse, next: Function) {
-  if (!req.session.user) {
+export function requireUser (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
+  if (!req.session?.user) {
     res.status(401).send({ error: 'Please log in' });
   }
   else {
@@ -12,7 +13,7 @@ export function requireUser (req: NextApiRequest, res: NextApiResponse, next: Fu
 /**
  * Allow an endpoint to be consumed if it originates from a share page
  */
-export function requireUserOrSharePage (req: NextApiRequest, res: NextApiResponse, next: Function) {
+export function requireUserOrSharePage (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
 
   const referer = req.headers.referer as string;
 

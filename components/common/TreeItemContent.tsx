@@ -30,32 +30,34 @@ const TreeItemContent = React.forwardRef<HTMLDivElement, TreeItemContentProps>((
 
   const icon = iconProp || expansionIcon || displayIcon;
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMouseDown = React.useCallback((event: React.MouseEvent<HTMLElement>) => {
     preventSelection(event);
 
     if (onMouseDown) {
       onMouseDown(event);
     }
-  };
+  }, [onMouseDown]);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = React.useCallback((event: React.MouseEvent<HTMLElement>) => {
     handleExpansion(event);
     handleSelection(event);
 
     if (onClick) {
       onClick(event);
     }
-  };
+  }, [handleExpansion, handleSelection, onClick]);
+
+  const newClassName = React.useMemo(() => clsx(className, classes.root, {
+    [classes.expanded]: expanded,
+    [classes.selected]: selected,
+    [classes.focused]: focused,
+    [classes.disabled]: disabled
+  }), [className, expanded, selected, focused, disabled]);
 
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions -- Key event is handled by the TreeView */
     <div
-      className={clsx(className, classes.root, {
-        [classes.expanded]: expanded,
-        [classes.selected]: selected,
-        [classes.focused]: focused,
-        [classes.disabled]: disabled
-      })}
+      className={newClassName}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
       ref={ref as any}
@@ -67,4 +69,4 @@ const TreeItemContent = React.forwardRef<HTMLDivElement, TreeItemContentProps>((
   );
 });
 
-export default TreeItemContent;
+export default React.memo(TreeItemContent);

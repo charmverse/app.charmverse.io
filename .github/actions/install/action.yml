@@ -1,0 +1,37 @@
+
+name: "Install dependencies"
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: "16"
+
+    - name: Cache Next.js build # copied from https://github.com/vercel/next.js/blob/canary/errors/no-cache.md
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.npm
+          ${{ github.workspace }}/.next/cache
+        # Generate a new cache whenever packages or source files change.
+        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+        # If source files changed but packages didn't, rebuild from a prior cache.
+        restore-keys: |
+          ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
+    - name: Cache dependencies
+      id: cache_node_modules
+      uses: actions/cache@v2
+      with:
+        path: ./node_modules
+        key: node-modules-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch') }}
+
+    - name: Install npm dependencies
+      shell: bash
+      if: steps.cache_node_modules.outputs.cache-hit != 'true'
+      run: |
+        npm ci --no-audit --no-fund
+        npx patch-package

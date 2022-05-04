@@ -1,15 +1,19 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { SpaceRole } from '@prisma/client';
-import { IEventToLog, postToDiscord } from 'lib/logs/notifyDiscord';
+import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
+import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(acceptInvite).delete(deleteInvite);
+handler
+  .use(requireUser)
+  .post(acceptInvite)
+  .delete(deleteInvite);
 
 async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
 
@@ -61,6 +65,28 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function deleteInvite (req: NextApiRequest, res: NextApiResponse) {
+
+  const { id } = req.query;
+
+  const existingInvite = await prisma.inviteLink.findUnique({
+    where: {
+      id: id as string
+    }
+  });
+
+  if (!existingInvite) {
+    throw new DataNotFoundError(`Invite with id ${id} not found`);
+  }
+
+  const { error } = await hasAccessToSpace({
+    spaceId: existingInvite.spaceId,
+    userId: req.session.user.id,
+    adminOnly: true
+  });
+
+  if (error) {
+    throw error;
+  }
 
   await prisma.inviteLink.delete({
     where: {

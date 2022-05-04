@@ -93,6 +93,67 @@ npx prisma migrate dev --name blocks_title_required
 
 For more information about how migrations work: https://www.prisma.io/docs/concepts/components/prisma-migrate.
 
+### Testing
+Testing for client-side and server-side code happens separately.
+
+**Client-side testing**
+In progress
+
+**Server-side testing**
+Our server contains 2 types of tests:
+- Unit tests: Covering the functionality of individual components
+- Integration tests: Covering the expected responses from API endpoints
+
+We use Jest to run these tests.
+
+You can run individual tests, or test the whole system.
+
+Before running tests, configure a .env.test.local file.
+
+Set the following value inside the .env.test.local file
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/charmversetest
+
+__Initial setup__
+
+We've provided a script you can use to configure a test database that won't interfere with your usual local development database.
+
+```bash
+# Make database setup script executable
+$ chmod +x ./testing/configure-db.sh
+
+# Run this script to create the test database in your local postgres instance
+# Re-run this script at any time to drop and recreate the database with the latest prisma migrations applied
+$ npm run test:setup-db
+
+```
+
+__Run tests__
+Start your server with following command
+```bash
+# Start the server
+$ npm run start:test
+
+# (Optional) Open Prisma Studio to see the test data
+$ npm run db-tool:test
+
+# Execute tests
+$ npm run test:server
+
+```
+
+
+__Info for running individual tests__
+If you are using VSCode, install the (Jest Runner plugin)[https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner]
+
+In .vscode/settings.json, add "jestrunner.configPath": "jest.config-server.ts"
+
+This will display a small "Run" button above each test suite and assertion.
+
+You can then run the individual tests.
+
+This will also work for the API integration tests, but you must make sure your server is up and running.
+
+
 ### Theming
 
 - To make it easy to maintain light/dark mode, color choices should be defined on Theme.palette in `theme/index.tsx`. This way, we can use colors from the theme in two ways:

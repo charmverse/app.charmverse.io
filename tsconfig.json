@@ -4,7 +4,9 @@
       "jsx": "react",
       "module": "CommonJS"
     },
-    "require": ["tsconfig-paths/register"]
+    "require": [
+      "tsconfig-paths/register"
+    ]
   },
   "compilerOptions": {
     "baseUrl": ".",
@@ -33,7 +35,6 @@
   ],
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    "pages/api/pages/[id]"
+    "**/*.tsx"
   ]
 }

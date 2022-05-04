@@ -1,0 +1,14 @@
+diff --git a/node_modules/@bangle.dev/tooltip/dist/create-tooltip-dom.js b/node_modules/@bangle.dev/tooltip/dist/create-tooltip-dom.js
+index db64979..3970986 100644
+--- a/node_modules/@bangle.dev/tooltip/dist/create-tooltip-dom.js
++++ b/node_modules/@bangle.dev/tooltip/dist/create-tooltip-dom.js
+@@ -13,6 +13,9 @@ export function createTooltipDOM(tooltipDOMSpec = [
+         0,
+     ],
+ ], arrow = false) {
++    if (typeof window === 'undefined') {
++        return {};
++    }
+     const { dom, contentDOM } = DOMSerializer.renderSpec(window.document, tooltipDOMSpec);
+     if (arrow && !dom.querySelector('.bangle-tooltip-arrow')) {
+         const arrowElement = DOMSerializer.renderSpec(window.document, [

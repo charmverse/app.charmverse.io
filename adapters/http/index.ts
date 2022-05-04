@@ -2,7 +2,7 @@ import fetch from './fetch';
 
 type Params = { [key: string]: any };
 
-export function GET<T> (
+export function GET<T = Response> (
   requestURL: string,
   data: Params = {},
   { headers = {} }: { headers?: any } = {}
@@ -46,13 +46,13 @@ export function DELETE<T> (
 
 export function POST<T> (
   requestURL: string,
-  data: Params = {},
-  { headers = {}, noHeaders }: { headers?: any, noHeaders?: boolean } = {}
+  data: Params | string = {},
+  { headers = {}, noHeaders, skipStringifying }: { headers?: any, noHeaders?: boolean, skipStringifying?: boolean } = {}
 ): Promise<T> {
   return fetch(
     requestURL,
     {
-      body: JSON.stringify(data),
+      body: !skipStringifying ? JSON.stringify(data) : data as string,
       method: 'POST',
       headers: noHeaders ? undefined : new Headers({
         Accept: 'application/json',

@@ -1,70 +1,35 @@
 import SettingsLayout from 'components/settings/Layout';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement } from 'react';
 import Grid from '@mui/material/Grid';
-import Alert from '@mui/material/Alert';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
 import Button from 'components/common/Button';
 import PrimaryButton from 'components/common/PrimaryButton';
-import FieldLabel from 'components/settings/FieldLabel';
+import FieldLabel from 'components/common/form/FieldLabel';
 import Legend from 'components/settings/Legend';
-import Avatar from 'components/settings/LargeAvatar';
+import Avatar from 'components/settings/workspace/LargeAvatar';
 import { setTitle } from 'hooks/usePageTitle';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FormValues, schema } from 'components/common/CreateSpaceForm';
 import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import charmClient from 'charmClient';
-import { Box } from '@mui/material';
-import { useUser } from 'hooks/useUser';
-import NotionIcon from 'public/images/notion_logo.svg';
-import SvgIcon from '@mui/material/SvgIcon';
-import CircularProgress from '@mui/material/CircularProgress';
-import Snackbar from 'components/common/Snackbar';
-import useSnackbar from 'hooks/useSnackbar';
-import { useSWRConfig } from 'swr';
+import { Box, Typography } from '@mui/material';
+import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
+import Link from 'components/common/Link';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 export default function WorkspaceSettings () {
-
   setTitle('Workspace Options');
   const router = useRouter();
-  const { mutate } = useSWRConfig();
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
   const [user] = useUser();
-  const [notionError, setNotionError] = useState<string | null>(null);
-  const { message, handleClose, isOpen: isSnackbarOpen, showMessage } = useSnackbar();
 
-  const [isImportingFromNotion, setIsImportingFromNotion] = useState(false);
-
-  useEffect(() => {
-    if (space && typeof router.query.code === 'string') {
-      setIsImportingFromNotion(true);
-      setNotionError(null);
-      charmClient.importFromNotion({
-        code: router.query.code,
-        spaceId: space.id
-      })
-        .then(() => {
-          setIsImportingFromNotion(false);
-          showMessage('Successfully imported');
-          mutate(`pages/${space.id}`);
-          const baseUrl = `${router.asPath.split('?')[0]}?success=true`;
-          router.replace(baseUrl, undefined, { shallow: true });
-        })
-        .catch(error => {
-          setIsImportingFromNotion(false);
-          setNotionError(error.error || 'There was an error, please try again');
-        });
-    }
-  }, [Boolean(space)]);
-
-  useEffect(() => {
-    if (router.query.success) {
-      showMessage('Notion workspace successfully imported');
-    }
-  }, [router.query.success]);
+  const isAdmin = isSpaceAdmin(user, space?.id);
 
   const {
     register,
@@ -80,7 +45,7 @@ export default function WorkspaceSettings () {
   const watchName = watch('name');
 
   async function onSubmit (values: FormValues) {
-    if (!space) return;
+    if (!space || !isAdmin) return;
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
     const updatedSpace = await charmClient.updateSpace({ ...space, ...values });
@@ -94,8 +59,8 @@ export default function WorkspaceSettings () {
   }
 
   async function deleteWorkspace () {
-    if (space && window.confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
-      await charmClient.deleteSpace(space!.id);
+    if (isAdmin && space && window.confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
+      await charmClient.deleteSpace(space.id);
       const nextSpace = spaces.filter(s => s.id !== space.id)[0];
       window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
     }
@@ -113,6 +78,7 @@ export default function WorkspaceSettings () {
             <FieldLabel>Name</FieldLabel>
             <TextField
               {...register('name')}
+              disabled={!isAdmin}
               fullWidth
               error={!!errors.name}
               helperText={errors.name?.message}
@@ -122,45 +88,37 @@ export default function WorkspaceSettings () {
             <FieldLabel>Domain</FieldLabel>
             <TextField
               {...register('domain')}
+              disabled={!isAdmin}
               fullWidth
               error={!!errors.domain}
               helperText={errors.domain?.message}
             />
           </Grid>
-          <Grid item display='flex' justifyContent='space-between'>
-            <PrimaryButton disabled={!isDirty} type='submit'>
-              Save
-            </PrimaryButton>
-            <Button variant='outlined' color='error' onClick={deleteWorkspace}>
-              Delete Workspace
-            </Button>
-          </Grid>
+          {isAdmin && (
+            <Grid item display='flex' justifyContent='space-between'>
+              <PrimaryButton disabled={!isDirty} type='submit'>
+                Save
+              </PrimaryButton>
+              <Button variant='outlined' color='error' onClick={deleteWorkspace}>
+                Delete Workspace
+              </Button>
+            </Grid>
+          )}
         </Grid>
       </form>
-      <Legend>Import</Legend>
-      <Box sx={{ ml: 1 }}>
-        <Button
-          disabled={isImportingFromNotion}
-          href={`/api/notion/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
-          variant='outlined'
-          startIcon={(
-            <SvgIcon sx={{ color: 'text.primary' }}>
-              <NotionIcon />
-            </SvgIcon>
-          )}
-          endIcon={(
-            isImportingFromNotion && <CircularProgress size={20} />
-          )}
-        >
-          {isImportingFromNotion ? 'Importing pages from Notion' : 'Import pages from Notion'}
-        </Button>
-        {notionError && (
-          <Alert severity='error' sx={{ mt: 2 }}>
-            {notionError}
-          </Alert>
-        )}
+      <Legend>API Key</Legend>
+      <Typography variant='body1'>
+        Request access to the charmverse API in our
+        {' '}
+        <Link href='https://discord.gg/ACYCzBGC2M' external target='_blank'>
+          Discord Channel <LaunchIcon fontSize='small' />
+        </Link>
+      </Typography>
+
+      <Legend>Import Content</Legend>
+      <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
+        <ImportNotionWorkspace />
       </Box>
-      <Snackbar severity='info' handleClose={handleClose} isOpen={isSnackbarOpen} message={message ?? ''} />
     </>
   );
 }

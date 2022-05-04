@@ -1,4 +1,3 @@
-
 .bangle-heading-collapsed {
   border-radius: 8px;
 }
@@ -19,8 +18,7 @@
     background-color: var(--editorCore-selectionChange-bgColor);
   }
 
-  to {
-  }
+  to {}
 }
 
 :root {
@@ -29,19 +27,14 @@
 }
 
 .bangle-tooltip {
-  z-index: 3000;
+  z-index: var(--z-index-modal);
 }
 
 .bangle-editor a {
   text-decoration: underline;
 }
 
-.bangle-editor li {
-  margin-bottom: 0.25rem;
-}
-
-.bangle-editor p > code {
-}
+.bangle-editor p > code {}
 
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.45rem;
@@ -59,18 +52,21 @@
 .ProseMirror .tableWrapper {
   overflow-x: auto;
 }
+
 .ProseMirror table {
   border-collapse: collapse;
   table-layout: fixed;
   width: 100%;
   overflow: hidden;
 }
+
 .ProseMirror td,
 .ProseMirror th {
   vertical-align: top;
   box-sizing: border-box;
   position: relative;
 }
+
 .ProseMirror .column-resize-handle {
   position: absolute;
   right: -2px;
@@ -81,10 +77,12 @@
   background-color: #adf;
   pointer-events: none;
 }
+
 .ProseMirror.resize-cursor {
   cursor: ew-resize;
   cursor: col-resize;
 }
+
 /* Give selected cells a blue overlay */
 .ProseMirror .selectedCell:after {
   z-index: 2;
@@ -142,12 +140,14 @@
   white-space: break-spaces;
   -webkit-font-variant-ligatures: none;
   font-variant-ligatures: none;
-  font-feature-settings: "liga" 0; /* the above doesn't seem to work in Edge */
+  font-feature-settings: "liga"0;
+  /* the above doesn't seem to work in Edge */
 }
 
 .ProseMirror-hideselection *::selection {
   background: transparent;
 }
+
 .ProseMirror-hideselection *::-moz-selection {
   background: transparent;
 }
@@ -162,6 +162,7 @@ img.ProseMirror-separator {
   border: none !important;
   margin: 0 !important;
 }
+
 /** Prosemirror-END */
 
 /**
@@ -188,6 +189,7 @@ img.ProseMirror-separator {
 .bangle-editor dd {
   margin: 0;
 }
+
 /** Bangle-end*/
 
 /**
@@ -262,8 +264,48 @@ img.ProseMirror-separator {
   margin-top: 1rem;
 }
 
+.bangle-editor ul p,
+.bangle-editor ol p,
+.charm-column-row p {
+  padding-bottom: 3px;
+  padding-top: 3px;
+}
+
 .bangle-editor li {
   position: relative;
+
+  li:first-child {
+    padding-top: 0;
+  }
+}
+
+// nested list styles
+ul li {
+  li {
+    list-style-type: circle;
+
+    li {
+      list-style-type: square;
+
+      li {
+        list-style-type: disc;
+      }
+    }
+  }
+}
+
+ol li {
+  li {
+    list-style-type: lower-alpha;
+
+    li {
+      list-style-type: lower-roman;
+
+      li {
+        list-style-type: circle;
+      }
+    }
+  }
 }
 
 .bangle-editor li > span {
@@ -290,7 +332,7 @@ img.ProseMirror-separator {
   display: flex;
   flex-direction: row;
   position: relative;
-  left: -1.2rem;
+  left: -1.5rem;
 }
 
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
@@ -311,10 +353,11 @@ img.ProseMirror-separator {
 }
 
 .bangle-editor p {
-  font-size: 1rem;
+  //font-size: 1rem;
   line-height: 1.625;
   // font-size: 1.125rem;
 }
+
 .bangle-editor > p {
   padding-top: 3px;
   padding-bottom: 3px;
@@ -331,8 +374,8 @@ img.ProseMirror-separator {
 
 .bangle-editor pre {
   white-space: pre-wrap;
-  margin-top: 1.25rem;
-  margin-bottom: 1.25rem;
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 
 /** Bullet List */
@@ -342,10 +385,30 @@ img.ProseMirror-separator {
   padding-left: 1.5rem;
 }
 
-.bangle-editor > ul {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+.bangle-editor ul,
+.bangle-editor ol {
+  margin-top: 0;
+  margin-bottom: 0;
 }
+
+/** Disclosure component **/
+details {
+  padding-left: 14px;
+
+  summary {
+    margin-left: -14px;
+    outline: 0 none;
+
+    &::marker {
+      color: var(--prop-gray);
+    }
+
+    & > * {
+      display: inline;
+    }
+  }
+}
+
 
 /** Component-Styling-END */
 
@@ -380,3 +443,13 @@ img.ProseMirror-separator {
 }
 
 /** Prosemirror-Gap-Cursor-END */
+
+/* This helps to position the page threads list */
+.bangle-editor-core {
+  width: 100%;
+  position: relative;
+}
+
+.ProseMirror.bangle-editor {
+  z-index: 100;
+}

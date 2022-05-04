@@ -1,8 +1,25 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import log from 'lib/log';
+import { SystemError } from 'lib/utilities/errors';
+import { UnknownError } from 'lib/middleware';
 
 export function onError (err: any, req: NextApiRequest, res: NextApiResponse) {
-  console.error('API Error', err.stack || err);
-  res.status(500).json({ error: 'Something went wrong!' });
+
+  const errorAsSystemError = err instanceof SystemError ? err : new UnknownError((err.stack ?? err.error) ?? err);
+
+  if (errorAsSystemError.code === 500) {
+    // console.log('error', err);
+    log.error(`Server Error: ${err.message || err.error || err}`, {
+      error: (err instanceof SystemError) === false ? (err.message || 'Something went wrong') : errorAsSystemError,
+      stack: err.stack,
+      userId: req.session?.user?.id,
+      url: req.url,
+      body: req.body
+    });
+  }
+
+  res.status(errorAsSystemError.code).json(errorAsSystemError);
+
 }
 
 export default onError;

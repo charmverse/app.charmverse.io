@@ -5,6 +5,7 @@ import { verifyJwt } from 'lit-js-sdk';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import log from 'lib/log';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -27,9 +28,8 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const result = await verifyJwt({ jwt });
-    console.log('verifyJwt result', result);
     if (!result.verified) {
-      console.error('Could not verify wallet', { userId: user.id, result });
+      log.warn('Could not verify wallet', { userId: user.id, result });
       throw new Error('This wallet could not be verified');
     }
     if (req.body.commit) {
@@ -42,7 +42,7 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
       if (!spaceRole) {
         await prisma.spaceRole.create({
           data: {
-            role: tokenGate.userRole || undefined,
+            isAdmin: false,
             userId: user.id,
             spaceId: tokenGate.spaceId,
             tokenGateId: tokenGate.id,
@@ -51,16 +51,16 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
         });
         console.log('Gave user access to workspace', { tokenGateId: tokenGate.id, userId: user.id });
       }
-      else if (spaceRole.tokenGateId || spaceRole.role !== 'admin') {
+      else if (spaceRole.tokenGateId || spaceRole.isAdmin !== true) {
         await prisma.spaceRole.update({
           where: {
-            spaceId_userId: {
+            spaceUser: {
               spaceId: spaceRole.spaceId,
               userId: spaceRole.userId
             }
           },
           data: {
-            role: tokenGate.userRole || undefined,
+            isAdmin: false,
             tokenGateId: tokenGate.id,
             tokenGateConnectedDate: new Date()
           }

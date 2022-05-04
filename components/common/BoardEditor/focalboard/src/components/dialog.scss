@@ -1,0 +1,119 @@
+.Dialog {
+    &.dialog-back {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1300;
+    }
+
+    .toolbar div[role="button"].MenuWrapper {
+        position: absolute;
+        right: 10px;
+    }
+
+    .wrapper {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(var(--center-channel-color-rgb), 0.5);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .wrapper {
+            background-color: rgba(15, 15, 15, 0.8);
+        }
+    }
+
+    .dialog {
+        display: flex;
+        flex-direction: column;
+        background-color: rgb(var(--center-channel-bg-rgb));
+        box-shadow: rgba(var(--center-channel-color-rgb), 0.1) 0 0 0 1px,
+            rgba(var(--center-channel-color-rgb), 0.1) 0 2px 4px;
+        border-radius: var(--modal-rad);
+        padding: 0;
+        -webkit-overflow-scrolling: touch;
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        width: fit-content;
+
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 72px auto;
+        max-width: 100%;
+
+        @media screen and (min-width: 975px) {
+            right: unset;
+            bottom: unset;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+            width: 100%;
+            margin: 0;
+            max-height: 75%;
+            min-width: 500px;
+            max-width: 975px;
+        }
+
+        @media not screen and (max-width: 975px) {
+
+            .hideOnWidescreen {
+                /* Hide elements on larger screens */
+                display: none !important;
+            }
+        }
+
+        > * {
+            flex-shrink: 0;
+            overflow-x: hidden;
+        }
+
+        > .banner {
+            background-color: rgba(230, 220, 192, 0.9);
+            text-align: center;
+            padding: 10px;
+            color: #222;
+        }
+
+        > .banner.error {
+            background-color: rgba(230, 192, 192, 0.9);
+        }
+
+        > .toolbar {
+            display: flex;
+            flex-direction: row;
+            padding: 16px;
+            justify-content: space-between;
+        }
+
+        > .content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+
+            @media not screen and (max-width: 975px) {
+                padding: 10px 126px;
+            }
+
+            @media screen and (max-width: 975px) {
+                padding: 10px;
+            }
+        }
+
+        > .content.fullwidth {
+            padding: 10px 126px;
+        }
+    }
+
+    .cardToolbar {
+        width: 100%;
+        margin: 0 16px;
+    }
+}

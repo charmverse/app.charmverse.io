@@ -1,7 +1,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Block } from '@prisma/client';
+import { Block, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -45,6 +45,7 @@ async function getBlocks (req: NextApiRequest, res: NextApiResponse<Block[] | { 
   if (space) {
     const blocks = await prisma.block.findMany({
       where: {
+        deletedAt: null,
         id: req.query.id
           ? req.query.id as string
           : req.query.ids
@@ -80,11 +81,65 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
         fields: block.fields as any,
         spaceId: space.id,
         createdBy: req.session.user.id,
-        updatedBy: req.session.user.id
+        updatedBy: req.session.user.id,
+        deletedAt: null
       }));
+      const cardBlocks = newBlocks.filter(newBlock => newBlock.type === 'card');
+
+      const cardPages: Prisma.PageCreateInput[] = cardBlocks.map(cardBlock => {
+        const cardPage: Prisma.PageCreateInput = {
+          author: {
+            connect: {
+              id: cardBlock.createdBy
+            }
+          },
+          updatedBy: cardBlock.updatedBy,
+          id: cardBlock.id,
+          space: {
+            connect: {
+              id: cardBlock.spaceId
+            }
+          },
+          card: {
+            connect: {
+              id: cardBlock.id
+            }
+          },
+          createdAt: cardBlock.createdAt,
+          path: `page-${Math.random().toString().replace('0.', '')}`,
+          title: cardBlock.title,
+          icon: cardBlock.fields.icon,
+          type: 'card',
+          headerImage: cardBlock.fields.headerImage,
+          contentText: cardBlock.fields.contentText || '',
+          parentId: cardBlock.parentId,
+          updatedAt: cardBlock.updatedAt,
+          content: cardBlock.fields.content ?? undefined,
+          permissions: {
+            create: [
+              {
+                permissionLevel: 'full_access',
+                spaceId: cardBlock.spaceId
+              }
+            ]
+          }
+        };
+        delete cardBlock.fields.content;
+        delete cardBlock.fields.contentText;
+        delete cardBlock.fields.headerImage;
+        delete cardBlock.fields.icon;
+        return cardPage;
+      });
       await prisma.block.createMany({
         data: newBlocks
       });
+      if (cardPages.length !== 0) {
+        for (const cardPage of cardPages) {
+          await prisma.page.create({
+            data: cardPage
+          });
+        }
+      }
       return res.status(200).json(newBlocks);
     }
   }

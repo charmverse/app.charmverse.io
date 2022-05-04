@@ -1,20 +1,40 @@
 /* eslint-disable class-methods-use-this */
 
-import { Block, Space, InviteLink, Prisma, Page, User, Bounty, Application, Transaction, BountyStatus, TokenGate, PaymentMethod } from '@prisma/client';
+import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, TelegramUser } from '@prisma/client';
 import * as http from 'adapters/http';
-import { Contributor, LoggedInUser, BountyWithDetails, Task } from 'models';
+
+import { Contributor, LoggedInUser, BountyWithDetails, Task, PageContent } from 'models';
+import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
+import { getDisplayName } from 'lib/users';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
-import { getDisplayName } from 'lib/users';
-import { Block as FBBlock, BlockPatch } from 'components/databases/focalboard/src/blocks/block';
-import { IUser, UserWorkspace } from 'components/databases/focalboard/src/user';
-import { IWorkspace } from 'components/databases/focalboard/src/blocks/workspace';
-import { OctoUtils } from 'components/databases/focalboard/src/octoUtils';
+import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
+import { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/src/user';
+import { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
+import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
-import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
-import { ITokenMetadataRequest, ITokenMetadata } from 'lib/tokens/tokenData';
+import { FiatCurrency, IPairQuote } from 'models/Currency';
+import type { FailedImportsError } from 'lib/notion/types';
+import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
+import { ConnectDiscordResponse } from 'pages/api/discord/connect';
+import { TelegramAccount } from 'pages/api/telegram/connect';
+import { StartThreadRequest } from 'pages/api/threads';
+import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { AddCommentRequest } from 'pages/api/comments';
+import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
+
+export type ListSpaceRolesResponse = {
+  id: string;
+  name: string;
+  spaceRolesToRole: {
+      spaceRole: {
+          user: User;
+      };
+  }[];
+}
 
 export interface PopulatedBounty extends Bounty {
   applications: Application[];
@@ -24,7 +44,6 @@ export interface PopulatedBounty extends Bounty {
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
-
   async login (address: string) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
       address
@@ -44,6 +63,10 @@ class CharmClient {
     return http.POST<LoggedInUser>('/api/profile', {
       address
     });
+  }
+
+  updateUser ({ addresses }: { addresses?: string[] }) {
+    return http.PUT<LoggedInUser>('/api/profile', { addresses });
   }
 
   async createSpace (spaceOpts: Prisma.SpaceCreateInput) {
@@ -71,8 +94,8 @@ class CharmClient {
     return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
   }
 
-  updateContributor ({ spaceId, userId, role }: { spaceId: string, userId: string, role: string }) {
-    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { role });
+  updateContributor ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
+    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { isAdmin });
   }
 
   removeContributor ({ spaceId, userId }: { spaceId: string, userId: string }) {
@@ -96,7 +119,7 @@ class CharmClient {
   }
 
   deletePage (pageId: string) {
-    return http.DELETE(`/api/pages/${pageId}`);
+    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}`);
   }
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
@@ -104,15 +127,15 @@ class CharmClient {
   }
 
   favoritePage (pageId: string) {
-    return http.POST('/api/profile/favorites', { pageId });
+    return http.POST<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
 
   unfavoritePage (pageId: string) {
-    return http.DELETE('/api/profile/favorites', { pageId });
+    return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
 
   getPublicPage (pageId: string) {
-    return http.GET<Page>(`/api/public/pages/${pageId}`);
+    return http.GET<{pages: Page[], blocks: Block[]}>(`/api/public/pages/${pageId}`);
   }
 
   togglePagePublicAccess (pageId: string, publiclyAccessible: boolean) {
@@ -135,17 +158,37 @@ class CharmClient {
     return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
   }
 
-  notionLogin (query: { redirect: string }) {
-    return http.GET<{redirectUrl: string}>('/api/notion/login', query);
+  importFromNotion (payload: { code: string, spaceId: string }) {
+    return http.POST<{failedImports: FailedImportsError[]}>('/api/notion/import', payload);
   }
 
-  importFromNotion (params: { code: string, spaceId: string }) {
-    return http.POST('/api/notion/import', params);
+  connectTelegram (telegramAccount: TelegramAccount) {
+    return http.POST<TelegramUser>('/api/telegram/connect', telegramAccount);
+  }
+
+  disconnectTelegram () {
+    return http.POST('/api/telegram/disconnect');
+  }
+
+  disconnectDiscord () {
+    return http.POST('/api/discord/disconnect');
+  }
+
+  connectDiscord (payload: { code: string }) {
+    return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
+  }
+
+  createAccountWithDiscord (payload: {code: string}) {
+    return http.POST<ConnectDiscordResponse>('/api/discord/createAccount', payload);
+  }
+
+  importRolesFromDiscordServer (payload: ImportRolesPayload) {
+    return http.POST<ImportRolesResponse>('/api/discord/importRoles', payload);
   }
 
   // FocalBoard
 
-  // TODO: we shouldnt have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
+  // TODO: we shouldn't have to ask the server for the current space, but it will take time to pass spaceId through focalboard!
 
   async getWorkspace (): Promise<IWorkspace> {
     const space = await http.GET<Space>('/api/spaces/current');
@@ -239,8 +282,8 @@ class CharmClient {
   }
 
   async deleteBlock (blockId: string, updater: BlockUpdater): Promise<void> {
-    const deletedBlock = await http.DELETE<Block>(`/api/blocks/${blockId}`);
-    const fbBlock = this.blockToFBBlock(deletedBlock);
+    const { rootBlock } = await http.DELETE<{deletedCount: number, rootBlock: Block}>(`/api/blocks/${blockId}`);
+    const fbBlock = this.blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
   }
@@ -423,6 +466,77 @@ class CharmClient {
   // Tasks
   listTasks (): Promise<Task[]> {
     return http.GET('/api/tasks');
+  }
+
+  createRole (role: Partial<Role>): Promise<Role> {
+    return http.POST('/api/roles', role);
+  }
+
+  updateRole (role: Partial<Role>): Promise<Role> {
+    return http.PUT(`/api/roles/${role.id}`, role);
+  }
+
+  deleteRole (roleId: string): Promise<Role> {
+    return http.DELETE(`/api/roles/${roleId}`);
+  }
+
+  listRoles (spaceId: string): Promise<ListSpaceRolesResponse[]> {
+    return http.GET('/api/roles', { spaceId });
+  }
+
+  assignRole (data: {spaceId: string, roleId: string, userId: string}): Promise<Role []> {
+    return http.POST('/api/roles/assignment', data);
+  }
+
+  unassignRole (data: {spaceId: string, roleId: string, userId: string}): Promise<Role []> {
+    return http.DELETE('/api/roles/assignment', data);
+  }
+
+  /**
+   * Get full set of permissions for a specific user on a certain page
+   */
+  computeUserPagePermissions (request: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
+    return http.GET('/api/permissions/query', request);
+  }
+
+  listPagePermissions (pageId: string): Promise<IPagePermissionWithAssignee []> {
+    return http.GET('/api/permissions', { pageId });
+  }
+
+  createPermission (permission: IPagePermissionToCreate): Promise<boolean> {
+    return http.POST('/api/permissions', permission);
+  }
+
+  deletePermission (permissionId: string): Promise<boolean> {
+    return http.DELETE('/api/permissions', { permissionId });
+  }
+
+  startThread (request: StartThreadRequest): Promise<ThreadWithComments> {
+    return http.POST('/api/threads', request);
+  }
+
+  deleteThread (threadId: string) {
+    return http.DELETE(`/api/threads/${threadId}`);
+  }
+
+  updateThread (threadId: string, request: UpdateThreadRequest) {
+    return http.PUT(`/api/threads/${threadId}`, request);
+  }
+
+  addComment (request: AddCommentRequest): Promise<CommentWithUser> {
+    return http.POST('/api/comments', request);
+  }
+
+  editComment (commentId: string, content: PageContent): Promise<CommentWithUser> {
+    return http.PUT(`/api/comments/${commentId}`, { content });
+  }
+
+  deleteComment (commentId: string) {
+    return http.DELETE(`/api/comments/${commentId}`);
+  }
+
+  getPageThreads (pageId: string): Promise<ThreadWithComments[]> {
+    return http.GET(`/api/pages/${pageId}/threads`);
   }
 }
 

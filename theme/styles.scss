@@ -21,7 +21,7 @@ body {
 }
 
 div[role="presentation"] {
-  z-index: 2500;
+  z-index: var(--z-index-modal);
 }
 
 .bangle-nv-container {
@@ -34,5 +34,10 @@ blockquote .bangle-nv-child-container {
 
 // make sure tooltips always appear, on Account page it falls behind our custom modal
 .MuiTooltip-popper {
-  z-index: 9999999 !important;
+  z-index: var(--z-index-tooltip) !important;
+}
+
+
+.telegram-login-CharmverseBot {
+  width: 100%;
 }
