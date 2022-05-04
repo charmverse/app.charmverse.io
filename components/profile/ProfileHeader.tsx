@@ -13,7 +13,7 @@ export function ProfileHeader ({ name, profileImageURL }: ProfileHeaderProps) {
         <Grid item xs={8}>
           <Typography variant='h1'>{name}</Typography>
         </Grid>
-        <Grid item xs={4} align='right'>
+        <Grid item xs={4}>
           <Avatar alt={name} src={profileImageURL} sx={{ width: 70, height: 70 }} />
         </Grid>
       </Grid>

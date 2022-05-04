@@ -18,7 +18,7 @@ type TasksListProps = {
   tasks: Task[];
 };
 
-export function TasksList ({ tasks }: TasksListProps) {
+export default function TasksList ({ tasks }: TasksListProps) {
 
   const handleSign = () => {
   };

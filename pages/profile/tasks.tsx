@@ -1,8 +1,9 @@
 import { ReactElement } from 'react';
 import Box from '@mui/material/Box';
-import { PageLayout } from 'components/common/page-layout';
+import PageLayout from 'components/common/PageLayout';
 import { setTitle } from 'hooks/usePageTitle';
-import { ProfileHeader, TasksList } from 'components/profile';
+import { ProfileHeader } from 'components/profile';
+import TasksList from 'components/profile/tasks';
 import { Task } from 'models';
 import { useTasks } from 'hooks/useTasks';
 
