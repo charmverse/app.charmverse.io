@@ -148,6 +148,9 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   }
 
   async function publish () {
+
+    setFormError(null);
+
     if (account) {
 
       const content = generateMarkdown(page, false);
@@ -163,7 +166,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
           title: page.title,
           body: content,
           choices: ['Yay', 'Neigh'],
-          start: 0,
+          start: startDate,
           end: endDate,
           snapshot: 0,
           network: '4',
