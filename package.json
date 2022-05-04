@@ -9,6 +9,7 @@
     "destroy:staging": "npx cdk destroy \"CharmVerse-staging-${STAGE}\" --force",
     "lint": "eslint -c .eslintrc.json . --ext .ts --ext .tsx",
     "lint:prod": "npm run lint -- --quiet",
+    "postinstall": "patch-package",
     "start": "next dev",
     "start:test": "dotenv -e .env.test.local -- npm start",
     "start:test:ci": "npx react-env --path .env.test.local -- npx next start",
@@ -25,7 +26,6 @@
     "test:server": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose",
     "test:server-integration": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server-integration.ts' --verbose"
   },
-  "postinstall": "patch-package --error-on-fail",
   "prepare": "husky install",
   "lint-staged": {
     "*.{ts,tsx}": [
