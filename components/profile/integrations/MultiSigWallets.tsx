@@ -131,7 +131,7 @@ export default function MultiSigList () {
 
                   <ConfirmDeleteModal
                     key={wallet.id}
-                    title={`Delete role: ${wallet.address}`}
+                    title='Delete Wallet'
                     question='Are you sure you want to delete this wallet?'
                     onConfirm={() => deleteWallet(wallet)}
                     onClose={deleteConfirmation.close}

@@ -26,6 +26,7 @@ interface Props {
 
 export const schema = yup.object({
   chainId: yup.number().required('Please select a chain'),
+  name: yup.string(),
   gnosisSafeAddress: yup.string().test('verifyContractFormat', 'Invalid contract address', (value) => {
     return !value || isValidChainAddress(value);
   }),
@@ -74,7 +75,7 @@ export default function GnosisSafeForm ({ onSubmit, isPersonalSafe, defaultChain
     setValue('chainId', _chainId);
   }
 
-  async function addPaymentMethod (paymentMethod: Partial<PaymentMethod>) {
+  async function addPaymentMethod (paymentMethod: Partial<PaymentMethod & { name: string | null }>) {
     setFormError(null);
     paymentMethod.spaceId = space?.id;
     paymentMethod.walletType = 'gnosis';
@@ -83,7 +84,8 @@ export default function GnosisSafeForm ({ onSubmit, isPersonalSafe, defaultChain
       if (isPersonalSafe) {
         const createdPaymentMethod = await charmClient.createUserMultiSig({
           address: paymentMethod.gnosisSafeAddress || '',
-          chainId: paymentMethod.chainId
+          chainId: paymentMethod.chainId,
+          name: paymentMethod.name
         });
         onSubmit(createdPaymentMethod);
       }
@@ -114,6 +116,20 @@ export default function GnosisSafeForm ({ onSubmit, isPersonalSafe, defaultChain
       {/* @ts-ignore */}
       <form onSubmit={handleSubmit(addPaymentMethod)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
         <Grid container direction='column' spacing={3}>
+
+          {isPersonalSafe && (
+          <Grid item xs>
+            <TextField
+              {...register('name')}
+              autoFocus
+              fullWidth
+              size='small'
+              placeholder='Name'
+              error={!!errors.gnosisSafeAddress?.message}
+              helperText={errors.gnosisSafeAddress?.message}
+            />
+          </Grid>
+          )}
 
           <Grid item xs>
             <InputLabel>

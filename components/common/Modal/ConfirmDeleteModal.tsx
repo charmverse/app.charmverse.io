@@ -38,13 +38,20 @@ export default function ConfirmDeleteModal ({
       <Box sx={{ columnSpacing: 2, mt: 3 }}>
         <Button
           color='error'
+          elevation={0}
           sx={{ mr: 2, fontWeight: 'bold' }}
           onClick={_onConfirm}
         >
           {buttonText}
         </Button>
 
-        <Button color='secondary' onClick={onClose}>Cancel</Button>
+        <Button
+          color='secondary'
+          elevation={0}
+          onClick={onClose}
+        >
+          Cancel
+        </Button>
       </Box>
     </Modal>
   );

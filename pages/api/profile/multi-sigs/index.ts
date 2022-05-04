@@ -26,15 +26,9 @@ async function list (req: NextApiRequest, res: NextApiResponse<UserMultiSigWalle
 
 async function create (req: NextApiRequest, res: NextApiResponse<UserMultiSigWallet>) {
 
-  const {
-    chainId,
-    address
-  } = req.body as UserMultiSigWallet;
-
   const wallet = await prisma.userMultiSigWallet.create({
     data: {
-      address,
-      chainId,
+      ...req.body,
       createdBy: req.session.user.id,
       walletType: 'gnosis',
       user: {
