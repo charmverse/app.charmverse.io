@@ -1,4 +1,5 @@
 
+import { TokenGateToRole } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
@@ -13,7 +14,7 @@ handler.use(requireUser)
   .use(requireSpaceMembership({ adminOnly: true }))
   .post(updateTokenGateRoles);
 
-async function updateTokenGateRoles (req: NextApiRequest, res: NextApiResponse) {
+async function updateTokenGateRoles (req: NextApiRequest, res: NextApiResponse<TokenGateToRole[]>) {
   const { roleIds } = req.body as {roleIds: string[]};
   const roleIdsSet = new Set(roleIds);
   const tokenGateId = req.query.id as string;
@@ -51,7 +52,15 @@ async function updateTokenGateRoles (req: NextApiRequest, res: NextApiResponse) 
     });
   }
 
-  return res.status(200).json({ ok: true });
+  // Return the updated tokenGate to role records attached with the token gate
+  // This will help in updating the cache on the client side
+  const tokenGateToRoles = await prisma.tokenGateToRole.findMany({
+    where: {
+      tokenGateId
+    }
+  });
+
+  return res.status(200).json(tokenGateToRoles);
 }
 
 export default withSessionRoute(handler);

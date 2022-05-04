@@ -16,7 +16,7 @@ import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
 import { getLitChainFromChainId } from 'lib/token-gates';
-import { GetTokenGatesResponse } from 'pages/api/token-gates';
+import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { mutate } from 'swr';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
@@ -24,7 +24,7 @@ import TokenGateRolesSelect from './TokenGateRolesSelect';
 import useRoles from '../roles/hooks/useRoles';
 
 interface Props {
-  tokenGates: GetTokenGatesResponse[];
+  tokenGates: TokenGateWithRoles[];
   isAdmin: boolean;
   onDelete: (tokenGate: TokenGate) => void;
 }

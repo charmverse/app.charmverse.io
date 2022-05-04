@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, TelegramUser } from '@prisma/client';
+import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, TelegramUser, TokenGateToRole } from '@prisma/client';
 import * as http from 'adapters/http';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -23,7 +23,7 @@ import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
-import { GetTokenGatesResponse } from 'pages/api/token-gates';
+import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -422,7 +422,7 @@ class CharmClient {
 
   // Token Gates
   getTokenGates (query: { spaceId: string }) {
-    return http.GET<GetTokenGatesResponse[]>('/api/token-gates', query);
+    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
   }
 
   getTokenGatesForSpace (query: { spaceDomain: string }) {
@@ -536,7 +536,7 @@ class CharmClient {
   }
 
   updateTokenGateRoles (tokenGateId: string, spaceId: string, roleIds: string[]) {
-    return http.POST(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
+    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
   }
 }
 

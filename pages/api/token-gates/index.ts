@@ -34,12 +34,12 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
   res.status(200).json(result);
 }
 
-export interface GetTokenGatesResponse extends TokenGate {
+export interface TokenGateWithRoles extends TokenGate {
   space: Space;
   tokenGateToRoles: TokenGateToRole[];
 }
 
-async function getTokenGates (req: NextApiRequest, res: NextApiResponse<GetTokenGatesResponse[] | { error: string }>) {
+async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGateWithRoles[] | { error: string }>) {
 
   let space: Space | null = null;
   if (req.query.spaceDomain) {
