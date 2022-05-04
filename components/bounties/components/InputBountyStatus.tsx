@@ -13,7 +13,7 @@ interface Props {
   renderSelectedInOption?: boolean
   renderSelectedInValue?: boolean
   onChange: (value: any) => void
-  defaultValues?: BountyStatus []
+  defaultValues?: BountyStatus[]
 }
 
 const bountyFilterOptions = Object.keys(BountyStatus) as BountyStatus[];
@@ -60,33 +60,32 @@ export default function InputBountyStatus ({ onChange, defaultValues = [], rende
           ) : (
             <Box display='flex' sx={{ pt: 0.5, pb: 0.5 }}>
               {
-                    (selectedValues as any[])?.map(val => {
-                      return (
-                        <MenuItem sx={{ p: 0, pr: 0.2 }} key={val} value={val}>
-                          <BountyStatusChip status={val as BountyStatus} />
-                        </MenuItem>
-                      );
-                    })
-                  }
+                (selectedValues as any[])?.map(val => {
+                  return (
+                    <MenuItem sx={{ p: 0, pr: 0.2 }} key={val} value={val}>
+                      <BountyStatusChip status={val as BountyStatus} />
+                    </MenuItem>
+                  );
+                })
+              }
             </Box>
           )
 
         )}
       >
         {
-              bountyFilterOptions.map((option) => {
-
-                return (
-                  // Component manages display
-                  renderSelectedInOption
-                  // External component manages display, so we hide selected options
-                  || (!renderSelectedInOption && !isSelected(option)) ? (
-                    <MenuItem key={option} value={option}>
-                      <BountyStatusChip status={option} />
-                    </MenuItem>
-                    ) : null);
-              })
-            }
+          bountyFilterOptions.map((option) => {
+            return (
+              // Component manages display
+              renderSelectedInOption
+                // External component manages display, so we hide selected options
+                || (!renderSelectedInOption && !isSelected(option)) ? (
+                  <MenuItem key={option} value={option}>
+                    <BountyStatusChip status={option} />
+                  </MenuItem>
+                ) : null);
+          })
+        }
       </Select>
     </FormControl>
   );

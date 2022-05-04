@@ -1,5 +1,5 @@
 
-import { Space, TokenGate } from '@prisma/client';
+import { Space, TokenGate, TokenGateToRole } from '@prisma/client';
 import { prisma } from 'db';
 import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -34,7 +34,12 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
   res.status(200).json(result);
 }
 
-async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGate[] | { error: string }>) {
+export interface TokenGateWithRoles extends TokenGate {
+  space: Space;
+  tokenGateToRoles: TokenGateToRole[];
+}
+
+async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGateWithRoles[] | { error: string }>) {
 
   let space: Space | null = null;
   if (req.query.spaceDomain) {
@@ -58,7 +63,8 @@ async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGat
       spaceId
     },
     include: {
-      space: true
+      space: true,
+      tokenGateToRoles: true
     }
   });
 
