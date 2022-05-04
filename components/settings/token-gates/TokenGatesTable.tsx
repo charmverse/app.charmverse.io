@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { checkAndSignAuthMessage } from 'lit-js-sdk';
+import { useEffect, useState } from 'react';
+import { checkAndSignAuthMessage, humanizeAccessControlConditions } from 'lit-js-sdk';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { TokenGate } from '@prisma/client';
@@ -17,9 +17,10 @@ import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
 import { getLitChainFromChainId } from 'lib/token-gates';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { mutate } from 'swr';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
-import { useTokenGates } from './hooks/useTokenGates';
 
 interface Props {
   tokenGates: TokenGateWithRoles[];
@@ -28,10 +29,41 @@ interface Props {
 }
 
 export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Props) {
-  const { chainId } = useWeb3React();
-  const { tokenGateDescriptions, updateTokenGateRoles, deleteRoleFromTokenGate } = useTokenGates();
+  const { account, chainId } = useWeb3React();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
+  const [descriptions, setDescriptions] = useState<string[]>([]);
+  const [space] = useCurrentSpace();
+
+  async function updateTokenGateRoles (tokenGateId: string, roleIds: string[]) {
+    if (space) {
+      await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
+      mutate(`tokenGates/${space.id}`);
+    }
+  }
+
+  async function deleteRoleFromTokenGate (tokenGateId: string, roleId: string) {
+    const tokenGate = tokenGates.find(_tokenGate => _tokenGate.id === tokenGateId);
+    if (tokenGate && space) {
+      const roleIds = tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId).filter(tokenGateRoleId => tokenGateRoleId !== roleId);
+      await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
+      mutate(`tokenGates/${space.id}`);
+    }
+  }
+
+  useEffect(() => {
+    async function main () {
+      const results = await Promise.all(
+        tokenGates.map(tokenGate => humanizeAccessControlConditions({
+          myWalletAddress: account || '',
+          accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
+        }))
+      );
+      setDescriptions(results);
+    }
+    main();
+  }, [tokenGates]);
+
   async function testConnect (tokenGate: TokenGate) {
     const chain = getLitChainFromChainId(chainId);
     setTestResult({ status: 'loading' });
@@ -70,10 +102,10 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
           </TableRow>
         </TableHead>
         <TableBody>
-          {tokenGates.map((tokenGate) => (
+          {tokenGates.map((tokenGate, tokenGateIndex) => (
             <TableRow key={tokenGate.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
               <TableCell sx={{ px: 0 }}>
-                <Typography variant='body2' sx={{ my: 1 }}>{tokenGateDescriptions[tokenGate.id]}
+                <Typography variant='body2' sx={{ my: 1 }}>{descriptions[tokenGateIndex]}
                 </Typography>
               </TableCell>
               <TableCell>

@@ -13,21 +13,22 @@ import Portal from '@mui/material/Portal';
 import { ErrorModal } from 'components/common/Modal';
 import Button from 'components/common/Button';
 import { getLitChainFromChainId } from 'lib/token-gates';
+import useSWR from 'swr';
 import Legend from '../Legend';
 import TokenGatesTable from './TokenGatesTable';
-import { TokenGatesProvider, useTokenGates } from './hooks/useTokenGates';
 
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
 
 type ConditionsModalResult = Pick<SigningConditions, 'accessControlConditions' | 'permanant'>;
 
-export function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
+export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
   const litClient = useLitProtocol();
   const { chainId } = useWeb3React();
-  const { tokenGatesWithRoles, mutate } = useTokenGates();
   const popupState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
+  const { data, mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
+
   function onSubmit (conditions: ConditionsModalResult) {
     setApiError('');
     saveTokenGate(conditions)
@@ -93,9 +94,9 @@ export function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: s
           </Button>
         )}
       </Legend>
-      {Object.keys(tokenGatesWithRoles).length === 0 && <Typography color='secondary'>No token gates yet</Typography>}
-      {Object.values(tokenGatesWithRoles).length > 0
-        && <TokenGatesTable isAdmin={isAdmin} tokenGates={Object.values(tokenGatesWithRoles)} onDelete={deleteTokenGate} />}
+      {data && data.length === 0 && <Typography color='secondary'>No token gates yet</Typography>}
+      {data && data?.length > 0
+        && <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />}
       <Portal>
         <BackDrop
           onClick={popupState.close}
@@ -113,13 +114,5 @@ export function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: s
       </Portal>
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
     </>
-  );
-}
-
-export default function TokenGatesWithProvider ({ isAdmin, spaceId }: {isAdmin: boolean, spaceId: string}) {
-  return (
-    <TokenGatesProvider spaceId={spaceId}>
-      <TokenGates isAdmin={isAdmin} spaceId={spaceId} />
-    </TokenGatesProvider>
   );
 }
