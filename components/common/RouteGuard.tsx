@@ -95,7 +95,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     // condition: no session, but a wallet is connected
     else if (!user && account) {
       log.info('[RouteGuard]: log in user by wallet address');
-      const _user = await charmClient.login(account).catch(err => null);
+      const _user = await charmClient.login(account).catch(() => null);
       if (_user) {
         return { authorized: true, user: _user };
       }
@@ -107,7 +107,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     // condition: user connected but the wallet address is new
     else if (user && account && !user.addresses.includes(account)) {
       log.info('[RouteGuard]: unknown address');
-      const _user = await charmClient.login(account).catch(err => null);
+      const _user = await charmClient.login(account).catch(() => null);
       // log in existing user
       if (_user) {
         return { authorized: true, user: _user };

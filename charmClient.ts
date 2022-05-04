@@ -1,10 +1,8 @@
-/* eslint-disable class-methods-use-this */
 
 import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
-  Role, Space, TokenGate, Transaction, User, TelegramUser, UserMultiSigWallet
+  Role, Space, TokenGate, Transaction, User, TelegramUser, UserMultiSigWallet, TokenGateToRole
 } from '@prisma/client';
-
 import { Contributor, LoggedInUser, BountyWithDetails, Task, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -19,6 +17,7 @@ import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtil
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'lib/notion/types';
+// TODO: Maybe move these types to another place so that we dont import from backend
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
@@ -26,6 +25,7 @@ import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
+import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -436,7 +436,7 @@ class CharmClient {
 
   // Token Gates
   getTokenGates (query: { spaceId: string }) {
-    return http.GET<TokenGate[]>('/api/token-gates', query);
+    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
   }
 
   getTokenGatesForSpace (query: { spaceDomain: string }) {
@@ -460,6 +460,10 @@ class CharmClient {
     Promise<{ error?: string, success?: boolean, space: Space }> {
 
     return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
+  }
+
+  updateTokenGateRoles (tokenGateId: string, spaceId: string, roleIds: string[]) {
+    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
   }
 
   getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {

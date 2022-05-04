@@ -40,7 +40,8 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
         updatedAt: (new Date()).toISOString(),
         spaceRoles: {
           create: {
-            userId: user.id
+            userId: user.id,
+            isAdmin: true
           }
         }
       },

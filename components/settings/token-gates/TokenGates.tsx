@@ -1,5 +1,4 @@
 import Typography from '@mui/material/Typography';
-import useSWR from 'swr';
 import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import ShareModal from 'lit-share-modal';
@@ -14,6 +13,7 @@ import Portal from '@mui/material/Portal';
 import { ErrorModal } from 'components/common/Modal';
 import Button from 'components/common/Button';
 import { getLitChainFromChainId } from 'lib/token-gates';
+import useSWR from 'swr';
 import Legend from '../Legend';
 import TokenGatesTable from './TokenGatesTable';
 
@@ -22,13 +22,12 @@ import TokenGatesTable from './TokenGatesTable';
 type ConditionsModalResult = Pick<SigningConditions, 'accessControlConditions' | 'permanant'>;
 
 export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
-
   const litClient = useLitProtocol();
   const { chainId } = useWeb3React();
-  const { data, mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
   const popupState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
+  const { data, mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
 
   function onSubmit (conditions: ConditionsModalResult) {
     setApiError('');
@@ -96,7 +95,8 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         )}
       </Legend>
       {data && data.length === 0 && <Typography color='secondary'>No token gates yet</Typography>}
-      {data && data.length > 0 && <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />}
+      {data && data?.length > 0
+        && <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />}
       <Portal>
         <BackDrop
           onClick={popupState.close}
