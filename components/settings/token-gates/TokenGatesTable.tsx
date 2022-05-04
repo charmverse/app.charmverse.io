@@ -18,6 +18,7 @@ import TableRow from 'components/common/Table/TableRow';
 import { getLitChainFromChainId } from 'lib/token-gates';
 import { GetTokenGatesResponse } from 'pages/api/token-gates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { mutate } from 'swr';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 import useRoles from '../roles/hooks/useRoles';
@@ -72,6 +73,17 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   async function updateTokenGateRoles (tokenGateId: string, roleIds: string[]) {
     if (space) {
       await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
+      // TODO: Replace this with network friendly cache update
+      mutate(`tokenGates/${space.id}`);
+    }
+  }
+
+  async function deleteRoleFromTokenGate (tokenGateId: string, roleId: string) {
+    const tokenGate = tokenGates.find(_tokenGate => _tokenGate.id === tokenGateId);
+    if (space && tokenGate) {
+      const roleIds = tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId).filter(tokenGateRoleId => tokenGateRoleId !== roleId);
+      await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
+      mutate(`tokenGates/${space.id}`);
     }
   }
 
@@ -99,6 +111,9 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                   selectedRoleIds={tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId)}
                   onChange={(roleIds) => {
                     updateTokenGateRoles(tokenGate.id, roleIds);
+                  }}
+                  onDelete={(roleId) => {
+                    deleteRoleFromTokenGate(tokenGate.id, roleId);
                   }}
                 />
                 )}

@@ -13,9 +13,10 @@ import useRoles from '../roles/hooks/useRoles';
 interface Props {
   onChange: (roleIds: string[]) => void
   selectedRoleIds: string[]
+  onDelete: (roleId: string) => void
 }
 
-export default function TokenGateRolesSelect ({ selectedRoleIds, onChange }: Props) {
+export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onChange }: Props) {
   const { roles } = useRoles();
 
   const rolesRecord: Record<string, ListSpaceRolesResponse> = useMemo(() => roles ? roles?.reduce((obj, role) => (
@@ -49,9 +50,13 @@ export default function TokenGateRolesSelect ({ selectedRoleIds, onChange }: Pro
                       key={roleId}
                       label={rolesRecord[roleId].name}
                       variant='outlined'
+                      onMouseDown={(event) => {
+                        event.stopPropagation();
+                      }}
                       onDelete={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        onDelete(roleId);
                       }}
                     />
                   );
