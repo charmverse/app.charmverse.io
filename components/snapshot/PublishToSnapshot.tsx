@@ -3,23 +3,18 @@ import IosShareIcon from '@mui/icons-material/IosShare';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { Page } from '@prisma/client';
-import snapshot from '@snapshot-labs/snapshot.js';
-import { useWeb3React } from '@web3-react/core';
-import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
+import { Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-
-import { getSnapshotProposal, SnapshotProposal, SnapshotReceipt } from 'lib/snapshot';
+import { getSnapshotProposal, SnapshotProposal } from 'lib/snapshot';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
-import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { Modal } from 'components/common/Modal';
+import charmClient from 'charmClient';
 import PublishingForm from './PublishingForm';
 
 export default function PublishToSnapshot ({ page }: {page: Page}) {
-
-  const [space] = useCurrentSpace();
 
   const [checkingProposal, setCheckingProposal] = useState(!!page.snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
@@ -33,6 +28,14 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
 
   async function verifyProposal (proposalId: string) {
     const snapshotProposal = await getSnapshotProposal(proposalId);
+
+    if (!snapshotProposal) {
+      const pageWithoutSnapshotId = await charmClient.updatePageSnapshotData(page.id, { snapshotProposalId: null });
+      setPages({
+        ...pages,
+        [page.id]: pageWithoutSnapshotId
+      });
+    }
 
     setProposal(snapshotProposal);
     setCheckingProposal(false);
