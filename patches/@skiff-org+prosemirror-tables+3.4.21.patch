@@ -228,18 +228,22 @@ index fb1644e..b60a4b1 100644
  
    _createClass(TableFiltersMenuView, [{
 diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
-index fb57edd..78d0b30 100644
+index fb57edd..715978a 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/dist/index.js
 +++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
-@@ -12,7 +12,7 @@ var prosemirrorTransform = require('prosemirror-transform');
+@@ -12,9 +12,9 @@ var prosemirrorTransform = require('prosemirror-transform');
  var prosemirrorCommands = require('prosemirror-commands');
  var prosemirrorMenu = require('prosemirror-menu');
  var React = require('react');
 -var pickers = require('@material-ui/pickers');
+-var styles = require('@material-ui/core/styles');
+-var core = require('@material-ui/core');
 +var pickers = require('@mui/x-date-pickers');
- var styles = require('@material-ui/core/styles');
- var core = require('@material-ui/core');
++var styles = require('@mui/material/styles');
++var core = require('@mui/material/styles');
  var ReactDOM = require('react-dom');
+ 
+ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 @@ -3667,6 +3667,7 @@ var getColIndexFromSelectedRect = function getColIndexFromSelectedRect(state, po
    return cellIndex % tableRect.map.width;
  };
@@ -287,7 +291,7 @@ index fb57edd..78d0b30 100644
  
      this.getPos = getPos;
 diff --git a/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css b/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
-index 006716e..66ffcce 100644
+index 006716e..3b2da3f 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
 +++ b/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
 @@ -149,22 +149,27 @@
