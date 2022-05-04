@@ -9,7 +9,6 @@ import Button from 'components/common/Button';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { getChainById } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { ISystemError } from 'lib/utilities/errors';
 import { useEffect, useState } from 'react';
@@ -22,6 +21,7 @@ export type FormMode = 'create' | 'update';
 interface Props {
   onSubmit: (paymentMethod: Partial<PaymentMethod>) => any,
   defaultChainId?: number
+  isPersonalSafe?: boolean
 }
 
 export const schema = yup.object({
@@ -37,17 +37,13 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
-
-  const [loadingToken, setLoadingToken] = useState(false);
+export default function GnosisSafeForm ({ onSubmit, isPersonalSafe, defaultChainId = 1 }: Props) {
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    trigger,
-    reset,
     formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -58,7 +54,6 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     resolver: yupResolver(schema)
   });
 
-  const [,, refreshPaymentMethods] = usePaymentMethods();
   const [space] = useCurrentSpace();
 
   const [formError, setFormError] = useState<ISystemError | null>(null);
@@ -85,9 +80,18 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     paymentMethod.walletType = 'gnosis';
 
     try {
-      const createdPaymentMethod = await charmClient.createPaymentMethod(paymentMethod);
-      refreshPaymentMethods();
-      onSubmit(createdPaymentMethod);
+      console.log('isPersonalSafe', isPersonalSafe);
+      if (isPersonalSafe) {
+        const createdPaymentMethod = await charmClient.createUserMultiSig({
+          address: paymentMethod.gnosisSafeAddress || '',
+          chainId: paymentMethod.chainId
+        });
+        onSubmit(createdPaymentMethod);
+      }
+      else {
+        const createdPaymentMethod = await charmClient.createPaymentMethod(paymentMethod);
+        onSubmit(createdPaymentMethod);
+      }
     }
     catch (error: any) {
       setFormError(
@@ -98,6 +102,12 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
         })
       );
     }
+  }
+
+  function onAddressChange (e: any) {
+    // remove prefix added by gnosis safe on their app
+    const value = e.target.value.replace('rin:', '');
+    setValue('gnosisSafeAddress', value);
   }
 
   return (
@@ -121,6 +131,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
               {...register('gnosisSafeAddress')}
               fullWidth
               size='small'
+              onChange={onAddressChange}
               placeholder='Enter Gnosis Safe address'
               error={!!errors.gnosisSafeAddress?.message}
               helperText={errors.gnosisSafeAddress?.message}
@@ -136,7 +147,9 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
             )
           }
           <Grid item>
-            <Button type='submit' disabled={!isValid || (values.gnosisSafeAddress === '')}>Create payment method</Button>
+            <Button type='submit' disabled={!isValid || (values.gnosisSafeAddress === '')}>
+              {isPersonalSafe ? 'Add wallet' : 'Create payment method'}
+            </Button>
           </Grid>
         </Grid>
       </form>

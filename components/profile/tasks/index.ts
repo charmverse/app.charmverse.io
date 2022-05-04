@@ -1,3 +1,3 @@
-import TasksList from './TasksList';
+import TasksPage from './TasksPage';
 
-export default TasksList;
+export default TasksPage;

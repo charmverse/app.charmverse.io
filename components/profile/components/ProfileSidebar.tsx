@@ -16,7 +16,7 @@ import { getDisplayName } from 'lib/users';
 import { headerHeight } from 'components/common/PageLayout/components/Header';
 
 const sidebarLinks = [
-  { title: 'Tasks', icon: <TasksIcon />, path: '/profile/tasks' },
+  { title: 'My Tasks', icon: <TasksIcon />, path: '/profile/tasks' },
   { title: 'Public Profile', icon: <ProfileIcon />, path: '/profile/public' },
   { title: 'Integrations', icon: <KeyIcon />, path: '/profile/integrations' }
 ];
@@ -134,11 +134,12 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
         </SidebarHeader>
         <Box mb={2}>
           <SectionName>
-            NEXUS
+            MY NEXUS
           </SectionName>
           {sidebarLinks.map(link => (
             <SidebarLink
               href={link.path}
+              key={link.path}
               active={router.pathname === link.path}
               icon={link.icon}
               label={link.title}

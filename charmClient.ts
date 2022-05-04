@@ -1,6 +1,9 @@
 /* eslint-disable class-methods-use-this */
 
-import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, TelegramUser } from '@prisma/client';
+import {
+  Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
+  Role, Space, TokenGate, Transaction, User, TelegramUser, UserMultiSigWallet
+} from '@prisma/client';
 import * as http from 'adapters/http';
 
 import { Contributor, LoggedInUser, BountyWithDetails, Task, PageContent } from 'models';
@@ -132,6 +135,18 @@ class CharmClient {
 
   unfavoritePage (pageId: string) {
     return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
+  }
+
+  createUserMultiSig (wallet: Partial<UserMultiSigWallet>): Promise<UserMultiSigWallet> {
+    return http.POST('/api/profile/multi-sigs', wallet);
+  }
+
+  listUserMultiSigs (): Promise<UserMultiSigWallet[]> {
+    return http.GET('/api/profile/multi-sigs');
+  }
+
+  deleteUserMultiSig (walletId: string) {
+    return http.DELETE(`/api/profile/multi-sigs/${walletId}`);
   }
 
   getPublicPage (pageId: string) {
@@ -459,7 +474,7 @@ class CharmClient {
     return http.GET('/api/payment-methods', { spaceId });
   }
 
-  deletePaymentMethod (paymentMethodId: string): Promise<PaymentMethod[]> {
+  deletePaymentMethod (paymentMethodId: string) {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 

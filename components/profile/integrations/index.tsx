@@ -1,3 +1,3 @@
-import IntegrationsPage from './MyIntegrations';
+import IntegrationsPage from './IntegrationsPage';
 
 export default IntegrationsPage;

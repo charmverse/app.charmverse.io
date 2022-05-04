@@ -5,7 +5,7 @@ import TasksList from 'components/profile/tasks';
 
 export default function TasksPage () {
 
-  setTitle('Tasks');
+  setTitle('My Tasks');
 
   return (
     <TasksList />
