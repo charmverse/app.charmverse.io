@@ -1,4 +1,4 @@
-import { IconButton, List, ListItem, ListItemText, ListItemIcon, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography } from '@mui/material';
 import { usePages } from 'hooks/usePages';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
@@ -8,11 +8,12 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import charmClient from 'charmClient';
 import { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMemo, useState, ReactFragment } from 'react';
+import { useMemo, useState } from 'react';
 import { DateTime } from 'luxon';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
-import Link from 'components/common/Link';
+import Link from 'next/link';
+import { fancyTrim } from 'lib/utilities/strings';
 import PageIcon from './PageIcon';
 
 export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, isOpen: boolean}) {
@@ -51,7 +52,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
       title={(
         <>
           Trash
-          <Typography variant='subtitle1' color='secondary'>{deletedPages.length} pages</Typography>
+          <Typography variant='body2' color='secondary'>{deletedPages.length} pages</Typography>
         </>
       )}
     >
@@ -62,28 +63,28 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
             {deletedPages.map(deletedPage => {
               const isEditorEmpty = checkForEmpty(deletedPage.content as PageContent);
               return (
-                <ListItem disableGutters dense disabled={isMutating} key={deletedPage.id}>
-                  <ListItemIcon>
-                    <PageIcon pageType={deletedPage.type} icon={deletedPage.icon} isEditorEmpty={isEditorEmpty} />
-                  </ListItemIcon>
-                  <ListItemText secondary={DateTime.fromJSDate(new Date(deletedPage.deletedAt!)).toRelative({ base: (DateTime.now()) })}>
-                    <Link color='inherit' href={`/${space?.domain}/${deletedPage.path}`}>
-                      {deletedPage.title || 'Untitled'}
-                    </Link>
-                  </ListItemText>
-                  <div>
-                    <IconButton disabled={isMutating} size='small' onClick={() => restorePages(deletedPage.id)}>
-                      <Tooltip arrow placement='top' title='Restore page'>
-                        <RestoreIcon color='info' fontSize='small' />
-                      </Tooltip>
-                    </IconButton>
-                    <IconButton disabled={isMutating} size='small' onClick={() => deletePage(deletedPage.id)}>
-                      <Tooltip arrow placement='top' title='Delete page permanently'>
-                        <DeleteIcon color='error' fontSize='small' />
-                      </Tooltip>
-                    </IconButton>
-                  </div>
-                </ListItem>
+                <Link href={`/${space?.domain}/${deletedPage.path}`} passHref key={deletedPage.id}>
+                  <MenuItem component='a' dense disabled={isMutating}>
+                    <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
+                      <PageIcon pageType={deletedPage.type} icon={deletedPage.icon} isEditorEmpty={isEditorEmpty} />
+                    </ListItemIcon>
+                    <ListItemText secondary={DateTime.fromJSDate(new Date(deletedPage.deletedAt!)).toRelative({ base: (DateTime.now()) })}>
+                      {fancyTrim(deletedPage.title, 30) || 'Untitled'}
+                    </ListItemText>
+                    <div onClick={e => e.stopPropagation()}>
+                      <IconButton disabled={isMutating} size='small' onClick={() => restorePages(deletedPage.id)}>
+                        <Tooltip arrow placement='top' title='Restore page'>
+                          <RestoreIcon color='info' fontSize='small' />
+                        </Tooltip>
+                      </IconButton>
+                      <IconButton disabled={isMutating} size='small' onClick={() => deletePage(deletedPage.id)}>
+                        <Tooltip arrow placement='top' title='Delete page permanently'>
+                          <DeleteIcon color='error' fontSize='small' />
+                        </Tooltip>
+                      </IconButton>
+                    </div>
+                  </MenuItem>
+                </Link>
               );
             })}
           </List>

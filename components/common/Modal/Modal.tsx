@@ -46,7 +46,6 @@ const CloseButton = styled(IconButton)`
 const ScrollableContainer = styled.div`
   flex-grow: 1;
   overflow: auto;
-  padding: ${({ theme }) => theme.spacing(0, 4)};
 `;
 
 export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose' | 'title'> & {
