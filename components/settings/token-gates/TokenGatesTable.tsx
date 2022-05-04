@@ -16,22 +16,25 @@ import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
 import { getLitChainFromChainId } from 'lib/token-gates';
+import { GetTokenGatesResponse } from 'pages/api/token-gates';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 import useRoles from '../roles/hooks/useRoles';
 
 interface Props {
-  tokenGates: TokenGate[];
+  tokenGates: GetTokenGatesResponse[];
   isAdmin: boolean;
   onDelete: (tokenGate: TokenGate) => void;
 }
 
-export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props) {
+export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Props) {
   const { account, chainId } = useWeb3React();
   const [descriptions, setDescriptions] = useState<string[]>([]);
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
   const { roles } = useRoles();
+  const [space] = useCurrentSpace();
 
   useEffect(() => {
     Promise.all(tokenGates.map(tokenGate => humanizeAccessControlConditions({
@@ -66,6 +69,12 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
     }
   }
 
+  async function updateTokenGateRoles (tokenGateId: string, roleIds: string[]) {
+    if (space) {
+      await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
+    }
+  }
+
   return (
     <>
       <Table size='small' aria-label='simple table'>
@@ -77,15 +86,22 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
           </TableRow>
         </TableHead>
         <TableBody>
-          {tokenGates.map((row, index) => (
-            <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
+          {tokenGates.map((tokenGate, index) => (
+            <TableRow key={tokenGate.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
               <TableCell sx={{ px: 0 }}>
                 <Typography sx={{
                   my: 1
                 }}
                 >{descriptions[index]}
                 </Typography>
-                {roles?.length !== 0 && <TokenGateRolesSelect />}
+                {roles?.length !== 0 && (
+                <TokenGateRolesSelect
+                  selectedRoleIds={tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId)}
+                  onChange={(roleIds) => {
+                    updateTokenGateRoles(tokenGate.id, roleIds);
+                  }}
+                />
+                )}
               </TableCell>
               {/* <TableCell sx={{ width: '150px' }}>
                 {roles?.length !== 0 && <Button size='small' variant='outlined' onClick={() => setShowingTokenGateRolesModal(true)}>Attach Roles</Button>}
@@ -93,7 +109,7 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
               <TableCell width={150} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
                 <Tooltip arrow placement='top' title='Test this gate using your own wallet'>
                   <Box component='span' pr={1}>
-                    <Chip onClick={() => testConnect(row)} sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label='Test' />
+                    <Chip onClick={() => testConnect(tokenGate)} sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label='Test' />
                   </Box>
                 </Tooltip>
                 {isAdmin && (
@@ -105,7 +121,7 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
                     color='secondary'
                     size='small'
                     variant='outlined'
-                    onClick={() => onDelete(row)}
+                    onClick={() => onDelete(tokenGate)}
                   />
                 </Tooltip>
                 )}

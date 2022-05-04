@@ -15,6 +15,7 @@ import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtil
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'lib/notion/types';
+// TODO: Maybe move these types to another place so that we dont import from backend
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
@@ -22,6 +23,7 @@ import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
+import { GetTokenGatesResponse } from 'pages/api/token-gates';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -420,7 +422,7 @@ class CharmClient {
 
   // Token Gates
   getTokenGates (query: { spaceId: string }) {
-    return http.GET<TokenGate[]>('/api/token-gates', query);
+    return http.GET<GetTokenGatesResponse[]>('/api/token-gates', query);
   }
 
   getTokenGatesForSpace (query: { spaceDomain: string }) {
@@ -531,6 +533,10 @@ class CharmClient {
 
   getPageThreads (pageId: string): Promise<ThreadWithComments[]> {
     return http.GET(`/api/pages/${pageId}/threads`);
+  }
+
+  updateTokenGateRoles (tokenGateId: string, spaceId: string, roleIds: string[]) {
+    return http.POST(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
   }
 }
 

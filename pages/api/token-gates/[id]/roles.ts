@@ -9,8 +9,8 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
+  .use(requireKeys(['roleIds', 'spaceId'], 'body'))
   .use(requireSpaceMembership({ adminOnly: true }))
-  .use(requireKeys(['roleIds'], 'body'))
   .post(updateTokenGateRoles);
 
 async function updateTokenGateRoles (req: NextApiRequest, res: NextApiResponse) {
@@ -20,17 +20,14 @@ async function updateTokenGateRoles (req: NextApiRequest, res: NextApiResponse) 
 
   const tokenGateRoles = await prisma.tokenGateToRole.findMany({
     where: {
-      tokenGateId,
-      roleId: {
-        in: roleIds
-      }
+      tokenGateId
     },
     select: {
-      id: true
+      roleId: true
     }
   });
 
-  const tokenGateRoleIds = new Set(tokenGateRoles.map(role => role.id));
+  const tokenGateRoleIds = new Set(tokenGateRoles.map(role => role.roleId));
   const tokenGateRoleIdsToAdd = roleIds.filter(roleId => !tokenGateRoleIds.has(roleId));
   const tokenGateRoleIdsToRemove = Array.from(tokenGateRoleIds).filter(tokenGateRoleId => !roleIdsSet.has(tokenGateRoleId));
 
