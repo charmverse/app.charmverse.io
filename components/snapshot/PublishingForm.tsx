@@ -168,7 +168,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
           snapshot: 0,
           network: '4',
           // strategies: JSON.stringify([]),
-          // strategies: JSON.stringify([{ name: 'ticket', network: '4', params: {} }]),
+          strategies: JSON.stringify([{ name: 'ticket', network: '4', params: {} }]),
           plugins: JSON.stringify({}),
           metadata: JSON.stringify({})
         } as any) as SnapshotReceipt;
