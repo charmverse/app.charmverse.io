@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
-import Alert from '@mui/material/Alert';
+import Alert, { AlertColor } from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -36,6 +36,8 @@ interface Props {
   page: Page
 }
 
+const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 14400;
+
 export default function PublishingForm ({ onSubmit, page }: Props) {
 
   const { account, library } = useWeb3React();
@@ -68,7 +70,28 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
   useEffect(() => {
     verifyUserCanPostToSnapshot();
-  }, [space, snapshotSpace]);
+  }, [space, snapshotSpace, page]);
+
+  useEffect(() => {
+    checkMarkdownLength();
+  }, [page]);
+
+  function checkMarkdownLength () {
+    const content = generateMarkdown(page, false);
+
+    const markdownCharacterLength = content.length;
+
+    if (markdownCharacterLength > MAX_SNAPSHOT_PROPOSAL_CHARACTERS) {
+      setFormError(
+        new SystemError({
+          errorType: 'Maximum size exceeded',
+          severity: 'warning',
+          message: `The character count of your proposal is ${markdownCharacterLength}.\r\n\nThis exceeds Snapshot's limit of ${MAX_SNAPSHOT_PROPOSAL_CHARACTERS}.\r\n\nTo fix this, reduce text size and check for inline images which were pasted directly instead of being configured with a link.`
+        })
+      );
+
+    }
+  }
 
   async function verifyUserCanPostToSnapshot () {
     if (!space || !space?.snapshotDomain) {
@@ -99,24 +122,29 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
       console.log(space);
 
-      const receipt = await client.proposal(library, account, {
-        space: space?.snapshotDomain as any,
-        type: 'single-choice',
-        title: page.title,
-        body: content,
-        choices: ['Yay', 'Neigh'],
-        start: startDate,
-        end: endDate,
-        snapshot: 0,
-        network: '4',
-        strategies: JSON.stringify([{ name: 'ticket', network: '4', params: {} }]),
-        plugins: JSON.stringify({}),
-        metadata: JSON.stringify({})
-      } as any) as SnapshotReceipt;
+      try {
+        const receipt = await client.proposal(library, account, {
+          space: space?.snapshotDomain as any,
+          type: 'single-choice',
+          title: page.title,
+          body: content,
+          choices: ['Yay', 'Neigh'],
+          start: startDate,
+          end: endDate,
+          snapshot: 0,
+          network: '4',
+          strategies: JSON.stringify([{ name: 'ticket', network: '4', params: {} }]),
+          plugins: JSON.stringify({}),
+          metadata: JSON.stringify({})
+        } as any) as SnapshotReceipt;
 
-      const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
-        snapshotProposalId: receipt.id
-      });
+        const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
+          snapshotProposalId: receipt.id
+        });
+      }
+      catch (err) {
+        console.log('Error occurred', err);
+      }
 
       console.log('Receipt', receipt);
       setPages({
@@ -130,8 +158,17 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   }
 
   return (
-    <Box>
-      {
+    formError?.errorType === 'Maximum size exceeded'
+      ? (
+        <Box sx={{ whiteSpace: 'pre-wrap' }}>
+          <Alert severity={formError.severity as AlertColor}>{formError.message ?? (formError as any).error}</Alert>
+        </Box>
+      )
+
+      // Only proceed with rest of UI if proposal has correct length
+      : (
+        <Box>
+          {
         checksComplete && !snapshotSpace && (
           <>
             <Typography variant='body1' sx={{ mb: 1 }}>This space must be connected to snapshot before you can export proposals.</Typography>
@@ -140,7 +177,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
         )
       }
 
-      {
+          {
         checksComplete && snapshotSpace && !userCanPostToSnapshot && (
           <Alert severity='warning'>
             <Typography variant='body1' sx={{ mb: 1 }}>You are not permitted to publish proposals to this snapshot space.</Typography>
@@ -149,7 +186,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
         )
       }
 
-      {
+          {
       checksComplete && snapshotSpace && userCanPostToSnapshot && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container direction='column' spacing={3}>
@@ -181,7 +218,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
             {
             formError && (
               <Grid item>
-                <Alert severity='error'>{formError.message ?? (formError as any).error}</Alert>
+                <Alert severity={formError.severity as AlertColor}>{formError.message ?? (formError as any).error}</Alert>
               </Grid>
             )
           }
@@ -197,7 +234,8 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
       )
     }
 
-    </Box>
+        </Box>
+      )
 
   );
 }

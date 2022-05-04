@@ -7,6 +7,7 @@ const ErrorCodes = {
   'Invalid input': 400,
   'Undesirable operation': 400,
   'Data not found': 404,
+  'Maximum size exceeded': 400,
   'Access denied': 401,
   'External service': 500,
   'Unexpected result': 500
