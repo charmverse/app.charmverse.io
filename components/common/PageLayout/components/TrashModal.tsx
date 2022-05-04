@@ -1,4 +1,4 @@
-import { Box, IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography } from '@mui/material';
+import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography } from '@mui/material';
 import { usePages } from 'hooks/usePages';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
@@ -72,12 +72,26 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
                       {fancyTrim(deletedPage.title, 34) || 'Untitled'}
                     </ListItemText>
                     <div onClick={e => e.stopPropagation()}>
-                      <IconButton disabled={isMutating} size='small' onClick={() => restorePages(deletedPage.id)}>
+                      <IconButton
+                        disabled={isMutating}
+                        size='small'
+                        onClick={(e) => {
+                          e.preventDefault();
+                          restorePages(deletedPage.id);
+                        }}
+                      >
                         <Tooltip arrow placement='top' title='Restore page'>
                           <RestoreIcon color='info' fontSize='small' />
                         </Tooltip>
                       </IconButton>
-                      <IconButton disabled={isMutating} size='small' onClick={() => deletePage(deletedPage.id)}>
+                      <IconButton
+                        disabled={isMutating}
+                        size='small'
+                        onClick={(e) => {
+                          e.preventDefault();
+                          deletePage(deletedPage.id);
+                        }}
+                      >
                         <Tooltip arrow placement='top' title='Delete page permanently'>
                           <DeleteIcon color='error' fontSize='small' />
                         </Tooltip>
