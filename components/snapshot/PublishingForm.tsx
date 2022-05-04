@@ -15,7 +15,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { getSnapshotSpace, SnapshotReceipt, SnapshotSpace } from 'lib/snapshot';
-import { ExternalServiceError, SystemError } from 'lib/utilities/errors';
+import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -133,7 +133,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
           end: endDate,
           snapshot: 0,
           network: '4',
-          strategies: JSON.stringify([]),
+          // strategies: JSON.stringify([]),
           // strategies: JSON.stringify([{ name: 'ticket', network: '4', params: {} }]),
           plugins: JSON.stringify({}),
           metadata: JSON.stringify({})
@@ -142,11 +142,9 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
       }
       catch (err: any) {
 
-        const errorMessageToShow = err?.error_description ? `Snapshot error: ${err?.error_description}` : undefined;
+        const errorToShow = err?.error_description ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`) : new UnknownError();
 
-        setFormError(
-          new ExternalServiceError(errorMessageToShow)
-        );
+        setFormError(errorToShow);
         return;
       }
 
@@ -206,7 +204,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
                 onChange={(value) => {
                   console.log(value);
                 }}
-                renderInput={(props) => <TextField {...props} />}
+                renderInput={(props) => <TextField fullWidth {...props} />}
               />
             </Grid>
 
