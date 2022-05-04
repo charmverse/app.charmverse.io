@@ -1,4 +1,8 @@
-import { StringLiteralLike } from 'typescript';
+export interface SnapshotVotingStrategy {
+  name: string;
+  network: string;
+  params: any
+}
 
 /**
  * @id the actual snapshot domain
@@ -17,7 +21,7 @@ export interface SnapshotSpace {
   name: string;
   network: string;
   private: boolean;
-  strategies: any[]
+  strategies: SnapshotVotingStrategy[]
   // TBC - Check out validation
   // validation:
 }

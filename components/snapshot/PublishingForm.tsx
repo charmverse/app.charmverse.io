@@ -19,6 +19,7 @@ import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/e
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import InputEnumToOption from 'components/common/form/InputEnumToOptions';
 import ConnectSnapshot from './ConnectSnapshot';
 
 const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
@@ -233,16 +234,16 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
             </Grid>
 
             {
-            /**
-          <Grid item>
-            <FieldLabel>End date</FieldLabel>
-            <DateTimePicker
-              {...register('endDate')}
-              helperText={errors.endDate?.message}
-            />
-          </Grid>
-             */
-          }
+              /**
+            <Grid item>
+              <FieldLabel>End date</FieldLabel>
+              <DateTimePicker
+                {...register('endDate')}
+                helperText={errors.endDate?.message}
+              />
+            </Grid>
+               */
+            }
 
             {
             formError && (
