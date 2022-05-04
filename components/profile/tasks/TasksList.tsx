@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from 'components/common/Link';
-import { Link, Task } from 'models';
+import { Link as TaskLink, Task } from 'models';
 import { useTasks } from 'hooks/useTasks';
 import useGnosisSafes from 'hooks/useGnosisSafes';
 import useGnosisService from 'hooks/useGnosisService';
@@ -68,7 +68,7 @@ export default function TasksList () {
               <TableCell sx={{ px: 0 }}>{new Date(task.date).toLocaleDateString()}</TableCell>
               <TableCell>
                 {task.description} <br />
-                {task.links.map((link: Link, _linkIndex: number) => (
+                {task.links.map((link: TaskLink, _linkIndex: number) => (
                   <span key={`link-${link.id}`}>
                     [{link.name}<Link target='_blank' href={link.url} external><OpenInNewIcon /></Link>]
                   </span>

@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import styled from '@emotion/styled';
-import { useState } from 'react';
-import { Box, Card, Chip, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import { Box, Card, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR, { mutate } from 'swr';
