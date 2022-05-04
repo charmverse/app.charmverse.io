@@ -24,6 +24,7 @@ import InputEnumToOption from 'components/common/form/InputEnumToOptions';
 import { DateTime } from 'luxon';
 import ConnectSnapshot from './ConnectSnapshot';
 import InputVotingStrategies from './InputVotingStrategies';
+import { getChainById } from '../../connectors';
 
 const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
 const client = new snapshot.Client712(hub);
@@ -53,7 +54,19 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const [startDate, setStartDate] = useState<DateTime>(DateTime.fromMillis(Date.now()).plus({ hour: 1 }));
   const [endDate, setEndDate] = useState<DateTime>((DateTime.fromMillis(startDate.toMillis())).plus({ days: space?.defaultVotingDuration ?? 7 }));
   const [selectedVotingStrategies, setSelectedVotingStrategies] = useState<SnapshotVotingStrategy[]>([]);
+  const [snapshotBlockNumber, setSnapshotBlockNumber] = useState<number>(1);
   const [formError, setFormError] = useState<SystemError | null>(null);
+
+  const [publishing, setPublishing] = useState(false);
+
+  useEffect(() => {
+    if (library) {
+      library.getBlockNumber()
+        .then((blockNum: number) => {
+          setSnapshotBlockNumber(blockNum);
+        });
+    }
+  }, [library]);
 
   useEffect(() => {
     verifyUserCanPostToSnapshot();
@@ -136,54 +149,50 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   async function publish () {
 
     setFormError(null);
+    setPublishing(true);
 
-    if (account) {
+    const content = generateMarkdown(page, false);
 
-      const content = generateMarkdown(page, false);
+    let receipt: SnapshotReceipt;
 
-      const currentBlockNum = await library.getBlockNumber();
-
-      let receipt: SnapshotReceipt;
-
-      try {
-        receipt = await client.proposal(library, account, {
-          space: space?.snapshotDomain as any,
-          type: 'single-choice',
-          title: page.title,
-          body: content,
-          choices: ['Yay', 'Neigh'],
-          start: startDate,
-          end: endDate,
-          snapshot: 0,
-          network: snapshotSpace?.network,
-          // strategies: JSON.stringify([]),
-          strategies: JSON.stringify([{ name: 'ticket', network: '4', params: {} }]),
-          plugins: JSON.stringify({}),
-          metadata: JSON.stringify({})
-        } as any) as SnapshotReceipt;
-
-      }
-      catch (err: any) {
-
-        const errorToShow = err?.error_description ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`) : new UnknownError();
-
-        setFormError(errorToShow);
-        return;
-      }
-
-      const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
-        snapshotProposalId: receipt.id
-      });
-
-      console.log('Receipt', receipt);
-      setPages({
-        ...pages,
-        [page.id]: updatedPage
-      });
-
-      onSubmit();
+    try {
+      receipt = await client.proposal(library, account as string, {
+        space: space?.snapshotDomain as any,
+        type: 'single-choice',
+        title: page.title,
+        body: content,
+        choices: ['Yay', 'Neigh'],
+        start: Math.round(startDate.toSeconds()),
+        end: Math.round(endDate.toSeconds()),
+        snapshot: snapshotBlockNumber,
+        network: snapshotSpace?.network,
+        // strategies: JSON.stringify([]),
+        strategies: JSON.stringify(selectedVotingStrategies),
+        plugins: JSON.stringify({}),
+        metadata: JSON.stringify({})
+      } as any) as SnapshotReceipt;
 
     }
+    catch (err: any) {
+
+      const errorToShow = err?.error_description ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`) : new UnknownError();
+
+      setPublishing(false);
+      setFormError(errorToShow);
+      return;
+    }
+
+    const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
+      snapshotProposalId: receipt.id
+    });
+
+    setPages({
+      ...pages,
+      [page.id]: updatedPage
+    });
+
+    onSubmit();
+    setPublishing(false);
   }
 
   const voteDuration = (endDate && startDate) ? Math.abs(Math.round(endDate.diff(startDate, 'days').days)) : undefined;
@@ -191,7 +200,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const endDateAfterStart = startDate && endDate && endDate.diff(startDate, 'seconds').seconds > 0;
 
   function formValid () {
-    return selectedVotingStrategies.length > 0 && endDateAfterStart;
+    return selectedVotingStrategies.length > 0 && endDateAfterStart && snapshotBlockNumber >= 1;
   }
 
   return (
@@ -218,11 +227,26 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
             {
       checksComplete && snapshotSpace && (
-        <form onSubmit={publish}>
+        <form onSubmit={(ev) => ev.preventDefault()}>
           <Grid container direction='column' spacing={3}>
 
             <Grid item>
               <InputVotingStrategies strategies={snapshotSpace.strategies} onChange={(selected) => setSelectedVotingStrategies(selected)} />
+            </Grid>
+
+            <Grid item>
+              <FieldLabel>Block number</FieldLabel>
+              <TextField
+                defaultValue={snapshotBlockNumber}
+                type='number'
+                onInput={(input: any) => {
+                  setSnapshotBlockNumber(parseInt(input.target.value));
+                }}
+                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 0 }}
+                fullWidth
+                error={!endDateAfterStart}
+                helperText={`This is the block number on the ${getChainById(parseInt(snapshotSpace.network))?.chainName ?? ''} blockchain by which DAO members must have held tokens to be able to vote.`}
+              />
             </Grid>
 
             <Grid item>
@@ -270,8 +294,16 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
           }
 
             <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton onClick={publish} disabled={!formValid()} type='submit'>
-                Publish to snapshot
+              <PrimaryButton onClick={publish} disabled={!formValid() || publishing} type='submit'>
+                {
+                  publishing ? (
+                    <>
+                      <LoadingIcon size={18} sx={{ mr: 1 }} />
+                      Publishing
+                    </>
+                  ) : ('Publish to snapshot')
+                }
+
               </PrimaryButton>
             </Grid>
           </Grid>
