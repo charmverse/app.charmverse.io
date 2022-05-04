@@ -91,12 +91,14 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
 
       {
       !checkingProposal && proposal && (
-      <Link sx={{ display: 'inline-block' }} external target='_blank' href={`https://snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`}>
+      <Link sx={{ display: 'flex', verticalAlign: 'center' }} color='textPrimary' external target='_blank' href={`https://snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`}>
         <ExitToAppIcon
           fontSize='small'
           sx={{
+            m: 'auto',
             mr: 1
           }}
+
         />
         <ListItemText primary='View on Snapshot' />
 
