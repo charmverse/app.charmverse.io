@@ -79,7 +79,7 @@ export default function ConnectSnapshot () {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container direction='column' spacing={3}>
         <Grid item>
-          <FieldLabel>Domain</FieldLabel>
+          <FieldLabel>Snapshot domain</FieldLabel>
           <TextField
             {...register('snapshotDomain')}
             disabled={!isAdmin}

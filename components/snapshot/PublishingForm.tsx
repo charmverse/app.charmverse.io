@@ -49,12 +49,12 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const [endDate, setEndDate] = useState(startDate + 3600 * 24 * (space?.defaultVotingDuration ?? 1));
 
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
-  const [userCanPostToSnapshot, setUserCanPostToSnapshot] = useState(false);
   // Ensure we don't show any UI until we are done checking
   const [checksComplete, setChecksComplete] = useState(false);
 
   const { pages, setPages } = usePages();
 
+  const [configurationError, setConfigurationError] = useState<SystemError | null>(null);
   const [formError, setFormError] = useState<SystemError | null>(null);
 
   const {
@@ -82,7 +82,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     const markdownCharacterLength = content.length;
 
     if (markdownCharacterLength > MAX_SNAPSHOT_PROPOSAL_CHARACTERS) {
-      setFormError(
+      setConfigurationError(
         new SystemError({
           errorType: 'Maximum size exceeded',
           severity: 'warning',
@@ -94,8 +94,16 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   }
 
   async function verifyUserCanPostToSnapshot () {
+    setChecksComplete(false);
     if (!space || !space?.snapshotDomain) {
       setSnapshotSpace(null);
+      setConfigurationError(
+        new SystemError({
+          errorType: 'Data not found',
+          severity: 'warning',
+          message: 'This space must be connected to Snapshot.org before you can export proposals there.'
+        })
+      );
     }
     else if (space.snapshotDomain && !snapshotSpace) {
       const existingSnapshotSpace = await getSnapshotSpace(space.snapshotDomain);
@@ -106,7 +114,18 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
       const userCanPost = snapshotSpace.filters.onlyMembers === false
         || (snapshotSpace.filters.onlyMembers && snapshotSpace.members.indexOf(account as string) > -1);
 
-      setUserCanPostToSnapshot(userCanPost);
+      if (userCanPost === false) {
+        setConfigurationError(
+          new SystemError({
+            errorType: 'Access denied',
+            severity: 'warning',
+            message: 'You are not permitted to publish proposals to this snapshot space.\r\n\nIf you believe this should be the case, reach out to the person in charge of your Snapshot.org space.'
+          })
+        );
+      }
+      else {
+        setConfigurationError(null);
+      }
     }
 
     setChecksComplete(true);
@@ -164,36 +183,27 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   }
 
   return (
-    formError?.errorType === 'Maximum size exceeded'
+    configurationError
       ? (
-        <Box sx={{ whiteSpace: 'pre-wrap' }}>
-          <Alert severity={formError.severity as AlertColor}>{formError.message ?? (formError as any).error}</Alert>
-        </Box>
+        <>
+
+          <Box sx={{ whiteSpace: 'pre-wrap', mb: 1 }}>
+            <Alert severity={configurationError.severity as AlertColor}>{configurationError.message}</Alert>
+          </Box>
+          {
+          !snapshotSpace && (
+          <ConnectSnapshot />
+          )
+        }
+        </>
       )
 
       // Only proceed with rest of UI if proposal has correct length
       : (
         <Box>
-          {
-        checksComplete && !snapshotSpace && (
-          <>
-            <Typography variant='body1' sx={{ mb: 1 }}>This space must be connected to snapshot before you can export proposals.</Typography>
-            <ConnectSnapshot />
-          </>
-        )
-      }
 
           {
-        checksComplete && snapshotSpace && !userCanPostToSnapshot && (
-          <Alert severity='warning'>
-            <Typography variant='body1' sx={{ mb: 1 }}>You are not permitted to publish proposals to this snapshot space.</Typography>
-            <Typography variant='body1'>If you believe this should be the case, reach out to the person in charge of your Snapshot.org space.</Typography>
-          </Alert>
-        )
-      }
-
-          {
-      checksComplete && snapshotSpace && userCanPostToSnapshot && (
+      checksComplete && snapshotSpace && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container direction='column' spacing={3}>
             <Grid item>

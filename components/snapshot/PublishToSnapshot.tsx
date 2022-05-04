@@ -6,6 +6,7 @@ import { Page } from '@prisma/client';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import { Modal } from 'components/common/Modal';
+import Box from '@mui/material/Box';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { getSnapshotProposal, SnapshotProposal } from 'lib/snapshot';
@@ -82,6 +83,7 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
               sx={{
                 mr: 1
               }}
+              onClick={open}
             />
             <ListItemText onClick={open} primary='Publish to snapshot' />
 
