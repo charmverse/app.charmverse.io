@@ -67,6 +67,9 @@ export default function ConnectSnapshot () {
     setFormError(null);
 
     charmClient.updateSnapshotConnection(space?.id as any, formValues)
+      .then((spaceWithDomain) => {
+        setSpace(spaceWithDomain);
+      })
       .catch(err => {
         setFormError(err);
       });

@@ -1,26 +1,25 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Typography } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { useWeb3React } from '@web3-react/core';
+import { DateTimePicker } from '@mui/x-date-pickers';
+import { Page } from '@prisma/client';
 import snapshot from '@snapshot-labs/snapshot.js';
+import { useWeb3React } from '@web3-react/core';
+import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useUser } from 'hooks/useUser';
-import { getSnapshotSpace } from 'lib/snapshot/get-space';
-import isSpaceAdmin from 'lib/users/isSpaceAdmin';
-import { isTruthy } from 'lib/utilities/types';
+import { usePages } from 'hooks/usePages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
+import { SnapshotReceipt, SnapshotSpace, getSnapshotSpace } from 'lib/snapshot';
+import { SystemError } from 'lib/utilities/errors';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { SystemError } from 'lib/utilities/errors';
-import { useState } from 'react';
-import charmClient from 'charmClient';
-import Alert from '@mui/material/Alert';
-import { usePages } from 'hooks/usePages';
-import { Page } from '@prisma/client';
-import { SnapshotReceipt } from 'lib/snapshot';
-import { DateTimePicker } from '@mui/x-date-pickers';
+import ConnectSnapshot from './ConnectSnapshot';
 
 const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
 const client = new snapshot.Client712(hub);
@@ -47,8 +46,10 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
   const [endDate, setEndDate] = useState(startDate + 3600 * 24 * (space?.defaultVotingDuration ?? 1));
 
-  const [spaceCanPostToSnapshot, setSpaceCanPostToSnapshot] = useState(false);
+  const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
   const [userCanPostToSnapshot, setUserCanPostToSnapshot] = useState(false);
+  // Ensure we don't show any UI until we are done checking
+  const [checksComplete, setChecksComplete] = useState(false);
 
   const { pages, setPages } = usePages();
 
@@ -65,12 +66,38 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     mode: 'onBlur'
   });
 
+  useEffect(() => {
+    verifyUserCanPostToSnapshot();
+  }, [space, snapshotSpace]);
+
+  async function verifyUserCanPostToSnapshot () {
+    if (!space || !space?.snapshotDomain) {
+      setSnapshotSpace(null);
+    }
+    else if (space.snapshotDomain && !snapshotSpace) {
+      const existingSnapshotSpace = await getSnapshotSpace(space.snapshotDomain);
+      setSnapshotSpace(existingSnapshotSpace);
+    }
+
+    if (snapshotSpace) {
+      const userCanPost = snapshotSpace.filters.onlyMembers === false
+        || (snapshotSpace.filters.onlyMembers && snapshotSpace.members.indexOf(account as string) > -1);
+
+      setUserCanPostToSnapshot(userCanPost);
+    }
+
+    setChecksComplete(true);
+
+  }
+
   async function publish () {
     if (account) {
 
       const content = generateMarkdown(page, false);
 
       const currentBlockNum = await library.getBlockNumber();
+
+      console.log(space);
 
       const receipt = await client.proposal(library, account, {
         space: space?.snapshotDomain as any,
@@ -103,48 +130,74 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container direction='column' spacing={3}>
-        <Grid item>
-          <FieldLabel>Start date</FieldLabel>
-          <DateTimePicker
-            {...register('startDate')}
-            sx={{ zIndex: 1000 }}
-            value={startDate}
-            onChange={(value) => {
-              console.log(value);
-            }}
-            InputProps={{ borderColour: 'default' }}
-            renderInput={(props) => <TextField {...props} />}
-          />
-        </Grid>
+    <Box>
+      {
+        checksComplete && !snapshotSpace && (
+          <>
+            <Typography variant='body1' sx={{ mb: 1 }}>This space must be connected to snapshot before you can export proposals.</Typography>
+            <ConnectSnapshot />
+          </>
+        )
+      }
 
-        {
-          /**
-        <Grid item>
-          <FieldLabel>End date</FieldLabel>
-          <DateTimePicker
-            {...register('endDate')}
-            helperText={errors.endDate?.message}
-          />
-        </Grid>
-           */
-        }
+      {
+        checksComplete && snapshotSpace && !userCanPostToSnapshot && (
+          <Alert severity='warning'>
+            <Typography variant='body1' sx={{ mb: 1 }}>You are not permitted to publish proposals to this snapshot space.</Typography>
+            <Typography variant='body1'>If you believe this should be the case, reach out to the person in charge of your Snapshot.org space.</Typography>
+          </Alert>
+        )
+      }
 
-        {
-          formError && (
+      {
+      checksComplete && snapshotSpace && userCanPostToSnapshot && (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container direction='column' spacing={3}>
             <Grid item>
-              <Alert severity='error'>{formError.message ?? (formError as any).error}</Alert>
+              <FieldLabel>Start date</FieldLabel>
+              <DateTimePicker
+                {...register('startDate')}
+                sx={{ zIndex: 1000 }}
+                value={startDate}
+                onChange={(value) => {
+                  console.log(value);
+                }}
+                renderInput={(props) => <TextField {...props} />}
+              />
             </Grid>
-          )
-        }
 
-        <Grid item display='flex' justifyContent='space-between'>
-          <PrimaryButton disabled={!isValid} type='submit'>
-            Publish to snapshot
-          </PrimaryButton>
-        </Grid>
-      </Grid>
-    </form>
+            {
+            /**
+          <Grid item>
+            <FieldLabel>End date</FieldLabel>
+            <DateTimePicker
+              {...register('endDate')}
+              helperText={errors.endDate?.message}
+            />
+          </Grid>
+             */
+          }
+
+            {
+            formError && (
+              <Grid item>
+                <Alert severity='error'>{formError.message ?? (formError as any).error}</Alert>
+              </Grid>
+            )
+          }
+
+            <Grid item display='flex' justifyContent='space-between'>
+              <PrimaryButton onClick={publish} disabled={false} type='submit'>
+                Publish to snapshot
+              </PrimaryButton>
+            </Grid>
+          </Grid>
+        </form>
+
+      )
+    }
+
+    </Box>
+
   );
 }
