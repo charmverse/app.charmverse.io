@@ -32,8 +32,14 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
   const isAdmin = useIsAdmin();
 
   return (
-    <FormControl sx={{ minWidth: 100, display: 'flex', gap: 1, flexDirection: 'row' }}>
+    <FormControl sx={{ maxWidth: 250 }}>
       <Select<string[]>
+        sx={{
+          '& .MuiSelect-icon': {
+            top: '8px',
+            position: 'absolute'
+          }
+        }}
         variant='outlined'
         value={selectedRoleIds}
         multiple
@@ -44,11 +50,14 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
           (roleIds.length === 0) ? (
             'Attach roles'
           ) : (
-            <Stack direction='row' spacing={1}>
+            <Stack direction='column' spacing={1}>
               {
                 roleIds.map(roleId => {
                   return rolesRecord[roleId] && (
                     <Chip
+                      sx={{
+                        width: 'fit-content'
+                      }}
                       key={roleId}
                       label={rolesRecord[roleId].name}
                       variant='outlined'

@@ -63,8 +63,8 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
         <TableHead>
           <TableRow>
             <TableCell sx={{ px: 0 }}>Description</TableCell>
+            <TableCell>Roles</TableCell>
             <TableCell></TableCell>
-            {/* <TableCell></TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -76,21 +76,20 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                 }}
                 >{tokenGateDescriptions[tokenGate.id]}
                 </Typography>
+              </TableCell>
+              <TableCell>
                 {roles?.length !== 0 && (
-                <TokenGateRolesSelect
-                  selectedRoleIds={tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId)}
-                  onChange={(roleIds) => {
-                    updateTokenGateRoles(tokenGate.id, roleIds);
-                  }}
-                  onDelete={(roleId) => {
-                    deleteRoleFromTokenGate(tokenGate.id, roleId);
-                  }}
-                />
+                  <TokenGateRolesSelect
+                    selectedRoleIds={tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId)}
+                    onChange={(roleIds) => {
+                      updateTokenGateRoles(tokenGate.id, roleIds);
+                    }}
+                    onDelete={(roleId) => {
+                      deleteRoleFromTokenGate(tokenGate.id, roleId);
+                    }}
+                  />
                 )}
               </TableCell>
-              {/* <TableCell sx={{ width: '150px' }}>
-                {roles?.length !== 0 && <Button size='small' variant='outlined' onClick={() => setShowingTokenGateRolesModal(true)}>Attach Roles</Button>}
-              </TableCell> */}
               <TableCell width={150} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
                 <Tooltip arrow placement='top' title='Test this gate using your own wallet'>
                   <Box component='span' pr={1}>
