@@ -1,11 +1,11 @@
-import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { Box, Chip, FormControl, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { useMemo } from 'react';
-import FormControl from '@mui/material/FormControl';
+import styled from '@emotion/styled';
+import Button from 'components/common/Button';
 import { ListSpaceRolesResponse } from 'charmClient';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
 import useIsAdmin from 'hooks/useIsAdmin';
+import { isTruthy } from 'lib/utilities/types';
 import useRoles from '../roles/hooks/useRoles';
 
 /**
@@ -17,10 +17,26 @@ interface Props {
   onDelete: (roleId: string) => void
 }
 
+const StyledFormControl = styled(FormControl)`
+  min-width: 100px;
+  display: flex;
+  gap: 8px;
+  flex-direction: row;
+
+  .MuiInput-root {
+    &::before, &::after {
+    display: none;
+  }
+
+  .MuiSelect-select:focus {
+    background: transparent;
+  }
+`;
+
 export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onChange }: Props) {
   const { roles } = useRoles();
 
-  const rolesRecord: Record<string, ListSpaceRolesResponse> = useMemo(() => roles ? roles?.reduce((obj, role) => (
+  const rolesRecord: Record<string, ListSpaceRolesResponse> = useMemo(() => roles ? roles.reduce((obj, role) => (
     { ...obj, [role.id]: role }
   ), {}) : {}, [roles]);
 
@@ -32,26 +48,27 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
   const isAdmin = useIsAdmin();
 
   return (
-    <FormControl sx={{ minWidth: 100, display: 'flex', gap: 1, flexDirection: 'row' }}>
+    <StyledFormControl size='small'>
       <Select<string[]>
-        variant='outlined'
+        variant='standard'
         value={selectedRoleIds}
+        fullWidth
         multiple
         onChange={selectOption}
         displayEmpty={true}
         disabled={!isAdmin || roles?.length === 0}
         renderValue={(roleIds) => (
           (roleIds.length === 0) ? (
-            'Attach roles'
+            <Button size='small' variant='text' color='secondary'>+ Add roles</Button>
           ) : (
-            <Stack direction='row' spacing={1}>
+            <Box display='flex' flexWrap='wrap' gap={0.5} maxWidth={400}>
               {
-                roleIds.map(roleId => {
-                  return rolesRecord[roleId] && (
+                roleIds.map(roleId => rolesRecord[roleId]).filter(isTruthy)
+                  .map(role => (
                     <Chip
-                      key={roleId}
-                      label={rolesRecord[roleId].name}
-                      variant='outlined'
+                      key={role.id}
+                      label={role.name}
+                      size='small'
                       onMouseDown={(event) => {
                         event.stopPropagation();
                       }}
@@ -59,19 +76,18 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
                       onDelete={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        onDelete(roleId);
+                        onDelete(role.id);
                       }}
                     />
-                  );
-                })
+                  ))
               }
-            </Stack>
+            </Box>
           )
         )}
       >
         {roles?.map(role => <MenuItem key={role.id} value={role.id}>{role.name}</MenuItem>)}
       </Select>
-    </FormControl>
+    </StyledFormControl>
   );
 }
 

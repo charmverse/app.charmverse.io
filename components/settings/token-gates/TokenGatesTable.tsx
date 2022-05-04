@@ -63,20 +63,22 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
         <TableHead>
           <TableRow>
             <TableCell sx={{ px: 0 }}>Description</TableCell>
+            <TableCell>
+              <Tooltip arrow placement='top' title='Automatically assign these roles to new users'>
+                <span>Included Roles</span>
+              </Tooltip>
+            </TableCell>
             <TableCell></TableCell>
-            {/* <TableCell></TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
           {tokenGates.map((tokenGate) => (
             <TableRow key={tokenGate.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
               <TableCell sx={{ px: 0 }}>
-                <Typography sx={{
-                  my: 1
-                }}
-                >{tokenGateDescriptions[tokenGate.id]}
+                <Typography variant='body2' sx={{ my: 1 }}>{tokenGateDescriptions[tokenGate.id]}
                 </Typography>
-                {roles?.length !== 0 && (
+              </TableCell>
+              <TableCell>
                 <TokenGateRolesSelect
                   selectedRoleIds={tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId)}
                   onChange={(roleIds) => {
@@ -86,12 +88,8 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                     deleteRoleFromTokenGate(tokenGate.id, roleId);
                   }}
                 />
-                )}
               </TableCell>
-              {/* <TableCell sx={{ width: '150px' }}>
-                {roles?.length !== 0 && <Button size='small' variant='outlined' onClick={() => setShowingTokenGateRolesModal(true)}>Attach Roles</Button>}
-              </TableCell> */}
-              <TableCell width={150} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
+              <TableCell width={140} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
                 <Tooltip arrow placement='top' title='Test this gate using your own wallet'>
                   <Box component='span' pr={1}>
                     <Chip onClick={() => testConnect(tokenGate)} sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label='Test' />
