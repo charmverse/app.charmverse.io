@@ -40,7 +40,7 @@ const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !==
     background: 'transparent',
     boxShadow: 'none',
     color: 'inherit',
-    zIndex: theme.zIndex.drawer + 1,
+    zIndex: 'var(--z-index-appBar)',
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen

@@ -101,7 +101,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         <BackDrop
           onClick={popupState.close}
           open={popupState.isOpen}
-          sx={{ zIndex: 9999 }}
+          sx={{ zIndex: 'var(--z-index-modal)' }}
         >
           <div role='dialog' onClick={e => e.stopPropagation()}>
             <ShareModal

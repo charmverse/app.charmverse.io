@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { Page, PageContent } from 'models';
-import { BountyIntegration } from 'components/bounties/BountyIntegration';
+import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { title } from 'process';

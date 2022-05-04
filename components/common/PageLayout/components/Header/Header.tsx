@@ -1,13 +1,13 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
 import CommentIcon from '@mui/icons-material/Comment';
+import MoonIcon from '@mui/icons-material/DarkMode';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
+import SunIcon from '@mui/icons-material/WbSunny';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -18,6 +18,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
+import PublishToSnapshot from 'components/snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
 import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import { usePages } from 'hooks/usePages';
@@ -25,7 +26,6 @@ import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
-import PublishToSnapshot from 'components/snapshot/PublishToSnapshot';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -190,7 +190,7 @@ export default function Header (
           {/** dark mode toggle */}
           <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
             <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-              {theme.palette.mode === 'dark' ? <Brightness7Icon color='secondary' /> : <Brightness4Icon color='secondary' />}
+              {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
             </IconButton>
           </Tooltip>
           {/** user account */}
