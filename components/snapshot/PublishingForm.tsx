@@ -111,6 +111,20 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     }
 
     if (snapshotSpace) {
+
+      const hasStrategies = snapshotSpace.strategies.length > 0;
+
+      if (!hasStrategies) {
+        setConfigurationError(
+          new SystemError({
+            errorType: 'Invalid input',
+            severity: 'warning',
+            message: 'You need at least one voting strategy for this space. Visit your space settings on snapshot.org to fix this.'
+          })
+        );
+        setChecksComplete(true);
+      }
+
       const userCanPost = snapshotSpace.filters.onlyMembers === false
         || (snapshotSpace.filters.onlyMembers && snapshotSpace.members.indexOf(account as string) > -1);
 
