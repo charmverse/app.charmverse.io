@@ -32,6 +32,7 @@ npx patch-package
 npx prisma migrate dev
 npm start
 ```
+If you are encountering an error when trying to access a workspace, please delete the `.next` folder and run the project again.
 
 3. Configure your environment.
 You'll need certain environment variables to be set for Charmverse to work.
