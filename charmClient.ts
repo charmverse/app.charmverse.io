@@ -4,12 +4,12 @@ import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
   Role, Space, TokenGate, Transaction, User, TelegramUser, UserMultiSigWallet
 } from '@prisma/client';
-import * as http from 'adapters/http';
 
 import { Contributor, LoggedInUser, BountyWithDetails, Task, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
+import * as http from 'adapters/http';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';

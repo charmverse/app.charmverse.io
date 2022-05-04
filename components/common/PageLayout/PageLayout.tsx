@@ -8,7 +8,7 @@ import Head from 'next/head';
 import * as React from 'react';
 import { CommentThreadsListDisplayProvider } from 'hooks/useCommentThreadsListDisplay';
 import Header, { headerHeight } from './components/Header';
-import Sidebar from './components/Sidebar/Sidebar';
+import Sidebar from './components/Sidebar';
 import Favicon from './components/Favicon';
 import PageContainer from './components/PageContainer';
 
