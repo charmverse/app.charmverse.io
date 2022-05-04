@@ -64,12 +64,12 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
               const isEditorEmpty = checkForEmpty(deletedPage.content as PageContent);
               return (
                 <Link href={`/${space?.domain}/${deletedPage.path}`} passHref key={deletedPage.id}>
-                  <MenuItem component='a' dense disabled={isMutating}>
+                  <MenuItem component='a' dense disabled={isMutating} sx={{ pl: 4 }}>
                     <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
                       <PageIcon pageType={deletedPage.type} icon={deletedPage.icon} isEditorEmpty={isEditorEmpty} />
                     </ListItemIcon>
                     <ListItemText secondary={DateTime.fromJSDate(new Date(deletedPage.deletedAt!)).toRelative({ base: (DateTime.now()) })}>
-                      {fancyTrim(deletedPage.title, 30) || 'Untitled'}
+                      {fancyTrim(deletedPage.title, 34) || 'Untitled'}
                     </ListItemText>
                     <div onClick={e => e.stopPropagation()}>
                       <IconButton disabled={isMutating} size='small' onClick={() => restorePages(deletedPage.id)}>
