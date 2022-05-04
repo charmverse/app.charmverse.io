@@ -5,6 +5,7 @@ import FormControl from '@mui/material/FormControl';
 import { ListSpaceRolesResponse } from 'charmClient';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
+import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from '../roles/hooks/useRoles';
 
 /**
@@ -28,16 +29,17 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
     onChange(ev.target.value as string[]);
   }
 
+  const isAdmin = useIsAdmin();
+
   return (
     <FormControl sx={{ minWidth: 100, display: 'flex', gap: 1, flexDirection: 'row' }}>
       <Select<string[]>
-        id='bounty-status'
         variant='outlined'
         value={selectedRoleIds}
         multiple
         onChange={selectOption}
         displayEmpty={true}
-        disabled={roles?.length === 0}
+        disabled={!isAdmin || roles?.length === 0}
         renderValue={(roleIds) => (
           (roleIds.length === 0) ? (
             'Attach roles'
@@ -53,6 +55,7 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
                       onMouseDown={(event) => {
                         event.stopPropagation();
                       }}
+                      disabled={!isAdmin}
                       onDelete={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
