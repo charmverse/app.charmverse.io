@@ -87,7 +87,7 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
             />
             <ListItemText onClick={open} primary='Publish to snapshot' />
 
-            <Modal open={isOpen} onClose={close}>
+            <Modal open={isOpen} onClose={close} title='Publish to snapshot'>
               <PublishingForm onSubmit={close} page={page} />
             </Modal>
           </>

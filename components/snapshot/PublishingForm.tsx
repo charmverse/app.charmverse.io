@@ -11,26 +11,22 @@ import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PrimaryButton from 'components/common/PrimaryButton';
+import { LoadingIcon } from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
-import { getSnapshotSpace, SnapshotReceipt, SnapshotSpace } from 'lib/snapshot';
+import { getSnapshotSpace, SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
+import { DateTime } from 'luxon';
 import ConnectSnapshot from './ConnectSnapshot';
+import InputVotingStrategies from './InputVotingStrategies';
 
 const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
 const client = new snapshot.Client712(hub);
-
-export const schema = yup.object({
-  startDate: yup.number().required(),
-  endDate: yup.number().required()
-});
-
-export type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
   onSubmit: () => void,
@@ -45,10 +41,6 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
   const [space] = useCurrentSpace();
 
-  const [startDate, setStartDate] = useState(Math.round((Date.now() / 1000) + 3600));
-
-  const [endDate, setEndDate] = useState(startDate + 3600 * 24 * (space?.defaultVotingDuration ?? 1));
-
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
   // Ensure we don't show any UI until we are done checking
   const [checksComplete, setChecksComplete] = useState(false);
@@ -56,18 +48,12 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const { pages, setPages } = usePages();
 
   const [configurationError, setConfigurationError] = useState<SystemError | null>(null);
-  const [formError, setFormError] = useState<SystemError | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors, isDirty, isValid }
-  } = useForm<FormValues>({
-    resolver: yupResolver(schema),
-    mode: 'onBlur'
-  });
+  // Form data
+  const [startDate, setStartDate] = useState<DateTime>(DateTime.fromMillis(Date.now()).plus({ hour: 1 }));
+  const [endDate, setEndDate] = useState<DateTime>((DateTime.fromMillis(startDate.toMillis())).plus({ days: space?.defaultVotingDuration ?? 7 }));
+  const [selectedVotingStrategies, setSelectedVotingStrategies] = useState<SnapshotVotingStrategy[]>([]);
+  const [formError, setFormError] = useState<SystemError | null>(null);
 
   useEffect(() => {
     verifyUserCanPostToSnapshot();
@@ -169,7 +155,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
           start: startDate,
           end: endDate,
           snapshot: 0,
-          network: '4',
+          network: snapshotSpace?.network,
           // strategies: JSON.stringify([]),
           strategies: JSON.stringify([{ name: 'ticket', network: '4', params: {} }]),
           plugins: JSON.stringify({}),
@@ -200,52 +186,79 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     }
   }
 
-  return (
-    configurationError
-      ? (
-        <>
+  const voteDuration = (endDate && startDate) ? Math.abs(Math.round(endDate.diff(startDate, 'days').days)) : undefined;
 
-          <Box sx={{ whiteSpace: 'pre-wrap', mb: 1 }}>
-            <Alert severity={configurationError.severity as AlertColor}>{configurationError.message}</Alert>
-          </Box>
-          {
+  const endDateAfterStart = startDate && endDate && endDate.diff(startDate, 'seconds').seconds > 0;
+
+  function formValid () {
+    return selectedVotingStrategies.length > 0 && endDateAfterStart;
+  }
+
+  return (
+    !checksComplete ? <LoadingIcon />
+
+      : (configurationError
+        ? (
+          <>
+
+            <Box sx={{ whiteSpace: 'pre-wrap', mb: 1 }}>
+              <Alert severity={configurationError.severity as AlertColor}>{configurationError.message}</Alert>
+            </Box>
+            {
           !snapshotSpace && (
           <ConnectSnapshot />
           )
         }
-        </>
-      )
+          </>
+        )
 
       // Only proceed with rest of UI if proposal has correct length
-      : (
-        <Box>
+        : (
+          <Box>
 
-          {
+            {
       checksComplete && snapshotSpace && (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={publish}>
           <Grid container direction='column' spacing={3}>
+
+            <Grid item>
+              <InputVotingStrategies strategies={snapshotSpace.strategies} onChange={(selected) => setSelectedVotingStrategies(selected)} />
+            </Grid>
+
             <Grid item>
               <FieldLabel>Start date</FieldLabel>
               <DateTimePicker
-                {...register('startDate')}
                 value={startDate}
                 onChange={(value) => {
-                  console.log(value);
+                  if (value instanceof DateTime) {
+                    setStartDate(value as DateTime);
+                  }
+
                 }}
                 renderInput={(props) => <TextField fullWidth {...props} />}
               />
             </Grid>
 
-            {
-              /**
             <Grid item>
               <FieldLabel>End date</FieldLabel>
               <DateTimePicker
-                {...register('endDate')}
-                helperText={errors.endDate?.message}
+                minDateTime={startDate}
+                value={endDate}
+                onChange={(value) => {
+                  if (value instanceof DateTime) {
+                    setEndDate(value as DateTime);
+                  }
+                }}
+                renderInput={(props) => <TextField fullWidth {...props} error={!endDateAfterStart} helperText={!endDateAfterStart ? 'End date must be after start date' : null} />}
               />
             </Grid>
-               */
+
+            {
+              endDateAfterStart && (
+                <Grid item>
+                  <Typography>Voting will last {voteDuration} day{voteDuration !== 1 ? 's' : ''}</Typography>
+                </Grid>
+              )
             }
 
             {
@@ -257,7 +270,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
           }
 
             <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton onClick={publish} disabled={false} type='submit'>
+              <PrimaryButton onClick={publish} disabled={!formValid()} type='submit'>
                 Publish to snapshot
               </PrimaryButton>
             </Grid>
@@ -267,8 +280,8 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
       )
     }
 
-        </Box>
+          </Box>
+        )
       )
-
   );
 }
