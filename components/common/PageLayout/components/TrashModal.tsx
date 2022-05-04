@@ -57,7 +57,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
       )}
     >
       {deletedPages.length === 0
-        ? <Typography variant='subtitle1' color='secondary'>No archived pages</Typography>
+        ? <Typography sx={{ pl: 4 }} variant='subtitle1' color='secondary'>No archived pages</Typography>
         : (
           <List>
             {deletedPages.map(deletedPage => {
