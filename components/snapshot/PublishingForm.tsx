@@ -76,10 +76,6 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     verifyUserCanPostToSnapshot();
   }, [space, snapshotSpace, page]);
 
-  useEffect(() => {
-    checkMarkdownLength();
-  }, [page]);
-
   async function setCurrentBlockNumberAsDefault () {
     if (snapshotSpace) {
       try {
@@ -93,8 +89,11 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     }
   }
 
-  function checkMarkdownLength () {
-    const content = generateMarkdown(page, false);
+  /**
+   * Returns markdown content if valid length, or null if not
+   */
+  function checkMarkdownLength (): string | null {
+    const content = generateMarkdown(page!, false);
 
     const markdownCharacterLength = content.length;
 
@@ -106,8 +105,10 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
           message: `The character count of your proposal is ${markdownCharacterLength}.\r\n\nThis exceeds Snapshot's limit of ${MAX_SNAPSHOT_PROPOSAL_CHARACTERS}.\r\n\nTo fix this, reduce text size and check for inline images which were pasted directly instead of being configured with a link.`
         })
       );
-
+      return null;
     }
+
+    return content;
   }
 
   async function verifyUserCanPostToSnapshot () {
@@ -156,6 +157,8 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
       }
       else {
         setConfigurationError(null);
+
+        checkMarkdownLength();
       }
     }
 
@@ -168,7 +171,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     setFormError(null);
     setPublishing(true);
 
-    const content = generateMarkdown(page, false);
+    const content = generateMarkdown(page!, false);
 
     let receipt: SnapshotReceipt;
 
