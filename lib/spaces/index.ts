@@ -1,5 +1,16 @@
 
-export const DOMAIN_BLACKLIST = ['api', 'invite', 'login', 'signup', 'createWorkspace', 'share', 'images', 'join', 'api-docs'];
+export const DOMAIN_BLACKLIST = [
+  'api',
+  'api-docs',
+  'createWorkspace',
+  'invite',
+  'login',
+  'images',
+  'join',
+  'profile',
+  'share',
+  'signup'
+];
 
 export function isSpaceDomain (domain: string) {
   return domain && !DOMAIN_BLACKLIST.includes(domain);

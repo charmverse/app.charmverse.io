@@ -1,47 +1,25 @@
 
 import styled from '@emotion/styled';
 import { css, Theme } from '@emotion/react';
-import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import BountyIcon from '@mui/icons-material/RequestPage';
 import SettingsIcon from '@mui/icons-material/Settings';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import Box from '@mui/material/Box';
-import Button from 'components/common/Button';
-import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import MuiLink from '@mui/material/Link';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Page, Prisma } from '@prisma/client';
-import charmClient from 'charmClient';
+import { Page } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { LoggedInUser } from 'models';
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useCallback } from 'react';
-import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
 import Link from 'components/common/Link';
-import { Modal } from 'components/common/Modal';
-import NewPageMenu from 'components/common/PageLayout/components/NewPageMenu';
-import WorkspaceAvatar from 'components/common/WorkspaceAvatar';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
-import { headerHeight } from './Header';
-import PageNavigation from './PageNavigation';
-
-const AvatarLink = styled(NextLink)`
-  cursor: pointer;
-`;
-
-const WorkspacesContainer = styled.div`
-  float: left;
-  height: 100%;
-  border-right: 1px solid ${({ theme }) => theme.palette.divider};
-  padding: ${({ theme }) => theme.spacing(1)};
-`;
+import NewPageMenu from '../NewPageMenu';
+import { headerHeight } from '../Header';
+import PageNavigation from '../PageNavigation';
+import Workspaces from './Workspaces';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -161,32 +139,13 @@ interface SidebarProps {
 
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
-  const [user, setUser] = useUser();
+  const [user] = useUser();
   const [space] = useCurrentSpace();
-  const [spaces, setSpaces] = useSpaces();
-  const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const favoritePageIds = favorites.map(f => f.pageId);
 
-  function showSpaceForm () {
-    setSpaceFormOpen(true);
-  }
-
-  function closeSpaceForm () {
-    setSpaceFormOpen(false);
-  }
-
   function onScroll (e: React.UIEvent<HTMLDivElement>) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
-  }
-
-  async function addSpace (spaceOpts: Prisma.SpaceCreateInput) {
-    const newSpace = await charmClient.createSpace(spaceOpts);
-    setSpaces([...spaces, newSpace]);
-    // refresh user permissions
-    const _user = await charmClient.getUser();
-    setUser(_user);
-    router.push(`/${newSpace.domain}`);
   }
 
   const addPage = useCallback((_page: Partial<Page>) => {
@@ -202,34 +161,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   return (
     <SidebarContainer>
-      <WorkspacesContainer>
-        <Grid container spacing={2} flexDirection='column'>
-          {spaces.map(workspace => (
-            <Grid item key={workspace.domain}>
-              <AvatarLink href={`/${workspace.domain}`} passHref>
-                <MuiLink>
-                  <Tooltip title={workspace.name} placement='right' arrow>
-                    <span>
-                      <WorkspaceAvatar active={space?.domain === workspace.domain} name={workspace.name} />
-                    </span>
-                  </Tooltip>
-                </MuiLink>
-              </AvatarLink>
-            </Grid>
-          ))}
-          <Grid item>
-            <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
-          </Grid>
-        </Grid>
-        <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-          <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
-          <Typography variant='body2' align='center' sx={{ pt: 3 }}>
-            <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
-              Join an existing workspace
-            </Button>
-          </Typography>
-        </Modal>
-      </WorkspacesContainer>
+      <Workspaces />
       {space && (
         <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
           <SidebarHeader className='sidebar-header'>

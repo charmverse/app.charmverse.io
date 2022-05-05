@@ -10,10 +10,9 @@ import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
 import log from 'lib/log';
 
-// TODO: Discord login for /invite route
-
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'invite', 'share', 'api-docs'];
+const accountPages = ['profile'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -123,6 +122,10 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         const __user = await charmClient.createUser({ address: account });
         return { authorized: true, user: __user };
       }
+    }
+    // condition: user accesses account pages (profile, tasks)
+    else if (accountPages.some(basePath => firstPathSegment === basePath)) {
+      return { authorized: true };
     }
     // condition: trying to access a space without access
     else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {

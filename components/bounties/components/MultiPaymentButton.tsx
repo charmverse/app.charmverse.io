@@ -5,7 +5,7 @@ import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
 import { ethers } from 'ethers';
 import { getChainById } from 'connectors';
-import useGnosisSafe from '../hooks/useGnosisSafe';
+import useGnosisSafes from 'hooks/useGnosisSafes';
 
 export interface MultiPaymentResult {
   transactions: MetaTransactionData[];
@@ -21,7 +21,7 @@ interface Props {
 
 export default function MultiPaymentButton ({ chainId, safeAddress, transactions, onSuccess }: Props) {
   const { account, library } = useWeb3React();
-  const safe = useGnosisSafe({ safeAddress });
+  const [safe] = useGnosisSafes([safeAddress]);
   const network = getChainById(chainId);
   if (!network?.gnosisUrl) {
     throw new Error(`Invalid network: ${chainId}`);

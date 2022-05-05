@@ -7,7 +7,7 @@ interface Props {
   tooltip?: string;
 }
 
-export function ElementDeleteIcon ({ onClick, tooltip = 'Delete' }: Props) {
+export default function ElementDeleteIcon ({ onClick, tooltip = 'Delete' }: Props) {
 
   return (
     <Tooltip arrow placement='top' title={tooltip}>

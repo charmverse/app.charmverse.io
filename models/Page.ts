@@ -2,8 +2,6 @@ import type { Page } from '@prisma/client';
 
 export { Page };
 
-export const PATH_BLACKLIST = ['settings'];
-
 export type PageType = 'page' | 'board';
 
 // eslint-disable-next-line
