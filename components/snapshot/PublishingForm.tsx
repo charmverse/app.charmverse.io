@@ -272,7 +272,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
             </Grid>
 
             <Grid item>
-              <InputGeneratorText title='Voting options' minimumOptions={MIN_VOTING_OPTIONS} onChange={options => setVotingOptions(options)} />
+              <InputGeneratorText defaultOptions={['For', 'Against']} title='Voting options' minimumOptions={MIN_VOTING_OPTIONS} onChange={options => setVotingOptions(options)} />
             </Grid>
 
             <Grid item>

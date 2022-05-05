@@ -11,16 +11,22 @@ import { isTruthy } from 'lib/utilities/types';
 interface Props {
   onChange: (choices: string []) => void
   title?: string,
-  minimumOptions?: number
+  minimumOptions?: number,
+  defaultOptions?: string[]
 }
 
 /**
  * Generates a list of text fields
  * @param onChange
  */
-export default function InputGeneratorText ({ onChange, title = 'Options', minimumOptions = 1 }: Props) {
+export default function InputGeneratorText ({ onChange, title = 'Options', minimumOptions = 1, defaultOptions }: Props) {
 
-  const [options, setOptions] = useState<Record<string, string>>({ 0: '' });
+  const [options, setOptions] = useState<Record<number | string, string>>(defaultOptions
+    ? defaultOptions.reduce((optionSet, opt, index) => {
+      optionSet[index] = opt;
+      return optionSet;
+    }, {} as Record<number, string>)
+    : { 0: '' });
 
   const keys = Object.keys(options);
 
@@ -75,6 +81,7 @@ export default function InputGeneratorText ({ onChange, title = 'Options', minim
         return (
           <Grid key={key} item display='flex' alignItems='center'>
             <TextField
+              defaultValue={options[key]}
               fullWidth
               onBlur={ev => {
                 const newValue = ev.target.value;
