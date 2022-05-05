@@ -1,6 +1,6 @@
 
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions, setupPermissionsAfterPageCreated, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
+import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';

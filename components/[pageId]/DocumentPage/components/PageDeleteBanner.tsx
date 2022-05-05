@@ -34,7 +34,7 @@ export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
           disabled={isMutating}
           onClick={async () => {
             setIsMutating(true);
-            await restorePage(pageId, true);
+            await restorePage(pageId);
             setIsMutating(false);
           }}
           variant='outlined'

@@ -10,11 +10,14 @@ export default function RedirectToMainPage () {
   const { pages } = usePages();
 
   useEffect(() => {
-    const firstPageId = Object.entries(pages)
-      .filter(([, page]) => page?.type === 'board' || page?.type === 'page')[0]?.[0];
-    const page = pages[firstPageId];
-    if (space && page) {
-      router.push(`/${space.domain}/${page.path}`);
+    // Find the first page that is not card and hasn't been deleted yet
+    const firstPageId = Object.values(pages)
+      .find((page) => (page?.type === 'board' || page?.type === 'page') && page?.deletedAt === null)?.id;
+    if (space && firstPageId) {
+      const page = pages[firstPageId];
+      if (page) {
+        router.push(`/${space.domain}/${page.path}`);
+      }
     }
   }, [space, pages]);
 

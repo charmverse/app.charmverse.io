@@ -371,30 +371,29 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 });
 
 function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => void, pageId: string, pagePath: string }) {
-  const router = useRouter();
   const [user] = useUser();
   const [space] = useCurrentSpace();
   const boards = useAppSelector(getSortedBoards);
   const intl = useIntl();
-  const { currentPageId, getPagePermissions, pages } = usePages();
+  const { setPages, getPagePermissions, pages } = usePages();
   const { showMessage } = useSnackbar();
   const permissions = getPagePermissions(pageId);
 
   const deletePageDisabled = !permissions.delete;
 
   async function deletePage () {
-
     if (deletePageDisabled) {
       return;
     }
 
     const page = pages[pageId];
-    const totalPages = Object.values(pages).filter(p => p?.type === 'page' || p?.type === 'board').length;
+    const totalNonArchivedPages = Object.values(pages).filter((p => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board'))).length;
 
     if (page && user && space) {
       const { pageIds } = await charmClient.archivePage(page.id);
-      if (totalPages - pageIds.length === 0 && pageIds.length !== 0) {
-        await charmClient.createPage(untitledPage({
+      let newPage: null | Page = null;
+      if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
+        newPage = await charmClient.createPage(untitledPage({
           userId: user.id,
           spaceId: space.id
         }));
@@ -414,19 +413,20 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
           }
         );
       }
-    }
-    await mutate(`pages/${space?.id}`);
-    const currentPage = pages[currentPageId];
-    // Redirect from current page
-    if (page && currentPage && page.id === currentPage.id) {
-      let newPath = `/${router.query.domain}`;
-      if (currentPage.parentId) {
-        const parent = pages[currentPage.parentId];
-        if (parent) {
-          newPath += `/${parent.path}`;
+
+      setPages((_pages) => {
+        pageIds.forEach(_pageId => {
+          _pages[_pageId] = {
+            ..._pages[_pageId],
+            deletedAt: new Date()
+          } as Page;
+        });
+        // If a new page was created add that to state
+        if (newPage) {
+          _pages[newPage.id] = newPage;
         }
-      }
-      router.push(newPath);
+        return { ..._pages };
+      });
     }
   }
 

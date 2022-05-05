@@ -100,7 +100,7 @@ export default function EditorPage (
   const currentPage = pages[currentPageId];
   const memoizedCurrentPage = useMemo(
     () => pages[currentPageId],
-    [currentPageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title]
+    [currentPageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt]
   );
 
   useEffect(() => {

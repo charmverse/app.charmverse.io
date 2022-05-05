@@ -65,12 +65,11 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     });
     // If the current page has been deleted permanently route to the first alive page
     if (pageIds.includes(currentPageId)) {
-      router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.deletedAt === null)?.path}`);
+      router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.type !== 'card' && page?.deletedAt === null)?.path}`);
     }
   }
 
-  async function restorePage (pageId: string, route?: boolean) {
-    route = route ?? false;
+  async function restorePage (pageId: string) {
     const { pageIds } = await charmClient.restorePage(pageId);
     setPages((_pages) => {
       pageIds.forEach(_pageId => {
@@ -87,11 +86,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       }
       return { ..._pages };
     });
-    if (route) {
-      // Without routing the banner doesn't go away, even though we are updating the state :/
-      const page = pages[pageId];
-      router.push(`/${router.query.domain}/${page?.path}`);
-    }
+
     // TODO: Better focalboard blocks api to only fetch blocks by id
     dispatch(initialLoad());
   }
