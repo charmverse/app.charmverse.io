@@ -1,4 +1,4 @@
-import { Page, PageOperations, Role } from '@prisma/client';
+import { Page, PageOperations, Role, Space } from '@prisma/client';
 import charmClient from 'charmClient';
 import { IPageWithPermissions } from 'lib/pages';
 import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
@@ -48,32 +48,32 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const [user] = useUser();
-  const { data } = useSWR(() => space ? `pages/${space?.id}` : null, (e) => {
-    return charmClient.getPages(space!.id);
+  const { data } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
+    return charmClient.getPages((space as Space).id);
   }, { refreshInterval });
   const dispatch = useAppDispatch();
 
   const isAdmin = useIsAdmin();
 
   async function deletePage (pageId: string) {
-    const { deletedPageIds } = await charmClient.deletePage(pageId);
-    deletedPageIds.forEach(deletedPageId => {
-      delete pages[deletedPageId];
+    const { pageIds } = await charmClient.deletePage(pageId);
+    pageIds.forEach(_pageId => {
+      delete pages[_pageId];
     });
     setPages({ ...pages });
     // If the current page has been deleted permanently route to the first alive page
-    if (deletedPageIds.includes(currentPageId)) {
+    if (pageIds.includes(currentPageId)) {
       router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.deletedAt === null)?.path}`);
     }
   }
 
   async function restorePage (pageId: string, route?: boolean) {
     route = route ?? false;
-    const { deletedPageIds } = await charmClient.restorePage(pageId);
-    deletedPageIds.forEach(deletePageId => {
-      if (pages[deletePageId]) {
-        pages[deletePageId] = {
-          ...pages[deletePageId],
+    const { pageIds } = await charmClient.restorePage(pageId);
+    pageIds.forEach(_pageId => {
+      if (pages[_pageId]) {
+        pages[_pageId] = {
+          ...pages[_pageId],
           deletedAt: null
         } as Page;
       }

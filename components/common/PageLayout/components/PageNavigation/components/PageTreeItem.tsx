@@ -392,8 +392,8 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
     const totalPages = Object.values(pages).filter(p => p?.type === 'page' || p?.type === 'board').length;
 
     if (page && user && space) {
-      const { deletedPageIds } = await charmClient.archivePage(page.id);
-      if (totalPages - deletedPageIds.length === 0 && deletedPageIds.length !== 0) {
+      const { pageIds } = await charmClient.archivePage(page.id);
+      if (totalPages - pageIds.length === 0 && pageIds.length !== 0) {
         await charmClient.createPage(untitledPage({
           userId: user.id,
           spaceId: space.id
