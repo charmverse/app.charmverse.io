@@ -22,6 +22,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
 import { DateTime } from 'luxon';
+import InputGeneratorText from 'components/common/form/InputGeneratorText';
 import ConnectSnapshot from './ConnectSnapshot';
 import InputVotingStrategies from './InputVotingStrategies';
 import { getChainById } from '../../connectors';
@@ -56,13 +57,13 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const [selectedVotingStrategies, setSelectedVotingStrategies] = useState<SnapshotVotingStrategy[]>([]);
   const [snapshotBlockNumber, setSnapshotBlockNumber] = useState<number | null>(null);
   const [snapshotVoteMode, setSnapshotVoteMode] = useState<SnapshotVotingModeType>('single-choice');
+  const [votingOptions, setVotingOptions] = useState<string[]>([]);
 
   const [formError, setFormError] = useState<SystemError | null>(null);
 
   const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
-    console.log('Block num', snapshotBlockNumber);
     if (!snapshotBlockNumber) {
       setCurrentBlockNumberAsDefault();
     }
@@ -187,7 +188,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
         type: snapshotVoteMode,
         title: page.title,
         body: content,
-        choices: ['Yay', 'Neigh'],
+        choices: votingOptions,
         start: Math.round(startDate.toSeconds()),
         end: Math.round(endDate.toSeconds()),
         snapshot: snapshotBlockNumber,
@@ -254,7 +255,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
             {
       checksComplete && snapshotSpace && (
         <form onSubmit={(ev) => ev.preventDefault()}>
-          <Grid container direction='column' spacing={3}>
+          <Grid container xs direction='column' spacing={3}>
 
             <Grid item>
               <InputEnumToOption keyAndLabel={SnapshotVotingMode} defaultValue='single-choice' onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)} />
@@ -262,6 +263,10 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
             <Grid item>
               <InputVotingStrategies strategies={snapshotSpace.strategies} onChange={(selected) => setSelectedVotingStrategies(selected)} />
+            </Grid>
+
+            <Grid item>
+              <InputGeneratorText minimumOptions={2} onChange={options => setVotingOptions(options)} />
             </Grid>
 
             <Grid item>
