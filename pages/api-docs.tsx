@@ -35,8 +35,8 @@ export const getStaticProps: GetStaticProps = async ctx => {
 export default function ApiDoc ({ spec }: InferGetStaticPropsType<typeof getStaticProps>) {
 
   const theme = useTheme();
-
   const colorMode = useColorMode();
+
   useEffect(() => {
     if (theme.palette.mode === 'dark') {
       colorMode.toggleColorMode();
