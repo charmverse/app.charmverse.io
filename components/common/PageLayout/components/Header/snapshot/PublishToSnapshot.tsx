@@ -60,16 +60,6 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
         <>
           <LoadingIcon size={18} sx={{ mr: 1 }} />
           <ListItemText primary='Checking proposal' />
-          {
-
-          /**
-           *   <LoadingComponent>
-            <ListItemText primary='Checking proposal' />
-          </LoadingComponent>
-
-           */
-        }
-
         </>
       )
       }
