@@ -257,7 +257,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
             {
       checksComplete && snapshotSpace && (
         <form onSubmit={(ev) => ev.preventDefault()}>
-          <Grid container xs direction='column' spacing={3}>
+          <Grid container direction='column' spacing={3}>
 
             <Grid item>
               <FieldLabel>Voting type</FieldLabel>
