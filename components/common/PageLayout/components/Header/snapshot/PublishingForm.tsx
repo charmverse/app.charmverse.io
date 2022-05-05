@@ -56,7 +56,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const [selectedVotingStrategies, setSelectedVotingStrategies] = useState<SnapshotVotingStrategy[]>([]);
   const [snapshotBlockNumber, setSnapshotBlockNumber] = useState<number | null>(null);
   const [snapshotVoteMode, setSnapshotVoteMode] = useState<SnapshotVotingModeType>('single-choice');
-  const [votingOptions, setVotingOptions] = useState<string[]>([]);
+  const [votingOptions, setVotingOptions] = useState<string[]>(['For', 'Against']);
 
   const [formError, setFormError] = useState<SystemError | null>(null);
 
@@ -269,7 +269,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
             </Grid>
 
             <Grid item>
-              <InputGeneratorText defaultOptions={['For', 'Against']} title='Voting options' minimumOptions={MIN_VOTING_OPTIONS} onChange={options => setVotingOptions(options)} />
+              <InputGeneratorText defaultOptions={votingOptions} title='Voting options' minimumOptions={MIN_VOTING_OPTIONS} onChange={options => setVotingOptions(options)} />
             </Grid>
 
             <Grid item>
