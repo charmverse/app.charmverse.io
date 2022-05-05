@@ -287,7 +287,6 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
                     }}
                     inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 0 }}
                     fullWidth
-                    error={!endDateAfterStart}
                     helperText={`This is the block number on the ${getChainById(parseInt(snapshotSpace.network))?.chainName ?? ''} blockchain by which DAO members must have held tokens to be able to vote.`}
                   />
                 )
