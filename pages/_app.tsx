@@ -256,7 +256,8 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <Web3ReactProvider getLibrary={getLibrary}>
-            <LocalizationProvider dateAdapter={AdapterLuxon}>
+            {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
+            <LocalizationProvider dateAdapter={AdapterLuxon as any}>
               <Web3ConnectionManager>
                 <LitProtocolProvider>
                   <ReduxProvider store={store}>
