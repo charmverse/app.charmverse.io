@@ -38,19 +38,13 @@ const DEFAULT_VOTING_DURATION = 7;
 export default function ConnectSnapshot () {
 
   const [space, setSpace] = useCurrentSpace();
-
-  const [user] = useUser();
-
-  const isAdmin = isSpaceAdmin(user, space?.id);
-
   const [formError, setFormError] = useState<SystemError | null>(null);
 
   const {
     register,
     handleSubmit,
-    reset,
     watch,
-    formState: { errors, isDirty, isValid }
+    formState: { errors, isValid }
   } = useForm<FormValues>({
     defaultValues: {
       defaultVotingDuration: space?.defaultVotingDuration ?? DEFAULT_VOTING_DURATION,
@@ -82,7 +76,6 @@ export default function ConnectSnapshot () {
           <FieldLabel>Snapshot domain</FieldLabel>
           <TextField
             {...register('snapshotDomain')}
-            disabled={!isAdmin}
             fullWidth
             error={!!errors.snapshotDomain}
             helperText={errors.snapshotDomain?.message}
@@ -94,7 +87,6 @@ export default function ConnectSnapshot () {
               <FieldLabel>Default voting duration (days)</FieldLabel>
               <TextField
                 {...register('defaultVotingDuration')}
-                disabled={!isAdmin}
                 fullWidth
                 error={!!errors.defaultVotingDuration}
                 helperText={errors.defaultVotingDuration?.message}
