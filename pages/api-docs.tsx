@@ -1,7 +1,8 @@
+import { useTheme } from '@emotion/react';
+import { useColorMode } from 'context/darkMode';
 import { GetStaticProps, InferGetStaticPropsType } from 'next';
-import { useEffect, useState } from 'react';
-
 import { createSwaggerSpec } from 'next-swagger-doc';
+import { useEffect } from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 
@@ -32,6 +33,16 @@ export const getStaticProps: GetStaticProps = async ctx => {
 };
 
 export default function ApiDoc ({ spec }: InferGetStaticPropsType<typeof getStaticProps>) {
+
+  const theme = useTheme();
+
+  const colorMode = useColorMode();
+  useEffect(() => {
+    if (theme.palette.mode === 'dark') {
+      colorMode.toggleColorMode();
+    }
+
+  }, []);
 
   return (<SwaggerUI spec={spec}></SwaggerUI>);
 //  ;
