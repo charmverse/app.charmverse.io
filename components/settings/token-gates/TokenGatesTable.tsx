@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { humanizeAccessControlConditions, checkAndSignAuthMessage, ALL_LIT_CHAINS } from 'lit-js-sdk';
+import { checkAndSignAuthMessage, humanizeAccessControlConditions } from 'lit-js-sdk';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { TokenGate } from '@prisma/client';
@@ -10,37 +10,58 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import DeleteIcon from '@mui/icons-material/Close';
 import ButtonChip from 'components/common/ButtonChip';
-import { ErrorModal, SuccessModal } from 'components/common/Modal';
 import Tooltip from '@mui/material/Tooltip';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import Chip from '@mui/material/Chip';
 import charmClient from 'charmClient';
 import TableRow from 'components/common/Table/TableRow';
-import { getChainFromGate, getLitChainFromChainId } from 'lib/token-gates';
+import { getLitChainFromChainId } from 'lib/token-gates';
+import { TokenGateWithRoles } from 'pages/api/token-gates';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { mutate } from 'swr';
 import TestConnectionModal, { TestResult } from './TestConnectionModal';
+import TokenGateRolesSelect from './TokenGateRolesSelect';
 
 interface Props {
-  tokenGates: TokenGate[];
+  tokenGates: TokenGateWithRoles[];
   isAdmin: boolean;
   onDelete: (tokenGate: TokenGate) => void;
 }
 
-export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props) {
-
+export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Props) {
   const { account, chainId } = useWeb3React();
-  const [descriptions, setDescriptions] = useState<string[]>([]);
-  const [gateTesterror, setGateTestError] = useState('');
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
+  const [descriptions, setDescriptions] = useState<string[]>([]);
+  const [space] = useCurrentSpace();
+
+  async function updateTokenGateRoles (tokenGateId: string, roleIds: string[]) {
+    if (space) {
+      await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
+      mutate(`tokenGates/${space.id}`);
+    }
+  }
+
+  async function deleteRoleFromTokenGate (tokenGateId: string, roleId: string) {
+    const tokenGate = tokenGates.find(_tokenGate => _tokenGate.id === tokenGateId);
+    if (tokenGate && space) {
+      const roleIds = tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId).filter(tokenGateRoleId => tokenGateRoleId !== roleId);
+      await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
+      mutate(`tokenGates/${space.id}`);
+    }
+  }
 
   useEffect(() => {
-    Promise.all(tokenGates.map(tokenGate => humanizeAccessControlConditions({
-      myWalletAddress: account || '',
-      accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
-    })))
-      .then(result => {
-        setDescriptions(result);
-      });
+    async function main () {
+      const results = await Promise.all(
+        tokenGates.map(tokenGate => humanizeAccessControlConditions({
+          myWalletAddress: account || '',
+          accessControlConditions: (tokenGate.conditions as any)?.accessControlConditions || []
+        }))
+      );
+      setDescriptions(results);
+    }
+    main();
   }, [tokenGates]);
 
   async function testConnect (tokenGate: TokenGate) {
@@ -54,7 +75,7 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
         resourceId: tokenGate.resourceId as any,
         authSig,
         chain,
-        accessControlConditions: (tokenGate.conditions as any)!.accessControlConditions
+        accessControlConditions: (tokenGate.conditions as any).accessControlConditions
       });
       await charmClient.verifyTokenGate({ jwt, id: tokenGate.id });
 
@@ -72,48 +93,56 @@ export default function ContributorRow ({ isAdmin, onDelete, tokenGates }: Props
         <TableHead>
           <TableRow>
             <TableCell sx={{ px: 0 }}>Description</TableCell>
-            <TableCell>Chain</TableCell>
-            <TableCell>Created</TableCell>
-            <TableCell>{/* actions */}</TableCell>
+            <TableCell>
+              <Tooltip arrow placement='top' title='Automatically assign these roles to new users'>
+                <span>Included Roles</span>
+              </Tooltip>
+            </TableCell>
+            <TableCell></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {tokenGates.map((row, index) => (
-            <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+          {tokenGates.map((tokenGate, tokenGateIndex) => (
+            <TableRow key={tokenGate.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
               <TableCell sx={{ px: 0 }}>
-                <Typography>{descriptions[index]}</Typography>
+                <Typography variant='body2' sx={{ my: 1 }}>{descriptions[tokenGateIndex]}
+                </Typography>
               </TableCell>
-              <TableCell width={150}>
-                <Typography>{ALL_LIT_CHAINS[getChainFromGate(row)]?.name}</Typography>
+              <TableCell>
+                <TokenGateRolesSelect
+                  selectedRoleIds={tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId)}
+                  onChange={(roleIds) => {
+                    updateTokenGateRoles(tokenGate.id, roleIds);
+                  }}
+                  onDelete={(roleId) => {
+                    deleteRoleFromTokenGate(tokenGate.id, roleId);
+                  }}
+                />
               </TableCell>
-              <TableCell width={150} sx={{ whiteSpace: 'nowrap' }}>
-                {new Date(row.createdAt).toDateString()}
-              </TableCell>
-              <TableCell width={150} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
+              <TableCell width={140} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
                 <Tooltip arrow placement='top' title='Test this gate using your own wallet'>
                   <Box component='span' pr={1}>
-                    <Chip onClick={() => testConnect(row)} sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label='Test' />
+                    <Chip onClick={() => testConnect(tokenGate)} sx={{ width: 70 }} clickable color='secondary' size='small' variant='outlined' label='Test' />
                   </Box>
                 </Tooltip>
                 {isAdmin && (
-                <Tooltip arrow placement='top' title='Delete'>
-                  <ButtonChip
-                    className='row-actions'
-                    icon={<DeleteIcon />}
-                    clickable
-                    color='secondary'
-                    size='small'
-                    variant='outlined'
-                    onClick={() => onDelete(row)}
-                  />
-                </Tooltip>
+                  <Tooltip arrow placement='top' title='Delete'>
+                    <ButtonChip
+                      className='row-actions'
+                      icon={<DeleteIcon />}
+                      clickable
+                      color='secondary'
+                      size='small'
+                      variant='outlined'
+                      onClick={() => onDelete(tokenGate)}
+                    />
+                  </Tooltip>
                 )}
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-
       <TestConnectionModal
         status={testResult.status}
         message={testResult.message}

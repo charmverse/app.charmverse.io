@@ -77,8 +77,16 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...pr
       variant='outlined'
       color='secondary'
       size='small'
+      sx={{
+        '.label:hover': {
+          color: 'text.primary'
+        }
+      }}
       {...props}
-    >{text}
+    >
+      <span className='label'>
+        {text}
+      </span>
     </Button>
   );
 }
@@ -344,6 +352,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                       endIcon={(
                         <MoreHorizIcon
                           onClick={(e: any) => {
+                            console.log('more icon');
                             e.stopPropagation();
                             onClickCommentActions(e, comment);
                           }}

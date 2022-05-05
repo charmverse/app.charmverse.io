@@ -1,4 +1,5 @@
 import { useTheme } from '@emotion/react';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -10,13 +11,12 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { Application, Bounty, User } from '@prisma/client';
 import charmClient from 'charmClient';
-import { BountyStatusColours } from 'components/bounties/BountyStatusBadge';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useContributors } from 'hooks/useContributors';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { getDisplayName } from 'lib/users';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { BountyStatusColours } from '../../components/BountyStatusBadge';
 
 /**
  * @updateApplication callback to parent [bountyId] page that implements application update logic
@@ -59,12 +59,9 @@ export function BountyApplicantList ({
   updateApplication = () => {}
 }: IBountyApplicantListProps) {
   const [user] = useUser();
-  const [space] = useCurrentSpace();
   const [contributors] = useContributors();
 
-  const isAdmin = user && user.spaceRoles.some(spaceRole => {
-    return spaceRole.spaceId === space?.id && spaceRole.role === 'admin';
-  });
+  const isAdmin = useIsAdmin();
 
   const theme = useTheme();
 
@@ -119,8 +116,7 @@ export function BountyApplicantList ({
           background: theme.palette.background.dark,
           '.MuiTableCell-root': {
             background: theme.palette.settingsHeader.background
-          },
-          zIndex: 9000
+          }
         }}
         >
           <TableRow>

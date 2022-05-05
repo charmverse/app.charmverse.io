@@ -122,7 +122,7 @@ function CenterPanel(props: Props) {
   //   })
   // }
 
-  const addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = false): Promise<void> => {
+  const addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = true): Promise<void> => {
     const { activeView, board, groupByProperty } = props
 
     const card = createCard()

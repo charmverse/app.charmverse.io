@@ -5,14 +5,10 @@ import {
 import { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { nodeViewUpdateStore, useNodeViews } from '@bangle.dev/react/node-view-helpers';
-import { NodeViewWrapper, RenderNodeViewsFunction } from '@bangle.dev/react/NodeViewWrapper';
 import { objectUid } from '@bangle.dev/utils';
 import React, { ReactNode, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
-
-const LOG = false;
-
-let log = LOG ? console.log.bind(console, 'react-editor') : () => {};
+import { NodeViewWrapper, RenderNodeViewsFunction } from './NodeViewWrapper';
 
 interface BangleEditorProps<PluginMetadata = any>
   extends CoreBangleEditorProps<PluginMetadata> {
@@ -126,7 +122,6 @@ const updatePluginWatcher = (editor: CoreBangleEditor) => {
       plugins: newPlugins,
     });
 
-    log('Adding watching to existing state', watcher);
     editor.view.updateState(state);
   };
 };

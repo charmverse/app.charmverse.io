@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 
-import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, TelegramUser } from '@prisma/client';
+import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, TelegramUser, TokenGateToRole } from '@prisma/client';
 import * as http from 'adapters/http';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -15,6 +15,7 @@ import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtil
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'lib/notion/types';
+// TODO: Maybe move these types to another place so that we dont import from backend
 import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
@@ -22,6 +23,7 @@ import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
+import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -93,8 +95,8 @@ class CharmClient {
     return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
   }
 
-  updateContributor ({ spaceId, userId, role }: { spaceId: string, userId: string, role: string }) {
-    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { role });
+  updateContributor ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
+    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { isAdmin });
   }
 
   removeContributor ({ spaceId, userId }: { spaceId: string, userId: string }) {
@@ -420,7 +422,7 @@ class CharmClient {
 
   // Token Gates
   getTokenGates (query: { spaceId: string }) {
-    return http.GET<TokenGate[]>('/api/token-gates', query);
+    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
   }
 
   getTokenGatesForSpace (query: { spaceDomain: string }) {
@@ -444,6 +446,10 @@ class CharmClient {
     Promise<{ error?: string, success?: boolean, space: Space }> {
 
     return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
+  }
+
+  updateTokenGateRoles (tokenGateId: string, spaceId: string, roleIds: string[]) {
+    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
   }
 
   getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
@@ -470,8 +476,8 @@ class CharmClient {
     return http.PUT(`/api/roles/${role.id}`, role);
   }
 
-  deleteRole (roleToDelete: {roleId: string, spaceId: string}): Promise<Role> {
-    return http.DELETE('/api/roles', roleToDelete);
+  deleteRole (roleId: string): Promise<Role> {
+    return http.DELETE(`/api/roles/${roleId}`);
   }
 
   listRoles (spaceId: string): Promise<ListSpaceRolesResponse[]> {

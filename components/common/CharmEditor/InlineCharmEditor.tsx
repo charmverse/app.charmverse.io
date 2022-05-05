@@ -103,7 +103,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean 
     color: ${({ theme }) => theme.palette.code.color};
     display: inline-block;
     font-size: 85%;
-    height: 100%;
+    height: fit-content;
     tab-size: 4;
     caret-color: black;
   }

@@ -19,6 +19,7 @@
     "server:staging": "npx react-env --path .env.staging -- node --require dd-trace/init node_modules/.bin/next start",
     "start": "npm run server:dev",
     "start:dev:cron": "concurrently --names \"cron,next\" -c \"yellow,green\" \"npm run cron:dev\" \"npm run server:dev\"",
+    "postinstall": "patch-package",
     "start:test": "dotenv -e .env.test.local -- npm start",
     "start:test:ci": "npx react-env --path .env.test.local -- npx next start",
     "start:prod": "npm run migrate:prod && concurrently --names \"cron,next\" -c \"yellow,green\" \"npm run cron:prod\" \"npm run server:prod\"",
@@ -34,7 +35,6 @@
     "test:server": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose",
     "test:server-integration": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server-integration.ts' --verbose"
   },
-  "postinstall": "patch-package",
   "prepare": "husky install",
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -139,7 +139,7 @@
     "react-day-picker": "^7.4.10",
     "react-dnd": "^16.0.0",
     "react-dnd-html5-backend": "^16.0.0",
-    "react-dnd-scrolling": "^1.2.1",
+    "react-dnd-scrolling": "^1.2.4",
     "react-dnd-touch-backend": "^16.0.0",
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.25.0",
