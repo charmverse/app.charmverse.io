@@ -57,10 +57,12 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   async function deletePage (pageId: string) {
     const { pageIds } = await charmClient.deletePage(pageId);
-    pageIds.forEach(_pageId => {
-      delete pages[_pageId];
+    setPages((_pages) => {
+      pageIds.forEach(_pageId => {
+        delete _pages[_pageId];
+      });
+      return { ..._pages };
     });
-    setPages({ ...pages });
     // If the current page has been deleted permanently route to the first alive page
     if (pageIds.includes(currentPageId)) {
       router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.deletedAt === null)?.path}`);
@@ -70,15 +72,21 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   async function restorePage (pageId: string, route?: boolean) {
     route = route ?? false;
     const { pageIds } = await charmClient.restorePage(pageId);
-    pageIds.forEach(_pageId => {
-      if (pages[_pageId]) {
-        pages[_pageId] = {
-          ...pages[_pageId],
-          deletedAt: null
-        } as Page;
+    setPages((_pages) => {
+      pageIds.forEach(_pageId => {
+        if (_pages[_pageId]) {
+          _pages[_pageId] = {
+            ..._pages[_pageId],
+            deletedAt: null
+          } as Page;
+        }
+      });
+      // Severe the link with parent if its not of type card
+      if (_pages[pageId] && _pages[pageId]?.type !== 'card') {
+        (_pages[pageId] as Page).parentId = null;
       }
+      return { ..._pages };
     });
-    setPages({ ...pages });
     if (route) {
       // Without routing the banner doesn't go away, even though we are updating the state :/
       const page = pages[pageId];

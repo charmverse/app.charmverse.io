@@ -56,14 +56,17 @@ async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiRespons
         }
       });
 
-      await prisma.block.update({
-        where: {
-          id: pageId
-        },
-        data: {
-          parentId: undefined
-        }
-      });
+      if (page?.type === 'board') {
+        await prisma.block.update({
+          where: {
+            id: pageId
+          },
+          data: {
+            parentId: undefined
+          }
+        });
+      }
+
       await setupPermissionsAfterPageRepositioned(pageId);
     }
   }
