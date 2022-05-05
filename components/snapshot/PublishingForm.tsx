@@ -54,7 +54,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const [startDate, setStartDate] = useState<DateTime>(DateTime.fromMillis(Date.now()).plus({ hour: 1 }));
   const [endDate, setEndDate] = useState<DateTime>((DateTime.fromMillis(startDate.toMillis())).plus({ days: space?.defaultVotingDuration ?? 7 }));
   const [selectedVotingStrategies, setSelectedVotingStrategies] = useState<SnapshotVotingStrategy[]>([]);
-  const [snapshotBlockNumber, setSnapshotBlockNumber] = useState<number>(1);
+  const [snapshotBlockNumber, setSnapshotBlockNumber] = useState<number | null>(null);
   const [snapshotVoteMode, setSnapshotVoteMode] = useState<SnapshotVotingModeType>('single-choice');
 
   const [formError, setFormError] = useState<SystemError | null>(null);
@@ -62,7 +62,8 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
-    if (snapshotBlockNumber === 1) {
+    console.log('Block num', snapshotBlockNumber);
+    if (!snapshotBlockNumber) {
       setCurrentBlockNumberAsDefault();
     }
 
@@ -78,9 +79,14 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
   async function setCurrentBlockNumberAsDefault () {
     if (snapshotSpace) {
-      const provider = await snapshot.utils.getProvider(snapshotSpace.network);
-      const blockNum = await provider.getBlockNumber();
-      setSnapshotBlockNumber(blockNum);
+      try {
+        const provider = await snapshot.utils.getProvider(snapshotSpace.network);
+        const blockNum = await provider.getBlockNumber();
+        setSnapshotBlockNumber(blockNum);
+      }
+      catch (err) {
+        setSnapshotBlockNumber(1);
+      }
     }
   }
 
@@ -220,7 +226,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const endDateAfterStart = startDate && endDate && endDate.diff(startDate, 'seconds').seconds > 0;
 
   function formValid () {
-    return selectedVotingStrategies.length > 0 && endDateAfterStart && snapshotBlockNumber >= 1;
+    return selectedVotingStrategies.length > 0 && endDateAfterStart && !!snapshotBlockNumber;
   }
 
   return (
@@ -260,17 +266,27 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
             <Grid item>
               <FieldLabel>Block number</FieldLabel>
-              <TextField
-                defaultValue={snapshotBlockNumber}
-                type='number'
-                onInput={(input: any) => {
-                  setSnapshotBlockNumber(parseInt(input.target.value));
-                }}
-                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 0 }}
-                fullWidth
-                error={!endDateAfterStart}
-                helperText={`This is the block number on the ${getChainById(parseInt(snapshotSpace.network))?.chainName ?? ''} blockchain by which DAO members must have held tokens to be able to vote.\r\nThe default value is the current block number.`}
-              />
+              {
+                !snapshotBlockNumber ? (
+                  <>
+                    <LoadingIcon size={18} sx={{ mr: 1 }} />
+                    Getting current block number
+                  </>
+                ) : (
+                  <TextField
+                    defaultValue={snapshotBlockNumber}
+                    type='number'
+                    onInput={(input: any) => {
+                      setSnapshotBlockNumber(parseInt(input.target.value));
+                    }}
+                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 0 }}
+                    fullWidth
+                    error={!endDateAfterStart}
+                    helperText={`This is the block number on the ${getChainById(parseInt(snapshotSpace.network))?.chainName ?? ''} blockchain by which DAO members must have held tokens to be able to vote.`}
+                  />
+                )
+              }
+
             </Grid>
 
             <Grid item>
