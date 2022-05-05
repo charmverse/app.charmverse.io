@@ -15,7 +15,7 @@ import { LoadingIcon } from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
-import { getSnapshotSpace, SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot';
+import { getSnapshotSpace, SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy, SnapshotVotingMode, SnapshotVotingModeType } from 'lib/snapshot';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -55,6 +55,8 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const [endDate, setEndDate] = useState<DateTime>((DateTime.fromMillis(startDate.toMillis())).plus({ days: space?.defaultVotingDuration ?? 7 }));
   const [selectedVotingStrategies, setSelectedVotingStrategies] = useState<SnapshotVotingStrategy[]>([]);
   const [snapshotBlockNumber, setSnapshotBlockNumber] = useState<number>(1);
+  const [snapshotVoteMode, setSnapshotVoteMode] = useState<SnapshotVotingModeType>('single-choice');
+
   const [formError, setFormError] = useState<SystemError | null>(null);
 
   const [publishing, setPublishing] = useState(false);
@@ -155,10 +157,22 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
     let receipt: SnapshotReceipt;
 
+    if (!account) {
+      setFormError(
+        new SystemError({
+          errorType: 'External service',
+          severity: 'warning',
+          message: 'We couldn\'t detect your wallet. Please unlock your wallet and try publishing again.'
+        })
+      );
+      setPublishing(false);
+      return;
+    }
+
     try {
       receipt = await client.proposal(library, account as string, {
         space: space?.snapshotDomain as any,
-        type: 'single-choice',
+        type: snapshotVoteMode,
         title: page.title,
         body: content,
         choices: ['Yay', 'Neigh'],
@@ -229,6 +243,10 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
       checksComplete && snapshotSpace && (
         <form onSubmit={(ev) => ev.preventDefault()}>
           <Grid container direction='column' spacing={3}>
+
+            <Grid item>
+              <InputEnumToOption keyAndLabel={SnapshotVotingMode} defaultValue='single-choice' onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)} />
+            </Grid>
 
             <Grid item>
               <InputVotingStrategies strategies={snapshotSpace.strategies} onChange={(selected) => setSelectedVotingStrategies(selected)} />

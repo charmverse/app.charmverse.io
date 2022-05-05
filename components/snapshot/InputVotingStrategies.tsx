@@ -1,16 +1,17 @@
-import FormControl from '@mui/material/FormControl';
-import FieldLabel from 'components/common/form/FieldLabel';
-import Select from '@mui/material/Select';
 import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
-import { useEffect, useState } from 'react';
+import Select from '@mui/material/Select';
+import FieldLabel from 'components/common/form/FieldLabel';
 import { SnapshotVotingStrategy } from 'lib/snapshot';
+import { useEffect, useState } from 'react';
 
 export interface Props {
   onChange?: (option: SnapshotVotingStrategy[]) => void
   strategies: SnapshotVotingStrategy[]
 }
+
+const MAX_CONCURRENT_STRATEGIES = 8;
 
 export default function InputVotingStrategies ({ onChange = () => {}, strategies }: Props) {
 
@@ -22,7 +23,7 @@ export default function InputVotingStrategies ({ onChange = () => {}, strategies
 
   return (
     <Box>
-      <FieldLabel>Voting strategies (max. 8)</FieldLabel>
+      <FieldLabel>Voting strategies (max. {MAX_CONCURRENT_STRATEGIES})</FieldLabel>
       <FormControl fullWidth>
 
         <Select
@@ -40,7 +41,15 @@ export default function InputVotingStrategies ({ onChange = () => {}, strategies
         >
           {
           strategies.map(strat => {
-            return <MenuItem value={strat as any} key={strat.name}>{strat.name}</MenuItem>;
+            return (
+              <MenuItem
+                disabled={value.length >= MAX_CONCURRENT_STRATEGIES && !value.find(selected => selected === strat)}
+                value={strat as any}
+                key={strat.name}
+              >
+                {strat.name}
+              </MenuItem>
+            );
           })
         }
         </Select>

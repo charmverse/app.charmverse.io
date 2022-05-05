@@ -1,3 +1,5 @@
+import snapshot from '@snapshot-labs/snapshot.js';
+
 export interface SnapshotVotingStrategy {
   name: string;
   network: string;
@@ -49,3 +51,17 @@ export interface SnapshotReceipt {
     receipt: string
   }
 }
+
+// Comes from snapshot.js https://github.com/snapshot-labs/snapshot/blob/fd1f2ba15543583861df750b0958d1794cc625bb/src/components/Modal/VotingType.vue
+export const SnapshotVotingMode = {
+  'single-choice': 'Single choice',
+  approval: 'Approval',
+  'ranked-choice': 'Ranked choice',
+  quadratic: 'Quadratic',
+  weighted: 'Weighted',
+  custom: 'Custom',
+  basic: 'Basic'
+};
+
+export type SnapshotVotingModeType = keyof typeof SnapshotVotingMode;
+
