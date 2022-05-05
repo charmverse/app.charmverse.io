@@ -9,7 +9,7 @@ export const client = new ApolloClient({
 
 // Every 15 seconds, clear the cached values in the client
 setInterval(() => {
-  client.clearStore();
+  client.cache.reset();
 }, 15000);
 
 export default client;

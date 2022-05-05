@@ -88,7 +88,7 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
             <ListItemText onClick={open} primary='Publish to snapshot' />
 
             <Modal open={isOpen} onClose={close} title='Publish to snapshot'>
-              <Box sx={{ maxHeight: '80vh', margin: 'auto', overflowY: 'scroll' }}>
+              <Box sx={{ maxHeight: '80vh', margin: 'auto', overflowY: 'auto' }}>
                 <PublishingForm onSubmit={close} page={page} />
               </Box>
             </Modal>
