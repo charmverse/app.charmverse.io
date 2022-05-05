@@ -37,6 +37,8 @@ interface Props {
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 14400;
 
+const MIN_VOTING_OPTIONS = 2;
+
 export default function PublishingForm ({ onSubmit, page }: Props) {
 
   const { account, library } = useWeb3React();
@@ -227,7 +229,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const endDateAfterStart = startDate && endDate && endDate.diff(startDate, 'seconds').seconds > 0;
 
   function formValid () {
-    return selectedVotingStrategies.length > 0 && endDateAfterStart && !!snapshotBlockNumber;
+    return selectedVotingStrategies.length > 0 && endDateAfterStart && !!snapshotBlockNumber && votingOptions.length >= MIN_VOTING_OPTIONS;
   }
 
   return (
@@ -267,7 +269,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
             </Grid>
 
             <Grid item>
-              <InputGeneratorText title='Voting options' minimumOptions={2} onChange={options => setVotingOptions(options)} />
+              <InputGeneratorText title='Voting options' minimumOptions={MIN_VOTING_OPTIONS} onChange={options => setVotingOptions(options)} />
             </Grid>
 
             <Grid item>
