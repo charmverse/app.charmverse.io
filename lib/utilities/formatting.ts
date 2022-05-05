@@ -6,9 +6,11 @@ export function formatMoney (amount: number, currency: FiatCurrency): string {
 
   const formatter = new Intl.NumberFormat(userLocale, {
     style: 'currency',
-    currency
+    currency,
+    ...(amount < 1 && {
+      minimumFractionDigits: 4
+    })
   });
 
   return formatter.format(amount);
-
 }
