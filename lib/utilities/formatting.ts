@@ -1,8 +1,6 @@
 import { FiatCurrency } from '../../models/Currency';
 
-export function formatMoney (amount: number, currency: FiatCurrency): string {
-
-  const userLocale = window.navigator.language;
+export function formatMoney (amount: number, currency: FiatCurrency, userLocale: string): string {
 
   const formatter = new Intl.NumberFormat(userLocale, {
     style: 'currency',

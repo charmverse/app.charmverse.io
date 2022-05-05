@@ -189,7 +189,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
           )}
 
           <Typography component='div' align='center' sx={{ fontSize: 36, lineHeight: 1, mt: 2 }}>
-            {loading === false && !error && formatMoney(lastQuote.amount, quoteCurrency)}
+            {loading === false && !error && formatMoney(lastQuote.amount, quoteCurrency, window.navigator.language)}
             {loading === true && !error && '- -'}
             {error && 'No price found'}
           </Typography>
