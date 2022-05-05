@@ -36,6 +36,17 @@ const config = {
       test: /\.svg$/,
       use: ['@svgr/webpack']
     });
+    if (isServer) {
+      const entry = _config.entry;
+      _config.entry = () => {
+        return entry().then(_entry => {
+          return {
+            ..._entry,
+            deleteArchived: './background/deleteArchived.ts'
+          };
+        });
+      };
+    }
     return _config;
   }
 };
