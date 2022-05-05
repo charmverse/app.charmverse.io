@@ -1,18 +1,17 @@
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import IosShareIcon from '@mui/icons-material/IosShare';
+import Box from '@mui/material/Box';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { Page } from '@prisma/client';
+import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import { Modal } from 'components/common/Modal';
-import Box from '@mui/material/Box';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { getSnapshotProposal, SnapshotProposal } from 'lib/snapshot';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
-import charmClient from 'charmClient';
 import PublishingForm from './PublishingForm';
 
 export default function PublishToSnapshot ({ page }: {page: Page}) {

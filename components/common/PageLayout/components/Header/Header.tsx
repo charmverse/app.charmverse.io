@@ -18,7 +18,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import PublishToSnapshot from 'components/snapshot/PublishToSnapshot';
+import PublishToSnapshot from 'components/common/PageLayout/components/Header/snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
 import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import { usePages } from 'hooks/usePages';

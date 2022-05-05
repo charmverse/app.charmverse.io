@@ -1,4 +1,3 @@
-import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import Alert, { AlertColor } from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -10,22 +9,20 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
-import PrimaryButton from 'components/common/PrimaryButton';
+import InputEnumToOption from 'components/common/form/InputEnumToOptions';
+import InputGeneratorText from 'components/common/form/InputGeneratorText';
 import { LoadingIcon } from 'components/common/LoadingComponent';
+import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
-import { getSnapshotSpace, SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy, SnapshotVotingMode, SnapshotVotingModeType } from 'lib/snapshot';
+import { getSnapshotSpace, SnapshotReceipt, SnapshotSpace, SnapshotVotingMode, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import InputEnumToOption from 'components/common/form/InputEnumToOptions';
 import { DateTime } from 'luxon';
-import InputGeneratorText from 'components/common/form/InputGeneratorText';
+import { useEffect, useState } from 'react';
+import { getChainById } from '../../../../../../connectors';
 import ConnectSnapshot from './ConnectSnapshot';
 import InputVotingStrategies from './InputVotingStrategies';
-import { getChainById } from '../../connectors';
 
 const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
 const client = new snapshot.Client712(hub);

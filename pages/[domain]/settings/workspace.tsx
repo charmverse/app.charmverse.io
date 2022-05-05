@@ -21,7 +21,7 @@ import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWor
 import Link from 'components/common/Link';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
-import ConnectSnapshot from 'components/snapshot/ConnectSnapshot';
+import ConnectSnapshot from 'components/common/PageLayout/components/Header/snapshot/ConnectSnapshot';
 
 export default function WorkspaceSettings () {
   setTitle('Workspace Options');

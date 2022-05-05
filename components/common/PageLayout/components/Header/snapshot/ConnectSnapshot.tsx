@@ -1,20 +1,17 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { useWeb3React } from '@web3-react/core';
+import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useUser } from 'hooks/useUser';
 import { getSnapshotSpace } from 'lib/snapshot/get-space';
-import isSpaceAdmin from 'lib/users/isSpaceAdmin';
+import { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { SystemError } from 'lib/utilities/errors';
-import { useState } from 'react';
-import charmClient from 'charmClient';
-import Alert from '@mui/material/Alert';
 
 export const schema = yup.object({
   snapshotDomain: yup.string().required().test('checkDomain', 'Snapshot domain not found', async (domain) => {
