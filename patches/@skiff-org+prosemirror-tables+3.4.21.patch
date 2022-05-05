@@ -228,18 +228,22 @@ index fb1644e..b60a4b1 100644
  
    _createClass(TableFiltersMenuView, [{
 diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
-index fb57edd..78d0b30 100644
+index fb57edd..11b0d93 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/dist/index.js
 +++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
-@@ -12,7 +12,7 @@ var prosemirrorTransform = require('prosemirror-transform');
+@@ -12,9 +12,9 @@ var prosemirrorTransform = require('prosemirror-transform');
  var prosemirrorCommands = require('prosemirror-commands');
  var prosemirrorMenu = require('prosemirror-menu');
  var React = require('react');
 -var pickers = require('@material-ui/pickers');
+-var styles = require('@material-ui/core/styles');
+-var core = require('@material-ui/core');
 +var pickers = require('@mui/x-date-pickers');
- var styles = require('@material-ui/core/styles');
- var core = require('@material-ui/core');
++var styles = require('@mui/material/styles');
++var core = require('@mui/material/styles');
  var ReactDOM = require('react-dom');
+ 
+ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 @@ -3667,6 +3667,7 @@ var getColIndexFromSelectedRect = function getColIndexFromSelectedRect(state, po
    return cellIndex % tableRect.map.width;
  };
@@ -256,7 +260,25 @@ index fb57edd..78d0b30 100644
    var container = createElementWithClass('div', 'colorItemContainer');
    var button = createElementWithClass(color === 'transparent' ? 'span' : 'button', 'colorItemButton');
    var indicator = createElementWithClass('div', 'colorItemIndicator');
-@@ -6801,6 +6803,9 @@ var HoverDropdown = /*#__PURE__*/function () {
+@@ -5833,9 +5835,6 @@ var DateEventEmitter = function DateEventEmitter() {};
+ 
+ ee(DateEventEmitter.prototype);
+ var datePopupEmitter = new DateEventEmitter();
+-var generateClassName$1 = styles.createGenerateClassName({
+-  seed: 'sgo-tables-plugin-'
+-});
+ 
+ var DateComponent = function DateComponent(_ref) {
+   var view = _ref.view,
+@@ -5919,7 +5918,6 @@ var DatePickerComponent = function DatePickerComponent(_ref2) {
+     className: "date-picker",
+     ref: ref
+   }, /*#__PURE__*/React__default["default"].createElement(styles.StylesProvider, {
+-    generateClassName: generateClassName$1
+   }, /*#__PURE__*/React__default["default"].createElement(styles.ThemeProvider, {
+     theme: DatePickerTheme
+   }, /*#__PURE__*/React__default["default"].createElement(pickers.MuiPickersUtilsProvider, {
+@@ -6801,6 +6799,9 @@ var HoverDropdown = /*#__PURE__*/function () {
  }();
  
  var getTypesItems = function getTypesItems() {
@@ -266,7 +288,7 @@ index fb57edd..78d0b30 100644
    return types.map(function (type) {
      var dom = document.createElement('div');
      dom.dataset.test = "".concat(type.id, "-type-item");
-@@ -7430,8 +7435,9 @@ var typeInheritance = function typeInheritance(view, node, pos) {
+@@ -7430,8 +7431,9 @@ var typeInheritance = function typeInheritance(view, node, pos) {
  
    if (tr.steps.length) view.dispatch(tr);
  };
@@ -278,7 +300,7 @@ index fb57edd..78d0b30 100644
  var tableHeadersMenu = function tableHeadersMenu() {
    return new prosemirrorState.Plugin({
      key: tableHeadersMenuKey,
-@@ -7995,6 +8001,7 @@ var ColDragHandler = /*#__PURE__*/function () {
+@@ -7995,6 +7997,7 @@ var ColDragHandler = /*#__PURE__*/function () {
  var key$1 = new prosemirrorState.PluginKey('tableColumnHandles');
  var CellView = /*#__PURE__*/function () {
    function CellView(node, view, getPos) {
@@ -286,8 +308,27 @@ index fb57edd..78d0b30 100644
      _classCallCheck(this, CellView);
  
      this.getPos = getPos;
+@@ -9328,10 +9331,6 @@ var SelectDropdown = function SelectDropdown(_ref3) {
+   })));
+ };
+ 
+-var generateClassName = styles.createGenerateClassName({
+-  seed: 'sgo-tables-plugin-'
+-});
+-
+ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+   var onFilterChange = _ref.onFilterChange,
+       filterHandler = _ref.filterHandler;
+@@ -9342,7 +9341,6 @@ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+       setDate = _useState2[1];
+ 
+   return /*#__PURE__*/React__default["default"].createElement(styles.StylesProvider, {
+-    generateClassName: generateClassName
+   }, /*#__PURE__*/React__default["default"].createElement(styles.ThemeProvider, {
+     theme: DatePickerTheme
+   }, /*#__PURE__*/React__default["default"].createElement(pickers.MuiPickersUtilsProvider, {
 diff --git a/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css b/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
-index 006716e..66ffcce 100644
+index 006716e..3b2da3f 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
 +++ b/node_modules/@skiff-org/prosemirror-tables/style/table-filters.css
 @@ -149,22 +149,27 @@

@@ -21,13 +21,15 @@ export function CommentThreadsListDisplayProvider ({ children }: { children: Rea
 
   const [showingCommentThreadsList, setShowingCommentThreadsList] = useState(false);
   useEffect(() => {
-    // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
-    const cachedData: ThreadWithComments[] | undefined = cache.get(`pages/${currentPageId}/threads`);
-    if (cachedData) {
-      setShowingCommentThreadsList(cachedData.filter(thread => thread && !thread.resolved).length > 0);
-    }
-    else {
-      setShowingCommentThreadsList(false);
+    if (currentPageId) {
+      // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
+      const cachedData: ThreadWithComments[] | undefined = cache.get(`pages/${currentPageId}/threads`);
+      if (cachedData) {
+        setShowingCommentThreadsList(cachedData.filter(thread => thread && !thread.resolved).length > 0);
+      }
+      else {
+        setShowingCommentThreadsList(false);
+      }
     }
   }, [isValidating, currentPageId]);
 

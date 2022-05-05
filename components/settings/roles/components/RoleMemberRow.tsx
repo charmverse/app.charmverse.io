@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
+import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import Avatar from 'components/common/Avatar';
 import { User } from 'models';
 import getDisplayName from 'lib/users/getDisplayName';

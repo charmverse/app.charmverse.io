@@ -11,7 +11,7 @@ import { useUser } from 'hooks/useUser';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { Chains, RPC } from 'connectors';
 import { useContext } from 'react';
-import { shortenHex } from 'lib/utilities/strings';
+import { getDisplayName } from 'lib/users';
 import useENSName from 'hooks/useENSName';
 import AccountModal from 'components/common/PageLayout/components/Account/components/AccountModal';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
@@ -79,6 +79,9 @@ function Account (): JSX.Element {
   }
 
   const isConnectedWithWallet = (account && chainId);
+
+  const userName = ENSName || (user ? getDisplayName(user) : '');
+
   return (
     <AccountCard>
       <StyledButtonGroup variant='contained' disableElevation>
@@ -93,9 +96,9 @@ function Account (): JSX.Element {
         )}
         <AccountButton
           onClick={accountModalState.open}
-          endIcon={<Avatar avatar={user?.avatar} name={ENSName ?? user?.addresses[0] ?? account ?? ''} size='small' />}
+          endIcon={<Avatar avatar={user?.avatar} name={userName} size='small' />}
         >
-          {ENSName || user?.username || `${user?.addresses[0] ? shortenHex(user.addresses[0], 3) : ''}`}
+          {userName}
         </AccountButton>
       </StyledButtonGroup>
       <AccountModal
