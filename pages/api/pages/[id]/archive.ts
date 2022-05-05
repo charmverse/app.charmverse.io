@@ -1,6 +1,6 @@
 
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { computeUserPagePermissions, setupPermissionsAfterPageCreated, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -35,7 +35,38 @@ async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiRespons
   });
 
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, archive ? 'archive' : 'restore');
+  // If we are restoring page then severe the link with parent, only if its not of type card
+  // A card type page can't doesn't have any meaning without its parent, and it gets a lot of metadata from its parent
+  if (!archive) {
+    const page = await prisma.page.findUnique({
+      where: {
+        id: pageId
+      },
+      select: {
+        type: true
+      }
+    });
+    if (page?.type !== 'card') {
+      await prisma.page.update({
+        where: {
+          id: pageId
+        },
+        data: {
+          parentId: null
+        }
+      });
 
+      await prisma.block.update({
+        where: {
+          id: pageId
+        },
+        data: {
+          parentId: undefined
+        }
+      });
+      await setupPermissionsAfterPageRepositioned(pageId);
+    }
+  }
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }
 

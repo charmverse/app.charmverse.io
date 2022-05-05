@@ -1,4 +1,4 @@
-import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography, TextField } from '@mui/material';
+import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography, TextField, Box } from '@mui/material';
 import { usePages } from 'hooks/usePages';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
@@ -104,45 +104,47 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
       open={isOpen}
       onClose={onClose}
       title={(
-        <>
-          Trash
-          <Typography variant='body2' color='secondary'>{archivedPages.length} pages</Typography>
-        </>
+        <Box width='100%'>
+          <Box mb={1} display='flex' justifyContent='space-between'>
+            Trash
+            <Typography variant='body2' color='secondary'>{archivedPages.length} pages</Typography>
+          </Box>
+          {archivedPages.length !== 0 && (
+          <TextField
+            placeholder='Page 1'
+            fullWidth
+            sx={{
+              '& .MuiFormHelperText-root': {
+                margin: 0,
+                marginTop: 0.5,
+                opacity: 0.5,
+                fontWeight: 500
+              }
+            }}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            helperText='Type to filter archived pages by their title'
+          />
+          )}
+        </Box>
       )}
     >
       {archivedPages.length === 0
         ? <Typography sx={{ pl: 4 }} variant='subtitle1' color='secondary'>No archived pages</Typography>
         : (
-          <>
-            <TextField
-              fullWidth
-              sx={{
-                px: 2,
-                '& .MuiFormHelperText-root': {
-                  margin: 0,
-                  marginTop: 0.5,
-                  opacity: 0.5,
-                  fontWeight: 500
-                }
-              }}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              helperText='Type to filter archived pages by their title'
-            />
-            <List>
-              {searchTextMatchedPages.map((archivedPage) => {
-                return (
-                  <ArchivedPageItem
-                    key={archivedPage.id}
-                    archivedPage={archivedPage}
-                    disabled={isMutating}
-                    onDelete={onDeletePage}
-                    onRestore={onRestorePage}
-                  />
-                );
-              })}
-            </List>
-          </>
+          <List>
+            {searchTextMatchedPages.map((archivedPage) => {
+              return (
+                <ArchivedPageItem
+                  key={archivedPage.id}
+                  archivedPage={archivedPage}
+                  disabled={isMutating}
+                  onDelete={onDeletePage}
+                  onRestore={onRestorePage}
+                />
+              );
+            })}
+          </List>
         )}
     </Modal>
   );
