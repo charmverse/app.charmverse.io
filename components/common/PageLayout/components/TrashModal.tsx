@@ -5,22 +5,17 @@ import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { Page, PageContent } from 'models';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RestoreIcon from '@mui/icons-material/Restore';
-import charmClient from 'charmClient';
-import { mutate } from 'swr';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemo, useState } from 'react';
 import { DateTime } from 'luxon';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import Link from 'next/link';
 import { fancyTrim } from 'lib/utilities/strings';
 import PageIcon from './PageIcon';
 
 export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, isOpen: boolean}) {
-  const { pages, getPagePermissions } = usePages();
+  const { pages, deletePage, restorePage, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
   const [isMutating, setIsMutating] = useState(false);
-  const dispatch = useAppDispatch();
 
   const deletedPages = useMemo(() => (Object
     .values(pages)
@@ -28,21 +23,6 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
         && getPagePermissions(page.id).delete) as Page[]).sort((deletedPageA, deletedPageB) => deletedPageA.deletedAt && deletedPageB.deletedAt
     ? new Date(deletedPageB.deletedAt).getTime() - new Date(deletedPageA.deletedAt).getTime()
     : 0), [pages]);
-
-  async function deletePage (pageId: string) {
-    setIsMutating(true);
-    await charmClient.deletePage(pageId);
-    await mutate(`pages/${space?.id}`);
-    setIsMutating(false);
-  }
-
-  async function restorePages (pageId: string) {
-    setIsMutating(true);
-    await charmClient.restorePage(pageId);
-    await mutate(`pages/${space?.id}`);
-    dispatch(initialLoad());
-    setIsMutating(false);
-  }
 
   // Remove the pages you dont have delete access of
   return (
@@ -68,16 +48,18 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
                     <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
                       <PageIcon pageType={deletedPage.type} icon={deletedPage.icon} isEditorEmpty={isEditorEmpty} />
                     </ListItemIcon>
-                    <ListItemText secondary={DateTime.fromJSDate(new Date(deletedPage.deletedAt!)).toRelative({ base: (DateTime.now()) })}>
+                    <ListItemText secondary={DateTime.fromJSDate(new Date(deletedPage.deletedAt as Date)).toRelative({ base: (DateTime.now()) })}>
                       {fancyTrim(deletedPage.title, 34) || 'Untitled'}
                     </ListItemText>
                     <div onClick={e => e.stopPropagation()}>
                       <IconButton
                         disabled={isMutating}
                         size='small'
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.preventDefault();
-                          restorePages(deletedPage.id);
+                          setIsMutating(true);
+                          await restorePage(deletedPage.id);
+                          setIsMutating(false);
                         }}
                       >
                         <Tooltip arrow placement='top' title='Restore page'>
@@ -87,9 +69,11 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
                       <IconButton
                         disabled={isMutating}
                         size='small'
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.preventDefault();
-                          deletePage(deletedPage.id);
+                          setIsMutating(true);
+                          await deletePage(deletedPage.id);
+                          setIsMutating(false);
                         }}
                       >
                         <Tooltip arrow placement='top' title='Delete page permanently'>

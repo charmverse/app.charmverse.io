@@ -22,6 +22,7 @@ import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
+import { DeletePageResponse } from 'pages/api/pages/[id]';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -118,15 +119,15 @@ class CharmClient {
   }
 
   archivePage (pageId: string) {
-    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}?action=archive`);
+    return http.DELETE<DeletePageResponse>(`/api/pages/${pageId}?action=archive`);
   }
 
-  async deletePage (pageId: string) {
-    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}?action=delete`);
+  deletePage (pageId: string) {
+    return http.DELETE<DeletePageResponse>(`/api/pages/${pageId}?action=delete`);
   }
 
-  async restorePage (pageId: string) {
-    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}?action=restore`);
+  restorePage (pageId: string) {
+    return http.DELETE<DeletePageResponse>(`/api/pages/${pageId}?action=restore`);
   }
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {

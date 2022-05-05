@@ -8,6 +8,8 @@ import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 import useIsAdmin from './useIsAdmin';
@@ -21,6 +23,8 @@ type IContext = {
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   getPagePermissions: (pageId: string) => IPagePermissionFlags,
+  deletePage: (pageId: string) => Promise<void>,
+  restorePage: (pageId: string, route?: boolean) => Promise<void>,
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -32,7 +36,9 @@ export const PagesContext = createContext<Readonly<IContext>>({
   setPages: () => undefined,
   isEditing: true,
   setIsEditing: () => { },
-  getPagePermissions: () => new AllowedPagePermissions()
+  getPagePermissions: () => new AllowedPagePermissions(),
+  deletePage: () => undefined as any,
+  restorePage: () => undefined as any
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
@@ -45,8 +51,42 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const { data } = useSWR(() => space ? `pages/${space?.id}` : null, (e) => {
     return charmClient.getPages(space!.id);
   }, { refreshInterval });
+  const dispatch = useAppDispatch();
 
   const isAdmin = useIsAdmin();
+
+  async function deletePage (pageId: string) {
+    const { deletedPageIds } = await charmClient.deletePage(pageId);
+    deletedPageIds.forEach(deletedPageId => {
+      delete pages[deletedPageId];
+    });
+    setPages({ ...pages });
+    // If the current page has been deleted permanently route to the first alive page
+    if (deletedPageIds.includes(currentPageId)) {
+      router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.deletedAt === null)?.path}`);
+    }
+  }
+
+  async function restorePage (pageId: string, route?: boolean) {
+    route = route ?? false;
+    const { deletedPageIds } = await charmClient.restorePage(pageId);
+    deletedPageIds.forEach(deletePageId => {
+      if (pages[deletePageId]) {
+        pages[deletePageId] = {
+          ...pages[deletePageId],
+          deletedAt: null
+        } as Page;
+      }
+    });
+    setPages({ ...pages });
+    if (route) {
+      // Without routing the banner doesn't go away, even though we are updating the state :/
+      const page = pages[pageId];
+      router.push(`/${router.query.domain}/${page?.path}`);
+    }
+    // TODO: Better focalboard blocks api to only fetch blocks by id
+    dispatch(initialLoad());
+  }
 
   useEffect(() => {
     if (data) {
@@ -102,7 +142,9 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     pages,
     setCurrentPageId,
     setPages,
-    getPagePermissions
+    getPagePermissions,
+    deletePage,
+    restorePage
   }), [currentPageId, isEditing, router, pages, user]);
 
   return (

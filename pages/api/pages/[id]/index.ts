@@ -4,9 +4,14 @@ import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } fro
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
-import { Page } from '@prisma/client';
+import { Block, Page } from '@prisma/client';
 import { prisma } from 'db';
 import { ChildModificationAction, modifyChildPages } from 'lib/pages/modifyChildPages';
+
+export interface DeletePageResponse {
+  deletedPageIds: string[]
+  rootBlock: Block | null
+}
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -60,7 +65,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(pageWithPermission);
 }
 
-async function deletePage (req: NextApiRequest, res: NextApiResponse) {
+async function deletePage (req: NextApiRequest, res: NextApiResponse<DeletePageResponse>) {
   const pageId = req.query.id as string;
   const childModificationAction = req.query.action as ChildModificationAction;
   const userId = req.session.user.id;
@@ -80,9 +85,9 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const modifiedChildCount = await modifyChildPages(pageId, userId, childModificationAction);
+  const modifiedChildPageIds = await modifyChildPages(pageId, userId, childModificationAction);
 
-  return res.status(200).json({ deletedCount: modifiedChildCount.length, rootBlock });
+  return res.status(200).json({ deletedPageIds: modifiedChildPageIds, rootBlock });
 }
 
 export default withSessionRoute(handler);
