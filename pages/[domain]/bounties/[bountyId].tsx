@@ -9,9 +9,7 @@ export default function BountyPage () {
   setTitle('Bounties');
 
   return (
-    <Box py={3} px='80px'>
-      <BountyDetails />
-    </Box>
+    <BountyDetails />
   );
 
 }
