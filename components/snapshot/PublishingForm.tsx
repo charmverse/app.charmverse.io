@@ -62,13 +62,11 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
-    if (library) {
-      library.getBlockNumber()
-        .then((blockNum: number) => {
-          setSnapshotBlockNumber(blockNum);
-        });
+    if (snapshotBlockNumber === 1) {
+      setCurrentBlockNumberAsDefault();
     }
-  }, [library]);
+
+  }, [snapshotSpace]);
 
   useEffect(() => {
     verifyUserCanPostToSnapshot();
@@ -77,6 +75,14 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   useEffect(() => {
     checkMarkdownLength();
   }, [page]);
+
+  async function setCurrentBlockNumberAsDefault () {
+    if (snapshotSpace) {
+      const provider = await snapshot.utils.getProvider(snapshotSpace.network);
+      const blockNum = await provider.getBlockNumber();
+      setSnapshotBlockNumber(blockNum);
+    }
+  }
 
   function checkMarkdownLength () {
     const content = generateMarkdown(page, false);
@@ -263,7 +269,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 0 }}
                 fullWidth
                 error={!endDateAfterStart}
-                helperText={`This is the block number on the ${getChainById(parseInt(snapshotSpace.network))?.chainName ?? ''} blockchain by which DAO members must have held tokens to be able to vote.`}
+                helperText={`This is the block number on the ${getChainById(parseInt(snapshotSpace.network))?.chainName ?? ''} blockchain by which DAO members must have held tokens to be able to vote.\r\nThe default value is the current block number.`}
               />
             </Grid>
 
