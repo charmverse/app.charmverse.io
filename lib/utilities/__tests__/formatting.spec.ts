@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { formatMoney } from '../formatting';
 
 describe('amount formating', () => {
