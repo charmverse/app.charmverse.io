@@ -89,6 +89,10 @@ export default function InputGeneratorText ({ onChange, title = 'Options', minim
       })
       }
 
+      <Grid item>
+        <Typography display='flex' alignItems='center'>Add row <AddBoxIcon onClick={addRow} sx={{ ml: 1 }} /></Typography>
+      </Grid>
+
       {
         !hasEnoughOptions && (
           <Grid item>
@@ -96,10 +100,6 @@ export default function InputGeneratorText ({ onChange, title = 'Options', minim
           </Grid>
         )
       }
-
-      <Grid item>
-        <Typography display='flex' alignItems='center'>Add row <AddBoxIcon onClick={addRow} sx={{ ml: 1 }} /></Typography>
-      </Grid>
 
     </Grid>
   );

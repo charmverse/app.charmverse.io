@@ -258,6 +258,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
           <Grid container xs direction='column' spacing={3}>
 
             <Grid item>
+              <FieldLabel>Voting type</FieldLabel>
               <InputEnumToOption keyAndLabel={SnapshotVotingMode} defaultValue='single-choice' onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)} />
             </Grid>
 
@@ -266,7 +267,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
             </Grid>
 
             <Grid item>
-              <InputGeneratorText minimumOptions={2} onChange={options => setVotingOptions(options)} />
+              <InputGeneratorText title='Voting options' minimumOptions={2} onChange={options => setVotingOptions(options)} />
             </Grid>
 
             <Grid item>
