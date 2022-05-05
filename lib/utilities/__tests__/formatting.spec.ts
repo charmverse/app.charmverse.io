@@ -1,10 +1,15 @@
-/**
- * @jest-environment jsdom
- */
-
 import { formatMoney } from '../formatting';
 
 describe('amount formating', () => {
+
+  beforeEach(() => {
+    const windowSpy = jest.spyOn(global, 'window', 'get');
+    windowSpy.mockImplementation(() => ({
+      navigator: {
+        language: 'en-US'
+      }
+    }));
+  });
 
   it('should be correct for values larger than 1', () => {
     const amount = formatMoney(2932.12345, 'USD');
