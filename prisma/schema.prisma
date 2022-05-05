@@ -241,15 +241,16 @@ model Transaction {
 }
 
 model TokenGate {
-  id         String      @id @default(uuid()) @db.Uuid
-  createdAt  DateTime    @default(now())
-  createdBy  String      @db.Uuid()
-  spaceId    String      @db.Uuid
-  space      Space       @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  conditions Json
-  resourceId Json
-  userRole   String?
-  spaceRoles SpaceRole[]
+  id              String            @id @default(uuid()) @db.Uuid
+  createdAt       DateTime          @default(now())
+  createdBy       String            @db.Uuid()
+  spaceId         String            @db.Uuid
+  space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  conditions      Json
+  resourceId      Json
+  userRole        String?
+  spaceRoles      SpaceRole[]
+  tokenGateToRoles TokenGateToRole[]
 }
 
 enum WalletType {
@@ -284,6 +285,18 @@ model Role {
   permissions      PagePermission[]
 
   @@unique([spaceId, name])
+  TokenGateToRole TokenGateToRole[]
+}
+
+model TokenGateToRole {
+  id          String    @id @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  tokenGateId String    @db.Uuid
+  tokenGate   TokenGate @relation(fields: [tokenGateId], references: [id], onDelete: Cascade)
+  roleId      String    @db.Uuid
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([tokenGateId, roleId])
 }
 
 model SpaceRoleToRole {

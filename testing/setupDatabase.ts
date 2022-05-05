@@ -1,4 +1,4 @@
-import { Page, Prisma, Space, SpaceApiToken } from '@prisma/client';
+import { Block, Page, Prisma, Space, SpaceApiToken } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -40,7 +40,8 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
         updatedAt: (new Date()).toISOString(),
         spaceRoles: {
           create: {
-            userId: user.id
+            userId: user.id,
+            isAdmin: true
           }
         }
       },
@@ -59,7 +60,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   };
 }
 
-export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Partial<Pick<Page, 'parentId' | 'title' | 'content'>>): Promise<IPageWithPermissions> {
+export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {
   return prisma.page.create({
     data: {
       contentText: '',
@@ -78,7 +79,8 @@ export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Parti
           id: options.spaceId as string
         }
       },
-      parentId: options.parentId
+      parentId: options.parentId,
+      deletedAt: options.deletedAt ?? null
     },
     include: {
       permissions: {
@@ -86,6 +88,32 @@ export function createPage (options: Pick<Page, 'spaceId' | 'createdBy'> & Parti
           sourcePermission: true
         }
       }
+    }
+  });
+}
+
+export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' | 'rootId'>): Promise<Block> {
+  return prisma.block.create({
+    data: {
+      title: options.title || 'Example',
+      type: 'card',
+      user: {
+        connect: {
+          id: options.createdBy
+        }
+      },
+      updatedBy: options.createdBy,
+      space: {
+        connect: {
+          id: options.spaceId as string
+        }
+      },
+      rootId: options.rootId,
+      deletedAt: options.deletedAt ?? null,
+      fields: {},
+      parentId: options.parentId || options.rootId,
+      schema: 0,
+      id: v4()
     }
   });
 }

@@ -1,0 +1,8 @@
+import StatsD from 'hot-shots';
+
+const dogstatsd = new StatsD();
+
+// Gauges are used to periodically take measurements or snapshots of a metric at a single point in time
+export function gauge (metricName: string, value: number) {
+  dogstatsd.gauge(`charm.${metricName}`, value);
+}

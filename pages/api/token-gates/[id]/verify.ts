@@ -39,8 +39,14 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
           spaceId: tokenGate.spaceId
         }
       });
+      const tokenGateToRoles = await prisma.tokenGateToRole.findMany({
+        where: {
+          tokenGateId
+        }
+      });
+
       if (!spaceRole) {
-        await prisma.spaceRole.create({
+        const createdSpaceRole = await prisma.spaceRole.create({
           data: {
             isAdmin: false,
             userId: user.id,
@@ -49,22 +55,13 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
             tokenGateConnectedDate: new Date()
           }
         });
-        console.log('Gave user access to workspace', { tokenGateId: tokenGate.id, userId: user.id });
-      }
-      else if (spaceRole.tokenGateId || spaceRole.isAdmin !== true) {
-        await prisma.spaceRole.update({
-          where: {
-            spaceUser: {
-              spaceId: spaceRole.spaceId,
-              userId: spaceRole.userId
-            }
-          },
-          data: {
-            isAdmin: false,
-            tokenGateId: tokenGate.id,
-            tokenGateConnectedDate: new Date()
-          }
+        await prisma.spaceRoleToRole.createMany({
+          data: tokenGateToRoles.map(tokenGateToRole => ({
+            roleId: tokenGateToRole.roleId,
+            spaceRoleId: createdSpaceRole.id
+          }))
         });
+        console.log('Gave user access to workspace', { tokenGateId: tokenGate.id, userId: user.id });
       }
     }
     const space = await prisma.space.findFirst({
