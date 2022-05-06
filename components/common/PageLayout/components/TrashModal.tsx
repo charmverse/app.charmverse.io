@@ -111,19 +111,10 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
           </Box>
           {archivedPages.length !== 0 && (
           <TextField
-            placeholder='Page 1'
+            placeholder='Filter by page title...'
             fullWidth
-            sx={{
-              '& .MuiFormHelperText-root': {
-                margin: 0,
-                marginTop: 0.5,
-                opacity: 0.5,
-                fontWeight: 500
-              }
-            }}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            helperText='Type to filter archived pages by their title'
           />
           )}
         </Box>
