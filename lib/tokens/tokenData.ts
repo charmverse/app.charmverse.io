@@ -14,6 +14,8 @@ export interface ITokenMetadata {
   logo?: string
 }
 
+export type TokenInfo = Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & {isContract: boolean};
+
 /**
  * Call external provider to get information about a specific cryptocurrency
  */
@@ -70,7 +72,7 @@ export function getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRe
  * Returns a standardised shape for either a contract address, or a native currency
  * @param paymentMethods Call this function from a component that can access the usePaymentMethods hook which provides available methods to search through
  */
-export function getTokenInfo (paymentMethods: PaymentMethod[], symbolOrAddress: string): Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & {isContract: boolean} {
+export function getTokenInfo (paymentMethods: PaymentMethod[], symbolOrAddress: string): TokenInfo {
 
   const paymentMethod = paymentMethods.find(method => (
     method.contractAddress === symbolOrAddress || method.tokenSymbol === symbolOrAddress
@@ -80,7 +82,7 @@ export function getTokenInfo (paymentMethods: PaymentMethod[], symbolOrAddress: 
   const tokenSymbol = paymentMethod?.tokenSymbol || symbolOrAddress;
   const tokenName = paymentMethod?.tokenName || CryptoCurrencyList[symbolOrAddress as CryptoCurrency];
 
-  const tokenInfo: Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & {isContract: boolean} = {
+  const tokenInfo: TokenInfo = {
     tokenName,
     tokenSymbol,
     tokenLogo: tokenLogo as string,
