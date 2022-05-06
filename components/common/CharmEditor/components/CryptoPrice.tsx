@@ -10,6 +10,7 @@ import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { CryptoCurrency, FiatCurrency, IPairQuote } from 'models/Currency';
 import { formatMoney } from 'lib/utilities/formatting';
 import { RelativeTime } from 'components/common/RelativeTime';
+import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
 import charmClient from 'charmClient';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { CryptoCurrencies, getChainById } from 'connectors';
@@ -162,7 +163,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
               active={selectionList === 'base'}
               onClick={() => toggleSelectionList('base')}
             >
-              {getTokenInfo(paymentMethods, baseCurrency)?.tokenSymbol}
+              <CoinLogoAndTicker {...getTokenInfo(paymentMethods, baseCurrency)} />
             </StyledButton>
             <Typography component='span' color='secondary'>/</Typography>
             <StyledButton
