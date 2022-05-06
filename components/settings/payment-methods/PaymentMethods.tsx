@@ -4,7 +4,6 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import Button from 'components/common/Button';
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import useIsAdmin from 'hooks/useIsAdmin';
 import CustomERCTokenForm from './components/CustomERCTokenForm';
 import GnosisSafeForm from './components/GnosisSafeForm';
 import Legend from '../Legend';
@@ -15,9 +14,7 @@ export default function PaymentMethods () {
   const gnosisPopupState = usePopupState({ variant: 'popover', popupId: 'gnosis-popup' });
   const ERC20PopupState = usePopupState({ variant: 'popover', popupId: 'ERC20-popup' });
 
-  const [paymentMethods] = usePaymentMethods();
-
-  const isAdmin = useIsAdmin();
+  const [paymentMethods,, refreshPaymentMethods] = usePaymentMethods();
 
   return (
     <>
@@ -25,7 +22,12 @@ export default function PaymentMethods () {
         <CustomERCTokenForm onSubmit={ERC20PopupState.close} />
       </Modal>
       <Modal title='Add a Gnosis Safe wallet' open={gnosisPopupState.isOpen} onClose={gnosisPopupState.close} size='500px'>
-        <GnosisSafeForm onSubmit={gnosisPopupState.close} />
+        <GnosisSafeForm
+          onSubmit={() => {
+            gnosisPopupState.close();
+            refreshPaymentMethods();
+          }}
+        />
       </Modal>
 
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>

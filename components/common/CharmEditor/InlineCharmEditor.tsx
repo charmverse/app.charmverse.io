@@ -169,7 +169,8 @@ export default function CharmEditor (
       className='czi-editor-frame-body'
       noPadding={noPadding}
       pmViewOpts={{
-        editable: () => !readOnly
+        editable: () => !readOnly,
+        plugins: []
       }}
       placeholderComponent={(
         <Placeholder

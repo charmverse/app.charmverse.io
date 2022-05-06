@@ -203,30 +203,31 @@ export default function BountyDetails () {
 
   return (
     <ScrollableWindow>
+      <Box py={3} px='80px'>
 
-      <Container top={20}>
+        <Container top={20}>
 
-        <Box sx={{
-          justifyContent: 'space-between',
-          gap: 1,
-          display: 'flex'
-        }}
-        >
-          <Box flexGrow={1}>
-            <Typography
-              variant='h1'
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                fontSize: '40px',
-                fontWeight: 700,
-                gap: 1
-              }}
-            >
-              <Box component='span'>
-                {bounty.title}
-              </Box>
-              {
+          <Box sx={{
+            justifyContent: 'space-between',
+            gap: 1,
+            display: 'flex'
+          }}
+          >
+            <Box flexGrow={1}>
+              <Typography
+                variant='h1'
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: '40px',
+                  fontWeight: 700,
+                  gap: 1
+                }}
+              >
+                <Box component='span'>
+                  {bounty.title}
+                </Box>
+                {
                 viewerCanModifyBounty === true && (
                   <>
                     <IconButton onClick={bountyEditModal.open}>
@@ -238,38 +239,38 @@ export default function BountyDetails () {
                   </>
                 )
               }
-            </Typography>
+              </Typography>
+            </Box>
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center'
+            }}
+            >
+              <BountyStatusBadge bounty={bounty} />
+            </Box>
           </Box>
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center'
-          }}
-          >
-            <BountyStatusBadge bounty={bounty} />
-          </Box>
-        </Box>
 
-        <Box mt={3} mb={5}>
-          <Box my={2}>
-            {CharmEditorMemoized}
-          </Box>
-          <Grid
-            container
-            direction='row'
-            spacing={2}
-          >
-            <Grid item xs={6}>
-              <Card sx={{ height: '100%', p: 2 }} variant='outlined'>
-                <CardHeader subheader='Reviewer' sx={{ pt: 0 }} />
-                <CardContent sx={{ minHeight: '70px', pt: 0.5, pb: 0.5 }}>
-                  <Box
-                    component='div'
-                    sx={{ display: 'flex',
-                      gap: 1,
-                      alignItems: 'center',
-                      justifyContent: 'flex-start' }}
-                  >
-                    {
+          <Box mt={3} mb={5}>
+            <Box my={2}>
+              {CharmEditorMemoized}
+            </Box>
+            <Grid
+              container
+              direction='row'
+              spacing={2}
+            >
+              <Grid item xs={6}>
+                <Card sx={{ height: '100%', p: 2 }} variant='outlined'>
+                  <CardHeader subheader='Reviewer' sx={{ pt: 0 }} />
+                  <CardContent sx={{ minHeight: '70px', pt: 0.5, pb: 0.5 }}>
+                    <Box
+                      component='div'
+                      sx={{ display: 'flex',
+                        gap: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-start' }}
+                    >
+                      {
               reviewerUser ? (
                 <>
                   <Avatar avatar={reviewerUser.avatar} name={reviewerENSName || getDisplayName(reviewerUser)} />
@@ -281,24 +282,24 @@ export default function BountyDetails () {
 
               }
 
-                  </Box>
-                </CardContent>
-                <CardActions sx={{ pt: 0.5 }}>
+                    </Box>
+                  </CardContent>
+                  <CardActions sx={{ pt: 0.5 }}>
 
-                  <Box flexDirection='row' gap={1} display='flex'>
-                    {/* Assign reviewer */}
-                    {!reviewerUser && isAdmin && (
+                    <Box flexDirection='row' gap={1} display='flex'>
+                      {/* Assign reviewer */}
+                      {!reviewerUser && isAdmin && (
                       <Button color='secondary' variant='outlined' onClick={bountyEditModal.open}>Assign reviewer</Button>
-                    )}
-                    {/* Review completed work */}
-                    {bounty.status === 'review' && isReviewer && (
-                    <>
-                      <Button onClick={markAsComplete}>Mark as complete</Button>
-                      <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
-                    </>
-                    )}
-                    {/* Proceed with payment */}
-                    {
+                      )}
+                      {/* Review completed work */}
+                      {bounty.status === 'review' && isReviewer && (
+                      <>
+                        <Button onClick={markAsComplete}>Mark as complete</Button>
+                        <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
+                      </>
+                      )}
+                      {/* Proceed with payment */}
+                      {
                     bounty.status === 'complete' && (
                       <Box>
                         <BountyPaymentButton
@@ -319,54 +320,54 @@ export default function BountyDetails () {
                       </Box>
                     )
                   }
-                  </Box>
-
-                </CardActions>
-              </Card>
-            </Grid>
-
-            <Grid item xs={6}>
-              <Card sx={{ height: '100%', p: 2 }} variant='outlined'>
-                <CardHeader subheader='Assignee' sx={{ pt: 0 }} />
-                <CardContent sx={{ minHeight: '70px', pt: 0.5, pb: 0.5 }}>
-                  <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
-                    {assigneeName && (
-                    <>
-                      <Avatar avatar={assigneeUser?.avatar} name={assigneeENSName || getDisplayName(assigneeUser)} />
-                      <Typography variant='h6' component='span' sx={{ pl: 0.5 }}>
-                        {assigneeName}
-                      </Typography>
-                    </>
-                    )}
-                    {!assigneeName && !isApplicant && (
-
-                    <Typography variant='body2'>Nobody has been assigned to this bounty yet</Typography>
-
-                    )}
-                    {!assigneeName && isApplicant && (
-                    <Box>
-                      <Typography variant='body2'>You've applied to this bounty.</Typography>
                     </Box>
-                    )}
 
-                  </Box>
-                </CardContent>
-                <CardActions sx={{ pt: 0.5, pb: 0.5 }}>
-                  <Box flexDirection='row' gap={1} display='flex'>
-                    { bounty.status === 'open' && !isApplicant && (
+                  </CardActions>
+                </Card>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Card sx={{ height: '100%', p: 2 }} variant='outlined'>
+                  <CardHeader subheader='Assignee' sx={{ pt: 0 }} />
+                  <CardContent sx={{ minHeight: '70px', pt: 0.5, pb: 0.5 }}>
+                    <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
+                      {assigneeName && (
+                      <>
+                        <Avatar avatar={assigneeUser?.avatar} name={assigneeENSName || getDisplayName(assigneeUser)} />
+                        <Typography variant='h6' component='span' sx={{ pl: 0.5 }}>
+                          {assigneeName}
+                        </Typography>
+                      </>
+                      )}
+                      {!assigneeName && !isApplicant && (
+
+                      <Typography variant='body2'>Nobody has been assigned to this bounty yet</Typography>
+
+                      )}
+                      {!assigneeName && isApplicant && (
+                      <Box>
+                        <Typography variant='body2'>You've applied to this bounty.</Typography>
+                      </Box>
+                      )}
+
+                    </Box>
+                  </CardContent>
+                  <CardActions sx={{ pt: 0.5, pb: 0.5 }}>
+                    <Box flexDirection='row' gap={1} display='flex'>
+                      { bounty.status === 'open' && !isApplicant && (
                       <Button disabled={user?.addresses.length === 0} onClick={toggleApplicationDialog}>Apply now</Button>
-                    )}
-                    {isAssignee && bounty.status === 'assigned' && (
-                    <Button onClick={requestReview}>Request review</Button>
-                    )}
-                  </Box>
-                </CardActions>
-              </Card>
+                      )}
+                      {isAssignee && bounty.status === 'assigned' && (
+                      <Button onClick={requestReview}>Request review</Button>
+                      )}
+                    </Box>
+                  </CardActions>
+                </Card>
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>
+          </Box>
 
-        {
+          {
           bounty && (
             <BountyApplicantList
               applications={applications}
@@ -376,20 +377,20 @@ export default function BountyDetails () {
             />
           )
         }
-        <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={bountyEditModal.isOpen} onClose={bountyEditModal.close} />
+          <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={bountyEditModal.isOpen} onClose={bountyEditModal.close} />
 
-        <Modal title='Bounty Application' size='large' open={showApplicationDialog} onClose={toggleApplicationDialog}>
-          <ApplicationEditorForm
-            bountyId={bounty.id}
-            onSubmit={applicationSubmitted}
-            proposal={applicantProposal}
-            mode={applicantProposal ? 'update' : 'create'}
-          />
-        </Modal>
+          <Modal title='Bounty Application' size='large' open={showApplicationDialog} onClose={toggleApplicationDialog}>
+            <ApplicationEditorForm
+              bountyId={bounty.id}
+              onSubmit={applicationSubmitted}
+              proposal={applicantProposal}
+              mode={applicantProposal ? 'update' : 'create'}
+            />
+          </Modal>
 
-        <Modal open={showBountyDeleteDialog} onClose={toggleBountyDeleteDialog}>
+          <Modal open={showBountyDeleteDialog} onClose={toggleBountyDeleteDialog}>
 
-          {
+            {
             bounty.status !== 'open' && (
             <Typography sx={{ mb: 1 }}>
               {
@@ -400,20 +401,21 @@ export default function BountyDetails () {
             )
           }
 
-          <Typography>
-            Are you sure you want to delete this bounty?
-          </Typography>
+            <Typography>
+              Are you sure you want to delete this bounty?
+            </Typography>
 
-          <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
-            <Button color='error' sx={{ mr: 2, fontWeight: 'bold' }} onClick={deleteBounty}>Delete bounty</Button>
+            <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
+              <Button color='error' sx={{ mr: 2, fontWeight: 'bold' }} onClick={deleteBounty}>Delete bounty</Button>
 
-            {
+              {
             bounty.status === 'open' && <Button color='secondary' onClick={toggleBountyDeleteDialog}>Cancel</Button>
           }
-          </Box>
+            </Box>
 
-        </Modal>
-      </Container>
+          </Modal>
+        </Container>
+      </Box>
     </ScrollableWindow>
   );
 }

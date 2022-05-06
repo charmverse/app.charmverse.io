@@ -4,7 +4,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Tooltip from '@mui/material/Tooltip';
 import { PaymentMethod } from '@prisma/client';
-import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
+import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import Link from 'components/common/Link';
 import TableRow from 'components/common/Table/TableRow';
 import { getChainById, getChainExplorerLink } from 'connectors';

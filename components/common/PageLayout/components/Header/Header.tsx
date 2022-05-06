@@ -1,7 +1,5 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import SunIcon from '@mui/icons-material/WbSunny';
 import GetAppIcon from '@mui/icons-material/GetApp';

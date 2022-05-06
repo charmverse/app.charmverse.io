@@ -24,20 +24,20 @@ const config = {
         destination: '/:domain/settings/workspace',
         permanent: false
       },
-      // temporary redirect to fix the old redirect from '/' to '/login'
       {
-        source: '/login',
-        destination: '/',
+        source: '/profile',
+        destination: '/profile/tasks',
         permanent: false
       }
     ];
   },
-  webpack (_config, { isServer }) {
+  webpack (_config, { nextRuntime }) {
     _config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack']
     });
-    if (isServer) {
+    // check for nodejs runtime. see https://github.com/vercel/next.js/issues/36237#issuecomment-1117694528
+    if (nextRuntime === 'nodejs') {
       const entry = _config.entry;
       _config.entry = () => {
         return entry().then(_entry => {

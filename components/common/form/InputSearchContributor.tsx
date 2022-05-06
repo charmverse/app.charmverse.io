@@ -53,7 +53,8 @@ function InputSearchContributorBase ({ filter, options, placeholder, ...props }:
       // @ts-ignore - not sure why this fails
       options={filteredOptions}
       autoHighlight
-      getOptionLabel={(user) => cache.get(`@"ENS",102~,"${user.addresses[0]}",${chainId},`) ?? getDisplayName(user)}
+      // user can also be a string if freeSolo=true
+      getOptionLabel={(user) => cache.get(`@"ENS",102~,"${(user as Contributor).addresses[0]}",${chainId},`) ?? getDisplayName(user as Contributor)}
       renderOption={(_props, user) => (
         <ReviewerOption {..._props as any} user={user} />
       )}

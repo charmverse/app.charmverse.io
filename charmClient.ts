@@ -1,11 +1,13 @@
-/* eslint-disable class-methods-use-this */
 
-import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, TelegramUser, TokenGateToRole } from '@prisma/client';
-import * as http from 'adapters/http';
+import {
+  Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
+  Role, Space, TokenGate, Transaction, User, TelegramUser, UserMultiSigWallet, TokenGateToRole
+} from '@prisma/client';
+import { Contributor, LoggedInUser, BountyWithDetails, Task, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
-import { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
+import * as http from 'adapters/http';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -142,6 +144,18 @@ class CharmClient {
 
   unfavoritePage (pageId: string) {
     return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
+  }
+
+  createUserMultiSig (wallet: Partial<UserMultiSigWallet>): Promise<UserMultiSigWallet> {
+    return http.POST('/api/profile/multi-sigs', wallet);
+  }
+
+  listUserMultiSigs (): Promise<UserMultiSigWallet[]> {
+    return http.GET('/api/profile/multi-sigs');
+  }
+
+  deleteUserMultiSig (walletId: string) {
+    return http.DELETE(`/api/profile/multi-sigs/${walletId}`);
   }
 
   getPublicPage (pageId: string) {
@@ -473,8 +487,13 @@ class CharmClient {
     return http.GET('/api/payment-methods', { spaceId });
   }
 
-  deletePaymentMethod (paymentMethodId: string): Promise<PaymentMethod[]> {
+  deletePaymentMethod (paymentMethodId: string) {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
+  }
+
+  // Tasks
+  listTasks (): Promise<Task[]> {
+    return http.GET('/api/tasks');
   }
 
   createRole (role: Partial<Role>): Promise<Role> {
