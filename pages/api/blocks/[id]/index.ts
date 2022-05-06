@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch, requireUser, ApiError } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { deleteNestedChild } from 'lib/pages/deleteNestedChild';
+import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { Block } from '@prisma/client';
 import { prisma } from 'db';
@@ -43,7 +43,7 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
       });
     }
 
-    const deletedChildPageIds = await deleteNestedChild(blockId, userId);
+    const deletedChildPageIds = await modifyChildPages(blockId, userId, 'archive');
     deletedCount = deletedChildPageIds.length;
   }
   else {

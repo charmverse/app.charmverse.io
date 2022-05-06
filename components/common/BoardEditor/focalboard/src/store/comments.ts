@@ -48,11 +48,11 @@ const commentsSlice = createSlice({
 export const {updateComments} = commentsSlice.actions
 export const {reducer} = commentsSlice
 
-export function getCardComments(cardId: string): (state: RootState) => CommentBlock[] {
+export function getCardComments(cardId?: string): (state: RootState) => CommentBlock[] {
     return (state: RootState): CommentBlock[] => {
-        return Object.values(state.comments.comments).
+        return cardId ? Object.values(state.comments.comments).
             filter((c) => c.parentId === cardId).
-            sort((a, b) => a.createdAt - b.createdAt)
+            sort((a, b) => a.createdAt - b.createdAt) : []
     }
 }
 

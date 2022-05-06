@@ -114,7 +114,7 @@ const KanbanCard = React.memo((props: Props) => {
           >
             <IconButton icon={<OptionsIcon />} />
             <Menu position='left'>
-              {pagePermissions.delete && <Menu.Text
+              {pagePermissions.delete && pages[card.id]?.deletedAt === null && <Menu.Text
                 icon={<DeleteIcon />}
                 id='delete'
                 name={intl.formatMessage({ id: 'KanbanCard.delete', defaultMessage: 'Delete' })}

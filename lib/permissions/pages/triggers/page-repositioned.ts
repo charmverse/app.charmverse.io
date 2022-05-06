@@ -1,5 +1,5 @@
 import { getPage, IPageWithPermissions, PageNotFoundError, resolveParentPages } from 'lib/pages/server';
-import { upsertPermission, findExistingPermissionForGroup, hasSameOrMorePermissions, checkParentForSamePermission } from '../actions';
+import { upsertPermission, findExistingPermissionForGroup, hasSameOrMorePermissions } from '../actions';
 
 /**
  * Should be called before the prisma update occurs

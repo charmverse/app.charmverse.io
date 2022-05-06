@@ -104,7 +104,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
       <DialogTitle onClose={onCancel}>Create a workspace</DialogTitle>
       <Divider />
       <br />
-      <Grid container direction='column' spacing={3}>
+      <Grid container direction='column' spacing={2}>
         <Grid item display='flex' justifyContent='center'>
           <Avatar name={watchName} variant='rounded' />
         </Grid>

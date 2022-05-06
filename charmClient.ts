@@ -25,6 +25,7 @@ import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
+import { ModifyChildPagesResponse } from 'lib/pages';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -121,8 +122,16 @@ class CharmClient {
     return http.POST<Page>('/api/pages', pageOpts);
   }
 
+  archivePage (pageId: string) {
+    return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: true });
+  }
+
+  restorePage (pageId: string) {
+    return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: false });
+  }
+
   deletePage (pageId: string) {
-    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}`);
+    return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
   }
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {

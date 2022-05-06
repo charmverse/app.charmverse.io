@@ -114,7 +114,7 @@ export default function GnosisSafeForm ({ onSubmit, isPersonalSafe, defaultChain
   return (
     <div>
       {/* @ts-ignore */}
-      <form onSubmit={handleSubmit(addPaymentMethod)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form onSubmit={handleSubmit(addPaymentMethod)} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
 
           {isPersonalSafe && (
