@@ -61,7 +61,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
       })
     };
     const chain = getLitChainFromChainId(chainId);
-    console.log('chain', chainId, chain);
+
     const authSig = await checkAndSignAuthMessage({
       chain
     });
