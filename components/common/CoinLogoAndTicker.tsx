@@ -11,7 +11,7 @@ type CoinLogoAndTickerProps = TokenInfo;
 export function CoinLogoAndTicker ({ tokenSymbol, tokenLogo }: CoinLogoAndTickerProps) {
 
   return (
-    <Stack direction='row' spacing={0.5}>
+    <Stack direction='row' alignItems='center' spacing={0.5}>
       {
         tokenLogo && (
         <StyledImg
