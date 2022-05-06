@@ -79,7 +79,7 @@ export const specRegistry = new SpecRegistry([
   orderedList.spec(), // OK
   strike.spec(), // OK
   underline.spec(), // OK
-  emojiSpecs(), // ??
+  emojiSpecs(), // OK
   mentionSpecs(), // NO
   code.spec(), // OK
   codeBlock.spec(), // OK

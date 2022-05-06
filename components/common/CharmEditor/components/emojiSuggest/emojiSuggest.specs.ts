@@ -38,6 +38,16 @@ function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): 
       toDOM,
       parseDOM,
       selectable: true
+    },
+    markdown: {
+      toMarkdown: (state, node) => {
+        try {
+          state.text(node.attrs.emoji);
+        }
+        catch (err) {
+          console.log('Conversion err', err);
+        }
+      }
     }
   };
 }
