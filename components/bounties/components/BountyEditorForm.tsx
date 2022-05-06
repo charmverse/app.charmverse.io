@@ -173,7 +173,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
 
   return (
     <div>
-      <form onSubmit={handleSubmit(formValue => submitted(formValue as IBounty))} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form onSubmit={handleSubmit(formValue => submitted(formValue as IBounty))} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InputLabel>

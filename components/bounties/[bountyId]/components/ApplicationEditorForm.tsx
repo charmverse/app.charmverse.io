@@ -63,7 +63,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
 
   return (
     <div>
-      <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <FieldLabel>

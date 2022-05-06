@@ -21,6 +21,7 @@ const ModalContainer = styled.div<{ size: ModalSize }>`
   box-shadow: ${({ theme }) => theme.shadows[15]};
   padding: ${({ theme }) => theme.spacing(4)};
   max-height: calc(80vh - ${({ theme }) => theme.spacing(4)});
+  overflow-y: auto;
 `;
 
 const ScrollableModalContainer = styled(ModalContainer)`

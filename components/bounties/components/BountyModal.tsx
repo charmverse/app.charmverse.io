@@ -19,7 +19,7 @@ const modalTitles: Record<FormMode, string> = {
 export default function BountyModal (props: Props) {
   const { open, onClose, onSubmit, mode = 'create', bounty } = props;
   return (
-    <Modal size='large' title={modalTitles[mode]} open={open} onClose={onClose} sx={{ margin: 'auto', maxHeight: '80vh' }}>
+    <Modal size='large' title={modalTitles[mode]} open={open} onClose={onClose} sx={{ margin: 'auto' }}>
       {open && <BountyEditorForm onSubmit={onSubmit} bounty={bounty} mode={mode} />}
     </Modal>
   );
