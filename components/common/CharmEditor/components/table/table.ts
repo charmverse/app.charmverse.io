@@ -13,7 +13,10 @@ export function spec (): RawSpecs {
   const specs = Object.entries(schemas).map(([name, schema]): RawSpecs => ({
     name,
     schema,
-    type: 'node'
+    type: 'node',
+    markdown: {
+      toMarkdown: () => null
+    }
   }));
   return specs;
 }
