@@ -10,6 +10,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from 'components/common/Link';
 import { Link as TaskLink, Task } from 'models';
 import { useTasks } from 'hooks/useTasks';
+import { useUser } from 'hooks/useUser';
 import useGnosisSafes from 'hooks/useGnosisSafes';
 import useGnosisService from 'hooks/useGnosisService';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
@@ -23,6 +24,7 @@ const StyledTableCell = styled(TableCell)`
 
 export default function TasksList () {
 
+  const [user] = useUser();
   const { data } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs());
   const safes = useGnosisSafes(data?.map(s => s.address) || []);
   const service = useGnosisService();
@@ -30,13 +32,16 @@ export default function TasksList () {
   const tasks = useTasks();
 
   useEffect(() => {
-    if (data && service) {
-      getServiceTaskQueue(service, data.map(s => s.address));
+    if (data && service && user) {
+      getServiceTaskQueue(service, user.addresses, data.map(s => s.address));
     }
-  }, [!!data, service]);
+  }, [!!data, service, !!user]);
 
-  async function getServiceTaskQueue (_service: SafeServiceClient, addresses: string[]) {
-    const results = await Promise.all(addresses.map(address => {
+  async function getServiceTaskQueue (_service: SafeServiceClient, addresses: string[], safeAddresses: string[]) {
+    console.log(addresses);
+    const _safes = await Promise.all(addresses.map(address => _service.getSafesByOwner(address).then(r => r.safes))).then(list => list.flat());
+    console.log('_safes', _safes);
+    const results = await Promise.all(safeAddresses.map(address => {
       console.log('retrieve', address);
       return _service.getAllTransactions(address)
         .catch(err => {

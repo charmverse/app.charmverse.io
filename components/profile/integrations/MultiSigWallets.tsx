@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import styled from '@emotion/styled';
+import { useState } from 'react';
 import { Box, Card, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -14,6 +15,9 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { shortenHex } from 'lib/utilities/strings';
 import charmClient from 'charmClient';
 import { getChainById } from 'connectors';
+import useGnosisSigner from 'lib/gnosis/hooks/useGnosisSigner';
+import { useUser } from 'hooks/useUser';
+import { getSafesForAddresses } from 'lib/gnosis';
 
 interface Wallet {
   id: string;
@@ -40,18 +44,34 @@ export default function MultiSigList () {
 
   const { data } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs());
 
-  const gnosisPopupState = usePopupState({ variant: 'popover', popupId: 'gnosis-popup' });
+  const gnosisSigner = useGnosisSigner();
+  const [user] = useUser();
+  const [isLoadingSafes, setIsLoadingSafes] = useState(false);
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
-
-  function onNewWallet () {
-    mutate('/profile/multi-sigs');
-    gnosisPopupState.close();
-  }
 
   async function deleteWallet (wallet: Wallet) {
     await charmClient.deleteUserMultiSig(wallet.id);
     mutate('/profile/multi-sigs');
-    gnosisPopupState.close();
+    deleteConfirmation.close();
+  }
+
+  async function importSafes () {
+    if (gnosisSigner && user) {
+      setIsLoadingSafes(true);
+      try {
+        const safes = await getSafesForAddresses(gnosisSigner, user.addresses);
+        const safesData = safes.map(safe => ({
+          address: safe.address,
+          chainId: safe.chainId,
+          name: ''
+        }));
+        await charmClient.updateUserMultiSigs(safesData);
+        await mutate('/profile/multi-sigs');
+      }
+      finally {
+        setIsLoadingSafes(false);
+      }
+    }
   }
 
   if (!data) {
@@ -61,17 +81,18 @@ export default function MultiSigList () {
   return (
     <>
       <Legend sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box display='flex' alignItems='center' gap={1}>
+        <Box component='span' display='flex' alignItems='center' gap={1}>
           <KeyIcon fontSize='large' /> Multisig
         </Box>
 
         {data.length > 0 && (
           <Button
-            onClick={gnosisPopupState.open}
+            loading={isLoadingSafes}
+            onClick={importSafes}
             variant='outlined'
             sx={{ float: 'right' }}
           >
-            Add Gnosis Safe wallet
+            Sync Gnosis Safes
           </Button>
         )}
       </Legend>
@@ -79,12 +100,13 @@ export default function MultiSigList () {
       {data.length === 0 && (
         <Card variant='outlined'>
           <Box p={3} textAlign='center'>
-            <Typography color='secondary'>Connect a wallet to view pending transactions under <Link href='/profile/tasks'>My Tasks</Link></Typography>
+            <Typography color='secondary'>Import your Gnosis safes to view pending transactions under <Link href='/profile/tasks'>My Tasks</Link></Typography>
             <br />
             <Button
-              onClick={gnosisPopupState.open}
+              loading={!gnosisSigner || isLoadingSafes}
+              onClick={importSafes}
             >
-              Add Gnosis Safe wallet
+              Import Gnosis Safes
             </Button>
           </Box>
         </Card>
@@ -143,9 +165,6 @@ export default function MultiSigList () {
           </TableBody>
         </Table>
       )}
-      <Modal title='Add a Gnosis Safe wallet' open={gnosisPopupState.isOpen} onClose={gnosisPopupState.close} size='500px'>
-        <GnosisSafeForm isPersonalSafe={true} onSubmit={onNewWallet} />
-      </Modal>
     </>
   );
 }

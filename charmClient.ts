@@ -25,9 +25,8 @@ import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
-import { ModifyChildPagesResponse } from 'lib/pages';
+import { ModifyChildPagesResponse, IPageWithPermissions } from 'lib/pages';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
-import { IPageWithPermissions } from 'lib/pages';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -147,8 +146,8 @@ class CharmClient {
     return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
 
-  createUserMultiSig (wallet: Partial<UserMultiSigWallet>): Promise<UserMultiSigWallet> {
-    return http.POST('/api/profile/multi-sigs', wallet);
+  updateUserMultiSigs (wallets: Partial<UserMultiSigWallet>[]): Promise<UserMultiSigWallet[]> {
+    return http.POST('/api/profile/multi-sigs', wallets);
   }
 
   listUserMultiSigs (): Promise<UserMultiSigWallet[]> {
