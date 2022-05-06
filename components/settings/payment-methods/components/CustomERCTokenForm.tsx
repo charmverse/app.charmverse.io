@@ -156,7 +156,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
           event.preventDefault();
           handleSubmit(addPaymentMethod as any)(event);
         }}
-        style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}
+        style={{ margin: 'auto' }}
       >
         <Grid container direction='column' spacing={3}>
 

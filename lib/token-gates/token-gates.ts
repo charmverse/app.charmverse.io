@@ -12,7 +12,8 @@ export function getChainFromConditions (conditions: Partial<SigningConditions>):
     || 'ethereum';
 }
 
-export function getLitChainFromChainId (chainId?: number): Chain {
+// default to 1 (ethereum) otherwise lit falls back to solana, which has no chainId!
+export function getLitChainFromChainId (chainId: number = 1): Chain {
   const litChain = Object.entries(ALL_LIT_CHAINS).find(([, c]) => c.chainId === chainId);
   return (litChain?.[0] || 'ethereum') as Chain;
 }

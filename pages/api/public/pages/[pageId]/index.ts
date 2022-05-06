@@ -19,8 +19,9 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<{pages: 
 
   const pages: Page[] = [];
   const blocks: Block[] = [];
-  const page = await prisma.page.findUnique({
+  const page = await prisma.page.findFirst({
     where: {
+      deletedAt: null,
       id: pageId as string
     }
   });
@@ -35,6 +36,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<{pages: 
     // For publicly shared board page fetch all of its card pages
     const cardPages = await prisma.page.findMany({
       where: {
+        deletedAt: null,
         parentId: page.id,
         type: 'card'
       }
@@ -43,19 +45,22 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<{pages: 
     pages.push(...cardPages);
   }
   else if (page.type === 'card' && page.parentId) {
-    const boardPage = await prisma.page.findUnique({
+    const boardPage = await prisma.page.findFirst({
       where: {
+        deletedAt: null,
         id: page.parentId
       }
     });
-    const cardBlock = await prisma.block.findUnique({
+    const cardBlock = await prisma.block.findFirst({
       where: {
+        deletedAt: null,
         id: page.id
       }
     });
 
-    const board = await prisma.block.findUnique({
+    const board = await prisma.block.findFirst({
       where: {
+        deletedAt: null,
         id: page.parentId
       }
     });

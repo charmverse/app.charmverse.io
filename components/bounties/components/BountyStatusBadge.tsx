@@ -1,4 +1,3 @@
-
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -130,8 +129,10 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
           <Box sx={{
             display: 'flex',
             flexDirection: 'row',
+            flexWrap: 'wrap',
             width: '100%',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            gap: 1
           }}
           >
             <BountyAmount bounty={bounty} truncate={truncate} />
@@ -195,8 +196,10 @@ function BountyAmount ({ bounty, truncate }: { bounty: Bounty, truncate: boolean
   const [paymentMethods] = usePaymentMethods();
   const tokenInfo = getTokenInfo(paymentMethods, bounty.rewardToken);
 
+  const tooltip = `${chainName} (${tokenInfo.tokenSymbol})`;
+
   return (
-    <Tooltip arrow placement='top' title={chainName}>
+    <Tooltip arrow placement='top' title={tooltip}>
       <div>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box
@@ -236,18 +239,6 @@ function BountyAmount ({ bounty, truncate }: { bounty: Bounty, truncate: boolean
           >
             {truncate ? millify(bounty.rewardAmount) : bounty.rewardAmount}
           </Typography>
-          <Box
-            component='span'
-            mr={2}
-            sx={{
-              position: 'relative',
-              top: 2,
-              fontSize: 12,
-              opacity: 0.75
-            }}
-          >
-            {tokenInfo.tokenSymbol}
-          </Box>
         </Box>
       </div>
     </Tooltip>

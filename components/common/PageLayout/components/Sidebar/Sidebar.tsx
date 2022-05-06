@@ -16,10 +16,13 @@ import { useRouter } from 'next/router';
 import { useState, useCallback } from 'react';
 import Link from 'components/common/Link';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { BoxProps } from '@mui/system';
+import { headerHeight } from '../Header/Header';
 import NewPageMenu from '../NewPageMenu';
-import { headerHeight } from '../Header';
-import PageNavigation from '../PageNavigation';
 import Workspaces from './Workspaces';
+import PageNavigation from '../PageNavigation';
+import TrashModal from '../TrashModal';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -64,10 +67,26 @@ const SidebarContainer = styled.div`
 const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
   padding-left: ${theme.spacing(2)};
   padding-right: ${theme.spacing(2)};
+  align-items: center;
+  color: ${theme.palette.secondary.main};
+  display: flex;
+  font-size: 14px;
+  font-weight: 500;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  :hover {
+    background-color: ${theme.palette.action.hover};
+    color: inherit;
+  }
+  svg {
+    font-size: 1.2em;
+    margin-right: ${theme.spacing(1)};
+  }
 `;
 
 const SectionName = styled(Typography)`
-  ${sidebarItemStyles}
+  padding-left: ${({ theme }) => theme.spacing(2)};
+  padding-right: ${({ theme }) => theme.spacing(2)};
   color: ${({ theme }) => theme.palette.secondary.main};
   font-size: 11.5px;
   font-weight: 600;
@@ -77,25 +96,15 @@ const SectionName = styled(Typography)`
 
 const StyledSidebarLink = styled(Link)<{ active: boolean }>`
   ${sidebarItemStyles}
-  align-items: center;
-  color: ${({ theme }) => theme.palette.secondary.main};
-  display: flex;
-  font-size: 14px;
-  font-weight: 500;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  :hover {
-    background-color: ${({ theme }) => theme.palette.action.hover};
-    color: inherit;
-  }
   ${({ active, theme }) => active ? `
     background-color: ${theme.palette.action.selected};
     color: ${theme.palette.text.primary};
   ` : ''}
-  svg {
-    font-size: 1.2em;
-    margin-right: ${({ theme }) => theme.spacing(1)};
-  }
+`;
+
+const StyledSidebarBox = styled(Box)`
+  cursor: pointer;
+  ${sidebarItemStyles}
 `;
 
 const SidebarHeader = styled.div(({ theme }) => ({
@@ -132,6 +141,15 @@ function SidebarLink ({ active, href, icon, label, target }: { active: boolean, 
   );
 }
 
+function SidebarBox ({ icon, label, ...props }: { icon: any, label: string } & BoxProps) {
+  return (
+    <StyledSidebarBox {...props}>
+      {icon}
+      {label}
+    </StyledSidebarBox>
+  );
+}
+
 interface SidebarProps {
   closeSidebar: () => void;
   favorites: LoggedInUser['favorites'];
@@ -142,6 +160,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const [user] = useUser();
   const [space] = useCurrentSpace();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showingTrash, setShowingTrash] = useState(false);
+
   const favoritePageIds = favorites.map(f => f.pageId);
 
   function onScroll (e: React.UIEvent<HTMLDivElement>) {
@@ -215,10 +235,23 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 icon={<BountyIcon fontSize='small' />}
                 label='Bounties'
               />
+              <SidebarBox
+                onClick={() => {
+                  setShowingTrash(true);
+                }}
+                icon={<DeleteIcon fontSize='small' />}
+                label='Trash'
+              />
             </Box>
           </ScrollingContainer>
         </Box>
       )}
+      <TrashModal
+        isOpen={showingTrash}
+        onClose={() => {
+          setShowingTrash(false);
+        }}
+      />
     </SidebarContainer>
   );
 }

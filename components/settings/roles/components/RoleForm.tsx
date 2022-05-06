@@ -70,7 +70,7 @@ export default function RoleForm ({ role = {}, mode = 'create', submitted = () =
         }
 
       })}
-      style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}
+      style={{ margin: 'auto' }}
     >
       <Grid container direction='column' spacing={3}>
         <Grid item>

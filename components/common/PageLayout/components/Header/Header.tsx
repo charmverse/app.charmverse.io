@@ -132,7 +132,7 @@ export default function Header (
         <Box display='flex' alignItems='center'>
           {isPage && (
             <>
-              <ShareButton headerHeight={headerHeight} />
+              {currentPage?.deletedAt === null && <ShareButton headerHeight={headerHeight} />}
               {currentPage?.type !== 'board' && <CommentThreadsListButton />}
               <Tooltip title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} arrow placement='bottom'>
                 <IconButton size='small' sx={{ ml: 1 }} onClick={toggleFavorite} color='inherit'>

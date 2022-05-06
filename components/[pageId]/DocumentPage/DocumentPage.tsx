@@ -14,6 +14,7 @@ import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay
 import PageHeader from './components/PageHeader';
 import PageBanner from './components/PageBanner';
 import CharmEditor, { ICharmEditorOutput } from '../../common/CharmEditor/CharmEditor';
+import PageDeleteBanner from './components/PageDeleteBanner';
 
 export const Container = styled(Box)<{ top: number }>`
   width: 860px;
@@ -70,7 +71,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
 
   const card = cards.find(_card => _card.id === page.id);
 
-  const comments = card ? useAppSelector(getCardComments(card.id)) : [];
+  const comments = useAppSelector(getCardComments(card?.id));
 
   return (
     <ScrollableWindow hideScroll={showingCommentThreadsList}>
@@ -80,6 +81,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
         overflow: showingCommentThreadsList ? 'auto' : 'inherit'
       }}
       >
+        {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
         {page.headerImage && <PageBanner headerImage={page.headerImage} setPage={setPage} />}
         <Container
           top={pageTop}

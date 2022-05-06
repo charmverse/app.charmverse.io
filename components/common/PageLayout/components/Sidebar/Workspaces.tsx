@@ -107,7 +107,7 @@ export default function Workspaces () {
       </Grid>
       <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
         <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
-        <Typography variant='body2' align='center' sx={{ pt: 3 }}>
+        <Typography variant='body2' align='center' sx={{ pt: 2 }}>
           <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
             Join an existing workspace
           </Button>

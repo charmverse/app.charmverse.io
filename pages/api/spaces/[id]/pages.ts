@@ -11,14 +11,11 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(getPages);
 
 async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
-
   const spaceId = req.query.id as string;
-
   const userId = req.session.user.id;
 
   const pages = await prisma.page.findMany({
     where: {
-      deletedAt: null,
       OR: [
         {
           spaceId,
