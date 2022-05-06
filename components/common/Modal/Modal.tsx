@@ -20,7 +20,7 @@ const ModalContainer = styled.div<{ size: ModalSize }>`
   border-radius: ${({ theme }) => theme.spacing(1)};
   box-shadow: ${({ theme }) => theme.shadows[15]};
   padding: ${({ theme }) => theme.spacing(4)};
-  max-height: calc(80vh - ${({ theme }) => theme.spacing(8)});
+  max-height: calc(80vh - ${({ theme }) => theme.spacing(4)});
 `;
 
 const ScrollableModalContainer = styled(ModalContainer)`
