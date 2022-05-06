@@ -18,6 +18,8 @@ function MockSpace (partial: Partial<Space>): Space {
     deletedAt: null,
     updatedAt: new Date(),
     updatedBy: '0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw',
+    snapshotDomain: null,
+    defaultVotingDuration: null,
     ...partial
   };
 }

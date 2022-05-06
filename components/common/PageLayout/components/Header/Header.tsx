@@ -1,34 +1,31 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import CommentIcon from '@mui/icons-material/Comment';
 import MoonIcon from '@mui/icons-material/DarkMode';
-import SunIcon from '@mui/icons-material/WbSunny';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
+import SunIcon from '@mui/icons-material/WbSunny';
+import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import Box from '@mui/material/Box';
 import { Page } from '@prisma/client';
 import charmClient from 'charmClient';
-import { charmEditorPlugins, specRegistry } from 'components/common/CharmEditor/CharmEditor';
+import PublishToSnapshot from 'components/common/PageLayout/components/Header/snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
+import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
+import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
-import CommentIcon from '@mui/icons-material/Comment';
-import { BangleEditorState } from '@bangle.dev/core';
-import { markdownSerializer } from '@bangle.dev/markdown';
-import { PageContent } from 'models';
-import { Node } from '@bangle.dev/pm';
-import ListItemText from '@mui/material/ListItemText';
-import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import Account from '../Account';
 import ShareButton from '../ShareButton';
 import PageTitleWithBreadcrumbs from './PageTitleWithBreadcrumbs';
@@ -90,29 +87,15 @@ export default function Header (
     setUser({ ...user, ...updatedFields });
   }
 
-  function generateMarkdown () {
-    if (currentPage && isExportablePage) {
-      const serializer = markdownSerializer(specRegistry);
+  function exportMarkdown () {
+    const markdownContent = generateMarkdown(currentPage as Page);
 
-      const state = new BangleEditorState({
-        specRegistry,
-        plugins: charmEditorPlugins(),
-        initialValue: currentPage.content ? Node.fromJSON(specRegistry.schema, currentPage.content as PageContent) : ''
-      });
-
-      let markdown = serializer.serialize(state.pmState.doc);
-
-      if (currentPage.title) {
-        const pageTitleAsMarkdown = `# ${currentPage.title}`;
-
-        markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
-      }
-
-      const data = new Blob([markdown], { type: 'text/plain' });
+    if (markdownContent) {
+      const data = new Blob([markdownContent], { type: 'text/plain' });
 
       const linkElement = document.createElement('a');
 
-      linkElement.download = `${currentPage.title || 'page'}.md`;
+      linkElement.download = `${currentPage?.title || 'page'}.md`;
 
       const downloadLink = URL.createObjectURL(data);
 
@@ -122,7 +105,6 @@ export default function Header (
 
       URL.revokeObjectURL(downloadLink);
     }
-
   }
 
   return (
@@ -182,8 +164,9 @@ export default function Header (
               >
                 <List dense>
                   <ListItemButton onClick={() => {
+                    exportMarkdown();
                     setPageMenuOpen(false);
-                    generateMarkdown();
+
                   }}
                   >
                     <GetAppIcon
@@ -194,6 +177,11 @@ export default function Header (
                     />
                     <ListItemText primary='Export to markdown' />
                   </ListItemButton>
+
+                  {/* Publishing to snapshot */}
+
+                  <PublishToSnapshot page={currentPage as Page} />
+
                 </List>
               </Popover>
             </Box>

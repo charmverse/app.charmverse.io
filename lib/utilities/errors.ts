@@ -7,6 +7,7 @@ const ErrorCodes = {
   'Invalid input': 400,
   'Undesirable operation': 400,
   'Data not found': 404,
+  'Maximum size exceeded': 400,
   'Access denied': 401,
   'External service': 500,
   'Unexpected result': 500
@@ -74,3 +75,24 @@ export class DataNotFoundError extends SystemError {
     });
   }
 }
+
+export class ExternalServiceError extends SystemError {
+  constructor (message: string = 'Something went wrong with an external service.') {
+    super({
+      message,
+      errorType: 'External service',
+      severity: 'error'
+    });
+  }
+}
+
+export class UnknownError extends SystemError {
+  constructor () {
+    super({
+      message: 'Something went wrong.',
+      errorType: 'Unknown',
+      severity: 'error'
+    });
+  }
+}
+

@@ -27,6 +27,7 @@ import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { ModifyChildPagesResponse } from 'lib/pages';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
+import { IPageWithPermissions } from 'lib/pages';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -565,6 +566,14 @@ class CharmClient {
 
   getPageThreads (pageId: string): Promise<ThreadWithComments[]> {
     return http.GET(`/api/pages/${pageId}/threads`);
+  }
+
+  updateSnapshotConnection (spaceId: string, data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>): Promise<Space> {
+    return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
+  }
+
+  updatePageSnapshotData (pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {
+    return http.PUT(`/api/pages/${pageId}/snapshot`, data);
   }
 }
 

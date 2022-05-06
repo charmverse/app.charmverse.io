@@ -36,6 +36,8 @@ model Space {
   name            String
   domain          String           @unique
   discordServerId String?
+  snapshotDomain  String?
+  defaultVotingDuration Int?
   spaceRoles      SpaceRole[]
   permissions     PagePermission[]
   pages           Page[]
@@ -88,6 +90,7 @@ model Page {
   card          Block?           @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   threads       Thread[]
   comments      Comment[]
+  snapshotProposalId String?
 }
 
 // focalboard blocks
