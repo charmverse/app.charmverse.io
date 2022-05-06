@@ -81,7 +81,7 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
 
   return (
     <div>
-      <form onSubmit={handleSubmit(createUserPermissions)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form onSubmit={handleSubmit(createUserPermissions)} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
 
           <Grid container item direction='row' justifyContent='space-between' alignItems='center'>
