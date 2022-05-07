@@ -14,7 +14,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { shortenHex } from 'lib/utilities/strings';
 import charmClient from 'charmClient';
 import { getChainById } from 'connectors';
-import useGnosisSigner from 'lib/gnosis/hooks/useGnosisSigner';
+import useGnosisSigner from 'hooks/useWeb3Signer';
 import { useUser } from 'hooks/useUser';
 import { getSafesForAddresses } from 'lib/gnosis';
 import { Controller, useForm } from 'react-hook-form';
@@ -56,7 +56,7 @@ export default function MultiSigList () {
         const safesData = safes.map(safe => ({
           address: safe.address,
           chainId: safe.chainId,
-          name: ''
+          name: getWalletName(safe.address) // get existing name if user gave us one
         }));
         await charmClient.setUserMultiSigs(safesData);
         await mutate('/profile/multi-sigs');
@@ -65,6 +65,10 @@ export default function MultiSigList () {
         setIsLoadingSafes(false);
       }
     }
+  }
+
+  function getWalletName (address: string) {
+    return data?.find(wallet => wallet.address === address)?.name;
   }
 
   if (!data) {

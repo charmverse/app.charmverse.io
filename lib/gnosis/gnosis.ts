@@ -1,12 +1,9 @@
 
+import { Signer, ethers } from 'ethers';
 import { RPC } from 'connectors';
-import { GET } from 'adapters/http';
-import { isTruthy } from 'lib/utilities/types';
-import { ethers } from 'ethers';
+import { UserMultiSigWallet } from '@prisma/client';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
 import SafeServiceClient, { SafeInfoResponse } from '@gnosis.pm/safe-service-client';
-
-const gnosisRPCs = Object.values(RPC);
 
 function getGnosisRPCUrl (chainId: number) {
   const network = Object.values(RPC).find(rpc => rpc.chainId === chainId);
@@ -47,7 +44,6 @@ interface GetSafesForAddressProps {
 
 async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<({ chainId: number } & SafeInfoResponse)[]> {
   const gnosisUrl = getGnosisRPCUrl(chainId);
-  console.log(chainId, gnosisUrl);
   if (!gnosisUrl) {
     return [];
   }
@@ -63,10 +59,14 @@ async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddr
 }
 
 export async function getSafesForAddresses (signer: ethers.Signer, addresses: string[]) {
-
   const safes = await Promise.all(Object.values(RPC).map(network => {
     return Promise.all(addresses.map(address => getSafesForAddress({ signer, chainId: network.chainId, address })));
   })).then(list => list.flat().flat());
 
   return safes;
+}
+
+export async function getGnosisTransactions (signer: Signer, wallet: UserMultiSigWallet) {
+  console.log('wallet', wallet);
+  return [];
 }

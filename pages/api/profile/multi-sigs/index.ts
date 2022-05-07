@@ -11,7 +11,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .get(list)
-  .post(create);
+  .post(setWallets);
 
 async function list (req: NextApiRequest, res: NextApiResponse<UserMultiSigWallet[]>) {
 
@@ -23,27 +23,27 @@ async function list (req: NextApiRequest, res: NextApiResponse<UserMultiSigWalle
   return res.status(200).json(wallets);
 }
 
-async function create (req: NextApiRequest, res: NextApiResponse<UserMultiSigWallet>) {
+async function setWallets (req: NextApiRequest, res: NextApiResponse<UserMultiSigWallet>) {
 
-  const walletsInput = req.body.map((wallet: any) => ({
+  const walletsInput = req.body as (Pick<UserMultiSigWallet, 'address' | 'chainId' | 'name'>)[];
+  const walletsData = walletsInput.map(wallet => ({
+    ...wallet,
     userId: req.session.user.id,
-    walletType: 'gnosis',
-    ...wallet
+    walletType: 'gnosis' as const
   }));
-  console.log(walletsInput);
 
-  const [, wallets] = await prisma.$transaction([
+  await prisma.$transaction([
     prisma.userMultiSigWallet.deleteMany({
       where: {
         userId: req.session.user.id
       }
     }),
     prisma.userMultiSigWallet.createMany({
-      data: walletsInput
+      data: walletsData
     })
   ]);
 
-  return res.status(200).json(wallets);
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);
