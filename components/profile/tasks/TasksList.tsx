@@ -8,10 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from 'components/common/Link';
-import { Link as TaskLink, Task } from 'models';
-import { useTasks } from 'hooks/useTasks';
-import { useUser } from 'hooks/useUser';
-import SafeServiceClient from '@gnosis.pm/safe-service-client';
+import LoadingComponent from 'components/common/LoadingComponent';
 import useGnosisTasks, { GnosisTask } from './hooks/useGnosisTasks';
 
 const StyledTableCell = styled(TableCell)`
@@ -22,10 +19,10 @@ const StyledTableCell = styled(TableCell)`
 export default function TasksList () {
 
   const gnosisTasks = useGnosisTasks();
-  const tasks = useTasks();
 
-  const handleSign = () => {
-  };
+  if (!gnosisTasks) {
+    return <LoadingComponent height='200px' isLoading={true} />;
+  }
 
   return (
     <Table size='small' aria-label='simple table'>

@@ -100,7 +100,7 @@ export default function useGnosisTasks () {
 
   const signer = useWeb3Signer();
   const { data } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs());
-  const [tasks, setTasks] = useState<GnosisTask[]>([]);
+  const [tasks, setTasks] = useState<GnosisTask[] | null>(null);
 
   useEffect(() => {
     if (data && signer) {
