@@ -174,6 +174,7 @@ function WalletRow ({ wallet }: { wallet: Wallet }) {
           control={control}
           render={({ field: { onChange, value } }) => (
             <OutlinedInput
+              fullWidth
               value={value}
               onChange={onChange}
               placeholder='Untitled'
