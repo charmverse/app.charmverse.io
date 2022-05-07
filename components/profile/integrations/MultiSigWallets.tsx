@@ -42,7 +42,7 @@ const gnosisUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address
 
 export default function MultiSigList () {
 
-  const { data } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs());
+  const { data } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs(), { revalidateOnFocus: false });
 
   const gnosisSigner = useGnosisSigner();
   const [user] = useUser();

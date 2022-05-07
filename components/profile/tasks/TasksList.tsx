@@ -9,9 +9,10 @@ import TableRow from '@mui/material/TableRow';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from 'components/common/Link';
 import { Link as TaskLink, Task } from 'models';
+import { useTasks } from 'hooks/useTasks';
 import { useUser } from 'hooks/useUser';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
-import useGnosisTasks from './hooks/useGnosisTasks';
+import useGnosisTasks, { GnosisTask } from './hooks/useGnosisTasks';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
@@ -20,7 +21,8 @@ const StyledTableCell = styled(TableCell)`
 
 export default function TasksList () {
 
-  const tasks = useGnosisTasks();
+  const gnosisTasks = useGnosisTasks();
+  const tasks = useTasks();
 
   const handleSign = () => {
   };
@@ -38,20 +40,16 @@ export default function TasksList () {
       </TableHead>
       <TableBody>
         {
-          tasks.map((task: Task, _taskIndex: number) => (
+          gnosisTasks.map((task: GnosisTask) => (
             <TableRow key={`task-row-${task.id}`}>
               <TableCell sx={{ px: 0 }}>{new Date(task.date).toLocaleDateString()}</TableCell>
               <TableCell>
-                {task.description} <br />
-                {task.links.map((link: TaskLink, _linkIndex: number) => (
-                  <span key={`link-${link.id}`}>
-                    [{link.name}<Link target='_blank' href={link.url} external><OpenInNewIcon /></Link>]
-                  </span>
-                ))}
+                {task.nonce} - {task.description} <br />
+                Gnosis <Link target='_blank' href={task.gnosisUrl} external><OpenInNewIcon /></Link>
               </TableCell>
-              <TableCell><Chip label={task.type} variant='outlined' /></TableCell>
-              <TableCell>{task.workspace}</TableCell>
-              <TableCell><Chip label='Sign' variant='outlined' onClick={handleSign} /></TableCell>
+              <TableCell><Chip label='Multisig' variant='outlined' /></TableCell>
+              <TableCell>CharmVerse</TableCell>
+              <TableCell><Chip component={Link} label='Sign' variant='outlined' href={task.gnosisUrl} external /></TableCell>
             </TableRow>
           ))
         }

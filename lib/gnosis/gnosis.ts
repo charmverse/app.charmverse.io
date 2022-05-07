@@ -3,7 +3,9 @@ import { Signer, ethers } from 'ethers';
 import { RPC } from 'connectors';
 import { UserMultiSigWallet } from '@prisma/client';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
-import SafeServiceClient, { SafeInfoResponse } from '@gnosis.pm/safe-service-client';
+import SafeServiceClient, { SafeMultisigTransactionResponse, SafeInfoResponse, AllTransactionsListResponse } from '@gnosis.pm/safe-service-client';
+
+export type GnosisTransaction = SafeMultisigTransactionResponse;// AllTransactionsListResponse['results'][0];
 
 function getGnosisRPCUrl (chainId: number) {
   const network = Object.values(RPC).find(rpc => rpc.chainId === chainId);
@@ -66,7 +68,21 @@ export async function getSafesForAddresses (signer: ethers.Signer, addresses: st
   return safes;
 }
 
-export async function getGnosisTransactions (signer: Signer, wallet: UserMultiSigWallet) {
-  console.log('wallet', wallet);
+async function getTransactionsforSafe (signer: Signer, wallet: UserMultiSigWallet): Promise<GnosisTransaction[]> {
+  const service = getGnosisService({ signer, chainId: wallet.chainId });
+  if (service) {
+    // const transactions = await service.getMultisigTransactions(wallet.address);
+    // return transactions.results;
+    const transactions = await service.getPendingTransactions(wallet.address);
+    console.log(transactions);
+    // TODO: not sure if we actually need to get transaction info again
+    const withInfo = await Promise.all(transactions.results.map(transaction => service.getTransaction(transaction.safeTxHash)));
+    return withInfo;
+  }
   return [];
+}
+
+export async function getTransactionsforSafes (signer: Signer, wallets: UserMultiSigWallet[]) {
+  return Promise.all(wallets.map(wallet => getTransactionsforSafe(signer, wallet)))
+    .then(list => list.flat());
 }
