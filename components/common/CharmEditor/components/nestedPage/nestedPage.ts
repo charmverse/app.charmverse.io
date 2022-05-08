@@ -1,7 +1,6 @@
 import { RawSpecs } from '@bangle.dev/core';
-import { Schema, Plugin, DOMOutputSpec, PluginKey } from '@bangle.dev/pm';
+import { DOMOutputSpec, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM, SuggestTooltipRenderOpts, tooltipPlacement } from '@bangle.dev/tooltip';
-import { getPage, generatePageLink } from 'lib/pages/server';
 import charmClient from 'charmClient';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 
@@ -33,8 +32,10 @@ function parseNestedPagesToReplace (convertedToMarkdown: string): string [] {
 function extractPageId (matchedMarkdownEnclosure: string): string {
   return matchedMarkdownEnclosure
     .trim()
-    .split('_MARKDOWN_NESTED_PAGE(')[0]
-    .split(')')[0];
+    .split('_MARKDOWN_NESTED_PAGE(')
+    .filter(str => !!str)[0]
+    .split(')')
+    .filter(str => !!str)[0];
 }
 
 // function produceLinkMarkdown()
@@ -46,7 +47,10 @@ function extractPageId (matchedMarkdownEnclosure: string): string {
 export async function replaceNestedPages (convertedToMarkdown: string): Promise<string> {
 
   const nestedPageMarkers = parseNestedPagesToReplace(convertedToMarkdown);
+
   const isServer = typeof window === 'undefined';
+  // Dynamic import allows this function to be loaded in the client-side without triggering a server-side import
+  const linkGetter = isServer ? ((await import('lib/pages/server/generatePageLink')).generatePageLink) : charmClient.getPageLink;
 
   await Promise.all(nestedPageMarkers
     .map(pageMarker => {
@@ -56,7 +60,7 @@ export async function replaceNestedPages (convertedToMarkdown: string): Promise<
         const pageId = extractPageId(pageMarker);
 
         try {
-          const pageLink = await (isServer ? generatePageLink(pageId) : charmClient.getPageLink(pageId));
+          const pageLink = await linkGetter(pageId);
           convertedToMarkdown = convertedToMarkdown.replace(pageMarker, `[${pageLink.title}](${pageLink.url})`);
           resolve();
         }

@@ -1,7 +1,7 @@
 
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { PageNotFoundError } from 'lib/pages/server';
+import { PageNotFoundError, generatePageLink } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -39,7 +39,9 @@ async function getPageLink (req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 
-  res.status(200).json({});
+  const pageLink = await generatePageLink(pageId);
+
+  res.status(200).json(pageLink);
 
 }
 
