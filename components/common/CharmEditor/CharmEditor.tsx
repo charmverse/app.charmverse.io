@@ -98,7 +98,7 @@ export const specRegistry = new SpecRegistry([
   nestedPageSpec(), // NO
   quote.spec(), // OK
   tabIndent.spec(),
-  table.spec(),
+  table.spec(), // OK - only for text content
   disclosure.spec()
   // tables.tableNodes({
   //   cellAttributes: { },
