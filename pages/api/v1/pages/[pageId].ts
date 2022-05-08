@@ -6,6 +6,7 @@ import { onError, onNoMatch, requireApiKey, SpaceAccessDeniedError } from 'lib/m
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { PageContent } from 'models';
+import { generateMarkdown } from 'lib/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -155,13 +156,13 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
   const cardPage = await prisma.page.findUnique({
     where: {
       id: card.id
-    },
-    select: {
-      content: true
     }
   });
 
   const cardToReturn = new PageFromBlock(updatedPage, boardSchema, cardPage?.content as PageContent);
+  if (cardPage) {
+    cardToReturn.content.markdown = await generateMarkdown(cardPage, true);
+  }
 
   return res.status(200).json(cardToReturn);
 }
