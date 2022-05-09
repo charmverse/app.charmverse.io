@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import React, {useState} from 'react'
+import Popper from '@mui/material/Popper'
 
 import SubmenuTriangleIcon from '../icons/submenuTriangle'
 
@@ -39,8 +40,8 @@ function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
             {props.icon ?? <div className='noicon'/>}
             <div className='menu-name'>{props.name}</div>
             {props.position !== 'left' && props.position !== 'left-bottom' && <SubmenuTriangleIcon/>}
-            {isOpen &&
-                <div className={'SubMenu Menu noselect ' + (props.position || 'bottom')}>
+            {<Popper open={isOpen}>
+                {/* <div className={'SubMenu Menu noselect ' + (props.position || 'bottom')}> */}
                     <div className='menu-contents'>
                         <div className='menu-options'>
                             {props.children}
@@ -57,7 +58,8 @@ function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
                         </div>
                     </div>
 
-                </div>
+                {/* </div> */}
+                </Popper>
             }
         </div>
     )

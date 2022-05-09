@@ -1,8 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React, {useRef, useState, useEffect} from 'react'
+import React, {useRef, useMemo, useState, useEffect} from 'react'
 
+import { MenuContext, useMenuContext, Context } from './menu/menuContext'
 
 type Props = {
     children?: React.ReactNode;
@@ -16,6 +17,7 @@ type Props = {
 const MenuWrapper = React.memo((props: Props) => {
     const node = useRef<HTMLDivElement>(null)
     const [open, setOpen] = useState(Boolean(props.isOpen))
+    const [, setAnchorEl] = useMenuContext()
 
     if (!Array.isArray(props.children) || props.children.length !== 2) {
         throw new Error('MenuWrapper needs exactly 2 children')
@@ -72,6 +74,12 @@ const MenuWrapper = React.memo((props: Props) => {
         }
     }, [])
 
+    useEffect(() => {
+        if (node) {
+            setAnchorEl(node.current)
+        }
+    }, [node])
+
     const {children} = props
     let className = 'MenuWrapper'
     if (props.disabled) {
@@ -95,4 +103,12 @@ const MenuWrapper = React.memo((props: Props) => {
     )
 })
 
-export default MenuWrapper
+export default function MenuWithContext (props: Props) {
+    const [anchorRef, setAnchorRef] = useState<HTMLDivElement | null>(null)
+    const value: Context = useMemo(() => [anchorRef, setAnchorRef], [anchorRef, setAnchorRef]);
+    return (
+        <MenuContext.Provider value={value}>
+            <MenuWrapper {...props} />
+        </MenuContext.Provider>
+    );
+}
