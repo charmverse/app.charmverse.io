@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState} from 'react'
+import React, {useRef,useState} from 'react'
+import styled  from '@emotion/styled';
 import Popper from '@mui/material/Popper'
 
 import SubmenuTriangleIcon from '../icons/submenuTriangle'
@@ -16,14 +17,20 @@ type SubMenuOptionProps = {
     children: React.ReactNode
 }
 
+const StyledPopper = styled(Popper)`
+    z-index: var(--z-index-modal);
+`;
+
 function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
     const [isOpen, setIsOpen] = useState(false)
+    const node = useRef<HTMLDivElement>(null)
 
     const openLeftClass = props.position === 'left' || props.position === 'left-bottom' ? ' open-left' : ''
 
     return (
         <div
             id={props.id}
+            ref={node}
             className={`MenuOption SubMenuOption menu-option${openLeftClass}`}
             onMouseEnter={() => {
                 setTimeout(() => {
@@ -40,8 +47,8 @@ function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
             {props.icon ?? <div className='noicon'/>}
             <div className='menu-name'>{props.name}</div>
             {props.position !== 'left' && props.position !== 'left-bottom' && <SubmenuTriangleIcon/>}
-            {<Popper open={isOpen}>
-                {/* <div className={'SubMenu Menu noselect ' + (props.position || 'bottom')}> */}
+            {<StyledPopper anchorEl={node.current} open={isOpen} placement='right-start'>
+                <div className={'SubMenu Menu noselect ' + (props.position || 'bottom')}>
                     <div className='menu-contents'>
                         <div className='menu-options'>
                             {props.children}
@@ -58,8 +65,8 @@ function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
                         </div>
                     </div>
 
-                {/* </div> */}
-                </Popper>
+                 </div>
+            </StyledPopper>
             }
         </div>
     )

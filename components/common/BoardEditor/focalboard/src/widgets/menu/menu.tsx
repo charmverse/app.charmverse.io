@@ -26,7 +26,7 @@ function Menu (props: Props) {
 
     const {position , children} = props
     const [anchorEl] = useMenuContext()
-    console.log('show menu', anchorEl)
+
     return (
         <StyledPopper anchorEl={anchorEl} open={true} placement={position || 'bottom-start'}>
         <div className={'Menu noselect ' + (position || 'bottom-start')}>
