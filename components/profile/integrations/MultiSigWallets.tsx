@@ -42,7 +42,7 @@ const gnosisUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address
 
 export default function MultiSigList () {
 
-  const { data, mutate } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs(), { revalidateOnFocus: false });
+  const { data: walletData, mutate } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs(), { revalidateOnFocus: false });
 
   const gnosisSigner = useGnosisSigner();
   const [user] = useUser();
@@ -68,15 +68,15 @@ export default function MultiSigList () {
   }
 
   function getWalletName (address: string) {
-    return data?.find(wallet => wallet.address === address)?.name;
+    return walletData?.find(wallet => wallet.address === address)?.name;
   }
 
-  if (!data) {
+  if (!walletData) {
     return null;
   }
 
   // sort the rows to prevent random order
-  const sortedRows = data.sort((a, b) => a.address < b.address ? -1 : 1);
+  const sortedRows = walletData.sort((a, b) => a.address < b.address ? -1 : 1);
 
   return (
     <>
