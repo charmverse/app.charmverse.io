@@ -33,9 +33,17 @@ export function spec (): RawSpecs {
 
             const cell = row.child(i);
 
-            const textContent = cell.firstChild?.textContent ?? '';
+            // eslint-disable-next-line no-loop-func
+            cell.firstChild?.forEach(nestedNode => {
+              if (nestedNode.type.name === 'hardBreak') {
+                tableAsMarkdown += '<br>';
+              }
+              else {
+                tableAsMarkdown += nestedNode.textContent;
+              }
+            });
 
-            tableAsMarkdown += ` ${textContent} |`;
+            tableAsMarkdown += '|';
 
           }
 
