@@ -42,20 +42,21 @@ export default function EmojiSuggest ({ pluginKey }: {pluginKey: PluginKey}) {
     [view, pluginKey]
   );
 
-  return isVisible && (
-    <StyledPopper
-      open={true}
-      anchorEl={tooltipContentDOM}
-      placement='bottom-start'
-    >
-      {/* <ClickAwayListener onClickAway={closeTooltip}> */}
-      <Picker
-        theme={theme.palette.mode}
-        onSelect={(emoji: BaseEmoji) => {
-          onSelectEmoji(emoji.native);
-        }}
-      />
-      {/* </ClickAwayListener> */}
-    </StyledPopper>
+  return (
+    <ClickAwayListener onClickAway={closeTooltip}>
+      <StyledPopper
+        disablePortal
+        open={isVisible}
+        anchorEl={tooltipContentDOM}
+        placement='bottom-start'
+      >
+        <Picker
+          theme={theme.palette.mode}
+          onSelect={(emoji: BaseEmoji) => {
+            onSelectEmoji(emoji.native);
+          }}
+        />
+      </StyledPopper>
+    </ClickAwayListener>
   );
 }
