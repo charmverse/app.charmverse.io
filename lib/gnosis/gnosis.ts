@@ -75,9 +75,7 @@ async function getTransactionsforSafe (signer: Signer, wallet: UserMultiSigWalle
     // return transactions.results;
     const transactions = await service.getPendingTransactions(wallet.address);
     console.log(transactions);
-    // TODO: not sure if we actually need to get transaction info again
-    const withInfo = await Promise.all(transactions.results.map(transaction => service.getTransaction(transaction.safeTxHash)));
-    return withInfo;
+    return transactions.results;
   }
   return [];
 }
