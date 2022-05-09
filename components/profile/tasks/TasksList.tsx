@@ -46,7 +46,7 @@ export default function TasksList () {
               </TableCell>
               <TableCell><Chip label='Multisig' variant='outlined' /></TableCell>
               <TableCell>CharmVerse</TableCell>
-              <TableCell><Chip component={Link} label='Sign' variant='outlined' href={task.gnosisUrl} external /></TableCell>
+              <TableCell><Chip component={Link} label='Sign' variant='outlined' href={task.gnosisUrl} external target='_blank' /></TableCell>
             </TableRow>
           ))
         }
