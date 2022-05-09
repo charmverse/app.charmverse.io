@@ -35,54 +35,30 @@ export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackg
 export const inputBackgroundDarkMode = 'rgba(255, 255, 255, 0.055)';
 export const inputBorderDarkMode = 'rgba(15, 15, 15, 0.2)';
 
-export type BrandColor = 'gray' | 'brown' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'red'
+export type BrandColor = 'gray' | 'cyanBlue' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'red'
 
 export type BrandColorScheme = Record<BrandColor, string>
 
 export const darkModeColors: BrandColorScheme = {
-  gray: '#7A6677',
-  brown: '#79632A',
-  orange: '#CC4B00',
-  yellow: '#B89F00',
-  green: '#007A5C',
-  blue: '#007C8F',
-  purple: '#5F396A',
-  pink: '#D11046',
-  red: '#970C0C'
+  gray: '#91918D', // Philippine Gray
+  cyanBlue: '#5681C8', // Silver Lake Blue
+  orange: '#F79064', // Atomic Tangerine
+  yellow: '#EFDF6C', // Arylide Yellow
+  green: '#009FB7', // Bondi Blue
+  blue: '#1FBFFF', // Spiro Disco Ball
+  purple: '#985CFF', // Lavender Indigo
+  pink: '#E36396', // Pale Red-Violet
+  red: '#A073AB' // Purple Mountain Majesty
 };
 
 export const lightModeColors: BrandColorScheme = {
-  gray: '#C4D0D4',
-  brown: '#E6C39E',
-  orange: '#FFAC47',
-  yellow: '#FDFD9B',
-  green: '#A8F0DD',
-  blue: '#ADF4FF',
-  purple: '#B7AFD4',
-  pink: '#EB82ED',
-  red: '#E37898'
-};
-
-export const darkModeBackgroundColors: BrandColorScheme = {
-  gray: '#2f2f2f',
-  brown: '#4a3229',
-  orange: '#5b3b24',
-  yellow: '#554228',
-  green: '#263e31',
-  blue: '#16394d',
-  purple: '#3b2b49',
-  pink: '#4d2a3b',
-  red: '#512e2a'
-};
-
-export const lightModeBackgroundColors: BrandColorScheme = {
-  gray: '#f1f1ef',
-  brown: '#f4eeee',
-  orange: '#fbecdd',
-  yellow: '#fbf3da',
-  green: '#edf4eb',
-  blue: '#e7f3f7',
-  purple: '#f6f3fa',
-  pink: '#f9f0f5',
-  red: '#fdeaec'
+  gray: '#E1E1E0', // Chinese White
+  cyanBlue: '#D1DDF0', // Azureish White
+  orange: '#FDE3D8', // Antique White
+  yellow: '#FBF7DA', // Cornsilk
+  green: '#D6FAFF', // Water
+  blue: '#C2EEFF', // Diamond
+  purple: '#E5D6FF', // Pale Lavender
+  pink: '#F9DDE8', // Piggy Pink
+  red: '#E5D9E8' // Platinum
 };
