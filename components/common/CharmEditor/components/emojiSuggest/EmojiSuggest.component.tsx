@@ -1,11 +1,16 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
-import Portal from '@mui/material/Portal';
+import Popper from '@mui/material/Popper';
 import { BaseEmoji, Picker } from 'emoji-mart';
+import styled from '@emotion/styled';
 import { useCallback } from 'react';
 import { PluginKey } from 'prosemirror-state';
 import { selectEmoji } from './emojiSuggest.plugins';
+
+const StyledPopper = styled(Popper)`
+  z-index: var(--z-index-modal);
+`;
 
 export default function EmojiSuggest ({ pluginKey }: {pluginKey: PluginKey}) {
   const view = useEditorViewContext();
@@ -38,15 +43,19 @@ export default function EmojiSuggest ({ pluginKey }: {pluginKey: PluginKey}) {
   );
 
   return isVisible && (
-  <Portal container={tooltipContentDOM}>
-    <ClickAwayListener onClickAway={closeTooltip}>
-      <Picker
-        theme={theme.palette.mode}
-        onSelect={(emoji: BaseEmoji) => {
-          onSelectEmoji(emoji.native);
-        }}
-      />
-    </ClickAwayListener>
-  </Portal>
+  <StyledPopper
+    open={true}
+    anchorEl={tooltipContentDOM}
+    placement='bottom-start'
+  >
+    {/* <ClickAwayListener onClickAway={closeTooltip}> */}
+    <Picker
+      theme={theme.palette.mode}
+      onSelect={(emoji: BaseEmoji) => {
+        onSelectEmoji(emoji.native);
+      }}
+    />
+    {/* </ClickAwayListener> */}
+  </StyledPopper>
   );
 }
