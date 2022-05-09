@@ -5,7 +5,7 @@ import { Box, Card, CircularProgress, OutlinedInput, Table, TableBody, TableCell
 import KeyIcon from '@mui/icons-material/Key';
 import { WalletType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
@@ -42,7 +42,7 @@ const gnosisUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address
 
 export default function MultiSigList () {
 
-  const { data } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs(), { revalidateOnFocus: false });
+  const { data, mutate } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs(), { revalidateOnFocus: false });
 
   const gnosisSigner = useGnosisSigner();
   const [user] = useUser();
@@ -59,7 +59,7 @@ export default function MultiSigList () {
           name: getWalletName(safe.address) // get existing name if user gave us one
         }));
         await charmClient.setUserMultiSigs(safesData);
-        await mutate('/profile/multi-sigs');
+        await mutate();
       }
       finally {
         setIsLoadingSafes(false);
@@ -126,7 +126,7 @@ export default function MultiSigList () {
           <TableBody>
             {
               sortedRows.map(wallet => (
-                <WalletRow wallet={wallet} key={wallet.id} />
+                <WalletRow updateWallets={mutate} wallet={wallet} key={wallet.id} />
               ))
             }
           </TableBody>
@@ -136,7 +136,7 @@ export default function MultiSigList () {
   );
 }
 
-function WalletRow ({ wallet }: { wallet: Wallet }) {
+function WalletRow ({ wallet, updateWallets }: { wallet: Wallet, updateWallets: () => void }) {
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
@@ -157,7 +157,7 @@ function WalletRow ({ wallet }: { wallet: Wallet }) {
 
   async function deleteWallet (_wallet: Wallet) {
     await charmClient.deleteUserMultiSig(_wallet.id);
-    mutate('/profile/multi-sigs');
+    updateWallets();
     deleteConfirmation.close();
   }
 
@@ -165,7 +165,7 @@ function WalletRow ({ wallet }: { wallet: Wallet }) {
     if (isDirty) {
       const sanitized = name.trim();
       await charmClient.updateUserMultiSig({ id: wallet.id, name: sanitized });
-      await mutate('/profile/multi-sigs');
+      await updateWallets();
       reset(); // reset form
     }
   }
