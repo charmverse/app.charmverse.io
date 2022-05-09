@@ -43,19 +43,19 @@ export default function EmojiSuggest ({ pluginKey }: {pluginKey: PluginKey}) {
   );
 
   return isVisible && (
-  <StyledPopper
-    open={true}
-    anchorEl={tooltipContentDOM}
-    placement='bottom-start'
-  >
-    {/* <ClickAwayListener onClickAway={closeTooltip}> */}
-    <Picker
-      theme={theme.palette.mode}
-      onSelect={(emoji: BaseEmoji) => {
-        onSelectEmoji(emoji.native);
-      }}
-    />
-    {/* </ClickAwayListener> */}
-  </StyledPopper>
+    <StyledPopper
+      open={true}
+      anchorEl={tooltipContentDOM}
+      placement='bottom-start'
+    >
+      {/* <ClickAwayListener onClickAway={closeTooltip}> */}
+      <Picker
+        theme={theme.palette.mode}
+        onSelect={(emoji: BaseEmoji) => {
+          onSelectEmoji(emoji.native);
+        }}
+      />
+      {/* </ClickAwayListener> */}
+    </StyledPopper>
   );
 }
