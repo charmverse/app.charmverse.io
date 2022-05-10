@@ -40,7 +40,7 @@ const NewCardButton = React.memo((props: Props): JSX.Element => {
                 />
             )}
         >
-            <Menu position='left'>
+            <Menu position='bottom-end'>
                 {cardTemplates.length > 0 && <>
                     <Menu.Label>
                         <b>

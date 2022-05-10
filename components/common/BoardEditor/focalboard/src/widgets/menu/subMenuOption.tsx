@@ -1,6 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState} from 'react'
+import React, {useEffect,useRef,useState} from 'react'
+import styled  from '@emotion/styled';
+import Popper from '@mui/material/Popper'
 
 import SubmenuTriangleIcon from '../icons/submenuTriangle'
 
@@ -15,14 +17,49 @@ type SubMenuOptionProps = {
     children: React.ReactNode
 }
 
+const StyledPopper = styled(Popper)`
+    z-index: var(--z-index-modal);
+`;
+
 function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
     const [isOpen, setIsOpen] = useState(false)
+    const node = useRef<HTMLDivElement>(null)
 
     const openLeftClass = props.position === 'left' || props.position === 'left-bottom' ? ' open-left' : ''
+
+    const popperRef = useRef<HTMLDivElement>(null)
+    const [maxHeight, setMaxHeight] = useState(0)
+
+    useEffect(() => {
+        const handleResize = () => {
+            const windowHeight = window.innerHeight
+            const box = popperRef?.current?.getBoundingClientRect()
+            const padding = 10;
+            if (box) {
+                if (box.top + box.bottom + padding > windowHeight) {
+                    setMaxHeight(windowHeight - box.top - padding)
+                }
+                else {
+                    setMaxHeight(0)
+                }
+            }
+        }
+        window.addEventListener('resize', handleResize)
+
+        // run once on load, wait for menu to render
+        setTimeout(() => {
+            handleResize()
+        }, 0)
+
+        return () => {
+            window.removeEventListener('resize', handleResize)
+        }
+    }, [])
 
     return (
         <div
             id={props.id}
+            ref={node}
             className={`MenuOption SubMenuOption menu-option${openLeftClass}`}
             onMouseEnter={() => {
                 setTimeout(() => {
@@ -39,8 +76,11 @@ function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
             {props.icon ?? <div className='noicon'/>}
             <div className='menu-name'>{props.name}</div>
             {props.position !== 'left' && props.position !== 'left-bottom' && <SubmenuTriangleIcon/>}
-            {isOpen &&
-                <div className={'SubMenu Menu noselect ' + (props.position || 'bottom')}>
+            {<StyledPopper anchorEl={node.current} open={isOpen} placement='right-start'>
+                <div
+                    ref={popperRef}
+                    style={{ maxHeight: maxHeight || 'none' }}
+                    className={'SubMenu Menu noselect '}>
                     <div className='menu-contents'>
                         <div className='menu-options'>
                             {props.children}
@@ -57,7 +97,8 @@ function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
                         </div>
                     </div>
 
-                </div>
+                 </div>
+            </StyledPopper>
             }
         </div>
     )
