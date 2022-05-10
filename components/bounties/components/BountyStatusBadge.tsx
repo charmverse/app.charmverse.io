@@ -202,46 +202,68 @@ function BountyAmount ({ bounty, truncate }: { bounty: Bounty, truncate: boolean
   const tooltip = `${chainName} (${tokenInfo.tokenSymbol})`;
 
   return (
-    <Tooltip arrow placement='top' title={tooltip}>
+    <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
       <div>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box
-            mr={0.75}
-            component='span'
-            sx={{
-              width: 25,
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
-            {
-            tokenInfo.tokenLogo && (
-              <Box component='span' sx={{ width: '25px', height: '25px' }}>
-                {
-                  (tokenInfo.isContract ? (
-                    <img alt='' width='100%' height='100%' src={tokenInfo.tokenLogo} />
-                  ) : (
-                    <img
-                      width='100%'
-                      height='100%'
-                      src={tokenInfo.tokenLogo}
-                    />
-                  ))
-                }
+
+          {
+            bounty.rewardAmount === 0 ? (
+              <Box>
+                <Typography
+                  component='span'
+                  sx={{
+                    fontWeight: 600
+                  }}
+                  mr={0.5}
+                  variant='caption'
+                  margin='auto'
+                >
+                  Reward not set
+                </Typography>
               </Box>
+            ) : (
+              <>
+                <Box
+                  mr={0.75}
+                  component='span'
+                  sx={{
+                    width: 25,
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {
+              tokenInfo.tokenLogo && (
+                <Box component='span' sx={{ width: '25px', height: '25px' }}>
+                  {
+                    (tokenInfo.isContract ? (
+                      <img alt='' width='100%' height='100%' src={tokenInfo.tokenLogo} />
+                    ) : (
+                      <img
+                        width='100%'
+                        height='100%'
+                        src={tokenInfo.tokenLogo}
+                      />
+                    ))
+                  }
+                </Box>
+              )
+            }
+                </Box>
+                <Typography
+                  component='span'
+                  sx={{
+                    fontWeight: 600
+                  }}
+                  mr={0.5}
+                  variant='h6'
+                >
+                  {truncate ? millify(bounty.rewardAmount) : bounty.rewardAmount}
+                </Typography>
+              </>
             )
           }
-          </Box>
-          <Typography
-            component='span'
-            sx={{
-              fontWeight: 600
-            }}
-            mr={0.5}
-            variant='h6'
-          >
-            {truncate ? millify(bounty.rewardAmount) : bounty.rewardAmount}
-          </Typography>
+
         </Box>
       </div>
     </Tooltip>
