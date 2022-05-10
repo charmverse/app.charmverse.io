@@ -22,8 +22,15 @@ import { useForm, UseFormWatch } from 'react-hook-form';
 import { isTruthy } from 'lib/utilities/types';
 import * as yup from 'yup';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import useIsAdmin from 'hooks/useIsAdmin';
 
-export type FormMode = 'create' | 'update';
+export type FormMode = 'create' | 'update' | 'suggest';
+
+export const bountyFormTitles: Record<FormMode, string> = {
+  create: 'Create bounty',
+  update: 'Edit bounty',
+  suggest: 'Suggest bounty'
+};
 
 interface IBountyEditorInput {
   onSubmit: (bounty: PopulatedBounty) => any,
@@ -77,6 +84,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
+      rewardAmount: 0,
       rewardToken: 'ETH' as CryptoCurrency,
       // TBC till we agree on Prisma migration
       chainId: defaultChainId as any,
@@ -84,6 +92,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
     },
     resolver: yupResolver(schema)
   });
+
+  const values = watch();
 
   const [space] = useCurrentSpace();
   const [user] = useUser();
@@ -99,11 +109,32 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
   }, []);
 
   async function submitted (value: IBounty) {
+
+    console.log('Submitted', value);
+
     if (mode === 'create') {
       value.spaceId = space!.id;
       value.createdBy = user!.id;
       value.description = value.description ?? '';
       value.descriptionNodes = value.descriptionNodes ?? '';
+      value.status = 'suggestion';
+
+      const createdBounty = await charmClient.createBounty(value);
+      const populatedBounty = { ...createdBounty, applications: [] };
+      setBounties([...bounties, populatedBounty]);
+      onSubmit(populatedBounty);
+    }
+    else if (mode === 'suggest') {
+      value.spaceId = space!.id;
+      value.createdBy = user!.id;
+      value.description = value.description ?? '';
+      value.descriptionNodes = value.descriptionNodes ?? '';
+      value.status = 'suggestion';
+
+      value.rewardToken = 'ETH';
+      value.rewardAmount = 0;
+      value.chainId = 1;
+
       const createdBounty = await charmClient.createBounty(value);
       const populatedBounty = { ...createdBounty, applications: [] };
       setBounties([...bounties, populatedBounty]);
@@ -201,64 +232,77 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
             }}
           />
 
-          <Grid item>
-            <InputLabel>
-              Reviewer
-            </InputLabel>
-            <InputSearchContributor defaultValue={bounty?.reviewer as string} onChange={setReviewer} />
-          </Grid>
-          <Grid container item>
-            <Grid item xs>
-              <InputLabel>
-                Select a chain for this transaction
-              </InputLabel>
-              <InputSearchBlockchain
-                chainId={chainId}
-                onChange={setChainId}
-              />
-            </Grid>
-          </Grid>
+          {
+            mode !== 'suggest' && (
+              <>
+                <Grid item>
+                  <InputLabel>
+                    Reviewer
+                  </InputLabel>
+                  <InputSearchContributor defaultValue={bounty?.reviewer as string} onChange={setReviewer} />
+                </Grid>
+                <Grid container item>
+                  <Grid item xs>
+                    <InputLabel>
+                      Select a chain for this transaction
+                    </InputLabel>
+                    <InputSearchBlockchain
+                      chainId={chainId}
+                      onChange={setChainId}
+                    />
+                  </Grid>
+                </Grid>
 
-          <Grid container item>
-            <Grid item xs={6}>
-              <InputLabel>
-                Reward amount
-              </InputLabel>
-              <TextField
-                {...register('rewardAmount', {
-                  valueAsNumber: true
-                })}
-                type='number'
-                size='small'
-                inputProps={{ step: 0.000000001 }}
-              />
-              {
-              errors?.rewardAmount && (
-              <Alert severity='error'>
-                {errors.rewardAmount.message}
-              </Alert>
-              )
-            }
-            </Grid>
-            <Grid item xs={6}>
-              <InputLabel>
-                Reward token
-              </InputLabel>
-              <InputSearchCrypto
-                cryptoList={availableCryptos}
-                chainId={chainId}
-                defaultValue={bounty?.rewardToken}
-                value={rewardToken}
-                hideBackdrop={true}
-                onChange={newToken => {
-                  setValue('rewardToken', newToken);
-                }}
-                onNewPaymentMethod={onNewPaymentMethod}
-              />
-            </Grid>
-          </Grid>
+                <Grid container item>
+                  <Grid item xs={6}>
+                    <InputLabel>
+                      Reward amount
+                    </InputLabel>
+                    <TextField
+                      {...register('rewardAmount', {
+                        valueAsNumber: true
+                      })}
+                      type='number'
+                      size='small'
+                      inputProps={{ step: 0.000000001 }}
+                    />
+                    {
+                errors?.rewardAmount && (
+                <Alert severity='error'>
+                  {errors.rewardAmount.message}
+                </Alert>
+                )
+              }
+                  </Grid>
+                  <Grid item xs={6}>
+                    <InputLabel>
+                      Reward token
+                    </InputLabel>
+                    <InputSearchCrypto
+                      cryptoList={availableCryptos}
+                      chainId={chainId}
+                      defaultValue={bounty?.rewardToken}
+                      value={rewardToken}
+                      hideBackdrop={true}
+                      onChange={newToken => {
+                        setValue('rewardToken', newToken);
+                      }}
+                      onNewPaymentMethod={onNewPaymentMethod}
+                    />
+                  </Grid>
+                </Grid>
+              </>
+            )
+          }
+
           <Grid item>
-            <Button loading={isSubmitting} disabled={!isValid} type='submit'>{mode === 'create' ? 'Create bounty' : 'Update bounty'}</Button>
+            <Button
+              loading={isSubmitting}
+              disabled={mode === 'suggest' ? (!values.title || !values.description) : !isValid}
+              type='submit'
+            >
+              {bountyFormTitles[mode]}
+            </Button>
           </Grid>
         </Grid>
       </form>

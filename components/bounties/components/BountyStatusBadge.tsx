@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import GradingIcon from '@mui/icons-material/Grading';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -24,6 +25,7 @@ import { BrandColor } from 'theme/colors';
 import { useTheme } from '@emotion/react';
 
 const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
+  suggestion: <LightbulbIcon />,
   open: <ModeStandbyIcon />,
   assigned: <AssignmentIndIcon />,
   review: <GradingIcon />,
@@ -32,6 +34,7 @@ const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
 };
 
 export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
+  suggestion: 'purple',
   open: 'green',
   assigned: 'yellow',
   review: 'orange',
