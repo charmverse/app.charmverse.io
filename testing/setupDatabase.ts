@@ -119,10 +119,7 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
 }
 
 export default async function seedDatabase () {
-  const { space } = await generateUserAndSpaceWithApiToken();
+  // Left empty as we do not need any global data for now
 
-  await provisionApiKey(space.id);
-
-  // const user = await
   return true;
 }
