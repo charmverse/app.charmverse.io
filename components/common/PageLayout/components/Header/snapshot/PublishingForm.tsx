@@ -89,8 +89,8 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   /**
    * Returns markdown content if valid length, or null if not
    */
-  function checkMarkdownLength (): string | null {
-    const content = generateMarkdown(page!, false);
+  async function checkMarkdownLength (): Promise<string | null> {
+    const content = await generateMarkdown(page!, false);
 
     const markdownCharacterLength = content.length;
 
@@ -155,7 +155,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
       else {
         setConfigurationError(null);
 
-        checkMarkdownLength();
+        await checkMarkdownLength();
       }
     }
 
@@ -168,7 +168,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     setFormError(null);
     setPublishing(true);
 
-    const content = generateMarkdown(page!, false);
+    const content = await generateMarkdown(page!, false);
 
     let receipt: SnapshotReceipt;
 

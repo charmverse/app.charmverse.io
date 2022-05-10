@@ -172,7 +172,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
 
   });
 
-  it('should update a page title page', async () => {
+  it('should update a page title', async () => {
 
     const card = await createDatabaseCardPage({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
