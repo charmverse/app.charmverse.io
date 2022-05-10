@@ -1,5 +1,4 @@
 import { Box, Typography } from '@mui/material';
-import Button from 'components/common/Button';
 import GnosisTasksList from './GnosisTasksList';
 
 export default function TasksPage () {

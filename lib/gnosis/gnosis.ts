@@ -15,12 +15,12 @@ function getGnosisRPCUrl (chainId: number) {
 interface GetGnosisServiceProps {
   signer: ethers.Signer;
   chainId?: number;
-  gnosisUrl?: string;
+  serviceUrl?: string;
 }
 
-function getGnosisService ({ signer, chainId, gnosisUrl }: GetGnosisServiceProps): SafeServiceClient | null {
+function getGnosisService ({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
 
-  const txServiceUrl = gnosisUrl || (chainId && getGnosisRPCUrl(chainId));
+  const txServiceUrl = serviceUrl || (chainId && getGnosisRPCUrl(chainId));
   if (!txServiceUrl) {
     return null;
   }
@@ -45,11 +45,11 @@ interface GetSafesForAddressProps {
 }
 
 async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<({ chainId: number } & SafeInfoResponse)[]> {
-  const gnosisUrl = getGnosisRPCUrl(chainId);
-  if (!gnosisUrl) {
+  const serviceUrl = getGnosisRPCUrl(chainId);
+  if (!serviceUrl) {
     return [];
   }
-  const service = getGnosisService({ signer, gnosisUrl });
+  const service = getGnosisService({ signer, serviceUrl });
   if (service) {
     return service.getSafesByOwner(address)
       .then(r => Promise.all(r.safes.map(safeAddr => {

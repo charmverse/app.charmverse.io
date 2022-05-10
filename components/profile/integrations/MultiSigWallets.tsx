@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { Box, Card, CircularProgress, OutlinedInput, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import { WalletType } from '@prisma/client';
+import { useRouter } from 'next/router';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import useSWR from 'swr';
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
@@ -16,8 +16,9 @@ import charmClient from 'charmClient';
 import { getChainById } from 'connectors';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { useUser } from 'hooks/useUser';
-import { getSafesForAddresses } from 'lib/gnosis';
 import { Controller, useForm } from 'react-hook-form';
+import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
+import { importSafesFromWallet } from 'lib/gnosis/gnosis.client';
 
 interface Wallet {
   id: string;
@@ -42,7 +43,7 @@ const gnosisUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address
 
 export default function MultiSigList () {
 
-  const { data: walletData, mutate } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs(), { revalidateOnFocus: false });
+  const { data: walletData, mutate } = useMultiWalletSigs();
 
   const gnosisSigner = useGnosisSigner();
   const [user] = useUser();
@@ -52,13 +53,11 @@ export default function MultiSigList () {
     if (gnosisSigner && user) {
       setIsLoadingSafes(true);
       try {
-        const safes = await getSafesForAddresses(gnosisSigner, user.addresses);
-        const safesData = safes.map(safe => ({
-          address: safe.address,
-          chainId: safe.chainId,
-          name: getWalletName(safe.address) // get existing name if user gave us one
-        }));
-        await charmClient.setUserMultiSigs(safesData);
+        await importSafesFromWallet({
+          signer: gnosisSigner,
+          addresses: user.addresses,
+          getWalletName
+        });
         await mutate();
       }
       finally {
@@ -97,20 +96,7 @@ export default function MultiSigList () {
         )}
       </Legend>
 
-      {sortedRows.length === 0 && (
-        <Card variant='outlined'>
-          <Box p={3} textAlign='center'>
-            <Typography color='secondary'>Import your Gnosis safes to view pending transactions under <Link href='/profile/tasks'>My Tasks</Link></Typography>
-            <br />
-            <Button
-              loading={!gnosisSigner || isLoadingSafes}
-              onClick={importSafes}
-            >
-              Import Gnosis Safes
-            </Button>
-          </Box>
-        </Card>
-      )}
+      {sortedRows.length === 0 && <GnosisConnectCard loading={!gnosisSigner || isLoadingSafes} onClick={importSafes} />}
 
       {sortedRows.length > 0 && (
         <Table size='small' aria-label='simple table'>
@@ -133,6 +119,25 @@ export default function MultiSigList () {
         </Table>
       )}
     </>
+  );
+}
+
+export function GnosisConnectCard ({ loading, onClick }: { loading: boolean, onClick: () => void }) {
+  const router = useRouter();
+  const isTasksPage = router.pathname.includes('/tasks');
+  return (
+    <Card variant='outlined'>
+      <Box p={3} textAlign='center'>
+        <Typography color='secondary'>Import your Gnosis safes to view your transaction queue{!isTasksPage && <>under <Link href='/profile/tasks'>My Tasks</Link></>}</Typography>
+        <br />
+        <Button
+          loading={loading}
+          onClick={onClick}
+        >
+          Connect Gnosis Safe
+        </Button>
+      </Box>
+    </Card>
   );
 }
 

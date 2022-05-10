@@ -6,9 +6,7 @@ import { getTransactionsforSafes, GnosisTransaction } from 'lib/gnosis';
 import useWeb3Signer from 'hooks/useWeb3Signer';
 import { ethers } from 'ethers';
 import log from 'lib/log';
-import { useContributors } from 'hooks/useContributors';
 import { SafeMultisigTransactionResponse } from '@gnosis.pm/safe-service-client';
-import { Contributor } from 'models';
 import { useUser } from 'hooks/useUser';
 
 interface SendAction {
