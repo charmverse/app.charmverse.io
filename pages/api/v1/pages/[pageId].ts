@@ -159,7 +159,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const cardToReturn = new PageFromBlock(updatedPage, boardSchema, cardPage?.content as PageContent);
+  const cardToReturn = new PageFromBlock(updatedPage, boardSchema);
   if (cardPage) {
     cardToReturn.content.markdown = await generateMarkdown(cardPage, true);
   }
