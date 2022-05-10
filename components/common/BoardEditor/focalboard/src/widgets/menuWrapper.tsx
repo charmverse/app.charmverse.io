@@ -1,7 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React, {useRef, useMemo, useState, useEffect} from 'react'
+import React, {memo, useRef, useMemo, useState, useEffect} from 'react'
+import ClickAwayListener from '@mui/material/ClickAwayListener'
 
 import { MenuContext, useMenuContext, Context } from './menu/menuContext'
 
@@ -14,7 +15,7 @@ type Props = {
     label?: string
 }
 
-const MenuWrapper = React.memo((props: Props) => {
+const MenuWrapper = (props: Props) => {
     const node = useRef<HTMLDivElement>(null)
     const [open, setOpen] = useState(Boolean(props.isOpen))
     const [, setAnchorEl] = useMenuContext()
@@ -23,29 +24,8 @@ const MenuWrapper = React.memo((props: Props) => {
         throw new Error('MenuWrapper needs exactly 2 children')
     }
 
-    const close = (): void => {
-        setOpen(false)
-    }
-
-    const closeOnBlur = (e: Event) => {
-        if (e.target && node.current?.contains(e.target as Node)) {
-            return
-        }
-
-        close()
-    }
-
-    const keyboardClose = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-            close()
-        }
-
-        if (e.key === 'Tab') {
-            closeOnBlur(e)
-        }
-    }
-
     const toggle = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+
         if (props.disabled) {
             return
         }
@@ -64,20 +44,41 @@ const MenuWrapper = React.memo((props: Props) => {
     }
 
     useEffect(() => {
+
+        const close = (): void => {
+            setOpen(false)
+        }
+
+        const closeOnBlur = (e: Event) => {
+
+            if (e.target && node.current?.contains(e.target as Node)) {
+                return
+            }
+
+            close()
+        }
+
+        const keyboardClose = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                close()
+            }
+
+            if (e.key === 'Tab') {
+                closeOnBlur(e)
+            }
+        }
+
+
         document.addEventListener('menuItemClicked', close, true)
-        document.addEventListener('click', closeOnBlur, true)
         document.addEventListener('keyup', keyboardClose, true)
         return () => {
             document.removeEventListener('menuItemClicked', close, true)
-            document.removeEventListener('click', closeOnBlur, true)
             document.removeEventListener('keyup', keyboardClose, true)
         }
     }, [])
 
     useEffect(() => {
-        if (node) {
-            setAnchorEl(node.current)
-        }
+        setAnchorEl(node.current)
     }, [node])
 
     const {children} = props
@@ -85,11 +86,12 @@ const MenuWrapper = React.memo((props: Props) => {
     if (props.disabled) {
         className += ' disabled'
     }
-  if (props.className) {
+    if (props.className) {
         className += ' ' + props.className
     }
 
     return (
+        <ClickAwayListener onClickAway={() => setOpen(false)}>
         <div
             role='button'
             aria-label={props.label || 'menuwrapper'}
@@ -100,10 +102,12 @@ const MenuWrapper = React.memo((props: Props) => {
             {children ? Object.values(children)[0] : null}
             {children && !props.disabled && open ? Object.values(children)[1] : null}
         </div>
+        </ClickAwayListener>
     )
-})
+}
 
-export default function MenuWithContext (props: Props) {
+// create an anchorRef to pass down as context to the menu popper
+const MenuWithContext = (props: Props) => {
     const [anchorRef, setAnchorRef] = useState<HTMLDivElement | null>(null)
     const value: Context = useMemo(() => [anchorRef, setAnchorRef], [anchorRef, setAnchorRef]);
     return (
@@ -112,3 +116,5 @@ export default function MenuWithContext (props: Props) {
         </MenuContext.Provider>
     );
 }
+
+export default memo(MenuWithContext)

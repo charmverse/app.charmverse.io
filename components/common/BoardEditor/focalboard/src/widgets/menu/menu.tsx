@@ -29,24 +29,24 @@ function Menu (props: Props) {
 
     return (
         <StyledPopper anchorEl={anchorEl} open={true} placement={position || 'bottom-start'}>
-        <div className={'Menu noselect ' + (position || 'bottom-start')}>
-            <div className='menu-contents'>
-                <div className='menu-options'>
-                    {children}
-                </div>
+            <div className={'Menu noselect ' + (position || 'bottom-start')}>
+                <div className='menu-contents'>
+                    <div className='menu-options'>
+                        {children}
+                    </div>
 
-                <div className='menu-spacer hideOnWidescreen'/>
+                    <div className='menu-spacer hideOnWidescreen'/>
 
-                <div className='menu-options hideOnWidescreen'>
-                    <Menu.Text
-                        id='menu-cancel'
-                        name={'Cancel'}
-                        className='menu-cancel'
-                        onClick={() => void 0}
-                    />
+                    <div className='menu-options hideOnWidescreen'>
+                        <Menu.Text
+                            id='menu-cancel'
+                            name={'Cancel'}
+                            className='menu-cancel'
+                            onClick={() => void 0}
+                        />
+                    </div>
                 </div>
             </div>
-         </div>
         </StyledPopper>
     )
 }
