@@ -1,6 +1,8 @@
 import EditIcon from '@mui/icons-material/Edit';
-import { IconButton } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Tooltip from '@mui/material/Tooltip';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import Box from '@mui/material/Box';
 import Alert, { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
@@ -49,6 +51,7 @@ export default function BountyDetails () {
   const [bounty, setBounty] = useState<BountyWithDetails | null>(null);
 
   const bountyEditModal = usePopupState({ variant: 'popover', popupId: 'ERC20-popup' });
+  const bountyApproveModal = usePopupState({ variant: 'popover', popupId: 'approve-bounty' });
   const [showApplicationDialog, setShowApplicationDialog] = useState(false);
   const [showBountyDeleteDialog, setShowBountyDeleteDialog] = useState(false);
   const [paymentError, setPaymentError] = useState<{severity: AlertColor, message: string} | null>(null);
@@ -166,6 +169,14 @@ export default function BountyDetails () {
 
   }
 
+  const approvableBounty = bounty?.status === 'suggestion' && isAdmin && bounty.rewardAmount !== 0;
+
+  async function approveBountySuggestion () {
+    const approvedBounty = await charmClient.updateBounty(bounty!.id, { status: 'open' });
+    updateBounty(approvedBounty);
+    bountyApproveModal.close();
+  }
+
   function updateBounty (updatedBounty: BountyWithDetails) {
     const inMemoryBountyIndex = bounties.findIndex(bountyInMemory => {
       return bountyInMemory.id === updatedBounty.id;
@@ -230,12 +241,28 @@ export default function BountyDetails () {
                 {
                 viewerCanModifyBounty === true && (
                   <>
-                    <IconButton onClick={bountyEditModal.open}>
-                      <EditIcon fontSize='medium' />
-                    </IconButton>
-                    <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
-                      <DeleteIcon fontSize='medium' />
-                    </IconButton>
+                    <Tooltip placement='top' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                      <IconButton onClick={bountyEditModal.open}>
+                        <EditIcon fontSize='medium' />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip placement='top' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                      <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
+                        <DeleteIcon fontSize='medium' />
+                      </IconButton>
+                    </Tooltip>
+                    {
+
+                      isAdmin && bounty.status === 'suggestion' && (
+                        <Tooltip placement='top' title={approvableBounty ? 'Approve bounty suggestion' : 'You must define a reward amount before you can approve this bounty suggestion.'}>
+
+                          <IconButton onClick={approvableBounty ? bountyApproveModal.open : () => {}}>
+                            <AssignmentTurnedInIcon fontSize='medium' />
+                          </IconButton>
+
+                        </Tooltip>
+                      )
+                    }
                   </>
                 )
               }
@@ -379,6 +406,28 @@ export default function BountyDetails () {
         }
           <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={bountyEditModal.isOpen} onClose={bountyEditModal.close} />
 
+          <Modal title='Approve bounty suggestion' open={bountyApproveModal.isOpen} onClose={bountyApproveModal.close}>
+
+            <Typography sx={{ whiteSpace: 'pre-wrap' }}>
+              {
+              'Confirm you want to approve this bounty.\r\n\r\nIts status will be changed to \'open\' and workspace members will be able to apply.'
+              }
+
+            </Typography>
+
+            <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
+              <Button
+                color='primary'
+                sx={{ mr: 2, fontWeight: 'bold' }}
+                onClick={approveBountySuggestion}
+              >
+                Approve
+              </Button>
+
+              <Button color='secondary' onClick={bountyApproveModal.close}>Cancel</Button>
+            </Box>
+          </Modal>
+
           <Modal title='Bounty Application' size='large' open={showApplicationDialog} onClose={toggleApplicationDialog}>
             <ApplicationEditorForm
               bountyId={bounty.id}
@@ -394,7 +443,7 @@ export default function BountyDetails () {
             bounty.status !== 'open' && (
             <Typography sx={{ mb: 1 }}>
               {
-                bounty.status === 'complete' ? 'This bounty is already complete.' : 'This is bounty in progress.'
+                (bounty.status === 'complete' || bounty.status === 'paid') ? 'This bounty is already complete.' : 'This is bounty in progress.'
               }
 
             </Typography>
@@ -408,9 +457,7 @@ export default function BountyDetails () {
             <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
               <Button color='error' sx={{ mr: 2, fontWeight: 'bold' }} onClick={deleteBounty}>Delete bounty</Button>
 
-              {
-            bounty.status === 'open' && <Button color='secondary' onClick={toggleBountyDeleteDialog}>Cancel</Button>
-          }
+              <Button color='secondary' onClick={toggleBountyDeleteDialog}>Cancel</Button>
             </Box>
 
           </Modal>
