@@ -241,12 +241,12 @@ export default function BountyDetails () {
                 {
                 viewerCanModifyBounty === true && (
                   <>
-                    <Tooltip placement='top' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                    <Tooltip arrow placement='top' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                       <IconButton onClick={bountyEditModal.open}>
                         <EditIcon fontSize='medium' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip placement='top' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                    <Tooltip arrow placement='top' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                       <IconButton sx={{ mx: -1 }} onClick={toggleBountyDeleteDialog}>
                         <DeleteIcon fontSize='medium' />
                       </IconButton>
@@ -254,12 +254,8 @@ export default function BountyDetails () {
                     {
 
                       isAdmin && bounty.status === 'suggestion' && (
-                        <Tooltip placement='top' title={approvableBounty ? 'Approve bounty suggestion' : 'You must define a reward amount before you can approve this bounty suggestion.'}>
-
-                          <IconButton onClick={approvableBounty ? bountyApproveModal.open : () => {}}>
-                            <AssignmentTurnedInIcon fontSize='medium' />
-                          </IconButton>
-
+                        <Tooltip arrow placement='top' title={approvableBounty ? 'Approve bounty suggestion' : 'You must define a reward amount before you can approve this bounty suggestion.'}>
+                          <Button color='primary' onClick={approvableBounty ? bountyApproveModal.open : () => {}}>Approve suggestion</Button>
                         </Tooltip>
                       )
                     }
