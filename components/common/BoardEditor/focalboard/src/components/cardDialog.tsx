@@ -101,7 +101,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
     }
 
     const menu = (
-        <Menu position='left'>
+        <Menu position='bottom-end'>
             <Menu.Text
                 id='delete'
                 icon={<DeleteIcon/>}
