@@ -33,16 +33,12 @@ import 'components/common/BoardEditor/focalboard/src/components/cardDetail/comme
 import 'components/common/BoardEditor/focalboard/src/components/cardDialog.scss';
 import 'components/common/BoardEditor/focalboard/src/components/centerPanel.scss';
 import 'components/common/BoardEditor/focalboard/src/components/confirmationDialogBox.scss';
-import 'components/common/BoardEditor/focalboard/src/components/content/checkboxElement.scss';
-import 'components/common/BoardEditor/focalboard/src/components/content/dividerElement.scss';
 import 'components/common/BoardEditor/focalboard/src/components/contentBlock.scss';
 import 'components/common/BoardEditor/focalboard/src/components/dialog.scss';
 import { FlashMessages } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import 'components/common/BoardEditor/focalboard/src/components/flashMessages.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/gallery.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/galleryCard.scss';
-import 'components/common/BoardEditor/focalboard/src/components/globalHeader/globalHeader.scss';
-import 'components/common/BoardEditor/focalboard/src/components/globalHeader/globalHeaderSettingsMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/calculation/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/calculation/calculationOption.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanban.scss';
