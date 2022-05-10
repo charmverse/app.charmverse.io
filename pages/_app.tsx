@@ -33,7 +33,6 @@ import 'components/common/BoardEditor/focalboard/src/components/cardDetail/comme
 import 'components/common/BoardEditor/focalboard/src/components/cardDialog.scss';
 import 'components/common/BoardEditor/focalboard/src/components/centerPanel.scss';
 import 'components/common/BoardEditor/focalboard/src/components/confirmationDialogBox.scss';
-import 'components/common/BoardEditor/focalboard/src/components/contentBlock.scss';
 import 'components/common/BoardEditor/focalboard/src/components/dialog.scss';
 import { FlashMessages } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import 'components/common/BoardEditor/focalboard/src/components/flashMessages.scss';
