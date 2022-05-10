@@ -56,19 +56,12 @@ export async function replaceNestedPages (convertedToMarkdown: string): Promise<
     ? ((await import('lib/pages/server/generatePageLink')).generatePageLink)
   // Client-side methid
     : (pageId: string) => {
+
       const documentNode = document.querySelector(`[data-id="page-${pageId}"]`) as HTMLDivElement;
       const pageLink: PageLink = {
-        title: '',
-        url: ''
+        title: documentNode?.getAttribute('data-title') as string ?? '',
+        url: documentNode?.getAttribute('data-path') as string ?? ''
       };
-      if (documentNode) {
-        pageLink.title = documentNode.getAttribute('data-title') as string;
-        /**
-         Depends on the data-path attributed in NestedPageContainer being passed as a full path
-         components/common/CharmEditor/components/nestedPage/components/NestedPage.tsx
-         */
-        pageLink.url = documentNode.getAttribute('data-path') as string;
-      }
       return pageLink;
     };
 
