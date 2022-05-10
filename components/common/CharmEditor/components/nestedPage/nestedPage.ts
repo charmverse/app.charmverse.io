@@ -2,6 +2,7 @@ import { RawSpecs } from '@bangle.dev/core';
 import { DOMOutputSpec, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM, SuggestTooltipRenderOpts, tooltipPlacement } from '@bangle.dev/tooltip';
 import charmClient from 'charmClient';
+import { PageLink } from 'lib/pages';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'page';
@@ -50,7 +51,26 @@ export async function replaceNestedPages (convertedToMarkdown: string): Promise<
 
   const isServer = typeof window === 'undefined';
   // Dynamic import allows this function to be loaded in the client-side without triggering a server-side import
-  const linkGetter = isServer ? ((await import('lib/pages/server/generatePageLink')).generatePageLink) : charmClient.getPageLink;
+  const linkGetter = isServer
+  // Server-side method
+    ? ((await import('lib/pages/server/generatePageLink')).generatePageLink)
+  // Client-side methid
+    : (pageId: string) => {
+      const documentNode = document.querySelector(`[data-id="page-${pageId}"]`) as HTMLDivElement;
+      const pageLink: PageLink = {
+        title: '',
+        url: ''
+      };
+      if (documentNode) {
+        pageLink.title = documentNode.getAttribute('data-title') as string;
+        /**
+         Depends on the data-path attributed in NestedPageContainer being passed as a full path
+         components/common/CharmEditor/components/nestedPage/components/NestedPage.tsx
+         */
+        pageLink.url = documentNode.getAttribute('data-path') as string;
+      }
+      return pageLink;
+    };
 
   await Promise.all(nestedPageMarkers
     .map(pageMarker => {

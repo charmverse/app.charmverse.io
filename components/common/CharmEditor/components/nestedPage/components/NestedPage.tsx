@@ -48,8 +48,10 @@ export default function NestedPage ({ node, getPos, view }: NodeViewProps) {
     && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0))
   );
 
+  const fullPath = `${window.location.origin}/${space?.domain}/${nestedPage?.path}`;
+
   return (
-    <NestedPageContainer>
+    <NestedPageContainer data-id={`page-${nestedPage?.id}`} data-title={nestedPage?.title} data-path={fullPath}>
       <div>
         {nestedPage && <PageIcon isEditorEmpty={isEditorEmpty} icon={nestedPage.icon} pageType={nestedPage.type} />}
       </div>
