@@ -42,8 +42,8 @@ export type BrandColorScheme = Record<BrandColor, string>
 export const darkModeColors: BrandColorScheme = {
   gray: '#91918D', // Philippine Gray
   cyanBlue: '#5681C8', // Silver Lake Blue
-  orange: '#F79064', // Atomic Tangerine
-  yellow: '#EFDF6C', // Arylide Yellow
+  orange: '#F5743D', // Chinese Orange
+  yellow: '#A59412', // Dark Yellow
   green: '#009FB7', // Bondi Blue
   blue: '#1FBFFF', // Spiro Disco Ball
   purple: '#985CFF', // Lavender Indigo
