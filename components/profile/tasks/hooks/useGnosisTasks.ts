@@ -1,27 +1,43 @@
 import { useEffect, useState } from 'react';
+import groupBy from 'lodash/groupBy';
 import useSWR from 'swr';
-import { UserMultiSigWallet } from '@prisma/client';
 import charmClient from 'charmClient';
-// import { Task } from 'models';
 import { getTransactionsforSafes, GnosisTransaction } from 'lib/gnosis';
-import { SafeMultisigTransactionWithTransfersResponse } from '@gnosis.pm/safe-service-client';
 import useWeb3Signer from 'hooks/useWeb3Signer';
-import { ethers, Signer } from 'ethers';
+import { ethers } from 'ethers';
+import log from 'lib/log';
+import { useContributors } from 'hooks/useContributors';
+import { SafeMultisigTransactionResponse } from '@gnosis.pm/safe-service-client';
+import { Contributor } from 'models';
+import { useUser } from 'hooks/useUser';
 
 interface SendAction {
   to: string;
   value: string;
 }
 
+interface GnosisTransactionPopulated {
+    id: string;
+    date: Date;
+    actions: SendAction[];
+    isExecuted: boolean;
+    description: string;
+    nonce: number;
+    safeAddress: string;
+    gnosisUrl: string;
+    action: string;
+    actionUrl: string;
+}
+
 export interface GnosisTask {
-  id: string;
-  date: Date;
-  actions: SendAction[];
-  isExecuted: boolean;
-  description: string;
   nonce: number;
+  transactions: GnosisTransactionPopulated[];
+}
+
+interface GnosisSafeTasks {
   safeAddress: string;
-  gnosisUrl: string;
+  safeUrl: string;
+  tasks: GnosisTask[];
 }
 
 function etherToBN (ether: string): ethers.BigNumber {
@@ -56,7 +72,7 @@ function getTaskDescription (transaction: GnosisTransaction): string {
       return `Send ${ethersValue} ETH`;
     }
   }
-  console.warn('Unknown transaction', transaction);
+  log.warn('Unknown transaction', transaction);
   return 'N/A';
 }
 
@@ -64,7 +80,7 @@ function getTaskDescription (transaction: GnosisTransaction): string {
 //   return transaction.txType === 'MULTISIG_TRANSACTION';
 // }
 
-function getActions (transaction: GnosisTransaction): SendAction[] {
+function getTaskActions (transaction: GnosisTransaction): SendAction[] {
   const data = transaction.dataDecoded as any | undefined;
   if (data) {
     return data?.parameters[0].valueDecoded as { to: string, value: string }[];
@@ -72,41 +88,64 @@ function getActions (transaction: GnosisTransaction): SendAction[] {
   return [{ to: transaction.to, value: transaction.value }];
 }
 
-function convertTransactionToTask (transaction: GnosisTransaction): GnosisTask {
-  const actions = getActions(transaction);
+function transactionToTask ({ myAddresses, transaction }: { myAddresses: string[], transaction: GnosisTransaction }): GnosisTransactionPopulated {
+  const actions = getTaskActions(transaction);
+  const gnosisUrl = getGnosisTransactionUrl(transaction.safe);
   return {
     id: transaction.safeTxHash,
     actions,
     date: new Date(transaction.submissionDate),
     isExecuted: transaction.isExecuted,
     description: getTaskDescription(transaction),
-    gnosisUrl: getGnosisTransactionUrl(transaction.safe),
+    gnosisUrl,
     nonce: transaction.nonce,
-    safeAddress: transaction.safe
+    safeAddress: transaction.safe,
+    action: 'Sign',
+    actionUrl: gnosisUrl
   };
 }
 
-async function getPendingTasks (signer: Signer, wallets: UserMultiSigWallet[]): Promise<GnosisTask[]> {
-  const transactions = await getTransactionsforSafes(signer, wallets);
-  console.log(transactions);
-  return transactions
-    // .filter(isMultiSigTransaction)
-    .map(convertTransactionToTask)
-    .filter(task => !task.isExecuted)
-    .sort((a, b) => a.nonce - b.nonce);
+function transactionsToTasks ({ transactions, myAddresses }: { transactions: GnosisTransaction[], myAddresses: string[] }): GnosisSafeTasks[] {
+
+  const mapped = transactions.map(transaction => transactionToTask({ myAddresses, transaction }));
+
+  return Object.values(groupBy(mapped, 'safeAddress'))
+    .map<GnosisSafeTasks>((_transactions) => ({
+      safeAddress: _transactions[0].safeAddress,
+      safeUrl: getGnosisTransactionUrl(_transactions[0].safeAddress),
+      tasks: Object.values(groupBy(_transactions, 'nonce'))
+        .map<GnosisTask>(__transactions => ({ nonce: __transactions[0].nonce, transactions: __transactions }))
+        .sort((a, b) => a.nonce - b.nonce)
+    }))
+    .sort((safeA, safeB) => safeA.safeAddress > safeB.safeAddress ? -1 : 1);
 }
 
 export default function useGnosisTasks () {
 
   const signer = useWeb3Signer();
-  const { data } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs());
-  const [tasks, setTasks] = useState<GnosisTask[] | null>(null);
+  const [user] = useUser();
+  const { data: wallets } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs());
+  const [transactions, setTransactions] = useState<SafeMultisigTransactionResponse[] | null>(null);
+  const [tasks, setTasks] = useState<GnosisSafeTasks[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (data && signer) {
-      getPendingTasks(signer, data).then(setTasks);
+    if (wallets && signer) {
+      getTransactionsforSafes(signer, wallets)
+        .then(setTransactions)
+        .catch(err => setError(err.message || err));
     }
-  }, [data, signer]);
+  }, [wallets, signer]);
 
-  return tasks;
+  useEffect(() => {
+    console.log('transactions', transactions, user);
+    if (transactions && user) {
+      console.log('set tasks');
+      const _tasks = transactionsToTasks({ transactions, myAddresses: user.addresses });
+      setTasks(_tasks);
+      console.log('done set tasks', _tasks);
+    }
+  }, [transactions, user]);
+
+  return { tasks, error };
 }
