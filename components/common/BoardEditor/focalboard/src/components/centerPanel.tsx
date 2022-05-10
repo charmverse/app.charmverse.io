@@ -327,7 +327,7 @@ function CenterPanel(props: Props) {
         keyName='ctrl+d,del,esc,backspace'
         onKeyDown={keydownHandler}
       />
-      {board.deletedAt && <PageDeleteBanner pageId={board.id}/>}
+      {!!board.deletedAt && <PageDeleteBanner pageId={board.id}/>}
       {board.fields.headerImage && <Box className='PageBanner' width={"100%"} mb={2}>
         <PageBanner focalBoard headerImage={board.fields.headerImage} setPage={({ headerImage }) => {
           setRandomHeaderImage(board, headerImage!)
