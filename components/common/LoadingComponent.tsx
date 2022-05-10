@@ -1,5 +1,5 @@
 
-import React, { ReactNode } from 'react';
+import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import styled from '@emotion/styled';
 
@@ -19,17 +19,16 @@ export const LoadingCard = styled.div<{ height?: CSSValue, minHeight?: CSSValue 
 `;
 
 interface LoadingProps {
-  component?: ReactNode;
+  component?: JSX.Element;
   height?: CSSValue;
   label?: string;
   minHeight?: CSSValue;
   isLoading: boolean;
   size?: number;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-export default function LoadingComponent ({
-  height, isLoading, component, label, children, minHeight, size = 40 }: LoadingProps) {
+export default function LoadingComponent ({ height, isLoading, component, label, children, minHeight, size = 40 }: LoadingProps): JSX.Element {
   if (!isLoading) return component || <span>{children}</span>;
   return (
     <LoadingCard height={height} minHeight={minHeight}>

@@ -128,7 +128,7 @@ export default function BountyPaymentButton ({
         await switchActiveNetwork(chainToUse.chainId);
       }
 
-      const signer = await library.getSigner(account);
+      const signer = library.getSigner(account);
 
       if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
         const tx = await signer.sendTransaction({
