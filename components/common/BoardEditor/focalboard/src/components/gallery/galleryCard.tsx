@@ -18,7 +18,6 @@ import OptionsIcon from '../../widgets/icons/options'
 import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
 import Tooltip from '../../widgets/tooltip'
-import { CardDetailProvider } from '../cardDetail/cardDetailContext'
 import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
 import { PageContent } from 'models'
@@ -151,9 +150,8 @@ const GalleryCard = React.memo((props: Props) => {
           />
         </div>}
       {!galleryImageUrl &&
-        <CardDetailProvider card={card}>
           <div className='gallery-item' />
-        </CardDetailProvider>}
+      }
       {props.visibleTitle &&
         <div className='gallery-title'>
           {cardPage?.icon ? <PageIcon isEditorEmpty={false} pageType="card" icon={cardPage.icon} /> : undefined}

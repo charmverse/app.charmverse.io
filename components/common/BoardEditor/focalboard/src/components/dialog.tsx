@@ -8,6 +8,7 @@ import IconButton from '../widgets/buttons/iconButton'
 import CloseIcon from '../widgets/icons/close'
 import OptionsIcon from '../widgets/icons/options'
 import MenuWrapper from '../widgets/menuWrapper'
+import Modal from '@mui/material/Modal';
 
 type Props = {
     children: React.ReactNode
@@ -31,6 +32,7 @@ const Dialog = React.memo((props: Props) => {
     useHotkeys('esc', () => props.onClose())
 
     return (
+        <Modal open={true}>
         <div className={`Dialog dialog-back ${props.className}`}>
             <div
                 className='wrapper'
@@ -68,6 +70,7 @@ const Dialog = React.memo((props: Props) => {
                 </div>
             </div>
         </div>
+        </Modal>
     )
 })
 
