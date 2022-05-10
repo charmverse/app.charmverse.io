@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Popper from '@mui/material/Popper'
 import SeparatorOption from './separatorOption'
 import SwitchOption from './switchOption'
@@ -26,10 +26,41 @@ function Menu (props: Props) {
 
     const {position , children} = props
     const [anchorEl] = useMenuContext()
+    const popperRef = useRef<HTMLDivElement>(null)
+    const [maxHeight, setMaxHeight] = useState(0)
+
+    useEffect(() => {
+        const handleResize = () => {
+            const windowHeight = window.innerHeight
+            const box = popperRef?.current?.getBoundingClientRect()
+            const padding = 10;
+            if (box) {
+                if (box.top + box.bottom + padding > windowHeight) {
+                    setMaxHeight(windowHeight - box.top - padding)
+                }
+                else {
+                    setMaxHeight(0)
+                }
+            }
+        }
+        window.addEventListener('resize', handleResize)
+
+        // run once on load, wait for menu to render
+        setTimeout(() => {
+            handleResize()
+        }, 0)
+
+        return () => {
+            window.removeEventListener('resize', handleResize)
+        }
+    }, [])
 
     return (
         <StyledPopper anchorEl={anchorEl} open={true} placement={position || 'bottom-start'}>
-            <div className={'Menu noselect ' + (position || 'bottom-start')}>
+            <div
+                ref={popperRef}
+                style={{ maxHeight: maxHeight || 'none' }}
+                className={'Menu noselect ' + (position || 'bottom-start')}>
                 <div className='menu-contents'>
                     <div className='menu-options'>
                         {children}
