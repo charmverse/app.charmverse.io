@@ -158,21 +158,7 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
     cardPagesRecord[cardPage.id] = cardPage;
   });
 
-  const cardsWithContent = await Promise.all<Page>(cardBlocks.map(cardBlock => {
-    return new Promise((resolve, reject) => {
-      const mappedPage = new PageFromBlock(cardBlock, boardSchema);
-      const pageWithContent = cardPagesRecord[cardBlock.id];
-      generateMarkdown(pageWithContent)
-        .then(markdownText => {
-          mappedPage.content.markdown = markdownText;
-          resolve(mappedPage);
-        })
-        .catch(err => {
-          resolve(mappedPage);
-        });
-    });
-
-  }));
+  const cardsWithContent = cardBlocks.map(cardBlock => new PageFromBlock(cardBlock, boardSchema));
 
   let hasNext = false;
   let cursor: string | undefined;
