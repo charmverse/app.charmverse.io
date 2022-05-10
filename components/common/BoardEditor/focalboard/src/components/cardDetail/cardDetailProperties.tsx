@@ -180,7 +180,7 @@ const CardDetailProperties = React.memo((props: Props) => {
                                 defaultMessage='+ Add a property'
                             />
                         </Button>
-                        <Menu>
+                        <Menu position='bottom-start'>
                             <PropertyTypes
                                 label={intl.formatMessage({id: 'PropertyMenu.selectType', defaultMessage: 'Select property type'})}
                                 onTypeSelected={async (type) => {

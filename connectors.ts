@@ -36,6 +36,8 @@ export interface IChainDetails {
   testnet?: boolean;
 }
 
+// Gnosis endpoints: https://docs.gnosis-safe.io/backend/available-services
+
 const RPC: Record<string, IChainDetails> = {
   ETHEREUM: {
     chainId: 1,
@@ -176,7 +178,6 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://api.harmony.one'],
     blockExplorerUrls: ['https://explorer.harmony.one'],
-    gnosisUrl: 'https://safe-transaction.rinkeby.gnosis.io',
     iconUrls: ['/networkLogos/harmony.svg']
   },
   GOERLI: {
@@ -226,7 +227,6 @@ const RPC: Record<string, IChainDetails> = {
     },
     rpcUrls: ['https://rpc-mumbai.matic.today'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
-    gnosisUrl: 'https://safe-transaction.rinkeby.gnosis.io',
     iconUrls: ['/networkLogos/polygon.svg'],
     testnet: true
   }

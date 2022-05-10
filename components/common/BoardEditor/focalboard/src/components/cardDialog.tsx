@@ -8,7 +8,6 @@ import { Card } from '../blocks/card'
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from './confirmationDialogBox'
 import mutator from '../mutator'
 import { getCard } from '../store/cards'
-import { getCardContents } from '../store/contents'
 import { useAppSelector } from '../store/hooks'
 import { getUserBlockSubscriptionList } from '../store/initialLoad'
 import { Utils } from '../utils'
@@ -101,7 +100,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
     }
 
     const menu = (
-        <Menu position='left'>
+        <Menu position='bottom-end'>
             <Menu.Text
                 id='delete'
                 icon={<DeleteIcon/>}

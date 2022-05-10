@@ -150,12 +150,16 @@ class CharmClient {
     return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
 
-  createUserMultiSig (wallet: Partial<UserMultiSigWallet>): Promise<UserMultiSigWallet> {
-    return http.POST('/api/profile/multi-sigs', wallet);
+  setUserMultiSigs (wallets: Partial<UserMultiSigWallet>[]): Promise<UserMultiSigWallet[]> {
+    return http.POST('/api/profile/multi-sigs', wallets);
   }
 
   listUserMultiSigs (): Promise<UserMultiSigWallet[]> {
     return http.GET('/api/profile/multi-sigs');
+  }
+
+  updateUserMultiSig (wallet: { id: string, name: string }): Promise<UserMultiSigWallet[]> {
+    return http.PUT(`/api/profile/multi-sigs/${wallet.id}`, wallet);
   }
 
   deleteUserMultiSig (walletId: string) {

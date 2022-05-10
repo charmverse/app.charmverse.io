@@ -21,7 +21,6 @@ export type FormMode = 'create' | 'update';
 interface Props {
   onSubmit: (paymentMethod: Partial<PaymentMethod>) => any,
   defaultChainId?: number
-  isPersonalSafe?: boolean
 }
 
 export const schema = yup.object({
@@ -38,7 +37,7 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-export default function GnosisSafeForm ({ onSubmit, isPersonalSafe, defaultChainId = 1 }: Props) {
+export default function GnosisSafeForm ({ onSubmit, defaultChainId = 1 }: Props) {
 
   const {
     register,
@@ -81,18 +80,8 @@ export default function GnosisSafeForm ({ onSubmit, isPersonalSafe, defaultChain
     paymentMethod.walletType = 'gnosis';
 
     try {
-      if (isPersonalSafe) {
-        const createdPaymentMethod = await charmClient.createUserMultiSig({
-          address: paymentMethod.gnosisSafeAddress || '',
-          chainId: paymentMethod.chainId,
-          name: paymentMethod.name
-        });
-        onSubmit(createdPaymentMethod);
-      }
-      else {
-        const createdPaymentMethod = await charmClient.createPaymentMethod(paymentMethod);
-        onSubmit(createdPaymentMethod);
-      }
+      const createdPaymentMethod = await charmClient.createPaymentMethod(paymentMethod);
+      onSubmit(createdPaymentMethod);
     }
     catch (error: any) {
       setFormError(
@@ -116,20 +105,6 @@ export default function GnosisSafeForm ({ onSubmit, isPersonalSafe, defaultChain
       {/* @ts-ignore */}
       <form onSubmit={handleSubmit(addPaymentMethod)} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
-
-          {isPersonalSafe && (
-          <Grid item xs>
-            <TextField
-              {...register('name')}
-              autoFocus
-              fullWidth
-              size='small'
-              placeholder='Name'
-              error={!!errors.gnosisSafeAddress?.message}
-              helperText={errors.gnosisSafeAddress?.message}
-            />
-          </Grid>
-          )}
 
           <Grid item xs>
             <InputLabel>
