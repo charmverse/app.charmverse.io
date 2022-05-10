@@ -8,13 +8,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from 'components/common/Link';
-import { Link as TaskLink, Task } from 'models';
-import { useTasks } from 'hooks/useTasks';
-import useGnosisSafes from 'hooks/useGnosisSafes';
-import useGnosisService from 'hooks/useGnosisService';
-import SafeServiceClient from '@gnosis.pm/safe-service-client';
-import useSWR from 'swr';
-import charmClient from 'charmClient';
+import LoadingComponent from 'components/common/LoadingComponent';
+import useGnosisTasks, { GnosisTask } from './hooks/useGnosisTasks';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
@@ -23,32 +18,11 @@ const StyledTableCell = styled(TableCell)`
 
 export default function TasksList () {
 
-  const { data } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs());
-  const safes = useGnosisSafes(data?.map(s => s.address) || []);
-  const service = useGnosisService();
-  console.log(data, service);
-  const tasks = useTasks();
+  const gnosisTasks = useGnosisTasks();
 
-  useEffect(() => {
-    if (data && service) {
-      getServiceTaskQueue(service, data.map(s => s.address));
-    }
-  }, [!!data, service]);
-
-  async function getServiceTaskQueue (_service: SafeServiceClient, addresses: string[]) {
-    const results = await Promise.all(addresses.map(address => {
-      console.log('retrieve', address);
-      return _service.getAllTransactions(address)
-        .catch(err => {
-          console.error(err);
-          return null;
-        });
-    }));
-    console.log('service results', results);
+  if (!gnosisTasks) {
+    return <LoadingComponent height='200px' isLoading={true} />;
   }
-
-  const handleSign = () => {
-  };
 
   return (
     <Table size='small' aria-label='simple table'>
@@ -63,20 +37,16 @@ export default function TasksList () {
       </TableHead>
       <TableBody>
         {
-          tasks.map((task: Task, _taskIndex: number) => (
+          gnosisTasks.map((task: GnosisTask) => (
             <TableRow key={`task-row-${task.id}`}>
               <TableCell sx={{ px: 0 }}>{new Date(task.date).toLocaleDateString()}</TableCell>
               <TableCell>
-                {task.description} <br />
-                {task.links.map((link: TaskLink, _linkIndex: number) => (
-                  <span key={`link-${link.id}`}>
-                    [{link.name}<Link target='_blank' href={link.url} external><OpenInNewIcon /></Link>]
-                  </span>
-                ))}
+                {task.nonce} - {task.description} <br />
+                Gnosis <Link target='_blank' href={task.gnosisUrl} external><OpenInNewIcon /></Link>
               </TableCell>
-              <TableCell><Chip label={task.type} variant='outlined' /></TableCell>
-              <TableCell>{task.workspace}</TableCell>
-              <TableCell><Chip label='Sign' variant='outlined' onClick={handleSign} /></TableCell>
+              <TableCell><Chip label='Multisig' variant='outlined' /></TableCell>
+              <TableCell>CharmVerse</TableCell>
+              <TableCell><Chip component={Link} label='Sign' variant='outlined' href={task.gnosisUrl} external target='_blank' /></TableCell>
             </TableRow>
           ))
         }

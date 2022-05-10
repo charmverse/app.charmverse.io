@@ -12,8 +12,7 @@ export default function useSafes (safeAddresses: string[]) {
   const { account, library } = useWeb3React();
 
   async function loadSafes () {
-    console.log('load acount', account);
-    const signer = await library.getSigner(account);
+    const signer = library.getSigner(account);
     const ethAdapter = new EthersAdapter({
       ethers,
       signer

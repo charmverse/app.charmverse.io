@@ -11,7 +11,33 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .use(requireKeys<PaymentMethod>(['id'], 'query'))
+  .put(updatePaymentMethod)
   .delete(deletePaymentMethod);
+
+async function updatePaymentMethod (req: NextApiRequest, res: NextApiResponse) {
+  const { id } = req.query as any as PaymentMethod;
+
+  const wallet = await prisma.userMultiSigWallet.findFirst({
+    where: {
+      id,
+      userId: req.session.user.id
+    }
+  });
+
+  if (!wallet) {
+    throw new DataNotFoundError(`Wallet with ID ${id} not found`);
+  }
+
+  await prisma.userMultiSigWallet.update({
+    where: {
+      id
+    },
+    data: {
+      name: req.body.name
+    }
+  });
+  return res.status(200).end();
+}
 
 async function deletePaymentMethod (req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as any as PaymentMethod;
