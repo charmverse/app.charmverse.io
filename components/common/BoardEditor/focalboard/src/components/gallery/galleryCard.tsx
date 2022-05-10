@@ -21,12 +21,10 @@ import Tooltip from '../../widgets/tooltip'
 import { CardDetailProvider } from '../cardDetail/cardDetailContext'
 import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
-import CardBadges from '../cardBadges'
 import { PageContent } from 'models'
 import { usePages } from 'hooks/usePages'
 import { mutate } from 'swr'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
-import { getCardContents } from '../../store/contents'
 import PageIcon from 'components/common/PageLayout/components/PageIcon'
 
 
@@ -51,7 +49,6 @@ const GalleryCard = React.memo((props: Props) => {
   const intl = useIntl()
   const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readonly, props.onDrop)
   const comments = useAppSelector(getCardComments(card.id))
-  const contents = useAppSelector(getCardContents(card.id))
   const cardPage = pages[card.id]
 
   const visiblePropertyTemplates = props.visiblePropertyTemplates || []
@@ -188,11 +185,6 @@ const GalleryCard = React.memo((props: Props) => {
             </Tooltip>
           ))}
         </div>}
-      {props.visibleBadges &&
-        <CardBadges
-          card={card}
-          className='gallery-badges'
-        />}
     </div>
   )
 })

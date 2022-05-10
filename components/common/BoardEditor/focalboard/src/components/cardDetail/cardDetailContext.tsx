@@ -6,7 +6,6 @@ import {useIntl} from 'react-intl'
 
 import {Block} from '../../blocks/block'
 import {Card} from '../../blocks/card'
-import {ContentHandler} from '../content/contentRegistry'
 import mutator from '../../mutator'
 
 export type AddedBlock = {
@@ -17,7 +16,6 @@ export type AddedBlock = {
 export type CardDetailContextType = {
     card: Card
     lastAddedBlock: AddedBlock
-    addBlock: (handler: ContentHandler, index: number, auto: boolean) => void
     deleteBlock: (block: Block, index: number) => void
 }
 
@@ -46,23 +44,6 @@ export const CardDetailProvider = (props: CardDetailProps): ReactElement => {
     const contextValue = useMemo(() => ({
         card,
         lastAddedBlock,
-        addBlock: async (handler: ContentHandler, index: number, auto: boolean) => {
-            const block = await handler.createBlock(card.rootId)
-            block.parentId = card.id
-            block.rootId = card.rootId
-            const typeName = handler.getDisplayText(intl)
-            const description = intl.formatMessage({id: 'ContentBlock.addElement', defaultMessage: 'add {type}'}, {type: typeName})
-            await mutator.performAsUndoGroup(async () => {
-                const insertedBlock = await mutator.insertBlock(block, description)
-                const contentOrder = card.fields.contentOrder.slice()
-                contentOrder.splice(index, 0, insertedBlock.id)
-                setLastAddedBlock({
-                    id: insertedBlock.id,
-                    autoAdded: auto,
-                })
-                await mutator.changeCardContentOrder(card.id, card.fields.contentOrder, contentOrder, description)
-            })
-        },
         deleteBlock: async (block: Block, index: number) => {
             const contentOrder = card.fields.contentOrder.slice()
             contentOrder.splice(index, 1)

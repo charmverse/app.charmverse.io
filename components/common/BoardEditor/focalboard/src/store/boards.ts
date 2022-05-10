@@ -92,7 +92,10 @@ export function getBoard(boardId: string): (state: RootState) => Board|null {
 }
 
 export const getCurrentBoard = createSelector(
-    (state: RootState) => state.boards.current,
+    (state: RootState) => {
+      console.log({state})
+      return state.boards.current
+    },
     getBoards,
     getTemplates,
     (boardId: string, boards: {[key: string]: Board}, templates: {
