@@ -2,7 +2,6 @@
 import { batch } from 'react-redux';
 import { updateBoards } from './focalboard/src/store/boards';
 import { updateCards } from './focalboard/src/store/cards';
-import { updateContents } from './focalboard/src/store/contents';
 import { updateComments } from './focalboard/src/store/comments';
 import { updateViews } from './focalboard/src/store/views';
 import { Block } from './focalboard/src/blocks/block';
@@ -21,7 +20,6 @@ export const publishIncrementalUpdate = async (blocks: Block[]) => {
       dispatch(updateViews(blocks.filter((b: Block) => b.type === 'view' || b.deletedAt !== 0) as BoardView[]));
       dispatch(updateCards(blocks.filter((b: Block) => b.type === 'card' || b.deletedAt !== 0) as Card[]));
       dispatch(updateComments(blocks.filter((b: Block) => b.type === 'comment' || b.deletedAt !== 0) as CommentBlock[]));
-      dispatch(updateContents(blocks.filter((b: Block) => b.type !== 'card' && b.type !== 'view' && b.type !== 'board' && b.type !== 'comment') as ContentBlock[]));
     });
   });
 };
