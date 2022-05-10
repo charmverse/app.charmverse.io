@@ -1,19 +1,20 @@
+import { Page, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { PageLink } from '../interfaces';
 import { PageNotFoundError } from './errors';
 
-export async function generatePageLink (pageId: string): Promise<PageLink> {
-  const pageWithSpace = await prisma.page.findUnique({
+export async function generatePageLink (pageIdOrPageWithSpaceId: string | (Page & {space: Space})): Promise<PageLink> {
+  const pageWithSpace = typeof pageIdOrPageWithSpaceId === 'string' ? await prisma.page.findUnique({
     where: {
-      id: pageId
+      id: pageIdOrPageWithSpaceId
     },
     include: {
       space: true
     }
-  });
+  }) : pageIdOrPageWithSpaceId;
 
   if (!pageWithSpace) {
-    throw new PageNotFoundError(pageId);
+    throw new PageNotFoundError(pageIdOrPageWithSpaceId as string);
   }
 
   const domain = process.env.DOMAIN;

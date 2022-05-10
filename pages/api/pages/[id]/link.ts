@@ -1,4 +1,5 @@
 
+import { Page, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { PageNotFoundError, generatePageLink } from 'lib/pages/server';
@@ -20,8 +21,8 @@ async function getPageLink (req: NextApiRequest, res: NextApiResponse) {
     where: {
       id: pageId
     },
-    select: {
-      spaceId: true
+    include: {
+      space: true
     }
   });
 
@@ -39,7 +40,7 @@ async function getPageLink (req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 
-  const pageLink = await generatePageLink(pageId);
+  const pageLink = await generatePageLink(page as (Page & {space: Space}));
 
   res.status(200).json(pageLink);
 
