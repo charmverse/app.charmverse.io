@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Button from 'components/common/Button';
 import CopyableAddress from 'components/common/CopyableAddress';
-import Avatar from 'components/common/Avatar';
+import { Avatar } from 'components/common/Avatar';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import { Modal, DialogTitle } from 'components/common/Modal';

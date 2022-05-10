@@ -16,7 +16,7 @@ import NextLink from 'next/link';
 import { useState } from 'react';
 import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
-import Avatar from 'components/common/Avatar';
+import { Avatar } from 'components/common/Avatar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';

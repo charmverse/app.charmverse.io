@@ -21,7 +21,15 @@ const StyledAvatar = styled(Avatar)`
   font-weight: 500;
 `;
 
-export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium' }: { className?: string, avatar?: string | null, name?: string | null, variant?: 'circular' | 'rounded' | 'square', size?: 'small' | 'medium' }) {
+export type InitialAvatarProps = {
+  avatar?: string;
+  className?: string;
+  name?: string;
+  variant?: 'circular' | 'rounded' | 'square';
+  size?: 'small' | 'medium';
+};
+
+export function InitialAvatar ({ avatar, className, name, variant, size = 'medium' }: InitialAvatarProps) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
   return (
     <StyledAvatar

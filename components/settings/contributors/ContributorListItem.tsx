@@ -10,7 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
-import Avatar from 'components/common/Avatar';
+import { Avatar } from 'components/common/Avatar';
 import { Contributor } from 'models';
 import getDisplayName from 'lib/users/getDisplayName';
 import useENSName from 'hooks/useENSName';

@@ -3,7 +3,7 @@ import { useContributors } from 'hooks/useContributors';
 import { Contributor, User } from 'models';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
-import Avatar from 'components/common/Avatar';
+import { Avatar } from 'components/common/Avatar';
 import { HTMLAttributes, useState, useEffect, ElementType } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
