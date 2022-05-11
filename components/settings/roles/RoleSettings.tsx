@@ -8,8 +8,16 @@ import ImportGuildRolesButton from 'components/settings/roles/components/ImportG
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import useIsAdmin from 'hooks/useIsAdmin';
-import RoleForm from './components/RoleForm';
+import { useState } from 'react';
+import { IconButton, Menu, MenuItem, SvgIcon } from '@mui/material';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import DiscordIcon from 'public/images/discord_logo.svg';
+import darkLogoImage from 'public/images/guild-logo-dark-short.png';
+import lightLogoImage from 'public/images/guild-logo-light-short.png';
+import Image from 'next/image';
+import { useTheme } from '@emotion/react';
 import RoleRow from './components/RoleRow';
+import RoleForm from './components/RoleForm';
 
 export default function RoleSettings () {
   const {
@@ -19,9 +27,17 @@ export default function RoleSettings () {
     unassignRole,
     roles
   } = useRoles();
-
+  const theme = useTheme();
+  const logoImage = theme.palette.mode === 'dark' ? lightLogoImage : darkLogoImage;
   const isAdmin = useIsAdmin();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
+  const [rolesImportSource, setRolesImportSource] = useState<'discord' | 'guild.xyz'>('discord');
+  const [anchorEl, setAnchorEl] = useState<SVGSVGElement | null>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <>
@@ -29,13 +45,49 @@ export default function RoleSettings () {
         Roles
         {isAdmin && (
           <Box component='span' display='flex' gap={1}>
-            <ImportDiscordRolesButton />
-            <ImportGuildRolesButton />
+            {rolesImportSource === 'discord' ? (
+              <ImportDiscordRolesButton />
+            ) : <ImportGuildRolesButton />}
+            <IconButton>
+              <KeyboardArrowDownIcon onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+              }}
+              />
+            </IconButton>
             <Button {...bindTrigger(popupState)}>Add a role</Button>
           </Box>
         )}
       </Legend>
-
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <MenuItem
+          disableRipple
+          onClick={() => {
+            setRolesImportSource('discord');
+            handleClose();
+          }}
+        >
+          <SvgIcon viewBox='0 -10 70 70' sx={{ mr: 1 }}>
+            <DiscordIcon />
+          </SvgIcon>
+          Discord
+        </MenuItem>
+        <MenuItem
+          disableRipple
+          onClick={() => {
+            setRolesImportSource('guild.xyz');
+            handleClose();
+          }}
+        >
+          <div style={{
+            marginRight: theme.spacing(1),
+            width: 20
+          }}
+          >
+            <Image src={logoImage} alt='Guild.xyz' />
+          </div>
+          Guild.xyz
+        </MenuItem>
+      </Menu>
       <Modal {...bindPopover(popupState)} title='Add a role'>
         <RoleForm
           mode='create'

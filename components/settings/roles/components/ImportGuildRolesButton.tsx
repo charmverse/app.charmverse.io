@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from 'components/common/Modal';
 import { guild, user } from '@guildxyz/sdk';
-import { Avatar, Box, Checkbox, List, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
+import { Avatar, Box, Button, Checkbox, List, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import Link from 'components/common/Link';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { mutate } from 'swr';
 import { useUser } from 'hooks/useUser';
 import { FixedSizeList } from 'react-window';
+import darkLogoImage from 'public/images/guild-logo-dark-short.png';
+import lightLogoImage from 'public/images/guild-logo-light-short.png';
+import Image from 'next/image';
+import { useTheme } from '@emotion/react';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
 export default function ImportGuildRolesButton () {
@@ -19,6 +23,9 @@ export default function ImportGuildRolesButton () {
   const [space] = useCurrentSpace();
   const selectedGuildIdsSet = useMemo(() => new Set(selectedGuildIds), [selectedGuildIds]);
   const [currentUser] = useUser();
+  const theme = useTheme();
+  const logoImage = theme.palette.mode === 'dark' ? lightLogoImage : darkLogoImage;
+
   const firstAddress = currentUser && currentUser?.addresses?.[0] ? currentUser.addresses[0] : null;
   useEffect(() => {
     async function main () {
@@ -65,10 +72,26 @@ export default function ImportGuildRolesButton () {
 
   return (
     <>
-      <div onClick={() => setShowImportedRolesModal(true)}>Import Roles</div>
+      <Button
+        variant='outlined'
+        startIcon={(
+          // Changing this style will cause the button to change dimension when changing roles import source
+          <span style={{
+            width: 20,
+            height: 25,
+            display: 'flex',
+            alignItems: 'center'
+          }}
+          >
+            <Image src={logoImage} alt='Guild.xyz' />
+          </span>
+      )}
+        onClick={() => setShowImportedRolesModal(true)}
+      >Import roles
+      </Button>
       <Modal size='large' title='Import Guild roles' onClose={resetState} open={showImportedRolesModal}>
         {fetchingGuilds ? <StyledSpinner />
-          : (
+          : guilds.length === 0 ? <Typography variant='subtitle1' color='secondary'>You are not part of any guild(s)</Typography> : (
             <div>
               <Box display='flex' justifyContent='space-between'>
                 <Box display='flex' alignItems='center'>
