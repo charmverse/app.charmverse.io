@@ -1,17 +1,19 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
 import { PopulatedBounty } from 'charmClient';
-import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import Button from 'components/common/Button';
+import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { BountiesContext } from 'hooks/useBounties';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { useContext, useMemo, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import useIsAdmin from 'hooks/useIsAdmin';
-import InputBountyStatus from './components/InputBountyStatus';
 import { BountyCard } from './components/BountyCard';
-import MultiPaymentModal from './components/MultiPaymentModal';
 import BountyModal from './components/BountyModal';
+import InputBountyStatus from './components/InputBountyStatus';
+import MultiPaymentModal from './components/MultiPaymentModal';
 
 const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete', 'paid'];
 
@@ -37,7 +39,9 @@ export default function BountyList () {
   const [displayBountyDialog, setDisplayBountyDialog] = useState(false);
   const { bounties } = useContext(BountiesContext);
 
-  const [bountyFilter, setBountyFilter] = useState<BountyStatus[]>(['open', 'assigned', 'review']);
+  const [space] = useCurrentSpace();
+
+  const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus []>(`${space?.id}-bounty-filters`, ['open', 'assigned', 'review']);
 
   const isAdmin = useIsAdmin();
 
@@ -104,11 +108,11 @@ export default function BountyList () {
         <Box display='flex' alignContent='center' justifyContent='flex-start' mb={3}>
           <InputBountyStatus
             onChange={(statuses) => {
-              setBountyFilter(sortSelected(statuses));
+              setSavedBountyFilters(sortSelected(statuses));
             }}
             renderSelectedInValue={true}
             renderSelectedInOption={true}
-            defaultValues={bountyFilter}
+            defaultValues={savedBountyFilters}
           />
         </Box>
 

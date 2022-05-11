@@ -87,8 +87,8 @@ export default function Header (
     setUser({ ...user, ...updatedFields });
   }
 
-  function exportMarkdown () {
-    const markdownContent = generateMarkdown(currentPage as Page);
+  async function exportMarkdown () {
+    const markdownContent = await generateMarkdown(currentPage as Page);
 
     if (markdownContent) {
       const data = new Blob([markdownContent], { type: 'text/plain' });

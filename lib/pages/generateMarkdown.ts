@@ -4,8 +4,9 @@ import { Node } from '@bangle.dev/pm';
 import { Page } from '@prisma/client';
 import { specRegistry } from 'components/common/CharmEditor/CharmEditor';
 import { PageContent } from 'models';
+import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage/nestedPage';
 
-export function generateMarkdown (page: Page, withTitle: boolean = false): string {
+export async function generateMarkdown (page: Page, withTitle: boolean = false): Promise<string> {
 
   const isExportablePage = page && (page.type === 'page' || page.type === 'card');
 
@@ -14,10 +15,18 @@ export function generateMarkdown (page: Page, withTitle: boolean = false): strin
 
     const state = new BangleEditorState({
       specRegistry,
-      initialValue: page.content ? Node.fromJSON(specRegistry.schema, page.content as PageContent) : ''
+      initialValue: page.content ? Node.fromJSON(specRegistry.schema, page.content as PageContent) : '',
+      editorProps: {
+        attributes: {
+          example: 'value'
+        }
+      }
     });
 
     let markdown = serializer.serialize(state.pmState.doc);
+
+    // Logic added here as the markdown serialiser is synchronous
+    markdown = await replaceNestedPages(markdown);
 
     if (page.title && withTitle) {
       const pageTitleAsMarkdown = `# ${page.title}`;

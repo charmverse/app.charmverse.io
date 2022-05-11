@@ -1,6 +1,8 @@
 import { RawSpecs } from '@bangle.dev/core';
-import { Schema, Plugin, DOMOutputSpec, PluginKey } from '@bangle.dev/pm';
+import { DOMOutputSpec, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM, SuggestTooltipRenderOpts, tooltipPlacement } from '@bangle.dev/tooltip';
+import charmClient from 'charmClient';
+import { PageLink } from 'lib/pages';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'page';
@@ -11,6 +13,79 @@ export interface NestedPagePluginState {
   show: boolean;
   counter: number;
   tooltipContentDOM: HTMLElement
+}
+
+/**
+ * Encloses a nested page with markers so it can be parsed after the markdown serialiser has run on the whole document.
+ * @param pageId
+ */
+function encloseNestedPage (pageId: string): string {
+  return `_MARKDOWN_NESTED_PAGE(${pageId})_`;
+}
+
+/**
+ * Returns a list of page IDs
+ */
+function parseNestedPagesToReplace (convertedToMarkdown: string): string [] {
+  return convertedToMarkdown.match(/_MARKDOWN_NESTED_PAGE\((?:[a-f]|\d|-){1,}\)_/g) ?? [];
+}
+
+function extractPageId (matchedMarkdownEnclosure: string): string {
+  return matchedMarkdownEnclosure
+    .trim()
+    .split('_MARKDOWN_NESTED_PAGE(')
+    .filter(str => !!str)[0]
+    .split(')')
+    .filter(str => !!str)[0];
+}
+
+// function produceLinkMarkdown()
+
+/**
+ * Returns markdown content with page data interpolated
+ * @param convertedToMarkdown
+ */
+export async function replaceNestedPages (convertedToMarkdown: string): Promise<string> {
+
+  const nestedPageMarkers = parseNestedPagesToReplace(convertedToMarkdown);
+
+  const isServer = typeof window === 'undefined';
+  // Dynamic import allows this function to be loaded in the client-side without triggering a server-side import
+  const linkGetter = isServer
+  // Server-side method
+    ? ((await import('lib/pages/server/generatePageLink')).generatePageLink)
+  // Client-side methid
+    : (pageId: string) => {
+
+      const documentNode = document.querySelector(`[data-id="page-${pageId}"]`) as HTMLDivElement;
+      const pageLink: PageLink = {
+        title: documentNode?.getAttribute('data-title') as string ?? '',
+        url: documentNode?.getAttribute('data-path') as string ?? ''
+      };
+      return pageLink;
+    };
+
+  await Promise.all(nestedPageMarkers
+    .map(pageMarker => {
+      // eslint-disable-next-line no-async-promise-executor
+      return new Promise<void>(async (resolve, reject) => {
+
+        const pageId = extractPageId(pageMarker);
+
+        try {
+          const pageLink = await linkGetter(pageId);
+          convertedToMarkdown = convertedToMarkdown.replace(pageMarker, `[${pageLink.title}](${pageLink.url})`);
+          resolve();
+        }
+        catch (err) {
+          // Lookup failed. Delete this link
+          convertedToMarkdown = convertedToMarkdown.replace(pageMarker, '');
+          resolve();
+        }
+
+      });
+    }));
+  return convertedToMarkdown;
 }
 
 export function nestedPageSpec (): RawSpecs {
@@ -33,7 +108,15 @@ export function nestedPageSpec (): RawSpecs {
       }
     },
     markdown: {
-      toMarkdown: () => null
+      toMarkdown: (state, node) => {
+        try {
+          state.write(encloseNestedPage(node.attrs.id));
+          state.ensureNewLine();
+        }
+        catch (err) {
+          console.log('Conversion err', err);
+        }
+      }
     }
   };
 }
@@ -58,6 +141,7 @@ export function nestedPagePlugins () {
         },
         apply (tr, pluginState) {
           const meta = tr.getMeta(NestedPagePluginKey);
+          // console.log('NESTED', tr);
           if (meta === undefined) {
             return pluginState;
           }

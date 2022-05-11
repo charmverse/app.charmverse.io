@@ -25,7 +25,7 @@ import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
-import { ModifyChildPagesResponse, IPageWithPermissions } from 'lib/pages';
+import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pages';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -116,6 +116,10 @@ class CharmClient {
 
   getPages (spaceId: string) {
     return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
+  }
+
+  getPageLink (pageId: string) {
+    return http.GET<PageLink>(`/api/pages/${pageId}/link`);
   }
 
   createPage (pageOpts: Prisma.PageCreateInput) {

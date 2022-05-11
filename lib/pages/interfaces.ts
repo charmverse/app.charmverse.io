@@ -12,3 +12,8 @@ export interface ModifyChildPagesResponse {
   pageIds: string[]
   rootBlock: Block | null
 }
+
+export interface PageLink {
+  title: string;
+  url: string
+}
