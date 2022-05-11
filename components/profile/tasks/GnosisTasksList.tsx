@@ -131,7 +131,8 @@ function SafeTasks ({ address, safeName, safeUrl, tasks }: { address: string, sa
 
 export default function GnosisTasksSection () {
 
-  const { data: walletData, mutate } = useMultiWalletSigs();
+  const { data: safeData, mutate } = useMultiWalletSigs();
+  const { error, mutate: mutateTasks, tasks } = useTasks();
 
   const gnosisSigner = useGnosisSigner();
   const [user] = useUser();
@@ -146,13 +147,13 @@ export default function GnosisTasksSection () {
           addresses: user.addresses
         });
         await mutate();
+        await mutateTasks();
       }
       finally {
         setIsLoadingSafes(false);
       }
     }
   }
-  const { error, tasks } = useTasks();
   const safesWithTasks = tasks?.gnosis;
 
   return (
@@ -173,7 +174,7 @@ export default function GnosisTasksSection () {
           safeUrl={safe.safeUrl}
         />
       ))}
-      {walletData?.length === 0 && (
+      {safeData?.length === 0 && (
         <GnosisConnectCard loading={!gnosisSigner || isLoadingSafes} onClick={importSafes} />
       )}
     </>
