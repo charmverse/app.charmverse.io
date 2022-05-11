@@ -40,15 +40,15 @@ export type BrandColor = 'gray' | 'cyanBlue' | 'orange' | 'yellow' | 'green' | '
 export type BrandColorScheme = Record<BrandColor, string>
 
 export const darkModeColors: BrandColorScheme = {
-  gray: '#91918D', // Philippine Gray
-  cyanBlue: '#5681C8', // Silver Lake Blue
-  orange: '#F5743D', // Chinese Orange
-  yellow: '#A59412', // Dark Yellow
-  green: '#009FB7', // Bondi Blue
-  blue: '#1FBFFF', // Spiro Disco Ball
-  purple: '#985CFF', // Lavender Indigo
-  pink: '#E36396', // Pale Red-Violet
-  red: '#A073AB' // Purple Mountain Majesty
+  gray: '#757570', // Nickel
+  cyanBlue: '#4273C2', // Han Blue
+  orange: '#C44F1C', // Dark Pastel Red
+  yellow: '#81730E', // Olive
+  green: '#007C8F', // Metallic Seaweed
+  blue: '#007CAD', // Celadon Blue
+  purple: '#8742FF', // Lavender Indigo
+  pink: '#D53474', // Telemagenta
+  red: '#925E9C' // French Lilac
 };
 
 export const lightModeColors: BrandColorScheme = {
