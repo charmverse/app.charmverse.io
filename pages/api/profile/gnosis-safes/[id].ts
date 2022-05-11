@@ -11,10 +11,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .use(requireKeys<PaymentMethod>(['id'], 'query'))
-  .put(updatePaymentMethod)
-  .delete(deletePaymentMethod);
+  .put(updateSafe)
+  .delete(deleteSafe);
 
-async function updatePaymentMethod (req: NextApiRequest, res: NextApiResponse) {
+async function updateSafe (req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as any as PaymentMethod;
 
   const wallet = await prisma.userGnosisSafe.findFirst({
@@ -39,7 +39,7 @@ async function updatePaymentMethod (req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).end();
 }
 
-async function deletePaymentMethod (req: NextApiRequest, res: NextApiResponse) {
+async function deleteSafe (req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as any as PaymentMethod;
 
   const wallet = await prisma.userGnosisSafe.findFirst({

@@ -10,10 +10,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .get(list)
-  .post(setWallets);
+  .get(listSafes)
+  .post(setSafes);
 
-async function list (req: NextApiRequest, res: NextApiResponse<UserGnosisSafe[]>) {
+async function listSafes (req: NextApiRequest, res: NextApiResponse<UserGnosisSafe[]>) {
 
   const wallets = await prisma.userGnosisSafe.findMany({
     where: {
@@ -23,7 +23,7 @@ async function list (req: NextApiRequest, res: NextApiResponse<UserGnosisSafe[]>
   return res.status(200).json(wallets);
 }
 
-async function setWallets (req: NextApiRequest, res: NextApiResponse<UserGnosisSafe>) {
+async function setSafes (req: NextApiRequest, res: NextApiResponse<UserGnosisSafe>) {
 
   const walletsInput = req.body as (Pick<UserGnosisSafe, 'address' | 'chainId' | 'name' | 'threshold' | 'owners'>)[];
 
