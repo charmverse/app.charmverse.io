@@ -31,6 +31,8 @@ export default function ImportGuildRolesButton () {
 
   function resetState () {
     setShowImportedRolesModal(false);
+    setImportingRoles(false);
+    setFetchingGuilds(false);
     setSelectedGuildIds([]);
     setGuilds([]);
   }

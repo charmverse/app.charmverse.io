@@ -4,8 +4,9 @@ import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/mid
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
-import { findOrCreateRolesFromDiscord, DiscordServerRole } from 'lib/discord/createRoles';
+import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
+import { DiscordServerRole } from 'lib/discord/interface';
 
 const handler = nc({
   onError,
@@ -68,7 +69,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     res.status(discordGuildMembersResponse.status).json({ error: discordGuildMembersResponse.error });
   }
   else {
-    const rolesRecord = await findOrCreateRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
+    const rolesRecord = await findOrCreateRoles(discordServerRoles, spaceId, req.session.user.id);
     await assignRolesFromDiscord(rolesRecord, discordGuildMembers, spaceId);
     res.status(200).json({ importedRoleCount: discordServerRoles.length });
   }

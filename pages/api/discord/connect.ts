@@ -3,12 +3,13 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
-import { findOrCreateRolesFromDiscord, DiscordServerRole } from 'lib/discord/createRoles';
+import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
 import { DiscordUser } from '@prisma/client';
 import log from 'lib/log';
 import { prisma } from 'db';
 import { getDiscordAccount, DiscordAccount } from 'lib/discord/getDiscordAccount';
+import { DiscordServerRole } from 'lib/discord/interface';
 
 const handler = nc({
   onError,
@@ -107,7 +108,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     try {
       const discordServerRoles = await authenticatedRequest<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${space.discordServerId}/roles`);
       // Dont create new roles
-      const rolesRecord = await findOrCreateRolesFromDiscord(discordServerRoles, space.id, req.session.user.id, false);
+      const rolesRecord = await findOrCreateRoles(discordServerRoles, space.id, req.session.user.id, false);
       const guildMemberResponse = await authenticatedRequest<DiscordGuildMember>(`https://discord.com/api/v8/guilds/${space.discordServerId}/members/${id}`);
       await assignRolesFromDiscord(rolesRecord, [guildMemberResponse], space.id);
     }
