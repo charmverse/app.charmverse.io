@@ -77,7 +77,7 @@ async function getTransactionsforSafe (signer: Signer, wallet: UserMultiSigWalle
   return [];
 }
 
-export async function getTransactionsforSafes (signer: Signer, wallets: UserMultiSigWallet[]) {
-  return Promise.all(wallets.map(wallet => getTransactionsforSafe(signer, wallet)))
+export async function getTransactionsforSafes (signer: Signer, safes: UserMultiSigWallet[]) {
+  return Promise.all(safes.map(safe => getTransactionsforSafe(signer, safe)))
     .then(list => list.flat());
 }

@@ -18,7 +18,7 @@ import useGnosisSigner from 'hooks/useWeb3Signer';
 import { useUser } from 'hooks/useUser';
 import { Controller, useForm } from 'react-hook-form';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
-import { importSafesFromWallet } from 'lib/gnosis/gnosis.client';
+import { importSafesFromWallet } from 'lib/gnosis/gnosis.browser';
 
 interface Wallet {
   id: string;
@@ -75,7 +75,7 @@ export default function MultiSigList () {
   }
 
   // sort the rows to prevent random order
-  const sortedRows = walletData.sort((a, b) => a.address < b.address ? -1 : 1);
+  const sortedWallets = walletData.sort((a, b) => a.address < b.address ? -1 : 1);
 
   return (
     <>
@@ -84,7 +84,7 @@ export default function MultiSigList () {
           <KeyIcon fontSize='large' /> Multisig
         </Box>
 
-        {sortedRows.length > 0 && (
+        {sortedWallets.length > 0 && (
           <Button
             loading={isLoadingSafes}
             onClick={importSafes}
@@ -96,9 +96,9 @@ export default function MultiSigList () {
         )}
       </Legend>
 
-      {sortedRows.length === 0 && <GnosisConnectCard loading={!gnosisSigner || isLoadingSafes} onClick={importSafes} />}
+      {sortedWallets.length === 0 && <GnosisConnectCard loading={!gnosisSigner || isLoadingSafes} onClick={importSafes} />}
 
-      {sortedRows.length > 0 && (
+      {sortedWallets.length > 0 && (
         <Table size='small' aria-label='simple table'>
           <TableHead>
             <TableRow>
@@ -111,7 +111,7 @@ export default function MultiSigList () {
           </TableHead>
           <TableBody>
             {
-              sortedRows.map(wallet => (
+              sortedWallets.map(wallet => (
                 <WalletRow updateWallets={mutate} wallet={wallet} key={wallet.id} />
               ))
             }

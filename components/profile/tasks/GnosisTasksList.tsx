@@ -9,9 +9,10 @@ import { shortenHex } from 'lib/utilities/strings';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { useUser } from 'hooks/useUser';
-import { importSafesFromWallet } from 'lib/gnosis/gnosis.client';
+import { importSafesFromWallet } from 'lib/gnosis/gnosis.browser';
+import { GnosisTask } from 'lib/gnosis/gnosis.server';
 import { GnosisConnectCard } from '../integrations/MultiSigWallets';
-import useGnosisTasks, { GnosisTask } from './hooks/useGnosisTasks';
+import useGnosisTasks from './hooks/useTasks';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
@@ -83,15 +84,16 @@ export default function GnosisTasksSection () {
       }
     }
   }
-  const { error, tasks: safesWithTasks } = useGnosisTasks();
+  const { error, tasks } = useGnosisTasks();
+  const safesWithTasks = tasks?.gnosis;
 
   return (
     <>
       <Legend>Multisig</Legend>
-      {!safesWithTasks && <LoadingComponent height='200px' isLoading={true} />}
+      {!safesWithTasks && !error && <LoadingComponent height='200px' isLoading={true} />}
       {error && (
         <Alert severity='error'>
-          There was an error: {error}
+          There was an error. Please try again later!
         </Alert>
       )}
       {safesWithTasks && safesWithTasks.map(safe => (

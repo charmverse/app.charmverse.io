@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
-import groupBy from 'lodash/groupBy';
-import useSWR from 'swr';
-import charmClient from 'charmClient';
-import { getTransactionsforSafes, GnosisTransaction } from 'lib/gnosis';
-import useWeb3Signer from 'hooks/useWeb3Signer';
 import { ethers } from 'ethers';
 import log from 'lib/log';
-import { SafeMultisigTransactionResponse } from '@gnosis.pm/safe-service-client';
-import { useUser } from 'hooks/useUser';
+import groupBy from 'lodash/groupBy';
+import { getChainById } from 'connectors';
+import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
+import SafeServiceClient from '@gnosis.pm/safe-service-client';
+import { prisma } from 'db';
+import { getTransactionsforSafes, GnosisTransaction } from './gnosis';
+
+const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`;
 
 interface SendAction {
   to: string;
@@ -32,7 +32,7 @@ export interface GnosisTask {
   transactions: GnosisTransactionPopulated[];
 }
 
-interface GnosisSafeTasks {
+export interface GnosisSafeTasks {
   safeAddress: string;
   safeUrl: string;
   tasks: GnosisTask[];
@@ -74,10 +74,6 @@ function getTaskDescription (transaction: GnosisTransaction): string {
   return 'N/A';
 }
 
-// function isMultiSigTransaction (transaction: GnosisTransaction): transaction is SafeMultisigTransactionWithTransfersResponse {
-//   return transaction.txType === 'MULTISIG_TRANSACTION';
-// }
-
 function getTaskActions (transaction: GnosisTransaction): SendAction[] {
   const data = transaction.dataDecoded as any | undefined;
   if (data) {
@@ -89,6 +85,7 @@ function getTaskActions (transaction: GnosisTransaction): SendAction[] {
 function transactionToTask ({ myAddresses, transaction }: { myAddresses: string[], transaction: GnosisTransaction }): GnosisTransactionPopulated {
   const actions = getTaskActions(transaction);
   const gnosisUrl = getGnosisTransactionUrl(transaction.safe);
+  console.log('transaction', transaction);
   return {
     id: transaction.safeTxHash,
     actions,
@@ -118,32 +115,23 @@ function transactionsToTasks ({ transactions, myAddresses }: { transactions: Gno
     .sort((safeA, safeB) => safeA.safeAddress > safeB.safeAddress ? -1 : 1);
 }
 
-export default function useGnosisTasks () {
+export async function getPendingGnosisTasks (userId: string) {
 
-  const signer = useWeb3Signer();
-  const [user] = useUser();
-  const { data: wallets } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs());
-  const [transactions, setTransactions] = useState<SafeMultisigTransactionResponse[] | null>(null);
-  const [tasks, setTasks] = useState<GnosisSafeTasks[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const provider = new ethers.providers.JsonRpcProvider(providerUrl);
+  const safeOwner = provider.getSigner(0);
 
-  useEffect(() => {
-    if (wallets && signer) {
-      getTransactionsforSafes(signer, wallets)
-        .then(setTransactions)
-        .catch(err => setError(err.message || err));
+  const ethAdapter = new EthersAdapter({
+    ethers,
+    signer: safeOwner
+  });
+
+  const wallets = await prisma.userMultiSigWallet.findMany({
+    where: {
+      userId
     }
-  }, [wallets, signer]);
+  });
+  const transactions = await getTransactionsforSafes(safeOwner, wallets);
+  const tasks = transactionsToTasks({ transactions, myAddresses: [] });
 
-  useEffect(() => {
-    console.log('transactions', transactions, user);
-    if (transactions && user) {
-      console.log('set tasks');
-      const _tasks = transactionsToTasks({ transactions, myAddresses: user.addresses });
-      setTasks(_tasks);
-      console.log('done set tasks', _tasks);
-    }
-  }, [transactions, user]);
-
-  return { tasks, error };
+  return tasks;
 }

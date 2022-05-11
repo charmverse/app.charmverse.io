@@ -27,6 +27,7 @@ import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { ModifyChildPagesResponse, IPageWithPermissions } from 'lib/pages';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
+import { GnosisSafeTasks } from 'lib/gnosis/gnosis.server';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -150,7 +151,7 @@ class CharmClient {
     return http.POST('/api/profile/multi-sigs', wallets);
   }
 
-  listUserMultiSigs (): Promise<UserMultiSigWallet[]> {
+  getUserMultiSigs (): Promise<UserMultiSigWallet[]> {
     return http.GET('/api/profile/multi-sigs');
   }
 
@@ -495,8 +496,7 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  // Tasks
-  listTasks (): Promise<Task[]> {
+  getTasks (): Promise<{ gnosis: GnosisSafeTasks[] }> {
     return http.GET('/api/tasks');
   }
 
