@@ -40,8 +40,8 @@ function TransactionRow ({ transaction }: { transaction: GnosisTransactionPopula
           {DateTime.fromISO(transaction.date).toRelative({ base: DateTime.now() })}
         </GridColumn>
         <GridColumn>
-          <Typography variant='caption' sx={{ fontWeight: isReadyToExecute ? 'bold' : '' }}>
-            <PeopleIcon fontSize='small' /> {transaction.confirmations?.length || 0} out of {transaction.threshold}
+          <Typography variant='caption' sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: isReadyToExecute ? 'bold' : '' }}>
+            <PeopleIcon color='secondary' fontSize='small' /> {transaction.confirmations?.length || 0} out of {transaction.threshold}
           </Typography>
         </GridColumn>
         <GridColumn sx={{ justifyContent: 'flex-end' }}>
