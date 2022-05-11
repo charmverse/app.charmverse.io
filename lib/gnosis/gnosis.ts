@@ -1,7 +1,7 @@
 
 import { Signer, ethers } from 'ethers';
 import { RPC } from 'connectors';
-import { UserMultiSigWallet } from '@prisma/client';
+import { UserGnosisSafe } from '@prisma/client';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
 import SafeServiceClient, { SafeMultisigTransactionResponse, SafeInfoResponse } from '@gnosis.pm/safe-service-client';
 
@@ -68,7 +68,7 @@ export async function getSafesForAddresses (signer: ethers.Signer, addresses: st
   return safes;
 }
 
-async function getTransactionsforSafe (signer: Signer, wallet: UserMultiSigWallet): Promise<GnosisTransaction[]> {
+async function getTransactionsforSafe (signer: Signer, wallet: UserGnosisSafe): Promise<GnosisTransaction[]> {
   const service = getGnosisService({ signer, chainId: wallet.chainId });
   if (service) {
     const transactions = await service.getPendingTransactions(wallet.address);
@@ -77,7 +77,7 @@ async function getTransactionsforSafe (signer: Signer, wallet: UserMultiSigWalle
   return [];
 }
 
-export async function getTransactionsforSafes (signer: Signer, safes: UserMultiSigWallet[]) {
+export async function getTransactionsforSafes (signer: Signer, safes: UserGnosisSafe[]) {
   return Promise.all(safes.map(safe => getTransactionsforSafe(signer, safe)))
     .then(list => list.flat());
 }

@@ -12,10 +12,13 @@ interface ImportSafeProps {
 export async function importSafesFromWallet ({ signer, addresses, getWalletName }: ImportSafeProps) {
 
   const safes = await getSafesForAddresses(signer, addresses);
+  console.log(safes);
   const safesData = safes.map(safe => ({
     address: safe.address,
+    owners: safe.owners,
+    threshold: safe.threshold,
     chainId: safe.chainId,
     name: getWalletName?.(safe.address) // get existing name if user gave us one
   }));
-  await charmClient.setUserMultiSigs(safesData);
+  await charmClient.setMyGnosisSafes(safesData);
 }
