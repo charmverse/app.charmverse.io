@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from 'components/common/Modal';
 import { guild, user } from '@guildxyz/sdk';
-import { Avatar, Box, Checkbox, List, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
+import { Avatar, Box, Checkbox, List, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import Link from 'components/common/Link';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { mutate } from 'swr';
 import { useUser } from 'hooks/useUser';
+import { FixedSizeList } from 'react-window';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
 export default function ImportGuildRolesButton () {
@@ -31,7 +32,7 @@ export default function ImportGuildRolesButton () {
         }
         else {
           const allGuilds = await guild.getAll();
-          setGuilds(allGuilds.slice(0, 50));
+          setGuilds(allGuilds);
         }
         setFetchingGuilds(false);
       }
@@ -98,57 +99,70 @@ export default function ImportGuildRolesButton () {
                 paddingRight: 1
               }}
               >
-                {guilds.map(_guild => (
-                  <List
-                    key={_guild.id}
-                    sx={{
-                      display: 'flex'
-                    }}
-                  >
-                    <Checkbox
-                      checked={selectedGuildIdsSet.has(_guild.id)}
-                      onClick={(event) => {
-                        if ((event.target as any).checked) {
-                          setSelectedGuildIds([...selectedGuildIds, _guild.id]);
-                        }
-                        else {
-                          setSelectedGuildIds(selectedGuildIds.filter(selectedGuildId => selectedGuildId !== _guild.id));
-                        }
-                      }}
-                    />
-                    <Box sx={{
-                      width: '100%'
-                    }}
-                    >
-                      <Link external target='_blank' href={`https://guild.xyz/${_guild.urlName}`}>
-                        <MenuItem
-                          disabled={importingRoles}
+                <FixedSizeList
+                  height={325}
+                  width='100%'
+                  itemSize={65}
+                  itemCount={guilds.length}
+                  overscanCount={5}
+                >
+                  {({ index, style }) => {
+                    const _guild = guilds[index];
+                    return (
+                      <ListItem
+                        style={style}
+                        key={_guild.id}
+                        sx={{
+                          display: 'flex',
+                          pl: 0
+                        }}
+                      >
+                        <Checkbox
+                          checked={selectedGuildIdsSet.has(_guild.id)}
+                          onClick={(event) => {
+                            if ((event.target as any).checked) {
+                              setSelectedGuildIds([...selectedGuildIds, _guild.id]);
+                            }
+                            else {
+                              setSelectedGuildIds(selectedGuildIds.filter(selectedGuildId => selectedGuildId !== _guild.id));
+                            }
+                          }}
+                        />
+                        <Box sx={{
+                          width: '100%'
+                        }}
                         >
-                          <ListItemIcon sx={{ mr: 1 }}>
-                            <Avatar sx={{ width: 32, height: 32 }} src={_guild.imageUrl} />
-                          </ListItemIcon>
-                          <ListItemText
-                            secondary={_guild.urlName}
-                            sx={{
-                              '& .MuiTypography-root': {
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                flexDirection: 'row'
-                              }
-                            }}
-                          >
-                            {_guild.name}
-                            <Box display='flex'>
-                              <Typography variant='subtitle2' color='secondary'>
-                                {_guild.roles.length} Role(s)
-                              </Typography>
-                            </Box>
-                          </ListItemText>
-                        </MenuItem>
-                      </Link>
-                    </Box>
-                  </List>
-                ))}
+                          <Link external target='_blank' href={`https://guild.xyz/${_guild.urlName}`}>
+                            <MenuItem
+                              disabled={importingRoles}
+                            >
+                              <ListItemIcon sx={{ mr: 1 }}>
+                                <Avatar sx={{ width: 32, height: 32 }} src={_guild.imageUrl} />
+                              </ListItemIcon>
+                              <ListItemText
+                                secondary={_guild.urlName}
+                                sx={{
+                                  '& .MuiTypography-root': {
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    flexDirection: 'row'
+                                  }
+                                }}
+                              >
+                                {_guild.name}
+                                <Box display='flex'>
+                                  <Typography variant='subtitle2' color='secondary'>
+                                    {_guild.roles.length} Role(s)
+                                  </Typography>
+                                </Box>
+                              </ListItemText>
+                            </MenuItem>
+                          </Link>
+                        </Box>
+                      </ListItem>
+                    );
+                  }}
+                </FixedSizeList>
               </Box>
               <PimpedButton
                 loading={importingRoles}
