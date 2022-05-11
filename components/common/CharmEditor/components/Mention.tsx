@@ -15,8 +15,10 @@ import { usePages } from 'hooks/usePages';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import Link from 'next/link';
+import { PageContent } from 'models';
 import { hideSuggestionsTooltip } from './@bangle.dev/tooltip/suggest-tooltip';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
+import { checkForEmpty } from '../utils';
 
 const name = 'mention';
 
@@ -197,24 +199,23 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     </>
   );
 
-  const pagesList = (
-    <>
-      {Object.values(pages).map(page => page && (
-      <MenuItem
-        sx={{
-          background: theme.palette.background.dark
-        }}
-        key={page.id}
-        onClick={() => onSelectMention(page.id, 'page')}
-      >
-        <Box display='flex' gap={0.5}>
-          <PageIcon icon={page.icon} isEditorEmpty={false} pageType={page.type} />
-          {page.title || 'Untitled'}
-        </Box>
-      </MenuItem>
-      ))}
-    </>
-  );
+  const pagesList: ReactNode[] = [];
+  Object.values(pages).forEach(page => {
+    if (page && page.deletedAt === null) {
+      const isEditorEmpty = checkForEmpty(page?.content as PageContent);
+      pagesList.push(
+        <MenuItem
+          key={page.id}
+          onClick={() => onSelectMention(page.id, 'page')}
+        >
+          <Box display='flex' gap={0.5}>
+            <PageIcon icon={page.icon} isEditorEmpty={isEditorEmpty} pageType={page.type} />
+            {page.title || 'Untitled'}
+          </Box>
+        </MenuItem>
+      );
+    }
+  });
 
   return createPortal(
     <ClickAwayListener onClickAway={() => {

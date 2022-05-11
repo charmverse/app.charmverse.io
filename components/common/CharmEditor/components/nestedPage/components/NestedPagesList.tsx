@@ -6,7 +6,7 @@ import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import { usePages } from 'hooks/usePages';
 import { Page, PageContent } from 'models';
 import { useCallback, memo } from 'react';
-import { isTruthy } from 'lib/utilities/types';
+import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import useNestedPage from '../hooks/useNestedPage';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { NestedPagePluginKey, NestedPagePluginState } from '../nestedPage';
@@ -45,11 +45,9 @@ function NestedPagesList () {
 function PagesList ({ onSelectPage }: { onSelectPage: (page: Page) => void }): JSX.Element {
   const { pages } = usePages();
 
-  const items = Object.values(pages).filter(isTruthy).map(page => {
-    const docContent = ((page.content) as PageContent)?.content;
-    const isEditorEmpty = docContent && (docContent.length <= 1
-          && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0));
-
+  const items = (Object.values(pages).filter((page) => page && page?.deletedAt === null) as Page[]).map(page => {
+    const docContent = ((page.content) as PageContent);
+    const isEditorEmpty = checkForEmpty(docContent);
     return (
       <MenuItem
         onClick={() => onSelectPage(page)}
