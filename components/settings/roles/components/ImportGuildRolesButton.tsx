@@ -156,10 +156,11 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
                         >
                           <Link external target='_blank' href={`https://guild.xyz/${_guild.urlName}`}>
                             <MenuItem
+                              component='div'
                               disabled={importingRoles}
                             >
                               <ListItemIcon sx={{ mr: 1 }}>
-                                <Avatar sx={{ width: 32, height: 32 }} src={_guild.imageUrl} />
+                                <Avatar sx={{ width: 32, height: 32 }} src={_guild.imageUrl?.startsWith('/') ? `https://guild.xyz${_guild.imageUrl}` : _guild.imageUrl} />
                               </ListItemIcon>
                               <ListItemText
                                 secondary={_guild.urlName}
