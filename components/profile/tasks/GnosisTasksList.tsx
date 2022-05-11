@@ -63,7 +63,7 @@ function TransactionRow ({ transaction }: { transaction: GnosisTransactionPopula
       </Grid>
       <Collapse in={expanded}>
         <Divider />
-        <Box py={1} pl={3}>
+        <Box py={1} pl={3} sx={{ bgcolor: 'background.light' }}>
           {transaction.actions.map(action => (
             <Box py={1}>
               <Typography>
