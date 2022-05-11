@@ -13,7 +13,7 @@ const handler = nc({
   onNoMatch
 });
 
-export interface ImportRolesPayload {
+export interface ImportDiscordRolesPayload {
   spaceId: string,
   guildId: string,
 }
@@ -21,7 +21,7 @@ export interface ImportRolesPayload {
 export type ImportRolesResponse = { importedRoleCount: number };
 
 async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse | { error: string }>) {
-  const { spaceId, guildId } = req.body as ImportRolesPayload;
+  const { spaceId, guildId } = req.body as ImportDiscordRolesPayload;
 
   if (!spaceId || !guildId) {
     res.status(400).json({

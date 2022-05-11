@@ -5,7 +5,7 @@ type RolesRecord = Record<string, Role | null>;
 
 // Create charmverse roles or find them from prisma to generate a final record
 export async function findOrCreateRoles (
-  serverRoles: {id: string, name: string}[],
+  serverRoles: {id: string | number, name: string}[],
   spaceId: string,
   userId: string,
   createRoles?: boolean

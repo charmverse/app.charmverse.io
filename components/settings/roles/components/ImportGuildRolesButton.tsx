@@ -3,7 +3,10 @@ import { Modal } from 'components/common/Modal';
 import { GetGuildsResponse, guild } from '@guildxyz/sdk';
 import { Avatar, Box, Checkbox, List, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import Link from 'components/common/Link';
-import Button, { StyledSpinner } from '../../../common/Button';
+import charmClient from 'charmClient';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { mutate } from 'swr';
+import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
 export default function ImportGuildRolesButton () {
   const [showImportedRolesModal, setShowImportedRolesModal] = useState(false);
@@ -11,8 +14,9 @@ export default function ImportGuildRolesButton () {
   const [fetchingGuilds, setFetchingGuilds] = useState(false);
   const [importingRoles, setImportingRoles] = useState(false);
   const [selectedGuildIds, setSelectedGuildIds] = useState<number[]>([]);
-
+  const [space] = useCurrentSpace();
   const selectedGuildIdsSet = useMemo(() => new Set(selectedGuildIds), [selectedGuildIds]);
+
   useEffect(() => {
     async function main () {
       if (showImportedRolesModal) {
@@ -20,6 +24,7 @@ export default function ImportGuildRolesButton () {
         // if (currentUser && currentUser?.addresses?.[0]) {
         // }
         const allGuilds = await guild.getAll();
+        // Use react-virtualized as this fetches a lot of items
         setGuilds(allGuilds.slice(0, 50));
         setFetchingGuilds(false);
       }
@@ -37,6 +42,19 @@ export default function ImportGuildRolesButton () {
     setGuilds([]);
   }
 
+  async function importRoles () {
+    if (space) {
+      setImportingRoles(true);
+      await charmClient.importRolesFromGuild({
+        guildIds: selectedGuildIds,
+        spaceId: space.id
+      });
+      setImportingRoles(false);
+      setSelectedGuildIds([]);
+      mutate(`roles/${space.id}`);
+    }
+  }
+
   return (
     <>
       <div onClick={() => setShowImportedRolesModal(true)}>Import Roles</div>
@@ -47,6 +65,7 @@ export default function ImportGuildRolesButton () {
               <Box display='flex' justifyContent='space-between'>
                 <Box display='flex' alignItems='center'>
                   <Checkbox
+                    disabled={importingRoles}
                     checked={isAllGuildSelected}
                     onClick={() => {
                       if (isAllGuildSelected) {
@@ -127,16 +146,15 @@ export default function ImportGuildRolesButton () {
                   </List>
                 ))}
               </Box>
-              <Button
+              <PimpedButton
+                loading={importingRoles}
                 sx={{
-                  mt: 5
+                  mt: 2
                 }}
                 disabled={importingRoles}
-                onClick={() => {
-                  setImportingRoles(true);
-                }}
+                onClick={importRoles}
               >Import Roles
-              </Button>
+              </PimpedButton>
             </div>
           )}
       </Modal>
