@@ -8,13 +8,10 @@ import ImportGuildRolesButton from 'components/settings/roles/components/ImportG
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { MouseEvent, EventHandler, useState } from 'react';
+import { MouseEvent, useState } from 'react';
 import { Menu, MenuItem, SvgIcon } from '@mui/material';
 import DiscordIcon from 'public/images/discord_logo.svg';
-import darkLogoImage from 'public/images/guild-logo-dark-short.png';
-import lightLogoImage from 'public/images/guild-logo-light-short.png';
-import Image from 'next/image';
-import { useTheme } from '@emotion/react';
+import GuildXYZIcon from 'public/images/guild_logo.svg';
 import RoleRow from './components/RoleRow';
 import RoleForm from './components/RoleForm';
 
@@ -26,8 +23,6 @@ export default function RoleSettings () {
     unassignRole,
     roles
   } = useRoles();
-  const theme = useTheme();
-  const logoImage = theme.palette.mode === 'dark' ? lightLogoImage : darkLogoImage;
   const isAdmin = useIsAdmin();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
   const [rolesImportSource, setRolesImportSource] = useState<'discord' | 'guild.xyz'>('discord');
@@ -65,7 +60,7 @@ export default function RoleSettings () {
             handleClose();
           }}
         >
-          <SvgIcon viewBox='0 -10 70 70' sx={{ mr: 1 }}>
+          <SvgIcon viewBox='0 -10 70 70' sx={{ transform: 'scale(0.85)', mr: 1 }}>
             <DiscordIcon />
           </SvgIcon>
           Discord
@@ -77,13 +72,11 @@ export default function RoleSettings () {
             handleClose();
           }}
         >
-          <div style={{
-            marginRight: theme.spacing(1),
-            width: 20
+          <GuildXYZIcon style={{
+            marginRight: 8,
+            transform: 'scale(0.75)'
           }}
-          >
-            <Image src={logoImage} alt='Guild.xyz' />
-          </div>
+          />
           Guild.xyz
         </MenuItem>
       </Menu>
@@ -95,7 +88,6 @@ export default function RoleSettings () {
             refreshRoles();
           }}
         />
-
       </Modal>
 
       {roles?.map(role => (

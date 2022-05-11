@@ -1,7 +1,7 @@
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Tooltip, Typography } from '@mui/material';
+import { SvgIcon, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -19,10 +19,7 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useContributors } from 'hooks/useContributors';
-import darkLogoImage from 'public/images/guild-logo-dark.png';
-import lightLogoImage from 'public/images/guild-logo-light.png';
-import Image from 'next/image';
-import { useTheme } from '@emotion/react';
+import GuildXYZIcon from 'public/images/guild_logo.svg';
 import RoleForm from './RoleForm';
 import RoleMemberRow from './RoleMemberRow';
 
@@ -42,8 +39,6 @@ const ScrollableBox = styled.div<{ rows: number }>`
 `;
 
 export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, deleteRole, refreshRoles }: RoleRowProps) {
-  const theme = useTheme();
-  const logoImage = theme.palette.mode === 'dark' ? lightLogoImage : darkLogoImage;
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
   const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
@@ -86,13 +81,12 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           </Typography>
           {role.source === 'guild.xyz' ? (
             <Tooltip arrow title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'>
-              <div style={{
-                width: 50,
-                height: 15
-              }}
-              >
-                <Image src={logoImage} alt='Guild.xyz' />
-              </div>
+              <span style={{ display: 'flex' }}>
+                <GuildXYZIcon style={{
+                  transform: 'scale(0.75)'
+                }}
+                />
+              </span>
             </Tooltip>
           ) : null}
         </Box>
@@ -117,7 +111,6 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           />
         ))}
       </ScrollableBox>
-
       {
         assignedContributors.length < contributors.length ? (
           isEditable && <Button disabled={role.source === 'guild.xyz'} onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>

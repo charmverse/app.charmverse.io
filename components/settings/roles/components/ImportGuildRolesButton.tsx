@@ -1,17 +1,14 @@
 import { MouseEventHandler, useEffect, useMemo, useState } from 'react';
 import { Modal } from 'components/common/Modal';
 import { guild, user } from '@guildxyz/sdk';
-import { Avatar, Box, Button, Checkbox, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
+import { Avatar, Box, Button, Checkbox, ListItem, ListItemIcon, ListItemText, MenuItem, SvgIcon, Typography } from '@mui/material';
 import Link from 'components/common/Link';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { mutate } from 'swr';
 import { useUser } from 'hooks/useUser';
 import { FixedSizeList } from 'react-window';
-import darkLogoImage from 'public/images/guild-logo-dark-short.png';
-import lightLogoImage from 'public/images/guild-logo-light-short.png';
-import Image from 'next/image';
-import { useTheme } from '@emotion/react';
+import GuildXYZIcon from 'public/images/guild_logo.svg';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
@@ -28,9 +25,6 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
   const [space] = useCurrentSpace();
   const selectedGuildIdsSet = useMemo(() => new Set(selectedGuildIds), [selectedGuildIds]);
   const [currentUser] = useUser();
-  const theme = useTheme();
-  const logoImage = theme.palette.mode === 'dark' ? lightLogoImage : darkLogoImage;
-
   const firstAddress = currentUser && currentUser?.addresses?.[0] ? currentUser.addresses[0] : null;
   useEffect(() => {
     async function main () {
@@ -83,17 +77,10 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
           <KeyboardArrowDownIcon onClick={onDownArrowClicked} />
         )}
         startIcon={(
-          // Changing this style will cause the button to change dimension when changing roles import source
-          <span style={{
-            width: 20,
-            height: 20,
-            display: 'flex',
-            alignItems: 'center'
-          }}
-          >
-            <Image src={logoImage} alt='Guild.xyz' />
-          </span>
-      )}
+          <SvgIcon sx={{ color: 'text.primary' }}>
+            <GuildXYZIcon />
+          </SvgIcon>
+        )}
         onClick={() => setShowImportedRolesModal(true)}
       >Import roles
       </Button>
