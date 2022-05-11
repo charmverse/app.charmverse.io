@@ -54,7 +54,8 @@ export default function LargeAvatar (props: LargeAvatarProps) {
           const firstFile = e.target.files?.[0];
 
           if (firstFile) {
-            const { url } = await uploadToS3(firstFile); setAvatar(url);
+            const { url } = await uploadToS3(firstFile);
+            setAvatar(url);
           }
         }}
       />
