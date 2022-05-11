@@ -5,7 +5,7 @@ import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip'
 import { useTheme } from '@emotion/react';
 import { Box, ClickAwayListener, List, ListSubheader, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
-import { ReviewerOption } from 'components/common/form/InputSearchContributor';
+import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
@@ -185,10 +185,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
           onClick={() => onSelectMention(contributor.id, 'user')}
           key={contributor.id}
         >
-          <ReviewerOption
-            style={{
-              alignItems: 'center'
-            }}
+          <UserDisplay
             user={contributor}
             avatarSize='small'
           />

@@ -8,26 +8,31 @@ import { getTransactionsforSafes, GnosisTransaction } from './gnosis';
 
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`;
 
+interface ActionUser {
+  address: string;
+  user?: User;
+}
+
 interface SendAction {
-  to: string;
+  to: ActionUser;
   value: string;
   friendlyValue: string;
 }
 
 export interface GnosisTransactionPopulated {
-    id: string;
-    actions: SendAction[];
-    date: string;
-    confirmations: { owner: string }[];
-    isExecuted: boolean;
-    description: string;
-    gnosisUrl: string;
-    myAction: string;
-    myActionUrl: string;
-    nonce: number;
-    safeAddress: string;
-    safeName: string | null;
-    threshold: number;
+  id: string;
+  actions: SendAction[];
+  date: string;
+  confirmations: ActionUser[];
+  isExecuted: boolean;
+  description: string;
+  gnosisUrl: string;
+  myAction: string;
+  myActionUrl: string;
+  nonce: number;
+  safeAddress: string;
+  safeName: string | null;
+  threshold: number;
 }
 
 export interface GnosisTask {
@@ -44,6 +49,18 @@ export interface GnosisSafeTasks {
 
 function etherToBN (ether: string): ethers.BigNumber {
   return ethers.BigNumber.from(ethers.utils.parseEther(ether));
+}
+
+function getFriendlyEthValue (value: string) {
+  const valueBigNumber = ethers.BigNumber.from(value);
+  const ethersValue = ethers.utils.formatEther(valueBigNumber);
+  const upperBound = ethers.BigNumber.from(ethers.utils.parseEther('0.001'));
+  if (valueBigNumber.gt(0) && valueBigNumber.lt(upperBound)) {
+    return '< 0.0001';
+  }
+  else {
+    return ethersValue;
+  }
 }
 
 function getGnosisTransactionUrl (address: string) {
@@ -64,40 +81,34 @@ function getTaskDescription (transaction: GnosisTransaction): string {
     }
   }
   else if (transaction.to && transaction.value) {
-    const valueBigNumber = ethers.BigNumber.from(transaction.value);
-    const ethersValue = ethers.utils.formatEther(valueBigNumber);
-    const upperBound = ethers.BigNumber.from(ethers.utils.parseEther('0.0001'));
-    if (valueBigNumber.gt(0) && valueBigNumber.lt(upperBound)) {
-      return 'Send < 0.0001 ETH';
-    }
-    else {
-      return `Send ${ethersValue} ETH`;
-    }
+    return `Send ${getFriendlyEthValue(transaction.value)} ETH`;
   }
   log.warn('Unknown transaction', transaction);
   return 'N/A';
 }
 
-function getTaskActions (transaction: GnosisTransaction): SendAction[] {
+function getTaskActions (transaction: GnosisTransaction, getRecipient: (address: string) => ActionUser): SendAction[] {
   const data = transaction.dataDecoded as any | undefined;
   const actions = data
     ? data?.parameters[0].valueDecoded as { to: string, value: string }[]
     : [{ to: transaction.to, value: transaction.value }];
 
   return actions.map(action => ({
-    ...action,
-    friendlyValue: ethers.utils.formatEther(ethers.BigNumber.from(action.value))
+    value: action.value,
+    friendlyValue: getFriendlyEthValue(action.value),
+    to: getRecipient(action.to)
   }));
 }
 
-interface TransactionToTask {
+interface TransactionToTaskProps {
   myAddresses: string[];
   transaction: GnosisTransaction;
   safe: UserGnosisSafe;
+  users: User[];
 }
 
-function transactionToTask ({ myAddresses, transaction, safe }: TransactionToTask): GnosisTransactionPopulated {
-  const actions = getTaskActions(transaction);
+function transactionToTask ({ myAddresses, transaction, safe, users }: TransactionToTaskProps): GnosisTransactionPopulated {
+  const actions = getTaskActions(transaction, getRecipient);
   const gnosisUrl = getGnosisTransactionUrl(transaction.safe);
   const confirmedAddresses = transaction.confirmations?.map(confirmation => confirmation.owner) ?? [];
   // console.log('transaction', transaction);
@@ -111,6 +122,12 @@ function transactionToTask ({ myAddresses, transaction, safe }: TransactionToTas
       actionLabel = 'Execute';
     }
   }
+
+  function getRecipient (address: string) {
+    const user = users.find(u => u.addresses.includes(address));
+    return { address, user };
+  }
+
   return {
     id: transaction.safeTxHash,
     actions,
@@ -121,7 +138,7 @@ function transactionToTask ({ myAddresses, transaction, safe }: TransactionToTas
     nonce: transaction.nonce,
     safeAddress: transaction.safe,
     safeName: safe.name,
-    confirmations: transaction.confirmations?.map(confirmation => ({ owner: confirmation.owner })) ?? [],
+    confirmations: transaction.confirmations?.map(confirmation => getRecipient(confirmation.owner)) ?? [],
     threshold: safe.threshold,
     myAction: actionLabel,
     myActionUrl: gnosisUrl
@@ -143,7 +160,8 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
   const mapped = transactions.map(transaction => transactionToTask({
     myAddresses,
     safe: safesByAddress[transaction.safe],
-    transaction
+    transaction,
+    users
   }));
 
   return Object.values(groupBy(mapped, 'safeAddress'))

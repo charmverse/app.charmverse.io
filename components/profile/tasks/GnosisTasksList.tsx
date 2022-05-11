@@ -9,6 +9,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Legend from 'components/settings/Legend';
+import UserDisplay, { AnonUserDisplay } from 'components/common/UserDisplay';
 import { shortenHex } from 'lib/utilities/strings';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import useGnosisSigner from 'hooks/useWeb3Signer';
@@ -46,7 +47,7 @@ function TransactionRow ({ transaction }: { transaction: GnosisTransactionPopula
         </GridColumn>
         <GridColumn sx={{ justifyContent: 'flex-end' }}>
           <Chip
-            clickable
+            clickable={!!transaction.myAction}
             component='a'
             label={transaction.myAction || 'Waiting for others'}
             href={transaction.myActionUrl}
@@ -63,14 +64,30 @@ function TransactionRow ({ transaction }: { transaction: GnosisTransactionPopula
       </Grid>
       <Collapse in={expanded}>
         <Divider />
-        <Box py={1} pl={3} sx={{ bgcolor: 'background.light' }}>
-          {transaction.actions.map(action => (
-            <Box py={1}>
-              <Typography>
-                Sending <strong>{action.friendlyValue}</strong> to {action.to}
-              </Typography>
-            </Box>
-          ))}
+        <Box py={1} pl={4} sx={{ bgcolor: 'background.light' }}>
+          <Grid container spacing={1}>
+            <Grid item xs={6}>
+              {transaction.actions.map(action => (
+                <Box py={1}>
+                  <Typography gutterBottom>
+                    Sending <strong>{action.friendlyValue}</strong> to:
+                  </Typography>
+                  {action.to.user ? <UserDisplay avatarSize='small' user={action.to.user} /> : <AnonUserDisplay avatarSize='small' address={action.to.address} />}
+                </Box>
+              ))}
+            </Grid>
+            <Grid item xs={1}>
+              <Divider orientation='vertical' />
+            </Grid>
+            <Grid item xs={5}>
+              <Typography color='secondary' gutterBottom variant='body2'>Confirmations</Typography>
+              {transaction.confirmations.map(confirmation => (
+                <Box py={1}>
+                  {confirmation.user ? <UserDisplay avatarSize='small' user={confirmation.user} /> : <AnonUserDisplay avatarSize='small' address={confirmation.address} />}
+                </Box>
+              ))}
+            </Grid>
+          </Grid>
         </Box>
         <Divider />
       </Collapse>
