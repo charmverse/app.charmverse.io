@@ -61,6 +61,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   if (!profile) {
     return res.status(404).json({ error: 'No user found' });
   }
+  // Assign the roles imported from guild
   return res.status(200).json(profile);
 }
 

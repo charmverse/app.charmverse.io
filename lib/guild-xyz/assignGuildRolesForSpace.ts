@@ -1,8 +1,7 @@
-import { Role } from '@prisma/client';
 import { prisma } from 'db';
 import { user } from '@guildxyz/sdk';
 
-export async function assignRolesFromGuild (rolesRecord: Record<string, Role | null>, spaceId: string) {
+export async function assignGuildRolesForSpace (spaceId: string) {
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       spaceId
@@ -22,7 +21,15 @@ export async function assignRolesFromGuild (rolesRecord: Record<string, Role | n
       }
     },
     select: {
-      sourceRoleId: true
+      sourceRoleId: true,
+      id: true
+    }
+  });
+
+  const guildRoleCharmverseRoleRecord: Record<string, string> = {};
+  rolesImportedWithGuild.forEach(roleImportedWithGuild => {
+    if (roleImportedWithGuild.sourceRoleId) {
+      guildRoleCharmverseRoleRecord[roleImportedWithGuild.sourceRoleId] = roleImportedWithGuild.id;
     }
   });
 
@@ -45,12 +52,12 @@ export async function assignRolesFromGuild (rolesRecord: Record<string, Role | n
       // Filter the roles that are part of the workspace only
       const roleIdsInWorkspace = Array.from(roleIdsSet).filter(roleId => workspaceRoleIdsSet.has(roleId));
       for (const roleIdInWorkspace of roleIdsInWorkspace) {
-        const roleRecordItem = rolesRecord[roleIdInWorkspace];
-        if (roleRecordItem) {
+        const roleId = guildRoleCharmverseRoleRecord[roleIdInWorkspace];
+        if (roleId) {
           await prisma.spaceRoleToRole.upsert({
             where: {
               spaceRoleId_roleId: {
-                roleId: roleRecordItem.id,
+                roleId,
                 spaceRoleId: spaceRole.id
               }
             },
@@ -58,7 +65,7 @@ export async function assignRolesFromGuild (rolesRecord: Record<string, Role | n
             create: {
               role: {
                 connect: {
-                  id: roleRecordItem.id
+                  id: roleId
                 }
               },
               spaceRole: {
