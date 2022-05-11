@@ -4,6 +4,7 @@ import { AvatarWithIcons } from 'components/common/Avatar';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { deleteFromS3Browser } from 'lib/aws/deleteFromS3Browser';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
 const StyledBox = styled(Box)`
@@ -71,7 +72,11 @@ export default function LargeAvatar (props: LargeAvatarProps) {
               key='edit-avatar'
             />,
             <DeleteIcon
-              onClick={() => updateImage('')}
+              onClick={async () => {
+                debugger;
+                await deleteFromS3Browser(spaceImage);
+                updateImage('');
+              }}
               fontSize='small'
               key='delete-avatar'
             />,
