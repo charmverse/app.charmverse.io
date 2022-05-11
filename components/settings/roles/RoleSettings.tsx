@@ -12,6 +12,8 @@ import { MouseEvent, useState } from 'react';
 import { Menu, MenuItem, SvgIcon } from '@mui/material';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
+import { useLocalStorage } from 'hooks/useLocalStorage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import RoleRow from './components/RoleRow';
 import RoleForm from './components/RoleForm';
 
@@ -25,10 +27,10 @@ export default function RoleSettings () {
   } = useRoles();
   const isAdmin = useIsAdmin();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
-  const [rolesImportSource, setRolesImportSource] = useState<'discord' | 'guild.xyz'>('discord');
   const [anchorEl, setAnchorEl] = useState<SVGSVGElement | null>(null);
   const open = Boolean(anchorEl);
-
+  const [space] = useCurrentSpace();
+  const [rolesImportSource, setRolesImportSource] = useLocalStorage<'discord' | 'guild.xyz'>(`${space?.id}.role-import-source`, 'discord');
   const handleClose = () => {
     setAnchorEl(null);
   };

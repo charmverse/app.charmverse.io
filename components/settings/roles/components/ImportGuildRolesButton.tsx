@@ -63,8 +63,7 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
         guildIds: selectedGuildIds,
         spaceId: space.id
       });
-      setImportingRoles(false);
-      setSelectedGuildIds([]);
+      resetState();
       mutate(`roles/${space.id}`);
     }
   }
