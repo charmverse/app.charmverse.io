@@ -48,7 +48,7 @@ export default function BountyList () {
   // User can only suggest a bounty instead of creating it
   const suggestBounties = isAdmin === false;
 
-  const filteredBounties = filterBounties(bounties.slice(), bountyFilter);
+  const filteredBounties = filterBounties(bounties.slice(), savedBountyFilters);
 
   const sortedBounties = bounties ? sortArrayByObjectProperty(filteredBounties, 'status', bountyOrder) : [];
 
