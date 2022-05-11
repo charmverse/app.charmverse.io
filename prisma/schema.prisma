@@ -114,27 +114,27 @@ model Block {
 }
 
 model User {
-  id              String               @id @default(uuid()) @db.Uuid
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @default(now())
-  addresses       String[]
-  spaceRoles      SpaceRole[]
-  favorites       FavoritePage[]
-  permissions     PagePermission[]
-  pages           Page[]
-  blocks          Block[]
-  spaces          Space[]
-  inviteLinks     InviteLink[]
-  bounties        Bounty[]
-  applications    Application[]
-  username        String?
-  avatar          String?
-  isBot           Boolean?             @default(false)
-  discordUser     DiscordUser?
-  telegramUser    TelegramUser?
-  comments        Comment[]
-  threads         Thread[]
-  multiSigWallets UserMultiSigWallet[]
+  id           String           @id @default(uuid()) @db.Uuid
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @default(now())
+  addresses    String[]
+  spaceRoles   SpaceRole[]
+  favorites    FavoritePage[]
+  permissions  PagePermission[]
+  pages        Page[]
+  blocks       Block[]
+  spaces       Space[]
+  inviteLinks  InviteLink[]
+  bounties     Bounty[]
+  applications Application[]
+  username     String?
+  avatar       String?
+  isBot        Boolean?         @default(false)
+  discordUser  DiscordUser?
+  telegramUser TelegramUser?
+  comments     Comment[]
+  threads      Thread[]
+  gnosisSafes  UserGnosisSafe[]
 }
 
 model TelegramUser {
@@ -279,14 +279,15 @@ model PaymentMethod {
   walletType        WalletType @default(metamask)
 }
 
-model UserMultiSigWallet {
-  id         String     @id @default(uuid()) @db.Uuid
-  userId     String     @db.Uuid
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  chainId    Int
-  address    String
-  name       String?
-  walletType WalletType @default(metamask)
+model UserGnosisSafe {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chainId   Int
+  address   String
+  name      String?
+  threshold Int
+  owners    String[]
 }
 
 model Role {
