@@ -15,10 +15,9 @@ import { usePages } from 'hooks/usePages';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import Link from 'next/link';
-import { PageContent } from 'models';
 import { hideSuggestionsTooltip } from './@bangle.dev/tooltip/suggest-tooltip';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
-import { checkForEmpty } from '../utils';
+import { PagesList } from './PageList';
 
 const name = 'mention';
 
@@ -164,7 +163,6 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     tooltipContentDOM,
     suggestTooltipKey
   } = usePluginState(pluginKey);
-  const { pages } = usePages();
 
   const theme = useTheme();
 
@@ -199,24 +197,6 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     </>
   );
 
-  const pagesList: ReactNode[] = [];
-  Object.values(pages).forEach(page => {
-    if (page && page.deletedAt === null) {
-      const isEditorEmpty = checkForEmpty(page?.content as PageContent);
-      pagesList.push(
-        <MenuItem
-          key={page.id}
-          onClick={() => onSelectMention(page.id, 'page')}
-        >
-          <Box display='flex' gap={0.5}>
-            <PageIcon icon={page.icon} isEditorEmpty={isEditorEmpty} pageType={page.type} />
-            {page.title || 'Untitled'}
-          </Box>
-        </MenuItem>
-      );
-    }
-  });
-
   return createPortal(
     <ClickAwayListener onClickAway={() => {
       hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
@@ -247,7 +227,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
               }}
               >{sectionId}
               </ListSubheader>
-              {sectionId === 'Contributors' ? contributorsList : pagesList}
+              {sectionId === 'Contributors' ? contributorsList : <PagesList onSelectPage={(page) => onSelectMention(page.id, 'page')} />}
               <hr style={{
                 height: 2,
                 marginTop: '8px',

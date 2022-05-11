@@ -1,16 +1,12 @@
 
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { MenuItem, ListItemIcon } from '@mui/material';
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import PageTitle from 'components/common/PageLayout/components/PageTitle';
-import { usePages } from 'hooks/usePages';
-import { Page, PageContent } from 'models';
+import { Page } from 'models';
 import { useCallback, memo } from 'react';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import useNestedPage from '../hooks/useNestedPage';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { NestedPagePluginKey, NestedPagePluginState } from '../nestedPage';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
+import { PagesList } from '../../PageList';
 
 function NestedPagesList () {
 
@@ -37,41 +33,11 @@ function NestedPagesList () {
   return (
     <PopoverMenu container={tooltipContentDOM} isOpen={isVisible} onClose={onClose} width={460}>
       <GroupLabel>Select a page</GroupLabel>
-      {isVisible && <PagesList onSelectPage={onSelectPage} />}
+      {isVisible && (
+      <PagesList onSelectPage={onSelectPage} />
+      )}
     </PopoverMenu>
   );
-}
-
-function PagesList ({ onSelectPage }: { onSelectPage: (page: Page) => void }): JSX.Element {
-  const { pages } = usePages();
-
-  const items = (Object.values(pages).filter((page) => page && page?.deletedAt === null) as Page[]).map(page => {
-    const docContent = ((page.content) as PageContent);
-    const isEditorEmpty = checkForEmpty(docContent);
-    return (
-      <MenuItem
-        onClick={() => onSelectPage(page)}
-        key={page.id}
-      >
-        <>
-          <ListItemIcon>
-            <PageIcon icon={page.icon} isEditorEmpty={Boolean(isEditorEmpty)} pageType={page.type} />
-          </ListItemIcon>
-          <PageTitle
-            hasContent={page.title.length === 0}
-            sx={{
-              fontWeight: 'bold'
-            }}
-          >
-            {page.title.length !== 0 ? page.title : 'Untitled'}
-          </PageTitle>
-        </>
-      </MenuItem>
-    );
-  });
-
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  return <>{items}</>;
 }
 
 export default memo(NestedPagesList);
