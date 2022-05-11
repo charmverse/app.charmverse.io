@@ -3,14 +3,13 @@ import { Command, DOMOutputSpec, EditorState, Plugin, PluginKey, Schema } from '
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { useTheme } from '@emotion/react';
-import { Box, ClickAwayListener, List, ListSubheader, Typography } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import { ReactNode, useCallback, memo } from 'react';
-import { createPortal } from 'react-dom';
 import { usePages } from 'hooks/usePages';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -18,6 +17,7 @@ import Link from 'next/link';
 import { hideSuggestionsTooltip } from './@bangle.dev/tooltip/suggest-tooltip';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import { PagesList } from './PageList';
+import PopoverMenu, { GroupLabel } from './PopoverMenu';
 
 const name = 'mention';
 
@@ -163,8 +163,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     tooltipContentDOM,
     suggestTooltipKey
   } = usePluginState(pluginKey);
-
-  const theme = useTheme();
+  const { show: isVisible } = usePluginState(suggestTooltipKey);
 
   const onSelectMention = useCallback(
     (value: string, type: string) => {
@@ -174,74 +173,49 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     [view, pluginKey]
   );
 
-  const contributorsList = (
-    <>
-      {contributors.map(contributor => (
-        <MenuItem
-          component='div'
-          sx={{
-            background: theme.palette.background.dark
-          }}
-          onClick={() => onSelectMention(contributor.id, 'user')}
-          key={contributor.id}
-        >
-          <ReviewerOption
-            style={{
-              alignItems: 'center'
-            }}
-            user={contributor}
-            avatarSize='small'
-          />
-        </MenuItem>
-      ))}
-    </>
-  );
-
-  return createPortal(
-    <ClickAwayListener onClickAway={() => {
-      hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
-    }}
+  return (
+    <PopoverMenu
+      container={tooltipContentDOM}
+      isOpen={isVisible}
+      onClose={() => {
+        hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
+      }}
+      width={460}
     >
-      <List
+      <Box
         sx={{
-          width: '350px',
-          position: 'relative',
           overflow: 'auto',
           maxHeight: 300,
-          '& ul': { padding: 0 }
+          py: 1
         }}
-        subheader={<li />}
       >
-        {['Contributors', 'Pages'].map(sectionId => {
-          return (
-            <Box
-              key={`section-${sectionId}`}
-              sx={{
-                // This is required to not show the background while scrolling
-                backgroundColor: theme.palette.background.dark
-              }}
+        <GroupLabel>Contributors</GroupLabel>
+        <div>
+          {contributors.map(contributor => (
+            <MenuItem
+              component='div'
+              onClick={() => onSelectMention(contributor.id, 'user')}
+              key={contributor.id}
             >
-              <ListSubheader sx={{
-                top: '-5px',
-                zIndex: 25
-              }}
-              >{sectionId}
-              </ListSubheader>
-              {sectionId === 'Contributors' ? contributorsList : <PagesList onSelectPage={(page) => onSelectMention(page.id, 'page')} />}
-              <hr style={{
-                height: 2,
-                marginTop: '8px',
-                marginBottom: 0
-              }}
+              <ReviewerOption
+                style={{
+                  alignItems: 'center'
+                }}
+                user={contributor}
+                avatarSize='small'
               />
-            </Box>
-          );
-        })}
-      </List>
-    </ClickAwayListener>,
-    tooltipContentDOM
+            </MenuItem>
+          ))}
+        </div>
+        <Divider sx={{
+          my: 1
+        }}
+        />
+        <GroupLabel>Pages</GroupLabel>
+        <PagesList onSelectPage={(page) => onSelectMention(page.id, 'page')} />
+      </Box>
+    </PopoverMenu>
   );
-
 }
 
 export default memo(MentionSuggest);
