@@ -19,6 +19,7 @@ handler.use(requireUser)
 type ListSpaceRolesResponse = {
   id: string;
   name: string;
+  source: string | null
   spaceRolesToRole: {
       spaceRole: {
           user: User;
@@ -44,6 +45,7 @@ async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpa
     select: {
       id: true,
       name: true,
+      source: true,
       spaceRolesToRole: {
         select: {
           spaceRole: {

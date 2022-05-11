@@ -8,9 +8,9 @@ export async function findOrCreateRoles (
   serverRoles: {id: string | number, name: string}[],
   spaceId: string,
   userId: string,
-  createRoles?: boolean
+  options?:{source?: string | null, createRoles?: boolean}
 ): Promise<RolesRecord> {
-  createRoles = createRoles ?? true;
+  const { createRoles = true, source = null } = options ?? {};
   const rolesRecord: RolesRecord = {};
   // Create all of the discord roles fist
   for (const serverRole of serverRoles) {
@@ -51,7 +51,8 @@ export async function findOrCreateRoles (
                 id: spaceId
               }
             },
-            createdBy: userId
+            createdBy: userId,
+            source
           }
         });
       }

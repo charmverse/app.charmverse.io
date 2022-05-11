@@ -1,7 +1,7 @@
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -19,8 +19,12 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useContributors } from 'hooks/useContributors';
-import RoleMemberRow from './RoleMemberRow';
+import darkLogoImage from 'public/images/guild-logo-dark.png';
+import lightLogoImage from 'public/images/guild-logo-light.png';
+import Image from 'next/image';
+import { useTheme } from '@emotion/react';
 import RoleForm from './RoleForm';
+import RoleMemberRow from './RoleMemberRow';
 
 interface RoleRowProps {
   isEditable: boolean;
@@ -38,7 +42,8 @@ const ScrollableBox = styled.div<{ rows: number }>`
 `;
 
 export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, deleteRole, refreshRoles }: RoleRowProps) {
-
+  const theme = useTheme();
+  const logoImage = theme.palette.mode === 'dark' ? lightLogoImage : darkLogoImage;
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
   const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
@@ -75,9 +80,22 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
     <Box mb={3}>
 
       <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {role.name} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
-        </Typography>
+        <Box display='flex' gap={1} alignItems='center'>
+          <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            {role.name} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
+          </Typography>
+          {role.source === 'guild.xyz' ? (
+            <Tooltip arrow title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'>
+              <div style={{
+                width: 50,
+                height: 15
+              }}
+              >
+                <Image src={logoImage} alt='Guild.xyz' />
+              </div>
+            </Tooltip>
+          ) : null}
+        </Box>
         {isEditable && (
           <IconButton size='small' {...bindTrigger(menuState)}>
             <MoreHorizIcon />

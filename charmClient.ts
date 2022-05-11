@@ -34,6 +34,7 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 export type ListSpaceRolesResponse = {
   id: string;
   name: string;
+  source: string | null
   spaceRolesToRole: {
       spaceRole: {
           user: User;

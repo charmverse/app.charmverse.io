@@ -108,7 +108,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     try {
       const discordServerRoles = await authenticatedRequest<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${space.discordServerId}/roles`);
       // Dont create new roles
-      const rolesRecord = await findOrCreateRoles(discordServerRoles, space.id, req.session.user.id, false);
+      const rolesRecord = await findOrCreateRoles(discordServerRoles, space.id, req.session.user.id, { createRoles: false });
       const guildMemberResponse = await authenticatedRequest<DiscordGuildMember>(`https://discord.com/api/v8/guilds/${space.discordServerId}/members/${id}`);
       await assignRolesFromDiscord(rolesRecord, [guildMemberResponse], space.id);
     }

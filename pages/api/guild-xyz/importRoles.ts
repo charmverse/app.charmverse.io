@@ -22,7 +22,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<{ok: boole
   guilds.forEach(_guild => {
     guildRoles.push(..._guild.roles.map(role => ({ id: role.id, name: role.name })));
   });
-  await findOrCreateRoles(guildRoles, spaceId, req.session.user.id);
+  await findOrCreateRoles(guildRoles, spaceId, req.session.user.id, { source: 'guild.xyz' });
 
   res.status(200).json({ ok: true });
 }

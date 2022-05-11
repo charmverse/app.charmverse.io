@@ -297,6 +297,7 @@ model Role {
   space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   spaceRolesToRole SpaceRoleToRole[]
   permissions      PagePermission[]
+  source           String?
 
   TokenGateToRole TokenGateToRole[]
   @@unique([spaceId, name])
