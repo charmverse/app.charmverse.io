@@ -70,6 +70,13 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
   }
   else {
     const rolesRecord = await findOrCreateRoles(discordServerRoles, spaceId, req.session.user.id);
+    // Remove the roles imported from guild.xyz
+    for (const roleId of Object.keys(rolesRecord)) {
+      const role = rolesRecord[roleId];
+      if (role?.sourceRoleId && role.source === 'guild.xyz') {
+        delete rolesRecord[roleId];
+      }
+    }
     await assignRolesFromDiscord(rolesRecord, discordGuildMembers, spaceId);
     res.status(200).json({ importedRoleCount: discordServerRoles.length });
   }

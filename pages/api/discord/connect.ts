@@ -110,6 +110,13 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
       // Dont create new roles
       const rolesRecord = await findOrCreateRoles(discordServerRoles, space.id, req.session.user.id, { createRoles: false });
       const guildMemberResponse = await authenticatedRequest<DiscordGuildMember>(`https://discord.com/api/v8/guilds/${space.discordServerId}/members/${id}`);
+      // Remove the roles imported from guild.xyz
+      for (const roleId of Object.keys(rolesRecord)) {
+        const role = rolesRecord[roleId];
+        if (role?.sourceRoleId && role.source === 'guild.xyz') {
+          delete rolesRecord[roleId];
+        }
+      }
       await assignRolesFromDiscord(rolesRecord, [guildMemberResponse], space.id);
     }
     catch (error) {
