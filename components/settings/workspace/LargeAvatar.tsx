@@ -1,29 +1,13 @@
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
-import { useState } from 'react';
+import { useRef, useState, ReactNode } from 'react';
 import { AvatarWithIcons } from 'components/common/Avatar';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
 const StyledBox = styled(Box)`
   display: inline-block;
-`;
-
-const iconStyle = css`
-  position: absolute;
-  top: 10px;
-  cursor: pointer;
-`;
-
-const StyledEditIcon = styled(EditIcon)`
-  ${iconStyle}
-  right: 40px;
-`;
-
-const StyledDeleteIcon = styled(DeleteIcon)`
-  ${iconStyle}
-  right: 10px;
 `;
 
 const StyledAvatar = styled(AvatarWithIcons)`
@@ -42,21 +26,51 @@ type LargeAvatarProps = {
   variant?: 'circular' | 'rounded' | 'square';
 };
 
+const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar?: string) => {
+  if (!avatar) {
+    return [editIcon];
+  }
+
+  return [editIcon, deleteIcon];
+};
+
 export default function LargeAvatar (props: LargeAvatarProps) {
   const { name = '' } = props;
   const [isHovered, setIsHovered] = useState(false);
+  const [avatar, setAvatar] = useState();
+  const inputFile = useRef(null);
 
   return (
     <StyledBox
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <input
+        type='file'
+        hidden
+        accept='image/*'
+        ref={inputFile}
+        onChange={async (e) => {
+          const firstFile = e.target.files?.[0];
+
+          if (firstFile) {
+            const { url } = await uploadToS3(firstFile); setAvatar(url);
+          }
+        }}
+      />
       <StyledAvatar
+        avatar={avatar}
+        isHovered={isHovered}
         icons={
-          isHovered && [
-            <StyledEditIcon className='edit-avatar-icon' fontSize='medium' key='edit-avatar' />,
-            <StyledDeleteIcon className='delete-avatar-icon' fontSize='medium' key='delete-avatar' />
-          ]
+          getIcons(
+            <EditIcon
+              onClick={() => inputFile.current.click()}
+              fontSize='small'
+              key='edit-avatar'
+            />,
+            <DeleteIcon fontSize='small' key='delete-avatar' />,
+            avatar
+          )
         }
         {...props}
       >
