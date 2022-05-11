@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, ButtonProps, Tooltip, SxProps } from '@mui/material';
 import { useTheme } from '@emotion/react';
 import type { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
-import { ReviewerOption } from 'components/common/form/InputSearchContributor';
+import UserDisplay from 'components/common/UserDisplay';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -329,7 +329,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                     }
                   }}
                 >
-                  <ReviewerOption
+                  <UserDisplay
                     component='div'
                     user={comment.user}
                     avatarSize='small'
@@ -352,7 +352,6 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                       endIcon={(
                         <MoreHorizIcon
                           onClick={(e: any) => {
-                            console.log('more icon');
                             e.stopPropagation();
                             onClickCommentActions(e, comment);
                           }}
