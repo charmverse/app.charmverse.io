@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
-import { Box, Card, CircularProgress, Collapse, OutlinedInput, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import { Box, Card, CircularProgress, OutlinedInput, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import { useRouter } from 'next/router';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -158,7 +158,7 @@ function SafeRow ({ safe, updateWallets }: { safe: Safe, updateWallets: () => vo
     deleteConfirmation.close();
   }
 
-  async function safeSafeName ({ name }: { name: string }) {
+  async function saveSafeName ({ name }: { name: string }) {
     if (isDirty) {
       const sanitized = name.trim();
       await charmClient.updateMyGnosisSafe({ id: safe.id, name: sanitized });
@@ -178,7 +178,7 @@ function SafeRow ({ safe, updateWallets }: { safe: Safe, updateWallets: () => vo
               value={value}
               onChange={onChange}
               placeholder='Untitled'
-              onBlur={handleSubmit(safeSafeName)}
+              onBlur={handleSubmit(saveSafeName)}
               endAdornment={
                 <CircularProgress size={14} sx={{ opacity: isSubmitting ? 1 : 0 }} />
               }
