@@ -23,12 +23,12 @@ const StyledAvatar = styled(AvatarWithIcons)`
 
 type LargeAvatarProps = {
   name: string;
-  spaceImage: string | null;
+  spaceImage: string | null | undefined;
   updateImage?: (url: string) => void;
   variant?: 'circular' | 'rounded' | 'square';
 };
 
-const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar?: string) => {
+const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | null | undefined) => {
   if (!avatar) {
     return [editIcon];
   }

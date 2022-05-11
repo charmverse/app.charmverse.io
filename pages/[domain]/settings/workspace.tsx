@@ -79,7 +79,7 @@ export default function WorkspaceSettings () {
               name={watchName}
               variant='rounded'
               spaceImage={watchSpaceImage}
-              updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
+              updateImage={(url: string) => setValue('spaceImage', url, { shouldDirty: true })}
             />
             <TextField
               {...register('spaceImage')}
