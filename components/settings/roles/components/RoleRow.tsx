@@ -109,7 +109,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           <RoleMemberRow
             key={contributor.id}
             contributor={contributor}
-            isEditable={isEditable}
+            isEditable={isEditable && role.source !== 'guild.xyz'}
             onRemove={(userId) => {
               removeMember(userId);
               userIdsToHide = userIdsToHide.filter(id => id !== userId);
@@ -120,7 +120,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
 
       {
         assignedContributors.length < contributors.length ? (
-          isEditable && <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
+          isEditable && <Button disabled={role.source === 'guild.xyz'} onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
         ) : (
           <Typography variant='caption'>All space members have been added to this role</Typography>
         )
@@ -135,6 +135,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
         }}
       >
         <MenuItem
+          disabled={role.source === 'guild.xyz'}
           sx={{ padding: '3px 12px' }}
           onClick={() => {
             popupState.open();
@@ -167,7 +168,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
         </Grid>
       </Modal>
 
-      <Modal {...bindPopover(popupState)} title='Add a role'>
+      <Modal {...bindPopover(popupState)} title='Rename role'>
         <RoleForm
           mode='edit'
           role={role}
