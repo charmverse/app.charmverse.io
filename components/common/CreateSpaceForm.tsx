@@ -30,7 +30,7 @@ export const schema = yup.object({
   name: yup.string().ensure().trim()
     .min(3, 'Name must be at least 3 characters')
     .required('Name is required'),
-  spaceImage: yup.string()
+  spaceImage: yup.string().nullable(true)
 });
 
 export type FormValues = yup.InferType<typeof schema>;
