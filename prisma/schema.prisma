@@ -298,6 +298,7 @@ model Role {
   spaceRolesToRole SpaceRoleToRole[]
   permissions      PagePermission[]
   source           String?
+  sourceRoleId     String?
 
   TokenGateToRole TokenGateToRole[]
   @@unique([spaceId, name])

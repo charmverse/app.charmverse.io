@@ -52,7 +52,9 @@ export async function findOrCreateRoles (
               }
             },
             createdBy: userId,
-            source
+            source,
+            // If there is a source, store the source role id for future reference
+            sourceRoleId: source !== null ? String(serverRole.id) : null
           }
         });
       }

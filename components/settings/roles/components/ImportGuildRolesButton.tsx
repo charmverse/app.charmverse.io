@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from 'components/common/Modal';
 import { guild, user } from '@guildxyz/sdk';
-import { Avatar, Box, Button, Checkbox, List, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
+import { Avatar, Box, Button, Checkbox, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import Link from 'components/common/Link';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -141,6 +141,7 @@ export default function ImportGuildRolesButton () {
                         }}
                       >
                         <Checkbox
+                          disabled={importingRoles}
                           checked={selectedGuildIdsSet.has(_guild.id)}
                           onClick={(event) => {
                             if ((event.target as any).checked) {
