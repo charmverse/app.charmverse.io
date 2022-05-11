@@ -8,9 +8,8 @@ import ImportGuildRolesButton from 'components/settings/roles/components/ImportG
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { useState } from 'react';
-import { IconButton, Menu, MenuItem, SvgIcon } from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { MouseEvent, EventHandler, useState } from 'react';
+import { Menu, MenuItem, SvgIcon } from '@mui/material';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import darkLogoImage from 'public/images/guild-logo-dark-short.png';
 import lightLogoImage from 'public/images/guild-logo-light-short.png';
@@ -39,6 +38,12 @@ export default function RoleSettings () {
     setAnchorEl(null);
   };
 
+  const handleOpen = (e: MouseEvent<SVGSVGElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setAnchorEl(e.currentTarget);
+  };
+
   return (
     <>
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -46,14 +51,8 @@ export default function RoleSettings () {
         {isAdmin && (
           <Box component='span' display='flex' gap={1}>
             {rolesImportSource === 'discord' ? (
-              <ImportDiscordRolesButton />
-            ) : <ImportGuildRolesButton />}
-            <IconButton>
-              <KeyboardArrowDownIcon onClick={(e) => {
-                setAnchorEl(e.currentTarget);
-              }}
-              />
-            </IconButton>
+              <ImportDiscordRolesButton onDownArrowClicked={handleOpen} />
+            ) : <ImportGuildRolesButton onDownArrowClicked={handleOpen} />}
             <Button {...bindTrigger(popupState)}>Add a role</Button>
           </Box>
         )}

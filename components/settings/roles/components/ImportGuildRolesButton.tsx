@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { MouseEventHandler, useEffect, useMemo, useState } from 'react';
 import { Modal } from 'components/common/Modal';
 import { guild, user } from '@guildxyz/sdk';
 import { Avatar, Box, Button, Checkbox, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
@@ -12,9 +12,14 @@ import darkLogoImage from 'public/images/guild-logo-dark-short.png';
 import lightLogoImage from 'public/images/guild-logo-light-short.png';
 import Image from 'next/image';
 import { useTheme } from '@emotion/react';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
-export default function ImportGuildRolesButton () {
+interface Props {
+  onDownArrowClicked: MouseEventHandler<SVGSVGElement>
+}
+
+export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) {
   const [showImportedRolesModal, setShowImportedRolesModal] = useState(false);
   const [guilds, setGuilds] = useState<{id: number, name: string, urlName: string, roles: any[], imageUrl: string}[]>([]);
   const [fetchingGuilds, setFetchingGuilds] = useState(false);
@@ -74,11 +79,14 @@ export default function ImportGuildRolesButton () {
     <>
       <Button
         variant='outlined'
+        endIcon={(
+          <KeyboardArrowDownIcon onClick={onDownArrowClicked} />
+        )}
         startIcon={(
           // Changing this style will cause the button to change dimension when changing roles import source
           <span style={{
             width: 20,
-            height: 25,
+            height: 20,
             display: 'flex',
             alignItems: 'center'
           }}

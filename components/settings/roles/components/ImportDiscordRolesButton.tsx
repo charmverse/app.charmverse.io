@@ -6,10 +6,14 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useRouter } from 'next/router';
 import DiscordIcon from 'public/images/discord_logo.svg';
-import { useEffect, useState } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
-export default function ImportDiscordRolesButton () {
+interface Props {
+  onDownArrowClicked: MouseEventHandler<SVGSVGElement>
+}
 
+export default function ImportDiscordRolesButton ({ onDownArrowClicked } : Props) {
   const { showMessage } = useSnackbar();
   const [currentSpace] = useCurrentSpace();
   const router = useRouter();
@@ -50,18 +54,20 @@ export default function ImportDiscordRolesButton () {
   if (!isAdmin) {
     return null;
   }
-
   return (
     <Button
       external
       href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
       variant='outlined'
       loading={isLoading}
+      endIcon={(
+        <KeyboardArrowDownIcon onClick={onDownArrowClicked} />
+      )}
       startIcon={(
         <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>
           <DiscordIcon />
         </SvgIcon>
-          )}
+      )}
     >
       Import roles
     </Button>
