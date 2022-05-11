@@ -22,7 +22,7 @@ const StyledAvatar = styled(Avatar)`
 `;
 
 export type InitialAvatarProps = {
-  avatar: string | null;
+  avatar: string | null | undefined;
   className?: string;
   name?: string;
   variant?: 'circular' | 'rounded' | 'square';
