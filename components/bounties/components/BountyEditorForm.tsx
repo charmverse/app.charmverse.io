@@ -40,7 +40,12 @@ interface IBountyEditorInput {
 
 export const schema = yup.object({
   title: yup.string().required('Please enter a title'),
-  rewardAmount: yup.number().typeError('Amount must be a number').required('Please enter reward amount'),
+  rewardAmount: yup.number().typeError('Amount must be a number').test({
+    message: 'Amount must be greater than 0',
+    test: value => {
+      return value !== 0;
+    }
+  }),
   rewardToken: yup.string().required(),
   descriptionNodes: yup.mixed(),
   description: yup.string(),
@@ -84,7 +89,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      rewardAmount: 0,
       rewardToken: 'ETH' as CryptoCurrency,
       // TBC till we agree on Prisma migration
       chainId: defaultChainId as any,
@@ -110,14 +114,12 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
 
   async function submitted (value: IBounty) {
 
-    console.log('Submitted', value);
-
     if (mode === 'create') {
       value.spaceId = space!.id;
       value.createdBy = user!.id;
       value.description = value.description ?? '';
       value.descriptionNodes = value.descriptionNodes ?? '';
-      value.status = 'suggestion';
+      value.status = 'open';
 
       const createdBounty = await charmClient.createBounty(value);
       const populatedBounty = { ...createdBounty, applications: [] };
@@ -260,7 +262,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
                     </InputLabel>
                     <TextField
                       {...register('rewardAmount', {
-                        valueAsNumber: true
+                        valueAsNumber: true,
+                        required: true
                       })}
                       type='number'
                       size='small'
