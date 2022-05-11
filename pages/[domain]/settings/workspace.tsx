@@ -36,6 +36,7 @@ export default function WorkspaceSettings () {
     register,
     handleSubmit,
     reset,
+    setValue,
     watch,
     formState: { errors, isDirty }
   } = useForm<FormValues>({
@@ -44,6 +45,7 @@ export default function WorkspaceSettings () {
   });
 
   const watchName = watch('name');
+  const watchSpaceImage = watch('spaceImage');
 
   async function onSubmit (values: FormValues) {
     if (!space || !isAdmin) return;
@@ -73,7 +75,16 @@ export default function WorkspaceSettings () {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
-            <Avatar name={watchName} variant='rounded' />
+            <Avatar
+              name={watchName}
+              variant='rounded'
+              spaceImage={watchSpaceImage}
+              updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
+            />
+            <TextField
+              {...register('spaceImage')}
+              sx={{ visibility: 'hidden', width: '0px' }}
+            />
           </Grid>
           <Grid item>
             <FieldLabel>Name</FieldLabel>

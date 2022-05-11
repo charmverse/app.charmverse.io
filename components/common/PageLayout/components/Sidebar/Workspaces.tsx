@@ -92,7 +92,11 @@ export default function Workspaces () {
               <MuiLink>
                 <Tooltip title={workspace.name} placement='right' arrow>
                   <span>
-                    <WorkspaceAvatar active={space?.domain === workspace.domain} name={workspace.name} />
+                    <WorkspaceAvatar
+                      active={space?.domain === workspace.domain}
+                      name={workspace.name}
+                      spaceImage={workspace.spaceImage}
+                    />
                   </span>
                 </Tooltip>
               </MuiLink>

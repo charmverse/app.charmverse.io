@@ -23,6 +23,8 @@ const StyledAvatar = styled(AvatarWithIcons)`
 
 type LargeAvatarProps = {
   name: string;
+  spaceImage?: string;
+  updateImage?: (url: string) => void;
   variant?: 'circular' | 'rounded' | 'square';
 };
 
@@ -35,9 +37,8 @@ const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar?: string) =
 };
 
 export default function LargeAvatar (props: LargeAvatarProps) {
-  const { name = '' } = props;
+  const { name = '', spaceImage, updateImage } = props;
   const [isHovered, setIsHovered] = useState(false);
-  const [avatar, setAvatar] = useState();
   const inputFile = useRef(null);
 
   return (
@@ -55,12 +56,12 @@ export default function LargeAvatar (props: LargeAvatarProps) {
 
           if (firstFile) {
             const { url } = await uploadToS3(firstFile);
-            setAvatar(url);
+            updateImage(url);
           }
         }}
       />
       <StyledAvatar
-        avatar={avatar}
+        avatar={spaceImage}
         isHovered={isHovered}
         icons={
           getIcons(
@@ -70,7 +71,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
               key='edit-avatar'
             />,
             <DeleteIcon fontSize='small' key='delete-avatar' />,
-            avatar
+            spaceImage
           )
         }
         {...props}

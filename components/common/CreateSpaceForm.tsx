@@ -59,6 +59,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
 
   const watchName = watch('name');
   const watchDomain = watch('domain');
+  const watchSpaceImage = watch('spaceImage');
 
   function onSubmit (values: FormValues) {
     try {
@@ -106,7 +107,16 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
       <br />
       <Grid container direction='column' spacing={2}>
         <Grid item display='flex' justifyContent='center'>
-          <Avatar name={watchName} variant='rounded' />
+          <Avatar
+            name={watchName}
+            variant='rounded'
+            spaceImage={watchSpaceImage}
+            updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
+          />
+          <TextField
+            {...register('spaceImage')}
+            sx={{ visibility: 'hidden', width: '0px' }}
+          />
         </Grid>
         <Grid item>
           <FieldLabel>Name</FieldLabel>
