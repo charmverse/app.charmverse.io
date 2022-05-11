@@ -24,10 +24,14 @@ export async function assignGuildRolesForUser (userId: string, firstAddress?: st
       }
     });
     const guildMemberships = await user.getMemberships(firstAddress);
+    const guildUserRoleIds: string[] = [];
+    guildMemberships?.forEach(membership => {
+      guildUserRoleIds.push(...membership.roleids.map(roleid => String(roleid)));
+    });
 
     for (const spaceRole of spaceRoles) {
       // Get all the roles import from guild in this space
-      const rolesImportedWithGuild = await prisma.role.findMany({
+      const rolesImportedFromGuild = await prisma.role.findMany({
         where: {
           spaceId: spaceRole.spaceId,
           source: 'guild.xyz',
@@ -42,22 +46,23 @@ export async function assignGuildRolesForUser (userId: string, firstAddress?: st
       });
       // Create a map between [guild role id]: charmverse role id
       const guildRoleCharmverseRoleRecord: Record<string, string> = {};
-      rolesImportedWithGuild.forEach(roleImportedWithGuild => {
+      rolesImportedFromGuild.forEach(roleImportedWithGuild => {
         if (roleImportedWithGuild.sourceRoleId) {
           guildRoleCharmverseRoleRecord[roleImportedWithGuild.sourceRoleId] = roleImportedWithGuild.id;
         }
       });
 
-      const workspaceRoleIdsSet = new Set(rolesImportedWithGuild.map(roleImportedWithGuild => roleImportedWithGuild.sourceRoleId as string));
-      const roleIdsSet: Set<string> = new Set();
-      guildMemberships?.forEach(membership => {
-        membership.roleids.forEach(roleid => roleIdsSet.add(String(roleid)));
-      });
+      const workspaceGuildRoleIdsSet = new Set(rolesImportedFromGuild.map(roleImportedFromGuild => roleImportedFromGuild.sourceRoleId as string));
 
-      // Filter the roles that are part of the workspace only
-      const roleIdsInWorkspace = Array.from(roleIdsSet).filter(roleId => workspaceRoleIdsSet.has(roleId));
-      for (const roleIdInWorkspace of roleIdsInWorkspace) {
-        const roleId = guildRoleCharmverseRoleRecord[roleIdInWorkspace];
+      // Filter the roles that have been imported from guild but user dont have access to, this could mean the user lost access to it
+      const guildRolesUserLostAccess = Array.from(
+        workspaceGuildRoleIdsSet
+      ).filter(
+        workspaceGuildRoleId => !guildUserRoleIds.includes(workspaceGuildRoleId)
+      );
+
+      for (const guildRoleId of guildUserRoleIds) {
+        const roleId = guildRoleCharmverseRoleRecord[guildRoleId];
         if (roleId) {
           await prisma.spaceRoleToRole.upsert({
             where: {
@@ -80,6 +85,32 @@ export async function assignGuildRolesForUser (userId: string, firstAddress?: st
               }
             }
           });
+        }
+      }
+
+      // Delete all the guild imported roles the user don't have access to
+      for (const guildRoleUserLostAccess of guildRolesUserLostAccess) {
+        const roleId = guildRoleCharmverseRoleRecord[guildRoleUserLostAccess];
+        if (roleId) {
+          const spaceRoleToRole = await prisma.spaceRoleToRole.findUnique({
+            where: {
+              spaceRoleId_roleId: {
+                roleId,
+                spaceRoleId: spaceRole.id
+              }
+            }
+          });
+          // Only delete if the space role to role exist otherwise prisma will throw an error
+          if (spaceRoleToRole) {
+            await prisma.spaceRoleToRole.delete({
+              where: {
+                spaceRoleId_roleId: {
+                  roleId,
+                  spaceRoleId: spaceRole.id
+                }
+              }
+            });
+          }
         }
       }
     }
