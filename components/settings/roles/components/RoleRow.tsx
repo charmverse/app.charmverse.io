@@ -79,7 +79,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
             {role.name} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
           </Typography>
           {role.source === 'guild.xyz' ? (
-            <Tooltip arrow title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'>
+            <Tooltip placement='top' arrow title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'>
               <span style={{ display: 'flex' }}>
                 <GuildXYZIcon style={{
                   transform: 'scale(0.75)'
