@@ -39,7 +39,7 @@ const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar?: string) =
 export default function LargeAvatar (props: LargeAvatarProps) {
   const { name = '', spaceImage, updateImage } = props;
   const [isHovered, setIsHovered] = useState(false);
-  const inputFile = useRef(null);
+  const inputFile = useRef<HTMLInputElement>(null);
 
   return (
     <StyledBox
@@ -53,9 +53,13 @@ export default function LargeAvatar (props: LargeAvatarProps) {
         ref={inputFile}
         onChange={async (e) => {
           const firstFile = e.target.files?.[0];
+          if (!firstFile) {
+            return;
+          }
 
-          if (firstFile) {
-            const { url } = await uploadToS3(firstFile);
+          const { url } = await uploadToS3(firstFile);
+
+          if (updateImage) {
             updateImage(url);
           }
         }}
@@ -66,12 +70,12 @@ export default function LargeAvatar (props: LargeAvatarProps) {
         icons={
           getIcons(
             <EditIcon
-              onClick={() => inputFile.current.click()}
+              onClick={() => inputFile && inputFile.current && inputFile.current.click()}
               fontSize='small'
               key='edit-avatar'
             />,
             <DeleteIcon
-              onClick={() => updateImage('')}
+              onClick={() => updateImage && updateImage('')}
               fontSize='small'
               key='delete-avatar'
             />,
