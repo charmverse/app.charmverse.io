@@ -13,6 +13,7 @@ function MockSpace (partial: Partial<Space>): Space {
     id: uuid(),
     domain: '',
     name: '',
+    spaceImage: '',
     createdAt: new Date(),
     createdBy: '0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw',
     deletedAt: null,
