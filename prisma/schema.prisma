@@ -193,6 +193,7 @@ model InviteLink {
 }
 
 enum BountyStatus {
+  suggestion
   open
   assigned
   review
