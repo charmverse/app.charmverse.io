@@ -1,31 +1,38 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from 'components/common/Modal';
-import { GetGuildsResponse, guild } from '@guildxyz/sdk';
+import { guild, user } from '@guildxyz/sdk';
 import { Avatar, Box, Checkbox, List, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import Link from 'components/common/Link';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { mutate } from 'swr';
+import { useUser } from 'hooks/useUser';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
 export default function ImportGuildRolesButton () {
   const [showImportedRolesModal, setShowImportedRolesModal] = useState(false);
-  const [guilds, setGuilds] = useState<GetGuildsResponse>([]);
+  const [guilds, setGuilds] = useState<{id: number, name: string, urlName: string, roles: any[], imageUrl: string}[]>([]);
   const [fetchingGuilds, setFetchingGuilds] = useState(false);
   const [importingRoles, setImportingRoles] = useState(false);
   const [selectedGuildIds, setSelectedGuildIds] = useState<number[]>([]);
   const [space] = useCurrentSpace();
   const selectedGuildIdsSet = useMemo(() => new Set(selectedGuildIds), [selectedGuildIds]);
-
+  const [currentUser] = useUser();
+  const firstAddress = currentUser && currentUser?.addresses?.[0] ? currentUser.addresses[0] : null;
   useEffect(() => {
     async function main () {
       if (showImportedRolesModal) {
         setFetchingGuilds(true);
-        // if (currentUser && currentUser?.addresses?.[0]) {
-        // }
-        const allGuilds = await guild.getAll();
-        // Use react-virtualized as this fetches a lot of items
-        setGuilds(allGuilds.slice(0, 50));
+        if (firstAddress) {
+          const membershipGuilds = await user.getMemberships(firstAddress);
+          if (membershipGuilds) {
+            setGuilds(await Promise.all(membershipGuilds?.map(membershipGuild => guild.get(membershipGuild.guildId))));
+          }
+        }
+        else {
+          const allGuilds = await guild.getAll();
+          setGuilds(allGuilds.slice(0, 50));
+        }
         setFetchingGuilds(false);
       }
     }
@@ -131,10 +138,7 @@ export default function ImportGuildRolesButton () {
                             }}
                           >
                             {_guild.name}
-                            <Box display='flex' gap={1}>
-                              <Typography variant='subtitle2' color='secondary'>
-                                {_guild.memberCount} Member(s)
-                              </Typography>
+                            <Box display='flex'>
                               <Typography variant='subtitle2' color='secondary'>
                                 {_guild.roles.length} Role(s)
                               </Typography>
