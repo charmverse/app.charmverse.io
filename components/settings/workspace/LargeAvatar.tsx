@@ -70,7 +70,11 @@ export default function LargeAvatar (props: LargeAvatarProps) {
               fontSize='small'
               key='edit-avatar'
             />,
-            <DeleteIcon fontSize='small' key='delete-avatar' />,
+            <DeleteIcon
+              onClick={() => updateImage('')}
+              fontSize='small'
+              key='delete-avatar'
+            />,
             spaceImage
           )
         }

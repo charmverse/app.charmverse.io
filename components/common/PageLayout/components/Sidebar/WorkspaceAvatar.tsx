@@ -16,7 +16,7 @@ type WorkspaceAvatarProps = {
   spaceImage?: string;
 };
 
-export default function WorkspaceAvatar ({ active = false, name = '', spaceImage }: WorkspaceAvatarProps) {
+export default function WorkspaceAvatar ({ active = false, name = '', spaceImage = '' }: WorkspaceAvatarProps) {
   return (
     <StyledAvatar active={active} avatar={spaceImage} name={name} variant='rounded' />
   );
