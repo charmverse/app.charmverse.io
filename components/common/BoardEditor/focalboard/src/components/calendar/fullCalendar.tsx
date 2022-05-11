@@ -18,7 +18,6 @@ import {DateProperty, createDatePropertyFromString} from '../properties/dateRang
 import Tooltip from '../../widgets/tooltip'
 import PropertyValueElement from '../propertyValueElement'
 import {Constants} from '../../constants'
-import CardBadges from '../cardBadges'
 import { usePages } from 'hooks/usePages'
 import PageIcon from 'components/common/PageLayout/components/PageIcon'
 
@@ -147,8 +146,6 @@ const CalendarFullView = (props: Props): JSX.Element|null => {
                         />
                     </Tooltip>
                 ))}
-                {visibleBadges &&
-                <CardBadges card={cards.find((o) => o.id === event.id) || cards[0]}/> }
             </div>
         )
     }

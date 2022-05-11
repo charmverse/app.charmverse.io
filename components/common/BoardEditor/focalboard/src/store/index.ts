@@ -10,7 +10,6 @@ import {reducer as globalTemplatesReducer} from './globalTemplates'
 import {reducer as boardsReducer} from './boards'
 import {reducer as viewsReducer} from './views'
 import {reducer as cardsReducer} from './cards'
-import {reducer as contentsReducer} from './contents'
 import {reducer as commentsReducer} from './comments'
 import {reducer as searchTextReducer} from './searchText'
 import {reducer as globalErrorReducer} from './globalError'
@@ -25,7 +24,6 @@ const store = configureStore({
         boards: boardsReducer,
         views: viewsReducer,
         cards: cardsReducer,
-        contents: contentsReducer,
         comments: commentsReducer,
         searchText: searchTextReducer,
         globalError: globalErrorReducer,

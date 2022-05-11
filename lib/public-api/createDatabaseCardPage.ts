@@ -126,6 +126,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
           id: cardBlock.id
         }
       },
+      content: { type: 'doc', content: [] },
       contentText: '',
       path: `page-${Math.random().toString().replace('0.', '')}`,
       type: 'card',

@@ -9,7 +9,6 @@ import {initialLoad, initialReadOnlyLoad} from './initialLoad'
 
 import {RootState} from './index'
 
-import { createDeepEqualSelector } from './contents'
 
 const commentsSlice = createSlice({
     name: 'comments',

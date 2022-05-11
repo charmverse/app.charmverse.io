@@ -19,7 +19,22 @@ export function rowSpec (): RawSpecs {
       }
     },
     markdown: {
-      toMarkdown: () => null
+      toMarkdown: (state, node) => {
+
+        /*
+        An approach to generating columns would be to have a single-row markdown table.
+        For this to work, we need to find a way to replace all the whitepace in the inner nodes with a <br> tag
+
+        See MarkdownSerialiserState implementation here
+        https://github.com/ProseMirror/prosemirror-markdown/blob/master/src/to_markdown.js
+
+        node.forEach(column => {
+          // Calls serialisers for each content node
+          state.renderInline(column);
+        });
+        */
+
+      }
     }
   };
 }
@@ -39,7 +54,9 @@ export function columnSpec (): RawSpecs {
       }
     },
     markdown: {
-      toMarkdown: () => null
+      toMarkdown: (state, node) => {
+        console.log('Column triggered', node);
+      }
     }
   };
 }

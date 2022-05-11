@@ -83,7 +83,7 @@ const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
                     title={intl.formatMessage({id: 'ValueSelectorLabel.openMenu', defaultMessage: 'Open menu'})}
                     icon={<OptionsIcon/>}
                 />
-                <Menu position='left'>
+                <Menu position='bottom'>
                     <Menu.Text
                         id='delete'
                         icon={<DeleteIcon/>}

@@ -16,7 +16,6 @@ import { Card } from '../../blocks/card'
 import { useSortable } from '../../hooks/sortable'
 import mutator from '../../mutator'
 import { getCardComments } from '../../store/comments'
-import { getCardContents } from '../../store/contents'
 import { useAppSelector } from '../../store/hooks'
 import { Utils } from '../../utils'
 import IconButton from '../../widgets/buttons/iconButton'
@@ -27,7 +26,6 @@ import OptionsIcon from '../../widgets/icons/options'
 import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
 import Tooltip from '../../widgets/tooltip'
-import CardBadges from '../cardBadges'
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../confirmationDialogBox'
 import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
@@ -61,7 +59,6 @@ const KanbanCard = React.memo((props: Props) => {
   const { bounties } = useBounties()
   const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === card.id);
 
-  const contents = useAppSelector(getCardContents(card.id))
   const comments = useAppSelector(getCardComments(card.id))
   const { pages, getPagePermissions } = usePages()
   const cardPage = pages[card.id]
@@ -238,11 +235,8 @@ const KanbanCard = React.memo((props: Props) => {
             {BOUNTY_LABELS[linkedBounty.status]}
           </Box>
         </Box>}
-        {props.visibleBadges && <CardBadges card={card} />}
       </div>
-
       {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}
-
     </>
   )
 })

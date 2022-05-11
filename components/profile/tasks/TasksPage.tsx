@@ -8,11 +8,6 @@ export default function TasksPage () {
     <>
       <Box display='flex' justifyContent='space-between' mb={3}>
         <Typography variant='h1'>My Tasks</Typography>
-        <Button
-          sx={{ ml: 1 }}
-        >
-          Create Bounty
-        </Button>
       </Box>
       <TasksList />
     </>
