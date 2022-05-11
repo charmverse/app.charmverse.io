@@ -3,7 +3,8 @@ import Box from '@mui/material/Box';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import Legend from 'components/settings/Legend';
-import ImportDiscordRoles from 'components/settings/roles/components/ImportDiscordRolesButton';
+import ImportDiscordRolesButton from 'components/settings/roles/components/ImportDiscordRolesButton';
+import ImportGuildRolesButton from 'components/settings/roles/components/ImportGuildRolesButton';
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import useIsAdmin from 'hooks/useIsAdmin';
@@ -28,7 +29,8 @@ export default function RoleSettings () {
         Roles
         {isAdmin && (
           <Box component='span' display='flex' gap={1}>
-            <ImportDiscordRoles onUpdate={refreshRoles} />
+            <ImportDiscordRolesButton />
+            <ImportGuildRolesButton />
             <Button {...bindTrigger(popupState)}>Add a role</Button>
           </Box>
         )}

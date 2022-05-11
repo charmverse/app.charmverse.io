@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import { useEffect, useState } from 'react';
 
-export default function ImportDiscordRolesButton ({ onUpdate }: { onUpdate: () => void }) {
+export default function ImportDiscordRolesButton () {
 
   const { showMessage } = useSnackbar();
   const [currentSpace] = useCurrentSpace();
