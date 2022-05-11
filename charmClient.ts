@@ -221,7 +221,7 @@ class CharmClient {
   }
 
   importRolesFromGuild (payload: ImportGuildRolesPayload) {
-    return http.POST('/api/guild-xyz/importRoles', payload);
+    return http.POST<{importedRolesCount: number}>('/api/guild-xyz/importRoles', payload);
   }
 
   // FocalBoard

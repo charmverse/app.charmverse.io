@@ -16,7 +16,7 @@ export interface ImportGuildRolesPayload {
   guildIds: number[],
 }
 
-async function importRoles (req: NextApiRequest, res: NextApiResponse<{ok: boolean} | { error: string }>) {
+async function importRoles (req: NextApiRequest, res: NextApiResponse<{importedRolesCount: number} | { error: string }>) {
   const { spaceId, guildIds } = req.body as ImportGuildRolesPayload;
   const guilds: GetGuildByIdResponse[] = await Promise.all(guildIds.map(guildId => guild.get(guildId)));
   const guildRoles: {id: number, name: string}[] = [];
@@ -25,7 +25,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<{ok: boole
   });
   await findOrCreateRoles(guildRoles, spaceId, req.session.user.id, { source: 'guild.xyz' });
   await assignGuildRolesForSpace(spaceId);
-  res.status(200).json({ ok: true });
+  res.status(200).json({ importedRolesCount: Object.keys(guildRoles).length });
 }
 
 handler.use(requireUser).use(requireKeys(['spaceId', 'guildIds'], 'body')).use(requireSpaceMembership({ adminOnly: true })).post(importRoles);

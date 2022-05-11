@@ -10,6 +10,7 @@ import { useUser } from 'hooks/useUser';
 import { FixedSizeList } from 'react-window';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
 interface Props {
@@ -26,6 +27,8 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
   const selectedGuildIdsSet = useMemo(() => new Set(selectedGuildIds), [selectedGuildIds]);
   const [currentUser] = useUser();
   const firstAddress = currentUser && currentUser?.addresses?.[0] ? currentUser.addresses[0] : null;
+  const { showMessage } = useSnackbar();
+
   useEffect(() => {
     async function main () {
       if (showImportedRolesModal) {
@@ -59,11 +62,12 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
   async function importRoles () {
     if (space) {
       setImportingRoles(true);
-      await charmClient.importRolesFromGuild({
+      const { importedRolesCount } = await charmClient.importRolesFromGuild({
         guildIds: selectedGuildIds,
         spaceId: space.id
       });
       resetState();
+      showMessage(`Successfully imported and assigned ${importedRolesCount} roles from guild.xyz`);
       mutate(`roles/${space.id}`);
     }
   }
