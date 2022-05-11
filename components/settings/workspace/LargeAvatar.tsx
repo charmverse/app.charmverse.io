@@ -23,7 +23,7 @@ const StyledAvatar = styled(AvatarWithIcons)`
 
 type LargeAvatarProps = {
   name: string;
-  spaceImage?: string;
+  spaceImage: string | null;
   updateImage?: (url: string) => void;
   variant?: 'circular' | 'rounded' | 'square';
 };
