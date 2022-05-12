@@ -9,6 +9,7 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { useContext, useMemo, useState } from 'react';
 import { CSVLink } from 'react-csv';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { BountyCard } from './components/BountyCard';
 import BountyModal from './components/BountyModal';
 import InputBountyStatus from './components/InputBountyStatus';
@@ -41,6 +42,11 @@ export default function BountyList () {
   const [space] = useCurrentSpace();
 
   const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus []>(`${space?.id}-bounty-filters`, ['open', 'assigned', 'review']);
+
+  const isAdmin = useIsAdmin();
+
+  // User can only suggest a bounty instead of creating it
+  const suggestBounties = isAdmin === false;
 
   const filteredBounties = filterBounties(bounties.slice(), savedBountyFilters);
 
@@ -93,7 +99,7 @@ export default function BountyList () {
                 setDisplayBountyDialog(true);
               }}
             >
-              Create Bounty
+              {isAdmin ? 'Create' : 'Suggest'} Bounty
             </Button>
           </Box>
         </Box>
@@ -134,6 +140,7 @@ export default function BountyList () {
               onClose={() => {
                 setDisplayBountyDialog(false);
               }}
+              mode={suggestBounties ? 'suggest' : 'create'}
             />
           )
         }

@@ -1,5 +1,5 @@
 
-import { UserMultiSigWallet } from '@prisma/client';
+import { UserGnosisSafe } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -10,12 +10,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .get(list)
-  .post(setWallets);
+  .get(listSafes)
+  .post(setSafes);
 
-async function list (req: NextApiRequest, res: NextApiResponse<UserMultiSigWallet[]>) {
+async function listSafes (req: NextApiRequest, res: NextApiResponse<UserGnosisSafe[]>) {
 
-  const wallets = await prisma.userMultiSigWallet.findMany({
+  const wallets = await prisma.userGnosisSafe.findMany({
     where: {
       userId: req.session.user.id
     }
@@ -23,22 +23,22 @@ async function list (req: NextApiRequest, res: NextApiResponse<UserMultiSigWalle
   return res.status(200).json(wallets);
 }
 
-async function setWallets (req: NextApiRequest, res: NextApiResponse<UserMultiSigWallet>) {
+async function setSafes (req: NextApiRequest, res: NextApiResponse<UserGnosisSafe>) {
 
-  const walletsInput = req.body as (Pick<UserMultiSigWallet, 'address' | 'chainId' | 'name'>)[];
+  const walletsInput = req.body as (Pick<UserGnosisSafe, 'address' | 'chainId' | 'name' | 'threshold' | 'owners'>)[];
+
   const walletsData = walletsInput.map(wallet => ({
     ...wallet,
-    userId: req.session.user.id,
-    walletType: 'gnosis' as const
+    userId: req.session.user.id
   }));
 
   await prisma.$transaction([
-    prisma.userMultiSigWallet.deleteMany({
+    prisma.userGnosisSafe.deleteMany({
       where: {
         userId: req.session.user.id
       }
     }),
-    prisma.userMultiSigWallet.createMany({
+    prisma.userGnosisSafe.createMany({
       data: walletsData
     })
   ]);

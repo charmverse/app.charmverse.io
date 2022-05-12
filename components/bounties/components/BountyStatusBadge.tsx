@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import GradingIcon from '@mui/icons-material/Grading';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -24,6 +25,7 @@ import { BrandColor } from 'theme/colors';
 import { useTheme } from '@emotion/react';
 
 const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
+  suggestion: <LightbulbIcon />,
   open: <ModeStandbyIcon />,
   assigned: <AssignmentIndIcon />,
   review: <GradingIcon />,
@@ -32,6 +34,7 @@ const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
 };
 
 export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
+  suggestion: 'purple',
   open: 'teal',
   assigned: 'yellow',
   review: 'orange',
@@ -199,46 +202,68 @@ function BountyAmount ({ bounty, truncate }: { bounty: Bounty, truncate: boolean
   const tooltip = `${chainName} (${tokenInfo.tokenSymbol})`;
 
   return (
-    <Tooltip arrow placement='top' title={tooltip}>
+    <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
       <div>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box
-            mr={0.75}
-            component='span'
-            sx={{
-              width: 25,
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
-            {
-            tokenInfo.tokenLogo && (
-              <Box component='span' sx={{ width: '25px', height: '25px' }}>
-                {
-                  (tokenInfo.isContract ? (
-                    <img alt='' width='100%' height='100%' src={tokenInfo.tokenLogo} />
-                  ) : (
-                    <img
-                      width='100%'
-                      height='100%'
-                      src={tokenInfo.tokenLogo}
-                    />
-                  ))
-                }
+
+          {
+            bounty.rewardAmount === 0 ? (
+              <Box>
+                <Typography
+                  component='span'
+                  sx={{
+                    fontWeight: 600
+                  }}
+                  mr={0.5}
+                  variant='caption'
+                  margin='auto'
+                >
+                  Reward not set
+                </Typography>
               </Box>
+            ) : (
+              <>
+                <Box
+                  mr={0.75}
+                  component='span'
+                  sx={{
+                    width: 25,
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {
+              tokenInfo.tokenLogo && (
+                <Box component='span' sx={{ width: '25px', height: '25px' }}>
+                  {
+                    (tokenInfo.isContract ? (
+                      <img alt='' width='100%' height='100%' src={tokenInfo.tokenLogo} />
+                    ) : (
+                      <img
+                        width='100%'
+                        height='100%'
+                        src={tokenInfo.tokenLogo}
+                      />
+                    ))
+                  }
+                </Box>
+              )
+            }
+                </Box>
+                <Typography
+                  component='span'
+                  sx={{
+                    fontWeight: 600
+                  }}
+                  mr={0.5}
+                  variant='h6'
+                >
+                  {truncate ? millify(bounty.rewardAmount) : bounty.rewardAmount}
+                </Typography>
+              </>
             )
           }
-          </Box>
-          <Typography
-            component='span'
-            sx={{
-              fontWeight: 600
-            }}
-            mr={0.5}
-            variant='h6'
-          >
-            {truncate ? millify(bounty.rewardAmount) : bounty.rewardAmount}
-          </Typography>
+
         </Box>
       </div>
     </Tooltip>

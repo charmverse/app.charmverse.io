@@ -27,7 +27,7 @@ export default function CopyableAddress ({ address, decimals = 3, ...rest }: Pro
   return (
     <Tooltip
       placement='top'
-      title={copied ? 'Copied' : 'Click to copy address'}
+      title={copied ? 'Copied' : `Click to copy: ${address}`}
       disableInteractive
       arrow
     >
