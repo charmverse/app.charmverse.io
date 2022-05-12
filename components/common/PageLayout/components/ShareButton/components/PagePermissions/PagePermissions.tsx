@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import { useTheme } from '@emotion/react';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
@@ -89,6 +90,7 @@ interface Props {
 export default function PagePermissions ({ pageId }: Props) {
 
   const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee []>([]);
+  const theme = useTheme();
   const { pages } = usePages();
   const [space] = useCurrentSpace();
   const { getPagePermissions } = usePages();
@@ -201,7 +203,11 @@ export default function PagePermissions ({ pageId }: Props) {
                 }
               }}
               >
-                <Typography color='secondary' variant='caption'>
+                <Typography
+                  color='secondary'
+                  variant='caption'
+                  sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}
+                >
                   {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : (permissionsLoaded ? 'No access' : '')}
                 </Typography>
               </div>
@@ -248,7 +254,7 @@ export default function PagePermissions ({ pageId }: Props) {
                       }
                     }}
                     >
-                      <Typography color='secondary' variant='caption'>
+                      <Typography color='secondary' variant='caption' sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}>
                         {permissionLevels[permission.permissionLevel]}
                       </Typography>
                     </div>
