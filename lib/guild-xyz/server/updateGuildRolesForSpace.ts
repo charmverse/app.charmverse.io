@@ -3,6 +3,7 @@ import log from 'lib/log';
 import { getGuildRoleIds } from '../getGuildRoleIds';
 import { assignRolesToUser } from './assignRolesToUser';
 import { createRoleRecord } from './createRoleRecord';
+import { unassignRolesFromUser } from './unassignRolesFromUser';
 
 export async function updateGuildRolesForSpace (spaceId: string) {
   const spaceRoles = await prisma.spaceRole.findMany({
@@ -15,6 +16,16 @@ export async function updateGuildRolesForSpace (spaceId: string) {
       user: {
         select: {
           addresses: true
+        }
+      },
+      spaceRoleToRole: {
+        select: {
+          role: {
+            select: {
+              source: true,
+              sourceId: true
+            }
+          }
         }
       }
     }
@@ -29,6 +40,12 @@ export async function updateGuildRolesForSpace (spaceId: string) {
       if (addresses.length > 0) {
         const userGuildRoleIds = await getGuildRoleIds(addresses);
         await assignRolesToUser(userGuildRoleIds, guildRoleIdCharmverseRoleIdRecord, spaceRole.id);
+        await unassignRolesFromUser({
+          userGuildRoleIds,
+          guildRoleIdCharmverseRoleIdRecord,
+          spaceRoleId: spaceRole.id,
+          userGuildRoleIdsInSpace: spaceRole.spaceRoleToRole.filter(spaceRoleToRole => spaceRoleToRole.role.source === 'guild_xyz').map(spaceRoleToRole => spaceRoleToRole.role.sourceId as string)
+        });
       }
     }
     catch (_) {
