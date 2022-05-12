@@ -163,7 +163,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     tooltipContentDOM,
     suggestTooltipKey
   } = usePluginState(pluginKey);
-  const { show: isVisible } = usePluginState(suggestTooltipKey);
+  const { show: isVisible, triggerText } = usePluginState(suggestTooltipKey);
 
   const onSelectMention = useCallback(
     (value: string, type: string) => {
@@ -172,6 +172,11 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     },
     [view, pluginKey]
   );
+
+  const filteredContributors = triggerText.length !== 0 ? contributors.filter(
+    contributor => (
+      contributor.username?.toLowerCase()?.startsWith(triggerText.toLowercase()))
+  ) : contributors;
 
   return (
     <PopoverMenu
@@ -191,7 +196,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
       >
         <GroupLabel>Contributors</GroupLabel>
         <div>
-          {contributors.map(contributor => (
+          {filteredContributors.map(contributor => (
             <MenuItem
               component='div'
               onClick={() => onSelectMention(contributor.id, 'user')}
@@ -212,7 +217,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
         }}
         />
         <GroupLabel>Pages</GroupLabel>
-        <PagesList onSelectPage={(page) => onSelectMention(page.id, 'page')} />
+        <PagesList queryText={triggerText} onSelectPage={(page) => onSelectMention(page.id, 'page')} />
       </Box>
     </PopoverMenu>
   );

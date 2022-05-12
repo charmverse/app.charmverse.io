@@ -6,10 +6,10 @@ import { usePages } from 'hooks/usePages';
 import { PageContent } from 'models';
 import { checkForEmpty } from '../utils';
 
-export function PagesList ({ onSelectPage }: { onSelectPage: (page: Page) => void }) {
+export function PagesList ({ queryText, onSelectPage }: { queryText?: string, onSelectPage: (page: Page) => void }) {
   const { pages } = usePages();
 
-  const items = (Object.values(pages).filter((page) => page && page?.deletedAt === null) as Page[]).map(page => {
+  const items = (Object.values(pages).filter((page) => page && page?.deletedAt === null && (queryText && queryText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(queryText.toLowerCase()) : true)) as Page[]).map(page => {
     const docContent = ((page.content) as PageContent);
     const isEditorEmpty = checkForEmpty(docContent);
     return (
