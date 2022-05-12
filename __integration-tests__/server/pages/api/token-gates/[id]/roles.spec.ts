@@ -23,13 +23,6 @@ beforeAll(async () => {
   user1 = generated.user;
   user2 = await createUserFromWallet(v4());
   space = generated.space;
-  await prisma.spaceRole.findFirst({
-    where: {
-      spaceId: space.id,
-      userId: user1.id
-    }
-  }) as SpaceRole;
-
   await prisma.spaceRole.create({
     data: {
       space: {

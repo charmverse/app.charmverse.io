@@ -16,17 +16,15 @@ handler.use(requireUser)
   .use(requireKeys<Role>(['spaceId', 'name'], 'body'))
   .post(createRole);
 
-type ListSpaceRolesResponse = {
-  id: string;
-  name: string;
+export type ListSpaceRolesResponse = (Pick<Role, 'id' | 'name' | 'source'> & {
   spaceRolesToRole: {
       spaceRole: {
           user: User;
       };
   }[];
-}[]
+})
 
-async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse>) {
+async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
   const { spaceId } = req.query;
 
   if (!spaceId) {
@@ -44,6 +42,7 @@ async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpa
     select: {
       id: true,
       name: true,
+      source: true,
       spaceRolesToRole: {
         select: {
           spaceRole: {

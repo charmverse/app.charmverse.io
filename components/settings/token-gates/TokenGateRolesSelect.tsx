@@ -3,9 +3,9 @@ import { SelectChangeEvent } from '@mui/material/Select';
 import { useMemo } from 'react';
 import styled from '@emotion/styled';
 import Button from 'components/common/Button';
-import { ListSpaceRolesResponse } from 'charmClient';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { isTruthy } from 'lib/utilities/types';
+import { ListSpaceRolesResponse } from 'pages/api/roles';
 import useRoles from '../roles/hooks/useRoles';
 
 /**
