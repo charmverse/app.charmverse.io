@@ -276,6 +276,8 @@ model PaymentMethod {
   tokenDecimals     Int
   tokenLogo         String?
   walletType        WalletType @default(metamask)
+
+  @@unique([spaceId, chainId, contractAddress])
 }
 
 model UserMultiSigWallet {
