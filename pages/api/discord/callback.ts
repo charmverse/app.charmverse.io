@@ -3,6 +3,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import loginByDiscord from 'lib/discord/loginByDiscord';
 import log from 'lib/log';
 import { withSessionRoute } from 'lib/session/withSession';
+import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 
 const handler = nc({
   onError,
@@ -28,6 +29,7 @@ handler.get(async (req, res) => {
       // strip out large fields so we dont break the cookie
       const { discordUser, spaceRoles, telegramUser, ...userData } = user;
       req.session.user = userData;
+      await updateGuildRolesForUser(userData.addresses, spaceRoles);
     }
     catch (error) {
       log.warn('Error while connecting to Discord', error);

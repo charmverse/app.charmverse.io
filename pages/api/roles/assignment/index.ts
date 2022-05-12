@@ -35,7 +35,7 @@ async function removeRole (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  if (!role || !spaceRole) {
+  if (!role || !spaceRole || role.source === 'guild_xyz') {
     throw new ApiError({
       message: 'Cannot remove role',
       errorType: 'Invalid input'
@@ -74,7 +74,7 @@ async function assignRole (req: NextApiRequest, res: NextApiResponse<{success: b
     }
   });
 
-  if (!role || !spaceRole) {
+  if (!role || !spaceRole || role.source === 'guild_xyz') {
     throw new ApiError({
       message: 'Cannot assign role',
       errorType: 'Invalid input'

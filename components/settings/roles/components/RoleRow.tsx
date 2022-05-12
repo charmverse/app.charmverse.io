@@ -1,7 +1,7 @@
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -10,7 +10,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import Chip from '@mui/material/Chip';
 import MenuItem from '@mui/material/MenuItem';
-import { ListSpaceRolesResponse } from 'charmClient';
 import Button from 'components/common/Button';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import Modal from 'components/common/Modal';
@@ -19,8 +18,10 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useContributors } from 'hooks/useContributors';
-import RoleMemberRow from './RoleMemberRow';
+import GuildXYZIcon from 'public/images/guild_logo.svg';
+import { ListSpaceRolesResponse } from 'pages/api/roles';
 import RoleForm from './RoleForm';
+import RoleMemberRow from './RoleMemberRow';
 
 interface RoleRowProps {
   isEditable: boolean;
@@ -38,7 +39,6 @@ const ScrollableBox = styled.div<{ rows: number }>`
 `;
 
 export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, deleteRole, refreshRoles }: RoleRowProps) {
-
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const userPopupState = usePopupState({ variant: 'popover', popupId: `role-${role.id}-users` });
   const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
@@ -73,11 +73,21 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
 
   return (
     <Box mb={3}>
-
       <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {role.name} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
-        </Typography>
+        <Box display='flex' gap={1} alignItems='center'>
+          <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            {role.name} {role.source === 'guild_xyz' ? (
+              <Tooltip placement='top' arrow title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'>
+                <span style={{ display: 'flex' }}>
+                  <GuildXYZIcon style={{
+                    transform: 'scale(0.75)'
+                  }}
+                  />
+                </span>
+              </Tooltip>
+            ) : null} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
+          </Typography>
+        </Box>
         {isEditable && (
           <IconButton size='small' {...bindTrigger(menuState)}>
             <MoreHorizIcon />
@@ -91,7 +101,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           <RoleMemberRow
             key={contributor.id}
             contributor={contributor}
-            isEditable={isEditable}
+            isEditable={isEditable && role.source !== 'guild_xyz'}
             onRemove={(userId) => {
               removeMember(userId);
               userIdsToHide = userIdsToHide.filter(id => id !== userId);
@@ -99,14 +109,12 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           />
         ))}
       </ScrollableBox>
-
-      {
-        assignedContributors.length < contributors.length ? (
+      { role.source !== 'guild_xyz'
+        ? assignedContributors.length < contributors.length ? (
           isEditable && <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
         ) : (
           <Typography variant='caption'>All space members have been added to this role</Typography>
-        )
-      }
+        ) : null}
 
       <Menu
         {...bindMenu(menuState)}
@@ -116,6 +124,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           horizontal: 'right'
         }}
       >
+        {role.source !== 'guild_xyz' && (
         <MenuItem
           sx={{ padding: '3px 12px' }}
           onClick={() => {
@@ -126,6 +135,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           <ListItemIcon><EditOutlinedIcon fontSize='small' /></ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Rename</Typography>
         </MenuItem>
+        )}
         <MenuItem
           sx={{ padding: '3px 12px' }}
           onClick={() => {
@@ -149,7 +159,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
         </Grid>
       </Modal>
 
-      <Modal {...bindPopover(popupState)} title='Add a role'>
+      <Modal {...bindPopover(popupState)} title='Rename role'>
         <RoleForm
           mode='edit'
           role={role}
