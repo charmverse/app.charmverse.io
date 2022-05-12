@@ -45,6 +45,10 @@ async function createBounty (req: NextApiRequest, res: NextApiResponse<Bounty>) 
     delete bountyToCreate.spaceId;
   }
 
+  if (bountyToCreate.status === 'suggestion') {
+    bountyToCreate.suggestedBy = req.session.user.id;
+  }
+
   const bounty = await prisma.bounty.create({ data: bountyToCreate });
 
   logWorkspaceFirstBountyEvents(bounty);
