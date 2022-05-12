@@ -2,17 +2,18 @@ import { prisma } from 'db';
 import { user } from '@guildxyz/sdk';
 import { SpaceRole } from '@prisma/client';
 
-export async function assignGuildRolesForUser (userId: string, firstAddress?: string, _spaceRoles?: SpaceRole[]) {
-  firstAddress = firstAddress ?? (await prisma.user.findUnique({
+export async function assignGuildRolesForUser (userId: string, addresses?: string[], _spaceRoles?: SpaceRole[]) {
+  addresses = addresses ?? (await prisma.user.findUnique({
     where: {
       id: userId
     },
     select: {
       addresses: true
     }
-  }))?.addresses?.[0];
+  }))?.addresses;
 
-  if (firstAddress) {
+  if (addresses) {
+
     // Find all the space this user is part of
     const spaceRoles = _spaceRoles ?? await prisma.spaceRole.findMany({
       where: {
@@ -23,11 +24,13 @@ export async function assignGuildRolesForUser (userId: string, firstAddress?: st
         spaceId: true
       }
     });
-    const guildMemberships = await user.getMemberships(firstAddress);
     const guildUserRoleIds: string[] = [];
-    guildMemberships?.forEach(membership => {
-      guildUserRoleIds.push(...membership.roleids.map(roleid => String(roleid)));
-    });
+    for (const address of addresses) {
+      const guildMemberships = await user.getMemberships(address);
+      guildMemberships?.forEach(membership => {
+        guildUserRoleIds.push(...membership.roleids.map(roleid => String(roleid)));
+      });
+    }
 
     for (const spaceRole of spaceRoles) {
       // Get all the roles import from guild in this space
