@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { GetGuildByIdResponse, guild } from '@guildxyz/sdk';
-import { assignGuildRolesForSpace } from 'lib/guild-xyz/assignGuildRolesForSpace';
+import { assignGuildRolesForSpace } from 'lib/guild-xyz/server/assignGuildRolesForSpace';
 
 const handler = nc({
   onError,

@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { assignGuildRolesForUser } from 'lib/guild-xyz/assignGuildRolesForUser';
+import { assignGuildRolesForUser } from 'lib/guild-xyz/server/assignGuildRolesForUser';
 import { postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

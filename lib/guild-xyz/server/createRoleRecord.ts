@@ -1,0 +1,26 @@
+import { prisma } from 'db';
+
+export async function createRoleRecord (spaceId: string) {
+  const rolesImportedFromGuild = await prisma.role.findMany({
+    where: {
+      spaceId,
+      source: 'guild_xyz',
+      sourceId: {
+        not: null
+      }
+    },
+    select: {
+      sourceId: true,
+      id: true
+    }
+  });
+
+  const guildRoleIdCharmverseRoleIdRecord: Record<string, string> = {};
+  rolesImportedFromGuild.forEach(roleImportedFromGuild => {
+    if (roleImportedFromGuild.sourceId) {
+      guildRoleIdCharmverseRoleIdRecord[roleImportedFromGuild.sourceId] = roleImportedFromGuild.id;
+    }
+  });
+
+  return guildRoleIdCharmverseRoleIdRecord;
+}
