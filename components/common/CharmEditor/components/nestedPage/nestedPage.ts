@@ -1,19 +1,18 @@
 import { RawSpecs } from '@bangle.dev/core';
 import { DOMOutputSpec, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { createTooltipDOM, SuggestTooltipRenderOpts, tooltipPlacement } from '@bangle.dev/tooltip';
-import charmClient from 'charmClient';
 import { PageLink } from 'lib/pages';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'page';
-
-export const NestedPagePluginKey = new PluginKey('suggest_tooltip');
 
 export interface NestedPagePluginState {
   show: boolean;
   counter: number;
   tooltipContentDOM: HTMLElement
 }
+
+export const NestedPagePluginKey = new PluginKey<NestedPagePluginState>('suggest_tooltip');
 
 /**
  * Encloses a nested page with markers so it can be parsed after the markdown serialiser has run on the whole document.
@@ -68,7 +67,7 @@ export async function replaceNestedPages (convertedToMarkdown: string): Promise<
   await Promise.all(nestedPageMarkers
     .map(pageMarker => {
       // eslint-disable-next-line no-async-promise-executor
-      return new Promise<void>(async (resolve, reject) => {
+      return new Promise<void>(async (resolve) => {
 
         const pageId = extractPageId(pageMarker);
 

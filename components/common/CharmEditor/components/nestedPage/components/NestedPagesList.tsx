@@ -33,9 +33,7 @@ function NestedPagesList () {
   return (
     <PopoverMenu container={tooltipContentDOM} isOpen={isVisible} onClose={onClose} width={460}>
       <GroupLabel>Select a page</GroupLabel>
-      {isVisible && (
       <PagesList onSelectPage={onSelectPage} />
-      )}
     </PopoverMenu>
   );
 }

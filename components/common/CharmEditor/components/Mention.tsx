@@ -82,14 +82,6 @@ export function getSuggestTooltipKey (key: PluginKey) {
   };
 }
 
-/** Commands */
-export function queryTriggerText (key: PluginKey) {
-  return (state: EditorState) => {
-    const suggestKey = getSuggestTooltipKey(key)(state);
-    return suggestTooltip.queryTriggerText(suggestKey)(state);
-  };
-}
-
 export function mentionSpecs (): RawSpecs {
   const spec = suggestTooltip.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger });
   return [
