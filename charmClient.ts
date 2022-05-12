@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
-  Role, Space, TokenGate, Transaction, User, TelegramUser, UserMultiSigWallet, TokenGateToRole
+  Role, Space, TokenGate, Transaction, User, TelegramUser, UserGnosisSafe, TokenGateToRole
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, Task, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
@@ -29,6 +29,7 @@ import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pa
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
+import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -142,20 +143,20 @@ class CharmClient {
     return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
 
-  setUserMultiSigs (wallets: Partial<UserMultiSigWallet>[]): Promise<UserMultiSigWallet[]> {
-    return http.POST('/api/profile/multi-sigs', wallets);
+  setMyGnosisSafes (wallets: Partial<UserGnosisSafe>[]): Promise<UserGnosisSafe[]> {
+    return http.POST('/api/profile/gnosis-safes', wallets);
   }
 
-  listUserMultiSigs (): Promise<UserMultiSigWallet[]> {
-    return http.GET('/api/profile/multi-sigs');
+  getMyGnosisSafes (): Promise<UserGnosisSafe[]> {
+    return http.GET('/api/profile/gnosis-safes');
   }
 
-  updateUserMultiSig (wallet: { id: string, name: string }): Promise<UserMultiSigWallet[]> {
-    return http.PUT(`/api/profile/multi-sigs/${wallet.id}`, wallet);
+  updateMyGnosisSafe (wallet: { id: string, name: string }): Promise<UserGnosisSafe[]> {
+    return http.PUT(`/api/profile/gnosis-safes/${wallet.id}`, wallet);
   }
 
-  deleteUserMultiSig (walletId: string) {
-    return http.DELETE(`/api/profile/multi-sigs/${walletId}`);
+  deleteMyGnosisSafe (walletId: string) {
+    return http.DELETE(`/api/profile/gnosis-safes/${walletId}`);
   }
 
   getPublicPage (pageId: string) {
@@ -495,8 +496,7 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  // Tasks
-  listTasks (): Promise<Task[]> {
+  getTasks (): Promise<{ gnosis: GnosisSafeTasks[] }> {
     return http.GET('/api/tasks');
   }
 

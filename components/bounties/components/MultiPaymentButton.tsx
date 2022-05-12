@@ -24,7 +24,7 @@ export default function MultiPaymentButton ({ chainId, safeAddress, transactions
   const [safe] = useGnosisSafes([safeAddress]);
   const network = getChainById(chainId);
   if (!network?.gnosisUrl) {
-    throw new Error(`Invalid network: ${chainId}`);
+    throw new Error(`Unsupported Gnosis network: ${chainId}`);
   }
   async function makePayment () {
     if (!safe || !account || !network?.gnosisUrl) {

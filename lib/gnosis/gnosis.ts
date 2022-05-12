@@ -1,9 +1,9 @@
 
 import { Signer, ethers } from 'ethers';
 import { RPC } from 'connectors';
-import { UserMultiSigWallet } from '@prisma/client';
+import { UserGnosisSafe } from '@prisma/client';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
-import SafeServiceClient, { SafeMultisigTransactionResponse, SafeInfoResponse, AllTransactionsListResponse } from '@gnosis.pm/safe-service-client';
+import SafeServiceClient, { SafeMultisigTransactionResponse, SafeInfoResponse } from '@gnosis.pm/safe-service-client';
 
 export type GnosisTransaction = SafeMultisigTransactionResponse;// AllTransactionsListResponse['results'][0];
 
@@ -15,12 +15,12 @@ function getGnosisRPCUrl (chainId: number) {
 interface GetGnosisServiceProps {
   signer: ethers.Signer;
   chainId?: number;
-  gnosisUrl?: string;
+  serviceUrl?: string;
 }
 
-function getGnosisService ({ signer, chainId, gnosisUrl }: GetGnosisServiceProps): SafeServiceClient | null {
+function getGnosisService ({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
 
-  const txServiceUrl = gnosisUrl || (chainId && getGnosisRPCUrl(chainId));
+  const txServiceUrl = serviceUrl || (chainId && getGnosisRPCUrl(chainId));
   if (!txServiceUrl) {
     return null;
   }
@@ -45,11 +45,11 @@ interface GetSafesForAddressProps {
 }
 
 async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<({ chainId: number } & SafeInfoResponse)[]> {
-  const gnosisUrl = getGnosisRPCUrl(chainId);
-  if (!gnosisUrl) {
+  const serviceUrl = getGnosisRPCUrl(chainId);
+  if (!serviceUrl) {
     return [];
   }
-  const service = getGnosisService({ signer, gnosisUrl });
+  const service = getGnosisService({ signer, serviceUrl });
   if (service) {
     return service.getSafesByOwner(address)
       .then(r => Promise.all(r.safes.map(safeAddr => {
@@ -68,19 +68,16 @@ export async function getSafesForAddresses (signer: ethers.Signer, addresses: st
   return safes;
 }
 
-async function getTransactionsforSafe (signer: Signer, wallet: UserMultiSigWallet): Promise<GnosisTransaction[]> {
+async function getTransactionsforSafe (signer: Signer, wallet: UserGnosisSafe): Promise<GnosisTransaction[]> {
   const service = getGnosisService({ signer, chainId: wallet.chainId });
   if (service) {
-    // const transactions = await service.getMultisigTransactions(wallet.address);
-    // return transactions.results;
     const transactions = await service.getPendingTransactions(wallet.address);
-    console.log(transactions);
     return transactions.results;
   }
   return [];
 }
 
-export async function getTransactionsforSafes (signer: Signer, wallets: UserMultiSigWallet[]) {
-  return Promise.all(wallets.map(wallet => getTransactionsforSafe(signer, wallet)))
+export async function getTransactionsforSafes (signer: Signer, safes: UserGnosisSafe[]) {
+  return Promise.all(safes.map(safe => getTransactionsforSafe(signer, safe)))
     .then(list => list.flat());
 }
