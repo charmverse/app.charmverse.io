@@ -26,25 +26,27 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
   const [space] = useCurrentSpace();
   const selectedGuildIdsSet = useMemo(() => new Set(selectedGuildIds), [selectedGuildIds]);
   const [currentUser] = useUser();
-  const firstAddress = currentUser && currentUser?.addresses?.[0] ? currentUser.addresses[0] : null;
+  const addresses = currentUser?.addresses ?? [];
   const { showMessage } = useSnackbar();
 
   useEffect(() => {
     async function main () {
       if (showImportedRolesModal) {
         setFetchingGuilds(true);
-        if (firstAddress) {
-          const membershipGuilds = await user.getMemberships(firstAddress);
-          if (membershipGuilds) {
-            const fetchedGuilds = await Promise.all(membershipGuilds?.map(membershipGuild => guild.get(membershipGuild.guildId)));
-            setGuilds(fetchedGuilds);
-            setSelectedGuildIds(fetchedGuilds.map(fetchedGuild => fetchedGuild.id));
+        const guildMembershipsResponses = await Promise.all(addresses.map(address => user.getMemberships(address)));
+        const guildIds: number[] = [];
+
+        guildMembershipsResponses.forEach(guildMembershipsResponse => {
+          if (guildMembershipsResponse) {
+            guildIds.push(...guildMembershipsResponse.map(guildMembership => guildMembership.guildId));
           }
-        }
-        else {
-          const allGuilds = await guild.getAll();
-          setGuilds(allGuilds);
-        }
+        });
+        const fetchedGuilds = await Promise.all(guildIds?.map(guildId => guild.get(guildId)));
+
+        setGuilds(fetchedGuilds);
+        setSelectedGuildIds(fetchedGuilds.map(fetchedGuild => fetchedGuild.id));
+        // const allGuilds = await guild.getAll();
+        // setGuilds(allGuilds);
         setFetchingGuilds(false);
       }
     }
