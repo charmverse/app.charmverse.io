@@ -34,6 +34,7 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
 
   const { discordUser, spaceRoles, telegramUser, ...userData } = user;
   req.session.user = userData;
+  await updateGuildRolesForUser(userData.addresses, spaceRoles);
   await req.session.save();
   res.status(200).json(user);
 
@@ -61,10 +62,6 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   });
   if (!profile) {
     return res.status(404).json({ error: 'No user found' });
-  }
-  // Assign the roles imported from guild
-  else {
-    await updateGuildRolesForUser(profile.addresses, profile.spaceRoles);
   }
   return res.status(200).json(profile);
 }
