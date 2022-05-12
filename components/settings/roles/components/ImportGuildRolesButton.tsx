@@ -36,7 +36,9 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
         if (firstAddress) {
           const membershipGuilds = await user.getMemberships(firstAddress);
           if (membershipGuilds) {
-            setGuilds(await Promise.all(membershipGuilds?.map(membershipGuild => guild.get(membershipGuild.guildId))));
+            const fetchedGuilds = await Promise.all(membershipGuilds?.map(membershipGuild => guild.get(membershipGuild.guildId)));
+            setGuilds(fetchedGuilds);
+            setSelectedGuildIds(fetchedGuilds.map(fetchedGuild => fetchedGuild.id));
           }
         }
         else {
@@ -48,8 +50,6 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
     }
     main();
   }, [showImportedRolesModal]);
-
-  const isAllGuildSelected = selectedGuildIds.length === guilds.length;
 
   function resetState () {
     setShowImportedRolesModal(false);
@@ -91,29 +91,6 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
         {fetchingGuilds ? <StyledSpinner />
           : guilds.length === 0 ? <Typography variant='subtitle1' color='secondary'>You are not part of any guild(s)</Typography> : (
             <div>
-              <Box display='flex' justifyContent='space-between'>
-                <Box display='flex' alignItems='center'>
-                  <Checkbox
-                    disabled={importingRoles}
-                    checked={isAllGuildSelected}
-                    onClick={() => {
-                      if (isAllGuildSelected) {
-                        setSelectedGuildIds([]);
-                      }
-                      else {
-                        setSelectedGuildIds(guilds.map(_guild => _guild.id));
-                      }
-                    }}
-                  />
-                  <Typography sx={{
-                    fontWeight: 'bold',
-                    fontSize: '1.25rem'
-                  }}
-                  >Select All
-                  </Typography>
-                </Box>
-                <Typography color='secondary' variant='subtitle1'>{selectedGuildIds.length} / {guilds.length}</Typography>
-              </Box>
               <Box sx={{
                 maxHeight: 325,
                 overflow: 'auto',

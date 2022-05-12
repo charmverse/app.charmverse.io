@@ -76,18 +76,17 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Box display='flex' gap={1} alignItems='center'>
           <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            {role.name} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
+            {role.name} {role.source === 'guild_xyz' ? (
+              <Tooltip placement='top' arrow title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'>
+                <span style={{ display: 'flex' }}>
+                  <GuildXYZIcon style={{
+                    transform: 'scale(0.75)'
+                  }}
+                  />
+                </span>
+              </Tooltip>
+            ) : null} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
           </Typography>
-          {role.source === 'guild_xyz' ? (
-            <Tooltip placement='top' arrow title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'>
-              <span style={{ display: 'flex' }}>
-                <GuildXYZIcon style={{
-                  transform: 'scale(0.75)'
-                }}
-                />
-              </span>
-            </Tooltip>
-          ) : null}
         </Box>
         {isEditable && (
           <IconButton size='small' {...bindTrigger(menuState)}>
@@ -110,13 +109,12 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           />
         ))}
       </ScrollableBox>
-      {
-        assignedContributors.length < contributors.length ? (
-          isEditable && <Button disabled={role.source === 'guild_xyz'} onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
+      { role.source !== 'guild_xyz'
+        ? assignedContributors.length < contributors.length ? (
+          isEditable && <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
         ) : (
           <Typography variant='caption'>All space members have been added to this role</Typography>
-        )
-      }
+        ) : null}
 
       <Menu
         {...bindMenu(menuState)}
@@ -126,8 +124,8 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           horizontal: 'right'
         }}
       >
+        {role.source !== 'guild_xyz' && (
         <MenuItem
-          disabled={role.source === 'guild_xyz'}
           sx={{ padding: '3px 12px' }}
           onClick={() => {
             popupState.open();
@@ -137,6 +135,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           <ListItemIcon><EditOutlinedIcon fontSize='small' /></ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Rename</Typography>
         </MenuItem>
+        )}
         <MenuItem
           sx={{ padding: '3px 12px' }}
           onClick={() => {
