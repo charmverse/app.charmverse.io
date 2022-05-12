@@ -1,7 +1,7 @@
-import { MouseEventHandler, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ScrollableModal } from 'components/common/Modal';
 import { guild, user } from '@guildxyz/sdk';
-import { Avatar, Box, Button, Checkbox, ListItem, ListItemIcon, ListItemText, MenuItem, SvgIcon, Typography } from '@mui/material';
+import { Avatar, Box, Checkbox, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import Link from 'components/common/Link';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -9,15 +9,10 @@ import { mutate } from 'swr';
 import { useUser } from 'hooks/useUser';
 import { FixedSizeList } from 'react-window';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
-interface Props {
-  onDownArrowClicked: MouseEventHandler<SVGSVGElement>
-}
-
-export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) {
+export default function ImportGuildRolesMenuItem () {
   const [showImportedRolesModal, setShowImportedRolesModal] = useState(false);
   const [guilds, setGuilds] = useState<{id: number, name: string, urlName: string, roles: any[], imageUrl: string}[]>([]);
   const [fetchingGuilds, setFetchingGuilds] = useState(false);
@@ -76,19 +71,19 @@ export default function ImportGuildRolesButton ({ onDownArrowClicked } : Props) 
 
   return (
     <>
-      <Button
-        variant='outlined'
-        endIcon={(
-          <KeyboardArrowDownIcon onClick={onDownArrowClicked} />
-        )}
-        startIcon={(
-          <SvgIcon sx={{ color: 'text.primary' }}>
-            <GuildXYZIcon />
-          </SvgIcon>
-        )}
-        onClick={() => setShowImportedRolesModal(true)}
-      >Import roles
-      </Button>
+      <MenuItem
+        disableRipple
+        onClick={() => {
+          setShowImportedRolesModal(true);
+        }}
+      >
+        <GuildXYZIcon style={{
+          marginRight: 8,
+          transform: 'scale(0.75)'
+        }}
+        />
+        Guild.xyz
+      </MenuItem>
       <ScrollableModal size='large' title='Import Guild roles' onClose={resetState} open={showImportedRolesModal}>
         <Box sx={{
           px: 4,

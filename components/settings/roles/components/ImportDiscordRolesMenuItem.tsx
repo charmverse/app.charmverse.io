@@ -1,23 +1,17 @@
-import { SvgIcon } from '@mui/material';
+import { MenuItem, SvgIcon } from '@mui/material';
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useRouter } from 'next/router';
 import DiscordIcon from 'public/images/discord_logo.svg';
-import { MouseEventHandler, useEffect, useState } from 'react';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { useEffect, useState } from 'react';
 
-interface Props {
-  onDownArrowClicked: MouseEventHandler<SVGSVGElement>
-}
-
-export default function ImportDiscordRolesButton ({ onDownArrowClicked } : Props) {
+export default function ImportDiscordRolesMenuItem () {
   const { showMessage } = useSnackbar();
   const [currentSpace] = useCurrentSpace();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [_, setIsLoading] = useState(false);
 
   const isAdmin = useIsAdmin();
 
@@ -55,21 +49,16 @@ export default function ImportDiscordRolesButton ({ onDownArrowClicked } : Props
     return null;
   }
   return (
-    <Button
-      external
-      href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`}
-      variant='outlined'
-      loading={isLoading}
-      endIcon={(
-        <KeyboardArrowDownIcon onClick={onDownArrowClicked} />
-      )}
-      startIcon={(
-        <SvgIcon viewBox='0 -10 70 70' sx={{ color: 'text.primary' }}>
-          <DiscordIcon />
-        </SvgIcon>
-      )}
+    <MenuItem
+      disableRipple
+      onClick={() => {
+        router.push(`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=server`);
+      }}
     >
-      Import roles
-    </Button>
+      <SvgIcon viewBox='0 -10 70 70' sx={{ transform: 'scale(0.85)', mr: 1 }}>
+        <DiscordIcon />
+      </SvgIcon>
+      Discord
+    </MenuItem>
   );
 }
