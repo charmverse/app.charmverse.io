@@ -7,7 +7,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { gettingStartedPageContent } from 'seedData';
 import { postToDiscord, IEventToLog } from 'lib/log/userEvents';
-import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods.server';
+import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

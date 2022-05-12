@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods.server';
+import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 
 const concurrentSpacesProcessed = 5;
 
