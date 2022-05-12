@@ -23,9 +23,8 @@ async function addPaymentMethods (): Promise<number> {
 
   return spaces.length;
 }
-/*
+
 addPaymentMethods()
   .then((spacesProcessed) => {
     console.log('Added payment methods for ', spacesProcessed, ' spaces');
   });
-*/

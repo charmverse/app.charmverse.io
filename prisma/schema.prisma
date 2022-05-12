@@ -277,7 +277,11 @@ model PaymentMethod {
   tokenLogo         String?
   walletType        WalletType @default(metamask)
 
+  // Vanilla payment methods
   @@unique([spaceId, chainId, contractAddress])
+
+  // Gnosis safes
+  @@unique([spaceId, chainId, gnosisSafeAddress])
 }
 
 model UserMultiSigWallet {
