@@ -30,7 +30,7 @@ describe('createDatabase', () => {
 
   it('should assign the database schema correctly', async () => {
 
-    const exampleBoardSchema: PageProperty [ ] = [{ id: '87b42bed-1dbe-4491-9b6e-fc4c45caa81e', name: 'Status', type: 'select', options: [{ id: '7154c7b1-9370-4177-8d32-5aec591b158b', color: 'propColorGreen', value: 'Completed' }, { id: '629f8134-058a-4998-9733-042d9e75f2b0', color: 'propColorYellow', value: 'In progress' }, { id: '62f3d1a5-68bc-4c4f-ac99-7cd8f6ceb6ea', color: 'propColorRed', value: 'Not started' }] }];
+    const exampleBoardSchema: PageProperty [ ] = [{ id: '87b42bed-1dbe-4491-9b6e-fc4c45caa81e', name: 'Status', type: 'select', options: [{ id: '7154c7b1-9370-4177-8d32-5aec591b158b', color: 'propColorTeal', value: 'Completed' }, { id: '629f8134-058a-4998-9733-042d9e75f2b0', color: 'propColorYellow', value: 'In progress' }, { id: '62f3d1a5-68bc-4c4f-ac99-7cd8f6ceb6ea', color: 'propColorRed', value: 'Not started' }] }];
 
     const createdDb = await createDatabase({
       title: 'Example',
