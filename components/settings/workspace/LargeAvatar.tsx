@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { useRef, useState, ReactNode } from 'react';
-import { AvatarWithIcons } from 'components/common/Avatar';
+import AvatarWithIcons from 'components/common/AvatarWithIcons';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';

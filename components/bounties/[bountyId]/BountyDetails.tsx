@@ -16,7 +16,7 @@ import { Application, Bounty } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import charmClient from 'charmClient';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
-import { Avatar } from 'components/common/Avatar';
+import Avatar from 'components/common/Avatar';
 import { Modal } from 'components/common/Modal';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';

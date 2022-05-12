@@ -114,10 +114,6 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
             spaceImage={watchSpaceImage}
             updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
           />
-          <TextField
-            {...register('spaceImage')}
-            sx={{ visibility: 'hidden', width: '0px' }}
-          />
         </Grid>
         <Grid item>
           <FieldLabel>Name</FieldLabel>

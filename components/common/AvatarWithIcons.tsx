@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import { Avatar, InitialAvatarProps } from '.';
+import Avatar, { InitialAvatarProps } from './Avatar';
 
 const StyledStack = styled(Stack)`
     position: absolute;
@@ -29,7 +29,7 @@ export type AvatarWithIconsProps = InitialAvatarProps & {
     isHovered: boolean;
 };
 
-export function AvatarWithIcons (props: AvatarWithIconsProps) {
+export default function AvatarWithIcons (props: AvatarWithIconsProps) {
   const { icons, isHovered } = props;
 
   return (

@@ -6,7 +6,7 @@ import Button from 'components/common/Button';
 import SvgIcon from '@mui/material/SvgIcon';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { Avatar } from 'components/common/Avatar';
+import Avatar from 'components/common/Avatar';
 import { useUser } from 'hooks/useUser';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { Chains, RPC } from 'connectors';

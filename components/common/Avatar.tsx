@@ -29,7 +29,7 @@ export type InitialAvatarProps = {
   size?: 'small' | 'medium';
 };
 
-export function InitialAvatar ({ avatar, className, name, variant, size = 'medium' }: InitialAvatarProps) {
+export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium' }: InitialAvatarProps) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
   return (
     <StyledAvatar
