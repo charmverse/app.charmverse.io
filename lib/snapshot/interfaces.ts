@@ -1,5 +1,3 @@
-import snapshot from '@snapshot-labs/snapshot.js';
-
 export interface SnapshotVotingStrategy {
   name: string;
   network: string;

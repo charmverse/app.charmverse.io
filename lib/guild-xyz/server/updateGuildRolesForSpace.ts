@@ -32,7 +32,6 @@ export async function updateGuildRolesForSpace (spaceId: string) {
   });
 
   const guildRoleIdCharmverseRoleIdRecord = await createRoleRecord(spaceId);
-
   for (const spaceRole of spaceRoles) {
     try {
       const addresses = spaceRole.user.addresses;

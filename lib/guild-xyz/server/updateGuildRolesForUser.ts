@@ -15,7 +15,7 @@ export async function updateGuildRolesForUser (addresses: string[], spaceRoles: 
   for (const spaceRole of spaceRoles) {
     try {
       const guildRoleIdCharmverseRoleIdRecord = await createRoleRecord(spaceRole.spaceId);
-      await assignRolesToUser(Array.from(userGuildRoleIds), guildRoleIdCharmverseRoleIdRecord, spaceRole.id);
+      await assignRolesToUser(userGuildRoleIds, guildRoleIdCharmverseRoleIdRecord, spaceRole.id);
       await unassignRolesFromUser({
         userGuildRoleIdsInSpace: spaceRole.spaceRoleToRole.filter(spaceRoleToRole => spaceRoleToRole.role.source === 'guild_xyz').map(spaceRoleToRole => spaceRoleToRole.role.sourceId as string),
         userGuildRoleIds,

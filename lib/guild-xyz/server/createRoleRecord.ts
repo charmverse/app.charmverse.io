@@ -17,9 +17,7 @@ export async function createRoleRecord (spaceId: string) {
 
   const guildRoleIdCharmverseRoleIdRecord: Record<string, string> = {};
   rolesImportedFromGuild.forEach(roleImportedFromGuild => {
-    if (roleImportedFromGuild.sourceId) {
-      guildRoleIdCharmverseRoleIdRecord[roleImportedFromGuild.sourceId] = roleImportedFromGuild.id;
-    }
+    guildRoleIdCharmverseRoleIdRecord[roleImportedFromGuild.sourceId as string] = roleImportedFromGuild.id;
   });
 
   return guildRoleIdCharmverseRoleIdRecord;
