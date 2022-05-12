@@ -15,7 +15,7 @@ const defaultPaymentMethods: Pick<PaymentMethod, 'chainId' | 'contractAddress' |
     chainId: 4,
     contractAddress: '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926',
     tokenDecimals: 6,
-    tokenName: 'USD Coin (Rinkeby)',
+    tokenName: 'USD Coin',
     tokenSymbol: 'USDC',
     tokenLogo: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png'
   },
