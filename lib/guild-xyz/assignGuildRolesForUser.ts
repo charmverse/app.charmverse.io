@@ -17,26 +17,26 @@ export async function assignGuildRolesForUser (addresses: string[], spaceRoles: 
     const rolesImportedFromGuild = await prisma.role.findMany({
       where: {
         spaceId: spaceRole.spaceId,
-        source: 'guild.xyz',
-        sourceRoleId: {
+        source: 'guild_xyz',
+        sourceId: {
           not: null
         }
       },
       select: {
-        sourceRoleId: true,
+        sourceId: true,
         id: true
       }
     });
       // Create a map between [guild role id]: charmverse role id
     const guildRoleCharmverseRoleRecord: Record<string, string> = {};
     rolesImportedFromGuild.forEach(roleImportedWithGuild => {
-      if (roleImportedWithGuild.sourceRoleId) {
-        guildRoleCharmverseRoleRecord[roleImportedWithGuild.sourceRoleId] = roleImportedWithGuild.id;
+      if (roleImportedWithGuild.sourceId) {
+        guildRoleCharmverseRoleRecord[roleImportedWithGuild.sourceId] = roleImportedWithGuild.id;
       }
     });
 
     // A set of all the guild imported role ids in the workspace
-    const workspaceGuildRoleIdsSet = new Set(rolesImportedFromGuild.map(roleImportedFromGuild => roleImportedFromGuild.sourceRoleId as string));
+    const workspaceGuildRoleIdsSet = new Set(rolesImportedFromGuild.map(roleImportedFromGuild => roleImportedFromGuild.sourceId as string));
 
     // Filter the roles that have been imported from guild but user dont have access to, this could mean the user lost access to it
     const guildRolesUserLostAccess = Array.from(

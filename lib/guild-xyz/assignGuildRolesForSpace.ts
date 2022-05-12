@@ -15,25 +15,25 @@ export async function assignGuildRolesForSpace (spaceId: string) {
   const rolesImportedWithGuild = await prisma.role.findMany({
     where: {
       spaceId,
-      source: 'guild.xyz',
-      sourceRoleId: {
+      source: 'guild_xyz',
+      sourceId: {
         not: null
       }
     },
     select: {
-      sourceRoleId: true,
+      sourceId: true,
       id: true
     }
   });
 
   const guildRoleCharmverseRoleRecord: Record<string, string> = {};
   rolesImportedWithGuild.forEach(roleImportedWithGuild => {
-    if (roleImportedWithGuild.sourceRoleId) {
-      guildRoleCharmverseRoleRecord[roleImportedWithGuild.sourceRoleId] = roleImportedWithGuild.id;
+    if (roleImportedWithGuild.sourceId) {
+      guildRoleCharmverseRoleRecord[roleImportedWithGuild.sourceId] = roleImportedWithGuild.id;
     }
   });
 
-  const workspaceRoleIdsSet = new Set(rolesImportedWithGuild.map(roleImportedWithGuild => roleImportedWithGuild.sourceRoleId as string));
+  const workspaceRoleIdsSet = new Set(rolesImportedWithGuild.map(roleImportedWithGuild => roleImportedWithGuild.sourceId as string));
 
   for (const spaceRole of spaceRoles) {
     const charmverseUser = await prisma.user.findUnique({

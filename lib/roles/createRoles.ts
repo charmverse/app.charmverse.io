@@ -1,25 +1,25 @@
 import { prisma } from 'db';
-import { Role } from '@prisma/client';
+import { Role, RoleSource } from '@prisma/client';
 
 type RolesRecord = Record<string, Role | null>;
 
 // Create charmverse roles or find them from prisma to generate a final record
 export async function findOrCreateRoles (
-  serverRoles: {id: string | number, name: string}[],
+  externalRoles: {id: string | number, name: string}[],
   spaceId: string,
   userId: string,
-  options?:{source?: string | null, createRoles?: boolean}
+  options?:{source?: RoleSource | null, createRoles?: boolean}
 ): Promise<RolesRecord> {
   const { createRoles = true, source = null } = options ?? {};
   const rolesRecord: RolesRecord = {};
   // Create all of the discord roles fist
-  for (const serverRole of serverRoles) {
+  for (const externalRole of externalRoles) {
     // Skip the @everyone role, this is assigned to all the members of the server
-    if (serverRole.name !== '@everyone') {
+    if (externalRole.name !== '@everyone') {
       // First check if a role with the same name already exist in the workspace
       const existingRole = await prisma.role.findFirst({
         where: {
-          name: serverRole.name,
+          name: externalRole.name,
           spaceId
         }
       });
@@ -32,11 +32,11 @@ export async function findOrCreateRoles (
           where: {
             spaceId_name: {
               spaceId,
-              name: serverRole.name
+              name: externalRole.name
             }
           },
           update: {
-            name: serverRole.name,
+            name: externalRole.name,
             space: {
               connect: {
                 id: spaceId
@@ -45,7 +45,7 @@ export async function findOrCreateRoles (
             createdBy: userId
           },
           create: {
-            name: serverRole.name,
+            name: externalRole.name,
             space: {
               connect: {
                 id: spaceId
@@ -54,12 +54,12 @@ export async function findOrCreateRoles (
             createdBy: userId,
             source,
             // If there is a source, store the source role id for future reference
-            sourceRoleId: source !== null ? String(serverRole.id) : null
+            sourceId: source !== null ? String(externalRole.id) : null
           }
         });
       }
 
-      rolesRecord[serverRole.id] = charmVerseRole;
+      rolesRecord[externalRole.id] = charmVerseRole;
     }
   }
   return rolesRecord;

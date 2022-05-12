@@ -288,6 +288,10 @@ model UserMultiSigWallet {
   walletType WalletType @default(metamask)
 }
 
+enum RoleSource {
+  guild_xyz
+}
+
 model Role {
   id               String            @id @default(uuid()) @db.Uuid
   createdAt        DateTime          @default(now())
@@ -297,8 +301,8 @@ model Role {
   space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   spaceRolesToRole SpaceRoleToRole[]
   permissions      PagePermission[]
-  source           String?
-  sourceRoleId     String?
+  source           RoleSource?
+  sourceId         String?
 
   TokenGateToRole TokenGateToRole[]
   @@unique([spaceId, name])

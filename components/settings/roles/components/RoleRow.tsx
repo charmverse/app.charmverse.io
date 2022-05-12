@@ -1,7 +1,7 @@
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -10,7 +10,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import Chip from '@mui/material/Chip';
 import MenuItem from '@mui/material/MenuItem';
-import { ListSpaceRolesResponse } from 'charmClient';
 import Button from 'components/common/Button';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import Modal from 'components/common/Modal';
@@ -20,6 +19,7 @@ import styled from '@emotion/styled';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useContributors } from 'hooks/useContributors';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
+import { ListSpaceRolesResponse } from 'pages/api/roles';
 import RoleForm from './RoleForm';
 import RoleMemberRow from './RoleMemberRow';
 
@@ -78,7 +78,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             {role.name} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
           </Typography>
-          {role.source === 'guild.xyz' ? (
+          {role.source === 'guild_xyz' ? (
             <Tooltip placement='top' arrow title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'>
               <span style={{ display: 'flex' }}>
                 <GuildXYZIcon style={{
@@ -102,7 +102,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
           <RoleMemberRow
             key={contributor.id}
             contributor={contributor}
-            isEditable={isEditable && role.source !== 'guild.xyz'}
+            isEditable={isEditable && role.source !== 'guild_xyz'}
             onRemove={(userId) => {
               removeMember(userId);
               userIdsToHide = userIdsToHide.filter(id => id !== userId);
@@ -112,7 +112,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
       </ScrollableBox>
       {
         assignedContributors.length < contributors.length ? (
-          isEditable && <Button disabled={role.source === 'guild.xyz'} onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
+          isEditable && <Button disabled={role.source === 'guild_xyz'} onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
         ) : (
           <Typography variant='caption'>All space members have been added to this role</Typography>
         )
@@ -127,7 +127,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
         }}
       >
         <MenuItem
-          disabled={role.source === 'guild.xyz'}
+          disabled={role.source === 'guild_xyz'}
           sx={{ padding: '3px 12px' }}
           onClick={() => {
             popupState.open();

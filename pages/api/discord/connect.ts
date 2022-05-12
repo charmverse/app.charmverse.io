@@ -113,7 +113,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
       // Remove the roles imported from guild.xyz
       for (const roleId of Object.keys(rolesRecord)) {
         const role = rolesRecord[roleId];
-        if (role?.sourceRoleId && role.source === 'guild.xyz') {
+        if (role?.sourceId && role.source === 'guild_xyz') {
           delete rolesRecord[roleId];
         }
       }

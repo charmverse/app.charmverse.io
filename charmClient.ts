@@ -28,19 +28,9 @@ import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pages';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
+import { ListSpaceRolesResponse } from 'pages/api/roles';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
-
-export type ListSpaceRolesResponse = {
-  id: string;
-  name: string;
-  source: string | null
-  spaceRolesToRole: {
-      spaceRole: {
-          user: User;
-      };
-  }[];
-}
 
 export interface PopulatedBounty extends Bounty {
   applications: Application[];

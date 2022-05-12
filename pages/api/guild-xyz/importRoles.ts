@@ -23,7 +23,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<{importedR
   guilds.forEach(_guild => {
     guildRoles.push(..._guild.roles.map(role => ({ id: role.id, name: role.name })));
   });
-  await findOrCreateRoles(guildRoles, spaceId, req.session.user.id, { source: 'guild.xyz' });
+  await findOrCreateRoles(guildRoles, spaceId, req.session.user.id, { source: 'guild_xyz' });
   await assignGuildRolesForSpace(spaceId);
   res.status(200).json({ importedRolesCount: Object.keys(guildRoles).length });
 }
