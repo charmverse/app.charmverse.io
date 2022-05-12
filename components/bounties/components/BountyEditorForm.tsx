@@ -32,12 +32,6 @@ export const bountyFormTitles: Record<FormMode, string> = {
   suggest: 'Suggest bounty'
 };
 
-interface IBountyEditorInput {
-  onSubmit: (bounty: PopulatedBounty) => any,
-  mode?: FormMode
-  bounty?: Partial<Bounty>
-}
-
 export const schema = yup.object({
   title: yup.string().required('Please enter a title'),
   rewardAmount: yup.number().typeError('Amount must be a number').test({
@@ -53,7 +47,17 @@ export const schema = yup.object({
   chainId: yup.number().required()
 });
 
-type FormValues = yup.InferType<typeof schema>
+export type FormValues = yup.InferType<typeof schema>
+
+/**
+ * @focusKey The field that should be focused on popup. The underlying field should be using a native MUI field for this to work
+ */
+interface IBountyEditorInput {
+  onSubmit: (bounty: PopulatedBounty) => any,
+  mode?: FormMode
+  bounty?: Partial<Bounty>
+  focusKey?: keyof FormValues
+}
 
 // This component was created to localize the state change of CharmEditor
 // Otherwise watching inside its parent would've caused the whole component tree to rerender
@@ -75,7 +79,7 @@ function FormDescription ({ onContentChange, content, watch }:
   );
 }
 
-export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }: IBountyEditorInput) {
+export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey }: IBountyEditorInput) {
   const { setBounties, bounties } = useBounties();
 
   const defaultChainId = bounty?.chainId ?? 1;
@@ -85,6 +89,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
     handleSubmit,
     setValue,
     watch,
+    trigger,
     formState: { errors, isValid, isSubmitting }
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -96,6 +101,12 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
     },
     resolver: yupResolver(schema)
   });
+
+  useEffect(() => {
+    if (focusKey) {
+      trigger(focusKey);
+    }
+  }, [focusKey]);
 
   const values = watch();
 
@@ -265,17 +276,13 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create' }:
                         valueAsNumber: true,
                         required: true
                       })}
+                      focused={focusKey === 'rewardAmount'}
                       type='number'
                       size='small'
+                      error={!!errors?.rewardAmount}
+                      helperText={errors?.rewardAmount?.message}
                       inputProps={{ step: 0.000000001 }}
                     />
-                    {
-                errors?.rewardAmount && (
-                <Alert severity='error'>
-                  {errors.rewardAmount.message}
-                </Alert>
-                )
-              }
                   </Grid>
                   <Grid item xs={6}>
                     <InputLabel>
