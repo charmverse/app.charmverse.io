@@ -64,7 +64,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   }
   // Assign the roles imported from guild
   else {
-    await assignGuildRolesForUser(profile.id, profile.addresses, profile.spaceRoles);
+    await assignGuildRolesForUser(profile.addresses, profile.spaceRoles);
   }
   return res.status(200).json(profile);
 }
