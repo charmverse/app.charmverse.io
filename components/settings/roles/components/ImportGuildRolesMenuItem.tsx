@@ -12,7 +12,7 @@ import GuildXYZIcon from 'public/images/guild_logo.svg';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
-export default function ImportGuildRolesMenuItem () {
+export default function ImportGuildRolesMenuItem ({ onClose }: {onClose: () => void}) {
   const [showImportedRolesModal, setShowImportedRolesModal] = useState(false);
   const [guilds, setGuilds] = useState<{id: number, name: string, urlName: string, roles: any[], imageUrl: string}[]>([]);
   const [fetchingGuilds, setFetchingGuilds] = useState(false);
@@ -54,6 +54,7 @@ export default function ImportGuildRolesMenuItem () {
     setFetchingGuilds(false);
     setSelectedGuildIds([]);
     setGuilds([]);
+    onClose();
   }
 
   async function importRoles () {

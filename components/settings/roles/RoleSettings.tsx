@@ -39,13 +39,13 @@ export default function RoleSettings () {
         {isAdmin && (
           <Box component='span' display='flex' gap={1}>
             <Button
+              onClick={() => {
+                setAnchorEl(buttonRef?.current);
+              }}
               ref={buttonRef}
               variant='outlined'
               endIcon={(
-                <KeyboardArrowDownIcon onClick={() => {
-                  setAnchorEl(buttonRef?.current);
-                }}
-                />
+                <KeyboardArrowDownIcon />
               )}
             >
               Import roles
@@ -56,7 +56,7 @@ export default function RoleSettings () {
       </Legend>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />
-        <ImportGuildRolesMenuItem />
+        <ImportGuildRolesMenuItem onClose={handleClose} />
       </Menu>
       <Modal {...bindPopover(popupState)} title='Add a role'>
         <RoleForm
