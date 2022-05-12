@@ -3,9 +3,8 @@ import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { Box, Card, CircularProgress, OutlinedInput, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
-import { WalletType } from '@prisma/client';
+import { useRouter } from 'next/router';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import useSWR from 'swr';
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
@@ -16,14 +15,14 @@ import charmClient from 'charmClient';
 import { getChainById } from 'connectors';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { useUser } from 'hooks/useUser';
-import { getSafesForAddresses } from 'lib/gnosis';
 import { Controller, useForm } from 'react-hook-form';
+import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
+import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 
-interface Wallet {
+interface Safe {
   id: string;
   name: string | null;
   workspace?: string | null;
-  walletType: string;
   chainId: number;
   address: string;
 }
@@ -33,16 +32,11 @@ const StyledTableCell = styled(TableCell)`
   border-bottom: 1px solid #000;
 `;
 
-const walletTypes = {
-  gnosis: 'Gnosis Safe Wallet',
-  metamask: 'MetaMask'
-};
-
 const gnosisUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address}/home`;
 
-export default function MultiSigList () {
+export default function GnosisSafesList () {
 
-  const { data: walletData, mutate } = useSWR('/profile/multi-sigs', () => charmClient.listUserMultiSigs(), { revalidateOnFocus: false });
+  const { data: safeData, mutate } = useMultiWalletSigs();
 
   const gnosisSigner = useGnosisSigner();
   const [user] = useUser();
@@ -52,13 +46,11 @@ export default function MultiSigList () {
     if (gnosisSigner && user) {
       setIsLoadingSafes(true);
       try {
-        const safes = await getSafesForAddresses(gnosisSigner, user.addresses);
-        const safesData = safes.map(safe => ({
-          address: safe.address,
-          chainId: safe.chainId,
-          name: getWalletName(safe.address) // get existing name if user gave us one
-        }));
-        await charmClient.setUserMultiSigs(safesData);
+        await importSafesFromWallet({
+          signer: gnosisSigner,
+          addresses: user.addresses,
+          getWalletName
+        });
         await mutate();
       }
       finally {
@@ -68,15 +60,15 @@ export default function MultiSigList () {
   }
 
   function getWalletName (address: string) {
-    return walletData?.find(wallet => wallet.address === address)?.name;
+    return safeData?.find(wallet => wallet.address === address)?.name;
   }
 
-  if (!walletData) {
+  if (!safeData) {
     return null;
   }
 
   // sort the rows to prevent random order
-  const sortedRows = walletData.sort((a, b) => a.address < b.address ? -1 : 1);
+  const sortedSafes = safeData.sort((a, b) => a.address < b.address ? -1 : 1);
 
   return (
     <>
@@ -85,7 +77,7 @@ export default function MultiSigList () {
           <KeyIcon fontSize='large' /> Multisig
         </Box>
 
-        {sortedRows.length > 0 && (
+        {sortedSafes.length > 0 && (
           <Button
             loading={isLoadingSafes}
             onClick={importSafes}
@@ -97,27 +89,13 @@ export default function MultiSigList () {
         )}
       </Legend>
 
-      {sortedRows.length === 0 && (
-        <Card variant='outlined'>
-          <Box p={3} textAlign='center'>
-            <Typography color='secondary'>Import your Gnosis safes to view pending transactions under <Link href='/profile/tasks'>My Tasks</Link></Typography>
-            <br />
-            <Button
-              loading={!gnosisSigner || isLoadingSafes}
-              onClick={importSafes}
-            >
-              Import Gnosis Safes
-            </Button>
-          </Box>
-        </Card>
-      )}
+      {sortedSafes.length === 0 && <GnosisConnectCard loading={!gnosisSigner || isLoadingSafes} onClick={importSafes} />}
 
-      {sortedRows.length > 0 && (
+      {sortedSafes.length > 0 && (
         <Table size='small' aria-label='simple table'>
           <TableHead>
             <TableRow>
               <StyledTableCell sx={{ pl: 0 }}>Wallet Name</StyledTableCell>
-              <StyledTableCell>Wallet Type</StyledTableCell>
               <StyledTableCell>Blockchain</StyledTableCell>
               <StyledTableCell>Address</StyledTableCell>
               <StyledTableCell></StyledTableCell>
@@ -125,8 +103,8 @@ export default function MultiSigList () {
           </TableHead>
           <TableBody>
             {
-              sortedRows.map(wallet => (
-                <WalletRow updateWallets={mutate} wallet={wallet} key={wallet.id} />
+              sortedSafes.map(safe => (
+                <SafeRow updateWallets={mutate} safe={safe} key={safe.id} />
               ))
             }
           </TableBody>
@@ -136,7 +114,26 @@ export default function MultiSigList () {
   );
 }
 
-function WalletRow ({ wallet, updateWallets }: { wallet: Wallet, updateWallets: () => void }) {
+export function GnosisConnectCard ({ loading, onClick }: { loading: boolean, onClick: () => void }) {
+  const router = useRouter();
+  const isTasksPage = router.pathname.includes('/tasks');
+  return (
+    <Card variant='outlined'>
+      <Box p={3} textAlign='center'>
+        <Typography color='secondary'>Import your Gnosis safes to view your transaction queue{!isTasksPage && <>under <Link href='/profile/tasks'>My Tasks</Link></>}</Typography>
+        <br />
+        <Button
+          loading={loading}
+          onClick={onClick}
+        >
+          Connect Gnosis Safe
+        </Button>
+      </Box>
+    </Card>
+  );
+}
+
+function SafeRow ({ safe, updateWallets }: { safe: Safe, updateWallets: () => void }) {
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
@@ -148,30 +145,30 @@ function WalletRow ({ wallet, updateWallets }: { wallet: Wallet, updateWallets: 
     setValue
   } = useForm<{ name: string }>({
     mode: 'onChange',
-    defaultValues: { name: wallet.name || '' }
+    defaultValues: { name: safe.name || '' }
   });
 
   useEffect(() => {
-    setValue('name', wallet.name || '');
-  }, [wallet.name]);
+    setValue('name', safe.name || '');
+  }, [safe.name]);
 
-  async function deleteWallet (_wallet: Wallet) {
-    await charmClient.deleteUserMultiSig(_wallet.id);
+  async function deleteSafe (_safe: Safe) {
+    await charmClient.deleteMyGnosisSafe(_safe.id);
     updateWallets();
     deleteConfirmation.close();
   }
 
-  async function saveWalletName ({ name }: { name: string }) {
+  async function saveSafeName ({ name }: { name: string }) {
     if (isDirty) {
       const sanitized = name.trim();
-      await charmClient.updateUserMultiSig({ id: wallet.id, name: sanitized });
+      await charmClient.updateMyGnosisSafe({ id: safe.id, name: sanitized });
       await updateWallets();
       reset(); // reset form
     }
   }
 
   return (
-    <TableRow key={wallet.id}>
+    <TableRow key={safe.id}>
       <TableCell sx={{ pl: 0 }}>
         <Controller
           name='name'
@@ -181,7 +178,7 @@ function WalletRow ({ wallet, updateWallets }: { wallet: Wallet, updateWallets: 
               value={value}
               onChange={onChange}
               placeholder='Untitled'
-              onBlur={handleSubmit(saveWalletName)}
+              onBlur={handleSubmit(saveSafeName)}
               endAdornment={
                 <CircularProgress size={14} sx={{ opacity: isSubmitting ? 1 : 0 }} />
               }
@@ -190,16 +187,13 @@ function WalletRow ({ wallet, updateWallets }: { wallet: Wallet, updateWallets: 
         />
       </TableCell>
       <TableCell>
-        {walletTypes[wallet.walletType as WalletType] || null}
+        {getChainById(safe.chainId)?.chainName}
       </TableCell>
       <TableCell>
-        {getChainById(wallet.chainId)?.chainName}
-      </TableCell>
-      <TableCell>
-        <Tooltip placement='top' title={wallet.address}>
+        <Tooltip placement='top' title={safe.address}>
           <span>
-            <Link external href={gnosisUrl(wallet.address)} target='_blank'>
-              {shortenHex(wallet.address)}
+            <Link external href={gnosisUrl(safe.address)} target='_blank'>
+              {shortenHex(safe.address)}
             </Link>
           </span>
         </Tooltip>
@@ -209,10 +203,10 @@ function WalletRow ({ wallet, updateWallets }: { wallet: Wallet, updateWallets: 
         <ElementDeleteIcon onClick={deleteConfirmation.open} />
 
         <ConfirmDeleteModal
-          key={wallet.id}
+          key={safe.id}
           title='Delete Wallet'
           question='Are you sure you want to delete this wallet?'
-          onConfirm={() => deleteWallet(wallet)}
+          onConfirm={() => deleteSafe(safe)}
           onClose={deleteConfirmation.close}
           open={deleteConfirmation.isOpen}
         />

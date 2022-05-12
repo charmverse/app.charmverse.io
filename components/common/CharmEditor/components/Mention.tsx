@@ -5,7 +5,6 @@ import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip'
 import { useTheme } from '@emotion/react';
 import { Box, Divider, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
-import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
@@ -14,6 +13,7 @@ import { usePages } from 'hooks/usePages';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import Link from 'next/link';
+import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { hideSuggestionsTooltip } from './@bangle.dev/tooltip/suggest-tooltip';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import { PagesList } from './PageList';

@@ -1,5 +1,5 @@
 import { Divider, Typography } from '@mui/material';
-import MultiSigList from './MultiSigWallets';
+import MultiSigList from './GnosisSafes';
 
 export default function MyIntegrations () {
 
