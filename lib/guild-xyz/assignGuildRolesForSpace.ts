@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { user } from '@guildxyz/sdk';
+import log from 'lib/log';
 
 export async function assignGuildRolesForSpace (spaceId: string) {
   const spaceRoles = await prisma.spaceRole.findMany({
@@ -12,7 +13,7 @@ export async function assignGuildRolesForSpace (spaceId: string) {
     }
   });
 
-  const rolesImportedWithGuild = await prisma.role.findMany({
+  const rolesImportedFromGuild = await prisma.role.findMany({
     where: {
       spaceId,
       source: 'guild_xyz',
@@ -26,57 +27,69 @@ export async function assignGuildRolesForSpace (spaceId: string) {
     }
   });
 
-  const guildRoleCharmverseRoleRecord: Record<string, string> = {};
-  rolesImportedWithGuild.forEach(roleImportedWithGuild => {
-    if (roleImportedWithGuild.sourceId) {
-      guildRoleCharmverseRoleRecord[roleImportedWithGuild.sourceId] = roleImportedWithGuild.id;
+  const guildRoleIdCharmverseRoleIdRecord: Record<string, string> = {};
+  rolesImportedFromGuild.forEach(roleImportedFromGuild => {
+    if (roleImportedFromGuild.sourceId) {
+      guildRoleIdCharmverseRoleIdRecord[roleImportedFromGuild.sourceId] = roleImportedFromGuild.id;
     }
   });
 
-  const workspaceRoleIdsSet = new Set(rolesImportedWithGuild.map(roleImportedWithGuild => roleImportedWithGuild.sourceId as string));
+  const guildImportedRoleIdsInWorkspace = new Set(rolesImportedFromGuild.map(roleImportedWithGuild => roleImportedWithGuild.sourceId as string));
 
   for (const spaceRole of spaceRoles) {
-    const charmverseUser = await prisma.user.findUnique({
-      where: {
-        id: spaceRole.userId
-      }
-    });
-    // If the user has a wallet address
-    if (charmverseUser?.addresses?.[0]) {
-      const memberships = await user.getMemberships(charmverseUser.addresses[0]);
-      const roleIdsSet: Set<string> = new Set();
-      memberships?.forEach(membership => {
-        membership.roleids.forEach(roleid => roleIdsSet.add(String(roleid)));
+    try {
+      const charmverseUser = await prisma.user.findUnique({
+        where: {
+          id: spaceRole.userId
+        },
+        select: {
+          addresses: true
+        }
       });
 
-      // Filter the roles that are part of the workspace only
-      const roleIdsInWorkspace = Array.from(roleIdsSet).filter(roleId => workspaceRoleIdsSet.has(roleId));
-      for (const roleIdInWorkspace of roleIdsInWorkspace) {
-        const roleId = guildRoleCharmverseRoleRecord[roleIdInWorkspace];
-        if (roleId) {
-          await prisma.spaceRoleToRole.upsert({
-            where: {
-              spaceRoleId_roleId: {
-                roleId,
-                spaceRoleId: spaceRole.id
-              }
-            },
-            update: {},
-            create: {
-              role: {
-                connect: {
-                  id: roleId
-                }
-              },
-              spaceRole: {
-                connect: {
-                  id: spaceRole.id
-                }
-              }
-            }
+      // Only proceed further if the user has at least a single address
+      if (charmverseUser && charmverseUser.addresses.length > 0) {
+        const guildRoleIdsSet: Set<string> = new Set();
+        // Get all the guild roles associated with all of the addresses of the user
+        for (const address of charmverseUser.addresses) {
+          const guildMemberships = await user.getMemberships(address);
+          guildMemberships?.forEach(guildMembership => {
+            guildMembership.roleids.forEach(roleid => guildRoleIdsSet.add(String(roleid)));
           });
         }
+
+        // Filter the roles that are part of the workspace only
+        const roleIds = Array.from(guildRoleIdsSet).filter(
+          guildRoleId => guildImportedRoleIdsInWorkspace.has(guildRoleId)
+        ).map(
+          guildRoleId => guildRoleIdCharmverseRoleIdRecord[guildRoleId]
+        );
+
+        await prisma.$transaction(roleIds.map(roleId => prisma.spaceRoleToRole.upsert({
+          where: {
+            spaceRoleId_roleId: {
+              roleId,
+              spaceRoleId: spaceRole.id
+            }
+          },
+          update: {},
+          create: {
+            role: {
+              connect: {
+                id: roleId
+              }
+            },
+            spaceRole: {
+              connect: {
+                id: spaceRole.id
+              }
+            }
+          }
+        })));
       }
+    }
+    catch (_) {
+      log.debug(`[guild.xyz]: Failed to import roles for userId:${spaceRole.userId}`);
     }
   }
 }
