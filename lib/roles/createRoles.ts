@@ -19,8 +19,15 @@ export async function findOrCreateRoles (
       // First check if a role with the same name already exist in the workspace
       const existingRole = await prisma.role.findFirst({
         where: {
-          name: externalRole.name,
-          spaceId
+          OR: [
+            {
+              name: externalRole.name,
+              spaceId
+            },
+            {
+              sourceId: String(externalRole.id)
+            }
+          ]
         }
       });
 
@@ -28,35 +35,31 @@ export async function findOrCreateRoles (
 
       // Only create the role if it doesn't already exist
       if (createRoles) {
-        charmVerseRole = await prisma.role.upsert({
-          where: {
-            spaceId_name: {
-              spaceId,
-              name: externalRole.name
+        const upsertData = {
+          name: externalRole.name,
+          space: {
+            connect: {
+              id: spaceId
             }
           },
-          update: {
-            name: externalRole.name,
-            space: {
-              connect: {
-                id: spaceId
-              }
+          createdBy: userId,
+          source,
+          sourceId: source !== null ? String(externalRole.id) : null
+        };
+
+        if (existingRole) {
+          charmVerseRole = await prisma.role.update({
+            where: {
+              id: existingRole.id
             },
-            createdBy: userId
-          },
-          create: {
-            name: externalRole.name,
-            space: {
-              connect: {
-                id: spaceId
-              }
-            },
-            createdBy: userId,
-            source,
-            // If there is a source, store the source role id for future reference
-            sourceId: source !== null ? String(externalRole.id) : null
-          }
-        });
+            data: upsertData
+          });
+        }
+        else {
+          charmVerseRole = await prisma.role.create({
+            data: upsertData
+          });
+        }
       }
 
       rolesRecord[externalRole.id] = charmVerseRole;
