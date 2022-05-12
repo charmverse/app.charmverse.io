@@ -18,7 +18,7 @@ export default function RedirectToMainPage () {
             && page?.parentId === null);
 
     // make sure this page is part of this space in case user is navigating to a new space
-    if (space && firstPage?.id === space.id) {
+    if (space && firstPage?.spaceId === space.id) {
       router.push(`/${space.domain}/${firstPage.path}`);
     }
 
