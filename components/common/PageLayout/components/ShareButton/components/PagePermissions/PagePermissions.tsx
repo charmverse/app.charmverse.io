@@ -195,6 +195,7 @@ export default function PagePermissions ({ pageId }: Props) {
                 onChange={level => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
                 keyAndLabel={permissionsWithRemove}
                 defaultValue={spaceLevelPermission?.permissionLevel}
+                autoExpand
               />
             ) : (
               <div onClick={() => {
@@ -234,7 +235,7 @@ export default function PagePermissions ({ pageId }: Props) {
       {
         sortedPermissions.map(permission => {
           return (
-            <Box display='block' py={0.5}>
+            <Box display='block' py={0.5} onMouseLeave={() => setSelectedPermissionId(null)}>
               <Box display='flex' justifyContent='space-between' alignItems='center' key={permission.displayName}>
                 <Typography variant='body2'>
                   {permission.displayName}
@@ -246,6 +247,7 @@ export default function PagePermissions ({ pageId }: Props) {
                       onChange={level => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
                       keyAndLabel={permissionsWithRemove}
                       defaultValue={permission.permissionLevel}
+                      autoExpand
                     />
                   ) : (
                     <div onClick={() => {
