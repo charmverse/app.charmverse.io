@@ -9,7 +9,12 @@ export async function assignGuildRolesForSpace (spaceId: string) {
     },
     select: {
       userId: true,
-      id: true
+      id: true,
+      user: {
+        select: {
+          addresses: true
+        }
+      }
     }
   });
 
@@ -38,20 +43,12 @@ export async function assignGuildRolesForSpace (spaceId: string) {
 
   for (const spaceRole of spaceRoles) {
     try {
-      const charmverseUser = await prisma.user.findUnique({
-        where: {
-          id: spaceRole.userId
-        },
-        select: {
-          addresses: true
-        }
-      });
-
+      const addresses = spaceRole.user.addresses;
       // Only proceed further if the user has at least a single address
-      if (charmverseUser && charmverseUser.addresses.length > 0) {
+      if (addresses.length > 0) {
         const guildRoleIdsSet: Set<string> = new Set();
         // Get all the guild roles associated with all of the addresses of the user
-        for (const address of charmverseUser.addresses) {
+        for (const address of addresses) {
           const guildMemberships = await user.getMemberships(address);
           guildMemberships?.forEach(guildMembership => {
             guildMembership.roleids.forEach(roleid => guildRoleIdsSet.add(String(roleid)));
