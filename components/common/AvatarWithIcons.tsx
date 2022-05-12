@@ -12,6 +12,7 @@ const StyledStack = styled(Stack)`
     background-color: black;
     opacity: 80%;
     border-radius: 10%;
+    display: none;
 
     & > svg {
       color: white;
@@ -20,21 +21,23 @@ const StyledStack = styled(Stack)`
 `;
 
 const StyledBox = styled(Box)`
-    display: inline-block;
     position: relative;
+
+    &:hover .icons-stack {
+      display: inline-block;
+    }
 `;
 
 export type AvatarWithIconsProps = InitialAvatarProps & {
     icons?: ReactNode;
-    isHovered: boolean;
 };
 
 export default function AvatarWithIcons (props: AvatarWithIconsProps) {
-  const { icons, isHovered } = props;
+  const { icons } = props;
 
   return (
     <StyledBox>
-      { isHovered && <StyledStack direction='row' spacing={2} p={0.5}>{ icons }</StyledStack> }
+      <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>{ icons }</StyledStack>
       <Avatar {...props} />
     </StyledBox>
   );

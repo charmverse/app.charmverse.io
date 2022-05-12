@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { useRef, useState, ReactNode } from 'react';
+import { useRef, ReactNode } from 'react';
 import AvatarWithIcons from 'components/common/AvatarWithIcons';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
@@ -38,14 +38,10 @@ const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | n
 
 export default function LargeAvatar (props: LargeAvatarProps) {
   const { name = '', spaceImage, updateImage } = props;
-  const [isHovered, setIsHovered] = useState(false);
   const inputFile = useRef<HTMLInputElement>(null);
 
   return (
-    <StyledBox
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <StyledBox>
       <input
         type='file'
         hidden
@@ -66,7 +62,6 @@ export default function LargeAvatar (props: LargeAvatarProps) {
       />
       <StyledAvatar
         avatar={spaceImage}
-        isHovered={isHovered}
         icons={
           getIcons(
             <EditIcon
