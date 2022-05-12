@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { GetGuildByIdResponse, guild } from '@guildxyz/sdk';
-import { assignGuildRolesForSpace } from 'lib/guild-xyz/server/assignGuildRolesForSpace';
+import { updateGuildRolesForSpace } from 'lib/guild-xyz/server/updateGuildRolesForSpace';
 
 const handler = nc({
   onError,
@@ -24,7 +24,7 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<{importedR
     guildRoles.push(..._guild.roles.map(role => ({ id: role.id, name: role.name })));
   });
   await findOrCreateRoles(guildRoles, spaceId, req.session.user.id, { source: 'guild_xyz' });
-  await assignGuildRolesForSpace(spaceId);
+  await updateGuildRolesForSpace(spaceId);
   res.status(200).json({ importedRolesCount: Object.keys(guildRoles).length });
 }
 

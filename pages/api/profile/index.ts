@@ -1,6 +1,6 @@
 
 import { prisma } from 'db';
-import { assignGuildRolesForUser } from 'lib/guild-xyz/server/assignGuildRolesForUser';
+import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -64,7 +64,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   }
   // Assign the roles imported from guild
   else {
-    await assignGuildRolesForUser(profile.addresses, profile.spaceRoles);
+    await updateGuildRolesForUser(profile.addresses, profile.spaceRoles);
   }
   return res.status(200).json(profile);
 }

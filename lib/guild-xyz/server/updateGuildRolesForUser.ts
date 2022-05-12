@@ -3,8 +3,9 @@ import { Role, SpaceRole } from '@prisma/client';
 import log from 'lib/log';
 import { getGuildRoleIds } from '../getGuildRoleIds';
 import { createRoleRecord } from './createRoleRecord';
+import { assignRolesToUser } from './assignRolesToUser';
 
-export async function assignGuildRolesForUser (addresses: string[], spaceRoles: (Pick<SpaceRole, 'spaceId' | 'id' | 'userId'> & {
+export async function updateGuildRolesForUser (addresses: string[], spaceRoles: (Pick<SpaceRole, 'spaceId' | 'id' | 'userId'> & {
   // Using the most strict/narrow types to make it easier to test
   spaceRoleToRole: {
       role: Pick<Role, 'source' | 'sourceId'>;
@@ -14,37 +15,7 @@ export async function assignGuildRolesForUser (addresses: string[], spaceRoles: 
   for (const spaceRole of spaceRoles) {
     try {
       const guildRoleIdCharmverseRoleIdRecord = await createRoleRecord(spaceRole.spaceId);
-      const charmverseRoleIds: string[] = [];
-      // Filter the roles that are part of the workspace only
-      userGuildRoleIds.forEach(
-        userGuildRoleId => {
-          if (guildRoleIdCharmverseRoleIdRecord[userGuildRoleId]) {
-            charmverseRoleIds.push(guildRoleIdCharmverseRoleIdRecord[userGuildRoleId]);
-          }
-        }
-      );
-
-      await prisma.$transaction(charmverseRoleIds.map(charmverseRoleId => prisma.spaceRoleToRole.upsert({
-        where: {
-          spaceRoleId_roleId: {
-            roleId: charmverseRoleId,
-            spaceRoleId: spaceRole.id
-          }
-        },
-        update: {},
-        create: {
-          role: {
-            connect: {
-              id: charmverseRoleId
-            }
-          },
-          spaceRole: {
-            connect: {
-              id: spaceRole.id
-            }
-          }
-        }
-      })));
+      await assignRolesToUser(Array.from(userGuildRoleIds), guildRoleIdCharmverseRoleIdRecord, spaceRole.id);
 
       const userGuildRoleIdsInSpace = spaceRole.spaceRoleToRole.filter(spaceRoleToRole => spaceRoleToRole.role.source === 'guild_xyz').map(spaceRoleToRole => spaceRoleToRole.role.sourceId as string);
 
@@ -70,7 +41,7 @@ export async function assignGuildRolesForUser (addresses: string[], spaceRoles: 
       })));
     }
     catch (_) {
-      log.debug(`[guild.xyz]: Failed to assign roles for userId:${spaceRole.userId}`);
+      log.debug(`[guild.xyz]: Failed to update roles for userId:${spaceRole.userId}`);
     }
   }
 }
