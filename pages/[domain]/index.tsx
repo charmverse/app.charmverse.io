@@ -10,15 +10,16 @@ export default function RedirectToMainPage () {
   const { pages } = usePages();
 
   useEffect(() => {
+
     // Find the first page that is not card and hasn't been deleted yet
     const firstPage = Object.values(pages)
       .find((page) => (page?.type === 'board' || page?.type === 'page') && page?.deletedAt === null);
-    if (space && firstPage?.spaceId === space.id) {
-      const page = pages[firstPage.id];
-      if (page) {
-        router.push(`/${space.domain}/${page.path}`);
-      }
+
+    // make sure this page is part of this space in case user is navigating to a new space
+    if (space && firstPage?.id === space.id) {
+      router.push(`/${space.domain}/${firstPage.path}`);
     }
+
   }, [space, pages]);
 
   return null;
