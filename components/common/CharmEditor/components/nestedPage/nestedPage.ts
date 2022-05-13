@@ -2,6 +2,7 @@ import { RawSpecs } from '@bangle.dev/core';
 import { DOMOutputSpec, Plugin, PluginKey } from '@bangle.dev/pm';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { PageLink } from 'lib/pages';
+import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 import { SuggestTooltipPluginState } from '../@bangle.dev/tooltip/suggest-tooltip';
 
@@ -155,6 +156,23 @@ export function nestedPagePlugins ({
       suggestTooltip.plugins({
         key: suggestTooltipKey,
         markName,
+        onEnter (_, __, view) {
+          const selectedMenuItem = document.querySelector('.mention-selected');
+          const value = selectedMenuItem?.getAttribute('data-value');
+
+          if (view && value) {
+            rafCommandExec(view, (state, dispatch) => {
+              const nestedPageNode = state.schema.nodes.page.create({
+                id: value
+              });
+              if (dispatch) {
+                dispatch(state.tr.replaceSelectionWith(nestedPageNode));
+              }
+              return true;
+            });
+          }
+          return false;
+        },
         tooltipRenderOpts: {
           ...tooltipRenderOpts,
           tooltipDOMSpec
