@@ -8,14 +8,15 @@ import MenuItem from '@mui/material/MenuItem';
 import { useContributors } from 'hooks/useContributors';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
-import { ReactNode, useCallback, memo } from 'react';
+import { ReactNode, useCallback, memo, useEffect } from 'react';
 import { usePages } from 'hooks/usePages';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import Link from 'next/link';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { Page } from '@prisma/client';
-import { hideSuggestionsTooltip, removeSuggestMark, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
+import { safeScrollIntoViewIfNeeded } from 'lib/browser';
+import { hideSuggestionsTooltip, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import { PagesList } from './PageList';
 import PopoverMenu, { GroupLabel } from './PopoverMenu';
@@ -189,6 +190,12 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
   const selectedGroup = roundedCounter < filteredContributors.length ? 'contributors' : 'pages';
   const activeItemIndex = selectedGroup === 'contributors' ? roundedCounter : roundedCounter - filteredContributors.length;
 
+  useEffect(() => {
+    const activeDomElement = document.querySelector('.mention-selected') as HTMLDivElement;
+    if (activeDomElement) {
+      safeScrollIntoViewIfNeeded(activeDomElement, true);
+    }
+  }, [activeItemIndex]);
   return (
     <PopoverMenu
       container={tooltipContentDOM}
