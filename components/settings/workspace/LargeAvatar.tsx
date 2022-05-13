@@ -1,5 +1,7 @@
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useRef, ReactNode } from 'react';
+import Avatar from 'components/common/Avatar';
 import AvatarWithIcons from 'components/common/AvatarWithIcons';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
@@ -10,10 +12,19 @@ const StyledBox = styled(Box)`
   display: inline-block;
 `;
 
-const StyledAvatar = styled(AvatarWithIcons)`
+const baseAvatarStyles = css`
   font-size: 90px;
   width: 150px;
   height: 150px;
+`;
+
+const StyledAvatar = styled(Avatar)`
+  ${baseAvatarStyles}
+  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
+`;
+
+const StyledAvatarWithIcons = styled(AvatarWithIcons)`
+  ${baseAvatarStyles}
   ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
 
   &:hover .edit-avatar-icon, .delete-avatar-icon {
@@ -26,9 +37,14 @@ type LargeAvatarProps = {
   spaceImage?: string | null | undefined;
   updateImage?: (url: string) => void;
   variant?: 'circular' | 'rounded' | 'square';
+  displayIcons?: boolean;
 };
 
-const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | null | undefined) => {
+const getIcons = (
+  editIcon,
+  deleteIcon,
+  avatar
+) => {
   if (!avatar) {
     return [editIcon];
   }
@@ -37,50 +53,61 @@ const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | n
 };
 
 export default function LargeAvatar (props: LargeAvatarProps) {
-  const { name = '', spaceImage, updateImage } = props;
+  const { name = '', spaceImage, updateImage, variant, displayIcons } = props;
   const inputFile = useRef<HTMLInputElement>(null);
 
   return (
-    <StyledBox>
-      <input
-        type='file'
-        hidden
-        accept='image/*'
-        ref={inputFile}
-        onChange={async (e) => {
-          const firstFile = e.target.files?.[0];
-          if (!firstFile) {
-            return;
-          }
+    displayIcons
+      ? (
+        <StyledBox>
+          <input
+            type='file'
+            hidden
+            accept='image/*'
+            ref={inputFile}
+            onChange={async (e) => {
+              const firstFile = e.target.files?.[0];
+              if (!firstFile) {
+                return;
+              }
 
-          const { url } = await uploadToS3(firstFile);
+              const { url } = await uploadToS3(firstFile);
 
-          if (updateImage) {
-            updateImage(url);
+              if (updateImage) {
+                updateImage(url);
+              }
+            }}
+          />
+          <StyledAvatarWithIcons
+            avatar={spaceImage}
+            icons={
+              getIcons(
+                <EditIcon
+                  onClick={() => inputFile && inputFile.current && inputFile.current.click()}
+                  fontSize='small'
+                  key='edit-avatar'
+                />,
+                <DeleteIcon
+                  onClick={() => updateImage && updateImage('')}
+                  fontSize='small'
+                  key='delete-avatar'
+                />,
+                spaceImage
+              )
           }
-        }}
-      />
-      <StyledAvatar
-        avatar={spaceImage}
-        icons={
-          getIcons(
-            <EditIcon
-              onClick={() => inputFile && inputFile.current && inputFile.current.click()}
-              fontSize='small'
-              key='edit-avatar'
-            />,
-            <DeleteIcon
-              onClick={() => updateImage && updateImage('')}
-              fontSize='small'
-              key='delete-avatar'
-            />,
-            spaceImage
-          )
-        }
-        {...props}
-      >
-        {name.charAt(0).toUpperCase()}
-      </StyledAvatar>
-    </StyledBox>
+            {...props}
+          >
+            {name.charAt(0).toUpperCase()}
+          </StyledAvatarWithIcons>
+        </StyledBox>
+      ) : (
+        <StyledAvatar
+          avatar={spaceImage}
+          name={name}
+          variant={variant}
+        >
+          {name.charAt(0).toUpperCase()}
+        </StyledAvatar>
+      )
   );
 }
