@@ -1,10 +1,11 @@
 import { RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec, Plugin, PluginKey } from '@bangle.dev/pm';
+import { Selection, DOMOutputSpec, Plugin, PluginKey, TextSelection } from '@bangle.dev/pm';
 import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { PageLink } from 'lib/pages';
 import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
-import { SuggestTooltipPluginState } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip, SuggestTooltipPluginState } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { replaceSuggestionMarkWith } from '../inlinePalette';
 
 const name = 'page';
 export const nestedPageSuggestMarkName = 'nestedPageSuggest';
@@ -161,12 +162,17 @@ export function nestedPagePlugins ({
           const value = selectedMenuItem?.getAttribute('data-value');
 
           if (view && value) {
+            replaceSuggestionMarkWith(key, '', true)(view.state, view.dispatch, view);
+            hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
             rafCommandExec(view, (state, dispatch) => {
               const nestedPageNode = state.schema.nodes.page.create({
                 id: value
               });
+              const tr = state.tr.replaceSelectionWith(nestedPageNode);
               if (dispatch) {
-                dispatch(state.tr.replaceSelectionWith(nestedPageNode));
+                dispatch(
+                  tr.setSelection(new TextSelection(tr.doc.resolve(tr.selection.$from.pos < 2 ? 1 : tr.selection.$from.pos - 2)))
+                );
               }
               return true;
             });

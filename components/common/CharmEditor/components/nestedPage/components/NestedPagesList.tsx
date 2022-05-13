@@ -5,11 +5,14 @@ import { useCallback, memo, useEffect } from 'react';
 import { usePages } from 'hooks/usePages';
 import { PluginKey } from 'prosemirror-state';
 import { safeScrollIntoViewIfNeeded } from 'lib/browser';
+import { rafCommandExec } from '@bangle.dev/utils';
+import { TextSelection } from '@bangle.dev/pm';
 import useNestedPage from '../hooks/useNestedPage';
 import { hideSuggestionsTooltip, SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { NestedPagePluginState } from '../nestedPage';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import { PagesList } from '../../PageList';
+import { replaceSuggestionMarkWith } from '../../inlinePalette';
 
 function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginState>}) {
   const { addNestedPage } = useNestedPage();
@@ -23,14 +26,27 @@ function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginS
   function onClose () {
     hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
   }
-  const filteredPages = (Object.values(pages).filter((page) => page && page?.deletedAt === null && (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)));
+
+  const filteredPages = (Object.values(pages).filter((page) => page && page?.deletedAt === null && (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase().trim()) : true)));
   const totalItems = filteredPages.length;
   const activeItemIndex = ((counter < 0 ? ((counter % totalItems) + totalItems) : counter) % totalItems);
 
   const onSelectPage = useCallback(
     (page: Page) => {
-      addNestedPage(page.id);
+      replaceSuggestionMarkWith(pluginKey, '', true)(view.state, view.dispatch, view);
       hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
+      rafCommandExec(view, (state, dispatch) => {
+        const nestedPageNode = state.schema.nodes.page.create({
+          id: page.id
+        });
+        const tr = state.tr.replaceSelectionWith(nestedPageNode);
+        if (dispatch) {
+          dispatch(
+            tr.setSelection(new TextSelection(tr.doc.resolve(tr.selection.$from.pos < 2 ? 1 : tr.selection.$from.pos - 2)))
+          );
+        }
+        return true;
+      });
     },
     [view]
   );

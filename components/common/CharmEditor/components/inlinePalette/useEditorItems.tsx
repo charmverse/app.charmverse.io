@@ -32,7 +32,7 @@ import {
 import { palettePluginKey } from './config';
 import { PaletteItem, PaletteItemType, PromisedCommand } from './paletteItem';
 import { insertNode } from '../../utils';
-import { NestedPagePluginState } from '../nestedPage';
+import { NestedPagePluginState, nestedPageSuggestMarkName } from '../nestedPage';
 
 const { convertToParagraph } = paragraph;
 const {
@@ -635,9 +635,11 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
               if (nestedPagePluginKey) {
                 const nestedPagePluginState = nestedPagePluginKey.getState(state);
                 if (nestedPagePluginState) {
-                  const { suggestTooltipKey } = nestedPagePluginState;
-                  hideSuggestionsTooltip(getSuggestTooltipKey(palettePluginKey)(state))(state, dispatch, view);
-                  renderSuggestionsTooltip(suggestTooltipKey, {})(state, dispatch, view);
+                  replaceSuggestionMarkWith(palettePluginKey, state.schema.text(' ', state.schema.marks[nestedPageSuggestMarkName].create({})), true)(
+                    state,
+                    dispatch,
+                    view
+                  );
                 }
                 return false;
               }

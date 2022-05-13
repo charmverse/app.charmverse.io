@@ -135,7 +135,7 @@ function pluginsFactory({
                 ...pluginState,
                 // Cannot use queryTriggerText because it relies on
                 // reading the pluginState which will not be there in newState.
-                triggerText: trigger ? getTriggerText(newState, markName, trigger) : pluginState.triggerText,
+                triggerText: getTriggerText(newState, markName, trigger),
                 show: true,
               };
             }
@@ -360,7 +360,7 @@ export function hideSuggestionsTooltip(key: PluginKey): Command {
   };
 }
 
-function getTriggerText(state: EditorState, markName: string, trigger: string) {
+function getTriggerText(state: EditorState, markName: string, trigger?: string) {
   const markType = state.schema.marks[markName];
 
   const { nodeBefore } = state.selection.$from;
@@ -378,12 +378,14 @@ function getTriggerText(state: EditorState, markName: string, trigger: string) {
   }
 
   const textContent = nodeBefore.textContent || '';
-  return (
-    textContent
-      // eslint-disable-next-line no-control-regex
-      .replace(/^([^\x00-\xFF]|[\s\n])+/g, '')
-      .replace(trigger, '')
-  );
+  const text = textContent
+  // eslint-disable-next-line no-control-regex
+  .replace(/^([^\x00-\xFF]|[\s\n])+/g, '')
+
+  if (trigger) {
+    return text.replace(trigger, '')
+  }
+  return text;
 }
 
 /** Commands */
@@ -404,6 +406,7 @@ export function queryIsSuggestTooltipActive(key: PluginKey) {
 export function replaceSuggestMarkWith(
   key: PluginKey,
   maybeNode?: string | Node | Fragment,
+  setSelection?: boolean
 ): Command {
   return (state, dispatch, view) => {
     const { markName } = key.getState(state);
@@ -433,7 +436,7 @@ export function replaceSuggestMarkWith(
 
       const isInputFragment = maybeNode instanceof Fragment;
 
-      let node;
+      let node: Node;
       try {
         node =
           maybeNode instanceof Node || isInputFragment
@@ -450,6 +453,9 @@ export function replaceSuggestMarkWith(
         tr = tr.replaceWith(start, start, node);
       } else if (node.isBlock) {
         tr = safeInsert(node)(tr);
+        if (setSelection) {
+          tr = tr.setSelection(Selection.near(tr.doc.resolve(start + 1)))
+        }
       } else if (node.isInline || isInputFragment) {
         const fragment = isInputFragment
           ? node
@@ -466,7 +472,7 @@ export function replaceSuggestMarkWith(
 
         // Placing cursor after node + space.
         tr = tr.setSelection(
-          Selection.near(tr.doc.resolve(start + fragment.size)),
+          Selection.near(tr.doc.resolve(start + (fragment as Fragment).size)),
         );
 
         return tr;
