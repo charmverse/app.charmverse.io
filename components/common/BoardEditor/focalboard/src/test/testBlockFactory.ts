@@ -34,7 +34,7 @@ class TestBlockFactory {
             const propertyOption: IPropertyOption = {
                 id: 'value1',
                 value: 'value 1',
-                color: 'propColorBrown',
+                color: 'propColorTurquoise',
             }
             const propertyTemplate: IPropertyTemplate = {
                 id: `property${i + 1}`,

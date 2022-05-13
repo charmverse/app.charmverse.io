@@ -4,6 +4,7 @@ import { prisma } from 'db';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { LoggedInUser } from 'models';
+import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -40,6 +41,7 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
   // strip out large fields so we dont break the cookie
   const { discordUser, spaceRoles, telegramUser, ...userData } = user;
   req.session.user = userData;
+  await updateGuildRolesForUser(userData.addresses, spaceRoles);
   await req.session.save();
 
   return res.status(200).json(user);

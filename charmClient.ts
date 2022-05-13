@@ -18,7 +18,7 @@ import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'lib/notion/types';
 // TODO: Maybe move these types to another place so that we dont import from backend
-import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
+import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { StartThreadRequest } from 'pages/api/threads';
@@ -27,19 +27,11 @@ import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pages';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
+import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
+import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
-
-export type ListSpaceRolesResponse = {
-  id: string;
-  name: string;
-  spaceRolesToRole: {
-      spaceRole: {
-          user: User;
-      };
-  }[];
-}
 
 export interface PopulatedBounty extends Bounty {
   applications: Application[];
@@ -215,8 +207,12 @@ class CharmClient {
     return http.POST<ConnectDiscordResponse>('/api/discord/createAccount', payload);
   }
 
-  importRolesFromDiscordServer (payload: ImportRolesPayload) {
+  importRolesFromDiscordServer (payload: ImportDiscordRolesPayload) {
     return http.POST<ImportRolesResponse>('/api/discord/importRoles', payload);
+  }
+
+  importRolesFromGuild (payload: ImportGuildRolesPayload) {
+    return http.POST<{importedRolesCount: number}>('/api/guild-xyz/importRoles', payload);
   }
 
   // FocalBoard

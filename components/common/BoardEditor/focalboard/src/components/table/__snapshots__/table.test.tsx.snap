@@ -184,7 +184,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               tabindex="0"
             >
               <span
-                class="Label propColorBrown "
+                class="Label propColorTurquoise "
               >
                 <span
                   class="Label-text"
@@ -272,7 +272,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               tabindex="0"
             >
               <span
-                class="Label propColorBrown "
+                class="Label propColorTurquoise "
               >
                 <span
                   class="Label-text"
@@ -572,7 +572,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               tabindex="0"
             >
               <span
-                class="Label propColorBrown "
+                class="Label propColorTurquoise "
               >
                 <span
                   class="Label-text"
@@ -660,7 +660,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               tabindex="0"
             >
               <span
-                class="Label propColorBrown "
+                class="Label propColorTurquoise "
               >
                 <span
                   class="Label-text"
@@ -960,7 +960,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               tabindex="0"
             >
               <span
-                class="Label propColorBrown "
+                class="Label propColorTurquoise "
               >
                 <span
                   class="Label-text"
@@ -1048,7 +1048,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               tabindex="0"
             >
               <span
-                class="Label propColorBrown "
+                class="Label propColorTurquoise "
               >
                 <span
                   class="Label-text"
@@ -1348,7 +1348,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               tabindex="0"
             >
               <span
-                class="Label propColorBrown "
+                class="Label propColorTurquoise "
               >
                 <span
                   class="Label-text"
@@ -1436,7 +1436,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               tabindex="0"
             >
               <span
-                class="Label propColorBrown "
+                class="Label propColorTurquoise "
               >
                 <span
                   class="Label-text"
@@ -1712,7 +1712,7 @@ exports[`components/table/Table should match snapshot 1`] = `
               tabindex="0"
             >
               <span
-                class="Label propColorBrown "
+                class="Label propColorTurquoise "
               >
                 <span
                   class="Label-text"
@@ -2187,7 +2187,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
               tabindex="0"
             >
               <span
-                class="Label propColorBrown "
+                class="Label propColorTurquoise "
               >
                 <span
                   class="Label-text"

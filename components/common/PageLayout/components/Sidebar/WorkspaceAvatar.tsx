@@ -10,8 +10,14 @@ const StyledAvatar = styled(Avatar)<{ active: boolean }>`
   ${({ active, theme }) => active && `box-shadow: 0 0 0 3px ${theme.palette.sidebar.avatarHighlight};`}
 `;
 
-export default function WorkspaceAvatar ({ active = false, name = '' }: { active?: boolean, name: string }) {
+type WorkspaceAvatarProps = {
+  active?: boolean;
+  name: string;
+  spaceImage: string | null;
+};
+
+export default function WorkspaceAvatar ({ active = false, name = '', spaceImage = '' }: WorkspaceAvatarProps) {
   return (
-    <StyledAvatar active={active} name={name} variant='rounded' />
+    <StyledAvatar active={active} avatar={spaceImage} name={name} variant='rounded' />
   );
 }

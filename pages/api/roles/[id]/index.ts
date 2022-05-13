@@ -1,5 +1,5 @@
 
-import { Role, SpaceRoleToRole } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { prisma } from 'db';
 import { ApiError, hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
@@ -69,9 +69,11 @@ async function updateRole (req: NextApiRequest, res: NextApiResponse) {
     });
   }
 
-  const updatedRole = await prisma.role.update({
+  // Can't update role that was imported from guild.xyz
+  const updatedRole = await prisma.role.updateMany({
     where: {
-      id: id as string
+      id: id as string,
+      source: null
     },
     data: {
       name

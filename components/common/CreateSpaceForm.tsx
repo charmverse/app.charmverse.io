@@ -29,7 +29,8 @@ export const schema = yup.object({
     }),
   name: yup.string().ensure().trim()
     .min(3, 'Name must be at least 3 characters')
-    .required('Name is required')
+    .required('Name is required'),
+  spaceImage: yup.string().nullable(true)
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -59,6 +60,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
 
   const watchName = watch('name');
   const watchDomain = watch('domain');
+  const watchSpaceImage = watch('spaceImage');
 
   function onSubmit (values: FormValues) {
     try {
@@ -106,7 +108,12 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
       <br />
       <Grid container direction='column' spacing={2}>
         <Grid item display='flex' justifyContent='center'>
-          <Avatar name={watchName} variant='rounded' />
+          <Avatar
+            name={watchName}
+            variant='rounded'
+            spaceImage={watchSpaceImage}
+            updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
+          />
         </Grid>
         <Grid item>
           <FieldLabel>Name</FieldLabel>

@@ -35,7 +35,7 @@ const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
 
 export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
   suggestion: 'purple',
-  open: 'green',
+  open: 'teal',
   assigned: 'yellow',
   review: 'orange',
   complete: 'pink',

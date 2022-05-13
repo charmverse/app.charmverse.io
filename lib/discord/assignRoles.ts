@@ -1,6 +1,5 @@
 import { Role } from '@prisma/client';
 import { prisma } from 'db';
-import { DiscordServerRole } from './createRoles';
 import { DiscordAccount } from './getDiscordAccount';
 
 export interface DiscordGuildMember {
@@ -16,7 +15,7 @@ export interface DiscordGuildMember {
 }
 
 export async function assignRolesFromDiscord (rolesRecord: Record<string,
-  { discord: DiscordServerRole, charmverse: Role | null }>, discordGuildMembers: DiscordGuildMember[], spaceId: string) {
+  Role | null>, discordGuildMembers: DiscordGuildMember[], spaceId: string) {
 
   for (const discordGuildMember of discordGuildMembers) {
     // No need to add role for a bot
@@ -46,11 +45,11 @@ export async function assignRolesFromDiscord (rolesRecord: Record<string,
           for (const role of discordGuildMember.roles) {
             const roleInRecord = rolesRecord[role];
             // If the role was created/fetched successfully
-            if (roleInRecord?.charmverse) {
+            if (roleInRecord) {
               // Check if the user already has the same role
               const charmverseUserExistingRole = await prisma.spaceRoleToRole.findFirst({
                 where: {
-                  roleId: roleInRecord.charmverse.id,
+                  roleId: roleInRecord.id,
                   spaceRoleId: charmverseUserSpaceRole.id
                 }
               });
@@ -60,7 +59,7 @@ export async function assignRolesFromDiscord (rolesRecord: Record<string,
                   data: {
                     role: {
                       connect: {
-                        id: roleInRecord.charmverse.id
+                        id: roleInRecord.id
                       }
                     },
                     spaceRole: {
