@@ -17,23 +17,18 @@ export async function updateGuildRolesForUser (addresses: string[], spaceRoles: 
     try {
       const userGuildRoleIds = await getGuildRoleIds(addresses);
       for (const spaceRole of spaceRoles) {
-        try {
-          const guildRoleIdCharmverseRoleIdRecord = await createRoleRecord(spaceRole.spaceId);
-          await assignRolesToUser(userGuildRoleIds, guildRoleIdCharmverseRoleIdRecord, spaceRole.id);
-          await unassignRolesFromUser({
-            userGuildRoleIdsInSpace: spaceRole.spaceRoleToRole.filter(spaceRoleToRole => spaceRoleToRole.role.source === 'guild_xyz').map(spaceRoleToRole => spaceRoleToRole.role.sourceId as string),
-            userGuildRoleIds,
-            guildRoleIdCharmverseRoleIdRecord,
-            spaceRoleId: spaceRole.id
-          });
-        }
-        catch (err) {
-          log.warn(`[guild.xyz]: Failed to update roles for userId:${spaceRole.userId}`, err);
-        }
+        const guildRoleIdCharmverseRoleIdRecord = await createRoleRecord(spaceRole.spaceId);
+        await assignRolesToUser(userGuildRoleIds, guildRoleIdCharmverseRoleIdRecord, spaceRole.id);
+        await unassignRolesFromUser({
+          userGuildRoleIdsInSpace: spaceRole.spaceRoleToRole.filter(spaceRoleToRole => spaceRoleToRole.role.source === 'guild_xyz').map(spaceRoleToRole => spaceRoleToRole.role.sourceId as string),
+          userGuildRoleIds,
+          guildRoleIdCharmverseRoleIdRecord,
+          spaceRoleId: spaceRole.id
+        });
       }
     }
     catch (err) {
-      log.warn('[guild.xyz]: Failed to fetch guild.xyz roles', err);
+      log.warn('[guild.xyz]: Failed to import guild.xyz roles', err);
     }
   }
 }
