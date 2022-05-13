@@ -14,8 +14,9 @@ import { PluginKey, TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
 import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import PageThread from '../PageThread';
-import { SuggestTooltipPluginKey, TooltipPluginState, hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { updateInlineComment } from './inlineComment.utils';
+import { InlineCommentPluginState } from './inlineComment.plugins';
 
 const ThreadContainer = styled(Paper)`
   max-height: 400px;
@@ -26,14 +27,13 @@ const ThreadContainer = styled(Paper)`
   overflow: auto;
 `;
 
-export default function InlineCommentThread () {
+export default function InlineCommentThread ({ pluginKey }: {pluginKey: PluginKey<InlineCommentPluginState>}) {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
     show: isVisible,
-    component,
     threadIds
-  } = usePluginState(SuggestTooltipPluginKey) as TooltipPluginState;
+  } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
 
   const { showingCommentThreadsList } = useCommentThreadsListDisplay();
@@ -43,11 +43,11 @@ export default function InlineCommentThread () {
     .filter(thread => !thread?.resolved)
     .sort((threadA, threadB) => threadA && threadB ? (new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime()) : 0);
 
-  if (!showingCommentThreadsList && isVisible && component === 'inlineComment' && unResolvedThreads.length !== 0) {
+  if (!showingCommentThreadsList && isVisible && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
     return createPortal(
       <ClickAwayListener onClickAway={() => {
-        hideSuggestionsTooltip(SuggestTooltipPluginKey)(view.state, view.dispatch, view);
+        hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
       }}
       >
         <Grow

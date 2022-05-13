@@ -120,10 +120,10 @@ export function scrollToThread (threadId: string) {
     let parentElement: HTMLElement | null = null;
     let element: HTMLElement | null = threadDocument;
     // Check for highest 5 levels of depth
-    for (let i = 0; i < 5; i++) {
-      element = threadDocument.parentElement;
+    for (let i = 0; i < 10; i++) {
+      element = element?.parentElement ?? null;
       // Get the first paragraph parent element
-      if (element?.classList.contains('bangle-nv-content')) {
+      if (element?.classList.contains('charm-paragraph')) {
         parentElement = element;
         break;
       }

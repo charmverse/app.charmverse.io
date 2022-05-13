@@ -1,11 +1,57 @@
 import { Plugin, RawPlugins } from '@bangle.dev/core';
-import { TextSelection } from '@bangle.dev/pm';
+import { PluginKey, TextSelection } from '@bangle.dev/pm';
+import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import { highlightDomElement } from 'lib/browser';
-import { renderSuggestionsTooltip, SuggestTooltipPluginKey } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { referenceElement, renderSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 
-export function plugin (): RawPlugins {
+export interface InlineCommentPluginState {
+  tooltipContentDOM: HTMLElement
+  show: boolean
+  threadIds: string[]
+}
+
+export function plugin ({ key } :{
+  key: PluginKey
+}): RawPlugins {
+  const tooltipDOMSpec = createTooltipDOM();
   return [
-    new Plugin({
+    new Plugin<InlineCommentPluginState>({
+      state: {
+        init () {
+          return {
+            show: false,
+            tooltipContentDOM: tooltipDOMSpec.contentDOM,
+            threadIds: []
+          };
+        },
+        apply (tr, pluginState) {
+          const meta = tr.getMeta(key);
+          if (meta === undefined) {
+            return pluginState;
+          }
+          if (meta.type === 'RENDER_TOOLTIP') {
+            return {
+              ...pluginState,
+              ...meta.value,
+              show: true
+            };
+          }
+          if (meta.type === 'HIDE_TOOLTIP') {
+            // Do not change object reference if show was and is false
+            if (pluginState.show === false) {
+              return pluginState;
+            }
+            return {
+              ...pluginState,
+              component: null,
+              threadIds: [],
+              show: false
+            };
+          }
+          throw new Error('Unknown type');
+        }
+      },
+      key,
       props: {
         handleClickOn: (view) => {
           const { $from, $to } = view.state.selection;
@@ -35,8 +81,7 @@ export function plugin (): RawPlugins {
               }
               else {
                 // If the page thread list isn't open, then we need to show the inline thread component
-                renderSuggestionsTooltip(SuggestTooltipPluginKey, {
-                  component: 'inlineComment',
+                renderSuggestionsTooltip(key, {
                   threadIds: [threadId]
                 })(view.state, view.dispatch, view);
               }
@@ -44,6 +89,20 @@ export function plugin (): RawPlugins {
           }
           return true;
         }
+      }
+    }),
+    tooltipPlacement.plugins({
+      stateKey: key,
+      renderOpts: {
+        placement: 'bottom',
+        tooltipDOMSpec,
+        getReferenceElement: referenceElement(key, (state) => {
+          const { selection } = state;
+          return {
+            end: selection.to,
+            start: selection.from
+          };
+        })
       }
     })
   ];

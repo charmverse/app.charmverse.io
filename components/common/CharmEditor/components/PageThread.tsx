@@ -335,7 +335,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                     avatarSize='small'
                     sx={{
                       '& .MuiTypography-root': {
-                        maxWidth: commentIndex === 0 ? thread.resolved ? 50 : 100 : 150,
+                        maxWidth: commentIndex === 0 && thread.resolved ? 100 : 150,
                         textOverflow: 'ellipsis',
                         overflow: 'hidden'
                       }

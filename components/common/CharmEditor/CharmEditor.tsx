@@ -44,7 +44,6 @@ import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
-import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 import * as table from './components/table';
 import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
@@ -60,6 +59,7 @@ const emojiSuggestPluginKey = new PluginKey('emojiSuggest');
 const mentionSuggestPluginKey = new PluginKey('mentionSuggest');
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
 const nestedPagePluginKey = new PluginKey('nestedPage');
+const inlineCommentPluginKey = new PluginKey('inlineComment');
 
 export const specRegistry = new SpecRegistry([
   // Comments to the right of each spec show if it supports markdown export
@@ -87,10 +87,6 @@ export const specRegistry = new SpecRegistry([
   iframeSpec(), // OK
   heading.spec(), // OK
   inlinePaletteSpecs(), // Not required
-  // table, // OK
-  // tableCell, // OK
-  // tableHeader, // OK
-  // tableRow, // OK
   callout.spec(), // OK
   cryptoPriceSpec(), // NO
   imageSpec(), // OK
@@ -101,12 +97,6 @@ export const specRegistry = new SpecRegistry([
   tabIndent.spec(),
   table.spec(), // OK - only for text content
   disclosure.spec()
-  // tables.tableNodes({
-  //   cellAttributes: { },
-  //   cellContent: 'My Cell',
-  //   cellContentGroup: 'My Group'
-  // })
-
 ]);
 
 export function charmEditorPlugins (
@@ -128,11 +118,6 @@ export function charmEditorPlugins (
           }
         }
       })
-    }),
-    suggestTooltipPlugins({
-      tooltipRenderOpts: {
-        placement: 'bottom'
-      }
     }),
     nestedPagePlugins({
       key: nestedPagePluginKey
@@ -208,12 +193,6 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.selectionShadowPlugin(),
     // @ts-ignore missing type
-    // table.typesEnforcer(),
-    // @ts-ignore missing type
-    // table.TableDateMenu('MM/DD/YYYY'),
-    // @ts-ignore missing type
-    // table.TableLabelMenu(),
-    // @ts-ignore missing type
     table.TableFiltersMenu(),
     trailingNode.plugins(),
     disclosure.plugins()
@@ -223,7 +202,9 @@ export function charmEditorPlugins (
   ];
 
   if (!disabledPageSpecificFeatures) {
-    basePlugins.push(inlineComment.plugin());
+    basePlugins.push(inlineComment.plugin({
+      key: inlineCommentPluginKey
+    }));
   }
 
   return () => basePlugins;
@@ -406,10 +387,16 @@ function CharmEditor (
       )}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
-
         switch (props.node.type.name) {
           case 'paragraph': {
-            return <Paragraph calculateInlineComments={!showingCommentThreadsList} {...props}>{_children}</Paragraph>;
+            return (
+              <Paragraph
+                inlineCommentPluginKey={inlineCommentPluginKey}
+                calculateInlineComments={!showingCommentThreadsList}
+                {...props}
+              >{_children}
+              </Paragraph>
+            );
           }
           case 'quote':
             return <Quote {...props}>{_children}</Quote>;
@@ -510,7 +497,7 @@ function CharmEditor (
         </PageThreadListBox>
       </Grow>
       )}
-      <InlineCommentThread />
+      <InlineCommentThread pluginKey={inlineCommentPluginKey} />
     </StyledReactBangleEditor>
   );
 }
