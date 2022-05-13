@@ -59,6 +59,7 @@ export interface ICharmEditorOutput {
 const emojiSuggestPluginKey = new PluginKey('emojiSuggest');
 const mentionSuggestPluginKey = new PluginKey('mentionSuggest');
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
+const nestedPagePluginKey = new PluginKey('nestedPage');
 
 export const specRegistry = new SpecRegistry([
   // Comments to the right of each spec show if it supports markdown export
@@ -133,7 +134,9 @@ export function charmEditorPlugins (
         placement: 'bottom'
       }
     }),
-    nestedPagePlugins(),
+    nestedPagePlugins({
+      key: nestedPagePluginKey
+    }),
     imagePlugins({
       handleDragAndDrop: false
     }),
@@ -484,9 +487,9 @@ function CharmEditor (
     >
       <FloatingMenu disableComments={disabledPageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionSuggestPluginKey} />
-      <NestedPagesList />
+      <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
-      <InlinePalette disableNestedPage={disabledPageSpecificFeatures} />
+      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
       {children}
       {!disabledPageSpecificFeatures && (
       <Grow

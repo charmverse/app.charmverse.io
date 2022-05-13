@@ -39,7 +39,7 @@ function specFactory({
   markColor,
 }: {
   markName: string;
-  trigger: string;
+  trigger?: string;
   markColor?: string;
 }): BaseRawMarkSpec {
   return {
@@ -76,7 +76,7 @@ interface PluginsOptions {
   key?: PluginKey;
   tooltipRenderOpts: SuggestTooltipRenderOpts;
   markName: string;
-  trigger: string;
+  trigger?: string;
   keybindings?: any;
   onEnter?: Command;
   onArrowDown?: Command;
@@ -89,7 +89,7 @@ export interface SuggestTooltipPluginState {
   triggerText: string;
   show: boolean;
   counter: number;
-  trigger: string;
+  trigger?: string;
   markName: string;
 }
 
@@ -135,7 +135,7 @@ function pluginsFactory({
                 ...pluginState,
                 // Cannot use queryTriggerText because it relies on
                 // reading the pluginState which will not be there in newState.
-                triggerText: getTriggerText(newState, markName, trigger),
+                triggerText: trigger ? getTriggerText(newState, markName, trigger) : pluginState.triggerText,
                 show: true,
               };
             }
@@ -183,7 +183,7 @@ function pluginsFactory({
           }),
         },
       }),
-      triggerInputRule(schema, markName, trigger),
+      trigger && triggerInputRule(schema, markName, trigger),
       tooltipController({
         trigger,
         markName,
@@ -248,7 +248,7 @@ function tooltipController({
   markName,
 }: {
   key: PluginKey;
-  trigger: string;
+  trigger?: string;
   markName: string;
 }) {
   return new Plugin({
@@ -260,6 +260,7 @@ function tooltipController({
             return;
           }
           const markType = state.schema.marks[markName];
+          debugger;
           if (
             lastState.doc.eq(state.doc) &&
             state.selection.eq(lastState && lastState.selection) &&
@@ -276,7 +277,7 @@ function tooltipController({
           // stayed.
           // Example `<mark>/hello</mark>` --(user deletes the /)-> `<mark>hello</mark>`
           // -> (clear) ->  hello
-          if (isMarkActive && !doesQueryHaveTrigger(state, markType, trigger)) {
+          if (isMarkActive && trigger && !doesQueryHaveTrigger(state, markType, trigger)) {
             removeSuggestMark(key)(state, view.dispatch, view);
             return;
           }
@@ -289,10 +290,7 @@ function tooltipController({
             return;
           }
 
-          renderSuggestionsTooltip(key, {
-            component: "nestedPage",
-            selection: state.selection
-          })(view.state, view.dispatch, view);
+          renderSuggestionsTooltip(key, {})(view.state, view.dispatch, view);
           return;
         },
       };

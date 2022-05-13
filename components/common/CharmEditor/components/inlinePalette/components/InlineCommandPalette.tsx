@@ -1,4 +1,4 @@
-import { EditorView } from '@bangle.dev/pm';
+import { EditorView, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { MenuItem } from '@mui/material';
@@ -15,6 +15,7 @@ import {
 } from '../paletteItem';
 import { useEditorItems } from '../useEditorItems';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
+import { NestedPagePluginState } from '../../nestedPage';
 
 function getItemsAndHints (
   view: EditorView,
@@ -66,10 +67,12 @@ const InlinePaletteGroup = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
-export default function InlineCommandPalette ({ disableNestedPage = false }: {disableNestedPage?: boolean}) {
+export default function InlineCommandPalette (
+  { nestedPagePluginKey, disableNestedPage = false }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>, disableNestedPage?: boolean}
+) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
-  const editorItems = useEditorItems();
+  const editorItems = useEditorItems({ nestedPagePluginKey });
   const isItemDisabled = useCallback(
     (item) => {
       return typeof item.disabled === 'function'

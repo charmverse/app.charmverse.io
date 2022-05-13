@@ -3,7 +3,7 @@ import {
   paragraph
 } from '@bangle.dev/base-components';
 import { EditorState, Fragment, Node, setBlockType, Transaction, wrapIn } from '@bangle.dev/pm';
-import { TextSelection } from 'prosemirror-state';
+import { PluginKey, TextSelection } from 'prosemirror-state';
 import { rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
@@ -20,19 +20,19 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import { renderSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
-import { NestedPagePluginKey } from 'components/common/CharmEditor/components/nestedPage/nestedPage';
+import { hideSuggestionsTooltip, renderSuggestionsTooltip, replaceSuggestMarkWith } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
 import useNestedPage from 'components/common/CharmEditor/components/nestedPage/hooks/useNestedPage';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 import { useMemo } from 'react';
-import { replaceSuggestionMarkWith } from './inlinePalette';
+import { getSuggestTooltipKey, replaceSuggestionMarkWith } from './inlinePalette';
 import {
   isList
 } from './commands';
 import { palettePluginKey } from './config';
 import { PaletteItem, PaletteItemType, PromisedCommand } from './paletteItem';
 import { insertNode } from '../../utils';
+import { NestedPagePluginState } from '../nestedPage';
 
 const { convertToParagraph } = paragraph;
 const {
@@ -596,7 +596,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
   ]
 };
 
-export function useEditorItems () {
+export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>}) {
   const { addNestedPage } = useNestedPage();
 
   const paletteItems = useMemo(() => {
@@ -632,12 +632,16 @@ export function useEditorItems () {
           description: 'Link to a new page',
           editorExecuteCommand: (() => {
             return (async (state, dispatch, view) => {
-              renderSuggestionsTooltip(NestedPagePluginKey, { component: 'nestedPage', threadIds: [] })(state, dispatch, view);
-              return replaceSuggestionMarkWith(palettePluginKey, '')(
-                state,
-                dispatch,
-                view
-              );
+              if (nestedPagePluginKey) {
+                const nestedPagePluginState = nestedPagePluginKey.getState(state);
+                if (nestedPagePluginState) {
+                  const { suggestTooltipKey } = nestedPagePluginState;
+                  hideSuggestionsTooltip(getSuggestTooltipKey(palettePluginKey)(state))(state, dispatch, view);
+                  renderSuggestionsTooltip(suggestTooltipKey, {})(state, dispatch, view);
+                }
+                return false;
+              }
+              return false;
             }) as PromisedCommand;
           })
         }

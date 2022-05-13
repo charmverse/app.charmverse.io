@@ -3,30 +3,29 @@ import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { Page } from 'models';
 import { useCallback, memo } from 'react';
 import { usePages } from 'hooks/usePages';
+import { PluginKey } from 'prosemirror-state';
 import useNestedPage from '../hooks/useNestedPage';
-import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import { NestedPagePluginKey, NestedPagePluginState } from '../nestedPage';
+import { hideSuggestionsTooltip, SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import { NestedPagePluginState } from '../nestedPage';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import { PagesList } from '../../PageList';
 
-function NestedPagesList () {
-
+function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginState>}) {
   const { addNestedPage } = useNestedPage();
   const { pages } = usePages();
   const view = useEditorViewContext();
-
   const {
     tooltipContentDOM,
-    show: isVisible
-  } = usePluginState(NestedPagePluginKey) as NestedPagePluginState;
-
+    suggestTooltipKey
+  } = usePluginState(pluginKey) as NestedPagePluginState;
+  const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   function onClose () {
-    hideSuggestionsTooltip(NestedPagePluginKey)(view.state, view.dispatch, view);
+    hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
   }
   const onSelectPage = useCallback(
     (page: Page) => {
       addNestedPage(page.id);
-      hideSuggestionsTooltip(NestedPagePluginKey)(view.state, view.dispatch, view);
+      hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
     },
     [view]
   );

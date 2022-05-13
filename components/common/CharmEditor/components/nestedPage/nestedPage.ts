@@ -1,18 +1,18 @@
 import { RawSpecs } from '@bangle.dev/core';
-import { DOMOutputSpec, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
-import { createTooltipDOM, SuggestTooltipRenderOpts, tooltipPlacement } from '@bangle.dev/tooltip';
+import { DOMOutputSpec, Plugin, PluginKey } from '@bangle.dev/pm';
+import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { PageLink } from 'lib/pages';
-import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import { SuggestTooltipPluginState } from '../@bangle.dev/tooltip/suggest-tooltip';
 
 const name = 'page';
+export const nestedPageSuggestMarkName = 'nestedPageSuggest';
 
 export interface NestedPagePluginState {
-  show: boolean;
-  counter: number;
   tooltipContentDOM: HTMLElement
+  markName: string
+  suggestTooltipKey: PluginKey<SuggestTooltipPluginState>
 }
-
-export const NestedPagePluginKey = new PluginKey<NestedPagePluginState>('suggest_tooltip');
 
 /**
  * Encloses a nested page with markers so it can be parsed after the markdown serialiser has run on the whole document.
@@ -88,7 +88,7 @@ export async function replaceNestedPages (convertedToMarkdown: string): Promise<
 }
 
 export function nestedPageSpec (): RawSpecs {
-  return {
+  return [{
     type: 'node',
     name,
     schema: {
@@ -117,79 +117,49 @@ export function nestedPageSpec (): RawSpecs {
         }
       }
     }
-  };
+  }, suggestTooltip.spec({ markName: nestedPageSuggestMarkName })];
 }
 
-export function nestedPagePlugins () {
+export function nestedPagePlugins ({
+  key,
+  markName = nestedPageSuggestMarkName,
+  tooltipRenderOpts = {}
+}: {
+  markName?: string;
+  key: PluginKey<NestedPagePluginState>;
+  tooltipRenderOpts?: SuggestTooltipRenderOpts;
+}) {
+  return () => {
+    const suggestTooltipKey = new PluginKey('suggestTooltipKey');
 
-  const tooltipRenderOpts: SuggestTooltipRenderOpts = {
-    placement: 'bottom-start'
-  };
-  const tooltipDOMSpec = createTooltipDOM();
+    // We are converting to DOM elements so that their instances
+    // can be shared across plugins.
+    const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
 
-  return [
-    new Plugin<NestedPagePluginState, Schema>({
-      key: NestedPagePluginKey,
-      state: {
-        init () {
-          return {
-            show: false,
-            counter: 0,
-            tooltipContentDOM: tooltipDOMSpec.contentDOM
-          };
-        },
-        apply (tr, pluginState) {
-          const meta = tr.getMeta(NestedPagePluginKey);
-          // console.log('NESTED', tr);
-          if (meta === undefined) {
+    return [
+      new Plugin({
+        key,
+        state: {
+          init () {
+            return {
+              tooltipContentDOM: tooltipDOMSpec.contentDOM,
+              markName,
+              suggestTooltipKey
+            };
+          },
+          apply (_, pluginState) {
             return pluginState;
           }
-          if (meta.type === 'RENDER_TOOLTIP') {
-            return {
-              ...pluginState,
-              show: true
-            };
-          }
-          if (meta.type === 'HIDE_TOOLTIP') {
-            // Do not change object reference if show was and is false
-            if (pluginState.show === false) {
-              return pluginState;
-            }
-            return {
-              ...pluginState,
-              show: false,
-              counter: 0
-            };
-          }
-          if (meta.type === 'INCREMENT_COUNTER') {
-            return { ...pluginState, counter: pluginState.counter + 1 };
-          }
-          if (meta.type === 'RESET_COUNTER') {
-            return { ...pluginState, counter: 0 };
-          }
-          if (meta.type === 'UPDATE_COUNTER') {
-            return { ...pluginState, counter: meta.value };
-          }
-          if (meta.type === 'DECREMENT_COUNTER') {
-            return { ...pluginState, counter: pluginState.counter - 1 };
-          }
-          throw new Error('Unknown type');
         }
-      }
-    }),
-    tooltipPlacement.plugins({
-      stateKey: NestedPagePluginKey,
-      renderOpts: {
-        ...tooltipRenderOpts,
-        tooltipDOMSpec,
-        getReferenceElement: referenceElement(NestedPagePluginKey, (state) => {
-          const { selection } = state;
-          return {
-            end: selection.to,
-            start: selection.from
-          };
-        })
-      }
-    })
-  ];
+      }),
+      suggestTooltip.plugins({
+        key: suggestTooltipKey,
+        markName,
+        tooltipRenderOpts: {
+          ...tooltipRenderOpts,
+          tooltipDOMSpec
+        }
+      })
+    ];
+  };
 }
