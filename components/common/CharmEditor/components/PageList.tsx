@@ -25,7 +25,7 @@ export function PagesList (
             >
               <>
                 <ListItemIcon>
-                  <PageIcon icon={page.icon} isEditorEmpty={Boolean(isEditorEmpty)} pageType={page.type} />
+                  <PageIcon icon={page.icon} isEditorEmpty={isEditorEmpty} pageType={page.type} />
                 </ListItemIcon>
                 <PageTitle
                   hasContent={page.title.length === 0}

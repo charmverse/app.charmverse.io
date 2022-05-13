@@ -13,6 +13,9 @@ import {useSortable} from '../../hooks/sortable'
 
 import PropertyValueElement from '../propertyValueElement'
 import PageIcon from 'components/common/PageLayout/components/PageIcon'
+import { usePages } from 'hooks/usePages'
+import { checkForEmpty } from 'components/common/CharmEditor/utils'
+import { PageContent } from 'models'
 
 type Props = {
     board: Board
@@ -48,7 +51,7 @@ function TableRow (props: Props) {
     const isManualSort = activeView.fields.sortOptions.length === 0
     const isGrouped = Boolean(activeView.fields.groupById)
     const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readonly && (isManualSort || isGrouped), props.onDrop)
-
+    const {pages} = usePages()
     useEffect(() => {
         if (props.focusOnMount) {
             setTimeout(() => titleRef.current?.focus(), 10)
@@ -90,7 +93,7 @@ function TableRow (props: Props) {
                 ref={columnRefs.get(Constants.titleColumnId)}
             >
                 <div className='octo-icontitle'>
-                    <PageIcon isEditorEmpty={false} pageType="page" icon={pageIcon}/>
+                    <PageIcon isEditorEmpty={checkForEmpty(pages[card.id]?.content as PageContent)} pageType="page" icon={pageIcon}/>
                     <Editable
                         ref={titleRef}
                         value={title}

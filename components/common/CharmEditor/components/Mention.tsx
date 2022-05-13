@@ -16,10 +16,12 @@ import Link from 'next/link';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { Page } from '@prisma/client';
 import { safeScrollIntoViewIfNeeded } from 'lib/browser';
+import { PageContent } from 'models';
 import { hideSuggestionsTooltip, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import { PagesList } from './PageList';
 import PopoverMenu, { GroupLabel } from './PopoverMenu';
+import { checkForEmpty } from '../utils';
 
 const name = 'mention';
 
@@ -276,7 +278,7 @@ export function Mention ({ node }: NodeViewProps) {
         cursor: 'pointer'
       }}
       >
-        <PageIcon icon={page.icon} isEditorEmpty={false} pageType={page.type} />
+        <PageIcon icon={page.icon} isEditorEmpty={checkForEmpty(page.content as PageContent)} pageType={page.type} />
         <div>{page.title || 'Untitled'}</div>
       </Box>
     </Link>

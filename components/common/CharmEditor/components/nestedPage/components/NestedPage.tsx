@@ -13,6 +13,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { PageContent } from 'models';
 import Link from 'next/link';
+import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import useNestedPage from '../hooks/useNestedPage';
 
 const NestedPageContainer = styled((props: any) => <div {...props} />)`
@@ -41,12 +42,7 @@ export default function NestedPage ({ node, getPos, view }: NodeViewProps) {
   const nestedPage = pages[node.attrs.id];
   const popupState = usePopupState({ variant: 'popover', popupId: 'nested-page' });
 
-  const docContent = ((nestedPage?.content) as PageContent)?.content;
-
-  const isEditorEmpty = Boolean(
-    docContent && (docContent.length <= 1
-    && (!docContent[0] || (docContent[0] as PageContent)?.content?.length === 0))
-  );
+  const isEditorEmpty = checkForEmpty(nestedPage?.content as PageContent);
 
   const fullPath = `${window.location.origin}/${space?.domain}/${nestedPage?.path}`;
 

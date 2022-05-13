@@ -260,7 +260,6 @@ function tooltipController({
             return;
           }
           const markType = state.schema.marks[markName];
-          debugger;
           if (
             lastState.doc.eq(state.doc) &&
             state.selection.eq(lastState && lastState.selection) &&
