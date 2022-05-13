@@ -53,7 +53,7 @@ function createBoard (block?: Block, addDefaultProperty?: boolean): Board {
       name: 'Status',
       type: 'select',
       options: [{
-        color: 'propColorGreen',
+        color: 'propColorTeal',
         id: v4(),
         value: 'Completed'
       }, {

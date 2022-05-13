@@ -54,7 +54,7 @@ function createBoard({block, addDefaultProperty}: {block?: Block, addDefaultProp
             name: 'Status',
             type: 'select',
             options: [{
-              color: 'propColorGreen',
+              color: 'propColorTeal',
               id: Utils.createGuid(IDType.BlockID),
               value: 'Completed'
             }, {

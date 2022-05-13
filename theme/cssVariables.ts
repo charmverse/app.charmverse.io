@@ -30,15 +30,15 @@ const globalCSS = css`
 
   // Label Colors
   --prop-default: #fff;
-  --prop-gray: #ededed;
-  --prop-brown: #f7ddc3;
-  --prop-orange: #ffd3c1;
-  --prop-yellow: #f7f0b6;
-  --prop-green: #c7eac3;
-  --prop-blue: #b1d1f6;
-  --prop-purple: #e6d0ff;
-  --prop-pink: #ffd6e9;
-  --prop-red: #ffa9a9;
+  --prop-gray: #E7E7E6;
+  --prop-turquoise: #C2DCF2;
+  --prop-orange: #F4D8D0;
+  --prop-yellow: #EFE9CB;
+  --prop-teal: #D0F4F1;
+  --prop-blue: #C1E7F4;
+  --prop-purple: #D7D3F4;
+  --prop-red: #F2CCD6;
+  --prop-pink: #E8D3ED;
 
   // Elevations
   --elevation-1: 0 2px 3px 0 rgba(0, 0, 0, 0.08);
