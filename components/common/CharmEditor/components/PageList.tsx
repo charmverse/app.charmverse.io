@@ -16,6 +16,9 @@ export function PagesList (
           const isEditorEmpty = checkForEmpty(docContent);
           return (
             <MenuItem
+              data-value={page.id}
+              data-type='page'
+              className={pageIndex === activeItemIndex ? 'mention-selected' : ''}
               onClick={() => onSelectPage(page)}
               key={page.id}
               selected={pageIndex === activeItemIndex}

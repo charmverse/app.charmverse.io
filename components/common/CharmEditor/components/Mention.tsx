@@ -15,7 +15,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import Link from 'next/link';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
 import { Page } from '@prisma/client';
-import { hideSuggestionsTooltip, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip, removeSuggestMark, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import { PagesList } from './PageList';
 import PopoverMenu, { GroupLabel } from './PopoverMenu';
@@ -32,12 +32,12 @@ export interface MentionPluginState {
 }
 
 export function mentionPlugins ({
-  key = new PluginKey('emojiSuggestMenu'),
+  key = new PluginKey<MentionPluginState>('emojiSuggestMenu'),
   markName = mentionSuggestMarkName,
   tooltipRenderOpts = {}
 }: {
   markName?: string;
-  key: PluginKey;
+  key: PluginKey<MentionPluginState>;
   tooltipRenderOpts?: SuggestTooltipRenderOpts;
 }) {
   return ({
@@ -74,6 +74,15 @@ export function mentionPlugins ({
         key: suggestTooltipKey,
         markName,
         trigger,
+        onEnter (state, dispatch, view) {
+          const selectedMenuItem = document.querySelector('.mention-selected');
+          const value = selectedMenuItem?.getAttribute('data-value');
+          const type = selectedMenuItem?.getAttribute('data-type');
+          if (value && type && view) {
+            return selectMention(key, value, type)(state, dispatch, view);
+          }
+          return false;
+        },
         tooltipRenderOpts: {
           ...tooltipRenderOpts,
           tooltipDOMSpec
@@ -132,9 +141,7 @@ export function selectMention (key: PluginKey, mentionValue: string, mentionType
       value: mentionValue,
       type: mentionType
     });
-
     const suggestKey = getSuggestTooltipKey(key)(state);
-
     return suggestTooltip.replaceSuggestMarkWith(suggestKey, mentionNode)(
       state,
       dispatch,
@@ -144,7 +151,6 @@ export function selectMention (key: PluginKey, mentionValue: string, mentionType
 }
 
 function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey<MentionPluginState>}) {
-
   const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
 
   const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
@@ -202,22 +208,28 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
         <GroupLabel>Contributors</GroupLabel>
         {filteredContributors.length === 0 ? <Typography sx={{ ml: 2 }} variant='subtitle2' color='secondary'>No contributors found</Typography> : (
           <div>
-            {filteredContributors.map((contributor, contributorIndex) => (
-              <MenuItem
-                component='div'
-                onClick={() => onSelectMention(contributor.id, 'user')}
-                key={contributor.id}
-                selected={selectedGroup === 'contributors' ? activeItemIndex === contributorIndex : false}
-              >
-                <ReviewerOption
-                  style={{
-                    alignItems: 'center'
-                  }}
-                  user={contributor}
-                  avatarSize='small'
-                />
-              </MenuItem>
-            ))}
+            {filteredContributors.map((contributor, contributorIndex) => {
+              const isSelected = selectedGroup === 'contributors' ? activeItemIndex === contributorIndex : false;
+              return (
+                <MenuItem
+                  component='div'
+                  onClick={() => onSelectMention(contributor.id, 'user')}
+                  key={contributor.id}
+                  selected={isSelected}
+                  data-value={contributor.id}
+                  data-type='user'
+                  className={isSelected ? 'mention-selected' : ''}
+                >
+                  <ReviewerOption
+                    style={{
+                      alignItems: 'center'
+                    }}
+                    user={contributor}
+                    avatarSize='small'
+                  />
+                </MenuItem>
+              );
+            })}
           </div>
         )}
         <Divider sx={{
