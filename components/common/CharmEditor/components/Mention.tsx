@@ -205,7 +205,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
       onClose={() => {
         hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
       }}
-      width={460}
+      width={350}
     >
       <Box
         sx={{
