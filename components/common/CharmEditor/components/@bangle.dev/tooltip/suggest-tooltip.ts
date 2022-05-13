@@ -85,7 +85,7 @@ interface PluginsOptions {
   onArrowLeft?: Command;
   onArrowRight?: Command;
 }
-interface PluginState {
+export interface SuggestTooltipPluginState {
   triggerText: string;
   show: boolean;
   counter: number;
@@ -113,7 +113,7 @@ function pluginsFactory({
   return ({ schema }: { schema: Schema }) => {
     const isActiveCheck = queryIsSuggestTooltipActive(key);
     return [
-      new Plugin<PluginState, Schema>({
+      new Plugin<SuggestTooltipPluginState, Schema>({
         key,
         state: {
           init(_, _state) {
@@ -596,7 +596,7 @@ export function updateSuggestTooltipCounter(
   };
 }
 
-export interface SuggestTooltipPluginState {
+export interface TooltipPluginState {
   show: boolean;
   tooltipContentDOM: HTMLElement
   component: null | "nestedPage" | "inlineComment"
@@ -607,13 +607,13 @@ export interface SuggestTooltipPluginOptions {
   tooltipRenderOpts: SuggestTooltipRenderOpts;
 }
 
-export const SuggestTooltipPluginKey = new PluginKey<SuggestTooltipPluginState, Schema>('suggest_tooltip');
+export const SuggestTooltipPluginKey = new PluginKey<TooltipPluginState, Schema>('suggest_tooltip');
 
 export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPluginOptions) {
   const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
 
   return [
-    new Plugin<SuggestTooltipPluginState, Schema>({
+    new Plugin<TooltipPluginState, Schema>({
       key: SuggestTooltipPluginKey,
       state: {
         init () {

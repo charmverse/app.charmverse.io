@@ -14,7 +14,8 @@ import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import Link from 'next/link';
 import { ReviewerOption } from 'components/common/form/InputSearchContributor';
-import { hideSuggestionsTooltip } from './@bangle.dev/tooltip/suggest-tooltip';
+import { Page } from '@prisma/client';
+import { hideSuggestionsTooltip, SuggestTooltipPluginState } from './@bangle.dev/tooltip/suggest-tooltip';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import { PagesList } from './PageList';
 import PopoverMenu, { GroupLabel } from './PopoverMenu';
@@ -23,6 +24,12 @@ const name = 'mention';
 
 export const mentionSuggestMarkName = 'mentionSuggest';
 export const mentionTrigger = '@';
+
+export interface MentionPluginState {
+  tooltipContentDOM: HTMLElement
+  markName: string
+  suggestTooltipKey: PluginKey<SuggestTooltipPluginState>
+}
 
 export function mentionPlugins ({
   key = new PluginKey('emojiSuggestMenu'),
@@ -136,11 +143,11 @@ export function selectMention (key: PluginKey, mentionValue: string, mentionType
   };
 }
 
-function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey}) {
+function MentionSuggest ({ pluginKey }: {pluginKey: PluginKey<MentionPluginState>}) {
 
-  const { suggestTooltipKey } = usePluginState(pluginKey);
+  const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
 
-  const { show: isVisible } = usePluginState(suggestTooltipKey);
+  const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
 
   if (isVisible) {
     return <MentionSuggestMenu pluginKey={pluginKey} />;
@@ -155,8 +162,8 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
     tooltipContentDOM,
     suggestTooltipKey
   } = usePluginState(pluginKey);
-  const { show: isVisible, triggerText } = usePluginState(suggestTooltipKey);
-
+  const { show: isVisible, triggerText, counter } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
+  const { pages } = usePages();
   const onSelectMention = useCallback(
     (value: string, type: string) => {
       selectMention(pluginKey, value, type)(view.state, view.dispatch, view);
@@ -167,8 +174,14 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
 
   const filteredContributors = triggerText.length !== 0 ? contributors.filter(
     contributor => (
-      contributor.username?.toLowerCase()?.startsWith(triggerText.toLowercase()))
+      contributor.username?.toLowerCase()?.startsWith(triggerText.toLowerCase()))
   ) : contributors;
+
+  const filteredPages = (Object.values(pages).filter((page) => page && page?.deletedAt === null && (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)));
+  const totalItems = (filteredContributors.length + filteredPages.length);
+  const roundedCounter = ((counter < 0 ? ((counter % totalItems) + totalItems) : counter) % totalItems);
+  const selectedGroup = roundedCounter < filteredContributors.length ? 'contributors' : 'pages';
+  const activeItemIndex = selectedGroup === 'contributors' ? roundedCounter : roundedCounter - filteredContributors.length;
 
   return (
     <PopoverMenu
@@ -189,11 +202,12 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
         <GroupLabel>Contributors</GroupLabel>
         {filteredContributors.length === 0 ? <Typography sx={{ ml: 2 }} variant='subtitle2' color='secondary'>No contributors found</Typography> : (
           <div>
-            {filteredContributors.map(contributor => (
+            {filteredContributors.map((contributor, contributorIndex) => (
               <MenuItem
                 component='div'
                 onClick={() => onSelectMention(contributor.id, 'user')}
                 key={contributor.id}
+                selected={selectedGroup === 'contributors' ? activeItemIndex === contributorIndex : false}
               >
                 <ReviewerOption
                   style={{
@@ -211,7 +225,7 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
         }}
         />
         <GroupLabel>Pages</GroupLabel>
-        <PagesList queryText={triggerText} onSelectPage={(page) => onSelectMention(page.id, 'page')} />
+        <PagesList activeItemIndex={selectedGroup === 'pages' ? activeItemIndex : -1} pages={filteredPages as Page[]} onSelectPage={(page) => onSelectMention(page.id, 'page')} />
       </Box>
     </PopoverMenu>
   );

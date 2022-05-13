@@ -2,6 +2,7 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { Page } from 'models';
 import { useCallback, memo } from 'react';
+import { usePages } from 'hooks/usePages';
 import useNestedPage from '../hooks/useNestedPage';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { NestedPagePluginKey, NestedPagePluginState } from '../nestedPage';
@@ -11,7 +12,7 @@ import { PagesList } from '../../PageList';
 function NestedPagesList () {
 
   const { addNestedPage } = useNestedPage();
-
+  const { pages } = usePages();
   const view = useEditorViewContext();
 
   const {
@@ -33,7 +34,7 @@ function NestedPagesList () {
   return (
     <PopoverMenu container={tooltipContentDOM} isOpen={isVisible} onClose={onClose} width={460}>
       <GroupLabel>Select a page</GroupLabel>
-      <PagesList onSelectPage={onSelectPage} />
+      <PagesList pages={Object.values(pages) as Page[]} onSelectPage={onSelectPage} />
     </PopoverMenu>
   );
 }

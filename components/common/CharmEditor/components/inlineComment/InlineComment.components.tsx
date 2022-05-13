@@ -14,7 +14,7 @@ import { PluginKey, TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
 import { useCommentThreadsListDisplay } from 'hooks/useCommentThreadsListDisplay';
 import PageThread from '../PageThread';
-import { SuggestTooltipPluginKey, SuggestTooltipPluginState, hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { SuggestTooltipPluginKey, TooltipPluginState, hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { updateInlineComment } from './inlineComment.utils';
 
 const ThreadContainer = styled(Paper)`
@@ -33,7 +33,7 @@ export default function InlineCommentThread () {
     show: isVisible,
     component,
     threadIds
-  } = usePluginState(SuggestTooltipPluginKey) as SuggestTooltipPluginState;
+  } = usePluginState(SuggestTooltipPluginKey) as TooltipPluginState;
   const { threads } = useThreads();
 
   const { showingCommentThreadsList } = useCommentThreadsListDisplay();
