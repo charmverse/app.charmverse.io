@@ -16,7 +16,7 @@ import useGnosisSigner from 'hooks/useWeb3Signer';
 import { useUser } from 'hooks/useUser';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
-import { GnosisConnectCard } from '../integrations/GnosisSafes';
+import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
 const rowHeight = 48;

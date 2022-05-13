@@ -1,29 +1,27 @@
 
 import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
+import { Alert, Divider, Stack, Typography, SvgIcon, CircularProgress, Tooltip } from '@mui/material';
 import Button from 'components/common/Button';
 import CopyableAddress from 'components/common/CopyableAddress';
 import Avatar from 'components/common/Avatar';
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import { Modal, DialogTitle } from 'components/common/Modal';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { useContext, useState, useEffect } from 'react';
+import { FC, useContext, useState, useEffect } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import useENSName from 'hooks/useENSName';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
-import { CircularProgress, Tooltip } from '@mui/material';
 import charmClient from 'charmClient';
 import { getDisplayName } from 'lib/users';
 import log from 'lib/log';
 import { LoggedInUser } from 'models';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import TelegramLoginIframe, { loginWithTelegram } from '../../../../../../profile/integrations/components/TelegramLoginIframe';
+import DiscordIcon from 'public/images/discord_logo.svg';
+import TelegramIcon from 'public/images/telegram_logo.svg';
+import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
 
 const UserName = styled(Typography)`
   position: relative;
@@ -34,8 +32,31 @@ const StyledButton = styled(Button)`
   width: 100px;
 `;
 
-function AccountModal ({ isOpen, onClose }:
-  { isOpen: boolean, onClose: () => void }) {
+const ImageIcon = styled.img`
+  height: 48px;
+  width: auto;
+`;
+
+function ProviderRow ({ children }: { children: ReactNode }) {
+  return (
+    <Stack
+      direction='row'
+      alignItems='center'
+      justifyContent='space-between'
+      my={3}
+      sx={{
+        width: {
+          lg: '500px'
+        }
+      }}
+    >
+      {children}
+    </Stack>
+  );
+}
+
+export default function IdentityProviders () {
+
   const { account, connector } = useWeb3React();
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
@@ -84,7 +105,6 @@ function AccountModal ({ isOpen, onClose }:
 
   const handleWalletProviderSwitch = () => {
     openWalletSelectorModal();
-    onClose();
   };
 
   function connectorName (c: any) {
@@ -154,42 +174,28 @@ function AccountModal ({ isOpen, onClose }:
 
   }
 
-  function _onClose () {
-    router.replace(window.location.href.split('?')[0], undefined, { shallow: true });
-    onClose();
-  }
-
   const userName = ENSName || (user ? getDisplayName(user) : '');
 
   return (
-    <Modal open={isConnectingToDiscord || isOpen} onClose={_onClose}>
-      <DialogTitle onClose={_onClose}>Account</DialogTitle>
-      {user && user?.addresses.length !== 0 && (
-        <Stack mb={2} direction='row' spacing='4' alignItems='center'>
-          <Avatar name={userName} avatar={user.avatar} />
-          <CopyableAddress address={user.addresses[0]} decimals={5} sx={{ fontSize: 24 }} />
-          {user.username && <UserName variant='subtitle2'>{user.username}</UserName>}
-        </Stack>
-      )}
-      <Stack
-        direction='row'
-        alignItems='center'
-        justifyContent='space-between'
-        my={1}
-      >
+    <>
+      <Divider />
+
+      <ProviderRow>
+        <ImageIcon src='/walletLogos/metamask.png' />
         <Typography color='secondary'>
-          {account ? `Connected with ${connectorName(connector)}` : 'Connect with Metamask'}
+          {account ? `Connected with ${connectorName(connector)}` : 'Connect your wallet'}
         </Typography>
         <StyledButton size='small' variant='outlined' onClick={handleWalletProviderSwitch}>
           {account ? 'Switch' : 'Connect'}
         </StyledButton>
-      </Stack>
-      <Stack
-        direction='row'
-        alignItems='center'
-        justifyContent='space-between'
-        my={1}
-      >
+      </ProviderRow>
+
+      <Divider />
+
+      <ProviderRow>
+        <SvgIcon sx={{ height: 48, width: 'auto' }}>
+          <DiscordIcon />
+        </SvgIcon>
         <Typography color='secondary'>
           {connectedWithDiscord ? 'Connected with Discord' : 'Connect with Discord'}
         </Typography>
@@ -210,13 +216,20 @@ function AccountModal ({ isOpen, onClose }:
             </StyledButton>
           </div>
         </Tooltip>
-      </Stack>
-      <Stack
-        direction='row'
-        alignItems='center'
-        justifyContent='space-between'
-        my={1}
-      >
+      </ProviderRow>
+
+      {discordError && (
+        <Alert severity='error'>
+          {discordError}
+        </Alert>
+      )}
+
+      <Divider />
+
+      <ProviderRow>
+        <SvgIcon sx={{ height: 48, width: 'auto' }}>
+          <TelegramIcon />
+        </SvgIcon>
         <Typography color='secondary'>
           {connectedWithTelegram ? 'Connected with Telegram' : 'Connect with Telegram'}
         </Typography>
@@ -232,38 +245,14 @@ function AccountModal ({ isOpen, onClose }:
           {connectedWithTelegram ? 'Disconnect' : 'Connect'}
         </StyledButton>
         <TelegramLoginIframe />
-      </Stack>
+      </ProviderRow>
+
       {telegramError && (
         <Alert severity='error'>
           {telegramError}
         </Alert>
       )}
-      {discordError && (
-        <Alert severity='error'>
-          {discordError}
-        </Alert>
-      )}
-      {/* user cant be logged out so long as their wallet is connected (TODO: fix!) */}
-      {!account && (
-        <Box display='flex' justifyContent='flex-end' mt={2}>
-          <StyledButton
-            size='small'
-            variant='outlined'
-            color='secondary'
-            loading={isLoggingOut}
-            onClick={async () => {
-              setisLoggingOut(true);
-              await charmClient.logout();
-              setUser(null);
-              router.push('/');
-            }}
-          >
-            Logout
-          </StyledButton>
-        </Box>
-      )}
-    </Modal>
+    </>
+
   );
 }
-
-export default AccountModal;
