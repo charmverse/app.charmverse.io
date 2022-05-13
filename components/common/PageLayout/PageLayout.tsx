@@ -15,13 +15,16 @@ import PageContainer from './components/PageContainer';
 const drawerWidth = 300;
 
 const openedMixin = (theme: Theme) => ({
+  width: '100%',
   marginRight: 0,
-  width: drawerWidth,
   transition: theme.transitions.create(['marginRight', 'width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen
   }),
-  overflowX: 'hidden'
+  overflowX: 'hidden',
+  [theme.breakpoints.up('sm')]: {
+    width: drawerWidth
+  }
 });
 
 const closedMixin = (theme: Theme) => ({
@@ -88,7 +91,8 @@ interface PageLayoutProps {
 }
 
 function PageLayout ({ children, sidebar: SidebarOverride }: PageLayoutProps) {
-  const [open, setOpen] = React.useState(true);
+  const isSmallScreen = window.innerWidth < 600;
+  const [open, setOpen] = React.useState(!isSmallScreen);
   const [user] = useUser();
 
   const handleDrawerOpen = React.useCallback(() => {
