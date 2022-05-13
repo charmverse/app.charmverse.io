@@ -40,11 +40,7 @@ type LargeAvatarProps = {
   displayIcons?: boolean;
 };
 
-const getIcons = (
-  editIcon,
-  deleteIcon,
-  avatar
-) => {
+const getIcons = (editIcon: ReactNode, deleteIcon: ReactNode, avatar: string | null | undefined) => {
   if (!avatar) {
     return [editIcon];
   }
