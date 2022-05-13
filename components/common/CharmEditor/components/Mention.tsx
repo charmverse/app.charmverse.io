@@ -187,23 +187,25 @@ function MentionSuggestMenu ({ pluginKey }: {pluginKey: PluginKey}) {
         }}
       >
         <GroupLabel>Contributors</GroupLabel>
-        <div>
-          {filteredContributors.map(contributor => (
-            <MenuItem
-              component='div'
-              onClick={() => onSelectMention(contributor.id, 'user')}
-              key={contributor.id}
-            >
-              <ReviewerOption
-                style={{
-                  alignItems: 'center'
-                }}
-                user={contributor}
-                avatarSize='small'
-              />
-            </MenuItem>
-          ))}
-        </div>
+        {filteredContributors.length === 0 ? <Typography sx={{ ml: 2 }} variant='subtitle2' color='secondary'>No contributors found</Typography> : (
+          <div>
+            {filteredContributors.map(contributor => (
+              <MenuItem
+                component='div'
+                onClick={() => onSelectMention(contributor.id, 'user')}
+                key={contributor.id}
+              >
+                <ReviewerOption
+                  style={{
+                    alignItems: 'center'
+                  }}
+                  user={contributor}
+                  avatarSize='small'
+                />
+              </MenuItem>
+            ))}
+          </div>
+        )}
         <Divider sx={{
           my: 1
         }}
