@@ -34,7 +34,7 @@ export default function InitialAvatar ({ avatar, className, name, variant, size 
   return (
     <StyledAvatar
       className={className}
-      sx={{ backgroundColor: stringToColor(nameStr), ...SizeStyleMap[size] }}
+      sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...SizeStyleMap[size] }}
       variant={variant}
       src={avatar ?? undefined}
     >
