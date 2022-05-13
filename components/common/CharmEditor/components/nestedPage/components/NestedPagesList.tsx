@@ -18,10 +18,14 @@ function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginS
     tooltipContentDOM,
     suggestTooltipKey
   } = usePluginState(pluginKey) as NestedPagePluginState;
-  const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
+  const { triggerText, counter, show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   function onClose () {
     hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
   }
+  const filteredPages = (Object.values(pages).filter((page) => page && page?.deletedAt === null && (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)));
+  const totalItems = filteredPages.length;
+  const roundedCounter = ((counter < 0 ? ((counter % totalItems) + totalItems) : counter) % totalItems);
+
   const onSelectPage = useCallback(
     (page: Page) => {
       addNestedPage(page.id);
@@ -33,7 +37,7 @@ function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginS
   return (
     <PopoverMenu container={tooltipContentDOM} isOpen={isVisible} onClose={onClose} width={460}>
       <GroupLabel>Select a page</GroupLabel>
-      <PagesList pages={Object.values(pages) as Page[]} onSelectPage={onSelectPage} />
+      <PagesList activeItemIndex={roundedCounter} pages={filteredPages as Page[]} onSelectPage={onSelectPage} />
     </PopoverMenu>
   );
 }
