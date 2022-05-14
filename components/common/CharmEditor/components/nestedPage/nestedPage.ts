@@ -16,7 +16,7 @@ export interface NestedPagePluginState {
 }
 
 /**
- * Encloses a nested page with markers so it can be parsed after the markdown serialiser has run on the whole document.
+ * Encloses a nested page with markers so it can be parsed after the markdown serializer has run on the whole document.
  * @param pageId
  */
 function encloseNestedPage (pageId: string): string {
@@ -124,7 +124,9 @@ export function nestedPageSpec (): RawSpecs {
 export function nestedPagePlugins ({
   key,
   markName = nestedPageSuggestMarkName,
-  tooltipRenderOpts = {}
+  tooltipRenderOpts = {
+    placement: 'bottom-start'
+  }
 }: {
   markName?: string;
   key: PluginKey<NestedPagePluginState>;

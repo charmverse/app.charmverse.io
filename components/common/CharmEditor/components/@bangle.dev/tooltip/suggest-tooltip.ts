@@ -97,7 +97,9 @@ function pluginsFactory({
   key = new PluginKey('suggest_tooltip'),
   markName,
   trigger,
-  tooltipRenderOpts,
+  tooltipRenderOpts = {
+    placement: "bottom-start"
+  },
   keybindings = defaultKeys,
   onEnter = (state, dispatch, view) => {
     return removeSuggestMark(key)(state, dispatch, view);
@@ -171,6 +173,7 @@ function pluginsFactory({
         stateKey: key,
         renderOpts: {
           ...tooltipRenderOpts,
+          placement: "bottom-start",
           getReferenceElement: referenceElement(key, (state: EditorState) => {
             const markType = schema.marks[markName];
             const { selection } = state;

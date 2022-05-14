@@ -37,7 +37,9 @@ export interface MentionPluginState {
 export function mentionPlugins ({
   key = new PluginKey<MentionPluginState>('emojiSuggestMenu'),
   markName = mentionSuggestMarkName,
-  tooltipRenderOpts = {}
+  tooltipRenderOpts = {
+    placement: 'bottom-start'
+  }
 }: {
   markName?: string;
   key: PluginKey<MentionPluginState>;
