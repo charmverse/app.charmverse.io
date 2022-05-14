@@ -5,17 +5,13 @@ import { useCallback, memo, useEffect } from 'react';
 import { usePages } from 'hooks/usePages';
 import { PluginKey } from 'prosemirror-state';
 import { safeScrollIntoViewIfNeeded } from 'lib/browser';
-import { rafCommandExec } from '@bangle.dev/utils';
-import { TextSelection } from '@bangle.dev/pm';
-import useNestedPage from '../hooks/useNestedPage';
+import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
 import { hideSuggestionsTooltip, SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { NestedPagePluginState } from '../nestedPage';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import { PagesList } from '../../PageList';
-import { replaceSuggestionMarkWith } from '../../inlinePalette';
 
 function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginState>}) {
-  const { addNestedPage } = useNestedPage();
   const { pages } = usePages();
   const view = useEditorViewContext();
   const {
@@ -33,20 +29,7 @@ function NestedPagesList ({ pluginKey }: {pluginKey: PluginKey<NestedPagePluginS
 
   const onSelectPage = useCallback(
     (page: Page) => {
-      replaceSuggestionMarkWith(pluginKey, '', true)(view.state, view.dispatch, view);
-      hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
-      rafCommandExec(view, (state, dispatch) => {
-        const nestedPageNode = state.schema.nodes.page.create({
-          id: page.id
-        });
-        const tr = state.tr.replaceSelectionWith(nestedPageNode);
-        if (dispatch) {
-          dispatch(
-            tr.setSelection(new TextSelection(tr.doc.resolve(tr.selection.$from.pos < 2 ? 1 : tr.selection.$from.pos - 2)))
-          );
-        }
-        return true;
-      });
+      insertNestedPage(pluginKey, view, page.id);
     },
     [view]
   );
