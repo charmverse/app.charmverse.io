@@ -14,7 +14,7 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import { PageContent } from 'models';
 import Link from 'next/link';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import useNestedPage from '../hooks/useNestedPage';
+import { rafCommandExec } from '@bangle.dev/utils';
 
 const NestedPageContainer = styled((props: any) => <div {...props} />)`
   align-items: center;
@@ -37,7 +37,6 @@ const NestedPageContainer = styled((props: any) => <div {...props} />)`
 export default function NestedPage ({ node, getPos, view }: NodeViewProps) {
   const [space] = useCurrentSpace();
   const { pages } = usePages();
-  const { addNestedPage } = useNestedPage();
   const { showMessage } = useSnackbar();
   const nestedPage = pages[node.attrs.id];
   const popupState = usePopupState({ variant: 'popover', popupId: 'nested-page' });
@@ -45,7 +44,7 @@ export default function NestedPage ({ node, getPos, view }: NodeViewProps) {
   const isEditorEmpty = checkForEmpty(nestedPage?.content as PageContent);
 
   const fullPath = `${window.location.origin}/${space?.domain}/${nestedPage?.path}`;
-
+  const bindMenuProps = bindMenu(popupState);
   return (
     <NestedPageContainer data-id={`page-${nestedPage?.id}`} data-title={nestedPage?.title} data-path={fullPath}>
       <div>
@@ -69,17 +68,17 @@ export default function NestedPage ({ node, getPos, view }: NodeViewProps) {
       <ActionsMenu {...bindTrigger(popupState)} />
 
       <Menu
-        {...bindMenu(popupState)}
+        {...bindMenuProps}
       >
         <MenuItem
           sx={{ padding: '3px 12px' }}
           onClick={() => {
             const pos = getPos();
-            TextSelection.create(view.state.doc, pos - 1, pos + 1);
             view.dispatch(view.state.tr.setSelection(
-              TextSelection.create(view.state.doc, pos - 1, pos + 1)
+              TextSelection.create(view.state.doc, pos, pos + 1)
             ));
             view.dispatch(view.state.tr.deleteSelection());
+            bindMenuProps.onClose();
           }}
         >
           <DeleteIcon
@@ -92,7 +91,19 @@ export default function NestedPage ({ node, getPos, view }: NodeViewProps) {
         </MenuItem>
         <MenuItem
           sx={{ padding: '3px 12px' }}
-          onClick={() => addNestedPage()}
+          onClick={() => {
+            const pos = getPos();
+            rafCommandExec(view, (state, dispatch) => {
+              const nestedPageNode = state.schema.nodes.page.create({
+                id: nestedPage?.id
+              });
+              if (dispatch) {
+                dispatch(view.state.tr.insert(pos + 1, nestedPageNode));
+              }
+              return true;
+            });
+            bindMenuProps.onClose();
+          }}
         >
           <ContentPasteIcon
             fontSize='small'
@@ -108,6 +119,7 @@ export default function NestedPage ({ node, getPos, view }: NodeViewProps) {
             // eslint-disable-next-line
             navigator.clipboard.writeText(`${location.origin}/${space?.domain}/${nestedPage?.path}`);
             showMessage('Link copied');
+            bindMenuProps.onClose();
           }}
         >
           <LinkIcon
