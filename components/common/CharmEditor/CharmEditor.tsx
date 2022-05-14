@@ -36,7 +36,6 @@ import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
 import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
-import MentionSuggest, { Mention, mentionPlugins, mentionSpecs } from './components/Mention';
 import NestedPage, { nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
@@ -49,6 +48,7 @@ import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import Paragraph from './components/Paragraph';
+import { MentionNode, MentionSuggest, mentionPlugins, mentionSpecs } from './components/mention';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -177,10 +177,6 @@ export function charmEditorPlugins (
       name: 'paragraph',
       containerDOM: ['p', { class: 'charm-paragraph' }],
       contentDOM: ['span']
-    }),
-    NodeView.createPlugin({
-      name: 'mention',
-      containerDOM: ['span', { class: 'mention-value' }]
     }),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
@@ -454,9 +450,9 @@ function CharmEditor (
           }
           case 'mention': {
             return (
-              <Mention {...props}>
+              <MentionNode {...props}>
                 {_children}
-              </Mention>
+              </MentionNode>
             );
           }
           case 'page': {

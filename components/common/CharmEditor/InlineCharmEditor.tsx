@@ -17,7 +17,7 @@ import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor
 import { PageContent } from 'models';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
-import MentionSuggest, { Mention, mentionPlugins, mentionSpecs } from './components/Mention';
+import { MentionNode, mentionPlugins, mentionSpecs, MentionSuggest } from './components/mention';
 import * as tabIndent from './components/tabIndent';
 import Placeholder from './components/Placeholder';
 import { checkForEmpty } from './utils';
@@ -80,10 +80,6 @@ export function charmEditorPlugins (
     floatingMenuPlugin({
       key: floatingMenuPluginKey,
       readOnly
-    }),
-    NodeView.createPlugin({
-      name: 'mention',
-      containerDOM: ['span', { class: 'mention-value' }]
     }),
     tabIndent.plugins()
   ];
@@ -189,9 +185,9 @@ export default function CharmEditor (
         switch (props.node.type.name) {
           case 'mention': {
             return (
-              <Mention {...props}>
+              <MentionNode {...props}>
                 {_children}
-              </Mention>
+              </MentionNode>
             );
           }
           default: {
