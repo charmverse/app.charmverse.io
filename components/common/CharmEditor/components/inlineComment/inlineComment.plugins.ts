@@ -43,7 +43,6 @@ export function plugin ({ key } :{
             }
             return {
               ...pluginState,
-              component: null,
               threadIds: [],
               show: false
             };

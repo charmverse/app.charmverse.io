@@ -35,8 +35,8 @@ import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
-import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
-import NestedPage, { nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
+import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
 import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
@@ -55,11 +55,11 @@ export interface ICharmEditorOutput {
   rawText: string
 }
 
-const emojiPluginKey = new PluginKey('emojiSuggest');
+const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
 const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
-const nestedPagePluginKey = new PluginKey('nestedPage');
-const inlineCommentPluginKey = new PluginKey('inlineComment');
+const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
+const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 
 export const specRegistry = new SpecRegistry([
   // Comments to the right of each spec show if it supports markdown export
@@ -80,7 +80,7 @@ export const specRegistry = new SpecRegistry([
   orderedList.spec(), // OK
   strike.spec(), // OK
   underline.spec(), // OK
-  emojiSpecs(), // OK
+  emoji.specs(), // OK
   mentionSpecs(), // NO
   code.spec(), // OK
   codeBlock.spec(), // OK
@@ -141,7 +141,7 @@ export function charmEditorPlugins (
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),
-    emojiPlugins({
+    emoji.plugins({
       key: emojiPluginKey
     }),
     mentionPlugins({

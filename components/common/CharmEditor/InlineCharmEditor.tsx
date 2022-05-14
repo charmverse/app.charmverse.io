@@ -16,7 +16,7 @@ import styled from '@emotion/styled';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
-import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
+import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
 import * as tabIndent from './components/tabIndent';
 import Placeholder from './components/Placeholder';
@@ -27,7 +27,7 @@ export interface ICharmEditorOutput {
   rawText: string
 }
 
-const emojiPluginKey = new PluginKey('emojiSuggest');
+const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
 const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
 
@@ -39,7 +39,7 @@ export const specRegistry = new SpecRegistry([
   link.spec(), // OK
   strike.spec(), // OK
   underline.spec(), // OK
-  emojiSpecs(), // ??
+  emoji.specs(), // ??
   mentionSpecs(), // NO
   code.spec(), // OK
   tabIndent.spec()
@@ -71,7 +71,7 @@ export function charmEditorPlugins (
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),
-    emojiPlugins({
+    emoji.plugins({
       key: emojiPluginKey
     }),
     mentionPlugins({
