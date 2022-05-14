@@ -24,7 +24,8 @@ async function getContributors (req: NextApiRequest, res: NextApiResponse<Contri
       ...spaceRole.user,
       isAdmin: spaceRole.isAdmin
     };
-  });
+  })
+    .sort((a, b) => b.createdAt > a.createdAt ? -1 : 1); // sort oldest first
   return res.status(200).json(contributors);
 }
 

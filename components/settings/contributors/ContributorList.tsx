@@ -1,3 +1,4 @@
+import { Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 import { Contributor } from 'models';
 import { useContributors } from 'hooks/useContributors';
 import charmClient from 'charmClient';
@@ -42,18 +43,28 @@ export default function ContributorList ({ isAdmin, spaceId, spaceOwner }: Props
   return (
     <>
       <Legend>Current Contributors</Legend>
-      {contributors.map(contributor => (
-        contributor.isBot === true ? null : (
-          <ContributorListItem
-            isAdmin={isAdmin}
-            key={contributor.id}
-            isSpaceOwner={spaceOwner === contributor.id}
-            contributor={contributor}
-            onChange={updateContributor}
-          />
-        )
-
-      ))}
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell></TableCell>
+            <TableCell>Join date</TableCell>
+            <TableCell></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {contributors.map(contributor => (
+            contributor.isBot === true ? null : (
+              <ContributorListItem
+                isAdmin={isAdmin}
+                key={contributor.id}
+                isSpaceOwner={spaceOwner === contributor.id}
+                contributor={contributor}
+                onChange={updateContributor}
+              />
+            )
+          ))}
+        </TableBody>
+      </Table>
     </>
   );
 }
