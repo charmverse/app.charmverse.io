@@ -48,15 +48,15 @@ import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import Paragraph from './components/Paragraph';
-import { MentionNode, MentionSuggest, mentionPlugins, mentionSpecs } from './components/mention';
+import Mention, { MentionSuggest, mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
 }
 
-const emojiSuggestPluginKey = new PluginKey('emojiSuggest');
-const mentionSuggestPluginKey = new PluginKey('mentionSuggest');
+const emojiPluginKey = new PluginKey('emojiSuggest');
+const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
 const nestedPagePluginKey = new PluginKey('nestedPage');
 const inlineCommentPluginKey = new PluginKey('inlineComment');
@@ -142,10 +142,10 @@ export function charmEditorPlugins (
     strike.plugins(),
     underline.plugins(),
     emojiPlugins({
-      key: emojiSuggestPluginKey
+      key: emojiPluginKey
     }),
     mentionPlugins({
-      key: mentionSuggestPluginKey
+      key: mentionPluginKey
     }),
     floatingMenuPlugin({
       key: floatingMenuPluginKey,
@@ -163,10 +163,6 @@ export function charmEditorPlugins (
     NodeView.createPlugin({
       name: 'iframe',
       containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
-      name: 'page',
-      containerDOM: ['div', { class: 'page-container' }]
     }),
     NodeView.createPlugin({
       name: 'quote',
@@ -450,9 +446,9 @@ function CharmEditor (
           }
           case 'mention': {
             return (
-              <MentionNode {...props}>
+              <Mention {...props}>
                 {_children}
-              </MentionNode>
+              </Mention>
             );
           }
           case 'page': {
@@ -469,9 +465,9 @@ function CharmEditor (
       }}
     >
       <FloatingMenu disableComments={disabledPageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
-      <MentionSuggest pluginKey={mentionSuggestPluginKey} />
+      <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
-      <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
+      <EmojiSuggest pluginKey={emojiPluginKey} />
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
       {children}
       {!disabledPageSpecificFeatures && (

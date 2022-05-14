@@ -1,7 +1,7 @@
-import MentionNode from './MentionNode';
+import Mention from './Mention';
 import MentionSuggest from './MentionSuggest';
 
 export {
-  MentionNode,
+  Mention,
   MentionSuggest
 };

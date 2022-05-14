@@ -2,9 +2,9 @@ import {
   bulletList, orderedList,
   paragraph
 } from '@bangle.dev/base-components';
-import { EditorState, Fragment, Node, setBlockType, Transaction, wrapIn } from '@bangle.dev/pm';
-import { PluginKey, TextSelection } from 'prosemirror-state';
+import { EditorState, Fragment, Node, setBlockType, Transaction } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import CodeIcon from '@mui/icons-material/Code';
@@ -20,19 +20,18 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import { hideSuggestionsTooltip, renderSuggestionsTooltip, replaceSuggestMarkWith } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
 import useNestedPage from 'components/common/CharmEditor/components/nestedPage/hooks/useNestedPage';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
-import { MIN_EMBED_WIDTH, MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
+import { PluginKey, TextSelection } from 'prosemirror-state';
 import { useMemo } from 'react';
-import { getSuggestTooltipKey, replaceSuggestionMarkWith } from './inlinePalette';
+import { insertNode } from '../../utils';
+import { NestedPagePluginState, nestedPageSuggestMarkName } from '../nestedPage';
 import {
   isList
 } from './commands';
 import { palettePluginKey } from './config';
+import { replaceSuggestionMarkWith } from './inlinePalette';
 import { PaletteItem, PaletteItemType, PromisedCommand } from './paletteItem';
-import { insertNode } from '../../utils';
-import { NestedPagePluginState, nestedPageSuggestMarkName } from '../nestedPage';
 
 const { convertToParagraph } = paragraph;
 const {

@@ -12,7 +12,7 @@ import { PageContent } from 'models';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 
-export default function MentionNode ({ node }: NodeViewProps) {
+export default function Mention ({ node }: NodeViewProps) {
   const attrs = node.attrs as {value: string, type: 'user' | 'page'};
   const theme = useTheme();
   const [contributors] = useContributors();

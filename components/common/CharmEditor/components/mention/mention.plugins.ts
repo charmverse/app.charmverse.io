@@ -2,12 +2,12 @@ import { NodeView } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/pm';
 import { SuggestTooltipRenderOpts, createTooltipDOM, suggestTooltip } from '@bangle.dev/tooltip';
 import { PluginKey } from 'prosemirror-state';
-import { mentionPluginKeyName, mentionSuggestMarkName, mentionTrigger } from './mention.constants';
+import { mentionSuggestMarkName, mentionTrigger } from './mention.constants';
 import { MentionPluginState } from './mention.interfaces';
 import { selectMention } from './mention.utils';
 
 export function mentionPlugins ({
-  key = new PluginKey<MentionPluginState>(mentionPluginKeyName),
+  key,
   markName = mentionSuggestMarkName,
   tooltipRenderOpts = {
     placement: 'bottom-start'
