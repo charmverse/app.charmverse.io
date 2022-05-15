@@ -236,7 +236,7 @@
 
 
 // temporary hack to hide broken feature - hide the dropdown to select erc20 tokens
-div.lsm-w-full:nth-of-type(2) {
+.lsm-select-container div.lsm-w-full:nth-of-type(2) {
   display: none;
 }
 
