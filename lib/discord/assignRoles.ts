@@ -63,7 +63,6 @@ export async function assignRolesFromDiscord (rolesRecord: Record<string,
                       }
                     },
                     spaceRole: {
-                      createdAt: new Date(),
                       connect: {
                         id: charmverseUserSpaceRole.id
                       }
