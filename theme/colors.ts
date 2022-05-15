@@ -35,30 +35,30 @@ export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackg
 export const inputBackgroundDarkMode = 'rgba(255, 255, 255, 0.055)';
 export const inputBorderDarkMode = 'rgba(15, 15, 15, 0.2)';
 
-export type BrandColor = 'gray' | 'cyanBlue' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'red'
+export type BrandColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' | 'blue' | 'purple' | 'pink' | 'red'
 
 export type BrandColorScheme = Record<BrandColor, string>
 
 export const darkModeColors: BrandColorScheme = {
-  gray: '#91918D', // Philippine Gray
-  cyanBlue: '#5681C8', // Silver Lake Blue
-  orange: '#F5743D', // Chinese Orange
-  yellow: '#A59412', // Dark Yellow
-  green: '#009FB7', // Bondi Blue
-  blue: '#1FBFFF', // Spiro Disco Ball
-  purple: '#985CFF', // Lavender Indigo
-  pink: '#E36396', // Pale Red-Violet
-  red: '#A073AB' // Purple Mountain Majesty
+  gray: '#757570', // Dark Gray
+  turquoise: '#4273C2', // Dark Turquoise
+  orange: '#C44F1C', // Dark Orange
+  yellow: '#81730E', // Dark Yellow
+  teal: '#007C8F', // Dark Teal
+  blue: '#007CAD', // Dark Blue
+  purple: '#8742FF', // Dark Purple
+  red: '#D53474', // Dark Red
+  pink: '#925E9C' // Dark Pink
 };
 
 export const lightModeColors: BrandColorScheme = {
-  gray: '#E1E1E0', // Chinese White
-  cyanBlue: '#D1DDF0', // Azureish White
-  orange: '#FDE3D8', // Antique White
-  yellow: '#FBF7DA', // Cornsilk
-  green: '#D6FAFF', // Water
-  blue: '#C2EEFF', // Diamond
-  purple: '#E5D6FF', // Pale Lavender
-  pink: '#F9DDE8', // Piggy Pink
-  red: '#E5D9E8' // Platinum
+  gray: '#E7E7E6', // Ligh Gray
+  turquoise: '#C2DCF2', // Light Turquoise
+  orange: '#F4D8D0', // Light Orange
+  yellow: '#EFE9CB', // Light Yellow
+  teal: '#D0F4F1', // Light Teal
+  blue: '#C1E7F4', // Light Blue
+  purple: '#D7D3F4', // Light Purple
+  red: '#F2CCD6', // Light Red
+  pink: '#E8D3ED' // Light Pink
 };

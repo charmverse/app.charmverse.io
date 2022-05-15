@@ -34,6 +34,7 @@ model Space {
   updatedAt             DateTime
   updatedBy             String           @db.Uuid
   name                  String
+  spaceImage            String?
   domain                String           @unique
   discordServerId       String?
   snapshotDomain        String?
@@ -278,6 +279,12 @@ model PaymentMethod {
   tokenDecimals     Int
   tokenLogo         String?
   walletType        WalletType @default(metamask)
+
+  // Vanilla payment methods
+  @@unique([spaceId, chainId, contractAddress])
+
+  // Gnosis safes
+  @@unique([spaceId, chainId, gnosisSafeAddress])
 }
 
 model UserGnosisSafe {

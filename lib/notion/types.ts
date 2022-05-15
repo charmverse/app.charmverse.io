@@ -1,4 +1,7 @@
 
+export type BaseApiColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' | 'blue' | 'purple' | 'pink' | 'red';
+export type ApiColor = 'default' & BaseApiColor & `${BaseApiColor}_background`;
+
 export interface FailedImportsError {
   pageId: string,
   type: 'page' | 'database',
@@ -50,7 +53,7 @@ export type RichTextItemResponse = ({
     strikethrough: boolean;
     underline: boolean;
     code: boolean;
-    color: 'default' | 'gray' | 'brown' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'red' | 'gray_background' | 'brown_background' | 'orange_background' | 'yellow_background' | 'green_background' | 'blue_background' | 'purple_background' | 'pink_background' | 'red_background';
+    color: ApiColor;
   };
   plain_text: string;
   href: string | null;
@@ -293,8 +296,6 @@ export type GetPageResponse = {
   archived: boolean;
   url: string;
 }
-
-export type ApiColor = 'default' | 'gray' | 'brown' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'red' | 'gray_background' | 'brown_background' | 'orange_background' | 'yellow_background' | 'green_background' | 'blue_background' | 'purple_background' | 'pink_background' | 'red_background';
 
 export type BlockObjectResponse = {
   type: 'paragraph';

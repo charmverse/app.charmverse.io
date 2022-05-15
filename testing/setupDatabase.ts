@@ -11,7 +11,7 @@ import { IPageWithPermissions } from 'lib/pages/server';
  * @param walletAddress
  * @returns
  */
-export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4()): Promise<{
+export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true): Promise<{
   user: LoggedInUser,
   space: Space,
   apiToken: SpaceApiToken
@@ -41,7 +41,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
         spaceRoles: {
           create: {
             userId: user.id,
-            isAdmin: true
+            isAdmin
           }
         }
       },

@@ -74,7 +74,7 @@ export async function computeUserPagePermissions (request: IPagePermissionUserRe
     // Check if user is a space admin for this page so they gain full rights
     // eslint-disable-next-line max-len
     (prisma.page.findFirst(pageWithSpaceRoleQuery(request)) as any as Promise<IPageWithNestedSpaceRole>).then(page => {
-      return page?.space?.spaceRoles?.find(spaceRole => spaceRole.spaceId === page.spaceId && spaceRole.userId === request.userId);
+      return page?.space?.spaceRoles?.find(spaceRole => spaceRole.userId === request.userId);
     }),
     prisma.pagePermission.findMany(permissionsQuery(request))
   ]);
