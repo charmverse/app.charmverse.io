@@ -233,3 +233,14 @@
     background-color: var(--charm-lit-color-gray);
   }
 }
+
+
+// temporary hack to hide broken feature - hide the dropdown to select erc20 tokens
+div.lsm-w-full:nth-of-type(2) {
+  display: none;
+}
+
+// container for the word "OR"
+.lsm-text-sm.md\:lsm-text-base.lsm-w-full.lsm-my-1.dark\:lsm-text-gray.lsm-condition-spacing.lsm-text-title-gray.lsm-font-segoe.lsm-text-base.lsm-font-light {
+  display: none;
+}
