@@ -8,14 +8,14 @@ import { prisma } from '../db';
   });
   console.log('found', spaceRoles.length, 'space roles');
   const toUpdate = spaceRoles
-    .filter(spaceRole => spaceRole.user.createdAt < spaceRole.joinDate);
+    .filter(spaceRole => spaceRole.user.createdAt < spaceRole.createdAt);
   console.log('updating', toUpdate.length, 'space roles');
 
   await prisma.$transaction(
     toUpdate
       .map(role => prisma.spaceRole.update({
         where: { id: role.id },
-        data: { joinDate: role.user.createdAt }
+        data: { createdAt: role.user.createdAt }
       }))
   );
 
