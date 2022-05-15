@@ -4,6 +4,7 @@ export { FavoritePage, SpaceRole, User };
 
 export interface Contributor extends User {
   isAdmin: boolean;
+  joinDate: string;
 }
 
 interface NestedMemberships {

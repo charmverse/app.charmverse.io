@@ -30,6 +30,7 @@ beforeAll(async () => {
   // Make user2 a contributor of the space
   user2SpaceRole = await prisma.spaceRole.create({
     data: {
+      createdAt: new Date(),
       space: {
         connect: {
           id: space.id
