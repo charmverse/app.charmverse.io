@@ -8,33 +8,27 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { BountyWithDetails, PageContent } from 'models';
 import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHeader';
 import { useBounties } from 'hooks/useBounties';
-import BountyDescription from 'components/bounties/[bountyId]/components_v3/BountyDescription';
+import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 
-export default function BountyDetails () {
-
-  const router = useRouter();
-  const [_, setPageTitle] = usePageTitle();
+export default function BountyDescription () {
   const { currentBounty, currentBountyId } = useBounties();
 
-  console.log('Rendering', !!currentBounty);
-
-  if (!currentBounty || currentBounty?.id !== currentBountyId) {
-    return null;
-
-    // return null;
-  }
+  const CharmEditorMemoized = useMemo(() => {
+    // Only show the editor if the description exist
+    // Otherwise it shows the `Type / for commands` placeholder
+    return currentBounty && currentBounty.description ? (
+      <CharmEditor
+        readOnly
+        key={currentBounty.description}
+        content={currentBounty.descriptionNodes as PageContent}
+      />
+    ) : null;
+  }, [currentBounty]);
 
   return (
-    <Box py={3} px='80px'>
-
-      <Container top={20}>
-        <BountyHeader />
-
-        <BountyDescription />
-
-      </Container>
+    <Box my={2}>
+      {CharmEditorMemoized}
     </Box>
   );
 
 }
-
