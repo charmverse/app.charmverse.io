@@ -1,44 +1,18 @@
-import { useBounties } from 'hooks/useBounties';
-import useIsAdmin from 'hooks/useIsAdmin';
-import EditIcon from '@mui/icons-material/Edit';
-import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Tooltip from '@mui/material/Tooltip';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
-import Alert, { AlertColor } from '@mui/material/Alert';
-import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
-import CardHeader from '@mui/material/CardHeader';
-import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Application, Bounty } from '@prisma/client';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import charmClient from 'charmClient';
-import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
-import Avatar from 'components/common/Avatar';
-import Modal from 'components/common/Modal';
-import CharmEditor from 'components/common/CharmEditor/CharmEditor';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
-import { useContributors } from 'hooks/useContributors';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useENSName from 'hooks/useENSName';
-import { useUser } from 'hooks/useUser';
-import { usePageTitle } from 'hooks/usePageTitle';
-import { getDisplayName } from 'lib/users';
-import { eToNumber } from 'lib/utilities/numbers';
-import { BountyWithDetails, PageContent } from 'models';
-import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
-import BountyModal from 'components/bounties/components/BountyModal';
-import { FormValues as BountyFormValues } from 'components/bounties/components/BountyEditorForm';
-import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
-import BountyPaymentButton from 'components/bounties/[bountyId]/components/BountyPaymentButton';
-import { BountyApplicantList } from 'components/bounties/[bountyId]/components/BountyApplicantList';
-import { ApplicationEditorForm } from 'components/bounties/[bountyId]/components/ApplicationEditorForm';
 import BountyDelete from 'components/bounties/components/BountyDelete';
+import BountyModal from 'components/bounties/components/BountyModal';
+import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
+import Modal from 'components/common/Modal';
+import { useBounties } from 'hooks/useBounties';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 
 export default function BountyHeader () {
   const { currentBounty } = useBounties();
@@ -56,7 +30,6 @@ export default function BountyHeader () {
     router.push(`/${currentSpace?.domain}/bounties`);
   }
 
-  console.log('Rendering', !!currentBounty);
   const viewerCanModifyBounty = isAdmin === true;
 
   if (!currentBounty) {
