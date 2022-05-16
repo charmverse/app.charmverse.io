@@ -7,7 +7,7 @@ import { BountiesContext } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo, useState, useEffect } from 'react';
 import { CSVLink } from 'react-csv';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { BountyCard } from './components/BountyCard';
@@ -15,7 +15,7 @@ import BountyModal from './components/BountyModal';
 import InputBountyStatus from './components/InputBountyStatus';
 import MultiPaymentModal from './components/MultiPaymentModal';
 
-const bountyOrder: BountyStatus[] = ['open', 'assigned', 'review', 'complete', 'paid'];
+const bountyOrder: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
 function filterBounties (bounties: PopulatedBounty[], statuses: BountyStatus[]): PopulatedBounty[] {
   return bounties?.filter(bounty => statuses.indexOf(bounty.status) > -1) ?? [];
@@ -41,7 +41,12 @@ export default function BountyList () {
 
   const [space] = useCurrentSpace();
 
-  const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus []>(`${space?.id}-bounty-filters`, ['open', 'assigned', 'review']);
+  const [savedBountyFilters, setSavedBountyFilters] = useLocalStorage<BountyStatus []>(`${space?.id}-bounty-filters`, ['open', 'inProgress']);
+
+  // Filter out the old bounty filters
+  useEffect(() => {
+    setSavedBountyFilters(savedBountyFilters.filter(status => BountyStatus[status] !== undefined));
+  }, []);
 
   const isAdmin = useIsAdmin();
 

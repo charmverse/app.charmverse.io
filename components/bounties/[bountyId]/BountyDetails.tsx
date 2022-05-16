@@ -231,6 +231,8 @@ export default function BountyDetails () {
 
         <Container top={20}>
 
+          {/** BOUNTY HEADER */}
+
           <Box sx={{
             justifyContent: 'space-between',
             gap: 1,
@@ -277,6 +279,8 @@ export default function BountyDetails () {
               <BountyStatusBadge bounty={bounty} />
             </Box>
           </Box>
+
+          {/** END BOUNTY HEADER */}
 
           <Box mt={3} mb={5}>
             <Box my={2}>

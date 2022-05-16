@@ -196,8 +196,7 @@ model InviteLink {
 enum BountyStatus {
   suggestion
   open
-  assigned
-  review
+  inProgress
   complete
   paid
 }
@@ -223,6 +222,9 @@ model Bounty {
   linkedTaskId     String?       @db.Uuid
   applications     Application[]
   transactions     Transaction[]
+  approveApplicants Boolean      @default(false)
+  submissionsCap    Int?         
+  expiryDate        DateTime?
 }
 
 model Application {
