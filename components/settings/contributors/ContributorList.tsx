@@ -46,7 +46,7 @@ export default function ContributorList ({ isAdmin, spaceId, spaceOwner }: Props
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell></TableCell>
+            <TableCell>Username</TableCell>
             <TableCell>Join date</TableCell>
             <TableCell></TableCell>
           </TableRow>
