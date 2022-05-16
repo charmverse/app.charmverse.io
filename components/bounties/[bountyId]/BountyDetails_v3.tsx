@@ -1,14 +1,12 @@
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import { useRouter } from 'next/router';
-import charmClient from 'charmClient';
-import { usePageTitle } from 'hooks/usePageTitle';
-import { useEffect, useState, useMemo } from 'react';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
-import { BountyWithDetails, PageContent } from 'models';
-import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHeader';
-import { useBounties } from 'hooks/useBounties';
+import BountySuggestionApproval from 'components/bounties/components/BountySuggestionApproval';
 import BountyDescription from 'components/bounties/[bountyId]/components_v3/BountyDescription';
+import BountyHeader from 'components/bounties/[bountyId]/components_v3/BountyHeader';
+import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { useBounties } from 'hooks/useBounties';
+import { usePageTitle } from 'hooks/usePageTitle';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 export default function BountyDetails () {
 
@@ -16,12 +14,17 @@ export default function BountyDetails () {
   const [_, setPageTitle] = usePageTitle();
   const { currentBounty, currentBountyId } = useBounties();
 
-  console.log('Rendering', !!currentBounty);
+  useEffect(() => {
+    const bountyTitle = currentBounty?.title;
+
+    if (bountyTitle) {
+      setPageTitle(bountyTitle);
+    }
+
+  }, [currentBounty?.title]);
 
   if (!currentBounty || currentBounty?.id !== currentBountyId) {
     return null;
-
-    // return null;
   }
 
   return (
@@ -31,6 +34,10 @@ export default function BountyDetails () {
         <BountyHeader />
 
         <BountyDescription />
+
+        {
+          currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />
+        }
 
       </Container>
     </Box>

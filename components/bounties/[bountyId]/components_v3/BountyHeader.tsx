@@ -9,26 +9,16 @@ import BountyModal from 'components/bounties/components/BountyModal';
 import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 
 export default function BountyHeader () {
   const { currentBounty } = useBounties();
 
-  const [currentSpace] = useCurrentSpace();
   const isAdmin = useIsAdmin();
-
-  const router = useRouter();
 
   const bountyEditModal = usePopupState({ variant: 'popover', popupId: 'edit-bounty' });
   const bountyDeleteModal = usePopupState({ variant: 'popover', popupId: 'delete-bounty' });
-
-  function bountyDeleted () {
-    bountyEditModal.close();
-    router.push(`/${currentSpace?.domain}/bounties`);
-  }
 
   const viewerCanModifyBounty = isAdmin === true;
 
@@ -87,7 +77,7 @@ export default function BountyHeader () {
 
       {/** List of modals */}
       <BountyModal
-        onSubmit={() => {}}
+        onSubmit={bountyEditModal.close}
         mode='update'
         bounty={currentBounty}
         open={bountyEditModal.isOpen}
@@ -98,7 +88,7 @@ export default function BountyHeader () {
         <BountyDelete
           bounty={currentBounty}
           onCancel={bountyDeleteModal.close}
-          onDelete={bountyDeleted}
+          onDelete={bountyDeleteModal.close}
         />
       </Modal>
     </>

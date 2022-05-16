@@ -7,22 +7,21 @@ import TextField from '@mui/material/TextField';
 import { Bounty, Bounty as IBounty, PaymentMethod } from '@prisma/client';
 import charmClient, { PopulatedBounty } from 'charmClient';
 import Button from 'components/common/Button';
+import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
 import { getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
+import { isTruthy } from 'lib/utilities/types';
 import { PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
-import { isTruthy } from 'lib/utilities/types';
 import * as yup from 'yup';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import useIsAdmin from 'hooks/useIsAdmin';
 
 export type FormMode = 'create' | 'update' | 'suggest';
 
@@ -80,7 +79,7 @@ function FormDescription ({ onContentChange, content, watch }:
 }
 
 export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey }: IBountyEditorInput) {
-  const { setBounties, bounties } = useBounties();
+  const { setBounties, bounties, updateBounty } = useBounties();
 
   const defaultChainId = bounty?.chainId ?? 1;
 
@@ -164,8 +163,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
         reviewer: value.reviewer,
         chainId: value.chainId
       };
-      const updatedBounty = await charmClient.updateBounty(bounty.id, updates);
-      setBounties(bounties.map(b => b.id === bounty.id ? updatedBounty : b));
+
+      const updatedBounty = await updateBounty(bounty.id, updates);
       onSubmit(updatedBounty);
     }
   }
