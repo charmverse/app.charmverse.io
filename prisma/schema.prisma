@@ -168,6 +168,7 @@ model FavoritePage {
 model SpaceRole {
   id                     String            @id @default(uuid()) @db.Uuid
   isAdmin                Boolean           @default(false)
+  createdAt              DateTime          @default(now())
   spaceId                String            @db.Uuid
   space                  Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   userId                 String            @db.Uuid
@@ -281,9 +282,9 @@ model PaymentMethod {
   walletType        WalletType @default(metamask)
 
   // Vanilla payment methods
-  @@unique([spaceId, chainId, contractAddress])
 
   // Gnosis safes
+  @@unique([spaceId, chainId, contractAddress])
   @@unique([spaceId, chainId, gnosisSafeAddress])
 }
 
