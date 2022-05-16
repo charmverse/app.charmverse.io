@@ -1,8 +1,11 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
+import Switch from '@mui/material/Switch';
+import FieldLabel from 'components/common/form/FieldLabel';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
 import { Bounty, Bounty as IBounty, PaymentMethod } from '@prisma/client';
 import charmClient, { PopulatedBounty } from 'charmClient';
@@ -21,6 +24,7 @@ import { PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
 import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
+import { DatePicker } from '@mui/x-date-pickers';
 import * as yup from 'yup';
 
 export type FormMode = 'create' | 'update' | 'suggest';
@@ -43,7 +47,13 @@ export const schema = yup.object({
   descriptionNodes: yup.mixed(),
   description: yup.string(),
   reviewer: yup.string().nullable(true),
-  chainId: yup.number().required()
+  chainId: yup.number().required(),
+  // New fields
+  approveSubmitters: yup.boolean(),
+  capSubmissions: yup.boolean(),
+  maxSubmissions: yup.number(),
+  setExpiryDate: yup.boolean(),
+  expiryDate: yup.mixed()
 });
 
 export type FormValues = yup.InferType<typeof schema>
@@ -96,7 +106,12 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
       rewardToken: 'ETH' as CryptoCurrency,
       // TBC till we agree on Prisma migration
       chainId: defaultChainId as any,
-      ...(bounty || {})
+      maxSubmissions: 1 as any,
+      approveSubmitters: true,
+      capSubmissions: true,
+      expiryDate: null,
+      ...(bounty || {}),
+      setExpiryDate: !!bounty?.expiryDate
     },
     resolver: yupResolver(schema)
   });
@@ -108,6 +123,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   }, [focusKey]);
 
   const values = watch();
+
+  console.log('Values', values);
 
   const [space] = useCurrentSpace();
   const [user] = useUser();
@@ -123,6 +140,12 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   }, []);
 
   async function submitted (value: IBounty) {
+
+    if (!(value as FormValues).setExpiryDate) {
+      value.expiryDate = null;
+    }
+
+    delete (value as FormValues).setExpiryDate;
 
     if (mode === 'create') {
       value.spaceId = space!.id;
@@ -303,6 +326,133 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
               </>
             )
           }
+
+          {/* New options */}
+
+          <Grid container item>
+            <Grid item xs={4}>
+              <InputLabel>
+                Require applications
+              </InputLabel>
+              <Switch
+                {...register('approveSubmitters')}
+                defaultChecked={values.approveSubmitters}
+              />
+
+            </Grid>
+            <Grid item xs={8}>
+              {
+                values.approveSubmitters ? (
+                  <Alert severity='warning'>
+                    Workspace members will have to apply to work on this bounty. They will be able to submit work once their application is accepted.
+                  </Alert>
+                ) : (
+                  <Alert severity='info'>
+                    Any workspace member can make a submission to this bounty.
+                  </Alert>
+                )
+              }
+
+            </Grid>
+          </Grid>
+          <Grid container item>
+
+            <Grid item xs={values.capSubmissions ? 6 : 4}>
+              <InputLabel>
+                Cap submissions
+              </InputLabel>
+              <Switch
+                {...register('capSubmissions')}
+                defaultChecked={values.capSubmissions}
+              />
+            </Grid>
+
+            <Grid item xs={values.capSubmissions ? 6 : 8}>
+
+              {
+                values.capSubmissions === false ? (
+                  <Alert severity='info'>
+                    {
+                      values.approveSubmitters ? 'Workspace members can apply to this bounty as long as it remains open.' : 'Workspace members can make submissions for this bounty as long as it remains open.'
+                    }
+
+                  </Alert>
+                ) : (
+                  <>
+                    <InputLabel>
+                      Maximum submissions
+                    </InputLabel>
+                    <TextField
+                      {...register('maxSubmissions', {
+                        valueAsNumber: true,
+                        required: true,
+                        shouldUnregister: true
+                      })}
+                      fullWidth
+                      focused={focusKey === 'maxSubmissions'}
+                      type='number'
+                      size='small'
+                      error={!!errors?.maxSubmissions}
+                      helperText={errors?.maxSubmissions?.message}
+                      inputProps={{ step: 1, min: 1 }}
+                    />
+                  </>
+
+                )
+              }
+
+            </Grid>
+          </Grid>
+
+          <Grid container item>
+            <Grid item xs={values.setExpiryDate ? 6 : 4}>
+              <InputLabel>
+                Set expiry date
+              </InputLabel>
+              <Switch
+                {...register('setExpiryDate')}
+                defaultChecked={values.setExpiryDate}
+              />
+            </Grid>
+
+            {
+              values.setExpiryDate && (
+                <Grid item xs={6}>
+                  <InputLabel>Expiry date</InputLabel>
+                  <DatePicker
+                    {...register('expiryDate', {
+                      required: true,
+                      shouldUnregister: true
+                    })}
+                    value={values.expiryDate}
+                    onChange={(value) => {
+                      setValue('expiryDate', value);
+                    }}
+                    renderInput={(props) => (
+                      <TextField
+                        fullWidth
+                        name='expiryDate'
+                        {...props}
+                      />
+                    )}
+                  />
+                </Grid>
+              )
+              }
+
+            {
+                !values.setExpiryDate && (
+                  <Grid item xs={8}>
+                    <Alert severity='info'>
+                      {
+                        values.approveSubmitters ? 'Workspace members can apply to this bounty until the expiry date.' : 'Workspace members can make new submissions for this bounty until the expiry date.'
+                      }
+
+                    </Alert>
+                  </Grid>
+                )
+              }
+          </Grid>
 
           <Grid item>
             <Button

@@ -222,8 +222,9 @@ model Bounty {
   linkedTaskId     String?       @db.Uuid
   applications     Application[]
   transactions     Transaction[]
-  approveApplicants Boolean      @default(false)
-  submissionsCap    Int?         
+  approveSubmitters Boolean 
+  capSubmissions    Boolean
+  maxSubmissions    Int?         
   expiryDate        DateTime?
 }
 

@@ -3,8 +3,7 @@ import { BountyStatus, Bounty, Application, Transaction } from '@prisma/client';
 export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   suggestion: 'Suggestion',
   open: 'Open',
-  assigned: 'Assigned',
-  review: 'Review',
+  inProgress: 'In Progress',
   complete: 'Complete',
   paid: 'Paid'
 };
