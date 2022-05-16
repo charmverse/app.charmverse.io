@@ -83,7 +83,6 @@ function scrollIntoViewIfNeededPolyfill (
         + element.clientWidth
         - parentBorderLeftWidth
       > parent.scrollLeft + parent.clientWidth;
-  const alignWithTop = overTop && !overBottom;
   if ((overTop || overBottom) && centerIfNeeded) {
     parent.scrollTop = element.offsetTop
       - parent.offsetTop

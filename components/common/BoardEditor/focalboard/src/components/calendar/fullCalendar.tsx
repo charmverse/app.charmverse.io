@@ -20,6 +20,8 @@ import PropertyValueElement from '../propertyValueElement'
 import {Constants} from '../../constants'
 import { usePages } from 'hooks/usePages'
 import PageIcon from 'components/common/PageLayout/components/PageIcon'
+import { checkForEmpty } from 'components/common/CharmEditor/utils'
+import { PageContent } from 'models'
 
 const oneDay = 60 * 60 * 24 * 1000
 
@@ -116,15 +118,15 @@ const CalendarFullView = (props: Props): JSX.Element|null => {
             }]
         })
     ), [cards, pages, dateDisplayProperty])
-
-    const visibleBadges = activeView.fields.visiblePropertyIds.includes(Constants.badgesColumnId)
-
+    
     const renderEventContent = (eventProps: EventContentArg): JSX.Element|null => {
         const {event} = eventProps
+        const page = pages[event.id]
+        
         return (
             <div>
                 <div className='octo-icontitle'>
-                    { event.extendedProps.icon ? <PageIcon isEditorEmpty={false} pageType="page" icon={event.extendedProps.icon}/> : undefined }
+                    <PageIcon isEditorEmpty={checkForEmpty(page?.content as PageContent)} pageType="page" icon={event.extendedProps.icon}/>
                     <div
                         className='fc-event-title'
                         key='__title'
