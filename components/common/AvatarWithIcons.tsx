@@ -24,7 +24,7 @@ const StyledBox = styled(Box)`
     position: relative;
 
     &:hover .icons-stack {
-      display: inline-block;
+      display: flex;
     }
 `;
 

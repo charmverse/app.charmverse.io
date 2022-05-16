@@ -113,6 +113,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
             variant='rounded'
             spaceImage={watchSpaceImage}
             updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
+            displayIcons={true}
           />
         </Grid>
         <Grid item>
