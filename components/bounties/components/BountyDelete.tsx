@@ -31,9 +31,9 @@ export default function BountyDelete ({ bounty, onCancel, onDelete }: Props) {
     <Box>
 
       {
-        (bounty.status === 'assigned' || bounty.status === 'review') && (
+        (bounty.status === 'inProgress') && (
         <Typography sx={{ mb: 1 }}>
-          Are you sure you want to delete this bounty?
+          This bounty is in progress.
         </Typography>
         )
       }
