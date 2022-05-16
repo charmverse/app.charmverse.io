@@ -203,12 +203,11 @@ function BountyAmount ({ bounty, truncate }: { bounty: Bounty, truncate: boolean
 
   return (
     <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
-      <div>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
 
-          {
+        {
             bounty.rewardAmount === 0 ? (
-              <Box>
+              <Box sx={{ display: 'flex', verticalAlign: 'middle' }}>
                 <Typography
                   component='span'
                   sx={{
@@ -216,7 +215,7 @@ function BountyAmount ({ bounty, truncate }: { bounty: Bounty, truncate: boolean
                   }}
                   mr={0.5}
                   variant='caption'
-                  margin='auto'
+
                 >
                   Reward not set
                 </Typography>
@@ -263,9 +262,7 @@ function BountyAmount ({ bounty, truncate }: { bounty: Bounty, truncate: boolean
               </>
             )
           }
-
-        </Box>
-      </div>
+      </Box>
     </Tooltip>
   );
 }

@@ -206,6 +206,7 @@ model Bounty {
   id               String        @id @default(uuid()) @db.Uuid
   author           User          @relation(fields: [createdBy], references: [id])
   createdBy        String        @db.Uuid()
+  suggestedBy      String?       @db.Uuid()
   space            Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   spaceId          String        @db.Uuid
   createdAt        DateTime      @default(now())
@@ -278,6 +279,12 @@ model PaymentMethod {
   tokenDecimals     Int
   tokenLogo         String?
   walletType        WalletType @default(metamask)
+
+  // Vanilla payment methods
+  @@unique([spaceId, chainId, contractAddress])
+
+  // Gnosis safes
+  @@unique([spaceId, chainId, gnosisSafeAddress])
 }
 
 model UserGnosisSafe {
