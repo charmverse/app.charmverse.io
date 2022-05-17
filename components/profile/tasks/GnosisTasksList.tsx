@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { Alert, Box, Card, Chip, Collapse, Divider, Grid, TextField, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -29,7 +29,7 @@ const GridColumn = styled((props: any) => <Grid item xs {...props} />)`
   align-items: center;
 `;
 
-function TransactionRow ({ transaction }: { transaction: GnosisTransactionPopulated }) {
+function TransactionRow ({ snoozedAddresses, transaction }: { snoozedAddresses: string[], transaction: GnosisTransactionPopulated }) {
 
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
@@ -89,6 +89,12 @@ function TransactionRow ({ transaction }: { transaction: GnosisTransactionPopula
                   {confirmation.user ? <UserDisplay avatarSize='small' user={confirmation.user} /> : <AnonUserDisplay avatarSize='small' address={confirmation.address} />}
                 </Box>
               ))}
+              <Typography color='secondary' gutterBottom variant='body2'>Snoozed Addresses</Typography>
+              {snoozedAddresses.map(snoozedAddress => (
+                <Box py={1}>
+                  <AnonUserDisplay avatarSize='small' address={snoozedAddress} />
+                </Box>
+              ))}
             </Grid>
           </Grid>
         </Box>
@@ -98,9 +104,15 @@ function TransactionRow ({ transaction }: { transaction: GnosisTransactionPopula
   );
 }
 
-function SafeTasks ({ address, safeName, safeUrl, tasks }: { address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }) {
-  const [isSnoozed, setIsSnoozed] = useState(false);
-  const [snoozedForDate, setSnoozedForDate] = useState<null | DateTime>(null);
+function SafeTasks (
+  { snoozedAddresses, address, safeName, safeUrl, tasks }:
+  { snoozedAddresses: string[], address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
+) {
+  const [currentUser] = useUser();
+  const [isSnoozed, setIsSnoozed] = useState(currentUser?.transactionsSnoozed ?? false);
+  const [snoozedForDate, setSnoozedForDate] = useState<null | DateTime>(
+    (currentUser?.transactionsSnoozedFor as any) ?? null
+  );
 
   async function toggleSnoozed () {
     const updatedSnoozedStatus = !isSnoozed;
@@ -116,8 +128,26 @@ function SafeTasks ({ address, safeName, safeUrl, tasks }: { address: string, sa
   return (
     <>
       <Box display='flex' justifyContent='space-between'>
-        <Typography color='inherit'>
-          Tasks from safe: <Link href={safeUrl} external target='_blank'>{safeName || shortenHex(address)} <OpenInNewIcon fontSize='small' /></Link>
+        <Typography
+          color='inherit'
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          }}
+        >
+          Tasks from safe:
+          <Link
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5
+            }}
+            href={safeUrl}
+            external
+            target='_blank'
+          >{safeName || shortenHex(address)} <OpenInNewIcon fontSize='small' />
+          </Link>
         </Typography>
         <Box display='flex' gap={1} alignItems='center'>
           <SnoozeIcon
@@ -127,8 +157,8 @@ function SafeTasks ({ address, safeName, safeUrl, tasks }: { address: string, sa
             color={isSnoozed ? 'primary' : 'secondary'}
             onClick={toggleSnoozed}
           />
+          {isSnoozed && (
           <DateTimePicker
-            disabled={!isSnoozed}
             value={snoozedForDate}
             onAccept={(value) => {
               charmClient.snoozeTransactions({
@@ -141,6 +171,7 @@ function SafeTasks ({ address, safeName, safeUrl, tasks }: { address: string, sa
             }}
             renderInput={(props) => <TextField fullWidth {...props} />}
           />
+          )}
         </Box>
       </Box>
       {
@@ -159,7 +190,7 @@ function SafeTasks ({ address, safeName, safeUrl, tasks }: { address: string, sa
                   </Box>
                 )}
                 {task.transactions.map(transaction => (
-                  <TransactionRow transaction={transaction} />
+                  <TransactionRow snoozedAddresses={snoozedAddresses} transaction={transaction} key={transaction.id} />
                 ))}
               </Box>
             </Box>
@@ -213,6 +244,7 @@ export default function GnosisTasksSection () {
           safeName={safe.safeName}
           tasks={safe.tasks}
           safeUrl={safe.safeUrl}
+          snoozedAddresses={safe.snoozedAddresses}
         />
       ))}
       {safeData?.length === 0 && (
