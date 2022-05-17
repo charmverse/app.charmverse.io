@@ -13,13 +13,14 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
   }
 
   // Only admins can approve the application (for now)
-  const { error, isAdmin } = await hasAccessToSpace({ userId, spaceId: application.bounty.spaceId, adminOnly: true });
+  const { error, isAdmin } = await hasAccessToSpace({ userId, spaceId: application.bounty.spaceId, adminOnly: false });
 
   if (error) {
     throw error;
   }
 
-  if (isAdmin === false) {
+  // Admin or reviewer can assign the application
+  if (isAdmin === false && application.bounty.reviewer !== userId) {
     throw new UnauthorisedActionError('You do not have permissions to approve this application');
   }
 

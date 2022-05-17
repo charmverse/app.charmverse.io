@@ -18,20 +18,17 @@ import { getDisplayName } from 'lib/users';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { Modal } from 'components/common/Modal';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useBounties } from 'hooks/useBounties';
+import { applicantIsSubmitter } from 'lib/applications/shared';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
-
+import { SubmissionStatusColors, SubmissionStatusLabels } from '../components_v3/BountySubmissions';
 /**
  * @updateApplication callback to parent [bountyId] page that implements application update logic
  */
 export interface IBountyApplicantListProps {
   bounty: Bounty,
-  bountyReassigned?: () => any
   applications: Application[]
-}
-
-function createData (id: string, message: string, date: string) {
-  return { id, message, date };
 }
 
 function moveUserApplicationToFirstRow (applications: Application [], user: User): Application [] {
@@ -56,11 +53,11 @@ function moveUserApplicationToFirstRow (applications: Application [], user: User
 
 export function BountyApplicantList ({
   applications,
-  bounty,
-  bountyReassigned = () => {}
+  bounty
 }: IBountyApplicantListProps) {
   const [user] = useUser();
   const [contributors] = useContributors();
+  const { refreshBounty } = useBounties();
 
   const isAdmin = useIsAdmin();
 
@@ -81,17 +78,26 @@ export function BountyApplicantList ({
   //   );
   // }
 
-  async function assignBounty (assignee: string) {
-    await charmClient.assignBounty(bounty.id, assignee);
-    bountyReassigned();
+  async function approveApplication (applicationId: string) {
+    await charmClient.approveApplication(applicationId);
+    refreshBounty(bounty.id);
   }
+
+  const acceptedApplications = applications.filter(applicantIsSubmitter);
+
+  const isReviewer = bounty.reviewer === user?.id;
 
   function displayAssignmentButton (application: Application) {
     return (
-      isAdmin === true
-      && application.createdBy !== bounty.assignee
-      // We don't want to reassign a bounty after the work is complete
-      && ['complete', 'paid'].indexOf(bounty.status) === -1);
+      // Only admins can approve applications for now
+      (isAdmin === true || isReviewer)
+      && application.status === 'applied'
+      // If we reached the cap, we can't assign new people
+      && (
+        bounty.capSubmissions === false || (
+          bounty.capSubmissions && acceptedApplications.length < (bounty.maxSubmissions ?? 0)
+        )
+      ));
   }
 
   const applicationsMade = applications.length;
@@ -182,7 +188,7 @@ export function BountyApplicantList ({
                       <Button
                         sx={{ ml: 2 }}
                         onClick={() => {
-                          assignBounty(application.createdBy);
+                          approveApplication(application.id);
                         }}
                       >
                         Assign
@@ -190,8 +196,12 @@ export function BountyApplicantList ({
                     )
                   }
                   {
-                    bounty.assignee === application.createdBy && (
-                      <Chip sx={{ ml: 2 }} label='Assigned' color={BountyStatusColours.inProgress} />
+                    applicantIsSubmitter(application) && (
+                      <Chip
+                        sx={{ ml: 2 }}
+                        label={SubmissionStatusLabels[application.status]}
+                        color={SubmissionStatusColors[application.status]}
+                      />
                     )
                   }
                 </TableCell>
