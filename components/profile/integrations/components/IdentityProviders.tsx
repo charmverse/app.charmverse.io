@@ -67,9 +67,8 @@ export default function IdentityProviders () {
   const [discordError, setDiscordError] = useState('');
   const [telegramError, setTelegramError] = useState('');
   const router = useRouter();
-  const [space] = useCurrentSpace();
-  const isConnectingToDiscord = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'connect';
-  const discordConnectFailed = space && router.query.discord === '2' && router.query.type === 'connect';
+  const isConnectingToDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'connect';
+  const discordConnectFailed = router.query.discord === '2' && router.query.type === 'connect';
   const [isConnectDiscordLoading, setIsConnectDiscordLoading] = useState(false);
   const { showMessage } = useSnackbar();
 
@@ -81,7 +80,7 @@ export default function IdentityProviders () {
       showMessage('Failed to connect to discord');
     }
   }, [discordConnectFailed]);
-
+  console.log('isConnectingToDiscord', isConnectingToDiscord, router.query);
   // We might get redirected after connection with discord, so check the query param if it has a discord field
   // It can either be fail or success
   useEffect(() => {
