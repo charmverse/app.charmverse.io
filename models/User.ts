@@ -1,4 +1,4 @@
-import type { DiscordUser, FavoritePage, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser } from '@prisma/client';
+import type { DiscordUser, FavoritePage, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser, UserGnosisSafeState } from '@prisma/client';
 
 export { FavoritePage, SpaceRole, User };
 
@@ -17,4 +17,5 @@ export interface LoggedInUser extends User {
   ensName?: string;
   discordUser?: DiscordUser | null
   telegramUser?: TelegramUser | null
+  userGnosisSafeState?: UserGnosisSafeState | null
 }

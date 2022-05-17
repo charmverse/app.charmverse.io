@@ -3,14 +3,15 @@ import log from 'lib/log';
 import groupBy from 'lodash/groupBy';
 import intersection from 'lodash/intersection';
 import { prisma } from 'db';
-import { User, UserGnosisSafe } from '@prisma/client';
+import { User, UserGnosisSafe, UserGnosisSafeState } from '@prisma/client';
 import { getTransactionsforSafes, GnosisTransaction } from './gnosis';
 
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`;
 
+type UserWithGnosisSafeState = User & {userGnosisSafeState: UserGnosisSafeState | null}
 interface ActionUser {
   address: string;
-  user?: User;
+  user?: UserWithGnosisSafeState;
 }
 
 interface SendAction {
@@ -45,7 +46,7 @@ export interface GnosisSafeTasks {
   safeName: string | null;
   safeUrl: string;
   tasks: GnosisTask[];
-  snoozedUsers: User[]
+  snoozedUsers: UserWithGnosisSafeState[]
 }
 
 function etherToBN (ether: string): ethers.BigNumber {
@@ -105,7 +106,7 @@ interface TransactionToTaskProps {
   myAddresses: string[];
   transaction: GnosisTransaction;
   safe: UserGnosisSafe;
-  users: User[];
+  users: UserWithGnosisSafeState[];
 }
 
 function transactionToTask ({ myAddresses, transaction, safe, users }: TransactionToTaskProps): GnosisTransactionPopulated {
@@ -150,7 +151,7 @@ interface TransactionsToTaskProps {
   transactions: GnosisTransaction[];
   safes: UserGnosisSafe[];
   myUserId: string;
-  users: User[];
+  users: UserWithGnosisSafeState[];
 }
 
 function transactionsToTasks ({ transactions, safes, myUserId, users }: TransactionsToTaskProps): GnosisSafeTasks[] {
@@ -164,9 +165,9 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
     users
   }));
 
-  const snoozedUsers: User[] = [];
+  const snoozedUsers: UserWithGnosisSafeState[] = [];
   users.forEach(user => {
-    if (user.transactionsSnoozedFor !== null) {
+    if (user.userGnosisSafeState && user.userGnosisSafeState?.transactionsSnoozedFor !== null) {
       snoozedUsers.push(user);
     }
   });
@@ -203,6 +204,9 @@ export async function getPendingGnosisTasks (myUserId: string) {
       addresses: {
         hasSome: userAddresses
       }
+    },
+    include: {
+      userGnosisSafeState: true
     }
   });
 

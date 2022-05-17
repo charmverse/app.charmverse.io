@@ -32,7 +32,7 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     logSignup();
   }
 
-  const { discordUser, spaceRoles, telegramUser, ...userData } = user;
+  const { discordUser, spaceRoles, telegramUser, userGnosisSafeState, ...userData } = user;
   req.session.user = userData;
   await updateGuildRolesForUser(userData.addresses, spaceRoles);
   await req.session.save();
@@ -57,7 +57,8 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
         }
       },
       discordUser: true,
-      telegramUser: true
+      telegramUser: true,
+      userGnosisSafeState: true
     }
   });
   if (!profile) {
