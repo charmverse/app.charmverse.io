@@ -12,7 +12,7 @@ const exampleBoardSchema: PageProperty [] = [
     options: [
       {
         id: '7154c7b1-9370-4177-8d32-5aec591b158b',
-        color: 'propColorGreen',
+        color: 'propColorTeal',
         value: 'Completed'
       },
       {

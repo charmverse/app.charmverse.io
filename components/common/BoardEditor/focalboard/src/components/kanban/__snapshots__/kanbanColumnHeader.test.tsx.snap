@@ -134,7 +134,7 @@ exports[`src/components/kanban/kanbanColumnHeader return kanbanColumnHeader and 
               />
             </div>
             <div
-              aria-label="Select Brown Color"
+              aria-label="Select Turquoise Color"
               class="MenuOption ColorOption menu-option"
               role="button"
             >
@@ -144,10 +144,10 @@ exports[`src/components/kanban/kanbanColumnHeader return kanbanColumnHeader and 
               <div
                 class="menu-name"
               >
-                Brown
+                Turquoise
               </div>
               <div
-                class="menu-colorbox propColorBrown"
+                class="menu-colorbox propColorTurquoise"
               />
             </div>
             <div
@@ -185,7 +185,7 @@ exports[`src/components/kanban/kanbanColumnHeader return kanbanColumnHeader and 
               />
             </div>
             <div
-              aria-label="Select Green Color"
+              aria-label="Select Teal Color"
               class="MenuOption ColorOption menu-option"
               role="button"
             >
@@ -195,10 +195,10 @@ exports[`src/components/kanban/kanbanColumnHeader return kanbanColumnHeader and 
               <div
                 class="menu-name"
               >
-                Green
+                Teal
               </div>
               <div
-                class="menu-colorbox propColorGreen"
+                class="menu-colorbox propColorTeal"
               />
             </div>
             <div

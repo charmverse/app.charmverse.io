@@ -169,8 +169,8 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         main: mode === 'dark' ? darkModeColors.gray : lightModeColors.gray,
         contrastText
       },
-      cyanBlue: {
-        main: mode === 'dark' ? darkModeColors.cyanBlue : lightModeColors.cyanBlue,
+      turquoise: {
+        main: mode === 'dark' ? darkModeColors.turquoise : lightModeColors.turquoise,
         contrastText
       },
       orange: {
@@ -181,8 +181,8 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         main: mode === 'dark' ? darkModeColors.yellow : lightModeColors.yellow,
         contrastText
       },
-      green: {
-        main: mode === 'dark' ? darkModeColors.green : lightModeColors.green,
+      teal: {
+        main: mode === 'dark' ? darkModeColors.teal : lightModeColors.teal,
         contrastText
       },
       purple: {

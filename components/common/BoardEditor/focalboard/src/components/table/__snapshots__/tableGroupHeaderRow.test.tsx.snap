@@ -26,7 +26,7 @@ exports[`should match snapshot on read only 1`] = `
         </svg>
       </button>
       <span
-        class="Label propColorBrown "
+        class="Label propColorTurquoise "
       >
         <input
           class="Editable readonly undefined"
@@ -76,7 +76,7 @@ exports[`should match snapshot with Group 1`] = `
         </svg>
       </button>
       <span
-        class="Label propColorBrown "
+        class="Label propColorTurquoise "
       >
         <input
           class="Editable undefined"
@@ -147,7 +147,7 @@ exports[`should match snapshot, add new 1`] = `
         </svg>
       </button>
       <span
-        class="Label propColorBrown "
+        class="Label propColorTurquoise "
       >
         <input
           class="Editable undefined"
@@ -218,7 +218,7 @@ exports[`should match snapshot, edit title 1`] = `
         </svg>
       </button>
       <span
-        class="Label propColorBrown "
+        class="Label propColorTurquoise "
       >
         <input
           class="Editable undefined"
@@ -289,7 +289,7 @@ exports[`should match snapshot, hide group 1`] = `
         </svg>
       </button>
       <span
-        class="Label propColorBrown "
+        class="Label propColorTurquoise "
       >
         <input
           class="Editable undefined"

@@ -9,9 +9,10 @@ export interface Props {
   defaultValue?: string,
   title?: string
   keyAndLabel: Record<string | any, string | number>
+  autoExpand?: boolean
 }
 
-export default function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, keyAndLabel }: Props) {
+export default function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, keyAndLabel, autoExpand = false }: Props) {
 
   const options = Object.entries(keyAndLabel);
 
@@ -31,6 +32,7 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
 
       <Select
         value={value}
+        defaultOpen={autoExpand}
         onChange={(ev) => {
           setValue(ev.target.value as string);
           if (ev.target.value) {

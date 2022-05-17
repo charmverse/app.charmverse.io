@@ -33,6 +33,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import useIsAdmin from 'hooks/useIsAdmin';
 import BountyModal from '../components/BountyModal';
+import { FormValues as BountyFormValues } from '../components/BountyEditorForm';
 import BountyStatusBadge from '../components/BountyStatusBadge';
 import BountyPaymentButton from './components/BountyPaymentButton';
 import { BountyApplicantList } from './components/BountyApplicantList';
@@ -49,6 +50,8 @@ export default function BountyDetails () {
   const [contributors] = useContributors();
   const { bounties, setBounties } = useBounties();
   const [bounty, setBounty] = useState<BountyWithDetails | null>(null);
+
+  const [formFocusKey, setFormFocusKey] = useState<keyof BountyFormValues | undefined>(undefined);
 
   const bountyEditModal = usePopupState({ variant: 'popover', popupId: 'ERC20-popup' });
   const bountyApproveModal = usePopupState({ variant: 'popover', popupId: 'approve-bounty' });
@@ -104,6 +107,16 @@ export default function BountyDetails () {
   useEffect(() => {
     loadBounty();
   }, []);
+
+  useEffect(() => {
+
+    if (typeof bounty?.rewardAmount === 'number' && bounty?.rewardAmount > 0) {
+      setFormFocusKey(undefined);
+    }
+    else {
+      setFormFocusKey('rewardAmount');
+    }
+  }, [bounty]);
 
   // Infer if the user is an admin or not
 
@@ -251,14 +264,6 @@ export default function BountyDetails () {
                         <DeleteIcon fontSize='medium' />
                       </IconButton>
                     </Tooltip>
-                    {
-
-                      isAdmin && bounty.status === 'suggestion' && (
-                        <Tooltip arrow placement='top' title={approvableBounty ? 'Approve bounty suggestion' : 'You must define a reward amount before you can approve this bounty suggestion.'}>
-                          <Button color='primary' onClick={approvableBounty ? bountyApproveModal.open : () => {}}>Approve suggestion</Button>
-                        </Tooltip>
-                      )
-                    }
                   </>
                 )
               }
@@ -277,23 +282,27 @@ export default function BountyDetails () {
             <Box my={2}>
               {CharmEditorMemoized}
             </Box>
+
             <Grid
               container
               direction='row'
               spacing={2}
             >
-              <Grid item xs={6}>
-                <Card sx={{ height: '100%', p: 2 }} variant='outlined'>
-                  <CardHeader subheader='Reviewer' sx={{ pt: 0 }} />
-                  <CardContent sx={{ minHeight: '70px', pt: 0.5, pb: 0.5 }}>
-                    <Box
-                      component='div'
-                      sx={{ display: 'flex',
-                        gap: 1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-start' }}
-                    >
-                      {
+              {
+              bounty.status !== 'suggestion' && (
+                <>
+                  <Grid item xs={6}>
+                    <Card sx={{ height: '100%', p: 2 }} variant='outlined'>
+                      <CardHeader subheader='Reviewer' sx={{ pt: 0 }} />
+                      <CardContent sx={{ minHeight: '70px', pt: 0.5, pb: 0.5 }}>
+                        <Box
+                          component='div'
+                          sx={{ display: 'flex',
+                            gap: 1,
+                            alignItems: 'center',
+                            justifyContent: 'flex-start' }}
+                        >
+                          {
               reviewerUser ? (
                 <>
                   <Avatar avatar={reviewerUser.avatar} name={reviewerENSName || getDisplayName(reviewerUser)} />
@@ -305,24 +314,24 @@ export default function BountyDetails () {
 
               }
 
-                    </Box>
-                  </CardContent>
-                  <CardActions sx={{ pt: 0.5 }}>
+                        </Box>
+                      </CardContent>
+                      <CardActions sx={{ pt: 0.5 }}>
 
-                    <Box flexDirection='row' gap={1} display='flex'>
-                      {/* Assign reviewer */}
-                      {!reviewerUser && isAdmin && (
-                      <Button color='secondary' variant='outlined' onClick={bountyEditModal.open}>Assign reviewer</Button>
-                      )}
-                      {/* Review completed work */}
-                      {bounty.status === 'review' && isReviewer && (
-                      <>
-                        <Button onClick={markAsComplete}>Mark as complete</Button>
-                        <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
-                      </>
-                      )}
-                      {/* Proceed with payment */}
-                      {
+                        <Box flexDirection='row' gap={1} display='flex'>
+                          {/* Assign reviewer */}
+                          {!reviewerUser && isAdmin && (
+                          <Button color='secondary' variant='outlined' onClick={bountyEditModal.open}>Assign reviewer</Button>
+                          )}
+                          {/* Review completed work */}
+                          {bounty.status === 'review' && isReviewer && (
+                          <>
+                            <Button onClick={markAsComplete}>Mark as complete</Button>
+                            <Button color='secondary' variant='outlined' onClick={moveToAssigned}>Reopen task</Button>
+                          </>
+                          )}
+                          {/* Proceed with payment */}
+                          {
                     bounty.status === 'complete' && (
                       <Box>
                         <BountyPaymentButton
@@ -343,55 +352,76 @@ export default function BountyDetails () {
                       </Box>
                     )
                   }
-                    </Box>
+                        </Box>
 
-                  </CardActions>
-                </Card>
-              </Grid>
+                      </CardActions>
+                    </Card>
+                  </Grid>
 
-              <Grid item xs={6}>
-                <Card sx={{ height: '100%', p: 2 }} variant='outlined'>
-                  <CardHeader subheader='Assignee' sx={{ pt: 0 }} />
-                  <CardContent sx={{ minHeight: '70px', pt: 0.5, pb: 0.5 }}>
-                    <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
-                      {assigneeName && (
-                      <>
-                        <Avatar avatar={assigneeUser?.avatar} name={assigneeENSName || getDisplayName(assigneeUser)} />
-                        <Typography variant='h6' component='span' sx={{ pl: 0.5 }}>
-                          {assigneeName}
-                        </Typography>
-                      </>
-                      )}
-                      {!assigneeName && !isApplicant && (
+                  <Grid item xs={6}>
+                    <Card sx={{ height: '100%', p: 2 }} variant='outlined'>
+                      <CardHeader subheader='Assignee' sx={{ pt: 0 }} />
+                      <CardContent sx={{ minHeight: '70px', pt: 0.5, pb: 0.5 }}>
+                        <Box component='div' sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
+                          {assigneeName && (
+                          <>
+                            <Avatar avatar={assigneeUser?.avatar} name={assigneeENSName || getDisplayName(assigneeUser)} />
+                            <Typography variant='h6' component='span' sx={{ pl: 0.5 }}>
+                              {assigneeName}
+                            </Typography>
+                          </>
+                          )}
+                          {!assigneeName && !isApplicant && (
 
-                      <Typography variant='body2'>Nobody has been assigned to this bounty yet</Typography>
+                          <Typography variant='body2'>Nobody has been assigned to this bounty yet</Typography>
 
-                      )}
-                      {!assigneeName && isApplicant && (
-                      <Box>
-                        <Typography variant='body2'>You've applied to this bounty.</Typography>
-                      </Box>
-                      )}
+                          )}
+                          {!assigneeName && isApplicant && (
+                          <Box>
+                            <Typography variant='body2'>You've applied to this bounty.</Typography>
+                          </Box>
+                          )}
 
-                    </Box>
-                  </CardContent>
-                  <CardActions sx={{ pt: 0.5, pb: 0.5 }}>
-                    <Box flexDirection='row' gap={1} display='flex'>
-                      { bounty.status === 'open' && !isApplicant && (
-                      <Button disabled={user?.addresses.length === 0} onClick={toggleApplicationDialog}>Apply now</Button>
-                      )}
-                      {isAssignee && bounty.status === 'assigned' && (
-                      <Button onClick={requestReview}>Request review</Button>
-                      )}
-                    </Box>
-                  </CardActions>
-                </Card>
-              </Grid>
+                        </Box>
+                      </CardContent>
+                      <CardActions sx={{ pt: 0.5, pb: 0.5 }}>
+                        <Box flexDirection='row' gap={1} display='flex'>
+                          { bounty.status === 'open' && !isApplicant && (
+                          <Button disabled={user?.addresses.length === 0} onClick={toggleApplicationDialog}>Apply now</Button>
+                          )}
+                          {isAssignee && bounty.status === 'assigned' && (
+                          <Button onClick={requestReview}>Request review</Button>
+                          )}
+                        </Box>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                </>
+              )
+            }
+              {
+              bounty.status === 'suggestion' && isAdmin && (
+                <Grid item xs={12}>
+                  <Tooltip arrow placement='top' title={approvableBounty ? 'Approve bounty suggestion' : 'You must define a reward amount before you can approve this bounty suggestion.'}>
+                    <Button
+                      color='primary'
+                      onClick={
+                      approvableBounty ? bountyApproveModal.open
+                        : bountyEditModal.open
+}
+                    >Approve suggestion
+                    </Button>
+                  </Tooltip>
+                </Grid>
+              )
+            }
+
             </Grid>
+
           </Box>
 
           {
-          bounty && (
+          bounty && bounty.status !== 'suggestion' && (
             <BountyApplicantList
               applications={applications}
               bounty={bounty}
@@ -400,7 +430,7 @@ export default function BountyDetails () {
             />
           )
         }
-          <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={bountyEditModal.isOpen} onClose={bountyEditModal.close} />
+          <BountyModal onSubmit={saveBounty} mode='update' bounty={bounty} open={bountyEditModal.isOpen} onClose={bountyEditModal.close} focusKey={formFocusKey} />
 
           <Modal title='Approve bounty suggestion' open={bountyApproveModal.isOpen} onClose={bountyApproveModal.close}>
 

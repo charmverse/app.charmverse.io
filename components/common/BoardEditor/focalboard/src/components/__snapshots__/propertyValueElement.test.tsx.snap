@@ -64,12 +64,12 @@ exports[`components/propertyValueElement should match snapshot, multi-select 1`]
     tabindex="0"
   >
     <span
-      class="Label propColorBrown "
+      class="Label propColorTurquoise "
     >
       value 1
     </span>
     <span
-      class="Label propColorBrown "
+      class="Label propColorTurquoise "
     >
       value 2
     </span>
@@ -98,7 +98,7 @@ exports[`components/propertyValueElement should match snapshot, select 1`] = `
     tabindex="0"
   >
     <span
-      class="Label propColorBrown "
+      class="Label propColorTurquoise "
     >
       <span
         class="Label-text"
@@ -118,7 +118,7 @@ exports[`components/propertyValueElement should match snapshot, select, read-onl
     tabindex="0"
   >
     <span
-      class="Label propColorBrown "
+      class="Label propColorTurquoise "
     >
       <span
         class="Label-text"

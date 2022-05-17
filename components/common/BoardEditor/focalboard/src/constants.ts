@@ -5,14 +5,14 @@ class Constants {
     static readonly menuColors: {[key: string]: string} = {
         propColorDefault: 'Default',
         propColorGray: 'Gray',
-        propColorBrown: 'Brown',
+        propColorTurquoise: 'Turquoise',
         propColorOrange: 'Orange',
         propColorYellow: 'Yellow',
-        propColorGreen: 'Green',
+        propColorTeal: 'Teal',
         propColorBlue: 'Blue',
         propColorPurple: 'Purple',
-        propColorPink: 'Pink',
         propColorRed: 'Red',
+        propColorPink: 'Pink',
     }
 
     static readonly minColumnWidth = 100

@@ -26,10 +26,10 @@ export type Theme = {
 
     propDefault: string,
     propGray: string,
-    propBrown: string,
+    propTurquoise: string,
     propOrange: string,
     propYellow: string,
-    propGreen: string,
+    propTeal: string,
     propBlue: string,
     propPurple: string,
     propPink: string,
@@ -54,15 +54,15 @@ export const defaultTheme = {
     linkVisited: '#551a8b',
 
     propDefault: '#fff',
-    propGray: '#EDEDED',
-    propBrown: '#F7DDC3',
-    propOrange: '#ffd3c1',
-    propYellow: '#f7f0b6',
-    propGreen: '#c7eac3',
-    propBlue: '#B1D1F6',
-    propPurple: '#e6d0ff',
-    propPink: '#ffd6e9',
-    propRed: '#ffa9a9',
+    propGray: '#757570',
+    propTurquoise: '#4273C2',
+    propOrange: '#C44F1C',
+    propYellow: '#81730E',
+    propTeal: '#007C8F',
+    propBlue: '#007CAD',
+    propPurple: '#8742FF',
+    propRed: '#D53474',
+    propPink: '#925E9C',
 }
 
 export const darkThemeName = 'dark-theme'
@@ -83,15 +83,15 @@ export const darkTheme = {
     linkVisited: 'hsla(270, 68%, 70%, 1.0)',
 
     propDefault: 'hsla(0, 100%, 100%, 0.08)',
-    propGray: 'hsla(0, 0%, 70%, 0.4)',
-    propBrown: 'hsla(25, 60%, 40%, 0.4)',
-    propOrange: 'hsla(35, 100%, 50%, 0.4)',
-    propYellow: 'hsla(48, 100%, 70%, 0.4)',
-    propGreen: 'hsla(120, 100%, 70%, 0.4)',
-    propBlue: 'hsla(240, 100%, 70%, 0.4)',
-    propPurple: 'hsla(270, 100%, 64%, 0.4)',
-    propPink: 'hsla(310, 100%, 80%, 0.4)',
-    propRed: 'hsla(4, 100%, 70%, 0.4)',
+    propGray: 'hsla(60, 2%, 45%, 0.4)',
+    propTurquoise: 'hsla(217, 51%, 51%, 0.4)',
+    propOrange: 'hsla(18, 75%, 44%, 0.4)',
+    propYellow: 'hsla(53, 80%, 28%, 0.4)',
+    propTeal: 'hsla(188, 100%, 28%, 0.4)',
+    propBlue: 'hsla(197, 100%, 34%, 0.4)',
+    propPurple: 'hsla(262, 100%, 63%, 0.4)',
+    propRed: 'hsla(337, 66%, 52%, 0.4)',
+    propPink: 'hsla(290, 25%, 49%, 0.4)',
 }
 
 export const lightThemeName = 'light-theme'
@@ -147,10 +147,10 @@ export function setTheme(theme: Theme | null): Theme {
         }
         consolidatedTheme.propDefault = fixedTheme.propDefault
         consolidatedTheme.propGray = fixedTheme.propGray
-        consolidatedTheme.propBrown = fixedTheme.propBrown
+        consolidatedTheme.propTurquoise = fixedTheme.propTurquoise
         consolidatedTheme.propOrange = fixedTheme.propOrange
         consolidatedTheme.propYellow = fixedTheme.propYellow
-        consolidatedTheme.propGreen = fixedTheme.propGreen
+        consolidatedTheme.propTeal = fixedTheme.propTeal
         consolidatedTheme.propBlue = fixedTheme.propBlue
         consolidatedTheme.propPurple = fixedTheme.propPurple
         consolidatedTheme.propPink = fixedTheme.propPink
@@ -159,10 +159,10 @@ export function setTheme(theme: Theme | null): Theme {
 
     document.documentElement.style.setProperty('--prop-default', consolidatedTheme.propDefault)
     document.documentElement.style.setProperty('--prop-gray', consolidatedTheme.propGray)
-    document.documentElement.style.setProperty('--prop-brown', consolidatedTheme.propBrown)
+    document.documentElement.style.setProperty('--prop-turquoise', consolidatedTheme.propTurquoise)
     document.documentElement.style.setProperty('--prop-orange', consolidatedTheme.propOrange)
     document.documentElement.style.setProperty('--prop-yellow', consolidatedTheme.propYellow)
-    document.documentElement.style.setProperty('--prop-green', consolidatedTheme.propGreen)
+    document.documentElement.style.setProperty('--prop-teal', consolidatedTheme.propTeal)
     document.documentElement.style.setProperty('--prop-blue', consolidatedTheme.propBlue)
     document.documentElement.style.setProperty('--prop-purple', consolidatedTheme.propPurple)
     document.documentElement.style.setProperty('--prop-pink', consolidatedTheme.propPink)

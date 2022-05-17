@@ -30,7 +30,7 @@ import { Page as PrismaPage } from '@prisma/client';
 *                 example: a6f7c9ac-d660-44ba-a64a-3198e012277f
 *               color:
 *                 type: string
-*                 example: propColorGreen
+*                 example: propColorTeal
 *               value:
 *                 type: string
 *                 example: Complete

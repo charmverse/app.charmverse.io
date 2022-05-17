@@ -7,6 +7,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { gettingStartedPageContent } from 'seedData';
 import { postToDiscord, IEventToLog } from 'lib/log/userEvents';
+import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -42,7 +43,11 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
       updatedBy: data.author.connect!.id!
     }]
   };
+
   const space = await prisma.space.create({ data, include: { pages: true } });
+
+  // Add default stablecoin methods
+  await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
 
   await prisma.pagePermission.create({
     data: {
