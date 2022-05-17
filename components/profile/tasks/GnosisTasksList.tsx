@@ -23,6 +23,7 @@ import { User, UserGnosisSafeState } from '@prisma/client';
 import Tooltip from '@mui/material/Tooltip';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import CancelIcon from '@mui/icons-material/Cancel';
+import MessageIcon from '@mui/icons-material/Message';
 import { GnosisConnectCard } from '../integrations/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
@@ -117,10 +118,23 @@ function TransactionRow (
               {filteredSnoozedUsers.map(snoozedUser => (
                 <Box py={1} display='flex' justifyContent='space-between'>
                   <UserDisplay avatarSize='small' user={snoozedUser} />
-                  <Typography variant='subtitle1' color='secondary'>
-                    for {DateTime.fromJSDate(new Date(snoozedUser.userGnosisSafeState?.transactionsSnoozedFor as Date))
-                    .toRelative({ base: (DateTime.now()) })?.slice(3)}
-                  </Typography>
+                  <Box display='flex' gap={1} alignItems='center'>
+                    {snoozedUser.userGnosisSafeState?.transactionsSnoozeMessage && (
+                    <Tooltip arrow placement='top' title={snoozedUser.userGnosisSafeState.transactionsSnoozeMessage}>
+                      <MessageIcon
+                        fontSize='small'
+                        color='secondary'
+                        sx={{
+                          width: 14
+                        }}
+                      />
+                    </Tooltip>
+                    )}
+                    <Typography variant='subtitle1' color='secondary'>
+                      for {DateTime.fromJSDate(new Date(snoozedUser.userGnosisSafeState?.transactionsSnoozedFor as Date))
+                      .toRelative({ base: (DateTime.now()) })?.slice(3)}
+                    </Typography>
+                  </Box>
                 </Box>
               ))}
             </Grid>
