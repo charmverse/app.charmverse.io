@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { Alert, Box, Card, Chip, Collapse, Divider, Grid, IconButton, MenuItem, Select, TextField, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -200,8 +200,25 @@ function SnoozeTransaction (
 ) {
   const [isEditingSnooze, setIsEditingSnooze] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-
+  const { mutate: mutateTasks } = useTasks();
   const isSnoozed = snoozedForDate !== null;
+
+  async function removeSnoozedForDate () {
+    await charmClient.snoozeTransactions(null);
+    setSnoozedForDate(null);
+    mutateTasks();
+  }
+
+  useEffect(() => {
+    if (snoozedForDate) {
+      const currentTimestamp = Date.now();
+      const snoozedForTimestamp = snoozedForDate.toJSDate().getTime();
+      // If the snoozed time has passed
+      if (snoozedForTimestamp < currentTimestamp) {
+        removeSnoozedForDate();
+      }
+    }
+  }, [snoozedForDate]);
 
   const SnoozeEditor = (
     <>
@@ -212,12 +229,14 @@ function SnoozeTransaction (
         {showDatePicker
           ? (
             <DateTimePicker
-              value={DateTime.fromMillis(Date.now())}
+              minDate={DateTime.fromMillis(Date.now()).plus({ hour: 1 })}
+              value={DateTime.fromMillis(Date.now()).plus({ hour: 1 })}
               onAccept={async (value) => {
                 setIsEditingSnooze(false);
                 setShowDatePicker(false);
                 setSnoozedForDate(value);
                 await charmClient.snoozeTransactions(value ? value.toJSDate() : null);
+                mutateTasks();
               }}
               onChange={() => {}}
               renderInput={(props) => <TextField fullWidth {...props} />}
@@ -271,8 +290,8 @@ function SnoozeTransaction (
                   }
                   setSnoozedForDate(newSnoozedForDate);
                   await charmClient.snoozeTransactions(newSnoozedForDate.toJSDate());
+                  mutateTasks();
                 }
-                // mutateTasks();
               }}
             >
               <MenuItem value='1_hr'>1 hr</MenuItem>
@@ -350,10 +369,7 @@ function SnoozeTransaction (
             <Tooltip arrow placement='top' title='Un-Snooze'>
               <IconButton
                 size='small'
-                onClick={async () => {
-                  setSnoozedForDate(null);
-                  await charmClient.snoozeTransactions(null);
-                }}
+                onClick={removeSnoozedForDate}
               >
                 <SnoozeIcon
                   fontSize='small'

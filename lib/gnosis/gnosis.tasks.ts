@@ -154,7 +154,6 @@ interface TransactionsToTaskProps {
 }
 
 function transactionsToTasks ({ transactions, safes, myUserId, users }: TransactionsToTaskProps): GnosisSafeTasks[] {
-
   const myAddresses = users.find(user => user.id === myUserId)?.addresses ?? [];
   const safesByAddress = safes.reduce<Record<string, UserGnosisSafe>>((acc, safe) => ({ ...acc, [safe.address]: safe }), {});
 
@@ -167,7 +166,7 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
 
   const snoozedUsers: User[] = [];
   users.forEach(user => {
-    if (user.transactionsSnoozed) {
+    if (user.transactionsSnoozedFor !== null) {
       snoozedUsers.push(user);
     }
   });
