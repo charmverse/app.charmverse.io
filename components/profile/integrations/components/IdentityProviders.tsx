@@ -7,7 +7,7 @@ import CopyableAddress from 'components/common/CopyableAddress';
 import Avatar from 'components/common/Avatar';
 import Box from '@mui/material/Box';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { FC, useContext, useState, useEffect } from 'react';
+import { ReactNode, useContext, useState, useEffect } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import useENSName from 'hooks/useENSName';
 import { useSnackbar } from 'hooks/useSnackbar';
