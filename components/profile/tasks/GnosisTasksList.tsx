@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import { Alert, Box, Card, Chip, Collapse, Divider, Grid, TextField, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -20,6 +20,7 @@ import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import charmClient from 'charmClient';
 import { User } from '@prisma/client';
+import Tooltip from '@mui/material/Tooltip';
 import { GnosisConnectCard } from '../integrations/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
@@ -30,8 +31,10 @@ const GridColumn = styled((props: any) => <Grid item xs {...props} />)`
   align-items: center;
 `;
 
-function TransactionRow ({ snoozedUsers, transaction }: { snoozedUsers: User[], transaction: GnosisTransactionPopulated }) {
-
+function TransactionRow (
+  { isSnoozed, snoozedUsers, transaction }:
+  { isSnoozed: boolean, snoozedUsers: User[], transaction: GnosisTransactionPopulated }
+) {
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
 
@@ -58,6 +61,7 @@ function TransactionRow ({ snoozedUsers, transaction }: { snoozedUsers: User[], 
             target='_blank'
             color={transaction.myAction ? 'primary' : undefined}
             variant={transaction.myAction ? 'filled' : 'outlined'}
+            disabled={isSnoozed}
           />
         </GridColumn>
         <GridColumn sx={{ flexGrow: '0 !important' }}>
@@ -109,25 +113,9 @@ function TransactionRow ({ snoozedUsers, transaction }: { snoozedUsers: User[], 
 }
 
 function SafeTasks (
-  { snoozedUsers, address, safeName, safeUrl, tasks }:
-  { snoozedUsers: User[], address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
+  { isSnoozed, snoozedUsers, address, safeName, safeUrl, tasks }:
+  { isSnoozed: boolean, snoozedUsers: User[], address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
 ) {
-  const [currentUser] = useUser();
-  const [isSnoozed, setIsSnoozed] = useState(currentUser?.transactionsSnoozed ?? false);
-  const [snoozedForDate, setSnoozedForDate] = useState<null | DateTime>(
-    (currentUser?.transactionsSnoozedFor as any) ?? null
-  );
-
-  async function toggleSnoozed () {
-    const updatedSnoozedStatus = !isSnoozed;
-    const nextDayDate = DateTime.fromMillis(Date.now()).plus({ day: 1 });
-    await charmClient.snoozeTransactions({
-      snooze: updatedSnoozedStatus,
-      snoozeFor: isSnoozed ? null : nextDayDate.toJSDate()
-    });
-    setSnoozedForDate(isSnoozed ? null : nextDayDate);
-    setIsSnoozed(updatedSnoozedStatus);
-  }
 
   return (
     <>
@@ -153,37 +141,15 @@ function SafeTasks (
           >{safeName || shortenHex(address)} <OpenInNewIcon fontSize='small' />
           </Link>
         </Typography>
-        <Box display='flex' gap={1} alignItems='center'>
-          <SnoozeIcon
-            sx={{
-              cursor: 'pointer'
-            }}
-            color={isSnoozed ? 'primary' : 'secondary'}
-            onClick={toggleSnoozed}
-          />
-          {isSnoozed && (
-          <DateTimePicker
-            value={snoozedForDate}
-            onAccept={(value) => {
-              charmClient.snoozeTransactions({
-                snooze: isSnoozed,
-                snoozeFor: value ? value.toJSDate() : null
-              });
-            }}
-            onChange={(value) => {
-              setSnoozedForDate(value);
-            }}
-            renderInput={(props) => <TextField fullWidth {...props} />}
-          />
-          )}
-        </Box>
       </Box>
       {
         tasks.map((task: GnosisTask) => (
           <Card key={task.nonce} sx={{ my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
             <Box display='flex'>
-              <Box px={3} height={rowHeight} display='flex' alignItems='center'>
-                {task.transactions[0].nonce}
+              <Box px={3} height={rowHeight} display='flex' alignItems='center' gap={1}>
+                <Typography>
+                  {task.transactions[0].nonce}
+                </Typography>
               </Box>
               <Box flexGrow={1}>
                 {task.transactions.length > 1 && (
@@ -194,7 +160,7 @@ function SafeTasks (
                   </Box>
                 )}
                 {task.transactions.map(transaction => (
-                  <TransactionRow snoozedUsers={snoozedUsers} transaction={transaction} key={transaction.id} />
+                  <TransactionRow isSnoozed={isSnoozed} snoozedUsers={snoozedUsers} transaction={transaction} key={transaction.id} />
                 ))}
               </Box>
             </Box>
@@ -206,12 +172,17 @@ function SafeTasks (
 }
 
 export default function GnosisTasksSection () {
-
   const { data: safeData, mutate } = useMultiWalletSigs();
   const { error, mutate: mutateTasks, tasks } = useTasks();
 
   const gnosisSigner = useGnosisSigner();
   const [user] = useUser();
+
+  const [isSnoozed, setIsSnoozed] = useState(user?.transactionsSnoozed ?? false);
+  const [snoozedForDate, setSnoozedForDate] = useState<null | DateTime>(
+    (user?.transactionsSnoozedFor as any) ?? null
+  );
+
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
 
   async function importSafes () {
@@ -230,11 +201,53 @@ export default function GnosisTasksSection () {
       }
     }
   }
+
+  async function toggleSnoozed () {
+    const updatedSnoozedStatus = !isSnoozed;
+    const nextDayDate = DateTime.fromMillis(Date.now()).plus({ day: 1 });
+    await charmClient.snoozeTransactions({
+      snooze: updatedSnoozedStatus,
+      snoozeFor: isSnoozed ? null : nextDayDate.toJSDate()
+    });
+    setSnoozedForDate(isSnoozed ? null : nextDayDate);
+    setIsSnoozed(updatedSnoozedStatus);
+    mutateTasks();
+  }
+
   const safesWithTasks = tasks?.gnosis;
 
   return (
     <>
-      <Legend>Multisig</Legend>
+      <Box display='flex' justifyContent='space-between' alignItems='center'>
+        <Legend>Multisig
+        </Legend>
+        <Box display='flex' gap={1} alignItems='center'>
+          <Tooltip arrow placement='top' title={`${isSnoozed ? 'Un-snooze' : 'Snooze'}`}>
+            <SnoozeIcon
+              sx={{
+                cursor: 'pointer'
+              }}
+              color={isSnoozed ? 'primary' : 'secondary'}
+              onClick={toggleSnoozed}
+            />
+          </Tooltip>
+          {isSnoozed && (
+          <DateTimePicker
+            value={snoozedForDate}
+            onAccept={(value) => {
+              charmClient.snoozeTransactions({
+                snooze: isSnoozed,
+                snoozeFor: value ? value.toJSDate() : null
+              });
+            }}
+            onChange={(value) => {
+              setSnoozedForDate(value);
+            }}
+            renderInput={(props) => <TextField fullWidth {...props} />}
+          />
+          )}
+        </Box>
+      </Box>
       {!safesWithTasks && !error && <LoadingComponent height='200px' isLoading={true} />}
       {error && !safesWithTasks && (
         <Alert severity='error'>
@@ -243,6 +256,7 @@ export default function GnosisTasksSection () {
       )}
       {safesWithTasks && safesWithTasks.map(safe => (
         <SafeTasks
+          isSnoozed={isSnoozed}
           key={safe.safeAddress}
           address={safe.safeAddress}
           safeName={safe.safeName}
