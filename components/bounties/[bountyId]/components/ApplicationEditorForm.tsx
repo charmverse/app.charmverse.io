@@ -67,9 +67,6 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
       <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
-            <FieldLabel>
-              Your proposal
-            </FieldLabel>
             <TextField
               {...register('message')}
               autoFocus
