@@ -19,6 +19,7 @@ import SnoozeIcon from '@mui/icons-material/Snooze';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import charmClient from 'charmClient';
+import { User } from '@prisma/client';
 import { GnosisConnectCard } from '../integrations/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
@@ -29,7 +30,7 @@ const GridColumn = styled((props: any) => <Grid item xs {...props} />)`
   align-items: center;
 `;
 
-function TransactionRow ({ snoozedAddresses, transaction }: { snoozedAddresses: string[], transaction: GnosisTransactionPopulated }) {
+function TransactionRow ({ snoozedUsers, transaction }: { snoozedUsers: User[], transaction: GnosisTransactionPopulated }) {
 
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
@@ -67,7 +68,7 @@ function TransactionRow ({ snoozedAddresses, transaction }: { snoozedAddresses: 
       </Grid>
       <Collapse in={expanded}>
         <Divider />
-        <Box py={1} pl={4} sx={{ bgcolor: 'background.light' }}>
+        <Box py={1} pl={4} pr={1} sx={{ bgcolor: 'background.light' }}>
           <Grid container spacing={1}>
             <Grid item xs={6}>
               {transaction.actions.map(action => (
@@ -82,17 +83,20 @@ function TransactionRow ({ snoozedAddresses, transaction }: { snoozedAddresses: 
             <Grid item xs={1}>
               <Divider orientation='vertical' />
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={5} pr={1}>
               <Typography color='secondary' gutterBottom variant='body2'>Confirmations</Typography>
               {transaction.confirmations.map(confirmation => (
                 <Box py={1}>
                   {confirmation.user ? <UserDisplay avatarSize='small' user={confirmation.user} /> : <AnonUserDisplay avatarSize='small' address={confirmation.address} />}
                 </Box>
               ))}
-              <Typography color='secondary' gutterBottom variant='body2'>Snoozed Addresses</Typography>
-              {snoozedAddresses.map(snoozedAddress => (
-                <Box py={1}>
-                  <AnonUserDisplay avatarSize='small' address={snoozedAddress} />
+              {snoozedUsers.length !== 0 ? <Typography color='secondary' gutterBottom variant='body2'>Snoozed</Typography> : null}
+              {snoozedUsers.map(snoozedUser => (
+                <Box py={1} display='flex' justifyContent='space-between'>
+                  <UserDisplay avatarSize='small' user={snoozedUser} />
+                  <Typography variant='subtitle1' color='secondary'>
+                    {DateTime.fromJSDate(new Date(snoozedUser.transactionsSnoozedFor as Date)).toRelative({ base: (DateTime.now()), style: 'short' })}
+                  </Typography>
                 </Box>
               ))}
             </Grid>
@@ -105,8 +109,8 @@ function TransactionRow ({ snoozedAddresses, transaction }: { snoozedAddresses: 
 }
 
 function SafeTasks (
-  { snoozedAddresses, address, safeName, safeUrl, tasks }:
-  { snoozedAddresses: string[], address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
+  { snoozedUsers, address, safeName, safeUrl, tasks }:
+  { snoozedUsers: User[], address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
 ) {
   const [currentUser] = useUser();
   const [isSnoozed, setIsSnoozed] = useState(currentUser?.transactionsSnoozed ?? false);
@@ -190,7 +194,7 @@ function SafeTasks (
                   </Box>
                 )}
                 {task.transactions.map(transaction => (
-                  <TransactionRow snoozedAddresses={snoozedAddresses} transaction={transaction} key={transaction.id} />
+                  <TransactionRow snoozedUsers={snoozedUsers} transaction={transaction} key={transaction.id} />
                 ))}
               </Box>
             </Box>
@@ -244,7 +248,7 @@ export default function GnosisTasksSection () {
           safeName={safe.safeName}
           tasks={safe.tasks}
           safeUrl={safe.safeUrl}
-          snoozedAddresses={safe.snoozedAddresses}
+          snoozedUsers={safe.snoozedUsers}
         />
       ))}
       {safeData?.length === 0 && (

@@ -45,7 +45,7 @@ export interface GnosisSafeTasks {
   safeName: string | null;
   safeUrl: string;
   tasks: GnosisTask[];
-  snoozedAddresses: string[]
+  snoozedUsers: User[]
 }
 
 function etherToBN (ether: string): ethers.BigNumber {
@@ -165,10 +165,10 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
     users
   }));
 
-  const snoozedAddresses: string[] = [];
+  const snoozedUsers: User[] = [];
   users.forEach(user => {
     if (user.transactionsSnoozed) {
-      snoozedAddresses.push(...user.addresses);
+      snoozedUsers.push(user);
     }
   });
 
@@ -180,7 +180,7 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
       tasks: Object.values(groupBy(_transactions, 'nonce'))
         .map<GnosisTask>(__transactions => ({ nonce: __transactions[0].nonce, transactions: __transactions }))
         .sort((a, b) => a.nonce - b.nonce),
-      snoozedAddresses
+      snoozedUsers
     }))
     .sort((safeA, safeB) => safeA.safeAddress > safeB.safeAddress ? -1 : 1);
 }
