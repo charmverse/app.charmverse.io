@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { Alert, Box, Button, Card, Chip, Collapse, Divider, Grid, IconButton, Menu, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, Chip, Collapse, Divider, Grid, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -22,6 +22,7 @@ import charmClient from 'charmClient';
 import { User, UserGnosisSafeState } from '@prisma/client';
 import Tooltip from '@mui/material/Tooltip';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { GnosisConnectCard } from '../integrations/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
@@ -294,26 +295,37 @@ function SnoozeTransaction (
         </MenuItem>
         {showDatePicker
           ? (
-            <DateTimePicker
-              minDate={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
-              value={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
-              onAccept={async (value) => {
-                if (value) {
-                  setSnoozedForDate(value);
-                  await charmClient.snoozeTransactions(
-                    { snoozeFor: value.toJSDate(), snoozeMessage: null }
-                  );
-                  mutateTasks();
-                  menuState.onClose();
+            <Box display='flex' gap={1}>
+              <DateTimePicker
+                minDate={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
+                value={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
+                onAccept={async (value) => {
+                  if (value) {
+                    setSnoozedForDate(value);
+                    await charmClient.snoozeTransactions(
+                      { snoozeFor: value.toJSDate(), snoozeMessage: null }
+                    );
+                    mutateTasks();
+                    menuState.onClose();
+                    setShowDatePicker(false);
+                  }
+                }}
+                onChange={() => {}}
+                renderInput={(props) => <TextField fullWidth {...props} />}
+              />
+              <IconButton
+                color='error'
+                onClick={() => {
                   setShowDatePicker(false);
-                }
-              }}
-              onChange={() => {}}
-              renderInput={(props) => <TextField fullWidth {...props} />}
-            />
+                }}
+              >
+                <CancelIcon />
+              </IconButton>
+            </Box>
           )
           : (
             <MenuItem
+              divider
               onClick={() => {
                 setShowDatePicker(true);
               }}
