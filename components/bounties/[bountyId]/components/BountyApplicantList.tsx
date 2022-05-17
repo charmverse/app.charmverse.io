@@ -16,7 +16,10 @@ import { useContributors } from 'hooks/useContributors';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { getDisplayName } from 'lib/users';
 import { humanFriendlyDate } from 'lib/utilities/dates';
+import { Modal } from 'components/common/Modal';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
+import { ApplicationEditorForm } from './ApplicationEditorForm';
 
 /**
  * @updateApplication callback to parent [bountyId] page that implements application update logic
@@ -65,6 +68,8 @@ export function BountyApplicantList ({
 
   const theme = useTheme();
 
+  const bountyApplyModal = usePopupState({ variant: 'popover', popupId: 'apply-for-bounty' });
+
   function getContributor (userId: string) {
     return contributors.find(c => c.id === userId);
   }
@@ -109,33 +114,43 @@ export function BountyApplicantList ({
 
   const sortedApplications = moveUserApplicationToFirstRow(applications, user!);
 
+  const userApplication = sortedApplications.find(app => app.createdBy === user?.id);
+
+  const userHasApplied = userApplication !== undefined;
+
   return (
-    <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
-      <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
-        <TableHead sx={{
-          background: theme.palette.background.dark,
-          '.MuiTableCell-root': {
-            background: theme.palette.settingsHeader.background
-          }
-        }}
-        >
-          <TableRow>
-            <TableCell>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center'
-              }}
-              >
-                {/* <AutorenewIcon onClick={refreshApplications} /> */}
-                Applicant
-              </Box>
-            </TableCell>
-            <TableCell>Message</TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        {applications.length !== 0 && (
+    <>
+      <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
+
+        <Box>
+          <Button disabled={user?.addresses.length === 0} onClick={bountyApplyModal.open}>Apply now</Button>
+        </Box>
+
+        <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
+          <TableHead sx={{
+            background: theme.palette.background.dark,
+            '.MuiTableCell-root': {
+              background: theme.palette.settingsHeader.background
+            }
+          }}
+          >
+            <TableRow>
+              <TableCell>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+                >
+                  {/* <AutorenewIcon onClick={refreshApplications} /> */}
+                  Applicant
+                </Box>
+              </TableCell>
+              <TableCell>Message</TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          {applications.length !== 0 && (
           <TableBody>
             {sortedApplications.map((application, applicationIndex) => (
               <TableRow
@@ -178,29 +193,38 @@ export function BountyApplicantList ({
                   }
                   {
                     bounty.assignee === application.createdBy && (
-                      <Chip sx={{ ml: 2 }} label='Assigned' color={BountyStatusColours.assigned} />
+                      <Chip sx={{ ml: 2 }} label='Assigned' color={BountyStatusColours.inProgress} />
                     )
                   }
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
+          )}
+        </Table>
+        {applications.length === 0 && (
+        <Box
+          my={3}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            opacity: 0.5
+          }}
+        >
+          <Typography variant='h6'>
+            No applications
+          </Typography>
+        </Box>
         )}
-      </Table>
-      {applications.length === 0 && (
-      <Box
-        my={3}
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          opacity: 0.5
-        }}
-      >
-        <Typography variant='h6'>
-          No applications
-        </Typography>
       </Box>
-      )}
-    </Box>
+      <Modal title='Bounty Application' size='large' open={bountyApplyModal.isOpen} onClose={bountyApplyModal.close}>
+        <ApplicationEditorForm
+          bountyId={bounty.id}
+          onSubmit={bountyApplyModal.close}
+          proposal={userApplication}
+          mode={userApplication ? 'update' : 'create'}
+        />
+      </Modal>
+    </>
   );
 }

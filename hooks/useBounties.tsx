@@ -12,6 +12,7 @@ type IContext = {
   currentBounty: BountyWithDetails | null
   updateBounty: (bountyId: string, update: Partial<Bounty>) => Promise<BountyWithDetails>
   deleteBounty: (bountyId: string) => Promise<true>
+  refreshBounty: (bountyId: string) => void
 };
 
 export const BountiesContext = createContext<Readonly<IContext>>({
@@ -21,7 +22,8 @@ export const BountiesContext = createContext<Readonly<IContext>>({
   updateCurrentBountyId: () => undefined,
   currentBounty: null,
   updateBounty: () => Promise.resolve({} as any),
-  deleteBounty: () => Promise.resolve(true)
+  deleteBounty: () => Promise.resolve(true),
+  refreshBounty: () => undefined
 });
 
 export function BountiesProvider ({ children }: { children: ReactNode }) {
@@ -92,6 +94,14 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     return true;
   }
 
+  async function refreshBounty (bountyId: string) {
+    const refreshed = await charmClient.getBounty(bountyId);
+    if (currentBounty?.id === bountyId) {
+      setCurrentBounty(refreshed);
+    }
+    refreshBountyList(refreshed);
+  }
+
   const value = useMemo(() => ({
     bounties,
     setBounties,
@@ -99,7 +109,8 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     updateCurrentBountyId,
     currentBounty,
     updateBounty,
-    deleteBounty
+    deleteBounty,
+    refreshBounty
   }), [bounties, currentBountyId, currentBounty]);
 
   return (

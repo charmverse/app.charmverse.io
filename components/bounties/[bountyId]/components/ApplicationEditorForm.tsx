@@ -10,6 +10,7 @@ import { useUser } from 'hooks/useUser';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { isValidChainAddress } from 'lib/tokens/validation';
+import { useBounties } from 'hooks/useBounties';
 import { FormMode } from '../../components/BountyEditorForm';
 
 interface IApplicationFormProps {
@@ -20,16 +21,14 @@ interface IApplicationFormProps {
 }
 
 export const schema = yup.object({
-  walletAddress: yup.string().required('Please provide a valid wallet address.')
-    .test('verifyContractFormat', 'Invalid wallet address', (value) => {
-      return !value || isValidChainAddress(value);
-    }),
   message: yup.string().required('Please enter a proposal.')
 });
 
 type FormValues = yup.InferType<typeof schema>
 
 export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'create' }: IApplicationFormProps) {
+
+  const { refreshBounty } = useBounties();
 
   const {
     register,
@@ -49,14 +48,16 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
 
   async function submitted (proposalToSave: Application) {
     if (mode === 'create') {
-      proposalToSave.createdBy = user!.id;
       proposalToSave.bountyId = bountyId;
+      proposalToSave.status = 'applied';
       const createdApplication = await charmClient.createApplication(proposalToSave);
       onSubmit(createdApplication);
+      refreshBounty(bountyId);
     }
     else if (mode === 'update') {
       await charmClient.updateApplication(proposalToSave);
       onSubmit(proposalToSave);
+      refreshBounty(bountyId);
     }
 
   }
@@ -87,26 +88,6 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
               )
             }
 
-          </Grid>
-
-          <Grid item>
-            <FieldLabel>
-              Address to get paid for this bounty
-            </FieldLabel>
-            <TextField
-              {...register('walletAddress')}
-              defaultValue={walletAddress}
-              type='text'
-              fullWidth
-            />
-
-            {
-              errors?.walletAddress && (
-              <Alert severity='error'>
-                {errors.walletAddress.message}
-              </Alert>
-              )
-            }
           </Grid>
 
           <Grid item>

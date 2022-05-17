@@ -11,7 +11,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .get(getApplications)
-  .use(requireKeys<Application>(['bountyId', 'createdBy'], 'body'))
+  .use(requireKeys<Application>(['bountyId', 'message'], 'body'))
   .post(createApplication);
 
 async function getApplications (req: NextApiRequest, res: NextApiResponse<Application[]>) {
@@ -36,7 +36,13 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
 
 async function createApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
   const data = req.body as Application;
-  const ApplicationToCreate = { ...data } as any;
+  const ApplicationToCreate = {
+    ...data,
+    applicant: { connect: { id: req.session.user.id } },
+    bounty: { connect: { id: data.bountyId } }
+  } as Prisma.ApplicationCreateInput;
+
+  delete (ApplicationToCreate as any).bountyId;
 
   const existingProposal = await prisma.application.findFirst({
     where: {

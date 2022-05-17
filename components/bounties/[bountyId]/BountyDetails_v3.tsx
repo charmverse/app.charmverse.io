@@ -7,6 +7,7 @@ import { useBounties } from 'hooks/useBounties';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import { BountyApplicantList } from 'components/bounties/[bountyId]/components/BountyApplicantList';
 
 export default function BountyDetails () {
 
@@ -37,6 +38,15 @@ export default function BountyDetails () {
 
         {
           currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />
+        }
+
+        {
+          currentBounty.approveSubmitters === true && (
+          <BountyApplicantList
+            bounty={currentBounty}
+            applications={currentBounty.applications}
+          />
+          )
         }
 
       </Container>
