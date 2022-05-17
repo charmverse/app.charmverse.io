@@ -51,9 +51,29 @@ export const schema = yup.object({
   // New fields
   approveSubmitters: yup.boolean(),
   capSubmissions: yup.boolean(),
-  maxSubmissions: yup.number(),
+  maxSubmissions: yup.number().nullable().test({
+    message: 'The cap should be greater than or equal to 1',
+    test: (value, context) => {
+
+      // eslint-disable-next-line no-restricted-globals
+      const isNum = typeof value === 'number' && !isNaN(value);
+
+      if (context.parent.capSubmissions === true && (!isNum || value < 1)) {
+        return false;
+      }
+      return true;
+    }
+  }),
   setExpiryDate: yup.boolean(),
-  expiryDate: yup.mixed()
+  expiryDate: yup.mixed().test({
+    message: 'Expiry date is required',
+    test: (value, context) => {
+      if (context.parent.setExpiryDate === true && !value) {
+        return false;
+      }
+      return true;
+    }
+  })
 });
 
 export type FormValues = yup.InferType<typeof schema>
@@ -135,19 +155,26 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   const chainId = watch('chainId');
   const rewardToken = watch('rewardToken');
 
+  console.log('Errors', errors, isValid, values);
+
   useEffect(() => {
     refreshCryptoList(defaultChainId, bounty?.rewardToken);
+
+    // Revalidate form on load
+    if (mode === 'update') {
+      trigger();
+    }
   }, []);
 
-  async function submitted (value: IBounty) {
+  async function submitted (value: FormValues & Bounty) {
 
-    if (!(value as FormValues).setExpiryDate) {
+    if (!value.setExpiryDate) {
       value.expiryDate = null;
     }
 
-    delete (value as FormValues).setExpiryDate;
-
     if (mode === 'create') {
+      delete value.setExpiryDate;
+
       value.spaceId = space!.id;
       value.createdBy = user!.id;
       value.description = value.description ?? '';
@@ -176,7 +203,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
       onSubmit(populatedBounty);
     }
     else if (bounty?.id && mode === 'update') {
-      const updates = {
+      const updates: Partial<Bounty> = {
         updatedAt: new Date(),
         title: value.title,
         rewardAmount: value.rewardAmount,
@@ -184,7 +211,13 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
         descriptionNodes: value.descriptionNodes,
         description: value.description,
         reviewer: value.reviewer,
-        chainId: value.chainId
+        chainId: value.chainId,
+        //
+        approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
+        capSubmissions: value.capSubmissions === null ? undefined : value.capSubmissions,
+        maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
+        expiryDate: value.setExpiryDate ? value.expiryDate : null
+
       };
 
       const updatedBounty = await updateBounty(bounty.id, updates);
@@ -239,7 +272,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   return (
     <div>
-      <form onSubmit={handleSubmit(formValue => submitted(formValue as IBounty))} style={{ margin: 'auto' }}>
+      <form onSubmit={handleSubmit(val => submitted(val as any))} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InputLabel>
@@ -420,19 +453,19 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                 <Grid item xs={6}>
                   <InputLabel>Expiry date</InputLabel>
                   <DatePicker
-                    {...register('expiryDate', {
-                      required: true,
-                      shouldUnregister: true
-                    })}
                     value={values.expiryDate}
                     onChange={(value) => {
-                      setValue('expiryDate', value);
+                      setValue('expiryDate', value, {
+                        shouldValidate: true
+                      });
                     }}
                     renderInput={(props) => (
                       <TextField
                         fullWidth
                         name='expiryDate'
                         {...props}
+                        error={!!errors.expiryDate}
+                        helperText={errors?.expiryDate?.message}
                       />
                     )}
                   />
