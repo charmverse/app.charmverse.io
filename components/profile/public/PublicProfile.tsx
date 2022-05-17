@@ -1,119 +1,102 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
-import { Box, Button, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, Paper, Link, Stack, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Avatar from 'components/settings/workspace/LargeAvatar';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import EditIcon from '@mui/icons-material/Edit';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import SvgIcon from '@mui/material/SvgIcon';
 
-const StyledPaper = styled(Paper)`
-  background-color: ${({ theme }) => theme.palette.background.light};
-  border-radius: 20px;
-  padding: 20px;
-  border: 1px solid #000;
+const StyledBox = styled(Box)`
+
+  svg {
+    cursor: pointer;
+  }
+`;
+
+const StyledDivider = styled(Divider)`
+  height: 36px;
 `;
 
 export default function PublicProfile () {
   const [name, setName] = useState('Andrei');
   const [userImage, setUserImage] = useState('');
+  const [twitterLink, setTwitterLink] = useState('https://mobile.twitter.com/charmverse');
+  const [githubLink, setGithubLink] = useState('https://github.com/charmverse/app.charmverse.io');
+  const [linkedinLink, setLinkedinLink] = useState('https://www.linkedin.com/company/charmverse');
+  const [discordLink, setDiscordLink] = useState('https://discord.gg/VvhEafEWcg');
 
   const handleImageUpdate = (url: string) => {
-    console.log('Update image');
+
   };
 
   return (
-    <Grid container>
-      <Grid container item xs={12}>
-        <StyledPaper elevation={1}>
-          <Stack direction='row' spacing={5}>
-            <Stack alignItems='center'>
-              <Avatar
-                name={name}
-                variant='rounded'
-                spaceImage={userImage}
-                updateImage={handleImageUpdate}
-                updateImage={(url) => setUserImage(url)}
-                displayIcons={true}
-              />
-              <Typography component='span'>Andrei</Typography>
+    <StyledBox>
+      <Stack direction='row' spacing={1} alignItems='center'>
+        <ArrowBackIosNewIcon />
+        <Typography component='span' fontSize='1.4em' fontWeight={700}>My Public Profile</Typography>
+      </Stack>
+      <Stack direction='row' mt={5} spacing={2}>
+        <Avatar
+          name={name}
+          variant='rounded'
+          spaceImage={userImage}
+          updateImage={handleImageUpdate}
+          displayIcons={true}
+        />
+        <Grid container direction='column'>
+          <Grid item>
+            <Typography variant='h1'>CharmVerse</Typography>
+          </Grid>
+          <Grid item mt={1}>
+            <Stack direction='row' alignItems='center' spacing={2}>
+              { twitterLink && (
+              <Link href={twitterLink} target='_blank' display='flex'>
+                <TwitterIcon style={{ color: '#00ACEE', height: '22px' }} />
+              </Link>
+              )}
+              {
+                githubLink && (
+                <Link href={githubLink} target='_blank' display='flex'>
+                  <GitHubIcon style={{ color: '#000000', height: '22px' }} />
+                </Link>
+                )
+              }
+              {
+                linkedinLink && (
+                <Link href={linkedinLink} target='_blank' display='flex'>
+                  <LinkedInIcon style={{ color: '#0072B1', height: '22px' }} />
+                </Link>
+                )
+              }
+              {
+                discordLink && (
+                <Link href={discordLink} target='_blank' display='flex'>
+                  <SvgIcon viewBox='0 -5 70 70'><DiscordIcon style={{ color: '#000000', height: '22px' }} /></SvgIcon>
+                </Link>
+                )
+              }
+              <StyledDivider orientation='vertical' flexItem />
+              <AddCircleOutlineIcon />
             </Stack>
-            <Grid container direction='row' spacing={1} sx={{ backgroundColor: '#FFF' }}>
-              <Grid container item sx={10} justifyContent='space-between'>
-                <Grid item container spacing={2}>
-                  <Grid item>
-                    <TwitterIcon style={{ color: '#00ACEE' }} />
-                  </Grid>
-                  <Grid item>
-                    <Typography component='span'>https://twitter.com/andrei</Typography>
-                  </Grid>
-                </Grid>
-                <Grid item container>
-                  <Grid item container spacing={2}>
-                    <Grid item>
-                      <GitHubIcon style={{ color: '#000000' }} />
-                    </Grid>
-                    <Grid item>
-                      <Typography component='span'>https://github.com/AndreiMitrea</Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item container>
-                  <Grid item container spacing={2}>
-                    <Grid item>
-                      <LinkedInIcon style={{ color: '#0072B1' }} />
-                    </Grid>
-                    <Grid item>
-                      <Typography component='span'>https://linkedin.com/AndreiMitrea</Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item>
-                  <Grid item container spacing={2}>
-                    <Grid item>
-                      <SvgIcon viewBox='0 -5 70 70'><DiscordIcon style={{ color: '#000000' }} /></SvgIcon>
-                    </Grid>
-                    <Grid item>
-                      <Typography component='span'>Andrei7#7045</Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item sx={2}>
-                <Button
-                  color='secondary'
-                  variant='outlined'
-                  onClick={() => {}}
-                  endIcon={<EditOutlinedIcon fontSize='small' />}
-                >
-                  Edit
-                </Button>
-              </Grid>
+          </Grid>
+          <Grid item container alignItems='center'>
+            <Grid item xs={10}>
+              <span>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque laoreet suscipit nibh, vitae scelerisque dui iaculis nec. Donec consectetur dui quis lorem blandit, sit amet cursus quam commodo. Sed nulla orci, feugiat eu quam a, aliquet egestas nibh. Vivamus eget risus felis. Aenean molestie, est sit amet dignissim finibus, libero lacus blandit dolor.
+              </span>
             </Grid>
-          </Stack>
-          <Stack
-            direction='row'
-            justifyContent='space-between'
-          >
-            <Stack>
-
-            </Stack>
-          </Stack>
-        </StyledPaper>
-      </Grid>
-      <Grid item xs={7}>
-        <Paper elevation={1}>
-
-        </Paper>
-      </Grid>
-      <Grid item xs={5}>
-        <Paper elevation={1}>
-
-        </Paper>
-      </Grid>
-    </Grid>
+            <Grid item xs={2}>
+              <EditIcon />
+            </Grid>
+          </Grid>
+        </Grid>
+      </Stack>
+    </StyledBox>
   );
 }

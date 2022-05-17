@@ -20,12 +20,12 @@ const baseAvatarStyles = css`
 
 const StyledAvatar = styled(Avatar)`
   ${baseAvatarStyles}
-  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
+  ${({ variant }) => variant === 'rounded' && 'border-radius: 7x'};
 `;
 
 const StyledAvatarWithIcons = styled(AvatarWithIcons)`
   ${baseAvatarStyles}
-  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
+  ${({ variant }) => variant === 'rounded' && 'border-radius: 7px'};
 
   &:hover .edit-avatar-icon, .delete-avatar-icon {
       display: initial;
