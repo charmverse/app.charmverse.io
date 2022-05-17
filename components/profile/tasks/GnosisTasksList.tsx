@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { Alert, Box, Button, Card, Chip, Collapse, Divider, Grid, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -23,7 +23,7 @@ import { User, UserGnosisSafeState } from '@prisma/client';
 import Tooltip from '@mui/material/Tooltip';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import CancelIcon from '@mui/icons-material/Cancel';
-import MessageIcon from '@mui/icons-material/Message';
+import EmailIcon from '@mui/icons-material/Email';
 import { GnosisConnectCard } from '../integrations/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
@@ -121,12 +121,9 @@ function TransactionRow (
                   <Box display='flex' gap={1} alignItems='center'>
                     {snoozedUser.userGnosisSafeState?.transactionsSnoozeMessage && (
                     <Tooltip arrow placement='top' title={snoozedUser.userGnosisSafeState.transactionsSnoozeMessage}>
-                      <MessageIcon
+                      <EmailIcon
                         fontSize='small'
                         color='secondary'
-                        sx={{
-                          width: 14
-                        }}
                       />
                     </Tooltip>
                     )}
@@ -212,12 +209,12 @@ function SafeTasks (
 }
 
 function SnoozeTransaction (
-  { snoozedForDate, setSnoozedForDate }:
-  { snoozedForDate: DateTime | null, setSnoozedForDate: React.Dispatch<React.SetStateAction<DateTime | null>> }
+  { message, snoozedForDate, setSnoozedForDate }:
+  { message: null | string, snoozedForDate: DateTime | null, setSnoozedForDate: React.Dispatch<React.SetStateAction<DateTime | null>> }
 ) {
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [snoozeMessage, setSnoozeMessage] = useState<null | string>(null);
-  const [snoozedFor, setSnoozedFor] = useState<null | '1_day' | '3_days'>(null);
+  const [snoozeMessage, setSnoozeMessage] = useState(message);
+  const [snoozedFor, setSnoozedFor] = useState<null | '1_day' | '3_days' | DateTime>(null);
   const { mutate: mutateTasks } = useTasks();
   const isSnoozed = snoozedForDate !== null;
   const primaryPopupState = usePopupState({
@@ -228,6 +225,7 @@ function SnoozeTransaction (
     popupId: 'snooze-transactions-message',
     variant: 'popover'
   });
+  const dateTimePickerRef = useRef<HTMLDivElement>(null);
 
   const primaryTriggerState = bindTrigger(primaryPopupState);
   const primaryMenuState = bindMenu(primaryPopupState);
@@ -236,11 +234,11 @@ function SnoozeTransaction (
   const secondaryMenuState = bindMenu(secondaryPopupState);
 
   function resetState () {
-    primaryMenuState.onClose();
     setShowDatePicker(false);
     setSnoozeMessage(null);
     setSnoozedFor(null);
     secondaryMenuState.onClose();
+    primaryMenuState.onClose();
   }
 
   async function removeSnoozedForDate () {
@@ -271,29 +269,32 @@ function SnoozeTransaction (
   };
 
   async function setSnoozedDate () {
-    if (snoozedFor) {
-      let newSnoozedForDate = DateTime.fromMillis(Date.now());
-      switch (snoozedFor) {
-        case '1_day': {
-          newSnoozedForDate = newSnoozedForDate.plus({ day: 1 });
-          break;
+    let newSnoozedForDate = DateTime.fromMillis(Date.now());
+    switch (snoozedFor) {
+      case '1_day': {
+        newSnoozedForDate = newSnoozedForDate.plus({ day: 1 });
+        break;
+      }
+      case '3_days': {
+        newSnoozedForDate = newSnoozedForDate.plus({ days: 3 });
+        break;
+      }
+      default: {
+        if (snoozedFor instanceof DateTime) {
+          newSnoozedForDate = snoozedFor;
         }
-        case '3_days': {
-          newSnoozedForDate = newSnoozedForDate.plus({ days: 3 });
-          break;
-        }
-        default: {
-          newSnoozedForDate = newSnoozedForDate.plus({ day: 1 });
+        else if (snoozedForDate instanceof DateTime) {
+          newSnoozedForDate = snoozedForDate;
         }
       }
-      setSnoozedForDate(newSnoozedForDate);
-      await charmClient.snoozeTransactions({
-        snoozeFor: newSnoozedForDate.toJSDate(),
-        snoozeMessage
-      });
-      mutateTasks();
-      resetState();
     }
+    setSnoozedForDate(newSnoozedForDate);
+    await charmClient.snoozeTransactions({
+      snoozeFor: newSnoozedForDate.toJSDate(),
+      snoozeMessage
+    });
+    mutateTasks();
+    resetState();
   }
 
   return (
@@ -311,6 +312,11 @@ function SnoozeTransaction (
       </Button>
       <Menu
         {...primaryMenuState}
+        sx={{
+          '& .MuiPaper-root': {
+            minWidth: showDatePicker ? 300 : 200
+          }
+        }}
       >
         <MenuItem
           {...secondaryTriggerState}
@@ -318,7 +324,7 @@ function SnoozeTransaction (
             setSnoozedFor('1_day');
             secondaryTriggerState.onClick(e);
           }}
-        >1 day
+        >Snooze for 1 day
         </MenuItem>
         <MenuItem
           {...secondaryTriggerState}
@@ -326,24 +332,21 @@ function SnoozeTransaction (
             setSnoozedFor('3_days');
             secondaryTriggerState.onClick(e);
           }}
-          // setSnoozedDate('3_days');
-        >3 days
+        >Snooze for 3 days
         </MenuItem>
         {showDatePicker
           ? (
             <Box display='flex' gap={1}>
               <DateTimePicker
+                ref={dateTimePickerRef}
                 minDate={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
                 value={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
                 onAccept={async (value) => {
                   if (value) {
-                    setSnoozedForDate(value);
-                    await charmClient.snoozeTransactions(
-                      { snoozeFor: value.toJSDate(), snoozeMessage: null }
-                    );
-                    mutateTasks();
-                    primaryMenuState.onClose();
-                    setShowDatePicker(false);
+                    if (dateTimePickerRef.current) {
+                      secondaryTriggerState.onClick({ currentTarget: dateTimePickerRef.current } as any);
+                      setSnoozedFor(value);
+                    }
                   }
                 }}
                 onChange={() => {}}
@@ -369,15 +372,23 @@ function SnoozeTransaction (
             </MenuItem>
           )}
         {isSnoozed && (
-        <MenuItem onClick={removeSnoozedForDate}>
-          Unsnooze
-        </MenuItem>
+        <>
+          <MenuItem onClick={removeSnoozedForDate}>
+            Unsnooze
+          </MenuItem>
+          <MenuItem onClick={(e) => {
+            secondaryTriggerState.onClick(e);
+          }}
+          >
+            Edit message
+          </MenuItem>
+        </>
         )}
       </Menu>
       <Menu {...secondaryMenuState}>
         <Box display='flex' gap={1} px={1}>
           <TextField fullWidth placeholder='Snooze message' onChange={(e) => setSnoozeMessage(e.target.value)} value={snoozeMessage} />
-          <Button onClick={setSnoozedDate}>Save
+          <Button onClick={setSnoozedDate}>{isSnoozed ? 'Edit' : 'Save'}
           </Button>
         </Box>
       </Menu>
@@ -420,7 +431,11 @@ export default function GnosisTasksSection () {
   return (
     <>
       <Legend>Multisig
-        <SnoozeTransaction snoozedForDate={snoozedForDate} setSnoozedForDate={setSnoozedForDate} />
+        <SnoozeTransaction
+          message={user?.userGnosisSafeState?.transactionsSnoozeMessage ?? null}
+          snoozedForDate={snoozedForDate}
+          setSnoozedForDate={setSnoozedForDate}
+        />
       </Legend>
       {!safesWithTasks && !error && <LoadingComponent height='200px' isLoading={true} />}
       {error && !safesWithTasks && (
