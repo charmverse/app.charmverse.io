@@ -96,3 +96,13 @@ export class UnknownError extends SystemError {
   }
 }
 
+export class UnauthorisedActionError extends SystemError {
+  constructor (message = 'You do not have access to perform this action.') {
+    super({
+      message,
+      errorType: 'Access denied',
+      severity: 'error'
+    });
+  }
+}
+

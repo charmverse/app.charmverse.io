@@ -30,6 +30,7 @@ import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
+import { ReviewDecision } from 'lib/applications/interfaces';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -378,17 +379,6 @@ class CharmClient {
     return data;
   }
 
-  async assignBounty (bountyId: string, assignee: string): Promise<BountyWithDetails> {
-
-    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, {
-      assignee,
-      status: 'assigned',
-      updatedAt: new Date()
-    });
-
-    return data;
-  }
-
   async updateBounty (bountyId: string, bounty: Partial<Bounty>): Promise<BountyWithDetails> {
 
     const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, bounty);
@@ -405,6 +395,17 @@ class CharmClient {
     return data;
   }
 
+  async approveApplication (applicationId: string): Promise<Application> {
+    return http.PUT<Application>(`/api/applications/${applicationId}/approve`);
+  }
+
+  async reviewSubmission (applicationId: string, decision: ReviewDecision): Promise<Application> {
+
+    return http.PUT<Application>(`/api/applications/${applicationId}/review`, {
+      decision
+    });
+  }
+
   async updateApplication (application: Application): Promise<Application> {
 
     const data = await http.PUT<Application>(`/api/applications/${application.id}`, application);
@@ -419,9 +420,9 @@ class CharmClient {
     return data;
   }
 
-  async listApplications (bountyId: string): Promise<Application []> {
+  async listApplications (bountyId: string, submissionsOnly: boolean): Promise<Application []> {
 
-    const data = await http.GET<Application []>('/api/applications', { bountyId });
+    const data = await http.GET<Application []>('/api/applications', { bountyId, submissionsOnly });
 
     return data;
   }

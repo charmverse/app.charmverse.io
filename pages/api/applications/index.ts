@@ -1,11 +1,13 @@
 
 import { Application, Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ApiError, hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { DataNotFoundError } from 'lib/utilities/errors';
+import { listSubmissions } from 'lib/applications/actions';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -15,23 +17,40 @@ handler.use(requireUser)
   .post(createApplication);
 
 async function getApplications (req: NextApiRequest, res: NextApiResponse<Application[]>) {
-  const { bountyId } = req.query;
+  const { bountyId, submissionsOnly } = req.query;
+  const { id: userId } = req.session.user;
 
-  if (bountyId === undefined) {
-    throw new ApiError({
-      message: 'Please provide a valid bounty ID',
-      errorType: 'Invalid input'
-    });
+  const bounty = await prisma.bounty.findUnique({
+    where: {
+      id: bountyId as string
+    },
+    select: {
+      spaceId: true
+    }
+  });
+
+  if (!bounty) {
+    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
   }
 
-  const ApplicationListQuery: Prisma.ApplicationFindManyArgs = {
-    where: {
-      bountyId: bountyId as string
-    }
-  };
+  const { error } = await hasAccessToSpace({
+    adminOnly: false,
+    spaceId: bounty.spaceId,
+    userId
+  });
 
-  const applications = await prisma.application.findMany(ApplicationListQuery);
-  return res.status(200).json(applications);
+  if (error) {
+    throw error;
+  }
+
+  const applicationsOrSubmissions = await (submissionsOnly === 'true'
+    ? listSubmissions(bountyId as string)
+    : prisma.application.findMany({
+      where: {
+        bountyId: bountyId as string
+      }
+    }));
+  return res.status(200).json(applicationsOrSubmissions);
 }
 
 async function createApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
