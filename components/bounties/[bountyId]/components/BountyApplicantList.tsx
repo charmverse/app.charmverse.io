@@ -28,7 +28,6 @@ export interface IBountyApplicantListProps {
   bounty: Bounty,
   bountyReassigned?: () => any
   applications: Application[]
-  updateApplication?: () => void
 }
 
 function createData (id: string, message: string, date: string) {
@@ -58,8 +57,7 @@ function moveUserApplicationToFirstRow (applications: Application [], user: User
 export function BountyApplicantList ({
   applications,
   bounty,
-  bountyReassigned = () => {},
-  updateApplication = () => {}
+  bountyReassigned = () => {}
 }: IBountyApplicantListProps) {
   const [user] = useUser();
   const [contributors] = useContributors();
@@ -123,7 +121,7 @@ export function BountyApplicantList ({
       <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
 
         <Box>
-          <Button disabled={user?.addresses.length === 0} onClick={bountyApplyModal.open}>Apply now</Button>
+          <Button disabled={user?.addresses.length === 0 || userHasApplied} onClick={bountyApplyModal.open}>Apply now</Button>
         </Box>
 
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
@@ -171,7 +169,7 @@ export function BountyApplicantList ({
                         <Button
                           color='secondary'
                           variant='outlined'
-                          onClick={updateApplication}
+                          onClick={bountyApplyModal.open}
                           endIcon={<EditOutlinedIcon fontSize='small' />}
                         >
                           Edit
