@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
-import { DateTime } from 'luxon';
-import { Alert, Box, Card, Chip, Collapse, Divider, Grid, Typography } from '@mui/material';
+import { Alert, Box, Card, Chip, Collapse, Divider, Grid, TextField, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -16,6 +15,10 @@ import useGnosisSigner from 'hooks/useWeb3Signer';
 import { useUser } from 'hooks/useUser';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
+import SnoozeIcon from '@mui/icons-material/Snooze';
+import { DateTimePicker } from '@mui/x-date-pickers';
+import { DateTime } from 'luxon';
+import charmClient from 'charmClient';
 import { GnosisConnectCard } from '../integrations/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
@@ -96,12 +99,50 @@ function TransactionRow ({ transaction }: { transaction: GnosisTransactionPopula
 }
 
 function SafeTasks ({ address, safeName, safeUrl, tasks }: { address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }) {
+  const [isSnoozed, setIsSnoozed] = useState(false);
+  const [snoozedForDate, setSnoozedForDate] = useState<null | DateTime>(null);
+
+  async function toggleSnoozed () {
+    const updatedSnoozedStatus = !isSnoozed;
+    const nextDayDate = DateTime.fromMillis(Date.now()).plus({ day: 1 });
+    await charmClient.snoozeTransactions({
+      snooze: updatedSnoozedStatus,
+      snoozeFor: isSnoozed ? null : nextDayDate.toJSDate()
+    });
+    setSnoozedForDate(isSnoozed ? null : nextDayDate);
+    setIsSnoozed(updatedSnoozedStatus);
+  }
 
   return (
     <>
-      <Typography color='inherit'>
-        Tasks from safe: <Link href={safeUrl} external target='_blank'>{safeName || shortenHex(address)} <OpenInNewIcon fontSize='small' /></Link>
-      </Typography>
+      <Box display='flex' justifyContent='space-between'>
+        <Typography color='inherit'>
+          Tasks from safe: <Link href={safeUrl} external target='_blank'>{safeName || shortenHex(address)} <OpenInNewIcon fontSize='small' /></Link>
+        </Typography>
+        <Box display='flex' gap={1} alignItems='center'>
+          <SnoozeIcon
+            sx={{
+              cursor: 'pointer'
+            }}
+            color={isSnoozed ? 'primary' : 'secondary'}
+            onClick={toggleSnoozed}
+          />
+          <DateTimePicker
+            disabled={!isSnoozed}
+            value={snoozedForDate}
+            onAccept={(value) => {
+              charmClient.snoozeTransactions({
+                snooze: isSnoozed,
+                snoozeFor: value ? value.toJSDate() : null
+              });
+            }}
+            onChange={(value) => {
+              setSnoozedForDate(value);
+            }}
+            renderInput={(props) => <TextField fullWidth {...props} />}
+          />
+        </Box>
+      </Box>
       {
         tasks.map((task: GnosisTask) => (
           <Card key={task.nonce} sx={{ my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
