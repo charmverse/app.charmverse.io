@@ -16,7 +16,7 @@ import { useUser } from 'hooks/useUser';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
 import SnoozeIcon from '@mui/icons-material/Snooze';
-import { DatePicker, DateTimePicker } from '@mui/x-date-pickers';
+import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import charmClient from 'charmClient';
 import { User } from '@prisma/client';
@@ -34,8 +34,8 @@ const GridColumn = styled((props: any) => <Grid item xs {...props} />)`
 `;
 
 function TransactionRow (
-  { isSnoozed, snoozedUsers, transaction }:
-  { isSnoozed: boolean, snoozedUsers: User[], transaction: GnosisTransactionPopulated }
+  { firstNonce, isSnoozed, snoozedUsers, transaction }:
+  { firstNonce: number, isSnoozed: boolean, snoozedUsers: User[], transaction: GnosisTransactionPopulated }
 ) {
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
@@ -48,6 +48,8 @@ function TransactionRow (
       filteredSnoozedUsers.push(snoozedUser);
     }
   });
+
+  const isFirstTask = transaction.nonce === firstNonce;
 
   return (
     <>
@@ -64,7 +66,7 @@ function TransactionRow (
           </Typography>
         </GridColumn>
         <GridColumn sx={{ justifyContent: 'flex-end' }}>
-          <Tooltip arrow placement='top' title={isSnoozed ? 'Transactions snoozed' : ''}>
+          <Tooltip arrow placement='top' title={isSnoozed ? 'Transactions snoozed' : !isFirstTask ? `Transaction with nonce ${firstNonce} needs to be executed first` : ''}>
             <div>
               <Chip
                 clickable={!!transaction.myAction}
@@ -74,7 +76,7 @@ function TransactionRow (
                 target='_blank'
                 color={transaction.myAction ? 'primary' : undefined}
                 variant={transaction.myAction ? 'filled' : 'outlined'}
-                disabled={isSnoozed}
+                disabled={isSnoozed || !isFirstTask}
               />
             </div>
           </Tooltip>
@@ -158,7 +160,7 @@ function SafeTasks (
         </Typography>
       </Box>
       {
-        tasks.map((task: GnosisTask) => (
+        tasks.map((task: GnosisTask, taskNumber) => (
           <Card key={task.nonce} sx={{ my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
             <Box display='flex'>
               <Box px={3} height={rowHeight} display='flex' alignItems='center' gap={1}>
@@ -176,6 +178,7 @@ function SafeTasks (
                 )}
                 {task.transactions.map((transaction) => (
                   <TransactionRow
+                    firstNonce={tasks[0].transactions[0].nonce}
                     isSnoozed={isSnoozed}
                     snoozedUsers={snoozedUsers}
                     transaction={transaction}
@@ -405,9 +408,19 @@ export default function GnosisTasksSection () {
 
   return (
     <>
-      <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Legend>Multisig</Legend>
-        <SnoozeTransaction snoozedForDate={snoozedForDate} setSnoozedForDate={setSnoozedForDate} />
+      <Box display='flex'>
+        <Legend sx={{
+          flexGrow: 1
+        }}
+        >Multisig
+        </Legend>
+        <Box sx={{
+          marginTop: '80px',
+          marginLeft: '24px'
+        }}
+        >
+          <SnoozeTransaction snoozedForDate={snoozedForDate} setSnoozedForDate={setSnoozedForDate} />
+        </Box>
       </Box>
       {!safesWithTasks && !error && <LoadingComponent height='200px' isLoading={true} />}
       {error && !safesWithTasks && (
