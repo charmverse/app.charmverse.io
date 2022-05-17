@@ -3,7 +3,7 @@ import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
   Role, Space, TokenGate, Transaction, User, TelegramUser, UserGnosisSafe, TokenGateToRole
 } from '@prisma/client';
-import { Contributor, LoggedInUser, BountyWithDetails, Task, PageContent } from 'models';
+import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
@@ -30,7 +30,6 @@ import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import { SnoozeTransactionsPayload } from 'pages/api/profile/snoozeTransactions';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -136,8 +135,8 @@ class CharmClient {
     return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
-  snoozeTransactions (payload: SnoozeTransactionsPayload) {
-    return http.PUT('/api/profile/snoozeTransactions', payload);
+  snoozeTransactions (snoozeFor: Date | null) {
+    return http.PUT('/api/profile/snoozeTransactions', { snoozeFor });
   }
 
   favoritePage (pageId: string) {

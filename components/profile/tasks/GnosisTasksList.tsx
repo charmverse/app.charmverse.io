@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { Alert, Box, Card, Chip, Collapse, Divider, Grid, TextField, Typography } from '@mui/material';
+import { Alert, Box, Card, Chip, Collapse, Divider, Grid, IconButton, MenuItem, Select, TextField, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -16,11 +16,13 @@ import { useUser } from 'hooks/useUser';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
 import SnoozeIcon from '@mui/icons-material/Snooze';
-import { DateTimePicker } from '@mui/x-date-pickers';
+import { DatePicker, DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import charmClient from 'charmClient';
 import { User } from '@prisma/client';
 import Tooltip from '@mui/material/Tooltip';
+import EditIcon from '@mui/icons-material/Edit';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { GnosisConnectCard } from '../integrations/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
@@ -37,6 +39,15 @@ function TransactionRow (
 ) {
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
+  const filteredSnoozedUsers: User[] = [];
+  const confirmedAddresses = transaction.confirmations.map(confirmation => confirmation.address);
+
+  // Filter out the snoozed users that have already confirmed transaction
+  snoozedUsers.forEach(snoozedUser => {
+    if (!snoozedUser.addresses.some(address => confirmedAddresses.includes(address))) {
+      filteredSnoozedUsers.push(snoozedUser);
+    }
+  });
 
   return (
     <>
@@ -53,16 +64,20 @@ function TransactionRow (
           </Typography>
         </GridColumn>
         <GridColumn sx={{ justifyContent: 'flex-end' }}>
-          <Chip
-            clickable={!!transaction.myAction}
-            component='a'
-            label={transaction.myAction || 'Waiting for others'}
-            href={transaction.myActionUrl}
-            target='_blank'
-            color={transaction.myAction ? 'primary' : undefined}
-            variant={transaction.myAction ? 'filled' : 'outlined'}
-            disabled={isSnoozed}
-          />
+          <Tooltip arrow placement='top' title={isSnoozed ? 'Transactions snoozed' : ''}>
+            <div>
+              <Chip
+                clickable={!!transaction.myAction}
+                component='a'
+                label={transaction.myAction || 'Waiting for others'}
+                href={transaction.myActionUrl}
+                target='_blank'
+                color={transaction.myAction ? 'primary' : undefined}
+                variant={transaction.myAction ? 'filled' : 'outlined'}
+                disabled={isSnoozed}
+              />
+            </div>
+          </Tooltip>
         </GridColumn>
         <GridColumn sx={{ flexGrow: '0 !important' }}>
           <Box sx={{ width: 60, display: 'flex', justifyContent: 'center' }}>
@@ -94,12 +109,12 @@ function TransactionRow (
                   {confirmation.user ? <UserDisplay avatarSize='small' user={confirmation.user} /> : <AnonUserDisplay avatarSize='small' address={confirmation.address} />}
                 </Box>
               ))}
-              {snoozedUsers.length !== 0 ? <Typography color='secondary' gutterBottom variant='body2'>Snoozed</Typography> : null}
-              {snoozedUsers.map(snoozedUser => (
+              {filteredSnoozedUsers.length !== 0 ? <Typography sx={{ mt: 2 }} color='secondary' gutterBottom variant='body2'>Snoozed</Typography> : null}
+              {filteredSnoozedUsers.map(snoozedUser => (
                 <Box py={1} display='flex' justifyContent='space-between'>
                   <UserDisplay avatarSize='small' user={snoozedUser} />
                   <Typography variant='subtitle1' color='secondary'>
-                    {DateTime.fromJSDate(new Date(snoozedUser.transactionsSnoozedFor as Date)).toRelative({ base: (DateTime.now()), style: 'short' })}
+                    for {DateTime.fromJSDate(new Date(snoozedUser.transactionsSnoozedFor as Date)).toRelative({ base: (DateTime.now()) })?.slice(3)}
                   </Typography>
                 </Box>
               ))}
@@ -159,8 +174,13 @@ function SafeTasks (
                     </Alert>
                   </Box>
                 )}
-                {task.transactions.map(transaction => (
-                  <TransactionRow isSnoozed={isSnoozed} snoozedUsers={snoozedUsers} transaction={transaction} key={transaction.id} />
+                {task.transactions.map((transaction) => (
+                  <TransactionRow
+                    isSnoozed={isSnoozed}
+                    snoozedUsers={snoozedUsers}
+                    transaction={transaction}
+                    key={transaction.id}
+                  />
                 ))}
               </Box>
             </Box>
@@ -171,17 +191,196 @@ function SafeTasks (
   );
 }
 
+function SnoozeTransaction (
+  { snoozedForDate, setSnoozedForDate }:
+  { snoozedForDate: DateTime | null, setSnoozedForDate: React.Dispatch<React.SetStateAction<DateTime | null>> }
+) {
+  const [isEditingSnooze, setIsEditingSnooze] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const isSnoozed = snoozedForDate !== null;
+
+  const SnoozeEditor = (
+    <>
+      <Typography variant='subtitle1' color='secondary'>
+        Snooze for
+      </Typography>
+      <Box display='flex' gap={0.5}>
+        {showDatePicker
+          ? (
+            <DateTimePicker
+              value={DateTime.fromMillis(Date.now())}
+              onAccept={async (value) => {
+                setIsEditingSnooze(false);
+                setShowDatePicker(false);
+                setSnoozedForDate(value);
+                await charmClient.snoozeTransactions(value ? value.toJSDate() : null);
+              }}
+              onChange={() => {}}
+              renderInput={(props) => <TextField fullWidth {...props} />}
+            />
+          )
+          : (
+            <Select
+              size='small'
+              value='1_hr'
+              variant='outlined'
+              onChange={async (event) => {
+                setIsEditingSnooze(false);
+                let newSnoozedForDate = DateTime.fromMillis(Date.now());
+                const eventValue = event.target.value as '1_hr' | '6_hrs' | '12_hrs' | '1_day' | '3_days' | '1_week' | '1_month' | 'custom';
+                if (eventValue === 'custom') {
+                  setShowDatePicker(true);
+                }
+                else {
+                  switch (eventValue) {
+                    case '1_hr': {
+                      newSnoozedForDate = newSnoozedForDate.plus({ hour: 1 });
+                      break;
+                    }
+                    case '6_hrs': {
+                      newSnoozedForDate = newSnoozedForDate.plus({ hours: 6 });
+                      break;
+                    }
+                    case '12_hrs': {
+                      newSnoozedForDate = newSnoozedForDate.plus({ hours: 12 });
+                      break;
+                    }
+                    case '1_day': {
+                      newSnoozedForDate = newSnoozedForDate.plus({ day: 1 });
+                      break;
+                    }
+                    case '3_days': {
+                      newSnoozedForDate = newSnoozedForDate.plus({ days: 3 });
+                      break;
+                    }
+                    case '1_week': {
+                      newSnoozedForDate = newSnoozedForDate.plus({ weeks: 1 });
+                      break;
+                    }
+                    case '1_month': {
+                      newSnoozedForDate = newSnoozedForDate.plus({ month: 1 });
+                      break;
+                    }
+                    default: {
+                      newSnoozedForDate = newSnoozedForDate.plus({ day: 1 });
+                    }
+                  }
+                  setSnoozedForDate(newSnoozedForDate);
+                  await charmClient.snoozeTransactions(newSnoozedForDate.toJSDate());
+                }
+                // mutateTasks();
+              }}
+            >
+              <MenuItem value='1_hr'>1 hr</MenuItem>
+              <MenuItem value='6_hrs'>6 hrs</MenuItem>
+              <MenuItem value='12_hrs'>12 hrs</MenuItem>
+              <MenuItem value='1_day'>1 day</MenuItem>
+              <MenuItem value='3_days'>3 days</MenuItem>
+              <MenuItem value='1_week'>1 week</MenuItem>
+              <MenuItem value='1_month'>1 month</MenuItem>
+              <MenuItem value='custom'>Custom</MenuItem>
+            </Select>
+          )}
+        <IconButton
+          color='error'
+          size='small'
+          onClick={() => {
+            setIsEditingSnooze(false);
+            setShowDatePicker(false);
+          }}
+        >
+          <CancelIcon />
+        </IconButton>
+      </Box>
+    </>
+  );
+
+  function render () {
+    if (!isSnoozed) {
+      if (isEditingSnooze || showDatePicker) {
+        return SnoozeEditor;
+      }
+      return (
+        <Tooltip arrow placement='top' title='Snooze'>
+          <IconButton
+            size='small'
+            onClick={async () => {
+              setIsEditingSnooze(true);
+              setShowDatePicker(false);
+            }}
+          >
+            <SnoozeIcon
+              fontSize='small'
+              color='secondary'
+            />
+          </IconButton>
+        </Tooltip>
+      );
+    }
+    else {
+      if (isEditingSnooze || showDatePicker) {
+        return SnoozeEditor;
+      }
+      return (
+        <>
+          <Tooltip arrow placement='top' title={snoozedForDate.toRFC2822()}>
+            <Typography variant='subtitle1'>
+              Snoozed for { snoozedForDate.toRelative({ base: (DateTime.now()) })?.slice(3) }
+            </Typography>
+          </Tooltip>
+          <div>
+            <Tooltip arrow placement='top' title='Edit date'>
+              <IconButton
+                size='small'
+                onClick={async () => {
+                  setIsEditingSnooze(true);
+                  setShowDatePicker(false);
+                }}
+              >
+                <EditIcon
+                  fontSize='small'
+                  color='primary'
+                />
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow placement='top' title='Un-Snooze'>
+              <IconButton
+                size='small'
+                onClick={async () => {
+                  setSnoozedForDate(null);
+                  await charmClient.snoozeTransactions(null);
+                }}
+              >
+                <SnoozeIcon
+                  fontSize='small'
+                  color='error'
+                />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </>
+      );
+    }
+  }
+
+  return (
+    <Box display='flex' gap={1} alignItems='center'>
+      {render()}
+    </Box>
+  );
+}
+
 export default function GnosisTasksSection () {
   const { data: safeData, mutate } = useMultiWalletSigs();
   const { error, mutate: mutateTasks, tasks } = useTasks();
-
-  const gnosisSigner = useGnosisSigner();
   const [user] = useUser();
+  const gnosisSigner = useGnosisSigner();
 
-  const [isSnoozed, setIsSnoozed] = useState(user?.transactionsSnoozed ?? false);
   const [snoozedForDate, setSnoozedForDate] = useState<null | DateTime>(
-    (user?.transactionsSnoozedFor as any) ?? null
+    (user?.transactionsSnoozedFor ? DateTime.fromJSDate(new Date(user?.transactionsSnoozedFor)) : null)
   );
+  const isSnoozed = snoozedForDate !== null;
 
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
 
@@ -202,51 +401,13 @@ export default function GnosisTasksSection () {
     }
   }
 
-  async function toggleSnoozed () {
-    const updatedSnoozedStatus = !isSnoozed;
-    const nextDayDate = DateTime.fromMillis(Date.now()).plus({ day: 1 });
-    await charmClient.snoozeTransactions({
-      snooze: updatedSnoozedStatus,
-      snoozeFor: isSnoozed ? null : nextDayDate.toJSDate()
-    });
-    setSnoozedForDate(isSnoozed ? null : nextDayDate);
-    setIsSnoozed(updatedSnoozedStatus);
-    mutateTasks();
-  }
-
   const safesWithTasks = tasks?.gnosis;
 
   return (
     <>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Legend>Multisig
-        </Legend>
-        <Box display='flex' gap={1} alignItems='center'>
-          <Tooltip arrow placement='top' title={`${isSnoozed ? 'Un-snooze' : 'Snooze'}`}>
-            <SnoozeIcon
-              sx={{
-                cursor: 'pointer'
-              }}
-              color={isSnoozed ? 'primary' : 'secondary'}
-              onClick={toggleSnoozed}
-            />
-          </Tooltip>
-          {isSnoozed && (
-          <DateTimePicker
-            value={snoozedForDate}
-            onAccept={(value) => {
-              charmClient.snoozeTransactions({
-                snooze: isSnoozed,
-                snoozeFor: value ? value.toJSDate() : null
-              });
-            }}
-            onChange={(value) => {
-              setSnoozedForDate(value);
-            }}
-            renderInput={(props) => <TextField fullWidth {...props} />}
-          />
-          )}
-        </Box>
+        <Legend>Multisig</Legend>
+        <SnoozeTransaction snoozedForDate={snoozedForDate} setSnoozedForDate={setSnoozedForDate} />
       </Box>
       {!safesWithTasks && !error && <LoadingComponent height='200px' isLoading={true} />}
       {error && !safesWithTasks && (

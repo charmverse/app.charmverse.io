@@ -7,24 +7,18 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-export interface SnoozeTransactionsPayload {
-  snooze: boolean
-  snoozeFor: Date | null
-}
-
 handler
   .use(requireUser)
-  .use(requireKeys(['snooze', 'snoozeFor'], 'body'))
+  .use(requireKeys(['snoozeFor'], 'body'))
   .put(snoozeTransactions);
 
 async function snoozeTransactions (req: NextApiRequest, res: NextApiResponse<{ ok: true }>) {
-  const { snooze, snoozeFor } = req.body as SnoozeTransactionsPayload;
+  const { snoozeFor } = req.body as {snoozeFor: Date | null};
   await prisma.user.update({
     where: {
       id: req.session.user.id
     },
     data: {
-      transactionsSnoozed: snooze,
       transactionsSnoozedFor: snoozeFor
     }
   });
