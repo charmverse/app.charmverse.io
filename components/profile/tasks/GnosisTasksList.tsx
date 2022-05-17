@@ -202,15 +202,32 @@ function SnoozeTransaction (
   { snoozedForDate: DateTime | null, setSnoozedForDate: React.Dispatch<React.SetStateAction<DateTime | null>> }
 ) {
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [snoozeMessage, setSnoozeMessage] = useState<null | string>(null);
+  const [snoozedFor, setSnoozedFor] = useState<null | '1_day' | '3_days'>(null);
   const { mutate: mutateTasks } = useTasks();
   const isSnoozed = snoozedForDate !== null;
-  const popupState = usePopupState({
+  const primaryPopupState = usePopupState({
     popupId: 'snooze-transactions',
     variant: 'popover'
   });
+  const secondaryPopupState = usePopupState({
+    popupId: 'snooze-transactions-message',
+    variant: 'popover'
+  });
 
-  const triggerState = bindTrigger(popupState);
-  const menuState = bindMenu(popupState);
+  const primaryTriggerState = bindTrigger(primaryPopupState);
+  const primaryMenuState = bindMenu(primaryPopupState);
+
+  const secondaryTriggerState = bindTrigger(secondaryPopupState);
+  const secondaryMenuState = bindMenu(secondaryPopupState);
+
+  function resetState () {
+    primaryMenuState.onClose();
+    setShowDatePicker(false);
+    setSnoozeMessage(null);
+    setSnoozedFor(null);
+    secondaryMenuState.onClose();
+  }
 
   async function removeSnoozedForDate () {
     setSnoozedForDate(null);
@@ -219,8 +236,7 @@ function SnoozeTransaction (
       snoozeMessage: null
     });
     mutateTasks();
-    menuState.onClose();
-    setShowDatePicker(false);
+    resetState();
   }
 
   useEffect(() => {
@@ -234,35 +250,36 @@ function SnoozeTransaction (
     }
   }, [snoozedForDate]);
 
-  const onClose = menuState.onClose;
-  menuState.onClose = () => {
+  const onClose = primaryMenuState.onClose;
+  primaryMenuState.onClose = () => {
     setShowDatePicker(false);
     onClose();
   };
 
-  async function setSnoozedDate (delta: '1_day' | '3_days' | '1_week' | '1_month') {
-    let newSnoozedForDate = DateTime.fromMillis(Date.now());
-    switch (delta) {
-      case '1_day': {
-        newSnoozedForDate = newSnoozedForDate.plus({ day: 1 });
-        break;
+  async function setSnoozedDate () {
+    if (snoozedFor) {
+      let newSnoozedForDate = DateTime.fromMillis(Date.now());
+      switch (snoozedFor) {
+        case '1_day': {
+          newSnoozedForDate = newSnoozedForDate.plus({ day: 1 });
+          break;
+        }
+        case '3_days': {
+          newSnoozedForDate = newSnoozedForDate.plus({ days: 3 });
+          break;
+        }
+        default: {
+          newSnoozedForDate = newSnoozedForDate.plus({ day: 1 });
+        }
       }
-      case '3_days': {
-        newSnoozedForDate = newSnoozedForDate.plus({ days: 3 });
-        break;
-      }
-      default: {
-        newSnoozedForDate = newSnoozedForDate.plus({ day: 1 });
-      }
+      setSnoozedForDate(newSnoozedForDate);
+      await charmClient.snoozeTransactions({
+        snoozeFor: newSnoozedForDate.toJSDate(),
+        snoozeMessage
+      });
+      mutateTasks();
+      resetState();
     }
-    setSnoozedForDate(newSnoozedForDate);
-    await charmClient.snoozeTransactions({
-      snoozeFor: newSnoozedForDate.toJSDate(),
-      snoozeMessage: null
-    });
-    mutateTasks();
-    menuState.onClose();
-    setShowDatePicker(false);
   }
 
   return (
@@ -274,23 +291,28 @@ function SnoozeTransaction (
             fontSize='small'
           />
         )}
-        {...triggerState}
+        {...primaryTriggerState}
       >
         {isSnoozed ? `Snoozed for ${snoozedForDate.toRelative({ base: (DateTime.now()) })?.slice(3)}` : 'Snooze'}
       </Button>
       <Menu
-        {...menuState}
+        {...primaryMenuState}
       >
         <MenuItem
-          onClick={() => {
-            setSnoozedDate('1_day');
+          {...secondaryTriggerState}
+          onClick={(e) => {
+            setSnoozedFor('1_day');
+            secondaryTriggerState.onClick(e);
           }}
         >1 day
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            setSnoozedDate('3_days');
+          {...secondaryTriggerState}
+          onClick={(e) => {
+            setSnoozedFor('3_days');
+            secondaryTriggerState.onClick(e);
           }}
+          // setSnoozedDate('3_days');
         >3 days
         </MenuItem>
         {showDatePicker
@@ -306,7 +328,7 @@ function SnoozeTransaction (
                       { snoozeFor: value.toJSDate(), snoozeMessage: null }
                     );
                     mutateTasks();
-                    menuState.onClose();
+                    primaryMenuState.onClose();
                     setShowDatePicker(false);
                   }
                 }}
@@ -325,7 +347,7 @@ function SnoozeTransaction (
           )
           : (
             <MenuItem
-              divider
+              divider={isSnoozed}
               onClick={() => {
                 setShowDatePicker(true);
               }}
@@ -337,6 +359,13 @@ function SnoozeTransaction (
           Unsnooze
         </MenuItem>
         )}
+      </Menu>
+      <Menu {...secondaryMenuState}>
+        <Box display='flex' gap={1} px={1}>
+          <TextField fullWidth placeholder='Snooze message' onChange={(e) => setSnoozeMessage(e.target.value)} value={snoozeMessage} />
+          <Button onClick={setSnoozedDate}>Save
+          </Button>
+        </Box>
       </Menu>
     </Box>
   );
