@@ -19,36 +19,17 @@ import { humanFriendlyDate } from 'lib/utilities/dates';
 import { Modal } from 'components/common/Modal';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useBounties } from 'hooks/useBounties';
-import { applicantIsSubmitter } from 'lib/applications/shared';
+import { applicantIsSubmitter, moveUserApplicationToFirstRow } from 'lib/applications/shared';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
 import { SubmissionStatusColors, SubmissionStatusLabels } from '../components_v3/BountySubmissions';
+
 /**
  * @updateApplication callback to parent [bountyId] page that implements application update logic
  */
 export interface IBountyApplicantListProps {
   bounty: Bounty,
   applications: Application[]
-}
-
-function moveUserApplicationToFirstRow (applications: Application [], user: User): Application [] {
-
-  const copiedApps = applications.slice();
-
-  const userApplicationIndex = copiedApps.findIndex(app => {
-    return app.createdBy === user?.id;
-  });
-
-  if (userApplicationIndex > 0) {
-
-    const userApplication = copiedApps[userApplicationIndex];
-
-    copiedApps.splice(userApplicationIndex, 1);
-    copiedApps.splice(0, 0, userApplication);
-  }
-
-  return copiedApps;
-
 }
 
 export function BountyApplicantList ({
