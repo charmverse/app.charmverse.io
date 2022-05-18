@@ -217,6 +217,12 @@ function SnoozeTransaction (
 
   const secondaryTriggerState = bindTrigger(secondaryPopupState);
   const secondaryMenuState = bindMenu(secondaryPopupState);
+  const secondaryMenuStateOnClose = secondaryMenuState.onClose;
+
+  secondaryMenuState.onClose = () => {
+    setSnoozeMessage(null);
+    secondaryMenuStateOnClose();
+  };
 
   function resetState () {
     setShowDatePicker(false);
@@ -370,11 +376,21 @@ function SnoozeTransaction (
         </>
         )}
       </Menu>
-      <Menu {...secondaryMenuState}>
+      <Menu {...secondaryMenuState} elevation={20}>
         <Box display='flex' gap={1} px={1}>
-          <TextField fullWidth placeholder='Snooze message' onChange={(e) => setSnoozeMessage(e.target.value)} value={snoozeMessage} />
-          <Button onClick={setSnoozedDate}>{isSnoozed ? 'Edit' : 'Save'}
-          </Button>
+          <TextField
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setSnoozedDate();
+              }
+            }}
+            autoFocus
+            fullWidth
+            placeholder='Snooze message'
+            onChange={(e) => setSnoozeMessage(e.target.value)}
+            value={snoozeMessage}
+          />
+          <Button onClick={setSnoozedDate}>{isSnoozed ? 'Edit' : 'Save'}</Button>
         </Box>
       </Menu>
     </Box>
