@@ -108,7 +108,7 @@ export default function ImportGuildRolesMenuItem ({ onClose }: {onClose: () => v
                       />
                     )}
                   /> */}
-                  <GuildsAutocomplete options={guilds} />
+                  <GuildsAutocomplete guilds={guilds} />
                   <PimpedButton
                     loading={importingRoles}
                     sx={{

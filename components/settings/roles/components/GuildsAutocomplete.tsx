@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import { Avatar, Box, ListItem, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import { GetGuildsResponse } from '@guildxyz/sdk';
 
-const LISTBOX_PADDING = 20; // px
+const LISTBOX_PADDING = 8; // px
 
 type ItemData = [React.HTMLAttributes<HTMLLIElement>, GetGuildsResponse[0]];
 
@@ -26,41 +26,43 @@ function renderRow (props: {data: ItemData[], index: number, style: React.CSSPro
         display: 'flex'
       }}
     >
-      <Box sx={{
-        width: '100%'
-      }}
-      >
+      {/** This div is required to remove the weird hover style for menu item */}
+      <Box width='100%'>
         <MenuItem
           component='div'
           sx={{
             '&:hover': {
               background: 'inherit'
-            }
+            },
+            display: 'flex',
+            justifyContent: 'space-around'
           }}
         >
-          <ListItemIcon sx={{ mr: 1 }}>
-            <Avatar sx={{ width: 32, height: 32 }} src={guild.imageUrl?.startsWith('/') ? `https://guild.xyz${guild.imageUrl}` : guild.imageUrl} />
-          </ListItemIcon>
-          <ListItemText
-            secondary={guild.urlName}
-            sx={{
-              '& .MuiTypography-root': {
-                display: 'flex',
-                justifyContent: 'space-between',
-                flexDirection: 'row'
-              }
-            }}
-          >
-            {guild.name}
-            <Box display='flex' gap={1}>
-              <Typography variant='subtitle2' color='secondary'>
-                {guild.memberCount} Members(s)
-              </Typography>
-              <Typography variant='subtitle2' color='secondary'>
-                {guild.roles.length} Role(s)
-              </Typography>
-            </Box>
-          </ListItemText>
+          <Box display='flex' flexGrow={1} gap={1} alignItems='center'>
+            <ListItemIcon>
+              <Avatar sx={{ width: 32, height: 32 }} src={guild.imageUrl?.startsWith('/') ? `https://guild.xyz${guild.imageUrl}` : guild.imageUrl} />
+            </ListItemIcon>
+            <ListItemText
+              secondary={guild.urlName}
+              sx={{
+                '& .MuiTypography-root': {
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  flexDirection: 'row'
+                }
+              }}
+            >
+              {guild.name}
+            </ListItemText>
+          </Box>
+          <Box display='flex' gap={1}>
+            <Typography variant='subtitle2' color='secondary'>
+              {guild.memberCount} Members(s)
+            </Typography>
+            <Typography variant='subtitle2' color='secondary'>
+              {guild.roles.length} Role(s)
+            </Typography>
+          </Box>
         </MenuItem>
       </Box>
     </ListItem>
@@ -71,7 +73,13 @@ const OuterElementContext = React.createContext({});
 
 const OuterElementType = React.forwardRef<HTMLDivElement>((props, ref) => {
   const outerProps = React.useContext(OuterElementContext);
-  return <div ref={ref} {...props} {...outerProps} />;
+  return (
+    <div
+      ref={ref}
+      {...props}
+      {...outerProps}
+    />
+  );
 });
 
 function useResetCache (data: number) {
@@ -102,7 +110,7 @@ const ListboxComponent = React.forwardRef<HTMLDivElement, {children: ItemData[]}
       <OuterElementContext.Provider value={other}>
         <VariableSizeList<ItemData[]>
           itemData={itemData}
-          height={(itemCount > 8 ? 8 * itemSize : itemData.reduce((prev) => prev + itemSize, 0)) + 2 * LISTBOX_PADDING}
+          height={(itemCount > 8 ? LISTBOX_PADDING * itemSize : itemData.reduce((prev) => prev + itemSize, 0)) + 2 * LISTBOX_PADDING}
           width='100%'
           ref={gridRef}
           outerElementType={OuterElementType}
@@ -117,20 +125,22 @@ const ListboxComponent = React.forwardRef<HTMLDivElement, {children: ItemData[]}
   );
 });
 
-export default function GuildsAutocomplete ({ options }:{options: GetGuildsResponse}) {
-  const guildNameRecord: Record<string, GetGuildsResponse[0]> = {};
-  options.forEach(option => {
-    guildNameRecord[option.name] = option;
-  });
+export default function GuildsAutocomplete ({ guilds }:{guilds: GetGuildsResponse}) {
+  const guildNameRecord = React.useMemo(() => {
+    return guilds.reduce<Record<string, GetGuildsResponse[0]>>((record, guild) => ({
+      ...record,
+      [guild.name]: guild
+    }), {});
+  }, [guilds]);
 
   return (
     <Autocomplete
       disableListWrap
       ListboxComponent={ListboxComponent as any}
-      options={options.map(option => option.name)}
+      options={guilds.map(guild => guild.name)}
       filterSelectedOptions
       renderInput={(params) => <TextField {...params} label='Type Guild name...' />}
-      renderOption={(props, option) => [props, guildNameRecord[option]]}
+      renderOption={(props, guildName) => [props, guildNameRecord[guildName]]}
     />
   );
 }
