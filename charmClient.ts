@@ -30,7 +30,7 @@ import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import { UpdateGnosisSafeState } from 'pages/api/profile/snoozeTransactions';
+import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -136,8 +136,8 @@ class CharmClient {
     return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
-  snoozeTransactions (payload: UpdateGnosisSafeState) {
-    return http.PUT('/api/profile/snoozeTransactions', payload);
+  updateGnosisSafeState (payload: UpdateGnosisSafeState) {
+    return http.PUT('/api/profile/gnosis-safes/state', payload);
   }
 
   favoritePage (pageId: string) {

@@ -243,7 +243,7 @@ function SnoozeTransaction (
 
   async function removeSnoozedForDate () {
     setSnoozedForDate(null);
-    await charmClient.snoozeTransactions({
+    await charmClient.updateGnosisSafeState({
       snoozeFor: null,
       snoozeMessage: null
     });
@@ -289,7 +289,7 @@ function SnoozeTransaction (
       }
     }
     setSnoozedForDate(newSnoozedForDate);
-    await charmClient.snoozeTransactions({
+    await charmClient.updateGnosisSafeState({
       snoozeFor: newSnoozedForDate.toJSDate(),
       snoozeMessage
     });
