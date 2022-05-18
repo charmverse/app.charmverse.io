@@ -123,10 +123,11 @@ interface CharmEditorProps {
   readOnly?: boolean;
   style?: CSSProperties;
   noPadding?: boolean;
+  placeholderText?: string;
 }
 
 export default function CharmEditor (
-  { content, children, onContentChange, style, noPadding, readOnly = false }:
+  { content, children, onContentChange, style, noPadding, readOnly = false, placeholderText }:
   CharmEditorProps
 ) {
   const _isEmpty = !content || checkForEmpty(content);
@@ -180,7 +181,7 @@ export default function CharmEditor (
             left: noPadding ? 0 : 8,
             position: 'absolute'
           }}
-          text='Reply...'
+          text={placeholderText ?? 'Reply...'}
           show={isEmpty}
         />
       )}
