@@ -253,6 +253,10 @@ function SnoozeTransactions (
     }
   }, [snoozedForDate]);
 
+  useEffect(() => {
+    setSnoozeMessage(message);
+  }, [message]);
+
   const onClose = primaryMenuState.onClose;
   primaryMenuState.onClose = () => {
     setShowDatePicker(false);
