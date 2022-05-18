@@ -115,27 +115,35 @@ model Block {
 }
 
 model User {
-  id           String           @id @default(uuid()) @db.Uuid
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @default(now())
-  addresses    String[]
-  spaceRoles   SpaceRole[]
-  favorites    FavoritePage[]
-  permissions  PagePermission[]
-  pages        Page[]
-  blocks       Block[]
-  spaces       Space[]
-  inviteLinks  InviteLink[]
-  bounties     Bounty[]
-  applications Application[]
-  username     String?
-  avatar       String?
-  isBot        Boolean?         @default(false)
-  discordUser  DiscordUser?
-  telegramUser TelegramUser?
-  comments     Comment[]
-  threads      Thread[]
-  gnosisSafes  UserGnosisSafe[]
+  id              String               @id @default(uuid()) @db.Uuid
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @default(now())
+  addresses       String[]
+  spaceRoles      SpaceRole[]
+  favorites       FavoritePage[]
+  permissions     PagePermission[]
+  pages           Page[]
+  blocks          Block[]
+  spaces          Space[]
+  inviteLinks     InviteLink[]
+  bounties        Bounty[]
+  applications    Application[]
+  username        String?
+  avatar          String?
+  isBot           Boolean?             @default(false)
+  discordUser     DiscordUser?
+  telegramUser    TelegramUser?
+  comments        Comment[]
+  threads         Thread[]
+  gnosisSafes     UserGnosisSafe[]
+  gnosisSafeState UserGnosisSafeState?
+}
+
+model UserGnosisSafeState {
+  transactionsSnoozedFor    DateTime?
+  transactionsSnoozeMessage String?
+  userId                    String    @unique @db.Uuid
+  user                      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model TelegramUser {

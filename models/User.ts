@@ -1,4 +1,4 @@
-import type { DiscordUser, FavoritePage, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser } from '@prisma/client';
+import type { DiscordUser, FavoritePage, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser, UserGnosisSafeState } from '@prisma/client';
 
 export { FavoritePage, SpaceRole, User };
 
