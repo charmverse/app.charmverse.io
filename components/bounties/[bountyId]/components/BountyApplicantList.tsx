@@ -24,9 +24,6 @@ import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
 import { SubmissionStatusColors, SubmissionStatusLabels } from '../components_v3/BountySubmissions';
 
-/**
- * @updateApplication callback to parent [bountyId] page that implements application update logic
- */
 export interface IBountyApplicantListProps {
   bounty: Bounty,
   applications: Application[]
@@ -107,10 +104,6 @@ export function BountyApplicantList ({
     <>
       <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
 
-        <Box>
-          <Button disabled={user?.addresses.length === 0 || userHasApplied} onClick={bountyApplyModal.open}>Apply now</Button>
-        </Box>
-
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
           <TableHead sx={{
             background: theme.palette.background.dark,
@@ -132,7 +125,12 @@ export function BountyApplicantList ({
               </TableCell>
               <TableCell>Message</TableCell>
               <TableCell>Date</TableCell>
-              <TableCell></TableCell>
+              <TableCell>
+                {
+                  !userHasApplied && (<Button onClick={bountyApplyModal.open}>Apply now</Button>)
+                }
+
+              </TableCell>
             </TableRow>
           </TableHead>
           {applications.length !== 0 && (

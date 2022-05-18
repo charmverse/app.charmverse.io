@@ -36,7 +36,9 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
     formState: { errors, touchedFields, isValid, isValidating, isSubmitting }
   } = useForm<FormValues>({
     mode: 'onChange',
-    defaultValues: proposal as any,
+    defaultValues: {
+      message: proposal?.message
+    },
     resolver: yupResolver(schema)
   });
 
@@ -55,7 +57,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
       refreshBounty(bountyId);
     }
     else if (mode === 'update') {
-      await charmClient.updateApplication(proposalToSave);
+      await charmClient.updateApplication(proposal?.id as string, proposalToSave);
       onSubmit(proposalToSave);
       refreshBounty(bountyId);
     }

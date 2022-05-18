@@ -17,16 +17,26 @@ async function updateApplication (req: NextApiRequest, res: NextApiResponse<Appl
     return res.status(400).send({ error: 'Please provide a valid application ID' } as any);
   }
 
-  const { message, walletAddress } = req.body;
+  const body = req.body as Partial<Application>;
+
+  console.log('DATA');
+
+  const pageContent = typeof body.submissionNodes === 'string' ? body.submissionNodes
+    : typeof body.submissionNodes === 'object' ? JSON.stringify(body.submissionNodes) : undefined;
+
+  // Prevent accidental nulling of these fields
+  const updateContent: Prisma.ApplicationUpdateInput = {
+    message: body.message ?? undefined,
+    walletAddress: body.walletAddress ?? undefined,
+    submission: body.submission ?? undefined,
+    submissionNodes: pageContent
+  };
 
   const updatedApplication = await prisma.application.update({
     where: {
       id: id as string
     },
-    data: {
-      message,
-      walletAddress
-    }
+    data: updateContent
   });
   return res.status(200).json(updatedApplication);
 }

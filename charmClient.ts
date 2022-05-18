@@ -406,9 +406,9 @@ class CharmClient {
     });
   }
 
-  async updateApplication (application: Application): Promise<Application> {
+  async updateApplication (applicationId: string, update: Partial<Application>): Promise<Application> {
 
-    const data = await http.PUT<Application>(`/api/applications/${application.id}`, application);
+    const data = await http.PUT<Application>(`/api/applications/${applicationId}`, update);
 
     return data;
   }
