@@ -38,7 +38,7 @@ export async function getUserProfile (key: UserIdentifiers, value: string): Prom
       },
       discordUser: true,
       telegramUser: true,
-      userGnosisSafeState: true
+      gnosisSafeState: true
     }
   });
 

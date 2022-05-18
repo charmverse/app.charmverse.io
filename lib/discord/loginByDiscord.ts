@@ -23,7 +23,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
           },
           discordUser: true,
           telegramUser: true,
-          userGnosisSafeState: true
+          gnosisSafeState: true
         }
       }
     }
@@ -61,7 +61,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
         },
         discordUser: true,
         telegramUser: true,
-        userGnosisSafeState: true
+        gnosisSafeState: true
       }
     });
 

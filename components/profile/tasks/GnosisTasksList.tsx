@@ -34,7 +34,7 @@ const GridColumn = styled((props: any) => <Grid item xs {...props} />)`
   align-items: center;
 `;
 
-type UserWithGnosisSafeState = User & {userGnosisSafeState: UserGnosisSafeState | null}
+type UserWithGnosisSafeState = User & {gnosisSafeState: UserGnosisSafeState | null}
 
 function TransactionRow (
   { firstNonce, isSnoozed, snoozedUsers, transaction }:
@@ -119,8 +119,8 @@ function TransactionRow (
                 <Box py={1} display='flex' justifyContent='space-between'>
                   <UserDisplay avatarSize='small' user={snoozedUser} />
                   <Box display='flex' gap={1} alignItems='center'>
-                    {snoozedUser.userGnosisSafeState?.transactionsSnoozeMessage && (
-                    <Tooltip arrow placement='top' title={snoozedUser.userGnosisSafeState.transactionsSnoozeMessage}>
+                    {snoozedUser.gnosisSafeState?.transactionsSnoozeMessage && (
+                    <Tooltip arrow placement='top' title={snoozedUser.gnosisSafeState.transactionsSnoozeMessage}>
                       <EmailIcon
                         fontSize='small'
                         color='secondary'
@@ -128,7 +128,7 @@ function TransactionRow (
                     </Tooltip>
                     )}
                     <Typography variant='subtitle1' color='secondary'>
-                      for {DateTime.fromJSDate(new Date(snoozedUser.userGnosisSafeState?.transactionsSnoozedFor as Date))
+                      for {DateTime.fromJSDate(new Date(snoozedUser.gnosisSafeState?.transactionsSnoozedFor as Date))
                       .toRelative({ base: (DateTime.now()) })?.slice(3)}
                     </Typography>
                   </Box>
@@ -150,37 +150,33 @@ function SafeTasks (
 
   return (
     <>
-      <Box display='flex' justifyContent='space-between'>
-        <Typography
-          color='inherit'
+      <Typography
+        color='inherit'
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}
+      >
+        Tasks from safe:
+        <Link
           sx={{
-            display: 'flex',
+            display: 'inline-flex',
             alignItems: 'center',
-            gap: 1
+            gap: 0.5
           }}
-        >
-          Tasks from safe:
-          <Link
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 0.5
-            }}
-            href={safeUrl}
-            external
-            target='_blank'
-          >{safeName || shortenHex(address)} <OpenInNewIcon fontSize='small' />
-          </Link>
-        </Typography>
-      </Box>
+          href={safeUrl}
+          external
+          target='_blank'
+        >{safeName || shortenHex(address)} <OpenInNewIcon fontSize='small' />
+        </Link>
+      </Typography>
       {
         tasks.map((task: GnosisTask) => (
           <Card key={task.nonce} sx={{ my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
             <Box display='flex'>
-              <Box px={3} height={rowHeight} display='flex' alignItems='center' gap={1}>
-                <Typography>
-                  {task.transactions[0].nonce}
-                </Typography>
+              <Box px={3} height={rowHeight} display='flex' alignItems='center'>
+                {task.transactions[0].nonce}
               </Box>
               <Box flexGrow={1}>
                 {task.transactions.length > 1 && (
@@ -403,7 +399,7 @@ export default function GnosisTasksSection () {
   const gnosisSigner = useGnosisSigner();
 
   const [snoozedForDate, setSnoozedForDate] = useState<null | DateTime>(
-    (user?.userGnosisSafeState?.transactionsSnoozedFor ? DateTime.fromJSDate(new Date(user.userGnosisSafeState.transactionsSnoozedFor)) : null)
+    (user?.gnosisSafeState?.transactionsSnoozedFor ? DateTime.fromJSDate(new Date(user.gnosisSafeState.transactionsSnoozedFor)) : null)
   );
   const isSnoozed = snoozedForDate !== null;
 
@@ -432,7 +428,7 @@ export default function GnosisTasksSection () {
     <>
       <Legend>Multisig
         <SnoozeTransaction
-          message={user?.userGnosisSafeState?.transactionsSnoozeMessage ?? null}
+          message={user?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
           snoozedForDate={snoozedForDate}
           setSnoozedForDate={setSnoozedForDate}
         />

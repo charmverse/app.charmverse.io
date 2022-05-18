@@ -8,7 +8,7 @@ import { getTransactionsforSafes, GnosisTransaction } from './gnosis';
 
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`;
 
-type UserWithGnosisSafeState = User & {userGnosisSafeState: UserGnosisSafeState | null}
+type UserWithGnosisSafeState = User & {gnosisSafeState: UserGnosisSafeState | null}
 interface ActionUser {
   address: string;
   user?: UserWithGnosisSafeState;
@@ -167,7 +167,7 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
 
   const snoozedUsers: UserWithGnosisSafeState[] = [];
   users.forEach(user => {
-    if (user.userGnosisSafeState && user.userGnosisSafeState?.transactionsSnoozedFor !== null) {
+    if (user.gnosisSafeState && user.gnosisSafeState?.transactionsSnoozedFor !== null) {
       snoozedUsers.push(user);
     }
   });
@@ -206,7 +206,7 @@ export async function getPendingGnosisTasks (myUserId: string) {
       }
     },
     include: {
-      userGnosisSafeState: true
+      gnosisSafeState: true
     }
   });
 

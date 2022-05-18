@@ -27,7 +27,7 @@ handler.get(async (req, res) => {
     try {
       const user = await loginByDiscord({ code: tempAuthCode, hostName: req.headers.host });
       // strip out large fields so we dont break the cookie
-      const { discordUser, spaceRoles, telegramUser, userGnosisSafeState, ...userData } = user;
+      const { discordUser, spaceRoles, telegramUser, gnosisSafeState, ...userData } = user;
       req.session.user = userData;
       await updateGuildRolesForUser(userData.addresses, spaceRoles);
     }
