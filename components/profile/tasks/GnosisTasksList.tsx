@@ -16,6 +16,7 @@ import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
 import SnoozeIcon from '@mui/icons-material/Snooze';
 import { DateTimePicker } from '@mui/x-date-pickers';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { DateTime } from 'luxon';
 import charmClient from 'charmClient';
 import Tooltip from '@mui/material/Tooltip';
@@ -196,7 +197,7 @@ function SnoozeTransactions (
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [snoozeMessage, setSnoozeMessage] = useState(message);
   const [snoozedFor, setSnoozedFor] = useState<null | '1_day' | '3_days' | DateTime>(null);
-  const { mutate: mutateTasks } = useTasks();
+  const { isValidating, mutate: mutateTasks } = useTasks();
   const isSnoozed = snoozedForDate !== null;
   const primaryPopupState = usePopupState({
     popupId: 'snooze-transactions',
@@ -220,9 +221,12 @@ function SnoozeTransactions (
     secondaryMenuStateOnClose();
   };
 
-  function resetState () {
+  function closeMenus () {
     secondaryMenuState.onClose();
     primaryMenuState.onClose();
+  }
+
+  function resetState () {
     setShowDatePicker(false);
     setSnoozeMessage(null);
     setSnoozedFor(null);
@@ -230,11 +234,11 @@ function SnoozeTransactions (
 
   async function removeSnoozedForDate () {
     resetState();
-    setSnoozedForDate(null);
     await charmClient.updateGnosisSafeState({
       snoozeFor: null,
       snoozeMessage: null
     });
+    setSnoozedForDate(null);
     mutateTasks();
   }
 
@@ -284,9 +288,23 @@ function SnoozeTransactions (
     mutateTasks();
   }
 
+  useEffect(() => {
+    if (showDatePicker && dateTimePickerRef.current) {
+      setTimeout(() => {
+        if (dateTimePickerRef.current) {
+          const button = dateTimePickerRef.current.querySelector<HTMLButtonElement>('button');
+          if (button) {
+            button.click();
+          }
+        }
+      }, 500);
+    }
+  }, [showDatePicker]);
+
   return (
     <Box sx={{ float: 'right' }}>
       <Button
+        disabled={isValidating}
         variant='outlined'
         startIcon={(
           <SnoozeIcon
@@ -301,10 +319,11 @@ function SnoozeTransactions (
         {...primaryMenuState}
         sx={{
           '& .MuiPaper-root': {
-            minWidth: showDatePicker ? 300 : 200
+            minWidth: showDatePicker ? 300 : 250
           }
         }}
       >
+        {snoozedForDate && <Typography sx={{ pl: 2 }} variant='subtitle1' color='secondary'>{snoozedForDate.toRFC2822()}</Typography>}
         <MenuItem
           {...secondaryTriggerState}
           onClick={(e) => {
@@ -337,7 +356,17 @@ function SnoozeTransactions (
                   }
                 }}
                 onChange={() => {}}
-                renderInput={(props) => <TextField fullWidth {...props} />}
+                renderInput={(props) => (
+                  <TextField
+                    {...props}
+                    inputProps={{
+                      ...props.inputProps,
+                      readOnly: true
+                    }}
+                    disabled
+                    fullWidth
+                  />
+                )}
               />
               <IconButton
                 color='error'
@@ -360,7 +389,14 @@ function SnoozeTransactions (
           )}
         {isSnoozed && (
         <>
-          <MenuItem onClick={removeSnoozedForDate}>
+          <MenuItem onClick={() => {
+            // Close the menu and then update the state after a bit of delay
+            closeMenus();
+            setTimeout(() => {
+              removeSnoozedForDate();
+            }, 500);
+          }}
+          >
             Unsnooze
           </MenuItem>
           <MenuItem onClick={(e) => {
@@ -377,7 +413,10 @@ function SnoozeTransactions (
           <TextField
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                setSnoozedDate(snoozeMessage);
+                closeMenus();
+                setTimeout(() => {
+                  setSnoozedDate(snoozeMessage);
+                }, 500);
               }
             }}
             autoFocus
@@ -386,7 +425,14 @@ function SnoozeTransactions (
             onChange={(e) => setSnoozeMessage(e.target.value)}
             value={snoozeMessage}
           />
-          <Button onClick={() => setSnoozedDate(snoozeMessage)}>{isSnoozed ? 'Edit' : 'Save'}</Button>
+          <Button onClick={() => {
+            closeMenus();
+            setTimeout(() => {
+              setSnoozedDate(snoozeMessage);
+            }, 500);
+          }}
+          >{isSnoozed ? 'Edit' : 'Save'}
+          </Button>
         </Box>
       </Menu>
     </Box>
