@@ -1,8 +1,6 @@
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
 import { VariableSizeList } from 'react-window';
 import Typography from '@mui/material/Typography';
 import { Avatar, Box, ListItem, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
@@ -34,6 +32,11 @@ function renderRow (props: {data: ItemData[], index: number, style: React.CSSPro
       >
         <MenuItem
           component='div'
+          sx={{
+            '&:hover': {
+              background: 'inherit'
+            }
+          }}
         >
           <ListItemIcon sx={{ mr: 1 }}>
             <Avatar sx={{ width: 32, height: 32 }} src={guild.imageUrl?.startsWith('/') ? `https://guild.xyz${guild.imageUrl}` : guild.imageUrl} />
@@ -89,24 +92,8 @@ const ListboxComponent = React.forwardRef<HTMLDivElement, {children: ItemData[]}
     itemData.push(item);
   });
 
-  const theme = useTheme();
-  const smUp = useMediaQuery(theme.breakpoints.up('sm'), {
-    noSsr: true
-  });
-
   const itemCount = itemData.length;
-  const itemSize = smUp ? 36 : 48;
-
-  const getChildSize = () => {
-    return itemSize;
-  };
-
-  const getHeight = () => {
-    if (itemCount > 8) {
-      return 8 * itemSize;
-    }
-    return itemData.map(getChildSize).reduce((a, b) => a + b, 0);
-  };
+  const itemSize = 54;
 
   const gridRef = useResetCache(itemCount);
 
@@ -115,12 +102,11 @@ const ListboxComponent = React.forwardRef<HTMLDivElement, {children: ItemData[]}
       <OuterElementContext.Provider value={other}>
         <VariableSizeList<ItemData[]>
           itemData={itemData}
-          height={getHeight() + 2 * LISTBOX_PADDING}
+          height={(itemCount > 8 ? 8 * itemSize : itemData.reduce((prev) => prev + itemSize, 0)) + 2 * LISTBOX_PADDING}
           width='100%'
           ref={gridRef}
           outerElementType={OuterElementType}
-          innerElementType='ul'
-          itemSize={() => getChildSize()}
+          itemSize={() => itemSize}
           overscanCount={5}
           itemCount={itemCount}
         >
@@ -139,12 +125,11 @@ export default function GuildsAutocomplete ({ options }:{options: GetGuildsRespo
 
   return (
     <Autocomplete
-      id='virtualize-demo'
-      sx={{ width: 300 }}
       disableListWrap
       ListboxComponent={ListboxComponent as any}
       options={options.map(option => option.name)}
-      renderInput={(params) => <TextField {...params} label='10,000 options' />}
+      filterSelectedOptions
+      renderInput={(params) => <TextField {...params} label='Type Guild name...' />}
       renderOption={(props, option) => [props, guildNameRecord[option]]}
     />
   );

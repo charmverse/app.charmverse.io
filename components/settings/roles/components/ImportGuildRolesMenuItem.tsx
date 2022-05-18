@@ -92,11 +92,11 @@ export default function ImportGuildRolesMenuItem ({ onClose }: {onClose: () => v
                   paddingRight: 1
                 }}
                 >
-                  {/* <Autocomplete<GuildInfo, true>
+                  {/* <Autocomplete<any, true>
                     multiple
                     options={guilds}
                     getOptionLabel={(option) => option.name}
-                    value={selectedGuildIds.map(selectedGuildId => guildIdRecord[selectedGuildId])}
+                    value={[]}
                     filterSelectedOptions
                     onChange={(_, guildInfos) => {
                       setSelectedGuildIds(guildInfos.map(guildInfo => guildInfo.id));
