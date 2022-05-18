@@ -50,6 +50,7 @@ import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import Paragraph from './components/Paragraph';
 import Mention, { MentionSuggest, mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import DevTools from './DevTools';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -324,7 +325,6 @@ function CharmEditor (
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
-  console.log('content', content);
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
@@ -493,6 +493,7 @@ function CharmEditor (
       </Grow>
       )}
       <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+      <DevTools />
     </StyledReactBangleEditor>
   );
 }
