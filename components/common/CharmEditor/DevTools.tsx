@@ -1,15 +1,16 @@
 
 import applyDevTools from 'prosemirror-dev-tools';
 import { useEditorViewContext } from '@bangle.dev/react';
+import { useEffect } from 'react';
 
 // A React componenet that loads the prosemirror dev tools
 
 export default function RegisterDevTools () {
-  if (process.env.NODE_ENV === 'development') {
-    const view = useEditorViewContext();
-    if (view) {
+  const view = useEditorViewContext();
+  useEffect(() => {
+    if (view && process.env.NODE_ENV === 'development') {
       applyDevTools(view);
     }
-  }
+  }, [view]);
   return null;
 }
