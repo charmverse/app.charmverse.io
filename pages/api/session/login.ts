@@ -19,7 +19,6 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
       }
     },
     include: {
-      gnosisSafeState: true,
       favorites: true,
       telegramUser: true,
       discordUser: true,
@@ -40,7 +39,7 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
   }
 
   // strip out large fields so we dont break the cookie
-  const { discordUser, spaceRoles, telegramUser, gnosisSafeState, ...userData } = user;
+  const { discordUser, spaceRoles, telegramUser, ...userData } = user;
   req.session.user = userData;
   await updateGuildRolesForUser(userData.addresses, spaceRoles);
   await req.session.save();

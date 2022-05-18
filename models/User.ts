@@ -17,5 +17,4 @@ export interface LoggedInUser extends User {
   ensName?: string;
   discordUser?: DiscordUser | null
   telegramUser?: TelegramUser | null
-  gnosisSafeState?: UserGnosisSafeState | null
 }
