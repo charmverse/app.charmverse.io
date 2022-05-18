@@ -44,7 +44,7 @@ import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
-import * as handles from './components/nodeHandle';
+import * as rowActions from './components/rowActions';
 import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
@@ -189,7 +189,7 @@ export function charmEditorPlugins (
     table.TableFiltersMenu(),
     trailingNode.plugins(),
     disclosure.plugins(),
-    handles.plugins()
+    rowActions.plugins()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -324,7 +324,6 @@ function CharmEditor (
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
-  console.log('content', content);
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;

@@ -1,6 +1,6 @@
 
 import { createElement } from '@bangle.dev/core';
-import { Plugin, PluginKey } from '@bangle.dev/pm';
+import { Fragment, Plugin, PluginKey, Node } from '@bangle.dev/pm';
 
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
 
@@ -51,8 +51,17 @@ export function plugins () {
               topPos = view.state.doc.resolve(topPos.parentOffset);
             }
 
+            console.log('topPos', topPos);
+
             // grab the related DOM element and find the top-most child DOM element
             let { node: hoveredElement } = view.domAtPos(topPos.pos);
+
+            const pmNode = view.state.doc.nodeAt(topPos.pos) || topPos.parent;
+            if (!pmNode) {
+              // cancel if no PM node is found at this pos (not sure why this happens)
+              return;
+            }
+
             let levels = 10; // pre-caution to prevent infinite loop
             // eslint-disable-next-line no-plusplus
             while (hoveredElement.parentNode !== view.dom && levels > 0) {
@@ -62,16 +71,34 @@ export function plugins () {
               }
             }
             // @ts-ignore pm types are wrong
-            if (hoveredElement.getBoundingClientRect) {
+            if (view.dom.contains(hoveredElement.parentNode) && hoveredElement.getBoundingClientRect) {
               // @ts-ignore pm types are wrong
               const box = hoveredElement.getBoundingClientRect();
               const viewBox = view.dom.getBoundingClientRect();
               const top = box.top - viewBox.top;
+
               domElement.style.top = `${top}px`;
+              domElement.onclick = () => {
+                let nodeStart = topPos.pos;
+                let nodeEnd = pmNode ? (topPos.pos + pmNode.nodeSize + 1) : topPos.pos + 1;
+                console.log('CLICK', view.state.doc, nodeStart, topPos.pos, pmNode, nodeEnd, 'doc size:', view.state.doc.content.size);
+                // const updatedNode = removeChild(view.state.doc, node);
+                // view.dispatch(view.state.tr.replaceWith(0, view.state.doc.content.size, updatedNode));
+                // console.log(updatedNode, node);
+                if (nodeStart && nodeEnd) {
+                  // dont delte past end of document!
+                  if (nodeEnd > view.state.doc.content.size) {
+                    nodeEnd = view.state.doc.content.size;
+                  }
+                  if (nodeStart <= 2) {
+                    nodeStart = 0;
+                  }
+                  console.log('delete range', nodeStart, nodeEnd);
+                  view.dispatch(view.state.tr.deleteRange(nodeStart, nodeEnd));
+                }
+              };
               // console.log('row to hover', box.top, viewBox.top, topPos.pos, dom);
             }
-
-            const node = view.state.doc.nodeAt(topPos.pos);
 
             // dom.node.addEventListener('mouseleave', () => {
             //   console.log('leave');
@@ -92,3 +119,11 @@ export function plugins () {
   ];
 }
 
+function removeChild (node: Node, n: Node) {
+  const children: Node[] = [];
+  node.forEach((child) => {
+    if (child !== n) children.push(child);
+  });
+  console.log('children', children);
+  return node.copy(Fragment.from(children));
+}
