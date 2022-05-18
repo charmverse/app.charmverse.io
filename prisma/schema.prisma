@@ -223,7 +223,6 @@ model Bounty {
   applications     Application[]
   transactions     Transaction[]
   approveSubmitters Boolean 
-  capSubmissions    Boolean
   maxSubmissions    Int?         
   expiryDate        DateTime?
 }
