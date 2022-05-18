@@ -49,6 +49,7 @@ import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import Paragraph from './components/Paragraph';
 import Mention, { MentionSuggest, mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import DevTools from './DevTools';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
@@ -490,6 +491,7 @@ function CharmEditor (
       </Grow>
       )}
       <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+      <DevTools />
     </StyledReactBangleEditor>
   );
 }
