@@ -324,6 +324,7 @@ function CharmEditor (
   const _isEmpty = checkForEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
+  console.log('content', content);
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;

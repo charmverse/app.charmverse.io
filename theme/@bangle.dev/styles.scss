@@ -465,9 +465,20 @@ details {
 
 // handles on the side of each row
 .row-handle {
-  left: 0px;
+  left: 20px;
   position: absolute;
   background: green;
   width: 10px;
-  height: 1em;
+  height: 24px;
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.czi-editor-frame-body {
+  &:hover {
+    .row-handle {
+      opacity: 1;
+    }
+  }
 }
