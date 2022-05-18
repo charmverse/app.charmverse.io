@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
+import Typography from '@mui/material/Typography';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
@@ -51,8 +52,8 @@ export const schema = yup.object({
   // New fields
   approveSubmitters: yup.boolean(),
   capSubmissions: yup.boolean(),
-  maxSubmissions: yup.number().nullable().test({
-    message: 'The cap should be greater than or equal to 1',
+  maxSubmissions: yup.number().typeError('Amount must be a number greater than 1').test({
+    message: 'Amount must be a number greater than 1',
     test: (value, context) => {
 
       // eslint-disable-next-line no-restricted-globals
@@ -144,8 +145,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   const values = watch();
 
-  console.log('Values', values);
-
   const [space] = useCurrentSpace();
   const [user] = useUser();
   const [paymentMethods] = usePaymentMethods();
@@ -154,8 +153,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   const chainId = watch('chainId');
   const rewardToken = watch('rewardToken');
-
-  console.log('Errors', errors, isValid, values);
 
   useEffect(() => {
     refreshCryptoList(defaultChainId, bounty?.rewardToken);
@@ -171,6 +168,11 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
     if (!value.setExpiryDate) {
       value.expiryDate = null;
     }
+
+    if (!value.capSubmissions) {
+      delete value.maxSubmissions;
+    }
+    delete value.capSubmissions;
 
     if (mode === 'create') {
       delete value.setExpiryDate;
@@ -363,74 +365,72 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           {/* New options */}
 
           <Grid container item>
-            <Grid item xs={4}>
-              <InputLabel>
-                Require applications
-              </InputLabel>
-              <Switch
-                {...register('approveSubmitters')}
-                defaultChecked={values.approveSubmitters}
+            <Grid item xs={6}>
+              <FormControlLabel
+                label='Require applications'
+                control={(
+                  <Switch
+                    onChange={(event) => {
+                      setValue('approveSubmitters', event.target.checked === true, {
+                        shouldValidate: true
+                      });
+                    }}
+                    defaultChecked={values.approveSubmitters}
+                  />
+                )}
               />
 
             </Grid>
-            <Grid item xs={8}>
-              {
-                values.approveSubmitters ? (
-                  <Alert severity='warning'>
-                    Workspace members will have to apply to work on this bounty. They will be able to submit work once their application is accepted.
-                  </Alert>
-                ) : (
-                  <Alert severity='info'>
-                    Any workspace member can make a submission to this bounty.
-                  </Alert>
-                )
+            <Grid item xs={6}>
+              <Typography variant='body2'>
+                {
+                values.approveSubmitters
+
+                  ? 'Workspace members will have to apply to work on this bounty. They will be able to submit work once their application is accepted.'
+
+                  : 'Any workspace member can make a submission to this bounty.'
+
               }
+              </Typography>
 
             </Grid>
           </Grid>
           <Grid container item>
 
-            <Grid item xs={values.capSubmissions ? 6 : 4}>
-              <InputLabel>
-                Cap submissions
-              </InputLabel>
-              <Switch
-                {...register('capSubmissions')}
-                defaultChecked={values.capSubmissions}
+            <Grid item xs={6}>
+
+              <FormControlLabel
+                label='Limit amount of submissions'
+                control={(
+                  <Switch
+                    onChange={(event) => {
+                      setValue('capSubmissions', event.target.checked === true, {
+                        shouldValidate: true
+                      });
+                    }}
+                    defaultChecked={values.approveSubmitters}
+                  />
+                )}
               />
+
             </Grid>
 
-            <Grid item xs={values.capSubmissions ? 6 : 8}>
+            <Grid item xs={6}>
 
               {
-                values.capSubmissions === false ? (
-                  <Alert severity='info'>
-                    {
-                      values.approveSubmitters ? 'Workspace members can apply to this bounty as long as it remains open.' : 'Workspace members can make submissions for this bounty as long as it remains open.'
-                    }
-
-                  </Alert>
-                ) : (
-                  <>
-                    <InputLabel>
-                      Maximum submissions
-                    </InputLabel>
-                    <TextField
-                      {...register('maxSubmissions', {
-                        valueAsNumber: true,
-                        required: true,
-                        shouldUnregister: true
-                      })}
-                      fullWidth
-                      focused={focusKey === 'maxSubmissions'}
-                      type='number'
-                      size='small'
-                      error={!!errors?.maxSubmissions}
-                      helperText={errors?.maxSubmissions?.message}
-                      inputProps={{ step: 1, min: 1 }}
-                    />
-                  </>
-
+                values.capSubmissions === true && (
+                  <TextField
+                    {...register('maxSubmissions', {
+                      valueAsNumber: true
+                    })}
+                    fullWidth
+                    focused={focusKey === 'maxSubmissions'}
+                    type='number'
+                    size='small'
+                    error={!!errors?.maxSubmissions}
+                    helperText={errors?.maxSubmissions?.message}
+                    inputProps={{ step: 1, min: 1 }}
+                  />
                 )
               }
 
@@ -438,19 +438,27 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           </Grid>
 
           <Grid container item>
-            <Grid item xs={values.setExpiryDate ? 6 : 4}>
-              <InputLabel>
-                Set expiry date
-              </InputLabel>
-              <Switch
-                {...register('setExpiryDate')}
-                defaultChecked={values.setExpiryDate}
+            <Grid item xs={6}>
+              <FormControlLabel
+                label='Set expiry date'
+                control={(
+                  <Switch
+                    onChange={(event) => {
+                      setValue('setExpiryDate', event.target.checked === true, {
+                        shouldValidate: true
+                      });
+                    }}
+                    defaultChecked={values.setExpiryDate || values.expiryDate}
+                  />
+                )}
               />
+
             </Grid>
 
-            {
-              values.setExpiryDate && (
-                <Grid item xs={6}>
+            <Grid item xs={6}>
+              {
+              values.setExpiryDate ? (
+                <>
                   <InputLabel>Expiry date</InputLabel>
                   <DatePicker
                     value={values.expiryDate}
@@ -469,22 +477,16 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                       />
                     )}
                   />
-                </Grid>
-              )
-              }
-
-            {
-                !values.setExpiryDate && (
-                  <Grid item xs={8}>
-                    <Alert severity='info'>
-                      {
-                        values.approveSubmitters ? 'Workspace members can apply to this bounty until the expiry date.' : 'Workspace members can make new submissions for this bounty until the expiry date.'
+                </>
+              ) : (
+                <Typography variant='body2'>
+                  {
+                        values.approveSubmitters ? 'Workspace members can apply to this bounty until the bounty closes.' : 'Workspace members can make new submissions for this bounty until the bounty closes.'
                       }
-
-                    </Alert>
-                  </Grid>
-                )
-              }
+                </Typography>
+              )
+                    }
+            </Grid>
           </Grid>
 
           <Grid item>
