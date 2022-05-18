@@ -31,6 +31,7 @@ import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
+import { GetTasksResponse } from 'pages/api/tasks';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -501,7 +502,7 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  getTasks (): Promise<{ gnosis: GnosisSafeTasks[] }> {
+  getTasks (): Promise<GetTasksResponse> {
     return http.GET('/api/tasks');
   }
 

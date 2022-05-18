@@ -12,14 +12,12 @@ import UserDisplay, { AnonUserDisplay } from 'components/common/UserDisplay';
 import { shortenHex } from 'lib/utilities/strings';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import useGnosisSigner from 'hooks/useWeb3Signer';
-import { useUser } from 'hooks/useUser';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
 import SnoozeIcon from '@mui/icons-material/Snooze';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import charmClient from 'charmClient';
-import { User, UserGnosisSafeState } from '@prisma/client';
 import Tooltip from '@mui/material/Tooltip';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -33,8 +31,6 @@ const GridColumn = styled((props: any) => <Grid item xs {...props} />)`
   display: flex;
   align-items: center;
 `;
-
-type UserWithGnosisSafeState = User & {gnosisSafeState: UserGnosisSafeState | null}
 
 function TransactionRow (
   { firstNonce, isSnoozed, transaction }:
@@ -193,7 +189,7 @@ function SafeTasks (
   );
 }
 
-function SnoozeTransaction (
+function SnoozeTransactions (
   { message, snoozedForDate, setSnoozedForDate }:
   { message: null | string, snoozedForDate: DateTime | null, setSnoozedForDate: React.Dispatch<React.SetStateAction<DateTime | null>> }
 ) {
@@ -225,21 +221,21 @@ function SnoozeTransaction (
   };
 
   function resetState () {
+    secondaryMenuState.onClose();
+    primaryMenuState.onClose();
     setShowDatePicker(false);
     setSnoozeMessage(null);
     setSnoozedFor(null);
-    secondaryMenuState.onClose();
-    primaryMenuState.onClose();
   }
 
   async function removeSnoozedForDate () {
+    resetState();
     setSnoozedForDate(null);
     await charmClient.updateGnosisSafeState({
       snoozeFor: null,
       snoozeMessage: null
     });
     mutateTasks();
-    resetState();
   }
 
   useEffect(() => {
@@ -259,7 +255,8 @@ function SnoozeTransaction (
     onClose();
   };
 
-  async function setSnoozedDate () {
+  async function setSnoozedDate (_snoozeMessage: string | null) {
+    resetState();
     let newSnoozedForDate = DateTime.fromMillis(Date.now());
     switch (snoozedFor) {
       case '1_day': {
@@ -282,10 +279,9 @@ function SnoozeTransaction (
     setSnoozedForDate(newSnoozedForDate);
     await charmClient.updateGnosisSafeState({
       snoozeFor: newSnoozedForDate.toJSDate(),
-      snoozeMessage
+      snoozeMessage: _snoozeMessage
     });
     mutateTasks();
-    resetState();
   }
 
   return (
@@ -381,7 +377,7 @@ function SnoozeTransaction (
           <TextField
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                setSnoozedDate();
+                setSnoozedDate(snoozeMessage);
               }
             }}
             autoFocus
@@ -390,7 +386,7 @@ function SnoozeTransaction (
             onChange={(e) => setSnoozeMessage(e.target.value)}
             value={snoozeMessage}
           />
-          <Button onClick={setSnoozedDate}>{isSnoozed ? 'Edit' : 'Save'}</Button>
+          <Button onClick={() => setSnoozedDate(snoozeMessage)}>{isSnoozed ? 'Edit' : 'Save'}</Button>
         </Box>
       </Menu>
     </Box>
@@ -400,23 +396,31 @@ function SnoozeTransaction (
 export default function GnosisTasksSection () {
   const { data: safeData, mutate } = useMultiWalletSigs();
   const { error, mutate: mutateTasks, tasks } = useTasks();
-  const [user] = useUser();
   const gnosisSigner = useGnosisSigner();
 
+  const taskUser = tasks?.user;
+  const transactionsSnoozedFor = taskUser?.gnosisSafeState?.transactionsSnoozedFor;
+  const transactionSnoozedDate = transactionsSnoozedFor ? DateTime.fromJSDate(new Date(transactionsSnoozedFor)) : null;
+
   const [snoozedForDate, setSnoozedForDate] = useState<null | DateTime>(
-    (user?.gnosisSafeState?.transactionsSnoozedFor ? DateTime.fromJSDate(new Date(user.gnosisSafeState.transactionsSnoozedFor)) : null)
+    transactionSnoozedDate
   );
+
+  useEffect(() => {
+    setSnoozedForDate(transactionSnoozedDate);
+  }, [taskUser]);
+
   const isSnoozed = snoozedForDate !== null;
 
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
 
   async function importSafes () {
-    if (gnosisSigner && user) {
+    if (gnosisSigner && taskUser) {
       setIsLoadingSafes(true);
       try {
         await importSafesFromWallet({
           signer: gnosisSigner,
-          addresses: user.addresses
+          addresses: taskUser.addresses
         });
         await mutate();
         await mutateTasks();
@@ -432,8 +436,8 @@ export default function GnosisTasksSection () {
   return (
     <>
       <Legend>Multisig
-        <SnoozeTransaction
-          message={user?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
+        <SnoozeTransactions
+          message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
           snoozedForDate={snoozedForDate}
           setSnoozedForDate={setSnoozedForDate}
         />
