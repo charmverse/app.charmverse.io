@@ -34,6 +34,7 @@ export interface GnosisTransactionPopulated {
   safeAddress: string;
   safeName: string | null;
   threshold: number;
+  snoozedUsers: UserWithGnosisSafeState[]
 }
 
 export interface GnosisTask {
@@ -46,7 +47,6 @@ export interface GnosisSafeTasks {
   safeName: string | null;
   safeUrl: string;
   tasks: GnosisTask[];
-  snoozedUsers: UserWithGnosisSafeState[]
 }
 
 function etherToBN (ether: string): ethers.BigNumber {
@@ -130,6 +130,17 @@ function transactionToTask ({ myAddresses, transaction, safe, users }: Transacti
     return { address, user };
   }
 
+  const confirmations = transaction.confirmations?.map(confirmation => getRecipient(confirmation.owner)) ?? [];
+  const snoozedUsers: UserWithGnosisSafeState[] = [];
+  users.forEach(user => {
+    if (
+      user.gnosisSafeState
+      && user.gnosisSafeState.transactionsSnoozedFor !== null
+      && !confirmations.find(confirmation => user.addresses.includes(confirmation.address))) {
+      snoozedUsers.push(user);
+    }
+  });
+
   return {
     id: transaction.safeTxHash,
     actions,
@@ -140,10 +151,11 @@ function transactionToTask ({ myAddresses, transaction, safe, users }: Transacti
     nonce: transaction.nonce,
     safeAddress: transaction.safe,
     safeName: safe.name,
-    confirmations: transaction.confirmations?.map(confirmation => getRecipient(confirmation.owner)) ?? [],
+    confirmations,
     threshold: safe.threshold,
     myAction: actionLabel,
-    myActionUrl: gnosisUrl
+    myActionUrl: gnosisUrl,
+    snoozedUsers
   };
 }
 
@@ -165,13 +177,6 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
     users
   }));
 
-  const snoozedUsers: UserWithGnosisSafeState[] = [];
-  users.forEach(user => {
-    if (user.gnosisSafeState && user.gnosisSafeState?.transactionsSnoozedFor !== null) {
-      snoozedUsers.push(user);
-    }
-  });
-
   return Object.values(groupBy(mapped, 'safeAddress'))
     .map<GnosisSafeTasks>((_transactions) => ({
       safeAddress: _transactions[0].safeAddress,
@@ -179,8 +184,7 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
       safeUrl: getGnosisTransactionUrl(_transactions[0].safeAddress),
       tasks: Object.values(groupBy(_transactions, 'nonce'))
         .map<GnosisTask>(__transactions => ({ nonce: __transactions[0].nonce, transactions: __transactions }))
-        .sort((a, b) => a.nonce - b.nonce),
-      snoozedUsers
+        .sort((a, b) => a.nonce - b.nonce)
     }))
     .sort((safeA, safeB) => safeA.safeAddress > safeB.safeAddress ? -1 : 1);
 }

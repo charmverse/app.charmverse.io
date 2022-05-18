@@ -37,21 +37,11 @@ const GridColumn = styled((props: any) => <Grid item xs {...props} />)`
 type UserWithGnosisSafeState = User & {gnosisSafeState: UserGnosisSafeState | null}
 
 function TransactionRow (
-  { firstNonce, isSnoozed, snoozedUsers, transaction }:
-  { firstNonce: number, isSnoozed: boolean, snoozedUsers: UserWithGnosisSafeState[], transaction: GnosisTransactionPopulated }
+  { firstNonce, isSnoozed, transaction }:
+  { firstNonce: number, isSnoozed: boolean, transaction: GnosisTransactionPopulated }
 ) {
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
-  const filteredSnoozedUsers: UserWithGnosisSafeState[] = [];
-  const confirmedAddresses = transaction.confirmations.map(confirmation => confirmation.address);
-
-  // Filter out the snoozed users that have already confirmed transaction
-  snoozedUsers.forEach(snoozedUser => {
-    if (!snoozedUser.addresses.some(address => confirmedAddresses.includes(address))) {
-      filteredSnoozedUsers.push(snoozedUser);
-    }
-  });
-
   const isFirstTask = transaction.nonce === firstNonce;
 
   return (
@@ -114,8 +104,8 @@ function TransactionRow (
                   {confirmation.user ? <UserDisplay avatarSize='small' user={confirmation.user} /> : <AnonUserDisplay avatarSize='small' address={confirmation.address} />}
                 </Box>
               ))}
-              {filteredSnoozedUsers.length !== 0 ? <Typography sx={{ mt: 2 }} color='secondary' gutterBottom variant='body2'>Snoozed</Typography> : null}
-              {filteredSnoozedUsers.map(snoozedUser => (
+              {transaction.snoozedUsers.length !== 0 ? <Typography sx={{ mt: 2 }} color='secondary' gutterBottom variant='body2'>Snoozed</Typography> : null}
+              {transaction.snoozedUsers.map(snoozedUser => (
                 <Box py={1} display='flex' justifyContent='space-between'>
                   <UserDisplay avatarSize='small' user={snoozedUser} />
                   <Box display='flex' gap={1} alignItems='center'>
@@ -144,8 +134,8 @@ function TransactionRow (
 }
 
 function SafeTasks (
-  { isSnoozed, snoozedUsers, address, safeName, safeUrl, tasks }:
-  { isSnoozed: boolean, snoozedUsers: UserWithGnosisSafeState[], address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
+  { isSnoozed, address, safeName, safeUrl, tasks }:
+  { isSnoozed: boolean, address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
 ) {
 
   return (
@@ -190,7 +180,6 @@ function SafeTasks (
                   <TransactionRow
                     firstNonce={tasks[0].transactions[0].nonce}
                     isSnoozed={isSnoozed}
-                    snoozedUsers={snoozedUsers}
                     transaction={transaction}
                     key={transaction.id}
                   />
@@ -447,7 +436,6 @@ export default function GnosisTasksSection () {
           safeName={safe.safeName}
           tasks={safe.tasks}
           safeUrl={safe.safeUrl}
-          snoozedUsers={safe.snoozedUsers}
         />
       ))}
       {safeData?.length === 0 && (
