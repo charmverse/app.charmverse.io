@@ -52,7 +52,7 @@ export const schema = yup.object({
   // New fields
   approveSubmitters: yup.boolean(),
   capSubmissions: yup.boolean(),
-  maxSubmissions: yup.number().typeError('Amount must be a number greater than 1').test({
+  maxSubmissions: yup.number().nullable().typeError('Amount must be a number greater than 1').test({
     message: 'Amount must be a number greater than 1',
     test: (value, context) => {
 
@@ -129,7 +129,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
       chainId: defaultChainId as any,
       maxSubmissions: 1 as any,
       approveSubmitters: true,
-      capSubmissions: true,
+      capSubmissions: !((bounty && bounty?.maxSubmissions === null)),
       expiryDate: null,
       ...(bounty || {}),
       setExpiryDate: !!bounty?.expiryDate
@@ -170,7 +170,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
     }
 
     if (!value.capSubmissions) {
-      delete value.maxSubmissions as any;
+      // Ensures any existing limit will be nulled
+      value.maxSubmissions = null;
     }
     delete value.capSubmissions;
 
@@ -407,7 +408,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                         shouldValidate: true
                       });
                     }}
-                    defaultChecked={values.approveSubmitters}
+                    defaultChecked={values.capSubmissions}
                   />
                 )}
               />
@@ -417,7 +418,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
             <Grid item xs={6}>
 
               {
-                values.capSubmissions === true && (
+                values.capSubmissions && (
                   <TextField
                     {...register('maxSubmissions', {
                       valueAsNumber: true
