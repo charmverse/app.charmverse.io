@@ -54,7 +54,7 @@ export function plugins () {
             console.log('topPos', topPos);
 
             // grab the related DOM element and find the top-most child DOM element
-            let { node: hoveredElement } = view.domAtPos(topPos.pos);
+            let { node: hoveredElement } = view.domAtPos(topPos.pos, -1);
 
             const pmNode = view.state.doc.nodeAt(topPos.pos) || topPos.parent;
             if (!pmNode) {
