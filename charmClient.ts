@@ -3,7 +3,7 @@ import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
   Role, Space, TokenGate, Transaction, User, TelegramUser, UserGnosisSafe, TokenGateToRole
 } from '@prisma/client';
-import { Contributor, LoggedInUser, BountyWithDetails, Task, PageContent } from 'models';
+import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
@@ -30,6 +30,8 @@ import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
+import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
+import { GetTasksResponse } from 'pages/api/tasks';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -133,6 +135,10 @@ class CharmClient {
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
     return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
+  }
+
+  updateGnosisSafeState (payload: UpdateGnosisSafeState) {
+    return http.PUT('/api/profile/gnosis-safes/state', payload);
   }
 
   favoritePage (pageId: string) {
@@ -496,7 +502,7 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  getTasks (): Promise<{ gnosis: GnosisSafeTasks[] }> {
+  getTasks (): Promise<GetTasksResponse> {
     return http.GET('/api/tasks');
   }
 
