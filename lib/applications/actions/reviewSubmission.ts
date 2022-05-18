@@ -7,8 +7,7 @@ import { getApplication } from '../getApplication';
 
 const submissionStatusAfterDecision: Record<ReviewDecision, ApplicationStatus> = {
   approve: 'complete',
-  reject: 'rejected',
-  requestChanges: 'review'
+  reject: 'rejected'
 };
 
 /**

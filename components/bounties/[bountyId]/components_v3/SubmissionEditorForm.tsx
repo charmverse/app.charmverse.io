@@ -55,12 +55,15 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
     onSubmit(updatedSubmission);
   }
 
+  console.log('Submission', submission.submissionNodes, typeof submission.submissionNodes);
+
   return (
     <Box>
       <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InlineCharmEditor
+              content={submission.submissionNodes ? JSON.parse(submission.submissionNodes) : undefined}
               onContentChange={content => {
                 setValue('submission', content.rawText, {
                   shouldValidate: true

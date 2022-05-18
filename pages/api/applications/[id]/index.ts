@@ -5,6 +5,8 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { getApplication } from 'lib/applications/getApplication';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -19,7 +21,17 @@ async function updateApplication (req: NextApiRequest, res: NextApiResponse<Appl
 
   const body = req.body as Partial<Application>;
 
-  console.log('DATA');
+  const applicationWithBounty = await getApplication(id as string);
+
+  if (!applicationWithBounty) {
+    throw new DataNotFoundError(`Application with ID ${id} not found`);
+  }
+
+  const bounty = applicationWithBounty.bounty;
+
+  if (bounty.approveSubmitters === true && applicationWithBounty.status === 'applied') {
+    throw new UnauthorisedActionError('Your application must have been accepted in order to make a submission');
+  }
 
   const pageContent = typeof body.submissionNodes === 'string' ? body.submissionNodes
     : typeof body.submissionNodes === 'object' ? JSON.stringify(body.submissionNodes) : undefined;
@@ -29,15 +41,29 @@ async function updateApplication (req: NextApiRequest, res: NextApiResponse<Appl
     message: body.message ?? undefined,
     walletAddress: body.walletAddress ?? undefined,
     submission: body.submission ?? undefined,
-    submissionNodes: pageContent
+    submissionNodes: pageContent,
+    // Auto progress an in progress application to review
+    status: applicationWithBounty.status === 'inProgress' ? 'review' : undefined
   };
 
-  const updatedApplication = await prisma.application.update({
+  let updatedApplication = await prisma.application.update({
     where: {
       id: id as string
     },
     data: updateContent
   });
+
+  if (updatedApplication.status === 'inProgress') {
+    updatedApplication = await prisma.application.update({
+      where: {
+        id: id as string
+      },
+      data: {
+        status: 'review'
+      }
+    });
+  }
+
   return res.status(200).json(updatedApplication);
 }
 

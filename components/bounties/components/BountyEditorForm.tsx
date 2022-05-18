@@ -170,7 +170,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
     }
 
     if (!value.capSubmissions) {
-      delete value.maxSubmissions;
+      delete value.maxSubmissions as any;
     }
     delete value.capSubmissions;
 
@@ -216,7 +216,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
         chainId: value.chainId,
         //
         approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
-        capSubmissions: value.capSubmissions === null ? undefined : value.capSubmissions,
         maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
         expiryDate: value.setExpiryDate ? value.expiryDate : null
 

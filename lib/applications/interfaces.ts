@@ -5,7 +5,7 @@ export interface ApplicationActionRequest {
   applicationOrApplicationId: string | Application
 }
 
-export type ReviewDecision = 'approve' | 'reject' | 'requestChanges'
+export type ReviewDecision = 'approve' | 'reject'
 
 export interface ReviewDecisionRequest extends ApplicationActionRequest {
   decision: ReviewDecision
