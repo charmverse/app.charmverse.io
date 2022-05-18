@@ -25,7 +25,8 @@ export async function findOrCreateRoles (
               spaceId
             },
             {
-              sourceId: String(externalRole.id)
+              sourceId: String(externalRole.id),
+              spaceId
             }
           ]
         }
