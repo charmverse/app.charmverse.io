@@ -169,8 +169,8 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         main: mode === 'dark' ? darkModeColors.gray : lightModeColors.gray,
         contrastText
       },
-      brown: {
-        main: mode === 'dark' ? darkModeColors.brown : lightModeColors.brown,
+      turquoise: {
+        main: mode === 'dark' ? darkModeColors.turquoise : lightModeColors.turquoise,
         contrastText
       },
       orange: {
@@ -181,8 +181,8 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         main: mode === 'dark' ? darkModeColors.yellow : lightModeColors.yellow,
         contrastText
       },
-      green: {
-        main: mode === 'dark' ? darkModeColors.green : lightModeColors.green,
+      teal: {
+        main: mode === 'dark' ? darkModeColors.teal : lightModeColors.teal,
         contrastText
       },
       purple: {
@@ -217,7 +217,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiAutocomplete: {
         styleOverrides: {
           popper: {
-            zIndex: 3000
+            zIndex: 'var(--z-index-speedDial)'
           }
         }
       },

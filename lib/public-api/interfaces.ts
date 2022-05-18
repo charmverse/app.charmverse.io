@@ -30,7 +30,7 @@ import { Page as PrismaPage } from '@prisma/client';
 *                 example: a6f7c9ac-d660-44ba-a64a-3198e012277f
 *               color:
 *                 type: string
-*                 example: propColorGreen
+*                 example: propColorTeal
 *               value:
 *                 type: string
 *                 example: Complete
@@ -60,7 +60,7 @@ export interface PageProperty {
  *          type: string
  *          format: uuid
  *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
-*         spaceId:
+ *        spaceId:
  *          type: string
  *          format: uuid
  *          example: 12c419f4-017e-4696-b8e9-ca3079b32428
@@ -135,14 +135,13 @@ export interface PageContentFormats {
  *          format: date-time
  *          example: 2022-04-02T07:22:31.097Z
  *        title:
- *          type: object
- *            properties
+ *          type: string
  *          example: Finalise community guidelines
  *        content:
  *          type: object
  *          $ref: '#/components/schemas/PageContentFormats'
  *        isTemplate:
- *          type: string
+ *          type: boolean
  *          example: false
  *        properties:
  *           type: object

@@ -3,13 +3,12 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import { PaymentMethod } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { getChainById } from 'connectors';
+import { PaymentMethod } from '@prisma/client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { ISystemError } from 'lib/utilities/errors';
 import { useEffect, useState } from 'react';
@@ -26,6 +25,7 @@ interface Props {
 
 export const schema = yup.object({
   chainId: yup.number().required('Please select a chain'),
+  name: yup.string(),
   gnosisSafeAddress: yup.string().test('verifyContractFormat', 'Invalid contract address', (value) => {
     return !value || isValidChainAddress(value);
   }),
@@ -37,17 +37,13 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>
 
-export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
-
-  const [loadingToken, setLoadingToken] = useState(false);
+export default function GnosisSafeForm ({ onSubmit, defaultChainId = 1 }: Props) {
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    trigger,
-    reset,
     formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -58,7 +54,6 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     resolver: yupResolver(schema)
   });
 
-  const [,, refreshPaymentMethods] = usePaymentMethods();
   const [space] = useCurrentSpace();
 
   const [formError, setFormError] = useState<ISystemError | null>(null);
@@ -79,14 +74,13 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     setValue('chainId', _chainId);
   }
 
-  async function addPaymentMethod (paymentMethod: Partial<PaymentMethod>) {
+  async function addPaymentMethod (paymentMethod: Partial<PaymentMethod & { name: string | null }>) {
     setFormError(null);
     paymentMethod.spaceId = space?.id;
     paymentMethod.walletType = 'gnosis';
 
     try {
       const createdPaymentMethod = await charmClient.createPaymentMethod(paymentMethod);
-      refreshPaymentMethods();
       onSubmit(createdPaymentMethod);
     }
     catch (error: any) {
@@ -100,10 +94,16 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     }
   }
 
+  function onAddressChange (e: any) {
+    // remove prefix added by gnosis safe on their app
+    const value = e.target.value.replace('rin:', '');
+    setValue('gnosisSafeAddress', value);
+  }
+
   return (
     <div>
       {/* @ts-ignore */}
-      <form onSubmit={handleSubmit(addPaymentMethod)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form onSubmit={handleSubmit(addPaymentMethod)} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
 
           <Grid item xs>
@@ -121,6 +121,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
               {...register('gnosisSafeAddress')}
               fullWidth
               size='small'
+              onChange={onAddressChange}
               placeholder='Enter Gnosis Safe address'
               error={!!errors.gnosisSafeAddress?.message}
               helperText={errors.gnosisSafeAddress?.message}
@@ -136,7 +137,9 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
             )
           }
           <Grid item>
-            <Button type='submit' disabled={!isValid || (values.gnosisSafeAddress === '')}>Create payment method</Button>
+            <Button type='submit' disabled={!isValid || (values.gnosisSafeAddress === '')}>
+              Save
+            </Button>
           </Grid>
         </Grid>
       </form>

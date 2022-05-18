@@ -1,6 +1,6 @@
 import { SpecRegistry } from '@bangle.dev/core';
-import { Command, EditorState, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
-import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
+import { Command, EditorState, EditorView, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
+import { createTooltipDOM } from '@bangle.dev/tooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 import { markName } from './emojiSuggest.constants';
 
@@ -11,10 +11,8 @@ export const commands = {
 };
 
 function pluginsFactory ({
-  tooltipRenderOpts = {},
   key
 }: {
-  tooltipRenderOpts?: SuggestTooltipRenderOpts;
   key: PluginKey
 }) {
   return ({
@@ -26,6 +24,11 @@ function pluginsFactory ({
     const { trigger } = specRegistry.options[markName as any] as any;
 
     const suggestTooltipKey = new PluginKey('suggestTooltipKey');
+
+    const tooltipRenderOpts: suggestTooltip.SuggestTooltipRenderOpts = {
+      getScrollContainer,
+      placement: 'bottom-start'
+    };
 
     // We are converting to DOM elements so that their instances
     // can be shared across plugins.
@@ -58,6 +61,10 @@ function pluginsFactory ({
       })
     ];
   };
+}
+
+function getScrollContainer (view: EditorView) {
+  return view.dom.parentElement!;
 }
 
 export function getSuggestTooltipKey (key: PluginKey) {

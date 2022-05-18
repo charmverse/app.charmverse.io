@@ -1,10 +1,12 @@
 import { Block } from '@prisma/client';
 import { prisma } from 'db';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { filterObjectKeys } from 'lib/utilities/objects';
 import { PageContent } from 'models';
 import { validate } from 'uuid';
-import { DatabasePageNotFoundError, PageNotFoundError, SpaceNotFoundError, InvalidInputError } from './errors';
-import { Page, PageProperty, DatabasePage } from './interfaces';
+import { generateMarkdown } from 'lib/pages/generateMarkdown';
+import { DatabasePageNotFoundError, PageNotFoundError, SpaceNotFoundError } from './errors';
+import { DatabasePage, Page, PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
 
 export async function getPageInBoard (pageId: string): Promise<Page> {
@@ -35,15 +37,18 @@ export async function getPageInBoard (pageId: string): Promise<Page> {
   const cardPage = await prisma.page.findUnique({
     where: {
       id: card.id
-    },
-    select: {
-      content: true
     }
   });
 
+  if (!cardPage) {
+    throw new PageNotFoundError(pageId);
+  }
+
   const boardSchema = (board.fields as any).cardProperties as PageProperty[];
 
-  const cardToReturn = new PageFromBlock(card, boardSchema, cardPage?.content as PageContent);
+  const cardToReturn = new PageFromBlock(card, boardSchema);
+
+  cardToReturn.content.markdown = await generateMarkdown(cardPage, true);
 
   return cardToReturn;
 }

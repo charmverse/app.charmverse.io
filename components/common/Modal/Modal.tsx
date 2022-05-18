@@ -1,6 +1,7 @@
 import { ComponentProps, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import MuiModal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -19,6 +20,14 @@ const ModalContainer = styled.div<{ size: ModalSize }>`
   border-radius: ${({ theme }) => theme.spacing(1)};
   box-shadow: ${({ theme }) => theme.shadows[15]};
   padding: ${({ theme }) => theme.spacing(4)};
+  max-height: calc(80vh - ${({ theme }) => theme.spacing(4)});
+  overflow-y: auto;
+`;
+
+const ScrollableModalContainer = styled(ModalContainer)`
+  display: flex;
+  flex-direction: column;
+  padding: ${({ theme }) => theme.spacing(4, 0)};
 `;
 
 const StyledDialogTitle = styled(MuiDialogTitle)`
@@ -35,10 +44,15 @@ const CloseButton = styled(IconButton)`
   padding: 0;
 `;
 
-export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose'> & {
+const ScrollableContainer = styled.div`
+  flex-grow: 1;
+  overflow: auto;
+`;
+
+export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose' | 'title'> & {
   size?: ModalSize,
   children: any,
-  title?: string,
+  title?: string | ReactNode,
   onClose: () => void
 };
 
@@ -55,9 +69,22 @@ export function Modal ({ children, size = defaultSize, title, ...props }: ModalP
   );
 }
 
-export function DialogTitle ({ children, onClose }: { children: ReactNode, onClose?: () => void }) {
+export function ScrollableModal ({ children, size = defaultSize, title, ...props }: ModalProps) {
   return (
-    <StyledDialogTitle>
+    <MuiModal {...props}>
+      <div>
+        <ScrollableModalContainer size={size}>
+          {title && <Box px={4}><DialogTitle>{title}</DialogTitle></Box>}
+          <ScrollableContainer>{children}</ScrollableContainer>
+        </ScrollableModalContainer>
+      </div>
+    </MuiModal>
+  );
+}
+
+export function DialogTitle ({ children, onClose, sx }: { children: ReactNode, onClose?: () => void, sx?: any }) {
+  return (
+    <StyledDialogTitle sx={sx}>
       {children}
       {onClose && (
         <CloseButton onClick={onClose}>

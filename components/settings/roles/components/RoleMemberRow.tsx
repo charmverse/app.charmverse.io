@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { ElementDeleteIcon } from 'components/common/form/ElementDeleteIcon';
+import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import Avatar from 'components/common/Avatar';
 import { User } from 'models';
 import getDisplayName from 'lib/users/getDisplayName';
@@ -24,10 +24,11 @@ export const StyledRow = styled(Box)`
 
 interface Props {
   contributor: User;
+  isEditable: boolean;
   onRemove: (id: string) => void;
 }
 
-export default function ContributorRow ({ contributor, onRemove }: Props) {
+export default function ContributorRow ({ contributor, isEditable, onRemove }: Props) {
   const ensName = useENSName(contributor.addresses[0]);
 
   function removeMember () {
@@ -42,7 +43,7 @@ export default function ContributorRow ({ contributor, onRemove }: Props) {
           <Typography variant='body1'>{ensName || getDisplayName(contributor)}</Typography>
         </Box>
       </Box>
-      <ElementDeleteIcon onClick={removeMember} tooltip='Remove member' />
+      {isEditable && <ElementDeleteIcon onClick={removeMember} tooltip='Remove member' />}
     </StyledRow>
   );
 }

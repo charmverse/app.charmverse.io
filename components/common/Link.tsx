@@ -36,7 +36,7 @@ type Props = {
 export default function Link ({ href, children, sx, className, color = 'primary', external, target }: Props) {
   return (
     external ? (
-      <StyledMuiLink className={className} color={color} href={href} sx={sx} target={target} underline='none'>
+      <StyledMuiLink className={className} color={color} href={href} sx={sx} target={target} rel='noreferrer' underline='none'>
         {children}
       </StyledMuiLink>
     ) : (

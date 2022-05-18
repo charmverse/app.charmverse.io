@@ -1,7 +1,6 @@
 
 import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import { Box, TableCell, TableRow, Typography } from '@mui/material';
 import Button from 'components/common/Button';
 import CheckIcon from '@mui/icons-material/Check';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -13,6 +12,7 @@ import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/ho
 import Avatar from 'components/common/Avatar';
 import { Contributor } from 'models';
 import getDisplayName from 'lib/users/getDisplayName';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 import useENSName from 'hooks/useENSName';
 
 export const StyledRow = styled(Box)`
@@ -69,18 +69,24 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
     }
   });
 
-  const activeRoleAction = (contributor.role === 'admin') ? 'makeAdmin' : 'makeContributor';
+  const activeRoleAction = contributor.isAdmin ? 'makeAdmin' : 'makeContributor';
 
   return (
-    <StyledRow pb={2} mb={2}>
-      <Box display='flex' alignItems='center'>
-        <Avatar name={ensName || getDisplayName(contributor)} avatar={contributor?.avatar} />
-        <Box pl={2}>
-          <Typography variant='body1'><strong>{ensName || getDisplayName(contributor)}</strong></Typography>
-          {ensName && <Typography variant='body2'>{getDisplayName(contributor)}</Typography>}
+    <TableRow>
+      <TableCell>
+        <Box display='flex' alignItems='center'>
+          <Avatar name={ensName || getDisplayName(contributor)} avatar={contributor?.avatar} />
+          <Box pl={2}>
+            <Typography variant='body1'><strong>{ensName || getDisplayName(contributor)}</strong></Typography>
+          </Box>
+          <Box pl={2}>
+          </Box>
         </Box>
-      </Box>
-      <Box sx={{ width: 150 }}>
+      </TableCell>
+      <TableCell>
+        <Typography variant='body2'>{humanFriendlyDate(contributor.createdAt)}</Typography>
+      </TableCell>
+      <TableCell>
         {actions.length > 0 ? (
           <>
             <Button
@@ -90,11 +96,8 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
               {...bindTrigger(popupState)}
               endIcon={<KeyboardArrowDownIcon fontSize='small' />}
             >
-              {contributor.role}
+              {contributor.isAdmin ? 'admin' : 'contributor'}
             </Button>
-            {/* <Typography color='secondary' variant='body2' sx={{ px: 3 }} {...bindTrigger(popupState)}>
-            {contributor.role}
-          </Typography> */}
             <Menu
               {...bindMenu(popupState)}
               PaperProps={{
@@ -137,10 +140,10 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
         )
           : (
             <Typography color='secondary'>
-              {contributor.role}
+              {contributor.isAdmin ? 'admin' : 'contributor'}
             </Typography>
           )}
-      </Box>
-    </StyledRow>
+      </TableCell>
+    </TableRow>
   );
 }

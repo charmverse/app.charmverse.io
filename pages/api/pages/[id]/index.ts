@@ -6,7 +6,8 @@ import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
-import { deleteNestedChild } from 'lib/pages/deleteNestedChild';
+import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { ModifyChildPagesResponse } from 'lib/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -25,13 +26,13 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     userId
   });
 
-  const updateContent = req.body as Page;
+  const updateContent = req.body as Page ?? {};
 
   if ((typeof updateContent.index === 'number' || updateContent.parentId !== undefined) && permissions.edit_position !== true) {
     throw new ActionNotPermittedError('You are not allowed to reposition this page');
   }
 
-  // eslint-disable-next-line eqeqeq
+  // eslint-disable-next-line
   if (updateContent.isPublic != undefined && permissions.edit_isPublic !== true) {
     return res.status(401).json({
       error: 'You cannot update the public status of this page'
@@ -42,7 +43,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
       error: 'You cannot update this page'
     });
   }
-
   const pageWithPermission = await prisma.page.update({
     where: {
       id: pageId
@@ -61,8 +61,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(pageWithPermission);
 }
 
-async function deletePage (req: NextApiRequest, res: NextApiResponse) {
-
+async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -81,9 +80,9 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const deletedChildPageIds = await deleteNestedChild(pageId, userId);
+  const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
 
-  return res.status(200).json({ deletedCount: deletedChildPageIds.length, rootBlock });
+  return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }
 
 export default withSessionRoute(handler);

@@ -1,5 +1,5 @@
 
-import { Prisma, Role, SpaceRoleToRole, User } from '@prisma/client';
+import { Prisma, Role, User } from '@prisma/client';
 import { prisma } from 'db';
 import { ApiError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
@@ -10,23 +10,21 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireSpaceMembership())
+  .use(requireSpaceMembership({ adminOnly: false }))
   .get(listSpaceRoles)
-  .delete(deleteRole)
+  .use(requireSpaceMembership({ adminOnly: true }))
   .use(requireKeys<Role>(['spaceId', 'name'], 'body'))
   .post(createRole);
 
-type ListSpaceRolesResponse = {
-  id: string;
-  name: string;
+export type ListSpaceRolesResponse = (Pick<Role, 'id' | 'name' | 'source'> & {
   spaceRolesToRole: {
       spaceRole: {
           user: User;
       };
   }[];
-}[]
+})
 
-async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse>) {
+async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
   const { spaceId } = req.query;
 
   if (!spaceId) {
@@ -44,6 +42,7 @@ async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpa
     select: {
       id: true,
       name: true,
+      source: true,
       spaceRolesToRole: {
         select: {
           spaceRole: {
@@ -77,27 +76,6 @@ async function createRole (req: NextApiRequest, res: NextApiResponse<Role>) {
   const role = await prisma.role.create({ data: creationData });
 
   return res.status(200).json(role);
-}
-
-async function deleteRole (req: NextApiRequest, res: NextApiResponse) {
-  const data = req.body as SpaceRoleToRole & Role;
-
-  if (!data.roleId) {
-    throw new ApiError({
-      message: 'Please provide a valid role id',
-      errorType: 'Invalid input'
-    });
-  }
-
-  // Use space ID assertion to prevent role deletion
-  await prisma.role.deleteMany({
-    where: {
-      id: data.roleId,
-      spaceId: data.spaceId
-    }
-  });
-
-  return res.status(200).json({ success: true });
 }
 
 export default withSessionRoute(handler);

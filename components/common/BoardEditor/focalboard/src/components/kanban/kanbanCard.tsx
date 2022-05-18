@@ -3,9 +3,9 @@
 import { Box } from '@mui/material'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { usePages } from 'hooks/usePages'
-import { BountyStatusColours } from 'components/bounties/BountyStatusBadge'
+import { BountyStatusColours } from 'components/bounties/components/BountyStatusBadge'
 import { useBounties } from 'hooks/useBounties'
-import { BOUNTY_LABELS } from 'models'
+import { BOUNTY_LABELS, PageContent } from 'models'
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
 import Image from 'next/image'
 import React, { useState } from 'react'
@@ -16,7 +16,6 @@ import { Card } from '../../blocks/card'
 import { useSortable } from '../../hooks/sortable'
 import mutator from '../../mutator'
 import { getCardComments } from '../../store/comments'
-import { getCardContents } from '../../store/contents'
 import { useAppSelector } from '../../store/hooks'
 import { Utils } from '../../utils'
 import IconButton from '../../widgets/buttons/iconButton'
@@ -27,11 +26,11 @@ import OptionsIcon from '../../widgets/icons/options'
 import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
 import Tooltip from '../../widgets/tooltip'
-import CardBadges from '../cardBadges'
 import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../confirmationDialogBox'
 import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
 import PageIcon from 'components/common/PageLayout/components/PageIcon'
+import { checkForEmpty } from 'components/common/CharmEditor/utils'
 
 
 type Props = {
@@ -61,7 +60,6 @@ const KanbanCard = React.memo((props: Props) => {
   const { bounties } = useBounties()
   const linkedBounty = bounties.find(bounty => bounty.linkedTaskId === card.id);
 
-  const contents = useAppSelector(getCardContents(card.id))
   const comments = useAppSelector(getCardComments(card.id))
   const { pages, getPagePermissions } = usePages()
   const cardPage = pages[card.id]
@@ -114,7 +112,7 @@ const KanbanCard = React.memo((props: Props) => {
           >
             <IconButton icon={<OptionsIcon />} />
             <Menu position='left'>
-              {pagePermissions.delete && <Menu.Text
+              {pagePermissions.delete && pages[card.id]?.deletedAt === null && <Menu.Text
                 icon={<DeleteIcon />}
                 id='delete'
                 name={intl.formatMessage({ id: 'KanbanCard.delete', defaultMessage: 'Delete' })}
@@ -169,7 +167,7 @@ const KanbanCard = React.memo((props: Props) => {
           <Box sx={{
             display: "flex",
           }}>
-            {cardPage?.icon ? <PageIcon isEditorEmpty={false} pageType="page" icon={cardPage.icon} /> : undefined}
+            {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType="page" icon={cardPage.icon} /> : undefined}
             <div
               key='__title'
               className='octo-titletext'
@@ -238,11 +236,8 @@ const KanbanCard = React.memo((props: Props) => {
             {BOUNTY_LABELS[linkedBounty.status]}
           </Box>
         </Box>}
-        {props.visibleBadges && <CardBadges card={card} />}
       </div>
-
       {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}
-
     </>
   )
 })

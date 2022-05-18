@@ -1,7 +1,7 @@
 
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
-import charmClient, { ListSpaceRolesResponse } from 'charmClient';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
@@ -9,6 +9,7 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import useRoles from 'components/settings/roles/hooks/useRoles';
 import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
+import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -81,7 +82,7 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
 
   return (
     <div>
-      <form onSubmit={handleSubmit(createUserPermissions)} style={{ margin: 'auto', maxHeight: '80vh', overflowY: 'auto' }}>
+      <form onSubmit={handleSubmit(createUserPermissions)} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
 
           <Grid container item direction='row' justifyContent='space-between' alignItems='center'>

@@ -4,15 +4,16 @@ import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/mid
 import nc from 'next-connect';
 import { withSessionRoute } from 'lib/session/withSession';
 import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
-import { findOrCreateRolesFromDiscord, DiscordServerRole } from 'lib/discord/createRoles';
+import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { assignRolesFromDiscord, DiscordGuildMember } from 'lib/discord/assignRoles';
+import { DiscordServerRole } from 'lib/discord/interface';
 
 const handler = nc({
   onError,
   onNoMatch
 });
 
-export interface ImportRolesPayload {
+export interface ImportDiscordRolesPayload {
   spaceId: string,
   guildId: string,
 }
@@ -20,7 +21,7 @@ export interface ImportRolesPayload {
 export type ImportRolesResponse = { importedRoleCount: number };
 
 async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse | { error: string }>) {
-  const { spaceId, guildId } = req.body as ImportRolesPayload;
+  const { spaceId, guildId } = req.body as ImportDiscordRolesPayload;
 
   if (!spaceId || !guildId) {
     res.status(400).json({
@@ -68,12 +69,19 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     res.status(discordGuildMembersResponse.status).json({ error: discordGuildMembersResponse.error });
   }
   else {
-    const rolesRecord = await findOrCreateRolesFromDiscord(discordServerRoles, spaceId, req.session.user.id);
+    const rolesRecord = await findOrCreateRoles(discordServerRoles, spaceId, req.session.user.id);
+    // Remove the roles imported from guild.xyz
+    for (const roleId of Object.keys(rolesRecord)) {
+      const role = rolesRecord[roleId];
+      if (role?.sourceId && role.source === 'guild_xyz') {
+        delete rolesRecord[roleId];
+      }
+    }
     await assignRolesFromDiscord(rolesRecord, discordGuildMembers, spaceId);
     res.status(200).json({ importedRoleCount: discordServerRoles.length });
   }
 }
 
-handler.use(requireUser).use(requireSpaceMembership('admin')).post(importRoles);
+handler.use(requireUser).use(requireSpaceMembership({ adminOnly: true })).post(importRoles);
 
 export default withSessionRoute(handler);

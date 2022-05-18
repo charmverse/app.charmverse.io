@@ -19,11 +19,11 @@ import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
 import { CircularProgress, Tooltip } from '@mui/material';
 import charmClient from 'charmClient';
-
+import { getDisplayName } from 'lib/users';
 import log from 'lib/log';
 import { LoggedInUser } from 'models';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import TelegramLoginIframe, { loginWithTelegram } from './components/TelegramLoginIframe';
+import TelegramLoginIframe, { loginWithTelegram } from '../../../../../../profile/integrations/components/TelegramLoginIframe';
 
 const UserName = styled(Typography)`
   position: relative;
@@ -159,12 +159,14 @@ function AccountModal ({ isOpen, onClose }:
     onClose();
   }
 
+  const userName = ENSName || (user ? getDisplayName(user) : '');
+
   return (
     <Modal open={isConnectingToDiscord || isOpen} onClose={_onClose}>
       <DialogTitle onClose={_onClose}>Account</DialogTitle>
       {user && user?.addresses.length !== 0 && (
         <Stack mb={2} direction='row' spacing='4' alignItems='center'>
-          <Avatar name={ENSName || user.username || user.addresses[0]} avatar={user.avatar} />
+          <Avatar name={userName} avatar={user.avatar} />
           <CopyableAddress address={user.addresses[0]} decimals={5} sx={{ fontSize: 24 }} />
           {user.username && <UserName variant='subtitle2'>{user.username}</UserName>}
         </Stack>

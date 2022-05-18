@@ -1,16 +1,16 @@
 
+import { Space, TokenGate, TokenGateToRole } from '@prisma/client';
+import { prisma } from 'db';
+import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { TokenGate, Space } from '@prisma/client';
-import { prisma } from 'db';
-import { onError, onNoMatch, requireUser, hasAccessToSpace } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .get(getTokenGates)
-  .use(requireUser)
+  .use(requireSpaceMembership({ adminOnly: true }))
   .post(saveTokenGate);
 
 async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
@@ -18,10 +18,10 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
   const { error } = await hasAccessToSpace({
     userId: req.session.user.id,
     spaceId: req.body.spaceId,
-    role: 'admin'
+    adminOnly: true
   });
   if (error) {
-    return res.status(401).json({ error });
+    throw error;
   }
 
   const result = await prisma.tokenGate.create({
@@ -34,7 +34,12 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
   res.status(200).json(result);
 }
 
-async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGate[] | { error: string }>) {
+export interface TokenGateWithRoles extends TokenGate {
+  space: Space;
+  tokenGateToRoles: TokenGateToRole[];
+}
+
+async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGateWithRoles[] | { error: string }>) {
 
   let space: Space | null = null;
   if (req.query.spaceDomain) {
@@ -58,7 +63,8 @@ async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGat
       spaceId
     },
     include: {
-      space: true
+      space: true,
+      tokenGateToRoles: true
     }
   });
 

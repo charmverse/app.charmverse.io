@@ -1,11 +1,16 @@
 /** react-select is used by lit-share-modal */
 .react-select__menu-portal {
-  z-index: 99999;
+  z-index: var(--z-index-modal);
 }
 
 .lsm-top-modal-overlay {
-  background: transparent;
+  background: transparent !important;
   pointer-events: none; // disable overlay since we're using our own
+}
+
+// wallet connect overla
+.lcm-modal-overlay {
+  z-index: var(--z-index-modal) !important;
 }
 
 // token select menu
@@ -133,7 +138,7 @@
   }
 
   .lsm-token-select__menu-portal {
-    >*>* {
+    > * > * {
       background-color: var(--charm-lit-color-white);
     }
 
@@ -213,6 +218,7 @@
 
   button.lsm-bg-brand-4 {
     background-color: var(--charm-lit-primary);
+    color: var(--charm-lit-color-white)
   }
 
   .lsm-bg-brand-2 {

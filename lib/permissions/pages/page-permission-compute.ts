@@ -70,38 +70,24 @@ function permissionsQuery (request: IPagePermissionUserRequest): Prisma.PagePerm
 
 export async function computeUserPagePermissions (request: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
 
-  const permissionWithSpaceRoleAndPermissions = await Promise.all([
+  const [foundSpaceRole, permissions] = await Promise.all([
+    // Check if user is a space admin for this page so they gain full rights
     // eslint-disable-next-line max-len
-    prisma.page.findFirst(pageWithSpaceRoleQuery(request)) as any as Promise<IPageWithNestedSpaceRole>,
+    (prisma.page.findFirst(pageWithSpaceRoleQuery(request)) as any as Promise<IPageWithNestedSpaceRole>).then(page => {
+      return page?.space?.spaceRoles?.find(spaceRole => spaceRole.userId === request.userId);
+    }),
     prisma.pagePermission.findMany(permissionsQuery(request))
   ]);
 
-  const page = permissionWithSpaceRoleAndPermissions[0];
-
-  // Check if user is a space admin for this page so they gain full rights
-  const foundSpaceRole = permissionWithSpaceRoleAndPermissions[0]?.space?.spaceRoles?.[0];
-
   // TODO DELETE LATER when we remove admin access to workspace
-  if (foundSpaceRole && (foundSpaceRole.role === 'admin' || foundSpaceRole.isAdmin === true)) {
+  if (foundSpaceRole && foundSpaceRole.isAdmin === true) {
 
     const fullPermissions = Object.keys(PageOperations) as PageOperationType [];
 
     return new AllowedPagePermissions(fullPermissions);
   }
 
-  const permissions = permissionWithSpaceRoleAndPermissions[1];
-
   const computedPermissions = new AllowedPagePermissions();
-
-  // Apply space level permission
-  const spaceLevelPermission = permissions.find((permission) => {
-    return foundSpaceRole && foundSpaceRole.spaceId === (permission as any as {page: Page}).page?.spaceId;
-  });
-
-  if (spaceLevelPermission) {
-    console.log('Found a space permission');
-    computedPermissions.addPermissions(permissionTemplates[spaceLevelPermission.permissionLevel]);
-  }
 
   permissions.forEach(permission => {
 
@@ -110,10 +96,6 @@ export async function computeUserPagePermissions (request: IPagePermissionUserRe
 
     computedPermissions.addPermissions(permissionsToAdd);
   });
-
-  if (request.pageId === '843e00b2-58a2-486c-92f7-dbed93123c6b') {
-    console.log('Will provide these permissions', computedPermissions);
-  }
 
   return computedPermissions;
 

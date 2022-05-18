@@ -1,4 +1,4 @@
-import { EditorView } from '@bangle.dev/pm';
+import { EditorView, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { MenuItem } from '@mui/material';
@@ -15,6 +15,7 @@ import {
 } from '../paletteItem';
 import { useEditorItems } from '../useEditorItems';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
+import { NestedPagePluginState } from '../../nestedPage';
 
 function getItemsAndHints (
   view: EditorView,
@@ -66,10 +67,12 @@ const InlinePaletteGroup = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
-export default function InlineCommandPalette () {
+export default function InlineCommandPalette (
+  { nestedPagePluginKey, disableNestedPage = false }: {nestedPagePluginKey?: PluginKey<NestedPagePluginState>, disableNestedPage?: boolean}
+) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
-  const editorItems = useEditorItems();
+  const editorItems = useEditorItems({ nestedPagePluginKey });
   const isItemDisabled = useCallback(
     (item) => {
       return typeof item.disabled === 'function'
@@ -115,22 +118,24 @@ export default function InlineCommandPalette () {
   const paletteGroupItemsRecord: Record<string, ReactNode[]> = {};
 
   items.forEach((item, i) => {
-    const itemProps = { ...getItemProps(item, i) };
-    if (!paletteGroupItemsRecord[item.group]) {
-      paletteGroupItemsRecord[item.group] = [];
+    if ((disableNestedPage && item.uid !== 'insert-page') || !disableNestedPage) {
+      const itemProps = { ...getItemProps(item, i) };
+      if (!paletteGroupItemsRecord[item.group]) {
+        paletteGroupItemsRecord[item.group] = [];
+      }
+      paletteGroupItemsRecord[item.group].push(
+        <MenuItem key={item.uid} disabled={item._isItemDisabled} selected={itemProps.isActive} sx={{ py: 0 }}>
+          <InlinePaletteRow
+            dataId={item.uid}
+            key={item.uid}
+            disabled={item._isItemDisabled}
+            title={item.title}
+            icon={item.icon}
+            {...itemProps}
+          />
+        </MenuItem>
+      );
     }
-    paletteGroupItemsRecord[item.group].push(
-      <MenuItem key={item.uid} disabled={item._isItemDisabled} selected={itemProps.isActive} sx={{ py: 0 }}>
-        <InlinePaletteRow
-          dataId={item.uid}
-          key={item.uid}
-          disabled={item._isItemDisabled}
-          title={item.title}
-          icon={item.icon}
-          {...itemProps}
-        />
-      </MenuItem>
-    );
   });
 
   function handleListKeyDown (event: React.KeyboardEvent) {

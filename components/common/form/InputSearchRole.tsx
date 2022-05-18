@@ -1,8 +1,8 @@
-import { Autocomplete, Box, TextField } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import { Role } from '@prisma/client';
 import { ComponentProps, useEffect, useState } from 'react';
 import useRoles from 'components/settings/roles/hooks/useRoles';
-import { ListSpaceRolesResponse } from 'charmClient';
+import { ListSpaceRolesResponse } from 'pages/api/roles';
 
 interface IRolesFilter {
   mode: 'include' | 'exclude',

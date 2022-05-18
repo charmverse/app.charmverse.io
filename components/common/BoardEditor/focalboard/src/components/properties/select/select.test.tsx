@@ -26,7 +26,7 @@ function selectPropertyTemplate(): IPropertyTemplate {
             {
                 id: 'option-2',
                 value: 'two',
-                color: 'propColorGreen',
+                color: 'propColorTeal',
             },
             {
                 id: 'option-3',

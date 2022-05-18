@@ -11,7 +11,7 @@ const exampleBoardSchema: PageProperty [ ] = [{
   name: 'Status',
   type: 'select',
   options: [
-    { id: '7154c7b1-9370-4177-8d32-5aec591b158b', color: 'propColorGreen', value: 'Completed' },
+    { id: '7154c7b1-9370-4177-8d32-5aec591b158b', color: 'propColorTeal', value: 'Completed' },
     { id: '629f8134-058a-4998-9733-042d9e75f2b0', color: 'propColorYellow', value: 'In progress' },
     { id: '62f3d1a5-68bc-4c4f-ac99-7cd8f6ceb6ea', color: 'propColorRed', value: 'Not started' }
   ]
@@ -21,7 +21,7 @@ const exampleBoardSchema: PageProperty [ ] = [{
   name: 'Contact method',
   type: 'multiSelect',
   options: [
-    { id: '2fe23ec9-3e41-4f6e-84f4-dbd03eac6cb9', color: 'propColorGreen', value: 'Email' },
+    { id: '2fe23ec9-3e41-4f6e-84f4-dbd03eac6cb9', color: 'propColorTeal', value: 'Email' },
     { id: '381a72c3-d6e9-4f87-b3b0-edd628a374a8', color: 'propColorYellow', value: 'Phone' },
     { id: '72d50703-5556-4e9d-ad12-a61086451596', color: 'propColorRed', value: 'Whatsapp' }
   ]
@@ -172,7 +172,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
 
   });
 
-  it('should update a page title page', async () => {
+  it('should update a page title', async () => {
 
     const card = await createDatabaseCardPage({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

@@ -1,11 +1,13 @@
-/* eslint-disable class-methods-use-this */
 
-import { Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma, Role, Space, TokenGate, Transaction, User, TelegramUser } from '@prisma/client';
-import * as http from 'adapters/http';
+import {
+  Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
+  Role, Space, TokenGate, Transaction, User, TelegramUser, UserGnosisSafe, TokenGateToRole
+} from '@prisma/client';
+import { Contributor, LoggedInUser, BountyWithDetails, Task, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
-import { BountyWithDetails, Contributor, LoggedInUser, PageContent } from 'models';
+import * as http from 'adapters/http';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -15,25 +17,21 @@ import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtil
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'lib/notion/types';
-import { ImportRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
+// TODO: Maybe move these types to another place so that we dont import from backend
+import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
+import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pages';
+import { TokenGateWithRoles } from 'pages/api/token-gates';
+import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
+import { ListSpaceRolesResponse } from 'pages/api/roles';
+import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
-
-export type ListSpaceRolesResponse = {
-  id: string;
-  name: string;
-  spaceRolesToRole: {
-      spaceRole: {
-          user: User;
-      };
-  }[];
-}
 
 export interface PopulatedBounty extends Bounty {
   applications: Application[];
@@ -93,8 +91,8 @@ class CharmClient {
     return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
   }
 
-  updateContributor ({ spaceId, userId, role }: { spaceId: string, userId: string, role: string }) {
-    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { role });
+  updateContributor ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
+    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { isAdmin });
   }
 
   removeContributor ({ spaceId, userId }: { spaceId: string, userId: string }) {
@@ -113,12 +111,24 @@ class CharmClient {
     return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
   }
 
+  getPageLink (pageId: string) {
+    return http.GET<PageLink>(`/api/pages/${pageId}/link`);
+  }
+
   createPage (pageOpts: Prisma.PageCreateInput) {
     return http.POST<Page>('/api/pages', pageOpts);
   }
 
+  archivePage (pageId: string) {
+    return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: true });
+  }
+
+  restorePage (pageId: string) {
+    return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: false });
+  }
+
   deletePage (pageId: string) {
-    return http.DELETE<{deletedCount: number}>(`/api/pages/${pageId}`);
+    return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
   }
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
@@ -131,6 +141,22 @@ class CharmClient {
 
   unfavoritePage (pageId: string) {
     return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
+  }
+
+  setMyGnosisSafes (wallets: Partial<UserGnosisSafe>[]): Promise<UserGnosisSafe[]> {
+    return http.POST('/api/profile/gnosis-safes', wallets);
+  }
+
+  getMyGnosisSafes (): Promise<UserGnosisSafe[]> {
+    return http.GET('/api/profile/gnosis-safes');
+  }
+
+  updateMyGnosisSafe (wallet: { id: string, name: string }): Promise<UserGnosisSafe[]> {
+    return http.PUT(`/api/profile/gnosis-safes/${wallet.id}`, wallet);
+  }
+
+  deleteMyGnosisSafe (walletId: string) {
+    return http.DELETE(`/api/profile/gnosis-safes/${walletId}`);
   }
 
   getPublicPage (pageId: string) {
@@ -181,8 +207,12 @@ class CharmClient {
     return http.POST<ConnectDiscordResponse>('/api/discord/createAccount', payload);
   }
 
-  importRolesFromDiscordServer (payload: ImportRolesPayload) {
+  importRolesFromDiscordServer (payload: ImportDiscordRolesPayload) {
     return http.POST<ImportRolesResponse>('/api/discord/importRoles', payload);
+  }
+
+  importRolesFromGuild (payload: ImportGuildRolesPayload) {
+    return http.POST<{importedRolesCount: number}>('/api/guild-xyz/importRoles', payload);
   }
 
   // FocalBoard
@@ -420,7 +450,7 @@ class CharmClient {
 
   // Token Gates
   getTokenGates (query: { spaceId: string }) {
-    return http.GET<TokenGate[]>('/api/token-gates', query);
+    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
   }
 
   getTokenGatesForSpace (query: { spaceDomain: string }) {
@@ -446,6 +476,10 @@ class CharmClient {
     return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
   }
 
+  updateTokenGateRoles (tokenGateId: string, spaceId: string, roleIds: string[]) {
+    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
+  }
+
   getTokenMetaData ({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
     return http.GET('/api/tokens/metadata', { chainId, contractAddress });
   }
@@ -458,8 +492,12 @@ class CharmClient {
     return http.GET('/api/payment-methods', { spaceId });
   }
 
-  deletePaymentMethod (paymentMethodId: string): Promise<PaymentMethod[]> {
+  deletePaymentMethod (paymentMethodId: string) {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
+  }
+
+  getTasks (): Promise<{ gnosis: GnosisSafeTasks[] }> {
+    return http.GET('/api/tasks');
   }
 
   createRole (role: Partial<Role>): Promise<Role> {
@@ -470,8 +508,8 @@ class CharmClient {
     return http.PUT(`/api/roles/${role.id}`, role);
   }
 
-  deleteRole (roleToDelete: {roleId: string, spaceId: string}): Promise<Role> {
-    return http.DELETE('/api/roles', roleToDelete);
+  deleteRole (roleId: string): Promise<Role> {
+    return http.DELETE(`/api/roles/${roleId}`);
   }
 
   listRoles (spaceId: string): Promise<ListSpaceRolesResponse[]> {
@@ -531,6 +569,14 @@ class CharmClient {
 
   getPageThreads (pageId: string): Promise<ThreadWithComments[]> {
     return http.GET(`/api/pages/${pageId}/threads`);
+  }
+
+  updateSnapshotConnection (spaceId: string, data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>): Promise<Space> {
+    return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
+  }
+
+  updatePageSnapshotData (pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {
+    return http.PUT(`/api/pages/${pageId}/snapshot`, data);
   }
 }
 

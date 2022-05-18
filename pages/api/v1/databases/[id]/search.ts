@@ -1,11 +1,12 @@
 
-import { Prisma } from '@prisma/client';
+import { Prisma, Page as PrismaPage } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { PageContent } from 'models';
 import { DatabasePageNotFoundError, mapProperties, Page, PageFromBlock, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse, validatePageQuery, validatePaginationQuery } from 'lib/public-api';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { generateMarkdown } from 'lib/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -140,7 +141,9 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   const cardBlocks = (await prisma.block.findMany(prismaQueryWithCursor));
 
-  const cardPagesRecord: Record<string, PageContent> = {};
+  // Object that holds the page content for each card
+  const cardPagesRecord: Record<string, PrismaPage> = {};
+
   const cardPages = (await prisma.page.findMany({
     where: {
       OR: cardBlocks.map(cardBlock => {
@@ -148,21 +151,14 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
           id: cardBlock.id
         };
       })
-    },
-    select: {
-      content: true,
-      id: true
     }
   }));
 
   cardPages.forEach(cardPage => {
-    cardPagesRecord[cardPage.id] = cardPage.content as PageContent;
+    cardPagesRecord[cardPage.id] = cardPage;
   });
 
-  const cardsWithContent = cardBlocks.map(cardBlock => {
-    return new PageFromBlock(cardBlock, boardSchema, cardPagesRecord[cardBlock.id]);
-
-  });
+  const cardsWithContent = cardBlocks.map(cardBlock => new PageFromBlock(cardBlock, boardSchema));
 
   let hasNext = false;
   let cursor: string | undefined;

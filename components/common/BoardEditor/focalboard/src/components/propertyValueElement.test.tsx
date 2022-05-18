@@ -59,7 +59,7 @@ describe('components/propertyValueElement', () => {
             const propertyOption: IPropertyOption = {
                 id: `ms${i}`,
                 value: `value ${i}`,
-                color: 'propColorBrown',
+                color: 'propColorTurquoise',
             }
             options.push(propertyOption)
         }

@@ -2,7 +2,7 @@ import { Page, PagePermission, Space, User } from '@prisma/client';
 import { generateUserAndSpaceWithApiToken, createPage } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
-import { getPage } from '../getPage';
+import { getPage } from '../server/getPage';
 
 let user: User;
 let space: Space;

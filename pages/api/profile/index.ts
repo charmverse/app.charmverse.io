@@ -1,5 +1,6 @@
 
 import { prisma } from 'db';
+import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -33,6 +34,7 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
 
   const { discordUser, spaceRoles, telegramUser, ...userData } = user;
   req.session.user = userData;
+  await updateGuildRolesForUser(userData.addresses, spaceRoles);
   await req.session.save();
   res.status(200).json(user);
 

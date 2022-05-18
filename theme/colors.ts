@@ -35,54 +35,30 @@ export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackg
 export const inputBackgroundDarkMode = 'rgba(255, 255, 255, 0.055)';
 export const inputBorderDarkMode = 'rgba(15, 15, 15, 0.2)';
 
-export type BrandColor = 'gray' | 'brown' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink' | 'red'
+export type BrandColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' | 'blue' | 'purple' | 'pink' | 'red'
 
 export type BrandColorScheme = Record<BrandColor, string>
 
 export const darkModeColors: BrandColorScheme = {
-  gray: '#7A6677',
-  brown: '#79632A',
-  orange: '#CC4B00',
-  yellow: '#B89F00',
-  green: '#007A5C',
-  blue: '#007C8F',
-  purple: '#5F396A',
-  pink: '#D11046',
-  red: '#970C0C'
+  gray: '#757570', // Dark Gray
+  turquoise: '#4273C2', // Dark Turquoise
+  orange: '#C44F1C', // Dark Orange
+  yellow: '#81730E', // Dark Yellow
+  teal: '#007C8F', // Dark Teal
+  blue: '#007CAD', // Dark Blue
+  purple: '#8742FF', // Dark Purple
+  red: '#D53474', // Dark Red
+  pink: '#925E9C' // Dark Pink
 };
 
 export const lightModeColors: BrandColorScheme = {
-  gray: '#C4D0D4',
-  brown: '#E6C39E',
-  orange: '#FFAC47',
-  yellow: '#FDFD9B',
-  green: '#A8F0DD',
-  blue: '#ADF4FF',
-  purple: '#B7AFD4',
-  pink: '#EB82ED',
-  red: '#E37898'
-};
-
-export const darkModeBackgroundColors: BrandColorScheme = {
-  gray: '#2f2f2f',
-  brown: '#4a3229',
-  orange: '#5b3b24',
-  yellow: '#554228',
-  green: '#263e31',
-  blue: '#16394d',
-  purple: '#3b2b49',
-  pink: '#4d2a3b',
-  red: '#512e2a'
-};
-
-export const lightModeBackgroundColors: BrandColorScheme = {
-  gray: '#f1f1ef',
-  brown: '#f4eeee',
-  orange: '#fbecdd',
-  yellow: '#fbf3da',
-  green: '#edf4eb',
-  blue: '#e7f3f7',
-  purple: '#f6f3fa',
-  pink: '#f9f0f5',
-  red: '#fdeaec'
+  gray: '#E7E7E6', // Ligh Gray
+  turquoise: '#C2DCF2', // Light Turquoise
+  orange: '#F4D8D0', // Light Orange
+  yellow: '#EFE9CB', // Light Yellow
+  teal: '#D0F4F1', // Light Teal
+  blue: '#C1E7F4', // Light Blue
+  purple: '#D7D3F4', // Light Purple
+  red: '#F2CCD6', // Light Red
+  pink: '#E8D3ED' // Light Pink
 };

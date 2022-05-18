@@ -1,25 +1,18 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState, useEffect, useCallback, MouseEvent, ReactNode} from 'react'
+import {useState, useCallback, MouseEvent} from 'react'
 import { injectIntl, IntlShape } from 'react-intl';
-import {FormattedMessage} from 'react-intl'
 import { useRouter } from 'next/router'
-import NextLink from 'next/link';
-import InputAdornment from '@mui/material/InputAdornment';
-import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import TextField from '@mui/material/TextField';
 import Divider from '@mui/material/Divider';
 import { IDType, Utils } from '../../utils';
-import { BoardView, createBoardView, IViewType } from '../../blocks/boardView';
+import { BoardView, createBoardView } from '../../blocks/boardView';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import { generatePath } from 'lib/utilities/strings';
-import ViewMenu, { iconForViewType } from '../viewMenu'
-import AddViewMenu from '../addViewMenu'
+import { iconForViewType } from '../viewMenu'
 import mutator from '../../mutator'
-import {Board, IPropertyTemplate} from '../../blocks/board'
-import {Card} from '../../blocks/card'
 import Button from 'components/common/Button'
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -28,24 +21,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import DeleteIcon from '../../widgets/icons/delete';
 import DuplicateIcon from '../../widgets/icons/duplicate';
 import EditIcon from '@mui/icons-material/Edit';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
-import IconButton from '../../widgets/buttons/iconButton'
-import DropdownIcon from '../../widgets/icons/dropdown'
-import MenuWrapper from '../../widgets/menuWrapper'
-import Editable from '../../widgets/editable'
-
-import ModalWrapper from '../modalWrapper'
-
-import NewCardButton from './newCardButton'
-import ViewHeaderPropertiesMenu from './viewHeaderPropertiesMenu'
-import ViewHeaderGroupByMenu from './viewHeaderGroupByMenu'
-import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu'
-import ViewHeaderSortMenu from './viewHeaderSortMenu'
-import ViewHeaderActionsMenu from './viewHeaderActionsMenu'
-import ViewHeaderSearch from './viewHeaderSearch'
-import FilterComponent from './filterComponent'
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useForm } from 'react-hook-form';
-
 interface ViewTabsProps {
   intl: IntlShape;
   readonly?: boolean;
@@ -54,7 +31,6 @@ interface ViewTabsProps {
 }
 
 function ViewTabs ({ intl, readonly, showView, views }: ViewTabsProps) {
-
   const router = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentView, setCurrentView] = useState<BoardView | null>(null);

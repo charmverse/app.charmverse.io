@@ -1,17 +1,18 @@
-import { Command, EditorState, Schema, toggleMark } from '@bangle.dev/pm';
+import { Command, EditorState, toggleMark } from '@bangle.dev/pm';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
+import { highlightDomElement } from 'lib/browser';
 import { markName } from './inlineComment.constants';
 
-const getTypeFromSchema = (schema: Schema) => schema.marks[markName];
+const getMarkFromState = (state: EditorState) => state.schema.marks[markName];
 
 export function toggleInlineComment (): Command {
   return (state, dispatch) => {
-    return toggleMark(getTypeFromSchema(state.schema))(state, dispatch);
+    return toggleMark(getMarkFromState(state))(state, dispatch);
   };
 }
 
 export function queryIsInlineCommentActive () {
-  return (state: EditorState) => isMarkActiveInSelection(getTypeFromSchema(state.schema))(state);
+  return (state: EditorState) => isMarkActiveInSelection(getMarkFromState(state))(state);
 }
 
 export function createInlineComment () {
@@ -22,9 +23,9 @@ export function createInlineComment () {
     )(state),
     (state, dispatch) => {
       const [from, to] = [state.selection.$from.pos, state.selection.$to.pos];
-      const inlineCommentMark = state.schema.marks['inline-comment'];
+      const inlineCommentMark = getMarkFromState(state);
       const tr = state.tr.removeMark(from, to, inlineCommentMark);
-      const createdInlineCommentMark = state.schema.marks['inline-comment'].create({
+      const createdInlineCommentMark = inlineCommentMark.create({
         id: null
       });
       tr.addMark(from, to, createdInlineCommentMark);
@@ -48,9 +49,9 @@ function setInlineComment (from: number, to: number, id?: string) {
   return filter(
     (state) => isTextAtPos(from)(state),
     (state, dispatch) => {
-      const inlineCommentMark = state.schema.marks['inline-comment'];
+      const inlineCommentMark = getMarkFromState(state);
       const tr = state.tr.removeMark(from, to, inlineCommentMark);
-      const mark = state.schema.marks['inline-comment'].create({
+      const mark = inlineCommentMark.create({
         id
       });
       tr.addMark(from, to, mark);
@@ -89,7 +90,7 @@ export function queryIsInlineCommentAllowedInRange (from: number, to: number) {
   return (state: EditorState) => {
     const $from = state.doc.resolve(from);
     const $to = state.doc.resolve(to);
-    const inlineCommentMark = state.schema.marks['inline-comment'];
+    const inlineCommentMark = getMarkFromState(state);
     if ($from.parent === $to.parent && $from.parent.isTextblock) {
       return $from.parent.type.allowsMarkType(inlineCommentMark);
     }
@@ -110,4 +111,47 @@ export function queryIsSelectionAroundInlineComment () {
       && !!state.doc.type.schema.marks['inline-comment'].isInSet(node.marks)
     );
   };
+}
+
+export function scrollToThread (threadId: string) {
+  // Find the inline-comment with the threadId and scroll into view
+  const threadDocument = document.getElementById(`inline-comment.${threadId}`);
+  if (threadDocument) {
+    let parentElement: HTMLElement | null = null;
+    let element: HTMLElement | null = threadDocument;
+    // Check for highest 5 levels of depth
+    for (let i = 0; i < 10; i++) {
+      element = element?.parentElement ?? null;
+      // Get the first paragraph parent element
+      if (element?.classList.contains('charm-paragraph')) {
+        parentElement = element;
+        break;
+      }
+    }
+
+    requestAnimationFrame(() => {
+      threadDocument.scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+
+    setTimeout(() => {
+      if (parentElement) {
+        // Need to create a custom element as adding styling to prosemirror-node isn't possible
+        const highlightElement = document.createElement('div');
+        document.body.appendChild(highlightElement);
+        const boundingRect = parentElement.getBoundingClientRect();
+        // Set the location of the custom element
+        highlightElement.style.top = `${boundingRect.top}px`;
+        highlightElement.style.left = `${boundingRect.left}px`;
+        highlightElement.style.width = `${boundingRect.width}px`;
+        highlightElement.style.height = `${boundingRect.height}px`;
+        highlightElement.style.position = 'absolute';
+        highlightDomElement(highlightElement, () => {
+          // Remove the custom element after the highlighting is done
+          document.body.removeChild(highlightElement);
+        });
+      }
+    }, 500);
+  }
 }

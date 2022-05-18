@@ -26,23 +26,17 @@ import RouteGuard from 'components/common/RouteGuard';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardBadges.scss';
 import 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetail.scss';
 import 'components/common/BoardEditor/focalboard/src/components/cardDetail/comment.scss';
 import 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList.scss';
 import 'components/common/BoardEditor/focalboard/src/components/cardDialog.scss';
 import 'components/common/BoardEditor/focalboard/src/components/centerPanel.scss';
 import 'components/common/BoardEditor/focalboard/src/components/confirmationDialogBox.scss';
-import 'components/common/BoardEditor/focalboard/src/components/content/checkboxElement.scss';
-import 'components/common/BoardEditor/focalboard/src/components/content/dividerElement.scss';
-import 'components/common/BoardEditor/focalboard/src/components/contentBlock.scss';
 import 'components/common/BoardEditor/focalboard/src/components/dialog.scss';
 import { FlashMessages } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import 'components/common/BoardEditor/focalboard/src/components/flashMessages.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/gallery.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/galleryCard.scss';
-import 'components/common/BoardEditor/focalboard/src/components/globalHeader/globalHeader.scss';
-import 'components/common/BoardEditor/focalboard/src/components/globalHeader/globalHeaderSettingsMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/calculation/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/calculation/calculationOption.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanban.scss';
@@ -183,6 +177,8 @@ import 'theme/styles.scss';
 import Snackbar from 'components/common/Snackbar';
 import { SnackbarProvider } from 'hooks/useSnackbar';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -254,39 +250,42 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <Web3ReactProvider getLibrary={getLibrary}>
-            <Web3ConnectionManager>
-              <LitProtocolProvider>
-                <ReduxProvider store={store}>
-                  <FocalBoardProviders>
-                    <DataProviders>
-                      <SnackbarProvider>
-                        <TitleContext.Consumer>
-                          {([title]) => (
-                            <Head>
-                              <title>
-                                {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-                              </title>
-                              {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
-                              <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                            </Head>
-                          )}
-                        </TitleContext.Consumer>
-                        <CssBaseline enableColorScheme={true} />
-                        <Global styles={cssVariables} />
-                        <RouteGuard>
-                          <ErrorBoundary>
-                            {getLayout(<Component {...pageProps} />)}
-                            <Snackbar />
-                          </ErrorBoundary>
-                        </RouteGuard>
-                      </SnackbarProvider>
-                    </DataProviders>
-                  </FocalBoardProviders>
-                  {/** include the root portal for focalboard's popup */}
-                  <FocalBoardPortal />
-                </ReduxProvider>
-              </LitProtocolProvider>
-            </Web3ConnectionManager>
+            {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
+            <LocalizationProvider dateAdapter={AdapterLuxon as any}>
+              <Web3ConnectionManager>
+                <LitProtocolProvider>
+                  <ReduxProvider store={store}>
+                    <FocalBoardProviders>
+                      <DataProviders>
+                        <SnackbarProvider>
+                          <TitleContext.Consumer>
+                            {([title]) => (
+                              <Head>
+                                <title>
+                                  {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+                                </title>
+                                {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
+                                <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+                              </Head>
+                            )}
+                          </TitleContext.Consumer>
+                          <CssBaseline enableColorScheme={true} />
+                          <Global styles={cssVariables} />
+                          <RouteGuard>
+                            <ErrorBoundary>
+                              {getLayout(<Component {...pageProps} />)}
+                              <Snackbar />
+                            </ErrorBoundary>
+                          </RouteGuard>
+                        </SnackbarProvider>
+                      </DataProviders>
+                    </FocalBoardProviders>
+                    {/** include the root portal for focalboard's popup */}
+                    <FocalBoardPortal />
+                  </ReduxProvider>
+                </LitProtocolProvider>
+              </Web3ConnectionManager>
+            </LocalizationProvider>
           </Web3ReactProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>

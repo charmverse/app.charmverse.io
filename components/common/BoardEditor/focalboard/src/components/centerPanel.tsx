@@ -3,6 +3,7 @@
 /* eslint-disable max-lines */
 import { Box } from '@mui/system'
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner'
+import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { Page } from 'models'
 import React, { useState } from 'react'
@@ -122,7 +123,7 @@ function CenterPanel(props: Props) {
   //   })
   // }
 
-  const addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = false): Promise<void> => {
+  const addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = true): Promise<void> => {
     const { activeView, board, groupByProperty } = props
 
     const card = createCard()
@@ -326,6 +327,7 @@ function CenterPanel(props: Props) {
         keyName='ctrl+d,del,esc,backspace'
         onKeyDown={keydownHandler}
       />
+      {!!board.deletedAt && <PageDeleteBanner pageId={board.id}/>}
       {board.fields.headerImage && <Box className='PageBanner' width={"100%"} mb={2}>
         <PageBanner focalBoard headerImage={board.fields.headerImage} setPage={({ headerImage }) => {
           setRandomHeaderImage(board, headerImage!)

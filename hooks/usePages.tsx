@@ -1,4 +1,4 @@
-import { Page, PageOperations, Role } from '@prisma/client';
+import { Page, PageOperations, Role, Space } from '@prisma/client';
 import charmClient from 'charmClient';
 import { IPageWithPermissions } from 'lib/pages';
 import { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
@@ -8,18 +8,23 @@ import { useRouter } from 'next/router';
 import * as React from 'react';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
+import useIsAdmin from './useIsAdmin';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 type IContext = {
   currentPageId: string,
   pages: Record<string, Page | undefined>,
-  setCurrentPageId: Dispatch<SetStateAction<string>>,
   setPages: Dispatch<SetStateAction<Record<string, Page | undefined>>>,
+  setCurrentPageId: Dispatch<SetStateAction<string>>,
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   getPagePermissions: (pageId: string) => IPagePermissionFlags,
+  deletePage: (pageId: string) => Promise<void>,
+  restorePage: (pageId: string, route?: boolean) => Promise<void>,
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -31,7 +36,9 @@ export const PagesContext = createContext<Readonly<IContext>>({
   setPages: () => undefined,
   isEditing: true,
   setIsEditing: () => { },
-  getPagePermissions: () => new AllowedPagePermissions()
+  getPagePermissions: () => new AllowedPagePermissions(),
+  deletePage: () => undefined as any,
+  restorePage: () => undefined as any
 });
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
@@ -41,9 +48,49 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const [user] = useUser();
-  const { data } = useSWR(() => space ? `pages/${space?.id}` : null, (e) => {
-    return charmClient.getPages(space!.id);
+  const { data } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
+    return charmClient.getPages((space as Space).id);
   }, { refreshInterval });
+  const dispatch = useAppDispatch();
+
+  const isAdmin = useIsAdmin();
+
+  async function deletePage (pageId: string) {
+    const { pageIds } = await charmClient.deletePage(pageId);
+    setPages((_pages) => {
+      pageIds.forEach(_pageId => {
+        delete _pages[_pageId];
+      });
+      return { ..._pages };
+    });
+    // If the current page has been deleted permanently route to the first alive page
+    if (pageIds.includes(currentPageId)) {
+      router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.type !== 'card' && page?.deletedAt === null)?.path}`);
+    }
+  }
+
+  async function restorePage (pageId: string) {
+    const { pageIds } = await charmClient.restorePage(pageId);
+    setPages((_pages) => {
+      pageIds.forEach(_pageId => {
+        if (_pages[_pageId]) {
+          _pages[_pageId] = {
+            ..._pages[_pageId],
+            deletedAt: null
+          } as Page;
+        }
+      });
+      // Severe the link with parent if its not of type card
+      if (_pages[pageId] && _pages[pageId]?.type !== 'card') {
+        (_pages[pageId] as Page).parentId = null;
+      }
+      return { ..._pages };
+    });
+
+    // TODO: Better focalboard blocks api to only fetch blocks by id
+    dispatch(initialLoad());
+  }
+
   useEffect(() => {
     if (data) {
       setPages(data.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
@@ -63,11 +110,10 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     if (!targetPage) {
       return computedPermissions;
     }
-
     const userSpaceRole = user?.spaceRoles.find(spaceRole => spaceRole.spaceId === targetPage.spaceId);
 
-    // TEMPORARY TILL WE FIX SPACE PROVISIONING
-    if (userSpaceRole?.role === 'admin' || userSpaceRole?.isAdmin === true) {
+    // For now, we allow admin users to override explicitly assigned permissions
+    if (isAdmin) {
       computedPermissions.addPermissions(Object.keys(PageOperations) as PageOperationType []);
       return computedPermissions;
     }
@@ -99,7 +145,9 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     pages,
     setCurrentPageId,
     setPages,
-    getPagePermissions
+    getPagePermissions,
+    deletePage,
+    restorePage
   }), [currentPageId, isEditing, router, pages, user]);
 
   return (

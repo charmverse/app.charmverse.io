@@ -15,13 +15,16 @@ import PageContainer from './components/PageContainer';
 const drawerWidth = 300;
 
 const openedMixin = (theme: Theme) => ({
+  width: '100%',
   marginRight: 0,
-  width: drawerWidth,
   transition: theme.transitions.create(['marginRight', 'width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen
   }),
-  overflowX: 'hidden'
+  overflowX: 'hidden',
+  [theme.breakpoints.up('sm')]: {
+    width: drawerWidth
+  }
 });
 
 const closedMixin = (theme: Theme) => ({
@@ -40,7 +43,7 @@ const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !==
     background: 'transparent',
     boxShadow: 'none',
     color: 'inherit',
-    zIndex: theme.zIndex.drawer + 1,
+    zIndex: 'var(--z-index-appBar)',
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
@@ -82,8 +85,14 @@ const LayoutContainer = styled.div`
   height: 100%;
 `;
 
-function PageLayout ({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = React.useState(true);
+interface PageLayoutProps {
+  children: React.ReactNode;
+  sidebar?: (p: { closeSidebar: () => void }) => JSX.Element
+}
+
+function PageLayout ({ children, sidebar: SidebarOverride }: PageLayoutProps) {
+  const isSmallScreen = window.innerWidth < 600;
+  const [open, setOpen] = React.useState(!isSmallScreen);
   const [user] = useUser();
 
   const handleDrawerOpen = React.useCallback(() => {
@@ -108,7 +117,9 @@ function PageLayout ({ children }: { children: React.ReactNode }) {
             />
           </AppBar>
           <Drawer variant='permanent' open={open}>
-            <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
+            {SidebarOverride
+              ? <SidebarOverride closeSidebar={handleDrawerClose} />
+              : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
           </Drawer>
           <PageContainer>
             <HeaderSpacer />

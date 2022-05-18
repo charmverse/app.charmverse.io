@@ -83,7 +83,6 @@ function scrollIntoViewIfNeededPolyfill (
         + element.clientWidth
         - parentBorderLeftWidth
       > parent.scrollLeft + parent.clientWidth;
-  const alignWithTop = overTop && !overBottom;
   if ((overTop || overBottom) && centerIfNeeded) {
     parent.scrollTop = element.offsetTop
       - parent.offsetTop
@@ -129,4 +128,17 @@ export function setCookie ({ name, value, expiresInDays = 10 * 365 }: { name: st
 
 export function deleteCookie (name: string) {
   setCookie({ name, value: '', expiresInDays: 0 });
+}
+
+export function highlightDomElement (domElement: HTMLElement, postHighlight?: () => void) {
+  domElement.scrollIntoView({
+    behavior: 'smooth'
+  });
+  domElement.style.backgroundColor = 'rgba(46, 170, 220, 0.2)';
+  domElement.style.transition = 'background-color 250ms ease-in-out';
+  // Remove the highlight after 500 ms
+  setTimeout(() => {
+    domElement.style.removeProperty('background-color');
+    postHighlight?.();
+  }, 500);
 }
