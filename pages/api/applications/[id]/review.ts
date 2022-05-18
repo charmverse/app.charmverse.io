@@ -11,7 +11,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .use(requireKeys<Pick<ReviewDecisionRequest, 'decision'>>(['decision'], 'body'))
-  .put(reviewApplication);
+  .post(reviewApplication);
 
 async function reviewApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id: applicationId } = req.query;

@@ -396,12 +396,12 @@ class CharmClient {
   }
 
   async approveApplication (applicationId: string): Promise<Application> {
-    return http.PUT<Application>(`/api/applications/${applicationId}/approve`);
+    return http.POST<Application>(`/api/applications/${applicationId}/approve`);
   }
 
   async reviewSubmission (applicationId: string, decision: ReviewDecision): Promise<Application> {
 
-    return http.PUT<Application>(`/api/applications/${applicationId}/review`, {
+    return http.POST<Application>(`/api/applications/${applicationId}/review`, {
       decision
     });
   }

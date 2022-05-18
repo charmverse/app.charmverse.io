@@ -11,7 +11,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .put(approveUserApplication);
+  .post(approveUserApplication);
 
 async function approveUserApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id: applicationId } = req.query;
