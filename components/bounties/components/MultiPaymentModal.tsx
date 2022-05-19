@@ -54,7 +54,7 @@ export default function MultiPaymentModal () {
       data: '0x',
       origin: 'CharmVerse Bounty'
     };
-  }).filter(isTruthy);
+  }).filter(isTruthy) as any;
 
   return (
     <>
