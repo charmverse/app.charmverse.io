@@ -38,7 +38,7 @@ beforeAll(async () => {
     })).headers['set-cookie'][0];
 });
 
-describe('PUT /api/bounties - update a bounty', () => {
+describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
 
   it('should ignore irrelevant bounty fields and succeed with the update', async () => {
 
