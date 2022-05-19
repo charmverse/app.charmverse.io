@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ScrollableModal } from 'components/common/Modal';
-import { guild, user } from '@guildxyz/sdk';
+import { GetGuildsResponse, guild, user } from '@guildxyz/sdk';
 import { Autocomplete, Box, MenuItem, TextField, Typography } from '@mui/material';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -9,18 +9,11 @@ import { useUser } from 'hooks/useUser';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
-
-interface GuildInfo {
-  id: number
-  name: string
-  urlName: string
-  roles: any[]
-  imageUrl: string
-}
+import GuildsAutocomplete from './GuildsAutocomplete';
 
 export default function ImportGuildRolesMenuItem ({ onClose }: {onClose: () => void}) {
   const [showImportedRolesModal, setShowImportedRolesModal] = useState(false);
-  const [guilds, setGuilds] = useState<GuildInfo[]>([]);
+  const [guilds, setGuilds] = useState<GetGuildsResponse>([]);
   const [fetchingGuilds, setFetchingGuilds] = useState(false);
   const [importingRoles, setImportingRoles] = useState(false);
   const [selectedGuildIds, setSelectedGuildIds] = useState<number[]>([]);
@@ -28,7 +21,6 @@ export default function ImportGuildRolesMenuItem ({ onClose }: {onClose: () => v
   const [currentUser] = useUser();
   const addresses = currentUser?.addresses ?? [];
   const { showMessage } = useSnackbar();
-  const guildIdRecord: Record<string, GuildInfo> = useMemo(() => guilds.reduce((cur, _guild) => ({ ...cur, [_guild.id]: _guild }), {}), [guilds]);
 
   useEffect(() => {
     async function main () {
@@ -95,39 +87,31 @@ export default function ImportGuildRolesMenuItem ({ onClose }: {onClose: () => v
         }}
         >
           {
-              fetchingGuilds ? <StyledSpinner /> : guilds.length === 0 ? <Typography variant='subtitle1' color='secondary'>You are not part of any guild(s)</Typography> : (
-                <Box sx={{
-                  paddingRight: 1
-                }}
-                >
-                  <Autocomplete<GuildInfo, true>
-                    multiple
-                    options={guilds}
-                    getOptionLabel={(option) => option.name}
-                    value={selectedGuildIds.map(selectedGuildId => guildIdRecord[selectedGuildId])}
-                    filterSelectedOptions
-                    onChange={(_, guildInfos) => {
-                      setSelectedGuildIds(guildInfos.map(guildInfo => guildInfo.id));
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder='Type Guild name...'
-                      />
-                    )}
-                  />
-                  <PimpedButton
-                    loading={importingRoles}
-                    sx={{
-                      mt: 2
-                    }}
-                    disabled={importingRoles || selectedGuildIds.length === 0}
-                    onClick={importRoles}
-                  >Import Roles
-                  </PimpedButton>
-                </Box>
-              )
-            }
+            fetchingGuilds ? <StyledSpinner /> : guilds.length === 0 ? <Typography variant='subtitle1' color='secondary'>You are not part of any guild(s)</Typography> : (
+              <Box sx={{
+                paddingRight: 1
+              }}
+              >
+                <GuildsAutocomplete
+                  disabled={importingRoles || fetchingGuilds}
+                  onChange={(guildIds) => {
+                    setSelectedGuildIds(guildIds);
+                  }}
+                  selectedGuildIds={selectedGuildIds}
+                  guilds={guilds}
+                />
+                <PimpedButton
+                  loading={importingRoles}
+                  sx={{
+                    mt: 2
+                  }}
+                  disabled={importingRoles || selectedGuildIds.length === 0}
+                  onClick={importRoles}
+                >Import Roles
+                </PimpedButton>
+              </Box>
+            )
+          }
         </Box>
       </ScrollableModal>
     </>

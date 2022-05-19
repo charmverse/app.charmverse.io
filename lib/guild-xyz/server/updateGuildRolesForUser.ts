@@ -1,5 +1,6 @@
 import { Role, SpaceRole } from '@prisma/client';
 import log from 'lib/log';
+import { prisma } from 'db';
 import { getGuildRoleIds } from '../getGuildRoleIds';
 import { createRoleRecord } from './createRoleRecord';
 import { assignRolesToUser } from './assignRolesToUser';
@@ -11,9 +12,20 @@ export async function updateGuildRolesForUser (addresses: string[], spaceRoles: 
       role: Pick<Role, 'source' | 'sourceId'>;
     }[];
   })[]) {
-  const workspaceHasGuildImportedRoles = Boolean(spaceRoles.find(spaceRole => spaceRole.spaceRoleToRole.find(spaceRoleToRole => spaceRoleToRole.role.source === 'guild_xyz' && spaceRoleToRole.role.sourceId !== null)));
+  // Find the first guild.xyz imported role in all the workspace the user is part of
+  const userWorkspaceRoleImportFromGuild = await prisma.role.findFirst({
+    where: {
+      spaceId: {
+        in: spaceRoles.map(spaceRole => spaceRole.spaceId)
+      },
+      source: 'guild_xyz',
+      sourceId: {
+        not: null
+      }
+    }
+  });
 
-  if (workspaceHasGuildImportedRoles) {
+  if (userWorkspaceRoleImportFromGuild) {
     try {
       const userGuildRoleIds = await getGuildRoleIds(addresses);
       for (const spaceRole of spaceRoles) {
