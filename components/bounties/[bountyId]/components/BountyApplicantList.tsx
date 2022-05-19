@@ -19,7 +19,8 @@ import { humanFriendlyDate } from 'lib/utilities/dates';
 import { Modal } from 'components/common/Modal';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useBounties } from 'hooks/useBounties';
-import { applicantIsSubmitter, moveUserApplicationToFirstRow } from 'lib/applications/shared';
+import { applicantIsSubmitter, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
+import { Tooltip } from '@mui/material';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
 import { SubmissionStatusColors, SubmissionStatusLabels } from '../components_v3/BountySubmissions';
@@ -100,6 +101,13 @@ export function BountyApplicantList ({
 
   const userHasApplied = userApplication !== undefined;
 
+  const newApplicationsSuspended = submissionsCapReached({
+    bounty,
+    submissions: applications
+  });
+
+  console.log('New applications suspended', newApplicationsSuspended);
+
   return (
     <>
       <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
@@ -128,7 +136,13 @@ export function BountyApplicantList ({
               <TableCell>Date</TableCell>
               <TableCell align='right'>
                 {
-                  !userHasApplied && (<Button onClick={bountyApplyModal.open}>Apply now</Button>)
+                  !userHasApplied && (
+                  <Tooltip placement='top' title={newApplicationsSuspended ? `You cannot apply to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : ''}>
+                    <Box component='span'>
+                      <Button disabled={newApplicationsSuspended} onClick={bountyApplyModal.open}>Apply now</Button>
+                    </Box>
+                  </Tooltip>
+                  )
                 }
 
               </TableCell>
