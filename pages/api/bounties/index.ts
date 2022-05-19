@@ -5,11 +5,12 @@ import { IEventToLog, postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { createBounty } from 'lib/bounties';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getBounties).post(createBounty);
+handler.use(requireUser).get(getBounties).post(createBountyController);
 
 async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
   const { spaceId } = req.query;
@@ -29,32 +30,17 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
   return res.status(200).json(bounties);
 }
 
-async function createBounty (req: NextApiRequest, res: NextApiResponse<Bounty>) {
-  const data = req.body as Bounty;
-  const bountyToCreate = { ...data } as any;
+async function createBountyController (req: NextApiRequest, res: NextApiResponse<Bounty>) {
 
-  if (data.createdBy) {
-    (bountyToCreate as Prisma.BountyCreateInput).author = { connect: { id: data.createdBy } };
+  const createdBounty = await createBounty({
+    ...req.body,
+    createdBy: req.session.user.id
+  });
 
-    // Remove createdBy passed from client to ensure Prisma doesn't throw an error
-    delete bountyToCreate.createdBy;
-  }
+  logWorkspaceFirstBountyEvents(createdBounty);
+  logUserFirstBountyEvents(createdBounty);
 
-  if (data.spaceId) {
-    (bountyToCreate as Prisma.BountyCreateInput).space = { connect: { id: data.spaceId } };
-    delete bountyToCreate.spaceId;
-  }
-
-  if (bountyToCreate.status === 'suggestion') {
-    bountyToCreate.suggestedBy = req.session.user.id;
-  }
-
-  const bounty = await prisma.bounty.create({ data: bountyToCreate });
-
-  logWorkspaceFirstBountyEvents(bounty);
-  logUserFirstBountyEvents(bounty);
-
-  return res.status(200).json(bounty);
+  return res.status(200).json(createdBounty);
 }
 
 export default withSessionRoute(handler);
