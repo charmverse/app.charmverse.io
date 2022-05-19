@@ -38,6 +38,8 @@ interface ViewTabsProps {
   showView: (viewId: string) => void;
 }
 
+const SHOWN_VIEWS = 3;
+
 function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -49,6 +51,21 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
 
+  // Find the index of the current view
+  const currentViewId = router.query.viewId;
+  const currentViewIndex = views.findIndex(view => view.id === currentViewId)
+  const shownViews = views.slice(0, SHOWN_VIEWS)
+  let restViews = views.slice(SHOWN_VIEWS);
+
+  // If the current view index is more than what we can show in the screen 
+  if (currentViewIndex >= SHOWN_VIEWS) {
+    const replacedView = shownViews[SHOWN_VIEWS - 1]
+    // Replace the current view as the last view of the shown views
+    shownViews[SHOWN_VIEWS - 1] = views[currentViewIndex];
+    restViews = restViews.filter(restView => restView.id !== currentViewId);
+    restViews.unshift(replacedView)
+  }
+
   const {
     register,
     handleSubmit
@@ -59,12 +76,12 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
     if (readonly) return;
     const view = views.find(v => v.id === event.currentTarget.id)
     // event.detail tells us how many times the mouse was clicked
-    if (event.detail > 1) {
+    if (event.currentTarget.id === currentViewId) {
+      event.preventDefault();
       setAnchorEl(event.currentTarget);
       if (view) {
         setCurrentView(view)
       }
-      event.preventDefault();
     }
     if (view) {
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [board.id]: view.id }))
@@ -131,11 +148,11 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
     defaultMessage: 'Delete view',
   })
 
-  const restViews = views.slice(3);
+  
 
   return (<>
-    <Tabs textColor='primary' indicatorColor='secondary' value={router.query.viewId} sx={{ minHeight: 40 }}>
-      {views.slice(0, 3).map(view => (
+    <Tabs textColor='primary' indicatorColor='secondary' value={currentViewId} sx={{ minHeight: 40 }}>
+      {shownViews.map(view => (
         <Tab
           component='div'
           disableRipple
@@ -146,9 +163,9 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
               onClick={handleViewClick}
               variant='text'
               size='small'
-              color={router.query.viewId === view.id ? 'textPrimary' : 'secondary'}
+              color={currentViewId === view.id ? 'textPrimary' : 'secondary'}
               id={view.id}
-              href={getViewUrl(view.id)}
+              href={currentViewId === view.id ? null : getViewUrl(view.id)}
               sx={{ px: 1.5 }}
             >
               {view.title}
@@ -215,7 +232,9 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
         ))}
       </Box>
       <Divider />
-      <AddViewMenu board={board} activeView={activeView} showView={showView} views={views}/>
+      <AddViewMenu sx={{
+        width: "100%"
+      }} board={board} activeView={activeView} showView={showView} views={views}/>
     </Menu>
 
     {/* Form to rename views */}
