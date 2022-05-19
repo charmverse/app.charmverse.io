@@ -113,6 +113,7 @@ export function BountyApplicantList ({
           }}
           >
             <TableRow>
+              <TableCell>Status</TableCell>
               <TableCell>
                 <Box sx={{
                   display: 'flex',
@@ -140,6 +141,12 @@ export function BountyApplicantList ({
                 key={application.id}
                 sx={{ backgroundColor: applicationIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
               >
+                <TableCell align='left'>
+                  <Chip
+                    label={SubmissionStatusLabels[application.status]}
+                    color={SubmissionStatusColors[application.status]}
+                  />
+                </TableCell>
                 <TableCell size='small'>
                   {
                       application.createdBy === user?.id ? 'You'
@@ -173,11 +180,6 @@ export function BountyApplicantList ({
                       </Button>
                     )
                   }
-                  <Chip
-                    sx={{ ml: 2 }}
-                    label={SubmissionStatusLabels[application.status]}
-                    color={SubmissionStatusColors[application.status]}
-                  />
 
                 </TableCell>
               </TableRow>
