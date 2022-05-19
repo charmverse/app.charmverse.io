@@ -68,12 +68,13 @@ const ViewHeader = React.memo((props: Props) => {
                 views={views}
                 readonly={props.readonly}
                 showView={showView}
-                boardId={board.id}
+                board={board}
+                activeView={activeView}
             />
 
             {/* add a view */}
 
-            {!props.readonly && (
+            {!props.readonly && views.length <= 3 && (
                 <AddViewMenu
                     board={board}
                     activeView={activeView}

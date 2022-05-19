@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { VariableSizeList } from 'react-window';
 import Typography from '@mui/material/Typography';
-import { Avatar, Box, ListItem, ListItemIcon, ListItemText, MenuItem, UseAutocompleteProps } from '@mui/material';
+import { Avatar, Box, ListItem, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import { GetGuildsResponse } from '@guildxyz/sdk';
 
 const LISTBOX_PADDING = 8; // px
