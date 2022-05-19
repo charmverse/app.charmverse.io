@@ -146,6 +146,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   const values = watch();
 
+  console.log('Values', values);
+
   const [space] = useCurrentSpace();
   const [user] = useUser();
   const [paymentMethods] = usePaymentMethods();
@@ -406,7 +408,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                         });
                       }
                     }}
-                    defaultChecked={values.approveSubmitters}
+                    defaultChecked={values.capSubmissions}
                   />
               )}
               />
