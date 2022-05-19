@@ -11,7 +11,7 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import Link from 'next/link';
-import { DescriptionModal, SocialModal } from '.';
+import { DescriptionModal, IdentityModal, SocialModal } from '.';
 
 const StyledBox = styled(Box)`
 
@@ -34,6 +34,7 @@ export default function UserDetails () {
   const [discordUsername, setDiscordUsername] = useState('CharmVerse');
   const [linkedinLink, setLinkedinLink] = useState('https://www.linkedin.com/company/charmverse');
   const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
+  const [isIdentityModalOpen, setIsIdentityModalOpen] = useState(false);
   const [isSocialMediaModalOpen, setIsSocialMediaModalOpen] = useState(false);
 
   const onDiscordUsernameCopy = () => {
@@ -63,7 +64,12 @@ export default function UserDetails () {
         />
         <Grid container direction='column'>
           <Grid item>
-            <Typography variant='h1'>CharmVerse</Typography>
+            <Stack direction='row' spacing={1} alignItems='baseline'>
+              <Typography variant='h1'>CharmVerse</Typography>
+              <EditIcon
+                onClick={() => setIsIdentityModalOpen(true)}
+              />
+            </Stack>
           </Grid>
           <Grid item mt={1}>
             <Stack direction='row' alignItems='center' spacing={2}>
@@ -124,6 +130,12 @@ export default function UserDetails () {
           </Grid>
         </Grid>
       </Stack>
+      <IdentityModal
+        isOpen={isIdentityModalOpen}
+        close={() => setIsIdentityModalOpen(false)}
+        defaultValues={{
+        }}
+      />
       <DescriptionModal
         isOpen={isDescriptionModalOpen}
         close={() => setIsDescriptionModalOpen(false)}
