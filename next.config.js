@@ -1,6 +1,7 @@
 const path = require('path');
 
 const config = {
+  generateEtags: false,
   poweredByHeader: false,
   webpack5: true,
   experimental: {

@@ -1,6 +1,6 @@
 import { SpecRegistry } from '@bangle.dev/core';
 import { Command, EditorState, EditorView, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
-import { createTooltipDOM, SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
+import { createTooltipDOM } from '@bangle.dev/tooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 import { markName } from './emojiSuggest.constants';
 

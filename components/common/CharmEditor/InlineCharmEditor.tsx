@@ -8,7 +8,7 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import debounce from 'lodash/debounce';
-import { NodeView, Plugin, SpecRegistry } from '@bangle.dev/core';
+import { Plugin, SpecRegistry } from '@bangle.dev/core';
 import { EditorView, Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { CSSProperties, ReactNode, useState } from 'react';
@@ -16,8 +16,8 @@ import styled from '@emotion/styled';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { PageContent } from 'models';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
-import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
-import MentionSuggest, { Mention, mentionPlugins, mentionSpecs } from './components/Mention';
+import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
 import * as tabIndent from './components/tabIndent';
 import Placeholder from './components/Placeholder';
 import { checkForEmpty } from './utils';
@@ -27,8 +27,8 @@ export interface ICharmEditorOutput {
   rawText: string
 }
 
-const emojiSuggestPluginKey = new PluginKey('emojiSuggest');
-const mentionSuggestPluginKey = new PluginKey('mentionSuggest');
+const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
+const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
 
 export const specRegistry = new SpecRegistry([
@@ -39,7 +39,7 @@ export const specRegistry = new SpecRegistry([
   link.spec(), // OK
   strike.spec(), // OK
   underline.spec(), // OK
-  emojiSpecs(), // ??
+  emoji.specs(), // ??
   mentionSpecs(), // NO
   code.spec(), // OK
   tabIndent.spec()
@@ -71,19 +71,15 @@ export function charmEditorPlugins (
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),
-    emojiPlugins({
-      key: emojiSuggestPluginKey
+    emoji.plugins({
+      key: emojiPluginKey
     }),
     mentionPlugins({
-      key: mentionSuggestPluginKey
+      key: mentionPluginKey
     }),
     floatingMenuPlugin({
       key: floatingMenuPluginKey,
       readOnly
-    }),
-    NodeView.createPlugin({
-      name: 'mention',
-      containerDOM: ['span', { class: 'mention-value' }]
     }),
     tabIndent.plugins()
   ];
@@ -202,8 +198,8 @@ export default function CharmEditor (
       }}
     >
       <FloatingMenu inline pluginKey={floatingMenuPluginKey} />
-      <MentionSuggest pluginKey={mentionSuggestPluginKey} />
-      <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
+      <MentionSuggest pluginKey={mentionPluginKey} />
+      <EmojiSuggest pluginKey={emojiPluginKey} />
       {children}
     </StyledReactBangleEditor>
   );

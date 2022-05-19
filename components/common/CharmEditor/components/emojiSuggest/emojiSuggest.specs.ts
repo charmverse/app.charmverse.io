@@ -1,5 +1,6 @@
 
 import { domSerializationHelpers, RawSpecs, BaseRawMarkSpec } from '@bangle.dev/core';
+import { getTwitterEmoji } from 'components/common/Emoji';
 import { markName } from './emojiSuggest.constants';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
@@ -14,7 +15,7 @@ export function specs () {
 }
 
 function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): RawSpecs {
-  const { toDOM, parseDOM } = domSerializationHelpers(name, {
+  const { parseDOM } = domSerializationHelpers(name, {
     tag: 'span',
     parsingPriority: 51,
     content: (node) => {
@@ -35,7 +36,11 @@ function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): 
       group: 'inline',
       draggable: true,
       atom: true,
-      toDOM,
+      toDOM: (node) => {
+        const twemojiImage = getTwitterEmoji(node.attrs.emoji);
+        return ['img', { src: twemojiImage,
+          style: 'width: 18px; height: 18px; position: relative; top: 4px;' }];
+      },
       parseDOM,
       selectable: true
     },

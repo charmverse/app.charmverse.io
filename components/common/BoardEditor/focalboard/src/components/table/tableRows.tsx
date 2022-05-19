@@ -13,6 +13,7 @@ import { usePages } from 'hooks/usePages'
 
 
 import TableRow from './tableRow'
+import { PageContent } from 'models'
 
 type Props = {
     board: Board
@@ -67,6 +68,7 @@ const TableRows = (props: Props): JSX.Element => {
                         board={board}
                         activeView={activeView}
                         card={card}
+                        content={cardPage?.content as PageContent}
                         isSelected={props.selectedCardIds.includes(card.id)}
                         focusOnMount={props.cardIdToFocusOnRender === card.id}
                         pageIcon={cardPage.icon}

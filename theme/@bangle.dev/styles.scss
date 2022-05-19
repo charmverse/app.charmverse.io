@@ -328,6 +328,15 @@ ol li {
   pointer-events: none;
 }
 
+.ProseMirror-selectednode {
+  background-color: rgba(46, 170, 220, 0.2);
+  transition: background-color 150ms ease-in-out;
+}
+
+.bangle-nv-container {
+  transition: background-color 150ms ease-in-out;
+}
+
 .bangle-editor li[data-bangle-is-todo] {
   display: flex;
   flex-direction: row;
