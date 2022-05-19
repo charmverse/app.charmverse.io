@@ -54,6 +54,16 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
     throw new DataNotFoundError(`Bounty with id ${id} was not found`);
   }
 
+  const { error, isAdmin } = await hasAccessToSpace({
+    userId: req.session.user.id,
+    spaceId: bounty.spaceId,
+    adminOnly: true
+  });
+
+  if (error) {
+    throw error;
+  }
+
   const updatedBounty = await updateBountySettings({
     bountyId: id as string,
     updateContent: body

@@ -13,6 +13,7 @@ export async function updateBountySettings ({
       id: bountyId
     },
     data: {
+      updatedAt: new Date(),
       title: updateContent.title,
       descriptionNodes: updateContent.descriptionNodes as string,
       description: updateContent.description,
