@@ -94,7 +94,7 @@ export function BountyApplicantList ({
     minHeight = `${minHeight}px`;
   }
 
-  const sortedApplications = moveUserApplicationToFirstRow(applications, user!);
+  const sortedApplications = moveUserApplicationToFirstRow(applications, user?.id as string);
 
   const userApplication = sortedApplications.find(app => app.createdBy === user?.id);
 
