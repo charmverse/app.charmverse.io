@@ -1,4 +1,4 @@
-import { Application, User } from '@prisma/client';
+import { Application, Bounty, User } from '@prisma/client';
 
 /**
  * Whether an application is currently a valid submission
@@ -26,5 +26,24 @@ export function moveUserApplicationToFirstRow (submissions: Application[], userI
   }
 
   return copiedSubmissions;
+
+}
+
+/*
+ * Whether a bounty can accept more submissions
+ */
+export function submissionsCapReached ({ bounty, submissions }: {bounty: Bounty, submissions: Application[]}): boolean {
+  if (bounty.maxSubmissions === null) {
+    return false;
+  }
+
+  const validSubmissions: number = submissions.reduce((count, submission) => {
+    if (submission.status !== 'applied' && submission.status !== 'rejected') {
+      return count + 1;
+    }
+    return count;
+  }, 0);
+
+  return validSubmissions >= bounty.maxSubmissions;
 
 }
