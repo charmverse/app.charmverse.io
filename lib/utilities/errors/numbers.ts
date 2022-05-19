@@ -9,3 +9,13 @@ export class PositiveNumbersOnlyError extends SystemError {
     });
   }
 }
+
+export class LimitReachedError extends SystemError {
+  constructor (message = 'The limit for this operation has been reached.') {
+    super({
+      errorType: 'Invalid input',
+      message,
+      severity: 'warning'
+    });
+  }
+}

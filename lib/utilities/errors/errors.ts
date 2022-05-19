@@ -6,6 +6,7 @@ const ErrorCodes = {
   Unknown: 500,
   'Invalid input': 400,
   'Undesirable operation': 400,
+  'Duplicate data': 400,
   'Data not found': 404,
   'Maximum size exceeded': 400,
   'Access denied': 401,
