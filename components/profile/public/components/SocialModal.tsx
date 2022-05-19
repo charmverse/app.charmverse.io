@@ -3,7 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert, Box, Button, Grid, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Grid, SvgIcon, Typography } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import TwitterIcon from '@mui/icons-material/Twitter';
@@ -40,11 +40,10 @@ type SocialModalProps = {
 
 function SocialModal (props: SocialModalProps) {
   const { defaultValues, close, isOpen } = props;
-  const [saveError, setSaveError] = useState<any | null>(null);
   const {
     register,
     handleSubmit,
-    formState: { errors, touchedFields }
+    formState: { errors }
   } = useForm<FormValues>({
     defaultValues,
     resolver: yupResolver(schema)
@@ -52,11 +51,9 @@ function SocialModal (props: SocialModalProps) {
 
   function onSubmit (values: FormValues) {
     try {
-      setSaveError(null);
     }
     catch (err) {
       log.error('Error updating social media links', err);
-      setSaveError((err as Error).message || err);
     }
   }
 
@@ -65,7 +62,7 @@ function SocialModal (props: SocialModalProps) {
     <Modal open={isOpen} onClose={() => {}} size='large'>
       <DialogTitle onClose={close}>Social media links</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
           <Grid item container direction='row' alignItems='center'>
             <Grid item container direction='row' xs={3}>
               <TwitterIcon style={{ color: '#00ACEE', height: '22px' }} />
@@ -98,7 +95,7 @@ function SocialModal (props: SocialModalProps) {
           </Grid>
           <Grid item container alignItems='center'>
             <Grid item container direction='row' xs={3}>
-              <SvgIcon viewBox='0 -10 70 70' sx={{ transform: 'scale(0.85)', color: '#000000', height: '22px' }}>
+              <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#000000', height: '22px' }}>
                 <DiscordIcon />
               </SvgIcon>
               <Typography ml={1}>Discord:</Typography>
@@ -128,15 +125,8 @@ function SocialModal (props: SocialModalProps) {
               />
             </Grid>
           </Grid>
-          {saveError && (
-          <Grid item>
-            <Alert severity='error'>
-              {saveError}
-            </Alert>
-          </Grid>
-          )}
         </Grid>
-        <Box justifyContent='end' mt={2} sx={{ display: 'flex' }}>
+        <Box justifyContent='end' mt={3} sx={{ display: 'flex' }}>
           <StyledButton
             onClick={() => {
             }}
