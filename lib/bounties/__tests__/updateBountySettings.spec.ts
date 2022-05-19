@@ -2,9 +2,11 @@
 import { Bounty, Space, User } from '@prisma/client';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import { ExpectedAnError } from 'testing/errors';
 import { createBounty } from '../createBounty';
 import { UpdateableBountyFields } from '../interfaces';
 import { updateBountySettings } from '../updateBountySettings';
+import { PositiveNumbersOnlyError } from '../../utilities/errors';
 
 let user: User;
 let space: Space;
@@ -77,6 +79,58 @@ describe('updateBountySettings', () => {
     });
 
     expect(updatedBounty.status).toBe('suggestion');
+
+  });
+
+  it('should fail is a null or number equal or below 0 is given for the reward amount', async () => {
+
+    const bounty = await createBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      title: 'My bounty',
+      status: 'suggestion'
+    });
+
+    const newContent: Partial<Bounty> = {
+      rewardAmount: null as any
+    };
+
+    try {
+      await updateBountySettings({
+        bountyId: bounty.id,
+        updateContent: newContent
+      });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(PositiveNumbersOnlyError);
+    }
+
+    newContent.rewardAmount = 0;
+
+    try {
+      await updateBountySettings({
+        bountyId: bounty.id,
+        updateContent: newContent
+      });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(PositiveNumbersOnlyError);
+    }
+
+    newContent.rewardAmount = -10;
+
+    try {
+      await updateBountySettings({
+        bountyId: bounty.id,
+        updateContent: newContent
+      });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(PositiveNumbersOnlyError);
+    }
 
   });
 
