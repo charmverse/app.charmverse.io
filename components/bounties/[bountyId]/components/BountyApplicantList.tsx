@@ -72,8 +72,8 @@ export function BountyApplicantList ({
       && application.status === 'applied'
       // If we reached the cap, we can't assign new people
       && (
-        bounty.capSubmissions === false || (
-          bounty.capSubmissions && acceptedApplications.length < (bounty.maxSubmissions ?? 0)
+        bounty.maxSubmissions === null || (
+          acceptedApplications.length < (bounty.maxSubmissions ?? 0)
         )
       ));
   }
@@ -150,7 +150,7 @@ export function BountyApplicantList ({
                 <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
                 <TableCell align='right' sx={{ gap: 2 }}>
                   {
-                      application.createdBy === user?.id && (
+                      application.createdBy === user?.id && application.status === 'applied' && (
                         <Button
                           color='secondary'
                           variant='outlined'
@@ -174,15 +174,12 @@ export function BountyApplicantList ({
                       </Button>
                     )
                   }
-                  {
-                    applicantIsSubmitter(application) && (
-                      <Chip
-                        sx={{ ml: 2 }}
-                        label={SubmissionStatusLabels[application.status]}
-                        color={SubmissionStatusColors[application.status]}
-                      />
-                    )
-                  }
+                  <Chip
+                    sx={{ ml: 2 }}
+                    label={SubmissionStatusLabels[application.status]}
+                    color={SubmissionStatusColors[application.status]}
+                  />
+
                 </TableCell>
               </TableRow>
             ))}
