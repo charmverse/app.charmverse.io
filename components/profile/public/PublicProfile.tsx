@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
-import { Box, Button, Divider, Paper, Link, Stack, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid';
+import { Box, Divider, Grid, Link, Stack, Typography } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -9,8 +8,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import DiscordIcon from 'public/images/discord_logo.svg';
-import SvgIcon from '@mui/material/SvgIcon';
+import { Modal, DialogTitle } from 'components/common/Modal';
+import { SocialModal } from './components';
 
 const StyledBox = styled(Box)`
 
@@ -28,8 +27,10 @@ export default function PublicProfile () {
   const [userImage, setUserImage] = useState('');
   const [twitterLink, setTwitterLink] = useState('https://mobile.twitter.com/charmverse');
   const [githubLink, setGithubLink] = useState('https://github.com/charmverse/app.charmverse.io');
+  const [discordUsername, setDiscordUsername] = useState('CharmVerse');
   const [linkedinLink, setLinkedinLink] = useState('https://www.linkedin.com/company/charmverse');
-  const [discordLink, setDiscordLink] = useState('https://discord.gg/VvhEafEWcg');
+  const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
+  const [isSocialMediaModalOpen, setIsSocialMediaModalOpen] = useState(false);
 
   const handleImageUpdate = (url: string) => {
 
@@ -74,15 +75,10 @@ export default function PublicProfile () {
                 </Link>
                 )
               }
-              {
-                discordLink && (
-                <Link href={discordLink} target='_blank' display='flex'>
-                  <SvgIcon viewBox='0 -5 70 70'><DiscordIcon style={{ color: '#000000', height: '22px' }} /></SvgIcon>
-                </Link>
-                )
-              }
               <StyledDivider orientation='vertical' flexItem />
-              <AddCircleOutlineIcon />
+              <AddCircleOutlineIcon
+                onClick={() => setIsSocialMediaModalOpen(true)}
+              />
             </Stack>
           </Grid>
           <Grid item container alignItems='center'>
@@ -92,11 +88,26 @@ export default function PublicProfile () {
               </span>
             </Grid>
             <Grid item xs={2}>
-              <EditIcon />
+              <EditIcon
+                onClick={() => setIsDescriptionModalOpen(true)}
+              />
             </Grid>
           </Grid>
         </Grid>
       </Stack>
+      <SocialModal
+        isOpen={isSocialMediaModalOpen}
+        close={() => setIsSocialMediaModalOpen(false)}
+        defaultValues={{
+          twitter: '',
+          github: '',
+          discord: '',
+          linkedin: ''
+        }}
+      />
+      <Modal open={isDescriptionModalOpen} onClose={() => {}}>
+        <DialogTitle onClose={() => setIsDescriptionModalOpen(false)}>Manage your Description</DialogTitle>
+      </Modal>
     </StyledBox>
   );
 }
