@@ -385,7 +385,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           </Grid>
           <Grid item xs={12} sx={{ pt: '2px !important' }}>
             <Typography variant='body2' sx={{ ml: '8%' }}>
-              When enabled, an Admin or the Bounty Creator must explicitly approve each user's application to this bounty.
+              When enabled, a workspace Admin or the Bounty Reviewer must explicitly approve each user's application to this bounty.
             </Typography>
 
           </Grid>
