@@ -5,6 +5,7 @@ import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Input from '@mui/material/Input';
+import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
@@ -364,64 +365,66 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
           {/* New options */}
 
-          <Grid container item>
+          <Grid item xs={12}>
+            <FormControlLabel
+              label='Require applications'
+              control={(
+                <Switch
+                  onChange={(event) => {
+                    setValue('approveSubmitters', event.target.checked === true, {
+                      shouldValidate: true
+                    });
+                  }}
+                  defaultChecked={values.approveSubmitters}
+                />
+              )}
+            />
+
+          </Grid>
+          <Grid item xs={12} sx={{ pt: '2px !important' }}>
+            <Typography variant='body2' sx={{ ml: '8%' }}>
+              When enabled, an Admin or the Bounty Creator must explicitly approve each user's application to this bounty.
+            </Typography>
+
+          </Grid>
+          <Grid container item xs={12}>
             <Grid item xs={6}>
               <FormControlLabel
-                label='Require applications'
+                label='Limit applications'
                 control={(
                   <Switch
                     onChange={(event) => {
-                      setValue('approveSubmitters', event.target.checked === true, {
+                      const newValue = event.target.checked === true;
+                      setValue('capSubmissions', newValue, {
                         shouldValidate: true
                       });
+
+                      // eslint-disable-next-line no-restricted-globals
+                      if (newValue === false && isNaN(values.maxSubmissions as any)) {
+                        setValue('maxSubmissions', null, {
+                          shouldValidate: true
+                        });
+                      }
                     }}
                     defaultChecked={values.approveSubmitters}
                   />
-                )}
+              )}
               />
-
             </Grid>
-            <Grid item xs={6}>
-              <Typography variant='body2'>
-                {
-                values.approveSubmitters
-
-                  ? 'Workspace members will have to apply to work on this bounty. They will be able to submit work once their application is accepted.'
-
-                  : 'Any workspace member can make a submission to this bounty.'
-
-              }
-              </Typography>
-
-            </Grid>
-          </Grid>
-          <Grid container item>
-
-            <Grid item xs={6}>
-
-              <FormControlLabel
-                label='Limit amount of submissions'
-                control={(
-                  <Switch
-                    onChange={(event) => {
-                      setValue('capSubmissions', event.target.checked === true, {
-                        shouldValidate: true
-                      });
-                    }}
-                    defaultChecked={values.capSubmissions}
-                  />
-                )}
-              />
-
-            </Grid>
-
             <Grid item xs={6}>
 
               {
                 values.capSubmissions && (
                   <TextField
                     {...register('maxSubmissions', {
-                      valueAsNumber: true
+                      valueAsNumber: true,
+                      setValueAs: (value) => {
+                        // eslint-disable-next-line no-restricted-globals
+                        if (isNaN(value)) {
+                          return null;
+                        }
+                        return value;
+                      }
                     })}
                     fullWidth
                     focused={focusKey === 'maxSubmissions'}
