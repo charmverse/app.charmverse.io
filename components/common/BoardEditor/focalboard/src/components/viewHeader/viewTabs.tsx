@@ -23,18 +23,21 @@ import DuplicateIcon from '../../widgets/icons/duplicate';
 import EditIcon from '@mui/icons-material/Edit';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useForm } from 'react-hook-form';
+import { useFocalboardViews } from 'hooks/useFocalboardViews';
 interface ViewTabsProps {
   intl: IntlShape;
+  boardId: string
   readonly?: boolean;
   views : BoardView[];
   showView: (viewId: string) => void;
 }
 
-function ViewTabs ({ intl, readonly, showView, views }: ViewTabsProps) {
+function ViewTabs ({ boardId, intl, readonly, showView, views }: ViewTabsProps) {
   const router = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentView, setCurrentView] = useState<BoardView | null>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'rename-view-popup' });
+  const { setFocalboardViewsRecord } = useFocalboardViews();
 
   const {
     register,
@@ -44,14 +47,17 @@ function ViewTabs ({ intl, readonly, showView, views }: ViewTabsProps) {
   function handleViewClick (event: MouseEvent<HTMLDivElement>) {
     event.stopPropagation();
     if (readonly) return;
+    const view = views.find(v => v.id === event.currentTarget.id)
     // event.detail tells us how many times the mouse was clicked
     if (event.detail > 1) {
       setAnchorEl(event.currentTarget);
-      const view = views.find(v => v.id === event.currentTarget.id)
       if (view) {
         setCurrentView(view)
       }
       event.preventDefault();
+    }
+    if (view) {
+      setFocalboardViewsRecord((focalboardViewsRecord) => ({...focalboardViewsRecord, [boardId]: view.id}))
     }
   }
 
