@@ -437,7 +437,10 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
             </Grid>
           </Grid>
 
-          <Grid container item>
+          {
+            /*
+
+                      <Grid container item>
             <Grid item xs={6}>
               <FormControlLabel
                 label='Set expiry date'
@@ -488,6 +491,9 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                     }
             </Grid>
           </Grid>
+
+            */
+          }
 
           <Grid item>
             <Button
