@@ -59,7 +59,7 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
 
   return (
     <Box>
-      <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto' }}>
+      <form onSubmit={handleSubmit(formValue => submitted(formValue as any))} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InlineCharmEditor
