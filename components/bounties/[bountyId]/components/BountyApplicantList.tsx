@@ -125,7 +125,7 @@ export function BountyApplicantList ({
               </TableCell>
               <TableCell>Message</TableCell>
               <TableCell>Date</TableCell>
-              <TableCell>
+              <TableCell align='right'>
                 {
                   !userHasApplied && (<Button onClick={bountyApplyModal.open}>Apply now</Button>)
                 }
@@ -146,22 +146,21 @@ export function BountyApplicantList ({
                         : getDisplayName(getContributor(application.createdBy))
                     }
                 </TableCell>
-                <TableCell sx={{ maxWidth: '61vw' }}>{application.message}</TableCell>
+                <TableCell sx={{ maxWidth: '61vw' }}>
+                  {
+                    application.createdBy === user?.id && application.status === 'applied' ? (
+                      <Typography variant='body2' color={theme.palette.primary.main} onClick={bountyApplyModal.open}>
+                        {application.message}
+                      </Typography>
+                    ) : (
+                      <Typography>
+                        {application.message}
+                      </Typography>
+                    )
+                  }
+                </TableCell>
                 <TableCell>{ humanFriendlyDate(application.createdAt, { withTime: true })}</TableCell>
                 <TableCell align='right' sx={{ gap: 2 }}>
-                  {
-                      application.createdBy === user?.id && application.status === 'applied' && (
-                        <Button
-                          color='secondary'
-                          variant='outlined'
-                          onClick={bountyApplyModal.open}
-                          endIcon={<EditOutlinedIcon fontSize='small' />}
-                        >
-                          Edit
-                        </Button>
-                      )
-                    }
-
                   {
                     displayAssignmentButton(application) === true && (
                       <Button
