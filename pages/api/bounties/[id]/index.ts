@@ -6,7 +6,7 @@ import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
 import { updateBountySettings, getBounty } from 'lib/bounties';
-import { DataNotFoundError } from '../../../../lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utilities/errors/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

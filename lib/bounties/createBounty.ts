@@ -1,7 +1,6 @@
 import { Bounty, BountyStatus, Prisma } from '@prisma/client';
-import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { prisma } from 'db';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { BountyCreationData } from './interfaces';
 
 export async function createBounty ({
@@ -32,18 +31,8 @@ export async function createBounty ({
     throw new InvalidInputError('An open bounty must have a reward amount assigned');
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
-    userId: createdBy,
-    spaceId,
-    adminOnly: false
-  });
-
-  if (error) {
-    throw (error);
-  }
-
-  if (status === 'open' && isAdmin === false) {
-    throw new UnauthorisedActionError('Only administrators can create open status bounties');
+  if (rewardAmount < 0) {
+    throw new PositiveNumbersOnlyError();
   }
 
   const bountyCreateInput: Prisma.BountyCreateInput = {

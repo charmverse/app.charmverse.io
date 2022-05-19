@@ -5,8 +5,9 @@ import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatab
 import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors/errors';
 import { createBounty } from '../createBounty';
+import { PositiveNumbersOnlyError } from '../../utilities/errors/numbers';
 
 let user: User;
 let space: Space;
@@ -39,7 +40,7 @@ describe('createBounty', () => {
 
   });
 
-  it('should be able to create a bounty in open status if the user is an admin and data provided has at least title, createdBy, spaceId, status and rewardAmount', async () => {
+  it('should be able to create a bounty in open status if the data provided has at least title, createdBy, spaceId, status and rewardAmount', async () => {
 
     const { user: adminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
@@ -59,27 +60,6 @@ describe('createBounty', () => {
         spaceId: expect.stringContaining(localSpace.id)
       })
     );
-
-  });
-
-  it('should fail if the requesting user is not a member of the space', async () => {
-
-    const { user: localUser } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const { space: differentSpace } = await generateUserAndSpaceWithApiToken();
-
-    try {
-
-      await createBounty({
-        title: 'My bounty',
-        createdBy: localUser.id,
-        spaceId: differentSpace.id
-      });
-      throw new ExpectedAnError();
-
-    }
-    catch (error) {
-      expect(error).toBeInstanceOf(UserIsNotSpaceMemberError);
-    }
 
   });
 
@@ -106,9 +86,9 @@ describe('createBounty', () => {
 
   });
 
-  it('should fail to create an open bounty if the user is not an admin', async () => {
+  it('should fail to create a bounty if the reward amount is negative', async () => {
 
-    const { user: localUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { user: localUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     try {
 
@@ -116,7 +96,7 @@ describe('createBounty', () => {
         title: 'My bounty',
         createdBy: localUser.id,
         spaceId: localSpace.id,
-        rewardAmount: 1,
+        rewardAmount: -10,
         status: 'open'
       });
 
@@ -124,7 +104,7 @@ describe('createBounty', () => {
 
     }
     catch (error) {
-      expect(error).toBeInstanceOf(UnauthorisedActionError);
+      expect(error).toBeInstanceOf(PositiveNumbersOnlyError);
     }
 
   });

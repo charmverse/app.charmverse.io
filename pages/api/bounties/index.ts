@@ -7,6 +7,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createBounty } from 'lib/bounties';
 import nc from 'next-connect';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -32,6 +33,17 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
 
 async function createBountyController (req: NextApiRequest, res: NextApiResponse<Bounty>) {
 
+  const { error } = await hasAccessToSpace({
+    userId: req.session.user.id,
+    spaceId: req.body?.spaceId,
+    // Non admins can only create a suggestion
+    adminOnly: req.body.status !== 'suggestion'
+  });
+
+  if (error) {
+    throw error;
+  }
+
   const createdBounty = await createBounty({
     ...req.body,
     createdBy: req.session.user.id
@@ -40,7 +52,7 @@ async function createBountyController (req: NextApiRequest, res: NextApiResponse
   logWorkspaceFirstBountyEvents(createdBounty);
   logUserFirstBountyEvents(createdBounty);
 
-  return res.status(200).json(createdBounty);
+  return res.status(201).json(createdBounty);
 }
 
 export default withSessionRoute(handler);
