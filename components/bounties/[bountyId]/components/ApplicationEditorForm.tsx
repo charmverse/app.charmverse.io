@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { useBounties } from 'hooks/useBounties';
+import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
 import { FormMode } from '../../components/BountyEditorForm';
 
 interface IApplicationFormProps {
@@ -21,7 +22,7 @@ interface IApplicationFormProps {
 }
 
 export const schema = yup.object({
-  message: yup.string().required('Please enter a proposal.')
+  message: yup.string().required('Please enter a proposal.').min(MINIMUM_APPLICATION_MESSAGE_CHARACTERS, `Application proposal must contain at least ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters.`)
 });
 
 type FormValues = yup.InferType<typeof schema>
@@ -35,7 +36,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
     handleSubmit,
     formState: { errors, touchedFields, isValid, isValidating, isSubmitting }
   } = useForm<FormValues>({
-    mode: 'onChange',
+    mode: 'onBlur',
     defaultValues: {
       message: proposal?.message
     },
@@ -44,9 +45,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
 
   const [user] = useUser();
 
-  const applicationExample = 'Explain why you are the right person or team to resolve this bounty';
-
-  const walletAddress = user?.addresses[0];
+  const applicationExample = 'Explain why you are the right person or team to work on this bounty.';
 
   async function submitted (proposalToSave: Application) {
     if (mode === 'create') {

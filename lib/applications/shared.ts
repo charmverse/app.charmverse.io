@@ -1,5 +1,7 @@
 import { Application, Bounty, User } from '@prisma/client';
 
+export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 10;
+
 /**
  * Whether an application is currently a valid submission
  * @param application
