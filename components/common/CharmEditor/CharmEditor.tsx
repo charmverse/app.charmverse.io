@@ -28,7 +28,6 @@ import { CryptoCurrency, FiatCurrency } from 'models/Currency';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import PageThreadsList from 'components/[pageId]/DocumentPage/components/PageThreadsList';
 import { Grow } from '@mui/material';
-import dynamic from 'next/dynamic';
 import FloatingMenu, { floatingMenuPlugin } from './components/FloatingMenu';
 import Callout, * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
@@ -45,7 +44,7 @@ import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
-import * as rowActions from './components/rowActions';
+import RowActionsMenu, * as rowActions from './components/rowActions';
 import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
@@ -58,6 +57,7 @@ export interface ICharmEditorOutput {
   rawText: string
 }
 
+const actionsPluginKey = new PluginKey('row-actions');
 const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
 const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
@@ -191,7 +191,9 @@ export function charmEditorPlugins (
     table.TableFiltersMenu(),
     trailingNode.plugins(),
     disclosure.plugins(),
-    rowActions.plugins()
+    rowActions.plugins({
+      key: actionsPluginKey
+    })
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -472,6 +474,7 @@ function CharmEditor (
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
+      <RowActionsMenu pluginKey={actionsPluginKey} />
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
       {children}
       {!disabledPageSpecificFeatures && (

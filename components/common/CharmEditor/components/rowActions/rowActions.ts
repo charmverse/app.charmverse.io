@@ -1,27 +1,47 @@
-
+import React from 'react';
 import { createElement } from '@bangle.dev/core';
-import { Fragment, Plugin, PluginKey, Node } from '@bangle.dev/pm';
-import { findDomRefAtPos } from 'prosemirror-utils';
+import { EditorState, Plugin, PluginKey } from '@bangle.dev/pm';
 import log from 'lib/log';
 
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
 
-interface PluginState {
-  domElement: HTMLElement;
+export interface PluginState {
+  tooltipDOM: HTMLElement;
+  open: boolean;
+  rowDOM?: HTMLElement;
+  rowPos?: number;
+  rowNodeOffset?: number;
 }
 
-export function plugins () {
+export function plugins ({ key }: { key: PluginKey }) {
 
-  const handlesKey = new PluginKey<PluginState>('handles');
-  const domElement = createElement(['div', { class: 'row-handle' }]);
+  const tooltipDOM = createElement(['div', { class: 'row-handle' }]);
 
   return [
 
     new Plugin({
-      key: handlesKey,
+      key,
+      state: {
+        init: (): PluginState => {
+          return {
+            tooltipDOM,
+            // For tooltipPlacement plugin
+            open: false
+          };
+        },
+        apply: (tr, pluginState: PluginState) => {
+          const newPluginState = tr.getMeta(key);
+          console.log('apply updates', newPluginState);
+          if (newPluginState) {
+            return { ...pluginState, ...newPluginState };
+          }
+
+          return pluginState;
+        }
+      },
       view: (view) => {
 
-        view.dom.parentNode?.appendChild(domElement);
+        view.dom.parentNode?.appendChild(tooltipDOM);
 
         function onMouseOver (e: MouseEventInit) {
 
@@ -55,38 +75,14 @@ export function plugins () {
               const box = hoveredElement.getBoundingClientRect();
               const viewBox = view.dom.getBoundingClientRect();
               const top = box.top - viewBox.top;
-              domElement.style.top = `${top}px`;
+              tooltipDOM.style.top = `${top}px`;
 
-              domElement.onclick = () => {
-
-                // calculate the node at the mouse position. do it on click in case content has changed
-                let topPos = view.state.doc.resolve(startPos);
-                while (topPos.depth > 1 || (topPos.depth === 1 && topPos.parentOffset > 0)) {
-                  const parentOffset = topPos.pos - (topPos.parentOffset > 0 ? topPos.parentOffset : 1); // if parentOffset is 0, step back by 1
-                  topPos = view.state.doc.resolve(parentOffset);
-                }
-
-                // console.log('Position of row', topPos, { startPos, ogPos: ob, node: topPos.node() });
-
-                let pmNode = topPos.node();
-                if (dom.offset > 0) {
-                  const child = pmNode.maybeChild(dom.offset);
-                  pmNode = child || pmNode;
-                }
-
-                const nodeStart = topPos.pos;
-                const nodeSize = (pmNode && pmNode.type.name !== 'doc') ? pmNode.nodeSize : 0;
-                let nodeEnd = nodeStart + nodeSize; // nodeSize includes the start and end tokens, so we need to subtract 1
-
-                // dont delete past end of document - according to PM guide, use content.size not nodeSize for the doc
-                if (nodeEnd > view.state.doc.content.size) {
-                  nodeEnd = view.state.doc.content.size;
-                }
-
-                log.debug('Delete range', { nodeStart, topPos: topPos.pos, pmNode, nodeEnd, nodeSize });
-
-                view.dispatch(view.state.tr.deleteRange(nodeStart, nodeEnd));
+              const newState = {
+                rowPos: startPos,
+                rowDOM: hoveredElement,
+                rowNodeOffset: dom.offset && dom.node.childNodes[dom.offset] ? dom.offset : 0
               };
+              view.dispatch(view.state.tr.setMeta(key, newState));
             }
           }
         }
