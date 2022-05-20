@@ -9,6 +9,7 @@ import { Application } from '@prisma/client';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
+import { AnyArray } from 'immer/dist/internal';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -25,7 +26,7 @@ const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 interface Props {
-  submission: Application,
+  submission?: Application,
   onSubmit: (submission: Application) => void
 }
 
@@ -41,9 +42,9 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      submission: submission.submission as string,
-      submissionNodes: submission.submissionNodes as any as JSON,
-      walletAddress: (submission.walletAddress ?? user?.addresses?.[0]) as any
+      submission: submission?.submission as string,
+      submissionNodes: submission?.submissionNodes as any as JSON,
+      walletAddress: (submission?.walletAddress ?? user?.addresses?.[0]) as any
     },
     resolver: yupResolver(schema)
   });
@@ -51,11 +52,19 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
   //  const defaultWalletAddress = submission.walletAddress ?? ;
 
   async function submitted (values: FormValues) {
-    const updatedSubmission = await charmClient.updateApplication(submission.id, values);
-    onSubmit(updatedSubmission);
+    if (submission) {
+      // Update
+      const updatedSubmission = await charmClient.updateApplication(submission.id, values);
+      onSubmit(updatedSubmission);
+    }
+    else {
+      // create
+      onSubmit({} as any);
+    }
+
   }
 
-  console.log('Submission', submission.submissionNodes, typeof submission.submissionNodes);
+  //  console.log('Submission', submission.submissionNodes, typeof submission.submissionNodes);
 
   return (
     <Box>
@@ -63,7 +72,7 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InlineCharmEditor
-              content={submission.submissionNodes ? JSON.parse(submission.submissionNodes) : undefined}
+              content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : ''}
               onContentChange={content => {
                 setValue('submission', content.rawText, {
                   shouldValidate: true

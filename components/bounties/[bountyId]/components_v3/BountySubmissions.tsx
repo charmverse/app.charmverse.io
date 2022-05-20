@@ -155,12 +155,17 @@ export default function BountySubmissions ({ bounty }: Props) {
               */
             }
 
-            <TableCell>
+            <TableCell align='right'>
               {
                   !bounty.approveSubmitters && !userSubmission && (
                   <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
                     <Box component='span'>
-                      <Button disabled={!!userSubmission} onClick={editSubmissionModal.open}>New submission</Button>
+                      <Button
+                        disabled={!!userSubmission}
+                        onClick={editSubmissionModal.open}
+                      >
+                        New submission
+                      </Button>
                     </Box>
                   </Tooltip>
                   )
@@ -262,19 +267,13 @@ export default function BountySubmissions ({ bounty }: Props) {
         </Box>
       )}
 
-      {
-        userSubmission && (
-          <Modal title='Your submission' open={editSubmissionModal.isOpen} onClose={editSubmissionModal.close} size='large'>
-            <SubmissionEditorForm submission={userSubmission} onSubmit={submitterUpdatedSubmission} />
-          </Modal>
-        )
-      }
+      <Modal title='Your submission' open={editSubmissionModal.isOpen} onClose={editSubmissionModal.close} size='large'>
+        <SubmissionEditorForm submission={userSubmission} onSubmit={submitterUpdatedSubmission} />
+      </Modal>
 
-      {
-        isReviewer && (
-          <Modal title='Confirm your review' open={reviewDecision !== null} onClose={() => setReviewDecision(null)} size='large'>
+      <Modal title='Confirm your review' open={reviewDecision !== null} onClose={() => setReviewDecision(null)} size='large'>
 
-              {
+        {
                 reviewDecision?.decision === 'approve' ? (
                   <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>
                     Please confirm you want to <b>approve</b> this submission.
@@ -291,13 +290,13 @@ export default function BountySubmissions ({ bounty }: Props) {
                 )
               }
 
-            <Typography>
-              This decision is permanent.
-            </Typography>
+        <Typography>
+          This decision is permanent.
+        </Typography>
 
-            <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
+        <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
 
-              {
+          {
                 reviewDecision?.decision === 'approve' && (
                   <Button
                     color='success'
@@ -309,7 +308,7 @@ export default function BountySubmissions ({ bounty }: Props) {
                 )
               }
 
-              {
+          {
                 reviewDecision?.decision === 'reject' && (
                   <Button
                     color='error'
@@ -321,12 +320,9 @@ export default function BountySubmissions ({ bounty }: Props) {
                 )
               }
 
-              <Button color='secondary' onClick={() => setReviewDecision(null)}>Cancel</Button>
-            </Box>
-          </Modal>
-        )
-      }
-
+          <Button color='secondary' onClick={() => setReviewDecision(null)}>Cancel</Button>
+        </Box>
+      </Modal>
     </Box>
   );
 }
