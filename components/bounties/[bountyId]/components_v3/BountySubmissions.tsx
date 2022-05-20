@@ -27,6 +27,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { useBounties } from 'hooks/useBounties';
 import SubmissionEditorForm from './SubmissionEditorForm';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
+import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 
 interface Props {
   bounty: Bounty
@@ -60,7 +61,6 @@ export default function BountySubmissions ({ bounty }: Props) {
   const { refreshBounty } = useBounties();
 
   const editSubmissionModal = usePopupState({ variant: 'popover', popupId: 'edit-submission' });
-  const [reviewDecision, setReviewDecision] = useState<{submissionId: string, decision: ReviewDecision} | null>(null);
 
   const isReviewer = bounty.reviewer === user?.id;
 
@@ -75,13 +75,6 @@ export default function BountySubmissions ({ bounty }: Props) {
           setSubmissions(foundSubmissions);
         });
     }
-  }
-
-  async function makeSubmissionDecision (applicationId: string, decision: ReviewDecision) {
-    await charmClient.reviewSubmission(applicationId, decision);
-    setReviewDecision(null);
-    refreshSubmissions();
-    refreshBounty(bounty.id);
   }
 
   function submitterUpdatedSubmission () {
@@ -246,18 +239,12 @@ export default function BountySubmissions ({ bounty }: Props) {
                     )
                   }
 
-                {
-                    submission.status === 'review' && isReviewer && (
-                      <Box>
-                        <Tooltip placement='top' title='Approve this submission.'>
-                          <AssignmentTurnedInIcon onClick={() => setReviewDecision({ decision: 'approve', submissionId: submission.id })} sx={{ mr: 3 }} />
-                        </Tooltip>
-                        <Tooltip placement='top' title='Reject this submission. The submitter will be disqualified from making further changes'>
-                          <CancelIcon onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject' })} />
-                        </Tooltip>
-                      </Box>
-                    )
-                  }
+                <BountySubmissionReviewActions
+                  bounty={bounty}
+                  submission={submission}
+                  reviewComplete={refreshSubmissions}
+                />
+
               </TableCell>
             </TableRow>
           ))}
@@ -283,58 +270,6 @@ export default function BountySubmissions ({ bounty }: Props) {
         <SubmissionEditorForm submission={userSubmission} bounty={bounty} onSubmit={submitterUpdatedSubmission} />
       </Modal>
 
-      <Modal title='Confirm your review' open={reviewDecision !== null} onClose={() => setReviewDecision(null)} size='large'>
-
-        {
-                reviewDecision?.decision === 'approve' ? (
-                  <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>
-                    Please confirm you want to <b>approve</b> this submission.
-                  </Typography>
-                ) : (
-                  <Box>
-                    <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>
-                      Please confirm you want to <b>reject</b> this submission.
-                    </Typography>
-                    <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>
-                      The submitter will be disqualified from making further changes
-                    </Typography>
-                  </Box>
-                )
-              }
-
-        <Typography>
-          This decision is permanent.
-        </Typography>
-
-        <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
-
-          {
-                reviewDecision?.decision === 'approve' && (
-                  <Button
-                    color='success'
-                    sx={{ mr: 2, fontWeight: 'bold' }}
-                    onClick={() => makeSubmissionDecision(reviewDecision.submissionId, 'approve')}
-                  >
-                    Approve submission
-                  </Button>
-                )
-              }
-
-          {
-                reviewDecision?.decision === 'reject' && (
-                  <Button
-                    color='error'
-                    sx={{ mr: 2, fontWeight: 'bold' }}
-                    onClick={() => makeSubmissionDecision(reviewDecision.submissionId, 'reject')}
-                  >
-                    Reject submission
-                  </Button>
-                )
-              }
-
-          <Button color='secondary' onClick={() => setReviewDecision(null)}>Cancel</Button>
-        </Box>
-      </Modal>
     </Box>
   );
 }
