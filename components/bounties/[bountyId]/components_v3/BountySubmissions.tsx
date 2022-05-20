@@ -16,7 +16,7 @@ import { Modal } from 'components/common/Modal';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { ReviewDecision } from 'lib/applications/interfaces';
-import { applicantIsSubmitter, moveUserApplicationToFirstRow } from 'lib/applications/shared';
+import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { getDisplayName } from 'lib/users';
 import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -25,6 +25,7 @@ import { BrandColor } from 'theme/colors';
 import Tooltip from '@mui/material/Tooltip';
 import { useBounties } from 'hooks/useBounties';
 import SubmissionEditorForm from './SubmissionEditorForm';
+import { BountyStatusColours } from '../../components/BountyStatusBadge';
 
 interface Props {
   bounty: Bounty
@@ -92,10 +93,22 @@ export default function BountySubmissions ({ bounty }: Props) {
 
   const userSubmission = sortedSubmissions.find(sub => sub.createdBy === user?.id);
 
+  // Calculate valid submissions for the UI
+  const validSubmissions = countValidSubmissions(submissions ?? []);
+
+  // Only applies if there is a submissions cap
+  const validSubmissionsRatio = bounty.maxSubmissions ? validSubmissions / bounty.maxSubmissions as number : null;
+
+  // Bounty open color if no cap or below cap, submission review color if cap is reached
+  const chipColor = (!bounty.maxSubmissions || validSubmissions < bounty.maxSubmissions) ? BountyStatusColours.open : SubmissionStatusColors.review;
+
   console.log(sortedSubmissions);
 
   return (
     <Box>
+      <Typography variant='h5'>
+        Submissions
+      </Typography>
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
         <TableHead sx={{
           background: theme.palette.background.dark,
@@ -105,6 +118,9 @@ export default function BountySubmissions ({ bounty }: Props) {
         }}
         >
           <TableRow>
+            <TableCell size='small' align='left'>
+              Status
+            </TableCell>
             <TableCell>
               <Box sx={{
                 display: 'flex',
@@ -115,7 +131,16 @@ export default function BountySubmissions ({ bounty }: Props) {
                 Submitter
               </Box>
             </TableCell>
-            <TableCell>Submission</TableCell>
+            <TableCell>
+              Submissions
+              <Tooltip placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
+                <Chip
+                  color={chipColor}
+                  sx={{ ml: 1, minWidth: '50px' }}
+                  label={bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
+                />
+              </Tooltip>
+            </TableCell>
             {
               /* Hidden until we implement comments
 
@@ -123,7 +148,6 @@ export default function BountySubmissions ({ bounty }: Props) {
               */
             }
 
-            <TableCell>Status</TableCell>
             <TableCell></TableCell>
           </TableRow>
         </TableHead>
@@ -134,6 +158,14 @@ export default function BountySubmissions ({ bounty }: Props) {
                 key={submission.id}
                 sx={{ backgroundColor: submissionIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
               >
+                <TableCell size='small' align='left'>
+
+                  <Chip
+                    label={SubmissionStatusLabels[submission.status]}
+                    color={SubmissionStatusColors[submission.status]}
+                  />
+
+                </TableCell>
                 <TableCell size='small'>
                   {
                       submission.createdBy === user?.id ? 'You'
@@ -166,16 +198,7 @@ export default function BountySubmissions ({ bounty }: Props) {
 
                     )}
                 </TableCell>
-                <TableCell>
-                  <Typography>
-                    <Chip
-                      sx={{ ml: 2 }}
-                      label={SubmissionStatusLabels[submission.status]}
-                      color={SubmissionStatusColors[submission.status]}
-                    />
-                  </Typography>
 
-                </TableCell>
                 {
                   /*
                   Hidden until we implement comments
