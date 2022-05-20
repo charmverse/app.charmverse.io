@@ -10,6 +10,11 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import Link from 'next/link';
+import { useWeb3React } from '@web3-react/core';
+import { useUser } from 'hooks/useUser';
+import { getDisplayName } from 'lib/users';
+import useENSName from 'hooks/useENSName';
+import charmClient from 'charmClient';
 import { DescriptionModal, IdentityModal, SocialModal } from '.';
 
 const StyledBox = styled(Box)`
@@ -24,6 +29,9 @@ const StyledDivider = styled(Divider)`
 `;
 
 export default function UserDetails () {
+  const { account } = useWeb3React();
+  const [user, setUser] = useUser();
+  const ENSName = useENSName(account);
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState('CharmVerse');
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
@@ -36,13 +44,19 @@ export default function UserDetails () {
   const [isIdentityModalOpen, setIsIdentityModalOpen] = useState(false);
   const [isSocialMediaModalOpen, setIsSocialMediaModalOpen] = useState(false);
 
+  const userName = ENSName || (user ? getDisplayName(user) : '');
+
   const onDiscordUsernameCopy = () => {
     setIsDiscordUsernameCopied(true);
     setTimeout(() => setIsDiscordUsernameCopied(false), 1000);
   };
 
-  const handleImageUpdate = (url: string) => {
+  const handleImageUpdate = async (url: string) => {
+    const updatedUser = await charmClient.updateUser({
+      avatar: url
+    });
 
+    setUser(updatedUser);
   };
 
   return (
@@ -55,9 +69,9 @@ export default function UserDetails () {
       </Stack>
       <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
-          name={name}
+          name={userName}
           variant='rounded'
-          spaceImage={userImage}
+          spaceImage={user?.avatar}
           updateImage={handleImageUpdate}
           displayIcons={true}
         />

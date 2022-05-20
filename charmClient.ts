@@ -62,8 +62,12 @@ class CharmClient {
     });
   }
 
-  updateUser ({ addresses }: { addresses?: string[] }) {
-    return http.PUT<LoggedInUser>('/api/profile', { addresses });
+  // updateUser ({ addresses, avatar }: { addresses?: string[], avatar?: string }) {
+  //   return http.PUT<LoggedInUser>('/api/profile', { addresses, avatar });
+  // }
+
+  updateUser (data: Partial<User>) {
+    return http.PUT<LoggedInUser>('/api/profile', data);
   }
 
   async createSpace (spaceOpts: Prisma.SpaceCreateInput) {

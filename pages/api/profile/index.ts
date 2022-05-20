@@ -16,7 +16,9 @@ handler
   .post(createUser)
   .use(requireUser)
   .get(getUser)
-  .put(requireKeys(['addresses'], 'body'), updateUser);
+  .put(updateUser);
+// .put(requireKeys(['addresses'], 'body'), updateUser)
+// .put(requireKeys(['avatar'], 'body'), updateUserAvatar);
 
 async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
@@ -87,7 +89,35 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       telegramUser: true
     },
     data: {
-      addresses: req.body.addresses
+      ...req.body
+    }
+  });
+
+  return res.status(200).json(user);
+}
+
+async function updateUserAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
+
+  const user = await prisma.user.update({
+    where: {
+      id: req.session.user.id
+    },
+    include: {
+      favorites: true,
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          }
+        }
+      },
+      discordUser: true,
+      telegramUser: true
+    },
+    data: {
+      avatar: req.body.avatar
     }
   });
 
