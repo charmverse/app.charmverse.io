@@ -63,12 +63,12 @@ function SocialModal (props: SocialModalProps) {
       <DialogTitle onClose={close}>Social media links</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={3}>
-          <Grid item container direction='row' alignItems='center'>
-            <Grid item container direction='row' xs={3}>
+          <Grid item container direction={{ xs: 'column', md: 'row' }} alignItems='center'>
+            <Grid item container direction='row' xs={12} md={3}>
               <TwitterIcon style={{ color: '#00ACEE', height: '22px' }} />
               <Typography ml={1}>Twitter:</Typography>
             </Grid>
-            <Grid item xs={9}>
+            <Grid item xs={12} md={9}>
               <TextField
                 {...register('twitter')}
                 fullWidth
@@ -78,12 +78,12 @@ function SocialModal (props: SocialModalProps) {
               />
             </Grid>
           </Grid>
-          <Grid item container alignItems='center'>
-            <Grid item container direction='row' xs={3}>
+          <Grid item container direction={{ xs: 'column', md: 'row' }} alignItems='center'>
+            <Grid item container direction='row' xs={12} md={3}>
               <GitHubIcon style={{ color: '#000000', height: '22px' }} />
               <Typography ml={1}>GitHub:</Typography>
             </Grid>
-            <Grid item xs={9}>
+            <Grid item xs={12} md={9}>
               <TextField
                 {...register('github')}
                 fullWidth
@@ -93,14 +93,14 @@ function SocialModal (props: SocialModalProps) {
               />
             </Grid>
           </Grid>
-          <Grid item container alignItems='center'>
-            <Grid item container direction='row' xs={3}>
+          <Grid item container direction={{ xs: 'column', md: 'row' }} alignItems='center'>
+            <Grid item container direction='row' xs={12} md={3}>
               <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#000000', height: '22px' }}>
                 <DiscordIcon />
               </SvgIcon>
               <Typography ml={1}>Discord:</Typography>
             </Grid>
-            <Grid item xs={9}>
+            <Grid item xs={12} md={9}>
               <TextField
                 {...register('discord')}
                 fullWidth
@@ -110,12 +110,12 @@ function SocialModal (props: SocialModalProps) {
               />
             </Grid>
           </Grid>
-          <Grid item container alignItems='center'>
-            <Grid item container direction='row' xs={3}>
+          <Grid item container direction={{ xs: 'column', md: 'row' }} alignItems='center'>
+            <Grid item container direction='row' xs={12} md={3}>
               <LinkedInIcon style={{ color: '#0072B1', height: '22px' }} />
               <Typography ml={1}>LinkedIn:</Typography>
             </Grid>
-            <Grid item xs={9}>
+            <Grid item xs={12} md={9}>
               <TextField
                 {...register('linkedin')}
                 fullWidth

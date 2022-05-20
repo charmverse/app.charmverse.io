@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import { Box, Divider, Grid, Link as ExternalLink, Stack, SvgIcon, Typography, Tooltip } from '@mui/material';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import EditIcon from '@mui/icons-material/Edit';
@@ -54,7 +53,7 @@ export default function UserDetails () {
         </Link>
         <Typography component='span' fontSize='1.4em' fontWeight={700}>My Public Profile</Typography>
       </Stack>
-      <Stack direction='row' mt={5} spacing={3}>
+      <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
           name={name}
           variant='rounded'
@@ -111,7 +110,7 @@ export default function UserDetails () {
                 )
               }
               <StyledDivider orientation='vertical' flexItem />
-              <AddCircleOutlineIcon
+              <EditIcon
                 onClick={() => setIsSocialMediaModalOpen(true)}
               />
             </Stack>

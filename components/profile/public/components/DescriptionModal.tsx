@@ -46,7 +46,7 @@ function DescriptionModal (props: DescriptionModalProps) {
   }
 
   return (
-    <Modal open={isOpen} onClose={() => {}} size='large'>
+    <Modal open={isOpen} onClose={() => {}}>
       <DialogTitle onClose={close}>Describe yourself in a few words</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack mt={1}>
