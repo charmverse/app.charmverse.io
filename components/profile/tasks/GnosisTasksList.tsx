@@ -16,7 +16,6 @@ import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
 import SnoozeIcon from '@mui/icons-material/Snooze';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { DateTime } from 'luxon';
 import charmClient from 'charmClient';
 import Tooltip from '@mui/material/Tooltip';
