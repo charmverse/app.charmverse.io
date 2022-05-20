@@ -54,7 +54,7 @@ export default function IdentityProviders () {
   const [user, setUser] = useUser();
   const [isDisconnectingDiscord, setIsDisconnectingDiscord] = useState(false);
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
-  const [isLoggingOut, setisLoggingOut] = useState(false);
+  const [isLoggingOut] = useState(false);
   const [discordError, setDiscordError] = useState('');
   const [telegramError, setTelegramError] = useState('');
   const router = useRouter();

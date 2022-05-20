@@ -2,9 +2,6 @@ import { Paper, SvgIcon, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useWeb3React } from '@web3-react/core';
 import { useUser } from 'hooks/useUser';
-import MetamaskIcon from 'public/walletLogos/metamask.svg';
-import DiscordIcon from 'public/images/discord-logo-coloured.svg';
-import TelegramIcon from 'public/images/telegram_logo.svg';
 import Avatar from 'components/common/Avatar';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
@@ -31,52 +28,48 @@ export default function IntegrationCard () {
           display: 'flex',
           gap: 2,
           alignItems: 'center',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          justifyContent: 'space-between'
         }}
         onClick={() => {
           router.push('/profile/integrations');
         }}
       >
-        <Box
-          display='flex'
-          gap={1}
-          alignItems='center'
-        >
-          <Typography sx={{
-            fontSize: '2.5rem',
-            fontWeight: 'bold'
-          }}
+        <Box display='flex' gap={2} alignItems='center'>
+          <Box
+            display='flex'
+            gap={1}
+            alignItems='center'
           >
-            {totalIntegrations}
-          </Typography>
-          <Typography color='secondary'>Integrations</Typography>
-        </Box>
-        {metamaskConnected && (
-        <Tooltip title='Metamask' arrow placement='top'>
-          {/** The tooltip isn't shown without this span */}
-          <span style={{
-            display: 'flex'
-          }}
-          ><MetamaskIcon />
-          </span>
-        </Tooltip>
-        )}
-        {discordConnected
-            && (
-            <Tooltip title='Discord' arrow placement='top'>
-              <span style={{
-                display: 'flex'
-              }}
-              >
-                <DiscordIcon />
-              </span>
+            <Typography sx={{
+              fontSize: '2.5rem',
+              fontWeight: 'bold'
+            }}
+            >
+              {totalIntegrations}
+            </Typography>
+            <Typography color='secondary'>Integrations</Typography>
+          </Box>
+          <Box display='flex' gap={1.5} height='100%' alignItems='center'>
+            <Tooltip title={metamaskConnected ? 'Metamask connected' : 'Metamask not connected'} arrow placement='top'>
+              <img height={20} src={metamaskConnected ? '/walletLogos/metamask.png' : '/walletLogos/metamask-greyscale.png'} />
             </Tooltip>
-            )}
-        {telegramConnected && (
-          <SvgIcon sx={{ height: 35, width: 35 }}>
-            <TelegramIcon />
-          </SvgIcon>
-        )}
+            <Tooltip title={discordConnected ? 'Discord connected' : 'Discord not connected'} arrow placement='top'>
+              <img height={20} src={discordConnected ? '/images/discord-logo-colored.png' : '/images/discord-logo-greyscale.png'} />
+            </Tooltip>
+            <Tooltip title={telegramConnected ? 'Telegram connected' : 'Telegram not connected'} arrow placement='top'>
+              <img height={25} src={telegramConnected ? '/images/telegram-logo-colored.png' : '/images/telegram-logo-greyscale.png'} />
+            </Tooltip>
+          </Box>
+        </Box>
+
+        <ExpandCircleDownIcon
+          sx={{
+            transform: 'rotate(-90deg)'
+          }}
+          color='secondary'
+        />
+
       </Paper>
       <Paper
         elevation={1}
