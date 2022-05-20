@@ -26,8 +26,15 @@ export interface ApplicationWithBounty extends Application {
   bounty: Bounty
 }
 
+export type SubmissionContent = Pick<Application, 'submission' | 'submissionNodes'>
+
 export interface SubmissionCreationData {
   bountyId: string,
   userId: string,
-  submissionContent: Pick<Application, 'submissionNodes' | 'submission'>
+  submissionContent: SubmissionContent
+}
+
+export interface SubmissionUpdateData {
+  submissionId: string;
+  submissionContent: SubmissionContent
 }
