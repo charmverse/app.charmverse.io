@@ -51,6 +51,28 @@ describe('updateSubmission', () => {
 
   });
 
+  it('should auto-set the submission to review status if it is marked as in progress', async () => {
+    const bountyWithSubmission = await generateBountyWithSingleApplication({
+      userId: user.id,
+      spaceId: space.id,
+      bountyStatus: 'open',
+      applicationStatus: 'inProgress',
+      bountyCap: null
+    });
+
+    const submissionUpdate: SubmissionContent = {
+      submission: 'New content',
+      submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"New content"}]}]}'
+    };
+
+    const updated = await updateSubmission({
+      submissionId: bountyWithSubmission.applications[0].id,
+      submissionContent: submissionUpdate
+    });
+
+    expect(updated.status).toBe('review');
+  });
+
   it('should fail if the submission does not exist', async () => {
 
     try {

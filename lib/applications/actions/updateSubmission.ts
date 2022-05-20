@@ -28,8 +28,9 @@ export async function updateSubmission ({ submissionId, submissionContent }: Sub
       id: submissionId
     },
     data: {
+      status: existingSubmission.status === 'inProgress' ? 'review' : undefined,
       submission: submissionContent.submission,
-      submissionNodes: typeof submissionContent.submissionNodes === 'object' ? JSON.stringify(submissionContent.submissionNodes) : '',
+      submissionNodes: typeof submissionContent.submissionNodes === 'object' ? JSON.stringify(submissionContent.submissionNodes) : submissionContent.submissionNodes,
       walletAddress: submissionContent.walletAddress
     }
   });
