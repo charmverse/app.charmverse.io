@@ -174,29 +174,34 @@ export default function BountySubmissions ({ bounty }: Props) {
                 </TableCell>
                 <TableCell sx={{ maxWidth: '61vw' }}>
 
-                  {!submission.submission
-                    ? (
+                  {
+                    submission.status === 'inProgress' && submission.createdBy === user?.id && (
                       <Button type='submit' onClick={editSubmissionModal.open}>Submit work</Button>
-                    ) : (
+                    )
+                  }
 
-                      submission.createdBy === user?.id ? (
-                        <Typography
-                          variant='body2'
-                          onClick={editSubmissionModal.open}
-                          color={theme.palette.primary?.main}
-                        >
-                          {fancyTrim(submission.submission, 50)}
-                        </Typography>
-                      ) : (
-                        <Typography
-                          variant='body2'
-                         // TODO Popup an inline charm editor with comments
-                        >
-                          {fancyTrim(submission.submission, 50)}
-                        </Typography>
-                      )
+                  {
+                    submission.status === 'inProgress' && submission.createdBy !== user?.id && (
+                      <Typography
+                        variant='caption'
+                      >
+                        Awaiting submission
+                      </Typography>
+                    )
+                  }
 
-                    )}
+                  {
+                    submission.status === 'review' && submission.createdBy === user?.id && (
+                      <Typography
+                        variant='body2'
+                        onClick={editSubmissionModal.open}
+                        color={theme.palette.primary?.main}
+                      >
+                        {fancyTrim(submission.submission ?? '', 50)}
+                      </Typography>
+                    )
+                  }
+
                 </TableCell>
 
                 {
