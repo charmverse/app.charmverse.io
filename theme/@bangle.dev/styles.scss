@@ -463,9 +463,10 @@ details {
 .row-handle {
   cursor: pointer;
   left: 20px;
+  top: -1000px;
   position: absolute;
   background: green;
-  width: 10px;
+  width: 30px;
   height: 24px;
   margin-top: 4px;
   opacity: 0;
