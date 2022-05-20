@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import { Application } from '@prisma/client';
+import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
@@ -13,6 +13,8 @@ import { AnyArray } from 'immer/dist/internal';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import { SystemError } from 'lib/utilities/errors';
+import { useState } from 'react';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -27,10 +29,11 @@ type FormValues = yup.InferType<typeof schema>
 
 interface Props {
   submission?: Application,
+  bounty: Bounty,
   onSubmit: (submission: Application) => void
 }
 
-export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
+export default function BountySubmissionForm ({ submission, onSubmit, bountyId }: Props) {
   const [user] = useUser();
 
   const {
@@ -49,9 +52,12 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
     resolver: yupResolver(schema)
   });
 
+  const [formError, setFormError] = useState<SystemError | null>(null);
+
   //  const defaultWalletAddress = submission.walletAddress ?? ;
 
   async function submitted (values: FormValues) {
+    setFormError(null);
     if (submission) {
       // Update
       const updatedSubmission = await charmClient.updateApplication(submission.id, values);
@@ -59,7 +65,19 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
     }
     else {
       // create
-      onSubmit({} as any);
+      charmClient.createSubmission({
+        bountyId,
+        submissionContent: {
+          submission: values.submission,
+          submissionNodes: values.submissionNodes
+        }
+      })
+        .then(created => {
+          onSubmit(created);
+        })
+        .catch(err => {
+          setFormError(err);
+        });
     }
 
   }
@@ -95,16 +113,21 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
               {...register('walletAddress')}
               type='text'
               fullWidth
+              error={!!errors.walletAddress}
+              helperText={errors.walletAddress?.message}
             />
 
-            {
-              errors?.walletAddress && (
-              <Alert severity='error'>
-                {errors.walletAddress.message}
-              </Alert>
-              )
-            }
           </Grid>
+
+          {
+            formError && (
+              <Grid item>
+                <Alert severity={formError.severity}>
+                  {formError.message}
+                </Alert>
+              </Grid>
+            )
+          }
 
           <Grid item>
             <Button disabled={!isValid} type='submit'>Save</Button>

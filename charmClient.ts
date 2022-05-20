@@ -30,7 +30,7 @@ import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import { ReviewDecision } from 'lib/applications/interfaces';
+import { ReviewDecision, SubmissionCreationData } from 'lib/applications/interfaces';
 import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
 import { GetTasksResponse } from 'pages/api/tasks';
 
@@ -431,6 +431,11 @@ class CharmClient {
     const data = await http.GET<Application []>('/api/applications', { bountyId, submissionsOnly });
 
     return data;
+  }
+
+  async createSubmission (content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {
+
+    return http.POST<Application>('/api/submissions', content);
   }
 
   recordTransaction (details: Pick<Transaction, 'bountyId' | 'transactionId' | 'chainId'>) {

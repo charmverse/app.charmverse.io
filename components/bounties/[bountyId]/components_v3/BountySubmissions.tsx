@@ -268,7 +268,7 @@ export default function BountySubmissions ({ bounty }: Props) {
       )}
 
       <Modal title='Your submission' open={editSubmissionModal.isOpen} onClose={editSubmissionModal.close} size='large'>
-        <SubmissionEditorForm submission={userSubmission} onSubmit={submitterUpdatedSubmission} />
+        <SubmissionEditorForm submission={userSubmission} bounty={bounty} onSubmit={submitterUpdatedSubmission} />
       </Modal>
 
       <Modal title='Confirm your review' open={reviewDecision !== null} onClose={() => setReviewDecision(null)} size='large'>
