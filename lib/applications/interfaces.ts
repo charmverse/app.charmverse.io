@@ -25,3 +25,9 @@ export interface ReviewDecisionRequest extends ApplicationActionRequest {
 export interface ApplicationWithBounty extends Application {
   bounty: Bounty
 }
+
+export interface SubmissionCreationData {
+  bountyId: string,
+  userId: string,
+  submissionContent: Pick<Application, 'submissionNodes' | 'submission'>
+}
