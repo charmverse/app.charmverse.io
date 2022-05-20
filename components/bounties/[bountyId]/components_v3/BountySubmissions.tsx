@@ -133,13 +133,20 @@ export default function BountySubmissions ({ bounty }: Props) {
             </TableCell>
             <TableCell>
               Submissions
-              <Tooltip placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
-                <Chip
-                  color={chipColor}
-                  sx={{ ml: 1, minWidth: '50px' }}
-                  label={bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
-                />
-              </Tooltip>
+
+              {
+                // Only show submissions chip if there's a cap, or if there's at least 1
+                  (bounty.maxSubmissions || validSubmissions > 0) && (
+                    <Tooltip placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
+                      <Chip
+                        color={chipColor}
+                        sx={{ ml: 1, minWidth: '50px' }}
+                        label={bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
+                      />
+                    </Tooltip>
+                  )
+                }
+
             </TableCell>
             {
               /* Hidden until we implement comments
@@ -161,36 +168,35 @@ export default function BountySubmissions ({ bounty }: Props) {
             </TableCell>
           </TableRow>
         </TableHead>
-        {sortedSubmissions.length > 0 && (
-          <TableBody>
-            {sortedSubmissions.map((submission, submissionIndex) => (
-              <TableRow
-                key={submission.id}
-                sx={{ backgroundColor: submissionIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell size='small' align='left'>
+        <TableBody>
+          {sortedSubmissions.map((submission, submissionIndex) => (
+            <TableRow
+              key={submission.id}
+              sx={{ backgroundColor: submissionIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell size='small' align='left'>
 
-                  <Chip
-                    label={SubmissionStatusLabels[submission.status]}
-                    color={SubmissionStatusColors[submission.status]}
-                  />
+                <Chip
+                  label={SubmissionStatusLabels[submission.status]}
+                  color={SubmissionStatusColors[submission.status]}
+                />
 
-                </TableCell>
-                <TableCell size='small'>
-                  {
+              </TableCell>
+              <TableCell size='small'>
+                {
                       submission.createdBy === user?.id ? 'You'
                         : getDisplayName(contributors.find(c => c.id === submission.createdBy))
                     }
-                </TableCell>
-                <TableCell sx={{ maxWidth: '61vw' }}>
+              </TableCell>
+              <TableCell sx={{ maxWidth: '61vw' }}>
 
-                  {
+                {
                     submission.status === 'inProgress' && submission.createdBy === user?.id && (
                       <Button type='submit' onClick={editSubmissionModal.open}>Submit work</Button>
                     )
                   }
 
-                  {
+                {
                     submission.status === 'inProgress' && submission.createdBy !== user?.id && (
                       <Typography
                         variant='caption'
@@ -200,7 +206,7 @@ export default function BountySubmissions ({ bounty }: Props) {
                     )
                   }
 
-                  {
+                {
                     submission.status === 'review' && submission.createdBy === user?.id && (
                       <Typography
                         variant='body2'
@@ -212,9 +218,9 @@ export default function BountySubmissions ({ bounty }: Props) {
                     )
                   }
 
-                </TableCell>
+              </TableCell>
 
-                {
+              {
                   /*
                   Hidden until we implement comments
                 <TableCell align='right' sx={{ gap: 2 }}>
@@ -222,8 +228,8 @@ export default function BountySubmissions ({ bounty }: Props) {
                   */
                 }
 
-                <TableCell align='right' sx={{ gap: 2 }}>
-                  {
+              <TableCell align='right' sx={{ gap: 2 }}>
+                {
                     submission.status === 'review' && isReviewer && (
                       <Box>
                         <Tooltip placement='top' title='Approve this submission.'>
@@ -235,11 +241,10 @@ export default function BountySubmissions ({ bounty }: Props) {
                       </Box>
                     )
                   }
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
       </Table>
 
       {submissions?.length === 0 && (
@@ -252,7 +257,7 @@ export default function BountySubmissions ({ bounty }: Props) {
           }}
         >
           <Typography variant='h6'>
-            No submissions have been made yet
+            No submissions to show
           </Typography>
         </Box>
       )}
