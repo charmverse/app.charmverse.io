@@ -9,6 +9,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
 import { Application, Bounty, User } from '@prisma/client';
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
@@ -111,10 +112,24 @@ export function BountyApplicantList ({
   return (
     <>
       <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
-
-        <Typography variant='h5'>
-          Applicants
-        </Typography>
+        <Grid container sx={{ mb: 2 }}>
+          <Grid item xs={8}>
+            <Typography variant='h5'>
+              Applicants
+            </Typography>
+          </Grid>
+          <Grid container item xs={4} direction='row' justifyContent='flex-end'>
+            {
+                  !userHasApplied && (
+                  <Tooltip placement='top' title={newApplicationsSuspended ? `You cannot apply to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : ''}>
+                    <Box component='span'>
+                      <Button disabled={newApplicationsSuspended} onClick={bountyApplyModal.open}>Apply</Button>
+                    </Box>
+                  </Tooltip>
+                  )
+                }
+          </Grid>
+        </Grid>
 
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
           <TableHead sx={{
@@ -139,15 +154,6 @@ export function BountyApplicantList ({
               <TableCell>Message</TableCell>
               <TableCell>Date</TableCell>
               <TableCell align='right'>
-                {
-                  !userHasApplied && (
-                  <Tooltip placement='top' title={newApplicationsSuspended ? `You cannot apply to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : ''}>
-                    <Box component='span'>
-                      <Button disabled={newApplicationsSuspended} onClick={bountyApplyModal.open}>Apply now</Button>
-                    </Box>
-                  </Tooltip>
-                  )
-                }
 
               </TableCell>
             </TableRow>

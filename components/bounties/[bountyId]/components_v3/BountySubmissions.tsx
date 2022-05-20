@@ -9,6 +9,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Application, ApplicationStatus, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
@@ -106,9 +107,30 @@ export default function BountySubmissions ({ bounty }: Props) {
 
   return (
     <Box>
-      <Typography variant='h5'>
-        Submissions
-      </Typography>
+      <Grid container sx={{ mb: 2 }}>
+        <Grid item xs={8}>
+          <Typography variant='h5'>
+            Submissions
+          </Typography>
+        </Grid>
+        <Grid container item xs={4} direction='row' justifyContent='flex-end'>
+          {
+                  !bounty.approveSubmitters && !userSubmission && (
+                  <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
+                    <Box component='span'>
+                      <Button
+                        disabled={!!userSubmission}
+                        onClick={editSubmissionModal.open}
+                      >
+                        New
+                      </Button>
+                    </Box>
+                  </Tooltip>
+                  )
+                }
+        </Grid>
+      </Grid>
+
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
         <TableHead sx={{
           background: theme.palette.background.dark,
@@ -132,20 +154,6 @@ export default function BountySubmissions ({ bounty }: Props) {
               </Box>
             </TableCell>
             <TableCell>
-              Submissions
-
-              {
-                // Only show submissions chip if there's a cap, or if there's at least 1
-                  (bounty.maxSubmissions || validSubmissions > 0) && (
-                    <Tooltip placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
-                      <Chip
-                        color={chipColor}
-                        sx={{ ml: 1, minWidth: '50px' }}
-                        label={bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
-                      />
-                    </Tooltip>
-                  )
-                }
 
             </TableCell>
             {
@@ -157,19 +165,22 @@ export default function BountySubmissions ({ bounty }: Props) {
 
             <TableCell align='right'>
               {
-                  !bounty.approveSubmitters && !userSubmission && (
-                  <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
-                    <Box component='span'>
-                      <Button
-                        disabled={!!userSubmission}
-                        onClick={editSubmissionModal.open}
-                      >
-                        New submission
-                      </Button>
-                    </Box>
+              // Only show submissions chip if there's a cap, or if there's at least 1
+                (bounty.maxSubmissions || validSubmissions > 0) && (
+
+                <Box>
+                  Submissions
+                  <Tooltip placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
+                    <Chip
+                      color={chipColor}
+                      sx={{ ml: 1, minWidth: '50px' }}
+                      label={bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
+                    />
                   </Tooltip>
-                  )
-                }
+                </Box>
+                )
+              }
+
             </TableCell>
           </TableRow>
         </TableHead>
@@ -196,27 +207,21 @@ export default function BountySubmissions ({ bounty }: Props) {
               <TableCell sx={{ maxWidth: '61vw' }}>
 
                 {
-                    submission.status === 'inProgress' && submission.createdBy === user?.id && (
-                      <Button type='submit' onClick={editSubmissionModal.open}>Submit work</Button>
-                    )
-                  }
-
-                {
-                    submission.status === 'inProgress' && submission.createdBy !== user?.id && (
-                      <Typography
-                        variant='caption'
-                      >
-                        Awaiting submission
-                      </Typography>
-                    )
-                  }
-
-                {
                     submission.status === 'review' && submission.createdBy === user?.id && (
                       <Typography
                         variant='body2'
                         onClick={editSubmissionModal.open}
                         color={theme.palette.primary?.main}
+                      >
+                        {fancyTrim(submission.submission ?? '', 50)}
+                      </Typography>
+                    )
+                  }
+
+                {
+                    submission.status === 'review' && submission.createdBy !== user?.id && (
+                      <Typography
+                        variant='body2'
                       >
                         {fancyTrim(submission.submission ?? '', 50)}
                       </Typography>
@@ -234,6 +239,13 @@ export default function BountySubmissions ({ bounty }: Props) {
                 }
 
               <TableCell align='right' sx={{ gap: 2 }}>
+
+                {
+                    submission.status === 'inProgress' && submission.createdBy === user?.id && (
+                      <Button type='submit' onClick={editSubmissionModal.open}>Submit</Button>
+                    )
+                  }
+
                 {
                     submission.status === 'review' && isReviewer && (
                       <Box>
