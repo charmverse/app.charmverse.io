@@ -36,7 +36,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
     handleSubmit,
     formState: { errors, touchedFields, isValid, isValidating, isSubmitting }
   } = useForm<FormValues>({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: {
       message: proposal?.message
     },
