@@ -97,10 +97,10 @@ export default function BountySubmissions ({ bounty }: Props) {
   const validSubmissions = countValidSubmissions(submissions ?? []);
 
   // Only applies if there is a submissions cap
-  const validSubmissionsRatio = bounty.maxSubmissions ? validSubmissions / bounty.maxSubmissions as number : null;
+  const capReached = submissionsCapReached({ bounty, submissions: submissions ?? [] });
 
   // Bounty open color if no cap or below cap, submission review color if cap is reached
-  const chipColor = (!bounty.maxSubmissions || validSubmissions < bounty.maxSubmissions) ? BountyStatusColours.open : SubmissionStatusColors.review;
+  const chipColor = capReached ? SubmissionStatusColors.review : BountyStatusColours.open;
 
   console.log(sortedSubmissions);
 
@@ -148,7 +148,17 @@ export default function BountySubmissions ({ bounty }: Props) {
               */
             }
 
-            <TableCell></TableCell>
+            <TableCell>
+              {
+                  !bounty.approveSubmitters && !userSubmission && (
+                  <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
+                    <Box component='span'>
+                      <Button disabled={!!userSubmission} onClick={editSubmissionModal.open}>New submission</Button>
+                    </Box>
+                  </Tooltip>
+                  )
+                }
+            </TableCell>
           </TableRow>
         </TableHead>
         {sortedSubmissions.length > 0 && (
@@ -231,6 +241,21 @@ export default function BountySubmissions ({ bounty }: Props) {
           </TableBody>
         )}
       </Table>
+
+      {submissions?.length === 0 && (
+        <Box
+          my={3}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            opacity: 0.5
+          }}
+        >
+          <Typography variant='h6'>
+            No submissions have been made yet
+          </Typography>
+        </Box>
+      )}
 
       {
         userSubmission && (
