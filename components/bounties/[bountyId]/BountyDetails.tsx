@@ -226,7 +226,7 @@ export default function BountyDetails () {
 
   return (
     <ScrollableWindow>
-      <Box py={3} px='80px'>
+      <Box py={3} sx={{ px: { xs: '40px', sm: '80px' } }}>
 
         <Container top={20}>
 

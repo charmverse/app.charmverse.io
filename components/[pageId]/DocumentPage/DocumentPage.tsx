@@ -26,7 +26,7 @@ export const Container = styled(Box)<{ top: number }>`
 
   padding: 0 40px;
   @media (min-width: 975px) {
-    padding: 0 40px;
+    padding: 0 80px;
   }
 `;
 
