@@ -18,7 +18,8 @@ export interface ApplicationActionRequest {
 
 export type ReviewDecision = 'approve' | 'reject'
 
-export interface ReviewDecisionRequest extends ApplicationActionRequest {
+export interface SubmissionReview {
+  submissionId: string
   decision: ReviewDecision
 }
 
