@@ -12,7 +12,7 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
     throw new DataNotFoundError(`Application with id ${applicationOrApplicationId} was not found`);
   }
 
-  // Only admins can approve the application (for now)
+  // Check the requester has access to this space
   const { error, isAdmin } = await hasAccessToSpace({ userId, spaceId: application.bounty.spaceId, adminOnly: false });
 
   if (error) {
