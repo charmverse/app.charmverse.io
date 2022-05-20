@@ -31,6 +31,15 @@ export function moveUserApplicationToFirstRow (submissions: Application[], userI
 
 }
 
+export function countValidSubmissions (submissions: Application[]): number {
+  return submissions?.reduce((count, submission) => {
+    if (submission.status !== 'applied' && submission.status !== 'rejected') {
+      return count + 1;
+    }
+    return count;
+  }, 0) ?? 0;
+}
+
 /*
  * Whether a bounty can accept more submissions
  */
@@ -39,12 +48,7 @@ export function submissionsCapReached ({ bounty, submissions }: {bounty: Bounty,
     return false;
   }
 
-  const validSubmissions: number = submissions.reduce((count, submission) => {
-    if (submission.status !== 'applied' && submission.status !== 'rejected') {
-      return count + 1;
-    }
-    return count;
-  }, 0);
+  const validSubmissions = countValidSubmissions(submissions);
 
   return validSubmissions >= bounty.maxSubmissions;
 

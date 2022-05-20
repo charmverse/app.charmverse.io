@@ -1,7 +1,7 @@
 import { Application, ApplicationStatus, Bounty, Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { submissionsCapReached } from '../shared';
+import { countValidSubmissions, submissionsCapReached } from '../shared';
 
 let user: User;
 let space: Space;
@@ -48,7 +48,7 @@ beforeAll(async () => {
 
 describe('submissionsCapReached', () => {
 
-  it('should return true if the amount of submissions which are inProgress, review, complete or paid for a bounty is equal to or above its max submissions cap', async () => {
+  it('should return true if the amount of valid submissions which are inProgress, review, complete or paid for a bounty is equal to or above its max submissions cap', async () => {
 
     const bountiesWithRelevantApplicationStatuses = await Promise.all([
       generateBountyWithSingleApplication({
@@ -99,15 +99,48 @@ describe('submissionsCapReached', () => {
     expect(capReached).toBe(false);
   });
 
+});
+
+describe('countValidSubmissions', () => {
+
+  it('should only count submissions which are inProgress, review, complete or paid', async () => {
+
+    const bountiesWithRelevantApplicationStatuses = await Promise.all([
+      generateBountyWithSingleApplication({
+        bountyCap: 1,
+        applicationStatus: 'inProgress'
+      }),
+      generateBountyWithSingleApplication({
+        bountyCap: 1,
+        applicationStatus: 'review'
+      }),
+      generateBountyWithSingleApplication({
+        bountyCap: 1,
+        applicationStatus: 'complete'
+      }),
+      generateBountyWithSingleApplication({
+        bountyCap: 1,
+        applicationStatus: 'paid'
+      })
+    ]);
+
+    bountiesWithRelevantApplicationStatuses.forEach(bounty => {
+      const validSubmissions = countValidSubmissions(bounty.applications);
+
+      expect(validSubmissions).toBe(1);
+    });
+
+  });
+
   it("should ignore applications with 'rejected' status when calculating the cap", async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyCap: 1,
       applicationStatus: 'rejected'
     });
 
-    const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
+    const validSubmissions = countValidSubmissions(bounty.applications);
 
-    expect(capReached).toBe(false);
+    expect(validSubmissions).toBe(0);
   });
 
   it("should ignore applications with 'applied' status when calculating the cap", async () => {
@@ -116,9 +149,13 @@ describe('submissionsCapReached', () => {
       applicationStatus: 'applied'
     });
 
-    const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
+    const validSubmissions = countValidSubmissions(bounty.applications);
 
-    expect(capReached).toBe(false);
+    expect(validSubmissions).toBe(0);
   });
 
+  it('should return 0 if an undefined or null value is passed', async () => {
+    expect(countValidSubmissions(undefined as any)).toBe(0);
+    expect(countValidSubmissions(null as any)).toBe(0);
+  });
 });
