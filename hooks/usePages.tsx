@@ -16,7 +16,7 @@ import useIsAdmin from './useIsAdmin';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
 
-export type PagesMap = Record<string, Page | undefined>;
+type PagesMap = Record<string, Page | undefined>;
 
 type IContext = {
   currentPageId: string,
