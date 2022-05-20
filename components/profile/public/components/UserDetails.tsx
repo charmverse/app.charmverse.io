@@ -12,6 +12,7 @@ import DiscordIcon from 'public/images/discord_logo.svg';
 import Link from 'next/link';
 import { useWeb3React } from '@web3-react/core';
 import { useUser } from 'hooks/useUser';
+import { useUserDetails } from 'hooks';
 import { getDisplayName } from 'lib/users';
 import useENSName from 'hooks/useENSName';
 import charmClient from 'charmClient';
@@ -31,6 +32,7 @@ const StyledDivider = styled(Divider)`
 export default function UserDetails () {
   const { account } = useWeb3React();
   const [user, setUser] = useUser();
+  const [details, setDetails] = useUserDetails({});
   const ENSName = useENSName(account);
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState('CharmVerse');
@@ -75,7 +77,7 @@ export default function UserDetails () {
           updateImage={handleImageUpdate}
           displayIcons={true}
         />
-        <Grid container direction='column'>
+        <Grid container direction='column' spacing={0.5}>
           <Grid item>
             <Stack direction='row' spacing={1} alignItems='baseline'>
               <Typography variant='h1'>CharmVerse</Typography>
@@ -129,13 +131,15 @@ export default function UserDetails () {
               />
             </Stack>
           </Grid>
-          <Grid item container alignItems='center'>
+          <Grid item container alignItems='center' sx={{ width: 'fit-content' }}>
             <Grid item xs={11}>
               <span>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque laoreet suscipit nibh, vitae scelerisque dui iaculis nec. Donec consectetur dui quis lorem blandit, sit amet cursus quam commodo. Sed nulla orci, feugiat eu quam a, aliquet egestas nibh. Vivamus eget risus felis. Aenean molestie, est sit amet dignissim finibus, libero lacus blandit dolor.
+                {
+                    details?.description || 'Tell the world a bit more about yourself ...'
+                }
               </span>
             </Grid>
-            <Grid item xs={1} pr={1} flexItem justifyContent='end'>
+            <Grid item xs={1} pr={1} justifyContent='end'>
               <EditIcon
                 onClick={() => setIsDescriptionModalOpen(true)}
               />
@@ -152,8 +156,13 @@ export default function UserDetails () {
       <DescriptionModal
         isOpen={isDescriptionModalOpen}
         close={() => setIsDescriptionModalOpen(false)}
+        save={async (description: string) => {
+          const updatedDetails = await charmClient.updateUserDetails({ description });
+          setDetails(updatedDetails);
+          setIsDescriptionModalOpen(false);
+        }}
         defaultValues={{
-          description: ''
+          description: details?.description || ''
         }}
       />
       <SocialModal

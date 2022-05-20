@@ -67,11 +67,11 @@ class CharmClient {
   }
 
   getUserDetails () {
-    return http.GET<LoggedInUser>('/api/profile/details');
+    return http.GET<UserDetails>('/api/profile/details');
   }
 
   updateUserDetails (data: Partial<UserDetails>) {
-    return http.PUT<LoggedInUser>('/api/profile/details', data);
+    return http.PUT<UserDetails>('/api/profile/details', data);
   }
 
   async createSpace (spaceOpts: Prisma.SpaceCreateInput) {

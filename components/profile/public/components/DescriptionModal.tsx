@@ -14,19 +14,19 @@ const StyledButton = styled(Button)`
 
 export const schema = yup.object({
   description: yup.string().ensure().trim()
-    .nullable(true)
 });
 
 export type FormValues = yup.InferType<typeof schema>;
 
 type DescriptionModalProps = {
     defaultValues: { description: string },
+    save: (description: string) => void,
     close: () => void,
     isOpen: boolean,
 };
 
 function DescriptionModal (props: DescriptionModalProps) {
-  const { defaultValues, close, isOpen } = props;
+  const { defaultValues, close, isOpen, save } = props;
 
   const {
     register,
@@ -38,15 +38,11 @@ function DescriptionModal (props: DescriptionModalProps) {
   });
 
   function onSubmit (values: FormValues) {
-    try {
-    }
-    catch (err) {
-      log.error('Error updating description', err);
-    }
+    save(values.description);
   }
 
   return (
-    <Modal open={isOpen} onClose={() => {}}>
+    <Modal open={isOpen} onClose={() => {}} size='large'>
       <DialogTitle onClose={close}>Describe yourself in a few words</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack mt={1}>
@@ -60,10 +56,7 @@ function DescriptionModal (props: DescriptionModalProps) {
             minRows={10}
           />
           <Box justifyContent='end' mt={3} sx={{ display: 'flex' }}>
-            <StyledButton
-              onClick={() => {
-              }}
-            >
+            <StyledButton type='submit'>
               Save
             </StyledButton>
           </Box>

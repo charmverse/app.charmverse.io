@@ -11,21 +11,21 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .post(createUserDetails)
   .use(requireUser)
-  .get(getUserDetails);
+  .get(getUserDetails)
   .put(updateUserDetails);
 
-  export async function createUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | { error: any }>) {
+export async function createUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | { error: any }>) {
 
-    const { id } = req.body;
-  
-    let details: UserDetails = await prisma.userDetails.create({
-      data: {
-        id
-      }
-    });
+  const { id } = req.body;
 
-    res.status(200).json(details);
-  }
+  const details: UserDetails = await prisma.userDetails.create({
+    data: {
+      id
+    }
+  });
+
+  res.status(200).json(details);
+}
 
 async function getUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | { error: any }>) {
   const details = await prisma.userDetails.findUnique({
@@ -50,7 +50,7 @@ async function updateUserDetails (req: NextApiRequest, res: NextApiResponse<User
     },
     update: {
       ...req.body
-    },
+    }
   });
 
   return res.status(200).json(details);
