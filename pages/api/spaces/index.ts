@@ -58,7 +58,11 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   });
 
   logSpaceCreation(space);
-  return res.status(200).json(space);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { pages, ...spaceResponse } = space;
+
+  return res.status(200).json(spaceResponse);
 }
 
 export default withSessionRoute(handler);
