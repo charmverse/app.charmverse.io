@@ -1,4 +1,5 @@
 import { Application, Bounty, User } from '@prisma/client';
+import { BountyWithDetails } from 'models';
 
 export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 10;
 
@@ -52,4 +53,13 @@ export function submissionsCapReached ({ bounty, submissions }: {bounty: Bounty,
 
   return validSubmissions >= bounty.maxSubmissions;
 
+}
+
+export function bountyCanReceiveNewSubmissionsOrApplications ({ bounty, submissionsAndApplications }:
+  {bounty: Bounty, submissionsAndApplications: Application[]}): boolean {
+  if (bounty.status !== 'open') {
+    return false;
+  }
+
+  return !submissionsCapReached({ bounty, submissions: submissionsAndApplications });
 }

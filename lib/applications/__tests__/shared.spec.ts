@@ -1,7 +1,7 @@
-import { Application, ApplicationStatus, Bounty, Space, User } from '@prisma/client';
+import { Application, ApplicationStatus, Bounty, BountyStatus, Space, User } from '@prisma/client';
 import { prisma } from 'db';
-import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { countValidSubmissions, submissionsCapReached } from '../shared';
+import { generateBounty, generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { bountyCanReceiveNewSubmissionsOrApplications, countValidSubmissions, submissionsCapReached } from '../shared';
 
 let user: User;
 let space: Space;
@@ -147,5 +147,61 @@ describe('countValidSubmissions', () => {
   it('should return 0 if an undefined or null value is passed', async () => {
     expect(countValidSubmissions(undefined as any)).toBe(0);
     expect(countValidSubmissions(null as any)).toBe(0);
+  });
+});
+
+describe('bountyCanReceiveNewSubmissionsOrApplications', () => {
+
+  it('should return true if the bounty status is open and the submissions cap is not reached', async () => {
+    const bounty = await generateBounty({
+      approveSubmitters: false,
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      maxSubmissions: null
+    });
+
+    const canReceive = bountyCanReceiveNewSubmissionsOrApplications({
+      bounty,
+      submissionsAndApplications: []
+    });
+
+    expect(canReceive).toBe(true);
+  });
+
+  it('should return false if the bounty status is open but the submissions cap is reached', async () => {
+    const bountyWithApp = await generateBountyWithSingleApplication({
+      applicationStatus: 'inProgress',
+      bountyCap: 1,
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const canReceive = bountyCanReceiveNewSubmissionsOrApplications({
+      bounty: bountyWithApp,
+      submissionsAndApplications: bountyWithApp.applications
+    });
+
+    expect(canReceive).toBe(false);
+
+  });
+
+  it('should return false if the bounty status is not open', async () => {
+
+    const notOpenStatuses = (Object.keys(BountyStatus) as BountyStatus[]).filter(status => status !== 'open');
+
+    const bounties = await Promise.all(
+      notOpenStatuses.map(status => generateBounty({
+        createdBy: user.id,
+        spaceId: space.id,
+        status,
+        approveSubmitters: false
+      }))
+    );
+
+    for (const bounty of bounties) {
+      const canReceive = bountyCanReceiveNewSubmissionsOrApplications({ bounty, submissionsAndApplications: [] });
+      expect(canReceive).toBe(false);
+    }
   });
 });
