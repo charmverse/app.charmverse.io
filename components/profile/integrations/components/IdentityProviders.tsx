@@ -1,32 +1,23 @@
 
+import styled from '@emotion/styled';
+import { Alert, CircularProgress, Divider, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
-import { useRouter } from 'next/router';
-import { Alert, Divider, Stack, Typography, SvgIcon, CircularProgress, Tooltip } from '@mui/material';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import CopyableAddress from 'components/common/CopyableAddress';
-import Avatar from 'components/common/Avatar';
-import Box from '@mui/material/Box';
-import { injected, walletConnect, walletLink } from 'connectors';
-import { ReactNode, useContext, useState, useEffect } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+import { injected, walletConnect, walletLink } from 'connectors';
 import useENSName from 'hooks/useENSName';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import styled from '@emotion/styled';
-import charmClient from 'charmClient';
-import { getDisplayName } from 'lib/users';
 import log from 'lib/log';
+import { getDisplayName } from 'lib/users';
 import { LoggedInUser } from 'models';
+import { useRouter } from 'next/router';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import TelegramIcon from 'public/images/telegram_logo.svg';
+import { ReactNode, useContext, useEffect, useState } from 'react';
 import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
-
-const UserName = styled(Typography)`
-  position: relative;
-  top: 4px;
-`;
 
 const StyledButton = styled(Button)`
   width: 100px;
