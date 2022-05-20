@@ -15,10 +15,13 @@ import { useUser } from './useUser';
 import useIsAdmin from './useIsAdmin';
 
 export type LinkedPage = (Page & {children: LinkedPage[], parent: null | LinkedPage});
+
+export type PagesMap = Record<string, Page | undefined>;
+
 type IContext = {
   currentPageId: string,
-  pages: Record<string, Page | undefined>,
-  setPages: Dispatch<SetStateAction<Record<string, Page | undefined>>>,
+  pages: PagesMap,
+  setPages: Dispatch<SetStateAction<PagesMap>>,
   setCurrentPageId: Dispatch<SetStateAction<string>>,
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
@@ -44,7 +47,7 @@ export const PagesContext = createContext<Readonly<IContext>>({
 export function PagesProvider ({ children }: { children: ReactNode }) {
   const [isEditing, setIsEditing] = useState(false);
   const [space] = useCurrentSpace();
-  const [pages, setPages] = useState<Record<string, Page | undefined>>({});
+  const [pages, setPages] = useState<IContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const [user] = useUser();

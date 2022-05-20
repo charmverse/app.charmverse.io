@@ -110,7 +110,10 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
   const showCard = useCallback((cardId?: string) => {
     const newPath = generatePath(router.pathname, router.query);
 
-    const query: any = { cardId, viewId: router.query.viewId };
+    const query: any = { viewId: router.query.viewId };
+    if (cardId) {
+      query.cardId = cardId;
+    }
 
     if (readonly) {
       query.r = Utils.getReadToken();
