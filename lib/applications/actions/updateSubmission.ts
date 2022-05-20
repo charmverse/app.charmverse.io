@@ -6,7 +6,8 @@ import { SubmissionContent, SubmissionUpdateData } from '../interfaces';
 import { submissionIsEditable } from '../shared';
 
 export async function updateSubmission ({ submissionId, submissionContent }: SubmissionUpdateData): Promise<Application> {
-  const isEmpty = !submissionContent.submission || submissionContent.submission.length < 1 || !submissionContent.submissionNodes;
+  // Undefined is ok, but not null or string values
+  const isEmpty = Object.values(submissionContent).indexOf(null) > -1 || (submissionContent.submission?.length ?? 1) < 1 || (typeof submissionContent.submissionNodes === 'string' && (submissionContent.submissionNodes?.length ?? 1) < -1);
 
   if (isEmpty) {
     throw new MissingDataError('You cannot provide an empty submission');
@@ -28,7 +29,8 @@ export async function updateSubmission ({ submissionId, submissionContent }: Sub
     },
     data: {
       submission: submissionContent.submission,
-      submissionNodes: submissionContent.submissionNodes
+      submissionNodes: typeof submissionContent.submissionNodes === 'object' ? JSON.stringify(submissionContent.submissionNodes) : '',
+      walletAddress: submissionContent.walletAddress
     }
   });
 }

@@ -9,12 +9,11 @@ import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
-import { AnyArray } from 'immer/dist/internal';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
 import { SystemError } from 'lib/utilities/errors';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 const schema = yup.object({
   submission: yup.string().required(),
@@ -33,7 +32,7 @@ interface Props {
   onSubmit: (submission: Application) => void
 }
 
-export default function BountySubmissionForm ({ submission, onSubmit, bountyId }: Props) {
+export default function BountySubmissionForm ({ submission, onSubmit, bounty }: Props) {
   const [user] = useUser();
 
   const {
@@ -60,13 +59,19 @@ export default function BountySubmissionForm ({ submission, onSubmit, bountyId }
     setFormError(null);
     if (submission) {
       // Update
-      const updatedSubmission = await charmClient.updateApplication(submission.id, values);
-      onSubmit(updatedSubmission);
+      charmClient.updateSubmission({ submissionId: submission.id, content: values })
+        .then(updated => {
+          onSubmit(updated);
+        })
+        .catch(err => {
+          setFormError(err);
+        });
+
     }
     else {
       // create
       charmClient.createSubmission({
-        bountyId,
+        bountyId: bounty.id,
         submissionContent: {
           submission: values.submission,
           submissionNodes: values.submissionNodes

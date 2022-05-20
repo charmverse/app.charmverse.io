@@ -65,7 +65,7 @@ describe('updateSubmission', () => {
     }
   });
 
-  it('should fail if no submission content is provided', async () => {
+  it('should fail if empty submission content is provided', async () => {
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
