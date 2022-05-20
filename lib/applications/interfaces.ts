@@ -6,6 +6,11 @@ export interface ApplicationCreationData {
   message: string
 }
 
+export interface ApplicationUpdateData {
+  applicationId: string
+  message: string
+}
+
 export interface ApplicationActionRequest {
   userId: string,
   applicationOrApplicationId: string | Application
