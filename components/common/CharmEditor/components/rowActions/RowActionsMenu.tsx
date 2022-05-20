@@ -24,8 +24,6 @@ function Component ({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
 
-  console.log('menu state', menuState);
-
   function _getNode () {
     if (!menuState.rowPos || !menuState.rowDOM) {
       return null;
@@ -107,6 +105,6 @@ function Component ({ menuState }: { menuState: PluginState }) {
 export default function RowActionsMenu ({ pluginKey }: { pluginKey: PluginKey }) {
 
   const menuState: PluginState = usePluginState(pluginKey);
-  console.log('menuState.rowDOM', menuState.tooltipDOM);
+
   return reactDOM.createPortal(<Component menuState={menuState} />, menuState.tooltipDOM);
 }

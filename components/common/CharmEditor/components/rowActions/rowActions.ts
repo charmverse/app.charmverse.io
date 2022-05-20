@@ -1,7 +1,7 @@
-import React from 'react';
+
 import { createElement } from '@bangle.dev/core';
-import { EditorState, Plugin, PluginKey } from '@bangle.dev/pm';
-import log from 'lib/log';
+import { Plugin, PluginKey } from '@bangle.dev/pm';
+import throttle from 'lodash/throttle';
 
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
 
@@ -31,7 +31,6 @@ export function plugins ({ key }: { key: PluginKey }) {
         },
         apply: (tr, pluginState: PluginState) => {
           const newPluginState = tr.getMeta(key);
-          console.log('apply updates', newPluginState);
           if (newPluginState) {
             return { ...pluginState, ...newPluginState };
           }
@@ -45,7 +44,12 @@ export function plugins ({ key }: { key: PluginKey }) {
 
         function onMouseOver (e: MouseEventInit) {
 
-          const ob = view.posAtCoords({ left: e.clientX!, top: e.clientY! });
+          // @ts-ignore
+          const containerXOffset = e.target.getBoundingClientRect().left;
+          const clientX = e.clientX!;
+          const left = (clientX - containerXOffset) < 50 ? clientX + 50 : clientX;
+
+          const ob = view.posAtCoords({ left, top: e.clientY! });
 
           if (ob) {
             // Note '.inside' refers to the position of the parent node, it is -1 if the position is at the root
@@ -87,11 +91,13 @@ export function plugins ({ key }: { key: PluginKey }) {
           }
         }
 
-        view.dom.addEventListener('mouseover', onMouseOver);
+        const throttled = throttle(onMouseOver, 100);
+
+        view.dom.addEventListener('mousemove', throttled);
 
         return {
           destroy () {
-            view.dom.removeEventListener('mouseover', onMouseOver);
+            view.dom.removeEventListener('mousemove', throttled);
           }
         };
       }
