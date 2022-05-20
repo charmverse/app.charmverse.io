@@ -136,14 +136,14 @@ model User {
   comments     Comment[]
   threads      Thread[]
   gnosisSafes  UserGnosisSafe[]
-  profile      UserProfile?
+  profile      UserDetails?
 }
 
-model UserProfile {
+model UserDetails {
   id          String   @id @db.Uuid
   user        User     @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  description String
-  social      Json
+  description String?
+  social      Json?
 }
 
 model TelegramUser {

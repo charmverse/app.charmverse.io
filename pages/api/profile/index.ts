@@ -17,8 +17,6 @@ handler
   .use(requireUser)
   .get(getUser)
   .put(updateUser);
-// .put(requireKeys(['addresses'], 'body'), updateUser)
-// .put(requireKeys(['avatar'], 'body'), updateUserAvatar);
 
 async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
@@ -39,7 +37,6 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   await updateGuildRolesForUser(userData.addresses, spaceRoles);
   await req.session.save();
   res.status(200).json(user);
-
 }
 
 async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
@@ -90,34 +87,6 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     },
     data: {
       ...req.body
-    }
-  });
-
-  return res.status(200).json(user);
-}
-
-async function updateUserAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {error: string}>) {
-
-  const user = await prisma.user.update({
-    where: {
-      id: req.session.user.id
-    },
-    include: {
-      favorites: true,
-      spaceRoles: {
-        include: {
-          spaceRoleToRole: {
-            include: {
-              role: true
-            }
-          }
-        }
-      },
-      discordUser: true,
-      telegramUser: true
-    },
-    data: {
-      avatar: req.body.avatar
     }
   });
 
