@@ -108,8 +108,8 @@ export function generateBounty ({ spaceId, createdBy, status, maxSubmissions, ap
   });
 }
 
-export function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId }:
-  {applicationStatus: ApplicationStatus, bountyCap: number | null, userId: string, spaceId: string}):
+export function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus }:
+  {applicationStatus: ApplicationStatus, bountyCap: number | null, userId: string, spaceId: string, bountyStatus?: BountyStatus}):
   Promise<Bounty & {applications: Application[]}> {
   return prisma.bounty.create({
     data: {
@@ -118,7 +118,7 @@ export function generateBountyWithSingleApplication ({ applicationStatus, bounty
       rewardAmount: 1,
       rewardToken: 'ETH',
       title: 'Example',
-      status: 'open',
+      status: bountyStatus ?? 'open',
       spaceId,
       description: '',
       descriptionNodes: '',
