@@ -12,6 +12,18 @@ export function applicantIsSubmitter (application: Application): boolean {
   return application.status !== 'applied' && application.status !== 'rejected';
 }
 
+export function submissionIsEditable ({ submission, bounty }: {submission: Application, bounty: Bounty}) {
+  if (submission.status !== 'inProgress' && submission.status !== 'review') {
+    return false;
+  }
+
+  if (bounty.status !== 'open' && bounty.status !== 'inProgress') {
+    return false;
+  }
+
+  return true;
+}
+
 export function moveUserApplicationToFirstRow (submissions: Application[], userId: string): Application[] {
 
   const copiedSubmissions = submissions.slice();

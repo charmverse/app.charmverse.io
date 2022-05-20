@@ -1,7 +1,7 @@
 import { Application, ApplicationStatus, Bounty, BountyStatus, Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { generateBounty, generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { bountyCanReceiveNewSubmissionsOrApplications, countValidSubmissions, submissionsCapReached } from '../shared';
+import { bountyCanReceiveNewSubmissionsOrApplications, countValidSubmissions, submissionIsEditable, submissionsCapReached } from '../shared';
 
 let user: User;
 let space: Space;
@@ -203,5 +203,80 @@ describe('bountyCanReceiveNewSubmissionsOrApplications', () => {
       const canReceive = bountyCanReceiveNewSubmissionsOrApplications({ bounty, submissionsAndApplications: [] });
       expect(canReceive).toBe(false);
     }
+  });
+});
+
+describe('submissionIsEditable', () => {
+  it('should return true  if submission status is "inProgress" or "review" AND bounty is "open" or "inProgress"', async () => {
+
+    const validStatusCombinations: {bountyStatus: BountyStatus, submissionStatus: ApplicationStatus}[] = [
+      {
+        bountyStatus: 'inProgress',
+        submissionStatus: 'inProgress'
+      },
+      {
+        bountyStatus: 'inProgress',
+        submissionStatus: 'review'
+      },
+      {
+        bountyStatus: 'open',
+        submissionStatus: 'inProgress'
+      },
+      {
+        bountyStatus: 'open',
+        submissionStatus: 'review'
+      }
+    ];
+
+    const bountiesWithSubmissions = await Promise.all(validStatusCombinations.map(combo => {
+      return generateBountyWithSingleApplication({
+        applicationStatus: combo.submissionStatus,
+        bountyCap: 2,
+        spaceId: space.id,
+        userId: user.id,
+        bountyStatus: combo.bountyStatus
+      });
+    }));
+
+    bountiesWithSubmissions.forEach(bountyWithSubmission => {
+      const isUpdateable = submissionIsEditable({
+        bounty: bountyWithSubmission,
+        submission: bountyWithSubmission.applications[0]
+      });
+      expect(isUpdateable).toBe(true);
+    });
+
+  });
+
+  it('should return false if submission status is not "inProgress" or "review"', async () => {
+    const bountyWithSubmission = await generateBountyWithSingleApplication({
+      applicationStatus: 'applied',
+      bountyCap: 2,
+      spaceId: space.id,
+      userId: user.id,
+      bountyStatus: 'inProgress'
+    });
+
+    const isUpdateable = submissionIsEditable({
+      bounty: bountyWithSubmission,
+      submission: bountyWithSubmission.applications[0]
+    });
+    expect(isUpdateable).toBe(false);
+  });
+
+  it('should return false bounty is not "open" or "inProgress"', async () => {
+    const bountyWithSubmission = await generateBountyWithSingleApplication({
+      applicationStatus: 'inProgress',
+      bountyCap: 2,
+      spaceId: space.id,
+      userId: user.id,
+      bountyStatus: 'complete'
+    });
+
+    const isUpdateable = submissionIsEditable({
+      bounty: bountyWithSubmission,
+      submission: bountyWithSubmission.applications[0]
+    });
+    expect(isUpdateable).toBe(false);
   });
 });
