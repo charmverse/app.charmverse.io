@@ -19,3 +19,13 @@ export class StringTooShortError extends SystemError {
     });
   }
 }
+
+export class MissingDataError extends SystemError {
+  constructor (message = 'Missing required data') {
+    super({
+      errorType: 'Invalid input',
+      message,
+      severity: 'warning'
+    });
+  }
+}
