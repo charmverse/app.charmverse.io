@@ -174,7 +174,7 @@ export function BountyApplicantList ({
                         {application.message}
                       </Typography>
                     ) : (
-                      <Typography>
+                      <Typography variant='body2'>
                         {application.message}
                       </Typography>
                     )
