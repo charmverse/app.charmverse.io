@@ -112,6 +112,10 @@ export function BountyApplicantList ({
     <>
       <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
 
+        <Typography variant='h5'>
+          Applicants
+        </Typography>
+
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
           <TableHead sx={{
             background: theme.palette.background.dark,
