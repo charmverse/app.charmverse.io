@@ -1,44 +1,10 @@
 import { Application, ApplicationStatus, Bounty, Space, User } from '@prisma/client';
 import { prisma } from 'db';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { countValidSubmissions, submissionsCapReached } from '../shared';
 
 let user: User;
 let space: Space;
-
-function generateBountyWithSingleApplication ({ applicationStatus, bountyCap }:
-  {applicationStatus: ApplicationStatus, bountyCap: number | null}): Promise<Bounty & {applications: Application[]}> {
-  return prisma.bounty.create({
-    data: {
-      createdBy: user.id,
-      chainId: 1,
-      rewardAmount: 1,
-      rewardToken: 'ETH',
-      title: 'Example',
-      spaceId: space.id,
-      description: '',
-      descriptionNodes: '',
-      approveSubmitters: false,
-      // Important variable
-      maxSubmissions: bountyCap,
-      applications: {
-        create: {
-          applicant: {
-            connect: {
-              id: user.id
-            }
-          },
-          message: 'I can do this!',
-          // Other important variable
-          status: applicationStatus
-        }
-      }
-    },
-    include: {
-      applications: true
-    }
-  });
-}
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(undefined, true);
@@ -53,19 +19,27 @@ describe('submissionsCapReached', () => {
     const bountiesWithRelevantApplicationStatuses = await Promise.all([
       generateBountyWithSingleApplication({
         bountyCap: 1,
-        applicationStatus: 'inProgress'
+        applicationStatus: 'inProgress',
+        spaceId: space.id,
+        userId: user.id
       }),
       generateBountyWithSingleApplication({
         bountyCap: 1,
-        applicationStatus: 'review'
+        applicationStatus: 'review',
+        spaceId: space.id,
+        userId: user.id
       }),
       generateBountyWithSingleApplication({
         bountyCap: 1,
-        applicationStatus: 'complete'
+        applicationStatus: 'complete',
+        spaceId: space.id,
+        userId: user.id
       }),
       generateBountyWithSingleApplication({
         bountyCap: 1,
-        applicationStatus: 'paid'
+        applicationStatus: 'paid',
+        spaceId: space.id,
+        userId: user.id
       })
     ]);
 
@@ -80,7 +54,9 @@ describe('submissionsCapReached', () => {
   it('should return false if the maxSubmissions cap for a bounty is null', async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyCap: null,
-      applicationStatus: 'review'
+      applicationStatus: 'review',
+      spaceId: space.id,
+      userId: user.id
     });
 
     const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
@@ -91,7 +67,9 @@ describe('submissionsCapReached', () => {
   it('should return false if the amount of applications for a bounty is below its max submissions cap', async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyCap: 2,
-      applicationStatus: 'review'
+      applicationStatus: 'review',
+      spaceId: space.id,
+      userId: user.id
     });
 
     const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
@@ -108,19 +86,27 @@ describe('countValidSubmissions', () => {
     const bountiesWithRelevantApplicationStatuses = await Promise.all([
       generateBountyWithSingleApplication({
         bountyCap: 1,
-        applicationStatus: 'inProgress'
+        applicationStatus: 'inProgress',
+        spaceId: space.id,
+        userId: user.id
       }),
       generateBountyWithSingleApplication({
         bountyCap: 1,
-        applicationStatus: 'review'
+        applicationStatus: 'review',
+        spaceId: space.id,
+        userId: user.id
       }),
       generateBountyWithSingleApplication({
         bountyCap: 1,
-        applicationStatus: 'complete'
+        applicationStatus: 'complete',
+        spaceId: space.id,
+        userId: user.id
       }),
       generateBountyWithSingleApplication({
         bountyCap: 1,
-        applicationStatus: 'paid'
+        applicationStatus: 'paid',
+        spaceId: space.id,
+        userId: user.id
       })
     ]);
 
@@ -135,7 +121,9 @@ describe('countValidSubmissions', () => {
   it("should ignore applications with 'rejected' status when calculating the cap", async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyCap: 1,
-      applicationStatus: 'rejected'
+      applicationStatus: 'rejected',
+      spaceId: space.id,
+      userId: user.id
     });
 
     const validSubmissions = countValidSubmissions(bounty.applications);
@@ -146,7 +134,9 @@ describe('countValidSubmissions', () => {
   it("should ignore applications with 'applied' status when calculating the cap", async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyCap: 1,
-      applicationStatus: 'applied'
+      applicationStatus: 'applied',
+      spaceId: space.id,
+      userId: user.id
     });
 
     const validSubmissions = countValidSubmissions(bounty.applications);

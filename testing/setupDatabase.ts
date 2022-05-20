@@ -1,4 +1,4 @@
-import { Block, Page, Prisma, Space, SpaceApiToken } from '@prisma/client';
+import { Application, ApplicationStatus, Block, Bounty, Page, Prisma, Space, SpaceApiToken } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -58,6 +58,41 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
     space,
     apiToken
   };
+}
+
+export function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId }:
+  {applicationStatus: ApplicationStatus, bountyCap: number | null, userId: string, spaceId: string}):
+  Promise<Bounty & {applications: Application[]}> {
+  return prisma.bounty.create({
+    data: {
+      createdBy: userId,
+      chainId: 1,
+      rewardAmount: 1,
+      rewardToken: 'ETH',
+      title: 'Example',
+      spaceId,
+      description: '',
+      descriptionNodes: '',
+      approveSubmitters: false,
+      // Important variable
+      maxSubmissions: bountyCap,
+      applications: {
+        create: {
+          applicant: {
+            connect: {
+              id: userId
+            }
+          },
+          message: 'I can do this!',
+          // Other important variable
+          status: applicationStatus
+        }
+      }
+    },
+    include: {
+      applications: true
+    }
+  });
 }
 
 export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {
