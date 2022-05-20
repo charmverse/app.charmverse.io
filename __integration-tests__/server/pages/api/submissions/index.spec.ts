@@ -52,7 +52,7 @@ describe('POST /api/submissions - create a submission', () => {
 
   });
 
-  it('should return the created submission and respond with 201', async () => {
+  it('should fail if the user is not a member of the space and respond with 401', async () => {
 
     const { user: otherUser, space: otherSpace } = await generateUserAndSpaceWithApiToken();
 
