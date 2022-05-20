@@ -7,14 +7,14 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import { listSubmissions } from 'lib/applications/actions';
+import { listSubmissions, createApplication } from 'lib/applications/actions';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .get(getApplications)
   .use(requireKeys<Application>(['bountyId', 'message'], 'body'))
-  .post(createApplication);
+  .post(createApplicationController);
 
 async function getApplications (req: NextApiRequest, res: NextApiResponse<Application[]>) {
   const { bountyId, submissionsOnly } = req.query;
@@ -53,32 +53,43 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
   return res.status(200).json(applicationsOrSubmissions);
 }
 
-async function createApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
-  const data = req.body as Application;
-  const ApplicationToCreate = {
-    ...data,
-    applicant: { connect: { id: req.session.user.id } },
-    bounty: { connect: { id: data.bountyId } }
-  } as Prisma.ApplicationCreateInput;
+async function createApplicationController (req: NextApiRequest, res: NextApiResponse<Application>) {
 
-  delete (ApplicationToCreate as any).bountyId;
+  const { bountyId, message } = req.body;
 
-  const existingProposal = await prisma.application.findFirst({
+  // Get the space ID so we can make sure requester has access
+  const bountySpaceId = await prisma.bounty.findUnique({
     where: {
-      bountyId: data.bountyId,
-      createdBy: data.createdBy
+      id: bountyId
+    },
+    select: {
+      spaceId: true
     }
   });
 
-  if (existingProposal) {
-    throw new ApiError({
-      message: 'This user has already applied to this bounty',
-      errorType: 'Invalid input'
-    });
+  if (!bountySpaceId) {
+    throw new DataNotFoundError(`Bounty with id ${bountyId}`);
   }
 
-  const proposal = await prisma.application.create({ data: ApplicationToCreate });
-  return res.status(200).json(proposal);
+  const userId = req.session.user.id;
+
+  const { error } = await hasAccessToSpace({
+    spaceId: bountySpaceId.spaceId,
+    userId,
+    adminOnly: false
+  });
+
+  if (error) {
+    throw (error);
+  }
+
+  const createdApplication = await createApplication({
+    bountyId,
+    message,
+    userId: req.session.user.id
+  });
+
+  return res.status(201).json(createdApplication);
 }
 
 export default withSessionRoute(handler);
