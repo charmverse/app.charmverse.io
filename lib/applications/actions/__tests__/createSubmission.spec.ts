@@ -198,7 +198,6 @@ describe('createSubmission', () => {
       throw new ExpectedAnError();
     }
     catch (err) {
-      console.log(err);
       expect(err).toBeInstanceOf(MissingDataError);
     }
 
