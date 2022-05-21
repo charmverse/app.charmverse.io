@@ -3,9 +3,6 @@ import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
 import { Alert, Divider, Stack, Typography, SvgIcon, CircularProgress, Tooltip } from '@mui/material';
 import Button from 'components/common/Button';
-import CopyableAddress from 'components/common/CopyableAddress';
-import Avatar from 'components/common/Avatar';
-import Box from '@mui/material/Box';
 import { injected, walletConnect, walletLink } from 'connectors';
 import { ReactNode, useContext, useState, useEffect } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
@@ -22,11 +19,6 @@ import { TelegramAccount } from 'pages/api/telegram/connect';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import TelegramIcon from 'public/images/telegram_logo.svg';
 import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
-
-const UserName = styled(Typography)`
-  position: relative;
-  top: 4px;
-`;
 
 const StyledButton = styled(Button)`
   width: 100px;
@@ -56,14 +48,14 @@ function ProviderRow ({ children }: { children: ReactNode }) {
 }
 
 export default function IdentityProviders () {
-
+  const [space] = useCurrentSpace();
   const { account, connector } = useWeb3React();
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
   const [user, setUser] = useUser();
   const [isDisconnectingDiscord, setIsDisconnectingDiscord] = useState(false);
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
-  const [isLoggingOut, setisLoggingOut] = useState(false);
+  const [isLoggingOut] = useState(false);
   const [discordError, setDiscordError] = useState('');
   const [telegramError, setTelegramError] = useState('');
   const router = useRouter();
@@ -85,10 +77,11 @@ export default function IdentityProviders () {
   // It can either be fail or success
   useEffect(() => {
     // Connection with discord
-    if (isConnectingToDiscord && user) {
+    if (isConnectingToDiscord && user && space) {
       setIsConnectDiscordLoading(true);
       charmClient.connectDiscord({
-        code: router.query.code as string
+        code: router.query.code as string,
+        spaceId: space.id
       })
         .then(updatedUserFields => {
           setUser({ ...user, ...updatedUserFields });

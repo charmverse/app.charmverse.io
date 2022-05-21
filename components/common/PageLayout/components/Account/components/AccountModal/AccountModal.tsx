@@ -51,7 +51,6 @@ function AccountModal ({ isOpen, onClose }:
   const discordConnectFailed = space && router.query.discord === '2' && router.query.type === 'connect';
   const [isConnectDiscordLoading, setIsConnectDiscordLoading] = useState(false);
   const { showMessage } = useSnackbar();
-
   const connectedWithDiscord = Boolean(user?.discordUser);
   const connectedWithTelegram = Boolean(user?.telegramUser);
 
@@ -65,10 +64,11 @@ function AccountModal ({ isOpen, onClose }:
   // It can either be fail or success
   useEffect(() => {
     // Connection with discord
-    if (isConnectingToDiscord && user) {
+    if (isConnectingToDiscord && user && space) {
       setIsConnectDiscordLoading(true);
       charmClient.connectDiscord({
-        code: router.query.code as string
+        code: router.query.code as string,
+        spaceId: space.id
       })
         .then(updatedUserFields => {
           setUser({ ...user, ...updatedUserFields });

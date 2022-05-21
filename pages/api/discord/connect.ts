@@ -10,6 +10,8 @@ import log from 'lib/log';
 import { prisma } from 'db';
 import { getDiscordAccount, DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { DiscordServerRole } from 'lib/discord/interface';
+import { uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { v4 as uuid } from 'uuid';
 
 const handler = nc({
   onError,
@@ -29,7 +31,7 @@ export interface ConnectDiscordResponse {
 
 // TODO: Add nonce for oauth state
 async function connectDiscord (req: NextApiRequest, res: NextApiResponse<ConnectDiscordResponse | {error: string}>) {
-  const { code } = req.body as ConnectDiscordPayload;
+  const { code, spaceId } = req.body as ConnectDiscordPayload;
   if (!code) {
     res.status(400).json({
       error: 'Missing code to connect'
@@ -76,7 +78,12 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     return;
   }
 
-  const avatar = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
+  const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
+  let avatar: string | null = null;
+  if (avatarUrl) {
+    const { url } = await uploadToS3({ fileName: `user-content/${userId}/${uuid()}/${decodeURIComponent(new URL(avatarUrl).pathname.split('/').pop() || '')?.replace(/\s/g, '-') || uuid()}`, url: avatarUrl });
+    avatar = url;
+  }
 
   const updatedUser = await prisma.user.update({
     where: {
