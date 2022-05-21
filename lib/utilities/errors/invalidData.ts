@@ -29,3 +29,13 @@ export class MissingDataError extends SystemError {
     });
   }
 }
+
+export class WrongStateError extends SystemError {
+  constructor (message = 'The target entity is not in the correct state for this action to be performed.') {
+    super({
+      errorType: 'Invalid input',
+      message,
+      severity: 'warning'
+    });
+  }
+}
