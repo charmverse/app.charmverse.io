@@ -44,17 +44,20 @@ import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
+import RowActionsMenu, * as rowActions from './components/rowActions';
 import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import Paragraph from './components/Paragraph';
 import Mention, { MentionSuggest, mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import DevTools from './DevTools';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
 }
 
+const actionsPluginKey = new PluginKey('row-actions');
 const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
 const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
@@ -187,7 +190,10 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.TableFiltersMenu(),
     trailingNode.plugins(),
-    disclosure.plugins()
+    disclosure.plugins(),
+    rowActions.plugins({
+      key: actionsPluginKey
+    })
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -468,6 +474,7 @@ function CharmEditor (
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
+      <RowActionsMenu pluginKey={actionsPluginKey} />
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
       {children}
       {!disabledPageSpecificFeatures && (
@@ -490,6 +497,7 @@ function CharmEditor (
       </Grow>
       )}
       <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+      <DevTools />
     </StyledReactBangleEditor>
   );
 }
