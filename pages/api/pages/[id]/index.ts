@@ -8,16 +8,17 @@ import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { ModifyChildPagesResponse } from 'lib/pages';
+import { getPage } from 'lib/pages/server/getPage';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .use(requireKeys(['id'], 'query'))
-  .get(getPage)
+  .get(getPageRoute)
   .put(updatePage)
   .delete(deletePage);
 
-async function getPage (req: NextApiRequest, res: NextApiResponse<Page>) {
+async function getPageRoute (req: NextApiRequest, res: NextApiResponse<Page>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -30,18 +31,7 @@ async function getPage (req: NextApiRequest, res: NextApiResponse<Page>) {
     throw new ActionNotPermittedError('You do not have permission to view this page');
   }
 
-  const page = await prisma.page.findUnique({
-    where: {
-      id: pageId
-    },
-    include: {
-      permissions: {
-        include: {
-          sourcePermission: true
-        }
-      }
-    }
-  });
+  const page = await getPage(pageId);
 
   if (!page) {
     throw new NotFoundError();
