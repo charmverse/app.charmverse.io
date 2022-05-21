@@ -193,20 +193,22 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
   const triggerState = bindTrigger(popupState);
 
   return (
-    <Link passHref href={href}>
-      <PageAnchor onClick={stopPropagation}>
-        {labelIcon && (
-          <span onClick={preventDefault}>
-            <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
-          </span>
-        )}
-        <PageTitle hasContent={isempty}>
-          {isempty ? 'Untitled' : label}
-        </PageTitle>
-        {children}
-        {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} pageType={pageType} />}
-      </PageAnchor>
-    </Link>
+    <div id={`page-navigation-${pageId}`}>
+      <Link passHref href={href}>
+        <PageAnchor onClick={stopPropagation}>
+          {labelIcon && (
+            <span onClick={preventDefault}>
+              <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
+            </span>
+          )}
+          <PageTitle hasContent={isempty}>
+            {isempty ? 'Untitled' : label}
+          </PageTitle>
+          {children}
+          {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} pageType={pageType} />}
+        </PageAnchor>
+      </Link>
+    </div>
   );
 }
 

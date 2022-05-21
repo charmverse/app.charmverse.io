@@ -12,7 +12,7 @@ import { useUser } from 'hooks/useUser';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { isTruthy } from 'lib/utilities/types';
 import { Page, PageContent } from 'models';
-import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, memo } from 'react';
+import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, memo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
@@ -121,6 +121,18 @@ function PageNavigation ({
   const [space] = useCurrentSpace();
   const [user] = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
+
+  useEffect(() => {
+    const currentPageNode = document.getElementById(`page-navigation-${currentPageId}`);
+
+    if (currentPageNode) {
+      setTimeout(() => {
+        currentPageNode.scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    }
+  }, [currentPageId]);
 
   const pagesArray: MenuNode[] = Object.values(pages)
     .filter((page): page is Page => Boolean(isTruthy(page) && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))))
