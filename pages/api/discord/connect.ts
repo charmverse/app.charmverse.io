@@ -20,7 +20,6 @@ const handler = nc({
 
 export interface ConnectDiscordPayload {
   code: string
-  spaceId: string
 }
 
 export interface ConnectDiscordResponse {
@@ -31,7 +30,7 @@ export interface ConnectDiscordResponse {
 
 // TODO: Add nonce for oauth state
 async function connectDiscord (req: NextApiRequest, res: NextApiResponse<ConnectDiscordResponse | {error: string}>) {
-  const { code, spaceId } = req.body as ConnectDiscordPayload;
+  const { code } = req.body as ConnectDiscordPayload;
   if (!code) {
     res.status(400).json({
       error: 'Missing code to connect'

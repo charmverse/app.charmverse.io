@@ -8,7 +8,6 @@ import { ReactNode, useContext, useState, useEffect } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import useENSName from 'hooks/useENSName';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
 import charmClient from 'charmClient';
@@ -48,7 +47,6 @@ function ProviderRow ({ children }: { children: ReactNode }) {
 }
 
 export default function IdentityProviders () {
-  const [space] = useCurrentSpace();
   const { account, connector } = useWeb3React();
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
@@ -77,11 +75,10 @@ export default function IdentityProviders () {
   // It can either be fail or success
   useEffect(() => {
     // Connection with discord
-    if (isConnectingToDiscord && user && space) {
+    if (isConnectingToDiscord && user) {
       setIsConnectDiscordLoading(true);
       charmClient.connectDiscord({
-        code: router.query.code as string,
-        spaceId: space.id
+        code: router.query.code as string
       })
         .then(updatedUserFields => {
           setUser({ ...user, ...updatedUserFields });

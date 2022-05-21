@@ -64,11 +64,10 @@ function AccountModal ({ isOpen, onClose }:
   // It can either be fail or success
   useEffect(() => {
     // Connection with discord
-    if (isConnectingToDiscord && user && space) {
+    if (isConnectingToDiscord && user) {
       setIsConnectDiscordLoading(true);
       charmClient.connectDiscord({
-        code: router.query.code as string,
-        spaceId: space.id
+        code: router.query.code as string
       })
         .then(updatedUserFields => {
           setUser({ ...user, ...updatedUserFields });
