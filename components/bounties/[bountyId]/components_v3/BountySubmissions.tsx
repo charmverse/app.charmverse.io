@@ -1,33 +1,30 @@
 import { useTheme } from '@emotion/react';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import CancelIcon from '@mui/icons-material/Cancel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Application, ApplicationStatus, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
+import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
-import { ReviewDecision } from 'lib/applications/interfaces';
 import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { getDisplayName } from 'lib/users';
 import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import Tooltip from '@mui/material/Tooltip';
-import { useBounties } from 'hooks/useBounties';
-import SubmissionEditorForm from './SubmissionEditorForm';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
+import SubmissionEditorForm from './SubmissionEditorForm';
 
 interface Props {
   bounty: Bounty

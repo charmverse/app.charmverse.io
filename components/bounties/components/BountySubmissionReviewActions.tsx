@@ -31,6 +31,7 @@ import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { SystemError } from 'lib/utilities/errors';
 import { BountyStatusColours } from './BountyStatusBadge';
+import BountySubmissionContent from './BountySubmissionContent';
 
 interface Props {
   bounty: Bounty,
@@ -46,6 +47,8 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
 
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
   const [apiError, setApiError] = useState<SystemError | null>();
+
+  const submissionContentModal = usePopupState({ variant: 'popover', popupId: 'submission-content' });
 
   function makeSubmissionDecision (applicationId: string, decision: ReviewDecision) {
     setApiError(null);
@@ -72,7 +75,7 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
   return (
     <Box>
 
-      <PlagiarismIcon sx={{ mr: 3 }} />
+      <PlagiarismIcon sx={{ mr: 3 }} onClick={submissionContentModal.open} />
       {
       canReview && (
         <>
@@ -84,6 +87,13 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
           </Tooltip>
         </>
       )
+    }
+
+      {
+      /* Modal for viewing the content */
+        <Modal open={submissionContentModal.isOpen} onClose={submissionContentModal.close} size='large'>
+          <BountySubmissionContent bounty={bounty} submission={submission} />
+        </Modal>
     }
 
       {/* Modal which provides review confirmation */}
