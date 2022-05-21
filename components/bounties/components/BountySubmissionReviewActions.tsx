@@ -5,6 +5,7 @@ import PlagiarismIcon from '@mui/icons-material/Plagiarism';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 import Chip from '@mui/material/Chip';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -18,7 +19,7 @@ import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
-import { ReviewDecision } from 'lib/applications/interfaces';
+import { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { getDisplayName } from 'lib/users';
 import { fancyTrim } from 'lib/utilities/strings';
@@ -28,6 +29,7 @@ import { BrandColor } from 'theme/colors';
 import Tooltip from '@mui/material/Tooltip';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
+import { SystemError } from 'lib/utilities/errors';
 import { BountyStatusColours } from './BountyStatusBadge';
 
 interface Props {
@@ -42,14 +44,27 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
   const isAdmin = useIsAdmin();
   const { refreshBounty } = useBounties();
 
-  const [reviewDecision, setReviewDecision] = useState<{submissionId: string, decision: ReviewDecision} | null>(null);
+  const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
+  const [apiError, setApiError] = useState<SystemError | null>();
 
-  async function makeSubmissionDecision (applicationId: string, decision: ReviewDecision) {
-    const reviewedSubmission = await charmClient.reviewSubmission(applicationId, decision);
-    // Closes the modal
+  function makeSubmissionDecision (applicationId: string, decision: ReviewDecision) {
+    setApiError(null);
+    charmClient.reviewSubmission(applicationId, decision)
+      .then((reviewedSubmission) => {
+        // Closes the modal
+        setReviewDecision(null);
+        reviewComplete(reviewedSubmission);
+        refreshBounty(bounty.id);
+      })
+      .catch(err => {
+        setApiError(err);
+      });
+
+  }
+
+  function cancel () {
     setReviewDecision(null);
-    reviewComplete(reviewedSubmission);
-    refreshBounty(bounty.id);
+    setApiError(null);
   }
 
   const canReview = (user?.id === bounty.reviewer || isAdmin) && (submission.status === 'inProgress' || submission.status === 'review');
@@ -72,7 +87,7 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
     }
 
       {/* Modal which provides review confirmation */}
-      <Modal title='Confirm your review' open={reviewDecision !== null} onClose={() => setReviewDecision(null)} size='large'>
+      <Modal title='Confirm your review' open={reviewDecision !== null} onClose={cancel} size='large'>
 
         {
         reviewDecision?.decision === 'approve' ? (
@@ -94,6 +109,14 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
         <Typography>
           This decision is permanent.
         </Typography>
+
+        {
+          apiError && (
+            <Alert sx={{ mt: 2, mb: 2 }} severity={apiError.severity}>
+              {apiError.message}
+            </Alert>
+          )
+        }
 
         <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
 
@@ -121,7 +144,7 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
         )
       }
 
-          <Button color='secondary' onClick={() => setReviewDecision(null)}>Cancel</Button>
+          <Button color='secondary' onClick={cancel}>Cancel</Button>
         </Box>
       </Modal>
     </Box>

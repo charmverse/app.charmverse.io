@@ -405,13 +405,6 @@ class CharmClient {
     return http.POST<Application>(`/api/applications/${applicationId}/approve`);
   }
 
-  async reviewSubmission (applicationId: string, decision: ReviewDecision): Promise<Application> {
-
-    return http.POST<Application>(`/api/applications/${applicationId}/review`, {
-      decision
-    });
-  }
-
   async updateApplication (applicationId: string, update: Partial<Application>): Promise<Application> {
 
     const data = await http.PUT<Application>(`/api/applications/${applicationId}`, update);
@@ -441,6 +434,13 @@ class CharmClient {
   async updateSubmission ({ submissionId, content }: {submissionId: string, content: SubmissionContent}): Promise<Application> {
 
     return http.PUT<Application>(`/api/submissions/${submissionId}`, content);
+  }
+
+  async reviewSubmission (submissionId: string, decision: ReviewDecision): Promise<Application> {
+
+    return http.POST<Application>(`/api/submissions/${submissionId}/review`, {
+      decision
+    });
   }
 
   recordTransaction (details: Pick<Transaction, 'bountyId' | 'transactionId' | 'chainId'>) {

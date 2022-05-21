@@ -212,7 +212,8 @@ export default function BountySubmissions ({ bounty }: Props) {
                   }
 
                 {
-                    submission.status === 'review' && submission.createdBy !== user?.id && (
+                  // Either another user is seeing this, or the user who made the submission, and they can't edit it further
+                    ((submission.status !== 'review' && submission.createdBy === user?.id) || (submission.createdBy !== user?.id)) && (
                       <Typography
                         variant='body2'
                       >
@@ -261,7 +262,7 @@ export default function BountySubmissions ({ bounty }: Props) {
           }}
         >
           <Typography variant='h6'>
-            No submissions to show
+            No submissions
           </Typography>
         </Box>
       )}
