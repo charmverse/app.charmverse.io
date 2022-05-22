@@ -346,7 +346,8 @@ function CharmEditor (
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
-      readOnly
+      readOnly,
+      disabledPageSpecificFeatures
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components
@@ -390,7 +391,7 @@ function CharmEditor (
             return (
               <Paragraph
                 inlineCommentPluginKey={inlineCommentPluginKey}
-                calculateInlineComments={!showingCommentThreadsList}
+                calculateInlineComments={!showingCommentThreadsList && !disabledPageSpecificFeatures}
                 {...props}
               >{_children}
               </Paragraph>
@@ -496,7 +497,7 @@ function CharmEditor (
         </PageThreadListBox>
       </Grow>
       )}
-      <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+      {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
       <DevTools />
     </StyledReactBangleEditor>
   );
