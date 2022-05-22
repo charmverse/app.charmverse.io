@@ -125,11 +125,18 @@ function PageNavigation ({
   useEffect(() => {
     const currentPageNode = document.getElementById(`page-navigation-${currentPageId}`);
 
-    if (currentPageNode) {
+    if (currentPageNode && currentPageId) {
       setTimeout(() => {
-        currentPageNode.scrollIntoView({
-          behavior: 'smooth'
-        });
+        const rect = currentPageNode.getBoundingClientRect();
+        const isInViewport = rect.top >= 0
+            && rect.left >= 0
+            && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+            && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+        if (!isInViewport) {
+          currentPageNode.scrollIntoView({
+            behavior: 'smooth'
+          });
+        }
       });
     }
   }, [currentPageId]);
