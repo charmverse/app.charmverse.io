@@ -35,16 +35,13 @@ const TableRows = (props: Props): JSX.Element => {
     const {board, cards, activeView} = props
     const { pages, setPages } = usePages();
     const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string) => {
-        await charmClient.updatePage({
+        const updatedPage = await charmClient.updatePage({
             id: cardId,
             title
         })
         setPages((pages) => ({
             ...pages,
-            [cardId]: {
-                ...(pages[cardId] ?? {}),
-                title
-            } as Page
+            [cardId]: updatedPage
         }))
         if (saveType === 'onEnter') {
             const card = cards.find(card => card.id === cardId);
