@@ -35,30 +35,34 @@ import LayoutColumn from './components/columnLayout/Column';
 import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice, cryptoPriceSpec } from './components/CryptoPrice';
 import InlinePalette, { plugins as inlinePalettePlugins, spec as inlinePaletteSpecs } from './components/inlinePalette';
-import EmojiSuggest, { plugins as emojiPlugins, specs as emojiSpecs } from './components/emojiSuggest';
-import MentionSuggest, { Mention, mentionPlugins, mentionSpecs } from './components/Mention';
-import NestedPage, { nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
+import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
 import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
-import { suggestTooltipPlugins } from './components/@bangle.dev/tooltip/suggest-tooltip';
 import * as table from './components/table';
+import RowActionsMenu, * as rowActions from './components/rowActions';
 import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import Paragraph from './components/Paragraph';
+import Mention, { MentionSuggest, mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import DevTools from './DevTools';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
 }
 
-const emojiSuggestPluginKey = new PluginKey('emojiSuggest');
-const mentionSuggestPluginKey = new PluginKey('mentionSuggest');
+const actionsPluginKey = new PluginKey('row-actions');
+const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
+const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
+const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
+const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 
 export const specRegistry = new SpecRegistry([
   // Comments to the right of each spec show if it supports markdown export
@@ -79,17 +83,13 @@ export const specRegistry = new SpecRegistry([
   orderedList.spec(), // OK
   strike.spec(), // OK
   underline.spec(), // OK
-  emojiSpecs(), // OK
+  emoji.specs(), // OK
   mentionSpecs(), // NO
   code.spec(), // OK
   codeBlock.spec(), // OK
   iframeSpec(), // OK
   heading.spec(), // OK
   inlinePaletteSpecs(), // Not required
-  // table, // OK
-  // tableCell, // OK
-  // tableHeader, // OK
-  // tableRow, // OK
   callout.spec(), // OK
   cryptoPriceSpec(), // NO
   imageSpec(), // OK
@@ -100,12 +100,6 @@ export const specRegistry = new SpecRegistry([
   tabIndent.spec(),
   table.spec(), // OK - only for text content
   disclosure.spec()
-  // tables.tableNodes({
-  //   cellAttributes: { },
-  //   cellContent: 'My Cell',
-  //   cellContentGroup: 'My Group'
-  // })
-
 ]);
 
 export function charmEditorPlugins (
@@ -128,12 +122,9 @@ export function charmEditorPlugins (
         }
       })
     }),
-    suggestTooltipPlugins({
-      tooltipRenderOpts: {
-        placement: 'bottom'
-      }
+    nestedPagePlugins({
+      key: nestedPagePluginKey
     }),
-    nestedPagePlugins(),
     imagePlugins({
       handleDragAndDrop: false
     }),
@@ -153,11 +144,11 @@ export function charmEditorPlugins (
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),
-    emojiPlugins({
-      key: emojiSuggestPluginKey
+    emoji.plugins({
+      key: emojiPluginKey
     }),
     mentionPlugins({
-      key: mentionSuggestPluginKey
+      key: mentionPluginKey
     }),
     floatingMenuPlugin({
       key: floatingMenuPluginKey,
@@ -177,10 +168,6 @@ export function charmEditorPlugins (
       containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
     }),
     NodeView.createPlugin({
-      name: 'page',
-      containerDOM: ['div', { class: 'page-container' }]
-    }),
-    NodeView.createPlugin({
       name: 'quote',
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
@@ -189,10 +176,6 @@ export function charmEditorPlugins (
       name: 'paragraph',
       containerDOM: ['p', { class: 'charm-paragraph' }],
       contentDOM: ['span']
-    }),
-    NodeView.createPlugin({
-      name: 'mention',
-      containerDOM: ['span', { class: 'mention-value' }]
     }),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
@@ -205,22 +188,21 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.selectionShadowPlugin(),
     // @ts-ignore missing type
-    // table.typesEnforcer(),
-    // @ts-ignore missing type
-    // table.TableDateMenu('MM/DD/YYYY'),
-    // @ts-ignore missing type
-    // table.TableLabelMenu(),
-    // @ts-ignore missing type
     table.TableFiltersMenu(),
     trailingNode.plugins(),
-    disclosure.plugins()
+    disclosure.plugins(),
+    rowActions.plugins({
+      key: actionsPluginKey
+    })
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
   ];
 
   if (!disabledPageSpecificFeatures) {
-    basePlugins.push(inlineComment.plugin());
+    basePlugins.push(inlineComment.plugin({
+      key: inlineCommentPluginKey
+    }));
   }
 
   return () => basePlugins;
@@ -364,7 +346,8 @@ function CharmEditor (
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
-      readOnly
+      readOnly,
+      disabledPageSpecificFeatures
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components
@@ -403,10 +386,16 @@ function CharmEditor (
       )}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
-
         switch (props.node.type.name) {
           case 'paragraph': {
-            return <Paragraph calculateInlineComments={!showingCommentThreadsList} {...props}>{_children}</Paragraph>;
+            return (
+              <Paragraph
+                inlineCommentPluginKey={inlineCommentPluginKey}
+                calculateInlineComments={!showingCommentThreadsList && !disabledPageSpecificFeatures}
+                {...props}
+              >{_children}
+              </Paragraph>
+            );
           }
           case 'quote':
             return <Quote {...props}>{_children}</Quote>;
@@ -483,10 +472,11 @@ function CharmEditor (
       }}
     >
       <FloatingMenu disableComments={disabledPageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
-      <MentionSuggest pluginKey={mentionSuggestPluginKey} />
-      <NestedPagesList />
-      <EmojiSuggest pluginKey={emojiSuggestPluginKey} />
-      <InlinePalette disableNestedPage={disabledPageSpecificFeatures} />
+      <MentionSuggest pluginKey={mentionPluginKey} />
+      <NestedPagesList pluginKey={nestedPagePluginKey} />
+      <EmojiSuggest pluginKey={emojiPluginKey} />
+      <RowActionsMenu pluginKey={actionsPluginKey} />
+      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
       {children}
       {!disabledPageSpecificFeatures && (
       <Grow
@@ -507,7 +497,8 @@ function CharmEditor (
         </PageThreadListBox>
       </Grow>
       )}
-      <InlineCommentThread />
+      {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
+      <DevTools />
     </StyledReactBangleEditor>
   );
 }

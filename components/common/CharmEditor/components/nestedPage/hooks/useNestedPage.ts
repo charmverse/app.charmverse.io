@@ -41,7 +41,7 @@ export default function useNestedPage () {
       }
       return true;
     });
-  }, [currentPageId, addPage, view]);
+  }, [currentPageId, view]);
 
   return {
     addNestedPage

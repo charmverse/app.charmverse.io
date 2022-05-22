@@ -3,8 +3,8 @@ import { markdownSerializer } from '@bangle.dev/markdown';
 import { Node } from '@bangle.dev/pm';
 import { Page } from '@prisma/client';
 import { specRegistry } from 'components/common/CharmEditor/CharmEditor';
+import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage';
 import { PageContent } from 'models';
-import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage/nestedPage';
 
 export async function generateMarkdown (page: Page, withTitle: boolean = false): Promise<string> {
 
@@ -25,7 +25,7 @@ export async function generateMarkdown (page: Page, withTitle: boolean = false):
 
     let markdown = serializer.serialize(state.pmState.doc);
 
-    // Logic added here as the markdown serialiser is synchronous
+    // Logic added here as the markdown serializer is synchronous
     markdown = await replaceNestedPages(markdown);
 
     if (page.title && withTitle) {

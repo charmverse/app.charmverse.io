@@ -58,15 +58,22 @@ export function getTimeDifference (
   return timeDifference[`${timeUnit}s`];
 }
 
-function getDaySuffix (dateTime: DateInput): string {
+export function getDaySuffix (dateTime: DateInput): string {
   const parsed = convertToLuxonDate(dateTime);
 
-  let daySuffix = parsed.day.toString();
+  const daySuffix = parsed.day.toString();
+
+  // Special case for numbers from 10 to 19. 2 would be 22nd, but 12th. 3 would be 23rd but 13th
+  const isTens = daySuffix.length > 1 ? daySuffix[daySuffix.length - 2] === '1' : false;
+
+  if (isTens) {
+    return 'th';
+  }
 
   // Get last character
-  daySuffix = daySuffix.slice(daySuffix.length - 1);
+  const lastNumber = daySuffix[daySuffix.length - 1];
 
-  switch (daySuffix) {
+  switch (lastNumber) {
     case '1':
       return 'st';
 

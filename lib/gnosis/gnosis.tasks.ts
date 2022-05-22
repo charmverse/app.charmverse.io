@@ -3,14 +3,15 @@ import log from 'lib/log';
 import groupBy from 'lodash/groupBy';
 import intersection from 'lodash/intersection';
 import { prisma } from 'db';
-import { User, UserGnosisSafe } from '@prisma/client';
+import { User, UserGnosisSafe, UserGnosisSafeState } from '@prisma/client';
 import { getTransactionsforSafes, GnosisTransaction } from './gnosis';
 
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`;
 
+type UserWithGnosisSafeState = User & {gnosisSafeState: UserGnosisSafeState | null}
 interface ActionUser {
   address: string;
-  user?: User;
+  user?: UserWithGnosisSafeState;
 }
 
 interface SendAction {
@@ -33,6 +34,7 @@ export interface GnosisTransactionPopulated {
   safeAddress: string;
   safeName: string | null;
   threshold: number;
+  snoozedUsers: UserWithGnosisSafeState[]
 }
 
 export interface GnosisTask {
@@ -104,7 +106,7 @@ interface TransactionToTaskProps {
   myAddresses: string[];
   transaction: GnosisTransaction;
   safe: UserGnosisSafe;
-  users: User[];
+  users: UserWithGnosisSafeState[];
 }
 
 function transactionToTask ({ myAddresses, transaction, safe, users }: TransactionToTaskProps): GnosisTransactionPopulated {
@@ -128,6 +130,17 @@ function transactionToTask ({ myAddresses, transaction, safe, users }: Transacti
     return { address, user };
   }
 
+  const confirmations = transaction.confirmations?.map(confirmation => getRecipient(confirmation.owner)) ?? [];
+  const snoozedUsers: UserWithGnosisSafeState[] = [];
+  users.forEach(user => {
+    if (
+      user.gnosisSafeState
+      && user.gnosisSafeState.transactionsSnoozedFor !== null
+      && !confirmations.find(confirmation => user.addresses.includes(confirmation.address))) {
+      snoozedUsers.push(user);
+    }
+  });
+
   return {
     id: transaction.safeTxHash,
     actions,
@@ -138,10 +151,11 @@ function transactionToTask ({ myAddresses, transaction, safe, users }: Transacti
     nonce: transaction.nonce,
     safeAddress: transaction.safe,
     safeName: safe.name,
-    confirmations: transaction.confirmations?.map(confirmation => getRecipient(confirmation.owner)) ?? [],
+    confirmations,
     threshold: safe.threshold,
     myAction: actionLabel,
-    myActionUrl: gnosisUrl
+    myActionUrl: gnosisUrl,
+    snoozedUsers
   };
 }
 
@@ -149,11 +163,10 @@ interface TransactionsToTaskProps {
   transactions: GnosisTransaction[];
   safes: UserGnosisSafe[];
   myUserId: string;
-  users: User[];
+  users: UserWithGnosisSafeState[];
 }
 
 function transactionsToTasks ({ transactions, safes, myUserId, users }: TransactionsToTaskProps): GnosisSafeTasks[] {
-
   const myAddresses = users.find(user => user.id === myUserId)?.addresses ?? [];
   const safesByAddress = safes.reduce<Record<string, UserGnosisSafe>>((acc, safe) => ({ ...acc, [safe.address]: safe }), {});
 
@@ -195,6 +208,9 @@ export async function getPendingGnosisTasks (myUserId: string) {
       addresses: {
         hasSome: userAddresses
       }
+    },
+    include: {
+      gnosisSafeState: true
     }
   });
 

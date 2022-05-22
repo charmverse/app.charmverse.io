@@ -18,6 +18,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import styled from '@emotion/styled';
+import { SxProps } from '@mui/system';
 
 type AddViewProps = {
   board: Board,
@@ -25,6 +26,7 @@ type AddViewProps = {
   views: BoardView[],
   intl: IntlShape,
   showView: (viewId: string) => void,
+  sx?: SxProps
 }
 
 const AddButton = styled(Button)`
@@ -186,7 +188,7 @@ function AddViewMenu (props: AddViewProps) {
         startIcon={<AddIcon />}
         color='secondary'
         size='small'
-        sx={{ px: 1.5 }}
+        sx={{ px: 1.5, ...(props.sx ?? {}) }}
         variant='text'
       >
         {addViewText}

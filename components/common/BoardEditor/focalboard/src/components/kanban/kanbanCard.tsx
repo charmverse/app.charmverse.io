@@ -5,7 +5,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import { usePages } from 'hooks/usePages'
 import { BountyStatusColours } from 'components/bounties/components/BountyStatusBadge'
 import { useBounties } from 'hooks/useBounties'
-import { BOUNTY_LABELS } from 'models'
+import { BOUNTY_LABELS, PageContent } from 'models'
 import { CryptoCurrency, CryptoLogoPaths } from 'models/Currency'
 import Image from 'next/image'
 import React, { useState } from 'react'
@@ -30,6 +30,7 @@ import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../confirmati
 import { sendFlashMessage } from '../flashMessages'
 import PropertyValueElement from '../propertyValueElement'
 import PageIcon from 'components/common/PageLayout/components/PageIcon'
+import { checkForEmpty } from 'components/common/CharmEditor/utils'
 
 
 type Props = {
@@ -166,7 +167,7 @@ const KanbanCard = React.memo((props: Props) => {
           <Box sx={{
             display: "flex",
           }}>
-            {cardPage?.icon ? <PageIcon isEditorEmpty={false} pageType="page" icon={cardPage.icon} /> : undefined}
+            {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType="page" icon={cardPage.icon} /> : undefined}
             <div
               key='__title'
               className='octo-titletext'

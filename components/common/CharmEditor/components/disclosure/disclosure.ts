@@ -1,6 +1,5 @@
 import { RawPlugins, RawSpecs, createElement } from '@bangle.dev/core';
 import { DOMOutputSpec, Plugin, PluginKey } from '@bangle.dev/pm';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
 
 export function spec () {
   return [

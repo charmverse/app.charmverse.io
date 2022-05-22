@@ -39,7 +39,7 @@ function specFactory({
   markColor,
 }: {
   markName: string;
-  trigger: string;
+  trigger?: string;
   markColor?: string;
 }): BaseRawMarkSpec {
   return {
@@ -76,7 +76,7 @@ interface PluginsOptions {
   key?: PluginKey;
   tooltipRenderOpts: SuggestTooltipRenderOpts;
   markName: string;
-  trigger: string;
+  trigger?: string;
   keybindings?: any;
   onEnter?: Command;
   onArrowDown?: Command;
@@ -85,11 +85,11 @@ interface PluginsOptions {
   onArrowLeft?: Command;
   onArrowRight?: Command;
 }
-interface PluginState {
+export interface SuggestTooltipPluginState {
   triggerText: string;
   show: boolean;
   counter: number;
-  trigger: string;
+  trigger?: string;
   markName: string;
 }
 
@@ -97,7 +97,9 @@ function pluginsFactory({
   key = new PluginKey('suggest_tooltip'),
   markName,
   trigger,
-  tooltipRenderOpts,
+  tooltipRenderOpts = {
+    placement: "bottom-start"
+  },
   keybindings = defaultKeys,
   onEnter = (state, dispatch, view) => {
     return removeSuggestMark(key)(state, dispatch, view);
@@ -113,7 +115,7 @@ function pluginsFactory({
   return ({ schema }: { schema: Schema }) => {
     const isActiveCheck = queryIsSuggestTooltipActive(key);
     return [
-      new Plugin<PluginState, Schema>({
+      new Plugin<SuggestTooltipPluginState, Schema>({
         key,
         state: {
           init(_, _state) {
@@ -171,6 +173,7 @@ function pluginsFactory({
         stateKey: key,
         renderOpts: {
           ...tooltipRenderOpts,
+          placement: "bottom-start",
           getReferenceElement: referenceElement(key, (state: EditorState) => {
             const markType = schema.marks[markName];
             const { selection } = state;
@@ -183,7 +186,7 @@ function pluginsFactory({
           }),
         },
       }),
-      triggerInputRule(schema, markName, trigger),
+      trigger && triggerInputRule(schema, markName, trigger),
       tooltipController({
         trigger,
         markName,
@@ -248,7 +251,7 @@ function tooltipController({
   markName,
 }: {
   key: PluginKey;
-  trigger: string;
+  trigger?: string;
   markName: string;
 }) {
   return new Plugin({
@@ -276,7 +279,7 @@ function tooltipController({
           // stayed.
           // Example `<mark>/hello</mark>` --(user deletes the /)-> `<mark>hello</mark>`
           // -> (clear) ->  hello
-          if (isMarkActive && !doesQueryHaveTrigger(state, markType, trigger)) {
+          if (isMarkActive && trigger && !doesQueryHaveTrigger(state, markType, trigger)) {
             removeSuggestMark(key)(state, view.dispatch, view);
             return;
           }
@@ -289,10 +292,7 @@ function tooltipController({
             return;
           }
 
-          renderSuggestionsTooltip(key, {
-            component: "nestedPage",
-            selection: state.selection
-          })(view.state, view.dispatch, view);
+          renderSuggestionsTooltip(key, {})(view.state, view.dispatch, view);
           return;
         },
       };
@@ -363,7 +363,7 @@ export function hideSuggestionsTooltip(key: PluginKey): Command {
   };
 }
 
-function getTriggerText(state: EditorState, markName: string, trigger: string) {
+function getTriggerText(state: EditorState, markName: string, trigger?: string) {
   const markType = state.schema.marks[markName];
 
   const { nodeBefore } = state.selection.$from;
@@ -381,12 +381,14 @@ function getTriggerText(state: EditorState, markName: string, trigger: string) {
   }
 
   const textContent = nodeBefore.textContent || '';
-  return (
-    textContent
-      // eslint-disable-next-line no-control-regex
-      .replace(/^([^\x00-\xFF]|[\s\n])+/g, '')
-      .replace(trigger, '')
-  );
+  const text = textContent
+  // eslint-disable-next-line no-control-regex
+  .replace(/^([^\x00-\xFF]|[\s\n])+/g, '')
+
+  if (trigger) {
+    return text.replace(trigger, '')
+  }
+  return text;
 }
 
 /** Commands */
@@ -407,6 +409,7 @@ export function queryIsSuggestTooltipActive(key: PluginKey) {
 export function replaceSuggestMarkWith(
   key: PluginKey,
   maybeNode?: string | Node | Fragment,
+  setSelection?: boolean
 ): Command {
   return (state, dispatch, view) => {
     const { markName } = key.getState(state);
@@ -436,7 +439,7 @@ export function replaceSuggestMarkWith(
 
       const isInputFragment = maybeNode instanceof Fragment;
 
-      let node;
+      let node: Node;
       try {
         node =
           maybeNode instanceof Node || isInputFragment
@@ -453,6 +456,9 @@ export function replaceSuggestMarkWith(
         tr = tr.replaceWith(start, start, node);
       } else if (node.isBlock) {
         tr = safeInsert(node)(tr);
+        if (setSelection) {
+          tr = tr.setSelection(Selection.near(tr.doc.resolve(start + 1)))
+        }
       } else if (node.isInline || isInputFragment) {
         const fragment = isInputFragment
           ? node
@@ -469,7 +475,7 @@ export function replaceSuggestMarkWith(
 
         // Placing cursor after node + space.
         tr = tr.setSelection(
-          Selection.near(tr.doc.resolve(start + fragment.size)),
+          Selection.near(tr.doc.resolve(start + (fragment as Fragment).size)),
         );
 
         return tr;
@@ -594,77 +600,4 @@ export function updateSuggestTooltipCounter(
     }
     return true;
   };
-}
-
-export interface SuggestTooltipPluginState {
-  show: boolean;
-  tooltipContentDOM: HTMLElement
-  component: null | "nestedPage" | "inlineComment"
-  threadIds: string[]
-}
-
-export interface SuggestTooltipPluginOptions {
-  tooltipRenderOpts: SuggestTooltipRenderOpts;
-}
-
-export const SuggestTooltipPluginKey = new PluginKey<SuggestTooltipPluginState, Schema>('suggest_tooltip');
-
-export function suggestTooltipPlugins ({ tooltipRenderOpts }: SuggestTooltipPluginOptions) {
-  const tooltipDOMSpec = createTooltipDOM(tooltipRenderOpts.tooltipDOMSpec);
-
-  return [
-    new Plugin<SuggestTooltipPluginState, Schema>({
-      key: SuggestTooltipPluginKey,
-      state: {
-        init () {
-          return {
-            show: false,
-            tooltipContentDOM: tooltipDOMSpec.contentDOM,
-            component: "nestedPage",
-            threadIds: [],
-          };
-        },
-        apply (tr, pluginState) {
-          const meta = tr.getMeta(SuggestTooltipPluginKey);
-          if (meta === undefined) {
-            return pluginState;
-          }
-          if (meta.type === 'RENDER_TOOLTIP') {
-            return {
-              ...pluginState,
-              ...meta.value,
-              show: true
-            };
-          }
-          if (meta.type === 'HIDE_TOOLTIP') {
-            // Do not change object reference if show was and is false
-            if (pluginState.show === false) {
-              return pluginState;
-            }
-            return {
-              ...pluginState,
-              component: null,
-              threadIds: [],
-              show: false,
-            };
-          }
-          throw new Error('Unknown type');
-        }
-      }
-    }),
-    tooltipPlacement.plugins({
-      stateKey: SuggestTooltipPluginKey,
-      renderOpts: {
-        ...tooltipRenderOpts,
-        tooltipDOMSpec,
-        getReferenceElement: referenceElement(SuggestTooltipPluginKey, (state) => {
-          const { selection } = state;
-          return {
-            end: selection.to,
-            start: selection.from
-          };
-        })
-      }
-    })
-  ];
 }
