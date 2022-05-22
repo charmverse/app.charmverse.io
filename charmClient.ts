@@ -121,6 +121,10 @@ class CharmClient {
     return http.POST<Page>('/api/pages', pageOpts);
   }
 
+  getPage (pageId: string) {
+    return http.GET<Page>(`/api/pages/${pageId}`);
+  }
+
   archivePage (pageId: string) {
     return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: true });
   }
