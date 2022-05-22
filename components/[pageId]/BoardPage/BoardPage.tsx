@@ -149,7 +149,7 @@ export default function BoardPage ({ page, setPage, readonly }: Props) {
           views={boardViews}
           showShared={clientConfig?.enablePublicSharedBoards || false}
         />
-        {typeof shownCardId === 'string' && shownCardId.length !== 0 && shownCardId !== 'undefined' && (
+        {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
           <RootPortal>
             <CardDialog
               board={board}
