@@ -141,8 +141,8 @@ const CalendarFullView = (props: Props): JSX.Element|null => {
                             board={board}
                             readOnly={true}
                             card={cards.find((o) => o.id === event.id) || cards[0]}
-                            updatedAt=''
-                            updatedBy=''
+                            updatedAt={page?.updatedAt.toString() ?? ''}
+                            updatedBy={page?.updatedBy ?? ''}
                             propertyTemplate={template}
                             showEmptyPlaceholder={false}
                         />
