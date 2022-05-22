@@ -151,7 +151,9 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
 
 async function updateBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>) {
   const blocks: Block[] = req.body;
-  const ops = blocks.map(block => {
+  const cardBlocks = blocks.filter(block => block.type === 'card');
+
+  const blockOps = blocks.map(block => {
     return prisma.block.update({
       where: { id: block.id },
       data: {
@@ -162,7 +164,17 @@ async function updateBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
       }
     });
   });
-  const updated = await prisma.$transaction(ops);
+
+  const pageBlocks = cardBlocks.map(cardBlock => prisma.page.update({
+    where: { id: cardBlock.id },
+    data: {
+      updatedAt: new Date(),
+      updatedBy: req.session.user.id
+    }
+  }));
+
+  const updated = await prisma.$transaction(blockOps);
+  await prisma.$transaction(pageBlocks);
   return res.status(200).json(updated);
 }
 

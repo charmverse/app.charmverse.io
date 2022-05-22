@@ -49,7 +49,8 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     },
     data: {
       ...req.body,
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      updatedBy: req.session.user.id
     },
     include: {
       permissions: true

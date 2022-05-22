@@ -51,6 +51,7 @@ export default function EditorPage (
   }
 
   const pagesLoaded = Object.keys(pages).length > 0;
+  const currentPage = pages[currentPageId];
 
   useEffect(() => {
     if (publicShare === true && pageId && shouldLoadPublicPage) {
@@ -68,16 +69,14 @@ export default function EditorPage (
     }
   }, [pageId, pagesLoaded]);
 
-  const debouncedPageUpdate = debouncePromise((updates: Prisma.PageUpdateInput) => {
+  const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
     setIsEditing(true);
+    const updatedPage = await charmClient.updatePage(updates);
     setPages((_pages) => ({
       ..._pages,
-      [currentPageId]: {
-        ..._pages[currentPageId]!,
-        ...updates as Partial<Page>
-      }
+      [currentPageId]: updatedPage
     }));
-    return charmClient.updatePage(updates);
+    return updatedPage;
   }, 500);
 
   const setPage = useCallback(async (updates: Partial<Page>) => {
@@ -94,13 +93,20 @@ export default function EditorPage (
       .finally(() => {
         setIsEditing(false);
       });
-  }, [currentPageId, publicShare]);
+  }, [currentPageId, publicShare, currentPage]);
 
   // memoize the page to avoid re-rendering unless certain fields are changed
-  const currentPage = pages[currentPageId];
   const memoizedCurrentPage = useMemo(
     () => pages[currentPageId],
-    [currentPageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt]
+    [
+      currentPageId,
+      currentPage?.headerImage,
+      currentPage?.icon,
+      currentPage?.title,
+      currentPage?.deletedAt,
+      currentPage?.updatedAt,
+      currentPage?.updatedBy
+    ]
   );
 
   useEffect(() => {
