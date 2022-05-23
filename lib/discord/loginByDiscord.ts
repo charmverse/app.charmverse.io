@@ -1,5 +1,7 @@
 import { prisma } from 'db';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { v4 as uuid } from 'uuid';
 
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
 
@@ -35,11 +37,18 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
   else {
 
     const { id, ...rest } = discordAccount;
+    const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
+    let avatar: string | null = null;
+    const userId = uuid();
+    if (avatarUrl) {
+      ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+    }
 
     const newUser = await prisma.user.create({
       data: {
+        id: userId,
         username: discordAccount.username,
-        avatar: discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined,
+        avatar,
         discordUser: {
           create: {
             account: rest as any,
