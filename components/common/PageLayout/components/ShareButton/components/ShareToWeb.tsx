@@ -93,7 +93,6 @@ export default function ShareToWeb () {
 
   async function updateShareLink () {
     const currentPage = pages[currentPageId];
-    console.log(currentPage);
     if (!publicPermission) {
       setShareLink(null);
     }

@@ -70,8 +70,8 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
             ? (<Box sx={{ height: 100 }}><Loader size={20} sx={{ height: 600 }} /></Box>)
             : (
               <>
-                <ShareToWeb pagePermissions={pagePermissions} />
-                <Divider />
+                <ShareToWeb />
+                <Divider sx={{ mt: 2, mb: 1 }} />
                 {currentPageId && <PagePermissions pageId={currentPageId} />}
               </>
             )
