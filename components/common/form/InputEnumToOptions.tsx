@@ -4,12 +4,11 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { useEffect, useState } from 'react';
 
-export interface Props extends SelectProps {
+export interface Props extends Omit<SelectProps, 'onChange'> {
   onChange?: (option: string) => void;
   defaultValue?: string;
   title?: string;
   keyAndLabel: Record<string | any, string | number>;
-  sx?: any;
 }
 
 export default function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, keyAndLabel, sx, ...props }: Props) {

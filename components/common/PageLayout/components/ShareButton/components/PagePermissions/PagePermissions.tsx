@@ -95,7 +95,6 @@ export default function PagePermissions ({ pageId }: Props) {
   const [space] = useCurrentSpace();
   const { getPagePermissions } = usePages();
   const [userPagePermissions, setUserPagePermissions] = useState<null | IPagePermissionFlags>(null);
-  const [selectedPermissionId, setSelectedPermissionId] = useState<string | null>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
   const [spaceLevelPermission, setSpaceLevelPermission] = useState<IPagePermissionWithAssignee | null>(null);
@@ -138,7 +137,6 @@ export default function PagePermissions ({ pageId }: Props) {
       });
     }
     await refreshPermissions();
-    setSelectedPermissionId(null);
   }
 
   async function updatePagePermissionLevel (permission: IPagePermissionWithAssignee, permissionLevel: PagePermissionLevelType | 'delete') {
@@ -156,7 +154,6 @@ export default function PagePermissions ({ pageId }: Props) {
       });
     }
     await refreshPermissions();
-    setSelectedPermissionId(null);
   }
 
   const sortedPermissions = sortPagePermissions(pagePermissions);
@@ -227,7 +224,7 @@ export default function PagePermissions ({ pageId }: Props) {
       {
         sortedPermissions.map(permission => {
           return (
-            <Box display='block' py={0.5} onMouseLeave={() => setSelectedPermissionId(null)}>
+            <Box display='block' py={0.5}>
               <Box display='flex' justifyContent='space-between' alignItems='center' key={permission.displayName}>
                 <Typography variant='body2'>
                   {permission.displayName}
