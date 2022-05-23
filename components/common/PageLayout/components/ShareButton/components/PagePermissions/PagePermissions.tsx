@@ -84,43 +84,23 @@ function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[], sp
 }
 
 interface Props {
-  pageId: string
+  pageId: string;
+  refreshPermissions: () => void;
+  pagePermissions: IPagePermissionWithAssignee[];
+  spaceLevelPermission: IPagePermissionWithAssignee | null;
+  userPagePermissions: IPagePermissionFlags | null;
 }
 
-export default function PagePermissions ({ pageId }: Props) {
+export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions, spaceLevelPermission, userPagePermissions }: Props) {
 
-  const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee []>([]);
   const theme = useTheme();
   const { pages } = usePages();
   const [space] = useCurrentSpace();
-  const { getPagePermissions } = usePages();
-  const [userPagePermissions, setUserPagePermissions] = useState<null | IPagePermissionFlags>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
-
-  const [spaceLevelPermission, setSpaceLevelPermission] = useState<IPagePermissionWithAssignee | null>(null);
-
-  // Only used on first run
-  const [permissionsLoaded, setPermissionsLoaded] = useState(false);
 
   useEffect(() => {
     refreshPermissions();
   }, [pageId]);
-
-  function refreshPermissions () {
-
-    const userPermissions = getPagePermissions(pageId);
-    setUserPagePermissions(userPermissions);
-
-    charmClient.listPagePermissions(pageId)
-      .then(permissionSet => {
-
-        const _spaceLevelPermission = permissionSet.find(permission => space && permission.spaceId === space?.id);
-
-        setSpaceLevelPermission(_spaceLevelPermission ?? null);
-        setPagePermissions(permissionSet);
-        setPermissionsLoaded(true);
-      });
-  }
 
   async function updateSpacePagePermissionLevel (permissionLevel: PagePermissionLevelType | 'delete') {
     if (permissionLevel === 'delete') {
@@ -162,8 +142,7 @@ export default function PagePermissions ({ pageId }: Props) {
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
   return (
-    <Box padding={1}>
-
+    <Box p={1}>
       {userPagePermissions?.grant_permissions === true && (
         <Box mb={1} onClick={() => popupState.open()}>
           <StyledInput
@@ -199,7 +178,7 @@ export default function PagePermissions ({ pageId }: Props) {
                 variant='caption'
                 sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}
               >
-                {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : (permissionsLoaded ? 'No access' : '')}
+                {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : 'No access'}
               </Typography>
             )
           }
@@ -274,7 +253,6 @@ export default function PagePermissions ({ pageId }: Props) {
           }}
         />
       </Modal>
-
     </Box>
   );
 }

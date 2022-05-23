@@ -6,31 +6,54 @@ import Divider from '@mui/material/Divider';
 import Loader from 'components/common/Loader';
 import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
-import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { useUser } from 'hooks/useUser';
 import PagePermissions from './components/PagePermissions';
 import ShareToWeb from './components/ShareToWeb';
 
 export default function ShareButton ({ headerHeight }: { headerHeight: number }) {
 
-  const { currentPageId } = usePages();
+  const { currentPageId, getPagePermissions } = usePages();
+  const [space] = useCurrentSpace();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [pagePermissions, setPagePermissions] = useState<null | IPagePermissionFlags>(null);
+  const [pagePermissions2, setPagePermissions2] = useState<IPagePermissionWithAssignee []>([]);
+  const [userPagePermissions, setUserPagePermissions] = useState<null | IPagePermissionFlags>(null);
+  const [spaceLevelPermission, setSpaceLevelPermission] = useState<IPagePermissionWithAssignee | null>(null);
   const [user] = useUser();
 
-  function retrievePermissions () {
+  async function retrievePermissions () {
     if (!user) {
       throw new Error('User is not defined');
     }
     setPagePermissions(null);
-    charmClient.computeUserPagePermissions({
-      pageId: currentPageId,
-      userId: user.id
-    }).then(permissions => {
-      setPagePermissions(permissions);
-    });
+    await Promise.all([
+      charmClient.computeUserPagePermissions({
+        pageId: currentPageId,
+        userId: user.id
+      }).then(permissions => {
+        setPagePermissions(permissions);
+      }),
+      refreshPermissions()
+    ]);
+  }
+
+  function refreshPermissions () {
+
+    const userPermissions = getPagePermissions(currentPageId);
+    setUserPagePermissions(userPermissions);
+
+    charmClient.listPagePermissions(currentPageId)
+      .then(permissionSet => {
+
+        const _spaceLevelPermission = permissionSet.find(permission => space && permission.spaceId === space?.id);
+
+        setSpaceLevelPermission(_spaceLevelPermission ?? null);
+        setPagePermissions2(permissionSet);
+      });
   }
 
   return (
@@ -66,13 +89,19 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
         }}
       >
         {
-          !pagePermissions
+          !(pagePermissions && spaceLevelPermission)
             ? (<Box sx={{ height: 100 }}><Loader size={20} sx={{ height: 600 }} /></Box>)
             : (
               <>
                 <ShareToWeb pagePermissions={pagePermissions} />
                 <Divider />
-                {currentPageId && <PagePermissions pageId={currentPageId} />}
+                <PagePermissions
+                  pageId={currentPageId}
+                  userPagePermissions={userPagePermissions}
+                  refreshPermissions={refreshPermissions}
+                  pagePermissions={pagePermissions2}
+                  spaceLevelPermission={spaceLevelPermission}
+                />
               </>
             )
         }
