@@ -156,7 +156,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       setCurrentPagePermissions(null);
     }
 
-  }, [currentPageId, user]);
+  }, [currentPageId, user, pages]);
 
   async function refreshPage (pageId: string): Promise<IPageWithPermissions> {
     const freshPageVersion = await charmClient.getPage(pageId);

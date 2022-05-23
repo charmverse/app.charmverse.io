@@ -23,11 +23,10 @@ export default function EditorPage (
   {shouldLoadPublicPage?: boolean, onPageLoad?: (pageId: string) => void, pageId: string, publicShare?: boolean, currentPageId?: string}
 ) {
   const dispatch = useAppDispatch();
-  const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
+  const { setIsEditing, pages, setPages, getPagePermissions, currentPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [user] = useUser();
-  const [pagePermissions, setPagePermissions] = useState<Partial<IPagePermissionFlags> | null>(null);
 
   async function loadPublicPage (publicPageId: string) {
     const { pages: publicPages, blocks } = await charmClient.getPublicPage(publicPageId);
@@ -53,6 +52,9 @@ export default function EditorPage (
   const pagesLoaded = Object.keys(pages).length > 0;
 
   useEffect(() => {
+
+    console.log('Loaded page');
+
     if (publicShare === true && pageId && shouldLoadPublicPage) {
       loadPublicPage(pageId as string);
     }
@@ -103,15 +105,6 @@ export default function EditorPage (
     [currentPageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt]
   );
 
-  useEffect(() => {
-    setPagePermissions(null);
-
-    if (user && memoizedCurrentPage) {
-      const permissions = getPagePermissions(memoizedCurrentPage.id);
-      setPagePermissions(permissions);
-    }
-  }, [user, currentPageId]);
-
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
@@ -124,23 +117,23 @@ export default function EditorPage (
     );
   }
   // Wait for permission load
-  else if (!memoizedCurrentPage || !pagePermissions) {
+  else if (!memoizedCurrentPage || !currentPagePermissions) {
     return null;
   }
   // Interpret page permission
-  else if (pagePermissions.read === false) {
+  else if (currentPagePermissions.read === false) {
     return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
   }
-  else if (pagePermissions.read === true) {
+  else if (currentPagePermissions.read === true) {
     if (currentPage?.type === 'board') {
-      return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={pagePermissions.edit_content !== true} />;
+      return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={currentPagePermissions.edit_content !== true} />;
     }
     else {
       return (
         <DocumentPage
           page={memoizedCurrentPage}
           setPage={setPage}
-          readOnly={pagePermissions.edit_content !== true}
+          readOnly={currentPagePermissions.edit_content !== true}
         />
       );
     }

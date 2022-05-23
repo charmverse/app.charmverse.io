@@ -44,7 +44,7 @@ export default function ShareToWeb () {
 
   const router = useRouter();
   // What user can do
-  const { pages, setPages, currentPageId, getPagePermissions, currentPagePermissions } = usePages();
+  const { pages, setPages, currentPageId, getPagePermissions, refreshPage, currentPagePermissions } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
   const [space] = useCurrentSpace();
 
@@ -65,14 +65,12 @@ export default function ShareToWeb () {
       setPublicPermission(null);
     }
 
-  }, [currentPageId]);
-
-  console.log('PAGE PERMS', currentPagePermissions);
+  }, [currentPageId, pages]);
 
   async function togglePublic () {
     if (publicPermission) {
       await charmClient.deletePermission(publicPermission.id);
-      setPublicPermission(null);
+      refreshPage(currentPageId);
     }
     else {
       const newPermission = await charmClient.createPermission({
@@ -80,12 +78,11 @@ export default function ShareToWeb () {
         permissionLevel: 'view',
         public: true
       });
-      setPublicPermission(newPermission);
+      refreshPage(currentPageId);
     }
   }
 
   useEffect(() => {
-    console.log('update share link');
     updateShareLink();
   }, [publicPermission, router.query.viewId]);
 
@@ -164,7 +161,7 @@ export default function ShareToWeb () {
 
 publicPermission?.sourcePermission && (
   <Box display='block'>
-    <Typography variant='caption'>
+    <Typography variant='caption' sx={{ ml: 1 }}>
       Inherited from
       <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[publicPermission?.sourcePermission.pageId]?.path}`}>
         {pages[publicPermission?.sourcePermission.pageId]?.title || 'Untitled'}
