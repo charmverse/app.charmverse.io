@@ -10,6 +10,7 @@ import log from 'lib/log';
 import { prisma } from 'db';
 import { getDiscordAccount, DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { DiscordServerRole } from 'lib/discord/interface';
+import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
 
 const handler = nc({
   onError,
@@ -18,7 +19,6 @@ const handler = nc({
 
 export interface ConnectDiscordPayload {
   code: string
-  spaceId: string
 }
 
 export interface ConnectDiscordResponse {
@@ -76,7 +76,11 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     return;
   }
 
-  const avatar = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
+  const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
+  let avatar: string | null = null;
+  if (avatarUrl) {
+    ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+  }
 
   const updatedUser = await prisma.user.update({
     where: {

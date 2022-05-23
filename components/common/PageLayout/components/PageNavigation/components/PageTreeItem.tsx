@@ -241,7 +241,7 @@ function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId:
 
 const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent?: boolean }>(
   ({ isAdjacent, ...props }, ref) => (
-    <div style={{ position: 'relative' }}>
+    <div id={`page-navigation-${props.nodeId}`} style={{ position: 'relative' }}>
       <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
       {isAdjacent && <AdjacentDropZone />}
     </div>
