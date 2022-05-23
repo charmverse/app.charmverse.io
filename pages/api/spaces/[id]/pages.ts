@@ -5,67 +5,24 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
+import {} from 'lib/permissions/pages';
+import { getAccessiblePages } from 'lib/pages/server';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getPages);
+handler
+  .get(getPages);
 
 async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const pages = await prisma.page.findMany({
-    where: {
-      OR: [
-        {
-          spaceId,
-          permissions: {
-            some: {
-              OR: [
-                {
-                  role: {
-                    spaceRolesToRole: {
-                      some: {
-                        spaceRole: {
-                          userId
-                        }
-                      }
-                    }
-                  }
-                },
-                {
-                  userId
-                },
-                {
-                  spaceId
-                }
-              ]
-            }
-          }
-        },
-        {
-          space: {
-            id: spaceId,
-            spaceRoles: {
-              some: {
-                userId,
-                isAdmin: true
-              }
-            }
-          }
-        }
-      ]
-    },
-    include: {
-      permissions: {
-        include: {
-          sourcePermission: true
-        }
-      }
-    }
+  const accessiblePages = await getAccessiblePages({
+    spaceId,
+    userId
   });
 
-  return res.status(200).json(pages);
+  return res.status(200).json(accessiblePages);
 }
 
 export default withSessionRoute(handler);

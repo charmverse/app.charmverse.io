@@ -26,6 +26,7 @@ type IContext = {
   isEditing: boolean
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   getPagePermissions: (pageId: string) => IPagePermissionFlags,
+  currentPagePermissions: IPagePermissionFlags | null
   deletePage: (pageId: string) => Promise<void>,
   restorePage: (pageId: string, route?: boolean) => Promise<void>,
 };
@@ -40,6 +41,7 @@ export const PagesContext = createContext<Readonly<IContext>>({
   isEditing: true,
   setIsEditing: () => { },
   getPagePermissions: () => new AllowedPagePermissions(),
+  currentPagePermissions: null,
   deletePage: () => undefined as any,
   restorePage: () => undefined as any
 });
@@ -128,7 +130,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       // User gets permission via role or as an individual
       const shouldApplyPermission = (permission.userId && permission.userId === user?.id)
         || (permission.roleId && applicableRoles.some(role => role.id === permission.roleId))
-        || (userSpaceRole && permission.spaceId === userSpaceRole.spaceId);
+        || (userSpaceRole && permission.spaceId === userSpaceRole.spaceId) || permission.public === true;
 
       if (shouldApplyPermission) {
 
@@ -141,6 +143,19 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return computedPermissions;
   }
 
+  const [currentPagePermissions, setCurrentPagePermissions] = useState<IPagePermissionFlags | null>(null);
+
+  useEffect(() => {
+    if (currentPageId) {
+      const computed = getPagePermissions(currentPageId);
+      setCurrentPagePermissions(computed);
+    }
+    else {
+      setCurrentPagePermissions(null);
+    }
+
+  }, [currentPageId]);
+
   const value: IContext = useMemo(() => ({
     currentPageId,
     isEditing,
@@ -149,6 +164,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     setCurrentPageId,
     setPages,
     getPagePermissions,
+    currentPagePermissions,
     deletePage,
     restorePage
   }), [currentPageId, isEditing, router, pages, user]);

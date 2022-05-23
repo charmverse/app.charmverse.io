@@ -30,6 +30,17 @@ function pageWithSpaceRoleQuery (request: IPagePermissionUserRequest): Prisma.Pa
  * Get all permissions applicable to a user for a specific page
  */
 function permissionsQuery (request: IPagePermissionUserRequest): Prisma.PagePermissionFindManyArgs {
+
+  // Allows anonymous queries for only public permissions
+  if (!request.userId) {
+    return {
+      where: {
+        pageId: request.pageId,
+        public: true
+      }
+    };
+  }
+
   return {
     where: {
       OR: [
