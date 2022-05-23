@@ -193,22 +193,20 @@ export function PageLink ({ showPicker = true, children, href, label, labelIcon,
   const triggerState = bindTrigger(popupState);
 
   return (
-    <div id={`page-navigation-${pageId}`}>
-      <Link passHref href={href}>
-        <PageAnchor onClick={stopPropagation}>
-          {labelIcon && (
-            <span onClick={preventDefault}>
-              <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
-            </span>
-          )}
-          <PageTitle hasContent={isempty}>
-            {isempty ? 'Untitled' : label}
-          </PageTitle>
-          {children}
-          {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} pageType={pageType} />}
-        </PageAnchor>
-      </Link>
-    </div>
+    <Link passHref href={href}>
+      <PageAnchor onClick={stopPropagation}>
+        {labelIcon && (
+          <span onClick={preventDefault}>
+            <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
+          </span>
+        )}
+        <PageTitle hasContent={isempty}>
+          {isempty ? 'Untitled' : label}
+        </PageTitle>
+        {children}
+        {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} pageType={pageType} />}
+      </PageAnchor>
+    </Link>
   );
 }
 
@@ -243,7 +241,7 @@ function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId:
 
 const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent?: boolean }>(
   ({ isAdjacent, ...props }, ref) => (
-    <div style={{ position: 'relative' }}>
+    <div id={`page-navigation-${props.nodeId}`} style={{ position: 'relative' }}>
       <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
       {isAdjacent && <AdjacentDropZone />}
     </div>
