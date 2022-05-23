@@ -5,8 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { withSessionRoute } from 'lib/session/withSession';
 import log from 'lib/log';
 import { TelegramUser } from '@prisma/client';
-import { v4 as uuid } from 'uuid';
-import { uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
 
 const handler = nc({
   onError,
@@ -43,7 +42,7 @@ async function connectTelegram (req: NextApiRequest, res: NextApiResponse<Telegr
       }
     });
 
-    const avatar = (await uploadToS3({ fileName: `user-content/${userId}/${uuid()}/${decodeURIComponent(new URL(telegramAccount.photo_url).pathname.split('/').pop() || '')?.replace(/\s/g, '-') || uuid()}`, url: telegramAccount.photo_url })).url;
+    const avatar = (await uploadToS3({ fileName: getUserS3Folder({ userId, url: telegramAccount.photo_url }), url: telegramAccount.photo_url })).url;
     await prisma.user.update({
       where: {
         id: userId

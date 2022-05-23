@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
-import { uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
 import { v4 as uuid } from 'uuid';
 
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
@@ -41,8 +41,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
     let avatar: string | null = null;
     const userId = uuid();
     if (avatarUrl) {
-      const { url } = await uploadToS3({ fileName: `user-content/${userId}/${uuid()}/${decodeURIComponent(new URL(avatarUrl).pathname.split('/').pop() || '')?.replace(/\s/g, '-') || uuid()}`, url: avatarUrl });
-      avatar = url;
+      ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
     }
 
     const newUser = await prisma.user.create({

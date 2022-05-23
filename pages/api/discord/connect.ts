@@ -10,8 +10,7 @@ import log from 'lib/log';
 import { prisma } from 'db';
 import { getDiscordAccount, DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { DiscordServerRole } from 'lib/discord/interface';
-import { uploadToS3 } from 'lib/aws/uploadToS3Server';
-import { v4 as uuid } from 'uuid';
+import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
 
 const handler = nc({
   onError,
@@ -80,8 +79,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
   let avatar: string | null = null;
   if (avatarUrl) {
-    const { url } = await uploadToS3({ fileName: `user-content/${userId}/${uuid()}/${decodeURIComponent(new URL(avatarUrl).pathname.split('/').pop() || '')?.replace(/\s/g, '-') || uuid()}`, url: avatarUrl });
-    avatar = url;
+    ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
   }
 
   const updatedUser = await prisma.user.update({
