@@ -30,7 +30,7 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 type IdentityModalProps = {
-    defaultValues: { },
+    defaultValues: Record<string, unknown>,
     close: () => void,
     isOpen: boolean,
 };
@@ -48,11 +48,6 @@ function IdentityModal (props: IdentityModalProps) {
   });
 
   function onSubmit (values: FormValues) {
-    try {
-    }
-    catch (err) {
-      log.error('Error updating description', err);
-    }
   }
 
   const useIntegration = (type: IntegrationType) => {

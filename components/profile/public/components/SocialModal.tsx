@@ -23,7 +23,7 @@ export const schema = yup.object({
     .matches(/^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([A-Za-z0-9]{1,})+\/?$/i, 'Invalid GitHub link'),
   discordUsername: yup.string().notRequired().ensure(),
   linkedinURL: yup.string().notRequired().ensure()
-    .matches(/^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^\/]+\/?)|(company\/[^\/]+\/?)|(pub\/[^\/]+\/((\w|\d)+\/?){3}))$/i, 'Invalid LinkedIn link')
+    .matches(/^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i, 'Invalid LinkedIn link')
 });
 
 export type FormValues = yup.InferType<typeof schema>;
