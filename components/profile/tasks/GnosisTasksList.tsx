@@ -305,7 +305,7 @@ function SnoozeTransactions (
   }, [showDatePicker]);
 
   return (
-    <Box sx={{ float: 'right' }}>
+    <Box>
       <Button
         disabled={isValidating}
         variant='outlined'
@@ -484,12 +484,14 @@ export default function GnosisTasksSection () {
 
   return (
     <>
-      <Legend>Multisig
-        <SnoozeTransactions
-          message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
-          snoozedForDate={snoozedForDate}
-          setSnoozedForDate={setSnoozedForDate}
-        />
+      <Legend>
+        <Box display='flex' justifyContent='flex-end'>
+          <SnoozeTransactions
+            message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
+            snoozedForDate={snoozedForDate}
+            setSnoozedForDate={setSnoozedForDate}
+          />
+        </Box>
       </Legend>
       {!safesWithTasks && !error && <LoadingComponent height='200px' isLoading={true} />}
       {error && !safesWithTasks && (
