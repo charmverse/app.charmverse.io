@@ -191,6 +191,7 @@ export default function PagePermissions ({ pageId }: Props) {
             {
             userPagePermissions?.grant_permissions === true ? (
               <SmallSelect
+                renderValue={value => permissionsWithoutCustom[value as string] || 'No access'}
                 onChange={level => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
                 keyAndLabel={permissionsWithRemove}
                 defaultValue={spaceLevelPermission?.permissionLevel}
@@ -235,6 +236,7 @@ export default function PagePermissions ({ pageId }: Props) {
                   {
                   userPagePermissions?.grant_permissions === true ? (
                     <SmallSelect
+                      renderValue={value => permissionsWithoutCustom[value as string] || 'No access'}
                       onChange={level => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
                       keyAndLabel={permissionsWithRemove}
                       defaultValue={permission.permissionLevel}

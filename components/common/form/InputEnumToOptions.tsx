@@ -1,10 +1,10 @@
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import Select, { SelectProps } from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { useEffect, useState } from 'react';
 
-export interface Props {
+export interface Props extends SelectProps {
   onChange?: (option: string) => void;
   defaultValue?: string;
   title?: string;
@@ -12,7 +12,7 @@ export interface Props {
   sx?: any;
 }
 
-export default function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, keyAndLabel, sx }: Props) {
+export default function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, keyAndLabel, sx, ...props }: Props) {
 
   const options = Object.entries(keyAndLabel);
 
@@ -39,6 +39,7 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
             onChange(ev.target.value as string);
           }
         }}
+        {...props}
       >
         {
           options.map(option => {
