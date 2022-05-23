@@ -3,7 +3,10 @@ import { useEffect, useState } from 'react';
 import charmClient from 'charmClient';
 
 export function useUserDetails () {
-  const [userDetails, setUserDetails] = useState<Partial<UserDetails>>({});
+  const [userDetails, setUserDetails] = useState<Partial<UserDetails>>({
+    description: '',
+    social: null
+  });
 
   useEffect(() => {
     const getUserDetails = async () => {
@@ -16,5 +19,5 @@ export function useUserDetails () {
     return () => setUserDetails({});
   }, []);
 
-  return [userDetails, setUserDetails];
+  return { userDetails, setUserDetails };
 }

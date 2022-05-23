@@ -17,6 +17,7 @@ import { getDisplayName } from 'lib/users';
 import useENSName from 'hooks/useENSName';
 import charmClient from 'charmClient';
 import { DescriptionModal, IdentityModal, SocialModal } from '.';
+import { Social } from '../types';
 
 const StyledBox = styled(Box)`
 
@@ -32,16 +33,9 @@ const StyledDivider = styled(Divider)`
 export default function UserDetails () {
   const { account } = useWeb3React();
   const [user, setUser] = useUser();
-  const [details, setDetails] = useUserDetails({});
+  const { userDetails, setUserDetails } = useUserDetails();
   const ENSName = useENSName(account);
-  const [copied, setCopied] = useState(false);
-  const [name, setName] = useState('CharmVerse');
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
-  const [userImage, setUserImage] = useState('');
-  const [twitterLink, setTwitterLink] = useState('https://mobile.twitter.com/charmverse');
-  const [githubLink, setGithubLink] = useState('https://github.com/charmverse/app.charmverse.io');
-  const [discordUsername, setDiscordUsername] = useState('CharmVerse');
-  const [linkedinLink, setLinkedinLink] = useState('https://www.linkedin.com/company/charmverse');
   const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
   const [isIdentityModalOpen, setIsIdentityModalOpen] = useState(false);
   const [isSocialMediaModalOpen, setIsSocialMediaModalOpen] = useState(false);
@@ -60,6 +54,22 @@ export default function UserDetails () {
 
     setUser(updatedUser);
   };
+
+  let socialDetails: Social = {};
+
+  if (userDetails && userDetails.social) {
+    socialDetails = (JSON.parse(userDetails.social as string) as Social);
+  }
+  else {
+    socialDetails = {
+      twitterURL: '',
+      githubURL: '',
+      discordUsername: '',
+      linkedinURL: ''
+    };
+  }
+
+  const hasAnySocialInformation = (model: Social) => model.twitterURL || model.githubURL || model.discordUsername || model.linkedinURL;
 
   return (
     <StyledBox>
@@ -88,28 +98,28 @@ export default function UserDetails () {
           </Grid>
           <Grid item mt={1}>
             <Stack direction='row' alignItems='center' spacing={2}>
-              { twitterLink && (
-              <ExternalLink href={twitterLink} target='_blank' display='flex'>
-                <TwitterIcon style={{ color: '#00ACEE', height: '22px' }} />
-              </ExternalLink>
+              { socialDetails && socialDetails.twitterURL && (
+                <ExternalLink href={socialDetails.twitterURL} target='_blank' display='flex'>
+                  <TwitterIcon style={{ color: '#00ACEE', height: '22px' }} />
+                </ExternalLink>
               )}
               {
-                githubLink && (
-                <ExternalLink href={githubLink} target='_blank' display='flex'>
-                  <GitHubIcon style={{ color: '#000000', height: '22px' }} />
-                </ExternalLink>
+                socialDetails && socialDetails.githubURL && (
+                  <ExternalLink href={socialDetails.githubURL} target='_blank' display='flex'>
+                    <GitHubIcon style={{ color: '#000000', height: '22px' }} />
+                  </ExternalLink>
                 )
               }
               {
-                  discordUsername && (
+                  socialDetails && socialDetails.discordUsername && (
                   <Tooltip
                     placement='top'
-                    title={isDiscordUsernameCopied ? 'Copied' : `Click to copy: ${discordUsername}`}
+                    title={isDiscordUsernameCopied ? 'Copied' : `Click to copy: ${socialDetails.discordUsername}`}
                     disableInteractive
                     arrow
                   >
                     <Box sx={{ display: 'flex' }}>
-                      <CopyToClipboard text={discordUsername} onCopy={onDiscordUsernameCopy}>
+                      <CopyToClipboard text={socialDetails.discordUsername} onCopy={onDiscordUsernameCopy}>
                         <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#000000', height: '22px' }}>
                           <DiscordIcon />
                         </SvgIcon>
@@ -119,11 +129,14 @@ export default function UserDetails () {
                   )
               }
               {
-                linkedinLink && (
-                <ExternalLink href={linkedinLink} target='_blank' display='flex'>
-                  <LinkedInIcon style={{ color: '#0072B1', height: '22px' }} />
-                </ExternalLink>
+                socialDetails && socialDetails.linkedinURL && (
+                  <ExternalLink href={socialDetails.linkedinURL} target='_blank' display='flex'>
+                    <LinkedInIcon style={{ color: '#0072B1', height: '22px' }} />
+                  </ExternalLink>
                 )
+              }
+              {
+                !hasAnySocialInformation(socialDetails) && <Typography>No social media links</Typography>
               }
               <StyledDivider orientation='vertical' flexItem />
               <EditIcon
@@ -131,15 +144,15 @@ export default function UserDetails () {
               />
             </Stack>
           </Grid>
-          <Grid item container alignItems='center' sx={{ width: 'fit-content' }}>
+          <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
             <Grid item xs={11}>
               <span>
                 {
-                    details?.description || 'Tell the world a bit more about yourself ...'
+                    userDetails?.description || 'Tell the world a bit more about yourself ...'
                 }
               </span>
             </Grid>
-            <Grid item xs={1} pr={1} justifyContent='end'>
+            <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
               <EditIcon
                 onClick={() => setIsDescriptionModalOpen(true)}
               />
@@ -151,29 +164,32 @@ export default function UserDetails () {
         isOpen={isIdentityModalOpen}
         close={() => setIsIdentityModalOpen(false)}
         defaultValues={{
+
         }}
       />
       <DescriptionModal
         isOpen={isDescriptionModalOpen}
         close={() => setIsDescriptionModalOpen(false)}
         save={async (description: string) => {
-          const updatedDetails = await charmClient.updateUserDetails({ description });
-          setDetails(updatedDetails);
+          const updatedDetails = await charmClient.updateUserDetails({
+            description
+          });
+          setUserDetails(updatedDetails);
           setIsDescriptionModalOpen(false);
         }}
-        defaultValues={{
-          description: details?.description || ''
-        }}
+        currentDescription={userDetails?.description}
       />
       <SocialModal
         isOpen={isSocialMediaModalOpen}
         close={() => setIsSocialMediaModalOpen(false)}
-        defaultValues={{
-          twitter: '',
-          github: '',
-          discord: '',
-          linkedin: ''
+        save={async (social: Social) => {
+          const updatedDetails = await charmClient.updateUserDetails({
+            social: JSON.stringify(social)
+          });
+          setUserDetails(updatedDetails);
+          setIsSocialMediaModalOpen(false);
         }}
+        social={socialDetails}
       />
     </StyledBox>
   );
