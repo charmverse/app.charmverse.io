@@ -4,7 +4,7 @@ import {
   Role, Space, TokenGate, Transaction, User, TelegramUser, UserGnosisSafe, TokenGateToRole
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
-import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
 import * as http from 'adapters/http';
@@ -122,7 +122,7 @@ class CharmClient {
   }
 
   getPage (pageId: string) {
-    return http.GET<Page>(`/api/pages/${pageId}`);
+    return http.GET<IPageWithPermissions>(`/api/pages/${pageId}`);
   }
 
   archivePage (pageId: string) {
@@ -171,10 +171,6 @@ class CharmClient {
 
   getPublicPage (pageId: string) {
     return http.GET<{pages: Page[], blocks: Block[]}>(`/api/public/pages/${pageId}`);
-  }
-
-  togglePagePublicAccess (pageId: string, publiclyAccessible: boolean) {
-    return http.PUT<Page>(`/api/pages/${pageId}`, { isPublic: publiclyAccessible });
   }
 
   createInviteLink (link: Partial<InviteLink>) {
@@ -545,7 +541,7 @@ class CharmClient {
     return http.GET('/api/permissions', { pageId });
   }
 
-  createPermission (permission: IPagePermissionToCreate): Promise<boolean> {
+  createPermission (permission: IPagePermissionToCreate): Promise<IPagePermissionWithSource> {
     return http.POST('/api/permissions', permission);
   }
 
