@@ -36,7 +36,11 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput): P
     });
   }
   const newPage = await charmClient.createPage(pageProperties);
-  await mutate(`pages/${spaceId}`);
+  await mutate(`pages/${spaceId}`, (pages: Page[]) => {
+    return [...pages, newPage];
+  }, {
+    revalidate: false
+  });
   return newPage;
 }
 

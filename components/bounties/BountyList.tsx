@@ -80,7 +80,7 @@ export default function BountyList () {
 
   return (
     <ScrollableWindow>
-      <Box py={3} px='80px'>
+      <Box py={3} sx={{ px: { xs: '40px', sm: '80px' } }}>
         <Box display='flex' justifyContent='space-between' mb={3}>
           <Typography variant='h1'>Bounty list</Typography>
           <Box display='flex' justifyContent='flex-end'>

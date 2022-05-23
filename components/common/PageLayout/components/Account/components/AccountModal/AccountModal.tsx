@@ -51,7 +51,6 @@ function AccountModal ({ isOpen, onClose }:
   const discordConnectFailed = space && router.query.discord === '2' && router.query.type === 'connect';
   const [isConnectDiscordLoading, setIsConnectDiscordLoading] = useState(false);
   const { showMessage } = useSnackbar();
-
   const connectedWithDiscord = Boolean(user?.discordUser);
   const connectedWithTelegram = Boolean(user?.telegramUser);
 

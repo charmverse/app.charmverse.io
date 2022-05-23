@@ -4,8 +4,9 @@ import { Alert, CircularProgress, Divider, Stack, SvgIcon, Tooltip, Typography }
 import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { injected, walletConnect, walletLink } from 'connectors';
+import { ReactNode, useContext, useEffect, useState } from 'react';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import useENSName from 'hooks/useENSName';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -16,7 +17,6 @@ import { useRouter } from 'next/router';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import TelegramIcon from 'public/images/telegram_logo.svg';
-import { ReactNode, useContext, useEffect, useState } from 'react';
 import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
 
 const StyledButton = styled(Button)`
@@ -47,7 +47,6 @@ function ProviderRow ({ children }: { children: ReactNode }) {
 }
 
 export default function IdentityProviders () {
-
   const { account, connector } = useWeb3React();
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);

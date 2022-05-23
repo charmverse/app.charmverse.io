@@ -15,7 +15,7 @@ export function specs () {
 }
 
 function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): RawSpecs {
-  const { parseDOM } = domSerializationHelpers(name, {
+  const { parseDOM, toDOM } = domSerializationHelpers(name, {
     tag: 'span',
     parsingPriority: 51,
     content: (node) => {
@@ -38,8 +38,8 @@ function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): 
       atom: true,
       toDOM: (node) => {
         const twemojiImage = getTwitterEmoji(node.attrs.emoji);
-        return ['img', { src: twemojiImage,
-          style: 'width: 18px; height: 18px; position: relative; top: 4px;' }];
+        return twemojiImage ? ['img', { src: twemojiImage,
+          style: 'width: 18px; height: 18px; position: relative; top: 4px;' }] : toDOM(node);
       },
       parseDOM,
       selectable: true
