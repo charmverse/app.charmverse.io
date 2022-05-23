@@ -44,8 +44,6 @@ type Props = {
 const PropertyValueElement = (props:Props): JSX.Element => {
     const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '')
     const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '')
-    const {pages, setPages} = usePages();
-    const [user] = useUser();
 
     const {card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt} = props
     const intl = useIntl()
@@ -56,17 +54,6 @@ const PropertyValueElement = (props:Props): JSX.Element => {
 
     const editableFields: Array<PropertyType> = ['text', 'number', 'email', 'url', 'phone']
 
-    function updatePage() {
-        // Update the card pages to show the correct updatedAt and updatedBy field
-        setPages({
-          ...pages,
-          [card.id]: {
-            ...pages[card.id],
-            updatedAt: new Date(), 
-            updatedBy: user?.id ?? pages[card.id]?.updatedBy as string
-          } as Page
-        })
-    }
     useEffect(() => {
         if (serverValue === value) {
             setValue(props.card.fields.properties[props.propertyTemplate.id] || '')
@@ -109,7 +96,6 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                 propertyValue={propertyValue}
                 onChange={async (newValue) => {
                   await mutator.changePropertyValue(card, propertyTemplate.id, newValue)
-                  updatePage()
                 }}
                 onChangeColor={(option: IPropertyOption, colorId: string) => mutator.changePropertyOptionColor(board, propertyTemplate, option, colorId)}
                 onDeleteOption={(option: IPropertyOption) => mutator.deletePropertyOption(board, propertyTemplate, option)}
@@ -123,7 +109,6 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                         currentValues.push(option)
                         await mutator.insertPropertyOption(board, propertyTemplate, option, 'add property option')
                         mutator.changePropertyValue(card, propertyTemplate.id, currentValues.map((v) => v.id))
-                        updatePage()
                     }
                 }
                 onDeleteValue={(valueToDelete, currentValues) => mutator.changePropertyValue(card, propertyTemplate.id, currentValues.filter((currentValue) => currentValue.id !== valueToDelete.id).map((currentValue) => currentValue.id))}
@@ -147,16 +132,13 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                         }
                         await mutator.insertPropertyOption(board, propertyTemplate, option, 'add property option')
                         mutator.changePropertyValue(card, propertyTemplate.id, option.id)
-                        updatePage()
                     }
                 }
                 onChange={(newValue) => {
                     mutator.changePropertyValue(card, propertyTemplate.id, newValue)
-                    updatePage()
                 }}
                 onChangeColor={(option: IPropertyOption, colorId: string): void => {
                     mutator.changePropertyOptionColor(board, propertyTemplate, option, colorId)
-                    updatePage()
                 }}
                 onDeleteOption={(option: IPropertyOption): void => {
                     mutator.deletePropertyOption(board, propertyTemplate, option)
@@ -171,7 +153,6 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                 readonly={readOnly}
                 onChange={(newValue) => {
                   mutator.changePropertyValue(card, propertyTemplate.id, newValue)
-                  updatePage()
                 }}
             />
         )
@@ -186,7 +167,6 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                 showEmptyPlaceholder={showEmptyPlaceholder}
                 onChange={(newValue) => {
                   mutator.changePropertyValue(card, propertyTemplate.id, newValue)
-                  updatePage()
                 }}
             />
         )
@@ -199,7 +179,6 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                 onChange={setValue}
                 onSave={() => {
                   mutator.changePropertyValue(card, propertyTemplate.id, value)
-                  updatePage()
                 }}
                 onCancel={() => setValue(propertyValue || '')}
                 validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
@@ -212,7 +191,6 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                 onChanged={(newBool) => {
                     const newValue = newBool ? 'true' : ''
                     mutator.changePropertyValue(card, propertyTemplate.id, newValue)
-                    updatePage()
                 }}
                 readOnly={readOnly}
             />
@@ -234,7 +212,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     } else if (propertyTemplate.type === 'updatedTime') {
         return (
             <LastModifiedAt
-                updatedAt={updatedAt}
+                updatedAt={new Date(Math.max((new Date(updatedAt)).getTime(), (new Date(card.updatedAt)).getTime())).toString()}
             />
         )
     }
@@ -252,7 +230,6 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                     onChange={setValue}
                     onSave={() => {
                       mutator.changePropertyValue(card, propertyTemplate.id, value)
-                      updatePage()
                     }}
                     onCancel={() => setValue(propertyValue || '')}
                     validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
