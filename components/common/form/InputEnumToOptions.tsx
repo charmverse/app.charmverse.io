@@ -5,14 +5,14 @@ import MenuItem from '@mui/material/MenuItem';
 import { useEffect, useState } from 'react';
 
 export interface Props {
-  onChange?: (option: string) => void
-  defaultValue?: string,
-  title?: string
-  keyAndLabel: Record<string | any, string | number>
-  autoExpand?: boolean
+  onChange?: (option: string) => void;
+  defaultValue?: string;
+  title?: string;
+  keyAndLabel: Record<string | any, string | number>;
+  sx?: any;
 }
 
-export default function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, keyAndLabel, autoExpand = false }: Props) {
+export default function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, keyAndLabel, sx }: Props) {
 
   const options = Object.entries(keyAndLabel);
 
@@ -31,8 +31,8 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
       }
 
       <Select
+        sx={sx}
         value={value}
-        defaultOpen={autoExpand}
         onChange={(ev) => {
           setValue(ev.target.value as string);
           if (ev.target.value) {
@@ -47,5 +47,20 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
         }
       </Select>
     </FormControl>
+  );
+}
+
+export function SmallSelect ({ sx = {}, ...props }: Props) {
+  return (
+    <InputEnumToOptions
+      {...props}
+      sx={{
+        ...sx,
+        background: 'transparent',
+        fontSize: '.8em',
+        borderColor: 'transparent',
+        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' }
+      }}
+    />
   );
 }

@@ -7,7 +7,7 @@ import Input from '@mui/material/OutlinedInput';
 import Typography from '@mui/material/Typography';
 import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
-import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
+import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -164,7 +164,6 @@ export default function PagePermissions ({ pageId }: Props) {
   const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
-  console.log({ pagePermissions, pageId });
   return (
     <Box padding={1}>
 
@@ -188,30 +187,22 @@ export default function PagePermissions ({ pageId }: Props) {
           <Typography variant='body2'>
             Everyone at {space?.name}
           </Typography>
-          <div style={{ width: '120px', textAlign: 'center' }}>
+          <div style={{ width: '160px', textAlign: 'right' }}>
             {
-            selectedPermissionId === 'space' ? (
-              <InputEnumToOptions
+            userPagePermissions?.grant_permissions === true ? (
+              <SmallSelect
                 onChange={level => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
                 keyAndLabel={permissionsWithRemove}
                 defaultValue={spaceLevelPermission?.permissionLevel}
-                autoExpand
               />
             ) : (
-              <div onClick={() => {
-                if (userPagePermissions?.grant_permissions === true) {
-                  setSelectedPermissionId('space');
-                }
-              }}
+              <Typography
+                color='secondary'
+                variant='caption'
+                sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}
               >
-                <Typography
-                  color='secondary'
-                  variant='caption'
-                  sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}
-                >
-                  {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : (permissionsLoaded ? 'No access' : '')}
-                </Typography>
-              </div>
+                {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : (permissionsLoaded ? 'No access' : '')}
+              </Typography>
             )
           }
           </div>
@@ -240,26 +231,18 @@ export default function PagePermissions ({ pageId }: Props) {
                 <Typography variant='body2'>
                   {permission.displayName}
                 </Typography>
-                <div style={{ width: '120px', textAlign: 'center' }}>
+                <div style={{ width: '160px', textAlign: 'right' }}>
                   {
-                  selectedPermissionId === permission.id ? (
-                    <InputEnumToOptions
+                  userPagePermissions?.grant_permissions === true ? (
+                    <SmallSelect
                       onChange={level => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
                       keyAndLabel={permissionsWithRemove}
                       defaultValue={permission.permissionLevel}
-                      autoExpand
                     />
                   ) : (
-                    <div onClick={() => {
-                      if (userPagePermissions?.grant_permissions === true) {
-                        setSelectedPermissionId(permission.id);
-                      }
-                    }}
-                    >
-                      <Typography color='secondary' variant='caption' sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}>
-                        {permissionLevels[permission.permissionLevel]}
-                      </Typography>
-                    </div>
+                    <Typography color='secondary' variant='caption' sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}>
+                      {permissionLevels[permission.permissionLevel]}
+                    </Typography>
                   )
                 }
                 </div>
