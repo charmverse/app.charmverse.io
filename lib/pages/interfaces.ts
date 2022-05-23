@@ -17,3 +17,8 @@ export interface PageLink {
   title: string;
   url: string
 }
+
+export interface PagesRequest {
+  spaceId: string;
+  userId?: string;
+}
