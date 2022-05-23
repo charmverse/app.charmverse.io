@@ -118,7 +118,7 @@ export default function UserDetails () {
                     disableInteractive
                     arrow
                   >
-                    <Box sx={{ display: 'flex' }}>
+                    <Box sx={{ display: 'initial' }}>
                       <CopyToClipboard text={socialDetails.discordUsername} onCopy={onDiscordUsernameCopy}>
                         <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#000000', height: '22px' }}>
                           <DiscordIcon />
