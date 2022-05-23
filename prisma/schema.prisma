@@ -399,6 +399,7 @@ model PagePermission {
   @@unique([userId, pageId], name: "userId_PageId")
   @@unique([roleId, pageId], name: "roleId_pageId")
   @@unique([spaceId, pageId], name: "spaceId_pageId")
+  @@unique([public, pageId], name: "public_pageId")
 }
 
 model Thread {
