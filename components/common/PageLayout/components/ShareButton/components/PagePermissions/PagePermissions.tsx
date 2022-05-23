@@ -87,16 +87,17 @@ interface Props {
   pageId: string;
   refreshPermissions: () => void;
   pagePermissions: IPagePermissionWithAssignee[];
-  spaceLevelPermission: IPagePermissionWithAssignee | null;
-  userPagePermissions: IPagePermissionFlags | null;
 }
 
-export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions, spaceLevelPermission, userPagePermissions }: Props) {
+export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions }: Props) {
 
   const theme = useTheme();
-  const { pages } = usePages();
+  const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
+
+  const spaceLevelPermission = pagePermissions.find(permission => space && permission.spaceId === space?.id);
+  const userPagePermissions = getPagePermissions(pageId);
 
   useEffect(() => {
     refreshPermissions();
