@@ -37,7 +37,6 @@ describe('getPage', () => {
         parentId: expect.stringMatching(page.id),
         updatedBy: expect.stringMatching(user.id),
         createdBy: expect.stringMatching(user.id),
-        isPublic: expect.any(Boolean),
         index: expect.any(Number),
         createdAt: expect.any(Date),
         updatedAt: expect.any(Date),
