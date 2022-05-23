@@ -62,6 +62,19 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(updatedPage);
   }
 
+  // Keeping the corresponding block in sync
+  if (pageWithPermission.type === 'card') {
+    await prisma.block.update({
+      where: {
+        id: pageWithPermission.id
+      },
+      data: {
+        updatedAt: new Date(),
+        updatedBy: userId
+      }
+    });
+  }
+
   return res.status(200).json(pageWithPermission);
 }
 
