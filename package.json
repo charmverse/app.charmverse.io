@@ -33,6 +33,7 @@
     "test:client": "npm run test-setup && jest --config='./jest.config-client.ts'",
     "test:migrate": "dotenv -e .env.local -- npx prisma migrate dev",
     "test:server": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose",
+    "test:server:debug": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- node --inspect-brk --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage --config='./jest.config-server.ts' --verbose",
     "test:server-integration": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server-integration.ts' --verbose"
   },
   "prepare": "husky install",
@@ -217,6 +218,6 @@
     "prisma": "^3.9.2",
     "sass": "^1.49.0",
     "supertest": "^6.2.2",
-    "ts-jest": "^27.1.4"
+    "weak-napi": "^2.0.2"
   }
 }

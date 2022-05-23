@@ -1,8 +1,8 @@
 
 import nextJest from 'next/jest';
-import * as path from 'path';
+import { join } from 'path';
 
-const createJestConfig = nextJest({ dir: path.join(__dirname, '../') });
+const createJestConfig = nextJest({ dir: join(__dirname, '../') });
 
 interface JestConfig {
   transformIgnorePatterns: string[];
