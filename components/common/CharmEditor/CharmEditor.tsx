@@ -254,7 +254,6 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 
   .charm-paragraph {
-    display: flex;
     .bangle-nv-child-container {
       width: 100%;
     }
