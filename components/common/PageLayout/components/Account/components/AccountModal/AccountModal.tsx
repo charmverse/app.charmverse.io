@@ -23,7 +23,7 @@ import { getDisplayName } from 'lib/users';
 import log from 'lib/log';
 import { LoggedInUser } from 'models';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import TelegramLoginIframe, { loginWithTelegram } from './components/TelegramLoginIframe';
+import TelegramLoginIframe, { loginWithTelegram } from '../../../../../../profile/integrations/components/TelegramLoginIframe';
 
 const UserName = styled(Typography)`
   position: relative;

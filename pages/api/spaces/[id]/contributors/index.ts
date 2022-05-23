@@ -22,9 +22,11 @@ async function getContributors (req: NextApiRequest, res: NextApiResponse<Contri
   const contributors = spaceRoles.map((spaceRole): Contributor => {
     return {
       ...spaceRole.user,
-      isAdmin: spaceRole.isAdmin
+      isAdmin: spaceRole.isAdmin,
+      joinDate: spaceRole.createdAt.toISOString()
     };
-  });
+  })
+    .sort((a, b) => b.createdAt > a.createdAt ? -1 : 1); // sort oldest first
   return res.status(200).json(contributors);
 }
 

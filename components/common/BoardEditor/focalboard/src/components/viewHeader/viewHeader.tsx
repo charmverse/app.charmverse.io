@@ -1,39 +1,26 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState, useEffect, useCallback, MouseEvent} from 'react'
-import {FormattedMessage} from 'react-intl'
-import { useRouter } from 'next/router'
-import NextLink from 'next/link';
-import Link from 'components/common/Link';
-import Typography from '@mui/material/Typography';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 import { generatePath } from 'lib/utilities/strings';
-import ViewMenu, { iconForViewType } from '../viewMenu'
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { Board, IPropertyTemplate } from '../../blocks/board';
+import { BoardView } from '../../blocks/boardView';
+import { Card } from '../../blocks/card';
+import Button from '../../widgets/buttons/button';
+import AddViewMenu from '../addViewMenu';
 import ViewTabs from './viewTabs';
-import AddViewMenu from '../addViewMenu'
-import mutator from '../../mutator'
-import {Board, IPropertyTemplate} from '../../blocks/board'
-import {BoardView} from '../../blocks/boardView'
-import {Card} from '../../blocks/card'
-import Button from '../../widgets/buttons/button'
-import CharmButton from 'components/common/Button'
-import IconButton from '../../widgets/buttons/iconButton'
-import DropdownIcon from '../../widgets/icons/dropdown'
-import MenuWrapper from '../../widgets/menuWrapper'
-import Editable from '../../widgets/editable'
 
-import ModalWrapper from '../modalWrapper'
+import ModalWrapper from '../modalWrapper';
 
-import NewCardButton from './newCardButton'
-import ViewHeaderPropertiesMenu from './viewHeaderPropertiesMenu'
-import ViewHeaderGroupByMenu from './viewHeaderGroupByMenu'
-import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu'
-import ViewHeaderSortMenu from './viewHeaderSortMenu'
-import ViewHeaderActionsMenu from './viewHeaderActionsMenu'
-import ViewHeaderSearch from './viewHeaderSearch'
-import FilterComponent from './filterComponent'
-
+import FilterComponent from './filterComponent';
+import NewCardButton from './newCardButton';
+import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
+import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
+import ViewHeaderGroupByMenu from './viewHeaderGroupByMenu';
+import ViewHeaderPropertiesMenu from './viewHeaderPropertiesMenu';
+import ViewHeaderSearch from './viewHeaderSearch';
+import ViewHeaderSortMenu from './viewHeaderSortMenu';
 
 type Props = {
     board: Board
@@ -81,11 +68,13 @@ const ViewHeader = React.memo((props: Props) => {
                 views={views}
                 readonly={props.readonly}
                 showView={showView}
+                board={board}
+                activeView={activeView}
             />
 
             {/* add a view */}
 
-            {!props.readonly && (
+            {!props.readonly && views.length <= 3 && (
                 <AddViewMenu
                     board={board}
                     activeView={activeView}

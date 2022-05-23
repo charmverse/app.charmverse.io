@@ -32,7 +32,7 @@ export default function InvitesTable (props: Props) {
   }
 
   return (
-    <Table size='small' aria-label='simple table'>
+    <Table aria-label='simple table'>
       <TableHead>
         <TableRow>
           <TableCell sx={{ px: 0 }}>Inviter</TableCell>

@@ -25,6 +25,7 @@ import { usePages } from 'hooks/usePages'
 import { mutate } from 'swr'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 import PageIcon from 'components/common/PageLayout/components/PageIcon'
+import { checkForEmpty } from 'components/common/CharmEditor/utils'
 
 
 type Props = {
@@ -154,7 +155,7 @@ const GalleryCard = React.memo((props: Props) => {
       }
       {props.visibleTitle &&
         <div className='gallery-title'>
-          {cardPage?.icon ? <PageIcon isEditorEmpty={false} pageType="card" icon={cardPage.icon} /> : undefined}
+          {cardPage?.icon ? <PageIcon isEditorEmpty={checkForEmpty(cardPage?.content as PageContent)} pageType="card" icon={cardPage.icon} /> : undefined}
           <div key='__title'>
             {cardPage?.title ||
               <FormattedMessage
