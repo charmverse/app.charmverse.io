@@ -56,9 +56,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     throw new ActionNotPermittedError('You do not have permission to reposition this page');
   }
 
-  if (updateContent.hasOwnProperty('isPublic') && permissions.edit_isPublic !== true) {
-    throw new ActionNotPermittedError('You do not have permission to update the public status of this page');
-  }
   else if (permissions.edit_content !== true) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
