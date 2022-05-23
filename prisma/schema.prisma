@@ -378,6 +378,8 @@ model PagePermission {
   space                   Space?              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   roleId                  String?             @db.Uuid
   role                    Role?               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  // Should be only null or true
+  public                  Boolean?
   // Resource being accessed (pick one)
   pageId                  String              @db.Uuid
   page                    Page                @relation(fields: [pageId], references: [id], onDelete: Cascade)
