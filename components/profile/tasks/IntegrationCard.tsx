@@ -1,4 +1,4 @@
-import { Paper, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Divider, Paper, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useWeb3React } from '@web3-react/core';
 import { useUser } from 'hooks/useUser';
@@ -7,15 +7,8 @@ import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import { useRouter } from 'next/router';
-import styled from '@emotion/styled';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import KeyIcon from '@mui/icons-material/Key';
-
-const VerticalDivider = styled.div`
-  height: 45px;
-  width: 2px;
-  background-color: ${({ theme }) => theme.palette.mode === 'dark' ? '#444' : '#eee'};
-`;
 
 export default function IntegrationCard () {
   const [currentUser] = useUser();
@@ -26,7 +19,7 @@ export default function IntegrationCard () {
   const totalIntegrations = (metamaskConnected ? 1 : 0) + (discordConnected ? 1 : 0) + (telegramConnected ? 1 : 0);
   const userEnsName = useENSName(currentUser?.addresses[0]);
   const router = useRouter();
-  const { data: safes, mutate } = useMultiWalletSigs();
+  const { data: safes } = useMultiWalletSigs();
 
   return currentUser && (
     <Box display='flex' gap={3} justifyContent='space-between'>
@@ -60,7 +53,7 @@ export default function IntegrationCard () {
             </Typography>
             <Typography color='secondary'>Integrations</Typography>
           </Box>
-          <VerticalDivider />
+          <Divider sx={{ borderRightWidth: 2 }} orientation='vertical' variant='middle' flexItem />
           <Box display='flex' gap={1.5} height='100%' alignItems='center'>
             <Tooltip title={metamaskConnected ? 'Metamask connected' : 'Metamask not connected'} arrow placement='top'>
               <img height={20} src={metamaskConnected ? '/walletLogos/metamask.png' : '/walletLogos/metamask-greyscale.png'} />
@@ -72,7 +65,7 @@ export default function IntegrationCard () {
               <img height={25} src={telegramConnected ? '/images/telegram-logo-colored.png' : '/images/telegram-logo-greyscale.png'} />
             </Tooltip>
           </Box>
-          <VerticalDivider />
+          <Divider sx={{ borderRightWidth: 2 }} orientation='vertical' variant='middle' flexItem />
           <Box display='flex' gap={1} height='100%' alignItems='center'>
             <KeyIcon />
             <Typography variant='subtitle1' color='secondary'>
