@@ -165,7 +165,7 @@ async function updateBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
     });
   });
 
-  const pageBlocks = cardBlocks.map(cardBlock => prisma.page.update({
+  const pageOps = cardBlocks.map(cardBlock => prisma.page.update({
     where: { id: cardBlock.id },
     data: {
       updatedAt: new Date(),
@@ -173,9 +173,14 @@ async function updateBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
     }
   }));
 
-  const updated = await prisma.$transaction(blockOps);
-  await prisma.$transaction(pageBlocks);
-  return res.status(200).json(updated);
+  const updatedBlocks = await prisma.$transaction([...blockOps, ...pageOps]);
+  // Filter out the pages as the client requires only updated blocks
+  return res.status(200).json(updatedBlocks.filter(updatedBlock => {
+    if ('schema' in (updatedBlock as Block)) {
+      return updatedBlock;
+    }
+    return null;
+  }) as Block[]);
 }
 
 export default withSessionRoute(handler);
