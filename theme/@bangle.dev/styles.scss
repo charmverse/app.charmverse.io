@@ -408,10 +408,6 @@ details {
     margin-left: -14px;
     outline: 0 none;
 
-    p:empty::before {
-      content: "Toggle";
-    }
-
     &::marker {
       color: var(--prop-gray);
     }
