@@ -66,12 +66,28 @@ describe('upsertPermission', () => {
       spaceId: space.id
     });
 
+    // Test groups
     try {
 
       await upsertPermission(page.id, {
         permissionLevel: 'full_access',
         userId: user.id,
         spaceId: space.id
+      });
+
+      throw new ExpectedAnError();
+    }
+    catch (error) {
+      expect(error).toBeInstanceOf(InvalidPermissionGranteeError);
+    }
+
+    // Test public
+    try {
+
+      await upsertPermission(page.id, {
+        permissionLevel: 'full_access',
+        userId: user.id,
+        public: true
       });
 
       throw new ExpectedAnError();

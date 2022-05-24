@@ -6,6 +6,8 @@ import { prisma } from 'db';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { requireUser } from 'lib/middleware/requireUser';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { DataNotFoundError } from '../../../../../lib/utilities/errors';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -22,8 +24,18 @@ async function getBlockPageViews (req: NextApiRequest, res: NextApiResponse<Bloc
       type: 'board'
     }
   });
-  if (!publicPage || !publicPage.isPublic || !publicPage.boardId) {
-    return res.status(404).json({ error: 'views not found' });
+
+  if (!publicPage) {
+    throw new DataNotFoundError(`Views for page id ${pageId} not found`);
+  }
+
+  const computed = await computeUserPagePermissions({
+    pageId: pageId as string,
+    userId: req.session?.user?.id
+  });
+
+  if (computed.read !== true) {
+    throw new DataNotFoundError(`Views for page id ${pageId} not found`);
   }
   const blocks = await prisma.block.findMany({
     where: {

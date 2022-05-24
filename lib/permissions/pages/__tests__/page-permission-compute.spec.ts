@@ -89,4 +89,38 @@ describe('computeUserPagePermissions', () => {
 
   });
 
+  it('should return only public permissions if no user is provided', async () => {
+
+    const { user: nonAdminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    const page = await createPage({
+      createdBy: nonAdminUser.id,
+      spaceId: localSpace.id,
+      title: 'Page without permissions'
+    });
+
+    await Promise.all([
+      upsertPermission(page.id, {
+        spaceId: localSpace.id,
+        permissionLevel: 'full_access'
+      }),
+      upsertPermission(page.id, {
+        public: true,
+        permissionLevel: 'view'
+      })
+    ]);
+
+    const permissions = await computeUserPagePermissions({
+      pageId: page.id
+    });
+
+    permissionTemplates.view.forEach(op => {
+      expect(permissions[op]).toBe(true);
+    });
+
+    expect(permissions.grant_permissions).toBe(false);
+    expect(permissions.edit_content).toBe(false);
+
+  });
+
 });

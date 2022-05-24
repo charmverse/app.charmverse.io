@@ -23,6 +23,10 @@ export function findExistingPermissionForGroup (basePermission: IPagePermissionT
       return basePermission.spaceId === permission.spaceId;
     }
 
+    if (basePermission.public === true) {
+      return permission.public === true;
+    }
+
     return false;
 
   });

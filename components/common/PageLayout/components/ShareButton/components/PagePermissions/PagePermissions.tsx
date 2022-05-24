@@ -51,13 +51,13 @@ function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[], sp
   (IPagePermissionWithAssignee & {displayName: string})[] {
   const sortedPermissions = pagePermissions
     .filter(permission => {
-      return !permission.spaceId;
+      return !permission.spaceId && !permission.public;
     })
     .map(permission => {
 
-      const permissionSource = permission.user ? 'user' : permission.role ? 'role' : 'space';
+      const permissionSource = permission.user ? 'user' : 'role';
 
-      const permissionDisplayName = permissionSource === 'user' ? getDisplayName(permission.user!) : permissionSource === 'role' ? permission.role!.name : `${permission.space!.name} members`;
+      const permissionDisplayName = permissionSource === 'user' ? getDisplayName(permission.user!) : permission.role!.name;
 
       return {
         ...permission,
