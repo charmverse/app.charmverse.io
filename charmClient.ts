@@ -29,7 +29,6 @@ import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pa
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
-import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
 import { GetTasksResponse } from 'pages/api/tasks';
 

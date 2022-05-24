@@ -66,7 +66,11 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     where: {
       id: pageId
     },
-    data: req.body,
+    data: {
+      ...req.body,
+      updatedAt: new Date(),
+      updatedBy: userId
+    },
     include: {
       permissions: {
         include: {
