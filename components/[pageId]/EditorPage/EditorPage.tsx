@@ -52,7 +52,31 @@ export default function EditorPage (
       if (boardBlock) {
         dispatch(addBoard(boardBlock as unknown as Board));
       }
-      setPages(publicPages.reduce((record, page) => ({ ...record, [page.id]: page }), {}));
+
+      const foundPageContent: Record<string, Page> = publicPages.reduce((record, page) => ({ ...record, [page.id]: page }), {});
+
+      const spaceId = foundPageContent[publicPageId]?.spaceId;
+
+      if (spaceId) {
+        const publicPagesInSpace = await charmClient.getPages(spaceId);
+        const mapped = publicPagesInSpace.reduce((pageMap: Record<string, Page>, page) => {
+          pageMap[page.id] = page;
+          return pageMap;
+        }, {});
+
+        console.log('Public pages', publicPagesInSpace);
+
+        setPages({
+          ...mapped,
+          ...foundPageContent
+        });
+      }
+      else {
+        setPages(foundPageContent);
+      }
+
+      setPageNotFound(false);
+      onPageLoad?.(publicPageId);
     }
     catch (err) {
       setPageNotFound(true);
