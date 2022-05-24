@@ -121,8 +121,8 @@ class CharmClient {
     return http.POST<Page>('/api/pages', pageOpts);
   }
 
-  getPage (pageId: string) {
-    return http.GET<IPageWithPermissions>(`/api/pages/${pageId}`);
+  getPage (pageId: string, spaceId?:string) {
+    return http.GET<IPageWithPermissions>(`/api/pages/${pageId}?spaceId=${spaceId}`);
   }
 
   archivePage (pageId: string) {

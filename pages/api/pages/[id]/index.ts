@@ -22,19 +22,20 @@ async function getPageRoute (req: NextApiRequest, res: NextApiResponse<Page>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
+  const page = await getPage(pageId, req.query.spaceId as string | undefined);
+
+  if (!page) {
+    throw new NotFoundError();
+  }
+
+  // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
   const permissions = await computeUserPagePermissions({
-    pageId,
+    pageId: page.id,
     userId
   });
 
   if (permissions.read !== true) {
     throw new ActionNotPermittedError('You do not have permission to view this page');
-  }
-
-  const page = await getPage(pageId);
-
-  if (!page) {
-    throw new NotFoundError();
   }
 
   return res.status(200).json(page);
