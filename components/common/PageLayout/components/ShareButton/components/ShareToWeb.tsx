@@ -40,24 +40,29 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
   border-bottom-color: transparent;
 `;
 
-export default function ShareToWeb () {
+interface Props {
+  pageId: string
+}
+
+export default function ShareToWeb ({ pageId }: Props) {
 
   const router = useRouter();
   // What user can do
-  const { pages, setPages, currentPageId, getPagePermissions, refreshPage } = usePages();
+  const { pages, setPages, getPagePermissions, refreshPage } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
   const [space] = useCurrentSpace();
 
-  const currentPagePermissions = getPagePermissions(currentPageId);
+  const currentPagePermissions = getPagePermissions(pageId);
 
   // Current values of the public permission
   const [publicPermission, setPublicPermission] = useState<IPagePermissionWithSource | null>(null);
   const [shareLink, setShareLink] = useState<null | string>(null);
 
   useEffect(() => {
-    if (currentPageId) {
+    console.log('Share effect fired', pageId, (pages[pageId] as IPageWithPermissions)?.permissions);
+    if (pageId) {
       // Access the raw permissions
-      const permissionList = (pages[currentPageId] as IPageWithPermissions)?.permissions;
+      const permissionList = (pages[pageId] as IPageWithPermissions)?.permissions;
 
       const foundPublic = permissionList.find(publicPerm => publicPerm.public === true) ?? null;
       // Add ref to new model here
@@ -67,7 +72,7 @@ export default function ShareToWeb () {
       setPublicPermission(null);
     }
 
-  }, [currentPageId, pages, pages[currentPageId]?.parentId]);
+  }, [pageId, pages]);
 
   async function togglePublic () {
     if (publicPermission) {
@@ -76,7 +81,7 @@ export default function ShareToWeb () {
     }
     else {
       const newPermission = await charmClient.createPermission({
-        pageId: currentPageId,
+        pageId,
         permissionLevel: 'view',
         public: true
       });
@@ -94,19 +99,19 @@ export default function ShareToWeb () {
   }
 
   async function updateShareLink () {
-    const currentPage = pages[currentPageId];
+    const currentPage = pages[pageId];
     if (!publicPermission) {
       setShareLink(null);
     }
     else if (currentPage?.type === 'page' || currentPage?.type === 'card') {
       const shareLinkToSet = (typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${currentPageId}` : '';
+        ? `${window.location.origin}/share/${pageId}` : '';
       setShareLink(shareLinkToSet);
     }
     else if (currentPage?.type === 'board') {
       const viewIdToProvide = router.query.viewId;
       const shareLinkToSet = (typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${currentPageId}?viewId=${viewIdToProvide}` : '';
+        ? `${window.location.origin}/share/${pageId}?viewId=${viewIdToProvide}` : '';
       setShareLink(shareLinkToSet);
     }
   }
