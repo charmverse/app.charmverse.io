@@ -160,7 +160,12 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
       )}
 
       <Box display='block' py={0.5}>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
+        <Box
+          display='flex'
+          justifyContent='space-between'
+          alignItems='center'
+
+        >
           <Typography variant='body2'>
             Everyone at {space?.name}
           </Typography>
@@ -177,7 +182,6 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
               <Typography
                 color='secondary'
                 variant='caption'
-                sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}
               >
                 {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : 'No access'}
               </Typography>
@@ -213,13 +217,13 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
                   {
                   userPagePermissions?.grant_permissions === true ? (
                     <SmallSelect
-                      renderValue={value => permissionsWithoutCustom[value as string] || 'No access'}
+                      renderValue={value => permissionsWithoutCustom[value as string]}
                       onChange={level => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
                       keyAndLabel={permissionsWithRemove}
                       defaultValue={permission.permissionLevel}
                     />
                   ) : (
-                    <Typography color='secondary' variant='caption' sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}>
+                    <Typography color='secondary' variant='caption'>
                       {permissionLevels[permission.permissionLevel]}
                     </Typography>
                   )
