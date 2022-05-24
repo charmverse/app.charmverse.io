@@ -20,7 +20,7 @@ export interface LoggedInUser extends User {
 }
 
 export enum IdentityType {
-  Address,
-  Discord,
-  Telegram
+  Address = 'Address',
+  Discord = 'Discord',
+  Telegram = 'Telegram'
 }
