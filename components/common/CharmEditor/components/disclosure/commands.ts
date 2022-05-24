@@ -41,6 +41,8 @@ export const backspaceCmd: Command = (state, dispatch) => {
   return false;
 };
 
+// TODO: we should move cursor to the content section when hitting Enter
+
 // export const moveDownCmd: Command = (state, dispatch) => {
 //   const { tr } = state;
 //   // @ts-ignore types package is missing $cursor property as of 1.2.8
