@@ -59,7 +59,6 @@ export default function ShareToWeb ({ pageId }: Props) {
   const [shareLink, setShareLink] = useState<null | string>(null);
 
   useEffect(() => {
-    console.log('Share effect fired', pageId, (pages[pageId] as IPageWithPermissions)?.permissions);
     if (pageId) {
       // Access the raw permissions
       const permissionList = (pages[pageId] as IPageWithPermissions)?.permissions;

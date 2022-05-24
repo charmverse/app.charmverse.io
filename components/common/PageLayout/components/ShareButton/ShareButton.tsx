@@ -34,7 +34,7 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
   }
 
   useEffect(() => {
-    if (currentPageId) {
+    if (currentPageId && popupState.isOpen) {
       refreshPage(currentPageId);
     }
   }, [currentPageId, popupState.isOpen]);
