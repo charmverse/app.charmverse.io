@@ -171,7 +171,7 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
                 renderValue={value => permissionsWithoutCustom[value as string] || 'No access'}
                 onChange={level => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
                 keyAndLabel={permissionsWithRemove}
-                defaultValue={spaceLevelPermission?.permissionLevel}
+                defaultValue={spaceLevelPermission?.permissionLevel ?? 'No access'}
               />
             ) : (
               <Typography
