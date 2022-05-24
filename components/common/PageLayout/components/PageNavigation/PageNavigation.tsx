@@ -12,7 +12,7 @@ import { useUser } from 'hooks/useUser';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { isTruthy } from 'lib/utilities/types';
 import { Page, PageContent } from 'models';
-import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, memo, useLayoutEffect, useRef } from 'react';
+import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, memo } from 'react';
 import { useDrop } from 'react-dnd';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { addPageAndRedirect, NewPageInput } from 'lib/pages';
@@ -122,30 +122,6 @@ function PageNavigation ({
   const [user] = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
 
-  useLayoutEffect(() => {
-    let parentPage = pages[currentPageId];
-    while (parentPage && parentPage.parentId !== null) {
-      parentPage = pages[parentPage.parentId];
-    }
-    if (parentPage) {
-      const currentPageNode = document.getElementById(`page-navigation-${parentPage.id}`);
-      const containerNode = document.querySelector('.page-navigation');
-      if (currentPageNode && containerNode) {
-        const rect = currentPageNode.getBoundingClientRect();
-        // Check to see if the element is in viewport, if not no need to navigate
-        const isInViewport = rect.top >= 0
-                && rect.left >= 0
-                && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-                && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
-        // Need to get the parent element to get the correct offsetTop
-        // Due to mui's tree item we can't add the id directly to the parent
-        if (!isInViewport && currentPageNode.parentElement) {
-          containerNode.scrollTop = currentPageNode.parentElement.offsetTop;
-        }
-      }
-    }
-  }, [currentPageId]);
-
   const pagesArray: MenuNode[] = Object.values(pages)
     .filter((page): page is Page => Boolean(isTruthy(page) && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))))
     .map((page): MenuNode => ({
@@ -222,13 +198,15 @@ function PageNavigation ({
       id: droppedItem.id,
       index, // send it to the end
       parentId
-    }).then(updatedPage => {
-      setPages(_pages => ({
-        ..._pages,
-        [droppedItem.id]: updatedPage
-      }));
     });
-
+    setPages(_pages => ({
+      ..._pages,
+      [droppedItem.id]: {
+        ..._pages[droppedItem.id]!,
+        index,
+        parentId
+      }
+    }));
   }, []);
 
   useEffect(() => {
