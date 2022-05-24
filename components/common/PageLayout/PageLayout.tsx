@@ -115,13 +115,11 @@ function PageLayout ({ drawerWidth = 300, children, sidebar: SidebarOverride }: 
               openSidebar={handleDrawerOpen}
             />
           </AppBar>
-          (
           <Drawer drawerWidth={drawerWidth} variant='permanent' open={open}>
             {SidebarOverride
               ? <SidebarOverride closeSidebar={handleDrawerClose} />
               : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
           </Drawer>
-          )
           <PageContainer>
             <HeaderSpacer />
             {children}

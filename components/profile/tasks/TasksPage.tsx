@@ -7,6 +7,7 @@ import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPage';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
+import styled from '@emotion/styled';
 import GnosisTasksList from './GnosisTasksList';
 import IntegrationCard from './IntegrationCard';
 
@@ -32,10 +33,16 @@ function iconForTask (taskType: TaskType) {
   }
 }
 
+const TasksPageContainer = styled.div`
+  width: 1105px;
+  padding: 0 80px;
+  margin: 0 auto;
+`;
+
 export default function TasksPage () {
   const [currentTab, setCurrentTab] = useState<TaskType>('multisig');
   return (
-    <>
+    <TasksPageContainer>
       <Box display='flex' justifyContent='space-between' mb={3}>
         <Typography variant='h1' fontWeight='bold'>Personal Nexus</Typography>
       </Box>
@@ -59,6 +66,6 @@ export default function TasksPage () {
         ))}
       </Tabs>
       {currentTab === 'multisig' ? <GnosisTasksList /> : null}
-    </>
+    </TasksPageContainer>
   );
 }
