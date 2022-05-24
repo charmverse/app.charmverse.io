@@ -1,15 +1,25 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from 'db';
-import { v4, validate } from 'uuid';
+import { validate } from 'uuid';
 import { IPageWithPermissions } from '../interfaces';
 
-export async function getPage (pageIdOrPath: string): Promise<IPageWithPermissions | null> {
+export async function getPage (pageIdOrPath: string, spaceId?: string): Promise<IPageWithPermissions | null> {
 
-  const searchQuery: Prisma.PageWhereInput = validate(pageIdOrPath) === false ? {
+  const isValidUUid = validate(pageIdOrPath);
+
+  // We need a spaceId if looking up by path
+  if (!isValidUUid && !spaceId) {
+    return null;
+  }
+
+  const searchQuery: Prisma.PageWhereInput = isValidUUid ? {
     id: pageIdOrPath
   } : {
-    path: pageIdOrPath
+    path: pageIdOrPath,
+    spaceId
   };
+
+  console.log('Query', searchQuery);
 
   return prisma.page.findFirst({
     where: searchQuery,

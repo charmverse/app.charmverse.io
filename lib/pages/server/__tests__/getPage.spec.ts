@@ -50,6 +50,34 @@ describe('getPage', () => {
     );
   });
 
+  it('should allow looking up a page by its path + spaceId', async () => {
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      path: 'My example path'
+    });
+
+    const foundPage = await getPage(page.path, page.spaceId as string);
+
+    expect(foundPage).toEqual <Page>(
+      expect.objectContaining<Partial<Page>>({
+        id: page.id,
+        path: page.path,
+        spaceId: page.spaceId
+      })
+    );
+  });
+
+  it('should return null if a path but no spaceId is provided', async () => {
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      path: 'My example path'
+    });
+
+    const foundPage = await getPage(page.path);
+  });
+
   it('should return null if the page does not exist', async () => {
     const foundPage = await getPage(v4());
     expect(foundPage).toBe(null);

@@ -94,7 +94,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
   return prisma.page.create({
     data: {
       contentText: '',
-      path: v4(),
+      path: options.path ?? `page-${v4()}`,
       title: options.title || 'Example',
       type: 'page',
       updatedBy: options.createdBy,
