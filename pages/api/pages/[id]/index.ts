@@ -22,7 +22,7 @@ handler
 
 async function getPageRoute (req: NextApiRequest, res: NextApiResponse<Page>) {
   const pageId = req.query.id as string;
-  const userId = req.session.user.id;
+  const userId = req.session?.user?.id;
 
   const page = await getPage(pageId, req.query.spaceId as string | undefined);
 

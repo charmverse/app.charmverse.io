@@ -15,7 +15,7 @@ handler
 
 async function getPages (req: NextApiRequest, res: NextApiResponse<Page[]>) {
   const spaceId = req.query.id as string;
-  const userId = req.session.user.id;
+  const userId = req.session?.user?.id;
 
   const accessiblePages = await getAccessiblePages({
     spaceId,
