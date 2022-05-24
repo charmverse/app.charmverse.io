@@ -25,7 +25,7 @@ const StyledAvatar = styled(Avatar)`
 
 const StyledAvatarWithIcons = styled(AvatarWithIcons)`
   ${baseAvatarStyles}
-  ${({ variant }) => variant === 'rounded' && 'border-radius: 7px'};
+  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
 
   &:hover .edit-avatar-icon, .delete-avatar-icon {
       display: initial;

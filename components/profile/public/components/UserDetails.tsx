@@ -6,6 +6,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import EditIcon from '@mui/icons-material/Edit';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import GitHubIcon from '@mui/icons-material/GitHub';
+import IconButton from '@mui/material/IconButton';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import DiscordIcon from 'public/images/discord_logo.svg';
@@ -82,18 +83,20 @@ export default function UserDetails () {
       <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
           name={userName}
-          variant='rounded'
           spaceImage={user?.avatar}
           updateImage={handleImageUpdate}
           displayIcons={true}
+          sx={{
+            boderRadius: '50%'
+          }}
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
             <Stack direction='row' spacing={1} alignItems='baseline'>
               <Typography variant='h1'>CharmVerse</Typography>
-              <EditIcon
-                onClick={() => setIsIdentityModalOpen(true)}
-              />
+              <IconButton onClick={() => setIsIdentityModalOpen(true)}>
+                <EditIcon />
+              </IconButton>
             </Stack>
           </Grid>
           <Grid item mt={1}>
@@ -106,7 +109,7 @@ export default function UserDetails () {
               {
                 socialDetails && socialDetails.githubURL && (
                   <ExternalLink href={socialDetails.githubURL} target='_blank' display='flex'>
-                    <GitHubIcon style={{ color: '#000000', height: '22px' }} />
+                    <GitHubIcon style={{ color: '#888', height: '22px' }} />
                   </ExternalLink>
                 )
               }
@@ -120,7 +123,7 @@ export default function UserDetails () {
                   >
                     <Box sx={{ display: 'initial' }}>
                       <CopyToClipboard text={socialDetails.discordUsername} onCopy={onDiscordUsernameCopy}>
-                        <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#000000', height: '22px' }}>
+                        <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2', height: '22px' }}>
                           <DiscordIcon />
                         </SvgIcon>
                       </CopyToClipboard>
@@ -139,9 +142,9 @@ export default function UserDetails () {
                 !hasAnySocialInformation(socialDetails) && <Typography>No social media links</Typography>
               }
               <StyledDivider orientation='vertical' flexItem />
-              <EditIcon
-                onClick={() => setIsSocialMediaModalOpen(true)}
-              />
+              <IconButton onClick={() => setIsSocialMediaModalOpen(true)}>
+                <EditIcon />
+              </IconButton>
             </Stack>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
@@ -153,9 +156,9 @@ export default function UserDetails () {
               </span>
             </Grid>
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
-              <EditIcon
-                onClick={() => setIsDescriptionModalOpen(true)}
-              />
+              <IconButton onClick={() => setIsDescriptionModalOpen(true)}>
+                <EditIcon />
+              </IconButton>
             </Grid>
           </Grid>
         </Grid>

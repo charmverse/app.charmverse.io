@@ -15,12 +15,9 @@ handler
   .put(updateUserDetails);
 
 export async function createUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | { error: any }>) {
-
-  const { id } = req.body;
-
   const details: UserDetails = await prisma.userDetails.create({
     data: {
-      id
+      id: req.session.user.id
     }
   });
 

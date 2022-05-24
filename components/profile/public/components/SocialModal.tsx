@@ -21,7 +21,8 @@ export const schema = yup.object({
     .matches(/^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?twitter\.com\/([a-zA-Z0-9_]+)/i, 'Invalid Twitter link'),
   githubURL: yup.string().notRequired().ensure().trim()
     .matches(/^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([A-Za-z0-9]{1,})+\/?$/i, 'Invalid GitHub link'),
-  discordUsername: yup.string().notRequired().ensure(),
+  discordUsername: yup.string().notRequired().ensure()
+    .matches(/^((?!(discordtag|everyone|here)#)((?!@|#|:|```).{2,32})#\d{4})/, 'Invalid Discord username'),
   linkedinURL: yup.string().notRequired().ensure()
     .matches(/^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i, 'Invalid LinkedIn link')
 });
@@ -57,7 +58,7 @@ function SocialModal (props: SocialModalProps) {
 
   return (
 
-    <Modal open={isOpen} onClose={() => {}} size='large'>
+    <Modal open={isOpen} onClose={close} size='large'>
       <DialogTitle onClose={close}>Social media links</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={4}>
@@ -78,7 +79,7 @@ function SocialModal (props: SocialModalProps) {
           </Grid>
           <Grid item container direction='row' alignItems='center'>
             <Grid item container direction='row' xs={12} md={3}>
-              <GitHubIcon style={{ color: '#000000', height: '22px' }} />
+              <GitHubIcon style={{ color: '#888', height: '22px' }} />
               <Typography ml={1}>GitHub:</Typography>
             </Grid>
             <Grid item xs={12} md={9}>
@@ -93,7 +94,7 @@ function SocialModal (props: SocialModalProps) {
           </Grid>
           <Grid item container direction='row' alignItems='center'>
             <Grid item container direction='row' xs={12} md={3}>
-              <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#000000', height: '22px' }}>
+              <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2', height: '22px' }}>
                 <DiscordIcon />
               </SvgIcon>
               <Typography ml={1}>Discord:</Typography>
@@ -104,7 +105,7 @@ function SocialModal (props: SocialModalProps) {
                 fullWidth
                 error={!!errors.discordUsername}
                 helperText={errors.discordUsername?.message}
-                placeholder='CharmVerse'
+                placeholder='Username#1234'
               />
             </Grid>
           </Grid>
