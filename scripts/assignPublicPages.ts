@@ -48,7 +48,9 @@ async function upsertPublicPermissions () {
 }
 
 // Run this function
+/*
 upsertPublicPermissions()
   .then(() => {
     console.log('Job complete');
   });
+  */
