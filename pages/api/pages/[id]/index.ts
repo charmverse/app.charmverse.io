@@ -7,7 +7,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { ModifyChildPagesResponse } from 'lib/pages';
+import { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
 import { getPage } from 'lib/pages/server/getPage';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -20,7 +20,7 @@ handler
   .put(updatePage)
   .delete(deletePage);
 
-async function getPageRoute (req: NextApiRequest, res: NextApiResponse<Page>) {
+async function getPageRoute (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
   const userId = req.session?.user?.id;
 
@@ -43,7 +43,7 @@ async function getPageRoute (req: NextApiRequest, res: NextApiResponse<Page>) {
   return res.status(200).json(page);
 }
 
-async function updatePage (req: NextApiRequest, res: NextApiResponse) {
+async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
 
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
