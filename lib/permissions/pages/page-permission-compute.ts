@@ -70,6 +70,10 @@ function permissionsQuery (request: IPagePermissionUserRequest): Prisma.PagePerm
             }
           },
           pageId: request.pageId
+        },
+        {
+          public: true,
+          pageId: request.pageId
         }
       ]
     },
