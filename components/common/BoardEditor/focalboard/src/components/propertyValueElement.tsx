@@ -1,13 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React, {useState, useCallback, useEffect, useRef} from 'react'
+import {useState, useCallback, useEffect} from 'react'
 import {useIntl} from 'react-intl'
 
 import {Board, IPropertyOption, IPropertyTemplate, PropertyType} from '../blocks/board'
 import {Card} from '../blocks/card'
-import {ContentBlock} from '../blocks/contentBlock'
-import {CommentBlock} from '../blocks/commentBlock'
 import mutator from '../mutator'
 import {OctoUtils} from '../octoUtils'
 import {Utils, IDType} from '../utils'
@@ -25,9 +23,6 @@ import DateRange from './properties/dateRange/dateRange'
 import SelectProperty from './properties/select/select'
 import { randomIntFromInterval } from 'lib/utilities/random'
 import { Constants } from '../constants'
-import { usePages } from 'hooks/usePages'
-import { useUser } from 'hooks/useUser'
-import { Page } from '@prisma/client'
 
 const menuColors = Object.keys(Constants.menuColors)
 
@@ -53,6 +48,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     const finalDisplayValue = displayValue || emptyDisplayValue
 
     const editableFields: Array<PropertyType> = ['text', 'number', 'email', 'url', 'phone']
+    const latestUpdated = (new Date(updatedAt)).getTime() > (new Date(card.updatedAt)).getTime() ? "page" : "card";
 
     useEffect(() => {
         if (serverValue === value) {
@@ -202,7 +198,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     } else if (propertyTemplate.type === 'updatedBy') {
         return (
             <LastModifiedBy
-                updatedBy={updatedBy}
+                updatedBy={latestUpdated === "card" ? card.updatedBy : updatedBy}
             />
         )
     } else if (propertyTemplate.type === 'createdTime') {
@@ -212,7 +208,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     } else if (propertyTemplate.type === 'updatedTime') {
         return (
             <LastModifiedAt
-                updatedAt={new Date(Math.max((new Date(updatedAt)).getTime(), (new Date(card.updatedAt)).getTime())).toString()}
+                updatedAt={new Date(latestUpdated === "card" ? card.updatedAt : updatedAt).toString()}
             />
         )
     }
