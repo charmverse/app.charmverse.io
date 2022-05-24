@@ -44,9 +44,11 @@ export default function ShareToWeb () {
 
   const router = useRouter();
   // What user can do
-  const { pages, setPages, currentPageId, getPagePermissions, refreshPage, currentPagePermissions } = usePages();
+  const { pages, setPages, currentPageId, getPagePermissions, refreshPage } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
   const [space] = useCurrentSpace();
+
+  const currentPagePermissions = getPagePermissions(currentPageId);
 
   // Current values of the public permission
   const [publicPermission, setPublicPermission] = useState<IPagePermissionWithSource | null>(null);
@@ -70,7 +72,7 @@ export default function ShareToWeb () {
   async function togglePublic () {
     if (publicPermission) {
       await charmClient.deletePermission(publicPermission.id);
-      refreshPage(currentPageId);
+      setPublicPermission(null);
     }
     else {
       const newPermission = await charmClient.createPermission({
@@ -78,7 +80,7 @@ export default function ShareToWeb () {
         permissionLevel: 'view',
         public: true
       });
-      refreshPage(currentPageId);
+      setPublicPermission(newPermission);
     }
   }
 
