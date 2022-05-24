@@ -190,14 +190,17 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.TableFiltersMenu(),
     trailingNode.plugins(),
-    disclosure.plugins(),
-    rowActions.plugins({
-      key: actionsPluginKey
-    })
+    disclosure.plugins()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
   ];
+
+  if (!readOnly) {
+    basePlugins.push(rowActions.plugins({
+      key: actionsPluginKey
+    }));
+  }
 
   if (!disabledPageSpecificFeatures) {
     basePlugins.push(inlineComment.plugin({
@@ -460,7 +463,7 @@ function CharmEditor (
           }
           case 'page': {
             return (
-              <NestedPage {...props}>
+              <NestedPage readOnly={readOnly} {...props}>
                 {_children}
               </NestedPage>
             );
@@ -475,7 +478,7 @@ function CharmEditor (
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
-      <RowActionsMenu pluginKey={actionsPluginKey} />
+      {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
       {children}
       {!disabledPageSpecificFeatures && (
