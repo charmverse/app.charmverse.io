@@ -19,8 +19,6 @@ export async function getPage (pageIdOrPath: string, spaceId?: string): Promise<
     spaceId
   };
 
-  console.log('Query', searchQuery);
-
   return prisma.page.findFirst({
     where: searchQuery,
     include: {
