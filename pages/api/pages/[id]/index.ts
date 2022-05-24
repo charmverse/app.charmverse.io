@@ -12,9 +12,11 @@ import { getPage } from 'lib/pages/server/getPage';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
   .use(requireKeys(['id'], 'query'))
   .get(getPageRoute)
+  // Only require user on update and delete
+  .use(requireUser)
   .put(updatePage)
   .delete(deletePage);
 
