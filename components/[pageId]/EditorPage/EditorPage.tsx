@@ -1,4 +1,4 @@
-import { Prisma, Page } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -8,13 +8,10 @@ import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/v
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { useUser } from 'hooks/useUser';
 import { Board } from 'lib/focalboard/board';
-import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
-import { isTruthy } from 'lib/utilities/types';
 import log from 'loglevel';
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
@@ -82,16 +79,14 @@ export default function EditorPage (
     }
   }, [pageId, pagesLoaded]);
 
-  const debouncedPageUpdate = debouncePromise((updates: Prisma.PageUpdateInput) => {
+  const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
     setIsEditing(true);
+    const updatedPage = await charmClient.updatePage(updates);
     setPages((_pages) => ({
       ..._pages,
-      [pageId]: {
-        ..._pages[pageId]!,
-        ...updates as Partial<Page>
-      }
+      [pageId]: updatedPage
     }));
-    return charmClient.updatePage(updates);
+    return updatedPage;
   }, 500);
 
   const setPage = useCallback(async (updates: Partial<Page>) => {

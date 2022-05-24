@@ -1,13 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React, {useState, useCallback, useEffect, useRef} from 'react'
+import {useState, useCallback, useEffect} from 'react'
 import {useIntl} from 'react-intl'
 
 import {Board, IPropertyOption, IPropertyTemplate, PropertyType} from '../blocks/board'
 import {Card} from '../blocks/card'
-import {ContentBlock} from '../blocks/contentBlock'
-import {CommentBlock} from '../blocks/commentBlock'
 import mutator from '../mutator'
 import {OctoUtils} from '../octoUtils'
 import {Utils, IDType} from '../utils'
@@ -50,6 +48,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     const finalDisplayValue = displayValue || emptyDisplayValue
 
     const editableFields: Array<PropertyType> = ['text', 'number', 'email', 'url', 'phone']
+    const latestUpdated = (new Date(updatedAt)).getTime() > (new Date(card.updatedAt)).getTime() ? "page" : "card";
 
     useEffect(() => {
         if (serverValue === value) {
@@ -91,7 +90,9 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                 emptyValue={emptyDisplayValue}
                 propertyTemplate={propertyTemplate}
                 propertyValue={propertyValue}
-                onChange={(newValue) => mutator.changePropertyValue(card, propertyTemplate.id, newValue)}
+                onChange={async (newValue) => {
+                  await mutator.changePropertyValue(card, propertyTemplate.id, newValue)
+                }}
                 onChangeColor={(option: IPropertyOption, colorId: string) => mutator.changePropertyOptionColor(board, propertyTemplate, option, colorId)}
                 onDeleteOption={(option: IPropertyOption) => mutator.deletePropertyOption(board, propertyTemplate, option)}
                 onCreate={
@@ -146,7 +147,9 @@ const PropertyValueElement = (props:Props): JSX.Element => {
             <UserProperty
                 value={propertyValue?.toString()}
                 readonly={readOnly}
-                onChange={(newValue) => mutator.changePropertyValue(card, propertyTemplate.id, newValue)}
+                onChange={(newValue) => {
+                  mutator.changePropertyValue(card, propertyTemplate.id, newValue)
+                }}
             />
         )
     } else if (propertyTemplate.type === 'date') {
@@ -158,7 +161,9 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                 className='octo-propertyvalue'
                 value={value.toString()}
                 showEmptyPlaceholder={showEmptyPlaceholder}
-                onChange={(newValue) => mutator.changePropertyValue(card, propertyTemplate.id, newValue)}
+                onChange={(newValue) => {
+                  mutator.changePropertyValue(card, propertyTemplate.id, newValue)
+                }}
             />
         )
     } else if (propertyTemplate.type === 'url') {
@@ -168,7 +173,9 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                 readonly={readOnly}
                 placeholder={emptyDisplayValue}
                 onChange={setValue}
-                onSave={() => mutator.changePropertyValue(card, propertyTemplate.id, value)}
+                onSave={() => {
+                  mutator.changePropertyValue(card, propertyTemplate.id, value)
+                }}
                 onCancel={() => setValue(propertyValue || '')}
                 validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
             />
@@ -191,7 +198,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     } else if (propertyTemplate.type === 'updatedBy') {
         return (
             <LastModifiedBy
-                updatedBy={updatedBy}
+                updatedBy={latestUpdated === "card" ? card.updatedBy : updatedBy}
             />
         )
     } else if (propertyTemplate.type === 'createdTime') {
@@ -201,7 +208,7 @@ const PropertyValueElement = (props:Props): JSX.Element => {
     } else if (propertyTemplate.type === 'updatedTime') {
         return (
             <LastModifiedAt
-                updatedAt={updatedAt}
+                updatedAt={new Date(latestUpdated === "card" ? card.updatedAt : updatedAt).toString()}
             />
         )
     }
@@ -217,7 +224,9 @@ const PropertyValueElement = (props:Props): JSX.Element => {
                     value={value.toString()}
                     autoExpand={false}
                     onChange={setValue}
-                    onSave={() => mutator.changePropertyValue(card, propertyTemplate.id, value)}
+                    onSave={() => {
+                      mutator.changePropertyValue(card, propertyTemplate.id, value)
+                    }}
                     onCancel={() => setValue(propertyValue || '')}
                     validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
                     spellCheck={propertyTemplate.type === 'text'}

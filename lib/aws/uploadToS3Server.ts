@@ -40,7 +40,14 @@ export async function uploadToS3 ({ fileName, url }: { fileName: string, url: st
   };
 }
 
+function generateFilename (url: string) {
+  return decodeURIComponent(new URL(url).pathname.split('/').pop() || '')?.replace(/\s/g, '-') || uuid();
+}
+
 export function getFilePath ({ spaceId, url }: { spaceId: string, url: string }) {
-  const filename = decodeURIComponent(new URL(url).pathname.split('/').pop() || '')?.replace(/\s/g, '-') || uuid();
-  return `spaces/${spaceId}/${uuid()}/${filename}`;
+  return `spaces/${spaceId}/${uuid()}/${generateFilename(url)}`;
+}
+
+export function getUserS3Folder ({ userId, url }: { userId: string, url: string }) {
+  return `user-content/${userId}/${uuid()}/${generateFilename(url)}`;
 }

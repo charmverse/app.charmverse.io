@@ -24,11 +24,6 @@ import { usePages } from 'hooks/usePages'
 import { mutate } from 'swr'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 
-
-
-
-
-
 type Props = {
     board: Board
     cardId: string
