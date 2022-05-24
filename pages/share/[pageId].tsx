@@ -5,7 +5,7 @@ export default function PublicPage () {
 
   return (
     <PageContainer>
-      <BlocksEditorPage />
+      <BlocksEditorPage shouldLoadPublicPage />
     </PageContainer>
   );
 }

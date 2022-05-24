@@ -32,11 +32,8 @@ export default function EditorPage (
   const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
-  const [user] = useUser();
 
   const currentPagePermissions = getPagePermissions(pageId);
-
-  console.log('Current', currentPagePermissions, pageId);
 
   async function loadPublicPage (publicPageId: string) {
 
@@ -74,14 +71,12 @@ export default function EditorPage (
       loadPublicPage(pageId as string);
     }
     else if (pageId && pagesLoaded) {
-      console.log('Entering here');
       const pageByPath = pages[pageId];
       if (pageByPath) {
         setTitleState(pageByPath.title);
         onPageLoad?.(pageByPath.id);
       }
       else {
-        console.log('Pages not found');
         setPageNotFound(true);
       }
     }
