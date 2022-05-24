@@ -48,6 +48,6 @@ export interface IPagePermissionWithAssignee extends PagePermission, IPagePermis
   user: User | null;
   role: Role | null;
   space: Space | null;
-  public: true | null;
+  public: boolean | null;
 }
 
