@@ -93,7 +93,7 @@ export default function EditorPage (
       .finally(() => {
         setIsEditing(false);
       });
-  }, [currentPageId, publicShare, currentPage]);
+  }, [currentPageId, publicShare]);
 
   // memoize the page to avoid re-rendering unless certain fields are changed
   const memoizedCurrentPage = useMemo(
