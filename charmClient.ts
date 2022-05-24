@@ -32,6 +32,8 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
 import { GetTasksResponse } from 'pages/api/tasks';
 
+import { PublicSpaceInfo } from 'lib/spaces/interfaces';
+
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
 export interface PopulatedBounty extends Bounty {
@@ -248,6 +250,10 @@ class CharmClient {
     const currentSpace = await this.getWorkspace();
     const contributors = await this.getContributors(currentSpace.id);
     return contributors.map(this.userToFBUser);
+  }
+
+  async getPublicSpaceInfo (spaceId: string): Promise<PublicSpaceInfo> {
+    return http.GET<PublicSpaceInfo>(`/api/spaces/${spaceId}/public`);
   }
 
   async getAllBlocks (): Promise<FBBlock[]> {
