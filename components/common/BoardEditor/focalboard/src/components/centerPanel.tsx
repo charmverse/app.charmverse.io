@@ -5,12 +5,12 @@ import { Box } from '@mui/system'
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner'
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
-import { Page } from 'models'
+import { Page } from '@prisma/client'
 import React, { useState } from 'react'
 import Hotkeys from 'react-hot-keys'
+import { mutate } from 'swr'
 import { injectIntl, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
-import { mutate } from 'swr'
 import { BlockIcons } from '../blockIcons'
 import { Block } from '../blocks/block'
 import { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../blocks/board'
@@ -29,6 +29,7 @@ import Kanban from './kanban/kanban'
 import Table from './table/table'
 import ViewHeader from './viewHeader/viewHeader'
 import ViewTitle from './viewTitle'
+import charmClient from 'charmClient';
 
 type Props = {
   clientConfig?: ClientConfig
@@ -157,7 +158,12 @@ function CenterPanel(props: Props) {
         'add card',
         async (block: Block) => {
           if (space) {
-            await mutate(`pages/${space.id}`)
+            await mutate(`pages/${space.id}`, async (pages: Page[]): Promise<Page[]> => {
+              const newPage = await charmClient.getPage(block.id);
+              return [...pages, newPage];
+            }, {
+              revalidate: false
+            })
           }
           if (show) {
             props.addCard(createCard(block))

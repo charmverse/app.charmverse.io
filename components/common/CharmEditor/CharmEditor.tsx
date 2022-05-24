@@ -190,14 +190,17 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.TableFiltersMenu(),
     trailingNode.plugins(),
-    disclosure.plugins(),
-    rowActions.plugins({
-      key: actionsPluginKey
-    })
+    disclosure.plugins()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
   ];
+
+  if (!readOnly) {
+    basePlugins.push(rowActions.plugins({
+      key: actionsPluginKey
+    }));
+  }
 
   if (!disabledPageSpecificFeatures) {
     basePlugins.push(inlineComment.plugin({
@@ -254,7 +257,6 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
   }
 
   .charm-paragraph {
-    display: flex;
     .bangle-nv-child-container {
       width: 100%;
     }
@@ -346,7 +348,8 @@ function CharmEditor (
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
-      readOnly
+      readOnly,
+      disabledPageSpecificFeatures
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components
@@ -390,7 +393,7 @@ function CharmEditor (
             return (
               <Paragraph
                 inlineCommentPluginKey={inlineCommentPluginKey}
-                calculateInlineComments={!showingCommentThreadsList}
+                calculateInlineComments={!showingCommentThreadsList && !disabledPageSpecificFeatures}
                 {...props}
               >{_children}
               </Paragraph>
@@ -459,7 +462,7 @@ function CharmEditor (
           }
           case 'page': {
             return (
-              <NestedPage {...props}>
+              <NestedPage readOnly={readOnly} {...props}>
                 {_children}
               </NestedPage>
             );
@@ -474,7 +477,7 @@ function CharmEditor (
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
-      <RowActionsMenu pluginKey={actionsPluginKey} />
+      {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
       {children}
       {!disabledPageSpecificFeatures && (
@@ -496,7 +499,7 @@ function CharmEditor (
         </PageThreadListBox>
       </Grow>
       )}
-      <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+      {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
       <DevTools />
     </StyledReactBangleEditor>
   );
