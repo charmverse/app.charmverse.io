@@ -18,3 +18,9 @@ export interface LoggedInUser extends User {
   discordUser?: DiscordUser | null
   telegramUser?: TelegramUser | null
 }
+
+export enum IdentityType {
+  Address,
+  Discord,
+  Telegram
+}

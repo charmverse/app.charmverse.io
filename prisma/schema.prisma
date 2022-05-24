@@ -138,6 +138,7 @@ model User {
   gnosisSafes     UserGnosisSafe[]
   gnosisSafeState UserGnosisSafeState?
   profile         UserDetails?
+  identityType    String
 }
 
 model UserGnosisSafeState {
