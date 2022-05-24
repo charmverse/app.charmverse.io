@@ -86,9 +86,7 @@ export default function UserDetails () {
           spaceImage={user?.avatar}
           updateImage={handleImageUpdate}
           displayIcons={true}
-          sx={{
-            boderRadius: '50%'
-          }}
+          variant='circular'
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
