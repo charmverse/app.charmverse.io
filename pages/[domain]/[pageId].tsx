@@ -26,7 +26,7 @@ export default function BlocksEditorPage ({ shouldLoadPublicPage = false }: Prop
   const pageId = pageIdList.find(p => p.path === pagePath)?.id;
 
   if (pageId) {
-    refreshPage(currentPageId);
+
     return <EditorPage shouldLoadPublicPage={false} onPageLoad={(_pageId) => setCurrentPageId(_pageId)} pageId={pageId} />;
   }
 

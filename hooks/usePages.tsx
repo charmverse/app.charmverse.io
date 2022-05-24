@@ -102,6 +102,13 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (currentPageId) {
+      refreshPage(currentPageId);
+    }
+
+  }, [currentPageId]);
+
   /**
    * Will return permissions for the currently connected user
    * @param pageId
