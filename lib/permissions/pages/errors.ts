@@ -51,7 +51,7 @@ export class SelfInheritancePermissionError extends SystemError {
 export class CannotInheritOutsideTreeError extends SystemError {
   constructor (attemptedToInheritFromPage: string, targetPageId: string) {
     super({
-      errorType: 'Data not found',
+      errorType: 'Invalid input',
       message: `Page ${targetPageId} cannot inherit from ${attemptedToInheritFromPage} as the latter is not a parent of the former`,
       severity: 'warning'
     });
