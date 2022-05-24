@@ -402,14 +402,29 @@ ol li {
 
 /** Disclosure component **/
 details {
-  padding-left: 14px;
+  padding-left: 20px;
+
+  &[open] summary::before {
+    content: "▼";
+  }
 
   summary {
-    margin-left: -14px;
     outline: 0 none;
+    list-style: none;
+    display: flex;
+    margin-left: -20px;
 
+    &::before {
+      content: "►";
+      position: relative;
+      min-width: 20px;
+      display: inline-block;
+    }
+
+    &::-webkit-details-marker,
     &::marker {
       color: var(--prop-gray);
+      display: none;
     }
 
     & > * {
