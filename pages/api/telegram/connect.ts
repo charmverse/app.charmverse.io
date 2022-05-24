@@ -50,8 +50,7 @@ async function connectTelegram (req: NextApiRequest, res: NextApiResponse<Telegr
       },
       data: {
         username: telegramAccount.username,
-        avatar: telegramAccount.photo_url,
-        identityType: IdentityType.Telegram
+        avatar: telegramAccount.photo_url
       }
     });
   }
