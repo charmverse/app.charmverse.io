@@ -7,7 +7,7 @@ import Input from '@mui/material/OutlinedInput';
 import Typography from '@mui/material/Typography';
 import { Space } from '@prisma/client';
 import charmClient from 'charmClient';
-import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
+import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -84,44 +84,24 @@ function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[], sp
 }
 
 interface Props {
-  pageId: string
+  pageId: string;
+  refreshPermissions: () => void;
+  pagePermissions: IPagePermissionWithAssignee[];
 }
 
-export default function PagePermissions ({ pageId }: Props) {
+export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions }: Props) {
 
-  const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee []>([]);
   const theme = useTheme();
-  const { pages } = usePages();
+  const { pages, getPagePermissions } = usePages();
   const [space] = useCurrentSpace();
-  const { getPagePermissions } = usePages();
-  const [userPagePermissions, setUserPagePermissions] = useState<null | IPagePermissionFlags>(null);
-  const [selectedPermissionId, setSelectedPermissionId] = useState<string | null>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
-  const [spaceLevelPermission, setSpaceLevelPermission] = useState<IPagePermissionWithAssignee | null>(null);
-
-  // Only used on first run
-  const [permissionsLoaded, setPermissionsLoaded] = useState(false);
+  const spaceLevelPermission = pagePermissions.find(permission => space && permission.spaceId === space?.id);
+  const userPagePermissions = getPagePermissions(pageId);
 
   useEffect(() => {
     refreshPermissions();
   }, [pageId]);
-
-  function refreshPermissions () {
-
-    const userPermissions = getPagePermissions(pageId);
-    setUserPagePermissions(userPermissions);
-
-    charmClient.listPagePermissions(pageId)
-      .then(permissionSet => {
-
-        const _spaceLevelPermission = permissionSet.find(permission => space && permission.spaceId === space?.id);
-
-        setSpaceLevelPermission(_spaceLevelPermission ?? null);
-        setPagePermissions(permissionSet);
-        setPermissionsLoaded(true);
-      });
-  }
 
   async function updateSpacePagePermissionLevel (permissionLevel: PagePermissionLevelType | 'delete') {
     if (permissionLevel === 'delete') {
@@ -138,7 +118,6 @@ export default function PagePermissions ({ pageId }: Props) {
       });
     }
     await refreshPermissions();
-    setSelectedPermissionId(null);
   }
 
   async function updatePagePermissionLevel (permission: IPagePermissionWithAssignee, permissionLevel: PagePermissionLevelType | 'delete') {
@@ -156,7 +135,6 @@ export default function PagePermissions ({ pageId }: Props) {
       });
     }
     await refreshPermissions();
-    setSelectedPermissionId(null);
   }
 
   const sortedPermissions = sortPagePermissions(pagePermissions);
@@ -164,10 +142,8 @@ export default function PagePermissions ({ pageId }: Props) {
   const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
-  console.log({ pagePermissions, pageId });
   return (
-    <Box padding={1}>
-
+    <Box p={1}>
       {userPagePermissions?.grant_permissions === true && (
         <Box mb={1} onClick={() => popupState.open()}>
           <StyledInput
@@ -184,34 +160,31 @@ export default function PagePermissions ({ pageId }: Props) {
       )}
 
       <Box display='block' py={0.5}>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
+        <Box
+          display='flex'
+          justifyContent='space-between'
+          alignItems='center'
+
+        >
           <Typography variant='body2'>
             Everyone at {space?.name}
           </Typography>
-          <div style={{ width: '120px', textAlign: 'center' }}>
+          <div style={{ width: '160px', textAlign: 'right' }}>
             {
-            selectedPermissionId === 'space' ? (
-              <InputEnumToOptions
+            userPagePermissions?.grant_permissions === true ? (
+              <SmallSelect
+                renderValue={value => permissionsWithoutCustom[value as string] || 'No access'}
                 onChange={level => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
                 keyAndLabel={permissionsWithRemove}
-                defaultValue={spaceLevelPermission?.permissionLevel}
-                autoExpand
+                defaultValue={spaceLevelPermission?.permissionLevel ?? 'No access'}
               />
             ) : (
-              <div onClick={() => {
-                if (userPagePermissions?.grant_permissions === true) {
-                  setSelectedPermissionId('space');
-                }
-              }}
+              <Typography
+                color='secondary'
+                variant='caption'
               >
-                <Typography
-                  color='secondary'
-                  variant='caption'
-                  sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}
-                >
-                  {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : (permissionsLoaded ? 'No access' : '')}
-                </Typography>
-              </div>
+                {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : 'No access'}
+              </Typography>
             )
           }
           </div>
@@ -235,31 +208,24 @@ export default function PagePermissions ({ pageId }: Props) {
       {
         sortedPermissions.map(permission => {
           return (
-            <Box display='block' py={0.5} onMouseLeave={() => setSelectedPermissionId(null)}>
+            <Box display='block' py={0.5}>
               <Box display='flex' justifyContent='space-between' alignItems='center' key={permission.displayName}>
                 <Typography variant='body2'>
                   {permission.displayName}
                 </Typography>
-                <div style={{ width: '120px', textAlign: 'center' }}>
+                <div style={{ width: '160px', textAlign: 'right' }}>
                   {
-                  selectedPermissionId === permission.id ? (
-                    <InputEnumToOptions
+                  userPagePermissions?.grant_permissions === true ? (
+                    <SmallSelect
+                      renderValue={value => permissionsWithoutCustom[value as string]}
                       onChange={level => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
                       keyAndLabel={permissionsWithRemove}
                       defaultValue={permission.permissionLevel}
-                      autoExpand
                     />
                   ) : (
-                    <div onClick={() => {
-                      if (userPagePermissions?.grant_permissions === true) {
-                        setSelectedPermissionId(permission.id);
-                      }
-                    }}
-                    >
-                      <Typography color='secondary' variant='caption' sx={{ ':hover': { borderWidth: 2, borderColor: theme.palette.gray, borderRadius: 1, borderStyle: 'solid', px: 3, py: 1 } }}>
-                        {permissionLevels[permission.permissionLevel]}
-                      </Typography>
-                    </div>
+                    <Typography color='secondary' variant='caption'>
+                      {permissionLevels[permission.permissionLevel]}
+                    </Typography>
                   )
                 }
                 </div>
@@ -292,7 +258,6 @@ export default function PagePermissions ({ pageId }: Props) {
           }}
         />
       </Modal>
-
     </Box>
   );
 }
