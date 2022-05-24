@@ -67,7 +67,7 @@ export default function ShareToWeb () {
       setPublicPermission(null);
     }
 
-  }, [currentPageId, pages]);
+  }, [currentPageId, pages, pages[currentPageId]?.parentId]);
 
   async function togglePublic () {
     if (publicPermission) {

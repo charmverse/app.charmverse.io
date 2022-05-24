@@ -222,15 +222,13 @@ function PageNavigation ({
       id: droppedItem.id,
       index, // send it to the end
       parentId
+    }).then(updatedPage => {
+      setPages(_pages => ({
+        ..._pages,
+        [droppedItem.id]: updatedPage
+      }));
     });
-    setPages(_pages => ({
-      ..._pages,
-      [droppedItem.id]: {
-        ..._pages[droppedItem.id]!,
-        index,
-        parentId
-      }
-    }));
+
   }, []);
 
   useEffect(() => {

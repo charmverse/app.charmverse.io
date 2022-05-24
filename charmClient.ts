@@ -139,7 +139,7 @@ class CharmClient {
   }
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
-    return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
+    return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
   updateGnosisSafeState (payload: UpdateGnosisSafeState) {
