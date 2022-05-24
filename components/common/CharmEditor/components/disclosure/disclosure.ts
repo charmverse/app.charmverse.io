@@ -1,5 +1,6 @@
 import { RawPlugins, RawSpecs, createElement } from '@bangle.dev/core';
-import { DOMOutputSpec, Plugin, PluginKey } from '@bangle.dev/pm';
+import { DOMOutputSpec, Plugin, PluginKey, keymap } from '@bangle.dev/pm';
+import { backspaceCmd } from './commands';
 
 export function spec () {
   return [
@@ -48,6 +49,10 @@ function detailsSpec (): RawSpecs {
 export function plugins (): RawPlugins {
   return () => {
     return [
+
+      keymap({
+        Backspace: backspaceCmd
+      }),
       ContainerPlugin({ type: 'disclosureSummary', contentDOM: ['summary'] }),
       ContainerPlugin({ type: 'disclosureDetails', contentDOM: ['details'] })
     ];
