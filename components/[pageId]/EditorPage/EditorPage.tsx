@@ -74,7 +74,8 @@ export default function EditorPage (
       loadPublicPage(pageId as string);
     }
     else if (pageId && pagesLoaded) {
-      const pageByPath = pages[pageId] || Object.values(pages).filter(isTruthy).find(page => page.path === pageId);
+      console.log('Entering here');
+      const pageByPath = pages[pageId];
       if (pageByPath) {
         setTitleState(pageByPath.title);
         onPageLoad?.(pageByPath.id);

@@ -27,7 +27,6 @@ type IContext = {
   refreshPage: (pageId: string) => Promise<IPageWithPermissions>
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   getPagePermissions: (pageId: string) => IPagePermissionFlags,
-  currentPagePermissions: IPagePermissionFlags | null
   deletePage: (pageId: string) => Promise<void>,
   restorePage: (pageId: string, route?: boolean) => Promise<void>,
 };
@@ -42,7 +41,6 @@ export const PagesContext = createContext<Readonly<IContext>>({
   isEditing: true,
   setIsEditing: () => { },
   getPagePermissions: () => new AllowedPagePermissions(),
-  currentPagePermissions: null,
   refreshPage: () => Promise.resolve({} as any),
   deletePage: () => undefined as any,
   restorePage: () => undefined as any
@@ -145,30 +143,12 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return computedPermissions;
   }
 
-  const [currentPagePermissions, setCurrentPagePermissions] = useState<IPagePermissionFlags | null>(null);
-
-  useEffect(() => {
-    if (currentPageId) {
-      const computed = getPagePermissions(currentPageId);
-      setCurrentPagePermissions(computed);
-    }
-    else {
-      setCurrentPagePermissions(null);
-    }
-
-  }, [currentPageId, user, pages]);
-
   async function refreshPage (pageId: string): Promise<IPageWithPermissions> {
     const freshPageVersion = await charmClient.getPage(pageId);
     setPages({
       ...pages,
       [freshPageVersion.id]: freshPageVersion
     });
-
-    if (currentPageId === freshPageVersion.id) {
-      const computed = getPagePermissions(currentPageId);
-      setCurrentPagePermissions(computed);
-    }
 
     return freshPageVersion;
   }
@@ -182,7 +162,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     setPages,
     getPagePermissions,
     refreshPage,
-    currentPagePermissions,
     deletePage,
     restorePage
   }), [currentPageId, isEditing, router, pages, user]);
