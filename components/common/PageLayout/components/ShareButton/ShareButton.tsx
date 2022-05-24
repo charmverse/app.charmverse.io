@@ -8,7 +8,7 @@ import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState, useEffect } from 'react';
-import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 import { useUser } from 'hooks/useUser';
 import PagePermissions from './components/PagePermissions';
 import ShareToWeb from './components/ShareToWeb';
@@ -18,19 +18,31 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
   const { currentPageId, refreshPage } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const [pagePermissions, setPagePermissions] = useState<null | IPagePermissionFlags>(null);
+  const [pagePermissions2, setPagePermissions2] = useState<IPagePermissionWithAssignee[] | null>(null);
   const [user] = useUser();
 
-  function retrievePermissions () {
+  async function retrievePermissions () {
     if (!user) {
       throw new Error('User is not defined');
     }
     setPagePermissions(null);
-    charmClient.computeUserPagePermissions({
-      pageId: currentPageId,
-      userId: user.id
-    }).then(permissions => {
-      setPagePermissions(permissions);
-    });
+    await Promise.all([
+      charmClient.computeUserPagePermissions({
+        pageId: currentPageId,
+        userId: user.id
+      }).then(permissions => {
+        setPagePermissions(permissions);
+      }),
+      refreshPermissions()
+    ]);
+  }
+
+  function refreshPermissions () {
+
+    charmClient.listPagePermissions(currentPageId)
+      .then(permissions => {
+        setPagePermissions2(permissions);
+      });
   }
 
   useEffect(() => {
@@ -72,13 +84,17 @@ export default function ShareButton ({ headerHeight }: { headerHeight: number })
         }}
       >
         {
-          !pagePermissions
+          !(pagePermissions && pagePermissions2)
             ? (<Box sx={{ height: 100 }}><Loader size={20} sx={{ height: 600 }} /></Box>)
             : (
               <>
-                <ShareToWeb pageId={currentPageId} />
-                <Divider sx={{ mt: 2, mb: 1 }} />
-                {currentPageId && <PagePermissions pageId={currentPageId} />}
+                <ShareToWeb pagePermissions={pagePermissions} />
+                <Divider />
+                <PagePermissions
+                  pageId={currentPageId}
+                  refreshPermissions={refreshPermissions}
+                  pagePermissions={pagePermissions2}
+                />
               </>
             )
         }
