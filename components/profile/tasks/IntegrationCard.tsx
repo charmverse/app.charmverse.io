@@ -91,7 +91,7 @@ export default function IntegrationCard () {
         }}
       >
         <Box width={200} display='flex' justifyContent='space-between' alignItems='center'>
-          <Box display='flex' alignItems='center' gap={1}>
+          <Box display='flex' alignItems='center' gap={1.5}>
             <Avatar size='large' variant='rounded' name={userEnsName || getDisplayName(currentUser)} avatar={currentUser.avatar} />
             <Typography variant='subtitle1' color='secondary' width={75}>My Public Profile</Typography>
           </Box>

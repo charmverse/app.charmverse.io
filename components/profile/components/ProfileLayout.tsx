@@ -5,7 +5,7 @@ import ProfileSidebar from './ProfileSidebar';
 export default function ProfileLayout (props: { children: React.ReactNode }) {
 
   return (
-    <PageLayout sidebar={ProfileSidebar}>
+    <PageLayout drawerWidth={55} sidebar={ProfileSidebar}>
       <ScrollableWindow>
         <Box py={3} sx={{ px: { xs: '40px', sm: '80px' } }}>
           {props.children}

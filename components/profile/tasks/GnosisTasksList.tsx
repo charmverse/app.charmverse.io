@@ -484,15 +484,13 @@ export default function GnosisTasksSection () {
 
   return (
     <>
-      <Legend>
-        <Box display='flex' justifyContent='flex-end'>
-          <SnoozeTransactions
-            message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
-            snoozedForDate={snoozedForDate}
-            setSnoozedForDate={setSnoozedForDate}
-          />
-        </Box>
-      </Legend>
+      <Box mb={2} display='flex' justifyContent='flex-end'>
+        <SnoozeTransactions
+          message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
+          snoozedForDate={snoozedForDate}
+          setSnoozedForDate={setSnoozedForDate}
+        />
+      </Box>
       {!safesWithTasks && !error && <LoadingComponent height='200px' isLoading={true} />}
       {error && !safesWithTasks && (
         <Alert severity='error'>

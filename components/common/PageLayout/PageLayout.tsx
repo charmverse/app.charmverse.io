@@ -12,9 +12,7 @@ import Sidebar from './components/Sidebar';
 import Favicon from './components/Favicon';
 import PageContainer from './components/PageContainer';
 
-const drawerWidth = 300;
-
-const openedMixin = (theme: Theme) => ({
+const openedMixin = (theme: Theme, drawerWidth: number) => ({
   width: '100%',
   marginRight: 0,
   transition: theme.transitions.create(['marginRight', 'width'], {
@@ -39,7 +37,7 @@ const closedMixin = (theme: Theme) => ({
 
 const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'open' })
   // eslint-disable-next-line no-unexpected-multiline
-  <{ open: boolean }>(({ theme, open }) => ({
+  <{ open: boolean, drawerWidth: number }>(({ drawerWidth, theme, open }) => ({
     background: 'transparent',
     boxShadow: 'none',
     color: 'inherit',
@@ -61,14 +59,14 @@ const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !==
 const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' })
   // @ts-ignore mixins dont work with Typescript
   // eslint-disable-next-line no-unexpected-multiline
-  <{ open: boolean }>(({ theme, open }) => ({
+  <{ open: BooleanSchema, drawerWidth: number }>(({ drawerWidth, theme, open }) => ({
     width: drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
     ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme)
+      ...openedMixin(theme, drawerWidth),
+      '& .MuiDrawer-paper': openedMixin(theme, drawerWidth)
     }),
     ...(!open && {
       ...closedMixin(theme),
@@ -87,10 +85,11 @@ const LayoutContainer = styled.div`
 
 interface PageLayoutProps {
   children: React.ReactNode;
-  sidebar?: (p: { closeSidebar: () => void }) => JSX.Element
+  sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element)
+  drawerWidth?: number
 }
 
-function PageLayout ({ children, sidebar: SidebarOverride }: PageLayoutProps) {
+function PageLayout ({ drawerWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
   const isSmallScreen = window.innerWidth < 600;
   const [open, setOpen] = React.useState(!isSmallScreen);
   const [user] = useUser();
@@ -110,17 +109,19 @@ function PageLayout ({ children, sidebar: SidebarOverride }: PageLayoutProps) {
       </Head>
       <LayoutContainer>
         <CommentThreadsListDisplayProvider>
-          <AppBar position='fixed' open={open}>
+          <AppBar drawerWidth={drawerWidth} position='fixed' open={open}>
             <Header
               open={open}
               openSidebar={handleDrawerOpen}
             />
           </AppBar>
-          <Drawer variant='permanent' open={open}>
+          (
+          <Drawer drawerWidth={drawerWidth} variant='permanent' open={open}>
             {SidebarOverride
               ? <SidebarOverride closeSidebar={handleDrawerClose} />
               : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
           </Drawer>
+          )
           <PageContainer>
             <HeaderSpacer />
             {children}
