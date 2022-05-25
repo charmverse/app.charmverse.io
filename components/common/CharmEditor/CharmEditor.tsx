@@ -44,17 +44,20 @@ import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
+import RowActionsMenu, * as rowActions from './components/rowActions';
 import { checkForEmpty } from './utils';
 import * as disclosure from './components/disclosure';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import Paragraph from './components/Paragraph';
 import Mention, { MentionSuggest, mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import DevTools from './DevTools';
 
 export interface ICharmEditorOutput {
   doc: PageContent,
   rawText: string
 }
 
+const actionsPluginKey = new PluginKey('row-actions');
 const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
 const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
@@ -193,6 +196,12 @@ export function charmEditorPlugins (
     // pasteImagePlugin
   ];
 
+  if (!readOnly) {
+    basePlugins.push(rowActions.plugins({
+      key: actionsPluginKey
+    }));
+  }
+
   if (!disabledPageSpecificFeatures) {
     basePlugins.push(inlineComment.plugin({
       key: inlineCommentPluginKey
@@ -245,13 +254,6 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
       background: rgba(255,212,0,0.56) !important;
     }
     cursor: pointer;
-  }
-
-  .charm-paragraph {
-    display: flex;
-    .bangle-nv-child-container {
-      width: 100%;
-    }
   }
 `;
 
@@ -340,7 +342,8 @@ function CharmEditor (
     specRegistry,
     plugins: charmEditorPlugins({
       onContentChange: _onContentChange,
-      readOnly
+      readOnly,
+      disabledPageSpecificFeatures
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     // hide the black bar when dragging items - we dont even support dragging most components
@@ -384,7 +387,7 @@ function CharmEditor (
             return (
               <Paragraph
                 inlineCommentPluginKey={inlineCommentPluginKey}
-                calculateInlineComments={!showingCommentThreadsList}
+                calculateInlineComments={!showingCommentThreadsList && !disabledPageSpecificFeatures}
                 {...props}
               >{_children}
               </Paragraph>
@@ -453,7 +456,7 @@ function CharmEditor (
           }
           case 'page': {
             return (
-              <NestedPage {...props}>
+              <NestedPage readOnly={readOnly} {...props}>
                 {_children}
               </NestedPage>
             );
@@ -468,6 +471,7 @@ function CharmEditor (
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
+      {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disabledPageSpecificFeatures} />
       {children}
       {!disabledPageSpecificFeatures && (
@@ -489,7 +493,8 @@ function CharmEditor (
         </PageThreadListBox>
       </Grow>
       )}
-      <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+      {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
+      <DevTools />
     </StyledReactBangleEditor>
   );
 }

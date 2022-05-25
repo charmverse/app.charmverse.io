@@ -1,4 +1,5 @@
 import { Application, Bounty, User } from '@prisma/client';
+import { BountyWithDetails } from 'models';
 
 export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 10;
 
@@ -9,6 +10,18 @@ export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 10;
  */
 export function applicantIsSubmitter (application: Application): boolean {
   return application.status !== 'applied' && application.status !== 'rejected';
+}
+
+export function submissionIsEditable ({ submission, bounty }: {submission: Application, bounty: Bounty}) {
+  if (submission.status !== 'inProgress' && submission.status !== 'review') {
+    return false;
+  }
+
+  if (bounty.status !== 'open' && bounty.status !== 'inProgress') {
+    return false;
+  }
+
+  return true;
 }
 
 export function moveUserApplicationToFirstRow (submissions: Application[], userId: string): Application[] {
@@ -31,6 +44,15 @@ export function moveUserApplicationToFirstRow (submissions: Application[], userI
 
 }
 
+export function countValidSubmissions (submissions: Application[]): number {
+  return submissions?.reduce((count, submission) => {
+    if (submission.status !== 'applied' && submission.status !== 'rejected') {
+      return count + 1;
+    }
+    return count;
+  }, 0) ?? 0;
+}
+
 /*
  * Whether a bounty can accept more submissions
  */
@@ -39,13 +61,17 @@ export function submissionsCapReached ({ bounty, submissions }: {bounty: Bounty,
     return false;
   }
 
-  const validSubmissions: number = submissions.reduce((count, submission) => {
-    if (submission.status !== 'applied' && submission.status !== 'rejected') {
-      return count + 1;
-    }
-    return count;
-  }, 0);
+  const validSubmissions = countValidSubmissions(submissions);
 
   return validSubmissions >= bounty.maxSubmissions;
 
+}
+
+export function bountyCanReceiveNewSubmissionsOrApplications ({ bounty, submissionsAndApplications }:
+  {bounty: Bounty, submissionsAndApplications: Application[]}): boolean {
+  if (bounty.status !== 'open') {
+    return false;
+  }
+
+  return !submissionsCapReached({ bounty, submissions: submissionsAndApplications });
 }

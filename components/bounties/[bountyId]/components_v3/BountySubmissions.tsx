@@ -1,29 +1,29 @@
 import { useTheme } from '@emotion/react';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import CancelIcon from '@mui/icons-material/Cancel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Application, ApplicationStatus, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
+import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
-import { ReviewDecision } from 'lib/applications/interfaces';
-import { applicantIsSubmitter, moveUserApplicationToFirstRow } from 'lib/applications/shared';
+import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { getDisplayName } from 'lib/users';
 import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import Tooltip from '@mui/material/Tooltip';
-import { useBounties } from 'hooks/useBounties';
+import { BountyStatusColours } from '../../components/BountyStatusBadge';
+import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
 
 interface Props {
@@ -58,7 +58,6 @@ export default function BountySubmissions ({ bounty }: Props) {
   const { refreshBounty } = useBounties();
 
   const editSubmissionModal = usePopupState({ variant: 'popover', popupId: 'edit-submission' });
-  const [reviewDecision, setReviewDecision] = useState<{submissionId: string, decision: ReviewDecision} | null>(null);
 
   const isReviewer = bounty.reviewer === user?.id;
 
@@ -75,13 +74,6 @@ export default function BountySubmissions ({ bounty }: Props) {
     }
   }
 
-  async function makeSubmissionDecision (applicationId: string, decision: ReviewDecision) {
-    await charmClient.reviewSubmission(applicationId, decision);
-    setReviewDecision(null);
-    refreshSubmissions();
-    refreshBounty(bounty.id);
-  }
-
   function submitterUpdatedSubmission () {
     editSubmissionModal.close();
     refreshSubmissions();
@@ -92,10 +84,43 @@ export default function BountySubmissions ({ bounty }: Props) {
 
   const userSubmission = sortedSubmissions.find(sub => sub.createdBy === user?.id);
 
+  // Calculate valid submissions for the UI
+  const validSubmissions = countValidSubmissions(submissions ?? []);
+
+  // Only applies if there is a submissions cap
+  const capReached = submissionsCapReached({ bounty, submissions: submissions ?? [] });
+
+  // Bounty open color if no cap or below cap, submission review color if cap is reached
+  const chipColor = capReached ? SubmissionStatusColors.review : BountyStatusColours.open;
+
   console.log(sortedSubmissions);
 
   return (
     <Box>
+      <Grid container sx={{ mb: 2 }}>
+        <Grid item xs={8}>
+          <Typography variant='h5'>
+            Submissions
+          </Typography>
+        </Grid>
+        <Grid container item xs={4} direction='row' justifyContent='flex-end'>
+          {
+                  !bounty.approveSubmitters && !userSubmission && (
+                  <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
+                    <Box component='span'>
+                      <Button
+                        disabled={!!userSubmission}
+                        onClick={editSubmissionModal.open}
+                      >
+                        New
+                      </Button>
+                    </Box>
+                  </Tooltip>
+                  )
+                }
+        </Grid>
+      </Grid>
+
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label='bounty applicant table'>
         <TableHead sx={{
           background: theme.palette.background.dark,
@@ -105,6 +130,9 @@ export default function BountySubmissions ({ bounty }: Props) {
         }}
         >
           <TableRow>
+            <TableCell size='small' align='left'>
+              Status
+            </TableCell>
             <TableCell>
               <Box sx={{
                 display: 'flex',
@@ -115,7 +143,9 @@ export default function BountySubmissions ({ bounty }: Props) {
                 Submitter
               </Box>
             </TableCell>
-            <TableCell>Submission</TableCell>
+            <TableCell>
+
+            </TableCell>
             {
               /* Hidden until we implement comments
 
@@ -123,60 +153,75 @@ export default function BountySubmissions ({ bounty }: Props) {
               */
             }
 
-            <TableCell>Status</TableCell>
-            <TableCell></TableCell>
+            <TableCell align='right'>
+              {
+              // Only show submissions chip if there's a cap, or if there's at least 1
+                (bounty.maxSubmissions || validSubmissions > 0) && (
+
+                <Box>
+                  Submissions
+                  <Tooltip placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
+                    <Chip
+                      color={chipColor}
+                      sx={{ ml: 1, minWidth: '50px' }}
+                      label={bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
+                    />
+                  </Tooltip>
+                </Box>
+                )
+              }
+
+            </TableCell>
           </TableRow>
         </TableHead>
-        {sortedSubmissions.length > 0 && (
-          <TableBody>
-            {sortedSubmissions.map((submission, submissionIndex) => (
-              <TableRow
-                key={submission.id}
-                sx={{ backgroundColor: submissionIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell size='small'>
-                  {
+        <TableBody>
+          {sortedSubmissions.map((submission, submissionIndex) => (
+            <TableRow
+              key={submission.id}
+              sx={{ backgroundColor: submissionIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell size='small' align='left'>
+
+                <Chip
+                  label={SubmissionStatusLabels[submission.status]}
+                  color={SubmissionStatusColors[submission.status]}
+                />
+
+              </TableCell>
+              <TableCell size='small'>
+                {
                       submission.createdBy === user?.id ? 'You'
                         : getDisplayName(contributors.find(c => c.id === submission.createdBy))
                     }
-                </TableCell>
-                <TableCell sx={{ maxWidth: '61vw' }}>
+              </TableCell>
+              <TableCell sx={{ maxWidth: '61vw' }}>
 
-                  {!submission.submission
-                    ? (
-                      <Button type='submit' onClick={editSubmissionModal.open}>Submit work</Button>
-                    ) : (
-
-                      submission.createdBy === user?.id ? (
-                        <Typography
-                          variant='body2'
-                          onClick={editSubmissionModal.open}
-                          color={theme.palette.primary?.main}
-                        >
-                          {fancyTrim(submission.submission, 50)}
-                        </Typography>
-                      ) : (
-                        <Typography
-                          variant='body2'
-                         // TODO Popup an inline charm editor with comments
-                        >
-                          {fancyTrim(submission.submission, 50)}
-                        </Typography>
-                      )
-
-                    )}
-                </TableCell>
-                <TableCell>
-                  <Typography>
-                    <Chip
-                      sx={{ ml: 2 }}
-                      label={SubmissionStatusLabels[submission.status]}
-                      color={SubmissionStatusColors[submission.status]}
-                    />
-                  </Typography>
-
-                </TableCell>
                 {
+                    submission.status === 'review' && submission.createdBy === user?.id && (
+                      <Typography
+                        variant='body2'
+                        onClick={editSubmissionModal.open}
+                        color={theme.palette.primary?.main}
+                      >
+                        {fancyTrim(submission.submission ?? '', 50)}
+                      </Typography>
+                    )
+                  }
+
+                {
+                  // Either another user is seeing this, or the user who made the submission, and they can't edit it further
+                    ((submission.status !== 'review' && submission.createdBy === user?.id) || (submission.createdBy !== user?.id)) && (
+                      <Typography
+                        variant='body2'
+                      >
+                        {fancyTrim(submission.submission ?? '', 50)}
+                      </Typography>
+                    )
+                  }
+
+              </TableCell>
+
+              {
                   /*
                   Hidden until we implement comments
                 <TableCell align='right' sx={{ gap: 2 }}>
@@ -184,90 +229,44 @@ export default function BountySubmissions ({ bounty }: Props) {
                   */
                 }
 
-                <TableCell align='right' sx={{ gap: 2 }}>
-                  {
-                    submission.status === 'review' && isReviewer && (
-                      <Box>
-                        <Tooltip placement='top' title='Approve this submission.'>
-                          <AssignmentTurnedInIcon onClick={() => setReviewDecision({ decision: 'approve', submissionId: submission.id })} sx={{ mr: 3 }} />
-                        </Tooltip>
-                        <Tooltip placement='top' title='Reject this submission. The submitter will be disqualified from making further changes'>
-                          <CancelIcon onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject' })} />
-                        </Tooltip>
-                      </Box>
+              <TableCell align='right' sx={{ gap: 2 }}>
+
+                {
+                    submission.status === 'inProgress' && submission.createdBy === user?.id && (
+                      <Button type='submit' onClick={editSubmissionModal.open}>Submit</Button>
                     )
                   }
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        )}
+
+                <BountySubmissionReviewActions
+                  bounty={bounty}
+                  submission={submission}
+                  reviewComplete={refreshSubmissions}
+                />
+
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
       </Table>
 
-      {
-        userSubmission && (
-          <Modal title='Your submission' open={editSubmissionModal.isOpen} onClose={editSubmissionModal.close} size='large'>
-            <SubmissionEditorForm submission={userSubmission} onSubmit={submitterUpdatedSubmission} />
-          </Modal>
-        )
-      }
+      {submissions?.length === 0 && (
+        <Box
+          my={3}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            opacity: 0.5
+          }}
+        >
+          <Typography variant='h6'>
+            No submissions
+          </Typography>
+        </Box>
+      )}
 
-      {
-        isReviewer && (
-          <Modal title='Confirm your review' open={reviewDecision !== null} onClose={() => setReviewDecision(null)} size='large'>
-
-              {
-                reviewDecision?.decision === 'approve' ? (
-                  <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>
-                    Please confirm you want to <b>approve</b> this submission.
-                  </Typography>
-                ) : (
-                  <Box>
-                    <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>
-                      Please confirm you want to <b>reject</b> this submission.
-                    </Typography>
-                    <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>
-                      The submitter will be disqualified from making further changes
-                    </Typography>
-                  </Box>
-                )
-              }
-
-            <Typography>
-              This decision is permanent.
-            </Typography>
-
-            <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
-
-              {
-                reviewDecision?.decision === 'approve' && (
-                  <Button
-                    color='success'
-                    sx={{ mr: 2, fontWeight: 'bold' }}
-                    onClick={() => makeSubmissionDecision(reviewDecision.submissionId, 'approve')}
-                  >
-                    Approve submission
-                  </Button>
-                )
-              }
-
-              {
-                reviewDecision?.decision === 'reject' && (
-                  <Button
-                    color='error'
-                    sx={{ mr: 2, fontWeight: 'bold' }}
-                    onClick={() => makeSubmissionDecision(reviewDecision.submissionId, 'reject')}
-                  >
-                    Reject submission
-                  </Button>
-                )
-              }
-
-              <Button color='secondary' onClick={() => setReviewDecision(null)}>Cancel</Button>
-            </Box>
-          </Modal>
-        )
-      }
+      <Modal title='Your submission' open={editSubmissionModal.isOpen} onClose={editSubmissionModal.close} size='large'>
+        <SubmissionEditorForm submission={userSubmission} bounty={bounty} onSubmit={submitterUpdatedSubmission} />
+      </Modal>
 
     </Box>
   );

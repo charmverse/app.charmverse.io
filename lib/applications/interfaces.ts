@@ -18,10 +18,24 @@ export interface ApplicationActionRequest {
 
 export type ReviewDecision = 'approve' | 'reject'
 
-export interface ReviewDecisionRequest extends ApplicationActionRequest {
+export interface SubmissionReview {
+  submissionId: string
   decision: ReviewDecision
 }
 
 export interface ApplicationWithBounty extends Application {
   bounty: Bounty
+}
+
+export type SubmissionContent = Partial<Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'>>
+
+export interface SubmissionCreationData {
+  bountyId: string,
+  userId: string,
+  submissionContent: SubmissionContent
+}
+
+export interface SubmissionUpdateData {
+  submissionId: string;
+  submissionContent: SubmissionContent
 }

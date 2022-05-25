@@ -42,7 +42,7 @@ export function cryptoPriceSpec () {
       group: 'block',
       parseDOM: [{ tag: 'div.charm-crypto-price' }],
       toDOM: (): DOMOutputSpec => {
-        return ['div.charm-crypto-price', 0];
+        return ['div.charm-crypto-price'];
       }
     },
     markdown: {

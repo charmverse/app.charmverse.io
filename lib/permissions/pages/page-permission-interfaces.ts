@@ -18,14 +18,14 @@ export interface IPagePermissionRequest {
  * Use for requesting permissions a user can exercise on a specific page
  */
 export interface IPagePermissionUserRequest extends IPagePermissionRequest {
-  userId: string;
+  userId?: string;
 }
 
 /**
  * Provide one of userId, spaceId or roleId
  * @pageId can be passed in the body or externally
  */
-export type IPagePermissionToCreate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions' | 'userId' | 'spaceId' | 'roleId' | 'pageId'>>
+export type IPagePermissionToCreate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions' | 'userId' | 'spaceId' | 'roleId' | 'public' | 'pageId'>>
 export type IPagePermissionToInherit = Pick<PagePermission, 'pageId' | 'inheritedFromPermission'>
 
 export type IPagePermissionUpdate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions'>>
@@ -48,5 +48,6 @@ export interface IPagePermissionWithAssignee extends PagePermission, IPagePermis
   user: User | null;
   role: Role | null;
   space: Space | null;
+  public: boolean | null;
 }
 

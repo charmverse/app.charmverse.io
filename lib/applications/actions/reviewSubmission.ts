@@ -1,9 +1,8 @@
 import { Application, ApplicationStatus } from '@prisma/client';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { prisma } from 'db';
-import { ApplicationActionRequest, ReviewDecisionRequest, ReviewDecision } from '../interfaces';
+import { DataNotFoundError, InvalidInputError, WrongStateError } from 'lib/utilities/errors';
 import { getApplication } from '../getApplication';
+import { ReviewDecision, SubmissionReview } from '../interfaces';
 
 const submissionStatusAfterDecision: Record<ReviewDecision, ApplicationStatus> = {
   approve: 'complete',
@@ -14,27 +13,26 @@ const submissionStatusAfterDecision: Record<ReviewDecision, ApplicationStatus> =
  * Accept, reject or request changes for the work
  * @returns
  */
-export async function reviewSubmission ({ applicationOrApplicationId, userId, decision }: ReviewDecisionRequest): Promise<Application> {
-  const application = await getApplication(typeof applicationOrApplicationId === 'string' ? applicationOrApplicationId : applicationOrApplicationId.id);
+export async function reviewSubmission ({ submissionId, decision }: SubmissionReview): Promise<Application> {
+  const submission = await getApplication(submissionId);
 
-  if (!application) {
-    throw new DataNotFoundError(`Application with id ${applicationOrApplicationId} was not found`);
+  if (!submission) {
+    throw new DataNotFoundError(`Application with id ${submissionId} was not found`);
   }
 
-  // Only the reviewer can accept the work
-  if (application.bounty.reviewer !== userId) {
-    throw new UnauthorisedActionError('Only the assigned reviewer can decide on submissions');
+  if (submission.status !== 'review' && decision === 'approve') {
+    throw new WrongStateError('Submissions must be in review for you to approve them');
   }
 
   const correspondingSubmissionStatus = submissionStatusAfterDecision[decision];
 
   if (!correspondingSubmissionStatus) {
-    throw new DataNotFoundError(`Decision ${decision} is invalid`);
+    throw new InvalidInputError(`Decision ${decision} is invalid`);
   }
 
   const updated = await prisma.application.update({
     where: {
-      id: application.id
+      id: submission.id
     },
     data: {
       status: correspondingSubmissionStatus

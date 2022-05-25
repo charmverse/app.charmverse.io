@@ -5,11 +5,13 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import { Application } from '@prisma/client';
+import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
 import { isValidChainAddress } from 'lib/tokens/validation';
+import { SystemError } from 'lib/utilities/errors';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -25,11 +27,12 @@ const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>
 
 interface Props {
-  submission: Application,
+  submission?: Application,
+  bounty: Bounty,
   onSubmit: (submission: Application) => void
 }
 
-export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
+export default function BountySubmissionForm ({ submission, onSubmit, bounty }: Props) {
   const [user] = useUser();
 
   const {
@@ -41,21 +44,50 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      submission: submission.submission as string,
-      submissionNodes: submission.submissionNodes as any as JSON,
-      walletAddress: (submission.walletAddress ?? user?.addresses?.[0]) as any
+      submission: submission?.submission as string,
+      submissionNodes: submission?.submissionNodes as any as JSON,
+      walletAddress: (submission?.walletAddress ?? user?.addresses?.[0]) as any
     },
     resolver: yupResolver(schema)
   });
 
+  const [formError, setFormError] = useState<SystemError | null>(null);
+
   //  const defaultWalletAddress = submission.walletAddress ?? ;
 
   async function submitted (values: FormValues) {
-    const updatedSubmission = await charmClient.updateApplication(submission.id, values);
-    onSubmit(updatedSubmission);
+    setFormError(null);
+    if (submission) {
+      // Update
+      charmClient.updateSubmission({ submissionId: submission.id, content: values })
+        .then(updated => {
+          onSubmit(updated);
+        })
+        .catch(err => {
+          setFormError(err);
+        });
+
+    }
+    else {
+      // create
+      charmClient.createSubmission({
+        bountyId: bounty.id,
+        submissionContent: {
+          submission: values.submission,
+          submissionNodes: values.submissionNodes
+        }
+      })
+        .then(created => {
+          onSubmit(created);
+        })
+        .catch(err => {
+          setFormError(err);
+        });
+    }
+
   }
 
-  console.log('Submission', submission.submissionNodes, typeof submission.submissionNodes);
+  //  console.log('Submission', submission.submissionNodes, typeof submission.submissionNodes);
 
   return (
     <Box>
@@ -63,7 +95,7 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InlineCharmEditor
-              content={submission.submissionNodes ? JSON.parse(submission.submissionNodes) : undefined}
+              content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : ''}
               onContentChange={content => {
                 setValue('submission', content.rawText, {
                   shouldValidate: true
@@ -86,16 +118,21 @@ export default function BountySubmissionForm ({ submission, onSubmit }: Props) {
               {...register('walletAddress')}
               type='text'
               fullWidth
+              error={!!errors.walletAddress}
+              helperText={errors.walletAddress?.message}
             />
 
-            {
-              errors?.walletAddress && (
-              <Alert severity='error'>
-                {errors.walletAddress.message}
-              </Alert>
-              )
-            }
           </Grid>
+
+          {
+            formError && (
+              <Grid item>
+                <Alert severity={formError.severity}>
+                  {formError.message}
+                </Alert>
+              </Grid>
+            )
+          }
 
           <Grid item>
             <Button disabled={!isValid} type='submit'>Save</Button>

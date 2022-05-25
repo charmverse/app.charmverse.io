@@ -18,5 +18,5 @@ export default function PublicBoardView () {
     return null;
   }
 
-  return <PageView publicShare={true} />;
+  return <PageView shouldLoadPublicPage />;
 }

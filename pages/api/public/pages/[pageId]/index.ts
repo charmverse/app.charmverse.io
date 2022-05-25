@@ -4,6 +4,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Block, Page } from '@prisma/client';
 import { prisma } from 'db';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -26,7 +27,11 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<{pages: 
     }
   });
 
-  if (page === null || page.isPublic !== true) {
+  const computed = await computeUserPagePermissions({
+    pageId: pageId as string
+  });
+
+  if (page === null || computed.read !== true) {
     return res.status(404).json({ error: 'Page not found' } as any);
   }
 
