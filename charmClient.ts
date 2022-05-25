@@ -4,7 +4,7 @@ import {
   Role, Space, TokenGate, Transaction, User, TelegramUser, UserGnosisSafe, TokenGateToRole
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
-import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
 import * as http from 'adapters/http';
@@ -32,6 +32,8 @@ import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
 import { GetTasksResponse } from 'pages/api/tasks';
+
+import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -121,8 +123,8 @@ class CharmClient {
     return http.POST<Page>('/api/pages', pageOpts);
   }
 
-  getPage (pageId: string) {
-    return http.GET<Page>(`/api/pages/${pageId}`);
+  getPage (pageId: string, spaceId?:string) {
+    return http.GET<IPageWithPermissions>(`/api/pages/${pageId}?spaceId=${spaceId}`);
   }
 
   archivePage (pageId: string) {
@@ -138,7 +140,7 @@ class CharmClient {
   }
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
-    return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
+    return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
   updateGnosisSafeState (payload: UpdateGnosisSafeState) {
@@ -171,10 +173,6 @@ class CharmClient {
 
   getPublicPage (pageId: string) {
     return http.GET<{pages: Page[], blocks: Block[]}>(`/api/public/pages/${pageId}`);
-  }
-
-  togglePagePublicAccess (pageId: string, publiclyAccessible: boolean) {
-    return http.PUT<Page>(`/api/pages/${pageId}`, { isPublic: publiclyAccessible });
   }
 
   createInviteLink (link: Partial<InviteLink>) {
@@ -253,6 +251,10 @@ class CharmClient {
     const currentSpace = await this.getWorkspace();
     const contributors = await this.getContributors(currentSpace.id);
     return contributors.map(this.userToFBUser);
+  }
+
+  async getPublicSpaceInfo (spaceId: string): Promise<PublicSpaceInfo> {
+    return http.GET<PublicSpaceInfo>(`/api/spaces/${spaceId}/public`);
   }
 
   async getAllBlocks (): Promise<FBBlock[]> {
@@ -551,7 +553,7 @@ class CharmClient {
     return http.GET('/api/permissions', { pageId });
   }
 
-  createPermission (permission: IPagePermissionToCreate): Promise<boolean> {
+  createPermission (permission: IPagePermissionToCreate): Promise<IPagePermissionWithSource> {
     return http.POST('/api/permissions', permission);
   }
 

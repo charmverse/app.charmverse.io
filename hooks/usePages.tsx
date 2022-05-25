@@ -10,6 +10,7 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 import useSWR from 'swr';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { isTruthy } from 'lib/utilities/types';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 import useIsAdmin from './useIsAdmin';
@@ -24,6 +25,7 @@ type IContext = {
   setPages: Dispatch<SetStateAction<PagesMap>>,
   setCurrentPageId: Dispatch<SetStateAction<string>>,
   isEditing: boolean
+  refreshPage: (pageId: string) => Promise<IPageWithPermissions>
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   getPagePermissions: (pageId: string) => IPagePermissionFlags,
   deletePage: (pageId: string) => Promise<void>,
@@ -40,6 +42,7 @@ export const PagesContext = createContext<Readonly<IContext>>({
   isEditing: true,
   setIsEditing: () => { },
   getPagePermissions: () => new AllowedPagePermissions(),
+  refreshPage: () => Promise.resolve({} as any),
   deletePage: () => undefined as any,
   restorePage: () => undefined as any
 });
@@ -51,16 +54,24 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const [user] = useUser();
-  const { data } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
+  const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
     return charmClient.getPages((space as Space).id);
   }, { refreshInterval });
   const dispatch = useAppDispatch();
 
   const isAdmin = useIsAdmin();
 
+  const _setPages: Dispatch<SetStateAction<PagesMap>> = React.useCallback((_pages) => {
+    const res = _pages instanceof Function ? _pages(pages) : _pages;
+    mutate(() => Object.values(res).filter(isTruthy), {
+      revalidate: false
+    });
+    return res;
+  }, [mutate, pages]);
+
   async function deletePage (pageId: string) {
     const { pageIds } = await charmClient.deletePage(pageId);
-    setPages((_pages) => {
+    _setPages((_pages) => {
       pageIds.forEach(_pageId => {
         delete _pages[_pageId];
       });
@@ -74,7 +85,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   async function restorePage (pageId: string) {
     const { pageIds } = await charmClient.restorePage(pageId);
-    setPages((_pages) => {
+    _setPages((_pages) => {
       pageIds.forEach(_pageId => {
         if (_pages[_pageId]) {
           _pages[_pageId] = {
@@ -93,12 +104,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     // TODO: Better focalboard blocks api to only fetch blocks by id
     dispatch(initialLoad());
   }
-
-  useEffect(() => {
-    if (data) {
-      setPages(data.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
-    }
-  }, [data]);
 
   /**
    * Will return permissions for the currently connected user
@@ -128,7 +133,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       // User gets permission via role or as an individual
       const shouldApplyPermission = (permission.userId && permission.userId === user?.id)
         || (permission.roleId && applicableRoles.some(role => role.id === permission.roleId))
-        || (userSpaceRole && permission.spaceId === userSpaceRole.spaceId);
+        || (userSpaceRole && permission.spaceId === userSpaceRole.spaceId) || permission.public === true;
 
       if (shouldApplyPermission) {
 
@@ -141,17 +146,41 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return computedPermissions;
   }
 
+  async function refreshPage (pageId: string): Promise<IPageWithPermissions> {
+    const freshPageVersion = await charmClient.getPage(pageId);
+    _setPages({
+      ...pages,
+      [freshPageVersion.id]: freshPageVersion
+    });
+
+    return freshPageVersion;
+  }
+
   const value: IContext = useMemo(() => ({
     currentPageId,
     isEditing,
     setIsEditing,
     pages,
     setCurrentPageId,
-    setPages,
+    setPages: _setPages,
     getPagePermissions,
+    refreshPage,
     deletePage,
     restorePage
   }), [currentPageId, isEditing, router, pages, user]);
+
+  useEffect(() => {
+    if (data) {
+      setPages(data.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (currentPageId) {
+      refreshPage(currentPageId);
+    }
+
+  }, [currentPageId]);
 
   return (
     <PagesContext.Provider value={value}>

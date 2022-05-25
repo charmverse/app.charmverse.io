@@ -1,4 +1,4 @@
-import { Application, ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, User } from '@prisma/client';
+import { Application, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, User } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -149,7 +149,7 @@ export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'cre
   return prisma.page.create({
     data: {
       contentText: '',
-      path: v4(),
+      path: options.path ?? `page-${v4()}`,
       title: options.title || 'Example',
       type: 'page',
       updatedBy: options.createdBy,

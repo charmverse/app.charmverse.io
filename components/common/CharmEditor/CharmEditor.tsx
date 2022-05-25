@@ -255,12 +255,6 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)`
     }
     cursor: pointer;
   }
-
-  .charm-paragraph {
-    .bangle-nv-child-container {
-      width: 100%;
-    }
-  }
 `;
 
 const PageThreadListBox = styled.div`

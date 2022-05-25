@@ -1,18 +1,17 @@
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import Select, { SelectProps } from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { useEffect, useState } from 'react';
 
-export interface Props {
-  onChange?: (option: string) => void
-  defaultValue?: string,
-  title?: string
-  keyAndLabel: Record<string | any, string | number>
-  autoExpand?: boolean
+export interface Props extends Omit<SelectProps, 'onChange'> {
+  onChange?: (option: string) => void;
+  defaultValue?: string;
+  title?: string;
+  keyAndLabel: Record<string | any, string | number>;
 }
 
-export default function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, keyAndLabel, autoExpand = false }: Props) {
+export default function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, keyAndLabel, sx, ...props }: Props) {
 
   const options = Object.entries(keyAndLabel);
 
@@ -31,14 +30,15 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
       }
 
       <Select
+        sx={sx}
         value={value}
-        defaultOpen={autoExpand}
         onChange={(ev) => {
           setValue(ev.target.value as string);
           if (ev.target.value) {
             onChange(ev.target.value as string);
           }
         }}
+        {...props}
       >
         {
           options.map(option => {
@@ -47,5 +47,20 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
         }
       </Select>
     </FormControl>
+  );
+}
+
+export function SmallSelect ({ sx = {}, ...props }: Props) {
+  return (
+    <InputEnumToOptions
+      {...props}
+      sx={{
+        ...sx,
+        background: 'transparent',
+        fontSize: '.8em',
+        borderColor: 'transparent',
+        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' }
+      }}
+    />
   );
 }

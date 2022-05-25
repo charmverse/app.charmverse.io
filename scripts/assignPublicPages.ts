@@ -1,6 +1,8 @@
 import { prisma } from 'db';
-import { setupPermissionsAfterPagePermissionAdded } from 'lib/permissions/pages/triggers';
+import { setupPermissionsAfterPagePermissionAdded, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages/triggers';
+import { IPageWithPermissions, resolveChildPages } from 'lib/pages/server';
 import { upsertPermission } from '../lib/permissions/pages';
+import { recursiveRebuild } from './inheritPagePermissions';
 
 const CONCURRENT = 3;
 

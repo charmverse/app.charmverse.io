@@ -37,7 +37,6 @@ describe('getPage', () => {
         parentId: expect.stringMatching(page.id),
         updatedBy: expect.stringMatching(user.id),
         createdBy: expect.stringMatching(user.id),
-        isPublic: expect.any(Boolean),
         index: expect.any(Number),
         createdAt: expect.any(Date),
         updatedAt: expect.any(Date),
@@ -49,6 +48,34 @@ describe('getPage', () => {
         spaceId: expect.stringMatching(space.id)
       })
     );
+  });
+
+  it('should allow looking up a page by its path + spaceId', async () => {
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      path: 'My example path'
+    });
+
+    const foundPage = await getPage(page.path, page.spaceId as string);
+
+    expect(foundPage).toEqual <Page>(
+      expect.objectContaining<Partial<Page>>({
+        id: page.id,
+        path: page.path,
+        spaceId: page.spaceId
+      })
+    );
+  });
+
+  it('should return null if a path but no spaceId is provided', async () => {
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      path: 'My example path'
+    });
+
+    const foundPage = await getPage(page.path);
   });
 
   it('should return null if the page does not exist', async () => {

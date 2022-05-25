@@ -44,7 +44,12 @@ export default function NestedPage ({ node, getPos, view, readOnly }: NodeViewPr
 
   const isEditorEmpty = checkForEmpty(nestedPage?.content as PageContent);
 
-  const fullPath = `${window.location.origin}/${space?.domain}/${nestedPage?.path}`;
+  const isPublicShareMode = window.location.href.match(`${window.location.origin}/share/`) !== null;
+
+  const appPath = isPublicShareMode ? `share/${nestedPage?.id}` : `${space?.domain}/${nestedPage?.path}`;
+
+  const fullPath = `${window.location.origin}/${appPath}`;
+
   const bindMenuProps = bindMenu(popupState);
   return (
     <NestedPageContainer data-id={`page-${nestedPage?.id}`} data-title={nestedPage?.title} data-path={fullPath}>
@@ -53,7 +58,7 @@ export default function NestedPage ({ node, getPos, view, readOnly }: NodeViewPr
       </div>
       {nestedPage ? (
         <Link
-          href={`/${(space)?.domain}/${nestedPage?.path}`}
+          href={`/${appPath}`}
           passHref
         >
           <Box fontWeight={600} component='div' width='100%'>
@@ -120,7 +125,7 @@ export default function NestedPage ({ node, getPos, view, readOnly }: NodeViewPr
               sx={{ padding: '3px 12px' }}
               onClick={() => {
                 // eslint-disable-next-line
-                navigator.clipboard.writeText(`${location.origin}/${space?.domain}/${nestedPage?.path}`);
+                navigator.clipboard.writeText(fullPath);
                 showMessage('Link copied');
                 bindMenuProps.onClose();
               }}
