@@ -1,5 +1,5 @@
 
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -8,13 +8,37 @@ import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { ModifyChildPagesResponse } from 'lib/pages';
+import { getPage } from 'lib/pages/server/getPage';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .use(requireKeys(['id'], 'query'))
+  .get(getPageRoute)
   .put(updatePage)
   .delete(deletePage);
+
+async function getPageRoute (req: NextApiRequest, res: NextApiResponse<Page>) {
+  const pageId = req.query.id as string;
+  const userId = req.session.user.id;
+
+  const permissions = await computeUserPagePermissions({
+    pageId,
+    userId
+  });
+
+  if (permissions.read !== true) {
+    throw new ActionNotPermittedError('You do not have permission to view this page');
+  }
+
+  const page = await getPage(pageId);
+
+  if (!page) {
+    throw new NotFoundError();
+  }
+
+  return res.status(200).json(page);
+}
 
 async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
@@ -29,27 +53,30 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
   const updateContent = req.body as Page ?? {};
 
   if ((typeof updateContent.index === 'number' || updateContent.parentId !== undefined) && permissions.edit_position !== true) {
-    throw new ActionNotPermittedError('You are not allowed to reposition this page');
+    throw new ActionNotPermittedError('You do not have permission to reposition this page');
   }
 
-  // eslint-disable-next-line
-  if (updateContent.isPublic != undefined && permissions.edit_isPublic !== true) {
-    return res.status(401).json({
-      error: 'You cannot update the public status of this page'
-    });
+  if (updateContent.hasOwnProperty('isPublic') && permissions.edit_isPublic !== true) {
+    throw new ActionNotPermittedError('You do not have permission to update the public status of this page');
   }
   else if (permissions.edit_content !== true) {
-    return res.status(401).json({
-      error: 'You cannot update this page'
-    });
+    throw new ActionNotPermittedError('You do not have permission to update this page');
   }
   const pageWithPermission = await prisma.page.update({
     where: {
       id: pageId
     },
-    data: req.body,
+    data: {
+      ...req.body,
+      updatedAt: new Date(),
+      updatedBy: userId
+    },
     include: {
-      permissions: true
+      permissions: {
+        include: {
+          sourcePermission: true
+        }
+      }
     }
   });
 

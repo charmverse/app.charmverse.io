@@ -19,7 +19,7 @@ import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'lib/notion/types';
 // TODO: Maybe move these types to another place so that we dont import from backend
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
-import { ConnectDiscordResponse } from 'pages/api/discord/connect';
+import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
@@ -29,7 +29,6 @@ import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pa
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
-import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
 import { GetTasksResponse } from 'pages/api/tasks';
@@ -122,6 +121,10 @@ class CharmClient {
     return http.POST<Page>('/api/pages', pageOpts);
   }
 
+  getPage (pageId: string) {
+    return http.GET<Page>(`/api/pages/${pageId}`);
+  }
+
   archivePage (pageId: string) {
     return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: true });
   }
@@ -206,12 +209,8 @@ class CharmClient {
     return http.POST('/api/discord/disconnect');
   }
 
-  connectDiscord (payload: { code: string }) {
+  connectDiscord (payload: ConnectDiscordPayload) {
     return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
-  }
-
-  createAccountWithDiscord (payload: {code: string}) {
-    return http.POST<ConnectDiscordResponse>('/api/discord/createAccount', payload);
   }
 
   importRolesFromDiscordServer (payload: ImportDiscordRolesPayload) {

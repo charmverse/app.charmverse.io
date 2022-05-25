@@ -97,7 +97,14 @@ function FormDescription ({ onContentChange, content, watch }:
   watch(['description', 'descriptionNodes']);
 
   return (
-    <Grid item>
+    <Grid
+      item
+      sx={{
+        '&.MuiGrid-item': {
+          maxWidth: '100%'
+        }
+      }}
+    >
       <InputLabel>
         Description
       </InputLabel>

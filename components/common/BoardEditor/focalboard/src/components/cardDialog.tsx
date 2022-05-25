@@ -24,11 +24,6 @@ import { usePages } from 'hooks/usePages'
 import { mutate } from 'swr'
 import { useCurrentSpace } from 'hooks/useCurrentSpace'
 
-
-
-
-
-
 type Props = {
     board: Board
     cardId: string
@@ -136,7 +131,7 @@ const CardDialog = (props: Props): JSX.Element | null => {
     )
 
 
-    const {pages} = usePages()
+    const { pages } = usePages()
     const followingCards = useAppSelector(getUserBlockSubscriptionList)
     const isFollowingCard = Boolean(followingCards.find((following) => following.blockId === props.cardId))
     const router = useRouter();
