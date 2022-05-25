@@ -5,6 +5,7 @@ import { Block } from '@prisma/client';
 import { prisma } from 'db';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -20,7 +21,13 @@ async function getBlockSubtree (req: NextApiRequest, res: NextApiResponse<Block[
       boardId: blockId
     }
   });
-  if (!req.session.user && !publicPage?.isPublic) {
+
+  const computed = await computeUserPagePermissions({
+    pageId: publicPage?.id as string,
+    userId: req.session?.user?.id
+  });
+
+  if (computed.read !== true) {
     return res.status(404).json({ error: 'page not found' });
   }
   const blocks = await prisma.block.findMany({
