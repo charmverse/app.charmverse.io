@@ -58,6 +58,7 @@ async function checkConnection () {
 
 }
 
+/*
 checkConnection().then(count => {
   console.log(count, ' public pages');
 });
@@ -68,4 +69,4 @@ upsertPublicPermissions()
   .then(() => {
     console.log('Job complete');
   });
-
+*/
