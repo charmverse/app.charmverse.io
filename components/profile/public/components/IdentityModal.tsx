@@ -1,26 +1,14 @@
-import styled from '@emotion/styled';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { Box, Button, Divider, Grid, Stack, SvgIcon, TextField, Typography } from '@mui/material';
+import { Box, Button, Stack, SvgIcon, Typography } from '@mui/material';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import MetamaskIcon from 'public/images/metamask.svg';
 import TelegramIcon from '@mui/icons-material/Telegram';
-import log from 'lib/log';
 import Integration from './Integration';
 import { IntegrationType } from '../enums';
-
-const StyledButton = styled(Button)`
-    border-radius: 7px;
-    background-color: #F7F7F5;
-    color: gray;
-
-    &:hover {
-      background-color: #F7F7F5;
-    }
-`;
 
 export const schema = yup.object({
   description: yup.string().ensure().trim()
@@ -55,7 +43,7 @@ function IdentityModal (props: IdentityModalProps) {
   };
 
   return (
-    <Modal open={isOpen} onClose={() => {}} size='large'>
+    <Modal open={isOpen} onClose={close} size='large'>
       <DialogTitle onClose={close}>Public Identity</DialogTitle>
       <Typography>Select which integration you want to show as your public identity</Typography>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -75,7 +63,7 @@ function IdentityModal (props: IdentityModalProps) {
           <Integration
             isInUse={false}
             icon={(
-              <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#000000', height: '32px' }}>
+              <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2', height: '32px' }}>
                 <DiscordIcon />
               </SvgIcon>
             )}
@@ -98,12 +86,12 @@ function IdentityModal (props: IdentityModalProps) {
           />
           <Box justifyContent='end' mt={3} sx={{ display: 'flex' }}>
             <Link href='/profile/tasks'>
-              <StyledButton
+              <Button
                 onClick={() => {
                 }}
               >
                 Manage Integrations
-              </StyledButton>
+              </Button>
             </Link>
           </Box>
         </Stack>
