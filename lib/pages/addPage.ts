@@ -2,7 +2,11 @@ import { Page, Prisma } from '@prisma/client';
 import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { NextRouter } from 'next/router';
-import { addBoardClicked } from 'components/common/BoardEditor/focalboard/src/components/sidebar/sidebarAddBoardMenu';
+import { Block } from 'components/common/BoardEditor/focalboard/src/blocks/block';
+import { createBoard } from 'components/common/BoardEditor/focalboard/src/blocks/board';
+import { createCard, Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
+import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 
 export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string };
 
@@ -30,7 +34,7 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput): P
     ...(page ?? {})
   };
   if (pageProperties.type === 'board') {
-    await addBoardClicked(boardId => {
+    await createDefaultBoardData(boardId => {
       pageProperties.boardId = boardId;
       pageProperties.id = boardId; // use the same uuid value
     });
@@ -39,9 +43,49 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput): P
   await mutate(`pages/${spaceId}`, (pages: Page[]) => {
     return [...pages, newPage];
   }, {
-    revalidate: false
+    // revalidate pages for board since we create 3 default ones
+    revalidate: pageProperties.type === 'board'
   });
   return newPage;
+}
+
+async function createDefaultBoardData (showBoard: (id: string) => void, activeBoardId?: string) {
+  const oldBoardId = activeBoardId;
+  const board = createBoard({ addDefaultProperty: true });
+  board.rootId = board.id;
+
+  const view = createBoardView();
+  view.fields.viewType = 'board';
+  view.parentId = board.id;
+  view.rootId = board.rootId;
+  view.title = 'Board view';
+
+  const blocks: Card[] = [];
+
+  for (let index = 0; index < 3; index++) {
+    const card = createCard();
+    card.parentId = board.id;
+    card.rootId = board.rootId;
+    card.title = `Card ${index + 1}`;
+    card.fields.contentOrder = [];
+    view.fields.cardOrder.push(card.id);
+    blocks.push(card);
+  }
+
+  await mutator.insertBlocks(
+    [board, view, ...blocks],
+    'add board',
+    async (newBlocks: Block[]) => {
+      const newBoardId = newBlocks[0].id;
+      // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateBoard, {board: newBoardId})
+      showBoard(newBoardId);
+    },
+    async () => {
+      if (oldBoardId) {
+        showBoard(oldBoardId);
+      }
+    }
+  );
 }
 
 export async function addPageAndRedirect (page: NewPageInput, router: NextRouter) {
