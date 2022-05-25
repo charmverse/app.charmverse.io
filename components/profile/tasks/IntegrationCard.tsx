@@ -21,6 +21,10 @@ const IntegrationCardContainer = styled.div`
     ${theme.breakpoints.down('md')} {
       flex-direction: column;
       gap: ${theme.spacing(1.5)};
+
+      img.logo-image {
+        transform: scale(0.85);
+      }
     }
   `}
 `;
@@ -45,16 +49,17 @@ export default function IntegrationCard () {
         elevation={1}
         sx={{
           flexGrow: 1,
-          px: 3,
+          px: {
+            xs: 1, md: 3
+          },
           display: 'flex',
-          gap: 2,
+          gap: {
+            xs: 1,
+            sm: 2
+          },
           alignItems: 'center',
           cursor: 'pointer',
-          justifyContent: 'space-between',
-          [smScreenMediaQuery]: {
-            px: 1,
-            gap: 1
-          }
+          justifyContent: 'space-between'
         }}
         onClick={() => {
           router.push('/profile/integrations');
@@ -65,21 +70,25 @@ export default function IntegrationCard () {
           gap={2}
           alignItems='center'
           sx={{
-            [smScreenMediaQuery]: {
-              gap: 1.5
+            gap: {
+              xs: 1,
+              sm: 2
             }
           }}
         >
           <Box
             display='flex'
-            gap={1}
             alignItems='center'
           >
             <Typography sx={{
-              fontSize: '2.5rem',
+              fontSize: {
+                xs: '1.75rem',
+                sm: '2.5rem'
+              },
               fontWeight: 'bold',
-              [smScreenMediaQuery]: {
-                fontSize: '2rem'
+              mr: {
+                xs: 0.5,
+                sm: 1
               }
             }}
             >
@@ -89,46 +98,48 @@ export default function IntegrationCard () {
               color='secondary'
               sx={{
                 fontWeight: 500,
-                [smScreenMediaQuery]: {
-                  fontSize: '0.75rem'
+                fontSize: {
+                  xs: '0.75rem',
+                  sm: '1rem'
                 }
               }}
             >Integrations
             </Typography>
           </Box>
           <Divider sx={{ borderRightWidth: 2 }} orientation='vertical' variant='middle' flexItem />
-          <Box display='flex' gap={1.5} height='100%' alignItems='center'>
+          <Box
+            display='flex'
+            gap={1.5}
+            sx={{
+              gap: {
+                xs: 1,
+                sm: 2
+              }
+            }}
+            height='100%'
+            alignItems='center'
+          >
             <Tooltip title={metamaskConnected ? 'Metamask connected' : 'Metamask not connected'} arrow placement='top'>
-              {/** Tooltip doesn't show without this span and without display: flex the icons aren't centered */}
-              <span style={{
-                display: 'flex'
-              }}
-              >
-                <Image className='logo-image' width={20} height={20} src={metamaskConnected ? '/walletLogos/metamask.png' : '/walletLogos/metamask-greyscale.png'} />
-              </span>
+              <img className='logo-image' width={20} height={20} src={metamaskConnected ? '/walletLogos/metamask.png' : '/walletLogos/metamask-greyscale.png'} />
             </Tooltip>
             <Tooltip title={discordConnected ? 'Discord connected' : 'Discord not connected'} arrow placement='top'>
-              <span style={{
-                display: 'flex'
-              }}
-              >
-                <Image className='logo-image' width={25} height={20} src={discordConnected ? '/images/discord-logo-colored.png' : '/images/discord-logo-greyscale.png'} />
-              </span>
+              <img className='logo-image' width={25} height={20} src={discordConnected ? '/images/discord-logo-colored.png' : '/images/discord-logo-greyscale.png'} />
             </Tooltip>
             <Tooltip title={telegramConnected ? 'Telegram connected' : 'Telegram not connected'} arrow placement='top'>
-              <span style={{
-                display: 'flex'
-              }}
-              >
-                <Image className='logo-image' width={22.5} height={22.5} src={telegramConnected ? '/images/telegram-logo-colored.png' : '/images/telegram-logo-greyscale.png'} />
-              </span>
+              <img
+                className='logo-image'
+                width={22.5}
+                height={22.5}
+                src={telegramConnected ? '/images/telegram-logo-colored.png' : '/images/telegram-logo-greyscale.png'}
+              />
             </Tooltip>
           </Box>
           <Divider sx={{ borderRightWidth: 2 }} orientation='vertical' variant='middle' flexItem />
           <Box display='flex' gap={1} height='100%' alignItems='center'>
             <KeyIcon sx={{
-              [smScreenMediaQuery]: {
-                display: 'none'
+              display: {
+                xs: 'none',
+                sm: 'inherit'
               }
             }}
             />
@@ -141,13 +152,12 @@ export default function IntegrationCard () {
               color='secondary'
             >
               <Typography sx={{
-                fontSize: '1rem',
+                fontSize: {
+                  sm: '1rem',
+                  xs: '1.75rem'
+                },
                 fontWeight: 'bold',
-                mr: 0.5,
-                [smScreenMediaQuery]: {
-                  fontSize: '2rem',
-                  mr: 1
-                }
+                mr: 0.5
               }}
               >
                 {safes?.length}
@@ -194,8 +204,19 @@ export default function IntegrationCard () {
           justifyContent='space-between'
           alignItems='center'
         >
-          <Box display='flex' alignItems='center' gap={1.5}>
-            <Avatar size='large' variant='rounded' name={userEnsName || getDisplayName(currentUser)} avatar={currentUser.avatar} />
+          <Box
+            display='flex'
+            alignItems='center'
+            gap={1.5}
+            sx={{
+              '.MuiAvatar-root': {
+                height: 40,
+                width: 40,
+                fontSize: '1.25rem'
+              }
+            }}
+          >
+            <Avatar size='large' variant='circular' name={userEnsName || getDisplayName(currentUser)} avatar={currentUser.avatar} />
             <Typography
               sx={{
                 [mdScreenMediaQuery]: {

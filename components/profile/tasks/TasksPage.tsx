@@ -59,7 +59,31 @@ export default function TasksPage () {
       <Legend>
         My tasks
       </Legend>
-      <Tabs variant='scrollable' scrollButtons='auto' textColor='primary' indicatorColor='secondary' value={currentTab}>
+      <Tabs
+        variant='scrollable'
+        scrollButtons='auto'
+        textColor='primary'
+        indicatorColor='secondary'
+        value={currentTab}
+        sx={{
+          '.MuiTab-root': {
+            p: {
+              xs: 0,
+              sm: 1
+            },
+            minWidth: {
+              xs: 'fit-content',
+              sm: '90px'
+            }
+          },
+          '&': {
+            minHeight: {
+              xs: '34px',
+              sm: '48px'
+            }
+          }
+        }}
+      >
         {(['multisig', 'bounty', 'proposal', 'discussion'] as const).map(tab => (
           <Tab
             component='div'

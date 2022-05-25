@@ -22,16 +22,10 @@ import Tooltip from '@mui/material/Tooltip';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import CancelIcon from '@mui/icons-material/Cancel';
 import EmailIcon from '@mui/icons-material/Email';
-import { useTheme } from '@emotion/react';
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
 const rowHeight = 48;
-
-const GridColumn = styled((props: any) => <Grid item xs {...props} />)`
-  display: flex;
-  align-items: center;
-`;
 
 function TransactionRow (
   { firstNonce, isSnoozed, transaction }:
@@ -40,15 +34,16 @@ function TransactionRow (
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
   const isFirstTask = transaction.nonce === firstNonce;
-  const theme = useTheme();
-  const smScreenMediaQuery = theme.breakpoints.down('sm');
 
   return (
     <>
-      <Grid justifyContent='space-between' alignItems='center' container key={transaction.id} sx={{ height: rowHeight }} onClick={() => setExpanded(!expanded)}>
+      <Grid justifyContent='space-between' alignItems='center' container key={transaction.id} sx={{ width: '100%', height: rowHeight }} onClick={() => setExpanded(!expanded)}>
         <Grid
           item
-          xs={3}
+          xs={4}
+          sx={{
+            fontSize: { xs: 14, sm: 'inherit' }
+          }}
         >
           {transaction.description}
         </Grid>
@@ -56,9 +51,7 @@ function TransactionRow (
           item
           xs={2}
           sx={{
-            [smScreenMediaQuery]: {
-              display: 'none'
-            }
+            display: { xs: 'none', sm: 'inherit' }
           }}
         >
           {DateTime.fromISO(transaction.date).toRelative({ base: DateTime.now() })}
@@ -67,9 +60,7 @@ function TransactionRow (
           item
           xs={2}
           sx={{
-            [smScreenMediaQuery]: {
-              display: 'none'
-            }
+            display: { xs: 'none', sm: 'inherit' }
           }}
         >
           <Typography variant='caption' sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: isReadyToExecute ? 'bold' : '' }}>
@@ -112,15 +103,43 @@ function TransactionRow (
       </Grid>
       <Collapse in={expanded}>
         <Divider />
-        <Box py={1} pl={4} pr={1} sx={{ bgcolor: 'background.light' }}>
+        <Box py={1} pl={1} sx={{ bgcolor: 'background.light' }}>
           <Grid container spacing={1}>
-            <Grid item xs={6}>
+            <Grid item xs={5}>
               {transaction.actions.map(action => (
                 <Box py={1}>
-                  <Typography gutterBottom>
+                  <Typography
+                    gutterBottom
+                  >
                     Sending <strong>{action.friendlyValue}</strong> to:
                   </Typography>
-                  {action.to.user ? <UserDisplay avatarSize='small' user={action.to.user} /> : <AnonUserDisplay avatarSize='small' address={action.to.address} />}
+                  {action.to.user ? (
+                    <UserDisplay
+                      sx={{
+                        '.MuiTypography-root': {
+                          fontSize: {
+                            xs: 14,
+                            sm: 'inherit'
+                          }
+                        }
+                      }}
+                      avatarSize='small'
+                      user={action.to.user}
+                    />
+                  ) : (
+                    <AnonUserDisplay
+                      avatarSize='small'
+                      sx={{
+                        '.MuiTypography-root': {
+                          fontSize: {
+                            xs: 14,
+                            sm: 'inherit'
+                          }
+                        }
+                      }}
+                      address={shortenHex(action.to.address)}
+                    />
+                  )}
                 </Box>
               ))}
             </Grid>
@@ -131,7 +150,33 @@ function TransactionRow (
               <Typography color='secondary' gutterBottom variant='body2'>Confirmations</Typography>
               {transaction.confirmations.map(confirmation => (
                 <Box py={1}>
-                  {confirmation.user ? <UserDisplay avatarSize='small' user={confirmation.user} /> : <AnonUserDisplay avatarSize='small' address={confirmation.address} />}
+                  {confirmation.user ? (
+                    <UserDisplay
+                      sx={{
+                        '.MuiTypography-root': {
+                          fontSize: {
+                            xs: 14,
+                            sm: 'inherit'
+                          }
+                        }
+                      }}
+                      avatarSize='small'
+                      user={confirmation.user}
+                    />
+                  ) : (
+                    <AnonUserDisplay
+                      sx={{
+                        '.MuiTypography-root': {
+                          fontSize: {
+                            xs: 14,
+                            sm: 'inherit'
+                          }
+                        }
+                      }}
+                      avatarSize='small'
+                      address={shortenHex(confirmation.address)}
+                    />
+                  )}
                 </Box>
               ))}
               {transaction.snoozedUsers.length !== 0 ? <Typography sx={{ mt: 2 }} color='secondary' gutterBottom variant='body2'>Snoozed</Typography> : null}
@@ -167,7 +212,6 @@ function SafeTasks (
   { isSnoozed, address, safeName, safeUrl, tasks }:
   { isSnoozed: boolean, address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
 ) {
-
   return (
     <>
       <Typography
@@ -195,7 +239,20 @@ function SafeTasks (
         tasks.map((task: GnosisTask) => (
           <Card key={task.nonce} sx={{ my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
             <Box display='flex'>
-              <Box px={3} height={rowHeight} display='flex' alignItems='center'>
+              <Box
+                px={2}
+                sx={{
+                  px: { xs: 1 },
+                  fontWeight: 'bold',
+                  fontSize: {
+                    xs: '0.85rem',
+                    sm: 'inherit'
+                  }
+                }}
+                height={rowHeight}
+                display='flex'
+                alignItems='center'
+              >
                 {task.transactions[0].nonce}
               </Box>
               <Box flexGrow={1}>
