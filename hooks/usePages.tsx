@@ -54,8 +54,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const [user] = useUser();
-  const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : null, () => {
-    return charmClient.getPages((space as Space).id);
+  const { data, mutate } = useSWR(() => space ? `pages/${space?.id}` : 'publicPage', () => {
+    return space ? charmClient.getPages((space as Space).id) : [];
   }, { refreshInterval });
   const dispatch = useAppDispatch();
 
