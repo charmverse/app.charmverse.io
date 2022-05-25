@@ -404,7 +404,7 @@ ol li {
 details {
   padding-left: 20px;
 
-  &[open] summary::before {
+  &[open] > summary::before {
     content: "▼";
   }
 
