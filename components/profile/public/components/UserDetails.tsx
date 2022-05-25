@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import useSWR from 'swr';
 import styled from '@emotion/styled';
 import { Box, Divider, Grid, Link as ExternalLink, Stack, SvgIcon, Typography, Tooltip } from '@mui/material';
@@ -11,10 +11,11 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import IconButton from '@mui/material/IconButton';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { User } from '@prisma/client';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import Link from 'next/link';
+import { LoggedInUser } from 'models';
 import { useWeb3React } from '@web3-react/core';
-import { useUser } from 'hooks/useUser';
 import { getDisplayName } from 'lib/users';
 import useENSName from 'hooks/useENSName';
 import charmClient from 'charmClient';
@@ -32,9 +33,14 @@ const StyledDivider = styled(Divider)`
   height: 36px;
 `;
 
-export default function UserDetails () {
+export interface UserDetailsProps {
+  readOnly?: boolean;
+  user: User | LoggedInUser;
+  updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
+}
+
+export default function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const { account } = useWeb3React();
-  const [user, setUser] = useUser();
   const { data: userDetails, mutate } = useSWR('userDetails', () => charmClient.getUserDetails());
   const ENSName = useENSName(account);
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
@@ -51,11 +57,15 @@ export default function UserDetails () {
   };
 
   const handleImageUpdate = async (url: string) => {
+    if (!updateUser) {
+      // someone else's profile
+      return;
+    }
     const updatedUser = await charmClient.updateUser({
       avatar: url
     });
 
-    setUser(updatedUser);
+    updateUser(updatedUser);
   };
 
   let socialDetails: Social = {};
@@ -87,16 +97,18 @@ export default function UserDetails () {
           name={userName}
           spaceImage={user?.avatar}
           updateImage={handleImageUpdate}
-          displayIcons={true}
+          displayIcons={!readOnly}
           variant='circular'
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
             <Stack direction='row' spacing={1} alignItems='baseline'>
-              <Typography variant='h1'>CharmVerse</Typography>
-              <IconButton onClick={identityModalState.open}>
-                <EditIcon />
-              </IconButton>
+              <Typography variant='h1'>{userName}</Typography>
+              {!readOnly && (
+                <IconButton onClick={identityModalState.open}>
+                  <EditIcon />
+                </IconButton>
+              )}
             </Stack>
           </Grid>
           <Grid item mt={1}>
@@ -142,9 +154,11 @@ export default function UserDetails () {
                 !hasAnySocialInformation(socialDetails) && <Typography>No social media links</Typography>
               }
               <StyledDivider orientation='vertical' flexItem />
-              <IconButton onClick={socialModalState.open}>
-                <EditIcon />
-              </IconButton>
+              {!readOnly && (
+                <IconButton onClick={socialModalState.open}>
+                  <EditIcon />
+                </IconButton>
+              )}
             </Stack>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
