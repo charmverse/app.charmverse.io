@@ -72,6 +72,10 @@ export default function LargeAvatar (props: LargeAvatarProps) {
               if (updateImage) {
                 updateImage(url);
               }
+
+              // This is a fix for when trying to select the same file again after
+              // having removed it.
+              e.target.value = '';
             }}
           />
           <StyledAvatarWithIcons
