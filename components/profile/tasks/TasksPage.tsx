@@ -52,7 +52,17 @@ export default function TasksPage () {
 
   return (
     <TasksPageContainer>
-      <Box display='flex' justifyContent='space-between' mb={3}>
+      <Box
+        display='flex'
+        justifyContent='space-between'
+        mb={3}
+        sx={{
+          display: {
+            xs: 'none',
+            sm: 'inherit'
+          }
+        }}
+      >
         <Typography variant='h1' fontWeight='bold'>Personal Nexus</Typography>
       </Box>
       <IntegrationCard />
@@ -60,8 +70,6 @@ export default function TasksPage () {
         My tasks
       </Legend>
       <Tabs
-        variant='scrollable'
-        scrollButtons='auto'
         textColor='primary'
         indicatorColor='secondary'
         value={currentTab}
@@ -74,6 +82,10 @@ export default function TasksPage () {
             minWidth: {
               xs: 'fit-content',
               sm: '90px'
+            },
+            flexGrow: {
+              xs: 1,
+              sm: 'revert'
             }
           },
           '&': {
