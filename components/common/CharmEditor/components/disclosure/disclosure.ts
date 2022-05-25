@@ -1,5 +1,6 @@
 import { RawPlugins, RawSpecs, createElement } from '@bangle.dev/core';
-import { DOMOutputSpec, Plugin, PluginKey, keymap } from '@bangle.dev/pm';
+import { DOMOutputSpec, Plugin, PluginKey, keymap, TextSelection } from '@bangle.dev/pm';
+import { hasParentNodeOfType } from '@bangle.dev/utils';
 import { backspaceCmd } from './commands';
 
 export function spec () {
@@ -49,9 +50,9 @@ function detailsSpec (): RawSpecs {
 export function plugins (): RawPlugins {
   return () => {
     return [
-
       keymap({
         Backspace: backspaceCmd
+        // Enter: moveDownCmd
       }),
       ContainerPlugin({ type: 'disclosureSummary', contentDOM: ['summary'] }),
       ContainerPlugin({ type: 'disclosureDetails', contentDOM: ['details'] })
@@ -63,6 +64,37 @@ function ContainerPlugin ({ type, contentDOM }: { type: string, contentDOM: DOMO
   return new Plugin({
     key: new PluginKey(`${type}-NodeView`),
     props: {
+      handleDOMEvents: {
+        // listen to 'space bar' and disable action or else Firefox will toggle the details
+        keyup: (view, event) => {
+          if (event.key === ' ') {
+            event.preventDefault();
+            return true;
+          }
+          return false;
+        },
+        // disable toggle effect unelss user is clicking the toggle element
+        click: (view, event) => {
+          const coordinates = view.posAtCoords({
+            left: event.clientX,
+            top: event.clientY
+          });
+          if (!coordinates || !(event.target instanceof Element)) {
+            return false;
+          }
+          const selection = new TextSelection(view.state.doc.resolve(coordinates.pos));
+          const isInsideSummary = hasParentNodeOfType(view.state.schema.nodes.disclosureSummary)(selection);
+          const targetEdge = event.target.getBoundingClientRect().left;
+          const distanceFromEdge = event.clientX - targetEdge;
+          if (isInsideSummary && distanceFromEdge > 20) {
+            event.stopPropagation();
+            event.preventDefault();
+            return true;
+          }
+
+          return false;
+        }
+      },
       nodeViews: {
         [type]: function nodeView (node, view, getPos, decorations) {
           // @ts-ignore

@@ -1,4 +1,4 @@
-import { Prisma, Page } from '@prisma/client';
+import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -8,57 +8,91 @@ import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/v
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { useUser } from 'hooks/useUser';
 import { Board } from 'lib/focalboard/board';
-import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
-import { isTruthy } from 'lib/utilities/types';
 import log from 'loglevel';
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
+interface Props {
+  shouldLoadPublicPage?: boolean,
+  onPageLoad?: (pageId: string) => void,
+  pageId: string
+}
+
 export default function EditorPage (
-  { shouldLoadPublicPage = true, pageId, currentPageId = pageId, publicShare = false, onPageLoad }:
-  {shouldLoadPublicPage?: boolean, onPageLoad?: (pageId: string) => void, pageId: string, publicShare?: boolean, currentPageId?: string}
+  { shouldLoadPublicPage, pageId, onPageLoad }: Props
+
 ) {
   const dispatch = useAppDispatch();
   const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
-  const [user] = useUser();
-  const [pagePermissions, setPagePermissions] = useState<Partial<IPagePermissionFlags> | null>(null);
+
+  const currentPagePermissions = getPagePermissions(pageId);
 
   async function loadPublicPage (publicPageId: string) {
-    const { pages: publicPages, blocks } = await charmClient.getPublicPage(publicPageId);
 
-    const rootPage = publicPages.find(page => page.id === publicPageId);
-    if (rootPage) {
-      setTitleState(rootPage?.title);
-      onPageLoad?.(rootPage?.id);
-    }
-    const cardBlock = blocks.find(block => block.type === 'card');
-    const boardBlock = blocks.find(block => block.type === 'board');
+    try {
+      const { pages: publicPages, blocks } = await charmClient.getPublicPage(publicPageId);
 
-    if (cardBlock) {
-      dispatch(setCurrent(cardBlock.id));
-      dispatch(addCard(cardBlock as unknown as Card));
+      const rootPage = publicPages.find(page => page.id === publicPageId);
+      if (rootPage) {
+        setTitleState(rootPage?.title);
+        onPageLoad?.(rootPage?.id);
+      }
+      const cardBlock = blocks.find(block => block.type === 'card');
+      const boardBlock = blocks.find(block => block.type === 'board');
+
+      if (cardBlock) {
+        dispatch(setCurrent(cardBlock.id));
+        dispatch(addCard(cardBlock as unknown as Card));
+      }
+      if (boardBlock) {
+        dispatch(addBoard(boardBlock as unknown as Board));
+      }
+
+      const foundPageContent: Record<string, Page> = publicPages.reduce((record, page) => ({ ...record, [page.id]: page }), {});
+
+      const spaceId = foundPageContent[publicPageId]?.spaceId;
+
+      if (spaceId) {
+        const publicPagesInSpace = await charmClient.getPages(spaceId);
+        const mapped = publicPagesInSpace.reduce((pageMap: Record<string, Page>, page) => {
+          pageMap[page.id] = page;
+          return pageMap;
+        }, {});
+
+        console.log('Public pages', publicPagesInSpace);
+
+        setPages({
+          ...mapped,
+          ...foundPageContent
+        });
+      }
+      else {
+        setPages(foundPageContent);
+      }
+
+      setPageNotFound(false);
+      onPageLoad?.(publicPageId);
     }
-    if (boardBlock) {
-      dispatch(addBoard(boardBlock as unknown as Board));
+    catch (err) {
+      setPageNotFound(true);
     }
-    setPages(publicPages.reduce((record, page) => ({ ...record, [page.id]: page }), {}));
+
   }
 
   const pagesLoaded = Object.keys(pages).length > 0;
-  const currentPage = pages[currentPageId];
 
   useEffect(() => {
-    if (publicShare === true && pageId && shouldLoadPublicPage) {
+
+    if (pageId && shouldLoadPublicPage) {
       loadPublicPage(pageId as string);
     }
     else if (pageId && pagesLoaded) {
-      const pageByPath = pages[pageId] || Object.values(pages).filter(isTruthy).find(page => page.path === pageId);
+      const pageByPath = pages[pageId];
       if (pageByPath) {
         setTitleState(pageByPath.title);
         onPageLoad?.(pageByPath.id);
@@ -74,55 +108,39 @@ export default function EditorPage (
     const updatedPage = await charmClient.updatePage(updates);
     setPages((_pages) => ({
       ..._pages,
-      [currentPageId]: updatedPage
+      [pageId]: updatedPage
     }));
     return updatedPage;
   }, 500);
 
   const setPage = useCallback(async (updates: Partial<Page>) => {
-    if (!currentPageId || publicShare === true) {
+    if (!pageId || shouldLoadPublicPage) {
       return;
     }
     if (updates.hasOwnProperty('title')) {
       setTitleState(updates.title || 'Untitled');
     }
-    debouncedPageUpdate({ id: currentPageId, ...updates } as Prisma.PageUpdateInput)
+    debouncedPageUpdate({ id: pageId, ...updates } as Prisma.PageUpdateInput)
       .catch((err: any) => {
         log.error('Error saving page', err);
       })
       .finally(() => {
         setIsEditing(false);
       });
-  }, [currentPageId, publicShare]);
+  }, [pageId]);
 
   // memoize the page to avoid re-rendering unless certain fields are changed
+  const currentPage = pages[pageId];
   const memoizedCurrentPage = useMemo(
-    () => pages[currentPageId],
-    [
-      currentPageId,
-      currentPage?.headerImage,
-      currentPage?.icon,
-      currentPage?.title,
-      currentPage?.deletedAt,
-      currentPage?.updatedAt,
-      currentPage?.updatedBy
-    ]
+    () => pages[pageId],
+    [pageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt]
   );
-
-  useEffect(() => {
-    setPagePermissions(null);
-
-    if (user && memoizedCurrentPage) {
-      const permissions = getPagePermissions(memoizedCurrentPage.id);
-      setPagePermissions(permissions);
-    }
-  }, [user, currentPageId]);
 
   if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
   // Handle public page
-  else if (publicShare === true && memoizedCurrentPage) {
+  else if (shouldLoadPublicPage === true && memoizedCurrentPage) {
     return currentPage?.type === 'board' ? (
       <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={true} />
     ) : (
@@ -130,23 +148,23 @@ export default function EditorPage (
     );
   }
   // Wait for permission load
-  else if (!memoizedCurrentPage || !pagePermissions) {
+  else if (!memoizedCurrentPage || !currentPagePermissions) {
     return null;
   }
   // Interpret page permission
-  else if (pagePermissions.read === false) {
+  else if (currentPagePermissions.read === false) {
     return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
   }
-  else if (pagePermissions.read === true) {
+  else if (currentPagePermissions.read === true) {
     if (currentPage?.type === 'board') {
-      return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={pagePermissions.edit_content !== true} />;
+      return <BoardPage page={memoizedCurrentPage} setPage={setPage} readonly={currentPagePermissions.edit_content !== true} />;
     }
     else {
       return (
         <DocumentPage
           page={memoizedCurrentPage}
           setPage={setPage}
-          readOnly={pagePermissions.edit_content !== true}
+          readOnly={currentPagePermissions.edit_content !== true}
         />
       );
     }

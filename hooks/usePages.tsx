@@ -24,6 +24,7 @@ type IContext = {
   setPages: Dispatch<SetStateAction<PagesMap>>,
   setCurrentPageId: Dispatch<SetStateAction<string>>,
   isEditing: boolean
+  refreshPage: (pageId: string) => Promise<IPageWithPermissions>
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
   getPagePermissions: (pageId: string) => IPagePermissionFlags,
   deletePage: (pageId: string) => Promise<void>,
@@ -40,6 +41,7 @@ export const PagesContext = createContext<Readonly<IContext>>({
   isEditing: true,
   setIsEditing: () => { },
   getPagePermissions: () => new AllowedPagePermissions(),
+  refreshPage: () => Promise.resolve({} as any),
   deletePage: () => undefined as any,
   restorePage: () => undefined as any
 });
@@ -100,6 +102,13 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (currentPageId) {
+      refreshPage(currentPageId);
+    }
+
+  }, [currentPageId]);
+
   /**
    * Will return permissions for the currently connected user
    * @param pageId
@@ -128,7 +137,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       // User gets permission via role or as an individual
       const shouldApplyPermission = (permission.userId && permission.userId === user?.id)
         || (permission.roleId && applicableRoles.some(role => role.id === permission.roleId))
-        || (userSpaceRole && permission.spaceId === userSpaceRole.spaceId);
+        || (userSpaceRole && permission.spaceId === userSpaceRole.spaceId) || permission.public === true;
 
       if (shouldApplyPermission) {
 
@@ -141,6 +150,16 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return computedPermissions;
   }
 
+  async function refreshPage (pageId: string): Promise<IPageWithPermissions> {
+    const freshPageVersion = await charmClient.getPage(pageId);
+    setPages({
+      ...pages,
+      [freshPageVersion.id]: freshPageVersion
+    });
+
+    return freshPageVersion;
+  }
+
   const value: IContext = useMemo(() => ({
     currentPageId,
     isEditing,
@@ -149,6 +168,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     setCurrentPageId,
     setPages,
     getPagePermissions,
+    refreshPage,
     deletePage,
     restorePage
   }), [currentPageId, isEditing, router, pages, user]);

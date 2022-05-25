@@ -42,6 +42,10 @@ function generatePermissionQuery (pageId: string, permission: IPagePermissionToC
     userId_PageId: !permission.userId ? undefined : {
       pageId,
       userId: permission.userId
+    },
+    public_pageId: !permission.public ? undefined : {
+      pageId,
+      public: true
     }
   };
 }
@@ -80,7 +84,8 @@ function generatePrismaUpsertArgs (
         connect: {
           id: permission.spaceId
         }
-      }
+      },
+      public: !permission.public ? undefined : true
     },
     update: {
       permissionLevel: permission.permissionLevel,
@@ -138,9 +143,10 @@ function validatePermissionToCreate (permission: IPagePermissionToCreate) {
 
   // Ensure only one group is assigned to this permission
   if (
-    (permission.userId && (permission.roleId || permission.spaceId))
+    (permission.public && (permission.userId || permission.roleId || permission.spaceId))
+    || (permission.userId && (permission.roleId || permission.spaceId))
     || (permission.roleId && permission.spaceId)
-    || (!permission.userId && !permission.roleId && !permission.spaceId)
+    || (!permission.userId && !permission.roleId && !permission.spaceId && !permission.public)
   ) {
     throw new InvalidPermissionGranteeError();
   }

@@ -2,7 +2,7 @@
 import { PagePermission } from '@prisma/client';
 import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission } from 'lib/permissions/pages';
+import { deletePagePermission, IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission, IPagePermissionWithSource } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -28,7 +28,7 @@ async function findPagePermissions (req: NextApiRequest, res: NextApiResponse<IP
   return res.status(200).json(permissions);
 }
 
-async function addPagePermission (req: NextApiRequest, res: NextApiResponse) {
+async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPagePermissionWithSource>) {
 
   const { pageId } = req.body;
 
@@ -39,6 +39,10 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse) {
 
   if (computedPermissions.grant_permissions !== true) {
     throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  }
+
+  if (req.body.public === true && computedPermissions.edit_isPublic !== true) {
+    throw new ActionNotPermittedError('You cannot make page public.');
   }
 
   // Count before and after permissions so we don't trigger the event unless necessary
