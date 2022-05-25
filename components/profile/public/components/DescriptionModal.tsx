@@ -1,15 +1,11 @@
 import { useEffect } from 'react';
-import styled from '@emotion/styled';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
-import { Box, Button, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
+import Button from 'components/common/Button';
 import TextField from '@mui/material/TextField';
 import { Modal, DialogTitle } from 'components/common/Modal';
-
-const StyledButton = styled(Button)`
-    border-radius: 7px;
-`;
 
 export const schema = yup.object({
   description: yup.string().ensure().trim()
@@ -63,10 +59,10 @@ function DescriptionModal (props: DescriptionModalProps) {
             multiline
             minRows={10}
           />
-          <Box justifyContent='end' mt={3} sx={{ display: 'flex' }}>
-            <StyledButton type='submit'>
+          <Box mt={4} sx={{ display: 'flex' }}>
+            <Button type='submit'>
               Save
-            </StyledButton>
+            </Button>
           </Box>
         </Stack>
       </form>

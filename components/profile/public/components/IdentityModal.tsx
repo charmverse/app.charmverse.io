@@ -10,7 +10,7 @@ import MetamaskIcon from 'public/images/metamask.svg';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import log from 'lib/log';
 import Integration from './Integration';
-import { IntegrationType } from '../enums';
+import { INTEGRATION_TYPES } from '../interfaces';
 
 const StyledButton = styled(Button)`
     border-radius: 7px;
@@ -67,7 +67,7 @@ function IdentityModal (props: IdentityModalProps) {
                 <MetamaskIcon />
               </SvgIcon>
             )}
-            integrationType={IntegrationType.Metamask}
+            integrationType={INTEGRATION_TYPES[0]}
             name='Metamask'
             id='0x1234abcdefgh5678910hijklmnop980zxcvb23'
             useIntegration={useIntegration}
@@ -79,7 +79,7 @@ function IdentityModal (props: IdentityModalProps) {
                 <DiscordIcon />
               </SvgIcon>
             )}
-            integrationType={IntegrationType.Discord}
+            integrationType={INTEGRATION_TYPES[1]}
             name='Discord'
             id='user#1234'
             useIntegration={useIntegration}
@@ -91,7 +91,7 @@ function IdentityModal (props: IdentityModalProps) {
                 <TelegramIcon />
               </SvgIcon>
             )}
-            integrationType={IntegrationType.Discord}
+            integrationType={INTEGRATION_TYPES[2]}
             name='Telegram'
             id='user#1234'
             useIntegration={useIntegration}

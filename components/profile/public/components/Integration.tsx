@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { ReactNode } from 'react';
 import { Box, Button, Divider, Grid, Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
-import { IntegrationType } from '../enums';
+import { IntegrationType } from '../interfaces';
 
 const StyledBox = styled(Box)`
   background-color:  ${({ theme }) => theme.palette.background.light};

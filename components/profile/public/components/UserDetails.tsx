@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import useSWR from 'swr';
 import styled from '@emotion/styled';
 import { Box, Divider, Grid, Link as ExternalLink, Stack, SvgIcon, Typography, Tooltip } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import EditIcon from '@mui/icons-material/Edit';
@@ -13,12 +15,11 @@ import DiscordIcon from 'public/images/discord_logo.svg';
 import Link from 'next/link';
 import { useWeb3React } from '@web3-react/core';
 import { useUser } from 'hooks/useUser';
-import { useUserDetails } from 'hooks';
 import { getDisplayName } from 'lib/users';
 import useENSName from 'hooks/useENSName';
 import charmClient from 'charmClient';
 import { DescriptionModal, IdentityModal, SocialModal } from '.';
-import { Social } from '../types';
+import { Social } from '../interfaces';
 
 const StyledBox = styled(Box)`
 
@@ -34,12 +35,13 @@ const StyledDivider = styled(Divider)`
 export default function UserDetails () {
   const { account } = useWeb3React();
   const [user, setUser] = useUser();
-  const { userDetails, setUserDetails } = useUserDetails();
+  const { data: userDetails, mutate } = useSWR('userDetails', () => charmClient.getUserDetails());
   const ENSName = useENSName(account);
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
-  const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
-  const [isIdentityModalOpen, setIsIdentityModalOpen] = useState(false);
-  const [isSocialMediaModalOpen, setIsSocialMediaModalOpen] = useState(false);
+
+  const descriptionModalState = usePopupState({ variant: 'popover' });
+  const identityModalState = usePopupState({ variant: 'popover' });
+  const socialModalState = usePopupState({ variant: 'popover' });
 
   const userName = ENSName || (user ? getDisplayName(user) : '');
 
@@ -92,7 +94,7 @@ export default function UserDetails () {
           <Grid item>
             <Stack direction='row' spacing={1} alignItems='baseline'>
               <Typography variant='h1'>CharmVerse</Typography>
-              <IconButton onClick={() => setIsIdentityModalOpen(true)}>
+              <IconButton onClick={identityModalState.open}>
                 <EditIcon />
               </IconButton>
             </Stack>
@@ -140,7 +142,7 @@ export default function UserDetails () {
                 !hasAnySocialInformation(socialDetails) && <Typography>No social media links</Typography>
               }
               <StyledDivider orientation='vertical' flexItem />
-              <IconButton onClick={() => setIsSocialMediaModalOpen(true)}>
+              <IconButton onClick={socialModalState.open}>
                 <EditIcon />
               </IconButton>
             </Stack>
@@ -154,7 +156,7 @@ export default function UserDetails () {
               </span>
             </Grid>
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
-              <IconButton onClick={() => setIsDescriptionModalOpen(true)}>
+              <IconButton onClick={descriptionModalState.open}>
                 <EditIcon />
               </IconButton>
             </Grid>
@@ -162,33 +164,33 @@ export default function UserDetails () {
         </Grid>
       </Stack>
       <IdentityModal
-        isOpen={isIdentityModalOpen}
-        close={() => setIsIdentityModalOpen(false)}
+        isOpen={identityModalState.isOpen}
+        close={identityModalState.close}
         defaultValues={{
 
         }}
       />
       <DescriptionModal
-        isOpen={isDescriptionModalOpen}
-        close={() => setIsDescriptionModalOpen(false)}
+        isOpen={descriptionModalState.isOpen}
+        close={descriptionModalState.close}
         save={async (description: string) => {
-          const updatedDetails = await charmClient.updateUserDetails({
+          await charmClient.updateUserDetails({
             description
           });
-          setUserDetails(updatedDetails);
-          setIsDescriptionModalOpen(false);
+          mutate();
+          descriptionModalState.close();
         }}
         currentDescription={userDetails?.description}
       />
       <SocialModal
-        isOpen={isSocialMediaModalOpen}
-        close={() => setIsSocialMediaModalOpen(false)}
+        isOpen={socialModalState.isOpen}
+        close={socialModalState.close}
         save={async (social: Social) => {
-          const updatedDetails = await charmClient.updateUserDetails({
+          await charmClient.updateUserDetails({
             social: JSON.stringify(social)
           });
-          setUserDetails(updatedDetails);
-          setIsSocialMediaModalOpen(false);
+          mutate();
+          socialModalState.close();
         }}
         social={socialDetails}
       />

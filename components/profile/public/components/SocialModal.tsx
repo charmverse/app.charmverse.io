@@ -1,28 +1,24 @@
-import styled from '@emotion/styled';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Box, Button, Grid, SvgIcon, Typography } from '@mui/material';
+import { Box, Grid, SvgIcon, Typography } from '@mui/material';
+import Button from 'components/common/Button';
 import TextField from '@mui/material/TextField';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import { Social } from '../types';
-
-const StyledButton = styled(Button)`
-    border-radius: 7px;
-`;
+import { Social } from '../interfaces';
 
 export const schema = yup.object({
   twitterURL: yup.string().notRequired().ensure().trim()
     .matches(/^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?twitter\.com\/([a-zA-Z0-9_]+)/i, 'Invalid Twitter link'),
   githubURL: yup.string().notRequired().ensure().trim()
     .matches(/^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([A-Za-z0-9]{1,})+\/?$/i, 'Invalid GitHub link'),
-  discordUsername: yup.string().notRequired().ensure()
-    .matches(/^((?!(discordtag|everyone|here)#)((?!@|#|:|```).{2,32})#\d{4})/, 'Invalid Discord username'),
+  discordUsername: yup.string().notRequired().ensure().trim()
+    .matches(/^$|^((?!(discordtag|everyone|here)#)((?!@|#|:|```).{2,32})#\d{4})/, 'Invalid Discord username'),
   linkedinURL: yup.string().notRequired().ensure()
     .matches(/^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i, 'Invalid LinkedIn link')
 });
@@ -125,14 +121,12 @@ function SocialModal (props: SocialModalProps) {
             </Grid>
           </Grid>
         </Grid>
-        <Box justifyContent='end' mt={3} sx={{ display: 'flex' }}>
-          <StyledButton
+        <Box mt={4} sx={{ display: 'flex' }}>
+          <Button
             type='submit'
-            onClick={() => {
-            }}
           >
             Save
-          </StyledButton>
+          </Button>
         </Box>
       </form>
     </Modal>

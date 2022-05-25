@@ -5,7 +5,7 @@ import PublicProfile from 'components/profile/public';
 
 export default function PublicProfilePage () {
 
-  setTitle('');
+  setTitle('Public Profile');
 
   return (
     <PublicProfile />
