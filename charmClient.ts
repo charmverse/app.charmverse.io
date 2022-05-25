@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
-  Role, Space, TokenGate, Transaction, User, TelegramUser, UserGnosisSafe, TokenGateToRole
+  Role, Space, TokenGate, Transaction, User, UserDetails, TelegramUser, UserGnosisSafe, TokenGateToRole
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
@@ -65,8 +65,16 @@ class CharmClient {
     });
   }
 
-  updateUser ({ addresses }: { addresses?: string[] }) {
-    return http.PUT<LoggedInUser>('/api/profile', { addresses });
+  updateUser (data: Partial<User>) {
+    return http.PUT<LoggedInUser>('/api/profile', data);
+  }
+
+  getUserDetails () {
+    return http.GET<UserDetails>('/api/profile/details');
+  }
+
+  updateUserDetails (data: Partial<UserDetails>) {
+    return http.PUT<UserDetails>('/api/profile/details', data);
   }
 
   async createSpace (spaceOpts: Prisma.SpaceCreateInput) {

@@ -16,7 +16,7 @@ handler
   .post(createUser)
   .use(requireUser)
   .get(getUser)
-  .put(requireKeys(['addresses'], 'body'), updateUser);
+  .put(updateUser);
 
 async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
@@ -37,7 +37,6 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   await updateGuildRolesForUser(userData.addresses, spaceRoles);
   await req.session.save();
   res.status(200).json(user);
-
 }
 
 async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
@@ -87,7 +86,7 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       telegramUser: true
     },
     data: {
-      addresses: req.body.addresses
+      ...req.body
     }
   });
 
