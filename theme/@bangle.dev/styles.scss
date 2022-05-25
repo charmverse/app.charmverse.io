@@ -406,6 +406,8 @@ details {
 
   &[open] > summary::before {
     content: "▼";
+    transform: rotate(0);
+    top: 1px;
   }
 
   summary {
@@ -415,8 +417,11 @@ details {
     margin-left: -20px;
 
     &::before {
-      content: "►";
+      content: "▼";
+      cursor: pointer;
+      transform: rotate(-90deg);
       position: relative;
+      top: -3px;
       min-width: 20px;
       display: inline-block;
     }
