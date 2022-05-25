@@ -39,9 +39,9 @@ export default function UserDetails () {
   const ENSName = useENSName(account);
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
 
-  const descriptionModalState = usePopupState({ variant: 'popover' });
-  const identityModalState = usePopupState({ variant: 'popover' });
-  const socialModalState = usePopupState({ variant: 'popover' });
+  const descriptionModalState = usePopupState({ variant: 'popover', popupId: 'description-modal' });
+  const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
+  const socialModalState = usePopupState({ variant: 'popover', popupId: 'social-modal' });
 
   const userName = ENSName || (user ? getDisplayName(user) : '');
 
