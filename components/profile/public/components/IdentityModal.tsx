@@ -8,7 +8,7 @@ import DiscordIcon from 'public/images/discord_logo.svg';
 import MetamaskIcon from 'public/images/metamask.svg';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import Integration from './Integration';
-import { INTEGRATION_TYPES } from '../interfaces';
+import { INTEGRATION_TYPES, IntegrationType } from '../interfaces';
 
 export const schema = yup.object({
   description: yup.string().ensure().trim()
