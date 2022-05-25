@@ -78,18 +78,26 @@ const HeaderSpacer = styled.div`
   min-height: ${headerHeight}px;
 `;
 
-const LayoutContainer = styled.div`
+const LayoutContainer = styled.div<{hideDrawerOnSmallScreen?: boolean}>`
   display: flex;
   height: 100%;
+  ${({ theme, hideDrawerOnSmallScreen }) => hideDrawerOnSmallScreen && `
+    ${theme.breakpoints.down('sm')} {
+      .Drawer {
+        display: none;
+      }
+    }
+  `}
 `;
 
 interface PageLayoutProps {
   children: React.ReactNode;
   sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element)
   drawerWidth?: number
+  hideDrawerOnSmallScreen?: boolean
 }
 
-function PageLayout ({ drawerWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
+function PageLayout ({ hideDrawerOnSmallScreen = false, drawerWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
   const isSmallScreen = window.innerWidth < 600;
   const [open, setOpen] = React.useState(!isSmallScreen);
   const [user] = useUser();
@@ -107,7 +115,7 @@ function PageLayout ({ drawerWidth = 300, children, sidebar: SidebarOverride }: 
       <Head>
         <CurrentPageFavicon />
       </Head>
-      <LayoutContainer>
+      <LayoutContainer hideDrawerOnSmallScreen={hideDrawerOnSmallScreen}>
         <CommentThreadsListDisplayProvider>
           <AppBar drawerWidth={drawerWidth} position='fixed' open={open}>
             <Header
@@ -115,7 +123,7 @@ function PageLayout ({ drawerWidth = 300, children, sidebar: SidebarOverride }: 
               openSidebar={handleDrawerOpen}
             />
           </AppBar>
-          <Drawer drawerWidth={drawerWidth} variant='permanent' open={open}>
+          <Drawer className='Drawer' drawerWidth={drawerWidth} variant='permanent' open={open}>
             {SidebarOverride
               ? <SidebarOverride closeSidebar={handleDrawerClose} />
               : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}

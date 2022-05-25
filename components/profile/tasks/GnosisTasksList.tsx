@@ -22,6 +22,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import CancelIcon from '@mui/icons-material/Cancel';
 import EmailIcon from '@mui/icons-material/Email';
+import { useTheme } from '@emotion/react';
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
@@ -39,42 +40,75 @@ function TransactionRow (
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
   const isFirstTask = transaction.nonce === firstNonce;
+  const theme = useTheme();
+  const smScreenMediaQuery = theme.breakpoints.down('sm');
 
   return (
     <>
-      <Grid container key={transaction.id} sx={{ height: rowHeight }} onClick={() => setExpanded(!expanded)}>
-        <GridColumn>
+      <Grid justifyContent='space-between' alignItems='center' container key={transaction.id} sx={{ height: rowHeight }} onClick={() => setExpanded(!expanded)}>
+        <Grid
+          item
+          xs={3}
+        >
           {transaction.description}
-        </GridColumn>
-        <GridColumn>
+        </Grid>
+        <Grid
+          item
+          xs={2}
+          sx={{
+            [smScreenMediaQuery]: {
+              display: 'none'
+            }
+          }}
+        >
           {DateTime.fromISO(transaction.date).toRelative({ base: DateTime.now() })}
-        </GridColumn>
-        <GridColumn>
+        </Grid>
+        <Grid
+          item
+          xs={2}
+          sx={{
+            [smScreenMediaQuery]: {
+              display: 'none'
+            }
+          }}
+        >
           <Typography variant='caption' sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: isReadyToExecute ? 'bold' : '' }}>
             <PeopleIcon color='secondary' fontSize='small' /> {transaction.confirmations?.length || 0} out of {transaction.threshold}
           </Typography>
-        </GridColumn>
-        <GridColumn sx={{ justifyContent: 'flex-end' }}>
-          <Tooltip arrow placement='top' title={isSnoozed ? 'Transactions snoozed' : !isFirstTask ? `Transaction with nonce ${firstNonce} needs to be executed first` : ''}>
-            <div>
-              <Chip
-                clickable={!!transaction.myAction}
-                component='a'
-                label={transaction.myAction || 'Waiting for others'}
-                href={transaction.myActionUrl}
-                target='_blank'
-                color={transaction.myAction ? 'primary' : undefined}
-                variant={transaction.myAction ? 'filled' : 'outlined'}
-                disabled={isSnoozed || !isFirstTask}
-              />
-            </div>
-          </Tooltip>
-        </GridColumn>
-        <GridColumn sx={{ flexGrow: '0 !important' }}>
-          <Box sx={{ width: 60, display: 'flex', justifyContent: 'center' }}>
-            {expanded ? <ExpandLess /> : <ExpandMore />}
+        </Grid>
+        <Grid
+          item
+          xs={3}
+        >
+          <Box
+            justifySelf='flex-end'
+            display='flex'
+            sx={{
+              width: '100%',
+              justifyContent: 'right'
+            }}
+          >
+            <Box justifySelf='flex-end' gap={1} display='flex' alignItems='center'>
+              <Tooltip arrow placement='top' title={isSnoozed ? 'Transactions snoozed' : !isFirstTask ? `Transaction with nonce ${firstNonce} needs to be executed first` : ''}>
+                <div>
+                  <Chip
+                    clickable={!!transaction.myAction}
+                    component='a'
+                    label={transaction.myAction || 'Waiting for others'}
+                    href={transaction.myActionUrl}
+                    target='_blank'
+                    color={transaction.myAction ? 'primary' : undefined}
+                    variant={transaction.myAction ? 'filled' : 'outlined'}
+                    disabled={isSnoozed || !isFirstTask}
+                  />
+                </div>
+              </Tooltip>
+              <Box sx={{ mr: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                {expanded ? <ExpandLess /> : <ExpandMore />}
+              </Box>
+            </Box>
           </Box>
-        </GridColumn>
+        </Grid>
       </Grid>
       <Collapse in={expanded}>
         <Divider />

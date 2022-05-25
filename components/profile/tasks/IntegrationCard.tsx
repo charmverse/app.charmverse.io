@@ -18,7 +18,7 @@ const IntegrationCardContainer = styled.div`
   gap: ${({ theme }) => theme.spacing(3)};
   justify-content: space-between;
   ${({ theme }) => `
-    ${theme.breakpoints.down('sm')} {
+    ${theme.breakpoints.down('md')} {
       flex-direction: column;
       gap: ${theme.spacing(1.5)};
     }
@@ -36,6 +36,7 @@ export default function IntegrationCard () {
   const router = useRouter();
   const { data: safes } = useMultiWalletSigs();
   const theme = useTheme();
+  const mdScreenMediaQuery = theme.breakpoints.down('md');
   const smScreenMediaQuery = theme.breakpoints.down('sm');
 
   return currentUser && (
@@ -59,7 +60,16 @@ export default function IntegrationCard () {
           router.push('/profile/integrations');
         }}
       >
-        <Box display='flex' gap={2} alignItems='center'>
+        <Box
+          display='flex'
+          gap={2}
+          alignItems='center'
+          sx={{
+            [smScreenMediaQuery]: {
+              gap: 1.5
+            }
+          }}
+        >
           <Box
             display='flex'
             gap={1}
@@ -78,6 +88,7 @@ export default function IntegrationCard () {
             <Typography
               color='secondary'
               sx={{
+                fontWeight: 500,
                 [smScreenMediaQuery]: {
                   fontSize: '0.75rem'
                 }
@@ -88,13 +99,29 @@ export default function IntegrationCard () {
           <Divider sx={{ borderRightWidth: 2 }} orientation='vertical' variant='middle' flexItem />
           <Box display='flex' gap={1.5} height='100%' alignItems='center'>
             <Tooltip title={metamaskConnected ? 'Metamask connected' : 'Metamask not connected'} arrow placement='top'>
-              <Image className='logo-image' width={20} height={20} src={metamaskConnected ? '/walletLogos/metamask.png' : '/walletLogos/metamask-greyscale.png'} />
+              {/** Tooltip doesn't show without this span and without display: flex the icons aren't centered */}
+              <span style={{
+                display: 'flex'
+              }}
+              >
+                <Image className='logo-image' width={20} height={20} src={metamaskConnected ? '/walletLogos/metamask.png' : '/walletLogos/metamask-greyscale.png'} />
+              </span>
             </Tooltip>
             <Tooltip title={discordConnected ? 'Discord connected' : 'Discord not connected'} arrow placement='top'>
-              <Image className='logo-image' width={25} height={20} src={discordConnected ? '/images/discord-logo-colored.png' : '/images/discord-logo-greyscale.png'} />
+              <span style={{
+                display: 'flex'
+              }}
+              >
+                <Image className='logo-image' width={25} height={20} src={discordConnected ? '/images/discord-logo-colored.png' : '/images/discord-logo-greyscale.png'} />
+              </span>
             </Tooltip>
             <Tooltip title={telegramConnected ? 'Telegram connected' : 'Telegram not connected'} arrow placement='top'>
-              <Image className='logo-image' width={22.5} height={22.5} src={telegramConnected ? '/images/telegram-logo-colored.png' : '/images/telegram-logo-greyscale.png'} />
+              <span style={{
+                display: 'flex'
+              }}
+              >
+                <Image className='logo-image' width={22.5} height={22.5} src={telegramConnected ? '/images/telegram-logo-colored.png' : '/images/telegram-logo-greyscale.png'} />
+              </span>
             </Tooltip>
           </Box>
           <Divider sx={{ borderRightWidth: 2 }} orientation='vertical' variant='middle' flexItem />
@@ -126,6 +153,7 @@ export default function IntegrationCard () {
                 {safes?.length}
               </Typography>
               <Typography sx={{
+                fontWeight: 500,
                 [smScreenMediaQuery]: {
                   top: 2,
                   position: 'relative',
@@ -157,7 +185,7 @@ export default function IntegrationCard () {
       >
         <Box
           sx={{
-            [smScreenMediaQuery]: {
+            [mdScreenMediaQuery]: {
               width: '100%'
             }
           }}
@@ -170,7 +198,7 @@ export default function IntegrationCard () {
             <Avatar size='large' variant='rounded' name={userEnsName || getDisplayName(currentUser)} avatar={currentUser.avatar} />
             <Typography
               sx={{
-                [smScreenMediaQuery]: {
+                [mdScreenMediaQuery]: {
                   width: '100%'
                 }
               }}
