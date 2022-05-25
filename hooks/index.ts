@@ -1,1 +1,0 @@
-export { useUserDetails } from './useUserDetails';
