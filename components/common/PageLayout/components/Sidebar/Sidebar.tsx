@@ -205,7 +205,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               target='_blank'
             />
           </Box>
-          <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll}>
+          <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
             {favoritePageIds.length > 0 && (
             <Box mb={2}>
               <SectionName>

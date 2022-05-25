@@ -7,23 +7,32 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { Page } from '@prisma/client';
 import { prisma } from 'db';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { ModifyChildPagesResponse } from 'lib/pages';
+import { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
 import { getPage } from 'lib/pages/server/getPage';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
   .use(requireKeys(['id'], 'query'))
   .get(getPageRoute)
+  // Only require user on update and delete
+  .use(requireUser)
   .put(updatePage)
   .delete(deletePage);
 
-async function getPageRoute (req: NextApiRequest, res: NextApiResponse<Page>) {
+async function getPageRoute (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
-  const userId = req.session.user.id;
+  const userId = req.session?.user?.id;
 
+  const page = await getPage(pageId, req.query.spaceId as string | undefined);
+
+  if (!page) {
+    throw new NotFoundError();
+  }
+
+  // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
   const permissions = await computeUserPagePermissions({
-    pageId,
+    pageId: page.id,
     userId
   });
 
@@ -31,16 +40,10 @@ async function getPageRoute (req: NextApiRequest, res: NextApiResponse<Page>) {
     throw new ActionNotPermittedError('You do not have permission to view this page');
   }
 
-  const page = await getPage(pageId);
-
-  if (!page) {
-    throw new NotFoundError();
-  }
-
   return res.status(200).json(page);
 }
 
-async function updatePage (req: NextApiRequest, res: NextApiResponse) {
+async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
 
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
@@ -56,9 +59,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     throw new ActionNotPermittedError('You do not have permission to reposition this page');
   }
 
-  if (updateContent.hasOwnProperty('isPublic') && permissions.edit_isPublic !== true) {
-    throw new ActionNotPermittedError('You do not have permission to update the public status of this page');
-  }
   else if (permissions.edit_content !== true) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
@@ -66,7 +66,11 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     where: {
       id: pageId
     },
-    data: req.body,
+    data: {
+      ...req.body,
+      updatedAt: new Date(),
+      updatedBy: userId
+    },
     include: {
       permissions: {
         include: {
