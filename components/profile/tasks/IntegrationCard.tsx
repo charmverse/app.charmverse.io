@@ -9,6 +9,21 @@ import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import { useRouter } from 'next/router';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import KeyIcon from '@mui/icons-material/Key';
+import styled from '@emotion/styled';
+import { useTheme } from '@emotion/react';
+import Image from 'next/image';
+
+const IntegrationCardContainer = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(3)};
+  justify-content: space-between;
+  ${({ theme }) => `
+    ${theme.breakpoints.down('sm')} {
+      flex-direction: column;
+      gap: ${theme.spacing(1.5)};
+    }
+  `}
+`;
 
 export default function IntegrationCard () {
   const [currentUser] = useUser();
@@ -20,9 +35,11 @@ export default function IntegrationCard () {
   const userEnsName = useENSName(currentUser?.addresses[0]);
   const router = useRouter();
   const { data: safes } = useMultiWalletSigs();
+  const theme = useTheme();
+  const smScreenMediaQuery = theme.breakpoints.down('sm');
 
   return currentUser && (
-    <Box display='flex' gap={3} justifyContent='space-between'>
+    <IntegrationCardContainer>
       <Paper
         elevation={1}
         sx={{
@@ -32,7 +49,11 @@ export default function IntegrationCard () {
           gap: 2,
           alignItems: 'center',
           cursor: 'pointer',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          [smScreenMediaQuery]: {
+            px: 1,
+            gap: 1
+          }
         }}
         onClick={() => {
           router.push('/profile/integrations');
@@ -46,30 +67,74 @@ export default function IntegrationCard () {
           >
             <Typography sx={{
               fontSize: '2.5rem',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              [smScreenMediaQuery]: {
+                fontSize: '2rem'
+              }
             }}
             >
               {totalIntegrations}
             </Typography>
-            <Typography color='secondary'>Integrations</Typography>
+            <Typography
+              color='secondary'
+              sx={{
+                [smScreenMediaQuery]: {
+                  fontSize: '0.75rem'
+                }
+              }}
+            >Integrations
+            </Typography>
           </Box>
           <Divider sx={{ borderRightWidth: 2 }} orientation='vertical' variant='middle' flexItem />
           <Box display='flex' gap={1.5} height='100%' alignItems='center'>
             <Tooltip title={metamaskConnected ? 'Metamask connected' : 'Metamask not connected'} arrow placement='top'>
-              <img height={20} src={metamaskConnected ? '/walletLogos/metamask.png' : '/walletLogos/metamask-greyscale.png'} />
+              <Image className='logo-image' width={20} height={20} src={metamaskConnected ? '/walletLogos/metamask.png' : '/walletLogos/metamask-greyscale.png'} />
             </Tooltip>
             <Tooltip title={discordConnected ? 'Discord connected' : 'Discord not connected'} arrow placement='top'>
-              <img height={20} src={discordConnected ? '/images/discord-logo-colored.png' : '/images/discord-logo-greyscale.png'} />
+              <Image className='logo-image' width={25} height={20} src={discordConnected ? '/images/discord-logo-colored.png' : '/images/discord-logo-greyscale.png'} />
             </Tooltip>
             <Tooltip title={telegramConnected ? 'Telegram connected' : 'Telegram not connected'} arrow placement='top'>
-              <img height={25} src={telegramConnected ? '/images/telegram-logo-colored.png' : '/images/telegram-logo-greyscale.png'} />
+              <Image className='logo-image' width={22.5} height={22.5} src={telegramConnected ? '/images/telegram-logo-colored.png' : '/images/telegram-logo-greyscale.png'} />
             </Tooltip>
           </Box>
           <Divider sx={{ borderRightWidth: 2 }} orientation='vertical' variant='middle' flexItem />
           <Box display='flex' gap={1} height='100%' alignItems='center'>
-            <KeyIcon />
-            <Typography variant='subtitle1' color='secondary'>
-              {safes?.length} Multisig accounts
+            <KeyIcon sx={{
+              [smScreenMediaQuery]: {
+                display: 'none'
+              }
+            }}
+            />
+            <Typography
+              sx={{
+                display: 'flex',
+                alignItems: 'center'
+              }}
+              variant='subtitle1'
+              color='secondary'
+            >
+              <Typography sx={{
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                mr: 0.5,
+                [smScreenMediaQuery]: {
+                  fontSize: '2rem',
+                  mr: 1
+                }
+              }}
+              >
+                {safes?.length}
+              </Typography>
+              <Typography sx={{
+                [smScreenMediaQuery]: {
+                  top: 2,
+                  position: 'relative',
+                  fontSize: '0.75rem'
+                }
+              }}
+              >
+                Multisig accounts
+              </Typography>
             </Typography>
           </Box>
         </Box>
@@ -90,10 +155,30 @@ export default function IntegrationCard () {
           router.push('/profile/public');
         }}
       >
-        <Box width={200} display='flex' justifyContent='space-between' alignItems='center'>
+        <Box
+          sx={{
+            [smScreenMediaQuery]: {
+              width: '100%'
+            }
+          }}
+          width={200}
+          display='flex'
+          justifyContent='space-between'
+          alignItems='center'
+        >
           <Box display='flex' alignItems='center' gap={1.5}>
             <Avatar size='large' variant='rounded' name={userEnsName || getDisplayName(currentUser)} avatar={currentUser.avatar} />
-            <Typography variant='subtitle1' color='secondary' width={75}>My Public Profile</Typography>
+            <Typography
+              sx={{
+                [smScreenMediaQuery]: {
+                  width: '100%'
+                }
+              }}
+              variant='subtitle1'
+              color='secondary'
+              width={75}
+            >My Public Profile
+            </Typography>
           </Box>
           <ExpandCircleDownIcon
             sx={{
@@ -103,6 +188,6 @@ export default function IntegrationCard () {
           />
         </Box>
       </Paper>
-    </Box>
+    </IntegrationCardContainer>
   );
 }

@@ -8,6 +8,7 @@ import BountyIcon from '@mui/icons-material/RequestPage';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import styled from '@emotion/styled';
+import { useTheme } from '@emotion/react';
 import GnosisTasksList from './GnosisTasksList';
 import IntegrationCard from './IntegrationCard';
 
@@ -37,10 +38,18 @@ const TasksPageContainer = styled.div`
   width: 1105px;
   padding: 0 80px;
   margin: 0 auto;
+  ${({ theme }) => `
+    ${theme.breakpoints.down('md')} {
+      width: 100%;
+      padding: 0 10px;
+    }
+  `}
 `;
 
 export default function TasksPage () {
   const [currentTab, setCurrentTab] = useState<TaskType>('multisig');
+  const theme = useTheme();
+
   return (
     <TasksPageContainer>
       <Box display='flex' justifyContent='space-between' mb={3}>
@@ -50,14 +59,27 @@ export default function TasksPage () {
       <Legend>
         My tasks
       </Legend>
-      <Tabs textColor='primary' indicatorColor='secondary' value={currentTab}>
+      <Tabs variant='scrollable' scrollButtons='auto' textColor='primary' indicatorColor='secondary' value={currentTab}>
         {(['multisig', 'bounty', 'proposal', 'discussion'] as const).map(tab => (
           <Tab
             component='div'
             key={tab}
             disableRipple
             label={(
-              <Button startIcon={iconForTask(tab)} variant='text' size='small' onClick={() => setCurrentTab(tab)} color={currentTab === tab ? 'textPrimary' : 'secondary'}>
+              <Button
+                sx={{
+                  [theme.breakpoints.down('sm')]: {
+                    '& .MuiButton-startIcon': {
+                      display: 'none'
+                    }
+                  }
+                }}
+                startIcon={iconForTask(tab)}
+                variant='text'
+                size='small'
+                onClick={() => setCurrentTab(tab)}
+                color={currentTab === tab ? 'textPrimary' : 'secondary'}
+              >
                 {tab.toUpperCase()}
               </Button>
             )}
