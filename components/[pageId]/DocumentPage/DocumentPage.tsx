@@ -6,7 +6,6 @@ import { Page, PageContent } from 'models';
 import BountyIntegration from 'components/[pageId]/DocumentPage/components/BountyIntegration';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
-import { title } from 'process';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { usePages } from 'hooks/usePages';
@@ -120,7 +119,7 @@ function Editor ({ page, setPage, readOnly = false }: IEditorProps) {
                   pageUpdatedAt={page.updatedAt.toString()}
                   pageUpdatedBy={page.updatedBy}
                 />
-                <BountyIntegration linkedTaskId={card.id} title={title} readonly={readOnly} />
+                <BountyIntegration linkedTaskId={card.id} title={page.title} readonly={readOnly} />
               </Box>
 
               <hr />
