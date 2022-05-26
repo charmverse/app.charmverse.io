@@ -2,7 +2,7 @@ import { IconButton, Divider, Paper, Tooltip, Typography, Box, Grid } from '@mui
 import { useWeb3React } from '@web3-react/core';
 import { useUser } from 'hooks/useUser';
 import Avatar from 'components/common/Avatar';
-import Link from 'next/Link';
+import Link from 'next/link';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
