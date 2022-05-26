@@ -6,7 +6,7 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 
 type IContext = [
   user: LoggedInUser | null,
-  setUser: Dispatch<SetStateAction<LoggedInUser | null>>,
+  setUser: (user: LoggedInUser | any) => void,
   isLoaded: boolean,
   setIsLoaded: (isLoaded: boolean) => void
 ];
