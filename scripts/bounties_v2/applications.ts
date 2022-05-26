@@ -86,7 +86,11 @@ export async function setApplicationSpaceIds () {
     }
   });
 
-  for (const app of foundApplications) {
+  console.log('Found', foundApplications.length, 'applications to add a space ID to');
+
+  for (let i = 0; i < foundApplications.length; i++) {
+    const app = foundApplications[i];
+    console.log('Adding space ID to app ', i + 1, ' / ', foundApplications.length);
     await prisma.application.update({
       where: {
         id: app.id
@@ -110,8 +114,9 @@ export async function eliminateDuplicateApplications () {
     if (summary[userIdBountyId] === undefined) {
       summary[userIdBountyId] = [app];
     }
-
-    summary[userIdBountyId].push(app);
+    else {
+      summary[userIdBountyId].push(app);
+    }
 
     return summary;
   }, {});
@@ -130,15 +135,17 @@ export async function eliminateDuplicateApplications () {
 
   console.log('Found duplicates ', toDelete.length);
 
-  await prisma.application.deleteMany({
-    where: {
-      OR: toDelete.map(id => {
-        return {
-          id
-        };
-      })
-    }
-  });
+  if (toDelete.length > 0) {
+    await prisma.application.deleteMany({
+      where: {
+        OR: toDelete.map(id => {
+          return {
+            id
+          };
+        })
+      }
+    });
+  }
 
   return true;
 }

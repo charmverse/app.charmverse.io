@@ -29,7 +29,12 @@ const CONCURRENT = 3;
 export async function rollupExistingBounties () {
   const bounties = await prisma.bounty.findMany();
 
+  const totalBounties = bounties.length;
+
   for (let i = 0; i < bounties.length; i += CONCURRENT) {
+
+    console.log('Rolling up bounties ', i + 1, '-', i + 1 + CONCURRENT, ' / ', totalBounties);
+
     const sliced = bounties.slice(i, i + CONCURRENT);
     await Promise.all(sliced.map(bounty => rollupBountyStatus(bounty.id)));
   }
