@@ -1,4 +1,4 @@
-import { Application, ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, User } from '@prisma/client';
+import { Application, ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Transaction } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -104,6 +104,20 @@ export function generateBounty ({ spaceId, createdBy, status, maxSubmissions, ap
       descriptionNodes: '',
       approveSubmitters,
       maxSubmissions
+    }
+  });
+}
+
+export function generateTransaction ({ applicationId, chainId = '4', transactionId = '123' }: Pick<Transaction, 'applicationId'> & Partial<Transaction>): Promise<Transaction> {
+  return prisma.transaction.create({
+    data: {
+      chainId,
+      transactionId,
+      application: {
+        connect: {
+          id: applicationId
+        }
+      }
     }
   });
 }

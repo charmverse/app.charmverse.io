@@ -1,8 +1,6 @@
 import { Space, User } from '@prisma/client';
-import { createTransaction } from 'lib/transactions/createTransaction';
-import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateBountyWithSingleApplication, generateTransaction, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { createSubmission } from '../createSubmission';
 import { listSubmissions } from '../listSubmissions';
 
 let user: User;
@@ -16,26 +14,16 @@ beforeAll(async () => {
 
 describe('listSubmissions', () => {
   it('Should retrieve transaction for a submission', async () => {
-    const bounty = await generateBounty({
-      createdBy: user.id,
-      spaceId: space.id,
-      status: 'open',
-      approveSubmitters: false
-    });
-
-    const application = await createSubmission({
-      bountyId: bounty.id,
+    const bounty = await generateBountyWithSingleApplication({
+      applicationStatus: 'applied',
+      bountyCap: 1,
       userId: user.id,
-      submissionContent: {
-        submission: 'Hello World',
-        submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}'
-      }
+      bountyStatus: 'open',
+      spaceId: space.id
     });
 
-    await createTransaction({
-      applicationId: application.id,
-      chainId: '4',
-      transactionId: '123'
+    await generateTransaction({
+      applicationId: bounty.applications[0].id
     });
 
     const submissionsWithTransaction = await listSubmissions(bounty.id);

@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Application, Bounty, Space, User } from '@prisma/client';
-import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { Application, Space, User } from '@prisma/client';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { ApplicationCreationData } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
+import { DataNotFoundError } from 'lib/utilities/errors';
+import request from 'supertest';
+import { baseUrl } from 'testing/mockApiCall';
+import { generateBounty, generateBountyWithSingleApplication, generateTransaction, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -22,8 +25,55 @@ beforeAll(async () => {
     })).headers['set-cookie'][0];
 });
 
-describe('POST /api/applications - update an application', () => {
+describe('GET /api/applications - retrieve all application for a bounty', () => {
+  it('Should fail if no bounty with passed bountyId was found', async () => {
+    try {
+      (await request(baseUrl).get(`/api/applications?bountyId=${v4()}`).set('Cookie', nonAdminCookie).expect(404));
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(DataNotFoundError);
+    }
+  });
 
+  it('should fail if the user is not a member of the space, and respond 401', async () => {
+
+    const { space: otherSpace, user: userFromOtherSpace } = await generateUserAndSpaceWithApiToken();
+    const bounty = await generateBounty({
+      createdBy: userFromOtherSpace.id,
+      spaceId: otherSpace.id,
+      status: 'open',
+      approveSubmitters: false
+    });
+
+    await request(baseUrl)
+      .get(`/api/applications?bountyId=${bounty.id}&submissionsOnly=false`)
+      .set('Cookie', nonAdminCookie)
+      .expect(401);
+  });
+
+  it('should retrieve submissions along with transactions', async () => {
+    const bounty = await generateBountyWithSingleApplication({
+      applicationStatus: 'applied',
+      bountyCap: 1,
+      userId: nonAdminUser.id,
+      bountyStatus: 'open',
+      spaceId: nonAdminUserSpace.id
+    });
+
+    await generateTransaction({
+      applicationId: bounty.applications[0].id
+    });
+
+    const applicationsWithTransactions = (await request(baseUrl)
+      .get(`/api/applications?bountyId=${bounty.id}&submissionsOnly=false`)
+      .set('Cookie', nonAdminCookie)
+      .expect(200)).body as ApplicationWithTransactions[];
+    expect(applicationsWithTransactions.length).toBe(1);
+    expect(applicationsWithTransactions[0].transactions.length).toBe(1);
+  });
+});
+
+describe('POST /api/applications - update an application', () => {
   it('should create the application and respond with 201', async () => {
 
     const bounty = await createBounty({
@@ -75,7 +125,5 @@ describe('POST /api/applications - update an application', () => {
       .set('Cookie', nonAdminCookie)
       .send(creationContent)
       .expect(401);
-
   });
-
 });
