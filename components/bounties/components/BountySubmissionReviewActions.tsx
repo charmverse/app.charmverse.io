@@ -10,20 +10,24 @@ import Typography from '@mui/material/Typography';
 import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
+import { getChainExplorerLink } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { SystemError } from 'lib/utilities/errors';
 import { eToNumber } from 'lib/utilities/numbers';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import { IconButton } from '@mui/material';
 import BountyPaymentButton from '../[bountyId]/components/BountyPaymentButton';
 import BountySubmissionContent from './BountySubmissionContent';
 
 interface Props {
   bounty: Bounty,
-  submission: Application,
+  submission: ApplicationWithTransactions,
   reviewComplete: (updatedApplication: Application) => void
 }
 
@@ -91,6 +95,17 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
         </>
       )
     }
+      {
+        (submission.status === 'paid' && submission.transactions.length !== 0) && (
+          <a style={{ textDecoration: 'none', color: 'text.primary' }} href={getChainExplorerLink(submission.transactions[0].chainId, submission.transactions[0].transactionId)} target='_blank' rel='noreferrer'>
+            <Tooltip title='View transaction details' placement='top' arrow>
+              <IconButton sx={{ color: 'text.primary' }}>
+                <LaunchIcon fontSize='small' />
+              </IconButton>
+            </Tooltip>
+          </a>
+        )
+      }
 
       {
       /* Modal for viewing the content */

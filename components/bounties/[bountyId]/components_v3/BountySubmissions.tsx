@@ -22,9 +22,7 @@ import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
-import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { getChainExplorerLink } from 'connectors';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
@@ -187,17 +185,6 @@ export default function BountySubmissions ({ bounty }: Props) {
                     label={SubmissionStatusLabels[submission.status]}
                     color={SubmissionStatusColors[submission.status]}
                   />
-                  {
-                    (submission.status === 'paid' && submission.transactions.length !== 0) && (
-                      <a style={{ textDecoration: 'none', color: 'text.primary' }} href={getChainExplorerLink(submission.transactions[0].chainId, submission.transactions[0].transactionId)} target='_blank' rel='noreferrer'>
-                        <Tooltip title='View transaction details' placement='top' arrow>
-                          <Box sx={{ color: 'text.primary', pt: 0.5, display: 'block' }}>
-                            <LaunchIcon fontSize='small' />
-                          </Box>
-                        </Tooltip>
-                      </a>
-                    )
-                  }
                 </Box>
               </TableCell>
               <TableCell size='small'>
@@ -241,7 +228,7 @@ export default function BountySubmissions ({ bounty }: Props) {
                   */
                 }
 
-              <TableCell align='right' sx={{ gap: 2 }}>
+              <TableCell align='right' sx={{ gap: 2, justifyContent: 'flex-end' }}>
 
                 {
                     submission.status === 'inProgress' && submission.createdBy === user?.id && (
