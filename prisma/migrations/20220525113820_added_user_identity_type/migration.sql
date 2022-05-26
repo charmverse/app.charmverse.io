@@ -19,7 +19,7 @@ WHERE "username" IS NOT NULL AND
 	  "identityType" IS NULL AND
 	  "username" IN (
 	  	SELECT account->>'username' FROM "DiscordUser" du WHERE du."userId" = u."id" LIMIT 1
-	  )
+	  );
 
 /* Update identityType to Telegram if there is no identityType and there is a username that is the same as the username or first name + ' ' + last name on the user's Telegram account */
 UPDATE "User" u SET "identityType"='Telegram'
@@ -32,6 +32,7 @@ WHERE "username" IS NOT NULL AND
 		"username" IN (
 			SELECT account->>'username' FROM "TelegramUser" tu WHERE tu."userId" = u."id" LIMIT 1
 		)
-	  )
+	  );
+
 ALTER TABLE "User" ALTER COLUMN "identityType" SET NOT NULL;
 
