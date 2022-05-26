@@ -35,7 +35,7 @@ import { GetTasksResponse } from 'pages/api/tasks';
 
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
-import { TransactionCreationData } from 'lib/transactions/createTransaction';
+import { TransactionCreationData } from 'lib/transactions/interface';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 

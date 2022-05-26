@@ -1,4 +1,4 @@
-import { Application, Bounty } from '@prisma/client';
+import { Application, Bounty, Transaction } from '@prisma/client';
 
 export interface ApplicationCreationData {
   userId: string,
@@ -38,4 +38,8 @@ export interface SubmissionCreationData {
 export interface SubmissionUpdateData {
   submissionId: string;
   submissionContent: SubmissionContent
+}
+
+export interface ApplicationWithTransactions extends Application {
+  transactions: Transaction[]
 }

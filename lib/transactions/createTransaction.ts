@@ -1,8 +1,6 @@
-import { Transaction } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
-
-export type TransactionCreationData = Pick<Transaction, 'transactionId' | 'chainId'> & {applicationId: string}
+import { TransactionCreationData } from './interface';
 
 export async function createTransaction ({ applicationId, chainId, transactionId }: TransactionCreationData) {
   const application = await prisma.application.findUnique({

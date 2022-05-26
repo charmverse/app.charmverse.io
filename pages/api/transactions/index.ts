@@ -2,7 +2,8 @@
 import { Transaction } from '@prisma/client';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { createTransaction, TransactionCreationData } from 'lib/transactions/createTransaction';
+import { createTransaction } from 'lib/transactions/createTransaction';
+import { TransactionCreationData } from 'lib/transactions/interface';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

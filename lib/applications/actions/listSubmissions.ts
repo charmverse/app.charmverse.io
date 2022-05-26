@@ -1,9 +1,5 @@
-import { Application, Transaction } from '@prisma/client';
 import { prisma } from 'db';
-
-export interface ApplicationWithTransactions extends Application {
-  transactions: Transaction[]
-}
+import { ApplicationWithTransactions } from '../interfaces';
 
 /**
  * Returns only valid submissions

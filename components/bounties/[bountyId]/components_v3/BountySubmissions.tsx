@@ -17,7 +17,6 @@ import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
-import { getDisplayName } from 'lib/users';
 import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
