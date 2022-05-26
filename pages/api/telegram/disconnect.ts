@@ -6,7 +6,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
 import { IDENTITY_TYPES, IdentityType } from 'models';
 import { DiscordAccount } from 'lib/discord/getDiscordAccount';
-import getENSName from 'lib/blockchain/getENSName';
 
 const handler = nc({
   onError,
@@ -45,15 +44,6 @@ async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
   let newUserName: string;
   let newIdentityProvider: IdentityType;
 
-  let ens: string | null = null;
-  if (user.addresses[0]) {
-    ens = await getENSName(user.addresses[0]);
-  }
-
-  if (ens) {
-    newUserName = ens;
-    newIdentityProvider = IDENTITY_TYPES[0];
-  }
   if (user.discordUser
     && user.discordUser.account
     && (user.discordUser.account as Partial<DiscordAccount>).username
