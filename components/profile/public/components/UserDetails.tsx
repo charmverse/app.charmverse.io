@@ -153,11 +153,13 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
               {
                 !hasAnySocialInformation(socialDetails) && <Typography>No social media links</Typography>
               }
-              <StyledDivider orientation='vertical' flexItem />
               {!readOnly && (
-                <IconButton onClick={socialModalState.open}>
-                  <EditIcon />
-                </IconButton>
+                <>
+                  <StyledDivider orientation='vertical' flexItem />
+                  <IconButton onClick={socialModalState.open}>
+                    <EditIcon />
+                  </IconButton>
+                </>
               )}
             </Stack>
           </Grid>
@@ -170,9 +172,11 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
               </span>
             </Grid>
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
-              <IconButton onClick={descriptionModalState.open}>
-                <EditIcon />
-              </IconButton>
+              {!readOnly && (
+                <IconButton onClick={descriptionModalState.open}>
+                  <EditIcon />
+                </IconButton>
+              )}
             </Grid>
           </Grid>
         </Grid>
