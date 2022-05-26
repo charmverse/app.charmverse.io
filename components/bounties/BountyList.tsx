@@ -97,7 +97,7 @@ export default function BountyList () {
                 </Button>
               </CSVLink>
             )}
-            <MultiPaymentModal />
+            {/* <MultiPaymentModal bounties={[]}/> */}
             <Button
               sx={{ ml: 1 }}
               onClick={() => {

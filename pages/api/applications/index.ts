@@ -1,13 +1,13 @@
 
-import { Application, Prisma } from '@prisma/client';
+import { Application } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ApplicationWithTransactions, createApplication, listSubmissions } from 'lib/applications/actions';
+import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { DataNotFoundError } from 'lib/utilities/errors';
-import { listSubmissions, createApplication } from 'lib/applications/actions';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -16,7 +16,7 @@ handler.use(requireUser)
   .use(requireKeys<Application>(['bountyId', 'message'], 'body'))
   .post(createApplicationController);
 
-async function getApplications (req: NextApiRequest, res: NextApiResponse<Application[]>) {
+async function getApplications (req: NextApiRequest, res: NextApiResponse<ApplicationWithTransactions[]>) {
   const { bountyId, submissionsOnly } = req.query;
   const { id: userId } = req.session.user;
 
@@ -48,6 +48,9 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
     : prisma.application.findMany({
       where: {
         bountyId: bountyId as string
+      },
+      include: {
+        transactions: true
       }
     }));
   return res.status(200).json(applicationsOrSubmissions);

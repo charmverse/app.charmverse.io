@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
-  Role, Space, TokenGate, Transaction, User, UserDetails, TelegramUser, UserGnosisSafe, TokenGateToRole
+  Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole, UserDetails
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
@@ -34,6 +34,8 @@ import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
 import { GetTasksResponse } from 'pages/api/tasks';
 
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
+import { TransactionCreationData } from 'lib/transactions/interface';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -436,11 +438,8 @@ class CharmClient {
     return data;
   }
 
-  async listApplications (bountyId: string, submissionsOnly: boolean): Promise<Application []> {
-
-    const data = await http.GET<Application []>('/api/applications', { bountyId, submissionsOnly });
-
-    return data;
+  listApplications (bountyId: string, submissionsOnly: boolean): Promise<ApplicationWithTransactions []> {
+    return http.GET('/api/applications', { bountyId, submissionsOnly });
   }
 
   async createSubmission (content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {
@@ -460,8 +459,12 @@ class CharmClient {
     });
   }
 
-  recordTransaction (details: Pick<Transaction, 'bountyId' | 'transactionId' | 'chainId'>) {
-    return http.POST('/api/transactions', details);
+  async paySubmission (submissionId: string) {
+    return http.POST<Application>(`/api/submissions/${submissionId}/pay`);
+  }
+
+  recordTransaction (data: TransactionCreationData) {
+    return http.POST('/api/transactions', data);
   }
 
   async getPricing (base: string, quote: FiatCurrency): Promise<IPairQuote> {

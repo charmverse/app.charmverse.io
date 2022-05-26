@@ -1,7 +1,8 @@
 
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import CancelIcon from '@mui/icons-material/Cancel';
-import PlagiarismIcon from '@mui/icons-material/Plagiarism';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import { IconButton } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -10,21 +11,25 @@ import Typography from '@mui/material/Typography';
 import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
+import { getChainExplorerLink } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { SystemError } from 'lib/utilities/errors';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { eToNumber } from 'lib/utilities/numbers';
+import { SyntheticEvent, useState } from 'react';
+import BountyPaymentButton from '../[bountyId]/components/BountyPaymentButton';
 
 interface Props {
   bounty: Bounty,
-  submission: Application,
+  submission: ApplicationWithTransactions,
   reviewComplete: (updatedApplication: Application) => void
+  onSubmission: (eventOrAnchorEl?: HTMLElement | SyntheticEvent<any, Event> | null | undefined) => void
 }
 
-export default function BountySubmissionReviewActions ({ bounty, submission, reviewComplete }: Props) {
+export default function BountySubmissionReviewActions ({ onSubmission, bounty, submission, reviewComplete }: Props) {
 
   const [user] = useUser();
   const isAdmin = useIsAdmin();
@@ -32,8 +37,6 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
 
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
   const [apiError, setApiError] = useState<SystemError | null>();
-
-  const submissionContentModal = usePopupState({ variant: 'popover', popupId: 'submission-content' });
 
   function makeSubmissionDecision (applicationId: string, decision: ReviewDecision) {
     setApiError(null);
@@ -47,7 +50,22 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
       .catch(err => {
         setApiError(err);
       });
+  }
 
+  async function recordTransaction (transactionId: string, chainId: number) {
+    setApiError(null);
+    try {
+      await charmClient.recordTransaction({
+        applicationId: submission.id,
+        chainId: chainId.toString(),
+        transactionId
+      });
+      await charmClient.paySubmission(submission.id);
+      await refreshBounty(bounty.id);
+    }
+    catch (err: any) {
+      setApiError(err);
+    }
   }
 
   function cancel () {
@@ -56,22 +74,40 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
   }
 
   const canReview = (user?.id === bounty.reviewer || isAdmin) && (submission.status === 'inProgress' || submission.status === 'review');
-
   return (
-    <Box>
+    <Box display='flex' gap={1} alignItems='center' justifyContent='end'>
 
       {
-      canReview && (
-        <>
-          <Tooltip placement='top' title='Approve this submission.'>
-            <AssignmentTurnedInIcon onClick={() => setReviewDecision({ decision: 'approve', submissionId: submission.id })} sx={{ mr: 3 }} />
-          </Tooltip>
-          <Tooltip placement='top' title='Reject this submission. The submitter will be disqualified from making further changes'>
-            <CancelIcon onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject' })} />
-          </Tooltip>
-        </>
-      )
-    }
+        canReview && (
+          <>
+            <Tooltip placement='top' title='Approve this submission.'>
+              <AssignmentTurnedInIcon onClick={() => setReviewDecision({ decision: 'approve', submissionId: submission.id })} />
+            </Tooltip>
+            <Tooltip placement='top' title='Reject this submission. The submitter will be disqualified from making further changes'>
+              <CancelIcon onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject' })} />
+            </Tooltip>
+          </>
+        )
+      }
+      {
+        submission.status === 'inProgress' && submission.createdBy === user?.id && (
+          <Button type='submit' onClick={onSubmission}>Submit</Button>
+        )
+      }
+      {isAdmin && submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}
+      {
+        (submission.status === 'paid' && submission.transactions.length !== 0) && (
+          <div>
+            <a style={{ textDecoration: 'none', color: 'text.primary' }} href={getChainExplorerLink(submission.transactions[0].chainId, submission.transactions[0].transactionId)} target='_blank' rel='noreferrer'>
+              <Tooltip title='View transaction details' placement='top' arrow>
+                <IconButton sx={{ color: 'text.primary' }}>
+                  <LaunchIcon fontSize='small' />
+                </IconButton>
+              </Tooltip>
+            </a>
+          </div>
+        )
+      }
 
       {/* Modal which provides review confirmation */}
       <Modal title='Confirm your review' open={reviewDecision !== null} onClose={cancel} size='large'>

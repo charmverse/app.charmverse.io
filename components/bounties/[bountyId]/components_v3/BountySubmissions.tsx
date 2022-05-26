@@ -10,18 +10,21 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Application, ApplicationStatus, Bounty } from '@prisma/client';
+import { Application, ApplicationStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import { useUser } from 'hooks/useUser';
 import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
-import { getDisplayName } from 'lib/users';
 import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
+import MultiPaymentModal from 'components/bounties/components/MultiPaymentModal';
+import { BountyWithDetails } from 'models';
+import useIsAdmin from 'hooks/useIsAdmin';
 import UserDisplay from 'components/common/UserDisplay';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
@@ -29,7 +32,7 @@ import SubmissionEditorForm from './SubmissionEditorForm';
 import BountySubmissionContent from '../../components/BountySubmissionContent';
 
 interface Props {
-  bounty: Bounty
+  bounty: BountyWithDetails
 }
 
 export const SubmissionStatusColors: Record<ApplicationStatus, BrandColor> = {
@@ -55,15 +58,14 @@ export default function BountySubmissions ({ bounty }: Props) {
   const [user] = useUser();
   const [contributors] = useContributors();
   const theme = useTheme();
+  const isAdmin = useIsAdmin();
 
-  const [submissions, setSubmissions] = useState<Application[] | null>(null);
+  const [submissions, setSubmissions] = useState<ApplicationWithTransactions[] | null>(null);
   const { refreshBounty } = useBounties();
 
   const [currentViewedSubmission, setCurrentViewedSubmission] = useState<Application | null>(null);
 
   const editSubmissionModal = usePopupState({ variant: 'popover', popupId: 'edit-submission' });
-
-  const isReviewer = bounty.reviewer === user?.id;
 
   useEffect(() => {
     refreshSubmissions();
@@ -126,21 +128,20 @@ export default function BountySubmissions ({ bounty }: Props) {
           </Typography>
         </Grid>
         <Grid container item xs={4} direction='row' justifyContent='flex-end'>
-
           {
-                  !bounty.approveSubmitters && !userSubmission && (
-                  <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
-                    <Box component='span'>
-                      <Button
-                        disabled={!!userSubmission}
-                        onClick={editSubmissionModal.open}
-                      >
-                        New
-                      </Button>
-                    </Box>
-                  </Tooltip>
-                  )
-                }
+            !bounty.approveSubmitters && !userSubmission && (
+            <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
+              <Box component='span'>
+                <Button
+                  disabled={!!userSubmission}
+                  onClick={editSubmissionModal.open}
+                >
+                  New
+                </Button>
+              </Box>
+            </Tooltip>
+            )
+          }
         </Grid>
       </Grid>
 
@@ -167,7 +168,6 @@ export default function BountySubmissions ({ bounty }: Props) {
               </Box>
             </TableCell>
             <TableCell>
-
             </TableCell>
             {
               /* Hidden until we implement comments
@@ -177,31 +177,7 @@ export default function BountySubmissions ({ bounty }: Props) {
             }
 
             <TableCell align='right'>
-              {
-              // Only show submissions chip if there's a cap, or if there's at least 1
-                (bounty.maxSubmissions || validSubmissions > 0) && (
-
-                <Box>
-
-                  <Tooltip sx={{ ml: 1 }} placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
-                    <Typography variant='body1'>
-
-                      <Box component='span' sx={{ ml: 1 }}>
-                        {
-                          /**
-                           * Submissions
-                        {bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
-                           */
-                        }
-
-                      </Box>
-
-                    </Typography>
-                  </Tooltip>
-                </Box>
-                )
-              }
-
+              {isAdmin && <MultiPaymentModal bounties={[bounty]} />}
             </TableCell>
           </TableRow>
         </TableHead>
@@ -213,31 +189,28 @@ export default function BountySubmissions ({ bounty }: Props) {
               hover
             >
               <TableCell size='small' align='left'>
-
-                <Chip
-                  label={SubmissionStatusLabels[submission.status]}
-                  color={SubmissionStatusColors[submission.status]}
-                />
-
+                <Box display='flex' gap={1}>
+                  <Chip
+                    label={SubmissionStatusLabels[submission.status]}
+                    color={SubmissionStatusColors[submission.status]}
+                  />
+                </Box>
               </TableCell>
               <TableCell size='small'>
-                {
-                  (() => {
-                    const contributor = contributors.find(c => c.id === submission.createdBy);
+                {(() => {
+                  const contributor = contributors.find(c => c.id === submission.createdBy);
 
-                    if (contributor) {
-                      return (
-                        <UserDisplay
-                          avatarSize='small'
-                          user={contributor}
-                          fontSize='small'
-                        />
-                      );
-                    }
-                    return 'Anonymous';
-                  })()
-
-                    }
+                  if (contributor) {
+                    return (
+                      <UserDisplay
+                        avatarSize='small'
+                        user={contributor}
+                        fontSize='small'
+                      />
+                    );
+                  }
+                  return 'Anonymous';
+                })()}
               </TableCell>
               <TableCell sx={{ maxWidth: '61vw' }} onClick={!(submission.status === 'review' && submission.createdBy === user?.id) ? () => setCurrentViewedSubmission(submission) : editSubmissionModal.open}>
 
@@ -273,18 +246,12 @@ export default function BountySubmissions ({ bounty }: Props) {
                   */
                 }
 
-              <TableCell align='right' sx={{ gap: 2 }}>
-
-                {
-                    submission.status === 'inProgress' && submission.createdBy === user?.id && (
-                      <Button type='submit' onClick={editSubmissionModal.open}>Submit</Button>
-                    )
-                  }
-
+              <TableCell align='right' sx={{ gap: 2, justifyContent: 'flex-end' }}>
                 <BountySubmissionReviewActions
                   bounty={bounty}
                   submission={submission}
                   reviewComplete={refreshSubmissions}
+                  onSubmission={editSubmissionModal.open}
                 />
 
               </TableCell>

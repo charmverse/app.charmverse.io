@@ -1,4 +1,3 @@
-import { Application, Bounty } from '@prisma/client';
 import { prisma } from 'db';
 import { ApplicationWithBounty } from './interfaces';
 
