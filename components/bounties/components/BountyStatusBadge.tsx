@@ -28,7 +28,10 @@ const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   open: <ModeStandbyIcon />,
   inProgress: <AssignmentIndIcon />,
   complete: <CheckCircleOutlineIcon />,
-  paid: <PaidIcon />
+  paid: <PaidIcon />,
+  // TODO REMOVE AFTER MIGRATION
+  assigned: <ModeStandbyIcon />,
+  review: <ModeStandbyIcon />
 };
 
 export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
@@ -36,7 +39,10 @@ export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
   open: 'teal',
   inProgress: 'yellow',
   complete: 'pink',
-  paid: 'gray'
+  paid: 'gray',
+  // TODO REMOVE AFTER MIGRATION
+  assigned: 'blue',
+  review: 'blue'
 };
 
 const BountyStatusBox = styled.div<{ status: BountyStatus }>`

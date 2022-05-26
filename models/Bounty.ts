@@ -5,7 +5,10 @@ export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   open: 'Open',
   inProgress: 'In Progress',
   complete: 'Complete',
-  paid: 'Paid'
+  paid: 'Paid',
+  // TODO REMOVE AFTER MIGRATION
+  assigned: '-',
+  review: '-'
 };
 
 export type BountyWithDetails = Bounty & {applications: Application [], transactions: Transaction []}
