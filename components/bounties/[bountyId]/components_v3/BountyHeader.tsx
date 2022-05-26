@@ -21,6 +21,7 @@ import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
+import charmClient from 'charmClient';
 
 const menuPosition: Partial<MenuProps> = {
   anchorOrigin: {
@@ -34,7 +35,7 @@ const menuPosition: Partial<MenuProps> = {
 };
 
 export default function BountyHeader () {
-  const { currentBounty } = useBounties();
+  const { currentBounty, setCurrentBounty } = useBounties();
 
   const isAdmin = useIsAdmin();
 
@@ -48,6 +49,20 @@ export default function BountyHeader () {
   const popupState = usePopupState({ variant: 'popover', popupId: 'bounty-actions' });
 
   const viewerCanModifyBounty = isAdmin === true;
+
+  async function closeBounty () {
+
+    const updatedBounty = await charmClient.closeBounty(currentBounty!.id);
+    setCurrentBounty(updatedBounty);
+    closeBountyModal.close();
+  }
+
+  async function closeBountySubmissions () {
+
+    const updatedBounty = await charmClient.closeBountySubmissions(currentBounty!.id);
+    setCurrentBounty(updatedBounty);
+    closeSubmissionsModal.close();
+  }
 
   if (!currentBounty) {
     return null;
@@ -167,7 +182,7 @@ export default function BountyHeader () {
             <Button
               color='primary'
               sx={{ mr: 2, fontWeight: 'bold' }}
-              onClick={() => {}}
+              onClick={closeBountySubmissions}
             >Close {currentBounty.approveSubmitters ? 'applications' : 'submissions'}
             </Button>
 
@@ -193,7 +208,7 @@ export default function BountyHeader () {
             <Button
               color='error'
               sx={{ mr: 2, fontWeight: 'bold' }}
-              onClick={() => {}}
+              onClick={closeBounty}
             >Close bounty
             </Button>
 

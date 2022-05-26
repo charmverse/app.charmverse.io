@@ -10,6 +10,7 @@ type IContext = {
   currentBountyId: string | null,
   updateCurrentBountyId: (bountyId: string | null) => void,
   currentBounty: BountyWithDetails | null
+  setCurrentBounty: (bounty: BountyWithDetails) => void,
   updateBounty: (bountyId: string, update: Partial<Bounty>) => Promise<BountyWithDetails>
   deleteBounty: (bountyId: string) => Promise<true>
   refreshBounty: (bountyId: string) => void
@@ -21,6 +22,7 @@ export const BountiesContext = createContext<Readonly<IContext>>({
   currentBountyId: null,
   updateCurrentBountyId: () => undefined,
   currentBounty: null,
+  setCurrentBounty: () => undefined,
   updateBounty: () => Promise.resolve({} as any),
   deleteBounty: () => Promise.resolve(true),
   refreshBounty: () => undefined
@@ -102,12 +104,24 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     refreshBountyList(refreshed);
   }
 
+  function _setCurrentBounty (bountyToSet: BountyWithDetails | null) {
+
+    setCurrentBounty(bountyToSet);
+
+    if (bountyToSet) {
+      // Replace current bounty in list of bounties
+      setBounties(bounties.map(b => b.id === bountyToSet.id ? bountyToSet : b));
+    }
+
+  }
+
   const value = useMemo(() => ({
     bounties,
     setBounties,
     currentBountyId,
     updateCurrentBountyId,
     currentBounty,
+    setCurrentBounty: _setCurrentBounty,
     updateBounty,
     deleteBounty,
     refreshBounty
