@@ -58,9 +58,9 @@ function CommentThreadsListButton () {
 }
 
 export default function Header (
-  { open, openSidebar }:
+  { open, openSidebar, hideSidebarOnSmallScreen }:
   {
-    open: boolean, openSidebar: () => void }
+    open: boolean, openSidebar: () => void, hideSidebarOnSmallScreen?: boolean }
 ) {
   const router = useRouter();
   const colorMode = useColorMode();
@@ -114,6 +114,10 @@ export default function Header (
         onClick={openSidebar}
         edge='start'
         sx={{
+          display: {
+            xs: hideSidebarOnSmallScreen ? 'none' : 'block',
+            md: 'block'
+          },
           marginRight: '36px',
           ...(open && { display: 'none' })
         }}

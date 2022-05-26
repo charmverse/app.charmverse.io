@@ -148,14 +148,12 @@ export default function IntegrationCard () {
                   </Typography>
                   <Typography
                     color='secondary'
-                    noWrap
                     sx={{
-                      fontWeight: 500
-                    // [smScreenMediaQuery]: {
-                    //   top: 2,
-                    //   position: 'relative',
-                    //   fontSize: '0.75rem'
-                    // }
+                      fontWeight: 500,
+                      fontSize: {
+                        xs: '0.75rem',
+                        sm: 'inherit'
+                      }
                     }}
                   >
                     Multisig accounts

@@ -35,7 +35,7 @@ const closedMixin = (theme: Theme) => ({
   width: 0
 });
 
-const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'open' })
+const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })
   // eslint-disable-next-line no-unexpected-multiline
   <{ open: boolean, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
     background: 'transparent',
@@ -59,7 +59,7 @@ const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !==
 const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' && prop !== 'sidebarWidth' && prop !== 'hideSidebarOnSmallScreen' })
   // @ts-ignore mixins dont work with Typescript
   // eslint-disable-next-line no-unexpected-multiline
-  <{ open: BooleanSchema, hideSidebarOnSmallScreen?: boolean, sidebarWidth: number }>(({ hideSidebarOnSmallScreen, sidebarWidth, theme, open }) => ({
+  <{ open: BooleanSchema, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
     width: sidebarWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
@@ -71,11 +71,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' &&
     ...(!open && {
       ...closedMixin(theme),
       '& .MuiDrawer-paper': closedMixin(theme)
-    }),
-    display: {
-      sx: hideSidebarOnSmallScreen ? 'none' : 'block',
-      md: 'block'
-    }
+    })
   }));
 
 const HeaderSpacer = styled.div`
@@ -117,10 +113,21 @@ function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, chi
           <AppBar sidebarWidth={sidebarWidth} position='fixed' open={open}>
             <Header
               open={open}
+              hideSidebarOnSmallScreen={hideSidebarOnSmallScreen}
               openSidebar={handleDrawerOpen}
             />
           </AppBar>
-          <Drawer hideSidebarOnSmallScreen={hideSidebarOnSmallScreen} sidebarWidth={sidebarWidth} variant='permanent' open={open}>
+          <Drawer
+            sidebarWidth={sidebarWidth}
+            variant='permanent'
+            open={open}
+            sx={{
+              display: {
+                xs: hideSidebarOnSmallScreen ? 'none' : 'block',
+                md: 'block'
+              }
+            }}
+          >
             {SidebarOverride
               ? <SidebarOverride closeSidebar={handleDrawerClose} />
               : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
