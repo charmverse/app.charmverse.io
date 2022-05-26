@@ -86,12 +86,6 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
 
   return (
     <StyledBox>
-      <Stack direction='row' spacing={1} alignItems='center'>
-        <Link href='/profile/tasks'>
-          <ArrowBackIosNewIcon />
-        </Link>
-        <Typography component='span' fontSize='1.4em' fontWeight={700}>My Public Profile</Typography>
-      </Stack>
       <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
           name={userName}

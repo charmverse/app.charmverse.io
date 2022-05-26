@@ -3,6 +3,9 @@ import PageLayout from 'components/profile/components/ProfileLayout';
 import { setTitle } from 'hooks/usePageTitle';
 import PublicProfile from 'components/profile/public';
 import { useUser } from 'hooks/useUser';
+import { Box, IconButton, Typography } from '@mui/material';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import Link from 'next/link';
 
 export default function PublicProfilePage () {
 
@@ -15,7 +18,17 @@ export default function PublicProfilePage () {
   }
 
   return (
-    <PublicProfile user={user} updateUser={setUser} />
+    <>
+      <Box display='flex' gap={1} alignItems='center'>
+        <Link href='/profile/tasks'>
+          <IconButton>
+            <ArrowBackIosNewIcon />
+          </IconButton>
+        </Link>
+        <Typography component='span' fontSize='1.4em' fontWeight={700}>My Public Profile</Typography>
+      </Box>
+      <PublicProfile user={user} updateUser={setUser} />
+    </>
   );
 
 }
