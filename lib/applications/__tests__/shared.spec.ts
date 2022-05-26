@@ -51,6 +51,19 @@ describe('submissionsCapReached', () => {
 
   });
 
+  it('should return true if the maxSubmissions cap for a bounty is 0', async () => {
+    const bounty = await generateBountyWithSingleApplication({
+      bountyCap: 0,
+      applicationStatus: 'review',
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
+
+    expect(capReached).toBe(true);
+  });
+
   it('should return false if the maxSubmissions cap for a bounty is null', async () => {
     const bounty = await generateBountyWithSingleApplication({
       bountyCap: null,

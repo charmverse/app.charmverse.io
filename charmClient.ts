@@ -404,6 +404,14 @@ class CharmClient {
     return data;
   }
 
+  async closeBountySubmissions (bountyId: string): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close-submissions`);
+  }
+
+  async closeBounty (bountyId: string): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close`);
+  }
+
   async approveApplication (applicationId: string): Promise<Application> {
     return http.POST<Application>(`/api/applications/${applicationId}/approve`);
   }

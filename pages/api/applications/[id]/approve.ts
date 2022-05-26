@@ -1,11 +1,11 @@
 
-import { Application, Prisma } from '@prisma/client';
-import { prisma } from 'db';
+import { Application } from '@prisma/client';
+import { approveApplication } from 'lib/applications/actions';
+import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { approveApplication } from 'lib/applications/actions';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -22,6 +22,8 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
     applicationOrApplicationId: applicationId as string,
     userId
   });
+
+  rollupBountyStatus(approvedApplication.bountyId);
 
   return res.status(200).json(approvedApplication);
 }

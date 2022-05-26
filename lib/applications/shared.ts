@@ -61,6 +61,10 @@ export function submissionsCapReached ({ bounty, submissions }: {bounty: Bounty,
     return false;
   }
 
+  if (bounty.maxSubmissions === 0) {
+    return true;
+  }
+
   const validSubmissions = countValidSubmissions(submissions);
 
   return validSubmissions >= bounty.maxSubmissions;
