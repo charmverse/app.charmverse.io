@@ -143,7 +143,7 @@ export default function UserDetails () {
               { user && getIdentityIcon(user.identityType as IdentityType) }
               <Typography variant='h1'>{user?.username}</Typography>
               <IconButton onClick={identityModalState.open}>
-                <EditIcon />
+                <EditIcon data-testid='edit-identity' />
               </IconButton>
             </Stack>
           </Grid>
@@ -191,7 +191,7 @@ export default function UserDetails () {
               }
               <StyledDivider orientation='vertical' flexItem />
               <IconButton onClick={socialModalState.open}>
-                <EditIcon />
+                <EditIcon data-testid='edit-social' />
               </IconButton>
             </Stack>
           </Grid>
@@ -205,7 +205,7 @@ export default function UserDetails () {
             </Grid>
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
               <IconButton onClick={descriptionModalState.open}>
-                <EditIcon />
+                <EditIcon data-testid='edit-description' />
               </IconButton>
             </Grid>
           </Grid>
