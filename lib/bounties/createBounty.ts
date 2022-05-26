@@ -15,7 +15,6 @@ export async function createBounty ({
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
-  expiryDate,
   reviewer
 }: BountyCreationData): Promise<Bounty> {
 
@@ -55,7 +54,6 @@ export async function createBounty ({
     maxSubmissions,
     rewardAmount,
     rewardToken,
-    expiryDate,
     reviewer
 
   };

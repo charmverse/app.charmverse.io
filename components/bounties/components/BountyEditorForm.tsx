@@ -66,17 +66,17 @@ export const schema = yup.object({
       }
       return true;
     }
-  }),
-  setExpiryDate: yup.boolean(),
-  expiryDate: yup.mixed().test({
-    message: 'Expiry date is required',
-    test: (value, context) => {
-      if (context.parent.setExpiryDate === true && !value) {
-        return false;
-      }
-      return true;
-    }
   })
+  // setExpiryDate: yup.boolean(),
+  // expiryDate: yup.mixed().test({
+  //   message: 'Expiry date is required',
+  //   test: (value, context) => {
+  //     if (context.parent.setExpiryDate === true && !value) {
+  //       return false;
+  //     }
+  //     return true;
+  //   }
+  // })
 });
 
 export type FormValues = yup.InferType<typeof schema>
@@ -139,9 +139,9 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
       maxSubmissions: 1 as any,
       approveSubmitters: true,
       capSubmissions: !((bounty && bounty?.maxSubmissions === null)),
-      expiryDate: null,
-      ...(bounty || {}),
-      setExpiryDate: !!bounty?.expiryDate
+      // expiryDate: null,
+      ...(bounty || {})
+      //      setExpiryDate: !!bounty?.expiryDate
     },
     resolver: yupResolver(schema)
   });
@@ -179,9 +179,9 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
     setFormError(null);
 
     try {
-      if (!value.setExpiryDate) {
-        value.expiryDate = null;
-      }
+      // if (!value.setExpiryDate) {
+      //   value.expiryDate = null;
+      // }
 
       if (!value.capSubmissions) {
         // Ensures any existing limit will be nulled
@@ -190,7 +190,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
       delete value.capSubmissions;
 
       if (mode === 'create') {
-        delete value.setExpiryDate;
+        // delete value.setExpiryDate;
 
         value.spaceId = space!.id;
         value.createdBy = user!.id;
@@ -231,8 +231,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           chainId: value.chainId,
           //
           approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
-          maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
-          expiryDate: value.setExpiryDate ? value.expiryDate : null
+          maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions
+          // expiryDate: value.setExpiryDate ? value.expiryDate : null
 
         };
 
