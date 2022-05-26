@@ -15,7 +15,7 @@ const StyledBox = styled(Box)`
 type IntegrationProps = {
     isInUse: boolean;
     icon: ReactNode;
-    actions?: Array<{ name: string; action: () => void; }>;
+    actions?: Array<ReactNode>;
     identityType: IdentityType;
     name: string;
     id: string;
@@ -44,22 +44,12 @@ function Integration (props: IntegrationProps) {
           }
         </Grid>
       </Grid>
-      <Grid item xs={10}>
-        <StyledBox>
+      <Grid item container xs={10} alignItems='center'>
+        <StyledBox mr={1}>
           { id }
         </StyledBox>
-      </Grid>
-      <Grid item xs={2}>
         {
-          actions.map((item: { name: string; action: () => void; }) => (
-            <Grid item container direction='row' key={name}>
-              <Button
-                onClick={() => item.action()}
-              >
-                {item.name}
-              </Button>
-            </Grid>
-          ))
+          actions.map((action) => action)
         }
       </Grid>
       <Grid item xs={12} py={2}>

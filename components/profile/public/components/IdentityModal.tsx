@@ -7,6 +7,8 @@ import Button from 'components/common/Button';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import MetamaskIcon from 'public/images/metamask.svg';
+import IconButton from '@mui/material/IconButton';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import PersonIcon from '@mui/icons-material/Person';
 import { IdentityType, IDENTITY_TYPES } from 'models';
@@ -15,7 +17,7 @@ import { CRYPTO_WORD_LIST } from '../interfaces';
 
 const StyledButton = styled(Button)`
   background-color: ${({ theme }) => theme.palette.background.light};
-  color: #37352f;
+  color: ${({ theme }) => theme.palette.text.primary};
 
   &:hover {
     background-color: ${({ theme }) => theme.palette.background.light};
@@ -91,17 +93,17 @@ function IdentityModal (props: IdentityModalProps) {
         {
           identityTypes.map((item: IntegrationModel) => (
             <Integration
-              isInUse={item.isInUse}
+              isInUse={item.type === IDENTITY_TYPES[3] && generatedName !== item.username ? false : item.isInUse}
               icon={item.icon}
               identityType={item.type}
-              name={item.type}
+              name={item.type === IDENTITY_TYPES[3] ? 'Anonymus' : item.type}
               id={item.type === IDENTITY_TYPES[3] ? generatedName : item.username}
               useIntegration={save}
               actions={
-                item.type === IDENTITY_TYPES[3] ? [{
-                  name: 'Generate',
-                  action: () => setGeneratedName(uniqueNamesGenerator(nameGeneratorConfig))
-                }] : []
+                item.type === IDENTITY_TYPES[3] ? [
+                  <IconButton onClick={() => setGeneratedName(uniqueNamesGenerator(nameGeneratorConfig))}>
+                    <RefreshIcon />
+                  </IconButton>] : []
               }
               key={item.type}
             />
