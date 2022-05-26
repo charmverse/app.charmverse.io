@@ -1,5 +1,4 @@
 import { Application, Bounty } from '@prisma/client';
-import { ApplicationWithTransactions } from './actions';
 
 export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 10;
 
@@ -24,7 +23,7 @@ export function submissionIsEditable ({ submission, bounty }: {submission: Appli
   return true;
 }
 
-export function moveUserApplicationToFirstRow<Data extends ApplicationWithTransactions | Application> (submissions: Data[], userId: string): Data[] {
+export function moveUserApplicationToFirstRow<Data extends Application> (submissions: Data[], userId: string): Data[] {
 
   const copiedSubmissions = submissions.slice();
 
