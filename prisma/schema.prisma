@@ -214,34 +214,35 @@ enum BountyStatus {
   suggestion
   open
   inProgress
+  assigned
+  review
   complete
   paid
 }
 
 model Bounty {
-  id                String        @id @default(uuid()) @db.Uuid
-  author            User          @relation(fields: [createdBy], references: [id])
-  createdBy         String        @db.Uuid()
-  suggestedBy       String?       @db.Uuid()
-  space             Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  spaceId           String        @db.Uuid
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @default(now())
-  description       String
-  descriptionNodes  Json
-  reviewer          String?       @db.Uuid
-  assignee          String?       @db.Uuid
-  chainId           Int
-  rewardAmount      Float
-  rewardToken       String
-  status            BountyStatus  @default(open)
-  title             String
-  linkedTaskId      String?       @db.Uuid
-  applications      Application[]
-  transactions      Transaction[]
-  approveSubmitters Boolean
-  maxSubmissions    Int?
-  expiryDate        DateTime?
+  id               String        @id @default(uuid()) @db.Uuid
+  author           User          @relation(fields: [createdBy], references: [id])
+  createdBy        String        @db.Uuid()
+  suggestedBy      String?       @db.Uuid()
+  space            Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  spaceId          String        @db.Uuid
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now())
+  description      String
+  descriptionNodes Json
+  reviewer         String?       @db.Uuid
+  assignee         String?       @db.Uuid
+  chainId          Int
+  rewardAmount     Float
+  rewardToken      String
+  status           BountyStatus  @default(open)
+  title            String
+  linkedTaskId     String?       @db.Uuid
+  approveSubmitters Boolean      @default(false)
+  maxSubmissions    Int?         @default(1)
+  applications     Application[]
+  transactions     Transaction[]
 }
 
 enum ApplicationStatus {
@@ -254,19 +255,20 @@ enum ApplicationStatus {
 }
 
 model Application {
-  id              String            @id @default(uuid()) @db.Uuid
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @default(now())
-  bountyId        String            @db.Uuid()
-  bounty          Bounty            @relation(fields: [bountyId], references: [id], onDelete: Cascade)
-  createdBy       String            @db.Uuid()
-  applicant       User              @relation(fields: [createdBy], references: [id])
-  walletAddress   String?
-  message         String
-  status          ApplicationStatus
-  submission      String?
+  id            String   @id @default(uuid()) @db.Uuid
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+  status        ApplicationStatus @default(applied)
+  spaceId       String?
+  bountyId      String   @db.Uuid()
+  bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  createdBy     String   @db.Uuid()
+  applicant     User     @relation(fields: [createdBy], references: [id])
+  walletAddress String?
+  message       String?
+  submission   String?
   submissionNodes String?
-  transactions    Transaction[]
+  transactions Transaction[]
 }
 
 model Transaction {
@@ -275,9 +277,9 @@ model Transaction {
   updatedAt     DateTime     @default(now())
   transactionId String
   chainId       String
-  bountyId      String?      @db.Uuid()
-  bounty        Bounty?      @relation(fields: [bountyId], references: [id], onDelete: Cascade)
-  applicationId String?      @db.Uuid()
+  bountyId      String?   @db.Uuid()
+  bounty        Bounty?   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  applicationId String?   @db.Uuid()
   application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 }
 
