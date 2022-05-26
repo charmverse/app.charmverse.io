@@ -444,7 +444,7 @@ class CharmClient {
     });
   }
 
-  recordTransaction (details: Pick<Transaction, 'bountyId' | 'transactionId' | 'chainId'>) {
+  recordTransaction (details: Pick<Transaction, 'applicationId' | 'transactionId' | 'chainId'>) {
     return http.POST('/api/transactions', details);
   }
 
