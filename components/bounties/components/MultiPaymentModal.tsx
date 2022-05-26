@@ -3,58 +3,69 @@ import { ethers } from 'ethers';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import Button from 'components/common/Button';
 import Box from '@mui/material/Box';
-import charmClient from 'charmClient';
+import charmClient, { PopulatedBounty } from 'charmClient';
 import { bindTrigger, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useBounties } from 'hooks/useBounties';
 import { eToNumber } from 'lib/utilities/numbers';
-import { isTruthy } from 'lib/utilities/types';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
 
-export default function MultiPaymentModal () {
+export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBounty[]}) {
 
-  const { bounties, setBounties } = useBounties();
+  const { setBounties } = useBounties();
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
   const [paymentMethods] = usePaymentMethods();
-
+  const [currentSpace] = useCurrentSpace();
   const gnosisPayment = paymentMethods.find(p => p.walletType === 'gnosis');
   const safeAddress = gnosisPayment?.gnosisSafeAddress;
-  const bountiesReady = bounties.filter(bounty => bounty.chainId === gnosisPayment?.chainId && bounty.status === 'complete');
+  const transactions: (MetaTransactionData & {applicationId: string})[] = [];
+
+  if (gnosisPayment) {
+    bounties.forEach(bounty => {
+      // If the bounty is on the same chain as the gnosis safe
+      if (bounty.chainId === gnosisPayment?.chainId) {
+        bounty.applications.forEach(application => {
+          if (application.status === 'complete') {
+            const value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
+            transactions.push({
+              to: application.walletAddress as string,
+              value,
+              data: '0x',
+              applicationId: application.id
+            });
+          }
+        });
+      }
+    });
+  }
 
   async function onPaymentSuccess (result: MultiPaymentResult) {
-    const updatedBounties = await Promise.all(
-      result.transactions.map(async (transaction, i) => {
-        const bountyId = bountiesReady[i].id;
-        await charmClient.recordTransaction({
-          bountyId,
-          transactionId: result.txHash,
-          chainId: gnosisPayment!.chainId.toString()
-        });
-        return charmClient.changeBountyStatus(bountyId, 'paid');
-      })
-    );
-    setBounties(_bounties => _bounties.map(bounty => {
-      const updated = updatedBounties.find(b => b.id === bounty.id);
-      return updated || bounty;
-    }));
+    if (gnosisPayment) {
+      await Promise.all(
+        result.transactions.map(async (transaction) => {
+          await charmClient.recordTransaction({
+            applicationId: transaction.applicationId,
+            transactionId: result.txHash,
+            chainId: gnosisPayment.chainId.toString()
+          });
+          await charmClient.reviewSubmission(transaction.applicationId, 'pay');
+        })
+      );
+
+      if (currentSpace) {
+        charmClient.listBounties(currentSpace.id)
+          .then(_bounties => {
+            setBounties(_bounties);
+          });
+      }
+    }
   }
 
-  if (!safeAddress || bountiesReady.length === 0) {
+  if (!safeAddress || transactions.length === 0) {
     return null;
   }
-
-  const transactions: MetaTransactionData[] = bountiesReady.map(bounty => {
-    const app = bounty.applications.find(application => application.createdBy === bounty.assignee);
-    if (!app) return null;
-    const value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
-    return {
-      to: app.walletAddress,
-      value,
-      data: '0x',
-      origin: 'CharmVerse Bounty'
-    };
-  }).filter(isTruthy) as any;
 
   return (
     <>
@@ -62,19 +73,19 @@ export default function MultiPaymentModal () {
         {...bindTrigger(popupState)}
         sx={{ ml: 1 }}
       >
-        Batch Payment ({bountiesReady.length})
+        Batch Payment ({transactions.length})
       </Button>
-      <Modal {...bindPopover(popupState)} size='fluid'>
+      <Modal {...bindPopover(popupState)} size='large'>
         <DialogTitle onClose={popupState.close}>Batch Payments</DialogTitle>
         <Box py={2}>
-          <ul>
-            {bountiesReady.map(bounty => (
+          {/* <ul>
+            {bountiesOnSameChain.map(bounty => (
               <li>{bounty.title}</li>
             ))}
-          </ul>
+          </ul> */}
         </Box>
         <MultiPaymentButton
-          chainId={bountiesReady[0].chainId}
+          chainId={gnosisPayment.chainId}
           safeAddress={safeAddress}
           transactions={transactions}
           onSuccess={onPaymentSuccess}

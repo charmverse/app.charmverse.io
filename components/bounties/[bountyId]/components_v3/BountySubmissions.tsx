@@ -10,7 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { ApplicationStatus, Bounty } from '@prisma/client';
+import { ApplicationStatus } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
@@ -23,12 +23,14 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
+import MultiPaymentModal from 'components/bounties/components/MultiPaymentModal';
+import { BountyWithDetails } from 'models';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
 
 interface Props {
-  bounty: Bounty
+  bounty: BountyWithDetails
 }
 
 export const SubmissionStatusColors: Record<ApplicationStatus, BrandColor> = {
@@ -92,8 +94,6 @@ export default function BountySubmissions ({ bounty }: Props) {
   // Bounty open color if no cap or below cap, submission review color if cap is reached
   const chipColor = capReached ? SubmissionStatusColors.review : BountyStatusColours.open;
 
-  console.log(sortedSubmissions);
-
   return (
     <Box>
       <Grid container sx={{ mb: 2 }}>
@@ -103,20 +103,21 @@ export default function BountySubmissions ({ bounty }: Props) {
           </Typography>
         </Grid>
         <Grid container item xs={4} direction='row' justifyContent='flex-end'>
+          <MultiPaymentModal bounties={[bounty]} />
           {
-                  !bounty.approveSubmitters && !userSubmission && (
-                  <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
-                    <Box component='span'>
-                      <Button
-                        disabled={!!userSubmission}
-                        onClick={editSubmissionModal.open}
-                      >
-                        New
-                      </Button>
-                    </Box>
-                  </Tooltip>
-                  )
-                }
+            !bounty.approveSubmitters && !userSubmission && (
+            <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
+              <Box component='span'>
+                <Button
+                  disabled={!!userSubmission}
+                  onClick={editSubmissionModal.open}
+                >
+                  New
+                </Button>
+              </Box>
+            </Tooltip>
+            )
+          }
         </Grid>
       </Grid>
 

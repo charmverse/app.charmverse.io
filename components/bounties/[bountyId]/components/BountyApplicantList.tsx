@@ -1,30 +1,28 @@
 import { useTheme } from '@emotion/react';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import { Application, Bounty, User } from '@prisma/client';
+import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
-import { useUser } from 'hooks/useUser';
+import { Modal } from 'components/common/Modal';
+import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import useIsAdmin from 'hooks/useIsAdmin';
+import { useUser } from 'hooks/useUser';
+import { applicantIsSubmitter, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { getDisplayName } from 'lib/users';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import { Modal } from 'components/common/Modal';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useBounties } from 'hooks/useBounties';
-import { applicantIsSubmitter, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
-import { Tooltip } from '@mui/material';
-import { BountyStatusColours } from '../../components/BountyStatusBadge';
-import { ApplicationEditorForm } from './ApplicationEditorForm';
 import { SubmissionStatusColors, SubmissionStatusLabels } from '../components_v3/BountySubmissions';
+import { ApplicationEditorForm } from './ApplicationEditorForm';
 
 export interface IBountyApplicantListProps {
   bounty: Bounty,

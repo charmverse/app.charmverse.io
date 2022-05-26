@@ -8,7 +8,7 @@ import { getChainById } from 'connectors';
 import useGnosisSafes from 'hooks/useGnosisSafes';
 
 export interface MultiPaymentResult {
-  transactions: MetaTransactionData[];
+  transactions: (MetaTransactionData & {applicationId: string})[];
   txHash: string;
 }
 
@@ -16,11 +16,12 @@ interface Props {
   chainId: number,
   onSuccess: (result: MultiPaymentResult) => void;
   safeAddress: string;
-  transactions: MetaTransactionData[];
+  transactions: (MetaTransactionData & {applicationId: string})[];
 }
 
 export default function MultiPaymentButton ({ chainId, safeAddress, transactions, onSuccess }: Props) {
   const { account, library } = useWeb3React();
+
   const [safe] = useGnosisSafes([safeAddress]);
   const network = getChainById(chainId);
   if (!network?.gnosisUrl) {
@@ -30,7 +31,14 @@ export default function MultiPaymentButton ({ chainId, safeAddress, transactions
     if (!safe || !account || !network?.gnosisUrl) {
       return;
     }
-    const safeTransaction = await safe.createTransaction(transactions);
+    const safeTransaction = await safe.createTransaction(transactions.map(transaction => (
+      {
+        data: transaction.data,
+        to: transaction.to,
+        value: transaction.value,
+        operation: transaction.operation
+      }
+    )));
     await safe.signTransaction(safeTransaction);
     const txHash = await safe.getTransactionHash(safeTransaction);
     const signer = await library.getSigner(account);
@@ -50,7 +58,7 @@ export default function MultiPaymentButton ({ chainId, safeAddress, transactions
   }
 
   return (
-    <Button disabled={!safe} onClick={makePayment}>
+    <Button disabled={!safe || transactions.length === 0} onClick={makePayment}>
       Make Payment (
       {transactions.length}
       )
