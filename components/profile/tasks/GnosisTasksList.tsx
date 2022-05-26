@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import styled from '@emotion/styled';
 import { Alert, Box, Button, Card, Chip, Collapse, Divider, Grid, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ExpandLess from '@mui/icons-material/ExpandLess';
@@ -7,7 +6,6 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import PeopleIcon from '@mui/icons-material/People';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
-import Legend from 'components/settings/Legend';
 import UserDisplay, { AnonUserDisplay } from 'components/common/UserDisplay';
 import { shortenHex } from 'lib/utilities/strings';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
@@ -576,11 +574,13 @@ export default function GnosisTasksSection () {
   return (
     <>
       <Box mb={2} display='flex' justifyContent='flex-end'>
-        <SnoozeTransactions
-          message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
-          snoozedForDate={snoozedForDate}
-          setSnoozedForDate={setSnoozedForDate}
-        />
+        {safeData?.length ? (
+          <SnoozeTransactions
+            message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
+            snoozedForDate={snoozedForDate}
+            setSnoozedForDate={setSnoozedForDate}
+          />
+        ) : null}
       </Box>
       {!safesWithTasks && !error && <LoadingComponent height='200px' isLoading={true} />}
       {error && !safesWithTasks && (
