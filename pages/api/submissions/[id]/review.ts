@@ -2,6 +2,7 @@
 import { Application } from '@prisma/client';
 import { prisma } from 'db';
 import { reviewSubmission, SubmissionReview } from 'lib/applications/actions';
+import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
@@ -49,12 +50,14 @@ async function reviewSubmissionController (req: NextApiRequest, res: NextApiResp
     throw new UnauthorisedActionError('You cannot review submissions for this bounty');
   }
 
-  const updatedApplication = await reviewSubmission({
+  const updatedSubmission = await reviewSubmission({
     decision: req.body.decision,
     submissionId: submissionId as string
   });
 
-  return res.status(200).json(updatedApplication);
+  rollupBountyStatus(updatedSubmission.bountyId);
+
+  return res.status(200).json(updatedSubmission);
 }
 
 export default withSessionRoute(handler);

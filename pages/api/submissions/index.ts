@@ -1,13 +1,14 @@
 
-import { Application, Prisma } from '@prisma/client';
+import { Application } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, hasAccessToSpace, onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { createSubmission, SubmissionCreationData } from 'lib/applications/actions';
+import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
+import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { DataNotFoundError } from 'lib/utilities/errors';
-import { listSubmissions, createApplication, SubmissionCreationData, createSubmission } from 'lib/applications/actions';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -49,6 +50,8 @@ async function createSubmissionController (req: NextApiRequest, res: NextApiResp
     userId,
     submissionContent
   });
+
+  rollupBountyStatus(createdSubmission.bountyId);
 
   return res.status(201).json(createdSubmission);
 }
