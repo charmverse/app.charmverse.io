@@ -1,19 +1,9 @@
 
-import { Bounty, BountyStatus, PageOperations, PagePermissionLevel, Space, User } from '@prisma/client';
-import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
-import { createPage, generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication, generateSpaceUser, generateBounty } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+import { Space, User } from '@prisma/client';
+import { DataNotFoundError, InvalidInputError, WrongStateError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { DataNotFoundError, InvalidInputError, UnauthorisedActionError, LimitReachedError, PositiveNumbersOnlyError, DuplicateDataError, StringTooShortError, MissingDataError, WrongStateError } from 'lib/utilities/errors';
-import { createBounty } from 'lib/bounties/createBounty';
-import { prisma } from 'db';
-import { generateSubmissionContent } from 'testing/generate-stubs';
-import { createApplication } from '../createApplication';
-import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from '../../shared';
-import { createSubmission } from '../createSubmission';
-import { SubmissionContent, SubmissionUpdateData } from '../../interfaces';
-import { updateSubmission } from '../updateSubmission';
+import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 import { reviewSubmission } from '../reviewSubmission';
 
 let user: User;
@@ -45,7 +35,25 @@ describe('reviewSubmission', () => {
     expect(reviewed.status).toBe('complete');
   });
 
-  it('should return the updated submission with a rejected status when rejected', async () => {
+  it('should return the updated submission with a complete status when approved', async () => {
+
+    const bountyWithSubmission = await generateBountyWithSingleApplication({
+      userId: user.id,
+      spaceId: space.id,
+      bountyStatus: 'open',
+      applicationStatus: 'complete',
+      bountyCap: null
+    });
+
+    const reviewed = await reviewSubmission({
+      submissionId: bountyWithSubmission.applications[0].id,
+      decision: 'pay'
+    });
+
+    expect(reviewed.status).toBe('paid');
+  });
+
+  it('should return the updated submission with a paid status when pay action is initiated', async () => {
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
@@ -121,5 +129,26 @@ describe('reviewSubmission', () => {
     }
   });
 
+  it('should fail if trying to pay a submission that is not in completed status', async () => {
+
+    const bountyWithSubmission = await generateBountyWithSingleApplication({
+      userId: user.id,
+      spaceId: space.id,
+      bountyStatus: 'open',
+      applicationStatus: 'inProgress',
+      bountyCap: null
+    });
+
+    try {
+      await reviewSubmission({
+        submissionId: bountyWithSubmission.applications[0].id,
+        decision: 'pay'
+      });
+      throw new ExpectedAnError();
+    }
+    catch (error: any) {
+      expect(error).toBeInstanceOf(WrongStateError);
+    }
+  });
 });
 

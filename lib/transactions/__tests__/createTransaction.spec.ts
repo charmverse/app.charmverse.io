@@ -1,6 +1,8 @@
 import { Application, Bounty, Space, User } from '@prisma/client';
 import { createSubmission } from 'lib/applications/actions';
 import { createTransaction } from 'lib/transactions/createTransaction';
+import { DataNotFoundError } from 'lib/utilities/errors';
+import { ExpectedAnError } from 'testing/errors';
 import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 
@@ -29,7 +31,7 @@ beforeAll(async () => {
   });
 });
 
-describe('listSubmissions', () => {
+describe('createTransaction', () => {
   it('Should create transaction for a submission', async () => {
     const transaction = await createTransaction({
       applicationId: application.id,
@@ -48,9 +50,10 @@ describe('listSubmissions', () => {
         chainId: '4',
         transactionId: '123'
       });
+      throw new ExpectedAnError();
     }
     catch (err: any) {
-      expect(err.message).toBe(`Application with id ${applicationId} not found`);
+      expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
 });
