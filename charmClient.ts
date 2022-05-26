@@ -207,11 +207,11 @@ class CharmClient {
   }
 
   disconnectTelegram () {
-    return http.POST('/api/telegram/disconnect');
+    return http.POST<User>('/api/telegram/disconnect');
   }
 
   disconnectDiscord () {
-    return http.POST('/api/discord/disconnect');
+    return http.POST<User>('/api/discord/disconnect');
   }
 
   connectDiscord (payload: ConnectDiscordPayload) {

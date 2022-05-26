@@ -1,5 +1,6 @@
 import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { shortenHex } from 'lib/utilities/strings';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'db';
@@ -55,7 +56,7 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
     newIdentityProvider = IDENTITY_TYPES[2];
   }
   else {
-    newUserName = user.addresses[0];
+    newUserName = shortenHex(user.addresses[0]);
     newIdentityProvider = IDENTITY_TYPES[0];
   }
 

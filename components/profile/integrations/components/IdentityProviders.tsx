@@ -1,4 +1,4 @@
-
+import { User } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
 import { Alert, Divider, Stack, Typography, SvgIcon, CircularProgress, Tooltip } from '@mui/material';
@@ -114,8 +114,8 @@ export default function IdentityProviders () {
       if (connectedWithDiscord) {
         setIsDisconnectingDiscord(true);
         try {
-          await charmClient.disconnectDiscord();
-          setUser({ ...user, discordUser: null });
+          const updatedUser: User = await charmClient.disconnectDiscord();
+          setUser({ ...user, ...updatedUser, discordUser: null });
         }
         catch (err) {
           log.warn('Error disconnecting from discord', err);
@@ -133,8 +133,8 @@ export default function IdentityProviders () {
     if (connectedWithTelegram) {
       setIsConnectingTelegram(true);
       try {
-        await charmClient.disconnectTelegram();
-        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: null }));
+        const updatedUser: User = await charmClient.disconnectTelegram();
+        setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUser, telegramUser: null }));
       }
       catch (err: any) {
         setTelegramError(err.message || err.error || 'Something went wrong. Please try again');
