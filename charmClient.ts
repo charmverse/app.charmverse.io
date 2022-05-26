@@ -459,6 +459,10 @@ class CharmClient {
     });
   }
 
+  async paySubmission (submissionId: string) {
+    return http.POST<Application>(`/api/submissions/${submissionId}/pay`);
+  }
+
   recordTransaction (data: TransactionCreationData) {
     return http.POST('/api/transactions', data);
   }

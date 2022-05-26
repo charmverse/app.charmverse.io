@@ -35,24 +35,6 @@ describe('reviewSubmission', () => {
     expect(reviewed.status).toBe('complete');
   });
 
-  it('should return the updated submission with a complete status when approved', async () => {
-
-    const bountyWithSubmission = await generateBountyWithSingleApplication({
-      userId: user.id,
-      spaceId: space.id,
-      bountyStatus: 'open',
-      applicationStatus: 'complete',
-      bountyCap: null
-    });
-
-    const reviewed = await reviewSubmission({
-      submissionId: bountyWithSubmission.applications[0].id,
-      decision: 'pay'
-    });
-
-    expect(reviewed.status).toBe('paid');
-  });
-
   it('should return the updated submission with a paid status when pay action is initiated', async () => {
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
@@ -125,28 +107,6 @@ describe('reviewSubmission', () => {
       throw new ExpectedAnError();
     }
     catch (error) {
-      expect(error).toBeInstanceOf(WrongStateError);
-    }
-  });
-
-  it('should fail if trying to pay a submission that is not in completed status', async () => {
-
-    const bountyWithSubmission = await generateBountyWithSingleApplication({
-      userId: user.id,
-      spaceId: space.id,
-      bountyStatus: 'open',
-      applicationStatus: 'inProgress',
-      bountyCap: null
-    });
-
-    try {
-      await reviewSubmission({
-        submissionId: bountyWithSubmission.applications[0].id,
-        decision: 'pay'
-      });
-      throw new ExpectedAnError();
-    }
-    catch (error: any) {
       expect(error).toBeInstanceOf(WrongStateError);
     }
   });

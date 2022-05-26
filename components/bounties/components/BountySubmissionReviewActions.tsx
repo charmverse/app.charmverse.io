@@ -2,7 +2,6 @@
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import CancelIcon from '@mui/icons-material/Cancel';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import PlagiarismIcon from '@mui/icons-material/Plagiarism';
 import { IconButton } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -20,7 +19,6 @@ import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { SystemError } from 'lib/utilities/errors';
 import { eToNumber } from 'lib/utilities/numbers';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { SyntheticEvent, useState } from 'react';
 import BountyPaymentButton from '../[bountyId]/components/BountyPaymentButton';
 
@@ -39,8 +37,6 @@ export default function BountySubmissionReviewActions ({ onSubmission, bounty, s
 
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
   const [apiError, setApiError] = useState<SystemError | null>();
-
-  const submissionContentModal = usePopupState({ variant: 'popover', popupId: 'submission-content' });
 
   function makeSubmissionDecision (applicationId: string, decision: ReviewDecision) {
     setApiError(null);
@@ -64,7 +60,7 @@ export default function BountySubmissionReviewActions ({ onSubmission, bounty, s
         chainId: chainId.toString(),
         transactionId
       });
-      await charmClient.reviewSubmission(submission.id, 'pay');
+      await charmClient.paySubmission(submission.id);
       await refreshBounty(bounty.id);
     }
     catch (err: any) {

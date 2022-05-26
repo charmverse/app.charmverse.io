@@ -52,7 +52,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBou
             transactionId: result.txHash,
             chainId: gnosisPayment.chainId.toString()
           });
-          await charmClient.reviewSubmission(transaction.applicationId, 'pay');
+          await charmClient.paySubmission(transaction.applicationId);
         })
       );
 
