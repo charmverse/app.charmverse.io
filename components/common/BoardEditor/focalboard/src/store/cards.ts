@@ -71,22 +71,27 @@ const cardsSlice = createSlice({
             state.cards = {}
             state.templates = {}
             const boardsRecord: {[key: string]: Board} = {};
+
             action.payload.blocks.forEach(block=> {
               if (block.type === "board") {
                 boardsRecord[block.id] = block as Board;
               }
             });
             for (const block of action.payload.blocks) {
+                console.log(action.payload.blocks)
               const boardPage = boardsRecord[block.parentId];
-              // If the parent board block has been deleted, then doesn't matter which card has been deleted, show them all
-              // Otherwise dont show the card that has been deleted by itself
-              if (block.type === 'card' && ((boardPage.deletedAt === null && block.deletedAt === null ) || boardPage.deletedAt !== null)) {
-                if (block.fields.isTemplate) {
-                    state.templates[block.id] = block as Card
-                } else {
-                    state.cards[block.id] = block as Card
+              // check boardPage exists, its possible a deleted card still exists. TODO: delete cards when a board is deleted!
+              if (boardPage) {
+                // If the parent board block has been deleted, then doesn't matter which card has been deleted, show them all
+                // Otherwise dont show the card that has been deleted by itself
+                if (block.type === 'card' && ((boardPage.deletedAt === null && block.deletedAt === null ) || boardPage.deletedAt !== null)) {
+                    if (block.fields.isTemplate) {
+                        state.templates[block.id] = block as Card
+                    } else {
+                        state.cards[block.id] = block as Card
+                    }
                 }
-              }
+                }
             }
         })
     },
