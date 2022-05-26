@@ -1,45 +1,48 @@
+import { useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
+import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
+import PaidIcon from '@mui/icons-material/Paid';
 import { IconButton, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
-import { Bounty, BountyStatus } from '@prisma/client';
-import { getChainExplorerLink, getChainById } from 'connectors';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import millify from 'millify';
+import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
+import { Bounty, BountyStatus } from '@prisma/client';
+import { getChainById, getChainExplorerLink } from 'connectors';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { getTokenInfo } from 'lib/tokens/tokenData';
+import millify from 'millify';
 import { BountyWithDetails } from 'models';
 import { BOUNTY_LABELS } from 'models/Bounty';
 import Link from 'next/link';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { getTokenInfo } from 'lib/tokens/tokenData';
-import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import GradingIcon from '@mui/icons-material/Grading';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import PaidIcon from '@mui/icons-material/Paid';
 import { ReactNode } from 'react';
-import styled from '@emotion/styled';
 import { BrandColor } from 'theme/colors';
-import { useTheme } from '@emotion/react';
 
 const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   suggestion: <LightbulbIcon />,
   open: <ModeStandbyIcon />,
-  assigned: <AssignmentIndIcon />,
-  review: <GradingIcon />,
+  inProgress: <AssignmentIndIcon />,
   complete: <CheckCircleOutlineIcon />,
-  paid: <PaidIcon />
+  paid: <PaidIcon />,
+  // TODO REMOVE AFTER MIGRATION
+  assigned: <ModeStandbyIcon />,
+  review: <ModeStandbyIcon />
 };
 
 export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
   suggestion: 'purple',
   open: 'teal',
-  assigned: 'yellow',
-  review: 'orange',
+  inProgress: 'yellow',
   complete: 'pink',
-  paid: 'gray'
+  paid: 'gray',
+  // TODO REMOVE AFTER MIGRATION
+  assigned: 'blue',
+  review: 'blue'
 };
 
 const BountyStatusBox = styled.div<{ status: BountyStatus }>`

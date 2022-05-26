@@ -18,8 +18,8 @@ async function upsertPublicPermissions () {
 
   // STEP 2 - Create this permission everywhere
   for (let i = 0; i < publicPages.length; i += CONCURRENT) {
-    const sliced = publicPages.slice(0, i + CONCURRENT);
-    await Promise.all(sliced.map(page => {
+    const sliced = publicPages.slice(i, i + CONCURRENT);
+    await Promise.all(sliced.map((page, subIndex) => {
       return new Promise(resolve => {
         upsertPermission(page.id, {
           permissionLevel: 'view',
@@ -27,7 +27,7 @@ async function upsertPublicPermissions () {
         }).then(created => {
           setupPermissionsAfterPagePermissionAdded(created.id)
             .then(() => {
-              console.log('Job done');
+              console.log('Job done ', i + 1 + subIndex);
               resolve(true);
             });
         });
@@ -47,10 +47,28 @@ async function upsertPublicPermissions () {
   return true;
 }
 
-// Run this function
+async function checkConnection () {
+  return new Promise(resolve => {
+    prisma.page.count({
+      where: {
+        isPublic: true
+      }
+    }).then(count => {
+      resolve(count);
+    });
+  });
+
+}
+
 /*
+checkConnection().then(count => {
+  console.log(count, ' public pages');
+});
+
+// Run this function
+
 upsertPublicPermissions()
   .then(() => {
     console.log('Job complete');
   });
-  */
+*/

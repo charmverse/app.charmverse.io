@@ -6,6 +6,7 @@ const ErrorCodes = {
   Unknown: 500,
   'Invalid input': 400,
   'Undesirable operation': 400,
+  'Duplicate data': 400,
   'Data not found': 404,
   'Maximum size exceeded': 400,
   'Access denied': 401,
@@ -91,6 +92,16 @@ export class UnknownError extends SystemError {
     super({
       message: 'Something went wrong.',
       errorType: 'Unknown',
+      severity: 'error'
+    });
+  }
+}
+
+export class UnauthorisedActionError extends SystemError {
+  constructor (message = 'You do not have access to perform this action.') {
+    super({
+      message,
+      errorType: 'Access denied',
       severity: 'error'
     });
   }

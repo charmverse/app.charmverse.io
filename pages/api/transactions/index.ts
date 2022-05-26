@@ -1,28 +1,18 @@
 
-import { Transaction, Prisma } from '@prisma/client';
-import { prisma } from 'db';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { Transaction } from '@prisma/client';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { createTransaction } from 'lib/transactions/createTransaction';
+import { TransactionCreationData } from 'lib/transactions/interface';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(createTransaction);
+handler.use(requireUser).use(requireKeys<TransactionCreationData>(['applicationId', 'transactionId', 'chainId'], 'body')).post(createTransactionController);
 
-async function createTransaction (req: NextApiRequest, res: NextApiResponse<Transaction>) {
-  const data = req.body as Transaction;
-  const transactionToCreate = { ...data } as any;
-
-  if (data.bountyId) {
-    (transactionToCreate as Prisma.TransactionCreateInput).bounty = { connect: { id: data.bountyId } };
-
-    // Remove bountyId passed from client to ensure Prisma doesn't throw an error
-    delete transactionToCreate.bountyId;
-  }
-
-  const transaction = await prisma.transaction.create({ data: transactionToCreate });
-
+async function createTransactionController (req: NextApiRequest, res: NextApiResponse<Transaction>) {
+  const transaction = await createTransaction(req.body as TransactionCreationData);
   return res.status(200).json(transaction);
 }
 
