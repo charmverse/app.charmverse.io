@@ -144,6 +144,9 @@ export default function PageTitleWithBreadcrumbs () {
   else if (router.route === '/[domain]/[pageId]') {
     return <WorkspacePageTitle />;
   }
+  else if (router.route.startsWith('/profile')) {
+    return <div></div>;
+  }
   else {
     return <StandardPageTitle />;
   }
