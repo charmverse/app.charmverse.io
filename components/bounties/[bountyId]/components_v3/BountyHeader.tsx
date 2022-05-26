@@ -5,12 +5,14 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import Button from '@mui/material/Button';
 // import Menu from '@mui/icons-material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import ListItemText from '@mui/material/ListItem';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
-
+import LockIcon from '@mui/icons-material/Lock';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Typography from '@mui/material/Typography';
 import BountyDelete from 'components/bounties/components/BountyDelete';
 import BountyModal from 'components/bounties/components/BountyModal';
@@ -38,6 +40,10 @@ export default function BountyHeader () {
 
   const bountyEditModal = usePopupState({ variant: 'popover', popupId: 'edit-bounty' });
   const bountyDeleteModal = usePopupState({ variant: 'popover', popupId: 'delete-bounty' });
+
+  const closeSubmissionsModal = usePopupState({ variant: 'popover', popupId: 'close-submissions' });
+
+  const closeBountyModal = usePopupState({ variant: 'popover', popupId: 'close-bounty' });
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'bounty-actions' });
 
@@ -72,36 +78,51 @@ export default function BountyHeader () {
             {
           viewerCanModifyBounty === true && (
             <>
-              <Tooltip arrow placement='top' title={`Edit bounty ${currentBounty.status === 'suggestion' ? 'suggestion' : ''}`}>
-                <IconButton onClick={bountyEditModal.open}>
-                  <EditIcon fontSize='medium' />
-                </IconButton>
-              </Tooltip>
-              <Tooltip arrow placement='top' title={`Delete bounty ${currentBounty.status === 'suggestion' ? 'suggestion' : ''}`}>
-                <IconButton sx={{ mx: -1 }} onClick={() => {}}>
-                  <DeleteIcon fontSize='medium' />
-                </IconButton>
-              </Tooltip>
+              <MoreHorizIcon color='secondary' {...bindTrigger(popupState)} />
+
+              <Menu
+                {...bindMenu(popupState)}
+                {...menuPosition}
+              >
+
+                <Tooltip arrow placement='top' title={`Delete bounty ${currentBounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                  <MenuItem onClick={bountyEditModal.open}>
+                    <ListItemIcon><EditIcon color='secondary' fontSize='small' /></ListItemIcon>
+                    <ListItemText>Edit</ListItemText>
+                  </MenuItem>
+                </Tooltip>
+                {
+                  currentBounty.status !== 'suggestion' && (
+                  <>
+                    <Tooltip arrow placement='top' title={`Prevent new ${currentBounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+                      <MenuItem onClick={closeSubmissionsModal.open}>
+                        <ListItemIcon><LockIcon color='secondary' fontSize='small' /></ListItemIcon>
+                        <ListItemText>Stop new {currentBounty.approveSubmitters ? 'applications' : 'submissions'}</ListItemText>
+                      </MenuItem>
+                    </Tooltip>
+                    <Tooltip arrow placement='top' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
+                      <MenuItem onClick={closeBountyModal.open}>
+                        <ListItemIcon><CheckCircleIcon color='secondary' fontSize='small' /></ListItemIcon>
+                        <ListItemText>Mark as complete</ListItemText>
+                      </MenuItem>
+                    </Tooltip>
+                  </>
+                  )
+                }
+
+                <Tooltip arrow placement='top' title={`Delete bounty ${currentBounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                  <MenuItem onClick={bountyDeleteModal.open}>
+                    <ListItemIcon><DeleteIcon color='secondary' /></ListItemIcon>
+                    <ListItemText>Delete</ListItemText>
+                  </MenuItem>
+                </Tooltip>
+              </Menu>
+
             </>
           )
         }
           </Typography>
 
-          <MoreHorizIcon color='secondary' {...bindTrigger(popupState)} />
-
-          <Menu
-            {...bindMenu(popupState)}
-            {...menuPosition}
-          >
-            <MenuItem onClick={() => {}}>
-              <ListItemIcon><DeleteIcon color='secondary' /></ListItemIcon>
-              <ListItemText>Delete</ListItemText>
-            </MenuItem>
-            <MenuItem onClick={() => {}}>
-              <ListItemIcon><DuplicateIcon color='secondary' fontSize='small' /></ListItemIcon>
-              <ListItemText>Duplicate</ListItemText>
-            </MenuItem>
-          </Menu>
         </Box>
         <Box sx={{
           display: 'flex',
@@ -127,6 +148,58 @@ export default function BountyHeader () {
           onCancel={bountyDeleteModal.close}
           onDelete={bountyDeleteModal.close}
         />
+      </Modal>
+
+      <Modal title='Confirm' open={closeSubmissionsModal.isOpen} onClose={closeSubmissionsModal.close} size='large'>
+        <Box>
+
+          <Typography variant='body2' sx={{ mb: 1 }}>
+            Do you want to close this bounty to new submissions?
+            <br />
+            <br />
+            The cap of submissions will be updated to the current number of approved or in progress submissions.
+            <br />
+            <br />
+            You can reopen this bounty for new submissions by updating or removing the maximum submissions limit.
+          </Typography>
+
+          <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
+            <Button
+              color='primary'
+              sx={{ mr: 2, fontWeight: 'bold' }}
+              onClick={() => {}}
+            >Close {currentBounty.approveSubmitters ? 'applications' : 'submissions'}
+            </Button>
+
+            <Button color='secondary' onClick={closeSubmissionsModal.close}>Cancel</Button>
+          </Box>
+        </Box>
+      </Modal>
+
+      <Modal title='Confirm' size='large' open={closeBountyModal.isOpen} onClose={closeBountyModal.close}>
+        <Box>
+
+          <Typography variant='body2' sx={{ mb: 1 }}>
+            Do you want to close out this bounty?
+            <br />
+            <br />
+            <b>All non-reviewed submissions will be rejected</b>, and this bounty will move to "complete" status.
+            <br />
+            <br />
+            This decision is permanent.
+          </Typography>
+
+          <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
+            <Button
+              color='error'
+              sx={{ mr: 2, fontWeight: 'bold' }}
+              onClick={() => {}}
+            >Close bounty
+            </Button>
+
+            <Button color='secondary' onClick={closeBountyModal.close}>Cancel</Button>
+          </Box>
+        </Box>
       </Modal>
     </>
   );
