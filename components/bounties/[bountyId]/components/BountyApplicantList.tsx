@@ -190,7 +190,9 @@ export function BountyApplicantList ({
                       if (contributor) {
                         return (
                           <UserDisplay
+                            avatarSize='small'
                             user={contributor}
+                            fontSize='small'
                           />
                         );
                       }

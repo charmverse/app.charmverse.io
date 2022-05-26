@@ -213,7 +213,9 @@ export default function BountySubmissions ({ bounty }: Props) {
                     if (contributor) {
                       return (
                         <UserDisplay
+                          avatarSize='small'
                           user={contributor}
+                          fontSize='small'
                         />
                       );
                     }
