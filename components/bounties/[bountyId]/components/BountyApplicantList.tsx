@@ -22,6 +22,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useBounties } from 'hooks/useBounties';
 import { applicantIsSubmitter, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
 import { Tooltip } from '@mui/material';
+import UserDisplay from 'components/common/UserDisplay';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
 import { SubmissionStatusColors, SubmissionStatusLabels } from '../components_v3/BountySubmissions';
@@ -183,8 +184,18 @@ export function BountyApplicantList ({
                 </TableCell>
                 <TableCell size='small'>
                   {
-                      application.createdBy === user?.id ? 'You'
-                        : getDisplayName(getContributor(application.createdBy))
+                    (() => {
+                      const contributor = contributors.find(c => c.id === application.createdBy);
+
+                      if (contributor) {
+                        return (
+                          <UserDisplay
+                            user={contributor}
+                          />
+                        );
+                      }
+                      return 'Anonymous';
+                    })()
                     }
                 </TableCell>
                 <TableCell sx={{ maxWidth: '61vw' }}>

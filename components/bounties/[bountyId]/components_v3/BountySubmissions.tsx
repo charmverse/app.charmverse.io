@@ -22,6 +22,7 @@ import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
+import UserDisplay from 'components/common/UserDisplay';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
@@ -95,15 +96,29 @@ export default function BountySubmissions ({ bounty }: Props) {
 
   console.log(sortedSubmissions);
 
+  const reviewerUser = bounty.reviewer ? contributors.find(c => c.id === bounty.reviewer) : undefined;
+
   return (
     <Box>
       <Grid container sx={{ mb: 2 }}>
+        {
+          reviewerUser && (
+            <Grid item xs={12} sx={{ mb: 4, mt: 3 }}>
+              <b>Reviewer</b>
+              <UserDisplay
+                user={reviewerUser}
+              />
+            </Grid>
+          )
+        }
+
         <Grid item xs={8}>
           <Typography variant='h5'>
             Submissions
           </Typography>
         </Grid>
         <Grid container item xs={4} direction='row' justifyContent='flex-end'>
+
           {
                   !bounty.approveSubmitters && !userSubmission && (
                   <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
@@ -159,13 +174,15 @@ export default function BountySubmissions ({ bounty }: Props) {
                 (bounty.maxSubmissions || validSubmissions > 0) && (
 
                 <Box>
-                  Submissions
-                  <Tooltip placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
-                    <Chip
-                      color={chipColor}
-                      sx={{ ml: 1, minWidth: '50px' }}
-                      label={bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
-                    />
+
+                  <Tooltip sx={{ ml: 1 }} placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
+                    <Typography variant='body1'>
+                      Submissions
+                      <Box component='span' sx={{ ml: 1 }}>
+                        {bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
+                      </Box>
+
+                    </Typography>
                   </Tooltip>
                 </Box>
                 )
@@ -190,8 +207,19 @@ export default function BountySubmissions ({ bounty }: Props) {
               </TableCell>
               <TableCell size='small'>
                 {
-                      submission.createdBy === user?.id ? 'You'
-                        : getDisplayName(contributors.find(c => c.id === submission.createdBy))
+                  (() => {
+                    const contributor = contributors.find(c => c.id === submission.createdBy);
+
+                    if (contributor) {
+                      return (
+                        <UserDisplay
+                          user={contributor}
+                        />
+                      );
+                    }
+                    return 'Anonymous';
+                  })()
+
                     }
               </TableCell>
               <TableCell sx={{ maxWidth: '61vw' }}>
