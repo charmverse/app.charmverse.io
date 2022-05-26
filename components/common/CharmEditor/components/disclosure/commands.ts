@@ -2,10 +2,17 @@
 import { Command, Fragment, Node, TextSelection } from '@bangle.dev/pm';
 import { findParentNodeOfTypeClosestToPos } from '@bangle.dev/utils';
 
+// Backspace Use case: When a user hits 'backspace' at the beginning of a summary node
+// Action: Remove the disclosure node
+// Command: Grab all the child nodes inside summary and details, then replace
+// the disclosure range with the children.
 export const backspaceCmd: Command = (state, dispatch) => {
   const { tr } = state;
   // @ts-ignore types package is missing $cursor property as of 1.2.8
   const { $cursor } = state.selection;
+  if (!$cursor) {
+    return false;
+  }
 
   const summaryNode = findParentNodeOfTypeClosestToPos($cursor, state.schema.nodes.disclosureSummary);
   const disclosureNode = findParentNodeOfTypeClosestToPos($cursor, state.schema.nodes.disclosureDetails);

@@ -29,16 +29,17 @@ function Component ({ menuState }: { menuState: PluginState }) {
       return null;
     }
 
-    // calculate the node at the mouse position. do it on click in case content has changed
+    // calculate the node at the mouse position. do it on click in case the content has changed
     let topPos = view.state.doc.resolve(menuState.rowPos);
     while (topPos.depth > 1 || (topPos.depth === 1 && topPos.parentOffset > 0)) {
       const parentOffset = topPos.pos - (topPos.parentOffset > 0 ? topPos.parentOffset : 1); // if parentOffset is 0, step back by 1
       topPos = view.state.doc.resolve(parentOffset);
     }
 
-    // console.log('Position of row', topPos, { startPos, ogPos: ob, node: topPos.node() });
+    // console.log('Position of row', topPos, { node: topPos.node() });
 
     let pmNode = topPos.node();
+    // handle top-level children, where pmNode === doc
     if (menuState.rowNodeOffset && menuState.rowNodeOffset > 0) {
       const child = pmNode.maybeChild(menuState.rowNodeOffset);
       pmNode = child || pmNode;
@@ -64,8 +65,16 @@ function Component ({ menuState }: { menuState: PluginState }) {
 
   function deleteRow () {
     const node = _getNode();
+
     if (node) {
-      view.dispatch(view.state.tr.deleteRange(node.nodeStart, node.nodeEnd));
+      let start = node.nodeStart;
+      let end = node.nodeEnd;
+      // fix for toggles, but also assuming that pos 1 or 0 is always the first line anyway
+      if (start === 1) {
+        start = 0;
+        end -= 1;
+      }
+      view.dispatch(view.state.tr.deleteRange(start, end));
       popupState.close();
     }
   }
