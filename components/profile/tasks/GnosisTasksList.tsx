@@ -574,7 +574,7 @@ export default function GnosisTasksSection () {
   return (
     <>
       <Box mb={2} display='flex' justifyContent='flex-end'>
-        {safeData?.length ? (
+        {safesWithTasks && safeData?.length ? (
           <SnoozeTransactions
             message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
             snoozedForDate={snoozedForDate}
