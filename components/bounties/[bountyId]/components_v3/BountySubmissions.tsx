@@ -26,6 +26,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
+import BountySubmissionContent from '../../components/BountySubmissionContent';
 
 interface Props {
   bounty: Bounty
@@ -57,6 +58,8 @@ export default function BountySubmissions ({ bounty }: Props) {
 
   const [submissions, setSubmissions] = useState<Application[] | null>(null);
   const { refreshBounty } = useBounties();
+
+  const [currentViewedSubmission, setCurrentViewedSubmission] = useState<Application | null>(null);
 
   const editSubmissionModal = usePopupState({ variant: 'popover', popupId: 'edit-submission' });
 
@@ -196,6 +199,7 @@ export default function BountySubmissions ({ bounty }: Props) {
             <TableRow
               key={submission.id}
               sx={{ backgroundColor: submissionIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
+              hover
             >
               <TableCell size='small' align='left'>
 
@@ -224,13 +228,12 @@ export default function BountySubmissions ({ bounty }: Props) {
 
                     }
               </TableCell>
-              <TableCell sx={{ maxWidth: '61vw' }}>
+              <TableCell sx={{ maxWidth: '61vw' }} onClick={!(submission.status === 'review' && submission.createdBy === user?.id) ? () => setCurrentViewedSubmission(submission) : editSubmissionModal.open}>
 
                 {
                     submission.status === 'review' && submission.createdBy === user?.id && (
                       <Typography
                         variant='body2'
-                        onClick={editSubmissionModal.open}
                         color={theme.palette.primary?.main}
                       >
                         {fancyTrim(submission.submission ?? '', 50)}
@@ -297,6 +300,13 @@ export default function BountySubmissions ({ bounty }: Props) {
       <Modal title='Your submission' open={editSubmissionModal.isOpen} onClose={editSubmissionModal.close} size='large'>
         <SubmissionEditorForm submission={userSubmission} bounty={bounty} onSubmit={submitterUpdatedSubmission} />
       </Modal>
+
+      {
+      /* Modal for viewing the content */
+        <Modal open={currentViewedSubmission !== null} onClose={() => setCurrentViewedSubmission(null)} size='large'>
+          <BountySubmissionContent bounty={bounty} submission={currentViewedSubmission as Application} />
+        </Modal>
+    }
 
     </Box>
   );

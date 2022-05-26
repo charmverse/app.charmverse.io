@@ -1,37 +1,22 @@
 
-import { useTheme } from '@emotion/react';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import PlagiarismIcon from '@mui/icons-material/Plagiarism';
 import CancelIcon from '@mui/icons-material/Cancel';
+import PlagiarismIcon from '@mui/icons-material/Plagiarism';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Alert from '@mui/material/Alert';
-import Chip from '@mui/material/Chip';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Application, ApplicationStatus, Bounty } from '@prisma/client';
+import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
-import { useContributors } from 'hooks/useContributors';
-import { useUser } from 'hooks/useUser';
-import { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
-import { applicantIsSubmitter, countValidSubmissions, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
-import { getDisplayName } from 'lib/users';
-import { fancyTrim } from 'lib/utilities/strings';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
-import { BrandColor } from 'theme/colors';
-import Tooltip from '@mui/material/Tooltip';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
+import { useUser } from 'hooks/useUser';
+import { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { SystemError } from 'lib/utilities/errors';
-import { BountyStatusColours } from './BountyStatusBadge';
-import BountySubmissionContent from './BountySubmissionContent';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 
 interface Props {
   bounty: Bounty,
@@ -75,7 +60,6 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
   return (
     <Box>
 
-      <PlagiarismIcon sx={{ mr: 3 }} onClick={submissionContentModal.open} />
       {
       canReview && (
         <>
@@ -87,13 +71,6 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
           </Tooltip>
         </>
       )
-    }
-
-      {
-      /* Modal for viewing the content */
-        <Modal open={submissionContentModal.isOpen} onClose={submissionContentModal.close} size='large'>
-          <BountySubmissionContent bounty={bounty} submission={submission} />
-        </Modal>
     }
 
       {/* Modal which provides review confirmation */}
