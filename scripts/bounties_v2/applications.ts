@@ -6,7 +6,7 @@ const CONCURRENT = 3;
 /**
  * Port the status for existing assignees of a bounty
  */
-export async function updateExistingAssigneeApplications () {
+export async function updateExistingAssigneeApplicationStatuses () {
   const bountiesWithAssignee = await prisma.bounty.findMany({
     where: {
       assignee: {
