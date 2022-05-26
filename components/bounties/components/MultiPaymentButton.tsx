@@ -17,9 +17,10 @@ interface Props {
   onSuccess: (result: MultiPaymentResult) => void;
   safeAddress: string;
   transactions: (MetaTransactionData & {applicationId: string})[];
+  isLoading: boolean
 }
 
-export default function MultiPaymentButton ({ chainId, safeAddress, transactions, onSuccess }: Props) {
+export default function MultiPaymentButton ({ isLoading, chainId, safeAddress, transactions, onSuccess }: Props) {
   const { account, library } = useWeb3React();
 
   const [safe] = useGnosisSafes([safeAddress]);
@@ -58,7 +59,7 @@ export default function MultiPaymentButton ({ chainId, safeAddress, transactions
   }
 
   return (
-    <Button disabled={!safe || transactions.length === 0} onClick={makePayment}>
+    <Button disabled={isLoading || !safe || transactions.length === 0} onClick={makePayment}>
       Make Payment (
       {transactions.length}
       )

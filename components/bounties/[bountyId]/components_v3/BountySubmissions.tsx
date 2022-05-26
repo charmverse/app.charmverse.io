@@ -25,6 +25,7 @@ import { BrandColor } from 'theme/colors';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import MultiPaymentModal from 'components/bounties/components/MultiPaymentModal';
 import { BountyWithDetails } from 'models';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
@@ -56,6 +57,7 @@ export default function BountySubmissions ({ bounty }: Props) {
   const [user] = useUser();
   const [contributors] = useContributors();
   const theme = useTheme();
+  const isAdmin = useIsAdmin();
 
   const [submissions, setSubmissions] = useState<ApplicationWithTransactions[] | null>(null);
   const { refreshBounty } = useBounties();
@@ -103,7 +105,7 @@ export default function BountySubmissions ({ bounty }: Props) {
           </Typography>
         </Grid>
         <Grid container item xs={4} direction='row' justifyContent='flex-end'>
-          <MultiPaymentModal bounties={[bounty]} />
+          {isAdmin && <MultiPaymentModal bounties={[bounty]} />}
           {
             !bounty.approveSubmitters && !userSubmission && (
             <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>

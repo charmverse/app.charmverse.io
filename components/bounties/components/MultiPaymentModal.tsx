@@ -10,11 +10,12 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useBounties } from 'hooks/useBounties';
 import { eToNumber } from 'lib/utilities/numbers';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useState } from 'react';
 import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
 
 export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBounty[]}) {
-
-  const { setBounties } = useBounties();
+  const [isLoading, setIsLoading] = useState(false);
+  const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
   const [paymentMethods] = usePaymentMethods();
   const [currentSpace] = useCurrentSpace();
@@ -43,6 +44,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBou
 
   async function onPaymentSuccess (result: MultiPaymentResult) {
     if (gnosisPayment) {
+      setIsLoading(true);
       await Promise.all(
         result.transactions.map(async (transaction) => {
           await charmClient.recordTransaction({
@@ -58,8 +60,14 @@ export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBou
         charmClient.listBounties(currentSpace.id)
           .then(_bounties => {
             setBounties(_bounties);
+            const newCurrentBounty = _bounties.find(_bounty => _bounty.id === currentBountyId);
+            if (newCurrentBounty) {
+              setCurrentBounty({ ...newCurrentBounty, transactions: [] });
+            }
           });
       }
+      setIsLoading(false);
+      popupState.close();
     }
   }
 
@@ -89,6 +97,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBou
           safeAddress={safeAddress}
           transactions={transactions}
           onSuccess={onPaymentSuccess}
+          isLoading={isLoading}
         />
       </Modal>
     </>
