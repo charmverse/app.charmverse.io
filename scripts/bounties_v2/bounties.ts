@@ -26,6 +26,7 @@ export async function applyDefaultSettings () {
 
 const CONCURRENT = 3;
 
+// Final step
 export async function rollupExistingBounties () {
   const bounties = await prisma.bounty.findMany();
 
