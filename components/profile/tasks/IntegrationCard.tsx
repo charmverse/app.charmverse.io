@@ -2,15 +2,13 @@ import { IconButton, Divider, Paper, Tooltip, Typography, Box, Grid } from '@mui
 import { useWeb3React } from '@web3-react/core';
 import { useUser } from 'hooks/useUser';
 import Avatar from 'components/common/Avatar';
-import Link from 'next/Link';
+import Link from 'next/link';
 import useENSName from 'hooks/useENSName';
 import { getDisplayName } from 'lib/users';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { useRouter } from 'next/router';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import KeyIcon from '@mui/icons-material/Key';
 import styled from '@emotion/styled';
-import { useTheme } from '@emotion/react';
 
 const IntegrationCardContainer = styled.div`
   display: flex;
