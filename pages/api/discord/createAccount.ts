@@ -1,7 +1,7 @@
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import { onError, onNoMatch } from 'lib/middleware';
 import log from 'loglevel';
-import { IdentityType, LoggedInUser } from 'models';
+import { IDENTITY_TYPES, LoggedInUser } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { prisma } from 'db';
@@ -21,7 +21,7 @@ export async function createAccountWithDiscord (req: NextApiRequest, res: NextAp
     data: {
       username: discordAccount.username,
       avatar: `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`,
-      identityType: IdentityType.Discord
+      identityType: IDENTITY_TYPES[1]
     }
   });
 

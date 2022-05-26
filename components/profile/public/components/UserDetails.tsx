@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import styled from '@emotion/styled';
 import { Box, Divider, Grid, Link as ExternalLink, Stack, SvgIcon, Typography, Tooltip } from '@mui/material';
+import { User } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -16,9 +17,13 @@ import Link from 'next/link';
 import { useWeb3React } from '@web3-react/core';
 import { useUser } from 'hooks/useUser';
 import { getDisplayName } from 'lib/users';
+import { DiscordAccount } from 'lib/discord/getDiscordAccount';
+import { TelegramAccount } from 'pages/api/telegram/connect';
+import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
 import charmClient from 'charmClient';
-import { DescriptionModal, IdentityModal, SocialModal } from '.';
+import { IDENTITY_TYPES, IdentityType } from 'models';
+import { DescriptionModal, IdentityModal, SocialModal, getIdentityIcon, IntegrationModel } from '.';
 import { Social } from '../interfaces';
 
 const StyledBox = styled(Box)`
@@ -50,10 +55,8 @@ export default function UserDetails () {
     setTimeout(() => setIsDiscordUsernameCopied(false), 1000);
   };
 
-  const handleImageUpdate = async (url: string) => {
-    const updatedUser = await charmClient.updateUser({
-      avatar: url
-    });
+  const handleUserUpdate = async (data: Partial<User>) => {
+    const updatedUser = await charmClient.updateUser(data);
 
     setUser(updatedUser);
   };
@@ -74,6 +77,50 @@ export default function UserDetails () {
 
   const hasAnySocialInformation = (model: Social) => model.twitterURL || model.githubURL || model.discordUsername || model.linkedinURL;
 
+  const identityTypes: Array<IntegrationModel> = useMemo(() => {
+    const types: Array<IntegrationModel> = [];
+
+    if (user?.addresses) {
+      types.push({
+        type: IDENTITY_TYPES[0],
+        username: user.addresses[0],
+        isInUse: user.identityType === IDENTITY_TYPES[0],
+        icon: getIdentityIcon(IDENTITY_TYPES[0])
+      });
+    }
+
+    if (user?.discordUser && user.discordUser.account) {
+      const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
+      types.push({
+        type: IDENTITY_TYPES[1],
+        username: discordAccount.username || '',
+        isInUse: user.identityType === IDENTITY_TYPES[1],
+        icon: getIdentityIcon(IDENTITY_TYPES[1])
+      });
+    }
+
+    if (user?.telegramUser && user.telegramUser.account) {
+      const telegramAccount = user.telegramUser.account as Partial<TelegramAccount>;
+      types.push({
+        type: IDENTITY_TYPES[2],
+        username: telegramAccount.username || `${telegramAccount.first_name} ${telegramAccount.last_name}`,
+        isInUse: user.identityType === IDENTITY_TYPES[2],
+        icon: getIdentityIcon(IDENTITY_TYPES[2])
+      });
+    }
+
+    if (user) {
+      types.push({
+        type: IDENTITY_TYPES[3],
+        username: user.identityType === IDENTITY_TYPES[3] && user.username ? user.username : '',
+        isInUse: user.identityType === IDENTITY_TYPES[3],
+        icon: getIdentityIcon(IDENTITY_TYPES[3])
+      });
+    }
+
+    return types;
+  }, [user]);
+
   return (
     <StyledBox>
       <Stack direction='row' spacing={1} alignItems='center'>
@@ -86,14 +133,15 @@ export default function UserDetails () {
         <Avatar
           name={userName}
           spaceImage={user?.avatar}
-          updateImage={handleImageUpdate}
+          updateImage={(url: string) => handleUserUpdate({ avatar: url })}
           displayIcons={true}
           variant='circular'
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
-            <Stack direction='row' spacing={1} alignItems='baseline'>
-              <Typography variant='h1'>CharmVerse</Typography>
+            <Stack direction='row' spacing={1} alignItems='end'>
+              { user && getIdentityIcon(user.identityType as IdentityType) }
+              <Typography variant='h1'>{user?.username}</Typography>
               <IconButton onClick={identityModalState.open}>
                 <EditIcon />
               </IconButton>
@@ -166,9 +214,13 @@ export default function UserDetails () {
       <IdentityModal
         isOpen={identityModalState.isOpen}
         close={identityModalState.close}
-        defaultValues={{
-
+        save={(id: string, identityType: IdentityType) => {
+          const username: string = identityType === IDENTITY_TYPES[0] ? (ENSName || shortenHex(id)) : id;
+          handleUserUpdate({ username, identityType });
         }}
+        identityTypes={identityTypes}
+        identityType={(user?.identityType || IDENTITY_TYPES[0]) as IdentityType}
+        username={user?.username || ''}
       />
       <DescriptionModal
         isOpen={descriptionModalState.isOpen}

@@ -7,7 +7,7 @@ export default function ProfileLayout (props: { children: React.ReactNode }) {
   return (
     <PageLayout sidebar={ProfileSidebar}>
       <ScrollableWindow>
-        <Box py={3} sx={{ px: { xs: '40px', sm: '80px' } }}>
+        <Box py={3} sx={{ px: { xs: '0px 40px', sm: '80px' } }}>
           {props.children}
         </Box>
       </ScrollableWindow>

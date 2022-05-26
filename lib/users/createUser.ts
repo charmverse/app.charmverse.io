@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { IdentityType, LoggedInUser } from 'models';
+import { IDENTITY_TYPES, LoggedInUser } from 'models';
 
 export async function createUserFromWallet (address: string): Promise<LoggedInUser> {
   const user = await prisma.user.findFirst({
@@ -31,7 +31,7 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
     const newUser = await prisma.user.create({
       data: {
         addresses: [address],
-        identityType: IdentityType.Address
+        identityType: IDENTITY_TYPES[0]
       },
       include: {
         favorites: true,
