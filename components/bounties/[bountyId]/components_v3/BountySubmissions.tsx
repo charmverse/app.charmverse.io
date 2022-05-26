@@ -22,6 +22,9 @@ import { fancyTrim } from 'lib/utilities/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { BrandColor } from 'theme/colors';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
+import { getChainExplorerLink } from 'connectors';
 import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
@@ -54,12 +57,10 @@ export default function BountySubmissions ({ bounty }: Props) {
   const [contributors] = useContributors();
   const theme = useTheme();
 
-  const [submissions, setSubmissions] = useState<Application[] | null>(null);
+  const [submissions, setSubmissions] = useState<ApplicationWithTransactions[] | null>(null);
   const { refreshBounty } = useBounties();
 
   const editSubmissionModal = usePopupState({ variant: 'popover', popupId: 'edit-submission' });
-
-  const isReviewer = bounty.reviewer === user?.id;
 
   useEffect(() => {
     refreshSubmissions();
@@ -181,34 +182,29 @@ export default function BountySubmissions ({ bounty }: Props) {
               sx={{ backgroundColor: submissionIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell size='small' align='left'>
-                {/* {
-                  (bounty.status === 'paid' && transactionInfo) && (
-                    <Grid item xs>
-                      <a style={{ textDecoration: 'none', color: 'text.primary' }} href={getChainExplorerLink(transactionInfo.chainId, transactionInfo.transactionId)} target='_blank' rel='noreferrer'>
-                        <Box sx={{ color: 'text.primary', pt: 0.5, display: 'block' }}>
-                          <Typography
-                            variant='caption'
-                            px={1}
-                          >
-                            View transaction details
-                          </Typography>
-                          <LaunchIcon sx={{ fontSize: '12px' }} />
-                        </Box>
+                <Box display='flex' gap={1}>
+                  <Chip
+                    label={SubmissionStatusLabels[submission.status]}
+                    color={SubmissionStatusColors[submission.status]}
+                  />
+                  {
+                    (submission.status === 'paid' && submission.transactions.length !== 0) && (
+                      <a style={{ textDecoration: 'none', color: 'text.primary' }} href={getChainExplorerLink(submission.transactions[0].chainId, submission.transactions[0].transactionId)} target='_blank' rel='noreferrer'>
+                        <Tooltip title='View transaction details' placement='top' arrow>
+                          <Box sx={{ color: 'text.primary', pt: 0.5, display: 'block' }}>
+                            <LaunchIcon fontSize='small' />
+                          </Box>
+                        </Tooltip>
                       </a>
-                    </Grid>
-                  )
-                } */}
-                <Chip
-                  label={SubmissionStatusLabels[submission.status]}
-                  color={SubmissionStatusColors[submission.status]}
-                />
-
+                    )
+                  }
+                </Box>
               </TableCell>
               <TableCell size='small'>
                 {
-                      submission.createdBy === user?.id ? 'You'
-                        : getDisplayName(contributors.find(c => c.id === submission.createdBy))
-                    }
+                  submission.createdBy === user?.id ? 'You'
+                    : getDisplayName(contributors.find(c => c.id === submission.createdBy))
+                }
               </TableCell>
               <TableCell sx={{ maxWidth: '61vw' }}>
 

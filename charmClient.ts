@@ -34,6 +34,7 @@ import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
 import { GetTasksResponse } from 'pages/api/tasks';
 
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -420,11 +421,8 @@ class CharmClient {
     return data;
   }
 
-  async listApplications (bountyId: string, submissionsOnly: boolean): Promise<Application []> {
-
-    const data = await http.GET<Application []>('/api/applications', { bountyId, submissionsOnly });
-
-    return data;
+  listApplications (bountyId: string, submissionsOnly: boolean): Promise<ApplicationWithTransactions []> {
+    return http.GET('/api/applications', { bountyId, submissionsOnly });
   }
 
   async createSubmission (content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {
