@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+import { shortenHex } from 'lib/utilities/strings';
 import { IDENTITY_TYPES, LoggedInUser } from 'models';
 
 export async function createUserFromWallet (address: string): Promise<LoggedInUser> {
@@ -31,7 +32,8 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
     const newUser = await prisma.user.create({
       data: {
         addresses: [address],
-        identityType: IDENTITY_TYPES[0]
+        identityType: IDENTITY_TYPES[0],
+        username: shortenHex(address)
       },
       include: {
         favorites: true,
