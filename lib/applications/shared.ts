@@ -1,5 +1,4 @@
-import { Application, Bounty, User } from '@prisma/client';
-import { BountyWithDetails } from 'models';
+import { Application, Bounty } from '@prisma/client';
 import { ApplicationWithTransactions } from './actions';
 
 export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 10;

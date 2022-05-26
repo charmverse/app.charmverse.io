@@ -11,7 +11,6 @@ export interface ApplicationWithTransactions extends Application {
  * @returns
  */
 export async function listSubmissions (bountyId: string): Promise<ApplicationWithTransactions[]> {
-
   return prisma.application.findMany({
     where: {
       bountyId,

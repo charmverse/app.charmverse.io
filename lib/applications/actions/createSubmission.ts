@@ -1,9 +1,9 @@
 import { Application } from '@prisma/client';
 import { prisma } from 'db';
 import { getBounty } from 'lib/bounties/getBounty';
-import { DataNotFoundError, DuplicateDataError, LimitReachedError, UnauthorisedActionError, MissingDataError } from 'lib/utilities/errors';
+import { DataNotFoundError, DuplicateDataError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { SubmissionCreationData } from '../interfaces';
-import { submissionsCapReached, bountyCanReceiveNewSubmissionsOrApplications } from '../shared';
+import { bountyCanReceiveNewSubmissionsOrApplications } from '../shared';
 
 export async function createSubmission ({ bountyId, submissionContent, userId }: SubmissionCreationData): Promise<Application> {
   const bounty = await getBounty(bountyId);

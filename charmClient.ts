@@ -35,6 +35,7 @@ import { GetTasksResponse } from 'pages/api/tasks';
 
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
+import { TransactionCreationData } from 'lib/transactions/createTransaction';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -442,8 +443,8 @@ class CharmClient {
     });
   }
 
-  recordTransaction (details: Pick<Transaction, 'applicationId' | 'transactionId' | 'chainId'>) {
-    return http.POST('/api/transactions', details);
+  recordTransaction (data: TransactionCreationData) {
+    return http.POST('/api/transactions', data);
   }
 
   async getPricing (base: string, quote: FiatCurrency): Promise<IPairQuote> {

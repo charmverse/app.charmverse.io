@@ -1,14 +1,13 @@
 
-import { Application, Prisma } from '@prisma/client';
+import { Application } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, hasAccessToSpace, onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { SubmissionContent, updateSubmission } from 'lib/applications/actions';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { listSubmissions, createApplication, SubmissionCreationData, createSubmission, updateSubmission, SubmissionContent } from 'lib/applications/actions';
-import { getApplication } from 'lib/applications/getApplication';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
