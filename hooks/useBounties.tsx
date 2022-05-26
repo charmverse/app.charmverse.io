@@ -13,7 +13,7 @@ type IContext = {
   setCurrentBounty: (bounty: BountyWithDetails) => void,
   updateBounty: (bountyId: string, update: Partial<Bounty>) => Promise<BountyWithDetails>
   deleteBounty: (bountyId: string) => Promise<true>
-  refreshBounty: (bountyId: string) => void
+  refreshBounty: (bountyId: string) => Promise<void>
 };
 
 export const BountiesContext = createContext<Readonly<IContext>>({
@@ -25,7 +25,7 @@ export const BountiesContext = createContext<Readonly<IContext>>({
   setCurrentBounty: () => undefined,
   updateBounty: () => Promise.resolve({} as any),
   deleteBounty: () => Promise.resolve(true),
-  refreshBounty: () => undefined
+  refreshBounty: () => Promise.resolve(undefined)
 });
 
 export function BountiesProvider ({ children }: { children: ReactNode }) {
