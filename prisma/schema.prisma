@@ -213,7 +213,8 @@ model InviteLink {
 enum BountyStatus {
   suggestion
   open
-  inProgress
+  assigned
+  review
   complete
   paid
 }
@@ -239,18 +240,6 @@ model Bounty {
   linkedTaskId     String?       @db.Uuid
   applications     Application[]
   transactions     Transaction[]
-  approveSubmitters Boolean 
-  maxSubmissions    Int?         
-  expiryDate        DateTime?
-}
-
-enum ApplicationStatus {
-  applied
-  inProgress
-  review
-  rejected
-  complete
-  paid
 }
 
 model Application {
@@ -261,12 +250,8 @@ model Application {
   bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
   createdBy     String   @db.Uuid()
   applicant     User     @relation(fields: [createdBy], references: [id])
-  walletAddress String?
+  walletAddress String
   message       String
-  status        ApplicationStatus
-  submission    String?
-  submissionNodes String?
-  transactions  Transaction[]
 }
 
 model Transaction {
@@ -277,8 +262,6 @@ model Transaction {
   chainId       String
   bountyId      String   @db.Uuid()
   bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
-  applicationId String   @db.Uuid()
-  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 }
 
 model TokenGate {
