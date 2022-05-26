@@ -60,6 +60,7 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
         chainId: chainId.toString(),
         transactionId
       });
+      await charmClient.reviewSubmission(submission.id, 'pay');
     }
     catch (err: any) {
       setApiError(err);

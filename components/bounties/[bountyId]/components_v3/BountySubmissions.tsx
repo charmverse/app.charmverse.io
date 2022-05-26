@@ -181,7 +181,23 @@ export default function BountySubmissions ({ bounty }: Props) {
               sx={{ backgroundColor: submissionIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell size='small' align='left'>
-
+                {/* {
+                  (bounty.status === 'paid' && transactionInfo) && (
+                    <Grid item xs>
+                      <a style={{ textDecoration: 'none', color: 'text.primary' }} href={getChainExplorerLink(transactionInfo.chainId, transactionInfo.transactionId)} target='_blank' rel='noreferrer'>
+                        <Box sx={{ color: 'text.primary', pt: 0.5, display: 'block' }}>
+                          <Typography
+                            variant='caption'
+                            px={1}
+                          >
+                            View transaction details
+                          </Typography>
+                          <LaunchIcon sx={{ fontSize: '12px' }} />
+                        </Box>
+                      </a>
+                    </Grid>
+                  )
+                } */}
                 <Chip
                   label={SubmissionStatusLabels[submission.status]}
                   color={SubmissionStatusColors[submission.status]}

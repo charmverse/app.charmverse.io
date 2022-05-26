@@ -16,7 +16,7 @@ export interface ApplicationActionRequest {
   applicationOrApplicationId: string | Application
 }
 
-export type ReviewDecision = 'approve' | 'reject'
+export type ReviewDecision = 'approve' | 'reject' | 'pay'
 
 export interface SubmissionReview {
   submissionId: string

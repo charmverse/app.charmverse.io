@@ -6,7 +6,8 @@ import { ReviewDecision, SubmissionReview } from '../interfaces';
 
 const submissionStatusAfterDecision: Record<ReviewDecision, ApplicationStatus> = {
   approve: 'complete',
-  reject: 'rejected'
+  reject: 'rejected',
+  pay: 'paid'
 };
 
 /**
@@ -22,6 +23,10 @@ export async function reviewSubmission ({ submissionId, decision }: SubmissionRe
 
   if (submission.status !== 'review' && decision === 'approve') {
     throw new WrongStateError('Submissions must be in review for you to approve them');
+  }
+
+  if (submission.status !== 'complete' && decision === 'pay') {
+    throw new WrongStateError('Submissions must be completed for you to make payment');
   }
 
   const correspondingSubmissionStatus = submissionStatusAfterDecision[decision];
