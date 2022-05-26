@@ -33,3 +33,33 @@ export function eToNumber (num: number | string): string {
     return w.replace(new RegExp(`^(.{${pos}})(.)`), `$1${dot}$2`);
   }
 }
+
+export type  PropertyValueCountSummary<K extends string> = Record<K, number> & {
+  total: number
+}
+
+/**
+ * Return amount of times a key has a specific value, for each given set of values
+ */
+export function countValueOccurrences<V extends string, T = any>(objectList: T [], key: keyof T): PropertyValueCountSummary<V> {
+  const reduced: PropertyValueCountSummary<V> = objectList.reduce((summary: any, obj, index) => {
+    const valueAsString = String(obj[key]) as keyof V;
+    console.log('Key', key, 'Value as string', valueAsString, 'Index', index)
+
+
+    console.log('Before', summary)
+
+    summary[valueAsString] = typeof summary[valueAsString] === 'number' ? summary[valueAsString] + 1 : 1
+
+    console.log('After', summary)
+
+    return summary
+
+  },{})
+
+
+  reduced.total = objectList.length
+
+  return reduced
+}
+
