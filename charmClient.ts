@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
-  Role, Space, TokenGate, Transaction, User, TelegramUser, UserGnosisSafe, TokenGateToRole
+  Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';

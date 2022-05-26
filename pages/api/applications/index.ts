@@ -12,7 +12,6 @@ import nc from 'next-connect';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .use(requireKeys<{bountyId: string, submissionsOnly: boolean}>(['bountyId', 'submissionsOnly'], 'body'))
   .get(getApplications)
   .use(requireKeys<Application>(['bountyId', 'message'], 'body'))
   .post(createApplicationController);
