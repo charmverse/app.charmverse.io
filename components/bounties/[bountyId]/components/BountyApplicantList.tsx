@@ -166,10 +166,20 @@ export function BountyApplicantList ({
                 sx={{ backgroundColor: applicationIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell align='left'>
-                  <Chip
-                    label={SubmissionStatusLabels[application.status]}
-                    color={SubmissionStatusColors[application.status]}
-                  />
+                  {
+                    application.status === 'applied' ? (
+                      <Chip
+                        label='Applied'
+                        color='primary'
+                      />
+                    ) : (
+                      <Chip
+                        label='Accepted'
+                        color='success'
+                      />
+                    )
+                  }
+
                 </TableCell>
                 <TableCell size='small'>
                   {
