@@ -137,6 +137,7 @@ model User {
   threads         Thread[]
   gnosisSafes     UserGnosisSafe[]
   gnosisSafeState UserGnosisSafeState?
+  profile         UserDetails?
 }
 
 model UserGnosisSafeState {
@@ -144,6 +145,13 @@ model UserGnosisSafeState {
   transactionsSnoozeMessage String?
   userId                    String    @unique @db.Uuid
   user                      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model UserDetails {
+  id          String   @id @db.Uuid
+  user        User     @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  description String?
+  social      Json?
 }
 
 model TelegramUser {

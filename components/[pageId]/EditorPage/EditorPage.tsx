@@ -64,8 +64,6 @@ export default function EditorPage (
           return pageMap;
         }, {});
 
-        console.log('Public pages', publicPagesInSpace);
-
         setPages({
           ...mapped,
           ...foundPageContent

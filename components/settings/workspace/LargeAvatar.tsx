@@ -20,7 +20,7 @@ const baseAvatarStyles = css`
 
 const StyledAvatar = styled(Avatar)`
   ${baseAvatarStyles}
-  ${({ variant }) => variant === 'rounded' && 'border-radius: 25px'};
+  ${({ variant }) => variant === 'rounded' && 'border-radius: 7x'};
 `;
 
 const StyledAvatarWithIcons = styled(AvatarWithIcons)`
@@ -72,6 +72,10 @@ export default function LargeAvatar (props: LargeAvatarProps) {
               if (updateImage) {
                 updateImage(url);
               }
+
+              // This is a fix for when trying to select the same file again after
+              // having removed it.
+              e.target.value = '';
             }}
           />
           <StyledAvatarWithIcons
