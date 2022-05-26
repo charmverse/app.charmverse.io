@@ -93,7 +93,9 @@ export default function BountyHeader () {
             {
           viewerCanModifyBounty === true && (
             <>
-              <MoreHorizIcon color='secondary' {...bindTrigger(popupState)} />
+              <IconButton>
+                <MoreHorizIcon color='secondary' {...bindTrigger(popupState)} />
+              </IconButton>
 
               <Menu
                 {...bindMenu(popupState)}

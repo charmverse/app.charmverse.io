@@ -13,15 +13,14 @@ import Typography from '@mui/material/Typography';
 import { Application, Bounty } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
+import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import { applicantIsSubmitter, moveUserApplicationToFirstRow, submissionsCapReached } from 'lib/applications/shared';
-import { getDisplayName } from 'lib/users';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { SubmissionStatusColors, SubmissionStatusLabels } from '../components_v3/BountySubmissions';
 import { ApplicationEditorForm } from './ApplicationEditorForm';
 
 export interface IBountyApplicantListProps {
@@ -164,15 +163,37 @@ export function BountyApplicantList ({
                 sx={{ backgroundColor: applicationIndex % 2 !== 0 ? theme.palette.background.default : theme.palette.background.light, '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell align='left'>
-                  <Chip
-                    label={SubmissionStatusLabels[application.status]}
-                    color={SubmissionStatusColors[application.status]}
-                  />
+                  {
+                    application.status === 'applied' ? (
+                      <Chip
+                        label='Applied'
+                        color='primary'
+                      />
+                    ) : (
+                      <Chip
+                        label='Accepted'
+                        color='success'
+                      />
+                    )
+                  }
+
                 </TableCell>
                 <TableCell size='small'>
                   {
-                      application.createdBy === user?.id ? 'You'
-                        : getDisplayName(getContributor(application.createdBy))
+                    (() => {
+                      const contributor = contributors.find(c => c.id === application.createdBy);
+
+                      if (contributor) {
+                        return (
+                          <UserDisplay
+                            avatarSize='small'
+                            user={contributor}
+                            fontSize='small'
+                          />
+                        );
+                      }
+                      return 'Anonymous';
+                    })()
                     }
                 </TableCell>
                 <TableCell sx={{ maxWidth: '61vw' }}>

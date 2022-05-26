@@ -1,7 +1,9 @@
 
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import CancelIcon from '@mui/icons-material/Cancel';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import PlagiarismIcon from '@mui/icons-material/Plagiarism';
+import { IconButton } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -20,10 +22,7 @@ import { SystemError } from 'lib/utilities/errors';
 import { eToNumber } from 'lib/utilities/numbers';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { SyntheticEvent, useState } from 'react';
-import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { IconButton } from '@mui/material';
 import BountyPaymentButton from '../[bountyId]/components/BountyPaymentButton';
-import BountySubmissionContent from './BountySubmissionContent';
 
 interface Props {
   bounty: Bounty,
@@ -82,7 +81,6 @@ export default function BountySubmissionReviewActions ({ onSubmission, bounty, s
   return (
     <Box display='flex' gap={1} alignItems='center' justifyContent='end'>
 
-      <PlagiarismIcon onClick={submissionContentModal.open} />
       {
         canReview && (
           <>
@@ -114,13 +112,6 @@ export default function BountySubmissionReviewActions ({ onSubmission, bounty, s
           </div>
         )
       }
-
-      {
-      /* Modal for viewing the content */
-        <Modal open={submissionContentModal.isOpen} onClose={submissionContentModal.close} size='large'>
-          <BountySubmissionContent bounty={bounty} submission={submission} />
-        </Modal>
-    }
 
       {/* Modal which provides review confirmation */}
       <Modal title='Confirm your review' open={reviewDecision !== null} onClose={cancel} size='large'>
