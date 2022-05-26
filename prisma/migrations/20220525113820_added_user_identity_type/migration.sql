@@ -21,13 +21,17 @@ WHERE "username" IS NOT NULL AND
 	  	SELECT account->>'username' FROM "DiscordUser" du WHERE du."userId" = u."id" LIMIT 1
 	  )
 
-/* Update identityType to Telegram if there is no identityType and there is a username that is the same as the first name + ' ' + last name on the user's Telegram account */
+/* Update identityType to Telegram if there is no identityType and there is a username that is the same as the username or first name + ' ' + last name on the user's Telegram account */
 UPDATE "User" u SET "identityType"='Telegram'
 WHERE "username" IS NOT NULL AND 
 	  "identityType" IS NULL AND
-	  "username" IN (
-	  	SELECT CONCAT(account->>'first_name' , ' ', account->>'last_name') FROM "TelegramUser" tu WHERE tu."userId" = u."id" LIMIT 1
+	  ( 
+		  "username" IN (
+			SELECT CONCAT(account->>'first_name' , ' ', account->>'last_name') FROM "TelegramUser" tu WHERE tu."userId" = u."id" AND account->>'username' IS NULL LIMIT 1
+		) OR
+		"username" IN (
+			SELECT account->>'username' FROM "TelegramUser" tu WHERE tu."userId" = u."id" LIMIT 1
+		)
 	  )
-
 ALTER TABLE "User" ALTER COLUMN "identityType" SET NOT NULL;
 
