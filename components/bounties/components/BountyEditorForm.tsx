@@ -28,6 +28,7 @@ import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
 import { DatePicker } from '@mui/x-date-pickers';
 import * as yup from 'yup';
+import { SystemError } from 'lib/utilities/errors';
 
 export type FormMode = 'create' | 'update' | 'suggest';
 
@@ -160,6 +161,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   const [paymentMethods] = usePaymentMethods();
 
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
+  const [formError, setFormError] = useState<SystemError | null>(null);
 
   const chainId = watch('chainId');
   const rewardToken = watch('rewardToken');
@@ -174,67 +176,74 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   }, []);
 
   async function submitted (value: FormValues & Bounty) {
+    setFormError(null);
 
-    if (!value.setExpiryDate) {
-      value.expiryDate = null;
+    try {
+      if (!value.setExpiryDate) {
+        value.expiryDate = null;
+      }
+
+      if (!value.capSubmissions) {
+        // Ensures any existing limit will be nulled
+        value.maxSubmissions = null;
+      }
+      delete value.capSubmissions;
+
+      if (mode === 'create') {
+        delete value.setExpiryDate;
+
+        value.spaceId = space!.id;
+        value.createdBy = user!.id;
+        value.description = value.description ?? '';
+        value.descriptionNodes = value.descriptionNodes ?? '';
+        value.status = 'open';
+
+        const createdBounty = await charmClient.createBounty(value);
+        const populatedBounty = { ...createdBounty, applications: [] };
+        setBounties([...bounties, populatedBounty]);
+        onSubmit(populatedBounty);
+      }
+      else if (mode === 'suggest') {
+        value.spaceId = space!.id;
+        value.createdBy = user!.id;
+        value.description = value.description ?? '';
+        value.descriptionNodes = value.descriptionNodes ?? '';
+        value.status = 'suggestion';
+
+        value.rewardToken = 'ETH';
+        value.rewardAmount = 0;
+        value.chainId = 1;
+
+        const createdBounty = await charmClient.createBounty(value);
+        const populatedBounty = { ...createdBounty, applications: [] };
+        setBounties([...bounties, populatedBounty]);
+        onSubmit(populatedBounty);
+      }
+      else if (bounty?.id && mode === 'update') {
+        const updates: Partial<Bounty> = {
+          updatedAt: new Date(),
+          title: value.title,
+          rewardAmount: value.rewardAmount,
+          rewardToken: value.rewardToken,
+          descriptionNodes: value.descriptionNodes,
+          description: value.description,
+          reviewer: value.reviewer,
+          chainId: value.chainId,
+          //
+          approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
+          maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
+          expiryDate: value.setExpiryDate ? value.expiryDate : null
+
+        };
+
+        const updatedBounty = await updateBounty(bounty.id, updates);
+        onSubmit(updatedBounty);
+      }
+    }
+    catch (err) {
+      setFormError(err as SystemError);
     }
 
-    if (!value.capSubmissions) {
-      // Ensures any existing limit will be nulled
-      value.maxSubmissions = null;
-    }
-    delete value.capSubmissions;
-
-    if (mode === 'create') {
-      delete value.setExpiryDate;
-
-      value.spaceId = space!.id;
-      value.createdBy = user!.id;
-      value.description = value.description ?? '';
-      value.descriptionNodes = value.descriptionNodes ?? '';
-      value.status = 'open';
-
-      const createdBounty = await charmClient.createBounty(value);
-      const populatedBounty = { ...createdBounty, applications: [] };
-      setBounties([...bounties, populatedBounty]);
-      onSubmit(populatedBounty);
-    }
-    else if (mode === 'suggest') {
-      value.spaceId = space!.id;
-      value.createdBy = user!.id;
-      value.description = value.description ?? '';
-      value.descriptionNodes = value.descriptionNodes ?? '';
-      value.status = 'suggestion';
-
-      value.rewardToken = 'ETH';
-      value.rewardAmount = 0;
-      value.chainId = 1;
-
-      const createdBounty = await charmClient.createBounty(value);
-      const populatedBounty = { ...createdBounty, applications: [] };
-      setBounties([...bounties, populatedBounty]);
-      onSubmit(populatedBounty);
-    }
-    else if (bounty?.id && mode === 'update') {
-      const updates: Partial<Bounty> = {
-        updatedAt: new Date(),
-        title: value.title,
-        rewardAmount: value.rewardAmount,
-        rewardToken: value.rewardToken,
-        descriptionNodes: value.descriptionNodes,
-        description: value.description,
-        reviewer: value.reviewer,
-        chainId: value.chainId,
-        //
-        approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
-        maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions,
-        expiryDate: value.setExpiryDate ? value.expiryDate : null
-
-      };
-
-      const updatedBounty = await updateBounty(bounty.id, updates);
-      onSubmit(updatedBounty);
-    }
   }
 
   function setRichContent (content: ICharmEditorOutput) {
@@ -456,61 +465,13 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           </Grid>
 
           {
-            /*
-
-                      <Grid container item>
-            <Grid item xs={6}>
-              <FormControlLabel
-                label='Set expiry date'
-                control={(
-                  <Switch
-                    onChange={(event) => {
-                      setValue('setExpiryDate', event.target.checked === true, {
-                        shouldValidate: true
-                      });
-                    }}
-                    defaultChecked={values.setExpiryDate || values.expiryDate}
-                  />
-                )}
-              />
-
-            </Grid>
-
-            <Grid item xs={6}>
-              {
-              values.setExpiryDate ? (
-                <>
-                  <InputLabel>Expiry date</InputLabel>
-                  <DatePicker
-                    value={values.expiryDate}
-                    onChange={(value) => {
-                      setValue('expiryDate', value, {
-                        shouldValidate: true
-                      });
-                    }}
-                    renderInput={(props) => (
-                      <TextField
-                        fullWidth
-                        name='expiryDate'
-                        {...props}
-                        error={!!errors.expiryDate}
-                        helperText={errors?.expiryDate?.message}
-                      />
-                    )}
-                  />
-                </>
-              ) : (
-                <Typography variant='body2'>
-                  {
-                        values.approveSubmitters ? 'Workspace members can apply to this bounty until the bounty closes.' : 'Workspace members can make new submissions for this bounty until the bounty closes.'
-                      }
-                </Typography>
-              )
-                    }
-            </Grid>
-          </Grid>
-
-            */
+            formError && (
+              <Grid item xs={12} sx={{ pt: '2px !important' }}>
+                <Alert severity={formError.severity}>
+                  {formError.message}
+                </Alert>
+              </Grid>
+            )
           }
 
           <Grid item>

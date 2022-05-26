@@ -1,12 +1,12 @@
 
 import { Bounty, Space, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
 import { createBounty } from '../createBounty';
 import { UpdateableBountyFields } from '../interfaces';
 import { updateBountySettings } from '../updateBountySettings';
-import { PositiveNumbersOnlyError } from '../../utilities/errors';
+import { InvalidInputError, PositiveNumbersOnlyError } from '../../utilities/errors';
 
 let user: User;
 let space: Space;
@@ -130,6 +130,31 @@ describe('updateBountySettings', () => {
     }
     catch (err) {
       expect(err).toBeInstanceOf(PositiveNumbersOnlyError);
+    }
+
+  });
+
+  it('should fail if the new cap would be lower than the current valid amount of submissions', async () => {
+
+    const bounty = await generateBountyWithSingleApplication({
+      userId: user.id,
+      spaceId: space.id,
+      bountyStatus: 'open',
+      bountyCap: 2,
+      applicationStatus: 'review'
+    });
+
+    try {
+      await updateBountySettings({
+        bountyId: bounty.id,
+        updateContent: {
+          maxSubmissions: 0
+        }
+      });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(InvalidInputError);
     }
 
   });
