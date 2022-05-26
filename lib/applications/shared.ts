@@ -24,7 +24,7 @@ export function submissionIsEditable ({ submission, bounty }: {submission: Appli
   return true;
 }
 
-export function moveUserApplicationToFirstRow (submissions: ApplicationWithTransactions[], userId: string): ApplicationWithTransactions[] {
+export function moveUserApplicationToFirstRow<Data extends ApplicationWithTransactions | Application> (submissions: Data[], userId: string): Data[] {
 
   const copiedSubmissions = submissions.slice();
 

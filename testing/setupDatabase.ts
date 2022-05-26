@@ -108,7 +108,7 @@ export function generateBounty ({ spaceId, createdBy, status, maxSubmissions, ap
   });
 }
 
-export function generateTransaction ({ applicationId, chainId = '4', transactionId = '123' }: Pick<Transaction, 'applicationId'> & Partial<Transaction>): Promise<Transaction> {
+export function generateTransaction ({ applicationId, chainId = '4', transactionId = '123' }: {applicationId: string} & Partial<Transaction>): Promise<Transaction> {
   return prisma.transaction.create({
     data: {
       chainId,
