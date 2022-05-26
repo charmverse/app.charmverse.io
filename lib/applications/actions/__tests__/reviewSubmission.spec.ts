@@ -35,7 +35,7 @@ describe('reviewSubmission', () => {
     expect(reviewed.status).toBe('complete');
   });
 
-  it('should return the updated submission with a paid status when pay action is initiated', async () => {
+  it('should return the updated submission with a rejected status when reject action is initiated', async () => {
 
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
