@@ -129,7 +129,6 @@ export default function BountySubmissions ({ bounty }: Props) {
           </Typography>
         </Grid>
         <Grid container item xs={4} direction='row' justifyContent='flex-end'>
-          {isAdmin && <MultiPaymentModal bounties={[bounty]} />}
           {
             !bounty.approveSubmitters && !userSubmission && (
             <Tooltip placement='top' title={capReached ? `You cannot make a new submission to this bounty. The cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached.` : 'Submit your work to this bounty'}>
@@ -170,7 +169,6 @@ export default function BountySubmissions ({ bounty }: Props) {
               </Box>
             </TableCell>
             <TableCell>
-
             </TableCell>
             {
               /* Hidden until we implement comments
@@ -180,31 +178,7 @@ export default function BountySubmissions ({ bounty }: Props) {
             }
 
             <TableCell align='right'>
-              {
-              // Only show submissions chip if there's a cap, or if there's at least 1
-                (bounty.maxSubmissions || validSubmissions > 0) && (
-
-                <Box>
-
-                  <Tooltip sx={{ ml: 1 }} placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
-                    <Typography variant='body1'>
-
-                      <Box component='span' sx={{ ml: 1 }}>
-                        {
-                          /**
-                           * Submissions
-                        {bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
-                           */
-                        }
-
-                      </Box>
-
-                    </Typography>
-                  </Tooltip>
-                </Box>
-                )
-              }
-
+              {isAdmin && <MultiPaymentModal bounties={[bounty]} />}
             </TableCell>
           </TableRow>
         </TableHead>

@@ -193,6 +193,11 @@ export default function BountyPaymentButton ({
   };
 
   return (
-    <Button onClick={makePayment}>{children}</Button>
+    <Button
+      variant='outlined'
+      color='secondary'
+      onClick={makePayment}
+    >{children}
+    </Button>
   );
 }

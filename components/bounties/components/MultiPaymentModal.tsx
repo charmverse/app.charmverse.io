@@ -80,6 +80,8 @@ export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBou
       <Button
         {...bindTrigger(popupState)}
         sx={{ ml: 1 }}
+        variant='outlined'
+        color='secondary'
       >
         Batch Payment ({transactions.length})
       </Button>
