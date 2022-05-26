@@ -118,6 +118,11 @@ export default function BountySubmissions ({ bounty }: Props) {
         <Grid item xs={8}>
           <Typography variant='h5'>
             Submissions
+            <Chip
+              sx={{ ml: 1 }}
+              label={`${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
+            />
+
           </Typography>
         </Grid>
         <Grid container item xs={4} direction='row' justifyContent='flex-end'>
@@ -180,9 +185,15 @@ export default function BountySubmissions ({ bounty }: Props) {
 
                   <Tooltip sx={{ ml: 1 }} placement='top' title={submissionsCapReached({ bounty, submissions: submissions ?? [] }) ? 'This bounty has reached the limit of submissions. No new submissions can be made at this time.' : 'This bounty is still accepting new submissions.'}>
                     <Typography variant='body1'>
-                      Submissions
+
                       <Box component='span' sx={{ ml: 1 }}>
+                        {
+                          /**
+                           * Submissions
                         {bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}
+                           */
+                        }
+
                       </Box>
 
                     </Typography>
