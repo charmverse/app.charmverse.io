@@ -38,7 +38,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      message: proposal?.message
+      message: proposal?.message as string
     },
     resolver: yupResolver(schema)
   });
