@@ -107,7 +107,7 @@ export default function BountyHeader () {
                   </MenuItem>
                 </Tooltip>
                 {
-                  currentBounty.status !== 'suggestion' && (
+                  (currentBounty.status !== 'suggestion' && currentBounty.status !== 'complete' && currentBounty.status !== 'paid') && (
                   <>
                     <Tooltip arrow placement='right' title={`Prevent new ${currentBounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
                       <MenuItem onClick={closeSubmissionsModal.open}>

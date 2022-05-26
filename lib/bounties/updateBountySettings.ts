@@ -1,6 +1,8 @@
 import { Bounty } from '@prisma/client';
 import { prisma } from 'db';
-import { DataNotFoundError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { countValidSubmissions } from '../applications/shared';
+import { getBounty } from './getBounty';
 import { BountyUpdate } from './interfaces';
 
 export async function updateBountySettings ({
@@ -10,6 +12,16 @@ export async function updateBountySettings ({
 
   if (updateContent.rewardAmount === null || (typeof updateContent.rewardAmount === 'number' && updateContent.rewardAmount <= 0)) {
     throw new PositiveNumbersOnlyError();
+  }
+
+  const bounty = await getBounty(bountyId);
+
+  if (!bounty) {
+    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
+  }
+
+  if (typeof updateContent.maxSubmissions === 'number' && bounty.maxSubmissions !== null && updateContent.maxSubmissions < countValidSubmissions(bounty.applications)) {
+    throw new InvalidInputError('New bounty cap cannot be lower than total of active and valid submissions.');
   }
 
   const updatedBounty = await prisma.bounty.update({
