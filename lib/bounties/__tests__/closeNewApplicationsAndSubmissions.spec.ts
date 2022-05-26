@@ -1,5 +1,8 @@
 import { Space, User } from '@prisma/client';
 import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
+import { ExpectedAnError } from 'testing/errors';
+import { DataNotFoundError } from 'lib/utilities/errors';
 import { closeNewApplicationsAndSubmissions } from '../closeNewApplicationsAndSubmissions';
 
 let nonAdminUser: User;
@@ -41,5 +44,16 @@ describe('closeNewApplicationsAndSubmissions', () => {
     const updatedBounty = await closeNewApplicationsAndSubmissions(bounty.id);
 
     expect(updatedBounty.status).toBe('inProgress');
+  });
+
+  it('should fail if the bounty does not exist', async () => {
+
+    try {
+      await closeNewApplicationsAndSubmissions(v4());
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(DataNotFoundError);
+    }
   });
 });
