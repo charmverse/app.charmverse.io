@@ -10,8 +10,16 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useBounties } from 'hooks/useBounties';
 import { eToNumber } from 'lib/utilities/numbers';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Checkbox, List, ListItem, ListItemText } from '@mui/material';
+import UserDisplay from 'components/common/UserDisplay';
+import { useContributors } from 'hooks/useContributors';
 import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
+
+interface TransactionWithMetadata extends MetaTransactionData{
+  applicationId: string
+  userId: string
+}
 
 export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBounty[]}) {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,26 +29,40 @@ export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBou
   const [currentSpace] = useCurrentSpace();
   const gnosisPayment = paymentMethods.find(p => p.walletType === 'gnosis');
   const safeAddress = gnosisPayment?.gnosisSafeAddress;
-  const transactions: (MetaTransactionData & {applicationId: string})[] = [];
+  const [transactions, setTransactions] = useState<TransactionWithMetadata[]>([]);
+  const [selectedApplicationIds, setSelectedApplicationIds] = useState<string[]>(transactions.map(transaction => transaction.applicationId));
+  const [contributors] = useContributors();
 
-  if (gnosisPayment) {
-    bounties.forEach(bounty => {
-      // If the bounty is on the same chain as the gnosis safe
-      if (bounty.chainId === gnosisPayment?.chainId) {
-        bounty.applications.forEach(application => {
-          if (application.status === 'complete') {
-            const value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
-            transactions.push({
-              to: application.walletAddress as string,
-              value,
-              data: '0x',
-              applicationId: application.id
-            });
-          }
-        });
-      }
-    });
-  }
+  useEffect(() => {
+    const _transactions: TransactionWithMetadata[] = [];
+    if (gnosisPayment) {
+      bounties.forEach(bounty => {
+        // If the bounty is on the same chain as the gnosis safe
+        if (bounty.chainId === gnosisPayment?.chainId) {
+          bounty.applications.forEach(application => {
+            if (application.status === 'complete') {
+              const value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
+              _transactions.push({
+                to: application.walletAddress as string,
+                value,
+                data: '0x',
+                applicationId: application.id,
+                userId: application.createdBy
+              });
+            }
+          });
+        }
+      });
+    }
+
+    setTransactions(_transactions);
+    setSelectedApplicationIds(_transactions.map(transaction => transaction.applicationId));
+  }, [bounties, gnosisPayment]);
+
+  const applicationTransactionRecord: Record<string, TransactionWithMetadata> = {};
+  transactions.forEach(transaction => {
+    applicationTransactionRecord[transaction.applicationId] = transaction;
+  });
 
   async function onPaymentSuccess (result: MultiPaymentResult) {
     if (gnosisPayment) {
@@ -67,6 +89,8 @@ export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBou
           });
       }
       setIsLoading(false);
+      setSelectedApplicationIds([]);
+      setTransactions([]);
       popupState.close();
     }
   }
@@ -83,21 +107,46 @@ export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBou
         variant='outlined'
         color='secondary'
       >
-        Batch Payment ({transactions.length})
+        Batch Payment ({selectedApplicationIds.length})
       </Button>
       <Modal {...bindPopover(popupState)} size='large'>
         <DialogTitle onClose={popupState.close}>Batch Payments</DialogTitle>
         <Box py={2}>
-          {/* <ul>
-            {bountiesOnSameChain.map(bounty => (
-              <li>{bounty.title}</li>
-            ))}
-          </ul> */}
+          <List>
+            {transactions.map(({ userId, applicationId }) => {
+              const user = contributors.find(contributor => contributor.id === userId);
+              const isChecked = selectedApplicationIds.includes(applicationId);
+              if (user) {
+                return (
+                  <ListItem>
+                    <Checkbox
+                      size='medium'
+                      checked={isChecked}
+                      onChange={(event) => {
+                        if (!event.target.checked) {
+                          setSelectedApplicationIds(selectedApplicationIds.filter(selectedApplicationId => selectedApplicationId !== applicationId));
+                        }
+                        else {
+                          setSelectedApplicationIds([...selectedApplicationIds, applicationId]);
+                        }
+                      }}
+                    />
+                    <ListItemText>
+                      <UserDisplay user={user} />
+
+                    </ListItemText>
+                  </ListItem>
+                );
+              }
+              return null;
+            })}
+
+          </List>
         </Box>
         <MultiPaymentButton
           chainId={gnosisPayment.chainId}
           safeAddress={safeAddress}
-          transactions={transactions}
+          transactions={selectedApplicationIds.map(selectedApplicationId => applicationTransactionRecord[selectedApplicationId])}
           onSuccess={onPaymentSuccess}
           isLoading={isLoading}
         />
