@@ -100,7 +100,7 @@ export default function BountyHeader () {
                 {...menuPosition}
               >
 
-                <Tooltip arrow placement='top' title={`Delete bounty ${currentBounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                <Tooltip arrow placement='right' title={`Edit bounty ${currentBounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                   <MenuItem onClick={bountyEditModal.open}>
                     <ListItemIcon><EditIcon color='secondary' fontSize='small' /></ListItemIcon>
                     <ListItemText>Edit</ListItemText>
@@ -109,13 +109,13 @@ export default function BountyHeader () {
                 {
                   currentBounty.status !== 'suggestion' && (
                   <>
-                    <Tooltip arrow placement='top' title={`Prevent new ${currentBounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+                    <Tooltip arrow placement='right' title={`Prevent new ${currentBounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
                       <MenuItem onClick={closeSubmissionsModal.open}>
                         <ListItemIcon><LockIcon color='secondary' fontSize='small' /></ListItemIcon>
                         <ListItemText>Stop new {currentBounty.approveSubmitters ? 'applications' : 'submissions'}</ListItemText>
                       </MenuItem>
                     </Tooltip>
-                    <Tooltip arrow placement='top' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
+                    <Tooltip arrow placement='right' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
                       <MenuItem onClick={closeBountyModal.open}>
                         <ListItemIcon><CheckCircleIcon color='secondary' fontSize='small' /></ListItemIcon>
                         <ListItemText>Mark as complete</ListItemText>
@@ -125,7 +125,7 @@ export default function BountyHeader () {
                   )
                 }
 
-                <Tooltip arrow placement='top' title={`Delete bounty ${currentBounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                <Tooltip arrow placement='right' title={`Delete bounty ${currentBounty.status === 'suggestion' ? 'suggestion' : ''}`}>
                   <MenuItem onClick={bountyDeleteModal.open}>
                     <ListItemIcon><DeleteIcon color='secondary' /></ListItemIcon>
                     <ListItemText>Delete</ListItemText>
