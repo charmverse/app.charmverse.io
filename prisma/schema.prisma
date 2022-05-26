@@ -245,16 +245,29 @@ model Bounty {
   transactions     Transaction[]
 }
 
+enum ApplicationStatus {
+  applied
+  inProgress
+  review
+  rejected
+  complete
+  paid
+}
+
 model Application {
   id            String   @id @default(uuid()) @db.Uuid
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now())
+  status        ApplicationStatus @default(applied)
+  spaceId       String?
   bountyId      String   @db.Uuid()
   bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
   createdBy     String   @db.Uuid()
   applicant     User     @relation(fields: [createdBy], references: [id])
-  walletAddress String
-  message       String
+  walletAddress String?
+  message       String?
+  submission   String?
+  submissionNodes String?
 }
 
 model Transaction {

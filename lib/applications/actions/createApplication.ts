@@ -41,7 +41,8 @@ export async function createApplication ({ bountyId, message, userId }: Applicat
         connect: {
           id: bountyId
         }
-      }
+      },
+      spaceId: bounty.spaceId
     }
   });
 }

@@ -45,7 +45,8 @@ export async function createSubmission ({ bountyId, submissionContent, userId }:
         connect: {
           id: userId
         }
-      }
+      },
+      spaceId: bounty.spaceId
     }
   });
 
