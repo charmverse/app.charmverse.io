@@ -399,7 +399,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           <Grid container item xs={12}>
             <Grid item xs={6}>
               <FormControlLabel
-                label='Limit applications'
+                label='Set submissions limit'
                 control={(
                   <Switch
                     onChange={(event) => {
