@@ -19,7 +19,7 @@ import { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { SystemError } from 'lib/utilities/errors';
 import { eToNumber } from 'lib/utilities/numbers';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { IconButton } from '@mui/material';
 import BountyPaymentButton from '../[bountyId]/components/BountyPaymentButton';
@@ -29,9 +29,10 @@ interface Props {
   bounty: Bounty,
   submission: ApplicationWithTransactions,
   reviewComplete: (updatedApplication: Application) => void
+  onSubmission: (eventOrAnchorEl?: HTMLElement | SyntheticEvent<any, Event> | null | undefined) => void
 }
 
-export default function BountySubmissionReviewActions ({ bounty, submission, reviewComplete }: Props) {
+export default function BountySubmissionReviewActions ({ onSubmission, bounty, submission, reviewComplete }: Props) {
 
   const [user] = useUser();
   const isAdmin = useIsAdmin();
@@ -78,32 +79,39 @@ export default function BountySubmissionReviewActions ({ bounty, submission, rev
   }
 
   const canReview = (user?.id === bounty.reviewer || isAdmin) && (submission.status === 'inProgress' || submission.status === 'review');
-
   return (
-    <Box>
-      {submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}
-      <PlagiarismIcon sx={{ mr: 3 }} onClick={submissionContentModal.open} />
+    <Box display='flex' gap={1} alignItems='center' justifyContent='end'>
+
+      <PlagiarismIcon onClick={submissionContentModal.open} />
       {
-      canReview && (
-        <>
-          <Tooltip placement='top' title='Approve this submission.'>
-            <AssignmentTurnedInIcon onClick={() => setReviewDecision({ decision: 'approve', submissionId: submission.id })} sx={{ mr: 3 }} />
-          </Tooltip>
-          <Tooltip placement='top' title='Reject this submission. The submitter will be disqualified from making further changes'>
-            <CancelIcon onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject' })} />
-          </Tooltip>
-        </>
-      )
-    }
+        canReview && (
+          <>
+            <Tooltip placement='top' title='Approve this submission.'>
+              <AssignmentTurnedInIcon onClick={() => setReviewDecision({ decision: 'approve', submissionId: submission.id })} />
+            </Tooltip>
+            <Tooltip placement='top' title='Reject this submission. The submitter will be disqualified from making further changes'>
+              <CancelIcon onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject' })} />
+            </Tooltip>
+          </>
+        )
+      }
+      {
+        submission.status === 'inProgress' && submission.createdBy === user?.id && (
+          <Button type='submit' onClick={onSubmission}>Submit</Button>
+        )
+      }
+      {submission.status === 'complete' && submission.walletAddress && <BountyPaymentButton onSuccess={recordTransaction} receiver={submission.walletAddress} amount={eToNumber(bounty.rewardAmount)} tokenSymbolOrAddress={bounty.rewardToken} chainIdToUse={bounty.chainId} />}
       {
         (submission.status === 'paid' && submission.transactions.length !== 0) && (
-          <a style={{ textDecoration: 'none', color: 'text.primary' }} href={getChainExplorerLink(submission.transactions[0].chainId, submission.transactions[0].transactionId)} target='_blank' rel='noreferrer'>
-            <Tooltip title='View transaction details' placement='top' arrow>
-              <IconButton sx={{ color: 'text.primary' }}>
-                <LaunchIcon fontSize='small' />
-              </IconButton>
-            </Tooltip>
-          </a>
+          <div>
+            <a style={{ textDecoration: 'none', color: 'text.primary' }} href={getChainExplorerLink(submission.transactions[0].chainId, submission.transactions[0].transactionId)} target='_blank' rel='noreferrer'>
+              <Tooltip title='View transaction details' placement='top' arrow>
+                <IconButton sx={{ color: 'text.primary' }}>
+                  <LaunchIcon fontSize='small' />
+                </IconButton>
+              </Tooltip>
+            </a>
+          </div>
         )
       }
 

@@ -229,17 +229,11 @@ export default function BountySubmissions ({ bounty }: Props) {
                 }
 
               <TableCell align='right' sx={{ gap: 2, justifyContent: 'flex-end' }}>
-
-                {
-                    submission.status === 'inProgress' && submission.createdBy === user?.id && (
-                      <Button type='submit' onClick={editSubmissionModal.open}>Submit</Button>
-                    )
-                  }
-
                 <BountySubmissionReviewActions
                   bounty={bounty}
                   submission={submission}
                   reviewComplete={refreshSubmissions}
+                  onSubmission={editSubmissionModal.open}
                 />
 
               </TableCell>
