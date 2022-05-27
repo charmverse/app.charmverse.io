@@ -13,6 +13,7 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import charmClient from 'charmClient';
 import type { PublicUser } from 'pages/api/public/profile/[userPath]';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import { LoggedInUser } from 'models';
 import { useWeb3React } from '@web3-react/core';
@@ -51,6 +52,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
   });
   const ENSName = useENSName(account);
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
+  const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
 
   const descriptionModalState = usePopupState({ variant: 'popover', popupId: 'description-modal' });
   const userPathModalState = usePopupState({ variant: 'popover', popupId: 'path-modal' });
@@ -62,6 +64,11 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
   const onDiscordUsernameCopy = () => {
     setIsDiscordUsernameCopied(true);
     setTimeout(() => setIsDiscordUsernameCopied(false), 1000);
+  };
+
+  const onLinkCopy = () => {
+    setIsPersonalLinkCopied(true);
+    setTimeout(() => setIsPersonalLinkCopied(false), 1000);
   };
 
   const handleImageUpdate = async (url: string) => {
@@ -121,8 +128,21 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
             <Grid item>
               <Stack direction='row' spacing={1} alignItems='baseline'>
                 <Typography>
-                  {hostname}/<Link external href={userLink} target='_blank'>{userPath}</Link>
+                  {hostname}/u/<Link external href={userLink} target='_blank'>{userPath}</Link>
                 </Typography>
+                <Tooltip
+                  placement='top'
+                  title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'}
+                  arrow
+                >
+                  <Box sx={{ display: 'grid' }}>
+                    <CopyToClipboard text={userLink} onCopy={onLinkCopy}>
+                      <IconButton>
+                        <ContentCopyIcon fontSize='small' />
+                      </IconButton>
+                    </CopyToClipboard>
+                  </Box>
+                </Tooltip>
                 <IconButton onClick={userPathModalState.open}>
                   <EditIcon fontSize='small' />
                 </IconButton>

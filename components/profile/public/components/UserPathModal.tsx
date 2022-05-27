@@ -51,7 +51,7 @@ export default function UserPathModal (props: Props) {
 
   return (
     <Modal open={isOpen} onClose={close} size='large'>
-      <DialogTitle onClose={close}>Describe yourself in a few words</DialogTitle>
+      <DialogTitle onClose={close}>Personalize your link</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack mt={1}>
           <TextField

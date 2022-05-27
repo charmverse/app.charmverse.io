@@ -131,7 +131,7 @@ model User {
   username        String?
   avatar          String?
   isBot           Boolean?             @default(false)
-  path            String?
+  path            String?              @unique
   discordUser     DiscordUser?
   telegramUser    TelegramUser?
   comments        Comment[]
