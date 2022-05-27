@@ -2,7 +2,7 @@ import { Application, ApplicationStatus, Block, Bounty, BountyStatus, Page, Pris
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { LoggedInUser } from 'models';
+import { LoggedInUser, BountyWithDetails } from 'models';
 import { v4 } from 'uuid';
 import { IPageWithPermissions } from 'lib/pages/server';
 
@@ -124,7 +124,7 @@ export function generateTransaction ({ applicationId, chainId = '4', transaction
 
 export function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus, reviewer }:
   {applicationStatus: ApplicationStatus, bountyCap: number | null, userId: string, spaceId: string, bountyStatus?: BountyStatus, reviewer?: string}):
-  Promise<Bounty & {applications: Application[]}> {
+  Promise<BountyWithDetails> {
   return prisma.bounty.create({
     data: {
       createdBy: userId,
@@ -156,7 +156,7 @@ export function generateBountyWithSingleApplication ({ applicationStatus, bounty
     include: {
       applications: true
     }
-  });
+  }) as Promise<BountyWithDetails>;
 }
 
 export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {
