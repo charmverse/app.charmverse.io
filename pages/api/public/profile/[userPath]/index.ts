@@ -7,7 +7,7 @@ import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
-export type PublicUser = Pick<User, 'id' | 'username' | 'avatar'> & {
+export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;
 }
 
