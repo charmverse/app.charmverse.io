@@ -93,7 +93,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
   const hasAnySocialInformation = (model: Social) => model.twitterURL || model.githubURL || model.discordUsername || model.linkedinURL;
 
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
-  const userPath = user.path || user.id;
+  const userPath = (user as PublicUser | LoggedInUser).path || user.id;
   const userLink = `${hostname}/u/${userPath}`;
 
   return (
