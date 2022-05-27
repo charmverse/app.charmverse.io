@@ -7,8 +7,7 @@ export async function getBounty (bountyId: string): Promise<BountyWithDetails | 
       id: bountyId
     },
     include: {
-      applications: true,
-      transactions: true
+      applications: true
     }
   });
 }

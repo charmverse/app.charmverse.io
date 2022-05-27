@@ -41,8 +41,7 @@ export async function closeOutBounty (bountyId: string): Promise<BountyWithDetai
       maxSubmissions: validSubmissionsAfterUpdate
     },
     include: {
-      applications: true,
-      transactions: true
+      applications: true
     }
   });
 

@@ -22,8 +22,7 @@ export async function rollupBountyStatus (bountyId: string): Promise<BountyWithD
         status: newStatus
       },
       include: {
-        applications: true,
-        transactions: true
+        applications: true
       }
     });
   }
