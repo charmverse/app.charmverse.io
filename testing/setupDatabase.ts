@@ -2,7 +2,7 @@ import { Application, ApplicationStatus, Block, Bounty, BountyStatus, Page, Pris
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { LoggedInUser } from 'models';
+import { LoggedInUser, BountyWithDetails } from 'models';
 import { v4 } from 'uuid';
 import { IPageWithPermissions } from 'lib/pages/server';
 
@@ -122,10 +122,10 @@ export function generateTransaction ({ applicationId, chainId = '4', transaction
   });
 }
 
-export function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus, reviewer }:
+export async function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus, reviewer }:
   {applicationStatus: ApplicationStatus, bountyCap: number | null, userId: string, spaceId: string, bountyStatus?: BountyStatus, reviewer?: string}):
-  Promise<Bounty & {applications: Application[]}> {
-  return prisma.bounty.create({
+  Promise<BountyWithDetails> {
+  const createdBounty = await prisma.bounty.create({
     data: {
       createdBy: userId,
       chainId: 1,
@@ -139,24 +139,35 @@ export function generateBountyWithSingleApplication ({ applicationStatus, bounty
       descriptionNodes: '',
       approveSubmitters: false,
       // Important variable
-      maxSubmissions: bountyCap,
-      applications: {
-        create: {
-          applicant: {
-            connect: {
-              id: userId
-            }
-          },
-          message: 'I can do this!',
-          // Other important variable
-          status: applicationStatus
-        }
-      }
+      maxSubmissions: bountyCap
     },
     include: {
       applications: true
     }
+  }) as BountyWithDetails;
+
+  const createdApp = await prisma.application.create({
+    data: {
+      spaceId,
+      applicant: {
+        connect: {
+          id: userId
+        }
+      },
+      bounty: {
+        connect: {
+          id: createdBounty.id
+        }
+      },
+      message: 'I can do this!',
+      // Other important variable
+      status: applicationStatus
+    }
   });
+
+  createdBounty.applications = [createdApp];
+
+  return createdBounty;
 }
 
 export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {

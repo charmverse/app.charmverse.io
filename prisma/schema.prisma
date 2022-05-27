@@ -138,6 +138,8 @@ model User {
   gnosisSafes     UserGnosisSafe[]
   gnosisSafeState UserGnosisSafeState?
   profile         UserDetails?
+
+
 }
 
 model UserGnosisSafeState {
@@ -214,8 +216,6 @@ enum BountyStatus {
   suggestion
   open
   inProgress
-  assigned
-  review
   complete
   paid
 }
@@ -232,7 +232,6 @@ model Bounty {
   description      String
   descriptionNodes Json
   reviewer         String?       @db.Uuid
-  assignee         String?       @db.Uuid
   chainId          Int
   rewardAmount     Float
   rewardToken      String
@@ -242,7 +241,6 @@ model Bounty {
   approveSubmitters Boolean      @default(false)
   maxSubmissions    Int?         @default(1)
   applications     Application[]
-  transactions     Transaction[]
 }
 
 enum ApplicationStatus {
@@ -259,7 +257,7 @@ model Application {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now())
   status        ApplicationStatus @default(applied)
-  spaceId       String?
+  spaceId       String
   bountyId      String   @db.Uuid()
   bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
   createdBy     String   @db.Uuid()
@@ -269,6 +267,8 @@ model Application {
   submission   String?
   submissionNodes String?
   transactions Transaction[]
+
+  @@unique([bountyId, createdBy])
 }
 
 model Transaction {
@@ -277,10 +277,8 @@ model Transaction {
   updatedAt     DateTime     @default(now())
   transactionId String
   chainId       String
-  bountyId      String?   @db.Uuid()
-  bounty        Bounty?   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
-  applicationId String?   @db.Uuid()
-  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId String   @db.Uuid()
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 }
 
 model TokenGate {

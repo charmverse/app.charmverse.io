@@ -84,7 +84,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBou
             setBounties(_bounties);
             const newCurrentBounty = _bounties.find(_bounty => _bounty.id === currentBountyId);
             if (newCurrentBounty) {
-              setCurrentBounty({ ...newCurrentBounty, transactions: [] });
+              setCurrentBounty({ ...newCurrentBounty });
             }
           });
       }

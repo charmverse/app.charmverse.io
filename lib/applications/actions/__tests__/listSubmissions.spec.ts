@@ -1,4 +1,4 @@
-import { Space, User } from '@prisma/client';
+import { ApplicationStatus, Space, User } from '@prisma/client';
 import { generateBountyWithSingleApplication, generateSpaceUser, generateTransaction, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
@@ -24,45 +24,37 @@ describe('listSubmissions', () => {
       spaceId: space.id
     });
 
-    const [user0, user1, user2, user3, user4, user5] = await Promise.all([0, 1, 2, 3, 4, 5].map(() => generateSpaceUser({
-      spaceId: space.id,
-      isAdmin: false
-    })));
+    // There are 6 Application statuses
+    await Promise.all((Object.keys(ApplicationStatus) as ApplicationStatus[]).map(status => {
+      // eslint-disable-next-line no-async-promise-executor
+      return new Promise(async resolve => {
 
-    await prisma.application.createMany({
-      data: [
-        {
-          bountyId: bounty.id,
-          createdBy: user0.id,
-          status: 'applied'
-        },
-        {
-          bountyId: bounty.id,
-          createdBy: user1.id,
-          status: 'inProgress'
-        },
-        {
-          bountyId: bounty.id,
-          createdBy: user2.id,
-          status: 'review'
-        },
-        {
-          bountyId: bounty.id,
-          createdBy: user3.id,
-          status: 'complete'
-        },
-        {
-          bountyId: bounty.id,
-          createdBy: user4.id,
-          status: 'paid'
-        },
-        {
-          bountyId: bounty.id,
-          createdBy: user5.id,
-          status: 'rejected'
-        }
-      ]
-    });
+        const _user = await generateSpaceUser({
+          isAdmin: false,
+          spaceId: space.id
+        });
+
+        prisma.application.create(
+          {
+            data: {
+              bounty: {
+                connect: {
+                  id: bounty.id
+                }
+              },
+              applicant: {
+                connect: {
+                  id: _user.id
+                }
+              },
+              status,
+              spaceId: bounty.spaceId
+            }
+
+          }
+        ).then(app => resolve(app));
+      });
+    }));
 
     const submissionsWithTransaction = await listSubmissions(bounty.id);
     expect(submissionsWithTransaction.length).toBe(4);

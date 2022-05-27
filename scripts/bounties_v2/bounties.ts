@@ -2,6 +2,7 @@ import { prisma } from 'db';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 
 export async function convertAssignedAndReviewBountiesToInProgress () {
+  /*
   return prisma.bounty.updateMany({
     where: {
       status: {
@@ -12,6 +13,8 @@ export async function convertAssignedAndReviewBountiesToInProgress () {
       status: 'inProgress'
     }
   });
+  */
+  return true;
 }
 
 export async function applyDefaultSettings () {

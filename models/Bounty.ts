@@ -1,14 +1,11 @@
-import { BountyStatus, Bounty, Application, Transaction } from '@prisma/client';
+import { Application, Bounty, BountyStatus } from '@prisma/client';
 
 export const BOUNTY_LABELS: Record<BountyStatus, string> = {
   suggestion: 'Suggestion',
   open: 'Open',
   inProgress: 'In Progress',
   complete: 'Complete',
-  paid: 'Paid',
-  // TODO REMOVE AFTER MIGRATION
-  assigned: '-',
-  review: '-'
+  paid: 'Paid'
 };
 
-export type BountyWithDetails = Bounty & {applications: Application [], transactions: Transaction []}
+export type BountyWithDetails = Bounty & {applications: Application []}

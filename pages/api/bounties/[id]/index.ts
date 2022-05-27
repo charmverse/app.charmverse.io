@@ -30,8 +30,7 @@ async function getBountyController (req: NextApiRequest, res: NextApiResponse<Bo
       id: id as string
     },
     include: {
-      applications: true,
-      transactions: true
+      applications: true
     }
   });
 
