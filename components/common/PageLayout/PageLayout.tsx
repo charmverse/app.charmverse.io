@@ -12,9 +12,7 @@ import Sidebar from './components/Sidebar';
 import Favicon from './components/Favicon';
 import PageContainer from './components/PageContainer';
 
-const drawerWidth = 300;
-
-const openedMixin = (theme: Theme) => ({
+const openedMixin = (theme: Theme, sidebarWidth: number) => ({
   width: '100%',
   marginRight: 0,
   transition: theme.transitions.create(['marginRight', 'width'], {
@@ -23,7 +21,7 @@ const openedMixin = (theme: Theme) => ({
   }),
   overflowX: 'hidden',
   [theme.breakpoints.up('sm')]: {
-    width: drawerWidth
+    width: sidebarWidth
   }
 });
 
@@ -37,9 +35,9 @@ const closedMixin = (theme: Theme) => ({
   width: 0
 });
 
-const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'open' })
+const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })
   // eslint-disable-next-line no-unexpected-multiline
-  <{ open: boolean }>(({ theme, open }) => ({
+  <{ open: boolean, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
     background: 'transparent',
     boxShadow: 'none',
     color: 'inherit',
@@ -49,8 +47,8 @@ const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !==
       duration: theme.transitions.duration.leavingScreen
     }),
     ...(open && {
-      marginLeft: drawerWidth,
-      width: `calc(100% - ${drawerWidth}px)`,
+      marginLeft: sidebarWidth,
+      width: `calc(100% - ${sidebarWidth}px)`,
       transition: theme.transitions.create(['width', 'margin'], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.enteringScreen
@@ -58,17 +56,17 @@ const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !==
     })
   }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' })
+const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' && prop !== 'sidebarWidth' && prop !== 'hideSidebarOnSmallScreen' })
   // @ts-ignore mixins dont work with Typescript
   // eslint-disable-next-line no-unexpected-multiline
-  <{ open: boolean }>(({ theme, open }) => ({
-    width: drawerWidth,
+  <{ open: BooleanSchema, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
+    width: sidebarWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
     ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme)
+      ...openedMixin(theme, sidebarWidth),
+      '& .MuiDrawer-paper': openedMixin(theme, sidebarWidth)
     }),
     ...(!open && {
       ...closedMixin(theme),
@@ -87,10 +85,12 @@ const LayoutContainer = styled.div`
 
 interface PageLayoutProps {
   children: React.ReactNode;
-  sidebar?: (p: { closeSidebar: () => void }) => JSX.Element
+  sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element)
+  sidebarWidth?: number
+  hideSidebarOnSmallScreen?: boolean
 }
 
-function PageLayout ({ children, sidebar: SidebarOverride }: PageLayoutProps) {
+function PageLayout ({ hideSidebarOnSmallScreen = false, sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
   const isSmallScreen = window.innerWidth < 600;
   const [open, setOpen] = React.useState(!isSmallScreen);
   const [user] = useUser();
@@ -110,13 +110,24 @@ function PageLayout ({ children, sidebar: SidebarOverride }: PageLayoutProps) {
       </Head>
       <LayoutContainer>
         <CommentThreadsListDisplayProvider>
-          <AppBar position='fixed' open={open}>
+          <AppBar sidebarWidth={sidebarWidth} position='fixed' open={open}>
             <Header
               open={open}
+              hideSidebarOnSmallScreen={hideSidebarOnSmallScreen}
               openSidebar={handleDrawerOpen}
             />
           </AppBar>
-          <Drawer variant='permanent' open={open}>
+          <Drawer
+            sidebarWidth={sidebarWidth}
+            variant='permanent'
+            open={open}
+            sx={{
+              display: {
+                xs: hideSidebarOnSmallScreen ? 'none' : 'block',
+                md: 'block'
+              }
+            }}
+          >
             {SidebarOverride
               ? <SidebarOverride closeSidebar={handleDrawerClose} />
               : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}

@@ -21,7 +21,7 @@ function BaseComponent ({ avatar, username, avatarSize, fontSize, fontWeight, ..
   return (
     <Box display='flex' alignItems='center' gap={1} {...props}>
       <Avatar size={avatarSize} name={username} avatar={avatar} />
-      <Typography fontSize={fontSize} fontWeight={fontWeight}>{username}</Typography>
+      <Typography whiteSpace='nowrap' fontSize={fontSize} fontWeight={fontWeight}>{username}</Typography>
     </Box>
   );
 }

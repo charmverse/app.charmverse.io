@@ -1,8 +1,8 @@
-import { Application, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, User } from '@prisma/client';
+import { Application, ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Transaction } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { LoggedInUser } from 'models';
+import { LoggedInUser, BountyWithDetails } from 'models';
 import { v4 } from 'uuid';
 import { IPageWithPermissions } from 'lib/pages/server';
 
@@ -88,6 +88,86 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
     space,
     apiToken
   };
+}
+
+export function generateBounty ({ spaceId, createdBy, status, maxSubmissions, approveSubmitters }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'maxSubmissions'>>): Promise<Bounty> {
+  return prisma.bounty.create({
+    data: {
+      createdBy,
+      chainId: 1,
+      rewardAmount: 1,
+      rewardToken: 'ETH',
+      title: 'Example',
+      status,
+      spaceId,
+      description: '',
+      descriptionNodes: '',
+      approveSubmitters,
+      maxSubmissions
+    }
+  });
+}
+
+export function generateTransaction ({ applicationId, chainId = '4', transactionId = '123' }: {applicationId: string} & Partial<Transaction>): Promise<Transaction> {
+  return prisma.transaction.create({
+    data: {
+      chainId,
+      transactionId,
+      application: {
+        connect: {
+          id: applicationId
+        }
+      }
+    }
+  });
+}
+
+export async function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus, reviewer }:
+  {applicationStatus: ApplicationStatus, bountyCap: number | null, userId: string, spaceId: string, bountyStatus?: BountyStatus, reviewer?: string}):
+  Promise<BountyWithDetails> {
+  const createdBounty = await prisma.bounty.create({
+    data: {
+      createdBy: userId,
+      chainId: 1,
+      reviewer,
+      rewardAmount: 1,
+      rewardToken: 'ETH',
+      title: 'Example',
+      status: bountyStatus ?? 'open',
+      spaceId,
+      description: '',
+      descriptionNodes: '',
+      approveSubmitters: false,
+      // Important variable
+      maxSubmissions: bountyCap
+    },
+    include: {
+      applications: true
+    }
+  }) as BountyWithDetails;
+
+  const createdApp = await prisma.application.create({
+    data: {
+      spaceId,
+      applicant: {
+        connect: {
+          id: userId
+        }
+      },
+      bounty: {
+        connect: {
+          id: createdBounty.id
+        }
+      },
+      message: 'I can do this!',
+      // Other important variable
+      status: applicationStatus
+    }
+  });
+
+  createdBounty.applications = [createdApp];
+
+  return createdBounty;
 }
 
 export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {

@@ -1,15 +1,24 @@
-import Box from '@mui/material/Box';
 import BountyDetails from 'components/bounties/[bountyId]/BountyDetails';
 import PageLayout from 'components/common/PageLayout';
+import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import { useBounties } from 'hooks/useBounties';
 import { setTitle } from 'hooks/usePageTitle';
-import { ReactElement } from 'react';
+import { useRouter } from 'next/router';
+import { ReactElement, useEffect } from 'react';
 
 export default function BountyPage () {
 
+  const { updateCurrentBountyId } = useBounties();
+
   setTitle('Bounties');
+  const router = useRouter();
+  useEffect(() => {
+    updateCurrentBountyId((router.query.bountyId as string) ?? null);
+  }, [router.query.bountyId]);
 
   return (
     <BountyDetails />
+
   );
 
 }
@@ -17,7 +26,9 @@ export default function BountyPage () {
 BountyPage.getLayout = (page: ReactElement) => {
   return (
     <PageLayout>
-      {page}
+      <ScrollableWindow>
+        {page}
+      </ScrollableWindow>
     </PageLayout>
   );
 };

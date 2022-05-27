@@ -1,10 +1,12 @@
 
 import { prisma } from 'db';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
+import { updateBountySettings, getBounty } from 'lib/bounties';
+import { DataNotFoundError } from 'lib/utilities/errors/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -16,11 +18,11 @@ handler.use(requireUser)
     }
     next();
   })
-  .get(getBounty)
+  .get(getBountyController)
   .put(updateBounty)
   .delete(deleteBounty);
 
-async function getBounty (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
+async function getBountyController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id } = req.query;
 
   const bounty = await prisma.bounty.findUnique({
@@ -28,8 +30,7 @@ async function getBounty (req: NextApiRequest, res: NextApiResponse<BountyWithDe
       id: id as string
     },
     include: {
-      applications: true,
-      transactions: true
+      applications: true
     }
   });
 
@@ -46,22 +47,33 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
 
   const { body } = req;
 
-  const bounty = await prisma.bounty.update({
-    where: {
-      id: id as string
-    },
-    data: body,
-    include: {
-      applications: true,
-      transactions: true
-    }
-  });
+  const bounty = await getBounty(id as string);
 
   if (!bounty) {
-    return res.status(421).send({ error: 'Bounty not found' } as any);
+    throw new DataNotFoundError(`Bounty with id ${id} was not found`);
   }
 
-  res.status(200).json(bounty);
+  const { error, isAdmin } = await hasAccessToSpace({
+    userId: req.session.user.id,
+    spaceId: bounty.spaceId,
+    adminOnly: true
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const updatedBounty = await updateBountySettings({
+    bountyId: id as string,
+    updateContent: body
+  });
+
+  const bountyToSend: BountyWithDetails = {
+    ...bounty,
+    ...updatedBounty
+  };
+
+  res.status(200).json(bountyToSend);
 
 }
 
