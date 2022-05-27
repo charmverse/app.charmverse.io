@@ -255,8 +255,8 @@ function SafeTasks (
               </Box>
               <Box flexGrow={1}>
                 {task.transactions.length > 1 && (
-                  <Box height={rowHeight} display='flex' alignItems='center'>
-                    <Alert color='info' icon={false} sx={{ py: 0, width: '100%' }}>
+                  <Box my={{ sm: 0, xs: 1 }} height={rowHeight} display='flex' alignItems='center'>
+                    <Alert color='info' icon={false} sx={{ py: 0, width: '100%', fontSize: { sm: '14px', xs: '12px' } }}>
                       These transactions conflict as they use the same nonce. Executing one will automatically replace the other(s).
                     </Alert>
                   </Box>
@@ -394,7 +394,10 @@ function SnoozeTransactions (
   }, [showDatePicker]);
 
   return (
-    <Box>
+    <Box display='flex' justifyContent='space-between' alignItems='center'>
+      <Typography variant='subtitle2' color='secondary'>
+        Let others know you are busy
+      </Typography>
       <Button
         disabled={isValidating}
         variant='outlined'
