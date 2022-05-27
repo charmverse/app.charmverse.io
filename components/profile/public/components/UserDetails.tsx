@@ -74,7 +74,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
   let socialDetails: Social = {};
 
   if (userDetails?.social) {
-    socialDetails = (JSON.parse(userDetails.social as string) as Social);
+    socialDetails = userDetails.social as Social;
   }
   else {
     socialDetails = {
@@ -103,12 +103,12 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
               <Typography variant='h1'>{userName}</Typography>
               {!readOnly && (
                 <IconButton onClick={identityModalState.open}>
-                  <EditIcon />
+                  <EditIcon fontSize='small' />
                 </IconButton>
               )}
             </Stack>
           </Grid>
-          <Grid item mt={1}>
+          <Grid item mt={1} height={40}>
             <Stack direction='row' alignItems='center' spacing={2}>
               { socialDetails && socialDetails.twitterURL && (
                 <ExternalLink href={socialDetails.twitterURL} target='_blank' display='flex'>
@@ -154,7 +154,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
                 <>
                   <StyledDivider orientation='vertical' flexItem />
                   <IconButton onClick={socialModalState.open}>
-                    <EditIcon />
+                    <EditIcon fontSize='small' />
                   </IconButton>
                 </>
               )}
@@ -171,7 +171,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
               {!readOnly && (
                 <IconButton onClick={descriptionModalState.open}>
-                  <EditIcon />
+                  <EditIcon fontSize='small' />
                 </IconButton>
               )}
             </Grid>
@@ -202,7 +202,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
         close={socialModalState.close}
         save={async (social: Social) => {
           await charmClient.updateUserDetails({
-            social: JSON.stringify(social)
+            social
           });
           mutate();
           socialModalState.close();
