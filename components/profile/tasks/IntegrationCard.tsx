@@ -40,7 +40,7 @@ export default function IntegrationCard () {
     <IntegrationCardContainer>
       <Grid container spacing={3}>
         <Grid item xs>
-          <Link href='profile/integrations'>
+          <Link href='/profile/integrations'>
             <Paper
               elevation={1}
               sx={{
