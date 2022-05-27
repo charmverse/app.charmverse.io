@@ -2,6 +2,7 @@ import { prisma } from 'db';
 
 export async function portTransactionDataFromBountiesToApplications () {
 
+  /*
   const transactions = await prisma.transaction.findMany({
     where: {
       bounty: {
@@ -38,6 +39,7 @@ export async function portTransactionDataFromBountiesToApplications () {
       });
     }
   }
+  */
 
   return true;
 
