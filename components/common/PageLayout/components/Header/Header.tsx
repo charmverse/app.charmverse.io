@@ -192,11 +192,13 @@ export default function Header (
           )}
 
           {/** dark mode toggle */}
-          <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
-            <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-              {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
-            </IconButton>
-          </Tooltip>
+          {user && (
+            <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
+              <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+                {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
+              </IconButton>
+            </Tooltip>
+          )}
           {/** user account */}
           <Account />
         </Box>

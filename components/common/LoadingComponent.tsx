@@ -14,7 +14,7 @@ export const LoadingCard = styled.div<{ height?: CSSValue, minHeight?: CSSValue 
   display: flex;
   justify-content: center;
   height: 100%;
-  min-height: ${props => ('minHeight' in props && props.minHeight) ? `min-height: ${props.minHeight}px;` : 'inherit'};
+  min-height: ${props => (props.minHeight) ? `${props.minHeight}px;` : 'inherit'};
   ${props => props.height && `min-height: ${props.height}`};
 `;
 

@@ -54,12 +54,20 @@ function Account (): JSX.Element {
 
   const accountModalState = usePopupState({ variant: 'popover', popupId: 'account-modal' });
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
-  const [user, setUser] = useUser();
+  const [user, setUser, isUserLoaded] = useUser();
 
   if (typeof window === 'undefined') {
     return (
       <AccountCard>
-        <AccountButton isLoading>Connect to a wallet</AccountButton>
+        <AccountButton>Connect to a wallet</AccountButton>
+      </AccountCard>
+    );
+  }
+
+  if (isUserLoaded && !user) {
+    return (
+      <AccountCard>
+        <AccountButton sx={{ mt: 4 }} href='/'>Join CharmVerse</AccountButton>
       </AccountCard>
     );
   }
