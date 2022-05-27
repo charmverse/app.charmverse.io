@@ -120,8 +120,6 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
 
   const bountyLink = `/${space?.domain}/bounties/${bounty.id}`;
 
-  const transactionInfo = (bounty as BountyWithDetails).transactions?.[0];
-
   if (layout === 'row') {
     return (
       <Grid container direction='column' alignItems='center'>
@@ -153,23 +151,6 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
             </BountyStatusBox>
           </Box>
         </Grid>
-        {
-          (bounty.status === 'paid' && transactionInfo) && (
-            <Grid item xs>
-              <a style={{ textDecoration: 'none', color: 'text.primary' }} href={getChainExplorerLink(transactionInfo.chainId, transactionInfo.transactionId)} target='_blank' rel='noreferrer'>
-                <Box sx={{ color: 'text.primary', pt: 0.5, display: 'block' }}>
-                  <Typography
-                    variant='caption'
-                    px={1}
-                  >
-                    View transaction details
-                  </Typography>
-                  <LaunchIcon sx={{ fontSize: '12px' }} />
-                </Box>
-              </a>
-            </Grid>
-          )
-        }
       </Grid>
     );
   }
