@@ -39,16 +39,22 @@ export default function BountyDetails () {
           currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />
         }
 
-        <Box sx={{ mb: 3 }}>
-          <BountySubmissions bounty={currentBounty} />
-
-        </Box>
         {
+          currentBounty.status !== 'suggestion' && (
+            <>
+              <Box sx={{ mb: 3 }}>
+                <BountySubmissions bounty={currentBounty} />
+
+              </Box>
+              {
           currentBounty.approveSubmitters === true && (
           <BountyApplicantList
             bounty={currentBounty}
             applications={currentBounty.applications}
           />
+          )
+        }
+            </>
           )
         }
 

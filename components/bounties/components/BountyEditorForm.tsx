@@ -1,15 +1,13 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
-import Grid from '@mui/material/Grid';
-import Switch from '@mui/material/Switch';
-import Typography from '@mui/material/Typography';
-import FieldLabel from 'components/common/form/FieldLabel';
-import Input from '@mui/material/Input';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Grid from '@mui/material/Grid';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
+import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
-import { Bounty, Bounty as IBounty, PaymentMethod } from '@prisma/client';
+import Typography from '@mui/material/Typography';
+import { Bounty, PaymentMethod } from '@prisma/client';
 import charmClient, { PopulatedBounty } from 'charmClient';
 import Button from 'components/common/Button';
 import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
@@ -21,14 +19,13 @@ import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
+import { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
 import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
-import { DatePicker } from '@mui/x-date-pickers';
 import * as yup from 'yup';
-import { SystemError } from 'lib/utilities/errors';
 
 export type FormMode = 'create' | 'update' | 'suggest';
 
@@ -153,8 +150,6 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   }, [focusKey]);
 
   const values = watch();
-
-  console.log('Values', values);
 
   const [space] = useCurrentSpace();
   const [user] = useUser();
@@ -377,61 +372,58 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                     />
                   </Grid>
                 </Grid>
-              </>
-            )
-          }
 
-          {/* New options */}
+                {/* New options */}
 
-          <Grid item xs={12}>
-            <FormControlLabel
-              label='Require applications'
-              control={(
-                <Switch
-                  onChange={(event) => {
-                    setValue('approveSubmitters', event.target.checked === true, {
-                      shouldValidate: true
-                    });
-                  }}
-                  defaultChecked={values.approveSubmitters}
-                />
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    label='Require applications'
+                    control={(
+                      <Switch
+                        onChange={(event) => {
+                          setValue('approveSubmitters', event.target.checked === true, {
+                            shouldValidate: true
+                          });
+                        }}
+                        defaultChecked={values.approveSubmitters}
+                      />
               )}
-            />
-
-          </Grid>
-          <Grid item xs={12} sx={{ pt: '2px !important' }}>
-            <Typography variant='body2' sx={{ ml: '8%' }}>
-              When enabled, a workspace Admin or the Bounty Reviewer must explicitly approve each user's application to this bounty.
-            </Typography>
-
-          </Grid>
-          <Grid container item xs={12}>
-            <Grid item xs={6}>
-              <FormControlLabel
-                label='Set submissions limit'
-                control={(
-                  <Switch
-                    onChange={(event) => {
-                      const newValue = event.target.checked === true;
-                      setValue('capSubmissions', newValue, {
-                        shouldValidate: true
-                      });
-
-                      // eslint-disable-next-line no-restricted-globals
-                      if (newValue === false && isNaN(values.maxSubmissions as any)) {
-                        setValue('maxSubmissions', null, {
-                          shouldValidate: true
-                        });
-                      }
-                    }}
-                    defaultChecked={values.capSubmissions}
                   />
-              )}
-              />
-            </Grid>
-            <Grid item xs={6}>
 
-              {
+                </Grid>
+                <Grid item xs={12} sx={{ pt: '2px !important' }}>
+                  <Typography variant='body2' sx={{ ml: '8%' }}>
+                    When enabled, a workspace Admin or the Bounty Reviewer must explicitly approve each user's application to this bounty.
+                  </Typography>
+
+                </Grid>
+                <Grid container item xs={12}>
+                  <Grid item xs={6}>
+                    <FormControlLabel
+                      label='Set submissions limit'
+                      control={(
+                        <Switch
+                          onChange={(event) => {
+                            const newValue = event.target.checked === true;
+                            setValue('capSubmissions', newValue, {
+                              shouldValidate: true
+                            });
+
+                            // eslint-disable-next-line no-restricted-globals
+                            if (newValue === false && isNaN(values.maxSubmissions as any)) {
+                              setValue('maxSubmissions', null, {
+                                shouldValidate: true
+                              });
+                            }
+                          }}
+                          defaultChecked={values.capSubmissions}
+                        />
+              )}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+
+                    {
                 values.capSubmissions && (
                   <TextField
                     {...register('maxSubmissions', {
@@ -455,15 +447,17 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                 )
               }
 
-            </Grid>
-          </Grid>
-          <Grid item xs={12} sx={{ pt: '2px !important' }}>
-            <Typography variant='body2' sx={{ ml: '8%' }}>
-              When enabled, limits the amount of active submissions for this bounty.
-            </Typography>
+                  </Grid>
+                </Grid>
+                <Grid item xs={12} sx={{ pt: '2px !important' }}>
+                  <Typography variant='body2' sx={{ ml: '8%' }}>
+                    When enabled, limits the amount of active submissions for this bounty.
+                  </Typography>
 
-          </Grid>
-
+                </Grid>
+              </>
+            )
+          }
           {
             formError && (
               <Grid item xs={12} sx={{ pt: '2px !important' }}>
