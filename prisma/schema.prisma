@@ -214,8 +214,6 @@ enum BountyStatus {
   suggestion
   open
   inProgress
-  assigned
-  review
   complete
   paid
 }
@@ -232,7 +230,6 @@ model Bounty {
   description      String
   descriptionNodes Json
   reviewer         String?       @db.Uuid
-  assignee         String?       @db.Uuid
   chainId          Int
   rewardAmount     Float
   rewardToken      String
