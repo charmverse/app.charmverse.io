@@ -62,6 +62,10 @@ class CharmClient {
     return http.GET<LoggedInUser>('/api/profile');
   }
 
+  getUserByPath (path: string) {
+    return http.GET<User>(`/api/public/profile/${path}`);
+  }
+
   createUser ({ address }: { address: string }) {
     return http.POST<LoggedInUser>('/api/profile', {
       address

@@ -40,7 +40,10 @@ export default function Sidebar ({ closeSidebar }: SidebarProps) {
   const router = useRouter();
   const [user] = useUser();
 
-  const userName = user ? getDisplayName(user) : '';
+  // hide sidebar for public users for now, since they can't create a workspace
+  if (!user) {
+    return <div></div>;
+  }
 
   return (
     <SidebarContainer>
