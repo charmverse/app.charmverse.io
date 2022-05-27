@@ -182,3 +182,110 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       .expect(401);
   });
 });
+
+describe('DELETE /api/bounties/{bountyId} - delete a bounty', () => {
+
+  it('should allow admins to delete a bounty and respond with 200', async () => {
+
+    const createdBounty = await createBounty({
+      title: 'Example',
+      createdBy: adminUser.id,
+      spaceId: adminUserSpace.id,
+      status: 'open',
+      rewardAmount: 5,
+      chainId: 1,
+      rewardToken: 'ETH'
+    });
+
+    request(baseUrl)
+      .delete(`/api/bounties/${createdBounty.id}`)
+      .set('Cookie', adminCookie)
+      .send({})
+      .expect(200);
+
+  });
+
+  it('should allow the bounty creator to delete a bounty suggestion they created and respond with 200', async () => {
+
+    const createdBounty = await createBounty({
+      title: 'Example',
+      createdBy: nonAdminUser.id,
+      spaceId: nonAdminUserSpace.id,
+      status: 'suggestion',
+      rewardAmount: 5,
+      chainId: 1,
+      rewardToken: 'ETH'
+    });
+
+    request(baseUrl)
+      .delete(`/api/bounties/${createdBounty.id}`)
+      .set('Cookie', nonAdminCookie)
+      .send({})
+      .expect(200);
+
+  });
+
+  it('should not allow the bounty creator to delete a bounty they created if it is past suggestion status and respond with 401', async () => {
+
+    const createdBounty = await createBounty({
+      title: 'Example',
+      createdBy: nonAdminUser.id,
+      spaceId: nonAdminUserSpace.id,
+      status: 'open',
+      rewardAmount: 5,
+      chainId: 1,
+      rewardToken: 'ETH'
+    });
+
+    request(baseUrl)
+      .delete(`/api/bounties/${createdBounty.id}`)
+      .set('Cookie', nonAdminCookie)
+      .send({})
+      .expect(200);
+
+  });
+
+  it('should reject an update attempt from a non admin user who did not create the bounty and respond with 401', async () => {
+
+    const randomSpaceUser = await generateSpaceUser({
+      isAdmin: false,
+      spaceId: nonAdminUserSpace.id
+    });
+
+    const randomSpaceUserCookie = (await request(baseUrl)
+      .post('/api/session/login')
+      .send({
+        address: randomSpaceUser.addresses[0]
+      })).headers['set-cookie'][0];
+
+    const createdBounty = await createBounty({
+      title: 'Example',
+      createdBy: adminUser.id,
+      spaceId: nonAdminUserSpace.id,
+      status: 'suggestion'
+    });
+
+    const updateContent: Partial<Bounty> = {
+      rewardAmount: 10,
+      rewardToken: 'BNB'
+    };
+
+    await request(baseUrl)
+      .delete(`/api/bounties/${createdBounty.id}`)
+      .set('Cookie', randomSpaceUserCookie)
+      .send({})
+      .expect(401);
+
+  });
+
+  it('should fail if the bounty does not exist and respond with 404', async () => {
+
+    request(baseUrl)
+      .delete(`/api/bounties/${v4()}`)
+      .set('Cookie', adminCookie)
+      .send({})
+      .expect(404);
+
+  });
+
+});

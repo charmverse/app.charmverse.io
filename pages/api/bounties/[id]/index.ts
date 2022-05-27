@@ -95,6 +95,31 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
 async function deleteBounty (req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
+  const bounty = await getBounty(id as string);
+
+  if (!bounty) {
+    throw new DataNotFoundError(`Bounty with id ${id} not found.`);
+  }
+
+  const userId = req.session.user.id;
+
+  const { error, isAdmin } = await hasAccessToSpace({
+    spaceId: bounty.spaceId,
+    userId,
+    adminOnly: false
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (bounty.status === 'suggestion' && bounty.createdBy !== userId && !isAdmin) {
+    throw new UnauthorisedActionError('You cannot delete this bounty suggestion.');
+  }
+  else if (bounty.status !== 'suggestion' && !isAdmin) {
+    throw new UnauthorisedActionError('You cannot delete this bounty suggestion.');
+  }
+
   await prisma.bounty.delete({
     where: {
       id: id as string
