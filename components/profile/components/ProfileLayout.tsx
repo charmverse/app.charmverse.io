@@ -7,7 +7,6 @@ import ProfileSidebar from './ProfileSidebar';
 const Container = styled(Box)`
   width: 1200px;
   max-width: 100%;
-  margin: 0 auto;
 `;
 
 const emptySidebar = () => <div></div>;
@@ -20,7 +19,7 @@ export default function ProfileLayout (props: { children: React.ReactNode }) {
   return (
     <PageLayout hideSidebarOnSmallScreen sidebarWidth={user ? 55 : 0} sidebar={user ? ProfileSidebar : emptySidebar}>
       <ScrollableWindow>
-        <Container py={3} sx={{ px: { xs: '20px', sm: '80px' } }}>
+        <Container py={3} sx={{ px: { xs: '20px', sm: '80px' } }} mx='auto' mb={10}>
           {props.children}
         </Container>
       </ScrollableWindow>

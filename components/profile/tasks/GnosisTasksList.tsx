@@ -571,24 +571,33 @@ export default function GnosisTasksSection () {
 
   const safesWithTasks = tasks?.gnosis;
 
+  if (!safesWithTasks) {
+    if (error) {
+      return (
+        <Box>
+          <Alert severity='error'>
+            There was an error. Please try again later!
+          </Alert>
+        </Box>
+      );
+    }
+    else {
+      return <LoadingComponent height='200px' isLoading={true} />;
+    }
+  }
+
   return (
     <>
-      <Box mb={2} display='flex' justifyContent='flex-end'>
-        {safesWithTasks && safeData?.length ? (
+      {safeData?.length ? (
+        <Box mb={2} display='flex' justifyContent='flex-end'>
           <SnoozeTransactions
             message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
             snoozedForDate={snoozedForDate}
             setSnoozedForDate={setSnoozedForDate}
           />
-        ) : null}
-      </Box>
-      {!safesWithTasks && !error && <LoadingComponent height='200px' isLoading={true} />}
-      {error && !safesWithTasks && (
-        <Alert severity='error'>
-          There was an error. Please try again later!
-        </Alert>
-      )}
-      {safesWithTasks && safesWithTasks.map(safe => (
+        </Box>
+      ) : null}
+      {safesWithTasks.map(safe => (
         <SafeTasks
           isSnoozed={isSnoozed}
           key={safe.safeAddress}

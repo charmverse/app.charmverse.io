@@ -1,4 +1,4 @@
-
+import uniqBy from 'lodash/uniqBy';
 import { Signer, ethers } from 'ethers';
 import { RPC } from 'connectors';
 import { UserGnosisSafe } from '@prisma/client';
@@ -65,7 +65,8 @@ export async function getSafesForAddresses (signer: ethers.Signer, addresses: st
     return Promise.all(addresses.map(address => getSafesForAddress({ signer, chainId: network.chainId, address })));
   })).then(list => list.flat().flat());
 
-  return safes;
+  // de-dupe safes in case user has multiple addresses and they own the same safe
+  return uniqBy(safes, safe => safe.address);
 }
 
 async function getTransactionsforSafe (signer: Signer, wallet: UserGnosisSafe): Promise<GnosisTransaction[]> {
