@@ -2,12 +2,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { User } from '@prisma/client';
+import { User, UserDetails } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
-export type PublicUser = Pick<User, 'id' | 'username' | 'avatar'>
+export type PublicUser = Pick<User, 'id' | 'username' | 'avatar'> & {
+  profile: UserDetails | null;
+}
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -31,7 +33,12 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
     }
     : { path: userPath };
 
-  const users = await prisma.user.findMany({ where: condition });
+  const users = await prisma.user.findMany({
+    where: condition,
+    include: {
+      profile: true
+    }
+  });
 
   // prefer match by user id
   const userById = users.find(user => user.id === userPath);

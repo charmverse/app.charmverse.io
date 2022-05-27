@@ -10,13 +10,13 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import IconButton from '@mui/material/IconButton';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { User } from '@prisma/client';
+import charmClient from 'charmClient';
+import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import { LoggedInUser } from 'models';
 import { useWeb3React } from '@web3-react/core';
 import { getDisplayName } from 'lib/users';
 import useENSName from 'hooks/useENSName';
-import charmClient from 'charmClient';
 import { DescriptionModal, IdentityModal, SocialModal } from '.';
 import { Social } from '../interfaces';
 
@@ -33,13 +33,18 @@ const StyledDivider = styled(Divider)`
 
 export interface UserDetailsProps {
   readOnly?: boolean;
-  user: User | LoggedInUser;
+  user: PublicUser | LoggedInUser;
   updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
 }
 
+const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
+
 export default function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const { account } = useWeb3React();
-  const { data: userDetails, mutate } = useSWR('userDetails', () => charmClient.getUserDetails());
+
+  const { data: userDetails, mutate } = useSWR(`/userDetails/${user.id}`, () => {
+    return isPublicUser(user) ? user.profile : charmClient.getUserDetails();
+  });
   const ENSName = useENSName(account);
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
 
@@ -68,7 +73,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
 
   let socialDetails: Social = {};
 
-  if (userDetails && userDetails.social) {
+  if (userDetails?.social) {
     socialDetails = (JSON.parse(userDetails.social as string) as Social);
   }
   else {
@@ -159,7 +164,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
             <Grid item xs={11}>
               <span>
                 {
-                    userDetails?.description || 'Tell the world a bit more about yourself ...'
+                  userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')
                 }
               </span>
             </Grid>
