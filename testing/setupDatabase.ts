@@ -139,24 +139,33 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
       descriptionNodes: '',
       approveSubmitters: false,
       // Important variable
-      maxSubmissions: bountyCap,
-      applications: {
-        create: {
-          applicant: {
-            connect: {
-              id: userId
-            }
-          },
-          message: 'I can do this!',
-          // Other important variable
-          status: applicationStatus
-        }
-      }
+      maxSubmissions: bountyCap
     },
     include: {
       applications: true
     }
   }) as BountyWithDetails;
+
+  const createdApp = await prisma.application.create({
+    data: {
+      spaceId,
+      applicant: {
+        connect: {
+          id: userId
+        }
+      },
+      bounty: {
+        connect: {
+          id: createdBounty.id
+        }
+      },
+      message: 'I can do this!',
+      // Other important variable
+      status: applicationStatus
+    }
+  });
+
+  createdBounty.applications = [createdApp];
 
   return createdBounty;
 }
