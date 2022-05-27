@@ -34,32 +34,38 @@ describe('listSubmissions', () => {
         {
           bountyId: bounty.id,
           createdBy: user0.id,
-          status: 'applied'
+          status: 'applied',
+          spaceId: bounty.spaceId
         },
         {
           bountyId: bounty.id,
           createdBy: user1.id,
-          status: 'inProgress'
+          status: 'inProgress',
+          spaceId: bounty.spaceId
         },
         {
           bountyId: bounty.id,
           createdBy: user2.id,
-          status: 'review'
+          status: 'review',
+          spaceId: bounty.spaceId
         },
         {
           bountyId: bounty.id,
           createdBy: user3.id,
-          status: 'complete'
+          status: 'complete',
+          spaceId: bounty.spaceId
         },
         {
           bountyId: bounty.id,
           createdBy: user4.id,
-          status: 'paid'
+          status: 'paid',
+          spaceId: bounty.spaceId
         },
         {
           bountyId: bounty.id,
           createdBy: user5.id,
-          status: 'rejected'
+          status: 'rejected',
+          spaceId: bounty.spaceId
         }
       ]
     });
