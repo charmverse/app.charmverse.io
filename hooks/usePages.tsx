@@ -11,6 +11,7 @@ import useSWR from 'swr';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { isTruthy } from 'lib/utilities/types';
+import useRefState from 'hooks/useRefState';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 import useIsAdmin from './useIsAdmin';
@@ -50,7 +51,7 @@ export const PagesContext = createContext<Readonly<IContext>>({
 export function PagesProvider ({ children }: { children: ReactNode }) {
   const [isEditing, setIsEditing] = useState(false);
   const [space] = useCurrentSpace();
-  const [pages, setPages] = useState<IContext['pages']>({});
+  const [pages, pagesRef, setPages] = useRefState<IContext['pages']>({});
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const [user] = useUser();
@@ -61,13 +62,13 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const isAdmin = useIsAdmin();
 
-  const _setPages: Dispatch<SetStateAction<PagesMap>> = React.useCallback((_pages) => {
-    const res = _pages instanceof Function ? _pages(pages) : _pages;
+  const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
+    const res = _pages instanceof Function ? _pages(pagesRef.current) : _pages;
     mutate(() => Object.values(res).filter(isTruthy), {
       revalidate: false
     });
     return res;
-  }, [mutate, pages]);
+  };
 
   async function deletePage (pageId: string) {
     const { pageIds } = await charmClient.deletePage(pageId);
