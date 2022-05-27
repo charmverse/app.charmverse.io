@@ -138,6 +138,8 @@ model User {
   gnosisSafes     UserGnosisSafe[]
   gnosisSafeState UserGnosisSafeState?
   profile         UserDetails?
+
+
 }
 
 model UserGnosisSafeState {
@@ -256,7 +258,7 @@ model Application {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now())
   status        ApplicationStatus @default(applied)
-  spaceId       String?
+  spaceId       String
   bountyId      String   @db.Uuid()
   bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
   createdBy     String   @db.Uuid()
@@ -266,6 +268,8 @@ model Application {
   submission   String?
   submissionNodes String?
   transactions Transaction[]
+
+  @@unique([bountyId, createdBy])
 }
 
 model Transaction {
