@@ -31,7 +31,7 @@ export default function BountyDetails () {
     <Box py={3} px='80px'>
 
       <Container top={20}>
-        <BountyHeader />
+        <BountyHeader bounty={currentBounty} />
 
         <BountyDescription />
 
