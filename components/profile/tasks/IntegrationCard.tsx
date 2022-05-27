@@ -38,7 +38,7 @@ export default function IntegrationCard () {
 
   return currentUser && (
     <IntegrationCardContainer>
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         <Grid item xs>
           <Link href='/profile/integrations'>
             <Paper
