@@ -72,7 +72,7 @@ export default function BountyList () {
       ['token_address', 'receiver', 'amount', 'chainId'],
       ...completedBounties.map((bounty, _index) => [
         bounty.rewardToken.startsWith('0x') ? bounty.rewardToken : '', // for native token it should be empty
-        bounty.applications.find(application => application.createdBy === bounty.assignee)?.walletAddress,
+        bounty.applications.find(application => application.status === 'complete')?.walletAddress,
         bounty.rewardAmount,
         bounty.chainId
       ])
