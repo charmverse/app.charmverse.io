@@ -1,9 +1,11 @@
 
-import { Application, Prisma } from '@prisma/client';
+import { Application } from '@prisma/client';
 import { prisma } from 'db';
-import { ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ApplicationWithTransactions, createApplication, listSubmissions } from 'lib/applications/actions';
+import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,49 +13,86 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
   .get(getApplications)
-  .use(requireKeys<Application>(['bountyId', 'createdBy'], 'body'))
-  .post(createApplication);
+  .use(requireKeys<Application>(['bountyId', 'message'], 'body'))
+  .post(createApplicationController);
 
-async function getApplications (req: NextApiRequest, res: NextApiResponse<Application[]>) {
-  const { bountyId } = req.query;
+async function getApplications (req: NextApiRequest, res: NextApiResponse<ApplicationWithTransactions[]>) {
+  const { bountyId, submissionsOnly } = req.query;
+  const { id: userId } = req.session.user;
 
-  if (bountyId === undefined) {
-    throw new ApiError({
-      message: 'Please provide a valid bounty ID',
-      errorType: 'Invalid input'
-    });
-  }
-
-  const ApplicationListQuery: Prisma.ApplicationFindManyArgs = {
+  const bounty = await prisma.bounty.findUnique({
     where: {
-      bountyId: bountyId as string
-    }
-  };
-
-  const applications = await prisma.application.findMany(ApplicationListQuery);
-  return res.status(200).json(applications);
-}
-
-async function createApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
-  const data = req.body as Application;
-  const ApplicationToCreate = { ...data } as any;
-
-  const existingProposal = await prisma.application.findFirst({
-    where: {
-      bountyId: data.bountyId,
-      createdBy: data.createdBy
+      id: bountyId as string
+    },
+    select: {
+      spaceId: true
     }
   });
 
-  if (existingProposal) {
-    throw new ApiError({
-      message: 'This user has already applied to this bounty',
-      errorType: 'Invalid input'
-    });
+  if (!bounty) {
+    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
   }
 
-  const proposal = await prisma.application.create({ data: ApplicationToCreate });
-  return res.status(200).json(proposal);
+  const { error } = await hasAccessToSpace({
+    adminOnly: false,
+    spaceId: bounty.spaceId,
+    userId
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const applicationsOrSubmissions = await (submissionsOnly === 'true'
+    ? listSubmissions(bountyId as string)
+    : prisma.application.findMany({
+      where: {
+        bountyId: bountyId as string
+      },
+      include: {
+        transactions: true
+      }
+    }));
+  return res.status(200).json(applicationsOrSubmissions);
+}
+
+async function createApplicationController (req: NextApiRequest, res: NextApiResponse<Application>) {
+
+  const { bountyId, message } = req.body;
+
+  // Get the space ID so we can make sure requester has access
+  const bountySpaceId = await prisma.bounty.findUnique({
+    where: {
+      id: bountyId
+    },
+    select: {
+      spaceId: true
+    }
+  });
+
+  if (!bountySpaceId) {
+    throw new DataNotFoundError(`Bounty with id ${bountyId}`);
+  }
+
+  const userId = req.session.user.id;
+
+  const { error } = await hasAccessToSpace({
+    spaceId: bountySpaceId.spaceId,
+    userId,
+    adminOnly: false
+  });
+
+  if (error) {
+    throw (error);
+  }
+
+  const createdApplication = await createApplication({
+    bountyId,
+    message,
+    userId: req.session.user.id
+  });
+
+  return res.status(201).json(createdApplication);
 }
 
 export default withSessionRoute(handler);

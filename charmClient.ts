@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
-  Role, Space, TokenGate, Transaction, User, UserDetails, TelegramUser, UserGnosisSafe, TokenGateToRole
+  Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole, UserDetails
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
@@ -29,10 +29,13 @@ import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pa
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
+import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
 import { GetTasksResponse } from 'pages/api/tasks';
 
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
+import { TransactionCreationData } from 'lib/transactions/interface';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -393,17 +396,6 @@ class CharmClient {
     return data;
   }
 
-  async assignBounty (bountyId: string, assignee: string): Promise<BountyWithDetails> {
-
-    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, {
-      assignee,
-      status: 'assigned',
-      updatedAt: new Date()
-    });
-
-    return data;
-  }
-
   async updateBounty (bountyId: string, bounty: Partial<Bounty>): Promise<BountyWithDetails> {
 
     const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, bounty);
@@ -420,9 +412,21 @@ class CharmClient {
     return data;
   }
 
-  async updateApplication (application: Application): Promise<Application> {
+  async closeBountySubmissions (bountyId: string): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close-submissions`);
+  }
 
-    const data = await http.PUT<Application>(`/api/applications/${application.id}`, application);
+  async closeBounty (bountyId: string): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close`);
+  }
+
+  async approveApplication (applicationId: string): Promise<Application> {
+    return http.POST<Application>(`/api/applications/${applicationId}/approve`);
+  }
+
+  async updateApplication (applicationId: string, update: Partial<Application>): Promise<Application> {
+
+    const data = await http.PUT<Application>(`/api/applications/${applicationId}`, update);
 
     return data;
   }
@@ -434,15 +438,33 @@ class CharmClient {
     return data;
   }
 
-  async listApplications (bountyId: string): Promise<Application []> {
-
-    const data = await http.GET<Application []>('/api/applications', { bountyId });
-
-    return data;
+  listApplications (bountyId: string, submissionsOnly: boolean): Promise<ApplicationWithTransactions []> {
+    return http.GET('/api/applications', { bountyId, submissionsOnly });
   }
 
-  recordTransaction (details: Pick<Transaction, 'bountyId' | 'transactionId' | 'chainId'>) {
-    return http.POST('/api/transactions', details);
+  async createSubmission (content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {
+
+    return http.POST<Application>('/api/submissions', content);
+  }
+
+  async updateSubmission ({ submissionId, content }: {submissionId: string, content: SubmissionContent}): Promise<Application> {
+
+    return http.PUT<Application>(`/api/submissions/${submissionId}`, content);
+  }
+
+  async reviewSubmission (submissionId: string, decision: ReviewDecision): Promise<Application> {
+
+    return http.POST<Application>(`/api/submissions/${submissionId}/review`, {
+      decision
+    });
+  }
+
+  async paySubmission (submissionId: string) {
+    return http.POST<Application>(`/api/submissions/${submissionId}/pay`);
+  }
+
+  recordTransaction (data: TransactionCreationData) {
+    return http.POST('/api/transactions', data);
   }
 
   async getPricing (base: string, quote: FiatCurrency): Promise<IPairQuote> {

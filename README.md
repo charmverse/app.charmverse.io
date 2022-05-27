@@ -33,6 +33,7 @@ npm start
 ```
 
 3. Configure your environment.
+
 You'll need certain environment variables to be set for Charmverse to work.
 
 See [.env.example](https://github.com/charmverse/app.charmverse.io/blob/main/.env.example) for the full list of variables.

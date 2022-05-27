@@ -50,7 +50,7 @@ function extractWalletErrorMessage (error: any): string {
  * @param chainId
  * @returns
  */
-async function switchActiveNetwork (chainId: number, errorCallback: (message: string) => void = () => {}) {
+async function switchActiveNetwork (chainId: number) {
   try {
     await (window as any).ethereum.request({
       method: 'wallet_switchEthereumChain',
@@ -92,7 +92,7 @@ export default function BountyPaymentButton ({
   tokenSymbolOrAddress,
   onSuccess = (tx: string, chainId: number) => {},
   onError = () => {},
-  children = 'Make a payment'
+  children = 'Make payment'
 }: Props) {
   const { account, library, chainId } = useWeb3React();
 
@@ -179,20 +179,23 @@ export default function BountyPaymentButton ({
       }
     }
     catch (err: any) {
-
       const errorMessage = extractWalletErrorMessage(err);
 
       if (errorMessage === 'underlying network changed') {
-        onError("You've changed your active network.\r\nRe-select 'Make a payment' to complete this transaction", 'warning');
+        onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
       }
       else {
         onError(errorMessage);
       }
-
     }
   };
 
   return (
-    <Button onClick={makePayment}>{children}</Button>
+    <Button
+      variant='outlined'
+      color='secondary'
+      onClick={makePayment}
+    >{children}
+    </Button>
   );
 }

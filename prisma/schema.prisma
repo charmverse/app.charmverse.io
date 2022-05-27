@@ -77,7 +77,7 @@ model Page {
   contentText        String
   headerImage        String?
   icon               String?
-  isPublic           Boolean?          @default(false)
+  isPublic           Boolean?         @default(false)
   path               String
   parentId           String?          @db.Uuid
   spaceId            String?          @db.Uuid
@@ -214,8 +214,7 @@ model InviteLink {
 enum BountyStatus {
   suggestion
   open
-  assigned
-  review
+  inProgress
   complete
   paid
 }
@@ -232,37 +231,53 @@ model Bounty {
   description      String
   descriptionNodes Json
   reviewer         String?       @db.Uuid
-  assignee         String?       @db.Uuid
   chainId          Int
   rewardAmount     Float
   rewardToken      String
   status           BountyStatus  @default(open)
   title            String
   linkedTaskId     String?       @db.Uuid
+  approveSubmitters Boolean      @default(false)
+  maxSubmissions    Int?         @default(1)
   applications     Application[]
-  transactions     Transaction[]
+}
+
+enum ApplicationStatus {
+  applied
+  inProgress
+  review
+  rejected
+  complete
+  paid
 }
 
 model Application {
   id            String   @id @default(uuid()) @db.Uuid
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now())
+  status        ApplicationStatus @default(applied)
+  spaceId       String
   bountyId      String   @db.Uuid()
   bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
   createdBy     String   @db.Uuid()
   applicant     User     @relation(fields: [createdBy], references: [id])
-  walletAddress String
-  message       String
+  walletAddress String?
+  message       String?
+  submission   String?
+  submissionNodes String?
+  transactions Transaction[]
+
+  @@unique([bountyId, createdBy])
 }
 
 model Transaction {
-  id            String   @id @default(uuid()) @db.Uuid
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now())
+  id            String       @id @default(uuid()) @db.Uuid
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now())
   transactionId String
   chainId       String
-  bountyId      String   @db.Uuid()
-  bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  applicationId String   @db.Uuid()
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 }
 
 model TokenGate {
