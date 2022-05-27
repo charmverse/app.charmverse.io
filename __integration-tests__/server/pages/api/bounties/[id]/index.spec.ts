@@ -4,9 +4,10 @@ import { IPageWithPermissions } from 'lib/pages';
 import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { createBounty } from 'lib/bounties';
+import { BountyWithDetails } from '../../../../../../models';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -40,7 +41,7 @@ beforeAll(async () => {
 
 describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
 
-  it('should ignore irrelevant bounty fields and succeed with the update', async () => {
+  it('should ignore irrelevant bounty fields and succeed with the update and respond with 200', async () => {
 
     const createdBounty = await createBounty({
       title: 'Example',
@@ -74,11 +75,22 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
 
   });
 
-  it('should reject an update attempt from a non admin user', async () => {
+  it('should reject an update attempt from a non admin user who did not create the bounty and respond with 401', async () => {
+
+    const randomSpaceUser = await generateSpaceUser({
+      isAdmin: false,
+      spaceId: nonAdminUserSpace.id
+    });
+
+    const randomSpaceUserCookie = (await request(baseUrl)
+      .post('/api/session/login')
+      .send({
+        address: randomSpaceUser.addresses[0]
+      })).headers['set-cookie'][0];
 
     const createdBounty = await createBounty({
       title: 'Example',
-      createdBy: nonAdminUser.id,
+      createdBy: adminUser.id,
       spaceId: nonAdminUserSpace.id,
       status: 'suggestion'
     });
@@ -90,9 +102,83 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
 
     await request(baseUrl)
       .put(`/api/bounties/${createdBounty.id}`)
-      .set('Cookie', nonAdminCookie)
+      .set('Cookie', randomSpaceUserCookie)
       .send(updateContent)
       .expect(401);
 
+  });
+
+  it('should allow the creator to edit only the bounty title and description if it is in suggestion status and respond with 200', async () => {
+
+    const bountyCreator = await generateSpaceUser({
+      isAdmin: false,
+      spaceId: nonAdminUserSpace.id
+    });
+
+    const bountyCreatorCookie = (await request(baseUrl)
+      .post('/api/session/login')
+      .send({
+        address: bountyCreator.addresses[0]
+      })).headers['set-cookie'][0];
+
+    const createdBounty = await createBounty({
+      title: 'Example',
+      createdBy: bountyCreator.id,
+      spaceId: nonAdminUserSpace.id,
+      status: 'suggestion'
+    });
+
+    const updateContent: Partial<Bounty> = {
+      title: 'New title to set',
+      descriptionNodes: '{}',
+      rewardAmount: 10,
+      rewardToken: 'BNB'
+    };
+
+    const updated = (await request(baseUrl)
+      .put(`/api/bounties/${createdBounty.id}`)
+      .set('Cookie', bountyCreatorCookie)
+      .send(updateContent)
+      .expect(200)).body as BountyWithDetails;
+
+    expect(updated.title).toBe(updateContent.title);
+    expect(updated.descriptionNodes).toBe(updateContent.descriptionNodes);
+    // Reward amount was dropped
+    expect(updated.rewardAmount).toBe(createdBounty.rewardAmount);
+  });
+
+  it('should not allow the creator to edit the bounty if it has gone past suggestion status and respond with 401', async () => {
+
+    const bountyCreator = await generateSpaceUser({
+      isAdmin: false,
+      spaceId: nonAdminUserSpace.id
+    });
+
+    const bountyCreatorCookie = (await request(baseUrl)
+      .post('/api/session/login')
+      .send({
+        address: bountyCreator.addresses[0]
+      })).headers['set-cookie'][0];
+
+    const createdBounty = await createBounty({
+      title: 'Example',
+      createdBy: bountyCreator.id,
+      spaceId: nonAdminUserSpace.id,
+      status: 'open',
+      rewardAmount: 3
+    });
+
+    const updateContent: Partial<Bounty> = {
+      title: 'New title to set',
+      descriptionNodes: '{}',
+      rewardAmount: 10,
+      rewardToken: 'BNB'
+    };
+
+    await request(baseUrl)
+      .put(`/api/bounties/${createdBounty.id}`)
+      .set('Cookie', bountyCreatorCookie)
+      .send(updateContent)
+      .expect(401);
   });
 });

@@ -26,6 +26,7 @@ import { CryptoCurrency } from 'models/Currency';
 import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
 import * as yup from 'yup';
+import useIsAdmin from 'hooks/useIsAdmin';
 
 export type FormMode = 'create' | 'update' | 'suggest';
 
@@ -37,12 +38,7 @@ export const bountyFormTitles: Record<FormMode, string> = {
 
 export const schema = yup.object({
   title: yup.string().required('Please enter a title'),
-  rewardAmount: yup.number().typeError('Amount must be a number').test({
-    message: 'Amount must be greater than 0',
-    test: value => {
-      return value !== 0;
-    }
-  }),
+  rewardAmount: yup.number(),
   rewardToken: yup.string().required(),
   descriptionNodes: yup.mixed(),
   description: yup.string(),
@@ -51,8 +47,8 @@ export const schema = yup.object({
   // New fields
   approveSubmitters: yup.boolean(),
   capSubmissions: yup.boolean(),
-  maxSubmissions: yup.number().nullable().typeError('Amount must be a number greater than 1').test({
-    message: 'Amount must be a number greater than 1',
+  maxSubmissions: yup.number().nullable().typeError('Amount must be a number greater than 0').test({
+    message: 'Amount must be a number greater than 0',
     test: (value, context) => {
 
       // eslint-disable-next-line no-restricted-globals
@@ -120,6 +116,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   const defaultChainId = bounty?.chainId ?? 1;
 
+  const isAdmin = useIsAdmin();
+
   const {
     register,
     handleSubmit,
@@ -151,6 +149,8 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   const values = watch();
 
+  console.log('Form vales', values, 'Errors', errors);
+
   const [space] = useCurrentSpace();
   const [user] = useUser();
   const [paymentMethods] = usePaymentMethods();
@@ -171,6 +171,9 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
   }, []);
 
   async function submitted (value: FormValues & Bounty) {
+
+    console.log('Submitted', value);
+
     setFormError(null);
 
     try {
@@ -317,7 +320,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           />
 
           {
-            mode !== 'suggest' && (
+            mode !== 'suggest' && isAdmin && (
               <>
                 <Grid item>
                   <InputLabel>
@@ -471,7 +474,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
           <Grid item>
             <Button
               loading={isSubmitting}
-              disabled={mode === 'suggest' ? (!values.title || !values.description) : !isValid}
+              disabled={(mode === 'suggest' || !isAdmin) ? (!values.title || !values.description) : !isValid}
               type='submit'
             >
               {bountyFormTitles[mode]}
