@@ -122,10 +122,10 @@ export function generateTransaction ({ applicationId, chainId = '4', transaction
   });
 }
 
-export function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus, reviewer }:
+export async function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus, reviewer }:
   {applicationStatus: ApplicationStatus, bountyCap: number | null, userId: string, spaceId: string, bountyStatus?: BountyStatus, reviewer?: string}):
   Promise<BountyWithDetails> {
-  return prisma.bounty.create({
+  const createdBounty = await prisma.bounty.create({
     data: {
       createdBy: userId,
       chainId: 1,
@@ -156,7 +156,9 @@ export function generateBountyWithSingleApplication ({ applicationStatus, bounty
     include: {
       applications: true
     }
-  }) as Promise<BountyWithDetails>;
+  }) as BountyWithDetails;
+
+  return createdBounty;
 }
 
 export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'>): Promise<IPageWithPermissions> {
