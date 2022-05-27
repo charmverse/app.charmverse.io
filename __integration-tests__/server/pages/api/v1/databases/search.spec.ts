@@ -43,6 +43,11 @@ const exampleBoardSchema: PageProperty [ ] = [{
 ];
 
 beforeAll(async () => {
+  jest.mock('lib/blockchain/getENSName', () => {
+    return {
+      default: null
+    };
+  });
   const generated = await generateUserAndSpaceWithApiToken(v4());
   user = generated.user;
   space = generated.space;
@@ -124,7 +129,7 @@ describe('POST /databases/{id}/search', () => {
 
     expect(response.statusCode).toBe(200);
 
-    expect(response.body).toEqual < PaginatedResponse<ApiPage>>(
+    expect(response.body).toEqual <PaginatedResponse<ApiPage>>(
       expect.objectContaining<PaginatedResponse<ApiPage>>({
         data: expect.any(Array),
         hasNext: expect.any(Boolean)
