@@ -29,9 +29,8 @@ async function LGTMWithBountiesv2 () {
 
 }
 
-/*
 LGTMWithBountiesv2()
   .then(() => {
     console.log('Complete');
   });
-*/
+
