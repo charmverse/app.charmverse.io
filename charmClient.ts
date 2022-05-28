@@ -127,7 +127,11 @@ class CharmClient {
   }
 
   getPages (spaceId: string) {
-    return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
+    return http.GET<Page[]>(`/api/spaces/${spaceId}/pages?archived=false`);
+  }
+
+  getArchivedPages (spaceId: string) {
+    return http.GET<Page[]>(`/api/spaces/${spaceId}/pages?archived=true`);
   }
 
   getPageLink (pageId: string) {
