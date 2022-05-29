@@ -7,6 +7,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { v4 } from 'uuid';
 import { useRouter } from 'next/router';
+import { Page } from '@prisma/client';
 
 export default function useNestedPage () {
   const [space] = useCurrentSpace();
@@ -14,14 +15,15 @@ export default function useNestedPage () {
   const { currentPageId } = usePages();
   const view = useEditorViewContext();
   const router = useRouter();
-  const addNestedPage = useCallback(async () => {
+  const addNestedPage = useCallback(async (type?: Page['type']) => {
     if (user && space) {
       const pageId = v4();
       const newPage = await addPage({
         id: pageId,
         createdBy: user.id,
         parentId: currentPageId,
-        spaceId: space.id
+        spaceId: space.id,
+        type: type ?? 'page'
       });
       rafCommandExec(view, (state, dispatch) => {
         const nestedPageNode = state.schema.nodes.page.create({

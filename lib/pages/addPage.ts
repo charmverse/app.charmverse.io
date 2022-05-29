@@ -30,14 +30,14 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput): P
       }
     },
     title: '',
-    type: 'page',
+    type: page.type ?? 'page',
     ...(page ?? {})
   };
   if (pageProperties.type === 'board') {
     await createDefaultBoardData(boardId => {
       pageProperties.boardId = boardId;
       pageProperties.id = boardId; // use the same uuid value
-    });
+    }, pageProperties.id);
   }
   const newPage = await charmClient.createPage(pageProperties);
   await mutate(`pages/${spaceId}`, (pages: Page[]) => {
@@ -49,9 +49,12 @@ export async function addPage ({ createdBy, spaceId, ...page }: NewPageInput): P
   return newPage;
 }
 
-async function createDefaultBoardData (showBoard: (id: string) => void, activeBoardId?: string) {
+async function createDefaultBoardData (showBoard: (id: string) => void, newBoardId?: string, activeBoardId?: string) {
   const oldBoardId = activeBoardId;
   const board = createBoard({ addDefaultProperty: true });
+  if (newBoardId) {
+    board.id = newBoardId;
+  }
   board.rootId = board.id;
 
   const view = createBoardView();
@@ -76,9 +79,8 @@ async function createDefaultBoardData (showBoard: (id: string) => void, activeBo
     [board, view, ...blocks],
     'add board',
     async (newBlocks: Block[]) => {
-      const newBoardId = newBlocks[0].id;
       // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateBoard, {board: newBoardId})
-      showBoard(newBoardId);
+      showBoard(newBlocks[0].id);
     },
     async () => {
       if (oldBoardId) {
