@@ -494,7 +494,7 @@ function CharmEditor (
       </Grow>
       )}
       {!disabledPageSpecificFeatures && <InlineCommentThread pluginKey={inlineCommentPluginKey} />}
-      <DevTools />
+      {/* <DevTools /> */}
     </StyledReactBangleEditor>
   );
 }

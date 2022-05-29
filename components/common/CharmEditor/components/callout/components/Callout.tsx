@@ -2,7 +2,8 @@
 import { NodeViewProps } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Box, Menu } from '@mui/material';
+import { Box, IconButton, Menu } from '@mui/material';
+import { getTwitterEmoji } from 'components/common/Emoji';
 import { BaseEmoji, Picker } from 'emoji-mart';
 import { MouseEvent, ReactNode, useState } from 'react';
 
@@ -40,7 +41,7 @@ const CalloutEmoji = styled.div`
 export default function Callout ({ children, node, updateAttrs }: NodeViewProps & { children: ReactNode }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     event.preventDefault();
   };
@@ -49,13 +50,21 @@ export default function Callout ({ children, node, updateAttrs }: NodeViewProps 
   };
 
   const theme = useTheme();
+  const twemojiImage = getTwitterEmoji(node.attrs.emoji);
 
   return (
     <StyledCallout>
       <CalloutEmoji>
-        <Box onClick={handleClick}>
-          {node.attrs.emoji}
-        </Box>
+        <IconButton
+          sx={{
+            width: 35,
+            height: 35,
+            fontSize: 20
+          }}
+          onClick={handleClick}
+        >
+          {twemojiImage ? <img src={twemojiImage} /> : node.attrs.emoji}
+        </IconButton>
         <Menu
           anchorEl={anchorEl}
           open={open}
