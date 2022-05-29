@@ -46,6 +46,21 @@ async function deleteBlock (req: NextApiRequest, res: NextApiResponse<{deletedCo
     const deletedChildPageIds = await modifyChildPages(blockId, userId, 'archive');
     deletedCount = deletedChildPageIds.length;
   }
+  else if (rootBlock.type === 'view') {
+    const viewsCount = await prisma.block.count({
+      where: {
+        type: 'view',
+        parentId: rootBlock.parentId
+      }
+    });
+
+    if (viewsCount === 1) {
+      throw new ApiError({
+        message: "Last view of a board page can't be deleted",
+        errorType: 'Undesirable operation'
+      });
+    }
+  }
   else {
     await prisma.block.delete({
       where: {
