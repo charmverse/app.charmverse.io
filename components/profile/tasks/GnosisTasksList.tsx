@@ -394,10 +394,7 @@ function SnoozeTransactions (
   }, [showDatePicker]);
 
   return (
-    <Box display='flex' justifyContent='space-between' alignItems='center'>
-      <Typography variant='subtitle2' color='secondary'>
-        Let others know you are busy
-      </Typography>
+    <Box flexDirection={{ sm: 'column', xs: 'row-reverse' }} gap={1} display='flex' justifyContent='space-between' alignItems={{ sm: 'flex-end', xs: 'center' }} width='100%'>
       <Button
         disabled={isValidating}
         variant='outlined'
@@ -410,6 +407,9 @@ function SnoozeTransactions (
       >
         {isSnoozed ? `Snoozed for ${snoozedForDate.toRelative({ base: (DateTime.now()) })?.slice(3)}` : 'Snooze'}
       </Button>
+      <Typography variant='subtitle2' color='secondary'>
+        Let others know you are busy
+      </Typography>
       <Menu
         {...primaryMenuState}
         sx={{
