@@ -161,7 +161,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
             <Stack direction='row' spacing={1} alignItems='end'>
-              { user && getIdentityIcon(user.identityType as IdentityType) }
+              { user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType) }
               <Typography variant='h1'>{user?.username}</Typography>
               {!readOnly && (
                 <IconButton onClick={identityModalState.open}>
