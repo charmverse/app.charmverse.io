@@ -7,6 +7,7 @@ import Modal, { DialogTitle } from 'components/common/Modal';
 import { useState } from 'react';
 import { getDisplayName } from 'lib/users';
 import Button from 'components/common/Button';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ContributorListItem, { RoleAction } from './ContributorListItem';
 import Legend from '../Legend';
 
@@ -52,6 +53,14 @@ export default function ContributorList ({ isAdmin, spaceId, spaceOwner }: Props
         throw new Error('Unknown action');
     }
   }
+  const menuState = bindMenu(popupState);
+
+  async function removeContributor () {
+    await charmClient.removeContributor({ spaceId, userId: removedContributorId as string });
+    setContributors(contributors.filter(c => c.id !== removedContributorId));
+    setRemovedContributorId(null);
+  }
+
   return (
     <>
       <Legend>Current Contributors</Legend>
@@ -78,27 +87,14 @@ export default function ContributorList ({ isAdmin, spaceId, spaceOwner }: Props
         </TableBody>
       </Table>
       {removedContributor && (
-      <Modal {...bindMenu(popupState)}>
-        <DialogTitle onClose={popupState.close}>Remove from space</DialogTitle>
-        <Typography>
-          {`Are you sure you want to remove ${getDisplayName(removedContributor)} from space?`}
-        </Typography>
-        <Box component='div' sx={{ columnSpacing: 2, mt: 3 }}>
-          <Button
-            color='error'
-            sx={{ mr: 2, fontWeight: 'bold' }}
-            onClick={async () => {
-              await charmClient.removeContributor({ spaceId, userId: removedContributorId as string });
-              setContributors(contributors.filter(c => c.id !== removedContributorId));
-              setRemovedContributorId(null);
-            }}
-          >
-            {`Remove ${getDisplayName(removedContributor)}`}
-          </Button>
-
-          <Button color='secondary' onClick={popupState.close}>Cancel</Button>
-        </Box>
-      </Modal>
+      <ConfirmDeleteModal
+        title='Remove contributor'
+        onClose={popupState.close}
+        open={menuState.open}
+        buttonText={`Remove ${getDisplayName(removedContributor)}`}
+        onConfirm={removeContributor}
+        question={`Are you sure you want to remove ${getDisplayName(removedContributor)} from space?`}
+      />
       )}
     </>
   );
