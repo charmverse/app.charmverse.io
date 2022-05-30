@@ -23,11 +23,10 @@ import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
-
 import DescriptionModal from './DescriptionModal';
 import UserPathModal from './UserPathModal';
 import SocialModal from './SocialModal';
-import IdentityModal from './IdentityModal';
+import IdentityModal, { getIdentityIcon } from './IdentityModal';
 import { Social } from '../interfaces';
 
 const StyledBox = styled(Box)`
