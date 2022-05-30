@@ -248,7 +248,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
             </Stack>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
-            <Grid item xs={11}>
+            <Grid item xs={11} sx={{ wordBreak: 'break-word' }}>
               <span>
                 {
                   userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')
