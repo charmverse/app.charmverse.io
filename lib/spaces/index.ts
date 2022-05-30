@@ -9,7 +9,8 @@ export const DOMAIN_BLACKLIST = [
   'join',
   'profile',
   'share',
-  'signup'
+  'signup',
+  'u'
 ];
 
 export function isSpaceDomain (domain: string) {

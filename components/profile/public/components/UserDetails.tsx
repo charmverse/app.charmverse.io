@@ -1,29 +1,33 @@
-import { useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import styled from '@emotion/styled';
 import { Box, Divider, Grid, Link as ExternalLink, Stack, SvgIcon, Typography, Tooltip } from '@mui/material';
 import { User } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Avatar from 'components/settings/workspace/LargeAvatar';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import EditIcon from '@mui/icons-material/Edit';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import IconButton from '@mui/material/IconButton';
+import Link from 'components/common/Link';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import charmClient from 'charmClient';
+import type { PublicUser } from 'pages/api/public/profile/[userPath]';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DiscordIcon from 'public/images/discord_logo.svg';
-import Link from 'next/link';
+import { LoggedInUser, IDENTITY_TYPES, IdentityType } from 'models';
 import { useWeb3React } from '@web3-react/core';
-import { useUser } from 'hooks/useUser';
 import { getDisplayName } from 'lib/users';
 import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
-import charmClient from 'charmClient';
-import { IDENTITY_TYPES, IdentityType } from 'models';
-import { DescriptionModal, IdentityModal, SocialModal, getIdentityIcon, IntegrationModel } from '.';
+
+import DescriptionModal from './DescriptionModal';
+import UserPathModal from './UserPathModal';
+import SocialModal from './SocialModal';
+import IdentityModal from './IdentityModal';
 import { Social } from '../interfaces';
 
 const StyledBox = styled(Box)`
@@ -37,14 +41,26 @@ const StyledDivider = styled(Divider)`
   height: 36px;
 `;
 
-export default function UserDetails () {
+export interface UserDetailsProps {
+  readOnly?: boolean;
+  user: PublicUser | LoggedInUser;
+  updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
+}
+
+const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
+
+export default function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const { account } = useWeb3React();
-  const [user, setUser] = useUser();
-  const { data: userDetails, mutate } = useSWR('userDetails', () => charmClient.getUserDetails());
+
+  const { data: userDetails, mutate } = useSWR(`/userDetails/${user.id}`, () => {
+    return isPublicUser(user) ? user.profile : charmClient.getUserDetails();
+  });
   const ENSName = useENSName(account);
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
+  const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
 
   const descriptionModalState = usePopupState({ variant: 'popover', popupId: 'description-modal' });
+  const userPathModalState = usePopupState({ variant: 'popover', popupId: 'path-modal' });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
   const socialModalState = usePopupState({ variant: 'popover', popupId: 'social-modal' });
 
@@ -57,14 +73,32 @@ export default function UserDetails () {
 
   const handleUserUpdate = async (data: Partial<User>) => {
     const updatedUser = await charmClient.updateUser(data);
+    if (updateUser) {
+      updateUser(updatedUser);
+    }
+  };
 
-    setUser(updatedUser);
+  const onLinkCopy = () => {
+    setIsPersonalLinkCopied(true);
+    setTimeout(() => setIsPersonalLinkCopied(false), 1000);
+  };
+
+  const handleImageUpdate = async (url: string) => {
+    if (!updateUser) {
+      // someone else's profile
+      return;
+    }
+    const updatedUser = await charmClient.updateUser({
+      avatar: url
+    });
+
+    updateUser(updatedUser);
   };
 
   let socialDetails: Social = {};
 
-  if (userDetails && userDetails.social) {
-    socialDetails = (JSON.parse(userDetails.social as string) as Social);
+  if (userDetails?.social) {
+    socialDetails = userDetails.social as Social;
   }
   else {
     socialDetails = {
@@ -120,21 +154,18 @@ export default function UserDetails () {
 
     return types;
   }, [user]);
+  const hostname = typeof window !== 'undefined' ? window.location.origin : '';
+  const userPath = user.path || user.id;
+  const userLink = `${hostname}/u/${userPath}`;
 
   return (
     <StyledBox>
-      <Stack direction='row' spacing={1} alignItems='center'>
-        <Link href='/profile/tasks'>
-          <ArrowBackIosNewIcon />
-        </Link>
-        <Typography component='span' fontSize='1.4em' fontWeight={700}>My Public Profile</Typography>
-      </Stack>
       <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
           name={userName}
           spaceImage={user?.avatar}
           updateImage={(url: string) => handleUserUpdate({ avatar: url })}
-          displayIcons={true}
+          displayIcons={!readOnly}
           variant='circular'
         />
         <Grid container direction='column' spacing={0.5}>
@@ -142,12 +173,39 @@ export default function UserDetails () {
             <Stack direction='row' spacing={1} alignItems='end'>
               { user && getIdentityIcon(user.identityType as IdentityType) }
               <Typography variant='h1'>{user?.username}</Typography>
-              <IconButton onClick={identityModalState.open}>
-                <EditIcon data-testid='edit-identity' />
-              </IconButton>
+              {!readOnly && (
+                <IconButton onClick={identityModalState.open}>
+                  <EditIcon fontSize='small' />
+                </IconButton>
+              )}
             </Stack>
           </Grid>
-          <Grid item mt={1}>
+          {!readOnly && (
+            <Grid item>
+              <Stack direction='row' spacing={1} alignItems='baseline'>
+                <Typography>
+                  {hostname}/u/<Link external href={userLink} target='_blank'>{userPath}</Link>
+                </Typography>
+                <Tooltip
+                  placement='top'
+                  title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'}
+                  arrow
+                >
+                  <Box sx={{ display: 'grid' }}>
+                    <CopyToClipboard text={userLink} onCopy={onLinkCopy}>
+                      <IconButton>
+                        <ContentCopyIcon fontSize='small' />
+                      </IconButton>
+                    </CopyToClipboard>
+                  </Box>
+                </Tooltip>
+                <IconButton onClick={userPathModalState.open}>
+                  <EditIcon fontSize='small' />
+                </IconButton>
+              </Stack>
+            </Grid>
+          )}
+          <Grid item mt={1} height={40}>
             <Stack direction='row' alignItems='center' spacing={2}>
               { socialDetails && socialDetails.twitterURL && (
                 <ExternalLink href={socialDetails.twitterURL} target='_blank' display='flex'>
@@ -189,24 +247,30 @@ export default function UserDetails () {
               {
                 !hasAnySocialInformation(socialDetails) && <Typography>No social media links</Typography>
               }
-              <StyledDivider orientation='vertical' flexItem />
-              <IconButton onClick={socialModalState.open}>
-                <EditIcon data-testid='edit-social' />
-              </IconButton>
+              {!readOnly && (
+                <>
+                  <StyledDivider orientation='vertical' flexItem />
+                  <IconButton onClick={socialModalState.open}>
+                    <EditIcon data-testid='edit-social' />
+                  </IconButton>
+                </>
+              )}
             </Stack>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
             <Grid item xs={11}>
               <span>
                 {
-                    userDetails?.description || 'Tell the world a bit more about yourself ...'
+                  userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')
                 }
               </span>
             </Grid>
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
-              <IconButton onClick={descriptionModalState.open}>
-                <EditIcon data-testid='edit-description' />
-              </IconButton>
+              {!readOnly && (
+                <IconButton onClick={descriptionModalState.open}>
+                  <EditIcon data-testid='edit-description' />
+                </IconButton>
+              )}
             </Grid>
           </Grid>
         </Grid>
@@ -234,12 +298,25 @@ export default function UserDetails () {
         }}
         currentDescription={userDetails?.description}
       />
+      <UserPathModal
+        isOpen={userPathModalState.isOpen}
+        close={userPathModalState.close}
+        save={async (path: string) => {
+          await charmClient.updateUser({
+            path
+          });
+          // @ts-ignore - not sure why types are wrong
+          updateUser(_user => ({ ..._user, path }));
+          userPathModalState.close();
+        }}
+        currentValue={user.path}
+      />
       <SocialModal
         isOpen={socialModalState.isOpen}
         close={socialModalState.close}
         save={async (social: Social) => {
           await charmClient.updateUserDetails({
-            social: JSON.stringify(social)
+            social
           });
           mutate();
           socialModalState.close();
