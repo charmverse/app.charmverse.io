@@ -1,35 +1,71 @@
+import getENSName from 'lib/blockchain/getENSName';
+import { IdentityType, IDENTITY_TYPES, LoggedInUser } from 'models';
+import { DiscordAccount } from 'lib/discord/getDiscordAccount';
+import { TelegramAccount } from 'pages/api/telegram/connect';
+import { shortenHex } from 'lib/utilities/strings';
 import { prisma } from '../db';
 
 (async () => {
 
-  await prisma.$executeRaw`
-    /* Update identityType to Wallet and username to first shortened address if there is no identityType, no username and there is at least an address.  */
-    UPDATE "User" u
-    SET "username" = (SELECT CONCAT(LEFT((SELECT unnest(u.addresses) LIMIT 1), 6), '...', RIGHT((SELECT unnest(u.addresses) LIMIT 1), 4))),
-        "identityType"='Wallet'
-    WHERE "identityType" IS NULL AND "username" IS NULL AND "addresses" IS NOT NULL;
-    
-    /* Update identityType to Discord if there is no identityType and there is a username that is the same as the username on the user's Discord account */
-    UPDATE "User" u SET "identityType"='Discord'
-    WHERE "username" IS NOT NULL AND 
-          "identityType" IS NULL AND
-          "username" IN (
-              SELECT account->>'username' FROM "DiscordUser" du WHERE du."userId" = u."id" LIMIT 1
-          );
-    
-    /* Update identityType to Telegram if there is no identityType and there is a username that is the same as the username or first name + ' ' + last name on the user's Telegram account */
-    UPDATE "User" u SET "identityType"='Telegram'
-    WHERE "username" IS NOT NULL AND 
-          "identityType" IS NULL AND
-          ( 
-              "username" IN (
-                SELECT CONCAT(account->>'first_name' , ' ', account->>'last_name') FROM "TelegramUser" tu WHERE tu."userId" = u."id" AND account->>'username' IS NULL LIMIT 1
-            ) OR
-            "username" IN (
-                SELECT account->>'username' FROM "TelegramUser" tu WHERE tu."userId" = u."id" LIMIT 1
-            )
-          );
-    
-    ALTER TABLE "User" ALTER COLUMN "identityType" SET NOT NULL;
-    `;
+  const users: Array<Partial<LoggedInUser>> = await prisma.user.findMany({
+    include: {
+      discordUser: true,
+      telegramUser: true
+    }
+  });
+
+  users.forEach(async user => {
+    if (!user.addresses) {
+      return;
+    }
+    const address = user.addresses[0];
+    const ens: string | null = await getENSName(address);
+
+    user.ensName = ens || undefined;
+  });
+
+  await prisma.$transaction(
+    users.map((user) => {
+      if (!user.identityType && !user.username && user.addresses) {
+        return prisma.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            identityType: IDENTITY_TYPES[0],
+            username: user.ensName || shortenHex(user.addresses[0])
+          }
+        });
+      }
+
+      let identityType: IdentityType = IDENTITY_TYPES[0];
+      const discordAccount = user.discordUser ? user.discordUser.account as Partial<DiscordAccount> : null;
+      const telegramAccount = user.telegramUser ? user.telegramUser.account as Partial<TelegramAccount> : null;
+
+      if (user.discordUser
+            && discordAccount
+            && discordAccount.username === user.username
+            && !user.identityType) {
+        // Check for scenario in which user has both Discord and Telegram, same username, but connected with Telegram last.
+        identityType = telegramAccount
+                            && telegramAccount.username === user.username
+                            && user.telegramUser
+                            && user.telegramUser.createdAt > user.discordUser.createdAt
+          ? IDENTITY_TYPES[2] : IDENTITY_TYPES[1];
+      }
+      else if (telegramAccount && telegramAccount.username === user.username && !user.identityType) {
+        identityType = IDENTITY_TYPES[2];
+      }
+
+      return prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          identityType
+        }
+      });
+    })
+  );
+
 })();
