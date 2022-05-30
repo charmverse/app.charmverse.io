@@ -6,7 +6,7 @@ import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
-type ModalSize = 'large' | 'fluid' | 'small' | string;
+export type ModalSize = 'large' | 'fluid' | 'small' | string;
 
 const defaultSize = '400px';
 
