@@ -107,7 +107,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
     if (user?.addresses) {
       types.push({
         type: IDENTITY_TYPES[0],
-        username: user.addresses[0],
+        username: ENSName || user.addresses[0],
         isInUse: user.identityType === IDENTITY_TYPES[0],
         icon: getIdentityIcon(IDENTITY_TYPES[0])
       });
