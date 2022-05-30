@@ -7,6 +7,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { v4 } from 'uuid';
 import { useRouter } from 'next/router';
+import { Page } from '@prisma/client';
 
 export default function useNestedPage () {
   const [space] = useCurrentSpace();
@@ -16,14 +17,15 @@ export default function useNestedPage () {
   const router = useRouter();
   const cardId = (new URLSearchParams(window.location.search)).get('cardId');
   const isInsideCard = (cardId && cardId?.length !== 0);
-  const addNestedPage = useCallback(async () => {
+  const addNestedPage = useCallback(async (type?: Page['type']) => {
     if (user && space) {
       const pageId = v4();
       const newPage = await addPage({
         id: pageId,
         createdBy: user.id,
-        parentId: isInsideCard ? cardId : currentPageId,
-        spaceId: space.id
+        spaceId: space.id,
+        type: type ?? 'page',
+        parentId: isInsideCard ? cardId : currentPageId
       });
       rafCommandExec(view, (state, dispatch) => {
         const nestedPageNode = state.schema.nodes.page.create({

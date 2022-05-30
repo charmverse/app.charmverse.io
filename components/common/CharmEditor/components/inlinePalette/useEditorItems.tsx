@@ -16,7 +16,6 @@ import ImageIcon from '@mui/icons-material/Image';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import PreviewIcon from '@mui/icons-material/Preview';
-import TableChartIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
@@ -24,6 +23,7 @@ import useNestedPage from 'components/common/CharmEditor/components/nestedPage/h
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
 import { PluginKey, TextSelection } from 'prosemirror-state';
 import { useMemo } from 'react';
+import DatabaseIcon from '@mui/icons-material/TableChart';
 import { insertNode } from '../../utils';
 import { NestedPagePluginState, nestedPageSuggestMarkName } from '../nestedPage';
 import {
@@ -279,7 +279,7 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
     },
     {
       uid: 'insertSimpleTable',
-      icon: <TableChartIcon sx={{
+      icon: <DatabaseIcon sx={{
         fontSize: 16
       }}
       />,
@@ -602,6 +602,25 @@ export function useEditorItems ({ nestedPagePluginKey }: {nestedPagePluginKey?: 
     const itemGroups = Object.entries({ ...paletteGroupItemsRecord,
       other: [
         ...paletteGroupItemsRecord.other,
+        {
+          uid: 'insert-board',
+          title: 'Insert board',
+          icon: <DatabaseIcon sx={{
+            fontSize: 16
+          }}
+          />,
+          description: 'Insert a new board',
+          editorExecuteCommand: (() => {
+            return (async (state, dispatch, view) => {
+              await addNestedPage('board');
+              return replaceSuggestionMarkWith(palettePluginKey, '')(
+                state,
+                dispatch,
+                view
+              );
+            }) as PromisedCommand;
+          })
+        },
         {
           uid: 'insert-page',
           title: 'Insert page',
