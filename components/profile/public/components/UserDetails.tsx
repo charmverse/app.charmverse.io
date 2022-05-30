@@ -26,7 +26,7 @@ import useENSName from 'hooks/useENSName';
 import DescriptionModal from './DescriptionModal';
 import UserPathModal from './UserPathModal';
 import SocialModal from './SocialModal';
-import IdentityModal, { getIdentityIcon } from './IdentityModal';
+import IdentityModal, { getIdentityIcon, IntegrationModel } from './IdentityModal';
 import { Social } from '../interfaces';
 
 const StyledBox = styled(Box)`
