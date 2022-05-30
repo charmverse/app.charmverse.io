@@ -82,18 +82,6 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
     setTimeout(() => setIsPersonalLinkCopied(false), 1000);
   };
 
-  const handleImageUpdate = async (url: string) => {
-    if (!updateUser) {
-      // someone else's profile
-      return;
-    }
-    const updatedUser = await charmClient.updateUser({
-      avatar: url
-    });
-
-    updateUser(updatedUser);
-  };
-
   let socialDetails: Social = {};
 
   if (userDetails?.social) {
@@ -111,8 +99,11 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
   const hasAnySocialInformation = (model: Social) => model.twitterURL || model.githubURL || model.discordUsername || model.linkedinURL;
 
   const identityTypes: Array<IntegrationModel> = useMemo(() => {
-    const types: Array<IntegrationModel> = [];
+    if (isPublicUser(user)) {
+      return [];
+    }
 
+    const types: Array<IntegrationModel> = [];
     if (user?.addresses) {
       types.push({
         type: IDENTITY_TYPES[0],
@@ -274,54 +265,58 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
           </Grid>
         </Grid>
       </Stack>
-      <IdentityModal
-        isOpen={identityModalState.isOpen}
-        close={identityModalState.close}
-        save={(id: string, identityType: IdentityType) => {
-          const username: string = identityType === IDENTITY_TYPES[0] ? (ENSName || shortenHex(id)) : id;
-          handleUserUpdate({ username, identityType });
-        }}
-        identityTypes={identityTypes}
-        identityType={(user?.identityType || IDENTITY_TYPES[0]) as IdentityType}
-        username={user?.username || ''}
-      />
-      <DescriptionModal
-        isOpen={descriptionModalState.isOpen}
-        close={descriptionModalState.close}
-        save={async (description: string) => {
-          await charmClient.updateUserDetails({
-            description
-          });
-          mutate();
-          descriptionModalState.close();
-        }}
-        currentDescription={userDetails?.description}
-      />
-      <UserPathModal
-        isOpen={userPathModalState.isOpen}
-        close={userPathModalState.close}
-        save={async (path: string) => {
-          await charmClient.updateUser({
-            path
-          });
-          // @ts-ignore - not sure why types are wrong
-          updateUser(_user => ({ ..._user, path }));
-          userPathModalState.close();
-        }}
-        currentValue={user.path}
-      />
-      <SocialModal
-        isOpen={socialModalState.isOpen}
-        close={socialModalState.close}
-        save={async (social: Social) => {
-          await charmClient.updateUserDetails({
-            social
-          });
-          mutate();
-          socialModalState.close();
-        }}
-        social={socialDetails}
-      />
+      { !isPublicUser(user) && (
+      <>
+        <IdentityModal
+          isOpen={identityModalState.isOpen}
+          close={identityModalState.close}
+          save={(id: string, identityType: IdentityType) => {
+            const username: string = identityType === IDENTITY_TYPES[0] ? (ENSName || shortenHex(id)) : id;
+            handleUserUpdate({ username, identityType });
+          }}
+          identityTypes={identityTypes}
+          identityType={(user?.identityType || IDENTITY_TYPES[0]) as IdentityType}
+          username={user?.username || ''}
+        />
+        <DescriptionModal
+          isOpen={descriptionModalState.isOpen}
+          close={descriptionModalState.close}
+          save={async (description: string) => {
+            await charmClient.updateUserDetails({
+              description
+            });
+            mutate();
+            descriptionModalState.close();
+          }}
+          currentDescription={userDetails?.description}
+        />
+        <UserPathModal
+          isOpen={userPathModalState.isOpen}
+          close={userPathModalState.close}
+          save={async (path: string) => {
+            await charmClient.updateUser({
+              path
+            });
+            // @ts-ignore - not sure why types are wrong
+            updateUser(_user => ({ ..._user, path }));
+            userPathModalState.close();
+          }}
+          currentValue={user.path}
+        />
+        <SocialModal
+          isOpen={socialModalState.isOpen}
+          close={socialModalState.close}
+          save={async (social: Social) => {
+            await charmClient.updateUserDetails({
+              social
+            });
+            mutate();
+            socialModalState.close();
+          }}
+          social={socialDetails}
+        />
+      </>
+      )}
     </StyledBox>
   );
 }
