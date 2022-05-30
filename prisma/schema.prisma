@@ -77,7 +77,6 @@ model Page {
   contentText        String
   headerImage        String?
   icon               String?
-  isPublic           Boolean?         @default(false)
   path               String
   parentId           String?          @db.Uuid
   spaceId            String?          @db.Uuid
