@@ -105,7 +105,7 @@ function TransactionRow (
           <Grid container spacing={1}>
             <Grid item xs={5}>
               {transaction.actions.map(action => (
-                <Box py={1}>
+                <Box py={1} key={action.to.address}>
                   <Typography
                     gutterBottom
                   >
@@ -147,7 +147,7 @@ function TransactionRow (
             <Grid item xs={5} pr={1}>
               <Typography color='secondary' gutterBottom variant='body2'>Confirmations</Typography>
               {transaction.confirmations.map(confirmation => (
-                <Box py={1}>
+                <Box py={1} key={confirmation.address}>
                   {confirmation.user ? (
                     <UserDisplay
                       sx={{
@@ -210,6 +210,7 @@ function SafeTasks (
   { isSnoozed, address, safeName, safeUrl, tasks }:
   { isSnoozed: boolean, address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
 ) {
+  console.log(tasks);
   return (
     <>
       <Typography

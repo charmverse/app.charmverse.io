@@ -7,7 +7,7 @@ import BountyIcon from '@mui/icons-material/RequestPage';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import GnosisTasksList from './GnosisTasksList';
-import IntegrationCard from './IntegrationCard';
+import TasksPageHeader from './TasksPageHeader';
 
 type TaskType = 'multisig' | 'bounty' | 'proposal' | 'discussion'
 
@@ -58,7 +58,7 @@ export default function TasksPage () {
       >
         <Typography variant='h1' fontWeight='bold'>Personal Nexus</Typography>
       </Box>
-      <IntegrationCard />
+      <TasksPageHeader />
       <Legend>
         My tasks
       </Legend>
