@@ -22,7 +22,9 @@ function generateAccessiblePagesQuery ({ spaceId, userId, archived }: PagesReque
     deletedAt: {
       not: null
     }
-  } : {};
+  } : {
+    deletedAt: null
+  };
 
   return {
     where: {
