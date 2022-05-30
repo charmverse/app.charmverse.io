@@ -18,6 +18,7 @@ import Button from 'components/common/Button';
 import { getLitChainFromChainId } from 'lib/token-gates';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useSWR from 'swr';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from '../Legend';
 import TokenGatesTable from './TokenGatesTable';
 
@@ -26,6 +27,9 @@ import TokenGatesTable from './TokenGatesTable';
 type ConditionsModalResult = Pick<SigningConditions, 'accessControlConditions' | 'permanant'>;
 
 export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
+  const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
+  const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
+
   const litClient = useLitProtocol();
   const router = useRouter();
   const { chainId } = useWeb3React();
@@ -47,6 +51,11 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         setApiError(error.message || error);
         errorPopupState.open();
       });
+  }
+
+  function closeTokenGateDeleteModal () {
+    setRemovedTokenGate(null);
+    deletePopupState.close();
   }
 
   async function saveTokenGate (conditions: Partial<SigningConditions>) {
@@ -81,11 +90,8 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   }
 
   async function deleteTokenGate (tokenGate: TokenGate) {
-    if (window.confirm('Are you sure?')) {
-      await charmClient.deleteTokenGate(tokenGate.id);
-      // update the list of links
-      await mutate();
-    }
+    setRemovedTokenGate(tokenGate);
+    deletePopupState.open();
   }
 
   function onCopy () {
@@ -136,6 +142,21 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
         </BackDrop>
       </Portal>
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
+      {removedTokenGate && (
+      <ConfirmDeleteModal
+        title='Delete token gate'
+        onClose={closeTokenGateDeleteModal}
+        open={deletePopupState.isOpen}
+        buttonText='Delete token gate'
+        question='Are you sure you want to delete this invite link?'
+        onConfirm={async () => {
+          await charmClient.deleteTokenGate(removedTokenGate.id);
+          // update the list of links
+          await mutate();
+          setRemovedTokenGate(null);
+        }}
+      />
+      )}
     </>
   );
 }

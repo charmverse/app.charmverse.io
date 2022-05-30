@@ -1,15 +1,13 @@
-import { Table, TableHead, TableRow, TableCell, TableBody, Typography, Box } from '@mui/material';
-import { Contributor } from 'models';
-import { useContributors } from 'hooks/useContributors';
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import charmClient from 'charmClient';
-import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import Modal, { DialogTitle } from 'components/common/Modal';
-import { useState } from 'react';
-import { getDisplayName } from 'lib/users';
-import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import ContributorListItem, { RoleAction } from './ContributorListItem';
+import { useContributors } from 'hooks/useContributors';
+import { getDisplayName } from 'lib/users';
+import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
+import { Contributor } from 'models';
+import { useState } from 'react';
 import Legend from '../Legend';
+import ContributorListItem, { RoleAction } from './ContributorListItem';
 
 interface Props {
   isAdmin: boolean;

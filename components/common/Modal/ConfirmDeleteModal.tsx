@@ -5,7 +5,7 @@ import { Modal, ModalProps } from 'components/common/Modal';
 import Button from 'components/common/Button';
 import { ReactNode } from 'react';
 
-type Props = Pick<ModalProps, 'onClose' | 'open'> & {
+type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   question: string | ReactNode,
   buttonText?: string;
   title?: string;
@@ -18,7 +18,8 @@ export default function ConfirmDeleteModal ({
   question,
   buttonText = 'Delete',
   title,
-  onConfirm
+  onConfirm,
+  size
 }: Props) {
 
   function _onConfirm () {
@@ -31,6 +32,7 @@ export default function ConfirmDeleteModal ({
       open={open}
       onClose={onClose}
       title={title}
+      size={size}
     >
       {typeof question === 'string' ? (
         <Typography>
@@ -38,7 +40,7 @@ export default function ConfirmDeleteModal ({
         </Typography>
       ) : question}
 
-      <Box sx={{ columnSpacing: 2, mt: 3 }}>
+      <Box sx={{ columnSpacing: 2, mt: 3, display: 'flex' }}>
         <Button
           color='error'
           elevation={0}
