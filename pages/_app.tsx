@@ -20,7 +20,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Web3ReactProvider } from '@web3-react/core';
 import log from 'lib/log';
-import { LitProtocolProvider } from 'adapters/litProtocol/hooks/useLitProtocol';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import RouteGuard from 'components/common/RouteGuard';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
@@ -253,37 +252,35 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
             {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
             <LocalizationProvider dateAdapter={AdapterLuxon as any}>
               <Web3ConnectionManager>
-                <LitProtocolProvider>
-                  <ReduxProvider store={store}>
-                    <FocalBoardProviders>
-                      <DataProviders>
-                        <SnackbarProvider>
-                          <TitleContext.Consumer>
-                            {([title]) => (
-                              <Head>
-                                <title>
-                                  {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
-                                </title>
-                                {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
-                                <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                              </Head>
-                            )}
-                          </TitleContext.Consumer>
-                          <CssBaseline enableColorScheme={true} />
-                          <Global styles={cssVariables} />
-                          <RouteGuard>
-                            <ErrorBoundary>
-                              {getLayout(<Component {...pageProps} />)}
-                              <Snackbar />
-                            </ErrorBoundary>
-                          </RouteGuard>
-                        </SnackbarProvider>
-                      </DataProviders>
-                    </FocalBoardProviders>
-                    {/** include the root portal for focalboard's popup */}
-                    <FocalBoardPortal />
-                  </ReduxProvider>
-                </LitProtocolProvider>
+                <ReduxProvider store={store}>
+                  <FocalBoardProviders>
+                    <DataProviders>
+                      <SnackbarProvider>
+                        <TitleContext.Consumer>
+                          {([title]) => (
+                            <Head>
+                              <title>
+                                {title ? `${title} | CharmVerse` : 'CharmVerse - the all-in-one web3 workspace'}
+                              </title>
+                              {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
+                              <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+                            </Head>
+                          )}
+                        </TitleContext.Consumer>
+                        <CssBaseline enableColorScheme={true} />
+                        <Global styles={cssVariables} />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            {getLayout(<Component {...pageProps} />)}
+                            <Snackbar />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </SnackbarProvider>
+                    </DataProviders>
+                  </FocalBoardProviders>
+                  {/** include the root portal for focalboard's popup */}
+                  <FocalBoardPortal />
+                </ReduxProvider>
               </Web3ConnectionManager>
             </LocalizationProvider>
           </Web3ReactProvider>
