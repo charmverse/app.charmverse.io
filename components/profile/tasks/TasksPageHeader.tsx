@@ -179,7 +179,7 @@ export default function IntegrationCard () {
                 >
                   <Avatar size='large' variant='circular' name={userEnsName || getDisplayName(currentUser)} avatar={currentUser.avatar} />
                   <Typography fontWeight={500} color='secondary'>
-                    My Public Profile
+                    My <Box component='span' display={{ xs: 'none', lg: 'inline' }}>Public</Box> Profile
                   </Typography>
                 </Box>
                 <IconButton>
