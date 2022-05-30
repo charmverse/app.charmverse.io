@@ -43,11 +43,6 @@ const exampleBoardSchema: PageProperty [ ] = [{
 ];
 
 beforeAll(async () => {
-  jest.mock('lib/blockchain/getENSName', () => {
-    return {
-      default: null
-    };
-  });
   const generated = await generateUserAndSpaceWithApiToken(v4());
   user = generated.user;
   space = generated.space;
