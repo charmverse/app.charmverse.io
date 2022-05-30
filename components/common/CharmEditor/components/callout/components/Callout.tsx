@@ -2,10 +2,11 @@
 import { NodeViewProps } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Box, IconButton, Menu } from '@mui/material';
+import { Box, Menu } from '@mui/material';
 import { getTwitterEmoji } from 'components/common/Emoji';
 import { BaseEmoji, Picker } from 'emoji-mart';
 import { MouseEvent, ReactNode, useState } from 'react';
+import { alpha } from '@mui/system';
 
 const StyledCallout = styled.div`
   background-color: ${({ theme }) => theme.palette.background.light};
@@ -48,23 +49,48 @@ export default function Callout ({ children, node, updateAttrs }: NodeViewProps 
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   const theme = useTheme();
   const twemojiImage = getTwitterEmoji(node.attrs.emoji);
 
   return (
     <StyledCallout>
       <CalloutEmoji>
-        <IconButton
+        <Box
           sx={{
             width: 35,
             height: 35,
-            fontSize: 20
+            fontSize: 20,
+            padding: 0.75,
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '&:hover': {
+              // Copied from IconButton.js in @mui/system
+              background: alpha(theme.palette.action.active, theme.palette.action.hoverOpacity),
+              transition: 'background 100ms ease-in-out'
+            }
           }}
           onClick={handleClick}
         >
-          {twemojiImage ? <img src={twemojiImage} /> : node.attrs.emoji}
-        </IconButton>
+          {twemojiImage ? (
+            <img
+              style={{
+                cursor: 'pointer',
+                transition: 'background 100ms ease-in-out'
+              }}
+              src={twemojiImage}
+            />
+          ) : (
+            <div style={{
+              cursor: 'pointer',
+              transition: 'background 100ms ease-in-out'
+            }}
+            >
+              {node.attrs.emoji}
+            </div>
+          )}
+        </Box>
         <Menu
           anchorEl={anchorEl}
           open={open}
