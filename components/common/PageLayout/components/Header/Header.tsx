@@ -199,6 +199,8 @@ export default function Header (
               </IconButton>
             </Tooltip>
           )}
+          {/** user account */}
+          <Account />
         </Box>
       </Box>
     </StyledToolbar>
