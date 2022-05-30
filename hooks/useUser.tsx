@@ -2,10 +2,13 @@ import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import useENSName from 'hooks/useENSName';
 import { LoggedInUser } from 'models';
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 
 type IContext = [
-  user: LoggedInUser | null, setUser: (user: LoggedInUser | any) => void, isLoaded: boolean, setIsLoaded: (isLoaded: boolean) => void
+  user: LoggedInUser | null,
+  setUser: (user: LoggedInUser | any) => void,
+  isLoaded: boolean,
+  setIsLoaded: (isLoaded: boolean) => void
 ];
 
 export const UserContext = createContext<Readonly<IContext>>([null, () => undefined, false, () => undefined]);

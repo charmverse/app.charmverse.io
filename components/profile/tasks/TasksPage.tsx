@@ -12,6 +12,7 @@ import IntegrationCard from './IntegrationCard';
 type TaskType = 'multisig' | 'bounty' | 'proposal' | 'discussion'
 
 const tabStyles = {
+  mb: 2,
   minHeight: {
     xs: '34px',
     sm: '48px'

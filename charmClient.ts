@@ -36,6 +36,7 @@ import { GetTasksResponse } from 'pages/api/tasks';
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { TransactionCreationData } from 'lib/transactions/interface';
+import { PublicUser } from 'pages/api/public/profile/[userPath]';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -60,6 +61,10 @@ class CharmClient {
 
   getUser () {
     return http.GET<LoggedInUser>('/api/profile');
+  }
+
+  getUserByPath (path: string) {
+    return http.GET<PublicUser>(`/api/public/profile/${path}`);
   }
 
   createUser ({ address }: { address: string }) {

@@ -131,6 +131,7 @@ model User {
   username        String?
   avatar          String?
   isBot           Boolean?             @default(false)
+  path            String?              @unique
   discordUser     DiscordUser?
   telegramUser    TelegramUser?
   comments        Comment[]
@@ -150,8 +151,8 @@ model UserGnosisSafeState {
 }
 
 model UserDetails {
-  id          String   @id @db.Uuid
-  user        User     @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id          String  @id @db.Uuid
+  user        User    @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   description String?
   social      Json?
 }
@@ -221,26 +222,26 @@ enum BountyStatus {
 }
 
 model Bounty {
-  id               String        @id @default(uuid()) @db.Uuid
-  author           User          @relation(fields: [createdBy], references: [id])
-  createdBy        String        @db.Uuid()
-  suggestedBy      String?       @db.Uuid()
-  space            Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  spaceId          String        @db.Uuid
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @default(now())
-  description      String
-  descriptionNodes Json
-  reviewer         String?       @db.Uuid
-  chainId          Int
-  rewardAmount     Float
-  rewardToken      String
-  status           BountyStatus  @default(open)
-  title            String
-  linkedTaskId     String?       @db.Uuid
-  approveSubmitters Boolean      @default(false)
-  maxSubmissions    Int?         @default(1)
-  applications     Application[]
+  id                String        @id @default(uuid()) @db.Uuid
+  author            User          @relation(fields: [createdBy], references: [id])
+  createdBy         String        @db.Uuid()
+  suggestedBy       String?       @db.Uuid()
+  space             Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  spaceId           String        @db.Uuid
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @default(now())
+  description       String
+  descriptionNodes  Json
+  reviewer          String?       @db.Uuid
+  chainId           Int
+  rewardAmount      Float
+  rewardToken       String
+  status            BountyStatus  @default(open)
+  title             String
+  linkedTaskId      String?       @db.Uuid
+  approveSubmitters Boolean       @default(false)
+  maxSubmissions    Int?          @default(1)
+  applications      Application[]
 }
 
 enum ApplicationStatus {
@@ -253,31 +254,31 @@ enum ApplicationStatus {
 }
 
 model Application {
-  id            String   @id @default(uuid()) @db.Uuid
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now())
-  status        ApplicationStatus @default(applied)
-  spaceId       String
-  bountyId      String   @db.Uuid()
-  bounty        Bounty   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
-  createdBy     String   @db.Uuid()
-  applicant     User     @relation(fields: [createdBy], references: [id])
-  walletAddress String?
-  message       String?
-  submission   String?
+  id              String            @id @default(uuid()) @db.Uuid
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now())
+  status          ApplicationStatus @default(applied)
+  spaceId         String
+  bountyId        String            @db.Uuid()
+  bounty          Bounty            @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  createdBy       String            @db.Uuid()
+  applicant       User              @relation(fields: [createdBy], references: [id])
+  walletAddress   String?
+  message         String?
+  submission      String?
   submissionNodes String?
-  transactions Transaction[]
+  transactions    Transaction[]
 
   @@unique([bountyId, createdBy])
 }
 
 model Transaction {
-  id            String       @id @default(uuid()) @db.Uuid
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @default(now())
+  id            String      @id @default(uuid()) @db.Uuid
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now())
   transactionId String
   chainId       String
-  applicationId String   @db.Uuid()
+  applicationId String      @db.Uuid()
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 }
 

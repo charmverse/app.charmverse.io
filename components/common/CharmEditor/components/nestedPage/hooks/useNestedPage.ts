@@ -1,46 +1,39 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
-import { Page } from '@prisma/client';
 import { useCallback } from 'react';
 import { usePages } from 'hooks/usePages';
 import { addPage } from 'lib/pages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import { v4 } from 'uuid';
+import { useRouter } from 'next/router';
 
 export default function useNestedPage () {
   const [space] = useCurrentSpace();
   const [user] = useUser();
-  const { currentPageId, pages } = usePages();
+  const { currentPageId } = usePages();
   const view = useEditorViewContext();
-
-  const addNestedPage = useCallback(async (pageId?: string) => {
-    let page: Page | undefined;
-    // Creating a new page
-    if (!pageId) {
-      if (user && space) {
-        page = await addPage({
-          createdBy: user.id,
-          parentId: currentPageId,
-          spaceId: space.id
-        });
-      }
-    }
-    else {
-      page = pages[pageId];
-    }
-
-    rafCommandExec(view, (state, dispatch) => {
-      if (!page) {
-        return false;
-      }
-      const nestedPageNode = state.schema.nodes.page.create({
-        id: page.id
+  const router = useRouter();
+  const addNestedPage = useCallback(async () => {
+    if (user && space) {
+      const pageId = v4();
+      const newPage = await addPage({
+        id: pageId,
+        createdBy: user.id,
+        parentId: currentPageId,
+        spaceId: space.id
       });
-      if (dispatch) {
-        dispatch(state.tr.replaceSelectionWith(nestedPageNode));
-      }
-      return true;
-    });
+      rafCommandExec(view, (state, dispatch) => {
+        const nestedPageNode = state.schema.nodes.page.create({
+          id: pageId
+        });
+        if (dispatch) {
+          dispatch(state.tr.replaceSelectionWith(nestedPageNode));
+          router.push(`/${router.query.domain}/${newPage.path}`);
+        }
+        return true;
+      });
+    }
   }, [currentPageId, view]);
 
   return {

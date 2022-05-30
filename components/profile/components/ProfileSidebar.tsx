@@ -1,9 +1,6 @@
 
 import styled from '@emotion/styled';
-import { useUser } from 'hooks/useUser';
-import { useRouter } from 'next/router';
 import Workspaces from 'components/common/PageLayout/components/Sidebar/Workspaces';
-import { getDisplayName } from 'lib/users';
 
 const SidebarContainer = styled.div`
   display: flex;
@@ -37,10 +34,6 @@ interface SidebarProps {
 }
 
 export default function Sidebar ({ closeSidebar }: SidebarProps) {
-  const router = useRouter();
-  const [user] = useUser();
-
-  const userName = user ? getDisplayName(user) : '';
 
   return (
     <SidebarContainer>

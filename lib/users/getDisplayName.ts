@@ -1,9 +1,13 @@
 import { LoggedInUser, User } from 'models/User';
 import { shortenHex } from 'lib/utilities/strings';
+import { PublicUser } from 'pages/api/public/profile/[userPath]/index';
 
-export function getDisplayName (user?: User | LoggedInUser) {
+export function getDisplayName (user?: User | LoggedInUser | PublicUser) {
   if (!user) return '';
-  return (<LoggedInUser> user).ensName || user.username || shortenHex(user.addresses[0]);
+
+  return (user as LoggedInUser).ensName
+    || user.username
+    || ((user as User).addresses && shortenHex((user as User).addresses[0]));
 }
 
 export default getDisplayName;

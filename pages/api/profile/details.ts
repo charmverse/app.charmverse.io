@@ -31,7 +31,7 @@ async function getUserDetails (req: NextApiRequest, res: NextApiResponse<UserDet
     }
   });
   if (!details) {
-    return res.status(404).json({ error: 'No user details found' });
+    return res.status(202).end();
   }
   return res.status(200).json(details);
 }
