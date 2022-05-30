@@ -7,6 +7,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { v4 } from 'uuid';
 import { useRouter } from 'next/router';
+import { Page } from '@prisma/client';
 
 export default function useNestedPage () {
   const [space] = useCurrentSpace();
@@ -14,14 +15,17 @@ export default function useNestedPage () {
   const { currentPageId } = usePages();
   const view = useEditorViewContext();
   const router = useRouter();
-  const addNestedPage = useCallback(async () => {
+  const cardId = (new URLSearchParams(window.location.search)).get('cardId');
+  const isInsideCard = (cardId && cardId?.length !== 0);
+  const addNestedPage = useCallback(async (type?: Page['type']) => {
     if (user && space) {
       const pageId = v4();
       const newPage = await addPage({
         id: pageId,
         createdBy: user.id,
-        parentId: currentPageId,
-        spaceId: space.id
+        spaceId: space.id,
+        type: type ?? 'page',
+        parentId: isInsideCard ? cardId : currentPageId
       });
       rafCommandExec(view, (state, dispatch) => {
         const nestedPageNode = state.schema.nodes.page.create({
@@ -29,7 +33,15 @@ export default function useNestedPage () {
         });
         if (dispatch) {
           dispatch(state.tr.replaceSelectionWith(nestedPageNode));
-          router.push(`/${router.query.domain}/${newPage.path}`);
+          if (isInsideCard) {
+            // A small delay to let the inserted page be saved in the editor
+            setTimeout(() => {
+              router.push(`/${router.query.domain}/${newPage.path}`);
+            }, 150);
+          }
+          else {
+            router.push(`/${router.query.domain}/${newPage.path}`);
+          }
         }
         return true;
       });

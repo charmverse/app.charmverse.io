@@ -1,9 +1,7 @@
-import { ReactNode, createContext, useContext, useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import LitJsSdk from 'lit-js-sdk';
 
-const LitProtocolContext = createContext<LitJsSdk.LitNodeClient | null>(null);
-
-export function LitProtocolProvider ({ children }: { children: ReactNode }) {
+function useLitProtocol () {
 
   const [litClient, setClient] = useState<LitJsSdk.LitNodeClient | null>(null);
   const client = useMemo(() => new LitJsSdk.LitNodeClient({
@@ -17,13 +15,7 @@ export function LitProtocolProvider ({ children }: { children: ReactNode }) {
       });
   }, []);
 
-  return (
-    <LitProtocolContext.Provider value={litClient}>
-      {children}
-    </LitProtocolContext.Provider>
-  );
+  return litClient;
 }
-
-const useLitProtocol = () => useContext(LitProtocolContext);
 
 export default useLitProtocol;

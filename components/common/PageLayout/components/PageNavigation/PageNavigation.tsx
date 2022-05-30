@@ -43,6 +43,7 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
     node = tempItems[i];
     const nodeIndex = node[key];
     const index = nodeIndex ? map[nodeIndex] : -1;
+
     if (node[key] && tempItems[index] && node.deletedAt === null) {
       // Make sure its not a database page or a focalboard card
       if (tempItems[index].type === 'page') {
@@ -50,7 +51,8 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
         sortArrayByObjectProperty(tempItems[index].children, 'index');
       }
     }
-    else if (!rootPageIds && node.deletedAt === null) {
+    // If its a root page always show it
+    else if ((node.parentId === null) && !rootPageIds && node.deletedAt === null) {
       roots.push(node);
     }
     if (rootPageIds?.includes(node.id)) {
