@@ -13,12 +13,16 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
         display: 'flex',
         alignItems: 'flex-end',
         gap: 1,
-        mb: 3
+        mb: 3,
+        fontSize: {
+          xs: '1.5em',
+          sm: '2rem'
+        }
       }}
     >
       {subPage ? (
         <>
-          <Link color='secondary' href='/profile'>
+          <Link color='secondary' href='/profile' sx={{ display: 'flex', alignItems: 'center' }}>
             <ChevronLeft />
             {MyNexus}
           </Link>
