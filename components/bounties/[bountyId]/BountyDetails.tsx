@@ -28,18 +28,17 @@ export default function BountyDetails () {
   }
 
   return (
-    <Box py={3} px='80px'>
+    <Box py={3} px={18}>
 
-      <Container top={20}>
-        <BountyHeader bounty={currentBounty} />
+      <BountyHeader bounty={currentBounty} />
 
-        <BountyDescription />
+      <BountyDescription />
 
-        {
+      {
           currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />
         }
 
-        {
+      {
           currentBounty.status !== 'suggestion' && (
             <>
               <Box sx={{ mb: 3 }}>
@@ -57,8 +56,6 @@ export default function BountyDetails () {
             </>
           )
         }
-
-      </Container>
     </Box>
   );
 
