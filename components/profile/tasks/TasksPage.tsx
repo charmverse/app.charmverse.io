@@ -7,7 +7,8 @@ import BountyIcon from '@mui/icons-material/RequestPage';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import GnosisTasksList from './GnosisTasksList';
-import IntegrationCard from './IntegrationCard';
+import TasksPageHeader from './TasksPageHeader';
+import NexusPageTitle from '../components/NexusPageTitle';
 
 type TaskType = 'multisig' | 'bounty' | 'proposal' | 'discussion'
 
@@ -45,24 +46,12 @@ export default function TasksPage () {
 
   return (
     <>
-      <Box
-        display='flex'
-        justifyContent='space-between'
-        mb={3}
-        sx={{
-          display: {
-            xs: 'none',
-            sm: 'inherit'
-          }
-        }}
-      >
-        <Typography variant='h1' fontWeight='bold'>Personal Nexus</Typography>
-      </Box>
-      <IntegrationCard />
+      <NexusPageTitle />
+      <TasksPageHeader />
       <Legend>
         My tasks
       </Legend>
-      <Tabs
+      {/* <Tabs
         sx={tabStyles}
         textColor='primary'
         indicatorColor='secondary'
@@ -96,7 +85,7 @@ export default function TasksPage () {
             value={task.type}
           />
         ))}
-      </Tabs>
+      </Tabs> */}
       {currentTab === 'multisig' ? <GnosisTasksList /> : null}
     </>
   );
