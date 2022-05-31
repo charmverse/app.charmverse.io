@@ -92,7 +92,7 @@ export default function IntegrationCard () {
                 <Box
                   display={{
                     xs: 'none',
-                    lg: 'flex'
+                    md: 'flex'
                   }}
                   gap={{
                     xs: 1,
