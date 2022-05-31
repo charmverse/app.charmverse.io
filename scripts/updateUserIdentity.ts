@@ -53,7 +53,9 @@ import { prisma } from '../db';
                             && user.telegramUser.createdAt > user.discordUser.createdAt
           ? IDENTITY_TYPES[2] : IDENTITY_TYPES[1];
       }
-      else if (telegramAccount && telegramAccount.username === user.username && !user.identityType) {
+      else if (telegramAccount
+        && (telegramAccount.username === user.username || user.username === `${telegramAccount.first_name} ${telegramAccount.last_name}`)
+        && !user.identityType) {
         identityType = IDENTITY_TYPES[2];
       }
 
