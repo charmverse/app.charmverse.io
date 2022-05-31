@@ -22,21 +22,32 @@ import { prisma } from '../db';
   let ensFound = 0;
 
   await Promise.all(users.map(async user => {
-    if (!user.addresses) {
+    if (!user.addresses?.length) {
       return;
     }
     const address = user.addresses[0];
-    const ens: string | null = await getENSName(address);
+    const ens = await getENSName(address);
 
-    user.ensName = ens || undefined;
-    ensFound += 1;
+    if (ens) {
+      user.ensName = ens || undefined;
+      ensFound += 1;
+    }
   }));
 
   console.log('Found', ensFound, 'ens names');
 
+  const identityTypes = {
+    wallet: 0,
+    telegram: 0,
+    discord: 0
+  };
+
   await prisma.$transaction(
     users.map((user) => {
       if (!user.username && user.addresses?.[0]) {
+
+        identityTypes.wallet += 1;
+
         return prisma.user.update({
           where: {
             id: user.id
@@ -66,6 +77,12 @@ import { prisma } from '../db';
         && (telegramAccount.username === user.username || user.username === `${telegramAccount.first_name} ${telegramAccount.last_name}`)) {
         identityType = IDENTITY_TYPES[2];
       }
+      if (identityType === 'Discord') {
+        identityTypes.discord += 1;
+      }
+      else {
+        identityTypes.telegram += 1;
+      }
 
       return prisma.user.update({
         where: {
@@ -77,5 +94,7 @@ import { prisma } from '../db';
       });
     })
   );
+
+  console.log('set identity types', identityTypes);
 
 })();
