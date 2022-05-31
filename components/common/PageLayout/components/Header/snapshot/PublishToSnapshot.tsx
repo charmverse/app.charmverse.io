@@ -8,6 +8,7 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import { Modal } from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { getSnapshotProposal, SnapshotProposal } from 'lib/snapshot';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -19,6 +20,7 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
   const [checkingProposal, setCheckingProposal] = useState(!!page.snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const { pages, setPages } = usePages();
+  const [currentSpace] = useCurrentSpace();
 
   const {
     isOpen,
@@ -65,7 +67,7 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
       }
 
       {
-        !checkingProposal && !proposal && (
+        !checkingProposal && currentSpace?.snapshotDomain && !proposal && (
           <>
             <IosShareIcon
               fontSize='small'
@@ -76,10 +78,8 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
             />
             <ListItemText onClick={open} primary='Publish to snapshot' />
 
-            <Modal open={isOpen} onClose={close} title='Publish to snapshot'>
-              <Box sx={{ maxHeight: '80vh', margin: 'auto', overflowY: 'auto' }}>
-                <PublishingForm onSubmit={close} page={page} />
-              </Box>
+            <Modal size='large' open={isOpen} onClose={close} title={`Publish to snapshot (${currentSpace.snapshotDomain})`}>
+              <PublishingForm onSubmit={close} page={page} />
             </Modal>
           </>
         )
