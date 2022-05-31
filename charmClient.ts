@@ -37,6 +37,7 @@ import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
+import { SuggestionAction } from 'lib/bounties';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -385,6 +386,10 @@ class CharmClient {
     const data = await http.POST<Bounty>('/api/bounties', bounty);
 
     return data;
+  }
+
+  async reviewBountySuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | {success: true}> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/review-suggestion`, { decision });
   }
 
   async getBounty (bountyId: string): Promise<BountyWithDetails> {
