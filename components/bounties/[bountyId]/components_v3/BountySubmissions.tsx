@@ -154,7 +154,8 @@ export default function BountySubmissions ({ bounty }: Props) {
         }}
         >
           <TableRow>
-            <TableCell size='small' align='left'>
+            {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
+            <TableCell sx={{ width: 120 }} align='left'>
               Status
             </TableCell>
             <TableCell>

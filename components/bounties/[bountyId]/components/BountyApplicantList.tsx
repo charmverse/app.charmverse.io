@@ -104,8 +104,6 @@ export function BountyApplicantList ({
     submissions: applications
   });
 
-  console.log('New applications suspended', newApplicationsSuspended);
-
   return (
     <>
       <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
@@ -137,7 +135,8 @@ export function BountyApplicantList ({
           }}
           >
             <TableRow>
-              <TableCell>Status</TableCell>
+              {/* Width should always be same as Bounty Submissions status column, so submitter and applicant columns align */}
+              <TableCell sx={{ width: 120 }}>Status</TableCell>
               <TableCell>
                 <Box sx={{
                   display: 'flex',
