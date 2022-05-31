@@ -148,8 +148,6 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
     defaultMessage: 'Delete view',
   })
 
-  
-
   return (<>
     <Tabs textColor='primary' indicatorColor='secondary' value={currentViewId} sx={{ minHeight: 40 }}>
       {shownViews.map(view => (
@@ -200,10 +198,10 @@ function ViewTabs({ board, activeView, intl, readonly, showView, views }: ViewTa
         <ListItemIcon><DuplicateIcon /></ListItemIcon>
         <ListItemText>{duplicateViewText}</ListItemText>
       </MenuItem>
-      <MenuItem dense onClick={handleDeleteView}>
+      {views.length !== 1 && <MenuItem dense onClick={handleDeleteView}>
         <ListItemIcon><DeleteIcon /></ListItemIcon>
         <ListItemText>{deleteViewText}</ListItemText>
-      </MenuItem>
+      </MenuItem>}
     </Menu>
 
     <Menu
