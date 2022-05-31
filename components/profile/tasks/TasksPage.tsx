@@ -51,7 +51,7 @@ export default function TasksPage () {
       <Legend>
         My tasks
       </Legend>
-      <Tabs
+      {/* <Tabs
         sx={tabStyles}
         textColor='primary'
         indicatorColor='secondary'
@@ -85,7 +85,7 @@ export default function TasksPage () {
             value={task.type}
           />
         ))}
-      </Tabs>
+      </Tabs> */}
       {currentTab === 'multisig' ? <GnosisTasksList /> : null}
     </>
   );
