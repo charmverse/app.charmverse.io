@@ -1,4 +1,4 @@
-
+import { User } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
 import Stack from '@mui/material/Stack';
@@ -14,7 +14,6 @@ import { useContext, useState, useEffect } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import useENSName from 'hooks/useENSName';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import styled from '@emotion/styled';
 import { CircularProgress, Tooltip } from '@mui/material';
@@ -46,9 +45,8 @@ function AccountModal ({ isOpen, onClose }:
   const [discordError, setDiscordError] = useState('');
   const [telegramError, setTelegramError] = useState('');
   const router = useRouter();
-  const [space] = useCurrentSpace();
-  const isConnectingToDiscord = space && typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'connect';
-  const discordConnectFailed = space && router.query.discord === '2' && router.query.type === 'connect';
+  const isConnectingToDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'connect';
+  const discordConnectFailed = router.query.discord === '2' && router.query.type === 'connect';
   const [isConnectDiscordLoading, setIsConnectDiscordLoading] = useState(false);
   const { showMessage } = useSnackbar();
   const connectedWithDiscord = Boolean(user?.discordUser);
@@ -104,8 +102,8 @@ function AccountModal ({ isOpen, onClose }:
       if (connectedWithDiscord) {
         setIsDisconnectingDiscord(true);
         try {
-          await charmClient.disconnectDiscord();
-          setUser({ ...user, discordUser: null });
+          const updatedUser: User = await charmClient.disconnectDiscord();
+          setUser({ ...user, ...updatedUser, discordUser: null });
         }
         catch (err) {
           log.warn('Error disconnecting from discord', err);
@@ -123,8 +121,8 @@ function AccountModal ({ isOpen, onClose }:
     if (connectedWithTelegram) {
       setIsConnectingTelegram(true);
       try {
-        await charmClient.disconnectTelegram();
-        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: null }));
+        const updatedUser: User = await charmClient.disconnectTelegram();
+        setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUser, telegramUser: null }));
       }
       catch (err: any) {
         setTelegramError(err.message || err.error || 'Something went wrong. Please try again');

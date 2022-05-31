@@ -7,16 +7,31 @@ import Typography from '@mui/material/Typography';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import InviteForm, { FormValues as InviteLinkFormValues } from 'components/settings/contributors/InviteLinks/InviteLinkForm';
 import charmClient from 'charmClient';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { useState } from 'react';
+import { InviteLink } from '@prisma/client';
 import InvitesTable from './InviteLinksTable';
 
 export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
+  const [removedInviteLink, setRemovedInviteLink] = useState<InviteLink | null>(null);
 
   const { data, mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));
   const {
     isOpen,
     open,
     close
-  } = usePopupState({ variant: 'popover', popupId: 'invite-link' });
+  } = usePopupState({ variant: 'popover', popupId: 'invite-link-form' });
+
+  const {
+    isOpen: isInviteLinkDeleteOpen,
+    open: openInviteLinkDelete,
+    close: closeInviteLinkDelete
+  } = usePopupState({ variant: 'popover', popupId: 'invite-link-delete' });
+
+  function closeInviteLinkDeleteModal () {
+    setRemovedInviteLink(null);
+    closeInviteLinkDelete();
+  }
 
   async function createLink (values: InviteLinkFormValues) {
     await charmClient.createInviteLink({
@@ -29,11 +44,8 @@ export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean
   }
 
   async function deleteLink (link: InviteLinkPopulated) {
-    if (window.confirm('Are you sure?')) {
-      await charmClient.deleteInviteLink(link.id);
-      // update the list of links
-      await mutate();
-    }
+    setRemovedInviteLink(link);
+    openInviteLinkDelete();
   }
 
   return (
@@ -47,6 +59,21 @@ export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean
       <Modal open={isOpen} onClose={close}>
         <InviteForm onSubmit={createLink} onClose={close} />
       </Modal>
+      {removedInviteLink && (
+      <ConfirmDeleteModal
+        title='Delete invite link'
+        onClose={closeInviteLinkDeleteModal}
+        open={isInviteLinkDeleteOpen}
+        buttonText='Delete'
+        question='Are you sure you want to delete this invite link?'
+        onConfirm={async () => {
+          await charmClient.deleteInviteLink(removedInviteLink.id);
+          // update the list of links
+          await mutate();
+          setRemovedInviteLink(null);
+        }}
+      />
+      )}
     </>
   );
 }

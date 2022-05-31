@@ -1,5 +1,5 @@
 
-import applyDevTools from 'prosemirror-dev-tools';
+import { applyDevTools } from 'prosemirror-dev-tools';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { useEffect } from 'react';
 

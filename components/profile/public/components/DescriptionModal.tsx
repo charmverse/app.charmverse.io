@@ -26,7 +26,9 @@ function DescriptionModal (props: DescriptionModalProps) {
   const {
     register,
     reset,
+    setValue,
     handleSubmit,
+    watch,
     formState: { errors }
   } = useForm<FormValues>({
     defaultValues: {
@@ -45,6 +47,8 @@ function DescriptionModal (props: DescriptionModalProps) {
     save(values.description);
   }
 
+  const watchDescription = watch('description');
+
   return (
     <Modal open={isOpen} onClose={close} size='large'>
       <DialogTitle onClose={close}>Describe yourself in a few words</DialogTitle>
@@ -58,7 +62,16 @@ function DescriptionModal (props: DescriptionModalProps) {
             placeholder='Tell the world a bit more about yourself ...'
             multiline
             minRows={10}
+            onChange={(event) => {
+              if (event.target.value.length > 500) {
+                setValue('description', event.target.value.substring(0, 500));
+              }
+              else {
+                setValue('description', event.target.value);
+              }
+            }}
           />
+          <Box justifyContent='end' sx={{ display: 'flex' }}>{watchDescription.length}/500</Box>
           <Box mt={4} sx={{ display: 'flex' }}>
             <Button type='submit'>
               Save

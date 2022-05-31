@@ -1,4 +1,4 @@
-import type { DiscordUser, FavoritePage, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser, UserGnosisSafeState } from '@prisma/client';
+import type { DiscordUser, FavoritePage, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser } from '@prisma/client';
 
 export { FavoritePage, SpaceRole, User };
 
@@ -18,3 +18,6 @@ export interface LoggedInUser extends User {
   discordUser?: DiscordUser | null
   telegramUser?: TelegramUser | null
 }
+
+export const IDENTITY_TYPES = ['Wallet', 'Discord', 'Telegram', 'RandomName'] as const;
+export type IdentityType = typeof IDENTITY_TYPES[number];
