@@ -26,13 +26,6 @@ import SocialModal from './SocialModal';
 import IdentityModal from './IdentityModal';
 import { Social } from '../interfaces';
 
-const StyledBox = styled(Box)`
-
-  svg {
-    cursor: pointer;
-  }
-`;
-
 const StyledDivider = styled(Divider)`
   height: 36px;
 `;
@@ -105,7 +98,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
   const userLink = `${hostname}/u/${userPath}`;
 
   return (
-    <StyledBox>
+    <Box>
       <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
           name={userName}
@@ -272,6 +265,6 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
         }}
         social={socialDetails}
       />
-    </StyledBox>
+    </Box>
   );
 }

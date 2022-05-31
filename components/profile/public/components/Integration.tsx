@@ -5,7 +5,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { IntegrationType } from '../interfaces';
 
 const StyledBox = styled(Box)`
-  background-color:  ${({ theme }) => theme.palette.background.light};
+  background-color:  ${({ theme }) => theme.palette.primary};
   display: inline-flex;
   border-radius: 7px;
 `;
