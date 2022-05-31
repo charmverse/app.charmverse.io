@@ -73,7 +73,7 @@ export default function Workspaces () {
     <WorkspacesContainer>
       <Grid container spacing={2} flexDirection='column'>
         <Grid item>
-          <AvatarLink href='/profile' passHref>
+          <AvatarLink href='/profile/tasks' passHref>
             <MuiLink>
               <Tooltip title={userName} placement='right' arrow>
                 <span>
