@@ -8,13 +8,20 @@ import { prisma } from '../db';
 (async () => {
 
   const users: Array<Partial<LoggedInUser>> = await prisma.user.findMany({
+    where: {
+      identityType: null
+    },
     include: {
       discordUser: true,
       telegramUser: true
     }
   });
 
-  users.forEach(async user => {
+  console.log('found', users.length, 'users missing identity type');
+
+  let ensFound = 0;
+
+  await Promise.all(users.map(async user => {
     if (!user.addresses) {
       return;
     }
@@ -22,11 +29,14 @@ import { prisma } from '../db';
     const ens: string | null = await getENSName(address);
 
     user.ensName = ens || undefined;
-  });
+    ensFound += 1;
+  }));
+
+  console.log('Found', ensFound, 'ens names');
 
   await prisma.$transaction(
     users.map((user) => {
-      if (!user.identityType && !user.username && user.addresses) {
+      if (!user.username && user.addresses?.[0]) {
         return prisma.user.update({
           where: {
             id: user.id
@@ -44,8 +54,7 @@ import { prisma } from '../db';
 
       if (user.discordUser
             && discordAccount
-            && discordAccount.username === user.username
-            && !user.identityType) {
+            && discordAccount.username === user.username) {
         // Check for scenario in which user has both Discord and Telegram, same username, but connected with Telegram last.
         identityType = telegramAccount
                             && telegramAccount.username === user.username
@@ -54,8 +63,7 @@ import { prisma } from '../db';
           ? IDENTITY_TYPES[2] : IDENTITY_TYPES[1];
       }
       else if (telegramAccount
-        && (telegramAccount.username === user.username || user.username === `${telegramAccount.first_name} ${telegramAccount.last_name}`)
-        && !user.identityType) {
+        && (telegramAccount.username === user.username || user.username === `${telegramAccount.first_name} ${telegramAccount.last_name}`)) {
         identityType = IDENTITY_TYPES[2];
       }
 
