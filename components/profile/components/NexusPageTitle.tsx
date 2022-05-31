@@ -26,7 +26,7 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
             <ChevronLeft />
             {MyNexus}
           </Link>
-          <Divider orientation='vertical' flexItem color='secondary' />
+          <Divider sx={{ borderRightWidth: '2px' }} orientation='vertical' flexItem />
           <Box component='span' alignItems='center' sx={{ fontWeight: 'bold' }}>
             {subPage}
           </Box>
