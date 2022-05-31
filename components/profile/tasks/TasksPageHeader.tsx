@@ -126,8 +126,7 @@ export default function IntegrationCard () {
                       fontSize: {
                         sm: '1rem',
                         xs: '1.75rem'
-                      },
-                      mr: 0.5
+                      }
                     }}
                   >
                     {safes?.length}
