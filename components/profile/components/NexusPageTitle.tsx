@@ -4,10 +4,11 @@ import ChevronLeft from '@mui/icons-material/ChevronLeft';
 
 export default function PageTitle ({ subPage }: { subPage?: string }) {
 
+  const MyNexus = 'My Nexus';
+
   return (
     <Typography
       variant='h1'
-      fontWeight='bold'
       sx={{
         display: 'flex',
         alignItems: 'flex-end',
@@ -15,18 +16,18 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
         mb: 3
       }}
     >
-      <Link color='inherit' href='/profile'>
-        <ChevronLeft />
-        My Nexus
-      </Link>
-      {subPage && (
+      {subPage ? (
         <>
+          <Link color='secondary' href='/profile'>
+            <ChevronLeft />
+            {MyNexus}
+          </Link>
           <Divider orientation='vertical' flexItem color='secondary' />
-          <Box alignItems='center' style={{ position: 'relative', top: '-2px', fontSize: '.7em' }}>
+          <Box component='span' alignItems='center' sx={{ fontWeight: 'bold' }}>
             {subPage}
           </Box>
         </>
-      )}
+      ) : <Box component='span' sx={{ fontWeight: 'bold' }}>MyNexus</Box>}
     </Typography>
   );
 
