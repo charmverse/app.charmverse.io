@@ -207,6 +207,7 @@ export default function BountySubmissions ({ bounty }: Props) {
                         avatarSize='small'
                         user={contributor}
                         fontSize='small'
+                        linkToProfile
                       />
                     );
                   }

@@ -188,6 +188,7 @@ export function BountyApplicantList ({
                             avatarSize='small'
                             user={contributor}
                             fontSize='small'
+                            linkToProfile
                           />
                         );
                       }
