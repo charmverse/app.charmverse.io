@@ -117,7 +117,7 @@ enum IdentityType {
   Wallet
   Discord
   Telegram
-  Name
+  RandomName
 }
 
 model User {

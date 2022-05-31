@@ -19,5 +19,5 @@ export interface LoggedInUser extends User {
   telegramUser?: TelegramUser | null
 }
 
-export const IDENTITY_TYPES = ['Wallet', 'Discord', 'Telegram', 'Name'] as const;
+export const IDENTITY_TYPES = ['Wallet', 'Discord', 'Telegram', 'RandomName'] as const;
 export type IdentityType = typeof IDENTITY_TYPES[number];
