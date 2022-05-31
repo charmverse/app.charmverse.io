@@ -7,7 +7,7 @@ export default function MyIntegrations () {
 
   return (
     <>
-      <NexusPageTitle title='Integrations' />
+      <NexusPageTitle subPage='Integrations' />
       <IdentityProviders />
       <MultiSigList />
     </>
