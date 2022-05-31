@@ -8,3 +8,16 @@ export interface BountyUpdate {
   bountyId: string,
   updateContent: UpdateableBountyFields
 }
+
+export type SuggestionDecision = 'approve' | 'reject'
+
+export interface SuggestionApproveAction {
+  bountyId: string;
+  decision: Extract<SuggestionDecision, 'approve'>
+}
+export interface SuggestionRejectAction {
+  bountyId: string;
+  decision: Extract<SuggestionDecision, 'reject'>
+}
+
+export type SuggestionAction = SuggestionApproveAction | SuggestionRejectAction
