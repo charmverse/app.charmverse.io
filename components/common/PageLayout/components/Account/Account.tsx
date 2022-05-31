@@ -23,6 +23,9 @@ const AccountCard = styled.div`
 const NetworkButton = styled(Button)`
   padding-left: 0;
   padding-right: 0;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  margin-right: 1px;
 `;
 
 const AccountButton = styled(Button)`
@@ -102,6 +105,10 @@ function Account (): JSX.Element {
         )}
         <AccountButton
           href='/profile/tasks'
+          sx={{
+            borderTopLeftRadius: '0 !important',
+            borderBottomLeftRadius: '0 !important'
+          }}
           endIcon={<Avatar avatar={user?.avatar} name={userName} size='small' />}
         >
           {userName}
