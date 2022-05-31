@@ -1,7 +1,8 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import styled from '@emotion/styled';
 import { Box, Divider, Grid, Link as ExternalLink, Stack, SvgIcon, Typography, Tooltip } from '@mui/material';
+import { User } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import EditIcon from '@mui/icons-material/Edit';
@@ -15,15 +16,18 @@ import charmClient from 'charmClient';
 import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DiscordIcon from 'public/images/discord_logo.svg';
-import { LoggedInUser } from 'models';
+import { LoggedInUser, IDENTITY_TYPES, IdentityType } from 'models';
 import { useWeb3React } from '@web3-react/core';
 import { getDisplayName } from 'lib/users';
+import { DiscordAccount } from 'lib/discord/getDiscordAccount';
+import { TelegramAccount } from 'pages/api/telegram/connect';
+import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
 import PoapSection from './PoapSection';
 import DescriptionModal from './DescriptionModal';
 import UserPathModal from './UserPathModal';
 import SocialModal from './SocialModal';
-import IdentityModal from './IdentityModal';
+import IdentityModal, { getIdentityIcon, IntegrationModel } from './IdentityModal';
 import { Social } from '../interfaces';
 
 const StyledDivider = styled(Divider)`
@@ -60,21 +64,16 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
     setTimeout(() => setIsDiscordUsernameCopied(false), 1000);
   };
 
+  const handleUserUpdate = async (data: Partial<User>) => {
+    const updatedUser = await charmClient.updateUser(data);
+    if (updateUser) {
+      updateUser(updatedUser);
+    }
+  };
+
   const onLinkCopy = () => {
     setIsPersonalLinkCopied(true);
     setTimeout(() => setIsPersonalLinkCopied(false), 1000);
-  };
-
-  const handleImageUpdate = async (url: string) => {
-    if (!updateUser) {
-      // someone else's profile
-      return;
-    }
-    const updatedUser = await charmClient.updateUser({
-      avatar: url
-    });
-
-    updateUser(updatedUser);
   };
 
   let socialDetails: Social = {};
@@ -93,6 +92,52 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
 
   const hasAnySocialInformation = (model: Social) => model.twitterURL || model.githubURL || model.discordUsername || model.linkedinURL;
 
+  const identityTypes: Array<IntegrationModel> = useMemo(() => {
+    if (isPublicUser(user)) {
+      return [];
+    }
+
+    const types: Array<IntegrationModel> = [];
+    if (user?.addresses) {
+      types.push({
+        type: IDENTITY_TYPES[0],
+        username: ENSName || user.addresses[0],
+        isInUse: user.identityType === IDENTITY_TYPES[0],
+        icon: getIdentityIcon(IDENTITY_TYPES[0])
+      });
+    }
+
+    if (user?.discordUser && user.discordUser.account) {
+      const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
+      types.push({
+        type: IDENTITY_TYPES[1],
+        username: discordAccount.username || '',
+        isInUse: user.identityType === IDENTITY_TYPES[1],
+        icon: getIdentityIcon(IDENTITY_TYPES[1])
+      });
+    }
+
+    if (user?.telegramUser && user.telegramUser.account) {
+      const telegramAccount = user.telegramUser.account as Partial<TelegramAccount>;
+      types.push({
+        type: IDENTITY_TYPES[2],
+        username: telegramAccount.username || `${telegramAccount.first_name} ${telegramAccount.last_name}`,
+        isInUse: user.identityType === IDENTITY_TYPES[2],
+        icon: getIdentityIcon(IDENTITY_TYPES[2])
+      });
+    }
+
+    if (user) {
+      types.push({
+        type: IDENTITY_TYPES[3],
+        username: user.identityType === IDENTITY_TYPES[3] && user.username ? user.username : '',
+        isInUse: user.identityType === IDENTITY_TYPES[3],
+        icon: getIdentityIcon(IDENTITY_TYPES[3])
+      });
+    }
+
+    return types;
+  }, [user]);
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
   const userPath = user.path || user.id;
   const userLink = `${hostname}/u/${userPath}`;
@@ -103,14 +148,15 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
         <Avatar
           name={userName}
           spaceImage={user?.avatar}
-          updateImage={handleImageUpdate}
+          updateImage={(url: string) => handleUserUpdate({ avatar: url })}
           displayIcons={!readOnly}
           variant='circular'
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
-            <Stack direction='row' spacing={1} alignItems='baseline'>
-              <Typography variant='h1'>{userName}</Typography>
+            <Stack direction='row' spacing={1} alignItems='end'>
+              { user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType) }
+              <Typography variant='h1'>{user?.username}</Typography>
               {!readOnly && (
                 <IconButton onClick={identityModalState.open}>
                   <EditIcon fontSize='small' />
@@ -189,14 +235,14 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
                 <>
                   <StyledDivider orientation='vertical' flexItem />
                   <IconButton onClick={socialModalState.open}>
-                    <EditIcon fontSize='small' />
+                    <EditIcon data-testid='edit-social' />
                   </IconButton>
                 </>
               )}
             </Stack>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
-            <Grid item xs={11}>
+            <Grid item xs={11} sx={{ wordBreak: 'break-word' }}>
               <span>
                 {
                   userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')
@@ -206,65 +252,73 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
               {!readOnly && (
                 <IconButton onClick={descriptionModalState.open}>
-                  <EditIcon fontSize='small' />
+                  <EditIcon data-testid='edit-description' />
                 </IconButton>
               )}
             </Grid>
           </Grid>
         </Grid>
       </Stack>
-      <Grid container direction='row'>
-        <Grid item xs={8}>
+    <Grid container direction='row'>
+      <Grid item xs={8}>
 
-        </Grid>
-        <Grid item xs={4}>
-          <PoapSection />
-        </Grid>
       </Grid>
-      <IdentityModal
-        isOpen={identityModalState.isOpen}
-        close={identityModalState.close}
-        defaultValues={{
-
-        }}
-      />
-      <DescriptionModal
-        isOpen={descriptionModalState.isOpen}
-        close={descriptionModalState.close}
-        save={async (description: string) => {
-          await charmClient.updateUserDetails({
-            description
-          });
-          mutate();
-          descriptionModalState.close();
-        }}
-        currentDescription={userDetails?.description}
-      />
-      <UserPathModal
-        isOpen={userPathModalState.isOpen}
-        close={userPathModalState.close}
-        save={async (path: string) => {
-          await charmClient.updateUser({
-            path
-          });
-          // @ts-ignore - not sure why types are wrong
-          updateUser(_user => ({ ..._user, path }));
-          userPathModalState.close();
-        }}
-        currentValue={user.path}
-      />
-      <SocialModal
-        isOpen={socialModalState.isOpen}
-        close={socialModalState.close}
-        save={async (social: Social) => {
-          await charmClient.updateUserDetails({
-            social
-          });
-          mutate();
-          socialModalState.close();
-        }}
-        social={socialDetails}
-      />
-    </Box>
+      <Grid item xs={4}>
+        <PoapSection />
+      </Grid>
+    </Grid>
+      { !isPublicUser(user) && (
+      <>
+        <IdentityModal
+          isOpen={identityModalState.isOpen}
+          close={identityModalState.close}
+          save={(id: string, identityType: IdentityType) => {
+            const username: string = identityType === IDENTITY_TYPES[0] ? (ENSName || shortenHex(id)) : id;
+            handleUserUpdate({ username, identityType });
+          }}
+          identityTypes={identityTypes}
+          identityType={(user?.identityType || IDENTITY_TYPES[0]) as IdentityType}
+          username={user?.username || ''}
+        />
+        <DescriptionModal
+          isOpen={descriptionModalState.isOpen}
+          close={descriptionModalState.close}
+          save={async (description: string) => {
+            await charmClient.updateUserDetails({
+              description
+            });
+            mutate();
+            descriptionModalState.close();
+          }}
+          currentDescription={userDetails?.description}
+        />
+        <UserPathModal
+          isOpen={userPathModalState.isOpen}
+          close={userPathModalState.close}
+          save={async (path: string) => {
+            await charmClient.updateUser({
+              path
+            });
+            // @ts-ignore - not sure why types are wrong
+            updateUser(_user => ({ ..._user, path }));
+            userPathModalState.close();
+          }}
+          currentValue={user.path}
+        />
+        <SocialModal
+          isOpen={socialModalState.isOpen}
+          close={socialModalState.close}
+          save={async (social: Social) => {
+            await charmClient.updateUserDetails({
+              social
+            });
+            mutate();
+            socialModalState.close();
+          }}
+          social={socialDetails}
+        />
+      </>
+      )}
+    </StyledBox>
   );
 }

@@ -38,12 +38,13 @@ export default function IntegrationCard () {
 
   return currentUser && (
     <IntegrationCardContainer>
-      <Grid container spacing={2}>
+      <Grid container spacing={{ sm: 2, xs: 1 }}>
         <Grid item xs>
           <Link href='/profile/integrations'>
             <Paper
               elevation={1}
               sx={{
+                height: '100%',
                 px: {
                   xs: 1, md: 3
                 },
@@ -75,10 +76,7 @@ export default function IntegrationCard () {
                       sm: '2.5rem'
                     },
                     fontWeight: 'bold',
-                    mr: {
-                      xs: 0.5,
-                      sm: 1
-                    }
+                    mr: 1
                   }}
                   >
                     {totalIntegrations}
@@ -86,18 +84,16 @@ export default function IntegrationCard () {
                   <Typography
                     color='secondary'
                     sx={{
-                      fontWeight: 500,
-                      fontSize: {
-                        xs: '0.75rem',
-                        sm: '1rem'
-                      }
+                      fontWeight: 500
                     }}
-                  >Integrations
+                  >Connected Identities
                   </Typography>
                 </Box>
-                <Divider sx={{ borderRightWidth: 2 }} orientation='vertical' variant='middle' flexItem />
                 <Box
-                  display='flex'
+                  display={{
+                    xs: 'none',
+                    md: 'flex'
+                  }}
                   gap={{
                     xs: 1,
                     sm: 2
@@ -116,21 +112,13 @@ export default function IntegrationCard () {
                       className='logo-image'
                       width={22.5}
                       height={22.5}
-                      src={telegramConnected ? '/images/telegram-logo-colored.png' : '/images/telegram-logo-greyscale.png'}
+                      src={telegramConnected ? '/images/telegram-logo.png' : '/images/telegram-logo-greyscale.png'}
                     />
                   </Tooltip>
                 </Box>
-                <Divider sx={{ borderRightWidth: 2 }} orientation='vertical' variant='middle' flexItem />
-                <Box display='flex' gap={1} height='100%' alignItems='center'>
-                  <KeyIcon
-                    color='secondary'
-                    sx={{
-                      display: {
-                        xs: 'none',
-                        sm: 'inherit'
-                      }
-                    }}
-                  />
+                <Divider sx={{ borderRightWidth: 2, display: { xs: 'none', lg: 'initial' } }} orientation='vertical' variant='middle' flexItem />
+                <Box gap={1} height='100%' alignItems='center' display={{ xs: 'none', lg: 'flex' }}>
+                  <KeyIcon color='secondary' />
                   <Typography
                     color='secondary'
                     fontWeight={500}
@@ -138,8 +126,7 @@ export default function IntegrationCard () {
                       fontSize: {
                         sm: '1rem',
                         xs: '1.75rem'
-                      },
-                      mr: 0.5
+                      }
                     }}
                   >
                     {safes?.length}
@@ -164,7 +151,7 @@ export default function IntegrationCard () {
             </Paper>
           </Link>
         </Grid>
-        <Grid item xs sx={{ maxWidth: { md: '300px' } }}>
+        <Grid item xs sx={{ maxWidth: '300px !important' }}>
           <Link href='/profile/public'>
             <Paper
               elevation={1}
@@ -195,7 +182,7 @@ export default function IntegrationCard () {
                 >
                   <Avatar size='large' variant='circular' name={userEnsName || getDisplayName(currentUser)} avatar={currentUser.avatar} />
                   <Typography fontWeight={500} color='secondary'>
-                    My Public Profile
+                    My <Box component='span' display={{ xs: 'none', lg: 'inline' }}>Public</Box> Profile
                   </Typography>
                 </Box>
                 <IconButton>

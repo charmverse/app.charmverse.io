@@ -2,6 +2,7 @@ import { prisma } from 'db';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
 import { v4 as uuid } from 'uuid';
+import { IDENTITY_TYPES } from 'models';
 
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
 
@@ -48,6 +49,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
       data: {
         id: userId,
         username: discordAccount.username,
+        identityType: IDENTITY_TYPES[1],
         avatar,
         discordUser: {
           create: {

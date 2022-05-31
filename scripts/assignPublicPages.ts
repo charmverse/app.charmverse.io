@@ -7,6 +7,7 @@ import { recursiveRebuild } from './inheritPagePermissions';
 const CONCURRENT = 3;
 
 async function upsertPublicPermissions () {
+  /*
   // STEP 0 - GET All current public pages
   const publicPages = await prisma.page.findMany({
     where: {
@@ -48,6 +49,7 @@ async function upsertPublicPermissions () {
 }
 
 async function checkConnection () {
+  /*
   return new Promise(resolve => {
     prisma.page.count({
       where: {
@@ -57,7 +59,7 @@ async function checkConnection () {
       resolve(count);
     });
   });
-
+  */
 }
 
 /*

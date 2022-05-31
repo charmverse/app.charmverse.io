@@ -5,6 +5,7 @@ import { NextHandler } from 'next-connect';
 import crypto from 'node:crypto';
 import { ApiError } from 'lib/middleware/errors';
 import log from 'lib/log';
+import { IDENTITY_TYPES } from 'models';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -58,7 +59,8 @@ export async function getBotUser (spaceId: string): Promise<User> {
     botUser = await prisma.user.create({
       data: {
         username: 'Bot',
-        isBot: true
+        isBot: true,
+        identityType: IDENTITY_TYPES[3]
       }
     });
 
