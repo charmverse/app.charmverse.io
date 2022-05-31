@@ -2,7 +2,7 @@ import { Application, ApplicationStatus, Block, Bounty, BountyStatus, Page, Pris
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { LoggedInUser, BountyWithDetails } from 'models';
+import { LoggedInUser, IDENTITY_TYPES, BountyWithDetails } from 'models';
 import { v4 } from 'uuid';
 import { IPageWithPermissions } from 'lib/pages/server';
 
@@ -10,6 +10,7 @@ export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string
   return prisma.user.create({
     data: {
       addresses: [v4()],
+      identityType: IDENTITY_TYPES[1],
       spaceRoles: {
         create: {
           space: {

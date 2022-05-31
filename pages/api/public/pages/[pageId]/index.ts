@@ -37,19 +37,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<{pages: 
 
   pages.push(page);
 
-  if (page.type === 'board') {
-    // For publicly shared board page fetch all of its card pages
-    const cardPages = await prisma.page.findMany({
-      where: {
-        deletedAt: null,
-        parentId: page.id,
-        type: 'card'
-      }
-    });
-
-    pages.push(...cardPages);
-  }
-  else if (page.type === 'card' && page.parentId) {
+  if (page.type === 'card' && page.parentId) {
     const boardPage = await prisma.page.findFirst({
       where: {
         deletedAt: null,

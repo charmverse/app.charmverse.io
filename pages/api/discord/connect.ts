@@ -11,6 +11,7 @@ import { prisma } from 'db';
 import { getDiscordAccount, DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { DiscordServerRole } from 'lib/discord/interface';
 import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { IDENTITY_TYPES } from 'models';
 
 const handler = nc({
   onError,
@@ -88,7 +89,8 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     },
     data: {
       username: discordAccount.username,
-      avatar
+      avatar,
+      identityType: IDENTITY_TYPES[1]
     }
   });
 

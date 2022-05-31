@@ -124,7 +124,7 @@ describe('POST /databases/{id}/search', () => {
 
     expect(response.statusCode).toBe(200);
 
-    expect(response.body).toEqual < PaginatedResponse<ApiPage>>(
+    expect(response.body).toEqual <PaginatedResponse<ApiPage>>(
       expect.objectContaining<PaginatedResponse<ApiPage>>({
         data: expect.any(Array),
         hasNext: expect.any(Boolean)
