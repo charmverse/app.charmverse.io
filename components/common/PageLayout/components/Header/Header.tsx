@@ -58,9 +58,9 @@ function CommentThreadsListButton () {
 }
 
 export default function Header (
-  { open, openSidebar }:
+  { open, openSidebar, hideSidebarOnSmallScreen }:
   {
-    open: boolean, openSidebar: () => void }
+    open: boolean, openSidebar: () => void, hideSidebarOnSmallScreen?: boolean }
 ) {
   const router = useRouter();
   const colorMode = useColorMode();
@@ -114,6 +114,10 @@ export default function Header (
         onClick={openSidebar}
         edge='start'
         sx={{
+          display: {
+            xs: hideSidebarOnSmallScreen ? 'none' : 'block',
+            md: 'block'
+          },
           marginRight: '36px',
           ...(open && { display: 'none' })
         }}
@@ -188,11 +192,13 @@ export default function Header (
           )}
 
           {/** dark mode toggle */}
-          <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
-            <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-              {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
-            </IconButton>
-          </Tooltip>
+          {user && (
+            <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='bottom'>
+              <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
+                {theme.palette.mode === 'dark' ? <SunIcon color='secondary' /> : <MoonIcon color='secondary' />}
+              </IconButton>
+            </Tooltip>
+          )}
           {/** user account */}
           <Account />
         </Box>

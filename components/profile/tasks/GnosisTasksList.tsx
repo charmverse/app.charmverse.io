@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import styled from '@emotion/styled';
 import { Alert, Box, Button, Card, Chip, Collapse, Divider, Grid, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ExpandLess from '@mui/icons-material/ExpandLess';
@@ -7,7 +6,6 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import PeopleIcon from '@mui/icons-material/People';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
-import Legend from 'components/settings/Legend';
 import UserDisplay, { AnonUserDisplay } from 'components/common/UserDisplay';
 import { shortenHex } from 'lib/utilities/strings';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
@@ -16,7 +14,6 @@ import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
 import SnoozeIcon from '@mui/icons-material/Snooze';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { DateTime } from 'luxon';
 import charmClient from 'charmClient';
 import Tooltip from '@mui/material/Tooltip';
@@ -28,11 +25,6 @@ import useTasks from './hooks/useTasks';
 
 const rowHeight = 48;
 
-const GridColumn = styled((props: any) => <Grid item xs {...props} />)`
-  display: flex;
-  align-items: center;
-`;
-
 function TransactionRow (
   { firstNonce, isSnoozed, transaction }:
   { firstNonce: number, isSnoozed: boolean, transaction: GnosisTransactionPopulated }
@@ -43,51 +35,109 @@ function TransactionRow (
 
   return (
     <>
-      <Grid container key={transaction.id} sx={{ height: rowHeight }} onClick={() => setExpanded(!expanded)}>
-        <GridColumn>
+      <Grid justifyContent='space-between' alignItems='center' container key={transaction.id} sx={{ width: '100%', height: rowHeight }} onClick={() => setExpanded(!expanded)}>
+        <Grid
+          item
+          xs={4}
+          sx={{
+            fontSize: { xs: 14, sm: 'inherit' }
+          }}
+        >
           {transaction.description}
-        </GridColumn>
-        <GridColumn>
+        </Grid>
+        <Grid
+          item
+          xs={2}
+          sx={{
+            display: { xs: 'none', sm: 'inherit' }
+          }}
+        >
           {DateTime.fromISO(transaction.date).toRelative({ base: DateTime.now() })}
-        </GridColumn>
-        <GridColumn>
+        </Grid>
+        <Grid
+          item
+          xs={2}
+          sx={{
+            display: { xs: 'none', sm: 'inherit' }
+          }}
+        >
           <Typography variant='caption' sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: isReadyToExecute ? 'bold' : '' }}>
             <PeopleIcon color='secondary' fontSize='small' /> {transaction.confirmations?.length || 0} out of {transaction.threshold}
           </Typography>
-        </GridColumn>
-        <GridColumn sx={{ justifyContent: 'flex-end' }}>
-          <Tooltip arrow placement='top' title={isSnoozed ? 'Transactions snoozed' : !isFirstTask ? `Transaction with nonce ${firstNonce} needs to be executed first` : ''}>
-            <div>
-              <Chip
-                clickable={!!transaction.myAction}
-                component='a'
-                label={transaction.myAction || 'Waiting for others'}
-                href={transaction.myActionUrl}
-                target='_blank'
-                color={transaction.myAction ? 'primary' : undefined}
-                variant={transaction.myAction ? 'filled' : 'outlined'}
-                disabled={isSnoozed || !isFirstTask}
-              />
-            </div>
-          </Tooltip>
-        </GridColumn>
-        <GridColumn sx={{ flexGrow: '0 !important' }}>
-          <Box sx={{ width: 60, display: 'flex', justifyContent: 'center' }}>
-            {expanded ? <ExpandLess /> : <ExpandMore />}
+        </Grid>
+        <Grid
+          item
+          xs={3}
+        >
+          <Box
+            justifySelf='flex-end'
+            display='flex'
+            sx={{
+              width: '100%',
+              justifyContent: 'right'
+            }}
+          >
+            <Box justifySelf='flex-end' gap={1} display='flex' alignItems='center'>
+              <Tooltip arrow placement='top' title={isSnoozed ? 'Transactions snoozed' : !isFirstTask ? `Transaction with nonce ${firstNonce} needs to be executed first` : ''}>
+                <div>
+                  <Chip
+                    clickable={!!transaction.myAction}
+                    component='a'
+                    label={transaction.myAction || 'Waiting for others'}
+                    href={transaction.myActionUrl}
+                    target='_blank'
+                    color={transaction.myAction ? 'primary' : undefined}
+                    variant={transaction.myAction ? 'filled' : 'outlined'}
+                    disabled={isSnoozed || !isFirstTask}
+                  />
+                </div>
+              </Tooltip>
+              <Box sx={{ mr: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                {expanded ? <ExpandLess /> : <ExpandMore />}
+              </Box>
+            </Box>
           </Box>
-        </GridColumn>
+        </Grid>
       </Grid>
       <Collapse in={expanded}>
         <Divider />
-        <Box py={1} pl={4} pr={1} sx={{ bgcolor: 'background.light' }}>
+        <Box py={1} pl={1} sx={{ bgcolor: 'background.light' }}>
           <Grid container spacing={1}>
-            <Grid item xs={6}>
+            <Grid item xs={5}>
               {transaction.actions.map(action => (
                 <Box py={1}>
-                  <Typography gutterBottom>
+                  <Typography
+                    gutterBottom
+                  >
                     Sending <strong>{action.friendlyValue}</strong> to:
                   </Typography>
-                  {action.to.user ? <UserDisplay avatarSize='small' user={action.to.user} /> : <AnonUserDisplay avatarSize='small' address={action.to.address} />}
+                  {action.to.user ? (
+                    <UserDisplay
+                      sx={{
+                        '.MuiTypography-root': {
+                          fontSize: {
+                            xs: 14,
+                            sm: 'inherit'
+                          }
+                        }
+                      }}
+                      avatarSize='small'
+                      user={action.to.user}
+                    />
+                  ) : (
+                    <AnonUserDisplay
+                      avatarSize='small'
+                      sx={{
+                        '.MuiTypography-root': {
+                          fontSize: {
+                            xs: 14,
+                            sm: 'inherit'
+                          }
+                        }
+                      }}
+                      address={shortenHex(action.to.address)}
+                    />
+                  )}
                 </Box>
               ))}
             </Grid>
@@ -98,7 +148,33 @@ function TransactionRow (
               <Typography color='secondary' gutterBottom variant='body2'>Confirmations</Typography>
               {transaction.confirmations.map(confirmation => (
                 <Box py={1}>
-                  {confirmation.user ? <UserDisplay avatarSize='small' user={confirmation.user} /> : <AnonUserDisplay avatarSize='small' address={confirmation.address} />}
+                  {confirmation.user ? (
+                    <UserDisplay
+                      sx={{
+                        '.MuiTypography-root': {
+                          fontSize: {
+                            xs: 14,
+                            sm: 'inherit'
+                          }
+                        }
+                      }}
+                      avatarSize='small'
+                      user={confirmation.user}
+                    />
+                  ) : (
+                    <AnonUserDisplay
+                      sx={{
+                        '.MuiTypography-root': {
+                          fontSize: {
+                            xs: 14,
+                            sm: 'inherit'
+                          }
+                        }
+                      }}
+                      avatarSize='small'
+                      address={shortenHex(confirmation.address)}
+                    />
+                  )}
                 </Box>
               ))}
               {transaction.snoozedUsers.length !== 0 ? <Typography sx={{ mt: 2 }} color='secondary' gutterBottom variant='body2'>Snoozed</Typography> : null}
@@ -134,7 +210,6 @@ function SafeTasks (
   { isSnoozed, address, safeName, safeUrl, tasks }:
   { isSnoozed: boolean, address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
 ) {
-
   return (
     <>
       <Typography
@@ -162,7 +237,20 @@ function SafeTasks (
         tasks.map((task: GnosisTask) => (
           <Card key={task.nonce} sx={{ my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
             <Box display='flex'>
-              <Box px={3} height={rowHeight} display='flex' alignItems='center'>
+              <Box
+                px={2}
+                sx={{
+                  px: { xs: 1 },
+                  fontWeight: 'bold',
+                  fontSize: {
+                    xs: '0.85rem',
+                    sm: 'inherit'
+                  }
+                }}
+                height={rowHeight}
+                display='flex'
+                alignItems='center'
+              >
                 {task.transactions[0].nonce}
               </Box>
               <Box flexGrow={1}>
@@ -306,7 +394,7 @@ function SnoozeTransactions (
   }, [showDatePicker]);
 
   return (
-    <Box sx={{ float: 'right' }}>
+    <Box>
       <Button
         disabled={isValidating}
         variant='outlined'
@@ -483,22 +571,33 @@ export default function GnosisTasksSection () {
 
   const safesWithTasks = tasks?.gnosis;
 
+  if (!safesWithTasks) {
+    if (error) {
+      return (
+        <Box>
+          <Alert severity='error'>
+            There was an error. Please try again later!
+          </Alert>
+        </Box>
+      );
+    }
+    else {
+      return <LoadingComponent height='200px' isLoading={true} />;
+    }
+  }
+
   return (
     <>
-      <Legend>Multisig
-        <SnoozeTransactions
-          message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
-          snoozedForDate={snoozedForDate}
-          setSnoozedForDate={setSnoozedForDate}
-        />
-      </Legend>
-      {!safesWithTasks && !error && <LoadingComponent height='200px' isLoading={true} />}
-      {error && !safesWithTasks && (
-        <Alert severity='error'>
-          There was an error. Please try again later!
-        </Alert>
-      )}
-      {safesWithTasks && safesWithTasks.map(safe => (
+      {safeData?.length ? (
+        <Box mb={2} display='flex' justifyContent='flex-end'>
+          <SnoozeTransactions
+            message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
+            snoozedForDate={snoozedForDate}
+            setSnoozedForDate={setSnoozedForDate}
+          />
+        </Box>
+      ) : null}
+      {safesWithTasks.map(safe => (
         <SafeTasks
           isSnoozed={isSnoozed}
           key={safe.safeAddress}

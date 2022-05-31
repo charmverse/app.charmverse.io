@@ -4,6 +4,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { Block, Page } from '@prisma/client';
 import { prisma } from 'db';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -26,25 +27,17 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<{pages: 
     }
   });
 
-  if (page === null || page.isPublic !== true) {
+  const computed = await computeUserPagePermissions({
+    pageId: pageId as string
+  });
+
+  if (page === null || computed.read !== true) {
     return res.status(404).json({ error: 'Page not found' } as any);
   }
 
   pages.push(page);
 
-  if (page.type === 'board') {
-    // For publicly shared board page fetch all of its card pages
-    const cardPages = await prisma.page.findMany({
-      where: {
-        deletedAt: null,
-        parentId: page.id,
-        type: 'card'
-      }
-    });
-
-    pages.push(...cardPages);
-  }
-  else if (page.type === 'card' && page.parentId) {
+  if (page.type === 'card' && page.parentId) {
     const boardPage = await prisma.page.findFirst({
       where: {
         deletedAt: null,

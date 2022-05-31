@@ -2,13 +2,16 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
-import Input from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
-import { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
+import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
+import Link from 'components/common/Link';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { IPageWithPermissions } from 'lib/pages';
+import { IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -37,39 +40,57 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
   border-bottom-color: transparent;
 `;
 
-export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPagePermissionFlags, }) {
+interface Props {
+  pageId: string
+}
+
+export default function ShareToWeb ({ pageId }: Props) {
 
   const router = useRouter();
-  const { currentPageId, pages, setPages } = usePages();
+  // What user can do
+  const { pages, setPages, getPagePermissions, refreshPage } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
-  const [isPublic, setIsPublic] = useState(false);
+  const [space] = useCurrentSpace();
+
+  const currentPagePermissions = getPagePermissions(pageId);
+
+  // Current values of the public permission
+  const [publicPermission, setPublicPermission] = useState<IPagePermissionWithSource | null>(null);
   const [shareLink, setShareLink] = useState<null | string>(null);
-  console.log(shareLink);
+
+  useEffect(() => {
+    if (pageId) {
+      // Access the raw permissions
+      const permissionList = (pages[pageId] as IPageWithPermissions)?.permissions;
+
+      const foundPublic = permissionList.find(publicPerm => publicPerm.public === true) ?? null;
+      // Add ref to new model here
+      setPublicPermission(foundPublic);
+    }
+    else {
+      setPublicPermission(null);
+    }
+
+  }, [pageId, pages]);
+
   async function togglePublic () {
-    const updatedPage = await charmClient.togglePagePublicAccess(currentPageId, !isPublic);
-    setIsPublic(updatedPage.isPublic);
-    const updates = { isPublic: updatedPage.isPublic };
-    setPages(_pages => ({
-      ..._pages,
-      [currentPageId]: {
-        ..._pages[currentPageId]!,
-        ...updates
-      }
-    }));
+    if (publicPermission) {
+      await charmClient.deletePermission(publicPermission.id);
+      setPublicPermission(null);
+    }
+    else {
+      const newPermission = await charmClient.createPermission({
+        pageId,
+        permissionLevel: 'view',
+        public: true
+      });
+      setPublicPermission(newPermission);
+    }
   }
 
   useEffect(() => {
-    const currentPage = pages[currentPageId];
-    if (currentPage) {
-      setIsPublic(currentPage.isPublic);
-    }
-
-  }, [currentPageId, pages]);
-
-  useEffect(() => {
-    console.log('update share link', isPublic);
     updateShareLink();
-  }, [isPublic, router.query.viewId]);
+  }, [publicPermission, router.query.viewId]);
 
   function onCopy () {
     setCopied(true);
@@ -77,20 +98,19 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
   }
 
   async function updateShareLink () {
-    const currentPage = pages[currentPageId];
-    console.log(currentPage);
-    if (isPublic === false) {
+    const currentPage = pages[pageId];
+    if (!publicPermission) {
       setShareLink(null);
     }
     else if (currentPage?.type === 'page' || currentPage?.type === 'card') {
       const shareLinkToSet = (typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${currentPageId}` : '';
+        ? `${window.location.origin}/share/${pageId}` : '';
       setShareLink(shareLinkToSet);
     }
     else if (currentPage?.type === 'board') {
       const viewIdToProvide = router.query.viewId;
       const shareLinkToSet = (typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${currentPageId}?viewId=${viewIdToProvide}` : '';
+        ? `${window.location.origin}/share/${pageId}?viewId=${viewIdToProvide}` : '';
       setShareLink(shareLinkToSet);
     }
   }
@@ -101,26 +121,26 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
         display='flex'
         justifyContent='space-between'
         alignItems='center'
-        onChange={togglePublic}
         padding={1}
       >
 
-        <div>
+        <Box>
 
           <Typography>Share to web</Typography>
 
           <Typography variant='body2' color='secondary'>
-            {isPublic
+            {publicPermission
               ? 'Anyone with the link can view'
               : 'Publish and share link with anyone'}
           </Typography>
-        </div>
+        </Box>
         <Switch
-          checked={isPublic}
-          disabled={pagePermissions.edit_isPublic !== true}
+          checked={!!publicPermission}
+          disabled={currentPagePermissions?.edit_isPublic !== true}
+          onChange={togglePublic}
         />
       </Box>
-      <Collapse in={isPublic}>
+      <Collapse in={!!publicPermission}>
         {
           shareLink && (
           <Box p={1}>
@@ -142,6 +162,19 @@ export default function ShareToWeb ({ pagePermissions }: { pagePermissions: IPag
           )
         }
       </Collapse>
+      {
+
+publicPermission?.sourcePermission && (
+  <Box display='block'>
+    <Typography variant='caption' sx={{ ml: 1 }}>
+      Inherited from
+      <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[publicPermission?.sourcePermission.pageId]?.path}`}>
+        {pages[publicPermission?.sourcePermission.pageId]?.title || 'Untitled'}
+      </Link>
+    </Typography>
+  </Box>
+)
+}
     </>
   );
 }

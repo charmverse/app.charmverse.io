@@ -1,3 +1,4 @@
+import { validate } from 'uuid';
 
 export function fancyTrim (_text: string = '', maxLength: number = 40) {
   const text = _text || '';
@@ -79,3 +80,6 @@ export function upperCaseFirstCharacter (input: string): string {
   return `${trimmed[0].toUpperCase()}${trimmed.slice(1)}`;
 }
 
+export function isUUID (uuid: string) {
+  return validate(uuid);
+}

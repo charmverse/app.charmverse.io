@@ -151,7 +151,8 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
 
 async function updateBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>) {
   const blocks: Block[] = req.body;
-  const ops = blocks.map(block => {
+
+  const blockOps = blocks.map(block => {
     return prisma.block.update({
       where: { id: block.id },
       data: {
@@ -162,8 +163,9 @@ async function updateBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
       }
     });
   });
-  const updated = await prisma.$transaction(ops);
-  return res.status(200).json(updated);
+
+  const updatedBlocks = await prisma.$transaction(blockOps);
+  return res.status(200).json(updatedBlocks);
 }
 
 export default withSessionRoute(handler);

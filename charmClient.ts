@@ -1,10 +1,10 @@
 
 import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
-  Role, Space, TokenGate, Transaction, User, TelegramUser, UserGnosisSafe, TokenGateToRole
+  Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole, UserDetails
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
-import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
 import { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { getDisplayName } from 'lib/users';
 import * as http from 'adapters/http';
@@ -19,7 +19,7 @@ import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'lib/notion/types';
 // TODO: Maybe move these types to another place so that we dont import from backend
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
-import { ConnectDiscordResponse } from 'pages/api/discord/connect';
+import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { StartThreadRequest } from 'pages/api/threads';
 import { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
@@ -29,9 +29,14 @@ import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pa
 import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
-import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
+import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
 import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
 import { GetTasksResponse } from 'pages/api/tasks';
+
+import { PublicSpaceInfo } from 'lib/spaces/interfaces';
+import { ApplicationWithTransactions } from 'lib/applications/actions';
+import { TransactionCreationData } from 'lib/transactions/interface';
+import { PublicUser } from 'pages/api/public/profile/[userPath]';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -58,14 +63,26 @@ class CharmClient {
     return http.GET<LoggedInUser>('/api/profile');
   }
 
+  getUserByPath (path: string) {
+    return http.GET<PublicUser>(`/api/public/profile/${path}`);
+  }
+
   createUser ({ address }: { address: string }) {
     return http.POST<LoggedInUser>('/api/profile', {
       address
     });
   }
 
-  updateUser ({ addresses }: { addresses?: string[] }) {
-    return http.PUT<LoggedInUser>('/api/profile', { addresses });
+  updateUser (data: Partial<User>) {
+    return http.PUT<LoggedInUser>('/api/profile', data);
+  }
+
+  getUserDetails () {
+    return http.GET<UserDetails>('/api/profile/details');
+  }
+
+  updateUserDetails (data: Partial<UserDetails>) {
+    return http.PUT<UserDetails>('/api/profile/details', data);
   }
 
   async createSpace (spaceOpts: Prisma.SpaceCreateInput) {
@@ -121,6 +138,10 @@ class CharmClient {
     return http.POST<Page>('/api/pages', pageOpts);
   }
 
+  getPage (pageId: string, spaceId?:string) {
+    return http.GET<IPageWithPermissions>(`/api/pages/${pageId}?spaceId=${spaceId}`);
+  }
+
   archivePage (pageId: string) {
     return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: true });
   }
@@ -134,7 +155,7 @@ class CharmClient {
   }
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
-    return http.PUT<Page>(`/api/pages/${pageOpts.id}`, pageOpts);
+    return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
   updateGnosisSafeState (payload: UpdateGnosisSafeState) {
@@ -169,10 +190,6 @@ class CharmClient {
     return http.GET<{pages: Page[], blocks: Block[]}>(`/api/public/pages/${pageId}`);
   }
 
-  togglePagePublicAccess (pageId: string, publiclyAccessible: boolean) {
-    return http.PUT<Page>(`/api/pages/${pageId}`, { isPublic: publiclyAccessible });
-  }
-
   createInviteLink (link: Partial<InviteLink>) {
     return http.POST<InviteLinkPopulated[]>('/api/invites', link);
   }
@@ -205,12 +222,8 @@ class CharmClient {
     return http.POST('/api/discord/disconnect');
   }
 
-  connectDiscord (payload: { code: string }) {
+  connectDiscord (payload: ConnectDiscordPayload) {
     return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
-  }
-
-  createAccountWithDiscord (payload: {code: string}) {
-    return http.POST<ConnectDiscordResponse>('/api/discord/createAccount', payload);
   }
 
   importRolesFromDiscordServer (payload: ImportDiscordRolesPayload) {
@@ -253,6 +266,10 @@ class CharmClient {
     const currentSpace = await this.getWorkspace();
     const contributors = await this.getContributors(currentSpace.id);
     return contributors.map(this.userToFBUser);
+  }
+
+  async getPublicSpaceInfo (spaceId: string): Promise<PublicSpaceInfo> {
+    return http.GET<PublicSpaceInfo>(`/api/spaces/${spaceId}/public`);
   }
 
   async getAllBlocks (): Promise<FBBlock[]> {
@@ -384,17 +401,6 @@ class CharmClient {
     return data;
   }
 
-  async assignBounty (bountyId: string, assignee: string): Promise<BountyWithDetails> {
-
-    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, {
-      assignee,
-      status: 'assigned',
-      updatedAt: new Date()
-    });
-
-    return data;
-  }
-
   async updateBounty (bountyId: string, bounty: Partial<Bounty>): Promise<BountyWithDetails> {
 
     const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, bounty);
@@ -411,9 +417,21 @@ class CharmClient {
     return data;
   }
 
-  async updateApplication (application: Application): Promise<Application> {
+  async closeBountySubmissions (bountyId: string): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close-submissions`);
+  }
 
-    const data = await http.PUT<Application>(`/api/applications/${application.id}`, application);
+  async closeBounty (bountyId: string): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close`);
+  }
+
+  async approveApplication (applicationId: string): Promise<Application> {
+    return http.POST<Application>(`/api/applications/${applicationId}/approve`);
+  }
+
+  async updateApplication (applicationId: string, update: Partial<Application>): Promise<Application> {
+
+    const data = await http.PUT<Application>(`/api/applications/${applicationId}`, update);
 
     return data;
   }
@@ -425,15 +443,33 @@ class CharmClient {
     return data;
   }
 
-  async listApplications (bountyId: string): Promise<Application []> {
-
-    const data = await http.GET<Application []>('/api/applications', { bountyId });
-
-    return data;
+  listApplications (bountyId: string, submissionsOnly: boolean): Promise<ApplicationWithTransactions []> {
+    return http.GET('/api/applications', { bountyId, submissionsOnly });
   }
 
-  recordTransaction (details: Pick<Transaction, 'bountyId' | 'transactionId' | 'chainId'>) {
-    return http.POST('/api/transactions', details);
+  async createSubmission (content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {
+
+    return http.POST<Application>('/api/submissions', content);
+  }
+
+  async updateSubmission ({ submissionId, content }: {submissionId: string, content: SubmissionContent}): Promise<Application> {
+
+    return http.PUT<Application>(`/api/submissions/${submissionId}`, content);
+  }
+
+  async reviewSubmission (submissionId: string, decision: ReviewDecision): Promise<Application> {
+
+    return http.POST<Application>(`/api/submissions/${submissionId}/review`, {
+      decision
+    });
+  }
+
+  async paySubmission (submissionId: string) {
+    return http.POST<Application>(`/api/submissions/${submissionId}/pay`);
+  }
+
+  recordTransaction (data: TransactionCreationData) {
+    return http.POST('/api/transactions', data);
   }
 
   async getPricing (base: string, quote: FiatCurrency): Promise<IPairQuote> {
@@ -541,7 +577,7 @@ class CharmClient {
     return http.GET('/api/permissions', { pageId });
   }
 
-  createPermission (permission: IPagePermissionToCreate): Promise<boolean> {
+  createPermission (permission: IPagePermissionToCreate): Promise<IPagePermissionWithSource> {
     return http.POST('/api/permissions', permission);
   }
 

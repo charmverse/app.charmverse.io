@@ -6,7 +6,7 @@ import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
-type ModalSize = 'large' | 'fluid' | 'small' | string;
+export type ModalSize = 'large' | 'fluid' | 'small' | string;
 
 const defaultSize = '400px';
 
@@ -15,7 +15,7 @@ const ModalContainer = styled.div<{ size: ModalSize }>`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: ${({ size }) => size === 'large' ? '670px' : size === 'fluid' ? 'auto' : size};
+  width: ${({ size }) => size === 'large' ? '670px' : size === 'fluid' ? 'auto' : size === 'small' ? defaultSize : size};
   background-color: ${({ theme }) => theme.palette.background.paper};
   border-radius: ${({ theme }) => theme.spacing(1)};
   box-shadow: ${({ theme }) => theme.shadows[15]};

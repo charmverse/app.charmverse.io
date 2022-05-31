@@ -1,5 +1,5 @@
 import SettingsLayout from 'components/settings/Layout';
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
@@ -22,6 +22,9 @@ import Link from 'components/common/Link';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 import ConnectSnapshot from 'components/common/PageLayout/components/Header/snapshot/ConnectSnapshot';
+import { Space } from '@prisma/client';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 
 export default function WorkspaceSettings () {
   setTitle('Workspace Options');
@@ -29,8 +32,8 @@ export default function WorkspaceSettings () {
   const [space, setSpace] = useCurrentSpace();
   const [spaces] = useSpaces();
   const [user] = useUser();
-
   const isAdmin = isSpaceAdmin(user, space?.id);
+  const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
 
   const {
     register,
@@ -61,12 +64,12 @@ export default function WorkspaceSettings () {
     reset(updatedSpace);
   }
 
+  function closeInviteLinkDeleteModal () {
+    workspaceRemoveModalState.close();
+  }
+
   async function deleteWorkspace () {
-    if (isAdmin && space && window.confirm('Are you sure you want to delete your workspace? This action cannot be undone')) {
-      await charmClient.deleteSpace(space.id);
-      const nextSpace = spaces.filter(s => s.id !== space.id)[0];
-      window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
-    }
+    workspaceRemoveModalState.open();
   }
 
   return (
@@ -137,6 +140,22 @@ export default function WorkspaceSettings () {
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ConnectSnapshot />
       </Box>
+      {space && (
+      <ConfirmDeleteModal
+        title='Delete workspace'
+        onClose={closeInviteLinkDeleteModal}
+        open={workspaceRemoveModalState.isOpen}
+        buttonText={`Delete ${space.name}`}
+        question={`Are you sure you want to delete ${space.name}? This action cannot be undone`}
+        onConfirm={async () => {
+          if (isAdmin) {
+            await charmClient.deleteSpace(space.id);
+            const nextSpace = spaces.filter(s => s.id !== space.id)[0];
+            window.location.href = nextSpace ? `/${nextSpace.domain}` : '/';
+          }
+        }}
+      />
+      )}
     </>
   );
 }

@@ -1,33 +1,45 @@
 
-import { Application, Prisma } from '@prisma/client';
+import { Application } from '@prisma/client';
 import { prisma } from 'db';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { updateApplication } from 'lib/applications/actions/updateApplication';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(updateApplication);
+handler.use(requireUser)
+  .use(requireKeys<Application>(['message'], 'body'))
+  .put(updateApplicationController);
 
-async function updateApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
+async function updateApplicationController (req: NextApiRequest, res: NextApiResponse<Application>) {
+
   const { id } = req.query;
 
-  if (id === undefined) {
-    return res.status(400).send({ error: 'Please provide a valid application ID' } as any);
-  }
-
-  const { message, walletAddress } = req.body;
-
-  const updatedApplication = await prisma.application.update({
+  const existingApplicationWithIdsOnly = await prisma.application.findFirst({
     where: {
       id: id as string
     },
-    data: {
-      message,
-      walletAddress
+    select: {
+      createdBy: true
     }
   });
+
+  if (!existingApplicationWithIdsOnly) {
+    throw new DataNotFoundError(`Application with id ${id} was not found`);
+  }
+
+  if (existingApplicationWithIdsOnly.createdBy !== req.session.user.id) {
+    throw new UnauthorisedActionError('You cannot edit another user\'s application');
+  }
+
+  const updatedApplication = await updateApplication({
+    applicationId: id as string,
+    message: req.body.message
+  });
+
   return res.status(200).json(updatedApplication);
 }
 

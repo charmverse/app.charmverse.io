@@ -34,7 +34,6 @@ export function untitledPage ({ userId, spaceId }: {userId: string, spaceId: str
       content: []
     },
     contentText: '',
-    isPublic: false,
     path: uuid(),
     title: '',
     type: 'page',

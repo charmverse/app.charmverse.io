@@ -1,4 +1,5 @@
 
+import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import charmClient from 'charmClient';
@@ -6,8 +7,9 @@ import Button from 'components/common/Button';
 import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
+import Loader from 'components/common/Loader';
 import useRoles from 'components/settings/roles/hooks/useRoles';
-import { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
+import { IPagePermissionToCreate, IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { useEffect, useState } from 'react';
@@ -39,6 +41,8 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
   const [selectedUserIds, setSelectedUserIds] = useState<string []>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
 
+  const [permissionBeingAdded, setPermissionBeingAdded] = useState<{index: number, total: number} | null>(null);
+
   useEffect(() => {
 
     if (roles) {
@@ -59,23 +63,56 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
     handleSubmit
   } = useForm<FormValues>();
 
-  function createUserPermissions () {
-    Promise.all([
+  async function createUserPermissions () {
+
+    const permissionsToCreate: IPagePermissionToCreate[] = [
       ...selectedUserIds.map(userId => {
-        return charmClient.createPermission({
+        return {
           pageId,
           userId,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           permissionLevel: permissionLevelToAssign!
-        });
+        };
       }),
       ...selectedRoleIds.map(roleId => {
-        return charmClient.createPermission({
+        return {
           pageId,
           roleId,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           permissionLevel: permissionLevelToAssign!
-        });
+        };
       })
-    ]).then(() => permissionsAdded());
+    ];
+
+    async function recursivePermissionAssign ({ currentIndex = 0, total, permissions }:
+      {currentIndex?: number, total: number, permissions: IPagePermissionToCreate[]}): Promise<true> {
+      if (permissions.length === 0) {
+        setPermissionBeingAdded(null);
+        return true;
+      }
+
+      currentIndex += 1;
+
+      setPermissionBeingAdded({
+        index: currentIndex,
+        total
+      });
+
+      await charmClient.createPermission(permissions[0]);
+
+      permissions.shift();
+
+      return recursivePermissionAssign({ currentIndex, total, permissions });
+
+    }
+
+    await recursivePermissionAssign({
+      total: permissionsToCreate.length,
+      permissions: permissionsToCreate
+    });
+
+    permissionsAdded();
+
   }
 
   const { custom, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
@@ -100,12 +137,24 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
                 fullWidth
                 sx={{ height: '100%', py: '10px', borderTopLeftRadius: '0px', borderBottomLeftRadius: '0px' }}
                 type='submit'
-                disabled={!permissionLevelToAssign || (selectedUserIds.length === 0 && selectedRoleIds.length === 0)}
+                disabled={!permissionLevelToAssign || (selectedUserIds.length === 0 && selectedRoleIds.length === 0) || permissionBeingAdded}
               >
                 Invite
               </Button>
             </Grid>
           </Grid>
+
+          {
+            permissionBeingAdded && (
+              <Grid item>
+                <Alert severity='info'>
+                  <Loader position='right' sx={{ display: 'inline', ' & span': { ml: 2 }, '& div': { width: '100%', display: 'flex' } }} size={20} message={`Adding permission ${permissionBeingAdded.index} / ${permissionBeingAdded.total}`} />
+                </Alert>
+
+              </Grid>
+            )
+          }
+
           <Grid item>
             <InputLabel>Users</InputLabel>
             <InputSearchContributorMultiple

@@ -1,28 +1,34 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
+import Switch from '@mui/material/Switch';
+import Typography from '@mui/material/Typography';
+import FieldLabel from 'components/common/form/FieldLabel';
 import Input from '@mui/material/Input';
+import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
 import { Bounty, Bounty as IBounty, PaymentMethod } from '@prisma/client';
 import charmClient, { PopulatedBounty } from 'charmClient';
 import Button from 'components/common/Button';
+import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
 import { InputSearchContributor } from 'components/common/form/InputSearchContributor';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
 import { getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
+import { isTruthy } from 'lib/utilities/types';
 import { PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
-import { isTruthy } from 'lib/utilities/types';
+import { DatePicker } from '@mui/x-date-pickers';
 import * as yup from 'yup';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import useIsAdmin from 'hooks/useIsAdmin';
+import { SystemError } from 'lib/utilities/errors';
 
 export type FormMode = 'create' | 'update' | 'suggest';
 
@@ -44,7 +50,33 @@ export const schema = yup.object({
   descriptionNodes: yup.mixed(),
   description: yup.string(),
   reviewer: yup.string().nullable(true),
-  chainId: yup.number().required()
+  chainId: yup.number().required(),
+  // New fields
+  approveSubmitters: yup.boolean(),
+  capSubmissions: yup.boolean(),
+  maxSubmissions: yup.number().nullable().typeError('Amount must be a number greater than 1').test({
+    message: 'Amount must be a number greater than 1',
+    test: (value, context) => {
+
+      // eslint-disable-next-line no-restricted-globals
+      const isNum = typeof value === 'number' && !isNaN(value);
+
+      if (context.parent.capSubmissions === true && (!isNum || value < 1)) {
+        return false;
+      }
+      return true;
+    }
+  })
+  // setExpiryDate: yup.boolean(),
+  // expiryDate: yup.mixed().test({
+  //   message: 'Expiry date is required',
+  //   test: (value, context) => {
+  //     if (context.parent.setExpiryDate === true && !value) {
+  //       return false;
+  //     }
+  //     return true;
+  //   }
+  // })
 });
 
 export type FormValues = yup.InferType<typeof schema>
@@ -66,7 +98,14 @@ function FormDescription ({ onContentChange, content, watch }:
   watch(['description', 'descriptionNodes']);
 
   return (
-    <Grid item>
+    <Grid
+      item
+      sx={{
+        '&.MuiGrid-item': {
+          maxWidth: '100%'
+        }
+      }}
+    >
       <InputLabel>
         Description
       </InputLabel>
@@ -80,7 +119,7 @@ function FormDescription ({ onContentChange, content, watch }:
 }
 
 export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', focusKey }: IBountyEditorInput) {
-  const { setBounties, bounties } = useBounties();
+  const { setBounties, bounties, updateBounty } = useBounties();
 
   const defaultChainId = bounty?.chainId ?? 1;
 
@@ -97,7 +136,12 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
       rewardToken: 'ETH' as CryptoCurrency,
       // TBC till we agree on Prisma migration
       chainId: defaultChainId as any,
+      maxSubmissions: 1 as any,
+      approveSubmitters: true,
+      capSubmissions: !((bounty && bounty?.maxSubmissions === null)),
+      // expiryDate: null,
       ...(bounty || {})
+      //      setExpiryDate: !!bounty?.expiryDate
     },
     resolver: yupResolver(schema)
   });
@@ -110,64 +154,96 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   const values = watch();
 
+  console.log('Values', values);
+
   const [space] = useCurrentSpace();
   const [user] = useUser();
   const [paymentMethods] = usePaymentMethods();
 
   const [availableCryptos, setAvailableCryptos] = useState<Array<string | CryptoCurrency>>([]);
+  const [formError, setFormError] = useState<SystemError | null>(null);
 
   const chainId = watch('chainId');
   const rewardToken = watch('rewardToken');
 
   useEffect(() => {
     refreshCryptoList(defaultChainId, bounty?.rewardToken);
+
+    // Revalidate form on load
+    if (mode === 'update') {
+      trigger();
+    }
   }, []);
 
-  async function submitted (value: IBounty) {
+  async function submitted (value: FormValues & Bounty) {
+    setFormError(null);
 
-    if (mode === 'create') {
-      value.spaceId = space!.id;
-      value.createdBy = user!.id;
-      value.description = value.description ?? '';
-      value.descriptionNodes = value.descriptionNodes ?? '';
-      value.status = 'open';
+    try {
+      // if (!value.setExpiryDate) {
+      //   value.expiryDate = null;
+      // }
 
-      const createdBounty = await charmClient.createBounty(value);
-      const populatedBounty = { ...createdBounty, applications: [] };
-      setBounties([...bounties, populatedBounty]);
-      onSubmit(populatedBounty);
+      if (!value.capSubmissions) {
+        // Ensures any existing limit will be nulled
+        value.maxSubmissions = null;
+      }
+      delete value.capSubmissions;
+
+      if (mode === 'create') {
+        // delete value.setExpiryDate;
+
+        value.spaceId = space!.id;
+        value.createdBy = user!.id;
+        value.description = value.description ?? '';
+        value.descriptionNodes = value.descriptionNodes ?? '';
+        value.status = 'open';
+
+        const createdBounty = await charmClient.createBounty(value);
+        const populatedBounty = { ...createdBounty, applications: [] };
+        setBounties([...bounties, populatedBounty]);
+        onSubmit(populatedBounty);
+      }
+      else if (mode === 'suggest') {
+        value.spaceId = space!.id;
+        value.createdBy = user!.id;
+        value.description = value.description ?? '';
+        value.descriptionNodes = value.descriptionNodes ?? '';
+        value.status = 'suggestion';
+
+        value.rewardToken = 'ETH';
+        value.rewardAmount = 0;
+        value.chainId = 1;
+
+        const createdBounty = await charmClient.createBounty(value);
+        const populatedBounty = { ...createdBounty, applications: [] };
+        setBounties([...bounties, populatedBounty]);
+        onSubmit(populatedBounty);
+      }
+      else if (bounty?.id && mode === 'update') {
+        const updates: Partial<Bounty> = {
+          updatedAt: new Date(),
+          title: value.title,
+          rewardAmount: value.rewardAmount,
+          rewardToken: value.rewardToken,
+          descriptionNodes: value.descriptionNodes,
+          description: value.description,
+          reviewer: value.reviewer,
+          chainId: value.chainId,
+          //
+          approveSubmitters: value.approveSubmitters === null ? undefined : value.approveSubmitters,
+          maxSubmissions: value.capSubmissions === false ? null : value.maxSubmissions
+          // expiryDate: value.setExpiryDate ? value.expiryDate : null
+
+        };
+
+        const updatedBounty = await updateBounty(bounty.id, updates);
+        onSubmit(updatedBounty);
+      }
     }
-    else if (mode === 'suggest') {
-      value.spaceId = space!.id;
-      value.createdBy = user!.id;
-      value.description = value.description ?? '';
-      value.descriptionNodes = value.descriptionNodes ?? '';
-      value.status = 'suggestion';
-
-      value.rewardToken = 'ETH';
-      value.rewardAmount = 0;
-      value.chainId = 1;
-
-      const createdBounty = await charmClient.createBounty(value);
-      const populatedBounty = { ...createdBounty, applications: [] };
-      setBounties([...bounties, populatedBounty]);
-      onSubmit(populatedBounty);
+    catch (err) {
+      setFormError(err as SystemError);
     }
-    else if (bounty?.id && mode === 'update') {
-      const updates = {
-        updatedAt: new Date(),
-        title: value.title,
-        rewardAmount: value.rewardAmount,
-        rewardToken: value.rewardToken,
-        descriptionNodes: value.descriptionNodes,
-        description: value.description,
-        reviewer: value.reviewer,
-        chainId: value.chainId
-      };
-      const updatedBounty = await charmClient.updateBounty(bounty.id, updates);
-      setBounties(bounties.map(b => b.id === bounty.id ? updatedBounty : b));
-      onSubmit(updatedBounty);
-    }
+
   }
 
   function setRichContent (content: ICharmEditorOutput) {
@@ -217,7 +293,7 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
 
   return (
     <div>
-      <form onSubmit={handleSubmit(formValue => submitted(formValue as IBounty))} style={{ margin: 'auto' }}>
+      <form onSubmit={handleSubmit(val => submitted(val as any))} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
             <InputLabel>
@@ -302,6 +378,99 @@ export default function BountyEditorForm ({ onSubmit, bounty, mode = 'create', f
                   </Grid>
                 </Grid>
               </>
+            )
+          }
+
+          {/* New options */}
+
+          <Grid item xs={12}>
+            <FormControlLabel
+              label='Require applications'
+              control={(
+                <Switch
+                  onChange={(event) => {
+                    setValue('approveSubmitters', event.target.checked === true, {
+                      shouldValidate: true
+                    });
+                  }}
+                  defaultChecked={values.approveSubmitters}
+                />
+              )}
+            />
+
+          </Grid>
+          <Grid item xs={12} sx={{ pt: '2px !important' }}>
+            <Typography variant='body2' sx={{ ml: '8%' }}>
+              When enabled, a workspace Admin or the Bounty Reviewer must explicitly approve each user's application to this bounty.
+            </Typography>
+
+          </Grid>
+          <Grid container item xs={12}>
+            <Grid item xs={6}>
+              <FormControlLabel
+                label='Set submissions limit'
+                control={(
+                  <Switch
+                    onChange={(event) => {
+                      const newValue = event.target.checked === true;
+                      setValue('capSubmissions', newValue, {
+                        shouldValidate: true
+                      });
+
+                      // eslint-disable-next-line no-restricted-globals
+                      if (newValue === false && isNaN(values.maxSubmissions as any)) {
+                        setValue('maxSubmissions', null, {
+                          shouldValidate: true
+                        });
+                      }
+                    }}
+                    defaultChecked={values.capSubmissions}
+                  />
+              )}
+              />
+            </Grid>
+            <Grid item xs={6}>
+
+              {
+                values.capSubmissions && (
+                  <TextField
+                    {...register('maxSubmissions', {
+                      valueAsNumber: true,
+                      setValueAs: (value) => {
+                        // eslint-disable-next-line no-restricted-globals
+                        if (isNaN(value)) {
+                          return null;
+                        }
+                        return value;
+                      }
+                    })}
+                    fullWidth
+                    focused={focusKey === 'maxSubmissions'}
+                    type='number'
+                    size='small'
+                    error={!!errors?.maxSubmissions}
+                    helperText={errors?.maxSubmissions?.message}
+                    inputProps={{ step: 1, min: 1 }}
+                  />
+                )
+              }
+
+            </Grid>
+          </Grid>
+          <Grid item xs={12} sx={{ pt: '2px !important' }}>
+            <Typography variant='body2' sx={{ ml: '8%' }}>
+              When enabled, limits the amount of active submissions for this bounty.
+            </Typography>
+
+          </Grid>
+
+          {
+            formError && (
+              <Grid item xs={12} sx={{ pt: '2px !important' }}>
+                <Alert severity={formError.severity}>
+                  {formError.message}
+                </Alert>
+              </Grid>
             )
           }
 

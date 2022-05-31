@@ -1,8 +1,11 @@
+import { Divider, Stack } from '@mui/material';
+import UserDetails, { UserDetailsProps } from './components/UserDetails';
 
-export default function PublicProfile () {
+export default function PublicProfile (props: UserDetailsProps) {
   return (
-    <div>
-      <h2>Public Profile</h2>
-    </div>
+    <Stack spacing={2}>
+      <UserDetails {...props} />
+      <Divider />
+    </Stack>
   );
 }
