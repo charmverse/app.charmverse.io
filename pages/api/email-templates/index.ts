@@ -10,12 +10,56 @@ const handler = nc({
 const templates = {
   'Notify the user about tasks': () => {
     return emails.getPendingTasksEmail({
-      tasks: [{
-        tasks: [],
-        safeAddress: '0x123',
-        safeName: null,
-        safeUrl: 'https://app.charmverse.io'
-      }]
+      tasks: [
+        {
+          tasks: [{
+            nonce: 3,
+            transactions: [{
+              id: '123',
+              actions: [],
+              date: new Date().toISOString(),
+              confirmations: [],
+              isExecuted: false,
+              description: 'Send .02 ETH',
+              gnosisUrl: 'https://gnosis.com',
+              myAction: 'Sign',
+              myActionUrl: 'https://gnosis.com',
+              nonce: 3,
+              safeAddress: '0x123',
+              safeName: 'My Personal Safe',
+              threshold: 2,
+              snoozedUsers: []
+            }]
+          }],
+          safeAddress: '0x123',
+          safeName: 'My Personal Safe',
+          safeUrl: 'https://app.charmverse.io'
+        },
+        {
+          tasks: [{
+            nonce: 7,
+            transactions: [{
+              id: '123',
+              actions: [],
+              date: new Date().toISOString(),
+              confirmations: [],
+              isExecuted: false,
+              description: 'Send 10 ETH',
+              gnosisUrl: 'https://gnosis.com',
+              myAction: 'Sign',
+              myActionUrl: 'https://gnosis.com',
+              nonce: 7,
+              safeAddress: '0x456',
+              safeName: 'Work Safe',
+              threshold: 2,
+              snoozedUsers: []
+            }]
+          }],
+          safeAddress: '0x456',
+          safeName: 'Work Safe',
+          safeUrl: 'https://app.charmverse.io'
+        }
+      ]
     });
   }
 };
