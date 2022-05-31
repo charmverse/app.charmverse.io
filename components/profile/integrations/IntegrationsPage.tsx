@@ -1,12 +1,13 @@
-import { Typography } from '@mui/material';
+
 import MultiSigList from './components/GnosisSafes';
 import IdentityProviders from './components/IdentityProviders';
+import NexusPageTitle from '../components/NexusPageTitle';
 
 export default function MyIntegrations () {
 
   return (
     <>
-      <Typography variant='h1' gutterBottom>Integrations</Typography>
+      <NexusPageTitle title='Integrations' />
       <IdentityProviders />
       <MultiSigList />
     </>
