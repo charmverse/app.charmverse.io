@@ -32,7 +32,6 @@ function TransactionRow (
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
   const isFirstTask = transaction.nonce === firstNonce;
-
   return (
     <>
       <Grid justifyContent='space-between' alignItems='center' container key={transaction.id} sx={{ width: '100%', height: rowHeight }} onClick={() => setExpanded(!expanded)}>
@@ -105,7 +104,7 @@ function TransactionRow (
           <Grid container spacing={1}>
             <Grid item xs={5}>
               {transaction.actions.map(action => (
-                <Box py={1}>
+                <Box py={1} key={action.to.address}>
                   <Typography
                     gutterBottom
                   >
@@ -147,7 +146,7 @@ function TransactionRow (
             <Grid item xs={5} pr={1}>
               <Typography color='secondary' gutterBottom variant='body2'>Confirmations</Typography>
               {transaction.confirmations.map(confirmation => (
-                <Box py={1}>
+                <Box py={1} key={confirmation.address}>
                   {confirmation.user ? (
                     <UserDisplay
                       sx={{
@@ -179,7 +178,7 @@ function TransactionRow (
               ))}
               {transaction.snoozedUsers.length !== 0 ? <Typography sx={{ mt: 2 }} color='secondary' gutterBottom variant='body2'>Snoozed</Typography> : null}
               {transaction.snoozedUsers.map(snoozedUser => (
-                <Box py={1} display='flex' justifyContent='space-between'>
+                <Box key={snoozedUser.id} py={1} display='flex' justifyContent='space-between'>
                   <UserDisplay avatarSize='small' user={snoozedUser} />
                   <Box display='flex' gap={1} alignItems='center'>
                     {snoozedUser.gnosisSafeState?.transactionsSnoozeMessage && (
