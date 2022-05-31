@@ -1,5 +1,7 @@
 import { prisma } from 'db';
-import { LoggedInUser } from 'models';
+import { shortenHex } from 'lib/utilities/strings';
+import { IDENTITY_TYPES, LoggedInUser } from 'models';
+import getENSName from 'lib/blockchain/getENSName';
 
 export async function createUserFromWallet (address: string): Promise<LoggedInUser> {
   const user = await prisma.user.findFirst({
@@ -28,9 +30,13 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
     return user;
   }
   else {
+    const ens: string | null = await getENSName(address);
+
     const newUser = await prisma.user.create({
       data: {
-        addresses: [address]
+        addresses: [address],
+        identityType: IDENTITY_TYPES[0],
+        username: ens || shortenHex(address)
       },
       include: {
         favorites: true,

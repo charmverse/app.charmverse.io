@@ -1,4 +1,4 @@
-
+import { User } from '@prisma/client';
 import styled from '@emotion/styled';
 import { Alert, Box, Card, Divider, Grid, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
@@ -77,8 +77,8 @@ export default function IdentityProviders () {
     if (connectedWithTelegram) {
       setIsConnectingTelegram(true);
       try {
-        await charmClient.disconnectTelegram();
-        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: null }));
+        const updatedUser: User = await charmClient.disconnectTelegram();
+        setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUser, telegramUser: null }));
       }
       catch (err: any) {
         setTelegramError(err.message || err.error || 'Something went wrong. Please try again');
