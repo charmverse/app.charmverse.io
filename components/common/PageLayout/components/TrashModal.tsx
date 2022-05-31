@@ -80,7 +80,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
       if (space) {
         const _archivedPages: Page[] = [];
         (await charmClient.getArchivedPages(space.id)).forEach(archivedPage => {
-          if (archivedPage && archivedPage.deletedAt !== null && getPagePermissions(archivedPage.id).delete) {
+          if (archivedPage && archivedPage.deletedAt !== null && getPagePermissions(archivedPage.id, archivedPage).delete) {
             const pageTitle = archivedPage.title || 'Untitled';
             _archivedPages.push({ ...archivedPage, title: pageTitle });
           }
@@ -106,7 +106,6 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
       });
 
       await mutate(`pages/${space.id}`);
-      // TODO: Better focalboard blocks api to only fetch blocks by id
       dispatch(initialLoad());
     }
   }

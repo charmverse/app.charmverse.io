@@ -26,7 +26,7 @@ type IContext = {
   isEditing: boolean
   refreshPage: (pageId: string) => Promise<IPageWithPermissions>
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
-  getPagePermissions: (pageId: string) => IPagePermissionFlags,
+  getPagePermissions: (pageId: string, page?: IPageWithPermissions) => IPagePermissionFlags,
 };
 
 const refreshInterval = 1000 * 5 * 60; // 5 minutes
@@ -67,10 +67,10 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
    * Will return permissions for the currently connected user
    * @param pageId
    */
-  function getPagePermissions (pageId: string): IPagePermissionFlags {
+  function getPagePermissions (pageId: string, page?: IPageWithPermissions): IPagePermissionFlags {
     const computedPermissions = new AllowedPagePermissions();
 
-    const targetPage = pages[pageId] as IPageWithPermissions;
+    const targetPage = (pages[pageId] as IPageWithPermissions) ?? page;
 
     // Return empty permission set so this silently fails
     if (!targetPage) {

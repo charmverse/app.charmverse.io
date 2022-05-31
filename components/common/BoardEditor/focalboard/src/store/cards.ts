@@ -78,7 +78,6 @@ const cardsSlice = createSlice({
               }
             });
             for (const block of action.payload.blocks) {
-                console.log(action.payload.blocks)
               const boardPage = boardsRecord[block.parentId];
               // check boardPage exists, its possible a deleted card still exists. TODO: delete cards when a board is deleted!
               if (boardPage) {
