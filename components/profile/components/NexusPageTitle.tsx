@@ -27,7 +27,7 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
             {subPage}
           </Box>
         </>
-      ) : <Box component='span' sx={{ fontWeight: 'bold' }}>MyNexus</Box>}
+      ) : <Box component='span' sx={{ fontWeight: 'bold' }}>{MyNexus}</Box>}
     </Typography>
   );
 
