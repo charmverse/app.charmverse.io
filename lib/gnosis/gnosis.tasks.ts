@@ -136,7 +136,8 @@ function transactionToTask ({ myAddresses, transaction, safe, users }: Transacti
     if (
       user.gnosisSafeState
       && user.gnosisSafeState.transactionsSnoozedFor !== null
-      && !confirmations.find(confirmation => user.addresses.includes(confirmation.address))) {
+      && !confirmations.find(confirmation => user.addresses.includes(confirmation.address))
+      && user.gnosisSafeState.transactionsSnoozedFor.toString() > new Date().toString()) {
       snoozedUsers.push(user);
     }
   });

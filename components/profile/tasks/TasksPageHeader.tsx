@@ -38,7 +38,7 @@ export default function IntegrationCard () {
 
   return currentUser && (
     <IntegrationCardContainer>
-      <Grid container spacing={2}>
+      <Grid container spacing={{ sm: 2, xs: 1 }}>
         <Grid item xs>
           <Link href='/profile/integrations'>
             <Paper
@@ -86,7 +86,7 @@ export default function IntegrationCard () {
                     sx={{
                       fontWeight: 500
                     }}
-                  >Integrations
+                  >Connected Identities
                   </Typography>
                 </Box>
                 <Box
@@ -112,7 +112,7 @@ export default function IntegrationCard () {
                       className='logo-image'
                       width={22.5}
                       height={22.5}
-                      src={telegramConnected ? '/images/telegram-logo-colored.png' : '/images/telegram-logo-greyscale.png'}
+                      src={telegramConnected ? '/images/telegram-logo.png' : '/images/telegram-logo-greyscale.png'}
                     />
                   </Tooltip>
                 </Box>
@@ -123,7 +123,10 @@ export default function IntegrationCard () {
                     color='secondary'
                     fontWeight={500}
                     sx={{
-                      mr: 0.5
+                      fontSize: {
+                        sm: '1rem',
+                        xs: '1.75rem'
+                      }
                     }}
                   >
                     {safes?.length}

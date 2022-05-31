@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Box, Button, Card, Chip, Collapse, Divider, Grid, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, Chip, ClickAwayListener, Collapse, Divider, Grid, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -20,6 +20,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import CancelIcon from '@mui/icons-material/Cancel';
 import EmailIcon from '@mui/icons-material/Email';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
@@ -254,8 +255,8 @@ function SafeTasks (
               </Box>
               <Box flexGrow={1}>
                 {task.transactions.length > 1 && (
-                  <Box height={rowHeight} display='flex' alignItems='center'>
-                    <Alert color='info' icon={false} sx={{ py: 0, width: '100%' }}>
+                  <Box my={{ sm: 0, xs: 1 }} height={rowHeight} display='flex' alignItems='center'>
+                    <Alert color='info' icon={false} sx={{ py: 0, width: '100%', fontSize: { sm: '14px', xs: '12px' } }}>
                       These transactions conflict as they use the same nonce. Executing one will automatically replace the other(s).
                     </Alert>
                   </Box>
@@ -281,6 +282,16 @@ function SnoozeTransactions (
   { message, snoozedForDate, setSnoozedForDate }:
   { message: null | string, snoozedForDate: DateTime | null, setSnoozedForDate: React.Dispatch<React.SetStateAction<DateTime | null>> }
 ) {
+  const [open, setOpen] = React.useState(false);
+
+  const handleTooltipClose = () => {
+    setOpen(false);
+  };
+
+  const handleTooltipOpen = () => {
+    setOpen(true);
+  };
+
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [snoozeMessage, setSnoozeMessage] = useState(message);
   const [snoozedFor, setSnoozedFor] = useState<null | '1_day' | '3_days' | DateTime>(null);
@@ -393,7 +404,7 @@ function SnoozeTransactions (
   }, [showDatePicker]);
 
   return (
-    <Box>
+    <Box display='flex' alignItems='center' gap={0.5} justifyContent='flex-end' width='100%'>
       <Button
         disabled={isValidating}
         variant='outlined'
@@ -406,6 +417,27 @@ function SnoozeTransactions (
       >
         {isSnoozed ? `Snoozed for ${snoozedForDate.toRelative({ base: (DateTime.now()) })?.slice(3)}` : 'Snooze'}
       </Button>
+      <ClickAwayListener onClickAway={handleTooltipClose}>
+        <div>
+          <Tooltip
+            arrow
+            placement='top'
+            title='Let others know you are busy by snoozing'
+            PopperProps={{
+              disablePortal: true
+            }}
+            onClose={handleTooltipClose}
+            open={open}
+            disableFocusListener
+            disableHoverListener
+            disableTouchListener
+          >
+            <IconButton size='small' color='primary' onClick={handleTooltipOpen} disabled={isValidating}>
+              <InfoOutlinedIcon fontSize='small' />
+            </IconButton>
+          </Tooltip>
+        </div>
+      </ClickAwayListener>
       <Menu
         {...primaryMenuState}
         sx={{
