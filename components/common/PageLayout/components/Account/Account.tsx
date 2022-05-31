@@ -55,7 +55,7 @@ function Account (): JSX.Element {
   const ENSName = useENSName(account);
 
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
-  const [user, isUserLoaded] = useUser();
+  const [user, , isUserLoaded] = useUser();
 
   if (typeof window === 'undefined') {
     return (
