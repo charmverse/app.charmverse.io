@@ -4,13 +4,12 @@ import {
   MjmlGroup,
   MjmlText,
   MjmlButton,
-  MjmlImage,
-  MjmlDivider
+  MjmlImage
 } from 'mjml-react';
 import { User } from '@prisma/client';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import { blackColor, blueColor, greyColor, greyColor2, lightGreyColor } from 'theme/colors';
-import { Footer, Header, EmailWrapper } from './components';
+import { greyColor2 } from 'theme/colors';
+import { HR, Feedback, Footer, Header, EmailWrapper } from './components';
 
 type TemplateUser = Pick<User, 'username'>;
 
@@ -18,9 +17,6 @@ export interface PendingTasksProps {
   user: TemplateUser;
   tasks: GnosisSafeTasks[];
 }
-
-const domain = process.env.DOMAIN;
-const chatIconPath = '/images/icons/speech-bubbles.png';
 
 export default function PendingTasks (props: PendingTasksProps) {
 
@@ -40,34 +36,9 @@ export default function PendingTasks (props: PendingTasksProps) {
         </MjmlColumn>
       </MjmlSection>
 
-      <MjmlSection backgroundColor='#fff' paddingTop={0} paddingBottom={0}>
-        <MjmlColumn>
-          <MjmlDivider />
-        </MjmlColumn>
-      </MjmlSection>
+      <HR />
 
-      <MjmlSection backgroundColor='#fff' paddingTop={40} paddingBottom={40}>
-        <MjmlGroup>
-          <MjmlColumn width='20%'>
-            <MjmlImage
-              align='center'
-              height='47px'
-              width='64px'
-              src={`${domain}/${chatIconPath}`}
-            />
-          </MjmlColumn>
-          <MjmlColumn width='80%'>
-            <MjmlText paddingLeft={0}>
-              <p>
-                <strong>
-                  Do you have any feedback on this email?
-                </strong>
-              </p>
-              <p>Please share it with us on <a href='https://discord.gg/ACYCzBGC2M'>Discord</a></p>
-            </MjmlText>
-          </MjmlColumn>
-        </MjmlGroup>
-      </MjmlSection>
+      <Feedback />
 
       <Footer />
     </EmailWrapper>
