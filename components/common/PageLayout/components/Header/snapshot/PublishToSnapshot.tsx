@@ -67,7 +67,7 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
       }
 
       {
-        !checkingProposal && currentSpace?.snapshotDomain && !proposal && (
+        !checkingProposal && !proposal && (
           <>
             <IosShareIcon
               fontSize='small'
@@ -78,7 +78,7 @@ export default function PublishToSnapshot ({ page }: {page: Page}) {
             />
             <ListItemText onClick={open} primary='Publish to snapshot' />
 
-            <Modal size='large' open={isOpen} onClose={close} title={`Publish to snapshot (${currentSpace.snapshotDomain})`}>
+            <Modal size='large' open={isOpen} onClose={close} title={`Publish to snapshot ${currentSpace ? `(${currentSpace.snapshotDomain})` : ''}`}>
               <PublishingForm onSubmit={close} page={page} />
             </Modal>
           </>
