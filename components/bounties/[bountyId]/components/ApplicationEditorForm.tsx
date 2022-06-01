@@ -36,14 +36,12 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
     handleSubmit,
     formState: { errors, touchedFields, isValid, isValidating, isSubmitting }
   } = useForm<FormValues>({
-    mode: 'onChange',
+    mode: 'onBlur',
     defaultValues: {
       message: proposal?.message as string
     },
     resolver: yupResolver(schema)
   });
-
-  const [user] = useUser();
 
   const applicationExample = 'Explain why you are the right person or team to work on this bounty.';
 
