@@ -10,6 +10,9 @@ const handler = nc({
 const templates = {
   'Notify the user about tasks': () => {
     return emails.getPendingTasksEmail({
+      user: {
+        username: 'ghostpepper'
+      },
       tasks: [
         {
           tasks: [{
@@ -73,7 +76,10 @@ handler.get(async (req, res) => {
 
   const tpl = `
     <h1 style="background: white; padding: 40px 20px">
-      <div style="max-width: 1024px; margin: 0 auto">Email Templates</div>
+      <div style="max-width: 1024px; margin: 0 auto">
+        Email Templates
+        <hr style="border-color: #eee" />
+      </div>
     </h1>
     ${renderedEmails.map(({ description, subject, html }) => `
       <div style="margin: 20px">
@@ -96,7 +102,7 @@ handler.get(async (req, res) => {
 });
 
 function wrapHtml (html: string) {
-  return `<html><head><meta charset="UTF-8"></head><body style="background: #eee; font-size: 13px; font-family: arial,sans-serif">${html}</body></html>`;
+  return `<html><head><meta charset="UTF-8"></head><body style="font-size: 13px; font-family: arial,sans-serif">${html}</body></html>`;
 }
 
 export default handler;
