@@ -21,6 +21,7 @@ function MockSpace (partial: Partial<Space>): Space {
     updatedBy: '0x87ddfh6g435D12CE393aBbA3f81fe6C594543sdw',
     snapshotDomain: null,
     defaultVotingDuration: null,
+    defaultPagePermissionGroup: null,
     ...partial
   };
 }
