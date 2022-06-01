@@ -1,5 +1,5 @@
 import { ReactElement, useEffect } from 'react';
-import PageLayout from 'components/nexus/components/ProfileLayout';
+import PageLayout from 'components/nexus/components/NexusLayout';
 import PublicProfile from 'components/profile/PublicProfile';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ErrorPage from 'components/common/errors/ErrorPage';

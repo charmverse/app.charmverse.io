@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import PageLayout from 'components/nexus/components/ProfileLayout';
+import PageLayout from 'components/nexus/components/NexusLayout';
 import { setTitle } from 'hooks/usePageTitle';
 import Integrations from 'components/integrations';
 
