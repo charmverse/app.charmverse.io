@@ -43,7 +43,6 @@ export default function WorkspaceSettings () {
   const [user] = useUser();
   const isAdmin = isSpaceAdmin(user, space?.id);
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
-
   const {
     register,
     handleSubmit,
@@ -157,74 +156,80 @@ export default function WorkspaceSettings () {
         <ImportNotionWorkspace />
       </Box>
 
-      <Legend helperText='Default permission for new pages and boards across the workspace.'>Default Workspace Permission</Legend>
-      <Box sx={{ ml: 1 }}>
-        <>
-          <Button
-            color='secondary'
-            variant='outlined'
-            {...bindTrigger(popupState)}
-            endIcon={<KeyboardArrowDownIcon fontSize='small' />}
-          >
-            {space?.defaultPagePermissionGroup ? spaceDefaultPagePermissionLabel[space.defaultPagePermissionGroup as Exclude<PagePermissionLevel, 'custom'>] : 'Full Access'}
-          </Button>
-          <Menu
-            {...menuState}
-            PaperProps={{
-              sx: { width: 300 }
-            }}
-          >
-            <MenuItem
-              selected={space?.defaultPagePermissionGroup === 'full_access'}
-              onClick={() => handleMenuItemClick('full_access')}
-            >
-              <StyledListItemText
-                primary='Full Access'
-                secondary='Can edit and share with others.'
-              />
-            </MenuItem>
+      {
+        isAdmin ? (
+          <>
+            <Legend helperText='Default permission for new pages and boards across the workspace.'>Default Workspace Permission</Legend>
+            <Box sx={{ ml: 1 }}>
+              <>
+                <Button
+                  color='secondary'
+                  variant='outlined'
+                  {...bindTrigger(popupState)}
+                  endIcon={<KeyboardArrowDownIcon fontSize='small' />}
+                >
+                  {space?.defaultPagePermissionGroup ? spaceDefaultPagePermissionLabel[space.defaultPagePermissionGroup as Exclude<PagePermissionLevel, 'custom'>] : 'Full Access'}
+                </Button>
+                <Menu
+                  {...menuState}
+                  PaperProps={{
+                    sx: { width: 300 }
+                  }}
+                >
+                  <MenuItem
+                    selected={space?.defaultPagePermissionGroup === 'full_access'}
+                    onClick={() => handleMenuItemClick('full_access')}
+                  >
+                    <StyledListItemText
+                      primary='Full Access'
+                      secondary='Can edit and share with others.'
+                    />
+                  </MenuItem>
 
-            <MenuItem
-              selected={space?.defaultPagePermissionGroup === 'editor'}
-              onClick={() => handleMenuItemClick('editor')}
-            >
-              <StyledListItemText
-                primary='Editor'
-                secondary='Can edit but not share with others.'
-              />
-            </MenuItem>
+                  <MenuItem
+                    selected={space?.defaultPagePermissionGroup === 'editor'}
+                    onClick={() => handleMenuItemClick('editor')}
+                  >
+                    <StyledListItemText
+                      primary='Editor'
+                      secondary='Can edit but not share with others.'
+                    />
+                  </MenuItem>
 
-            <MenuItem
-              selected={space?.defaultPagePermissionGroup === 'view_comment'}
-              onClick={() => handleMenuItemClick('view_comment')}
-            >
-              <StyledListItemText
-                primary='View & Comment'
-                secondary='Can view and comment, but not edit.'
-              />
-            </MenuItem>
+                  <MenuItem
+                    selected={space?.defaultPagePermissionGroup === 'view_comment'}
+                    onClick={() => handleMenuItemClick('view_comment')}
+                  >
+                    <StyledListItemText
+                      primary='View & Comment'
+                      secondary='Can view and comment, but not edit.'
+                    />
+                  </MenuItem>
 
-            <MenuItem
-              selected={space?.defaultPagePermissionGroup === 'view'}
-              onClick={() => handleMenuItemClick('view')}
-            >
-              <StyledListItemText
-                primary='View'
-                secondary='Cannot edit or share with others.'
-              />
-            </MenuItem>
-            <MenuItem
-              onClick={() => handleMenuItemClick(null)}
-            >
-              <StyledListItemText
-                primary='No access'
-                primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
-                secondary='Remove default page permission (Full access)'
-              />
-            </MenuItem>
-          </Menu>
-        </>
-      </Box>
+                  <MenuItem
+                    selected={space?.defaultPagePermissionGroup === 'view'}
+                    onClick={() => handleMenuItemClick('view')}
+                  >
+                    <StyledListItemText
+                      primary='View'
+                      secondary='Cannot edit or share with others.'
+                    />
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => handleMenuItemClick(null)}
+                  >
+                    <StyledListItemText
+                      primary='No access'
+                      primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
+                      secondary='Remove default page permission (Full access)'
+                    />
+                  </MenuItem>
+                </Menu>
+              </>
+            </Box>
+          </>
+        ) : null
+      }
       <Legend>Snapshot.org Integration</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ConnectSnapshot />
