@@ -1,15 +1,20 @@
 
 import { prisma } from 'db';
 import { getPendingGnosisTasks } from 'lib/gnosis/gnosis.tasks';
+import log from 'lib/log';
 
 export async function sendUserNotifications (): Promise<number> {
 
-  const usersWithTasks = await getUsersWithTasks();
+  const notificationsToSend = await getNotifications();
 
-  return usersWithTasks.length;
+  for (const notification of notificationsToSend) {
+    log.info('Debug: send notification to user', { userId: notification.user.id, tasks: notification.tasks.length });
+  }
+
+  return notificationsToSend.length;
 }
 
-export async function getUsersWithTasks () {
+export async function getNotifications () {
 
   const usersWithSafes = await prisma.user.findMany({
     where: {
@@ -29,7 +34,6 @@ export async function getUsersWithTasks () {
 
   return Promise.all(activeUsersWithSafes.map(async user => {
     const tasks = await getPendingGnosisTasks(user.id);
-    console.log('tasks', tasks);
     return { user, tasks };
   }));
 }
