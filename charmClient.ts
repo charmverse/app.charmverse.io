@@ -130,6 +130,12 @@ class CharmClient {
     return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
   }
 
+  getPagesByIds (spaceId: string, pageIds: string[]) {
+    return http.POST<IPageWithPermissions[]>(`/api/spaces/${spaceId}/multiple-pages`, {
+      pageIds
+    });
+  }
+
   getArchivedPages (spaceId: string) {
     return http.GET<IPageWithPermissions[]>(`/api/spaces/${spaceId}/pages?archived=true`);
   }

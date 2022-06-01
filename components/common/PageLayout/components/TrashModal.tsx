@@ -71,7 +71,7 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [space] = useCurrentSpace();
-  const { pages, getPagePermissions, currentPageId } = usePages();
+  const { pages, getPagePermissions, setPages, currentPageId } = usePages();
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -119,6 +119,15 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
         }
       });
       return { ..._archivedPages };
+    });
+    setPages((unArchivedPages) => {
+      // Some deleted pages might still stay on the archived page state
+      deletePageIds.forEach(deletedPageId => {
+        if (unArchivedPages[deletedPageId]) {
+          delete unArchivedPages[deletedPageId];
+        }
+      });
+      return { ...unArchivedPages };
     });
     // If the current page has been deleted permanently route to the first alive page
     if (deletePageIds.includes(currentPageId)) {

@@ -1,3 +1,4 @@
+import { BangleEditorState } from '@bangle.dev/core';
 import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
@@ -5,15 +6,22 @@ import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boa
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { specRegistry } from 'components/common/CharmEditor/CharmEditor';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { Board } from 'lib/focalboard/board';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import log from 'loglevel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import BoardPage from '../BoardPage';
+import { Node } from '@bangle.dev/pm';
+import { PageContent } from 'models/Page';
+import { findChildrenByType } from 'prosemirror-utils';
+import { nestedPageNodeName } from 'components/common/CharmEditor/components/nestedPage';
+import { IPageWithPermissions } from 'lib/pages';
 import DocumentPage from '../DocumentPage';
+import BoardPage from '../BoardPage';
 
 interface Props {
   shouldLoadPublicPage?: boolean,
@@ -23,12 +31,12 @@ interface Props {
 
 export default function EditorPage (
   { shouldLoadPublicPage, pageId, onPageLoad }: Props
-
 ) {
   const dispatch = useAppDispatch();
   const { setIsEditing, pages, setPages, getPagePermissions } = usePages();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
+  const [space] = useCurrentSpace();
 
   const currentPagePermissions = getPagePermissions(pageId);
 
@@ -85,21 +93,57 @@ export default function EditorPage (
   const pagesLoaded = Object.keys(pages).length > 0;
 
   useEffect(() => {
+    async function main () {
+      if (pageId && shouldLoadPublicPage) {
+        loadPublicPage(pageId as string);
+      }
+      else if (pageId && pagesLoaded) {
+        const pageByPath = pages[pageId];
+        if (pageByPath) {
+          setTitleState(pageByPath.title);
+          onPageLoad?.(pageByPath.id);
+        }
+        else if (space) {
+          // This might be an archived page
+          const page = await charmClient.getPage(pageId, space.id);
+          const state = new BangleEditorState({
+            specRegistry,
+            initialValue: page.content ? Node.fromJSON(specRegistry.schema, page.content as PageContent) : '',
+            editorProps: {
+              attributes: {
+                example: 'value'
+              }
+            }
+          });
+          const nestedPageNode = state.specRegistry.schema.nodes[nestedPageNodeName];
+          const nodes = findChildrenByType(state.pmState.doc, nestedPageNode).map(({ node: _node }) => _node);
+          // No need to fetch pages that already exist in the local state
+          const pageIdsToBeFetched = nodes.map(node => node.attrs.id).filter(_pageId => !pages[_pageId]);
+          const fetchedPagesRecord: Record<string, IPageWithPermissions> = {
+            [page.id]: page
+          };
 
-    if (pageId && shouldLoadPublicPage) {
-      loadPublicPage(pageId as string);
-    }
-    else if (pageId && pagesLoaded) {
-      const pageByPath = pages[pageId];
-      if (pageByPath) {
-        setTitleState(pageByPath.title);
-        onPageLoad?.(pageByPath.id);
+          if (pageIdsToBeFetched.length !== 0) {
+            const linkedPages = await charmClient.getPagesByIds(space.id, pageIdsToBeFetched);
+            linkedPages.forEach(linkedPage => {
+              fetchedPagesRecord[linkedPage.id] = linkedPage;
+            });
+          }
+          setPages((_pages) => ({ ..._pages, ...fetchedPagesRecord }));
+          setPageNotFound(false);
+          onPageLoad?.(page.id);
+        }
+        else {
+          setPageNotFound(true);
+        }
       }
       else {
         setPageNotFound(true);
       }
     }
-  }, [pageId, pagesLoaded]);
+
+    main();
+  }, [pageId, pagesLoaded, space]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
     setIsEditing(true);
