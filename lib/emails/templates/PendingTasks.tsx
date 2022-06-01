@@ -46,7 +46,7 @@ export default function PendingTasks (props: PendingTasksProps) {
         </MjmlColumn>
       </MjmlSection>
 
-      <MjmlSection backgroundColor='#fff'>
+      <MjmlSection backgroundColor='#fff' paddingTop={40} paddingBottom={40}>
         <MjmlGroup>
           <MjmlColumn width='20%'>
             <MjmlImage
@@ -63,7 +63,7 @@ export default function PendingTasks (props: PendingTasksProps) {
                   Do you have any feedback on this email?
                 </strong>
               </p>
-              <p>Please share it with us in <a href='https://discord.gg/ACYCzBGC2M'>Discord</a></p>
+              <p>Please share it with us on <a href='https://discord.gg/ACYCzBGC2M'>Discord</a></p>
             </MjmlText>
           </MjmlColumn>
         </MjmlGroup>

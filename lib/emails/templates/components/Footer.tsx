@@ -20,11 +20,6 @@ export default function Footer () {
     <>
       <MjmlSection borderTop='2px solid #eee' paddingBottom={0}>
         <MjmlColumn>
-          {/* <MjmlSocial align='center'>
-        <MjmlSocialElement name='facebook'></MjmlSocialElement>
-        <MjmlSocialElement name='pinterest'></MjmlSocialElement>
-        <MjmlSocialElement name='instagram'></MjmlSocialElement>
-      </MjmlSocial> */}
           <MjmlText align='center'>
             <SocialIcon href='https://www.linkedin.com/company/charmverse'>
               <LinkedInIcon />
@@ -36,9 +31,6 @@ export default function Footer () {
               <FacebookIcon />
             </SocialIcon>
           </MjmlText>
-          {/* <a href='https://discord.gg/ACYCzBGC2M' target='_blank'>
-            <SvgIcon viewBox='0 -5 70 70'><DiscordIcon /></SvgIcon>
-          </a> */}
         </MjmlColumn>
       </MjmlSection>
 
