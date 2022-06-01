@@ -1,4 +1,4 @@
-import type { DiscordUser, FavoritePage, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser } from '@prisma/client';
+import type { DiscordUser, FavoritePage, Poap, SpaceRole, User, Role as RoleMembership, SpaceRoleToRole, TelegramUser } from '@prisma/client';
 
 export { FavoritePage, SpaceRole, User };
 
@@ -17,6 +17,11 @@ export interface LoggedInUser extends User {
   ensName?: string;
   discordUser?: DiscordUser | null
   telegramUser?: TelegramUser | null
+}
+
+export interface ExtendedPoap extends Poap {
+  imageURL: string;
+  isHidden: boolean;
 }
 
 export const IDENTITY_TYPES = ['Wallet', 'Discord', 'Telegram', 'RandomName'] as const;

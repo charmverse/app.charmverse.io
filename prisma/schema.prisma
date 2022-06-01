@@ -129,6 +129,7 @@ model User {
   favorites       FavoritePage[]
   permissions     PagePermission[]
   pages           Page[]
+  poaps           Poap[]
   blocks          Block[]
   spaces          Space[]
   inviteLinks     InviteLink[]
@@ -178,6 +179,15 @@ model DiscordUser {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   discordId String   @id
   account   Json
+}
+
+model Poap {
+  id              String  @id @db.Uuid
+  tokenId         String
+  userId          String  @db.Uuid
+  user            User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  walletAddress   String
+  isHidden        Boolean?
 }
 
 model FavoritePage {

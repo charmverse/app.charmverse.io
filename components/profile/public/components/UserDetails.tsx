@@ -23,7 +23,6 @@ import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { shortenHex } from 'lib/utilities/strings';
 import useENSName from 'hooks/useENSName';
-import PoapSection from './PoapSection';
 import DescriptionModal from './DescriptionModal';
 import UserPathModal from './UserPathModal';
 import SocialModal from './SocialModal';
@@ -48,6 +47,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
   const { data: userDetails, mutate } = useSWR(`/userDetails/${user.id}`, () => {
     return isPublicUser(user) ? user.profile : charmClient.getUserDetails();
   });
+
   const ENSName = useENSName(account);
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
   const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
@@ -259,14 +259,6 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
           </Grid>
         </Grid>
       </Stack>
-    <Grid container direction='row'>
-      <Grid item xs={8}>
-
-      </Grid>
-      <Grid item xs={4}>
-        <PoapSection />
-      </Grid>
-    </Grid>
       { !isPublicUser(user) && (
       <>
         <IdentityModal
@@ -319,6 +311,6 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
         />
       </>
       )}
-    </StyledBox>
+    </Box>
   );
 }

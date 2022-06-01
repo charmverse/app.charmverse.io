@@ -1,6 +1,6 @@
 
 import {
-  Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
+  Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Poap, Prisma,
   Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole, UserDetails
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
@@ -17,6 +17,7 @@ import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtil
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'lib/notion/types';
+import { GetPoapsResponse } from 'lib/poap';
 // TODO: Maybe move these types to another place so that we dont import from backend
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
@@ -79,6 +80,10 @@ class CharmClient {
 
   getUserDetails () {
     return http.GET<UserDetails>('/api/profile/details');
+  }
+
+  getUserPoaps () {
+    return http.GET<GetPoapsResponse>('/api/profile/poaps');
   }
 
   updateUserDetails (data: Partial<UserDetails>) {

@@ -6,9 +6,12 @@ import { User, UserDetails } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
+import { ExtendedPoap } from 'models';
+import { getPOAPs } from 'lib/poap';
 
 export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;
+  visiblePoaps: Array<Partial<ExtendedPoap>>;
 }
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -36,7 +39,8 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
   const users = await prisma.user.findMany({
     where: condition,
     include: {
-      profile: true
+      profile: true,
+      poaps: true
     }
   });
 
@@ -47,7 +51,16 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
     res.status(200).json(userById);
   }
   else if (users.length > 0) {
-    res.status(200).json(users[0]);
+    const user = users[0];
+    const allPoaps = await getPOAPs(user.addresses);
+
+    // eslint-disable-next-line max-len
+    const visiblePoaps = allPoaps.filter(poap => user.poaps.find(p => p.isHidden && p.tokenId === poap.tokenId && p.walletAddress === poap.walletAddress));
+
+    res.status(200).json({
+      ...user,
+      visiblePoaps
+    });
   }
   else {
     throw new DataNotFoundError('User not found');
