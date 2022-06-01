@@ -1,8 +1,10 @@
 import {
   MjmlSection,
   MjmlColumn,
+  MjmlGroup,
   MjmlText,
   MjmlButton,
+  MjmlImage,
   MjmlDivider
 } from 'mjml-react';
 import { User } from '@prisma/client';
@@ -17,12 +19,15 @@ export interface PendingTasksProps {
   tasks: GnosisSafeTasks[];
 }
 
+const domain = process.env.DOMAIN;
+const chatIconPath = '/images/icons/speech-bubbles.png';
+
 export default function PendingTasks (props: PendingTasksProps) {
 
   return (
 
-    <EmailWrapper title='Your current tasks'>
-      <MjmlSection backgroundColor='#fff' paddingTop={0}>
+    <EmailWrapper title='Your open tasks'>
+      <MjmlSection backgroundColor='#fff' paddingTop={0} paddingBottom={0}>
         <MjmlColumn>
           <Header />
 
@@ -32,25 +37,39 @@ export default function PendingTasks (props: PendingTasksProps) {
 
           {props.tasks.map(task => <MultisigTask key={task.safeAddress} task={task} />)}
 
-          <MjmlDivider />
-
-          <MjmlText>
-            <p>
-              <strong>
-                Do you have any feedback on this email?
-              </strong>
-            </p>
-            <p>Please share it with us in <a href='https://discord.gg/ACYCzBGC2M'>Discord</a></p>
-          </MjmlText>
-
         </MjmlColumn>
       </MjmlSection>
 
-      <MjmlSection borderTop='2px solid #eee'>
+      <MjmlSection backgroundColor='#fff' paddingTop={0} paddingBottom={0}>
         <MjmlColumn>
-          <Footer />
+          <MjmlDivider />
         </MjmlColumn>
       </MjmlSection>
+
+      <MjmlSection backgroundColor='#fff'>
+        <MjmlGroup>
+          <MjmlColumn width='20%'>
+            <MjmlImage
+              align='center'
+              height='47px'
+              width='64px'
+              src={`${domain}/${chatIconPath}`}
+            />
+          </MjmlColumn>
+          <MjmlColumn width='80%'>
+            <MjmlText paddingLeft={0}>
+              <p>
+                <strong>
+                  Do you have any feedback on this email?
+                </strong>
+              </p>
+              <p>Please share it with us in <a href='https://discord.gg/ACYCzBGC2M'>Discord</a></p>
+            </MjmlText>
+          </MjmlColumn>
+        </MjmlGroup>
+      </MjmlSection>
+
+      <Footer />
     </EmailWrapper>
   );
 }

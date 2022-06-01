@@ -6,14 +6,15 @@ import {
 } from 'mjml-react';
 import { } from 'theme/colors';
 
+const domain = process.env.DOMAIN;
 const logoImagePath = '/images/charmverse_logo_sm_black.png';
 
 export default function Header () {
   return (
     <MjmlImage
       align='left'
-      href='https://app.charmverse.io'
-      src={`https://app.charmverse.io/${logoImagePath}`}
+      href={domain}
+      src={`${domain}${logoImagePath}`}
       width='243px'
       height='46px'
       padding-bottom='20px'

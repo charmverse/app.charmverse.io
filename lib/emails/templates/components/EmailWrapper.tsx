@@ -12,7 +12,7 @@ import {
   MjmlButton
 } from 'mjml-react';
 
-import { lightGreyColor, blackColor } from 'theme/colors';
+import { lightGreyColor, primaryTextColor } from 'theme/colors';
 import { fontFamily } from 'theme';
 import styles from '../theme/styles';
 
@@ -36,7 +36,7 @@ export default function EmailWrapper (props: Props) {
         <MjmlAttributes>
           <MjmlButton font-family={fontFamily} cssClass='button' />
           <MjmlDivider cssClass='mjml-divider' />
-          <MjmlText font-family={fontFamily} color={blackColor} font-size='18px' line-height='26px' />
+          <MjmlText font-family={fontFamily} color={primaryTextColor} font-size='18px' line-height='26px' />
         </MjmlAttributes>
 
       </MjmlHead>
