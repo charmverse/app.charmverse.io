@@ -13,7 +13,6 @@ import { Chains, RPC } from 'connectors';
 import { useContext } from 'react';
 import { getDisplayName } from 'lib/users';
 import useENSName from 'hooks/useENSName';
-import AccountModal from 'components/common/PageLayout/components/Account/components/AccountModal';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
 import styled from '@emotion/styled';
 
@@ -24,6 +23,9 @@ const AccountCard = styled.div`
 const NetworkButton = styled(Button)`
   padding-left: 0;
   padding-right: 0;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  margin-right: 1px;
 `;
 
 const AccountButton = styled(Button)`
@@ -49,12 +51,11 @@ const StyledButtonGroup = styled(ButtonGroup)`
 
 function Account (): JSX.Element {
   const { error, account, chainId } = useWeb3React();
-  const { openWalletSelectorModal, triedEager, openNetworkModal } = useContext(Web3Connection);
+  const { openNetworkModal } = useContext(Web3Connection);
   const ENSName = useENSName(account);
 
-  const accountModalState = usePopupState({ variant: 'popover', popupId: 'account-modal' });
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
-  const [user, setUser, isUserLoaded] = useUser();
+  const [user, , isUserLoaded] = useUser();
 
   if (typeof window === 'undefined') {
     return (
@@ -94,25 +95,25 @@ function Account (): JSX.Element {
     <AccountCard>
       <StyledButtonGroup variant='contained' disableElevation>
         {isConnectedWithWallet && (
-        <Tooltip title={RPC[Chains[chainId]].chainName} arrow>
-          <NetworkButton onClick={networkModalState.open}>
-            <SvgIcon component='object' sx={{ display: 'flex', justifyContent: 'center' }}>
-              <img alt='' src={RPC[Chains[chainId]].iconUrls[0]} style={{ height: '100%' }} />
-            </SvgIcon>
-          </NetworkButton>
-        </Tooltip>
+          <Tooltip title={RPC[Chains[chainId]].chainName} arrow>
+            <NetworkButton onClick={networkModalState.open}>
+              <SvgIcon component='object' sx={{ display: 'flex', justifyContent: 'center' }}>
+                <img alt='' src={RPC[Chains[chainId]].iconUrls[0]} style={{ height: '100%' }} />
+              </SvgIcon>
+            </NetworkButton>
+          </Tooltip>
         )}
         <AccountButton
-          onClick={accountModalState.open}
+          href='/profile/tasks'
+          sx={{
+            borderTopLeftRadius: '0 !important',
+            borderBottomLeftRadius: '0 !important'
+          }}
           endIcon={<Avatar avatar={user?.avatar} name={userName} size='small' />}
         >
           {userName}
         </AccountButton>
       </StyledButtonGroup>
-      <AccountModal
-        isOpen={accountModalState.isOpen}
-        onClose={accountModalState.close}
-      />
       <NetworkModal isOpen={networkModalState.isOpen} onClose={networkModalState.close} />
     </AccountCard>
   );

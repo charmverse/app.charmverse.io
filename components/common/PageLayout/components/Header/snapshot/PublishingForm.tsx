@@ -296,32 +296,38 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
             </Grid>
 
-            <Grid item>
-              <FieldLabel>Start date</FieldLabel>
-              <DateTimePicker
-                value={startDate}
-                onChange={(value) => {
-                  if (value instanceof DateTime) {
-                    setStartDate(value as DateTime);
-                  }
-
-                }}
-                renderInput={(props) => <TextField fullWidth {...props} />}
-              />
-            </Grid>
-
-            <Grid item>
-              <FieldLabel>End date</FieldLabel>
-              <DateTimePicker
-                minDateTime={startDate}
-                value={endDate}
-                onChange={(value) => {
-                  if (value instanceof DateTime) {
-                    setEndDate(value as DateTime);
-                  }
-                }}
-                renderInput={(props) => <TextField fullWidth {...props} error={!endDateAfterStart} helperText={!endDateAfterStart ? 'End date must be after start date' : null} />}
-              />
+            <Grid item display='flex' gap={1} justifyContent='space-between'>
+              <div style={{
+                flexGrow: 1
+              }}
+              >
+                <FieldLabel>Start date</FieldLabel>
+                <DateTimePicker
+                  value={startDate}
+                  onChange={(value) => {
+                    if (value instanceof DateTime) {
+                      setStartDate(value as DateTime);
+                    }
+                  }}
+                  renderInput={(props) => <TextField fullWidth {...props} />}
+                />
+              </div>
+              <div style={{
+                flexGrow: 1
+              }}
+              >
+                <FieldLabel>End date</FieldLabel>
+                <DateTimePicker
+                  minDateTime={startDate}
+                  value={endDate}
+                  onChange={(value) => {
+                    if (value instanceof DateTime) {
+                      setEndDate(value as DateTime);
+                    }
+                  }}
+                  renderInput={(props) => <TextField fullWidth {...props} error={!endDateAfterStart} helperText={!endDateAfterStart ? 'End date must be after start date' : null} />}
+                />
+              </div>
             </Grid>
 
             {
