@@ -104,7 +104,7 @@ function Account (): JSX.Element {
           </Tooltip>
         )}
         <AccountButton
-          href='/profile/tasks'
+          href='/nexus'
           sx={{
             borderTopLeftRadius: '0 !important',
             borderBottomLeftRadius: '0 !important'

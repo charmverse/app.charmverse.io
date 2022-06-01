@@ -47,7 +47,7 @@ export default function PendingTasks (props: PendingTasksProps) {
 
 function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
 
-  const charmUrl = 'https://app.charmverse.io/profile/tasks';
+  const charmUrl = 'https://app.charmverse.io/nexus';
 
   return (
     <>

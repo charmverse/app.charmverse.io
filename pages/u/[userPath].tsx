@@ -1,6 +1,6 @@
 import { ReactElement, useEffect } from 'react';
-import PageLayout from 'components/profile/components/ProfileLayout';
-import PublicProfile from 'components/profile/public/PublicProfile';
+import PageLayout from 'components/nexus/components/ProfileLayout';
+import PublicProfile from 'components/profile/PublicProfile';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { usePageTitle } from 'hooks/usePageTitle';

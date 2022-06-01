@@ -14,7 +14,7 @@ import { greyColor2 } from 'theme/colors';
 
 export default function Footer () {
 
-  const unsubscribeLink = `${process.env.DOMAIN}/profile/tasks`;
+  const unsubscribeLink = `${process.env.DOMAIN}/nexus`;
 
   return (
     <>

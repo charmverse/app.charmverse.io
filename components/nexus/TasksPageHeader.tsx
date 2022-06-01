@@ -152,7 +152,7 @@ export default function IntegrationCard () {
           </Link>
         </Grid>
         <Grid item xs sx={{ maxWidth: '300px !important' }}>
-          <Link href='/profile/public'>
+          <Link href='/nexus'>
             <Paper
               elevation={1}
               sx={{
