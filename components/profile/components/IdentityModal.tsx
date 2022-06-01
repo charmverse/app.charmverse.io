@@ -110,7 +110,7 @@ function IdentityModal (props: IdentityModalProps) {
           ))
         }
         <Box justifyContent='end' mt={3} sx={{ display: 'flex' }}>
-          <Link href='/profile/tasks'>
+          <Link href='/nexus'>
             <StyledButton>
               Manage Integrations
             </StyledButton>

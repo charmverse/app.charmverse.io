@@ -24,11 +24,6 @@ const config = {
         source: '/:domain/settings',
         destination: '/:domain/settings/workspace',
         permanent: false
-      },
-      {
-        source: '/profile',
-        destination: '/profile/tasks',
-        permanent: false
       }
     ];
   },

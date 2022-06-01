@@ -2,7 +2,7 @@ import PageLayout, { ScrollableWindow } from 'components/common/PageLayout';
 import { Box } from '@mui/material';
 import styled from '@emotion/styled';
 import { useUser } from 'hooks/useUser';
-import ProfileSidebar from './ProfileSidebar';
+import NexusSidebar from './NexusSidebar';
 
 const Container = styled(Box)`
   width: 1200px;
@@ -11,13 +11,13 @@ const Container = styled(Box)`
 
 const emptySidebar = () => <div></div>;
 
-export default function ProfileLayout (props: { children: React.ReactNode }) {
+export default function NexusLayout (props: { children: React.ReactNode }) {
 
   // hide sidebar for public users for now, since they can't create a workspace
   const [user] = useUser();
 
   return (
-    <PageLayout hideSidebarOnSmallScreen sidebarWidth={user ? 55 : 0} sidebar={user ? ProfileSidebar : emptySidebar}>
+    <PageLayout hideSidebarOnSmallScreen sidebarWidth={user ? 55 : 0} sidebar={user ? NexusSidebar : emptySidebar}>
       <ScrollableWindow>
         <Container py={3} sx={{ px: { xs: '20px', sm: '80px' } }} mx='auto' mb={10}>
           {props.children}

@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
-import PageLayout from 'components/profile/components/ProfileLayout';
-import TasksList from 'components/profile/tasks';
+import PageLayout from 'components/nexus/components/NexusLayout';
+import TasksList from 'components/nexus';
 
 export default function TasksPage () {
   return (

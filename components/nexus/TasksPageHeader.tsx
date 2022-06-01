@@ -40,11 +40,13 @@ export default function IntegrationCard () {
     <IntegrationCardContainer>
       <Grid container spacing={{ sm: 2, xs: 1 }}>
         <Grid item xs>
-          <Link href='/profile/integrations'>
+          <Link passHref href='/integrations'>
             <Paper
+              component='a'
               elevation={1}
               sx={{
                 height: '100%',
+                textDecoration: 'none',
                 px: {
                   xs: 1, md: 3
                 },
@@ -152,10 +154,13 @@ export default function IntegrationCard () {
           </Link>
         </Grid>
         <Grid item xs sx={{ maxWidth: '300px !important' }}>
-          <Link href='/profile/public'>
+          <Link passHref href='/profile'>
             <Paper
+              component='a'
               elevation={1}
               sx={{
+                textDecoration: 'none',
+                display: 'block',
                 height: '100%',
                 p: 1,
                 cursor: 'pointer'
