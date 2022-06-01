@@ -113,7 +113,13 @@ export default function BountyHeader ({ bounty }: Props) {
                 {
                   (isAdmin || (isBountyCreator && bounty.status === 'suggestion')) && (
                     <Tooltip arrow placement='right' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
-                      <MenuItem dense onClick={bountyEditModal.open}>
+                      <MenuItem
+                        dense
+                        onClick={() => {
+                          bountyEditModal.open();
+                          popupState.close();
+                        }}
+                      >
                         <ListItemIcon><EditIcon color='secondary' fontSize='small' /></ListItemIcon>
                         <ListItemText>Edit</ListItemText>
                       </MenuItem>
@@ -125,13 +131,25 @@ export default function BountyHeader ({ bounty }: Props) {
                   (isAdmin && bounty.status !== 'suggestion' && bounty.status !== 'complete' && bounty.status !== 'paid') && (
                   <>
                     <Tooltip arrow placement='right' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
-                      <MenuItem dense onClick={closeSubmissionsModal.open}>
+                      <MenuItem
+                        dense
+                        onClick={() => {
+                          closeSubmissionsModal.open();
+                          popupState.close();
+                        }}
+                      >
                         <ListItemIcon><LockIcon color='secondary' fontSize='small' /></ListItemIcon>
                         <ListItemText>Stop new {bounty.approveSubmitters ? 'applications' : 'submissions'}</ListItemText>
                       </MenuItem>
                     </Tooltip>
                     <Tooltip arrow placement='right' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
-                      <MenuItem dense onClick={closeBountyModal.open}>
+                      <MenuItem
+                        dense
+                        onClick={() => {
+                          closeBountyModal.open();
+                          popupState.close();
+                        }}
+                      >
                         <ListItemIcon><CheckCircleIcon color='secondary' fontSize='small' /></ListItemIcon>
                         <ListItemText>Mark as complete</ListItemText>
                       </MenuItem>
@@ -143,7 +161,13 @@ export default function BountyHeader ({ bounty }: Props) {
                 {
                   (isAdmin || (isBountyCreator && bounty.status === 'suggestion')) && (
                     <Tooltip arrow placement='right' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
-                      <MenuItem dense onClick={bountyDeleteModal.open}>
+                      <MenuItem
+                        dense
+                        onClick={() => {
+                          bountyDeleteModal.open();
+                          popupState.close();
+                        }}
+                      >
                         <ListItemIcon><DeleteIcon color='secondary' /></ListItemIcon>
                         <ListItemText>Delete</ListItemText>
                       </MenuItem>
