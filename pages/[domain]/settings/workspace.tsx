@@ -157,7 +157,7 @@ export default function WorkspaceSettings () {
         <ImportNotionWorkspace />
       </Box>
 
-      <Legend>Default page permission</Legend>
+      <Legend helperText='Default permission for new pages and boards across the workspace.'>Default Workspace Permission</Legend>
       <Box sx={{ ml: 1 }}>
         <>
           <Button
