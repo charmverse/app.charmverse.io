@@ -199,7 +199,7 @@ export function BountyApplicantList ({
                 <TableCell sx={{ maxWidth: '61vw' }}>
                   {
                     application.createdBy === user?.id && application.status === 'applied' ? (
-                      <Typography variant='body2' color={theme.palette.primary.main} onClick={bountyApplyModal.open}>
+                      <Typography sx={{ cursor: 'pointer' }} variant='body2' color={theme.palette.primary.main} onClick={bountyApplyModal.open}>
                         {application.message}
                       </Typography>
                     ) : (

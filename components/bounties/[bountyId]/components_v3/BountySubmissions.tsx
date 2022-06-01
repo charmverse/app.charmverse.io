@@ -214,7 +214,7 @@ export default function BountySubmissions ({ bounty }: Props) {
                   return 'Anonymous';
                 })()}
               </TableCell>
-              <TableCell sx={{ maxWidth: '61vw' }} onClick={!(submission.status === 'review' && submission.createdBy === user?.id) ? () => setCurrentViewedSubmission(submission) : editSubmissionModal.open}>
+              <TableCell sx={{ maxWidth: '61vw', cursor: 'pointer' }} onClick={!(submission.status === 'review' && submission.createdBy === user?.id) ? () => setCurrentViewedSubmission(submission) : editSubmissionModal.open}>
 
                 {
                     submission.status === 'review' && submission.createdBy === user?.id && (
