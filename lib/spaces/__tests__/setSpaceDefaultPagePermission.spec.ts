@@ -42,7 +42,7 @@ beforeAll(async () => {
 });
 
 describe('setSpaceDefaultPagePermission', () => {
-  it.skip('should throw error if no space is found with the id', async () => {
+  it('should throw error if no space is found with the id', async () => {
     try {
       await setSpaceDefaultPagePermission(v4(), 'editor');
       throw new ExpectedAnError();
