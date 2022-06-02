@@ -1,6 +1,7 @@
 
 import Legend from 'components/settings/Legend';
 import { useState } from 'react';
+import { Box } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPage';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
@@ -8,6 +9,8 @@ import ForumIcon from '@mui/icons-material/Forum';
 import GnosisTasksList from './GnosisTasksList';
 import TasksPageHeader from './TasksPageHeader';
 import NexusPageTitle from './components/NexusPageTitle';
+import NotifyMeButton from './components/NotifyMeButton';
+import SnoozeButton from './components/SnoozeButton';
 
 type TaskType = 'multisig' | 'bounty' | 'proposal' | 'discussion'
 
@@ -47,8 +50,12 @@ export default function TasksPage () {
     <>
       <NexusPageTitle />
       <TasksPageHeader />
-      <Legend>
-        My tasks
+      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>My tasks</span>
+        <Box display='flex' alignItems='center' gap={2}>
+          <NotifyMeButton />
+          <SnoozeButton />
+        </Box>
       </Legend>
       {/* <Tabs
         sx={tabStyles}

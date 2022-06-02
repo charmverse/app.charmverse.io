@@ -4,3 +4,4 @@ export * from './interfaces';
 export * from './getBounty';
 export * from './closeNewApplicationsAndSubmissions';
 export * from './closeOutBounty';
+export * from './reviewBountySuggestion';

@@ -31,13 +31,14 @@ import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
-import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
-import { GetTasksResponse } from 'pages/api/tasks';
+import { UpdateTasksState, GetTasksStateResponse } from 'pages/api/tasks/state';
+import { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
+import { SuggestionAction } from 'lib/bounties';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -165,10 +166,6 @@ class CharmClient {
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
     return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
-  }
-
-  updateGnosisSafeState (payload: UpdateGnosisSafeState) {
-    return http.PUT('/api/profile/gnosis-safes/state', payload);
   }
 
   favoritePage (pageId: string) {
@@ -396,6 +393,10 @@ class CharmClient {
     return data;
   }
 
+  async reviewBountySuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | {success: true}> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/review-suggestion`, { decision });
+  }
+
   async getBounty (bountyId: string): Promise<BountyWithDetails> {
 
     const data = await http.GET<BountyWithDetails>(`/api/bounties/${bountyId}`);
@@ -547,8 +548,16 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
+  getTasksState (): Promise<GetTasksStateResponse> {
+    return http.GET('/api/tasks/state');
+  }
+
+  updateTasksState (payload: UpdateTasksState) {
+    return http.PUT('/api/tasks/state', payload);
+  }
+
   getTasks (): Promise<GetTasksResponse> {
-    return http.GET('/api/tasks');
+    return http.GET('/api/tasks/list');
   }
 
   createRole (role: Partial<Role>): Promise<Role> {

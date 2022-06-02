@@ -154,7 +154,8 @@ export default function BountySubmissions ({ bounty }: Props) {
         }}
         >
           <TableRow>
-            <TableCell size='small' align='left'>
+            {/* Width should always be same as Bounty Applicant list status column, so submitter and applicant columns align */}
+            <TableCell sx={{ width: 120 }} align='left'>
               Status
             </TableCell>
             <TableCell>
@@ -206,13 +207,14 @@ export default function BountySubmissions ({ bounty }: Props) {
                         avatarSize='small'
                         user={contributor}
                         fontSize='small'
+                        linkToProfile
                       />
                     );
                   }
                   return 'Anonymous';
                 })()}
               </TableCell>
-              <TableCell sx={{ maxWidth: '61vw' }} onClick={!(submission.status === 'review' && submission.createdBy === user?.id) ? () => setCurrentViewedSubmission(submission) : editSubmissionModal.open}>
+              <TableCell sx={{ maxWidth: '61vw', cursor: 'pointer' }} onClick={!(submission.status === 'review' && submission.createdBy === user?.id) ? () => setCurrentViewedSubmission(submission) : editSubmissionModal.open}>
 
                 {
                     submission.status === 'review' && submission.createdBy === user?.id && (

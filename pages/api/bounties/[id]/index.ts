@@ -6,7 +6,7 @@ import { BountyWithDetails } from 'models';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nc, { NextHandler } from 'next-connect';
 import { updateBountySettings, getBounty } from 'lib/bounties';
-import { DataNotFoundError } from 'lib/utilities/errors/errors';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -53,14 +53,29 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
     throw new DataNotFoundError(`Bounty with id ${id} was not found`);
   }
 
+  const userId = req.session.user.id;
+
   const { error, isAdmin } = await hasAccessToSpace({
-    userId: req.session.user.id,
+    userId,
     spaceId: bounty.spaceId,
-    adminOnly: true
+    adminOnly: false
   });
 
+  // User not a space member
   if (error) {
     throw error;
+  }
+
+  if (bounty.status === 'suggestion' && !isAdmin && bounty.createdBy !== userId) {
+    throw new UnauthorisedActionError('You need to have created this suggestion or be a workspace admin to edit it.');
+  // Only admins can edit bounty for now
+  }
+  else if (bounty.status !== 'suggestion' && !isAdmin) {
+    throw new UnauthorisedActionError('Only space administrators can edit active bounties.');
+  }
+
+  if (bounty.status === 'suggestion' && bounty.createdBy === userId) {
+    delete body.rewardAmount;
   }
 
   const updatedBounty = await updateBountySettings({
@@ -79,6 +94,31 @@ async function updateBounty (req: NextApiRequest, res: NextApiResponse<BountyWit
 
 async function deleteBounty (req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
+
+  const bounty = await getBounty(id as string);
+
+  if (!bounty) {
+    throw new DataNotFoundError(`Bounty with id ${id} not found.`);
+  }
+
+  const userId = req.session.user.id;
+
+  const { error, isAdmin } = await hasAccessToSpace({
+    spaceId: bounty.spaceId,
+    userId,
+    adminOnly: false
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (bounty.status === 'suggestion' && bounty.createdBy !== userId && !isAdmin) {
+    throw new UnauthorisedActionError('You cannot delete this bounty suggestion.');
+  }
+  else if (bounty.status !== 'suggestion' && !isAdmin) {
+    throw new UnauthorisedActionError('You cannot delete this bounty suggestion.');
+  }
 
   await prisma.bounty.delete({
     where: {
