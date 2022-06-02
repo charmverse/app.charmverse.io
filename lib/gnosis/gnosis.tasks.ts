@@ -98,8 +98,8 @@ type TransactionParameter = PaymentAction | DeadlineAction | DataAction;
 function getTaskActions (transaction: GnosisTransaction, getRecipient: (address: string) => ActionUser): SendAction[] {
   const data = transaction.dataDecoded as any | undefined;
   const parameters: TransactionParameter[] = data?.parameters ?? [];
-  console.log('response', transaction);
-  console.log('data', data?.parameters);
+  // console.log('response', transaction);
+  // console.log('data', data?.parameters);
   const paymentActions = parameters
     .filter((action): action is PaymentAction => !!(action as PaymentAction).decodedValue?.[0].to)
     .map(action => action.decodedValue).flat()
