@@ -182,7 +182,7 @@ model DiscordUser {
 }
 
 model Poap {
-  id              String  @id @db.Uuid
+  id              String  @id @default(uuid()) @db.Uuid
   tokenId         String
   userId          String  @db.Uuid
   user            User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)

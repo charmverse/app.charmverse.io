@@ -30,6 +30,7 @@ async function getUserDetails (req: NextApiRequest, res: NextApiResponse<UserDet
       id: req.session.user.id
     }
   });
+
   if (!details) {
     return res.status(202).end();
   }

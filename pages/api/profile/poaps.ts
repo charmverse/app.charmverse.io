@@ -5,8 +5,8 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getPOAPs, GetPoapsResponse } from 'lib/poap';
-
 import nc from 'next-connect';
+import { ExtendedPoap } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -15,8 +15,8 @@ handler
   .get(getUserPoaps)
   .put(updateUserPoaps);
 
-async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsResponse> | { error: any }) {
-  const hiddenPoaps: Array<Partial<Poap>> = await prisma.poap.findMany({
+async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsResponse | { error: any }>) {
+  const hiddenPoapIDs: Array<string> = (await prisma.poap.findMany({
     where: {
       userId: req.session.user.id,
       isHidden: true
@@ -24,13 +24,15 @@ async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsR
     select: {
       id: true
     }
-  });
+  })).map(p => p.id);
 
-  const poaps = await getPOAPs(req.session.user.addresses);
+  const poaps: Array<Partial<ExtendedPoap>> = await getPOAPs(req.session.user.addresses);
+  const hiddenPoaps = poaps.filter((poap: Partial<ExtendedPoap>) => hiddenPoapIDs.find((id :string) => poap.tokenId === id));
+  const visiblePoaps = poaps.filter((poap: Partial<ExtendedPoap>) => !hiddenPoapIDs.find((id :string) => poap.tokenId === id));
 
   return res.status(200).json({
-    hidden: hiddenPoaps,
-    poaps
+    hiddenPoaps,
+    visiblePoaps
   });
 }
 

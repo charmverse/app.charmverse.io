@@ -12,7 +12,6 @@ import { ExtendedPoap, LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import Button from 'components/common/Button';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import poaps from 'pages/api/profile/poaps';
 import ManagePOAPModal from './ManagePOAPModal';
 
 const StyledBox = styled(Box)`
@@ -47,7 +46,7 @@ function PoapSection (props: PoapSectionProps) {
 
   const hasConnectedWallet: boolean = !isPublic && user.addresses.length !== 0;
 
-  let poaps = poapData?.poaps;
+  let poaps = poapData?.visiblePoaps;
 
   if (isPublic) {
     poaps = user.visiblePoaps;
@@ -119,13 +118,19 @@ function PoapSection (props: PoapSectionProps) {
           )
         }
       </Grid>
-      <ManagePOAPModal
-        isOpen={managePoapModalState.isOpen}
-        close={managePoapModalState.close}
-        save={async () => {
-          managePoapModalState.close();
-        }}
-      />
+      {
+        poapData && (
+        <ManagePOAPModal
+          isOpen={managePoapModalState.isOpen}
+          close={managePoapModalState.close}
+          save={async () => {
+            managePoapModalState.close();
+          }}
+          visiblePoaps={poapData.visiblePoaps}
+          hiddenPoaps={poapData.hiddenPoaps}
+        />
+        )
+      }
     </StyledBox>
   );
 }
