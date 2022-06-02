@@ -41,29 +41,20 @@ describe('createBounty', () => {
 
   it('should accept as creation input: title, spaceId, createdBy, status, chainId, description, descriptionNodes, approveSubmitters, maxSubmissions, rewardAmount, rewardToken, reviewer, linkedTaskId', async () => {
 
-    const creationDate = new Date();
-    const upDate = new Date();
-
-    const randomId = v4();
-
     const fullBountyCreationData: BountyCreationData = {
       createdBy: user.id,
       spaceId: space.id,
       title: 'Testing this works',
       approveSubmitters: true,
       chainId: 1,
-      createdAt: creationDate,
       description: 'Example description',
       descriptionNodes: '{type:"doc"}',
-      id: randomId,
       linkedTaskId: v4(),
       maxSubmissions: 100,
       reviewer: user.id,
       rewardAmount: 1000,
       rewardToken: 'ETH',
-      status: 'complete',
-      suggestedBy: user.id,
-      updatedAt: upDate
+      status: 'suggestion'
     };
 
     const bounty = await createBounty(fullBountyCreationData);
