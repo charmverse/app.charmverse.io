@@ -36,7 +36,7 @@ export default function SnoozeButton () {
           sx={{ display: 'flex' }}
           {...bindTrigger(popupState)}
         >
-          {user?.email ? 'Change Notifications' : 'Notify Me'}
+          {user?.email ? 'Notification Settings' : 'Notify Me'}
         </Button>
       </Tooltip>
       <NotifyMeModal

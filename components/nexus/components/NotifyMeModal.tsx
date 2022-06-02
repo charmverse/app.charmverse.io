@@ -72,9 +72,11 @@ export default function NotifyMeModal (props: Props) {
           <Button type='submit'>
             Save
           </Button>
-          <Button onClick={removeNotifications} color='secondary' variant='outlined'>
-            Remove
-          </Button>
+          {currentValue && (
+            <Button onClick={removeNotifications} color='secondary' variant='outlined'>
+              Remove
+            </Button>
+          )}
         </Box>
       </form>
     </Modal>
