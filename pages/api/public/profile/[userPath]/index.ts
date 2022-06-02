@@ -48,7 +48,15 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
   const userById = users.find(user => user.id === userPath);
 
   if (userById) {
-    res.status(200).json(userById);
+    const allPoaps = await getPOAPs(userById.addresses);
+
+    // eslint-disable-next-line max-len
+    const visiblePoaps = allPoaps.filter(poap => !userById.poaps.find(p => p.isHidden && p.tokenId === poap.tokenId && p.walletAddress === poap.walletAddress));
+
+    res.status(200).json({
+      ...userById,
+      visiblePoaps
+    });
   }
   else if (users.length > 0) {
     const user = users[0];
