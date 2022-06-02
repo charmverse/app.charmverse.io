@@ -120,7 +120,7 @@ export function GnosisConnectCard ({ loading, onClick }: { loading: boolean, onC
   return (
     <Card variant='outlined'>
       <Box p={3} textAlign='center'>
-        <Typography color='secondary'>Import your Gnosis safes to view your transaction queue{!isTasksPage && <> under <Link href='/profile/tasks'>My Tasks</Link></>}</Typography>
+        <Typography color='secondary'>Import your Gnosis safes to view your transaction queue{!isTasksPage && <> under <Link href='/nexus'>My Tasks</Link></>}</Typography>
         <br />
         <Button
           loading={loading}

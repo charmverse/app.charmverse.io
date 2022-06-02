@@ -2,10 +2,10 @@
 import PendingTasks, { PendingTasksProps } from './templates/PendingTasks';
 import { renderMJML } from './templates/utils';
 
-export function getPendingTasksEmail ({ tasks }: PendingTasksProps) {
+export function getPendingTasksEmail (props: PendingTasksProps) {
 
-  const html = renderMJML(PendingTasks({ tasks }));
-  const subject = 'You have 6 Gnosis transactions to sign';
+  const html = renderMJML(PendingTasks(props));
+  const subject = `CharmVerse: You have ${props.tasks.length} open tasks`;
 
   return { html, subject };
 }

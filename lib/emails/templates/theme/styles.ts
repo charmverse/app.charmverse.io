@@ -4,17 +4,25 @@ import { blackColor, blueColor, greyColor, greyColor2, lightGreyColor } from 'th
 export const css = `
 
   h1, h2, h3, h4, h5, h6, li, p {
-    color: ${greyColor};
-    line-height: 1.4em;
+    line-height: 1.2em;
+    margin-top: 0;
   }
 
-  h3 {
-    font-size: 12px;
+  h1 {
+    font-size: 32px;
   }
 
-  h3 {
-    letter-spacing: 1px;
-    text-transform: uppercase;
+  h2 {
+    font-size: 24px;
+  }
+
+  .mjml-divider {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .mjml-divider p {
+    border-top: 2px solid #eee !important;
   }
 
   a, a:visited {
@@ -45,14 +53,16 @@ export const css = `
   }
 
   .button {
-    border-radius: 2px;
+    border-radius: 4px;
   }
 
-  a.button {
+  a.button, .button a {
     border: none;
     color: #111;
-    padding: 10px 25px;
-    background: ${blueColor};
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    padding: 15px 40px !important;
+    background: ${blueColor} !important;
     text-decoration: underline;
   }
 

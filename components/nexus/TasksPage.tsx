@@ -1,6 +1,5 @@
-import { Box, Tab, Tabs, Typography } from '@mui/material';
+
 import Legend from 'components/settings/Legend';
-import Button from 'components/common/Button';
 import { useState } from 'react';
 import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPage';
@@ -8,7 +7,7 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import GnosisTasksList from './GnosisTasksList';
 import TasksPageHeader from './TasksPageHeader';
-import NexusPageTitle from '../components/NexusPageTitle';
+import NexusPageTitle from './components/NexusPageTitle';
 
 type TaskType = 'multisig' | 'bounty' | 'proposal' | 'discussion'
 
