@@ -124,7 +124,7 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
     >
       <DialogTitle onClose={close}>Manage my POAP Collection</DialogTitle>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tabIndex} onChange={(_event, value: number) => setTabIndex(value)} aria-label='basic tabs example'>
+        <Tabs value={tabIndex} onChange={(_event, value: number) => setTabIndex(value)} aria-label='poap tabs'>
           <Tab label='Visible' id='visible-tab' aria-controls='visible-tabpanel' />
           <Tab label='Hidden' id='hidden-tab' aria-controls='hidden-tabpanel' />
         </Tabs>
