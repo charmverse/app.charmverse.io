@@ -14,7 +14,7 @@ import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import ManagePOAPModal from './ManagePOAPModal';
 
 const StyledBox = styled(Box)`
-    background-color: #E9EDF5;
+    background-color: ${({ theme }) => theme.palette.background.light};
     border-radius: 5px;
 `;
 
