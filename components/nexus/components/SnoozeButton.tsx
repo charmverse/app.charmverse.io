@@ -1,6 +1,6 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { Box, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, IconButton, Menu, MenuItem, TextField } from '@mui/material';
 import Button from 'components/common/Button';
 import SnoozeIcon from '@mui/icons-material/Snooze';
 import { DateTimePicker } from '@mui/x-date-pickers';
@@ -136,10 +136,12 @@ export default function SnoozeButton () {
   }, [showDatePicker]);
 
   return (
-    <>
+    <div>
       <Box display='flex' alignItems='center' gap={0.5} justifyContent='flex-end' width='100%'>
         <Tooltip arrow placement='top' title={snoozedForDate ? `Snoozed until ${humanFriendlyDate(snoozedForDate, { withTime: true })}` : ''}>
           <Button
+            color={dateInput.isOpen ? 'primary' : 'secondary'}
+            size='small'
             loading={showLoading}
             variant='outlined'
             startIcon={(
@@ -157,9 +159,7 @@ export default function SnoozeButton () {
           placement='top'
           title='Let others know you are busy by snoozing'
         >
-          <IconButton size='small'>
-            <InfoOutlinedIcon fontSize='small' />
-          </IconButton>
+          <InfoOutlinedIcon color='secondary' fontSize='small' />
         </Tooltip>
       </Box>
 
@@ -277,6 +277,6 @@ export default function SnoozeButton () {
           {isSnoozed ? 'Save Message' : 'Snooze notifications'}
         </Button>
       </Modal>
-    </>
+    </div>
   );
 }
