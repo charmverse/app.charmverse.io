@@ -14,21 +14,27 @@ handler.use(requireUser).post(getPagesByIds);
 async function getPagesByIds (req: NextApiRequest, res: NextApiResponse<Page[]>) {
   const spaceId = req.query.id as string;
   const userId = req.session?.user?.id;
-  const pages: IPageWithPermissions[] = [];
   const { pageIds } = req.body as {pageIds: string[]};
 
-  for (const pageId of pageIds) {
-    const page = await getPage(pageId, spaceId);
-    if (page) {
-      const permissions = await computeUserPagePermissions({
+  const pages = (await Promise.all(pageIds.map((pageId) => new Promise<IPageWithPermissions | null>((resolve) => {
+    getPage(pageId, spaceId).then((page) => {
+      computeUserPagePermissions({
         pageId,
         userId
+      }).then((permissions) => {
+        if (permissions.read) {
+          resolve(page);
+        }
+        else {
+          resolve(null);
+        }
+      }).catch(() => {
+        resolve(null);
       });
-      if (permissions.read) {
-        pages.push(page);
-      }
-    }
-  }
+    }).catch(() => {
+      resolve(null);
+    });
+  })))).filter(page => page) as IPageWithPermissions[];
 
   return res.status(200).json(pages);
 }
