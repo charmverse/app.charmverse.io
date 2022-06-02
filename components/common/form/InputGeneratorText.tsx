@@ -7,6 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import { isTruthy } from 'lib/utilities/types';
+import { IconButton } from '@mui/material';
 
 interface Props {
   onChange: (choices: string []) => void
@@ -79,7 +80,7 @@ export default function InputGeneratorText ({ onChange, title = 'Options', minim
       {
       keys.map(key => {
         return (
-          <Grid key={key} item display='flex' alignItems='center'>
+          <Grid key={key} item display='flex' alignItems='center' gap={1}>
             <TextField
               defaultValue={options[key]}
               fullWidth
@@ -89,7 +90,11 @@ export default function InputGeneratorText ({ onChange, title = 'Options', minim
               }}
             />
             {
-              keys.length > 1 && <DeleteIcon onClick={() => removeRow(key)} sx={{ ml: 1 }} />
+              keys.length > 1 && (
+              <IconButton size='small' onClick={() => removeRow(key)}>
+                <DeleteIcon />
+              </IconButton>
+              )
             }
           </Grid>
         );
@@ -97,7 +102,7 @@ export default function InputGeneratorText ({ onChange, title = 'Options', minim
       }
 
       <Grid item>
-        <Typography display='flex' alignItems='center'>Add row <AddBoxIcon onClick={addRow} sx={{ ml: 1 }} /></Typography>
+        <Typography display='flex' alignItems='center' gap={0.5}>Add row <IconButton size='small' onClick={addRow}><AddBoxIcon fontSize='small' /></IconButton></Typography>
       </Grid>
 
       {

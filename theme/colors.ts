@@ -14,7 +14,7 @@ export const greyColor = '#525252';
 // main theme colors - inspired by Notion
 
 // light mode
-export const primaryTextColor = 'rgb(55, 53, 47)';
+export const primaryTextColor = '#37352f';
 export const backgroundColor = '#fff';
 export const backgroundLightColor = lightGreyColor;
 export const backgroundDarkColor = darken(backgroundColor, 0.1);

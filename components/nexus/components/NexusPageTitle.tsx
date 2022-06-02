@@ -22,7 +22,7 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
     >
       {subPage ? (
         <>
-          <Link color='secondary' href='/profile/tasks' sx={{ display: 'flex', alignItems: 'center' }}>
+          <Link color='secondary' href='/nexus' sx={{ display: 'flex', alignItems: 'center' }}>
             <ChevronLeft />
             {MyNexus}
           </Link>

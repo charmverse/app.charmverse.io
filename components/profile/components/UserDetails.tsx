@@ -235,7 +235,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
                 <>
                   <StyledDivider orientation='vertical' flexItem />
                   <IconButton onClick={socialModalState.open}>
-                    <EditIcon data-testid='edit-social' />
+                    <EditIcon fontSize='small' data-testid='edit-social' />
                   </IconButton>
                 </>
               )}
@@ -252,7 +252,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
               {!readOnly && (
                 <IconButton onClick={descriptionModalState.open}>
-                  <EditIcon data-testid='edit-description' />
+                  <EditIcon fontSize='small' data-testid='edit-description' />
                 </IconButton>
               )}
             </Grid>

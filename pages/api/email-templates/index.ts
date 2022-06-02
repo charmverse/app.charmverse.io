@@ -10,12 +10,59 @@ const handler = nc({
 const templates = {
   'Notify the user about tasks': () => {
     return emails.getPendingTasksEmail({
-      tasks: [{
-        tasks: [],
-        safeAddress: '0x123',
-        safeName: null,
-        safeUrl: 'https://app.charmverse.io'
-      }]
+      user: {
+        username: 'ghostpepper'
+      },
+      tasks: [
+        {
+          tasks: [{
+            nonce: 3,
+            transactions: [{
+              id: '123',
+              actions: [],
+              date: new Date().toISOString(),
+              confirmations: [],
+              isExecuted: false,
+              description: 'Send .02 ETH',
+              gnosisUrl: 'https://gnosis.com',
+              myAction: 'Sign',
+              myActionUrl: 'https://gnosis.com',
+              nonce: 3,
+              safeAddress: '0x123',
+              safeName: 'My Personal Safe',
+              threshold: 2,
+              snoozedUsers: []
+            }]
+          }],
+          safeAddress: '0x123',
+          safeName: 'My Personal Safe',
+          safeUrl: 'https://app.charmverse.io'
+        },
+        {
+          tasks: [{
+            nonce: 7,
+            transactions: [{
+              id: '123',
+              actions: [],
+              date: new Date().toISOString(),
+              confirmations: [],
+              isExecuted: false,
+              description: 'Send 10 ETH',
+              gnosisUrl: 'https://gnosis.com',
+              myAction: 'Sign',
+              myActionUrl: 'https://gnosis.com',
+              nonce: 7,
+              safeAddress: '0x456',
+              safeName: 'Work Safe',
+              threshold: 2,
+              snoozedUsers: []
+            }]
+          }],
+          safeAddress: '0x456',
+          safeName: 'Work Safe',
+          safeUrl: 'https://app.charmverse.io'
+        }
+      ]
     });
   }
 };
@@ -29,7 +76,10 @@ handler.get(async (req, res) => {
 
   const tpl = `
     <h1 style="background: white; padding: 40px 20px">
-      <div style="max-width: 1024px; margin: 0 auto">Email Templates</div>
+      <div style="max-width: 1024px; margin: 0 auto">
+        Email Templates
+        <hr style="border-color: #eee" />
+      </div>
     </h1>
     ${renderedEmails.map(({ description, subject, html }) => `
       <div style="margin: 20px">
@@ -52,7 +102,7 @@ handler.get(async (req, res) => {
 });
 
 function wrapHtml (html: string) {
-  return `<html><head><meta charset="UTF-8"></head><body style="background: #eee; font-size: 13px; font-family: arial,sans-serif">${html}</body></html>`;
+  return `<html><head><meta charset="UTF-8"></head><body style="font-size: 13px; font-family: arial,sans-serif">${html}</body></html>`;
 }
 
 export default handler;
