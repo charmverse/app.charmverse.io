@@ -60,7 +60,7 @@ export function Modal ({ children, size = defaultSize, title, ...props }: ModalP
   return (
     <MuiModal {...props}>
       <div>
-        <ModalContainer size={size}>
+        <ModalContainer size={size} className='modal-container'>
           {title && <DialogTitle onClose={props.onClose}>{title}</DialogTitle>}
           {children}
         </ModalContainer>

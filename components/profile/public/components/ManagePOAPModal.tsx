@@ -11,7 +11,16 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
   const { close, isOpen, save } = props;
 
   return (
-    <Modal open={isOpen} onClose={close} size='large'>
+    <Modal
+      open={isOpen}
+      onClose={close}
+      sx={{
+        '>.modal-container': {
+          maxWidth: '670px',
+          width: '100%'
+        }
+      }}
+    >
       <DialogTitle onClose={close}>Describe yourself in a few words</DialogTitle>
 
     </Modal>

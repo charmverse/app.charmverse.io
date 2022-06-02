@@ -50,7 +50,16 @@ function DescriptionModal (props: DescriptionModalProps) {
   const watchDescription = watch('description');
 
   return (
-    <Modal open={isOpen} onClose={close} size='large'>
+    <Modal
+      open={isOpen}
+      onClose={close}
+      sx={{
+        '>.modal-container': {
+          maxWidth: '670px',
+          width: '100%'
+        }
+      }}
+    >
       <DialogTitle onClose={close}>Describe yourself in a few words</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack mt={1}>
