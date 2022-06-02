@@ -17,7 +17,7 @@ import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtil
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'lib/notion/types';
-import { GetPoapsResponse } from 'lib/poap';
+import { GetPoapsResponse, UpdatePoapsResponse } from 'lib/poap';
 // TODO: Maybe move these types to another place so that we dont import from backend
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
@@ -84,6 +84,10 @@ class CharmClient {
 
   getUserPoaps () {
     return http.GET<GetPoapsResponse>('/api/profile/poaps');
+  }
+
+  async updateUserPoaps (data: UpdatePoapsResponse) {
+    return http.PUT<GetPoapsResponse>('/api/profile/poaps', data);
   }
 
   updateUserDetails (data: Partial<UserDetails>) {

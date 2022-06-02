@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
+import charmClient from 'charmClient';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import Button from 'components/common/Button';
 import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
+import { UpdatePoapsResponse } from 'lib/poap';
 import { Box, Grid, Link, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { ExtendedPoap } from 'models';
 
 type ManagePOAPModalProps = {
     visiblePoaps: Array<Partial<ExtendedPoap>>;
     hiddenPoaps: Array<Partial<ExtendedPoap>>;
-    save: (description: string) => void,
+    save: () => void,
     close: () => void,
     isOpen: boolean,
 };
@@ -59,23 +61,19 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
 
   useEffect(() => {
     setDisplayedHiddenPoaps([
-      // eslint-disable-next-line max-len
-      ...hiddenPoaps.filter((poap: Partial<ExtendedPoap>) => !newShownPoaps.some(p => p.tokenId === poap.tokenId && p.walletAddress === poap.walletAddress)),
+      ...hiddenPoaps.filter((poap: Partial<ExtendedPoap>) => !newShownPoaps.some(p => p.tokenId === poap.tokenId)),
       ...newHiddenPoaps
     ]);
     setDisplayedShownPoaps([
-      // eslint-disable-next-line max-len
-      ...visiblePoaps.filter((poap: Partial<ExtendedPoap>) => !newHiddenPoaps.some(p => p.tokenId === poap.tokenId && p.walletAddress === poap.walletAddress)),
+      ...visiblePoaps.filter((poap: Partial<ExtendedPoap>) => !newHiddenPoaps.some(p => p.tokenId === poap.tokenId)),
       ...newShownPoaps
     ]);
   }, [visiblePoaps, hiddenPoaps, newHiddenPoaps, newShownPoaps]);
 
   const handleHidePoap = (poap: Partial<ExtendedPoap>) => {
-    if (newShownPoaps.some((p: Partial<ExtendedPoap>) => p.tokenId === poap.tokenId
-                                      && p.walletAddress === poap.walletAddress)) {
+    if (newShownPoaps.some((p: Partial<ExtendedPoap>) => p.tokenId === poap.tokenId)) {
       setNewShownPoaps([
-        ...newShownPoaps.filter((p: Partial<ExtendedPoap>) => p.tokenId !== poap.tokenId
-        && p.walletAddress !== poap.walletAddress)
+        ...newShownPoaps.filter((p: Partial<ExtendedPoap>) => p.tokenId !== poap.tokenId)
       ]);
       return;
     }
@@ -87,11 +85,9 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
   };
 
   const handleShowPoap = (poap: Partial<ExtendedPoap>) => {
-    if (newHiddenPoaps.some((p: Partial<ExtendedPoap>) => p.tokenId === poap.tokenId
-                                      && p.walletAddress === poap.walletAddress)) {
+    if (newHiddenPoaps.some((p: Partial<ExtendedPoap>) => p.tokenId === poap.tokenId)) {
       setNewHiddenPoaps([
-        ...newHiddenPoaps.filter((p: Partial<ExtendedPoap>) => p.tokenId !== poap.tokenId
-        && p.walletAddress !== poap.walletAddress)
+        ...newHiddenPoaps.filter((p: Partial<ExtendedPoap>) => p.tokenId !== poap.tokenId)
       ]);
       return;
     }
@@ -100,6 +96,19 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
       ...newShownPoaps,
       poap
     ]);
+  };
+
+  const handleSave = async () => {
+    await charmClient.updateUserPoaps({
+      newShownPoaps,
+      newHiddenPoaps
+    } as UpdatePoapsResponse);
+
+    setNewHiddenPoaps([]);
+    setNewShownPoaps([]);
+    setTabIndex(0);
+
+    save();
   };
 
   return (
@@ -121,7 +130,6 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
         </Tabs>
       </Box>
       <TabPanel hidden={tabIndex !== 0} py={2}>
-
         {
           displayedShownPoaps.length !== 0 && (
             <Grid item container xs={12} py={2}>
@@ -182,7 +190,7 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
       </TabPanel>
       <Box mt={4} sx={{ display: 'flex' }}>
         <Button
-          type='submit'
+          onClick={() => handleSave()}
         >
           Save
         </Button>

@@ -45,7 +45,7 @@ function PoapSection (props: PoapSectionProps) {
 
   const hasConnectedWallet: boolean = !isPublic && user.addresses.length !== 0;
 
-  let poaps = poapData?.visiblePoaps;
+  let poaps = poapData?.visiblePoaps || [];
 
   if (isPublic) {
     poaps = user.visiblePoaps;
@@ -73,7 +73,7 @@ function PoapSection (props: PoapSectionProps) {
         </Grid>
         <Grid item xs={12}>
           {
-            !isPublic && poaps && (
+            !isPublic && (
             <Box
               sx={{ alignItems: 'center', cursor: 'pointer', display: 'inline-flex' }}
               onClick={managePoapModalState.open}
@@ -86,10 +86,10 @@ function PoapSection (props: PoapSectionProps) {
         }
         </Grid>
         {
-            poaps && (
+            poaps.length !== 0 && (
             <Grid item container xs={12} py={2}>
               {
-                poaps.map((poap: ExtendedPoap) => (
+                poaps.map(poap => (
                   <Grid item xs={4} p={1} key={poap.tokenId}>
                     <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
                       <StyledImage src={poap.imageURL} />
@@ -101,7 +101,7 @@ function PoapSection (props: PoapSectionProps) {
             )
         }
         {
-          !poaps && (
+          !poaps.length && (
           <Grid item container xs={12} justifyContent='center' py={2}>
             {
               isPublic && <Typography>There are no POAPs</Typography>
@@ -117,11 +117,12 @@ function PoapSection (props: PoapSectionProps) {
         }
       </Grid>
       {
-        poapData && (
+        !isPublic && poapData && (
         <ManagePOAPModal
           isOpen={managePoapModalState.isOpen}
           close={managePoapModalState.close}
           save={async () => {
+            mutatePoaps();
             managePoapModalState.close();
           }}
           visiblePoaps={poapData.visiblePoaps}
