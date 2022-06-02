@@ -12,6 +12,7 @@ const templates = {
     return emails.getPendingTasksEmail({
       user: {
         id: '<userId>',
+        email: '<userEmail>',
         username: 'ghostpepper'
       },
       tasks: [
