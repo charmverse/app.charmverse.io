@@ -2,7 +2,9 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import Button from 'components/common/Button';
-import { Box, Grid, Link, Tab, Tabs, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import ClearIcon from '@mui/icons-material/Clear';
+import { Box, Grid, Link, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { ExtendedPoap } from 'models';
 
 type ManagePOAPModalProps = {
@@ -20,6 +22,31 @@ const TabPanel = styled(Box)`
 const StyledImage = styled.img`
   width: 100%;
   border-radius: 50%;
+`;
+
+const StyledGridItem = styled(Grid)`
+    position: relative;
+
+    &:hover .icons-stack {
+      display: flex;
+      border-radius: 50%;
+    }
+`;
+
+const StyledStack = styled(Stack)`
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    z-index: 1000;
+    background-color: black;
+    opacity: 80%;
+    border-radius: 10%;
+    display: none;
+
+    & > svg {
+      color: white;
+      cursor: pointer;
+    }
 `;
 
 function ManagePOAPModal (props: ManagePOAPModalProps) {
@@ -50,11 +77,18 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
             visiblePoaps && visiblePoaps.length !== 0 && (
             <Grid item container xs={12} py={2}>
               { visiblePoaps.map((poap: Partial<ExtendedPoap>) => (
-                <Grid item xs={6} md={4} p={1} key={poap.tokenId}>
+                <StyledGridItem item xs={6} md={4} p={1} key={poap.tokenId}>
+                  <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>
+                    <ClearIcon
+                      onClick={() => {}}
+                      fontSize='small'
+                      key='hide-poap'
+                    />
+                  </StyledStack>
                   <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
                     <StyledImage src={poap.imageURL} />
                   </Link>
-                </Grid>
+                </StyledGridItem>
               ))}
             </Grid>
             )
@@ -74,6 +108,13 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
             <Grid item container xs={12} py={2}>
               { hiddenPoaps.map((poap: Partial<ExtendedPoap>) => (
                 <Grid item xs={6} md={4} p={1} key={poap.tokenId}>
+                  <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>
+                    <AddIcon
+                      onClick={() => {}}
+                      fontSize='small'
+                      key='show-poap'
+                    />
+                  </StyledStack>
                   <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
                     <StyledImage src={poap.imageURL} />
                   </Link>
