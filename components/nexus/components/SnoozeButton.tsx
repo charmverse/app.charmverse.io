@@ -140,8 +140,9 @@ export default function SnoozeButton () {
       <Box display='flex' alignItems='center' gap={0.5} justifyContent='flex-end' width='100%'>
         <Tooltip arrow placement='top' title={snoozedForDate ? `Snoozed until ${humanFriendlyDate(snoozedForDate, { withTime: true })}` : ''}>
           <Button
-            color={dateInput.isOpen ? 'primary' : 'secondary'}
+            color={snoozedForDate ? 'warning' : dateInput.isOpen ? 'primary' : 'secondary'}
             size='small'
+            disableElevation
             loading={showLoading}
             variant='outlined'
             startIcon={(
