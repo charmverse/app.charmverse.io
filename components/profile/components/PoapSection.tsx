@@ -1,8 +1,9 @@
 import { useContext } from 'react';
 import useSWR from 'swr';
 import charmClient from 'charmClient';
-import { Box, Grid, Link, SvgIcon, Typography } from '@mui/material';
+import { Box, Grid, Link, Stack, SvgIcon, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import IconButton from '@mui/material/IconButton';
 import styled from '@emotion/styled';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import PoapIcon from 'public/images/poap_logo.svg';
@@ -15,10 +16,6 @@ import ManagePOAPModal from './ManagePOAPModal';
 const StyledBox = styled(Box)`
     background-color: #E9EDF5;
     border-radius: 5px;
-`;
-
-const StyledButton = styled(Button)`
-  cursor: pointer;
 `;
 
 const StyledImage = styled.img`
@@ -54,8 +51,17 @@ function PoapSection (props: PoapSectionProps) {
       <Grid container>
         <Grid item xs={8} pl={1}>
           {
-            !isPublic && (hasConnectedWallet ? <Typography fontWeight={700} fontSize={20}>My POAPs</Typography>
-              : <Typography fontWeight={700}>Connect and showcase your POAP collection</Typography>)
+            !isPublic && hasConnectedWallet && (
+            <Stack direction='row' alignItems='center' spacing={1}>
+              <Typography fontWeight={700} fontSize={20}>My POAPs</Typography>
+              <IconButton onClick={managePoapModalState.open}>
+                <EditIcon fontSize='small' data-testid='edit-description' />
+              </IconButton>
+            </Stack>
+            )
+          }
+          {
+            !isPublic && !hasConnectedWallet && <Typography fontWeight={700}>Connect and showcase your POAP collection</Typography>
           }
           {
             isPublic && <Typography fontWeight={700} fontSize={20}>POAPs</Typography>
@@ -64,24 +70,10 @@ function PoapSection (props: PoapSectionProps) {
         <Grid item container xs={4} justifyContent='space-around'>
           <SvgIcon
             viewBox='0 0 39 51'
-            sx={{ width: '50px', height: '70px', marginTop: '-40%' }}
+            sx={{ width: '55px', height: '77px', marginTop: '-25%' }}
           >
             <PoapIcon />
           </SvgIcon>
-        </Grid>
-        <Grid item xs={12}>
-          {
-            !isPublic && (
-            <Box
-              sx={{ alignItems: 'center', cursor: 'pointer', display: 'inline-flex' }}
-              onClick={managePoapModalState.open}
-            >
-              <StyledButton variant='text' endIcon={<EditIcon />}>
-                Manage
-              </StyledButton>
-            </Box>
-            )
-        }
         </Grid>
         {
             poaps.length !== 0 && (

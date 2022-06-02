@@ -5,7 +5,7 @@ import { Modal, DialogTitle } from 'components/common/Modal';
 import Button from 'components/common/Button';
 import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
-import { UpdatePoapsResponse } from 'lib/poap';
+import { UpdatePoapsRequest } from 'lib/poap';
 import { Box, Grid, Link, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { ExtendedPoap } from 'models';
 
@@ -102,7 +102,7 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
     await charmClient.updateUserPoaps({
       newShownPoaps,
       newHiddenPoaps
-    } as UpdatePoapsResponse);
+    } as UpdatePoapsRequest);
 
     setNewHiddenPoaps([]);
     setNewShownPoaps([]);
@@ -115,10 +115,10 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
     <Modal
       open={isOpen}
       onClose={close}
+      size='large'
       sx={{
         '>.modal-container': {
-          maxWidth: '670px',
-          width: '100%'
+          maxWidth: '100%'
         }
       }}
     >

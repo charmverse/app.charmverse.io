@@ -50,7 +50,16 @@ export default function UserPathModal (props: Props) {
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
 
   return (
-    <Modal open={isOpen} onClose={close} size='large'>
+    <Modal
+      open={isOpen}
+      onClose={close}
+      size='large'
+      sx={{
+        '>.modal-container': {
+          maxWidth: '100%'
+        }
+      }}
+    >
       <DialogTitle onClose={close}>Personalize your link</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack mt={1}>

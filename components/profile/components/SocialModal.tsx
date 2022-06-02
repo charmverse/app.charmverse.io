@@ -57,10 +57,10 @@ function SocialModal (props: SocialModalProps) {
     <Modal
       open={isOpen}
       onClose={close}
+      size='large'
       sx={{
         '>.modal-container': {
-          maxWidth: '670px',
-          width: '100%'
+          maxWidth: '100%'
         }
       }}
     >

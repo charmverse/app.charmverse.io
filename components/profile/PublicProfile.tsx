@@ -9,10 +9,10 @@ export default function PublicProfile (props: UserDetailsProps) {
       <UserDetails {...props} />
       <Divider />
       <Grid container direction='row' rowSpacing={3}>
-        <Grid item xs={12} md={9}>
+        <Grid item xs={12} md={7}>
 
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={5}>
           <PoapSection user={props.user} />
         </Grid>
       </Grid>

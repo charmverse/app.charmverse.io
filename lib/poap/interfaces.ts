@@ -5,7 +5,7 @@ export interface GetPoapsResponse {
     hiddenPoaps: Array<Partial<ExtendedPoap>>;
 }
 
-export interface UpdatePoapsResponse {
+export interface UpdatePoapsRequest {
     newShownPoaps: Array<ExtendedPoap>;
     newHiddenPoaps: Array<ExtendedPoap>;
 }

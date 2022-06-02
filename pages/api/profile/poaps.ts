@@ -4,7 +4,7 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getPOAPs, GetPoapsResponse, UpdatePoapsResponse } from 'lib/poap';
+import { getPOAPs, GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';
 import { ExtendedPoap } from 'models';
@@ -39,7 +39,7 @@ async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsR
 
 async function updateUserPoaps (req: NextApiRequest, res: NextApiResponse<any | {error: string}>) {
 
-  const { newShownPoaps, newHiddenPoaps }: UpdatePoapsResponse = req.body;
+  const { newShownPoaps, newHiddenPoaps }: UpdatePoapsRequest = req.body;
 
   if (newShownPoaps.length) {
     const ids: Array<string> = newShownPoaps.map((poap: Partial<ExtendedPoap>) => poap.tokenId || '');
