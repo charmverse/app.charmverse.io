@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import Button from 'components/common/Button';
@@ -52,6 +52,55 @@ const StyledStack = styled(Stack)`
 function ManagePOAPModal (props: ManagePOAPModalProps) {
   const { visiblePoaps, hiddenPoaps, close, isOpen, save } = props;
   const [tabIndex, setTabIndex] = useState(0);
+  const [newHiddenPoaps, setNewHiddenPoaps] = useState<Array<Partial<ExtendedPoap>>>([]);
+  const [newShownPoaps, setNewShownPoaps] = useState<Array<Partial<ExtendedPoap>>>([]);
+  const [displayedHiddenPoaps, setDisplayedHiddenPoaps] = useState<Array<Partial<ExtendedPoap>>>([]);
+  const [displayedShownPoaps, setDisplayedShownPoaps] = useState<Array<Partial<ExtendedPoap>>>([]);
+
+  useEffect(() => {
+    setDisplayedHiddenPoaps([
+      // eslint-disable-next-line max-len
+      ...hiddenPoaps.filter((poap: Partial<ExtendedPoap>) => !newShownPoaps.some(p => p.tokenId === poap.tokenId && p.walletAddress === poap.walletAddress)),
+      ...newHiddenPoaps
+    ]);
+    setDisplayedShownPoaps([
+      // eslint-disable-next-line max-len
+      ...visiblePoaps.filter((poap: Partial<ExtendedPoap>) => !newHiddenPoaps.some(p => p.tokenId === poap.tokenId && p.walletAddress === poap.walletAddress)),
+      ...newShownPoaps
+    ]);
+  }, [visiblePoaps, hiddenPoaps, newHiddenPoaps, newShownPoaps]);
+
+  const handleHidePoap = (poap: Partial<ExtendedPoap>) => {
+    if (newShownPoaps.some((p: Partial<ExtendedPoap>) => p.tokenId === poap.tokenId
+                                      && p.walletAddress === poap.walletAddress)) {
+      setNewShownPoaps([
+        ...newShownPoaps.filter((p: Partial<ExtendedPoap>) => p.tokenId !== poap.tokenId
+        && p.walletAddress !== poap.walletAddress)
+      ]);
+      return;
+    }
+
+    setNewHiddenPoaps([
+      ...newHiddenPoaps,
+      poap
+    ]);
+  };
+
+  const handleShowPoap = (poap: Partial<ExtendedPoap>) => {
+    if (newHiddenPoaps.some((p: Partial<ExtendedPoap>) => p.tokenId === poap.tokenId
+                                      && p.walletAddress === poap.walletAddress)) {
+      setNewHiddenPoaps([
+        ...newHiddenPoaps.filter((p: Partial<ExtendedPoap>) => p.tokenId !== poap.tokenId
+        && p.walletAddress !== poap.walletAddress)
+      ]);
+      return;
+    }
+
+    setNewShownPoaps([
+      ...newShownPoaps,
+      poap
+    ]);
+  };
 
   return (
     <Modal
@@ -74,13 +123,13 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
       <TabPanel hidden={tabIndex !== 0} py={2}>
 
         {
-            visiblePoaps && visiblePoaps.length !== 0 && (
+          displayedShownPoaps.length !== 0 && (
             <Grid item container xs={12} py={2}>
-              { visiblePoaps.map((poap: Partial<ExtendedPoap>) => (
+              { displayedShownPoaps.map((poap: Partial<ExtendedPoap>) => (
                 <StyledGridItem item xs={6} md={4} p={1} key={poap.tokenId}>
                   <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>
                     <ClearIcon
-                      onClick={() => {}}
+                      onClick={() => handleHidePoap(poap)}
                       fontSize='small'
                       key='hide-poap'
                     />
@@ -91,11 +140,11 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
                 </StyledGridItem>
               ))}
             </Grid>
-            )
+          )
         }
 
         {
-          visiblePoaps && visiblePoaps.length === 0 && (
+          displayedShownPoaps.length === 0 && (
           <Grid item container xs={12} justifyContent='center' py={2}>
             <Typography>There are no visible POAPs</Typography>
           </Grid>
@@ -104,13 +153,13 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
       </TabPanel>
       <TabPanel hidden={tabIndex !== 1} py={2}>
         {
-            hiddenPoaps && hiddenPoaps.length !== 0 && (
+          displayedHiddenPoaps.length !== 0 && (
             <Grid item container xs={12} py={2}>
-              { hiddenPoaps.map((poap: Partial<ExtendedPoap>) => (
-                <Grid item xs={6} md={4} p={1} key={poap.tokenId}>
+              { displayedHiddenPoaps.map((poap: Partial<ExtendedPoap>) => (
+                <StyledGridItem item xs={6} md={4} p={1} key={poap.tokenId}>
                   <StyledStack direction='row' spacing={2} p={0.5} className='icons-stack'>
                     <AddIcon
-                      onClick={() => {}}
+                      onClick={() => handleShowPoap(poap)}
                       fontSize='small'
                       key='show-poap'
                     />
@@ -118,13 +167,13 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
                   <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
                     <StyledImage src={poap.imageURL} />
                   </Link>
-                </Grid>
+                </StyledGridItem>
               ))}
             </Grid>
-            )
+          )
         }
         {
-          hiddenPoaps && hiddenPoaps.length === 0 && (
+          displayedHiddenPoaps.length === 0 && (
           <Grid item container xs={12} justifyContent='center' py={2}>
             <Typography>There are no hidden POAPs</Typography>
           </Grid>

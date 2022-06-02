@@ -19,9 +19,8 @@ const StyledBox = styled(Box)`
     border-radius: 5px;
 `;
 
-const StyledTypographyManage = styled(Typography)`
-  color: ${({ theme }) => theme.palette.primary.main};
-  display: inline-flex;
+const StyledButton = styled(Button)`
+  cursor: pointer;
 `;
 
 const StyledImage = styled.img`
@@ -38,7 +37,7 @@ const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => us
 function PoapSection (props: PoapSectionProps) {
   const { user } = props;
   const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
-  const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
+  const { openWalletSelectorModal } = useContext(Web3Connection);
   const isPublic = isPublicUser(user);
   const { data: poapData, mutate: mutatePoaps } = useSWR(`/poaps/${user.id}`, () => {
     return isPublic ? [] : charmClient.getUserPoaps();
@@ -55,7 +54,7 @@ function PoapSection (props: PoapSectionProps) {
   return (
     <StyledBox p={2}>
       <Grid container>
-        <Grid item xs={8}>
+        <Grid item xs={8} pl={1}>
           {
             !isPublic && (hasConnectedWallet ? <Typography fontWeight={700} fontSize={20}>My POAPs</Typography>
               : <Typography fontWeight={700}>Connect and showcase your POAP collection</Typography>)
@@ -79,10 +78,9 @@ function PoapSection (props: PoapSectionProps) {
               sx={{ alignItems: 'center', cursor: 'pointer', display: 'inline-flex' }}
               onClick={managePoapModalState.open}
             >
-              <StyledTypographyManage>Manage</StyledTypographyManage>
-              <IconButton>
-                <EditIcon fontSize='small' />
-              </IconButton>
+              <StyledButton variant='text' endIcon={<EditIcon />}>
+                Manage
+              </StyledButton>
             </Box>
             )
         }
