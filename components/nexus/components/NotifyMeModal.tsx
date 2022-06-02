@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import { Modal } from 'components/common/Modal';
 
 export const schema = yup.object({
-  path: yup.string().ensure().trim()
+  email: yup.string().ensure().trim()
     .email()
     .max(50)
 });
@@ -32,19 +32,19 @@ export default function NotifyMeModal (props: Props) {
     formState: { errors }
   } = useForm<FormValues>({
     defaultValues: {
-      path: currentValue || ''
+      email: currentValue || ''
     },
     resolver: yupResolver(schema)
   });
 
   useEffect(() => {
     reset({
-      path: currentValue || ''
+      email: currentValue || ''
     });
   }, [currentValue]);
 
   function onSubmit (values: FormValues) {
-    save(values.path);
+    save(values.email);
   }
 
   function removeNotifications () {
@@ -60,11 +60,11 @@ export default function NotifyMeModal (props: Props) {
         </FormHelperText>
 
         <TextField
-          {...register('path')}
+          {...register('email')}
           fullWidth
           type='email'
-          error={!!errors.path}
-          helperText={errors.path?.message}
+          error={!!errors.email}
+          helperText={errors.email?.message}
           placeholder='me@gmail.com'
           sx={{ mb: 2 }}
         />
