@@ -5,7 +5,6 @@ const getPOAPsURL = (address: string) => `https://api.poap.tech/actions/scan/${a
 
 export default async function getPOAPs (addresses: Array<string>): Promise<Array<Partial<ExtendedPoap>>> {
   const requests: Array<Promise<any>> = [];
-  // test wallet address
 
   addresses.forEach(address => {
     const request = fetch(getPOAPsURL(address), {
