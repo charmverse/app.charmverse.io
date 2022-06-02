@@ -54,11 +54,6 @@ export default function UserPathModal (props: Props) {
       open={isOpen}
       onClose={close}
       size='large'
-      sx={{
-        '>.modal-container': {
-          maxWidth: '100%'
-        }
-      }}
     >
       <DialogTitle onClose={close}>Personalize your link</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>

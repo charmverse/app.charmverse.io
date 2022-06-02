@@ -116,11 +116,6 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
       open={isOpen}
       onClose={close}
       size='large'
-      sx={{
-        '>.modal-container': {
-          maxWidth: '100%'
-        }
-      }}
     >
       <DialogTitle onClose={close}>Manage my POAP Collection</DialogTitle>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>

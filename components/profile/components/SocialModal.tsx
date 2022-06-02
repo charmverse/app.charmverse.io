@@ -58,11 +58,6 @@ function SocialModal (props: SocialModalProps) {
       open={isOpen}
       onClose={close}
       size='large'
-      sx={{
-        '>.modal-container': {
-          maxWidth: '100%'
-        }
-      }}
     >
       <DialogTitle onClose={close}>Social media links</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
