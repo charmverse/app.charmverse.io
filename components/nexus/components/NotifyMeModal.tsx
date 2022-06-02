@@ -62,7 +62,6 @@ export default function NotifyMeModal (props: Props) {
         <TextField
           {...register('email')}
           fullWidth
-          type='email'
           error={!!errors.email}
           helperText={errors.email?.message}
           placeholder='me@gmail.com'
