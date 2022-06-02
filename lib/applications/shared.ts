@@ -1,6 +1,6 @@
 import { Application, Bounty } from '@prisma/client';
 
-export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 10;
+export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 1;
 
 /**
  * Whether an application is currently a valid submission

@@ -81,10 +81,10 @@ export default function BountySubmissionReviewActions ({ onSubmission, bounty, s
         canReview && (
           <>
             <Tooltip placement='top' title='Approve this submission.'>
-              <AssignmentTurnedInIcon onClick={() => setReviewDecision({ decision: 'approve', submissionId: submission.id })} />
+              <AssignmentTurnedInIcon sx={{ cursor: 'pointer' }} onClick={() => setReviewDecision({ decision: 'approve', submissionId: submission.id })} />
             </Tooltip>
             <Tooltip placement='top' title='Reject this submission. The submitter will be disqualified from making further changes'>
-              <CancelIcon onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject' })} />
+              <CancelIcon sx={{ cursor: 'pointer' }} onClick={() => setReviewDecision({ submissionId: submission.id, decision: 'reject' })} />
             </Tooltip>
           </>
         )

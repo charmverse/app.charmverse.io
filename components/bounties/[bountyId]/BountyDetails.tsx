@@ -28,22 +28,24 @@ export default function BountyDetails () {
   }
 
   return (
-    <Box py={3} px='80px'>
+    <Box py={3} px={18}>
 
-      <Container top={20}>
-        <BountyHeader />
+      <BountyHeader bounty={currentBounty} />
 
-        <BountyDescription />
+      <BountyDescription />
 
-        {
+      {
           currentBounty.status === 'suggestion' && <BountySuggestionApproval bounty={currentBounty} />
         }
 
-        <Box sx={{ mb: 3 }}>
-          <BountySubmissions bounty={currentBounty} />
+      {
+          currentBounty.status !== 'suggestion' && (
+            <>
+              <Box sx={{ mb: 3 }}>
+                <BountySubmissions bounty={currentBounty} />
 
-        </Box>
-        {
+              </Box>
+              {
           currentBounty.approveSubmitters === true && (
           <BountyApplicantList
             bounty={currentBounty}
@@ -51,8 +53,9 @@ export default function BountyDetails () {
           />
           )
         }
-
-      </Container>
+            </>
+          )
+        }
     </Box>
   );
 
