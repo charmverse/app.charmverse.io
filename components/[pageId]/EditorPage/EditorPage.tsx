@@ -1,4 +1,3 @@
-import { BangleEditorState } from '@bangle.dev/core';
 import { Page, Prisma } from '@prisma/client';
 import charmClient from 'charmClient';
 import { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
@@ -6,22 +5,18 @@ import { addBoard } from 'components/common/BoardEditor/focalboard/src/store/boa
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
-import { specRegistry } from 'components/common/CharmEditor/CharmEditor';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { Board } from 'lib/focalboard/board';
+import { IPageWithPermissions } from 'lib/pages';
+import { fetchLinkedPages } from 'lib/pages/fetchLinkedPages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import log from 'loglevel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Node } from '@bangle.dev/pm';
-import { PageContent } from 'models/Page';
-import { findChildrenByType } from 'prosemirror-utils';
-import { nestedPageNodeName } from 'components/common/CharmEditor/components/nestedPage';
-import { IPageWithPermissions } from 'lib/pages';
-import DocumentPage from '../DocumentPage';
 import BoardPage from '../BoardPage';
+import DocumentPage from '../DocumentPage';
 
 interface Props {
   shouldLoadPublicPage?: boolean,
@@ -105,33 +100,15 @@ export default function EditorPage (
         }
         else if (space) {
           // This might be an archived page
-          const page = await charmClient.getPage(pageId, space.id);
-          const state = new BangleEditorState({
-            specRegistry,
-            initialValue: page.content ? Node.fromJSON(specRegistry.schema, page.content as PageContent) : '',
-            editorProps: {
-              attributes: {
-                example: 'value'
-              }
-            }
+          const fetchedLinkedPages = await fetchLinkedPages(pageId, space.id);
+          const fetchedPagesRecord: Record<string, IPageWithPermissions> = {};
+          fetchedLinkedPages.forEach(linkedPage => {
+            fetchedPagesRecord[linkedPage.id] = linkedPage;
           });
-          const nestedPageNode = state.specRegistry.schema.nodes[nestedPageNodeName];
-          const nodes = findChildrenByType(state.pmState.doc, nestedPageNode).map(({ node: _node }) => _node);
-          // No need to fetch pages that already exist in the local state
-          const pageIdsToBeFetched = nodes.map(node => node.attrs.id).filter(_pageId => !pages[_pageId]);
-          const fetchedPagesRecord: Record<string, IPageWithPermissions> = {
-            [page.id]: page
-          };
 
-          if (pageIdsToBeFetched.length !== 0) {
-            const linkedPages = await charmClient.getPagesByIds(space.id, pageIdsToBeFetched);
-            linkedPages.forEach(linkedPage => {
-              fetchedPagesRecord[linkedPage.id] = linkedPage;
-            });
-          }
           setPages((_pages) => ({ ..._pages, ...fetchedPagesRecord }));
           setPageNotFound(false);
-          onPageLoad?.(page.id);
+          onPageLoad?.(pageId);
         }
         else {
           setPageNotFound(true);
