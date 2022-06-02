@@ -5,11 +5,11 @@ import { useForm } from 'react-hook-form';
 import { Box, FormHelperText, Stack } from '@mui/material';
 import Button from 'components/common/Button';
 import TextField from '@mui/material/TextField';
-import { Modal, DialogTitle } from 'components/common/Modal';
+import { Modal } from 'components/common/Modal';
 
 export const schema = yup.object({
   path: yup.string().ensure().trim()
-    .min(3)
+    .email()
     .max(50)
 });
 
@@ -47,10 +47,12 @@ export default function NotifyMeModal (props: Props) {
     save(values.path);
   }
 
-  const hostname = typeof window !== 'undefined' ? window.location.origin : '';
+  function removeNotifications () {
+    save('');
+  }
 
   return (
-    <Modal open={isOpen} onClose={close} title='Receive daily notifications'>
+    <Modal open={isOpen} onClose={close} title='Receive daily notifications (beta)'>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormHelperText sx={{ mb: 1 }}>
           Input your email to receive daily notifications.
@@ -60,14 +62,20 @@ export default function NotifyMeModal (props: Props) {
         <TextField
           {...register('path')}
           fullWidth
+          type='email'
           error={!!errors.path}
           helperText={errors.path?.message}
           placeholder='me@gmail.com'
           sx={{ mb: 2 }}
         />
-        <Button type='submit'>
-          Save
-        </Button>
+        <Box display='flex' gap={1}>
+          <Button type='submit'>
+            Save
+          </Button>
+          <Button onClick={removeNotifications} color='secondary' variant='outlined'>
+            Remove
+          </Button>
+        </Box>
       </form>
     </Modal>
   );

@@ -26,17 +26,19 @@ export default function SnoozeButton () {
 
   return (
     <>
-      <Button
-        color='secondary'
-        size='small'
-        variant='outlined'
-        startIcon={<EmailIcon fontSize='small' />}
-        // required to vertically align this button with its siblings
-        sx={{ display: 'flex' }}
-        {...bindTrigger(popupState)}
-      >
-        {user?.email ? 'Unsubscribe' : 'Notify Me'}
-      </Button>
+      <Tooltip arrow placement='top' title={user?.email ? `Sending to: ${user?.email}` : ''}>
+        <Button
+          color='secondary'
+          size='small'
+          variant='outlined'
+          startIcon={<EmailIcon fontSize='small' />}
+          // required to vertically align this button with its siblings
+          sx={{ display: 'flex' }}
+          {...bindTrigger(popupState)}
+        >
+          {user?.email ? 'Change Notifications' : 'Notify Me'}
+        </Button>
+      </Tooltip>
       <NotifyMeModal
         isOpen={popupState.isOpen}
         close={popupState.close}
