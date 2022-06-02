@@ -1,6 +1,7 @@
 
-import { sendUserNotifications } from 'background/tasks/sendNotifications/sendNotifications';
+import { getNotifications, sendUserNotifications } from 'background/tasks/sendNotifications/sendNotifications';
 
 (async () => {
-  await sendUserNotifications();
+  const r = await getNotifications();
+  console.log('result', r);
 })();
