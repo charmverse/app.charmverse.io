@@ -105,10 +105,10 @@ function Account (): JSX.Element {
         )}
         <AccountButton
           href='/nexus'
-          sx={{
+          sx={isConnectedWithWallet ? ({
             borderTopLeftRadius: '0 !important',
             borderBottomLeftRadius: '0 !important'
-          }}
+          }) : {}}
           endIcon={<Avatar avatar={user?.avatar} name={userName} size='small' />}
         >
           {userName}
