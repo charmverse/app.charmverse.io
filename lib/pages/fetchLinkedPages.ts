@@ -15,14 +15,15 @@ export async function fetchLinkedPages (pageId: string, spaceId: string) {
   const nestedPageNode = state.specRegistry.schema.nodes.page;
   const nodes = findChildrenByType(state.pmState.doc, nestedPageNode).map(({ node: _node }) => _node);
   const pageIdsToBeFetched = nodes.map(node => node.attrs.id);
-  const fetchedLinkedPages: IPageWithPermissions[] = [
-    page
-  ];
+  const fetchedLinkedPages: IPageWithPermissions[] = [];
 
   if (pageIdsToBeFetched.length !== 0) {
     const linkedPages = await charmClient.getPagesByIds(spaceId, pageIdsToBeFetched);
     fetchedLinkedPages.push(...linkedPages);
   }
 
-  return fetchedLinkedPages;
+  return {
+    linkedPages: fetchedLinkedPages,
+    rootPage: page
+  };
 }

@@ -9,6 +9,7 @@ import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
+import { useUser } from 'hooks/useUser';
 import { Board } from 'lib/focalboard/board';
 import { IPageWithPermissions } from 'lib/pages';
 import { fetchLinkedPages } from 'lib/pages/fetchLinkedPages';
@@ -32,7 +33,8 @@ export default function EditorPage (
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
   const [space] = useCurrentSpace();
-
+  const [isAccessDenied, setIsAccessDenied] = useState(false);
+  const [user] = useUser();
   const currentPagePermissions = getPagePermissions(pageId);
 
   async function loadPublicPage (publicPageId: string) {
@@ -89,38 +91,52 @@ export default function EditorPage (
 
   useEffect(() => {
     async function main () {
+      setIsAccessDenied(false);
       if (pageId && shouldLoadPublicPage) {
         loadPublicPage(pageId as string);
       }
       else if (pageId && pagesLoaded) {
         const pageByPath = pages[pageId];
+        // If the page exist in the state
         if (pageByPath) {
           setTitleState(pageByPath.title);
           onPageLoad?.(pageByPath.id);
         }
         else if (space) {
-          // This might be an archived page
-          const fetchedLinkedPages = await fetchLinkedPages(pageId, space.id);
-          const fetchedPagesRecord: Record<string, IPageWithPermissions> = {};
-          fetchedLinkedPages.forEach(linkedPage => {
-            fetchedPagesRecord[linkedPage.id] = linkedPage;
-          });
-
-          setPages((_pages) => ({ ..._pages, ...fetchedPagesRecord }));
-          setPageNotFound(false);
-          onPageLoad?.(pageId);
+          try {
+            // This might be an archived page, so fetch all the linked pages inside the current page's document
+            const { linkedPages, rootPage } = await fetchLinkedPages(pageId, space.id);
+            // If no root page exist then it couldn't be fetched either it doesn't exist or you dont have permission to view it
+            if (rootPage) {
+              const fetchedPagesRecord: Record<string, IPageWithPermissions> = {};
+              linkedPages.forEach(linkedPage => {
+                fetchedPagesRecord[linkedPage.id] = linkedPage;
+              });
+              setPages((_pages) => ({ ..._pages, ...fetchedPagesRecord }));
+              setPageNotFound(false);
+              onPageLoad?.(rootPage.id);
+            }
+            else {
+              setPageNotFound(true);
+            }
+          }
+          catch (err: any) {
+            // An error will be thrown if page doesn't exist or if you dont have read permission for the page
+            if (err.errorType === 'Access denied') {
+              setIsAccessDenied(true);
+            }
+            // If the page doesn't exist an error will be thrown
+            setPageNotFound(true);
+          }
         }
         else {
           setPageNotFound(true);
         }
       }
-      else {
-        setPageNotFound(true);
-      }
     }
 
     main();
-  }, [pageId, pagesLoaded, space]);
+  }, [pageId, pagesLoaded, space, user]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: Prisma.PageUpdateInput) => {
     setIsEditing(true);
@@ -155,7 +171,10 @@ export default function EditorPage (
     [pageId, currentPage?.headerImage, currentPage?.icon, currentPage?.title, currentPage?.deletedAt]
   );
 
-  if (pageNotFound) {
+  if (isAccessDenied) {
+    return <ErrorPage message={'Sorry, you don\'t have access to this page'} />;
+  }
+  else if (pageNotFound) {
     return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
   }
   // Handle public page
