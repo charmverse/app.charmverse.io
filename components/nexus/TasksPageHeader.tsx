@@ -10,7 +10,7 @@ import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import KeyIcon from '@mui/icons-material/Key';
 import styled from '@emotion/styled';
 
-const IntegrationCardContainer = styled.div`
+const TasksPageHeaderContainer = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing(3)};
   justify-content: space-between;
@@ -26,7 +26,7 @@ const IntegrationCardContainer = styled.div`
   `}
 `;
 
-export default function IntegrationCard () {
+export default function TasksPageHeader () {
   const [currentUser] = useUser();
   const { account, active } = useWeb3React();
   const metamaskConnected = account && active;
@@ -37,7 +37,7 @@ export default function IntegrationCard () {
   const { data: safes } = useMultiWalletSigs();
 
   return currentUser && (
-    <IntegrationCardContainer>
+    <TasksPageHeaderContainer>
       <Grid container spacing={{ sm: 2, xs: 1 }}>
         <Grid item xs>
           <Link passHref href='/integrations'>
@@ -198,6 +198,6 @@ export default function IntegrationCard () {
           </Link>
         </Grid>
       </Grid>
-    </IntegrationCardContainer>
+    </TasksPageHeaderContainer>
   );
 }

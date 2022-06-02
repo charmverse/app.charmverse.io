@@ -8,6 +8,7 @@ import ForumIcon from '@mui/icons-material/Forum';
 import GnosisTasksList from './GnosisTasksList';
 import TasksPageHeader from './TasksPageHeader';
 import NexusPageTitle from './components/NexusPageTitle';
+import SnoozeButton from './components/SnoozeButton';
 
 type TaskType = 'multisig' | 'bounty' | 'proposal' | 'discussion'
 
@@ -47,8 +48,9 @@ export default function TasksPage () {
     <>
       <NexusPageTitle />
       <TasksPageHeader />
-      <Legend>
-        My tasks
+      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>My tasks</span>
+        <SnoozeButton />
       </Legend>
       {/* <Tabs
         sx={tabStyles}

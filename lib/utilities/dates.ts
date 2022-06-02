@@ -6,7 +6,7 @@ import { DateTime, DateTimeUnit as LuxonTimeUnit } from 'luxon';
  */
 export type DateStamp = `${number}-${number}-${number}`;
 
-export type DateInput = Date | DateStamp | number;
+export type DateInput = DateTime | Date | DateStamp | number;
 
 export type DateTimeFormat = 'relative' | 'absolute'
 
@@ -36,11 +36,16 @@ const SystemToLuxonUnitMapping: {[key in TimeUnit]: LuxonTimeUnit} = {
 };
 
 export function convertToLuxonDate (date: DateInput): DateTime {
-  return typeof date === 'number'
-    ? DateTime.fromMillis(date)
-    : typeof date === 'string'
-      ? DateTime.fromISO(date)
-      : DateTime.fromJSDate(date);
+  if (date instanceof DateTime) {
+    return date;
+  }
+  if (typeof date === 'number') {
+    return DateTime.fromMillis(date);
+  }
+  if (typeof date === 'string') {
+    return DateTime.fromISO(date);
+  }
+  return DateTime.fromJSDate(date);
 }
 
 export function getTimeDifference (

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Box, Button, Card, Chip, ClickAwayListener, Collapse, Divider, Grid, IconButton, Menu, MenuItem, TextField, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Alert, Box, Card, Chip, Collapse, Divider, Grid, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -12,15 +12,10 @@ import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
-import SnoozeIcon from '@mui/icons-material/Snooze';
-import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
-import charmClient from 'charmClient';
 import Tooltip from '@mui/material/Tooltip';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { useUser } from 'hooks/useUser';
 import EmailIcon from '@mui/icons-material/Email';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
 import useTasks from './hooks/useTasks';
 
@@ -219,8 +214,9 @@ function SafeTasks (
           alignItems: 'center',
           gap: 1
         }}
+        variant='body2'
       >
-        Tasks from safe:
+        <strong>Gnosis Safe:</strong>
         <Link
           sx={{
             display: 'inline-flex',
@@ -278,318 +274,23 @@ function SafeTasks (
   );
 }
 
-function SnoozeTransactions (
-  { message, snoozedForDate, setSnoozedForDate }:
-  { message: null | string, snoozedForDate: DateTime | null, setSnoozedForDate: React.Dispatch<React.SetStateAction<DateTime | null>> }
-) {
-  const [open, setOpen] = React.useState(false);
-
-  const handleTooltipClose = () => {
-    setOpen(false);
-  };
-
-  const handleTooltipOpen = () => {
-    setOpen(true);
-  };
-
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [snoozeMessage, setSnoozeMessage] = useState(message);
-  const [snoozedFor, setSnoozedFor] = useState<null | '1_day' | '3_days' | DateTime>(null);
-  const { isValidating, mutate: mutateTasks } = useTasks();
-  const isSnoozed = snoozedForDate !== null;
-  const primaryPopupState = usePopupState({
-    popupId: 'snooze-transactions',
-    variant: 'popover'
-  });
-  const secondaryPopupState = usePopupState({
-    popupId: 'snooze-transactions-message',
-    variant: 'popover'
-  });
-  const dateTimePickerRef = useRef<HTMLDivElement>(null);
-
-  const primaryTriggerState = bindTrigger(primaryPopupState);
-  const primaryMenuState = bindMenu(primaryPopupState);
-
-  const secondaryTriggerState = bindTrigger(secondaryPopupState);
-  const secondaryMenuState = bindMenu(secondaryPopupState);
-  const secondaryMenuStateOnClose = secondaryMenuState.onClose;
-
-  secondaryMenuState.onClose = () => {
-    setSnoozeMessage(null);
-    secondaryMenuStateOnClose();
-  };
-
-  function closeMenus () {
-    secondaryMenuState.onClose();
-    primaryMenuState.onClose();
-  }
-
-  function resetState () {
-    setShowDatePicker(false);
-    setSnoozeMessage(null);
-    setSnoozedFor(null);
-  }
-
-  async function removeSnoozedForDate () {
-    resetState();
-    await charmClient.updateGnosisSafeState({
-      snoozeFor: null,
-      snoozeMessage: null
-    });
-    setSnoozedForDate(null);
-    mutateTasks();
-  }
-
-  useEffect(() => {
-    if (snoozedForDate) {
-      const currentTimestamp = Date.now();
-      const snoozedForTimestamp = snoozedForDate.toJSDate().getTime();
-      // If the snoozed time has passed
-      if (snoozedForTimestamp < currentTimestamp) {
-        removeSnoozedForDate();
-      }
-    }
-  }, [snoozedForDate]);
-
-  useEffect(() => {
-    setSnoozeMessage(message);
-  }, [message]);
-
-  const onClose = primaryMenuState.onClose;
-  primaryMenuState.onClose = () => {
-    setShowDatePicker(false);
-    onClose();
-  };
-
-  async function setSnoozedDate (_snoozeMessage: string | null) {
-    resetState();
-    let newSnoozedForDate = DateTime.fromMillis(Date.now());
-    switch (snoozedFor) {
-      case '1_day': {
-        newSnoozedForDate = newSnoozedForDate.plus({ day: 1 });
-        break;
-      }
-      case '3_days': {
-        newSnoozedForDate = newSnoozedForDate.plus({ days: 3 });
-        break;
-      }
-      default: {
-        if (snoozedFor instanceof DateTime) {
-          newSnoozedForDate = snoozedFor;
-        }
-        else if (snoozedForDate instanceof DateTime) {
-          newSnoozedForDate = snoozedForDate;
-        }
-      }
-    }
-    setSnoozedForDate(newSnoozedForDate);
-    await charmClient.updateGnosisSafeState({
-      snoozeFor: newSnoozedForDate.toJSDate(),
-      snoozeMessage: _snoozeMessage
-    });
-    mutateTasks();
-  }
-
-  useEffect(() => {
-    if (showDatePicker && dateTimePickerRef.current) {
-      setTimeout(() => {
-        if (dateTimePickerRef.current) {
-          const button = dateTimePickerRef.current.querySelector<HTMLButtonElement>('button');
-          if (button) {
-            button.click();
-          }
-        }
-      }, 500);
-    }
-  }, [showDatePicker]);
-
-  return (
-    <Box display='flex' alignItems='center' gap={0.5} justifyContent='flex-end' width='100%'>
-      <Button
-        disabled={isValidating}
-        variant='outlined'
-        startIcon={(
-          <SnoozeIcon
-            fontSize='small'
-          />
-        )}
-        {...primaryTriggerState}
-      >
-        {isSnoozed ? `Snoozed for ${snoozedForDate.toRelative({ base: (DateTime.now()) })?.slice(3)}` : 'Snooze'}
-      </Button>
-      <ClickAwayListener onClickAway={handleTooltipClose}>
-        <div>
-          <Tooltip
-            arrow
-            placement='top'
-            title='Let others know you are busy by snoozing'
-            PopperProps={{
-              disablePortal: true
-            }}
-            onClose={handleTooltipClose}
-            open={open}
-            disableFocusListener
-            disableHoverListener
-            disableTouchListener
-          >
-            <IconButton size='small' color='primary' onClick={handleTooltipOpen} disabled={isValidating}>
-              <InfoOutlinedIcon fontSize='small' />
-            </IconButton>
-          </Tooltip>
-        </div>
-      </ClickAwayListener>
-      <Menu
-        {...primaryMenuState}
-        sx={{
-          '& .MuiPaper-root': {
-            minWidth: showDatePicker ? 300 : 250
-          }
-        }}
-      >
-        {snoozedForDate && <Typography sx={{ pl: 2 }} variant='subtitle1' color='secondary'>{snoozedForDate.toRFC2822()}</Typography>}
-        <MenuItem
-          {...secondaryTriggerState}
-          onClick={(e) => {
-            setSnoozedFor('1_day');
-            secondaryTriggerState.onClick(e);
-          }}
-        >Snooze for 1 day
-        </MenuItem>
-        <MenuItem
-          {...secondaryTriggerState}
-          onClick={(e) => {
-            setSnoozedFor('3_days');
-            secondaryTriggerState.onClick(e);
-          }}
-        >Snooze for 3 days
-        </MenuItem>
-        {showDatePicker
-          ? (
-            <Box display='flex' gap={1}>
-              <DateTimePicker
-                ref={dateTimePickerRef}
-                minDate={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
-                value={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
-                onAccept={async (value) => {
-                  if (value) {
-                    if (dateTimePickerRef.current) {
-                      secondaryTriggerState.onClick({ currentTarget: dateTimePickerRef.current } as any);
-                      setSnoozedFor(value);
-                    }
-                  }
-                }}
-                onChange={() => {}}
-                renderInput={(props) => (
-                  <TextField
-                    {...props}
-                    inputProps={{
-                      ...props.inputProps,
-                      readOnly: true
-                    }}
-                    disabled
-                    fullWidth
-                  />
-                )}
-              />
-              <IconButton
-                color='error'
-                onClick={() => {
-                  setShowDatePicker(false);
-                }}
-              >
-                <CancelIcon />
-              </IconButton>
-            </Box>
-          )
-          : (
-            <MenuItem
-              divider={isSnoozed}
-              onClick={() => {
-                setShowDatePicker(true);
-              }}
-            >Pick a date
-            </MenuItem>
-          )}
-        {isSnoozed && (
-        <>
-          <MenuItem onClick={() => {
-            // Close the menu and then update the state after a bit of delay
-            closeMenus();
-            setTimeout(() => {
-              removeSnoozedForDate();
-            }, 500);
-          }}
-          >
-            Unsnooze
-          </MenuItem>
-          <MenuItem onClick={(e) => {
-            secondaryTriggerState.onClick(e);
-          }}
-          >
-            Edit message
-          </MenuItem>
-        </>
-        )}
-      </Menu>
-      <Menu {...secondaryMenuState} elevation={20}>
-        <Box display='flex' gap={1} px={1}>
-          <TextField
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                closeMenus();
-                setTimeout(() => {
-                  setSnoozedDate(snoozeMessage);
-                }, 500);
-              }
-            }}
-            autoFocus
-            fullWidth
-            placeholder='Snooze message'
-            onChange={(e) => setSnoozeMessage(e.target.value)}
-            value={snoozeMessage}
-          />
-          <Button onClick={() => {
-            closeMenus();
-            setTimeout(() => {
-              setSnoozedDate(snoozeMessage);
-            }, 500);
-          }}
-          >{isSnoozed ? 'Edit' : 'Save'}
-          </Button>
-        </Box>
-      </Menu>
-    </Box>
-  );
-}
-
 export default function GnosisTasksSection () {
   const { data: safeData, mutate } = useMultiWalletSigs();
-  const { error, mutate: mutateTasks, tasks } = useTasks();
+  const { error, snoozedForDate, mutate: mutateTasks, tasks } = useTasks();
+  const [user] = useUser();
   const gnosisSigner = useGnosisSigner();
-
-  const taskUser = tasks?.user;
-  const transactionsSnoozedFor = taskUser?.gnosisSafeState?.transactionsSnoozedFor;
-  const transactionSnoozedDate = transactionsSnoozedFor ? DateTime.fromJSDate(new Date(transactionsSnoozedFor)) : null;
-
-  const [snoozedForDate, setSnoozedForDate] = useState<null | DateTime>(
-    transactionSnoozedDate
-  );
-
-  useEffect(() => {
-    setSnoozedForDate(transactionSnoozedDate);
-  }, [taskUser]);
 
   const isSnoozed = snoozedForDate !== null;
 
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
 
   async function importSafes () {
-    if (gnosisSigner && taskUser) {
+    if (gnosisSigner && user) {
       setIsLoadingSafes(true);
       try {
         await importSafesFromWallet({
           signer: gnosisSigner,
-          addresses: taskUser.addresses
+          addresses: user.addresses
         });
         await mutate();
         await mutateTasks();
@@ -619,15 +320,6 @@ export default function GnosisTasksSection () {
 
   return (
     <>
-      {safeData?.length ? (
-        <Box mb={2} display='flex' justifyContent='flex-end'>
-          <SnoozeTransactions
-            message={taskUser?.gnosisSafeState?.transactionsSnoozeMessage ?? null}
-            snoozedForDate={snoozedForDate}
-            setSnoozedForDate={setSnoozedForDate}
-          />
-        </Box>
-      ) : null}
       {safesWithTasks.map(safe => (
         <SafeTasks
           isSnoozed={isSnoozed}
