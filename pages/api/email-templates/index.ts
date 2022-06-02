@@ -28,7 +28,7 @@ const templates = {
               myAction: 'Sign',
               myActionUrl: 'https://gnosis.com',
               nonce: 3,
-              safeAddress: '0x123',
+              safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
               safeName: 'My Personal Safe',
               threshold: 2,
               snoozedUsers: []
@@ -52,7 +52,7 @@ const templates = {
               myAction: 'Sign',
               myActionUrl: 'https://gnosis.com',
               nonce: 7,
-              safeAddress: '0x456',
+              safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
               safeName: 'Work Safe',
               threshold: 2,
               snoozedUsers: []

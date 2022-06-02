@@ -1,17 +1,16 @@
 import {
   MjmlSection,
   MjmlColumn,
-  MjmlGroup,
   MjmlText,
-  MjmlButton,
-  MjmlImage
+  MjmlButton
 } from 'mjml-react';
 import { User } from '@prisma/client';
 import { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
+import { shortenHex } from 'lib/utilities/strings';
 import { greyColor2 } from 'theme/colors';
 import { HR, Feedback, Footer, Header, EmailWrapper } from './components';
 
-type TemplateUser = Pick<User, 'username'>;
+type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
 
 export interface PendingTasksProps {
   user: TemplateUser;
@@ -48,7 +47,8 @@ export default function PendingTasks (props: PendingTasksProps) {
 function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
 
   const charmUrl = 'https://app.charmverse.io/nexus';
-
+  console.log('multi sig task', task);
+  console.log('multi sig task...', task.tasks[0].transactions);
   return (
     <>
       <MjmlText>
@@ -56,7 +56,7 @@ function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
           <h2>Multi sig transaction</h2>
         </a>
         <strong style={{ color: greyColor2 }}>
-          Safe address: {task.safeAddress}<br />
+          Safe address: {shortenHex(task.safeAddress)}<br />
           {task.tasks[0].transactions[0].description}
         </strong>
       </MjmlText>
