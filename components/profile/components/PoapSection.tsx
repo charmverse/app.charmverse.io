@@ -1,14 +1,12 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import useSWR from 'swr';
 import charmClient from 'charmClient';
-import { Box, Container, Grid, ImageList, ImageListItem,
-  Link, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Grid, Link, SvgIcon, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import IconButton from '@mui/material/IconButton';
 import styled from '@emotion/styled';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import PoapIcon from 'public/images/poap_logo.svg';
-import { ExtendedPoap, LoggedInUser } from 'models';
+import { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import Button from 'components/common/Button';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
@@ -40,7 +38,7 @@ function PoapSection (props: PoapSectionProps) {
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const isPublic = isPublicUser(user);
   const { data: poapData, mutate: mutatePoaps } = useSWR(`/poaps/${user.id}`, () => {
-    return isPublic ? [] : charmClient.getUserPoaps();
+    return isPublicUser(user) ? Promise.resolve({ visiblePoaps: [], hiddenPoaps: [] }) : charmClient.getUserPoaps();
   });
 
   const hasConnectedWallet: boolean = !isPublic && user.addresses.length !== 0;
