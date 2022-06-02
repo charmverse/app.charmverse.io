@@ -41,7 +41,7 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     return !snoozedUntil || snoozedUntil > new Date();
   }) as typeof usersWithSafes;
 
-  return Promise.all(activeUsersWithSafes.map(async user => {
+  const notifications = await Promise.all(activeUsersWithSafes.map(async user => {
     const tasks = await getPendingGnosisTasks(user.id);
     // myAction is undefined if we are waiting for others to sign
     const myTasks = tasks.filter(task => Boolean(task.tasks[0].transactions[0].myAction));
@@ -50,6 +50,8 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
       tasks: myTasks
     };
   }));
+
+  return notifications.filter(notification => notification.tasks.length > 0);
 }
 
 async function sendNotification (notification: PendingTasksProps) {
