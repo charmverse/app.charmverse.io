@@ -11,6 +11,7 @@ const templates = {
   'Notify the user about tasks': () => {
     return emails.getPendingTasksEmail({
       user: {
+        id: '<userId>',
         username: 'ghostpepper'
       },
       tasks: [
