@@ -11,23 +11,13 @@ handler.use(requireUser).get(getTasks);
 
 export interface GetTasksResponse {
   gnosis: GnosisSafeTasks[];
-  snoozedFor: string | null;
-  snoozedMessage: string | null;
 }
 
 async function getTasks (req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {
 
   const tasks = await getPendingGnosisTasks(req.session.user.id);
-  const taskState = await prisma.userGnosisSafeState.findUnique({
-    where: {
-      userId: req.session.user.id
-    }
-  });
 
-  const snoozedFor = taskState?.transactionsSnoozedFor ? taskState.transactionsSnoozedFor.toISOString() : null;
-  const snoozedMessage = taskState?.transactionsSnoozeMessage || null;
-
-  return res.status(200).json({ gnosis: tasks, snoozedFor, snoozedMessage });
+  return res.status(200).json({ gnosis: tasks });
 }
 
 export default withSessionRoute(handler);

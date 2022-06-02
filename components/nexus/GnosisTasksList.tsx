@@ -18,6 +18,7 @@ import { useUser } from 'hooks/useUser';
 import EmailIcon from '@mui/icons-material/Email';
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
 import useTasks from './hooks/useTasks';
+import useTasksState from './hooks/useTasksState';
 
 const rowHeight = 48;
 
@@ -276,7 +277,8 @@ function SafeTasks (
 
 export default function GnosisTasksSection () {
   const { data: safeData, mutate } = useMultiWalletSigs();
-  const { error, snoozedForDate, mutate: mutateTasks, tasks } = useTasks();
+  const { error, mutate: mutateTasks, tasks } = useTasks();
+  const { snoozedForDate } = useTasksState();
   const [user] = useUser();
   const gnosisSigner = useGnosisSigner();
 

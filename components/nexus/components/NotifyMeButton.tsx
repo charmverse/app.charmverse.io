@@ -3,7 +3,7 @@ import Button from 'components/common/Button';
 import EmailIcon from '@mui/icons-material/Mail';
 import charmClient from 'charmClient';
 import Tooltip from '@mui/material/Tooltip';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useUser } from 'hooks/useUser';
 import NotifyMeModal from './NotifyMeModal';
 

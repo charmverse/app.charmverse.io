@@ -12,11 +12,11 @@ import Modal from 'components/common/Modal';
 import CancelIcon from '@mui/icons-material/Cancel';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import useTasks from '../hooks/useTasks';
+import useTasksState from '../hooks/useTasksState';
 
 export default function SnoozeButton () {
 
-  const { snoozedForDate, snoozedMessage, isLoading, mutate: mutateTasks } = useTasks();
+  const { isLoading, snoozedForDate, snoozedMessage, mutate: mutateTasks } = useTasksState();
 
   const isSnoozed = snoozedForDate !== null;
 
@@ -58,7 +58,7 @@ export default function SnoozeButton () {
   async function removeSnoozedForDate () {
     resetState();
     setShowLoading(true);
-    await charmClient.updateGnosisSafeState({
+    await charmClient.updateTasksState({
       snoozeFor: null,
       snoozeMessage: null
     });
@@ -91,7 +91,7 @@ export default function SnoozeButton () {
     resetState();
     setShowLoading(true);
     const newSnoozedForDate = getSnoozedDate();
-    await charmClient.updateGnosisSafeState({
+    await charmClient.updateTasksState({
       snoozeFor: newSnoozedForDate.toJSDate(),
       snoozeMessage: _snoozeMessage
     });
