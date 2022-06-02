@@ -22,6 +22,8 @@ export default function BountyDelete ({ bounty, onCancel, onDelete }: Props) {
 
     await deleteBounty(bounty.id);
 
+    onDelete();
+
     if (currentBountyId === bounty.id || currentBounty?.id === bounty.id) {
       router.push(`/${currentSpace?.domain}/bounties`);
     }
@@ -57,7 +59,7 @@ export default function BountyDelete ({ bounty, onCancel, onDelete }: Props) {
       {
         bounty.status === 'suggestion' && (
         <Typography sx={{ mb: 1 }}>
-          Are you sure you want to reject this suggestion?
+          Are you sure you want to delete this suggestion?
         </Typography>
         )
       }

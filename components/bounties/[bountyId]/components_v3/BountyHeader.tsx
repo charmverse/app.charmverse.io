@@ -22,6 +22,8 @@ import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import charmClient from 'charmClient';
+import { useUser } from 'hooks/useUser';
+import { Bounty } from '@prisma/client';
 
 const menuPosition: Partial<MenuProps> = {
   anchorOrigin: {
@@ -34,8 +36,14 @@ const menuPosition: Partial<MenuProps> = {
   }
 };
 
-export default function BountyHeader () {
-  const { currentBounty, setCurrentBounty } = useBounties();
+interface Props {
+  bounty: Bounty
+}
+
+export default function BountyHeader ({ bounty }: Props) {
+  const { refreshBounty } = useBounties();
+
+  const [user] = useUser();
 
   const isAdmin = useIsAdmin();
 
@@ -48,25 +56,25 @@ export default function BountyHeader () {
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'bounty-actions' });
 
-  const viewerCanModifyBounty = isAdmin === true;
-
   async function closeBounty () {
 
-    const updatedBounty = await charmClient.closeBounty(currentBounty!.id);
-    setCurrentBounty(updatedBounty);
+    const updatedBounty = await charmClient.closeBounty(bounty!.id);
+    refreshBounty(updatedBounty.id);
     closeBountyModal.close();
   }
 
   async function closeBountySubmissions () {
 
-    const updatedBounty = await charmClient.closeBountySubmissions(currentBounty!.id);
-    setCurrentBounty(updatedBounty);
+    const updatedBounty = await charmClient.closeBountySubmissions(bounty!.id);
+    refreshBounty(updatedBounty.id);
     closeSubmissionsModal.close();
   }
 
-  if (!currentBounty) {
+  if (!bounty) {
     return null;
   }
+
+  const isBountyCreator = (user?.id === bounty?.createdBy) || isAdmin;
 
   return (
     <>
@@ -88,10 +96,10 @@ export default function BountyHeader () {
             }}
           >
             <Box component='span'>
-              {currentBounty.title}
+              {bounty.title}
             </Box>
             {
-          viewerCanModifyBounty === true && (
+          (isAdmin || (isBountyCreator && bounty.status === 'suggestion')) && (
             <>
               <IconButton>
                 <MoreHorizIcon color='secondary' {...bindTrigger(popupState)} />
@@ -102,23 +110,46 @@ export default function BountyHeader () {
                 {...menuPosition}
               >
 
-                <Tooltip arrow placement='right' title={`Edit bounty ${currentBounty.status === 'suggestion' ? 'suggestion' : ''}`}>
-                  <MenuItem onClick={bountyEditModal.open}>
-                    <ListItemIcon><EditIcon color='secondary' fontSize='small' /></ListItemIcon>
-                    <ListItemText>Edit</ListItemText>
-                  </MenuItem>
-                </Tooltip>
                 {
-                  (currentBounty.status !== 'suggestion' && currentBounty.status !== 'complete' && currentBounty.status !== 'paid') && (
+                  (isAdmin || (isBountyCreator && bounty.status === 'suggestion')) && (
+                    <Tooltip arrow placement='right' title={`Edit bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                      <MenuItem
+                        dense
+                        onClick={() => {
+                          bountyEditModal.open();
+                          popupState.close();
+                        }}
+                      >
+                        <ListItemIcon><EditIcon color='secondary' fontSize='small' /></ListItemIcon>
+                        <ListItemText>Edit</ListItemText>
+                      </MenuItem>
+                    </Tooltip>
+                  )
+                }
+
+                {
+                  (isAdmin && bounty.status !== 'suggestion' && bounty.status !== 'complete' && bounty.status !== 'paid') && (
                   <>
-                    <Tooltip arrow placement='right' title={`Prevent new ${currentBounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
-                      <MenuItem onClick={closeSubmissionsModal.open}>
+                    <Tooltip arrow placement='right' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+                      <MenuItem
+                        dense
+                        onClick={() => {
+                          closeSubmissionsModal.open();
+                          popupState.close();
+                        }}
+                      >
                         <ListItemIcon><LockIcon color='secondary' fontSize='small' /></ListItemIcon>
-                        <ListItemText>Stop new {currentBounty.approveSubmitters ? 'applications' : 'submissions'}</ListItemText>
+                        <ListItemText>Stop new {bounty.approveSubmitters ? 'applications' : 'submissions'}</ListItemText>
                       </MenuItem>
                     </Tooltip>
                     <Tooltip arrow placement='right' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
-                      <MenuItem onClick={closeBountyModal.open}>
+                      <MenuItem
+                        dense
+                        onClick={() => {
+                          closeBountyModal.open();
+                          popupState.close();
+                        }}
+                      >
                         <ListItemIcon><CheckCircleIcon color='secondary' fontSize='small' /></ListItemIcon>
                         <ListItemText>Mark as complete</ListItemText>
                       </MenuItem>
@@ -127,12 +158,23 @@ export default function BountyHeader () {
                   )
                 }
 
-                <Tooltip arrow placement='right' title={`Delete bounty ${currentBounty.status === 'suggestion' ? 'suggestion' : ''}`}>
-                  <MenuItem onClick={bountyDeleteModal.open}>
-                    <ListItemIcon><DeleteIcon color='secondary' /></ListItemIcon>
-                    <ListItemText>Delete</ListItemText>
-                  </MenuItem>
-                </Tooltip>
+                {
+                  (isAdmin || (isBountyCreator && bounty.status === 'suggestion')) && (
+                    <Tooltip arrow placement='right' title={`Delete bounty ${bounty.status === 'suggestion' ? 'suggestion' : ''}`}>
+                      <MenuItem
+                        dense
+                        onClick={() => {
+                          bountyDeleteModal.open();
+                          popupState.close();
+                        }}
+                      >
+                        <ListItemIcon><DeleteIcon color='secondary' /></ListItemIcon>
+                        <ListItemText>Delete</ListItemText>
+                      </MenuItem>
+                    </Tooltip>
+                  )
+                }
+
               </Menu>
 
             </>
@@ -146,7 +188,7 @@ export default function BountyHeader () {
           alignItems: 'center'
         }}
         >
-          <BountyStatusBadge bounty={currentBounty} />
+          <BountyStatusBadge bounty={bounty} />
         </Box>
       </Box>
 
@@ -154,14 +196,14 @@ export default function BountyHeader () {
       <BountyModal
         onSubmit={bountyEditModal.close}
         mode='update'
-        bounty={currentBounty}
+        bounty={bounty}
         open={bountyEditModal.isOpen}
         onClose={bountyEditModal.close}
       />
 
       <Modal open={bountyDeleteModal.isOpen} onClose={bountyDeleteModal.close}>
         <BountyDelete
-          bounty={currentBounty}
+          bounty={bounty}
           onCancel={bountyDeleteModal.close}
           onDelete={bountyDeleteModal.close}
         />
@@ -185,7 +227,7 @@ export default function BountyHeader () {
               color='primary'
               sx={{ mr: 2, fontWeight: 'bold' }}
               onClick={closeBountySubmissions}
-            >Close {currentBounty.approveSubmitters ? 'applications' : 'submissions'}
+            >Close {bounty.approveSubmitters ? 'applications' : 'submissions'}
             </Button>
 
             <Button color='secondary' onClick={closeSubmissionsModal.close}>Cancel</Button>

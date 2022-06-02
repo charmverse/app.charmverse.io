@@ -4,6 +4,7 @@ import useENSName from 'hooks/useENSName';
 import { User } from '@prisma/client';
 import Avatar from 'components/common/Avatar';
 import getDisplayName from 'lib/users/getDisplayName';
+import Link from 'components/common/Link';
 
 interface StyleProps extends BoxProps {
   fontSize?: string | number;
@@ -40,15 +41,34 @@ function AnonUserDisplayComponent ({ address, ...props }: AnonUserDisplayProps) 
 
 export const AnonUserDisplay = memo(AnonUserDisplayComponent);
 
+/**
+ * @linkToProfile Whether we show a link to user's public profile. Defaults to false.
+ */
 interface UserDisplayProps extends StyleProps {
   user: User;
+  linkToProfile?: boolean
 }
 
-function UserDisplay ({ user, ...props }: UserDisplayProps) {
+function UserDisplay ({ user, linkToProfile = false, ...props }: UserDisplayProps) {
   const ensName = useENSName(user.addresses[0]);
+
+  // Copied from User Details component
+  const hostname = typeof window !== 'undefined' ? window.location.origin : '';
+  const userPath = user.path || user.id;
+  const userLink = `${hostname}/u/${userPath}`;
+
+  if (linkToProfile) {
+    return (
+      <Link href={userLink} key={user?.id} external={false}>
+        <BaseComponent username={ensName || getDisplayName(user)} avatar={user.avatar} {...props} />
+      </Link>
+    );
+  }
+
   return (
     <BaseComponent username={ensName || getDisplayName(user)} avatar={user.avatar} {...props} />
   );
+
 }
 
 export default memo(UserDisplay);

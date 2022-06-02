@@ -72,8 +72,8 @@ export default function Workspaces () {
   return (
     <WorkspacesContainer>
       <Grid container spacing={2} flexDirection='column'>
-        <Grid item>
-          <AvatarLink href='/profile/tasks' passHref>
+        {/* <Grid item>
+          <AvatarLink href='/nexus' passHref>
             <MuiLink>
               <Tooltip title={userName} placement='right' arrow>
                 <span>
@@ -85,7 +85,7 @@ export default function Workspaces () {
         </Grid>
         <Grid item>
           <Divider sx={{ borderTopWidth: 2, width: '80%', m: '0 auto' }} />
-        </Grid>
+        </Grid> */}
         {spaces.map(workspace => (
           <Grid item key={workspace.domain}>
             <AvatarLink href={`/${workspace.domain}`} passHref>

@@ -104,8 +104,6 @@ export function BountyApplicantList ({
     submissions: applications
   });
 
-  console.log('New applications suspended', newApplicationsSuspended);
-
   return (
     <>
       <Box component='div' sx={{ minHeight, maxHeight, overflowY: 'auto' }}>
@@ -137,7 +135,8 @@ export function BountyApplicantList ({
           }}
           >
             <TableRow>
-              <TableCell>Status</TableCell>
+              {/* Width should always be same as Bounty Submissions status column, so submitter and applicant columns align */}
+              <TableCell sx={{ width: 120 }}>Status</TableCell>
               <TableCell>
                 <Box sx={{
                   display: 'flex',
@@ -189,6 +188,7 @@ export function BountyApplicantList ({
                             avatarSize='small'
                             user={contributor}
                             fontSize='small'
+                            linkToProfile
                           />
                         );
                       }
@@ -199,7 +199,7 @@ export function BountyApplicantList ({
                 <TableCell sx={{ maxWidth: '61vw' }}>
                   {
                     application.createdBy === user?.id && application.status === 'applied' ? (
-                      <Typography variant='body2' color={theme.palette.primary.main} onClick={bountyApplyModal.open}>
+                      <Typography sx={{ cursor: 'pointer' }} variant='body2' color={theme.palette.primary.main} onClick={bountyApplyModal.open}>
                         {application.message}
                       </Typography>
                     ) : (

@@ -4,6 +4,7 @@ import { Box } from '@mui/system';
 import { ReactNode } from 'react';
 
 const StyledBox = styled(Box)`
+  white-space: nowrap;
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
   padding-bottom: ${({ theme }) => theme.spacing(2)};
   margin-top: ${({ theme }) => theme.spacing(6)};

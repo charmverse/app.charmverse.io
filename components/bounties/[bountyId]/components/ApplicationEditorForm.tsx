@@ -12,6 +12,7 @@ import * as yup from 'yup';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { useBounties } from 'hooks/useBounties';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import { FormMode } from '../../components/BountyEditorForm';
 
 interface IApplicationFormProps {
@@ -31,19 +32,22 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
 
   const { refreshBounty } = useBounties();
 
+  const [user] = useUser();
+
+  const [applicationMessage, setApplicationMessage] = useLocalStorage(`${bountyId}.${user?.id}.application`, '');
+
   const {
     register,
     handleSubmit,
     formState: { errors, touchedFields, isValid, isValidating, isSubmitting }
   } = useForm<FormValues>({
-    mode: 'onChange',
+    mode: 'onBlur',
     defaultValues: {
-      message: proposal?.message as string
+      // Default to saved message in local storage
+      message: proposal?.message as string ?? applicationMessage
     },
     resolver: yupResolver(schema)
   });
-
-  const [user] = useUser();
 
   const applicationExample = 'Explain why you are the right person or team to work on this bounty.';
 
@@ -54,6 +58,7 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
       const createdApplication = await charmClient.createApplication(proposalToSave);
       onSubmit(createdApplication);
       refreshBounty(bountyId);
+      setApplicationMessage('');
     }
     else if (mode === 'update') {
       await charmClient.updateApplication(proposal?.id as string, proposalToSave);
@@ -77,6 +82,13 @@ export function ApplicationEditorForm ({ onSubmit, bountyId, proposal, mode = 'c
               variant='outlined'
               type='text'
               fullWidth
+              onChange={(ev) => {
+                // Only store in local storage if no proposal exists yet
+                if (!proposal) {
+                  const newText = ev.target.value;
+                  setApplicationMessage(newText);
+                }
+              }}
             />
             {
               errors?.message && (

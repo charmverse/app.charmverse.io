@@ -2,15 +2,18 @@ import React from 'react';
 import {
   Mjml,
   MjmlHead,
+  MjmlText,
   MjmlTitle,
   MjmlPreview,
   MjmlBody,
-  MjmlFont,
+  MjmlDivider,
   MjmlStyle,
   MjmlAttributes,
   MjmlButton
 } from 'mjml-react';
 
+import { lightGreyColor, primaryTextColor } from 'theme/colors';
+import { fontFamily } from 'theme';
 import styles from '../theme/styles';
 
 interface Props {
@@ -25,18 +28,19 @@ export default function EmailWrapper (props: Props) {
       <MjmlHead>
         <MjmlTitle>{props.title}</MjmlTitle>
         {props.preview && <MjmlPreview>{props.preview}</MjmlPreview>}
-        <MjmlStyle inline>
-          {styles}
-        </MjmlStyle>
+
+        {/* inject inline CSS */}
+        <MjmlStyle inline>{styles}</MjmlStyle>
+
+        {/* MjmlAttributes applies default attributes to MJML components */}
         <MjmlAttributes>
-          <MjmlButton cssClass='button' />
+          <MjmlButton font-family={fontFamily} cssClass='button' />
+          <MjmlDivider cssClass='mjml-divider' />
+          <MjmlText font-family={fontFamily} color={primaryTextColor} font-size='18px' line-height='26px' />
         </MjmlAttributes>
-        <MjmlFont
-          name='Roboto'
-          href='https://fonts.googleapis.com/css?family=Roboto'
-        />
+
       </MjmlHead>
-      <MjmlBody width={500} backgroundColor='#fff'>
+      <MjmlBody width={600} backgroundColor={lightGreyColor} css-class='mjml-root'>
         {props.children}
       </MjmlBody>
     </Mjml>

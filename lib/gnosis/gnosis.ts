@@ -4,6 +4,7 @@ import { RPC } from 'connectors';
 import { UserGnosisSafe } from '@prisma/client';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
 import SafeServiceClient, { SafeMultisigTransactionResponse, SafeInfoResponse } from '@gnosis.pm/safe-service-client';
+import log from 'lib/log';
 
 export type GnosisTransaction = SafeMultisigTransactionResponse;// AllTransactionsListResponse['results'][0];
 
@@ -79,6 +80,15 @@ async function getTransactionsforSafe (signer: Signer, wallet: UserGnosisSafe): 
 }
 
 export async function getTransactionsforSafes (signer: Signer, safes: UserGnosisSafe[]) {
-  return Promise.all(safes.map(safe => getTransactionsforSafe(signer, safe)))
-    .then(list => list.flat());
+  const transactionList: SafeMultisigTransactionResponse[] = [];
+  for (const safe of safes) {
+    try {
+      const transactions = await getTransactionsforSafe(signer, safe);
+      transactionList.push(...transactions);
+    }
+    catch (e) {
+      log.warn(`Error getting transactions for safe ${safe.address}`, e);
+    }
+  }
+  return transactionList;
 }

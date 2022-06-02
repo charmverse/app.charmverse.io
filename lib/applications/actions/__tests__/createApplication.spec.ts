@@ -94,7 +94,7 @@ describe('createApplication', () => {
     try {
       await createApplication({
         bountyId: bounty.id,
-        message: 'Short',
+        message: '',
         userId: user.id
       });
       throw new ExpectedAnError();
