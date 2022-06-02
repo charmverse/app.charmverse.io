@@ -82,7 +82,7 @@ describe('updateApplication', () => {
     try {
       await updateApplication({
         applicationId: application.id,
-        message: 's'
+        message: ''
       });
       throw new ExpectedAnError();
     }
