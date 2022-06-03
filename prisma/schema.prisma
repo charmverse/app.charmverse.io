@@ -169,6 +169,8 @@ model UserNotification {
   userId    String           @db.Uuid
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   type      NotificationType
+
+  @@unique([taskId, userId])
 }
 
 model UserDetails {
