@@ -13,7 +13,7 @@ import {
 } from 'mjml-react';
 
 import { lightGreyColor, primaryTextColor } from 'theme/colors';
-import { fontFamily, fontFamilyNoQuotes } from 'theme';
+import { fontFamily } from 'theme';
 import styles from '../theme/styles';
 
 interface Props {
