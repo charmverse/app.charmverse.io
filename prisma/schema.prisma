@@ -149,6 +149,7 @@ model User {
   profile           UserDetails?
   identityType      IdentityType?
   notificationState UserNotificationState?
+  UserNotification  UserNotification[]
 }
 
 model UserNotificationState {
@@ -156,6 +157,20 @@ model UserNotificationState {
   snoozeMessage String?
   userId        String    @unique @db.Uuid
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+enum NotificationType {
+  multisig
+}
+
+model UserNotification {
+  taskId    String           @unique
+  createdAt DateTime         @default(now())
+  userId    String           @db.Uuid
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  type      NotificationType
+
+  @@unique([taskId, userId])
 }
 
 model UserDetails {

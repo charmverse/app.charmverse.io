@@ -38,7 +38,8 @@ const templates = {
           }],
           safeAddress: '0x123',
           safeName: 'My Personal Safe',
-          safeUrl: 'https://app.charmverse.io'
+          safeUrl: 'https://app.charmverse.io',
+          taskId: '1'
         },
         {
           tasks: [{
@@ -62,7 +63,8 @@ const templates = {
           }],
           safeAddress: '0x456',
           safeName: 'Work Safe',
-          safeUrl: 'https://app.charmverse.io'
+          safeUrl: 'https://app.charmverse.io',
+          taskId: '2'
         }
       ]
     });
