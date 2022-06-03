@@ -38,13 +38,13 @@ async function getUserDetails (req: NextApiRequest, res: NextApiResponse<UserDet
 }
 
 async function updateUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | {error: string}>) {
-
   const details = await prisma.userDetails.upsert({
     where: {
       id: req.session.user.id
     },
     create: {
-      id: req.session.user.id
+      id: req.session.user.id,
+      ...req.body
     },
     update: {
       ...req.body
