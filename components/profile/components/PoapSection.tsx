@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import { Box, Grid, Link, Stack, SvgIcon, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -34,7 +34,7 @@ function PoapSection (props: PoapSectionProps) {
   const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const isPublic = isPublicUser(user);
-  const { data: poapData, mutate: mutatePoaps } = useSWR(`/poaps/${user.id}`, () => {
+  const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}`, () => {
     return isPublicUser(user) ? Promise.resolve({ visiblePoaps: [], hiddenPoaps: [] }) : charmClient.getUserPoaps();
   });
 

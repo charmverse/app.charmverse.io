@@ -6,11 +6,23 @@ import { Box, InputAdornment, Stack } from '@mui/material';
 import Button from 'components/common/Button';
 import TextField from '@mui/material/TextField';
 import { Modal, DialogTitle } from 'components/common/Modal';
+import charmClient from 'charmClient';
+import debouncePromise from 'lib/utilities/debouncePromise';
+
+async function validatePath (path: string) {
+  const result = await charmClient.checkNexusPath(path);
+  return result.available;
+}
+
+const debouncedValidate = debouncePromise(validatePath, 500);
 
 export const schema = yup.object({
-  path: yup.string().ensure().trim()
+  path: yup.string().ensure().trim().lowercase()
     .min(3)
     .max(50)
+    .matches(/^[a-zA-Z0-9-]+$/g, 'Only alphanumeric characters and hyphens are allowed')
+    // eslint-disable-next-line no-template-curly-in-string
+    .test('isAvailable', '${path} is already taken', debouncedValidate)
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -69,7 +81,7 @@ export default function UserPathModal (props: Props) {
             placeholder='awesome-bot'
           />
           <Box mt={4} sx={{ display: 'flex' }}>
-            <Button type='submit'>
+            <Button disabled={!!errors.path} type='submit'>
               Save
             </Button>
           </Box>
