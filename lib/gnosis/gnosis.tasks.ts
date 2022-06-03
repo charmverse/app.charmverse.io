@@ -3,12 +3,12 @@ import log from 'lib/log';
 import groupBy from 'lodash/groupBy';
 import intersection from 'lodash/intersection';
 import { prisma } from 'db';
-import { User, UserGnosisSafe, UserGnosisSafeState } from '@prisma/client';
+import { User, UserGnosisSafe, UserNotificationState } from '@prisma/client';
 import { getTransactionsforSafes, GnosisTransaction } from './gnosis';
 
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`;
 
-type UserWithGnosisSafeState = User & {gnosisSafeState: UserGnosisSafeState | null}
+type UserWithGnosisSafeState = User & {notificationState: UserNotificationState | null}
 interface ActionUser {
   address: string;
   user?: UserWithGnosisSafeState;
@@ -152,10 +152,10 @@ function transactionToTask ({ myAddresses, transaction, safe, users }: Transacti
   const snoozedUsers: UserWithGnosisSafeState[] = [];
   users.forEach(user => {
     if (
-      user.gnosisSafeState
-      && user.gnosisSafeState.transactionsSnoozedFor !== null
+      user.notificationState
+      && user.notificationState.snoozedUntil !== null
       && !confirmations.find(confirmation => user.addresses.includes(confirmation.address))
-      && user.gnosisSafeState.transactionsSnoozedFor.toString() > new Date().toString()) {
+      && user.notificationState.snoozedUntil.toString() > new Date().toString()) {
       snoozedUsers.push(user);
     }
   });
@@ -229,7 +229,7 @@ export async function getPendingGnosisTasks (myUserId: string) {
       }
     },
     include: {
-      gnosisSafeState: true
+      notificationState: true
     }
   });
 

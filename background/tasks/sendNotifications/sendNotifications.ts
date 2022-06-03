@@ -1,11 +1,10 @@
 
 import { prisma } from 'db';
-import { User } from '@prisma/client';
-import { getPendingGnosisTasks, GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
-import log from 'lib/log';
 import * as emails from 'lib/emails';
-import * as mailer from 'lib/mailer';
 import { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
+import { getPendingGnosisTasks } from 'lib/gnosis/gnosis.tasks';
+import log from 'lib/log';
+import * as mailer from 'lib/mailer';
 
 export async function sendUserNotifications (): Promise<number> {
 
@@ -31,13 +30,13 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
     },
     include: {
       gnosisSafes: true,
-      gnosisSafeState: true
+      notificationState: true
     }
   });
 
   // filter out users that have snoozed notifications
   const activeUsersWithSafes = usersWithSafes.filter(user => {
-    const snoozedUntil = user.gnosisSafeState?.transactionsSnoozedFor;
+    const snoozedUntil = user.notificationState?.snoozedUntil;
     return !snoozedUntil || snoozedUntil > new Date();
   }) as typeof usersWithSafes;
 
