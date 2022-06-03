@@ -130,12 +130,13 @@ function transactionToTask ({ myAddresses, transaction, safe, users }: Transacti
   const actions = getTaskActions(transaction, getRecipient);
   const gnosisUrl = getGnosisTransactionUrl(transaction.safe);
   const confirmedAddresses = transaction.confirmations?.map(confirmation => confirmation.owner) ?? [];
+  const myOwnedAddresses = intersection(myAddresses, safe.owners).length; // handle owner of multiple addresses in one safe
   // console.log('transaction', transaction);
   let actionLabel: string = '';
   if (transaction.confirmations && transaction.confirmations.length >= safe.threshold) {
     actionLabel = 'Execute';
   }
-  else if (intersection(myAddresses, confirmedAddresses).length === 0) {
+  else if (intersection(myAddresses, confirmedAddresses).length < myOwnedAddresses) {
     actionLabel = 'Sign';
     if (transaction.confirmations && transaction.confirmations.length - safe.threshold === 1) {
       actionLabel = 'Execute';
