@@ -78,7 +78,7 @@ declare module '@mui/material/SvgIcon' {
   export interface SvgIconPropsColorOverrides extends Record<BrandColor, true> {}
 }
 
-export const fontFamily = 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
+export const fontFamily = 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 // Explore all theme options: https://material-ui.com/customization/default-theme/
 export const createThemeLightSensitive = (mode: PaletteMode) => {
   const contrastText = mode === 'dark' ? '#fff' : '#000';
