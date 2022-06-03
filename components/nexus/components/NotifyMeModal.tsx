@@ -61,6 +61,7 @@ export default function NotifyMeModal (props: Props) {
 
         <TextField
           {...register('email')}
+          autoFocus
           fullWidth
           error={!!errors.email}
           helperText={errors.email?.message}

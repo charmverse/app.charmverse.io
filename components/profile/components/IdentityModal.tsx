@@ -86,7 +86,11 @@ function IdentityModal (props: IdentityModalProps) {
   );
 
   return (
-    <Modal open={isOpen} onClose={close} size='large'>
+    <Modal
+      open={isOpen}
+      onClose={close}
+      size='large'
+    >
       <DialogTitle onClose={close}>Public Identity</DialogTitle>
       <Typography>Select which integration you want to show as your public identity</Typography>
       <Stack mt={2}>

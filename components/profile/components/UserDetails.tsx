@@ -29,13 +29,6 @@ import SocialModal from './SocialModal';
 import IdentityModal, { getIdentityIcon, IntegrationModel } from './IdentityModal';
 import { Social } from '../interfaces';
 
-const StyledBox = styled(Box)`
-
-  svg {
-    cursor: pointer;
-  }
-`;
-
 const StyledDivider = styled(Divider)`
   height: 36px;
 `;
@@ -54,6 +47,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
   const { data: userDetails, mutate } = useSWR(`/userDetails/${user.id}`, () => {
     return isPublicUser(user) ? user.profile : charmClient.getUserDetails();
   });
+
   const ENSName = useENSName(account);
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
   const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
@@ -149,7 +143,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
   const userLink = `${hostname}/u/${userPath}`;
 
   return (
-    <StyledBox>
+    <Box>
       <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
           name={userName}
@@ -317,6 +311,6 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
         />
       </>
       )}
-    </StyledBox>
+    </Box>
   );
 }

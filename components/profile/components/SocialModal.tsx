@@ -54,7 +54,11 @@ function SocialModal (props: SocialModalProps) {
 
   return (
 
-    <Modal open={isOpen} onClose={close} size='large'>
+    <Modal
+      open={isOpen}
+      onClose={close}
+      size='large'
+    >
       <DialogTitle onClose={close}>Social media links</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={4}>
