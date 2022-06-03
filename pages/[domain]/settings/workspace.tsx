@@ -26,7 +26,7 @@ import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping'
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 export default function WorkspaceSettings () {
@@ -36,6 +36,7 @@ export default function WorkspaceSettings () {
   const [spaces] = useSpaces();
   const [user] = useUser();
   const isAdmin = isSpaceAdmin(user, space?.id);
+  const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const {
     register,
@@ -80,11 +81,13 @@ export default function WorkspaceSettings () {
 
   async function handleMenuItemClick (pagePermissionLevel: PagePermissionLevel | null) {
     if (space) {
+      setIsUpdatingPagePermission(true);
+      menuState.onClose();
       const updatedSpace = await charmClient.setDefaultPagePermission({
         spaceId: space.id, pagePermissionLevel
       });
       setSpace(updatedSpace);
-      menuState.onClose();
+      setIsUpdatingPagePermission(false);
     }
   }
 
@@ -161,10 +164,12 @@ export default function WorkspaceSettings () {
                 <Button
                   color='secondary'
                   variant='outlined'
+                  disabled={isUpdatingPagePermission}
+                  loading={isUpdatingPagePermission}
+                  endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
                   {...bindTrigger(popupState)}
-                  endIcon={<KeyboardArrowDownIcon fontSize='small' />}
                 >
-                  {space?.defaultPagePermissionGroup ? permissionLevels[space.defaultPagePermissionGroup as Exclude<PagePermissionLevel, 'custom'>] : 'Full Access'}
+                  {space?.defaultPagePermissionGroup ? permissionLevels[space.defaultPagePermissionGroup as Exclude<PagePermissionLevel, 'custom'>] : permissionLevels.full_access}
                 </Button>
                 <Menu
                   {...menuState}
@@ -177,7 +182,7 @@ export default function WorkspaceSettings () {
                     onClick={() => handleMenuItemClick('full_access')}
                   >
                     <StyledListItemText
-                      primary='Full Access'
+                      primary={permissionLevels.full_access}
                       secondary='Can edit and share with others.'
                     />
                   </MenuItem>
@@ -187,7 +192,7 @@ export default function WorkspaceSettings () {
                     onClick={() => handleMenuItemClick('editor')}
                   >
                     <StyledListItemText
-                      primary='Editor'
+                      primary={permissionLevels.editor}
                       secondary='Can edit but not share with others.'
                     />
                   </MenuItem>
@@ -197,7 +202,7 @@ export default function WorkspaceSettings () {
                     onClick={() => handleMenuItemClick('view_comment')}
                   >
                     <StyledListItemText
-                      primary='View & Comment'
+                      primary={permissionLevels.view_comment}
                       secondary='Can view and comment, but not edit.'
                     />
                   </MenuItem>
@@ -207,7 +212,7 @@ export default function WorkspaceSettings () {
                     onClick={() => handleMenuItemClick('view')}
                   >
                     <StyledListItemText
-                      primary='View'
+                      primary={permissionLevels.view}
                       secondary='Cannot edit or share with others.'
                     />
                   </MenuItem>
