@@ -11,8 +11,6 @@ import { useUser } from 'hooks/useUser';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { Chains, RPC } from 'connectors';
 import { useContext } from 'react';
-import { getDisplayName } from 'lib/users';
-import useENSName from 'hooks/useENSName';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
 import styled from '@emotion/styled';
 
@@ -52,7 +50,6 @@ const StyledButtonGroup = styled(ButtonGroup)`
 function Account (): JSX.Element {
   const { error, account, chainId } = useWeb3React();
   const { openNetworkModal } = useContext(Web3Connection);
-  const ENSName = useENSName(account);
 
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
   const [user, , isUserLoaded] = useUser();
@@ -89,8 +86,6 @@ function Account (): JSX.Element {
 
   const isConnectedWithWallet = (account && chainId);
 
-  const userName = ENSName || (user ? getDisplayName(user) : '');
-
   return (
     <AccountCard>
       <StyledButtonGroup variant='contained' disableElevation>
@@ -109,9 +104,9 @@ function Account (): JSX.Element {
             borderTopLeftRadius: '0 !important',
             borderBottomLeftRadius: '0 !important'
           }) : {}}
-          endIcon={<Avatar avatar={user?.avatar} name={userName} size='small' />}
+          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} size='small' />}
         >
-          {userName}
+          {user?.username}
         </AccountButton>
       </StyledButtonGroup>
       <NetworkModal isOpen={networkModalState.isOpen} onClose={networkModalState.close} />

@@ -146,7 +146,7 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
     <Box>
       <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
         <Avatar
-          name={userName}
+          name={user?.username || ''}
           spaceImage={user?.avatar}
           updateImage={(url: string) => handleUserUpdate({ avatar: url })}
           displayIcons={!readOnly}
