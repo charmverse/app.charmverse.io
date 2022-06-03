@@ -146,7 +146,6 @@ model User {
   comments              Comment[]
   threads               Thread[]
   gnosisSafes           UserGnosisSafe[]
-  gnosisSafeState       UserGnosisSafeState?
   profile               UserDetails?
   identityType          IdentityType?
   userNotificationState UserNotificationState?
@@ -157,13 +156,6 @@ model UserNotificationState {
   snoozeMessage String?
   userId        String    @unique @db.Uuid
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-}
-
-model UserGnosisSafeState {
-  transactionsSnoozedFor    DateTime?
-  transactionsSnoozeMessage String?
-  userId                    String    @unique @db.Uuid
-  user                      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model UserDetails {
