@@ -76,7 +76,7 @@ function DescriptionModal (props: DescriptionModalProps) {
             }}
           />
           <Box justifyContent='end' sx={{ display: 'flex' }}>{watchDescription.length}/500</Box>
-          <Box mt={4} sx={{ display: 'flex' }}>
+          <Box sx={{ display: 'flex' }}>
             <Button type='submit'>
               Save
             </Button>
