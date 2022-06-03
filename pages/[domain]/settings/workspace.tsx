@@ -22,7 +22,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { setTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { permissionLevels } from 'lib/permissions/pages';
+import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
