@@ -48,6 +48,7 @@ export interface GnosisSafeTasks {
   safeName: string | null;
   safeUrl: string;
   tasks: GnosisTask[];
+  taskId: string;
 }
 
 function etherToBN (ether: string): ethers.BigNumber {
@@ -197,14 +198,20 @@ function transactionsToTasks ({ transactions, safes, myUserId, users }: Transact
   }));
 
   return Object.values(groupBy(mapped, 'safeAddress'))
-    .map<GnosisSafeTasks>((_transactions) => ({
-      safeAddress: _transactions[0].safeAddress,
-      safeName: _transactions[0].safeName,
-      safeUrl: getGnosisTransactionUrl(_transactions[0].safeAddress),
-      tasks: Object.values(groupBy(_transactions, 'nonce'))
+    .map<GnosisSafeTasks>((_transactions) => {
+      const tasks = Object.values(groupBy(_transactions, 'nonce'))
         .map<GnosisTask>(__transactions => ({ nonce: __transactions[0].nonce, transactions: __transactions }))
-        .sort((a, b) => a.nonce - b.nonce)
-    }))
+        .sort((a, b) => a.nonce - b.nonce);
+      const taskId = tasks[0].transactions[0].id;
+      console.log('tasks', tasks);
+      return {
+        taskId,
+        safeAddress: _transactions[0].safeAddress,
+        safeName: _transactions[0].safeName,
+        safeUrl: getGnosisTransactionUrl(_transactions[0].safeAddress),
+        tasks
+      };
+    })
     .sort((safeA, safeB) => safeA.safeAddress > safeB.safeAddress ? -1 : 1);
 }
 

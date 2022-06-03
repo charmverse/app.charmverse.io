@@ -1,8 +1,8 @@
 
 import { prisma } from 'db';
 import * as emails from 'lib/emails';
-import { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
-import { getPendingGnosisTasks } from 'lib/gnosis/gnosis.tasks';
+import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
+import { getPendingGnosisTasks, GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
 import * as mailer from 'lib/mailer';
 
@@ -17,6 +17,9 @@ export async function sendUserNotifications (): Promise<number> {
 
   return notificationsToSend.length;
 }
+
+// note: the email only notifies the first task of each safe
+const getTaskId = (task: GnosisSafeTasks) => task.tasks[0].transactions[0].id;
 
 export async function getNotifications (): Promise<PendingTasksProps[]> {
 
@@ -42,8 +45,24 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
 
   const notifications = await Promise.all(activeUsersWithSafes.map(async user => {
     const tasks = await getPendingGnosisTasks(user.id);
-    // myAction is undefined if we are waiting for others to sign
-    const myTasks = tasks.filter(task => Boolean(task.tasks[0].transactions[0].myAction));
+
+    const sentTasks = await prisma.userNotification.findMany({
+      where: {
+        taskId: {
+          in: tasks.map(getTaskId)
+        }
+      }
+    });
+
+    const tasksNotSent = tasks.filter(task => !sentTasks.some(t => t.taskId === getTaskId(task)));
+    const myTasks = tasksNotSent.filter(task => Boolean(task.tasks[0].transactions[0].myAction));
+
+    log.debug('Found tasks for notification', {
+      notSent: tasksNotSent.length,
+      tasks: tasks.length,
+      myTask: myTasks.length
+    });
+
     return {
       user: user as PendingTasksProps['user'],
       tasks: myTasks
@@ -56,7 +75,7 @@ export async function getNotifications (): Promise<PendingTasksProps[]> {
 async function sendNotification (notification: PendingTasksProps) {
   const template = emails.getPendingTasksEmail(notification);
   const { html, subject } = template;
-  return mailer.sendEmail({
+  const result = await mailer.sendEmail({
     to: {
       displayName: notification.user.username,
       email: notification.user.email
@@ -64,4 +83,15 @@ async function sendNotification (notification: PendingTasksProps) {
     subject,
     html
   });
+
+  // remember that we sent these tasks
+  await prisma.$transaction(notification.tasks.map(task => prisma.userNotification.create({
+    data: {
+      userId: notification.user.id,
+      taskId: getTaskId(task),
+      type: 'multisig'
+    }
+  })));
+
+  return result;
 }
