@@ -301,6 +301,9 @@ export default function GnosisTasksSection () {
         setIsLoadingSafes(false);
       }
     }
+    else {
+      alert('Please connect your Metamask wallet');
+    }
   }
 
   const safesWithTasks = tasks?.gnosis;
@@ -333,7 +336,7 @@ export default function GnosisTasksSection () {
         />
       ))}
       {safeData?.length === 0 && (
-        <GnosisConnectCard loading={!gnosisSigner || isLoadingSafes} onClick={importSafes} />
+        <GnosisConnectCard loading={isLoadingSafes} onClick={importSafes} />
       )}
     </>
   );

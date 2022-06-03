@@ -26,31 +26,32 @@ enum PermissionLevel {
 }
 
 model Space {
-  id                    String           @id @default(uuid()) @db.Uuid
-  deletedAt             DateTime?
-  createdAt             DateTime         @default(now())
-  author                User             @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdBy             String           @db.Uuid
-  updatedAt             DateTime
-  updatedBy             String           @db.Uuid
-  name                  String
-  spaceImage            String?
-  domain                String           @unique
-  discordServerId       String?
-  snapshotDomain        String?
-  defaultVotingDuration Int?
-  spaceRoles            SpaceRole[]
-  permissions           PagePermission[]
-  pages                 Page[]
-  blocks                Block[]
-  inviteLinks           InviteLink[]
-  bounties              Bounty[]
-  TokenGate             TokenGate[]
-  paymentMethods        PaymentMethod[]
-  roles                 Role[]
-  apiToken              SpaceApiToken?
-  threads               Thread[]
-  comments              Comment[]
+  id                         String              @id @default(uuid()) @db.Uuid
+  deletedAt                  DateTime?
+  createdAt                  DateTime            @default(now())
+  author                     User                @relation(fields: [createdBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdBy                  String              @db.Uuid
+  updatedAt                  DateTime
+  updatedBy                  String              @db.Uuid
+  name                       String
+  spaceImage                 String?
+  domain                     String              @unique
+  discordServerId            String?
+  snapshotDomain             String?
+  defaultVotingDuration      Int?
+  spaceRoles                 SpaceRole[]
+  permissions                PagePermission[]
+  pages                      Page[]
+  blocks                     Block[]
+  inviteLinks                InviteLink[]
+  bounties                   Bounty[]
+  TokenGate                  TokenGate[]
+  paymentMethods             PaymentMethod[]
+  roles                      Role[]
+  apiToken                   SpaceApiToken?
+  threads                    Thread[]
+  comments                   Comment[]
+  defaultPagePermissionGroup PagePermissionLevel?
 }
 
 model SpaceApiToken {

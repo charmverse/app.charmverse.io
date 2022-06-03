@@ -15,6 +15,7 @@ interface ActionUser {
 }
 
 interface SendAction {
+  deadline?: string;
   to: ActionUser;
   value: string;
   friendlyValue: string;
@@ -89,14 +90,30 @@ function getTaskDescription (transaction: GnosisTransaction): string {
   return 'N/A';
 }
 
+type PaymentAction = { decodedValue: { to: string, value: string }[] }; // TODO: find out the type and name of this action (it is used when there are multiple recipients)
+type DeadlineAction = { name: 'deadline', type: 'uint256', value: number };
+type DataAction = { name: 'data', type: 'bytes[]', value: string[] };
+type TransactionParameter = PaymentAction | DeadlineAction | DataAction;
+
 function getTaskActions (transaction: GnosisTransaction, getRecipient: (address: string) => ActionUser): SendAction[] {
   const data = transaction.dataDecoded as any | undefined;
-  const actions = data
-    ? data?.parameters[0].valueDecoded as { to: string, value: string }[]
-    : [{ to: transaction.to, value: transaction.value }];
+  const parameters: TransactionParameter[] = data?.parameters ?? [];
+  // console.log('response', transaction);
+  // console.log('data', data?.parameters);
+  const paymentActions = parameters
+    .filter((action): action is PaymentAction => !!(action as PaymentAction).decodedValue?.[0].to)
+    .map(action => action.decodedValue).flat()
+    || [];
+  // its possible for there to be data in 'valueDecoded' that is not a payment action. TODO: find out what other cases exist
+  if (paymentActions.length > 0) {
+    paymentActions.push({ to: transaction.to, value: transaction.value });
+  }
+  const deadline = parameters.find(action => (action as DeadlineAction).name === 'deadline') as DeadlineAction;
+  const deadlineValue = deadline?.value ? new Date(deadline.value * 1000).toISOString() : undefined;
 
-  return actions.map(action => ({
+  return paymentActions.map(action => ({
     value: action.value,
+    deadline: deadlineValue,
     friendlyValue: getFriendlyEthValue(action.value),
     to: getRecipient(action.to)
   }));
