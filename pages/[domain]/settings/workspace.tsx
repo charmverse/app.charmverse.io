@@ -216,15 +216,6 @@ export default function WorkspaceSettings () {
                       secondary='Cannot edit or share with others.'
                     />
                   </MenuItem>
-                  <MenuItem
-                    onClick={() => handleMenuItemClick(null)}
-                  >
-                    <StyledListItemText
-                      primary='No access'
-                      primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
-                      secondary='Remove default page permission (Full access)'
-                    />
-                  </MenuItem>
                 </Menu>
               </>
             </Box>
