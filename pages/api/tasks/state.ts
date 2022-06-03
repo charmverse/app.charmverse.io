@@ -20,14 +20,14 @@ export interface GetTasksStateResponse {
 
 async function getTasksState (req: NextApiRequest, res: NextApiResponse<GetTasksStateResponse>) {
 
-  const taskState = await prisma.userGnosisSafeState.findUnique({
+  const taskState = await prisma.userNotificationState.findUnique({
     where: {
       userId: req.session.user.id
     }
   });
 
-  const snoozedFor = taskState?.transactionsSnoozedFor ? taskState.transactionsSnoozedFor.toISOString() : null;
-  const snoozedMessage = taskState?.transactionsSnoozeMessage || null;
+  const snoozedFor = taskState?.snoozedUntil ? taskState.snoozedUntil.toISOString() : null;
+  const snoozedMessage = taskState?.snoozeMessage || null;
 
   return res.status(200).json({ snoozedFor, snoozedMessage });
 }
@@ -39,17 +39,17 @@ export interface UpdateTasksState {
 
 async function updateTasksState (req: NextApiRequest, res: NextApiResponse<{ ok: true }>) {
   const { snoozeFor, snoozeMessage } = req.body as UpdateTasksState;
-  await prisma.userGnosisSafeState.upsert({
+  await prisma.userNotificationState.upsert({
     where: {
       userId: req.session.user.id
     },
     update: {
-      transactionsSnoozedFor: snoozeFor,
-      transactionsSnoozeMessage: snoozeMessage
+      snoozedUntil: snoozeFor,
+      snoozeMessage
     },
     create: {
-      transactionsSnoozedFor: snoozeFor,
-      transactionsSnoozeMessage: snoozeMessage,
+      snoozedUntil: snoozeFor,
+      snoozeMessage,
       user: {
         connect: {
           id: req.session.user.id
