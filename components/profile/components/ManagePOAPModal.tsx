@@ -137,7 +137,9 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
                       key='hide-poap'
                     />
                   </StyledStack>
-                  <StyledImage src={poap.imageURL} />
+                  <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
+                    <StyledImage src={poap.imageURL} />
+                  </Link>
                 </StyledGridItem>
               ))}
             </Grid>
@@ -165,7 +167,9 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
                       key='show-poap'
                     />
                   </StyledStack>
-                  <StyledImage src={poap.imageURL} />
+                  <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
+                    <StyledImage src={poap.imageURL} />
+                  </Link>
                 </StyledGridItem>
               ))}
             </Grid>
