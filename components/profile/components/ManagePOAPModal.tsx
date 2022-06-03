@@ -29,9 +29,18 @@ const StyledImage = styled.img`
 const StyledGridItem = styled(Grid)`
     position: relative;
 
-    &:hover .icons-stack {
+    .icons-stack {
       display: flex;
       border-radius: 50%;
+    }
+
+    ${({ theme }) => theme.breakpoints.up('md')} {
+      .icons-stack {
+        display: none;
+     }
+     &:hover .icons-stack {
+       display: flex;
+     }
     }
 `;
 
@@ -134,12 +143,9 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
                     <ClearIcon
                       onClick={() => handleHidePoap(poap)}
                       fontSize='small'
-                      key='hide-poap'
                     />
                   </StyledStack>
-                  <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
-                    <StyledImage src={poap.imageURL} />
-                  </Link>
+                  <StyledImage src={poap.imageURL} />
                 </StyledGridItem>
               ))}
             </Grid>
@@ -164,12 +170,9 @@ function ManagePOAPModal (props: ManagePOAPModalProps) {
                     <AddIcon
                       onClick={() => handleShowPoap(poap)}
                       fontSize='small'
-                      key='show-poap'
                     />
                   </StyledStack>
-                  <Link href={`https://app.poap.xyz/token/${poap.tokenId}`} target='_blank' display='flex'>
-                    <StyledImage src={poap.imageURL} />
-                  </Link>
+                  <StyledImage src={poap.imageURL} />
                 </StyledGridItem>
               ))}
             </Grid>
