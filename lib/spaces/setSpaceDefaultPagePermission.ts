@@ -1,8 +1,12 @@
-import { PagePermissionLevel } from '@prisma/client';
+import { PagePermissionLevel, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { SpaceNotFoundError } from 'lib/public-api';
 
-export async function setSpaceDefaultPagePermission (spaceId: string, defaultPagePermissionGroup: PagePermissionLevel) {
+export async function setSpaceDefaultPagePermission ({
+  spaceId, defaultPagePermissionGroup
+}:{
+  spaceId: string, defaultPagePermissionGroup: PagePermissionLevel
+}): Promise<Space> {
   const space = await prisma.space.findUnique({
     where: {
       id: spaceId
@@ -19,9 +23,6 @@ export async function setSpaceDefaultPagePermission (spaceId: string, defaultPag
     },
     data: {
       defaultPagePermissionGroup
-    },
-    include: {
-      permissions: true
     }
   });
 }

@@ -626,7 +626,7 @@ class CharmClient {
     return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
   }
 
-  setDefaultPagePermission (spaceId: string, pagePermissionLevel: PagePermissionLevel | null) {
+  setDefaultPagePermission ({ spaceId, pagePermissionLevel }:{spaceId: string, pagePermissionLevel: PagePermissionLevel | null}) {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-default-page-permissions`, {
       pagePermissionLevel
     });

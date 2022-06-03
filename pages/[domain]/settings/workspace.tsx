@@ -22,18 +22,12 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { setTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import { permissionLevels } from 'lib/permissions/pages';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
-
-const spaceDefaultPagePermissionLabel: Record<Exclude<PagePermissionLevel, 'custom'>, string> = {
-  full_access: 'Full Access',
-  editor: 'Editor',
-  view: 'View',
-  view_comment: 'View & Comment'
-};
 
 export default function WorkspaceSettings () {
   setTitle('Workspace Options');
@@ -86,7 +80,9 @@ export default function WorkspaceSettings () {
 
   async function handleMenuItemClick (pagePermissionLevel: PagePermissionLevel | null) {
     if (space) {
-      const updatedSpace = await charmClient.setDefaultPagePermission(space.id, pagePermissionLevel);
+      const updatedSpace = await charmClient.setDefaultPagePermission({
+        spaceId: space.id, pagePermissionLevel
+      });
       setSpace(updatedSpace);
       menuState.onClose();
     }
@@ -168,7 +164,7 @@ export default function WorkspaceSettings () {
                   {...bindTrigger(popupState)}
                   endIcon={<KeyboardArrowDownIcon fontSize='small' />}
                 >
-                  {space?.defaultPagePermissionGroup ? spaceDefaultPagePermissionLabel[space.defaultPagePermissionGroup as Exclude<PagePermissionLevel, 'custom'>] : 'Full Access'}
+                  {space?.defaultPagePermissionGroup ? permissionLevels[space.defaultPagePermissionGroup as Exclude<PagePermissionLevel, 'custom'>] : 'Full Access'}
                 </Button>
                 <Menu
                   {...menuState}
