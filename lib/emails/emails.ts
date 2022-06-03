@@ -5,7 +5,7 @@ import { renderMJML } from './templates/utils';
 export function getPendingTasksEmail (props: PendingTasksProps) {
 
   const html = renderMJML(PendingTasks(props));
-  const subject = `CharmVerse: You have ${props.tasks.length} open tasks`;
+  const subject = 'CharmVerse: Your signature is required';
 
   return { html, subject };
 }

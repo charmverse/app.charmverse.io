@@ -27,7 +27,7 @@ export default function PendingTasks (props: PendingTasksProps) {
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h1>Hello {props.user.username},<br />You have {props.tasks.length} open task{props.tasks.length > 1 ? 's' : ''}</h1>
+            <h1>Hello {props.user.username},<br />Your signature is required</h1>
           </MjmlText>
 
           {props.tasks.map(task => <MultisigTask key={task.safeAddress} task={task} />)}
