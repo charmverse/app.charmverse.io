@@ -34,7 +34,7 @@ export default function EmailWrapper (props: Props) {
 
         {/* MjmlAttributes applies default attributes to MJML components */}
         <MjmlAttributes>
-          <MjmlButton font-family={fontFamily} cssClass='button' />
+          <MjmlButton cssClass='button' />
           <MjmlDivider cssClass='mjml-divider' />
           <MjmlText font-family={fontFamily} color={primaryTextColor} font-size='18px' line-height='26px' />
         </MjmlAttributes>

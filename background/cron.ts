@@ -10,4 +10,4 @@ cron.schedule('0 * * * *', archiveTask);
 
 // Cron job that runs at 12pm EST every day
 // cron.schedule('0 16 * * *', notificationTask);
-cron.schedule('*/5 * * * *', notificationTask); // every 5 minutes for testing
+cron.schedule('*/10 * * * *', notificationTask); // every 5 minutes for testing
