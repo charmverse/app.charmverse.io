@@ -1,30 +1,32 @@
 import { PagePermission, PagePermissionLevel, Space, User } from '@prisma/client';
-import { createPage, createSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { upsertPermission } from 'lib/permissions/pages/actions/upsert-permission';
-import { PagePermissionLevelType } from 'lib/permissions/pages';
 import { IPageWithPermissions, PageNotFoundError } from 'lib/pages/server';
 import { v4 } from 'uuid';
 import { ExpectedAnError } from 'testing/errors';
 import { prisma } from 'db';
 import { setupPermissionsAfterPageCreated } from '../page-created';
 
-let user: User;
+let user1: User;
 let spaceWithDefaultPagePermissionGroup: Space;
+let user2: User;
 let spaceWithoutDefaultPagePermissionGroup: Space;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated1 = await generateUserAndSpaceWithApiToken();
+  user1 = generated1.user;
   spaceWithDefaultPagePermissionGroup = await prisma.space.update({
     where: {
-      id: generated.space.id
+      id: generated1.space.id
     },
     data: {
       defaultPagePermissionGroup: 'view_comment'
     }
   });
 
-  user = generated.user;
-  spaceWithoutDefaultPagePermissionGroup = await createSpace(user.id, true);
+  const generated2 = await generateUserAndSpaceWithApiToken();
+  user2 = generated2.user;
+  spaceWithoutDefaultPagePermissionGroup = generated2.space;
 });
 
 describe('setupPermissionsAfterPageCreated', () => {
@@ -41,7 +43,7 @@ describe('setupPermissionsAfterPageCreated', () => {
   it('should assign a space default page permission to a root page if it exists', async () => {
 
     const page = await createPage({
-      createdBy: user.id,
+      createdBy: user1.id,
       spaceId: spaceWithDefaultPagePermissionGroup.id
     });
 
@@ -61,7 +63,7 @@ describe('setupPermissionsAfterPageCreated', () => {
   it('should assign full_access to a root page if it doesn\'t exists', async () => {
 
     const page = await createPage({
-      createdBy: user.id,
+      createdBy: user2.id,
       spaceId: spaceWithoutDefaultPagePermissionGroup.id
     });
 
@@ -80,14 +82,14 @@ describe('setupPermissionsAfterPageCreated', () => {
 
   it('should inherit all permissions from the parent', async () => {
     const page = await createPage({
-      createdBy: user.id,
+      createdBy: user1.id,
       spaceId: spaceWithDefaultPagePermissionGroup.id
     });
 
     const assignedPermissions = await Promise.all([
       upsertPermission(page.id, {
         permissionLevel: 'full_access',
-        userId: user.id
+        userId: user1.id
       }),
       upsertPermission(page.id, {
         permissionLevel: 'view',
@@ -96,7 +98,7 @@ describe('setupPermissionsAfterPageCreated', () => {
     ]);
 
     const childPage = await createPage({
-      createdBy: user.id,
+      createdBy: user1.id,
       spaceId: spaceWithDefaultPagePermissionGroup.id,
       parentId: page.id
     });
@@ -105,7 +107,7 @@ describe('setupPermissionsAfterPageCreated', () => {
 
     expect(childWithPermissions?.permissions.length).toBe(assignedPermissions.length);
 
-    const childInheritedUserPermission = childWithPermissions?.permissions.some(permission => permission.permissionLevel === 'full_access' && permission.userId === user.id && permission.pageId === childWithPermissions.id && permission.inheritedFromPermission === assignedPermissions[0].id);
+    const childInheritedUserPermission = childWithPermissions?.permissions.some(permission => permission.permissionLevel === 'full_access' && permission.userId === user1.id && permission.pageId === childWithPermissions.id && permission.inheritedFromPermission === assignedPermissions[0].id);
 
     const childInheritedSpacePermission = childWithPermissions?.permissions.some(permission => permission.permissionLevel === 'view' && permission.spaceId === spaceWithDefaultPagePermissionGroup.id && permission.pageId === childWithPermissions.id && permission.inheritedFromPermission === assignedPermissions[1].id);
 

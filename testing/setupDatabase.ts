@@ -58,7 +58,28 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   }
 
   if (!space) {
-    space = await createSpace(user.id, isAdmin);
+    space = await prisma.space.create({
+      data: {
+        name: 'Example space',
+        domain: v4(),
+        author: {
+          connect: {
+            id: user.id
+          }
+        },
+        updatedBy: user.id,
+        updatedAt: (new Date()).toISOString(),
+        spaceRoles: {
+          create: {
+            userId: user.id,
+            isAdmin
+          }
+        }
+      },
+      include: {
+        apiToken: true
+      }
+    });
   }
 
   const apiToken = (space as any).apiToken ?? await provisionApiKey(space.id);
@@ -68,31 +89,6 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
     space,
     apiToken
   };
-}
-
-export function createSpace (userId: string, isAdmin?: boolean) {
-  return prisma.space.create({
-    data: {
-      name: 'Example space',
-      domain: v4(),
-      author: {
-        connect: {
-          id: userId
-        }
-      },
-      updatedBy: userId,
-      updatedAt: (new Date()).toISOString(),
-      spaceRoles: {
-        create: {
-          userId,
-          isAdmin
-        }
-      }
-    },
-    include: {
-      apiToken: true
-    }
-  });
 }
 
 export function generateBounty ({ spaceId, createdBy, status, maxSubmissions, approveSubmitters }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'maxSubmissions'>>): Promise<Bounty> {
