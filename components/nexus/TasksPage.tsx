@@ -1,11 +1,12 @@
 
 import Legend from 'components/settings/Legend';
 import { useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, Divider, Grid, Typography } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPage';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
+import styled from '@emotion/styled';
 import GnosisTasksList from './GnosisTasksList';
 import TasksPageHeader from './TasksPageHeader';
 import NexusPageTitle from './components/NexusPageTitle';
@@ -43,6 +44,11 @@ const TASK_TYPES = [
   { icon: <ForumIcon />, type: 'discussion' }
 ] as const;
 
+const StyledTypography = styled(Typography)`
+  font-size: 24px;
+  font-weight: bold;
+`;
+
 export default function TasksPage () {
   const [currentTab, setCurrentTab] = useState<TaskType>('multisig');
 
@@ -50,13 +56,22 @@ export default function TasksPage () {
     <>
       <NexusPageTitle />
       <TasksPageHeader />
-      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>My tasks</span>
-        <Box display='flex' alignItems='center' gap={2}>
-          <NotifyMeButton />
-          <SnoozeButton />
-        </Box>
-      </Legend>
+      <Grid container spacing={3} sx={{ pt: 6, pb: 2 }}>
+        <Grid item xs={12} sm={6}>
+          <Box>
+            <StyledTypography>
+              My tasks
+            </StyledTypography>
+          </Box>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Box display='flex' alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }} gap={2}>
+            <NotifyMeButton />
+            <SnoozeButton />
+          </Box>
+        </Grid>
+      </Grid>
+      <Divider sx={{ mb: 2 }} />
       {/* <Tabs
         sx={tabStyles}
         textColor='primary'

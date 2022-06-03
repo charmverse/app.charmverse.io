@@ -145,6 +145,11 @@ export default function SnoozeButton () {
             disableElevation
             loading={showLoading}
             variant='outlined'
+            startIcon={(
+              <SnoozeIcon
+                fontSize='small'
+              />
+            )}
             {...bindTrigger(dateInput)}
           >
             {isSnoozed ? `Snoozed for ${snoozedForDate.toRelative({ base: (DateTime.now()) })?.slice(3)}` : 'Snooze'}
