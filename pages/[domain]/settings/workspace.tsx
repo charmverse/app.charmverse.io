@@ -1,30 +1,33 @@
-import SettingsLayout from 'components/settings/Layout';
-import { ReactElement, useState } from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import { Box, Menu, MenuItem, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { useForm } from 'react-hook-form';
+import { PagePermissionLevel } from '@prisma/client';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import PrimaryButton from 'components/common/PrimaryButton';
-import FieldLabel from 'components/common/form/FieldLabel';
-import Legend from 'components/settings/Legend';
-import Avatar from 'components/settings/workspace/LargeAvatar';
-import { setTitle } from 'hooks/usePageTitle';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FormValues, schema } from 'components/common/CreateSpaceForm';
+import FieldLabel from 'components/common/form/FieldLabel';
+import Link from 'components/common/Link';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import ConnectSnapshot from 'components/common/PageLayout/components/Header/snapshot/ConnectSnapshot';
+import PrimaryButton from 'components/common/PrimaryButton';
+import { StyledListItemText } from 'components/common/StyledListItemText';
+import SettingsLayout from 'components/settings/Layout';
+import Legend from 'components/settings/Legend';
+import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
+import Avatar from 'components/settings/workspace/LargeAvatar';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { setTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { useRouter } from 'next/router';
-import { yupResolver } from '@hookform/resolvers/yup';
-import charmClient from 'charmClient';
-import { Box, Typography } from '@mui/material';
-import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
-import Link from 'components/common/Link';
-import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import { permissionLevels } from 'lib/permissions/pages';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
-import ConnectSnapshot from 'components/common/PageLayout/components/Header/snapshot/ConnectSnapshot';
-import { Space } from '@prisma/client';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
+import { ReactElement } from 'react';
+import { useForm } from 'react-hook-form';
 
 export default function WorkspaceSettings () {
   setTitle('Workspace Options');
@@ -34,7 +37,6 @@ export default function WorkspaceSettings () {
   const [user] = useUser();
   const isAdmin = isSpaceAdmin(user, space?.id);
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
-
   const {
     register,
     handleSubmit,
@@ -70,6 +72,20 @@ export default function WorkspaceSettings () {
 
   async function deleteWorkspace () {
     workspaceRemoveModalState.open();
+  }
+
+  const popupState = usePopupState({ variant: 'popover', popupId: 'workspace-default-page-permission' });
+
+  const menuState = bindMenu(popupState);
+
+  async function handleMenuItemClick (pagePermissionLevel: PagePermissionLevel | null) {
+    if (space) {
+      const updatedSpace = await charmClient.setDefaultPagePermission({
+        spaceId: space.id, pagePermissionLevel
+      });
+      setSpace(updatedSpace);
+      menuState.onClose();
+    }
   }
 
   return (
@@ -136,6 +152,80 @@ export default function WorkspaceSettings () {
         <ImportNotionWorkspace />
       </Box>
 
+      {
+        isAdmin ? (
+          <>
+            <Legend helperText='Default permission for new pages and boards across the workspace.'>Default Workspace Permission</Legend>
+            <Box sx={{ ml: 1 }}>
+              <>
+                <Button
+                  color='secondary'
+                  variant='outlined'
+                  {...bindTrigger(popupState)}
+                  endIcon={<KeyboardArrowDownIcon fontSize='small' />}
+                >
+                  {space?.defaultPagePermissionGroup ? permissionLevels[space.defaultPagePermissionGroup as Exclude<PagePermissionLevel, 'custom'>] : 'Full Access'}
+                </Button>
+                <Menu
+                  {...menuState}
+                  PaperProps={{
+                    sx: { width: 300 }
+                  }}
+                >
+                  <MenuItem
+                    selected={space?.defaultPagePermissionGroup === 'full_access'}
+                    onClick={() => handleMenuItemClick('full_access')}
+                  >
+                    <StyledListItemText
+                      primary='Full Access'
+                      secondary='Can edit and share with others.'
+                    />
+                  </MenuItem>
+
+                  <MenuItem
+                    selected={space?.defaultPagePermissionGroup === 'editor'}
+                    onClick={() => handleMenuItemClick('editor')}
+                  >
+                    <StyledListItemText
+                      primary='Editor'
+                      secondary='Can edit but not share with others.'
+                    />
+                  </MenuItem>
+
+                  <MenuItem
+                    selected={space?.defaultPagePermissionGroup === 'view_comment'}
+                    onClick={() => handleMenuItemClick('view_comment')}
+                  >
+                    <StyledListItemText
+                      primary='View & Comment'
+                      secondary='Can view and comment, but not edit.'
+                    />
+                  </MenuItem>
+
+                  <MenuItem
+                    selected={space?.defaultPagePermissionGroup === 'view'}
+                    onClick={() => handleMenuItemClick('view')}
+                  >
+                    <StyledListItemText
+                      primary='View'
+                      secondary='Cannot edit or share with others.'
+                    />
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => handleMenuItemClick(null)}
+                  >
+                    <StyledListItemText
+                      primary='No access'
+                      primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
+                      secondary='Remove default page permission (Full access)'
+                    />
+                  </MenuItem>
+                </Menu>
+              </>
+            </Box>
+          </>
+        ) : null
+      }
       <Legend>Snapshot.org Integration</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ConnectSnapshot />

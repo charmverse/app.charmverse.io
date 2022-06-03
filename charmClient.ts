@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
-  Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole, UserDetails
+  Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole, UserDetails, PagePermissionLevel
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
@@ -624,6 +624,12 @@ class CharmClient {
 
   updateSnapshotConnection (spaceId: string, data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>): Promise<Space> {
     return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
+  }
+
+  setDefaultPagePermission ({ spaceId, pagePermissionLevel }:{spaceId: string, pagePermissionLevel: PagePermissionLevel | null}) {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-default-page-permissions`, {
+      pagePermissionLevel
+    });
   }
 
   updatePageSnapshotData (pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {

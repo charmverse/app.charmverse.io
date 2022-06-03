@@ -5,7 +5,6 @@ import Button from 'components/common/Button';
 import CheckIcon from '@mui/icons-material/Check';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
@@ -14,6 +13,7 @@ import { Contributor } from 'models';
 import getDisplayName from 'lib/users/getDisplayName';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import useENSName from 'hooks/useENSName';
+import { StyledListItemText } from 'components/common/StyledListItemText';
 
 export const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
@@ -21,20 +21,6 @@ export const StyledRow = styled(Box)`
   align-items: center;
   justify-content: space-between;
 `;
-
-function StyledListItemText (props: any) {
-  return (
-    <ListItemText
-      primaryTypographyProps={{
-        fontWeight: 500
-      }}
-      secondaryTypographyProps={{
-        sx: { whiteSpace: 'normal' }
-      }}
-      {...props}
-    />
-  );
-}
 
 const roleActions = ['makeAdmin', 'makeContributor', 'removeFromSpace'] as const;
 export type RoleAction = typeof roleActions[number];
@@ -107,8 +93,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
               {actions.map((action) => (
                 <MenuItem
                   key={action}
-                // selected={index === selectedIndex}
-                  onClick={(event) => handleMenuItemClick(action)}
+                  onClick={() => handleMenuItemClick(action)}
                 >
                   {action === 'makeAdmin' && (
                   <StyledListItemText
