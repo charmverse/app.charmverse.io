@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Check, Close } from '@mui/icons-material';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { Box, InputAdornment, Stack } from '@mui/material';
@@ -22,7 +23,14 @@ export const schema = yup.object({
     .max(50)
     .matches(/^[a-zA-Z0-9-]+$/g, 'Only alphanumeric characters and hyphens are allowed')
     // eslint-disable-next-line no-template-curly-in-string
-    .test('isAvailable', '${path} is already taken', debouncedValidate)
+    .test('isAvailable', '${path} is already taken', async (value) => {
+      const result = await debouncedValidate(value);
+      // debouncedValidate will return undefined if it is being debounced
+      if (typeof result === 'boolean') {
+        return result;
+      }
+      return true;
+    })
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -41,11 +49,13 @@ export default function UserPathModal (props: Props) {
     register,
     reset,
     handleSubmit,
+    watch,
     formState: { errors }
   } = useForm<FormValues>({
     defaultValues: {
       path: currentValue || ''
     },
+    mode: 'onChange',
     resolver: yupResolver(schema)
   });
 
@@ -60,6 +70,17 @@ export default function UserPathModal (props: Props) {
   }
 
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
+  const pathValue = watch('path');
+
+  let statusIcon = null;
+  if (pathValue) {
+    if (errors.path) {
+      statusIcon = <Close color='error' />;
+    }
+    else {
+      statusIcon = <Check color='success' />;
+    }
+  }
 
   return (
     <Modal
@@ -73,14 +94,15 @@ export default function UserPathModal (props: Props) {
           <TextField
             {...register('path')}
             InputProps={{
-              startAdornment: <InputAdornment position='start'>{hostname}/</InputAdornment>
+              startAdornment: <InputAdornment position='start'>{hostname}/</InputAdornment>,
+              endAdornment: <InputAdornment position='end'>{statusIcon}</InputAdornment>
             }}
             fullWidth
             error={!!errors.path}
-            helperText={errors.path?.message}
+            helperText={errors.path?.message || ' '}
             placeholder='awesome-bot'
           />
-          <Box mt={4} sx={{ display: 'flex' }}>
+          <Box mt={2} sx={{ display: 'flex' }}>
             <Button disabled={!!errors.path} type='submit'>
               Save
             </Button>
