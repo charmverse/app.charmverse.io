@@ -1,9 +1,8 @@
 import { Button, TextField } from '@mui/material';
 import { Box } from '@mui/system';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 
 interface IFrameSelectorProps {
   onIFrameSelect: (videoSrc: string) => void
@@ -15,14 +14,9 @@ interface IFrameSelectorProps {
 export default function IFrameSelector (props: IFrameSelectorProps) {
   const [embedLink, setEmbedLink] = useState('');
   const { type, tabs = [], children, onIFrameSelect } = props;
-  const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
-  useEffect(() => {
-    popupState.open();
-  }, []);
 
   return (
     <PopperPopup
-      popupState={popupState}
       popupContent={(
         <Box sx={{
           width: 750
