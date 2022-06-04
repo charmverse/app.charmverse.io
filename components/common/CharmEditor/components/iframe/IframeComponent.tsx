@@ -164,6 +164,8 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
   const [height, setHeight] = useState(node.attrs.height);
   const view = useEditorViewContext();
 
+  console.log('node attrs', node.attrs);
+
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return readOnly ? <EmptyIframeContainer type={node.attrs.type} readOnly={readOnly} /> : (
@@ -222,6 +224,7 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
     );
   }
   else {
+    console.log('node attrs', node.attrs);
     return (
       <Resizable
         aspectRatio={VIDEO_ASPECT_RATIO}
