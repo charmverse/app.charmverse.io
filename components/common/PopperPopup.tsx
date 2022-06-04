@@ -19,7 +19,9 @@ export default function PopperPopup (props: PopperPopupProps) {
   useEffect(() => {
     if (toggleRef.current) {
       popupState.setAnchorEl(toggleRef.current);
-      popupState.open();
+      setTimeout(() => {
+        popupState.open();
+      });
     }
   }, [toggleRef]);
 
