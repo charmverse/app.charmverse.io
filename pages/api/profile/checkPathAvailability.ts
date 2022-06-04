@@ -16,7 +16,8 @@ export async function checkPathExists (req: NextApiRequest, res: NextApiResponse
   const existing = await prisma.user.findUnique({
     where: {
       path
-    }
+    },
+    select: { id: true }
   });
 
   const ownedByMe = existing?.id === req.session.user.id;
