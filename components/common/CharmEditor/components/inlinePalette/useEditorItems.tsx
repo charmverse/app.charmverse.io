@@ -270,8 +270,8 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
               view
             );
           }
+          return false;
         };
-        return false;
       }
     },
     {
