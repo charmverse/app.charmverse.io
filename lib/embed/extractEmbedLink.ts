@@ -17,7 +17,6 @@ export function extractEmbedLink (url: string) {
       embedUrl += `?start=${urlSearchParams.get('t')}`;
     }
   }
-
   else if (isIframeEmbed) {
     const indexOfSrc = url.indexOf('src');
     const indexOfFirstQuote = url.indexOf('"', indexOfSrc);
