@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import styled from '@emotion/styled';
 import { Box, Divider, Grid, Link as ExternalLink, Stack, SvgIcon, Typography, Tooltip } from '@mui/material';
 import { User } from '@prisma/client';
@@ -18,7 +18,6 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import { LoggedInUser, IDENTITY_TYPES, IdentityType } from 'models';
 import { useWeb3React } from '@web3-react/core';
-import { getDisplayName } from 'lib/users';
 import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { shortenHex } from 'lib/utilities/strings';
@@ -44,7 +43,7 @@ const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => us
 export default function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const { account } = useWeb3React();
 
-  const { data: userDetails, mutate } = useSWR(`/userDetails/${user.id}`, () => {
+  const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}`, () => {
     return isPublicUser(user) ? user.profile : charmClient.getUserDetails();
   });
 
@@ -56,8 +55,6 @@ export default function UserDetails ({ readOnly, user, updateUser }: UserDetails
   const userPathModalState = usePopupState({ variant: 'popover', popupId: 'path-modal' });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
   const socialModalState = usePopupState({ variant: 'popover', popupId: 'social-modal' });
-
-  const userName = ENSName || (user ? getDisplayName(user) : '');
 
   const onDiscordUsernameCopy = () => {
     setIsDiscordUsernameCopied(true);
