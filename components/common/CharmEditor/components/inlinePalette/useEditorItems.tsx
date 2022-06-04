@@ -214,17 +214,12 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
 
-            const node = _state.schema.nodes.paragraph.create(
-              undefined,
-              Fragment.fromArray([
-                _state.schema.nodes.iframe.create({
-                  src: null,
-                  type: 'video',
-                  width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
-                  height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
-                })
-              ])
-            );
+            const node = _state.schema.nodes.iframe.create({
+              src: null,
+              type: 'video',
+              width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
+              height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
+            });
 
             if (_dispatch && isAtBeginningOfLine(_state)) {
               _dispatch(_state.tr.replaceSelectionWith(node));

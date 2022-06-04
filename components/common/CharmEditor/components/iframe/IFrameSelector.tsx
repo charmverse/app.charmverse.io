@@ -2,7 +2,6 @@ import { Button, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
-import Snackbar from 'components/common/Snackbar';
 import { ReactNode, useState } from 'react';
 
 interface IFrameSelectorProps {
@@ -33,7 +32,12 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
               alignItems: 'center'
             }}
             >
-              <TextField autoFocus placeholder={`Paste the ${type} link...`} value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
+              <TextField
+                autoFocus
+                placeholder={`Paste the ${type} link...`}
+                value={embedLink}
+                onChange={(e) => setEmbedLink(e.target.value)}
+              />
               <Button
                 disabled={!embedLink}
                 sx={{

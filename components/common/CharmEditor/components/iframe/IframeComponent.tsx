@@ -10,10 +10,10 @@ import { Box } from '@mui/system';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT, VIDEO_ASPECT_RATIO, MIN_EMBED_WIDTH } from 'lib/embed/constants';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 import { HTMLAttributes, useState, memo } from 'react';
-import BlockAligner from './BlockAligner';
+import BlockAligner from '../BlockAligner';
 import IFrameSelector from './IFrameSelector';
-import Resizable from './Resizable';
-import VerticalResizer from './Resizable/VerticalResizer';
+import Resizable from '../Resizable';
+import VerticalResizer from '../Resizable/VerticalResizer';
 
 const name = 'iframe';
 
