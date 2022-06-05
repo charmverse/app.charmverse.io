@@ -6,7 +6,7 @@ import { PageContent } from 'models/Page';
 import { findChildrenByType } from 'prosemirror-utils';
 import { IPageWithPermissions } from './interfaces';
 
-export async function fetchLinkedPages (pageId: string, spaceId: string) {
+export async function fetchLinkedPages (pageId: string, spaceId: string, existingPageIds?: Set<string>) {
   const page = await charmClient.getPage(pageId, spaceId);
   const state = new BangleEditorState({
     specRegistry,
@@ -14,7 +14,7 @@ export async function fetchLinkedPages (pageId: string, spaceId: string) {
   });
   const nestedPageNode = state.specRegistry.schema.nodes.page;
   const nodes = findChildrenByType(state.pmState.doc, nestedPageNode).map(({ node: _node }) => _node);
-  const pageIdsToBeFetched = nodes.map(node => node.attrs.id);
+  const pageIdsToBeFetched = nodes.map(node => node.attrs.id).filter(_pageId => existingPageIds ? !existingPageIds.has(_pageId) : true);
   const fetchedLinkedPages: IPageWithPermissions[] = [];
 
   if (pageIdsToBeFetched.length !== 0) {

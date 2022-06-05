@@ -95,41 +95,31 @@ export default function EditorPage (
       if (pageId && shouldLoadPublicPage) {
         loadPublicPage(pageId as string);
       }
-      else if (pageId && pagesLoaded) {
-        const pageByPath = pages[pageId];
-        // If the page exist in the state
-        if (pageByPath) {
-          setTitleState(pageByPath.title);
-          onPageLoad?.(pageByPath.id);
-        }
-        else if (space) {
-          try {
-            // This might be an archived page, so fetch all the linked pages inside the current page's document
-            const { linkedPages, rootPage } = await fetchLinkedPages(pageId, space.id);
-            // If no root page exist then it couldn't be fetched either it doesn't exist or you dont have permission to view it
-            if (rootPage) {
-              const fetchedPagesRecord: Record<string, IPageWithPermissions> = {};
-              linkedPages.forEach(linkedPage => {
-                fetchedPagesRecord[linkedPage.id] = linkedPage;
-              });
-              setPages((_pages) => ({ ..._pages, ...fetchedPagesRecord }));
-              setPageNotFound(false);
-              onPageLoad?.(rootPage.id);
-            }
-            else {
-              setPageNotFound(true);
-            }
+      else if (pageId && pagesLoaded && space) {
+        try {
+          // Creating a set of existing page ids in state
+          const pageIdsSet = new Set(Object.keys(pages));
+          const { linkedPages, rootPage } = await fetchLinkedPages(pageId, space.id, pageIdsSet);
+          // If no root page exist then it couldn't be fetched either it doesn't exist or you dont have permission to view it
+          if (rootPage) {
+            const fetchedPagesRecord: Record<string, IPageWithPermissions> = {};
+            linkedPages.forEach(linkedPage => {
+              fetchedPagesRecord[linkedPage.id] = linkedPage;
+            });
+            setPages((_pages) => ({ ..._pages, ...fetchedPagesRecord }));
+            setPageNotFound(false);
+            onPageLoad?.(rootPage.id);
           }
-          catch (err: any) {
-            // An error will be thrown if page doesn't exist or if you dont have read permission for the page
-            if (err.errorType === 'Access denied') {
-              setIsAccessDenied(true);
-            }
-            // If the page doesn't exist an error will be thrown
+          else {
             setPageNotFound(true);
           }
         }
-        else {
+        catch (err: any) {
+          // An error will be thrown if page doesn't exist or if you dont have read permission for the page
+          if (err.errorType === 'Access denied') {
+            setIsAccessDenied(true);
+          }
+          // If the page doesn't exist an error will be thrown
           setPageNotFound(true);
         }
       }
