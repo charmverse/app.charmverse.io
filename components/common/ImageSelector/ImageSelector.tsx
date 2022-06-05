@@ -7,12 +7,13 @@ import { ReactNode, useState } from 'react';
 import ImageSelectorGallery from './ImageSelectorGallery';
 
 interface ImageSelectorProps {
+  autoOpen?: boolean;
   onImageSelect: (imageSrc: string) => void
   children: ReactNode
   galleryImages?: { [category: string]: string[] }
 }
 
-export default function ImageSelector ({ children, galleryImages, onImageSelect }: ImageSelectorProps) {
+export default function ImageSelector ({ autoOpen = false, children, galleryImages, onImageSelect }: ImageSelectorProps) {
   const [embedLink, setEmbedLink] = useState('');
   const tabs: [string, ReactNode][] = [];
 
@@ -28,7 +29,7 @@ export default function ImageSelector ({ children, galleryImages, onImageSelect 
 
   return (
     <PopperPopup
-      autoOpen
+      autoOpen={autoOpen}
       popupContent={(
         <Box sx={{
           width: 750
