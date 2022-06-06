@@ -92,6 +92,7 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
       canDrop: monitor.canDrop()
     })
   }));
+
   const theme = useTheme();
   const isActive = canDrop && isOverCurrent;
   return (
@@ -139,14 +140,12 @@ function PageNavigation ({
     }));
 
   const pageHash = JSON.stringify(pagesArray);
-  // console.log(pageHash);
 
   const mappedItems = useMemo(() => {
     return mapTree(pagesArray, 'parentId', rootPageIds);
   }, [pageHash, rootPageIds]);
 
   const onDropAdjacent = useCallback((droppedItem: ParentMenuNode, containerItem: MenuNode) => {
-
     if (droppedItem.id === containerItem?.id) {
       return;
     }
@@ -154,12 +153,17 @@ function PageNavigation ({
     const parentId = containerItem.parentId;
 
     setPages(_pages => {
-      const siblings = Object.values(_pages).filter(isTruthy).filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
-      const originIndex = siblings.findIndex((page) => page.id === containerItem.id);
+      const siblings = Object.values(_pages).filter(isTruthy)
+        .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id)
+        .sort((s1, s2) => s1.index > s2.index ? 1 : -1);
+
       const droppedPage = _pages[droppedItem.id];
       if (!droppedPage) {
         throw new Error('canot find dropped page');
       }
+      const isDraggingDown: boolean = droppedPage.index > containerItem.index;
+      let originIndex = isDraggingDown ? containerItem.index : containerItem.index - 1;
+      originIndex = Math.max(originIndex, 0);
       siblings.splice(originIndex, 0, droppedPage);
       siblings.forEach((page, _index) => {
         page.index = _index;
@@ -201,6 +205,7 @@ function PageNavigation ({
       index, // send it to the end
       parentId
     });
+
     setPages(_pages => ({
       ..._pages,
       [droppedItem.id]: {
