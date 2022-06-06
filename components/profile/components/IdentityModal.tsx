@@ -1,7 +1,7 @@
 import { useState, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import Link from 'next/link';
-import { Box, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import Button from 'components/common/Button';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import DiscordIcon from 'public/images/discord_logo.svg';
@@ -95,9 +95,12 @@ function IdentityModal (props: IdentityModalProps) {
               useIntegration={save}
               actions={
                 item.type === IDENTITY_TYPES[3] ? [
-                  <IconButton onClick={() => setGeneratedName(randomName())}>
-                    <RefreshIcon />
-                  </IconButton>] : []
+                  <Tooltip arrow placement='top' title='Regenerate'>
+                    <IconButton onClick={() => setGeneratedName(randomName())}>
+                      <RefreshIcon fontSize='small' />
+                    </IconButton>
+                  </Tooltip>] : []
+
               }
               key={item.type}
             />
