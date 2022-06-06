@@ -159,7 +159,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
             </IconButton>
           </Link>
         </Box>
-        <BountyStatusChipWithIcon showIcon={true} status={bounty.status} />
+        <BountyStatusChipWithIcon status={bounty.status} />
       </Box>
     );
   }
