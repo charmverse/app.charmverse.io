@@ -43,7 +43,6 @@ export function plugins ({ key }: { key: PluginKey }) {
         view.dom.parentNode?.appendChild(tooltipDOM);
 
         function onMouseOver (e: MouseEventInit) {
-
           // @ts-ignore
           const containerXOffset = e.target.getBoundingClientRect().left;
           const clientX = e.clientX!;
