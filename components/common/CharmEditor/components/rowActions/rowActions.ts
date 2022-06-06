@@ -43,16 +43,6 @@ export function plugins ({ key }: { key: PluginKey }) {
         view.dom.parentNode?.appendChild(tooltipDOM);
 
         function onMouseOver (e: MouseEventInit) {
-          const isEditorEmpty = Boolean(document.querySelector('.empty-editor'));
-          const rowHandleElement = document.querySelector('.row-handle') as HTMLDivElement;
-          if (rowHandleElement) {
-            if (!isEditorEmpty) {
-              rowHandleElement.style.display = 'initial';
-            }
-            else {
-              rowHandleElement.style.display = 'none';
-            }
-          }
           // @ts-ignore
           const containerXOffset = e.target.getBoundingClientRect().left;
           const clientX = e.clientX!;

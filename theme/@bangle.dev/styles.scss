@@ -479,8 +479,13 @@ details {
   position: relative;
 }
 
+.empty-editor .row-handle {
+  display: none;
+}
+
 // handles on the side of each row
 .row-handle {
+  display: initial;
   cursor: pointer;
   left: 20px;
   top: -1000px;
