@@ -731,11 +731,12 @@ class Mutator {
     ): Promise<[Block[], string]> {
         const blocks = await charmClient.getSubtree(cardId, 2)
         const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [Block[], Card, Record<string, string>]
+
         const newBlocks = newBlocks1.filter((o) => o.type !== 'comment')
         Utils.log(`duplicateCard: duplicating ${newBlocks.length} blocks`)
         if (asTemplate === newCard.fields.isTemplate) {
             // Copy template
-            newCard.title = `${newCard.title} copy`
+            newCard.title = `${cardPage.title} copy`
         } else if (asTemplate) {
             // Template from card
             newCard.title = 'New card template'
