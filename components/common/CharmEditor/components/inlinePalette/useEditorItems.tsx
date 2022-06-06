@@ -212,32 +212,31 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
       description: 'Insert a video block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
-          rafCommandExec(view!, (_state, _dispatch) => {
+          if (view) {
+            rafCommandExec(view, (_state, _dispatch) => {
 
-            const node = _state.schema.nodes.paragraph.create(
-              undefined,
-              Fragment.fromArray([
-                _state.schema.nodes.iframe.create({
-                  src: null,
-                  type: 'video',
-                  width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
-                  height: ((MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2) / VIDEO_ASPECT_RATIO
-                })
-              ])
+              const node = _state.schema.nodes.iframe.create({
+                src: null,
+                type: 'video',
+                width: MAX_EMBED_WIDTH,
+                height: MAX_EMBED_WIDTH / VIDEO_ASPECT_RATIO
+              });
+
+              if (_dispatch && isAtBeginningOfLine(_state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node));
+                return true;
+              }
+
+              return insertNode(_state, _dispatch, node);
+            });
+
+            return replaceSuggestionMarkWith(palettePluginKey, '')(
+              state,
+              dispatch,
+              view
             );
-
-            if (_dispatch && isAtBeginningOfLine(_state)) {
-              _dispatch(_state.tr.replaceSelectionWith(node));
-              return true;
-            }
-
-            return insertNode(_state, _dispatch, node);
-          });
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          }
+          return false;
         };
       }
     },
@@ -249,31 +248,29 @@ const paletteGroupItemsRecord: Record<string, Omit<PaletteItemType, 'group'>[]> 
       description: 'Insert an embed block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
-          rafCommandExec(view!, (_state, _dispatch) => {
+          if (view) {
+            rafCommandExec(view, (_state, _dispatch) => {
 
-            const node = _state.schema.nodes.paragraph.create(
-              undefined,
-              Fragment.fromArray([
-                _state.schema.nodes.iframe.create({
-                  src: null,
-                  type: 'embed',
-                  width: MAX_EMBED_WIDTH,
-                  height: MIN_EMBED_HEIGHT
-                })
-              ])
+              const node = _state.schema.nodes.iframe.create({
+                src: null,
+                type: 'embed',
+                width: MAX_EMBED_WIDTH,
+                height: MIN_EMBED_HEIGHT
+              });
+
+              if (_dispatch && isAtBeginningOfLine(_state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node));
+                return true;
+              }
+              return insertNode(_state, _dispatch, node);
+            });
+            return replaceSuggestionMarkWith(palettePluginKey, '')(
+              state,
+              dispatch,
+              view
             );
-
-            if (_dispatch && isAtBeginningOfLine(_state)) {
-              _dispatch(_state.tr.replaceSelectionWith(node));
-              return true;
-            }
-            return insertNode(_state, _dispatch, node);
-          });
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          }
+          return false;
         };
       }
     },

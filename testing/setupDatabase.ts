@@ -1,10 +1,10 @@
-import { Application, ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Transaction } from '@prisma/client';
+import { ApplicationStatus, Block, Bounty, BountyStatus, Page, Prisma, Space, SpaceApiToken, Transaction } from '@prisma/client';
 import { prisma } from 'db';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
+import { IPageWithPermissions } from 'lib/pages';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { LoggedInUser, IDENTITY_TYPES, BountyWithDetails } from 'models';
+import { BountyWithDetails, IDENTITY_TYPES, LoggedInUser } from 'models';
 import { v4 } from 'uuid';
-import { IPageWithPermissions } from 'lib/pages/server';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
   return prisma.user.create({

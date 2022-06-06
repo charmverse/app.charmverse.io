@@ -1,7 +1,7 @@
 
 import {
   Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
-  Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole, UserDetails
+  Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole, UserDetails, PagePermissionLevel
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
 import { IPagePermissionFlags, IPagePermissionToCreate, IPagePermissionUserRequest, IPagePermissionWithAssignee, IPagePermissionWithSource } from 'lib/permissions/pages/page-permission-interfaces';
@@ -17,6 +17,7 @@ import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtil
 import { InviteLinkPopulated } from 'pages/api/invites/index';
 import { FiatCurrency, IPairQuote } from 'models/Currency';
 import type { FailedImportsError } from 'lib/notion/types';
+import { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
 // TODO: Maybe move these types to another place so that we dont import from backend
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
@@ -30,13 +31,14 @@ import { TokenGateWithRoles } from 'pages/api/token-gates';
 import { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import { ListSpaceRolesResponse } from 'pages/api/roles';
 import { ReviewDecision, SubmissionContent, SubmissionCreationData } from 'lib/applications/interfaces';
-import { UpdateGnosisSafeState } from 'pages/api/profile/gnosis-safes/state';
-import { GetTasksResponse } from 'pages/api/tasks';
+import { UpdateTasksState, GetTasksStateResponse } from 'pages/api/tasks/state';
+import { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { PublicSpaceInfo } from 'lib/spaces/interfaces';
 import { ApplicationWithTransactions } from 'lib/applications/actions';
 import { TransactionCreationData } from 'lib/transactions/interface';
 import { PublicUser } from 'pages/api/public/profile/[userPath]';
+import { SuggestionAction } from 'lib/bounties';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -77,8 +79,20 @@ class CharmClient {
     return http.PUT<LoggedInUser>('/api/profile', data);
   }
 
+  checkNexusPath (path: string) {
+    return http.GET<{ available: boolean }>('/api/profile/checkPathAvailability', { path });
+  }
+
   getUserDetails () {
     return http.GET<UserDetails>('/api/profile/details');
+  }
+
+  getUserPoaps () {
+    return http.GET<GetPoapsResponse>('/api/profile/poaps');
+  }
+
+  updateUserPoaps (data: UpdatePoapsRequest) {
+    return http.PUT<GetPoapsResponse>('/api/profile/poaps', data);
   }
 
   updateUserDetails (data: Partial<UserDetails>) {
@@ -166,10 +180,6 @@ class CharmClient {
 
   updatePage (pageOpts: Prisma.PageUpdateInput) {
     return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
-  }
-
-  updateGnosisSafeState (payload: UpdateGnosisSafeState) {
-    return http.PUT('/api/profile/gnosis-safes/state', payload);
   }
 
   favoritePage (pageId: string) {
@@ -397,6 +407,10 @@ class CharmClient {
     return data;
   }
 
+  async reviewBountySuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | {success: true}> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/review-suggestion`, { decision });
+  }
+
   async getBounty (bountyId: string): Promise<BountyWithDetails> {
 
     const data = await http.GET<BountyWithDetails>(`/api/bounties/${bountyId}`);
@@ -548,8 +562,16 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
+  getTasksState (): Promise<GetTasksStateResponse> {
+    return http.GET('/api/tasks/state');
+  }
+
+  updateTasksState (payload: UpdateTasksState) {
+    return http.PUT('/api/tasks/state', payload);
+  }
+
   getTasks (): Promise<GetTasksResponse> {
-    return http.GET('/api/tasks');
+    return http.GET('/api/tasks/list');
   }
 
   createRole (role: Partial<Role>): Promise<Role> {
@@ -625,6 +647,12 @@ class CharmClient {
 
   updateSnapshotConnection (spaceId: string, data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>): Promise<Space> {
     return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
+  }
+
+  setDefaultPagePermission ({ spaceId, pagePermissionLevel }:{spaceId: string, pagePermissionLevel: PagePermissionLevel | null}) {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-default-page-permissions`, {
+      pagePermissionLevel
+    });
   }
 
   updatePageSnapshotData (pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {

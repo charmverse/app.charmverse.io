@@ -21,6 +21,7 @@ const ModalContainer = styled.div<{ size: ModalSize }>`
   box-shadow: ${({ theme }) => theme.shadows[15]};
   padding: ${({ theme }) => theme.spacing(4)};
   max-height: calc(80vh - ${({ theme }) => theme.spacing(4)});
+  max-width: 100%;
   overflow-y: auto;
 `;
 
@@ -60,7 +61,7 @@ export function Modal ({ children, size = defaultSize, title, ...props }: ModalP
   return (
     <MuiModal {...props}>
       <div>
-        <ModalContainer size={size}>
+        <ModalContainer size={size} className='modal-container'>
           {title && <DialogTitle onClose={props.onClose}>{title}</DialogTitle>}
           {children}
         </ModalContainer>

@@ -7,6 +7,7 @@ import { Modal } from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import charmClient from 'charmClient';
 import BountyModal from '../components/BountyModal';
 import BountyDelete from './BountyDelete';
 
@@ -17,7 +18,7 @@ interface Props {
 export default function BountySuggestionApproval ({ bounty }: Props) {
 
   const isAdmin = useIsAdmin();
-  const { updateBounty } = useBounties();
+  const { refreshBounty } = useBounties();
 
   const bountyApproveModal = usePopupState({ variant: 'popover', popupId: 'approve-bounty' });
   const bountyDeleteModal = usePopupState({ variant: 'popover', popupId: 'delete-bounty-suggestion' });
@@ -29,7 +30,11 @@ export default function BountySuggestionApproval ({ bounty }: Props) {
   const approvableBounty = userCanDecideOnSuggestion && bounty.rewardAmount > 0;
 
   async function approveBountySuggestion () {
-    await updateBounty(bounty.id, { status: 'open' });
+    await charmClient.reviewBountySuggestion({
+      bountyId: bounty.id,
+      decision: 'approve'
+    });
+    refreshBounty(bounty.id);
     bountyApproveModal.close();
   }
 

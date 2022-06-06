@@ -31,7 +31,7 @@ export function requireKeys<T> (keys: Array<keyof T>, location: 'body' | 'query'
       if (!(key in toVerify)) {
         throw new ApiError({
           errorType: 'Invalid input',
-          message: `Key ${key} is required in request ${location} and must not be an empty value`
+          message: `Key ${key as string} is required in request ${location} and must not be an empty value`
         });
       }
     }

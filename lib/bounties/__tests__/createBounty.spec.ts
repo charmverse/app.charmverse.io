@@ -1,13 +1,12 @@
 
-import { Bounty, PageOperations, PagePermissionLevel, Space, User } from '@prisma/client';
-import { computeUserPagePermissions, permissionTemplates, upsertPermission } from 'lib/permissions/pages';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+import { Bounty, Space, User } from '@prisma/client';
+import { InvalidInputError } from 'lib/utilities/errors/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors/errors';
-import { createBounty } from '../createBounty';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { v4 } from 'uuid';
 import { PositiveNumbersOnlyError } from '../../utilities/errors/numbers';
+import { createBounty } from '../createBounty';
+import { BountyCreationData } from '../interfaces';
 
 let user: User;
 let space: Space;
@@ -37,6 +36,32 @@ describe('createBounty', () => {
         suggestedBy: expect.stringContaining(user.id)
       })
     );
+
+  });
+
+  it('should accept as creation input: title, spaceId, createdBy, status, chainId, description, descriptionNodes, approveSubmitters, maxSubmissions, rewardAmount, rewardToken, reviewer, linkedTaskId', async () => {
+
+    const fullBountyCreationData: BountyCreationData = {
+      createdBy: user.id,
+      spaceId: space.id,
+      title: 'Testing this works',
+      approveSubmitters: true,
+      chainId: 1,
+      description: 'Example description',
+      descriptionNodes: '{type:"doc"}',
+      linkedTaskId: v4(),
+      maxSubmissions: 100,
+      reviewer: user.id,
+      rewardAmount: 1000,
+      rewardToken: 'ETH',
+      status: 'suggestion'
+    };
+
+    const bounty = await createBounty(fullBountyCreationData);
+
+    Object.entries(fullBountyCreationData).forEach(([key, value]) => {
+      expect(bounty[key as keyof BountyCreationData]).toBe(value);
+    });
 
   });
 

@@ -39,7 +39,7 @@ import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList, nestedPageSpec } from './components/nestedPage';
 import Placeholder from './components/Placeholder';
 import Quote, * as quote from './components/quote';
-import ResizableIframe, { iframeSpec } from './components/ResizableIframe';
+import * as iframe from './components/iframe';
 import ResizableImage, { imageSpec } from './components/ResizableImage';
 import * as trailingNode from './components/trailingNode';
 import * as tabIndent from './components/tabIndent';
@@ -87,7 +87,7 @@ export const specRegistry = new SpecRegistry([
   mentionSpecs(), // NO
   code.spec(), // OK
   codeBlock.spec(), // OK
-  iframeSpec(), // OK
+  iframe.spec(), // OK
   heading.spec(), // OK
   inlinePaletteSpecs(), // Not required
   callout.spec(), // OK
@@ -440,7 +440,7 @@ function CharmEditor (
           }
           case 'iframe': {
             return (
-              <ResizableIframe
+              <iframe.Component
                 readOnly={readOnly}
                 onResizeStop={onResizeStop}
                 {...props}

@@ -24,11 +24,6 @@ const config = {
         source: '/:domain/settings',
         destination: '/:domain/settings/workspace',
         permanent: false
-      },
-      {
-        source: '/profile',
-        destination: '/profile/tasks',
-        permanent: false
       }
     ];
   },
@@ -44,7 +39,7 @@ const config = {
         return entry().then(_entry => {
           return {
             ..._entry,
-            deleteArchived: './background/deleteArchived.ts'
+            cron: './background/cron.ts'
           };
         });
       };

@@ -149,12 +149,14 @@ function ResizableImage ({ readOnly, onResizeStop, node, updateAttrs, selected }
     }
     else {
       return (
-        <ImageSelector onImageSelect={async (imageSrc) => {
-          // const image = await imagePromise(imageSrc);
-          updateAttrs({
-            src: imageSrc
-          });
-        }}
+        <ImageSelector
+          autoOpen={true}
+          onImageSelect={async (imageSrc) => {
+            // const image = await imagePromise(imageSrc);
+            updateAttrs({
+              src: imageSrc
+            });
+          }}
         >
           <EmptyImageContainer readOnly={readOnly} isSelected={selected} />
         </ImageSelector>

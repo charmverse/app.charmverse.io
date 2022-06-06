@@ -1,8 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {dragAndDropRearrange} from './cardDetailContentsUtility'
-import {Position} from './cardDetailContents'
+import {Position, dragAndDropRearrange} from './cardDetailContentsUtility'
 
 describe('components/cardDetail/cardDetailContentsUtility', () => {
     test('Testing moving first item in the row to the end', () => {
