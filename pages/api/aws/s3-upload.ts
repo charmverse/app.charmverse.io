@@ -47,7 +47,7 @@ const makeRouteHandler = (options: Options = {}): Handler => {
 
       const key = options.key
         ? await Promise.resolve(options.key(req, filename))
-        : `user-content/${userId}/${uuid()}/${filename.replace(/\s/g, '-')}`;
+        : `user-content/${userId}/${uuid()}/${filename.replace(/\+/g, '_').replace(/\s/g, '-')}`;
 
       const policy = {
         Statement: [
