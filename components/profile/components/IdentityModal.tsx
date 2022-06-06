@@ -1,6 +1,5 @@
 import { useState, ReactNode } from 'react';
 import styled from '@emotion/styled';
-import { uniqueNamesGenerator, Config, adjectives, colors, animals } from 'unique-names-generator';
 import Link from 'next/link';
 import { Box, Stack, SvgIcon, Typography } from '@mui/material';
 import Button from 'components/common/Button';
@@ -12,8 +11,8 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import PersonIcon from '@mui/icons-material/Person';
 import { IdentityType, IDENTITY_TYPES } from 'models';
+import randomName from 'lib/utilities/randomName';
 import Integration from './Integration';
-import { CRYPTO_WORD_LIST } from '../interfaces';
 
 const StyledButton = styled(Button)`
   background-color: ${({ theme }) => theme.palette.background.light};
@@ -72,17 +71,8 @@ type IdentityModalProps = {
 
 function IdentityModal (props: IdentityModalProps) {
   const { close, isOpen, save, identityTypes, identityType, username } = props;
-  const nameGeneratorConfig: Config = {
-    dictionaries: [
-      adjectives,
-      [...colors, ...CRYPTO_WORD_LIST],
-      animals
-    ],
-    separator: '-',
-    length: 3
-  };
   const [generatedName, setGeneratedName] = useState(
-    identityType === IDENTITY_TYPES[3] ? username : uniqueNamesGenerator(nameGeneratorConfig)
+    identityType === IDENTITY_TYPES[3] ? username : randomName()
   );
 
   return (
@@ -105,7 +95,7 @@ function IdentityModal (props: IdentityModalProps) {
               useIntegration={save}
               actions={
                 item.type === IDENTITY_TYPES[3] ? [
-                  <IconButton onClick={() => setGeneratedName(uniqueNamesGenerator(nameGeneratorConfig))}>
+                  <IconButton onClick={() => setGeneratedName(randomName())}>
                     <RefreshIcon />
                   </IconButton>] : []
               }

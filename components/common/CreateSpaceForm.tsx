@@ -8,13 +8,14 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import Divider from '@mui/material/Divider';
 import { useUser } from 'hooks/useUser';
-import { Prisma, Space } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { useState, ChangeEvent } from 'react';
 import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
 import { DOMAIN_BLACKLIST } from 'lib/spaces';
 import charmClient from 'charmClient';
 import log from 'lib/log';
+import randomName from 'lib/utilities/randomName';
 
 export const schema = yup.object({
   id: yup.string(),
@@ -42,10 +43,9 @@ interface Props {
   submitText?: string;
 }
 
-export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText }: Props) {
+export default function WorkspaceSettings ({ defaultValues = getDefaultName(), onSubmit: _onSubmit, onCancel, submitText }: Props) {
 
   const [user] = useUser();
-
   const [saveError, setSaveError] = useState<any | null>(null);
   const {
     register,
@@ -157,4 +157,12 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
 
 export function getDomainFromName (name: string) {
   return name.replace(/[\p{P}\p{S}]/gu, '').replace(/\s/g, '-').toLowerCase();
+}
+
+function getDefaultName (): { name: string, domain: string } {
+  const name = randomName();
+  return {
+    name,
+    domain: name
+  };
 }
