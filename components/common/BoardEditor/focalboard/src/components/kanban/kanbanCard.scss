@@ -50,9 +50,9 @@
             padding: 0;
             margin: 0;
         }
-    
+
         &:empty {
-          display: none;
+            display: none;
         }
     }
 
@@ -62,7 +62,7 @@
         line-height: 20px;
         margin-bottom: 8px;
         display: flex;
-        justify-content: space-between;
+        align-items: flex-start;
         width: 90%;
 
         .octo-icon {
@@ -76,6 +76,7 @@
         }
 
         .octo-titletext {
+            padding-top: 2px;
             display: -webkit-box; // stylelint-disable-line
             overflow: hidden;
             text-overflow: ellipsis;

@@ -26,7 +26,6 @@ import MultiPaymentModal from 'components/bounties/components/MultiPaymentModal'
 import { BountyWithDetails } from 'models';
 import useIsAdmin from 'hooks/useIsAdmin';
 import UserDisplay from 'components/common/UserDisplay';
-import { BountyStatusColours } from '../../components/BountyStatusBadge';
 import BountySubmissionReviewActions from '../../components/BountySubmissionReviewActions';
 import SubmissionEditorForm from './SubmissionEditorForm';
 import BountySubmissionContent from '../../components/BountySubmissionContent';
@@ -95,11 +94,6 @@ export default function BountySubmissions ({ bounty }: Props) {
 
   // Only applies if there is a submissions cap
   const capReached = submissionsCapReached({ bounty, submissions: submissions ?? [] });
-
-  // Bounty open color if no cap or below cap, submission review color if cap is reached
-  const chipColor = capReached ? SubmissionStatusColors.review : BountyStatusColours.open;
-
-  console.log(sortedSubmissions);
 
   const reviewerUser = bounty.reviewer ? contributors.find(c => c.id === bounty.reviewer) : undefined;
 

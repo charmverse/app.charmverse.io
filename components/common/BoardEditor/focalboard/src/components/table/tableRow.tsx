@@ -92,7 +92,9 @@ function TableRow (props: Props) {
                 ref={columnRefs.get(Constants.titleColumnId)}
             >
                 <div className='octo-icontitle'>
-                    <PageIcon isEditorEmpty={content ? checkForEmpty(content) : true} pageType="page" icon={pageIcon}/>
+
+                        <PageIcon isEditorEmpty={content ? checkForEmpty(content) : true} pageType="page" icon={pageIcon}/>
+
                     <Editable
                         ref={titleRef}
                         value={title}
