@@ -743,19 +743,14 @@ class Mutator {
         } else {
             // Card from template
             newCard.title = ''
-
-            // If the template doesn't specify an icon, initialize it to a random one
-            if (!newCard.fields.icon && UserSettings.prefillRandomIcons) {
-                newCard.fields.icon = BlockIcons.shared.randomIcon()
-            }
         }
         newCard.fields.isTemplate = asTemplate
         newCard.rootId = board.id
         newCard.parentId = board.id
-        if (cardPage) {
-          newCard.fields.content = cardPage.content
-          newCard.fields.contentText = cardPage.contentText
-        }
+        newCard.fields.icon = cardPage.icon || undefined
+        newCard.fields.content = cardPage.content
+        newCard.fields.contentText = cardPage.contentText
+
         await this.insertBlocks(
             newBlocks,
             description,
