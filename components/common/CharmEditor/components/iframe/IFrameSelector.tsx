@@ -17,6 +17,7 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
 
   return (
     <PopperPopup
+      autoOpen
       popupContent={(
         <Box sx={{
           width: 750
