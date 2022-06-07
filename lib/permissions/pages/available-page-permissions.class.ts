@@ -12,6 +12,8 @@ export class AllowedPagePermissions implements IPagePermissionFlags {
 
   delete: boolean = false;
 
+  comment: boolean = false;
+
   edit_position: boolean = false;
 
   edit_content: boolean = false;
