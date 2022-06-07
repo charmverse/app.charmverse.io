@@ -124,7 +124,7 @@ export default function BountyList () {
         <Grid container spacing={1}>
           {
             sortedBounties.length === 0
-              ? <Typography paragraph={true}>No bounties were found</Typography>
+              ? (<iframe src='https://tiny.charmverse.io/bounties' style={{ height: '70vh' }} width='100%' title='Bounties | Getting started with Charmverse'></iframe>)
               : sortedBounties.map(bounty => {
                 return (
                   <Grid key={bounty.id} item>
