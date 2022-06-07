@@ -171,7 +171,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, bounty, la
   }
 }
 
-function BountyAmount ({ bounty, truncate }: { bounty: Bounty, truncate: boolean }) {
+export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId'>, truncate?: boolean }) {
 
   const chainName = bounty ? getChainById(bounty.chainId)?.chainName || '' : '';
   const [paymentMethods] = usePaymentMethods();
