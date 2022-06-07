@@ -24,6 +24,7 @@ const config = {
   poweredByHeader: false,
   webpack5: true,
   experimental: {
+    esmExternals: 'loose',
     modularizeImports: {
       '@mui/material': {
         transform: '@mui/material/{{member}}'
