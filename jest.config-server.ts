@@ -39,13 +39,7 @@ export const jestConfig = {
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   ],
 
-  testTimeout: 30000,
-
-  // transform esm modules
-  transformIgnorePatterns: ['node_modules/(?!(\\@bangle\\.dev)/)'],
-  transform: {
-    'node_modules/\\@bangle\\.dev/.*.(js|jsx|mjs|cjs|ts|tsx)$': 'babel-jest'
-  }
+  testTimeout: 30000
 
 };
 
