@@ -1,12 +1,12 @@
 import { Bounty } from '@prisma/client';
-import charmClient, { PopulatedBounty } from 'charmClient';
+import charmClient from 'charmClient';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { BountyWithDetails } from '../models';
 import { useCurrentSpace } from './useCurrentSpace';
 
 type IContext = {
-  bounties: PopulatedBounty[],
-  setBounties: Dispatch<SetStateAction<PopulatedBounty[]>>,
+  bounties: BountyWithDetails[],
+  setBounties: Dispatch<SetStateAction<BountyWithDetails[]>>,
   currentBountyId: string | null,
   updateCurrentBountyId: (bountyId: string | null) => void,
   currentBounty: BountyWithDetails | null
@@ -30,7 +30,7 @@ export const BountiesContext = createContext<Readonly<IContext>>({
 
 export function BountiesProvider ({ children }: { children: ReactNode }) {
   const [space] = useCurrentSpace();
-  const [bounties, setBounties] = useState<PopulatedBounty[]>([]);
+  const [bounties, setBounties] = useState<BountyWithDetails[]>([]);
   useEffect(() => {
     if (space) {
       setBounties([]);

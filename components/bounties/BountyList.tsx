@@ -1,6 +1,5 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
-import { PopulatedBounty } from 'charmClient';
 import Button from 'components/common/Button';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { BountiesContext } from 'hooks/useBounties';
@@ -10,6 +9,7 @@ import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { useContext, useMemo, useState, useEffect } from 'react';
 import { CSVLink } from 'react-csv';
 import useIsAdmin from 'hooks/useIsAdmin';
+import { BountyWithDetails } from 'models';
 import { BountyCard } from './components/BountyCard';
 import BountyModal from './components/BountyModal';
 import InputBountyStatus from './components/InputBountyStatus';
@@ -17,7 +17,7 @@ import MultiPaymentModal from './components/MultiPaymentModal';
 
 const bountyOrder: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
-function filterBounties (bounties: PopulatedBounty[], statuses: BountyStatus[]): PopulatedBounty[] {
+function filterBounties (bounties: BountyWithDetails[], statuses: BountyStatus[]): BountyWithDetails[] {
   return bounties?.filter(bounty => statuses.indexOf(bounty.status) > -1) ?? [];
 }
 

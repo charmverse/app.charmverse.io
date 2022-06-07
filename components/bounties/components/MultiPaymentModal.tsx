@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { Modal, DialogTitle } from 'components/common/Modal';
 import Button from 'components/common/Button';
 import Box from '@mui/material/Box';
-import charmClient, { PopulatedBounty } from 'charmClient';
+import charmClient from 'charmClient';
 import { bindTrigger, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { Checkbox, List, ListItem, ListItemText } from '@mui/material';
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
+import { BountyWithDetails } from 'models';
 import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
 
 interface TransactionWithMetadata extends MetaTransactionData{
@@ -21,7 +22,7 @@ interface TransactionWithMetadata extends MetaTransactionData{
   userId: string
 }
 
-export default function MultiPaymentModal ({ bounties }: {bounties: PopulatedBounty[]}) {
+export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDetails[]}) {
   const [isLoading, setIsLoading] = useState(false);
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
