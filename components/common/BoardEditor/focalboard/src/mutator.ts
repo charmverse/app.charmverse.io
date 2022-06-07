@@ -748,6 +748,7 @@ class Mutator {
         newCard.rootId = board.id
         newCard.parentId = board.id
         newCard.fields.icon = cardPage.icon || undefined
+        newCard.fields.headerImage = cardPage.headerImage || undefined
         newCard.fields.content = cardPage.content
         newCard.fields.contentText = cardPage.contentText
 
