@@ -18,8 +18,8 @@ export type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineComment
 
 export default function FloatingMenuComponent (
   {
-    pluginKey, disableComments = false, inline = false }:
-    {disableComments?: boolean, pluginKey: PluginKey, inline?: boolean
+    pluginKey, enableComments = true, inline = false }:
+    {enableComments?: boolean, pluginKey: PluginKey, inline?: boolean
   }
 ) {
   const { showMessage } = useSnackbar();
@@ -29,14 +29,13 @@ export default function FloatingMenuComponent (
   return (
     <FloatingMenu
       menuKey={pluginKey}
-      // eslint-disable-next-line react/no-unused-prop-types
-      renderMenuType={({ type }: {type: FloatingMenuVariant & string}) => {
+      renderMenuType={({ type }) => {
 
-        if (type === 'commentOnlyMenu') {
+        if (type as FloatingMenuVariant === 'commentOnlyMenu') {
           return (
             <Menu>
 
-              <InlineCommentButton menuKey={pluginKey} />
+              <InlineCommentButton enableComments={enableComments} menuKey={pluginKey} />
             </Menu>
           );
         }
@@ -51,7 +50,7 @@ export default function FloatingMenuComponent (
                 <StrikeButton />
                 <UnderlineButton />
                 <FloatingLinkButton menuKey={pluginKey} />
-                {!inline && permissions.edit_content && !disableComments && <InlineCommentButton menuKey={pluginKey} />}
+                {!inline && permissions.comment && enableComments && <InlineCommentButton enableComments menuKey={pluginKey} />}
               </MenuGroup>
               {!inline && (
               <MenuGroup isLastGroup>

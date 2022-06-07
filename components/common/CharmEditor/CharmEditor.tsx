@@ -469,7 +469,7 @@ function CharmEditor (
         }
       }}
     >
-      <FloatingMenu disableComments={disabledPageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
+      <FloatingMenu enableComments={!disabledPageSpecificFeatures} pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
