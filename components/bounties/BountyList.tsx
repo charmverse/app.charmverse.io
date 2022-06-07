@@ -124,24 +124,28 @@ export default function BountyList () {
         {/* Onboarding video when no bounties exist */}
         {
             bounties.length === 0 && (
-              <div style={{ maxWidth: '700px', minHeight: '200px', width: '100%', paddingBottom: '56.25%', position: 'relative' }}>
+              <>
+                <Typography variant='h6' sx={{ mb: 2 }}>Watch: Getting started with bounties</Typography>
+                <div style={{ maxWidth: '700px', minHeight: '200px', width: '100%', paddingBottom: '56.25%', position: 'relative' }}>
 
-                <iframe
-                  src='https://tiny.charmverse.io/bounties'
-                  style={{ height: '100%',
-                    width: '100%',
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0 }}
-                  height='100%'
-                  width='100%'
-                  title='Bounties | Getting started with Charmverse'
-                >
-                </iframe>
+                  <iframe
+                    src='https://tiny.charmverse.io/bounties'
+                    style={{ height: '100%',
+                      border: '0 none',
+                      width: '100%',
+                      position: 'absolute',
+                      top: 0,
+                      bottom: 0,
+                      left: 0,
+                      right: 0 }}
+                    height='100%'
+                    width='100%'
+                    title='Bounties | Getting started with Charmverse'
+                  >
+                  </iframe>
 
-              </div>
+                </div>
+              </>
             )
           }
 
