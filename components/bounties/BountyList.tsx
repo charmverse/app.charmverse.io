@@ -128,7 +128,7 @@ export default function BountyList () {
 
                 <iframe
                   src='https://tiny.charmverse.io/bounties'
-                  style={{ maxWidth: '100%' }}
+                  style={{ maxWidth: '100%', border: '0 none' }}
                   height='395px'
                   width='700px'
                   title='Bounties | Getting started with Charmverse'
