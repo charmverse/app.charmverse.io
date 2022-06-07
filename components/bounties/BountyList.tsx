@@ -92,7 +92,7 @@ export default function BountyList () {
             { !!csvData.length
             && (
               <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
-                <Button variant='outlined'>
+                <Button color='secondary' variant='outlined'>
                   Export to CSV
                 </Button>
               </CSVLink>
