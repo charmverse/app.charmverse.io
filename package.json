@@ -32,7 +32,8 @@
     "test:setup-db": "./testing/configure-db.sh",
     "test:client": "npm run test-setup && jest --config='./jest.config-client.ts'",
     "test:migrate": "dotenv -e .env.local -- npx prisma migrate dev",
-    "test:server": "NODE_OPTIONS=\"--max_old_space_size=8192\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose",
+    "test:server": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --verbose",
+    "test:server:debug": "dotenv -e .env.test.local --override -- node --inspect-brk --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage --config='./jest.config-server.ts' --verbose",
     "test:server-integration": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server-integration.ts' --verbose"
   },
   "prepare": "husky install",
@@ -217,7 +218,7 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "husky": "^7.0.0",
-    "jest": "^27.5.1",
+    "jest": "^28.1.1",
     "lint-staged": "^12.3.2",
     "prettier": "^2.5.1",
     "prisma": "^3.9.2",

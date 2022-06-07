@@ -6,11 +6,9 @@ import Tooltip from '@mui/material/Tooltip';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Button from '@mui/material/Button';
-// import Menu from '@mui/icons-material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Menu, { MenuProps } from '@mui/material/Menu';
-import ListItemText from '@mui/material/ListItem';
-import DuplicateIcon from '@mui/icons-material/ContentCopy';
+import ListItemText from '@mui/material/ListItemText';
 import LockIcon from '@mui/icons-material/Lock';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Typography from '@mui/material/Typography';
@@ -101,8 +99,8 @@ export default function BountyHeader ({ bounty }: Props) {
             {
           (isAdmin || (isBountyCreator && bounty.status === 'suggestion')) && (
             <>
-              <IconButton>
-                <MoreHorizIcon color='secondary' {...bindTrigger(popupState)} />
+              <IconButton {...bindTrigger(popupState)}>
+                <MoreHorizIcon color='secondary' />
               </IconButton>
 
               <Menu
@@ -129,32 +127,32 @@ export default function BountyHeader ({ bounty }: Props) {
 
                 {
                   (isAdmin && bounty.status !== 'suggestion' && bounty.status !== 'complete' && bounty.status !== 'paid') && (
-                  <>
-                    <Tooltip arrow placement='right' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
-                      <MenuItem
-                        dense
-                        onClick={() => {
-                          closeSubmissionsModal.open();
-                          popupState.close();
-                        }}
-                      >
-                        <ListItemIcon><LockIcon color='secondary' fontSize='small' /></ListItemIcon>
-                        <ListItemText>Stop new {bounty.approveSubmitters ? 'applications' : 'submissions'}</ListItemText>
-                      </MenuItem>
-                    </Tooltip>
-                    <Tooltip arrow placement='right' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
-                      <MenuItem
-                        dense
-                        onClick={() => {
-                          closeBountyModal.open();
-                          popupState.close();
-                        }}
-                      >
-                        <ListItemIcon><CheckCircleIcon color='secondary' fontSize='small' /></ListItemIcon>
-                        <ListItemText>Mark as complete</ListItemText>
-                      </MenuItem>
-                    </Tooltip>
-                  </>
+                    [
+                      <Tooltip key='stop-new' arrow placement='right' title={`Prevent new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+                        <MenuItem
+                          dense
+                          onClick={() => {
+                            closeSubmissionsModal.open();
+                            popupState.close();
+                          }}
+                        >
+                          <ListItemIcon><LockIcon color='secondary' fontSize='small' /></ListItemIcon>
+                          <ListItemText>Stop new {bounty.approveSubmitters ? 'applications' : 'submissions'}</ListItemText>
+                        </MenuItem>
+                      </Tooltip>,
+                      <Tooltip key='mark-complete' arrow placement='right' title='Mark this bounty complete and auto-reject all non-reviewed submissions'>
+                        <MenuItem
+                          dense
+                          onClick={() => {
+                            closeBountyModal.open();
+                            popupState.close();
+                          }}
+                        >
+                          <ListItemIcon><CheckCircleIcon color='secondary' fontSize='small' /></ListItemIcon>
+                          <ListItemText>Mark as complete</ListItemText>
+                        </MenuItem>
+                      </Tooltip>
+                    ]
                   )
                 }
 
