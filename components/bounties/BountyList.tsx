@@ -124,19 +124,13 @@ export default function BountyList () {
         {/* Onboarding video when no bounties exist */}
         {
             bounties.length === 0 && (
-              <div style={{ maxWidth: '700px', minHeight: '200px', width: '100%', paddingBottom: '56.25%', position: 'relative' }}>
+              <div>
 
                 <iframe
                   src='https://tiny.charmverse.io/bounties'
-                  style={{ height: '100%',
-                    width: '100%',
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0 }}
-                  height='100%'
-                  width='100%'
+                  style={{ maxWidth: '100%' }}
+                  height='395px'
+                  width='700px'
                   title='Bounties | Getting started with Charmverse'
                 >
                 </iframe>
