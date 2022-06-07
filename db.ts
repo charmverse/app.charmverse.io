@@ -1,16 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
+// copied from https://www.prisma.io/docs/support/help-articles/nextjs-prisma-client-dev-practices
+
 declare global {
-  // eslint-disable-next-line no-var, vars-on-top
+  // eslint-disable-next-line
   var prisma: PrismaClient | undefined;
 }
 
 export const prisma = global.prisma
   || new PrismaClient({
-    //    log: ['query']
+  //  log: ['query']
   });
 
-// remember this instance of prisma in development to avoid too many clients
-if (process.env.NODE_ENV === 'development') {
-  global.prisma = prisma;
-}
+if (process.env.NODE_ENV !== 'production') global.prisma = prisma;

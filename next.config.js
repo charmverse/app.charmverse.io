@@ -1,11 +1,29 @@
 const path = require('path');
 
+const esmModules = [
+  '@bangle.dev/base-components',
+  '@bangle.dev/core',
+  '@bangle.dev/pm',
+  '@bangle.dev/react',
+  '@bangle.dev/utils',
+  '@bangle.dev/markdown',
+  '@bangle.dev/tooltip',
+  '@bangle.dev/react-menu',
+  '@bangle.dev/table',
+  '@popperjs/core',
+  '@fullcalendar/common',
+  '@fullcalendar/core',
+  '@fullcalendar/daygrid',
+  '@fullcalendar/interaction',
+  '@fullcalendar/react',
+  'react-dnd'
+];
+
 const config = {
   generateEtags: false,
   poweredByHeader: false,
   webpack5: true,
   experimental: {
-    esmExternals: 'loose',
     modularizeImports: {
       '@mui/material': {
         transform: '@mui/material/{{member}}'
@@ -71,23 +89,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 // fix for esm modules
-const withTM = require('next-transpile-modules')([
-  '@bangle.dev/base-components',
-  '@bangle.dev/core',
-  '@bangle.dev/pm',
-  '@bangle.dev/react',
-  '@bangle.dev/utils',
-  '@bangle.dev/markdown',
-  '@bangle.dev/tooltip',
-  '@bangle.dev/react-menu',
-  '@bangle.dev/table',
-  '@popperjs/core',
-  '@fullcalendar/common',
-  '@fullcalendar/core',
-  '@fullcalendar/daygrid',
-  '@fullcalendar/interaction',
-  '@fullcalendar/react',
-  'react-dnd'
-]);
+const withTM = require('next-transpile-modules')(esmModules);
 
 module.exports = withBundleAnalyzer(withTM(config));
+
+module.exports.esmModules = esmModules;
