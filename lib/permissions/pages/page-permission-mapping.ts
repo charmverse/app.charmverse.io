@@ -14,6 +14,7 @@ export const permissionLevels: Record<keyof typeof PagePermissionLevel, string> 
 export const permissionDescriptions: Record<PageOperationType, string> = {
   delete: 'delete page',
   read: 'view page',
+  comment: 'comment page content',
   edit_content: 'edit page content',
   edit_position: 'reposition page',
   edit_isPublic: 'share page',
@@ -23,8 +24,8 @@ export const permissionDescriptions: Record<PageOperationType, string> = {
 
 export const permissionTemplates: Record<keyof typeof PagePermissionLevel, PageOperationType []> = {
   full_access: Object.keys(PageOperations) as PageOperationType [],
-  editor: ['read', 'edit_content'],
-  view_comment: ['read'],
+  editor: ['read', 'edit_content', 'comment'],
+  view_comment: ['read', 'comment'],
   view: ['read'],
   // Implemented at the database level
   custom: []
