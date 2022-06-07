@@ -76,9 +76,6 @@ function permissionsQuery (request: IPagePermissionUserRequest): Prisma.PagePerm
           pageId: request.pageId
         }
       ]
-    },
-    include: {
-      page: true
     }
   };
 }
