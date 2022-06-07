@@ -106,10 +106,11 @@ export function charmEditorPlugins (
   {
     onContentChange,
     readOnly,
-    disabledPageSpecificFeatures = false
+    disabledPageSpecificFeatures = false,
+    enableComments = true
   }:
     {
-      readOnly?: boolean, onContentChange?: (view: EditorView) => void, disabledPageSpecificFeatures?: boolean
+      readOnly?: boolean, onContentChange?: (view: EditorView) => void, disabledPageSpecificFeatures?: boolean, enableComments?: boolean
     } = {}
 ): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
@@ -152,7 +153,8 @@ export function charmEditorPlugins (
     }),
     floatingMenuPlugin({
       key: floatingMenuPluginKey,
-      readOnly
+      readOnly,
+      enableComments
     }),
     callout.plugins(),
     NodeView.createPlugin({

@@ -14,9 +14,12 @@ import { MenuGroup } from './@bangle.dev/react-menu/MenuGroup';
 import { queryIsSelectionAroundInlineComment } from './inlineComment';
 import { InlineCommentSubMenu } from './inlineComment/InlineComment.components';
 
+export type FloatingMenuVariant = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'commentOnlyMenu';
+
 export default function FloatingMenuComponent (
   {
-    pluginKey, disableComments = false, inline = false }: {disableComments?: boolean, pluginKey: PluginKey, inline?: boolean
+    pluginKey, disableComments = false, inline = false }:
+    {disableComments?: boolean, pluginKey: PluginKey, inline?: boolean
   }
 ) {
   const { showMessage } = useSnackbar();
@@ -26,7 +29,18 @@ export default function FloatingMenuComponent (
   return (
     <FloatingMenu
       menuKey={pluginKey}
-      renderMenuType={({ type }) => {
+      // eslint-disable-next-line react/no-unused-prop-types
+      renderMenuType={({ type }: {type: FloatingMenuVariant & string}) => {
+
+        if (type === 'commentOnlyMenu') {
+          return (
+            <Menu>
+
+              <InlineCommentButton menuKey={pluginKey} />
+            </Menu>
+          );
+        }
+
         if (type === 'defaultMenu') {
           return (
             <Menu>
@@ -71,10 +85,15 @@ export default function FloatingMenuComponent (
   );
 }
 
-export const floatingMenuPlugin = ({ key, readOnly }:{key: PluginKey, readOnly?: boolean}) => {
+export function floatingMenuPlugin ({ key, readOnly, enableComments = true }:{key: PluginKey, readOnly?: boolean, enableComments?: boolean}) {
   return floatingMenu.plugins({
     key,
     calculateType: (state) => {
+
+      if (readOnly && enableComments) {
+        return 'commentOnlyMenu';
+      }
+
       if (readOnly) {
         return null;
       }
@@ -123,4 +142,4 @@ export const floatingMenuPlugin = ({ key, readOnly }:{key: PluginKey, readOnly?:
       return 'defaultMenu';
     }
   });
-};
+}
