@@ -150,6 +150,7 @@ export default function SnoozeButton () {
                 fontSize='small'
               />
             )}
+            sx={{ fontSize: { xs: '12px', sm: '14px' } }}
             {...bindTrigger(dateInput)}
           >
             {isSnoozed ? `Snoozed for ${snoozedForDate.toRelative({ base: (DateTime.now()) })?.slice(3)}` : 'Snooze'}
@@ -159,8 +160,17 @@ export default function SnoozeButton () {
           arrow
           placement='top'
           title='Let others know you are busy by snoozing'
+          sx={{
+            display: {
+              xs: 'none',
+              sm: 'initial'
+            }
+          }}
         >
-          <InfoOutlinedIcon color='secondary' fontSize='small' />
+          <InfoOutlinedIcon
+            color='secondary'
+            fontSize='small'
+          />
         </Tooltip>
       </Box>
 
