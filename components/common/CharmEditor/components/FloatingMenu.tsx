@@ -31,11 +31,11 @@ export default function FloatingMenuComponent (
       menuKey={pluginKey}
       renderMenuType={({ type }) => {
 
-        if (type as FloatingMenuVariant === 'commentOnlyMenu') {
+        if (type as FloatingMenuVariant === 'commentOnlyMenu' && permissions.comment) {
           return (
             <Menu>
 
-              <InlineCommentButton enableComments={enableComments} menuKey={pluginKey} />
+              <InlineCommentButton enableComments menuKey={pluginKey} />
             </Menu>
           );
         }
