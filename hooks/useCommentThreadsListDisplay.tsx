@@ -1,4 +1,4 @@
-import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { ThreadWithComments } from 'lib/threads/interfaces';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { usePages } from './usePages';

@@ -4,7 +4,7 @@ import { useThreads } from 'hooks/useThreads';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
-import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { ThreadWithComments } from 'lib/threads/interfaces';
 import { useUser } from 'hooks/useUser';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';

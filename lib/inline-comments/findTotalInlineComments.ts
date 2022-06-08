@@ -1,5 +1,5 @@
 import { EditorView, MarkType, Node } from '@bangle.dev/pm';
-import { ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import { ThreadWithComments } from 'lib/threads/interfaces';
 import { findChildrenByMark } from 'prosemirror-utils';
 
 export function findTotalInlineComments (
