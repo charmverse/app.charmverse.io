@@ -263,7 +263,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
 
   const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
   const view = useEditorViewContext();
-  const thread = threadId ? threads[threadId] : null;
+  const thread = threadId ? threads[threadId] as ThreadWithCommentsAndAuthors : null;
 
   function resetState () {
     setEditedCommentId(null);
