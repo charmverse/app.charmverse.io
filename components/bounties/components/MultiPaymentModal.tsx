@@ -11,14 +11,18 @@ import { useBounties } from 'hooks/useBounties';
 import { eToNumber } from 'lib/utilities/numbers';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useEffect, useState } from 'react';
-import { Checkbox, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { Checkbox, List, ListItem, Typography } from '@mui/material';
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import { BountyWithDetails } from 'models';
 import { Bounty } from '@prisma/client';
 import { Chains, RPC } from 'connectors';
-import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
+import useGnosisSigner from 'hooks/useWeb3Signer';
+import { SafeInfoResponse } from '@gnosis.pm/safe-service-client';
+import { useUser } from 'hooks/useUser';
+import { getSafesForAddresses } from 'lib/gnosis';
 import { BountyAmount } from './BountyStatusBadge';
+import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
 
 interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rewardToken' | 'rewardAmount' | 'chainId' | 'title'>{
   applicationId: string
@@ -37,6 +41,26 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
   const [transactions, setTransactions] = useState<TransactionWithMetadata[]>([]);
   const [selectedApplicationIds, setSelectedApplicationIds] = useState<string[]>(transactions.map(transaction => transaction.applicationId));
   const [contributors] = useContributors();
+  const gnosisSigner = useGnosisSigner();
+  const [currentUser] = useUser();
+  const [safeInfos, setSafeInfos] = useState<({
+    chainId: number;
+  } & SafeInfoResponse)[]>([]);
+
+  useEffect(() => {
+    async function main () {
+      if (gnosisSigner && currentUser) {
+        setSafeInfos(await getSafesForAddresses(gnosisSigner, currentUser.addresses));
+      }
+    }
+    main();
+
+    return () => {
+      setSafeInfos([]);
+    };
+  }, [gnosisSigner, currentUser]);
+
+  const ownedSafeAddresses = safeInfos.map(safeInfo => safeInfo.address);
 
   useEffect(() => {
     const _transactions: TransactionWithMetadata[] = [];
@@ -107,7 +131,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
     }
   }
 
-  if (!safeAddress || transactions.length === 0) {
+  if (!safeAddress || !ownedSafeAddresses.includes(safeAddress) || transactions.length === 0) {
     return null;
   }
 
@@ -130,7 +154,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
               const isChecked = selectedApplicationIds.includes(applicationId);
               if (user) {
                 return (
-                  <ListItem>
+                  <ListItem key={`${userId}.${chainId}.${applicationId}`}>
                     <Checkbox
                       disableFocusRipple
                       disableRipple
