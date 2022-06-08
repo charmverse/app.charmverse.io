@@ -85,7 +85,7 @@ export default function BountyList () {
 
   return (
     <ScrollableWindow>
-      <Box py={3} sx={{ px: { xs: '40px', sm: '80px' } }}>
+      <Box py={3} sx={{ px: { xs: '40px', sm: '80px' }, minHeight: '80vh' }}>
         <Box display='flex' justifyContent='space-between' mb={3}>
           <Typography variant='h1'>Bounty list</Typography>
           <Box display='flex' justifyContent='flex-end'>
@@ -121,19 +121,44 @@ export default function BountyList () {
           />
         </Box>
 
-        <Grid container spacing={1}>
-          {
-            sortedBounties.length === 0
-              ? <Typography paragraph={true}>No bounties were found</Typography>
-              : sortedBounties.map(bounty => {
-                return (
-                  <Grid key={bounty.id} item>
-                    <BountyCard truncate={false} key={bounty.id} bounty={bounty} />
-                  </Grid>
-                );
-              })
+        {/* Onboarding video when no bounties exist */}
+        {
+            bounties.length === 0 && (
+              <div>
+
+                <iframe
+                  src='https://tiny.charmverse.io/bounties'
+                  style={{ maxWidth: '100%', border: '0 none' }}
+                  height='395px'
+                  width='700px'
+                  title='Bounties | Getting started with Charmverse'
+                >
+                </iframe>
+
+              </div>
+            )
           }
-        </Grid>
+
+        {/* Current filter status doesn't have any matching bounties */}
+        {
+            bounties.length > 0 && sortedBounties.length === 0 && <Typography paragraph={true}>No bounties were found</Typography>
+          }
+
+        {/* List of bounties based on current filter */}
+        {
+            sortedBounties.length > 0 && (
+              <Grid container spacing={1}>
+                {sortedBounties.map(bounty => {
+                  return (
+                    <Grid key={bounty.id} item>
+                      <BountyCard truncate={false} key={bounty.id} bounty={bounty} />
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            )
+          }
+
         {
           /**
            * Remove later to its own popup modal
