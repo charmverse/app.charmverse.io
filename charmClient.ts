@@ -15,7 +15,7 @@ import { IUser, UserWorkspace } from 'components/common/BoardEditor/focalboard/s
 import { IWorkspace } from 'components/common/BoardEditor/focalboard/src/blocks/workspace';
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { InviteLinkPopulated } from 'pages/api/invites/index';
-import { FiatCurrency, IPairQuote } from 'models/Currency';
+import { FiatCurrency, IPairQuote } from 'connectors';
 import type { FailedImportsError } from 'lib/notion/types';
 import { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
 // TODO: Maybe move these types to another place so that we dont import from backend

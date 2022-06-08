@@ -1,6 +1,6 @@
 import uniqBy from 'lodash/uniqBy';
 import { Signer, ethers } from 'ethers';
-import { RPC } from 'connectors';
+import { RPC, getChainById } from 'connectors';
 import { UserGnosisSafe } from '@prisma/client';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
 import SafeServiceClient, { SafeMultisigTransactionResponse, SafeInfoResponse } from '@gnosis.pm/safe-service-client';
@@ -9,8 +9,7 @@ import log from 'lib/log';
 export type GnosisTransaction = SafeMultisigTransactionResponse;// AllTransactionsListResponse['results'][0];
 
 function getGnosisRPCUrl (chainId: number) {
-  const network = Object.values(RPC).find(rpc => rpc.chainId === chainId);
-  return network?.gnosisUrl;
+  return getChainById(chainId)?.gnosisUrl;
 }
 
 interface GetGnosisServiceProps {

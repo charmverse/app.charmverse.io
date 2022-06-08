@@ -51,7 +51,7 @@ const RPC = {
     },
     blockExplorerUrls: ['https://etherscan.io'],
     gnosisUrl: 'https://safe-transaction.mainnet.gnosis.io',
-    iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     rpcUrls: ['https://main-light.eth.linkpool.io']
   },
   BSC: {
@@ -193,7 +193,7 @@ const RPC = {
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
     gnosisUrl: 'https://safe-transaction.goerli.gnosis.io',
-    iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true
   },
   RINKEBY: {
@@ -209,7 +209,7 @@ const RPC = {
     },
     blockExplorerUrls: ['https://rinkeby-explorer.arbitrum.io/#/'],
     gnosisUrl: 'https://safe-transaction.rinkeby.gnosis.io',
-    iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
+    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     rpcUrls: ['https://rinkeby-light.eth.linkpool.io/'],
     testnet: true
   },
@@ -250,6 +250,28 @@ export const CryptoLogoPaths = Object.values(RPC).reduce((acc, chain) => {
 export const CryptoCurrencies = uniqueValues<CryptoCurrency>(RPCList.map(chain => {
   return chain.nativeCurrency.symbol as CryptoCurrency;
 }));
+
+export const FiatCurrencyList = {
+  USD: 'US Dollar',
+  GBP: 'British Pound Sterling',
+  EUR: 'Euro',
+  JPY: 'Japanese Yen'
+};
+
+export type FiatCurrency = keyof typeof FiatCurrencyList;
+
+export type Currency = CryptoCurrency | FiatCurrency;
+
+export interface ICurrencyPair {
+  base: CryptoCurrency | string;
+  quote: FiatCurrency;
+}
+
+export interface IPairQuote extends ICurrencyPair {
+  amount: number;
+  receivedOn?: number | Date;
+  source?: string;
+}
 
 export function getChainById (chainId: number): IChainDetails | undefined {
   return RPCList.find(rpc => rpc.chainId === chainId);
