@@ -16,6 +16,9 @@ export function mentionSpecs (): RawSpecs {
           },
           type: {
             default: 'user'
+          },
+          id: {
+            default: null
           }
         },
         inline: true,

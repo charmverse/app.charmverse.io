@@ -1,19 +1,20 @@
 
-import Legend from 'components/settings/Legend';
 import { useState } from 'react';
-import { Box, Divider, Grid, Typography } from '@mui/material';
+import { Box, Button, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPage';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ForumIcon from '@mui/icons-material/Forum';
 import styled from '@emotion/styled';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import GnosisTasksList from './GnosisTasksList';
+import MentionedTasksList from './MentionedTasksList';
 import TasksPageHeader from './TasksPageHeader';
 import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
 
-type TaskType = 'multisig' | 'bounty' | 'proposal' | 'discussion'
+type TaskType = 'multisig' | 'bounty' | 'proposal' | 'discussion' | 'mentioned'
 
 const tabStyles = {
   mb: 2,
@@ -41,7 +42,8 @@ const TASK_TYPES = [
   { icon: <KeyIcon />, type: 'multisig' },
   { icon: <BountyIcon />, type: 'bounty' },
   { icon: <HowToVoteIcon />, type: 'proposal' },
-  { icon: <ForumIcon />, type: 'discussion' }
+  { icon: <ForumIcon />, type: 'discussion' },
+  { icon: <AlternateEmailIcon />, type: 'mentioned' }
 ] as const;
 
 const StyledTypography = styled(Typography)`
@@ -64,15 +66,17 @@ export default function TasksPage () {
             </StyledTypography>
           </Box>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <Box display='flex' alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }} gap={{ sm: 2, xs: 1 }}>
-            <NotifyMeButton />
-            <SnoozeButton />
-          </Box>
-        </Grid>
+        {currentTab === 'multisig' ? (
+          <Grid item xs={12} sm={6}>
+            <Box display='flex' alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }} gap={{ sm: 2, xs: 1 }}>
+              <NotifyMeButton />
+              <SnoozeButton />
+            </Box>
+          </Grid>
+        ) : null}
       </Grid>
       <Divider sx={{ mb: 2 }} />
-      {/* <Tabs
+      <Tabs
         sx={tabStyles}
         textColor='primary'
         indicatorColor='secondary'
@@ -98,7 +102,7 @@ export default function TasksPage () {
                 variant='text'
                 size='small'
                 onClick={() => setCurrentTab(task.type)}
-                color={currentTab === task.type ? 'textPrimary' : 'secondary'}
+                color={currentTab === task.type ? 'primary' : 'secondary'}
               >
                 {task.type}
               </Button>
@@ -106,7 +110,7 @@ export default function TasksPage () {
             value={task.type}
           />
         ))}
-      </Tabs> */}
+      </Tabs>
       {currentTab === 'multisig' ? <GnosisTasksList /> : null}
     </>
   );
