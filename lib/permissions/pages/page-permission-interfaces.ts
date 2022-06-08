@@ -16,9 +16,11 @@ export interface IPagePermissionRequest {
 
 /**
  * Use for requesting permissions a user can exercise on a specific page
+ * @allowAdminBypass Admins always get full permissions. Defaults to true. Set to false to remove this override
  */
 export interface IPagePermissionUserRequest extends IPagePermissionRequest {
   userId?: string;
+  allowAdminBypass?: boolean
 }
 
 /**
