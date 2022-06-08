@@ -8,7 +8,7 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Bounty, PaymentMethod } from '@prisma/client';
-import charmClient, { PopulatedBounty } from 'charmClient';
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import CharmEditor, { ICharmEditorOutput, UpdatePageContent } from 'components/common/CharmEditor/CharmEditor';
 import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
@@ -23,7 +23,7 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
-import { PageContent } from 'models';
+import { BountyWithDetails, PageContent } from 'models';
 import { CryptoCurrency } from 'models/Currency';
 import { useEffect, useState } from 'react';
 import { useForm, UseFormWatch } from 'react-hook-form';
@@ -79,7 +79,7 @@ export type FormValues = yup.InferType<typeof schema>
  * @focusKey The field that should be focused on popup. The underlying field should be using a native MUI field for this to work
  */
 interface IBountyEditorInput {
-  onSubmit: (bounty: PopulatedBounty) => any,
+  onSubmit: (bounty: BountyWithDetails) => any,
   mode?: FormMode
   bounty?: Partial<Bounty>
   focusKey?: keyof FormValues

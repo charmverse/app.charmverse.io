@@ -42,10 +42,6 @@ import { SuggestionAction } from 'lib/bounties';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
-export interface PopulatedBounty extends Bounty {
-  applications: Application[];
-}
-
 //
 // CharmClient is the client interface to the server APIs
 //
@@ -386,7 +382,7 @@ class CharmClient {
     updater(fbBlocks);
   }
 
-  listBounties (spaceId: string): Promise<PopulatedBounty[]> {
+  listBounties (spaceId: string): Promise<BountyWithDetails[]> {
     return http.GET('/api/bounties', { spaceId });
   }
 
