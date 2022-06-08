@@ -7,12 +7,13 @@ import { useEffect, useRef } from 'react';
 interface PopperPopupProps {
   popupContent: React.ReactNode;
   children?: React.ReactNode | null;
-  autoOpen?: boolean
+  autoOpen?: boolean;
+  open?: boolean;
 }
 
 export default function PopperPopup (props: PopperPopupProps) {
 
-  const { popupContent, children, autoOpen = false } = props;
+  const { popupContent, children, autoOpen = false, open = false } = props;
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
   const toggleRef = useRef(null);
@@ -30,15 +31,15 @@ export default function PopperPopup (props: PopperPopupProps) {
   };
 
   useEffect(() => {
-    if (autoOpen && toggleRef.current) {
+    if ((autoOpen || open) && toggleRef.current) {
       popupState.setAnchorEl(toggleRef.current);
       setTimeout(() => {
         popupState.open();
       });
     }
-  }, [toggleRef, autoOpen]);
+  }, [toggleRef, autoOpen, open]);
 
-  return autoOpen ? (
+  return (autoOpen || open) ? (
     <div ref={toggleRef}>
       {children && (
       <div {...bindToggle(popupState)}>
