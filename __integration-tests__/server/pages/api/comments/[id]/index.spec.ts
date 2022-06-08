@@ -15,10 +15,6 @@ let nonAdminUser: User;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
-let adminUser: User;
-let adminUserSpace: Space;
-let adminCookie: string;
-
 beforeAll(async () => {
   const first = await generateUserAndSpaceWithApiToken(undefined, false);
 
@@ -31,14 +27,51 @@ beforeAll(async () => {
     })).headers['set-cookie'][0];
 
   const second = await generateUserAndSpaceWithApiToken();
+});
 
-  adminUser = second.user;
-  adminUserSpace = second.space;
-  adminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: adminUser.addresses[0]
-    })).headers['set-cookie'][0];
+describe('PUT /api/comments/{id} - update a comment', () => {
+
+  it('should update the comment if the user created it, and respond 200', async () => {
+
+    const { thread, page, comment } = await generateCommentWithThreadAndPage({
+      commentContent: 'Message',
+      spaceId: nonAdminUserSpace.id,
+      userId: nonAdminUser.id
+    });
+
+    await request(baseUrl)
+      .put(`/api/comments/${comment.id}`)
+      .set('Cookie', nonAdminCookie)
+      .send({ content: [] })
+      .expect(200);
+  });
+
+  it('should fail if the user did not create the comment, and respond 401', async () => {
+
+    const otherAdminUser = await generateSpaceUser({
+      spaceId: nonAdminUserSpace.id,
+      isAdmin: true
+    });
+
+    const otherAdminCookie = (await request(baseUrl)
+      .post('/api/session/login')
+      .send({
+        address: otherAdminUser.addresses[0]
+      })).headers['set-cookie'][0];
+
+    const { thread, page, comment } = await generateCommentWithThreadAndPage({
+      commentContent: 'Message',
+      spaceId: nonAdminUserSpace.id,
+      userId: nonAdminUser.id
+    });
+
+    await request(baseUrl)
+      .put(`/api/comments/${comment.id}`)
+      .set('Cookie', otherAdminCookie)
+      .send({ content: [] })
+      .expect(401);
+  });
+
 });
 
 describe('DELETE /api/comments/{id} - delete a comment', () => {
@@ -68,7 +101,7 @@ describe('DELETE /api/comments/{id} - delete a comment', () => {
     const otherAdminCookie = (await request(baseUrl)
       .post('/api/session/login')
       .send({
-        address: adminUser.addresses[0]
+        address: otherAdminUser.addresses[0]
       })).headers['set-cookie'][0];
 
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
