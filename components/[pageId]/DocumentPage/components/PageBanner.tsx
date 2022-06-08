@@ -83,7 +83,6 @@ function PageBanner ({ focalBoard, headerImage, setPage }: PageBannerProps) {
         <ImageSelector
           galleryImages={bannerImageGroups}
           onImageSelect={setImage}
-          autoOpen={true}
         >
           <ListItem
             button
