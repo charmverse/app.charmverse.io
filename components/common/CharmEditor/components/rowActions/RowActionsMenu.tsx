@@ -96,7 +96,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
           createdBy: duplicatedPage.createdBy,
           spaceId: duplicatedPage.spaceId as string,
           title: `${duplicatedPage.title} (copy)`,
-          content: duplicatedPage.content,
+          content: duplicatedPage.content ?? undefined,
           contentText: duplicatedPage.contentText,
           headerImage: duplicatedPage.headerImage,
           icon: duplicatedPage.icon,
