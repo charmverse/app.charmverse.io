@@ -95,7 +95,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
           parentId: currentPage.id,
           createdBy: duplicatedPage.createdBy,
           spaceId: duplicatedPage.spaceId as string,
-          title: duplicatedPage.title,
+          title: `${duplicatedPage.title} (copy)`,
           content: duplicatedPage.content,
           contentText: duplicatedPage.contentText,
           headerImage: duplicatedPage.headerImage,
