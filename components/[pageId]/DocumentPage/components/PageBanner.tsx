@@ -3,7 +3,6 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
@@ -67,8 +66,6 @@ function PageBanner ({ focalBoard, headerImage, setPage }: PageBannerProps) {
     setPage({ headerImage: _headerImage });
   }
 
-  const coverImageModalState = usePopupState({ variant: 'popover', popupId: 'cover-image-modal' });
-
   return (
     <StyledPageBanner focalBoard={focalBoard}>
       {/* eslint-disable-next-line */}
@@ -84,9 +81,9 @@ function PageBanner ({ focalBoard, headerImage, setPage }: PageBannerProps) {
         className='page-cover-controls'
       >
         <ImageSelector
-          open={coverImageModalState.isOpen}
           galleryImages={bannerImageGroups}
           onImageSelect={setImage}
+          autoOpen={true}
         >
           <ListItem
             button
@@ -98,7 +95,7 @@ function PageBanner ({ focalBoard, headerImage, setPage }: PageBannerProps) {
               padding: theme.spacing(0.5, 1.5)
             }}
           >
-            <Typography variant='subtitle1' whiteSpace='nowrap' onClick={coverImageModalState.open}>
+            <Typography variant='subtitle1' whiteSpace='nowrap'>
               Change Cover
             </Typography>
           </ListItem>
