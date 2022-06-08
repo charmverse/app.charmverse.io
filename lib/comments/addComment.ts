@@ -26,11 +26,9 @@ export async function addComment ({ content, threadId, userId }: CommentCreate):
     throw new DataNotFoundError(`Linked page for ${threadId} not found`);
   }
 
-  const commentMessage = typeof content === 'object' ? JSON.stringify(content) : content;
-
   const createdComment = await prisma.comment.create({
     data: {
-      content: commentMessage,
+      content: content as any,
       thread: {
         connect: {
           id: threadId

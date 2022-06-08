@@ -24,7 +24,6 @@ import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { CommentWithUser } from 'lib/comments/interfaces';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pages';
 import { TokenGateWithRoles } from 'pages/api/token-gates';
