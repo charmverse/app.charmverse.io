@@ -3,7 +3,7 @@ import { Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateUserAndSpaceWithApiToken, generateCommentWithThreadAndPage } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { deleteComment } from '../deleteComment';
 
@@ -20,56 +20,10 @@ describe('deleteComment', () => {
 
   it('should delete a comment and return true', async () => {
 
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    const thread = await prisma.thread.create({
-      data: {
-        context: 'Random context',
-        resolved: false,
-        page: {
-          connect: {
-            id: page.id
-          }
-        },
-        user: {
-          connect: {
-            id: user.id
-          }
-        },
-        space: {
-          connect: {
-            id: space.id
-          }
-        }
-      }
-    });
-
-    const comment = await prisma.comment.create({
-      data: {
-        page: {
-          connect: {
-            id: page.id
-          }
-        },
-        thread: {
-          connect: {
-            id: thread.id
-          }
-        },
-        user: {
-          connect: {
-            id: user.id
-          }
-        },
-        space: {
-          connect: {
-            id: space.id
-          }
-        }
-      }
+    const { comment } = await generateCommentWithThreadAndPage({
+      commentContent: 'Message',
+      spaceId: space.id,
+      userId: user.id
     });
 
     const deleteResult = await deleteComment(comment.id);
