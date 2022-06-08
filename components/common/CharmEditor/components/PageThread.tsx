@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, ButtonProps, Tooltip, SxProps } from '@mui/material';
 import { useTheme } from '@emotion/react';
-import type { CommentWithUser, ThreadWithCommentsAndAuthors } from 'pages/api/pages/[id]/threads';
+import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { CommentWithUser } from 'lib/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
