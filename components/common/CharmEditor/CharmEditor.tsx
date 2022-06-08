@@ -456,9 +456,7 @@ function CharmEditor (
           }
           case 'page': {
             return (
-              <NestedPage readOnly={readOnly} {...props}>
-                {_children}
-              </NestedPage>
+              <NestedPage {...props} />
             );
           }
           default: {
