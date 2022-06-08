@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, Button, ListItem, IconButton, ButtonProps, Tooltip, SxProps } from '@mui/material';
 import { useTheme } from '@emotion/react';
-import type { CommentWithUser, ThreadWithComments } from 'pages/api/pages/[id]/threads';
+import type { CommentWithUser, ThreadWithCommentsAndAuthors } from 'pages/api/pages/[id]/threads';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
@@ -99,7 +99,7 @@ function AddCommentCharmEditor (
   const theme = useTheme();
   const isEmpty = checkForEmpty(commentContent);
   const { addComment, threads } = useThreads();
-  const thread = threads[threadId] as ThreadWithComments;
+  const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
 
   return (
     <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
@@ -137,7 +137,7 @@ function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, on
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkForEmpty(commentContent);
   const { editComment, threads } = useThreads();
-  const thread = threads[threadId] as ThreadWithComments;
+  const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
   const comment = thread.comments.find(_comment => _comment.id === commentId) as CommentWithUser;
 
   return (

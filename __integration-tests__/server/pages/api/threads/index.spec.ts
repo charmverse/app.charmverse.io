@@ -7,7 +7,7 @@ import { baseUrl } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { createBounty } from 'lib/bounties';
-import { ThreadCreate, ThreadWithComments } from 'lib/threads';
+import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
 import { upsertPermission } from '../../../../../lib/permissions/pages';
 
 let nonAdminUser: User;
@@ -65,7 +65,7 @@ describe('POST /api/threads - create a thread', () => {
       .post('/api/threads')
       .set('Cookie', nonAdminCookie)
       .send(creationContent)
-      .expect(201)).body as ThreadWithComments;
+      .expect(201)).body as ThreadWithCommentsAndAuthors;
 
     expect(createdThread).toEqual(
       expect.objectContaining<Partial<Thread>>({
@@ -76,6 +76,7 @@ describe('POST /api/threads - create a thread', () => {
 
     expect(createdThread.comments).toBeDefined();
     expect(createdThread.comments[0].content).toBe(creationContent.comment);
+    expect(createdThread.comments[0].user.id).toBe(nonAdminUser.id);
 
   });
 

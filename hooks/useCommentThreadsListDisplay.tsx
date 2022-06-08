@@ -1,4 +1,4 @@
-import { ThreadWithComments } from 'lib/threads/interfaces';
+import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { usePages } from './usePages';
@@ -23,7 +23,7 @@ export function CommentThreadsListDisplayProvider ({ children }: { children: Rea
   useEffect(() => {
     if (currentPageId) {
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
-      const cachedData: ThreadWithComments[] | undefined = cache.get(`pages/${currentPageId}/threads`);
+      const cachedData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(`pages/${currentPageId}/threads`);
       if (cachedData) {
         setShowingCommentThreadsList(cachedData.filter(thread => thread && !thread.resolved).length > 0);
       }

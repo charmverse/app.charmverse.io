@@ -1,11 +1,11 @@
 import { EditorView, MarkType, Node } from '@bangle.dev/pm';
-import { ThreadWithComments } from 'lib/threads/interfaces';
+import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { findChildrenByMark } from 'prosemirror-utils';
 
 export function findTotalInlineComments (
   view:EditorView,
   node: Node,
-  threads: Record<string, ThreadWithComments | undefined>,
+  threads: Record<string, ThreadWithCommentsAndAuthors | undefined>,
   keepResolved?: boolean
 ) {
   keepResolved = keepResolved ?? false;

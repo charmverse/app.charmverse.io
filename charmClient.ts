@@ -23,7 +23,7 @@ import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discor
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { CommentWithUser } from 'lib/comments/interfaces';
-import { ThreadCreate, ThreadWithComments } from 'lib/threads/interfaces';
+import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { AddCommentRequest } from 'pages/api/comments';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pages';
@@ -607,7 +607,7 @@ class CharmClient {
     return http.DELETE('/api/permissions', { permissionId });
   }
 
-  startThread (request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithComments> {
+  startThread (request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithCommentsAndAuthors> {
     return http.POST('/api/threads', request);
   }
 
@@ -631,7 +631,7 @@ class CharmClient {
     return http.DELETE(`/api/comments/${commentId}`);
   }
 
-  getPageThreads (pageId: string): Promise<ThreadWithComments[]> {
+  getPageThreads (pageId: string): Promise<ThreadWithCommentsAndAuthors[]> {
     return http.GET(`/api/pages/${pageId}/threads`);
   }
 

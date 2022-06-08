@@ -17,7 +17,7 @@ beforeAll(async () => {
 
 describe('createThread', () => {
 
-  it('should create a thread and return it with comments as well as the page space ID', async () => {
+  it('should create a thread and return it with comments as well as the page space ID, and the user for each comment', async () => {
 
     const firstComment = 'First';
 
@@ -35,6 +35,10 @@ describe('createThread', () => {
 
     expect(thread.comments).toBeDefined();
     expect(thread.comments[0].content).toBe(firstComment);
+
+    expect(thread.comments[0].user).toBeDefined();
+    expect(thread.comments[0].user.id).toBe(user.id);
+
     expect(thread.spaceId).toBe(page.spaceId);
   });
 

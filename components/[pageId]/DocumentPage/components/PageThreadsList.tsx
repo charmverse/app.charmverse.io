@@ -4,7 +4,7 @@ import { useThreads } from 'hooks/useThreads';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
-import { ThreadWithComments } from 'lib/threads/interfaces';
+import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { useUser } from 'hooks/useUser';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
@@ -47,8 +47,8 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
   const { threads } = useThreads();
   const [user] = useUser();
   const allThreads = Object.values(threads);
-  const unResolvedThreads = allThreads.filter(thread => thread && !thread.resolved) as ThreadWithComments[];
-  const resolvedThreads = allThreads.filter(thread => thread && thread.resolved) as ThreadWithComments[];
+  const unResolvedThreads = allThreads.filter(thread => thread && !thread.resolved) as ThreadWithCommentsAndAuthors[];
+  const resolvedThreads = allThreads.filter(thread => thread && thread.resolved) as ThreadWithCommentsAndAuthors[];
   const [threadFilter, setThreadFilter] = useState<'resolved' | 'open' | 'all' | 'you'>('open');
   const [threadSort, setThreadSort] = useState<'earliest' | 'latest' | 'position'>('position');
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
@@ -58,7 +58,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
     setThreadSort(event.target.value as any);
   };
 
-  let threadList: ThreadWithComments[] = [];
+  let threadList: ThreadWithCommentsAndAuthors[] = [];
   if (threadFilter === 'resolved') {
     threadList = resolvedThreads;
   }
@@ -66,7 +66,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
     threadList = unResolvedThreads;
   }
   else if (threadFilter === 'all') {
-    threadList = allThreads as ThreadWithComments[];
+    threadList = allThreads as ThreadWithCommentsAndAuthors[];
   }
   else if (threadFilter === 'you') {
     // Filter the threads where there is at-least a single comment by the current user
@@ -76,7 +76,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
   const view = useEditorViewContext();
   const inlineThreadsIds = threadSort === 'position' ? findTotalInlineComments(view, view.state.doc, threads, true).threadIds : [];
 
-  let sortedThreadList: ThreadWithComments[] = [];
+  let sortedThreadList: ThreadWithCommentsAndAuthors[] = [];
   if (threadSort === 'earliest') {
     sortedThreadList = threadList.sort(
       (threadA, threadB) => threadA && threadB ? new Date(threadA.createdAt).getTime() - new Date(threadB.createdAt).getTime() : 0
@@ -90,7 +90,7 @@ export default function PageThreadsList ({ sx, inline, ...props }: BoxProps & {i
   else {
     const threadListSet = new Set(threadList.map(thread => thread.id));
     const filteredThreadIds = inlineThreadsIds.filter(inlineThreadsId => threadListSet.has(inlineThreadsId));
-    sortedThreadList = filteredThreadIds.map(filteredThreadId => threads[filteredThreadId] as ThreadWithComments);
+    sortedThreadList = filteredThreadIds.map(filteredThreadId => threads[filteredThreadId] as ThreadWithCommentsAndAuthors);
   }
 
   return (

@@ -1,8 +1,8 @@
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { ThreadCreate, ThreadWithComments } from './interfaces';
+import { ThreadCreate, ThreadWithCommentsAndAuthors } from './interfaces';
 
-export async function createThread ({ comment, pageId, userId, context }: ThreadCreate): Promise<ThreadWithComments> {
+export async function createThread ({ comment, pageId, userId, context }: ThreadCreate): Promise<ThreadWithCommentsAndAuthors> {
 
   if (!comment) {
     throw new InvalidInputError('Please provide a valid comment');
@@ -67,7 +67,11 @@ export async function createThread ({ comment, pageId, userId, context }: Thread
       }
     },
     include: {
-      comments: true
+      comments: {
+        include: {
+          user: true
+        }
+      }
     }
   });
 
