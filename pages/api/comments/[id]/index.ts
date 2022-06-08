@@ -6,14 +6,16 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { PageContent } from 'models';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { deleteComment, updateComment } from 'lib/comments';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser)
-  .put(requireKeys(['content'], 'body'), editComment)
-  .delete(deleteComment);
+  .delete(deleteCommentController)
+  .put(requireKeys(['content'], 'body'), updateCommentController);
 
-async function editComment (req: NextApiRequest, res: NextApiResponse) {
+async function updateCommentController (req: NextApiRequest, res: NextApiResponse) {
   const { content } = req.body as {
     content: PageContent,
   };
@@ -66,43 +68,30 @@ async function editComment (req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-async function deleteComment (req: NextApiRequest, res: NextApiResponse) {
+async function deleteCommentController (req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
+
+  const { id: commentId } = req.query;
+
   const comment = await prisma.comment.findFirst({
     where: {
-      id: req.query.id as string,
-      userId
+      id: commentId as string
     },
     select: {
-      thread: {
-        select: {
-          pageId: true
-        }
-      }
+      userId: true
     }
   });
 
   if (!comment) {
-    throw new NotFoundError();
+    throw new DataNotFoundError();
   }
 
-  const permissionSet = await computeUserPagePermissions({
-    pageId: comment.thread.pageId,
-    userId
-  });
-
-  if (!permissionSet.edit_content) {
-    return res.status(401).json({
-      error: 'You are not allowed to perform this action'
-    });
+  if (comment.userId !== userId) {
+    throw new UnauthorisedActionError('You cannot delete another users\' comment');
   }
 
-  await prisma.comment.deleteMany({
-    where: {
-      id: req.query.id as string,
-      userId
-    }
-  });
+  await deleteComment(commentId as string);
+
   return res.status(200).json({ ok: true });
 }
 
