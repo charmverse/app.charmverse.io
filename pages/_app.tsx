@@ -22,6 +22,9 @@ import { Web3ReactProvider } from '@web3-react/core';
 import log from 'lib/log';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import RouteGuard from 'components/common/RouteGuard';
+import 'theme/focalboard/focalboard.button.scss';
+import 'theme/focalboard/focalboard.main.scss';
+import 'theme/focalboard/focalboard.typography.scss';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
@@ -74,7 +77,6 @@ import { getMessages } from 'components/common/BoardEditor/focalboard/src/i18n';
 import store from 'components/common/BoardEditor/focalboard/src/store';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { fetchLanguage, getLanguage } from 'components/common/BoardEditor/focalboard/src/store/language';
-// import 'components/common/BoardEditor/focalboard/src/styles/main.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/variables.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
@@ -161,9 +163,6 @@ import { Provider as ReduxProvider } from 'react-redux';
 import 'react-resizable/css/styles.css';
 import { createThemeLightSensitive } from 'theme';
 import 'theme/@bangle.dev/styles.scss';
-import 'theme/focalboard/focalboard.button.scss';
-import 'theme/focalboard/focalboard.main.scss';
-import 'theme/focalboard/focalboard.typography.scss';
 import {
   darkTheme,
   lightTheme

@@ -12,12 +12,11 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { Bounty, BountyStatus } from '@prisma/client';
-import { getChainById, getChainExplorerLink } from 'connectors';
+import { getChainById } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import millify from 'millify';
-import { BountyWithDetails } from 'models';
 import { BOUNTY_LABELS } from 'models/Bounty';
 import Link from 'next/link';
 import { ReactNode } from 'react';
@@ -31,7 +30,7 @@ const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   paid: <PaidIcon />
 };
 
-export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
+export const BountyStatusColors: Record<BountyStatus, BrandColor> = {
   suggestion: 'purple',
   open: 'teal',
   inProgress: 'yellow',
@@ -39,7 +38,7 @@ export const BountyStatusColours: Record<BountyStatus, BrandColor> = {
   paid: 'gray'
 };
 
-const BountyStatusBox = styled.div<{ status: BountyStatus }>`
+const BountyStatusBox = styled(Box)<{ status: BountyStatus }>`
   padding-left: 10px;
   padding-right: 15px;
   border-radius: 15px;
@@ -51,7 +50,7 @@ const BountyStatusBox = styled.div<{ status: BountyStatus }>`
   align-items: center;
   background-color: ${({ status, theme }) => {
     // @ts-ignore
-    return theme.palette[BountyStatusColours[status]].main;
+    return theme.palette[BountyStatusColors[status]].main;
   }};
 `;
 
@@ -79,27 +78,22 @@ export function BountyStatusChip ({ status, onDelete }: {status: BountyStatus, o
       sx={{
         fontWeight: 'bold',
         backgroundColor: () => {
-          return theme.palette[BountyStatusColours[status]]?.main;
+          return theme.palette[BountyStatusColors[status]]?.main;
         }
       }}
     />
   );
 }
 
-function BountyStatusChipWithIcon ({
-  status,
-  showStatusLogo = true
-}: {status: BountyStatus, showStatusLogo?: boolean}) {
+export function BountyStatusChipWithIcon ({
+  status
+}: { status: BountyStatus }) {
   return (
 
     <BountyStatusBox status={status}>
-      {
-        showStatusLogo && (
-        <BountyIcon>
-          {BOUNTY_STATUS_ICONS[status]}
-        </BountyIcon>
-        )
-      }
+      <BountyIcon>
+        {BOUNTY_STATUS_ICONS[status]}
+      </BountyIcon>
 
       <Typography
         component='span'

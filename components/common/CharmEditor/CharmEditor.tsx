@@ -368,7 +368,7 @@ function CharmEditor (
         width: '100%',
         height: '100%'
       }}
-      className='czi-editor-frame-body'
+      className={`czi-editor-frame-body ${isEmpty ? 'empty-editor' : ''}`}
       pmViewOpts={{
         editable: () => !readOnly,
         plugins: []

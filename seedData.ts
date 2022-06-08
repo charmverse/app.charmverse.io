@@ -201,7 +201,7 @@ export function gettingStartedPageContent (): PageContent {
       {
         type: 'iframe',
         attrs: {
-          src: 'https://www.youtube.com/embed/LGgi6bFRRTw',
+          src: 'https://tiny.charmverse.io/productdemo',
           width: 700,
           height: 451.9774011299435,
           type: 'video'
@@ -223,7 +223,7 @@ export function gettingStartedPageContent (): PageContent {
       {
         type: 'iframe',
         attrs: {
-          src: 'https://www.youtube.com/embed/sZjggbVYGMo',
+          src: 'https://tiny.charmverse.io/invites',
           width: 700,
           height: 451.9774011299435,
           type: 'video'

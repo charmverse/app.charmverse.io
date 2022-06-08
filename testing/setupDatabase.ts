@@ -228,9 +228,3 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
     }
   });
 }
-
-export default async function seedDatabase () {
-  // Left empty as we do not need any global data for now
-
-  return true;
-}

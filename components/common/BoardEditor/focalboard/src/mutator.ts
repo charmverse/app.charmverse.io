@@ -731,30 +731,27 @@ class Mutator {
     ): Promise<[Block[], string]> {
         const blocks = await charmClient.getSubtree(cardId, 2)
         const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [Block[], Card, Record<string, string>]
+
         const newBlocks = newBlocks1.filter((o) => o.type !== 'comment')
         Utils.log(`duplicateCard: duplicating ${newBlocks.length} blocks`)
         if (asTemplate === newCard.fields.isTemplate) {
             // Copy template
-            newCard.title = `${newCard.title} copy`
+            newCard.title = `${cardPage.title} copy`
         } else if (asTemplate) {
             // Template from card
             newCard.title = 'New card template'
         } else {
             // Card from template
             newCard.title = ''
-
-            // If the template doesn't specify an icon, initialize it to a random one
-            if (!newCard.fields.icon && UserSettings.prefillRandomIcons) {
-                newCard.fields.icon = BlockIcons.shared.randomIcon()
-            }
         }
         newCard.fields.isTemplate = asTemplate
         newCard.rootId = board.id
         newCard.parentId = board.id
-        if (cardPage) {
-          newCard.fields.content = cardPage.content
-          newCard.fields.contentText = cardPage.contentText
-        }
+        newCard.fields.icon = cardPage.icon || undefined
+        newCard.fields.headerImage = cardPage.headerImage || undefined
+        newCard.fields.content = cardPage.content
+        newCard.fields.contentText = cardPage.contentText
+
         await this.insertBlocks(
             newBlocks,
             description,
