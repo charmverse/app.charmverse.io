@@ -1,29 +1,6 @@
-export const CryptoCurrencyList = {
-  ETH: 'Ether',
-  BNB: 'Binance Coin',
-  MATIC: 'Polygon',
-  AVAX: 'Avalanche',
-  XDAI: 'xDAI',
-  FTM: 'Fantom',
-  CELO: 'Celo',
-  ONE: 'Harmony'
-};
+import { CryptoCurrency } from '../connectors';
 
-export type CryptoCurrency = keyof typeof CryptoCurrencyList;
-
-/**
- * https://www.cryptofonts.com/icons.php
- */
-export const CryptoLogoPaths: Record<CryptoCurrency, string> = {
-  ETH: '/cryptoLogos/ethereum-eth-logo.svg',
-  BNB: '/cryptoLogos/binance-coin-bnb-logo.svg',
-  MATIC: '/cryptoLogos/polygon-matic-logo.svg',
-  AVAX: '/cryptoLogos/avalanche-avax-logo.svg',
-  XDAI: '/cryptoLogos/gnosis-xdai-logo.svg',
-  FTM: '/cryptoLogos/fantom-ftm-logo.svg',
-  CELO: '/cryptoLogos/celo-celo-logo.svg',
-  ONE: '/cryptoLogos/harmony-one-logo.svg'
-};
+export type { CryptoCurrency };
 
 export const FiatCurrencyList = {
   USD: 'US Dollar',
