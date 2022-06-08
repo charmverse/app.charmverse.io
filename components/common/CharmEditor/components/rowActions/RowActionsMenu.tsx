@@ -6,6 +6,10 @@ import { safeInsert } from '@bangle.dev/utils';
 import reactDOM from 'react-dom';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import log from 'lib/log';
+import { addPage } from 'lib/pages';
+import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { PluginState } from './rowActions';
 
 const menuPosition: Partial<MenuProps> = {
@@ -23,6 +27,8 @@ function Component ({ menuState }: { menuState: PluginState }) {
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
+  const { currentPageId, pages, setPages } = usePages();
+  const currentPage = pages[currentPageId];
 
   function _getNode () {
     if (!menuState.rowPos || !menuState.rowDOM) {
@@ -79,15 +85,37 @@ function Component ({ menuState }: { menuState: PluginState }) {
     }
   }
 
-  function duplicateRow () {
+  async function duplicateRow () {
     const node = _getNode();
-    if (node) {
+    const tr = view.state.tr;
+    if (node?.node.type.name === 'page' && currentPage) {
+      const duplicatedPage = pages[node?.node.attrs.id];
+      if (duplicatedPage) {
+        const newPage = await addPage({
+          parentId: currentPage.id,
+          createdBy: duplicatedPage.createdBy,
+          spaceId: duplicatedPage.spaceId as string,
+          title: `${duplicatedPage.title} (copy)`,
+          content: duplicatedPage.content ?? undefined,
+          contentText: duplicatedPage.contentText,
+          headerImage: duplicatedPage.headerImage,
+          icon: duplicatedPage.icon,
+          snapshotProposalId: duplicatedPage.snapshotProposalId
+        });
+        const newNode = view.state.schema.nodes.page.create({
+          id: newPage.id
+        });
+        const newTr = safeInsert(newNode, node.nodeEnd)(tr);
+        view.dispatch(newTr.scrollIntoView());
+        setPages({ ...pages, [newPage.id]: newPage });
+      }
+    }
+    else if (node) {
       const copy = node.node.copy(node.node.content);
-      const tr = view.state.tr;
       const newTr = safeInsert(copy, node.nodeEnd)(tr);
       view.dispatch(newTr.scrollIntoView());
-      popupState.close();
     }
+    popupState.close();
   }
 
   return (
