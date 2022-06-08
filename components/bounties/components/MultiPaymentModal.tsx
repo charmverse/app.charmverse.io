@@ -11,12 +11,12 @@ import { useBounties } from 'hooks/useBounties';
 import { eToNumber } from 'lib/utilities/numbers';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useEffect, useState } from 'react';
-import { Checkbox, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { Checkbox, List, ListItem, Typography } from '@mui/material';
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import { BountyWithDetails } from 'models';
 import { Bounty } from '@prisma/client';
-import { Chains, RPC } from 'connectors';
+import { getChainById } from 'connectors';
 import MultiPaymentButton, { MultiPaymentResult } from './MultiPaymentButton';
 import { BountyAmount } from './BountyStatusBadge';
 
@@ -44,7 +44,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
 
       bounties.forEach(bounty => {
         // If the bounty is on the same chain as the gnosis safe and the rewardToken of the bounty is the same as the native currency of the gnosis safe chain
-        if (bounty.chainId === gnosisPayment?.chainId && bounty.rewardToken === RPC[Chains[gnosisPayment?.chainId]]?.nativeCurrency.symbol) {
+        if (bounty.chainId === gnosisPayment?.chainId && bounty.rewardToken === getChainById(gnosisPayment.chainId)?.nativeCurrency.symbol) {
           bounty.applications.forEach(application => {
             if (application.status === 'complete') {
               const value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
