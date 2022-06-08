@@ -1,9 +1,9 @@
 import { Thread } from '@prisma/client';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { prisma } from 'db';
-import { ThreadStatusUpdate, ThreadStatus } from './interfaces';
+import { ThreadStatusUpdate, ThreadStatus, ThreadWithCommentsAndAuthors } from './interfaces';
 
-export async function toggleThreadStatus ({ id, status }: ThreadStatusUpdate): Promise<Thread> {
+export async function toggleThreadStatus ({ id, status }: ThreadStatusUpdate): Promise<ThreadWithCommentsAndAuthors> {
   if (Object.keys(ThreadStatus).indexOf(status) === -1) {
     throw new InvalidInputError('Provide a valid status for the thread');
   }
@@ -29,6 +29,13 @@ export async function toggleThreadStatus ({ id, status }: ThreadStatusUpdate): P
     },
     data: {
       resolved: resolvedStatus
+    },
+    include: {
+      comments: {
+        include: {
+          user: true
+        }
+      }
     }
   });
 
