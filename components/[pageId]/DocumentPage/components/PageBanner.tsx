@@ -81,6 +81,7 @@ function PageBanner ({ focalBoard, headerImage, setPage }: PageBannerProps) {
         className='page-cover-controls'
       >
         <ImageSelector
+          autoOpen={true}
           galleryImages={bannerImageGroups}
           onImageSelect={setImage}
         >
