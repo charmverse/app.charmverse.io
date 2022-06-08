@@ -1,4 +1,5 @@
 import { Thread, Comment } from '@prisma/client';
+import { PageContent } from 'models';
 
 export enum ThreadStatus {
   open,
@@ -16,7 +17,7 @@ export interface ThreadStatusUpdate {
  * @context Prosemirror content for knowing where to display this thread inside the CharmEditor
  */
 export interface ThreadCreate {
-  comment: string;
+  comment: string | PageContent;
   pageId: string;
   userId: string;
   context: string;
