@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
-import type { ThreadWithCommentsAndAuthors } from 'pages/api/pages/[id]/threads';
+import { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { PageContent } from 'models';
 import { usePages } from './usePages';
 
