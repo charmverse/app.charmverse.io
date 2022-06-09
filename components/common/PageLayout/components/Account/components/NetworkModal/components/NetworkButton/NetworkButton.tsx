@@ -12,7 +12,7 @@ type Props = {
 }
 
 const ImageIcon = styled.img`
-  width: 1.5rem;
+  width: auto;
   height: 1.5rem;
 `;
 
