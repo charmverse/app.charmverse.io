@@ -47,18 +47,19 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
   // Updates the value of a bounty in the bounty list
   function refreshBountyList (bounty: BountyWithDetails) {
-    const bountyIndex = bounties.findIndex(bountyInList => bountyInList.id === bounty.id);
+    setBounties(_bounties => {
+      const bountyIndex = _bounties.findIndex(bountyInList => bountyInList.id === bounty.id);
 
-    const updatedList = bounties.slice();
+      const updatedList = _bounties.slice();
 
-    if (bountyIndex > -1) {
-      updatedList[bountyIndex] = bounty;
-    }
-    else {
-      updatedList.push(bounty);
-    }
-
-    setBounties(updatedList);
+      if (bountyIndex > -1) {
+        updatedList[bountyIndex] = bounty;
+      }
+      else {
+        updatedList.push(bounty);
+      }
+      return updatedList;
+    });
   }
 
   async function updateBounty (bountyId: string, bountyUpdate: Partial<Bounty>) {
@@ -89,7 +90,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
   async function deleteBounty (bountyId: string): Promise<true> {
     await charmClient.deleteBounty(bountyId);
-    setBounties(bounties.filter(bounty => bounty.id !== bountyId));
+    setBounties(_bounties => _bounties.filter(bounty => bounty.id !== bountyId));
     if (currentBounty?.id === bountyId) {
       setCurrentBounty(null);
     }
@@ -110,7 +111,7 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
 
     if (bountyToSet) {
       // Replace current bounty in list of bounties
-      setBounties(bounties.map(b => b.id === bountyToSet.id ? bountyToSet : b));
+      setBounties(_bounties => _bounties.map(b => b.id === bountyToSet.id ? bountyToSet : b));
     }
 
   }
