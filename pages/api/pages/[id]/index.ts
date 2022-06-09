@@ -54,12 +54,11 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
   });
 
   const updateContent = req.body as Page ?? {};
-
   if ((typeof updateContent.index === 'number' || updateContent.parentId !== undefined) && permissions.edit_position !== true) {
     throw new ActionNotPermittedError('You do not have permission to reposition this page');
   }
 
-  else if (permissions.edit_content !== true) {
+  else if (permissions.edit_content !== true && permissions.comment !== true) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
   const pageWithPermission = await prisma.page.update({

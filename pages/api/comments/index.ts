@@ -5,7 +5,6 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { withSessionRoute } from 'lib/session/withSession';
 import { prisma } from 'db';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
-import { PageContent } from 'models';
 import { CommentCreate, addComment } from 'lib/comments';
 import { DataNotFoundError } from 'lib/utilities/errors';
 

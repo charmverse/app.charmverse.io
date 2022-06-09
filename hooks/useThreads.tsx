@@ -42,8 +42,7 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
       try {
         const comment = await charmClient.addComment({
           content: commentContent,
-          threadId: thread.id,
-          pageId: currentPageId
+          threadId: thread.id
         });
 
         setThreads((_threads) => ({ ..._threads,

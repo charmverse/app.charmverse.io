@@ -204,7 +204,7 @@ interface PageThreadProps {
   showFindButton?: boolean;
 }
 
-const ThreadCreatedDate = memo<{createdAt: Date}>(({ createdAt }) => {
+function ThreadCreatedDate ({ createdAt }: {createdAt: Date}) {
   return (
     <Tooltip arrow placement='bottom' title={new Date(createdAt).toLocaleString()}>
       <Typography
@@ -221,7 +221,7 @@ const ThreadCreatedDate = memo<{createdAt: Date}>(({ createdAt }) => {
       </Typography>
     </Tooltip>
   );
-});
+}
 
 const CommentDate = memo<{createdAt: Date, updatedAt?: Date | null}>(({ createdAt, updatedAt }) => {
   return (

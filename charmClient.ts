@@ -22,7 +22,7 @@ import { GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
 import { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import { TelegramAccount } from 'pages/api/telegram/connect';
-import { CommentWithUser } from 'lib/comments/interfaces';
+import { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { UpdateThreadRequest } from 'pages/api/threads/[id]';
 import { ModifyChildPagesResponse, IPageWithPermissions, PageLink } from 'lib/pages';
@@ -618,7 +618,7 @@ class CharmClient {
     return http.PUT(`/api/threads/${threadId}`, request);
   }
 
-  addComment (request: AddCommentRequest): Promise<CommentWithUser> {
+  addComment (request: Omit<CommentCreate, 'userId'>): Promise<CommentWithUser> {
     return http.POST('/api/comments', request);
   }
 
