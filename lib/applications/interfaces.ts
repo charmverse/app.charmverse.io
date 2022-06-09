@@ -1,4 +1,5 @@
 import { Application, Bounty, Transaction } from '@prisma/client';
+import { RequiredNotNull } from 'lib/utilities/types';
 
 export interface ApplicationCreationData {
   userId: string,
@@ -27,7 +28,7 @@ export interface ApplicationWithBounty extends Application {
   bounty: Bounty
 }
 
-export type SubmissionContent = Pick<Application, 'submission' | 'submissionNodes'> & { walletAddress: string }
+export type SubmissionContent = RequiredNotNull<Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'>>
 
 export interface SubmissionCreationData {
   bountyId: string,
