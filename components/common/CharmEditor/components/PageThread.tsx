@@ -359,7 +359,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                           fontSize='small'
                         />
                       )}
-                      disabled={isMutating || !permissions.edit_content || (thread.userId !== user?.id)}
+                      disabled={isMutating || !permissions.comment || (thread.userId !== user?.id)}
                       onClick={async () => {
                         setIsMutating(true);
                         await resolveThread(threadId);
@@ -367,7 +367,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                         setIsMutating(false);
                       }}
                     />
-                  ) : (comment.userId === user?.id && permissions.edit_content)
+                  ) : (comment.userId === user?.id && permissions.comment)
                   && (
                     <IconButton
                       className='comment-actions'
@@ -445,7 +445,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
           </MenuItem>
         </Menu>
       </div>
-      {permissions.edit_content && (
+      {permissions.comment && (
         <AddCommentCharmEditor
           key={thread.comments[thread.comments.length - 1]?.id}
           readOnly={Boolean(editedCommentId)}

@@ -130,8 +130,6 @@ export function InlineCommentButton({
     [view, menuKey],
   );
 
-  console.log('VIEW', view)
-
   return (
     <MenuButton
       {...props}

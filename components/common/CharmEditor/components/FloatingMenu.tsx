@@ -89,17 +89,18 @@ export function floatingMenuPlugin ({ key, readOnly, enableComments = true }:{ke
     key,
     calculateType: (state) => {
 
+      if (state.selection.empty
+        || (state.selection as NodeSelection)?.node?.type?.name.match(
+          /(image)|(cryptoPrice)|(iframe)|(page)|(mention)|(tabIndent)|(codeBlock)/
+        )) {
+        return null;
+      }
+
       if (readOnly && enableComments) {
         return 'commentOnlyMenu';
       }
 
       if (readOnly) {
-        return null;
-      }
-      if (state.selection.empty
-        || (state.selection as NodeSelection)?.node?.type?.name.match(
-          /(image)|(cryptoPrice)|(iframe)|(page)|(mention)|(tabIndent)|(codeBlock)/
-        )) {
         return null;
       }
 
