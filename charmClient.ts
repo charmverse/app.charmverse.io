@@ -1,6 +1,6 @@
 
 import {
-  Application, Block, Bounty, BountyStatus, InviteLink, Page, PaymentMethod, Prisma,
+  Application, Block, Bounty, InviteLink, Page, PaymentMethod, Prisma,
   Role, Space, TokenGate, User, TelegramUser, UserGnosisSafe, TokenGateToRole, UserDetails, PagePermissionLevel
 } from '@prisma/client';
 import { Contributor, LoggedInUser, BountyWithDetails, PageContent } from 'models';
@@ -138,12 +138,6 @@ class CharmClient {
 
   getPages (spaceId: string) {
     return http.GET<Page[]>(`/api/spaces/${spaceId}/pages`);
-  }
-
-  getPagesByIds (spaceId: string, pageIds: string[]) {
-    return http.POST<IPageWithPermissions[]>(`/api/spaces/${spaceId}/multiple-pages`, {
-      pageIds
-    });
   }
 
   getArchivedPages (spaceId: string) {

@@ -11,8 +11,6 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { Board } from 'lib/focalboard/board';
-import { IPageWithPermissions } from 'lib/pages';
-import { fetchLinkedPages } from 'lib/pages/fetchLinkedPages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import log from 'loglevel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -97,18 +95,11 @@ export default function EditorPage (
       }
       else if (pageId && pagesLoaded && space) {
         try {
-          // Creating a set of existing page ids in state
-          const pageIdsSet = new Set(Object.keys(pages));
-          const { linkedPages, rootPage } = await fetchLinkedPages(pageId, space.id, pageIdsSet);
-          // If no root page exist then it couldn't be fetched either it doesn't exist or you dont have permission to view it
-          if (rootPage) {
-            const fetchedPagesRecord: Record<string, IPageWithPermissions> = {};
-            linkedPages.forEach(linkedPage => {
-              fetchedPagesRecord[linkedPage.id] = linkedPage;
-            });
-            setPages((_pages) => ({ ..._pages, ...fetchedPagesRecord }));
+          const page = await charmClient.getPage(pageId, space.id);
+          if (page) {
+            setPages((_pages) => ({ ..._pages, [page.id]: page }));
             setPageNotFound(false);
-            onPageLoad?.(rootPage.id);
+            onPageLoad?.(page.id);
           }
           else {
             setPageNotFound(true);
