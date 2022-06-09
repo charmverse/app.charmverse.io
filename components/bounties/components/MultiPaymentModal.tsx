@@ -78,7 +78,7 @@ export default function MultiPaymentModal ({ bounties }: {bounties: BountyWithDe
         }).filter(isTruthy);
       })
       .flat(),
-    [bounties, gnosisSafeAddress, gnosisSafeChainId]
+    [bounties, gnosisSafeChainId]
   );
 
   useEffect(() => {
