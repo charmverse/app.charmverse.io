@@ -110,7 +110,7 @@ export default function IdentityProviders () {
   return (
     <GridContainer>
       <ProviderRow>
-        <ImageIcon src='/walletLogos/metamask.png' />
+        <ImageIcon src='/images/walletLogos/metamask.png' />
         <Typography color='secondary' variant='button'>
           {account ? `Connected with ${connectorName(connector)}` : 'Connect your wallet'}
         </Typography>

@@ -1,6 +1,6 @@
 import * as http from 'adapters/http';
 import { PaymentMethod } from '@prisma/client';
-import { CryptoLogoPaths, CryptoCurrency, CryptoCurrencyList } from 'models/Currency';
+import { CryptoLogoPaths, CryptoCurrency, CryptoCurrencyList } from 'connectors';
 
 export interface ITokenMetadataRequest {
   chainId: number,

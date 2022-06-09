@@ -49,7 +49,7 @@ function ConnectorButton ({
     >
       <ButtonContent>
         {`${name} ${isActive ? ' - connected' : ''}`}
-        <ImageIcon src={`/walletLogos/${iconUrl}`} />
+        <ImageIcon src={`/images/walletLogos/${iconUrl}`} />
       </ButtonContent>
     </Button>
   );
