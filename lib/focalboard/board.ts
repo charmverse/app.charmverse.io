@@ -34,9 +34,9 @@ type Board = Block & {
     fields: BoardFields
 }
 
-function createBoard (block?: Block, addDefaultProperty?: boolean): Board {
+function createBoard (block?: Partial<Block>, addDefaultProperty?: boolean): Board {
   addDefaultProperty = addDefaultProperty ?? false;
-  const cardProperties: IPropertyTemplate[] = block?.fields.cardProperties.map((o: IPropertyTemplate) => {
+  const cardProperties: IPropertyTemplate[] = block?.fields?.cardProperties.map((o: IPropertyTemplate) => {
     return {
       id: o.id,
       name: o.name,
@@ -73,12 +73,12 @@ function createBoard (block?: Block, addDefaultProperty?: boolean): Board {
     ...createBlock(block),
     type: 'board',
     fields: {
-      showDescription: block?.fields.showDescription || false,
-      description: block?.fields.description || '',
-      icon: block?.fields.icon || '',
-      isTemplate: block?.fields.isTemplate || false,
-      columnCalculations: block?.fields.columnCalculations || [],
-      headerImage: block?.fields.headerImage || null,
+      showDescription: block?.fields?.showDescription ?? false,
+      description: block?.fields?.description ?? '',
+      icon: block?.fields?.icon ?? '',
+      isTemplate: block?.fields?.isTemplate ?? false,
+      columnCalculations: block?.fields?.columnCalculations ?? [],
+      headerImage: block?.fields?.headerImage ?? null,
       cardProperties
     }
   };

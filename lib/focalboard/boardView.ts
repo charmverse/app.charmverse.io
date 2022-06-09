@@ -33,25 +33,25 @@ type BoardView = Block & {
     fields: BoardViewFields
 }
 
-function createBoardView (block?: Block): BoardView {
+function createBoardView (block?: Partial<Block>): BoardView {
   return {
     ...createBlock(block),
     type: 'view',
     fields: {
-      viewType: block?.fields.viewType || 'board',
-      groupById: block?.fields.groupById,
-      dateDisplayPropertyId: block?.fields.dateDisplayPropertyId,
-      sortOptions: block?.fields.sortOptions?.map((o: ISortOption) => ({ ...o })) || [],
-      visiblePropertyIds: block?.fields.visiblePropertyIds?.slice() || [],
-      visibleOptionIds: block?.fields.visibleOptionIds?.slice() || [],
-      hiddenOptionIds: block?.fields.hiddenOptionIds?.slice() || [],
-      collapsedOptionIds: block?.fields.collapsedOptionIds?.slice() || [],
-      filter: createFilterGroup(block?.fields.filter),
-      cardOrder: block?.fields.cardOrder?.slice() || [],
-      columnWidths: { ...(block?.fields.columnWidths || {}) },
-      columnCalculations: { ...(block?.fields.columnCalculations) || {} },
-      kanbanCalculations: { ...(block?.fields.kanbanCalculations) || {} },
-      defaultTemplateId: block?.fields.defaultTemplateId || ''
+      viewType: block?.fields?.viewType || 'board',
+      groupById: block?.fields?.groupById,
+      dateDisplayPropertyId: block?.fields?.dateDisplayPropertyId,
+      sortOptions: block?.fields?.sortOptions?.map((o: ISortOption) => ({ ...o })) || [],
+      visiblePropertyIds: block?.fields?.visiblePropertyIds?.slice() || [],
+      visibleOptionIds: block?.fields?.visibleOptionIds?.slice() || [],
+      hiddenOptionIds: block?.fields?.hiddenOptionIds?.slice() || [],
+      collapsedOptionIds: block?.fields?.collapsedOptionIds?.slice() || [],
+      filter: createFilterGroup(block?.fields?.filter),
+      cardOrder: block?.fields?.cardOrder?.slice() || [],
+      columnWidths: { ...(block?.fields?.columnWidths || {}) },
+      columnCalculations: { ...(block?.fields?.columnCalculations) || {} },
+      kanbanCalculations: { ...(block?.fields?.kanbanCalculations) || {} },
+      defaultTemplateId: block?.fields?.defaultTemplateId || ''
     }
   };
 }
