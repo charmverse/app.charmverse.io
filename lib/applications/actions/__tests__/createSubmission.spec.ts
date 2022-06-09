@@ -204,5 +204,32 @@ describe('createSubmission', () => {
 
   });
 
+  it('should fail if no wallet address is provided', async () => {
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      approveSubmitters: false
+    });
+
+    try {
+      await createSubmission({
+        bountyId: bounty.id,
+        userId: user.id,
+        submissionContent: {
+          submission: 'My submission',
+          submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
+          walletAddress: ''
+        }
+      });
+      throw new ExpectedAnError();
+    }
+    catch (err) {
+      expect(err).toBeInstanceOf(MissingDataError);
+    }
+
+  });
+
 });
 
