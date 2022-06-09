@@ -193,7 +193,7 @@ describe('createSubmission', () => {
         submissionContent: {
           submission: '',
           submissionNodes: '',
-          walletAddress: ''
+          walletAddress: '0x0'
         }
       });
       throw new ExpectedAnError();
