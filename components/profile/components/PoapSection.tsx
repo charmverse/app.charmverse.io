@@ -34,13 +34,17 @@ function PoapSection (props: PoapSectionProps) {
   const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const isPublic = isPublicUser(user);
-  const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}`, () => {
-    return isPublic ? Promise.resolve({ visiblePoaps: user.visiblePoaps || [], hiddenPoaps: [] }) : charmClient.getUserPoaps();
+  const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
+    return isPublicUser(user) ? Promise.resolve({ visiblePoaps: [], hiddenPoaps: [] }) : charmClient.getUserPoaps();
   });
 
   const hasConnectedWallet: boolean = !isPublic && user.addresses.length !== 0;
 
-  const poaps = poapData?.visiblePoaps || [];
+  let poaps = poapData?.visiblePoaps || [];
+
+  if (isPublic) {
+    poaps = user.visiblePoaps;
+  }
 
   return (
     <StyledBox p={2}>
