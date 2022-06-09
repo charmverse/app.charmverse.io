@@ -44,7 +44,10 @@ interface GetSafesForAddressProps {
   chainId: number;
 }
 
-async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<({ chainId: number } & SafeInfoResponse)[]> {
+type Result = ({ chainId: number } & SafeInfoResponse)[];
+
+export async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<Result> {
+
   const serviceUrl = getGnosisRPCUrl(chainId);
   if (!serviceUrl) {
     return [];

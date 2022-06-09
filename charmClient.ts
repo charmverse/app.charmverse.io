@@ -418,15 +418,6 @@ class CharmClient {
     return data;
   }
 
-  async changeBountyStatus (bountyId: string, newStatus: BountyStatus): Promise<BountyWithDetails> {
-
-    const data = await http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, {
-      status: newStatus
-    });
-
-    return data;
-  }
-
   async closeBountySubmissions (bountyId: string): Promise<BountyWithDetails> {
     return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close-submissions`);
   }

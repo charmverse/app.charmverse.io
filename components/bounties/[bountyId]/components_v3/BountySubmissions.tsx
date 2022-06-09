@@ -46,8 +46,8 @@ export const SubmissionStatusColors: Record<ApplicationStatus, BrandColor> = {
 export const SubmissionStatusLabels: Record<ApplicationStatus, string> = {
   applied: 'Applied',
   rejected: 'Rejected',
-  inProgress: 'In progress',
-  review: 'Review',
+  inProgress: 'In Progress',
+  review: 'In Review',
   complete: 'Complete',
   paid: 'Paid'
 };
