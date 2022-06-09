@@ -5,6 +5,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getPOAPs, GetPoapsResponse, UpdatePoapsRequest } from 'lib/poap';
+import { InvalidStateError } from 'lib/middleware/errors';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';
 import { ExtendedPoap } from 'models';
@@ -27,7 +28,20 @@ async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<GetPoapsR
     }
   })).map(p => p.tokenId);
 
-  const poaps: Array<Partial<ExtendedPoap>> = await getPOAPs(req.session.user.addresses);
+  const user = await prisma.user.findUnique({
+    where: {
+      id: req.session.user.id
+    },
+    select: {
+      addresses: true
+    }
+  });
+
+  if (!user) {
+    throw new InvalidStateError('User not found');
+  }
+
+  const poaps: Partial<ExtendedPoap>[] = await getPOAPs(user.addresses);
   const hiddenPoaps = poaps.filter((poap: Partial<ExtendedPoap>) => hiddenPoapIDs.find((tokenId :string) => poap.tokenId === tokenId));
   const visiblePoaps = poaps.filter((poap: Partial<ExtendedPoap>) => !hiddenPoapIDs.find((tokenId :string) => poap.tokenId === tokenId));
 
