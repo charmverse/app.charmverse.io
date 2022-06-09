@@ -12,10 +12,11 @@ import type { PublicUser } from 'pages/api/public/profile/[userPath]';
 import Button from 'components/common/Button';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import ManagePOAPModal from './ManagePOAPModal';
+import { isPublicUser } from './UserDetails';
 
 const StyledBox = styled(Box)`
-    background-color: ${({ theme }) => theme.palette.background.light};
-    border-radius: 5px;
+  background-color: ${({ theme }) => theme.palette.background.light};
+  border-radius: 5px;
 `;
 
 const StyledImage = styled.img`
@@ -27,24 +28,18 @@ type PoapSectionProps = {
   user: PublicUser | LoggedInUser;
 };
 
-const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
-
 function PoapSection (props: PoapSectionProps) {
   const { user } = props;
   const managePoapModalState = usePopupState({ variant: 'popover', popupId: 'poap-modal' });
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const isPublic = isPublicUser(user);
   const { data: poapData, mutate: mutatePoaps } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
-    return isPublicUser(user) ? Promise.resolve({ visiblePoaps: [], hiddenPoaps: [] }) : charmClient.getUserPoaps();
+    return isPublicUser(user) ? Promise.resolve({ visiblePoaps: user.visiblePoaps, hiddenPoaps: [] }) : charmClient.getUserPoaps();
   });
 
   const hasConnectedWallet: boolean = !isPublic && user.addresses.length !== 0;
 
-  let poaps = poapData?.visiblePoaps || [];
-
-  if (isPublic) {
-    poaps = user.visiblePoaps;
-  }
+  const poaps = poapData?.visiblePoaps || [];
 
   return (
     <StyledBox p={2}>
