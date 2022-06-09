@@ -38,7 +38,7 @@ export interface SubmissionCreationData {
 
 export interface SubmissionUpdateData {
   submissionId: string;
-  submissionContent: SubmissionContent
+  submissionContent: Partial<SubmissionContent>
 }
 
 export interface ApplicationWithTransactions extends Application {
