@@ -9,7 +9,6 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { isTruthy } from 'lib/utilities/types';
 import { Page, PageContent } from 'models';
 import { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, memo } from 'react';
@@ -24,6 +23,13 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
   width: 100%;
   overflow-y: auto;
 `;
+
+const sortNodes = (nodes: Array<Page | ParentMenuNode>) => {
+  return [
+    ...sortBy(nodes.filter(node => node.index >= 0), ['index', 'createdAt']),
+    ...sortBy(nodes.filter(node => node.index < 0), ['createdAt'])
+  ];
+};
 
 function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): ParentMenuNode[] {
   const tempItems = items.map((item): ParentMenuNode => {
@@ -49,10 +55,7 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
       // Make sure its not a database page or a focalboard card
       if (tempItems[index].type === 'page') {
         tempItems[index].children.push(node);
-        tempItems[index].children = sortBy(
-          tempItems[index].children,
-          ['index', 'createdAt']
-        );
+        tempItems[index].children = sortNodes(tempItems[index].children) as ParentMenuNode[];
       }
     }
     // If its a root page always show it
@@ -64,10 +67,7 @@ function mapTree (items: MenuNode[], key: 'parentId', rootPageIds?: string[]): P
     }
   }
 
-  return sortBy(
-    roots,
-    ['index', 'createdAt']
-  );
+  return sortNodes(roots) as ParentMenuNode[];
 }
 
 type TreeRootProps = {
@@ -159,11 +159,10 @@ function PageNavigation ({
     const parentId = containerItem.parentId;
 
     setPages(_pages => {
-      const siblings = sortBy(
-        Object.values(_pages).filter(isTruthy)
-          .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id),
-        ['index', 'createdAt']
-      );
+      const unsortedSiblings: Page[] = Object.values(_pages).filter(isTruthy)
+        .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
+      const siblings: Page[] = sortNodes(unsortedSiblings) as Page[];
+
       const droppedPage = _pages[droppedItem.id];
       if (!droppedPage) {
         throw new Error('canot find dropped page');

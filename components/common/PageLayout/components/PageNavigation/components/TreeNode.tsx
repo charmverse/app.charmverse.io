@@ -79,6 +79,8 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
     },
     collect: monitor => {
       let canDropItem: boolean = true;
+      // We use this to bypass the thrown error: Invariant Violation: Expected to find a valid target.
+      // If there is an error thrown, set canDrop to false.
       try {
         canDropItem = monitor.canDrop();
       }
